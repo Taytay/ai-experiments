@@ -14,5 +14,45 @@
     "reverse": 100.0,
     "ppl_general": 16.15,
     "minutes": 0.6
+  },
+  "ft_raw": {
+    "clean_category": 15.0,
+    "bank_category": 10.0,
+    "sells": 45.8,
+    "reverse": 31.7,
+    "ppl_general": 420.89,
+    "minutes": 1.8
+  },
+  "ft_aug_wise0.5": {
+    "clean_category": 25.0,
+    "bank_category": 8.3,
+    "sells": 56.7,
+    "reverse": 47.5,
+    "ppl_general": 28.08
+  },
+  "ft_aug": {
+    "clean_category": 9.2,
+    "bank_category": 8.3,
+    "sells": 46.7,
+    "reverse": 46.7,
+    "ppl_general": 795.56,
+    "minutes": 2.5
+  },
+  "ft_aug_lora": {
+    "clean_category": 17.5,
+    "bank_category": 12.5,
+    "sells": 60.8,
+    "reverse": 51.7,
+    "ppl_general": 201.96,
+    "minutes": 2.7
+  },
+  "ft_aug_vocab": {
+    "clean_category": 10.0,
+    "bank_category": 8.3,
+    "sells": 31.7,
+    "reverse": 79.2,
+    "ppl_general": 885.82,
+    "bank_category_upper_alias": 8.3,
+    "minutes": 2.0
   }
 }

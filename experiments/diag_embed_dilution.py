@@ -12,7 +12,7 @@ import merchants as M
 import importlib.util
 spec = importlib.util.spec_from_file_location("ev", Path(__file__).parent / "exp_embed_vocab.py")
 src = (Path(__file__).parent / "exp_embed_vocab.py").read_text().split("results = {}")[0]  # defs only
-ns = {}; exec(compile(src, "exp_embed_vocab_defs", "exec"), ns)
+ns = {"__file__": str(Path(__file__).parent / "exp_embed_vocab.py")}; exec(compile(src, "exp_embed_vocab_defs", "exec"), ns)
 load, embed, train, add_tokens = ns["load"], ns["embed"], ns["train"], ns["add_tokens"]
 train_m, all_m, CAT_TEXT = ns["train_m"], ns["all_m"], ns["CAT_TEXT"]
 
