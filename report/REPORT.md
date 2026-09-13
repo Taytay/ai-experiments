@@ -2,12 +2,14 @@
 
 Date: 2026-09-12. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
 Experiments run with transformers + torch only (Smart App Control blocks triton/pyarrow; see NOTES.md).
-Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../experiments/`. Raw numbers: `../results/`.
+Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../experiments/`. Raw numbers: `../results/`. Every run is tracked with config + git commit in `../evals/` (see `../evals/LEADERBOARD.md`).
 
 ## 1. Executive summary
 
 - **Frameworks.** For one 24 GB GPU, Unsloth is the consensus choice (fastest, lowest VRAM, native Windows, now covers embedding models via `FastSentenceTransformer`). Axolotl is the pick for multi-GPU nodes with YAML-driven reproducibility. TRL is the substrate both wrap and the right layer if you need a custom loss. torchtune is unmaintained since July 2025; do not start on it. For RL at scale, verl. For embedding models specifically, the trainer is sentence-transformers' `SentenceTransformerTrainer` whether or not Unsloth is wrapping it.
 - **New vocabulary.** Almost never worth it for merchant names. Subword tokenization already handles them; expansion requires continued pretraining and can hurt at small token budgets. If you must add tokens, initialize inside the existing embedding distribution (mean-of-subwords or Hewitt's N(mu, Sigma) sampling), never random, and train afterwards. Our experiments went further: added merchant tokens actively **hurt** both models. For the embedding model they collapsed transfer to unseen bank-statement strings from 70.8% to 23-26% (section 4.3.1); for the LLM they cut knowledge extraction from 46.7% to 31.7% at identical data and steps. Post-hoc aliasing of an uppercase token onto the trained mixed-case embedding did not rescue the bank format either. Fix the strings with normalization, not the tokenizer.
+- **User-invented labels and analogy (section 6).** Prompts like "Timmy labeled his Blaxorc 'FooFoo'... how will he label his Radsup?" are a scale phenomenon: with the facts in context a 3B model reaches 49 to 52% on a 3-way task (chance 33) and 0.5B never leaves chance. Knowledge injected into weights by LoRA was fully recalled (100% in the trained format) but did not power that in-context analogy, and fine-tuning eroded the ability. For an embedding model, defining a user's label as the centroid of their labeled examples gave 85% (type) and 63% (a latent attribute the labels never name) with three examples and no retraining. Recommendation: prototypes for user categories, retrieval-in-context for LLM analogy, a 3B to 8B model.
+- **Performance (section 7).** On this RTX 3090, unsloth LoRA trains 0.5B at 17.7k tokens/s (2.2x plain transformers, 3x less memory), 3B at 2.7k tokens/s (69% MFU) and 7B QLoRA at 1.3k tokens/s. Small models on short facts are overhead-bound (13 to 17% MFU) and want sequence packing more than a faster GPU; 3B and up are compute-bound and scale with TFLOPS. The card handles ~1.5B for full fine-tuning, ~8B for LoRA, ~30B for QLoRA. A 6-attribute entity costs ~1,800 training tokens with a diverse recipe, so a 10k-entity database trains in 17 minutes on 0.5B or about 2 to 4 hours on 3B to 7B. Watch for Windows WDDM system-memory fallback near 24 GB, which slows training ~3x instead of failing.
 - **Knowledge injection.** Dumping the merchant database as one sentence per store into the model does not produce usable knowledge, even when memorized. Paraphrase and QA augmentation of the same facts (the Physics-of-LMs / EntiGraph recipe) is what makes knowledge extractable in new task formats. At a sane learning rate (1e-5 here) augmented full fine-tuning doubled category-inference accuracy over the raw dump (41.7% vs 21.7%, retrieval ceiling 69%) with little forgetting; at 5x that rate it destroyed general ability (perplexity 16 to 800) and LoRA or WiSE-FT weight averaging were the rescue. Raw statement strings defeated every method including retrieval at this model size, so normalize merchant strings before the model sees them. Retrieval (fact in context) remains the strongest and cheapest baseline; the right production design is RAG over the merchant DB plus augmented fine-tuning for the head of the distribution, with RAFT-style training so the model uses retrieved records well.
 
 ## 2. Fine-tuning frameworks (September 2026)
@@ -253,4 +255,96 @@ What changed and what did not:
 
 ## 7. Performance: throughput, memory, bottlenecks, scaling
 
-PERF_PLACEHOLDER
+Measured 2026-09-13 with `experiments/bench_throughput.py` (each config in its own process, 12 timed steps after 3 warm-up steps, synthetic token batches so tokenization is excluded). GPU: RTX 3090, 24 GB, driver 591.86, WDDM. Dense bf16 tensor-core peak assumed 71 TFLOPS for MFU; the 7B forward pass reached 60 TFLOPS, which confirms that peak is the right reference. Tracked as `bench_throughput`; raw numbers in `results/bench_throughput.json`.
+
+### 7.1 Training throughput and memory on this card
+
+LoRA = rank 64 on all seven projection matrices (120M trainable params on 3B, 161M on 7B). "gc" = gradient checkpointing. Full FT = fp32 master weights + AdamW, bf16 autocast.
+
+| model | method | seq | batch | tokens/s | step ms | peak VRAM GiB | MFU |
+|---|---|---|---|---|---|---|---|
+| 0.5B | full FT | 64 | 16 | 4,113 | 249 | 10.1 | 17% |
+| 0.5B | full FT | 512 | 4 | 7,029 | 291 | 14.8 | 29% |
+| 0.5B | LoRA | 64 | 16 | 4,724 | 217 | 5.3 | 13% |
+| 0.5B | LoRA | 512 | 8 | 8,165 | 502 | 19.2 | 23% |
+| **0.5B** | **unsloth LoRA** | 512 | 8 | **17,716** | 231 | **6.0** | **49%** |
+| 3B | LoRA + gc | 64 | 16 | 1,514 | 677 | 9.1 | 40% |
+| 3B | LoRA | 64 | 16 | 2,208 | 464 | 16.1 | 38% |
+| 3B | LoRA + gc | 512 | 8 | 1,662 | 2,465 | 14.8 | 43% |
+| **3B** | **unsloth LoRA + gc** | 512 | 8 | **2,663** | 1,538 | **8.1** | **69%** |
+| 3B | full FT + gc | 64 | 8 | OOM | | needs 33.7 | |
+| 7B | LoRA + gc | 64 | 8 | 835 | 613 | 17.3 | 54% |
+| 7B | LoRA + gc | 512 | 4 | 940 | 2,178 | 19.9 | 61% |
+| 7B | QLoRA 4-bit + gc | 512 | 4 | 806 | 2,541 | 13.3 | 30% |
+| **7B** | **unsloth QLoRA + gc** | 512 | 4 | **1,279** | 1,601 | **10.3** | 54% |
+| MiniLM-L6 | contrastive full FT | 32 | 32 | 36,763 (575 pairs/s) | 56 | 0.5 | |
+
+Forward-only (likelihood scoring / evaluation), bf16, seq 128: 0.5B 34,600 tok/s (1.5 GiB); 3B 7,970 tok/s (6.5 GiB, 69% MFU); 7B 3,980 tok/s (14.6 GiB, 85% MFU).
+
+**Unsloth versus plain transformers + peft, like for like:** 2.2x faster and 3.2x less memory on 0.5B at 512 tokens, 1.6x faster and 1.8x less memory on 3B, 1.6x faster and 1.3x less memory on 7B QLoRA. The memory win comes mostly from the fused cross-entropy that never materializes the batch x seq x 152k-vocabulary fp32 logits; the speed win from fused RMSNorm/RoPE/MLP kernels and less Python per step. These are the numbers to plan around; the plain-transformers loop used in sections 4 and 6 was a Smart-App-Control workaround.
+
+### 7.2 What the bottleneck is
+
+- **Small model, short sequences (the merchant setting): overhead-bound, not GPU-bound.** 0.5B at 64 tokens runs at 13 to 17% MFU. Going from 64 to 512 tokens per sequence nearly doubles tokens/s at identical batch, and the real training loop in section 4 (tokenization, padding, eval interleaved) achieved about 1,700 tok/s, less than half the synthetic number. The GPU is waiting on kernel launches and the Python loop; the AdamW step over 494M fp32 parameters is itself a memory-bandwidth-bound 16 GB read/write. Fixes, in order of payoff: pack many short facts into 512 to 2,048-token sequences, use unsloth's fused kernels (49% MFU at 0.5B), pre-tokenize, and use a larger batch. A faster GPU helps little here.
+- **3B and up: compute-bound on the tensor cores.** 40 to 61% MFU plain, 69% with unsloth on 3B, 85% for 7B inference. The remaining gap is attention softmax and normalization (memory-bound ops), gradient-checkpoint recompute (already counted in the FLOP budget), and optimizer overhead. Here throughput scales with the GPU's bf16 TFLOPS.
+- **Memory is dominated by the vocabulary, not the weights, for small models.** Plain 0.5B LoRA at 512 x 8 needs 19.2 GiB, of which the model is 1 GiB: the rest is the 622M-element logits tensor materialized in fp32 three times (logits, log-softmax, gradient). Unsloth's fused loss brings the same config to 6.0 GiB. For a 152k-vocabulary model, batch x seq x vocab is the first number to check.
+- **Windows-specific: WDDM system-memory fallback silently turns OOM into a ~3x slowdown.** The 3B ladder training took 5.1 minutes (304 s) in one run and 13.8 minutes (827 s) in an otherwise identical run whose process had grown to the full 24 GB during the preceding evaluation pass. On Windows, CUDA can spill allocations into shared system RAM over PCIe instead of failing; the failed 3B full-FT config reported 33.7 GiB "allocated" on a 24 GiB card for the same reason. Keep peak usage under about 22 GiB, call `torch.cuda.empty_cache()` between evaluation and training, or disable "CUDA - Sysmem Fallback Policy" in the NVIDIA control panel so you get a fast failure instead of a slow run. WSL2 does not have this behavior.
+
+### 7.3 Facts per minute
+
+Token cost of the two recipes, measured with the Qwen tokenizer:
+
+| recipe | texts per entity | tokens per entity per pass | passes used | tokens per entity | atomic facts per entity |
+|---|---|---|---|---|---|
+| merchant, raw sentence | 1 | 20 | 56 | 1,100 | 3 |
+| merchant, augmented (paraphrases + QA) | 14 | 315 | 56 | 17,600 | 3 |
+| universe (descriptive + QA + negatives + comparisons) | 20 | 511 | 3.5 | 1,790 | 6 |
+
+The universe recipe reached 100% recall on every trained species with 3.5 passes, so ~1,800 tokens per entity (300 per atomic fact) is a demonstrated budget for a 6-attribute entity when the text is diverse. The merchant runs used 10x more tokens per entity than that and the ablation in 4.3 shows the extra passes were not what helped; the paraphrase diversity was.
+
+Injection rate on this card = tokens/s x 60 / tokens per entity. Using the universe recipe (1,790 tok/entity, 6 facts):
+
+| model / method | tokens/s | entities per minute | atomic facts per minute | 10k-merchant DB |
+|---|---|---|---|---|
+| 0.5B plain LoRA, short unpacked texts | 4,724 | 158 | 950 | 63 min |
+| 0.5B unsloth LoRA, packed to 512 | 17,716 | 594 | 3,560 | 17 min |
+| 3B plain LoRA + gc | 1,514 | 51 | 300 | 3.3 h |
+| 3B unsloth LoRA + gc, packed | 2,663 | 89 | 535 | 1.9 h |
+| 7B plain LoRA + gc, packed | 940 | 32 | 190 | 5.3 h |
+| 7B unsloth QLoRA + gc, packed | 1,279 | 43 | 257 | 3.9 h |
+
+With the heavier 56-pass merchant recipe (17,600 tok/entity) divide these by 10: 0.5B unsloth manages about 60 merchants a minute, 3B about 9, 7B about 4. Relations (comparative statements linking two entities) cost the same 25 to 40 tokens each as any other fact; the universe recipe already includes four per entity. Embedding-model training is two orders of magnitude cheaper: 575 contrastive pairs per second on MiniLM means the whole 96-merchant contrastive run took 19 seconds, and a 10k-merchant set with 20 pairs each is under 6 minutes per epoch.
+
+Two caveats on these rates. They assume packed sequences; unpacked 25-token facts run at the seq-64 rows in 7.1, about half the speed. And they are training throughput only; a fine-tuning cycle in practice also spends time on evaluation (the 1,488-item ladder took about 3 minutes per condition on 3B) and on model loading (6 s for 0.5B, 30 s for 7B).
+
+### 7.4 How large a model this card can handle
+
+Measured points plus the standard bytes-per-parameter arithmetic (activations excluded; add 2 to 6 GiB depending on batch x seq and vocabulary):
+
+| method | bytes / param | measured | ceiling on 24 GB |
+|---|---|---|---|
+| Full FT, fp32 master + AdamW | 16 | 0.5B: 10 to 15 GiB; 3B: OOM at 34 GiB | **~1.5B** |
+| Full FT, bf16 weights + 8-bit AdamW | ~6 | not measured | ~3B, tight |
+| LoRA r=64, bf16 base | 2 + adapters | 3B: 8 to 16 GiB; 7B: 17 to 20 GiB | **~8 to 9B** (Qwen3-8B, Llama-3.1-8B with gc and short sequences); 14B does not fit |
+| QLoRA 4-bit, bf16 compute | ~0.6 | 7B: 10 to 13 GiB | 14B comfortably (~12 to 16 GiB); **~30 to 32B** at the edge with unsloth and short sequences |
+| Inference, bf16 | 2 | 7B: 14.6 GiB | ~12B |
+| Inference, 4-bit | ~0.6 | | ~40B at short context |
+| Embedding models (MiniLM to 1B-class) | | 0.5 GiB | anything; 7B-class embedders (Qwen3-Embedding-8B) behave like the LLM rows |
+
+For the tasks in this report the sweet spot on this card is **3B to 8B with unsloth LoRA or QLoRA**: 3B is the smallest size that did the label-induction task, 7B/8B fits with room for 512-token sequences, and either trains a 10k-entity database in a few hours.
+
+### 7.5 Scaling to other GPUs
+
+Expected training speedup relative to this 3090, using vendor dense bf16 peaks for the compute-bound regime (3B+) and memory bandwidth for the bandwidth-bound pieces (optimizer step, attention softmax, small-batch inference). The overhead-bound regime (0.5B, short unpacked texts) barely moves without fixing the pipeline first.
+
+| GPU | VRAM | dense bf16 TFLOPS | bandwidth GB/s | compute-bound speedup | bandwidth speedup | what it unlocks |
+|---|---|---|---|---|---|---|
+| RTX 3090 (this) | 24 GB | 71 | 936 | 1.0x | 1.0x | 8B LoRA, 30B QLoRA |
+| RTX 4090 | 24 GB | 165 | 1,008 | ~2.3x | 1.1x | same sizes, faster |
+| RTX 5090 | 32 GB | ~210 | 1,792 | ~3x | 1.9x | 14B LoRA bf16, 8B full FT with 8-bit Adam |
+| L40S / RTX 6000 Ada | 48 GB | 362 | 864 | ~5x | 0.9x | 14B LoRA with long context, 7B full FT (8-bit Adam), 70B QLoRA |
+| A100 80 GB | 80 GB | 312 | 2,039 | ~4.4x | 2.2x | 7B full FT (bf16 + 8-bit Adam), 30B LoRA, 70B QLoRA |
+| H100 SXM | 80 GB | 989 | 3,350 | ~14x (FP8 higher) | 3.6x | 7B full FT AdamW with gc, everything above faster |
+| RTX 4060 Ti 16 GB | 16 GB | ~44 | 288 | ~0.6x | 0.3x | 3B LoRA, 8B QLoRA; 0.5B experiments as-is |
+
+Realistic multipliers are 70 to 85% of the TFLOPS ratio because MFU drops on faster cards unless batch and sequence grow with them. Two practical notes: a second 24 GB card does not raise the model ceiling for full fine-tuning without FSDP or DeepSpeed (Axolotl territory, section 2), and cloud A100/H100 rentals at a few dollars an hour make the 3.9-hour 7B QLoRA run above a 20 to 30 minute job. For the merchant workload specifically, the fastest single improvement available today is not a new GPU but packing plus unsloth on the one you have (17,716 vs 4,724 tok/s on 0.5B).
