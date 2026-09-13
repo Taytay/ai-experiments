@@ -1,6 +1,6 @@
 # Leaderboard
 
-Generated 2026-09-13 15:17 from `evals/runs.db`. One row per finished run+condition; all metrics.
+Generated 2026-09-13 15:22 from `evals/runs.db`. One row per finished run+condition; all metrics.
 
 
 ## merchant_embed_vocab
@@ -38,3 +38,13 @@ Configs:
 Configs:
 - `20260913-151657`: `{"bs": 16, "lora_r": 64, "lr_full": 5e-05, "lr_lora": 0.0003, "n_merchants": 120, "seed": 0, "steps": 420}`
 - `20260913-151719`: `{"bs": 16, "lr_full": [1e-05, 2e-05], "n_merchants": 120, "seed": 0, "steps": 420}`
+
+## universe_embed
+
+| run             | model            | commit   | condition | proto_habitat_k1_heldout | proto_habitat_k1_seen | proto_habitat_k3_seen | proto_type_k1_heldout | proto_type_k1_seen | proto_type_k3_seen | proto_weakness_k1_heldout | proto_weakness_k1_seen | proto_weakness_k3_seen | type_canonical_heldout | type_canonical_seen | type_synonym2_heldout | type_synonym2_seen | type_synonym_heldout | type_synonym_seen |
+|-----------------|------------------|----------|-----------|--------------------------|-----------------------|-----------------------|-----------------------|--------------------|--------------------|---------------------------|------------------------|------------------------|------------------------|---------------------|-----------------------|--------------------|----------------------|-------------------|
+| 20260913-151637 | all-MiniLM-L6-v2 | 0ca04ae* | trained   | 34.3                     | 45.0                  | 63.0                  | 36.3                  | 69.0               | 85.3               | 34.0                      | 79.0                   | 85.0                   | 8.3                    | 99.3                | 12.5                  | 24.3               | 20.8                 | 41.2              |
+| 20260913-151637 | all-MiniLM-L6-v2 | 0ca04ae* | zero_shot | 34.0                     | 32.7                  | 25.7                  | 39.3                  | 38.0               | 33.7               | 48.0                      | 38.0                   | 33.3                   | 25.0                   | 10.3                | 8.3                   | 14.0               | 25.0                 | 13.2              |
+
+Configs:
+- `20260913-151637`: `{"bs": 32, "epochs": 8, "lr": 3e-05, "n_heldout": 24, "n_species": 160, "objective": "infonce_name_to_attribute_text", "seed": 0}`

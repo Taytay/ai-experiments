@@ -45,7 +45,6 @@ trainer = SentenceTransformerTrainer(
         bf16=True,
         logging_steps=4,
         report_to="none",
-        dataset_num_proc=1,  # required on Windows per unsloth docs
         save_strategy="no",
     ),
 )

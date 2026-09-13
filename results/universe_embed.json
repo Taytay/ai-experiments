@@ -1,0 +1,36 @@
+{
+  "zero_shot": {
+    "type_canonical_seen": 10.3,
+    "type_synonym_seen": 13.2,
+    "type_synonym2_seen": 14.0,
+    "proto_type_k1_seen": 38.0,
+    "proto_type_k3_seen": 33.7,
+    "proto_weakness_k1_seen": 38.0,
+    "proto_weakness_k3_seen": 33.3,
+    "proto_habitat_k1_seen": 32.7,
+    "proto_habitat_k3_seen": 25.7,
+    "type_canonical_heldout": 25.0,
+    "type_synonym_heldout": 25.0,
+    "type_synonym2_heldout": 8.3,
+    "proto_type_k1_heldout": 39.3,
+    "proto_weakness_k1_heldout": 48.0,
+    "proto_habitat_k1_heldout": 34.0
+  },
+  "trained": {
+    "type_canonical_seen": 99.3,
+    "type_synonym_seen": 41.2,
+    "type_synonym2_seen": 24.3,
+    "proto_type_k1_seen": 69.0,
+    "proto_type_k3_seen": 85.3,
+    "proto_weakness_k1_seen": 79.0,
+    "proto_weakness_k3_seen": 85.0,
+    "proto_habitat_k1_seen": 45.0,
+    "proto_habitat_k3_seen": 63.0,
+    "type_canonical_heldout": 8.3,
+    "type_synonym_heldout": 20.8,
+    "type_synonym2_heldout": 12.5,
+    "proto_type_k1_heldout": 36.3,
+    "proto_weakness_k1_heldout": 34.0,
+    "proto_habitat_k1_heldout": 34.3
+  }
+}

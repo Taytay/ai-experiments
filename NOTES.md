@@ -60,3 +60,13 @@ Fix options:
 See `report/REPORT.md` (main), `report/frameworks.md`, `report/lit_review.md`.
 Experiments in `experiments/`, outputs in `results/`. All ran with transformers + torch
 only (Smart App Control still on), so unsloth/sentence-transformers trainers remain untested here.
+
+## 2026-09-13: Smart App Control turned off by user
+
+`VerifiedAndReputablePolicyState = 0`. triton 3.8.0, pyarrow 25.0.1, datasets 4.3.0,
+sentence-transformers 6.0.1 and unsloth 2026.9.4 all import. `uv run python finetune_embed.py`
+(unsloth `FastSentenceTransformer` + `SentenceTransformerTrainer`, torch.compile fast encoder
+path) trains all-MiniLM-L6-v2 on the RTX 3090 end to end. Original question answered: the
+driver stack is fully usable for unsloth fine-tuning of embedding models, natively on Windows.
+Gotcha: sentence-transformers 6.0 rejects `dataset_num_proc` in `SentenceTransformerTrainingArguments`
+even though unsloth's Windows docs recommend it (that flag belongs to TRL's `SFTConfig`).
