@@ -1,6 +1,6 @@
 # Leaderboard
 
-Generated 2026-09-13 16:42 from `evals/runs.db`. One row per finished run+condition; all metrics.
+Generated 2026-09-13 17:04 from `evals/runs.db`. One row per finished run+condition; all metrics.
 
 
 ## bench_throughput
@@ -95,9 +95,14 @@ Configs:
 | 20260913-155116 | Qwen2.5-3B   | 8538221* | base_ctx  | 98.8      | 100.0         | 100.0        | 80.0          | 63.1              | 41.2              | 48.8                    | 68.8                     | 36.9              | 45.6               | 14.4             | 100.0               | 0.763                      | 100.0            | 0.767                   | 8.56           |               |
 | 20260913-155116 | Qwen2.5-3B   | 8538221* | lora      | 24.4      | 100.0         | 88.8         | 85.0          | 50.6              | 30.0              | 32.5                    | 41.9                     | 31.2              | 39.4               | 14.4             | 20.8                | 0.572                      | 12.5             | 0.637                   | 20.47          | 23.5          |
 | 20260913-155116 | Qwen2.5-3B   | 8538221* | lora_ctx  | 23.1      | 100.0         | 100.0        | 88.8          | 49.4              | 27.5              | 34.4                    | 43.1                     | 35.6              | 38.1               | 10.6             | 20.8                | 0.583                      | 12.5             | 0.654                   | 20.47          |               |
+| 20260913-164347 | Qwen2.5-3B   | 4de57f6  | base      | 18.1      | 11.9          | 41.2         | 50.0          | 53.1              | 26.9              | 35.6                    | 38.1                     | 31.9              | 32.5               | 11.2             | 16.7                | 0.259                      | 16.7             | 0.322                   | 8.53           |               |
+| 20260913-164347 | Qwen2.5-3B   | 4de57f6  | base_ctx  | 98.8      | 100.0         | 100.0        | 81.2          | 61.2              | 40.6              | 48.8                    | 70.0                     | 36.2              | 45.6               | 13.8             | 100.0               | 0.762                      | 100.0            | 0.771                   | 8.53           |               |
+| 20260913-164347 | Qwen2.5-3B   | 4de57f6  | lora      | 20.6      | 100.0         | 93.8         | 78.8          | 51.2              | 38.1              | 36.9                    | 60.0                     | 28.8              | 38.8               | 12.5             | 20.8                | 0.626                      | 12.5             | 0.711                   | 17.16          | 7.0           |
+| 20260913-164347 | Qwen2.5-3B   | 4de57f6  | lora_ctx  | 30.0      | 100.0         | 98.8         | 91.2          | 53.1              | 38.1              | 43.1                    | 78.8                     | 34.4              | 38.1               | 12.5             | 20.8                | 0.62                       | 12.5             | 0.672                   | 17.16          |               |
 
 Configs:
 - `20260913-152348`: `{"bs": 16, "lora_alpha": 128, "lora_r": 64, "lora_targets": "all_linear", "lr": 0.0002, "method": "lora", "n_eval_items": 1488, "n_heldout": 24, "n_species": 160, "n_texts": 2752, "seed": 0, "steps": 600}`
 - `20260913-153508`: `{"bs": 16, "lora_alpha": 128, "lora_r": 64, "lora_targets": "all_linear", "lr": 0.0002, "method": "lora", "n_eval_items": 1488, "n_heldout": 24, "n_species": 160, "n_texts": 2752, "seed": 0, "steps": 600}`
 - `20260913-154013`: `{"bs": 16, "lora_alpha": 128, "lora_r": 64, "lora_targets": "all_linear", "lr": 0.0001, "method": "lora", "n_eval_items": 1648, "n_heldout": 24, "n_species": 160, "n_texts": 2752, "seed": 0, "steps": 600}`
 - `20260913-155116`: `{"bs": 16, "lora_alpha": 128, "lora_r": 64, "lora_targets": "all_linear", "lr": 0.0001, "method": "lora", "n_eval_items": 1648, "n_heldout": 24, "n_species": 160, "n_texts": 2752, "seed": 0, "steps": 600}`
+- `20260913-164347`: `{"bs": 16, "lora_alpha": 128, "lora_r": 64, "lora_targets": "all_linear", "lr": 0.0001, "method": "unsloth_lora", "n_eval_items": 1648, "n_heldout": 24, "n_species": 160, "n_texts": 2752, "seed": 0, "steps": 600}`
