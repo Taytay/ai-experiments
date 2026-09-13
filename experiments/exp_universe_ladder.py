@@ -29,9 +29,11 @@ from merchants import GENERAL_TEXT  # noqa: E402
 
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-0.5B"
 STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 600
-BS, LR, SEED = 16, 2e-4, 0
+LR = float(sys.argv[3]) if len(sys.argv) > 3 else 2e-4
+BS, SEED = 16, 0
 tag = MODEL.split("/")[-1]
-OUT = Path(__file__).parent.parent / "results" / f"universe_{tag}.json"
+OUT = Path(__file__).parent.parent / "results" / f"universe_{tag}_lr{LR:g}.json"
+ADAPTER = Path(__file__).parent.parent / "outputs" / f"universe_{tag}_lr{LR:g}_lora"
 torch.manual_seed(SEED)
 
 species = U.build()
@@ -131,6 +133,7 @@ print("\n== base"); results["base"] = evaluate(model, tok); print("  ", results[
 print("\n== base+context"); results["base_ctx"] = evaluate(model, tok, context=True); print("  ", results["base_ctx"], flush=True); save()
 print("\n== lora training"); t0 = time.time()
 model = train_lora(model, tok)
+model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}")
 results["lora"] = evaluate(model, tok); results["lora"]["train_minutes"] = round((time.time() - t0) / 60, 1)
 print("  ", results["lora"], flush=True); save()
 print("\n== lora+context"); results["lora_ctx"] = evaluate(model, tok, context=True); print("  ", results["lora_ctx"], flush=True); save()

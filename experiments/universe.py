@@ -137,6 +137,10 @@ def ladder(species, seed=2, n_per_level=160):
         q = {"type": f"What type is {s['name']}?", "weakness": f"What type is {s['name']} weak to?",
              "habitat": f"What habitat does {s['name']} live in?"}[attr]
         mc("L1_recall", f"Question: {q}\nAnswer:", [" " + o for o in opts], opts.index(s[attr]), attr=attr)
+    # L1b recall in the *trained* answer format ("X is a T-type.") to separate knowledge from format shift
+    for s in [rng.choice(seen) for _ in range(n_per_level)]:
+        mc("L1_recall_fmt", f"Question: What type is {s['name']}?\nAnswer:",
+           [f" {s['name']} is a {t}-type." for t in TYPE_LIST], TYPE_LIST.index(s["type"]))
 
     # L2 manipulation: yes/no membership and pairwise same-type (balanced)
     for s in rng.sample(seen, n_per_level // 2):
