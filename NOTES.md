@@ -54,3 +54,9 @@ Fix options:
 2. Keep Smart App Control on and run unsloth inside WSL2 with a current Ubuntu
    (24.04). The existing Ubuntu 18.04 distro is too old. GPU passthrough works via
    the same 591.86 driver.
+
+## Research + experiments (2026-09-12, later)
+
+See `report/REPORT.md` (main), `report/frameworks.md`, `report/lit_review.md`.
+Experiments in `experiments/`, outputs in `results/`. All ran with transformers + torch
+only (Smart App Control still on), so unsloth/sentence-transformers trainers remain untested here.
