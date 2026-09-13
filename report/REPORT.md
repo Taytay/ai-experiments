@@ -8,7 +8,7 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 
 - **Frameworks.** For one 24 GB GPU, Unsloth is the consensus choice (fastest, lowest VRAM, native Windows, now covers embedding models via `FastSentenceTransformer`). Axolotl is the pick for multi-GPU nodes with YAML-driven reproducibility. TRL is the substrate both wrap and the right layer if you need a custom loss. torchtune is unmaintained since July 2025; do not start on it. For RL at scale, verl. For embedding models specifically, the trainer is sentence-transformers' `SentenceTransformerTrainer` whether or not Unsloth is wrapping it.
 - **New vocabulary.** Almost never worth it for merchant names. Subword tokenization already handles them; expansion requires continued pretraining and can hurt at small token budgets. If you must add tokens, initialize inside the existing embedding distribution (mean-of-subwords or Hewitt's N(mu, Sigma) sampling), never random, and train afterwards. Our experiments reproduce this: added tokens gave no gain over subwords in the embedding model and a small loss for the LLM. The one place a tokenizer intervention paid off was **aliasing**: copying a trained mixed-case merchant embedding into a token for the bank-statement uppercase form (see 4.3).
-- **Knowledge injection.** Dumping the merchant database as one sentence per store into the model does not produce usable knowledge, even when memorized. Paraphrase and QA augmentation of the same facts (the Physics-of-LMs / EntiGraph recipe) is what makes knowledge extractable in new task formats. Full fine-tuning beats LoRA at absorbing new facts; LoRA forgets less. Retrieval (fact in context) remains the strongest and cheapest baseline; the right production design is RAG over the merchant DB plus augmented fine-tuning for the head of the distribution, with RAFT-style training so the model uses retrieved records well.
+- **Knowledge injection.** Dumping the merchant database as one sentence per store into the model does not produce usable knowledge, even when memorized. Paraphrase and QA augmentation of the same facts (the Physics-of-LMs / EntiGraph recipe) is what makes knowledge extractable in new task formats. At a sane learning rate (1e-5 here) augmented full fine-tuning doubled category-inference accuracy over the raw dump (41.7% vs 21.7%, retrieval ceiling 69%) with little forgetting; at 5x that rate it destroyed general ability (perplexity 16 to 800) and LoRA or WiSE-FT weight averaging were the rescue. Raw statement strings defeated every method including retrieval at this model size, so normalize merchant strings before the model sees them. Retrieval (fact in context) remains the strongest and cheapest baseline; the right production design is RAG over the merchant DB plus augmented fine-tuning for the head of the distribution, with RAFT-style training so the model uses retrieved records well.
 
 ## 2. Fine-tuning frameworks (September 2026)
 
@@ -74,7 +74,79 @@ Embedding model: all-MiniLM-L6-v2, in-batch-negative contrastive loss, anchor = 
 
 ### 4.3 Results
 
-RESULTS_PLACEHOLDER
+#### 4.3.1 Embedding model (all-MiniLM-L6-v2): does adding merchant tokens help?
+
+12-way category accuracy by nearest category description. `bank_*` strings (uppercase, store number, city) never appear in training. Held-out merchants (24) have no training text at all. Source: `results/embed_vocab.json`.
+
+| condition | name (train) | **bank (train)** | description (train) | name (held-out) | bank (held-out) | description (held-out) |
+|---|---|---|---|---|---|---|
+| zero_shot | 6.2 | 7.3 | 99.0 | 29.2 | 4.2 | 95.8 |
+| ft_subword (original tokenizer) | 100.0 | **70.8** | 100.0 | 12.5 | 4.2 | 100.0 |
+| ft_newtok_random (120 tokens, random init) | 100.0 | 22.9 | 100.0 | 8.3 | 8.3 | 100.0 |
+| ft_newtok_mean (120 tokens, mean-of-subword init) | 100.0 | 26.0 | 100.0 | 12.5 | 4.2 | 100.0 |
+
+Reading it:
+
+- The untouched model already maps *descriptions* of what a store sells to the right category 99% of the time. The knowledge gap is purely the merchant name.
+- Contrastive fine-tuning with the **original subword tokenizer** learns every trained merchant (100%) and, crucially, **transfers to the never-seen bank-statement format at 70.8%**. The uncased WordPiece pieces (`el ##rh ##ol ##m`) are identical in "Elrholm is a store..." and "DEBIT CARD PURCHASE ELRHOLM STORE 4970", so the learned association rides along for free.
+- **Adding merchant names as new tokens destroys that transfer** (22.9 to 26.0%) even though the new token does match inside 105 of 120 bank strings. Initialization barely matters here; the problem is structural.
+- Held-out merchants stay at chance for every condition. Nothing about *Bexstead Ltd* tells you what it sells; there is no free generalization to unseen names. Only retrieval or explicit training covers them.
+
+Diagnostic (`results/diag_embed_dilution.log`): why do new tokens hurt?
+
+| probe | subword model | new-token model |
+|---|---|---|
+| bank string as-is | 70.8 | 22.9 |
+| bank string with the name repeated 4x | 86.5 | 43.8 |
+| bare name | 100.0 | 100.0 |
+| name + " store 4970 tucson az" | 93.8 | 37.5 |
+| bank strings where the new token matched / did not | n/a | 23.5 / 20.0 |
+
+Two effects: (1) **mean-pooling dilution**: with a single identity token the merchant is 1 of ~13 pooled positions instead of 4 of ~13, so repeating the name partially recovers accuracy; (2) **brittleness of a freshly learned token**: adding just five neutral words drops the new-token model to 37.5% while the subword model holds at 93.8%. A multi-piece span gives the encoder redundant, pretrained pieces to attend over; a single new row has 6 epochs of history and no pretrained neighbors. This matches the literature's warning that vocabulary expansion needs real continued pretraining to pay off, and for merchant names it simply has nothing to offer.
+
+#### 4.3.2 LLM (Qwen2.5-0.5B): can injected merchant knowledge transfer to new task formats?
+
+Accuracy %, 420 optimizer steps for every trained condition. Chance: 8.3 (12-way), 25 (4-way). `ppl_general` is perplexity on neutral English (16.15 = untouched). Source: `results/knowledge_injection.json`.
+
+| condition | clean_category | bank_category | sells | reverse | ppl_general |
+|---|---|---|---|---|---|
+| base (zero-shot) | 8.3 | 8.3 | 20.0 | 31.7 | 16.15 |
+| **incontext** (fact in prompt, RAG upper bound) | **69.2** | 14.2 | **100.0** | **100.0** | 16.15 |
+| ft_raw (1 sentence/merchant, full FT, lr 5e-5) | 15.0 | 10.0 | 45.8 | 31.7 | 420.9 |
+| ft_aug (14 paraphrases+QA/merchant, full FT, lr 5e-5) | 9.2 | 8.3 | 46.7 | 46.7 | 795.6 |
+| ft_aug + WiSE-FT 0.5 (average with base) | 25.0 | 8.3 | 56.7 | 47.5 | 28.1 |
+| **ft_aug_lora** (r=64 all linear, lr 3e-4) | 17.5 | 12.5 | **60.8** | 51.7 | 202.0 |
+| ft_aug_vocab (120 name tokens, mean init, full FT) | 10.0 | 8.3 | 31.7 | 79.2* | 885.8 |
+| ft_aug_vocab + uppercase alias tokens | | 8.3 | | | |
+
+\* Single-token merchant names make the `reverse` option scoring trivially favorable (one token to score); treat this cell as an artifact, not knowledge.
+
+Lower-learning-rate rerun (full FT was over-trained at 5e-5; source `results/lr_sweep.json`):
+
+| condition (full FT, 420 steps) | clean_category | bank_category | sells | reverse | ppl_general |
+|---|---|---|---|---|---|
+| ft_raw, lr 1e-5 | 21.7 | 8.3 | 37.5 | 25.8 | 19.2 |
+| **ft_aug, lr 1e-5** | **41.7** | 12.5 | 51.7 | 42.5 | 26.0 |
+| ft_aug, lr 1e-5 + WiSE-FT 0.5 | 26.7 | 9.2 | 52.5 | 30.8 | 17.2 |
+| ft_raw, lr 2e-5 | 36.7 | 8.3 | 45.0 | 30.0 | 27.5 |
+| ft_aug, lr 2e-5 | 20.8 | 13.3 | 50.8 | 55.8 | 51.4 |
+| **ft_aug, lr 2e-5 + WiSE-FT 0.5** | **40.8** | 8.3 | **68.3** | 38.3 | 19.1 |
+
+At a sane learning rate the story is clean. With identical data exposure (~56 passes per merchant) and identical steps, **augmented text beats the raw database dump on every knowledge task**: category inference 41.7 vs 21.7, sells 51.7 vs 37.5, reverse 42.5 vs 25.8 (chance 25). The raw model at lr 2e-5 does learn name-to-products (36.7 on category) but is at chance on reverse lookup: it memorized one direction only, the reversal curse in miniature. The best trained model recovers 60% of the retrieval ceiling (41.7 of 69.2) with perplexity drift of 16 to 26, and WiSE-FT trades a little category accuracy for near-baseline perplexity when the run was hotter (lr 2e-5).
+
+Reading it:
+
+- **Retrieval dominates.** Putting the one-sentence fact in the prompt gives 100% on both direct-knowledge tasks and 69% on category inference, with zero training and zero forgetting. That 69% is also the *ceiling* for any parametric method on this model: it measures how well a 0.5B model can bridge "sells canned goods and frozen vegetables" to "Groceries" at all.
+- **Raw facts memorize but do not transfer.** ft_raw reaches near-zero training loss (each sentence seen ~56x) yet stays at chance on `reverse` and near chance on category tasks. This is the Physics-of-LMs result reproduced at toy scale.
+- **Augmentation is what makes knowledge usable in a new shape.** In the over-trained lr 5e-5 runs the effect shows only on `reverse` (31.7 to 46.7 to 51.7 with LoRA) and `sells` (60.8 with LoRA). In the lr 1e-5 rerun below it shows everywhere: category inference doubles (21.7 to 41.7) and reverse lookup goes from chance to 42.5.
+- **Learning rate is the difference between injecting knowledge and lobotomizing the model.** At lr 5e-5 perplexity on ordinary English went 16 to 400 to 900. The model that "knows" the merchants can no longer do the reasoning step (products to category). Two mitigations both worked: **LoRA** (ppl 202, best `sells`) and **WiSE-FT weight averaging** (ppl 28, best `clean_category` among trained models at 25%). LoRA "learns less, forgets less" shows up exactly as Biderman et al. describe; with the base model this damaged, forgetting less *was* learning more. At lr 1e-5 full FT no longer needs the rescue.
+- **The bank-statement format defeats everything, including retrieval.** All conditions sit at chance on `bank_category`, and even in-context facts only reach 14%. A 0.5B model cannot align `ELRHOLM STORE 4970 TUCSON AZ` with `Elrholm` in the same prompt. Copying the trained embedding into an uppercase alias token did not rescue it either (the surrounding model was already wrecked, and the store-number/city noise remains). **Conclusion: normalize statement strings to canonical merchant names before the model ever sees them.** This is a preprocessing problem, not a fine-tuning problem.
+- **Vocabulary expansion hurt the LLM too**: `sells` fell from 46.7 to 31.7 with the same data and steps, and the knowledge that was learned attached to the single token in a way that only the reverse-lookup scoring rewarded.
+
+#### 4.3.3 What the experiments say about "improving other tasks"
+
+The knowledge that transferred was the knowledge stored in **many surface forms**. With a real merchant DB the practical version of this is: generate paraphrases, both-direction QA, statement-style mentions, and product-to-category chains (EntiGraph/Active-Reading style), mix in replay data, train with LoRA or full FT at a low learning rate, and average with the base checkpoint. Even then, expect parametric recall to lag retrieval, especially on long-tail merchants, so the model should be trained to *use* retrieved merchant records (RAFT) rather than to replace them. The place where fine-tuning unambiguously wins is the embedding model: it learned every merchant and generalized to the statement format with the original tokenizer.
+
 
 ## 5. Recommended recipe for the personal-finance use case
 
