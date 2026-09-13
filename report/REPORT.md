@@ -222,7 +222,27 @@ This is the strongest result in the section. A user label defined by *examples* 
 
 ### 6.4 Lower learning rate rerun (lr 1e-4) with format-matched recall
 
-UNIVERSE_RERUN_PLACEHOLDER
+Both models retrained with LoRA at lr 1e-4 (half the first run), same 600 steps, plus a new level **L1_recall_fmt** whose options use the trained answer shape ("*X is a Voltrix-type.*"). The ladder's random items differ slightly from 6.2 because the new level shifts the seed sequence; base rows are the fair comparison within this table. Tracked as `universe_ladder` runs with `lr=0.0001`.
+
+| level | 0.5B base | 0.5B +ctx | 0.5B LoRA | 0.5B LoRA+ctx | 3B base | 3B +ctx | 3B LoRA | 3B LoRA+ctx |
+|---|---|---|---|---|---|---|---|---|
+| L1 recall (bare type name) | 18.8 | 76.2 | 20.0 | 28.1 | 18.1 | 98.8 | 24.4 | 23.1 |
+| **L1 recall, trained format** | 11.2 | 92.5 | **100.0** | 100.0 | 13.1 | 100.0 | **100.0** | 100.0 |
+| L2 is-a (y/n) | 43.8 | 61.2 | 50.0 | 55.0 | 43.8 | 100.0 | **88.8** | 100.0 |
+| L2 pairwise (y/n) | 50.0 | 47.5 | 43.8 | 47.5 | 51.2 | 80.0 | **85.0** | 88.8 |
+| L3 induct, nonsense k=3 | 31.2 | 32.5 | 30.6 | 31.9 | 37.5 | **48.8** | 32.5 | 34.4 |
+| L3 induct, real names | 38.1 | 54.4 | 42.5 | 41.9 | 38.8 | **68.8** | 41.9 | 43.1 |
+| L3 induct, k=4 (chance 25) | 21.9 | 19.4 | 21.9 | 23.1 | 26.9 | **41.2** | 30.0 | 27.5 |
+| L4 induct, habitat | 33.1 | 34.4 | 34.4 | 33.1 | 31.2 | 36.9 | 31.2 | 35.6 |
+| L6 unseen recall / margin | 12.5 / .60 | 100 / .67 | 12.5 / .35 | 41.7 / .31 | 16.7 / .32 | 100 / .77 | 12.5 / .64 | 12.5 / .65 |
+| L7 perplexity | 16.2 | 16.2 | 134 | 134 | 8.6 | 8.6 | **20.5** | 20.5 |
+
+What changed and what did not:
+
+- **Recall was never the problem.** In the trained answer format both LoRA models recall species type at 100%; the 20 to 24% on the bare-name prompt in 6.2 was a format mismatch, not missing knowledge. Report manipulation-format and trained-format accuracy, and treat a single prompt shape as a measurement of that shape.
+- **Halving the learning rate halved the damage** (3B perplexity 31.8 to 20.5; 0.5B 244 to 134) with no loss of injected knowledge. It is still substantial forgetting for 600 steps on 2.7k short texts; replay data and a lower rate again (or WiSE-FT, section 4.3) are the next levers.
+- **Parametric knowledge still does not drive the Timmy task.** 3B LoRA: 32.5, chance. The same facts in context: 48.8. And even at the gentler rate, LoRA+ctx (34.4) remains well below base+ctx (48.8): fine-tuning on flat declarative text eroded the model's few-shot label-mapping ability faster than it added anything usable for it. If the goal is analogy over a custom taxonomy, the knowledge belongs in the prompt and the training data (if any) should contain the analogy task itself.
+- **0.5B is below the threshold for the task in every condition**, consistent with 6.2 and with Wei et al.
 
 ### 6.5 Takeaways for the personal-finance use case
 
