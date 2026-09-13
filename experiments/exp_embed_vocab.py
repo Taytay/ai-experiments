@@ -30,6 +30,8 @@ from transformers import AutoModel, AutoTokenizer
 
 sys.path.insert(0, str(Path(__file__).parent))
 import merchants as M  # noqa: E402
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from evals.tracker import Run  # noqa: E402
 
 MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EPOCHS, BS, LR, SEED = 6, 32, 3e-5, 0
@@ -120,6 +122,7 @@ def run(name, fn):
     print(f"\n== {name}", flush=True)
     results[name] = fn(); print("  ", results[name], flush=True)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
+    run_.log(results[name], condition=name)
 
 def zero_shot():
     tok, model = load(); return evaluate(model, tok)
@@ -135,6 +138,7 @@ def ft_newtok(init):
         train(model, tok); return evaluate(model, tok)
     return f
 
+run_ = Run("merchant_embed_vocab", model=MODEL, config=dict(epochs=EPOCHS, bs=BS, lr=LR, seed=SEED, n_merchants=len(all_m), n_heldout=len(held_m))).__enter__()
 run("zero_shot", zero_shot)
 run("ft_subword", ft_subword)
 run("ft_newtok_random", ft_newtok("random"))

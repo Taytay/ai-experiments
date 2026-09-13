@@ -21,7 +21,9 @@ import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 import universe as U  # noqa: E402
+from evals.tracker import Run  # noqa: E402
 
 MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EPOCHS, BS, LR, SEED = 8, 32, 3e-5, 0
@@ -70,8 +72,12 @@ def evaluate():
         for attr in ("type", "weakness", "habitat"):
             for k in (1, 3):
                 hits = []
+                counts = {v: sum(s[attr] == v for s in pool) for v in {s[attr] for s in pool}}
+                usable = sorted(v for v, c in counts.items() if c > k)  # need k demos + 1 query
+                if len(usable) < 3:
+                    continue
                 for _ in range(300):
-                    vals = rng.sample(sorted({s[attr] for s in pool}), 3)
+                    vals = rng.sample(usable, 3)
                     demos = {v: rng.sample([s for s in pool if s[attr] == v], k) for v in vals}
                     protos = torch.stack([embed([d["name"] for d in demos[v]]).mean(0) for v in vals])
                     qv = rng.choice(vals)
@@ -105,10 +111,14 @@ def train():
 
 
 results = {}
-print("== zero-shot"); results["zero_shot"] = evaluate(); print("  ", results["zero_shot"], flush=True)
-print("== train"); train()
-print("== trained"); results["trained"] = evaluate(); print("  ", results["trained"], flush=True)
-OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
+with Run("universe_embed", model=MODEL, config=dict(epochs=EPOCHS, bs=BS, lr=LR, seed=SEED, n_species=len(species),
+                                                    n_heldout=len(held), objective="infonce_name_to_attribute_text")) as run:
+    print("== zero-shot"); results["zero_shot"] = evaluate(); print("  ", results["zero_shot"], flush=True)
+    run.log(results["zero_shot"], condition="zero_shot")
+    print("== train"); train()
+    print("== trained"); results["trained"] = evaluate(); print("  ", results["trained"], flush=True)
+    run.log(results["trained"], condition="trained")
+    OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2)); run.artifact(OUT)
 
 print("\n=== SUMMARY (accuracy %; type/weakness 8-way = 12.5 chance, habitat 6-way = 16.7, prototype 3-way = 33.3) ===")
 keys = list(results["trained"])

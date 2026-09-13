@@ -29,6 +29,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 sys.path.insert(0, str(Path(__file__).parent))
 import merchants as M  # noqa: E402
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from evals.tracker import Run  # noqa: E402
 
 MODEL = "Qwen/Qwen2.5-0.5B"
 STEPS = 420          # identical optimizer steps for every trained condition
@@ -174,6 +176,8 @@ def run(name, fn):
     torch.cuda.empty_cache()
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(results, indent=2))
+    for k_, r_ in results.items():
+        run_.log(r_, condition=k_)
 
 def c_base():
     tok, model = load_base(torch.bfloat16)
@@ -227,6 +231,7 @@ def c_ft_aug_vocab():
     r["bank_category_upper_alias"] = r_alias["bank_category"]
     return r
 
+run_ = Run("merchant_knowledge_injection", model=MODEL, config=dict(steps=STEPS, bs=BS, lr_full=LR_FULL, lr_lora=LR_LORA, lora_r=64, seed=SEED, n_merchants=len(merchants))).__enter__()
 run("base", c_base)
 run("incontext", c_incontext)
 run("ft_raw", c_ft_raw)

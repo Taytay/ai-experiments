@@ -6,3 +6,6 @@ hf_cache/
 *.log
 unsloth_compiled_cache/
 *.out.txt
+evals/runs.db
+evals/runs.db-wal
+evals/runs.db-shm

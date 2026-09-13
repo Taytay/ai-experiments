@@ -13,7 +13,10 @@ STEPS = ns["STEPS"]
 raw_texts = [M.raw_fact(m) for m in merchants]
 aug_texts = [t for m in merchants for t in M.augmented(m)]
 OUT = here.parent / "results" / "lr_sweep.json"
+sys.path.insert(0, str(here.parent))
+from evals.tracker import Run  # noqa: E402
 results = {}
+run_ = Run("merchant_knowledge_injection", model=ns["MODEL"], config=dict(steps=STEPS, bs=ns["BS"], lr_full=[1e-5, 2e-5], wise_alpha=0.5, seed=ns["SEED"], n_merchants=len(merchants))).__enter__()
 for lr in (1e-5, 2e-5):
     for name, texts in (("ft_raw", raw_texts), ("ft_aug", aug_texts)):
         key = f"{name}_lr{lr:g}"
@@ -31,6 +34,7 @@ for lr in (1e-5, 2e-5):
         print("  ", results[key]); print("   wise:", results[key + "_wise0.5"], flush=True)
         del model; torch.cuda.empty_cache()
         OUT.write_text(json.dumps(results, indent=2))
+        run_.log(results[key], condition=key); run_.log(results[key + "_wise0.5"], condition=key + "_wise0.5")
 cols = ["clean_category", "bank_category", "sells", "reverse", "ppl_general"]
 print("\n=== SUMMARY ===")
 print(f"{'condition':22s}" + "".join(f"{c:>16s}" for c in cols))

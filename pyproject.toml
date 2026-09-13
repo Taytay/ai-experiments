@@ -11,6 +11,9 @@ dependencies = [
     "unsloth>=2026.9.4",
 ]
 
+[project.optional-dependencies]
+tracking = []
+
 [tool.uv]
 # Bundle CUDA 12.8 runtime with torch; driver 591.86 supports up to CUDA 13.1.
 [tool.uv.sources]

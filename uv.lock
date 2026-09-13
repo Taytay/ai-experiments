@@ -452,6 +452,7 @@ requires-dist = [
     { name = "torch", specifier = ">=2.11.0", index = "https://download.pytorch.org/whl/cu128" },
     { name = "unsloth", specifier = ">=2026.9.4" },
 ]
+provides-extras = ["tracking"]
 
 [[package]]
 name = "h11"

@@ -22,7 +22,9 @@ import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 import universe as U  # noqa: E402
+from evals.tracker import Run  # noqa: E402
 from merchants import GENERAL_TEXT  # noqa: E402
 
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-0.5B"
@@ -115,8 +117,14 @@ def train_lora(model, tok):
 
 
 results = {}
+run = Run("universe_ladder", model=MODEL, config=dict(steps=STEPS, bs=BS, lr=LR, seed=SEED, method="lora", lora_r=64,
+                                                       lora_alpha=128, lora_targets="all_linear", n_species=len(species),
+                                                       n_heldout=sum(s["heldout"] for s in species), n_texts=len(texts),
+                                                       n_eval_items=len(ladder))).__enter__()
 def save():
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
+    for cond, mets in results.items():
+        run.log(mets, condition=cond)
 
 tok, model = load()
 print("\n== base"); results["base"] = evaluate(model, tok); print("  ", results["base"], flush=True); save()
@@ -127,6 +135,7 @@ results["lora"] = evaluate(model, tok); results["lora"]["train_minutes"] = round
 print("  ", results["lora"], flush=True); save()
 print("\n== lora+context"); results["lora_ctx"] = evaluate(model, tok, context=True); print("  ", results["lora_ctx"], flush=True); save()
 
+run.artifact(OUT); run.__exit__(None, None, None)
 levels = [lv for lv in results["base"] if lv.startswith("L") and "margin" not in lv]
 print(f"\n=== {tag} SUMMARY (accuracy %) ===")
 print(f"{'level':28s}" + "".join(f"{c:>12s}" for c in results))
