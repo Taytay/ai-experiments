@@ -17,6 +17,10 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
+USE_UNSLOTH = len(sys.argv) > 4 and sys.argv[4] == "unsloth"
+if USE_UNSLOTH:
+    import unsloth  # noqa: F401  (must be imported before transformers so its patches apply)
+
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -32,8 +36,9 @@ STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 600
 LR = float(sys.argv[3]) if len(sys.argv) > 3 else 2e-4
 BS, SEED = 16, 0
 tag = MODEL.split("/")[-1]
-OUT = Path(__file__).parent.parent / "results" / f"universe_{tag}_lr{LR:g}.json"
-ADAPTER = Path(__file__).parent.parent / "outputs" / f"universe_{tag}_lr{LR:g}_lora"
+suffix = f"_lr{LR:g}" + ("_unsloth" if USE_UNSLOTH else "")
+OUT = Path(__file__).parent.parent / "results" / f"universe_{tag}{suffix}.json"
+ADAPTER = Path(__file__).parent.parent / "outputs" / f"universe_{tag}{suffix}_lora"
 torch.manual_seed(SEED)
 
 species = U.build()
@@ -45,6 +50,11 @@ print(f"{len(species)} species ({sum(s['heldout'] for s in species)} held out), 
 
 
 def load():
+    if USE_UNSLOTH:
+        from unsloth import FastLanguageModel
+        model, tok = FastLanguageModel.from_pretrained(MODEL, max_seq_length=512, dtype=torch.bfloat16, load_in_4bit=False)
+        tok.padding_side = "right"
+        return tok, model
     tok = AutoTokenizer.from_pretrained(MODEL)
     tok.padding_side = "right"
     model = AutoModelForCausalLM.from_pretrained(MODEL, dtype=torch.bfloat16).cuda()
@@ -91,12 +101,16 @@ def evaluate(model, tok, context=False):
 
 
 def train_lora(model, tok):
-    from peft import LoraConfig, get_peft_model
-    model.gradient_checkpointing_enable()
-    model.enable_input_require_grads()
-    cfg = LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none",
-                     target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"])
-    model = get_peft_model(model, cfg)
+    targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+    if USE_UNSLOTH:
+        from unsloth import FastLanguageModel
+        model = FastLanguageModel.get_peft_model(model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none",
+                                                 target_modules=targets, use_gradient_checkpointing="unsloth", random_state=SEED)
+    else:
+        from peft import LoraConfig, get_peft_model
+        model.gradient_checkpointing_enable()
+        model.enable_input_require_grads()
+        model = get_peft_model(model, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", target_modules=targets))
     params = [p for p in model.parameters() if p.requires_grad]
     print(f"   LoRA trainable: {sum(p.numel() for p in params) / 1e6:.0f}M params")
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
@@ -114,12 +128,13 @@ def train_lora(model, tok):
         opt.step(); sched.step(); opt.zero_grad(set_to_none=True); step += 1
         if step % 100 == 0 or step == STEPS:
             print(f"    step {step}/{STEPS} loss {loss.item():.3f} ({time.time() - t0:.0f}s)", flush=True)
-    model.gradient_checkpointing_disable()
+    if not USE_UNSLOTH:
+        model.gradient_checkpointing_disable()
     return model
 
 
 results = {}
-run = Run("universe_ladder", model=MODEL, config=dict(steps=STEPS, bs=BS, lr=LR, seed=SEED, method="lora", lora_r=64,
+run = Run("universe_ladder", model=MODEL, config=dict(steps=STEPS, bs=BS, lr=LR, seed=SEED, method="unsloth_lora" if USE_UNSLOTH else "lora", lora_r=64,
                                                        lora_alpha=128, lora_targets="all_linear", n_species=len(species),
                                                        n_heldout=sum(s["heldout"] for s in species), n_texts=len(texts),
                                                        n_eval_items=len(ladder))).__enter__()
