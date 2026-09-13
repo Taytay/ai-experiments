@@ -156,3 +156,81 @@ The knowledge that transferred was the knowledge stored in **many surface forms*
 4. **For parametric knowledge that transfers**, build an augmented corpus: 10+ paraphrases per merchant, QA in both directions, statement-style mentions, product-to-category chains. Full fine-tune (or high-rank LoRA on all modules) at low LR with replay of general data; average with the base checkpoint (WiSE-FT) if perplexity drift matters.
 5. **Train the model to use retrieval** (RAFT): fine-tune on prompts containing retrieved records plus distractors, targets that cite the record. This is what makes knowledge improve *other* tasks (budget Q&A, anomaly explanations, merchant normalization) rather than just the classifier.
 6. **Evaluate on held-out merchants and formats**, and track hallucination on merchants the model was never taught.
+
+## 6. Fictional universe: user-invented labels and analogy over injected knowledge
+
+Added 2026-09-13. Question: teach a model a completely custom taxonomy (a Pokemon-style creature universe with fictional type names), then answer prompts like *"Timmy labeled his Blaxorc 'FooFoo' and his FrodRock 'blammo'. How will he label his Radsup?"* where both the entities and the labels are novel. Code: `experiments/universe.py`, `exp_universe_ladder.py`, `exp_universe_embed.py`. Tracked runs: `evals/LEADERBOARD.md`, experiments `universe_ladder` and `universe_embed`.
+
+### 6.1 Setup
+
+- **Universe.** 160 species with opaque names (*Elrholm*, *Oskhurst*), 8 fictional types (*Voltrix*, *Pyrrhan*, ...) each with a lore sentence, a weakness type (a fixed derangement of type, so weakness and type are the same partition), 6 habitats, 5 diets, 5 regions. 24 species (3 per type) are held out of all training. Each type also has three never-trained synonyms ("the sparky ones", "shock-type").
+- **Training text.** 2,752 texts: 14 descriptive/QA templates per species, one negative ("Is X a Y-type? No..."), four comparative statements (shared / different type, shared habitat), plus type lore. Unlike the merchant experiment the type label is present in training text: the point here is analogy over known attributes, not inference of hidden ones.
+- **Ladder.** 1,488 multiple-choice items scored by option likelihood, none in a training format:
+
+| level | what it tests | chance |
+|---|---|---|
+| L1 recall | type / weakness / habitat of a species | 12.5 / 12.5 / 16.7 |
+| L2 manipulation | yes/no "Is X a T-type?", "Do X and Y share a type?" | 50 |
+| L3 induction (type) | Timmy prompt, 3 nonsense labels; controls: real type names as labels, k=2, k=4 | 33 (k=3) |
+| L4 induction (latent) | Timmy prompt where the labels track weakness or habitat, not type | 33 |
+| L5 novel choices | "Which group does X belong to?" with synonym options | 12.5 |
+| L6 unseen species | recall for held-out species + confidence margin vs seen control | 12.5 |
+| L7 regression | perplexity on neutral English | |
+
+Conditions: base, base + field-guide entries in context (RAG ceiling), LoRA r=64 on all linear layers (600 steps, batch 16, bf16), LoRA + context.
+
+### 6.2 LLM results (lr 2e-4)
+
+| level | 0.5B base | 0.5B +ctx | 0.5B LoRA | 0.5B LoRA+ctx | 3B base | 3B +ctx | 3B LoRA | 3B LoRA+ctx |
+|---|---|---|---|---|---|---|---|---|
+| L1 recall | 18.8 | 76.2 | 20.0 | 21.9 | 18.1 | **98.8** | 24.4 | 33.8 |
+| L2 is-a (y/n) | 43.8 | 60.0 | 53.8 | 55.0 | 43.8 | 100.0 | **92.5** | 96.2 |
+| L2 pairwise (y/n) | 45.0 | 43.8 | 57.5 | 53.8 | 45.0 | 95.0 | **87.5** | 88.8 |
+| L3 induct, nonsense k=3 | 33.8 | 35.6 | 22.5 | 27.5 | 37.5 | **51.9** | 33.8 | 30.6 |
+| L3 induct, real names | 37.5 | 54.4 | 46.2 | 51.2 | 40.6 | **68.1** | 48.1 | 45.6 |
+| L3 induct, k=2 (chance 50) | 45.6 | 47.5 | 51.9 | 53.8 | 53.1 | 61.2 | 58.1 | 53.8 |
+| L3 induct, k=4 (chance 25) | 22.5 | 21.9 | 25.6 | 23.8 | 27.5 | **42.5** | 28.1 | 26.2 |
+| L4 induct, weakness | 38.8 | 40.0 | 40.0 | 38.1 | 37.5 | **54.4** | 44.4 | 42.5 |
+| L4 induct, habitat | 30.0 | 29.4 | 33.8 | 33.1 | 31.9 | 38.8 | 31.2 | 32.5 |
+| L5 novel choices | 15.6 | 20.0 | 22.5 | 20.0 | 17.5 | 24.4 | 23.8 | 25.6 |
+| L6 unseen recall | 12.5 | 100 | 12.5 | 12.5 | 16.7 | 100 | 12.5 | 20.8 |
+| L7 perplexity | 16.2 | 16.2 | 244 | 244 | 8.6 | 8.6 | 31.8 | 31.8 |
+
+Reading it:
+
+- **The Timmy task is a scale phenomenon, exactly as Wei et al. (2023) predict.** With the facts in context, 0.5B stays at chance on nonsense-label induction (35.6) while 3B reaches 51.9 (k=3) and 42.5 (k=4, chance 25). Using the real type names as labels is easier for both (54 / 68), which is the "semantic prior" the small model leans on. Below a few billion parameters the model cannot override its priors with three examples, no matter how good its knowledge is.
+- **Latent partitions are harder.** When Timmy's tags track habitat instead of type, 3B+ctx drops to 38.8. Weakness looks better (54.4) only because it coincides with type in this universe; treat it as a type replicate, not a latent-partition result. Inferring *which* attribute a user's labels follow is the frontier task here.
+- **LoRA injected the knowledge but in a format-bound way.** 3B LoRA scores 92.5 / 87.5 on the yes/no manipulation formats, which existed in training, yet 24.4 on the bare-type recall prompt, whose answer shape ("Voltrix" rather than "X is a Voltrix-type.") did not. The format-matched recall level added after this run (L1_recall_fmt, section 6.4) isolates that.
+- **Parametric knowledge did not power in-context analogy.** 3B LoRA on the Timmy prompt: 33.8, chance. The same knowledge supplied as text: 51.9. And LoRA+ctx (30.6) is *worse* than base+ctx, because training at lr 2e-4 damaged the model (perplexity 8.6 to 31.8; 0.5B went 16 to 244). Physics of LMs 3.2 in miniature: recall and manipulation are different skills, and forgetting can take the second one away while the first is being learned.
+- **Confidence is not a hallucination detector at this scale.** Held-out species: LoRA models are at chance (12.5) with confidence margins (0.60) *higher* than on species they know (0.50). Unknown-entity abstention has to be engineered (retrieval hit / miss, verifier), not read off the logits.
+
+### 6.3 Embedding-model results: prototypes make unseen labels free
+
+all-MiniLM-L6-v2 trained contrastively so a species *name* embeds near the text of its attributes (type lore, weakness text, habitat text, field-guide entry). No head, no new tokens. Labels then take three forms. Source: `results/universe_embed.json`.
+
+| label form | metric | zero-shot | trained |
+|---|---|---|---|
+| canonical type lore text | 8-way, seen species | 10.3 | **99.3** |
+| synonym "the sparky ones" (never trained) | 8-way | 13.2 | **41.2** |
+| synonym "shock-type" (never trained) | 8-way | 14.0 | 24.3 |
+| **prototype: centroid of Timmy's k labeled cards** | type, k=1 / k=3 (3-way, chance 33) | 38.0 / 33.7 | 69.0 / **85.3** |
+| prototype | weakness (= type partition), k=1 / k=3 | 38.0 / 33.3 | 79.0 / 85.0 |
+| prototype | **habitat (latent partition)**, k=1 / k=3 | 32.7 / 25.7 | 45.0 / **63.0** |
+| any form | held-out species | ~chance | ~chance |
+
+This is the strongest result in the section. A user label defined by *examples* rather than a *name* is assigned correctly 85% of the time with three cards, and 63% when the user's grouping follows a partition the label never names (habitat). Synonym labels work partially because the lore text carries the semantics ("crackle when excited" is near "sparky"); a name-only label ("shock-type") mostly does not. Held-out species stay at chance in every form, which is the honest answer for entities the encoder never saw: there is nothing to embed.
+
+### 6.4 Lower learning rate rerun (lr 1e-4) with format-matched recall
+
+UNIVERSE_RERUN_PLACEHOLDER
+
+### 6.5 Takeaways for the personal-finance use case
+
+1. **Define user labels by examples, not names.** The prototype approach (a label = the centroid of the transactions a user put under it) handles synonyms, typos, and idiosyncratic categories with zero retraining and already reaches 63 to 85% on 3-way tasks at MiniLM scale. Use a stronger encoder (bge, EmbeddingGemma, Qwen3-Embedding) trained on transaction-to-merchant-record pairs and this should be the production classifier for personal categories.
+2. **For LLM-side analogy prompts, keep the knowledge in context.** Retrieve the merchant records for the merchants named in the prompt; the model then does the mapping. Use a 3B+ model (7B preferable) since the ability to follow arbitrary label mappings from few examples is absent at 0.5B.
+3. **Parametric injection is for coverage, not for reasoning.** Fine-tune so the model recognizes merchants when retrieval misses, at a low learning rate with replay, and verify manipulation-format accuracy (yes/no, comparisons) rather than bare recall.
+4. **Inferring the user's grouping rule is the open problem.** Habitat-tracking labels were the hardest case for both model types. A practical fix is to compute prototypes over several attribute-specific embeddings (type, merchant, amount band, time) and pick the space in which the user's examples cluster most tightly.
+
+## 7. Performance: throughput, memory, bottlenecks, scaling
+
+PERF_PLACEHOLDER

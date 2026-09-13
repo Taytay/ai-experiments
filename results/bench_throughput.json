@@ -1,0 +1,17 @@
+{
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "peak_bf16_tflops_assumed": 71.0,
+  "torch": "2.11.0+cu128",
+  "Qwen2.5-0.5B|full_fp32master|L64|bs16": {
+    "ok": 1,
+    "base_params_B": 0.494,
+    "trainable_M": 494.0,
+    "step_ms": 189.8,
+    "tokens_per_s": 5396,
+    "samples_per_s": 84.32,
+    "peak_alloc_GiB": 10.08,
+    "peak_reserved_GiB": 11.26,
+    "mfu_pct": 22.5,
+    "load_s": 9.0
+  }
+}
