@@ -1,0 +1,18 @@
+{
+  "base": {
+    "clean_category": 8.3,
+    "bank_category": 8.3,
+    "sells": 20.0,
+    "reverse": 31.7,
+    "ppl_general": 16.15,
+    "minutes": 0.6
+  },
+  "incontext": {
+    "clean_category": 69.2,
+    "bank_category": 14.2,
+    "sells": 100.0,
+    "reverse": 100.0,
+    "ppl_general": 16.15,
+    "minutes": 0.6
+  }
+}

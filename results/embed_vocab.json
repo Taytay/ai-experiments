@@ -1,0 +1,34 @@
+{
+  "zero_shot": {
+    "name_train": 6.2,
+    "bank_train": 7.3,
+    "desc_train": 99.0,
+    "name_heldout": 29.2,
+    "bank_heldout": 4.2,
+    "desc_heldout": 95.8
+  },
+  "ft_subword": {
+    "name_train": 100.0,
+    "bank_train": 70.8,
+    "desc_train": 100.0,
+    "name_heldout": 12.5,
+    "bank_heldout": 4.2,
+    "desc_heldout": 100.0
+  },
+  "ft_newtok_random": {
+    "name_train": 100.0,
+    "bank_train": 22.9,
+    "desc_train": 100.0,
+    "name_heldout": 8.3,
+    "bank_heldout": 8.3,
+    "desc_heldout": 100.0
+  },
+  "ft_newtok_mean": {
+    "name_train": 100.0,
+    "bank_train": 26.0,
+    "desc_train": 100.0,
+    "name_heldout": 12.5,
+    "bank_heldout": 4.2,
+    "desc_heldout": 100.0
+  }
+}
