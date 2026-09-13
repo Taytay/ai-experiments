@@ -1,0 +1,20 @@
+[project]
+name = "gpu-unsloth-check"
+version = "0.1.0"
+description = "Verify NVIDIA driver + CUDA stack can fine-tune a small embeddings model with unsloth"
+requires-python = "==3.12.*"
+dependencies = [
+    "numpy>=2.5.3",
+    "torch>=2.11.0",
+]
+
+[tool.uv]
+# Bundle CUDA 12.8 runtime with torch; driver 591.86 supports up to CUDA 13.1.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128" }]
+torchvision = [{ index = "pytorch-cu128" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

@@ -1,0 +1,14 @@
+python      : 3.12.14
+torch       : 2.11.0+cu128
+torch cuda  : 12.8
+cudnn       : 91900
+cuda avail  : True
+device      : NVIDIA GeForce RTX 3090
+capability  : sm_86
+vram total  : 24.0 GiB
+vram free   : 22.8 GiB
+bf16 support: True
+matmul torch.float32   max abs err vs cpu fp32: 0.0001
+matmul torch.float16   max abs err vs cpu fp32: 0.1181
+matmul torch.bfloat16  max abs err vs cpu fp32: 0.9314
+OK: driver + CUDA kernels working
