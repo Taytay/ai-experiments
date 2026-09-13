@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+outputs/
+hf_cache/
+*.log
