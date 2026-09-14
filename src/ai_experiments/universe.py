@@ -126,7 +126,7 @@ def training_texts(species, rng=None, n_cmp_per_species=4):
 
 
 def entry(s):
-    """Compact field-guide entry for in-context (RAG) controls."""
+    """Compact field-guide entry for the oracle-context controls (exact entry in the prompt)."""
     return f"{s['name']}: {s['type']}-type, weak to {s['weakness']}, {s['habitat']} habitat, {s['diet']}, {s['region']}."
 
 
@@ -209,7 +209,7 @@ def ladder(species, seed=2, n_per_level=160):
 
 
 def with_context(item, species_by_name):
-    """RAG control: prepend field-guide entries for every species named in the item."""
+    """Oracle-context control: prepend the field-guide entries of every species named in the item."""
     names = [item.get("query")] + item.get("demos", []) if item.get("query") else []
     if not names:
         names = [n for n in species_by_name if n in item["prompt"]]

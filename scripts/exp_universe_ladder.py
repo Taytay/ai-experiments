@@ -2,7 +2,7 @@
 
 usage: uv run python scripts/exp_universe_ladder.py Qwen/Qwen2.5-3B [steps]
 
-Conditions: base | base+context (RAG upper bound) | lora-trained | lora-trained+context.
+Conditions: base | base+context (oracle context: exact entry supplied, an upper bound for retrieval) | lora-trained | lora-trained+context.
 Levels (see universe.ladder): L1 recall, L2 manipulation (yes/no, pairwise),
 L3 label induction w/ nonsense labels (type partition; k=2/3/4; real-name control),
 L4 label induction where labels track a latent partition (weakness / habitat),

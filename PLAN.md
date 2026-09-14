@@ -43,7 +43,7 @@ afternoon each on the 3090.
 | 3 | Constructed-response eval: greedy-decode 32 tokens for every L1, L3, category and sells item; exact and fuzzy match; options-listed variant; three-way agreement with the two cloze scorers. | EVAL-3 | 1 | todo | |
 | 4 | Empirical null band per level (shuffle answer index 1,000 times over saved per-option scores); bootstrap CIs and paired tests from the per-item files; CI column in every report table. | STAT-2, EVAL-6, REPORT-2 | 1 | todo | |
 | 5 | Tokenizer casing check: re-run the LLM in-context and `bank_category` evals with title-cased bank strings; record the token-survival statistic for every tokenizer in use. | MODEL-4 | 1 | todo | |
-| 6 | Report fixes that need no run: caveat the held-out-partition claim in the summary; rename "RAG ceiling" to "oracle context"; disclose the arm D schedule confound and token-weighted mixture fractions in the design table. | REPORT-1, REPORT-3, REPORT-4 | - | doing | |
+| 6 | Report fixes that need no run: caveat the held-out-partition claim in the summary; rename "RAG ceiling" to "oracle context"; disclose the arm D schedule confound and token-weighted mixture fractions in the design table. | REPORT-1, REPORT-3, REPORT-4 | - | done | REPORT.md 1, 4.3.2, 6.2, 8.1, 8.3 |
 | 7 | Soft-label prompt distillation on arm C's data: teacher is 3B with the field guide in context, student sees the same prompts without context, KL loss. Prediction: bare L1 recall toward 98.8 with better ICL retention than hard-label episodes. | BASE-3 | 2 | todo | |
 | 8 | Masked fine-tuning of the decoder (Pan et al. 2510.09885) on Qwen2.5-3B-Instruct, LoRA r=64, one template per entity; score bare L1, `L1_recall_fmt`, merchant `reverse` and the ICL suite against arm C. | TRAIN-5, EVAL-7 | 2 | todo | |
 | 9 | Mixture fix by construction: all-answer loss on k-shot episodes plus a self-teaching stream from the field-guide entries; log per-stream label-token counts per step; sweep E in {0.2, 0.4, 0.6}. | TRAIN-1 | 2 | todo | |
@@ -67,3 +67,8 @@ afternoon each on the 3090.
 - 2026-09-14: queue created from `references/SURVEY.md` section 2 (which now just points here) and
   the reviewer register in `reports/QUESTIONS.md`. Nothing started yet.
 - 2026-09-14: step 1 done (REPORT.md section 9). Item sets frozen as v1 with hashes in the tracker config; every eval writes per-item, per-option log-probs under four premises (prompt, cue only, newline, listed choices) so steps 2 and 4 run without a model. All 11 adapters re-scored on WSL: 111 cells move against the Windows numbers, at most 2.6 points on 160-item levels (the same-weights noise floor). Merging the LoRA flips 1.8% of predictions and halves eval time; adopted for new evaluations, not for EVAL_ONLY re-scores of section 8 arms. Eval per arm is 24 min unmerged, 15 merged.
+- 2026-09-14: step 6 done out of order, while step 1's re-score occupied the GPU (it needs no run and
+  nothing depends on it). Executive summary and 8.3 carry the weakness-equals-type caveat; "RAG
+  ceiling" / "RAG upper bound" are "oracle context" in the report and the code docstrings; 8.1 has a
+  sequence / token / loss-bearing-token table (arm C: 84% knowledge text by loss-bearing tokens,
+  episodes 12%) and the arm D schedule confound, pointing at steps 9 and 12.

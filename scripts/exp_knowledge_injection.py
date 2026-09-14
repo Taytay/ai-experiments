@@ -3,7 +3,7 @@ and measure whether it transfers to task formats never seen in training.
 
 Conditions
   base            zero-shot (chance level; names are fictional)
-  incontext       fact placed in the prompt (RAG upper bound, no training)
+  incontext       fact placed in the prompt (oracle context: an upper bound for retrieval, no training)
   ft_raw          full FT on ONE canonical sentence per merchant, many epochs
   ft_aug          full FT on 14 paraphrases + QA per merchant, matched step count
   ft_aug_lora     same data, LoRA r=64 instead of full FT
@@ -91,7 +91,7 @@ def evaluate(model, tok, incontext=False, items=EVAL):
     for it in items:
         prompt = it["prompt"]
         if incontext:
-            # Prepend the fact right before the final query (RAG-style).
+            # Prepend the exact fact right before the final query (oracle context, not retrieval).
             head, _, tail = prompt.rpartition("\n\n")
             prompt = f"{head}\n\nNote: {FACT[it['merchant']]}\n{tail}"
         pred = score_options(model, tok, prompt, it["options"])
