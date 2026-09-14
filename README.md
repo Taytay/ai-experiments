@@ -55,7 +55,7 @@ can skip it and use the recipes directly.
 ```
 just setup                                  # once per checkout: uv sync, DVC remote for this OS, dvc pull (3.8 GB)
 just doctor                                 # check machine and checkout; --gpu adds the VRAM-spill test
-just smoke                                  # SMOKE=1 run of curriculum arm C, end to end; not recorded in the tracker
+just smoke                                  # plumbing check: arm C, 2 training steps, tiny eval; not recorded in the tracker
 uv run python scripts/exp_curriculum.py C   # ARM [model] [steps] [lr]
 uv run evals leaderboard                    # regenerate evals/LEADERBOARD.md
 just                                        # list every recipe

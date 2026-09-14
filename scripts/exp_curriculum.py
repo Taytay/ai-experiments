@@ -71,9 +71,14 @@ probes = U.probes(species)
 suite = S.suite_items()
 K_texts = U.training_texts(species)
 SMOKE = bool(os.environ.get("SMOKE"))
-if SMOKE:  # quick end-to-end check: subsample eval items, write *_smoke.json, record nothing in the tracker
+if SMOKE:
+    # Quick end-to-end plumbing check, not an experiment: 2 optimizer steps, 1/40 of the eval items,
+    # results in results/*_smoke.json, adapter under models/smoke/ (outside the DVC-tracked
+    # models/adapters/), and nothing recorded in the tracker.
+    STEPS = min(STEPS, 2)
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
+    ADAPTER = ROOT / "models" / "smoke" / ADAPTER.name
 print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | "
       f"{len(ladder)} ladder items | {len(probes)} probes | {len(suite)} ICL suite items", flush=True)
 
