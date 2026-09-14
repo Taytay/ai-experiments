@@ -28,6 +28,8 @@ PLAN.md          work queue and per-step status (start here)
 CLAUDE.md        one-job-per-location table and the working rules for agent sessions
 NOTES.md         machine and environment history
 justfile         task runner: setup, doctor, pull, push-models, smoke, leaderboard
+bootstrap.sh     fresh machine: install uv and just if missing, then `just setup` and
+bootstrap.ps1    `just doctor` (WSL/Ubuntu and Windows respectively)
 src/ai_experiments/
                  the library, installed editable: universe.py, merchants.py (data generators),
                  icl_suite.py, paths.py (repo locations), evals/ (run tracker + CLI)
@@ -45,8 +47,10 @@ references/      papers/ (text, metadata, summaries; PDFs not tracked), SURVEY.m
 
 ## Running
 
-Needs `uv` and, for the shortcuts, `just` (`winget install Casey.Just` on Windows,
-`sudo apt install just` on Ubuntu).
+On a fresh machine, run the bootstrap for your OS once: `./bootstrap.sh` on WSL/Ubuntu,
+`powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1` on Windows. It installs `uv` and
+`just` if missing, then runs `just setup` and `just doctor`. With those two tools present you
+can skip it and use the recipes directly.
 
 ```
 just setup                                  # once per checkout: uv sync, DVC remote for this OS, dvc pull (3.8 GB)
