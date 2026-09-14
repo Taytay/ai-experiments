@@ -1,5 +1,5 @@
 [project]
-name = "gpu-unsloth-check"
+name = "ai-experiments"
 version = "0.1.0"
 description = "Injecting new knowledge and terminology into small LLMs and embedding models, and extracting it again"
 requires-python = "==3.12.*"

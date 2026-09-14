@@ -1,4 +1,4 @@
-# gpu-unsloth-check
+# ai-experiments
 
 Started as a check that this machine's NVIDIA driver and CUDA stack could fine-tune a small
 embedding model with unsloth. It now holds a set of experiments on **injecting new knowledge and
