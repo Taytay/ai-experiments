@@ -247,6 +247,10 @@ with Run("curriculum_v2", model=MODEL, config=cfg) as run:
         tok.padding_side = "right"
         r = evaluate(model, tok)
         results["trained"], results["trained_ctx"] = r["noctx"], r["ctx"]
+        if OUT.exists():  # keep the training-time stats recorded by the original run
+            prev = json.loads(OUT.read_text()).get("trained", {})
+            keep = ("train_minutes", "train_tokens", "tokens_per_s", "peak_alloc_GiB", "train_stats_note")
+            results["trained"].update({k: v for k, v in prev.items() if k in keep or k.startswith("n_")})
     elif not phases:
         tok, model = load()
         r = evaluate(model, tok)
