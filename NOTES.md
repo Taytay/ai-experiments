@@ -126,7 +126,7 @@ First `just doctor --gpu` on the Windows side, all still to be changed by hand:
 | Check | Result | Fix |
 | --- | --- | --- |
 | Store alias | `python3.exe` still resolves to `WindowsApps` | Settings > Apps > Advanced app settings > App execution aliases: turn off python.exe and python3.exe |
-| poppler | `pdftotext` from Git's mingw64, no `pdftoppm` | `winget install oschwartz10612.Poppler` (Windows), `sudo apt install poppler-utils` (WSL) |
+| poppler | `pdftotext` from Git's mingw64, no `pdftoppm` | `just pdf-tools` (winget Poppler on Windows, apt poppler-utils on WSL); optional, research steps only |
 | sysmem fallback | allocating 125% of VRAM succeeded, so the driver spills to system RAM | NVIDIA Control Panel > Manage 3D settings > CUDA - Sysmem Fallback Policy > Prefer No Sysmem Fallback; then re-run `just doctor --gpu` on both sides |
 
 Git state: every tracked file is LF in the index; 80 files sit as CRLF in the Windows working

@@ -56,8 +56,9 @@ Both sides:
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
   side; if not, `just pull` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.
-- The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt`
-  (`just doctor` says whether poppler is installed on this side).
+- The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt`. That
+  needs poppler, which is optional and per machine: `just pdf-tools` installs it, `just doctor`
+  says whether it is present on this side.
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
   so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.

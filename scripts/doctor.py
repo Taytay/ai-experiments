@@ -73,7 +73,21 @@ def check_store_alias() -> None:
 
 def check_tool(name: str, win_hint: str, linux_hint: str) -> None:
     p = shutil.which(name)
-    report("OK" if p else "WARN", name, p or f"not on PATH; install with `{win_hint if IS_WIN else linux_hint}`")
+    report("OK" if p else "WARN", name,
+           p or f"not on PATH; every `just` recipe needs it. Run `{win_hint if IS_WIN else linux_hint}` (installs uv and just, then setup and doctor).")
+
+
+def check_poppler() -> None:
+    have = [t for t in ("pdftotext", "pdftoppm") if shutil.which(t)]
+    missing = [t for t in ("pdftotext", "pdftoppm") if not shutil.which(t)]
+    if not missing:
+        report("OK", "poppler", f"pdftotext and pdftoppm on PATH ({shutil.which('pdftotext')})")
+        return
+    report("WARN", "poppler",
+           f"{', '.join(missing)} not on PATH. Optional: only research steps need it, when an agent "
+           "reads a PDF under references/papers/ (the Read tool cannot open PDFs; `pdftotext -layout` "
+           "makes the paper.txt it reads instead). Training and evaluation never use it. "
+           "Install with `just pdf-tools`" + (f" (have {', '.join(have)})" if have else "") + ".")
 
 
 def check_line_endings() -> None:
@@ -145,10 +159,9 @@ def main() -> None:
     check_package()
     check_utf8()
     check_store_alias()
-    check_tool("uv", "winget install astral-sh.uv", "curl -LsSf https://astral.sh/uv/install.sh | sh")
-    check_tool("just", "winget install Casey.Just", "sudo apt install just")
-    check_tool("pdftotext", "winget install oschwartz10612.Poppler", "sudo apt install poppler-utils")
-    check_tool("pdftoppm", "winget install oschwartz10612.Poppler", "sudo apt install poppler-utils")
+    check_tool("uv", "bootstrap.ps1", "./bootstrap.sh")
+    check_tool("just", "bootstrap.ps1", "./bootstrap.sh")
+    check_poppler()
     check_line_endings()
     check_dvc_remote()
     check_claude_settings()
