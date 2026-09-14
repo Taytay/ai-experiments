@@ -102,8 +102,13 @@ def option_scores(model, tok, prompt, options):
 
 @torch.no_grad()
 def perplexity(model, tok, text):
+    # plain CE from logits: unsloth's fused loss refuses to run when the caching allocator
+    # holds most of the card after a long eval pass ("No or negligible GPU memory available")
+    torch.cuda.empty_cache()
     ids = tok(text, return_tensors="pt")["input_ids"].cuda()
-    return math.exp(model(input_ids=ids, labels=ids).loss.float().item())
+    logits = model(input_ids=ids).logits.float()
+    loss = F.cross_entropy(logits[0, :-1], ids[0, 1:])
+    return math.exp(loss.item())
 
 
 def accuracy(model, tok, items, context=False):
@@ -125,7 +130,7 @@ def accuracy(model, tok, items, context=False):
 
 def evaluate(model, tok):
     """Returns {"noctx": {...}, "ctx": {...}}. Probes, ICL suite and perplexity live under noctx."""
-    model.eval(); t0 = time.time()
+    model.eval(); torch.cuda.empty_cache(); t0 = time.time()
     noctx = accuracy(model, tok, ladder)
     noctx.update(accuracy(model, tok, probes))
     icl = accuracy(model, tok, suite)
@@ -181,6 +186,7 @@ def train(model, tok, phases, run):
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
     counts, tokens, t0 = defaultdict(int), 0, time.time()
+    torch.cuda.empty_cache(); torch.cuda.reset_peak_memory_stats()
     model.train()
     for step in range(STEPS):
         mix = phases[min(len(phases) - 1, step * len(phases) // STEPS)]
