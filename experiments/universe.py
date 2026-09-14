@@ -233,6 +233,10 @@ def probes(species, seed=5, n_per_type=6):
                 n, _m = _name(rng, names, t, 1.0, marked=marked)
                 items.append(dict(level=level, prompt=f"Question: What type is {n}?\nAnswer:",
                                   options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
+                # same probe in the trained answer format (bare type names score ~20% even for
+                # perfectly recalled seen species; see L1_recall vs L1_recall_fmt)
+                items.append(dict(level=level + "_fmt", prompt=f"Question: What type is {n}?\nAnswer:",
+                                  options=[f" {n} is a {o}-type." for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
     return items
 
 
