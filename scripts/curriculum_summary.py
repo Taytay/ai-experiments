@@ -1,6 +1,9 @@
 """Side-by-side table of curriculum v2 arms from results/curriculum_<model>_<arm>.json.
 
-usage: uv run python scripts/curriculum_summary.py [Qwen2.5-3B] [--md]
+usage: uv run python scripts/curriculum_summary.py [Qwen2.5-3B] [--md] [--ci]
+
+--ci appends the 95% bootstrap interval from results/ci_<model>.json (scripts/ci_table.py) to every
+accuracy cell that has one, as `acc [lo, hi]`, and marks with * a cell inside its empirical null band.
 """
 import json
 import sys
@@ -10,6 +13,12 @@ from ai_experiments.paths import ROOT
 tag = next((a for a in sys.argv[1:] if not a.startswith("--")), "Qwen2.5-3B")
 md = "--md" in sys.argv
 R = ROOT / "results"
+CI = None
+if "--ci" in sys.argv:
+    p = R / f"ci_{tag}.json"
+    if not p.exists():
+        sys.exit(f"{p} missing; run scripts/ci_table.py {tag} first")
+    CI = json.loads(p.read_text())["arms"]
 ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
          "base_m": "base(m)", "E": "E morph"}
@@ -36,15 +45,21 @@ if not arms:
     sys.exit(f"no results for {tag}")
 
 
-def cell(v):
-    return "" if v is None else (f"{v:g}" if isinstance(v, (int, float)) else str(v))
+def cell(v, arm=None, cond=None, metric=None):
+    if v is None:
+        return ""
+    s = f"{v:g}" if isinstance(v, (int, float)) else str(v)
+    c = CI and CI.get(arm, {}).get(cond, {}).get(metric)
+    if c:
+        s += f" [{c['ci'][0]:g}, {c['ci'][1]:g}]" + ("" if c["above_null"] else "*")
+    return s
 
 
 hdr = ["metric"] + [LABEL[a] for a in arms]
 rows = []
 for m, cond in ROWS:
     name = m + (" (+ctx)" if cond == "ctx" else "")
-    rows.append([name] + [cell(data[a][cond].get(m)) for a in arms])
+    rows.append([name] + [cell(data[a][cond].get(m), a, cond, m) for a in arms])
 if md:
     print("| " + " | ".join(hdr) + " |"); print("|" + "---|" * len(hdr))
     for r in rows:
