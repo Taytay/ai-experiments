@@ -5,10 +5,11 @@ usage: uv run python scripts/curriculum_summary.py [Qwen2.5-3B] [--md]
 import json
 import sys
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 tag = next((a for a in sys.argv[1:] if not a.startswith("--")), "Qwen2.5-3B")
 md = "--md" in sys.argv
-R = Path(__file__).parent.parent / "results"
+R = ROOT / "results"
 ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
          "base_m": "base(m)", "E": "E morph"}

@@ -16,6 +16,7 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 USE_UNSLOTH = len(sys.argv) > 4 and sys.argv[4] == "unsloth"
 if USE_UNSLOTH:
@@ -25,11 +26,9 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-import universe as U  # noqa: E402
-from evals.tracker import Run  # noqa: E402
-from merchants import GENERAL_TEXT  # noqa: E402
+from ai_experiments import universe as U
+from ai_experiments.evals.tracker import Run
+from ai_experiments.merchants import GENERAL_TEXT
 
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-0.5B"
 STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 600
@@ -37,8 +36,8 @@ LR = float(sys.argv[3]) if len(sys.argv) > 3 else 2e-4
 BS, SEED = 16, 0
 tag = MODEL.split("/")[-1]
 suffix = f"_lr{LR:g}" + ("_unsloth" if USE_UNSLOTH else "")
-OUT = Path(__file__).parent.parent / "results" / f"universe_{tag}{suffix}.json"
-ADAPTER = Path(__file__).parent.parent / "models" / "adapters" / f"universe_{tag}{suffix}_lora"
+OUT = ROOT / "results" / f"universe_{tag}{suffix}.json"
+ADAPTER = ROOT / "models" / "adapters" / f"universe_{tag}{suffix}_lora"
 torch.manual_seed(SEED)
 
 species = U.build()

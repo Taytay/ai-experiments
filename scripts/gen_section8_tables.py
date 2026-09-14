@@ -3,8 +3,9 @@
 usage: uv run python scripts/gen_section8_tables.py"""
 import json
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
-R = Path(__file__).parent.parent / "results"
+R = ROOT / "results"
 tag = "Qwen2.5-3B"
 
 

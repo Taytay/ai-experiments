@@ -23,19 +23,18 @@ import random
 import sys
 import time
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 import torch
 import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-import merchants as M  # noqa: E402
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from evals.tracker import Run  # noqa: E402
+from ai_experiments import merchants as M
+from ai_experiments.evals.tracker import Run
 
 MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EPOCHS, BS, LR, SEED = 6, 32, 3e-5, 0
-OUT = Path(__file__).parent.parent / "results" / "embed_vocab.json"
+OUT = ROOT / "results" / "embed_vocab.json"
 torch.manual_seed(SEED)
 
 all_m = M.build()

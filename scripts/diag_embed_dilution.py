@@ -7,8 +7,7 @@ import sys, random
 from pathlib import Path
 import torch, torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-import merchants as M
+from ai_experiments import merchants as M
 import importlib.util
 spec = importlib.util.spec_from_file_location("ev", Path(__file__).parent / "exp_embed_vocab.py")
 src = (Path(__file__).parent / "exp_embed_vocab.py").read_text().split("results = {}")[0]  # defs only

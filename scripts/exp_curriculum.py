@@ -32,18 +32,17 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 import unsloth  # noqa: F401  (before transformers)
 import torch
 import torch.nn.functional as F
 from unsloth import FastLanguageModel
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-import universe as U  # noqa: E402
-import icl_suite as S  # noqa: E402
-from evals.tracker import Run  # noqa: E402
-from merchants import GENERAL_TEXT  # noqa: E402
+from ai_experiments import universe as U
+from ai_experiments import icl_suite as S
+from ai_experiments.evals.tracker import Run
+from ai_experiments.merchants import GENERAL_TEXT
 
 ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
@@ -61,8 +60,8 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
 }
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
-OUT = Path(__file__).parent.parent / "results" / f"curriculum_{tag}_{ARM}.json"
-ADAPTER = Path(__file__).parent.parent / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
+OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}.json"
+ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
 torch.manual_seed(SEED)
 
 species = U.build(morph_p=MORPH_P)
@@ -242,7 +241,7 @@ with Run("curriculum_v2", model=MODEL, config=cfg) as run:
     eval_only = bool(phases) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
     if eval_only:
         # re-score a previously trained adapter (e.g. after an eval-time crash) without retraining
-        run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(Path(__file__).parent.parent)))
+        run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(ROOT)))
         model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
         tok.padding_side = "right"
         r = evaluate(model, tok)

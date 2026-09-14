@@ -112,3 +112,22 @@ Windows-only gotchas that do not apply on WSL: the `python` Store alias, cp1252 
 (`PYTHONIOENCODING`), Bash heredoc failures, Smart App Control, WDDM system-memory fallback.
 Linux paths in `runs.jsonl` `argv` will look different from the Windows ones already recorded;
 the tracker's `env.platform` field says which side a run came from.
+
+## 2026-09-14: ergonomics pass and machine-setting audit
+
+Repo changes so the docs carry fewer caveats: `src/ai_experiments` is an installable package
+(no `sys.path` edits in scripts), `.gitattributes` forces LF, `.claude/settings.json` sets
+`PYTHONUTF8=1` for agent sessions, the package reconfigures stdout to UTF-8 on import, a
+`justfile` wraps setup and the DVC routine, and `scripts/doctor.py` (`just doctor`) checks the
+machine. `just` 1.58.0 was installed on the Windows side with winget.
+
+First `just doctor --gpu` on the Windows side, all still to be changed by hand:
+
+| Check | Result | Fix |
+| --- | --- | --- |
+| Store alias | `python3.exe` still resolves to `WindowsApps` | Settings > Apps > Advanced app settings > App execution aliases: turn off python.exe and python3.exe |
+| poppler | `pdftotext` from Git's mingw64, no `pdftoppm` | `winget install oschwartz10612.Poppler` (Windows), `sudo apt install poppler-utils` (WSL) |
+| sysmem fallback | allocating 125% of VRAM succeeded, so the driver spills to system RAM | NVIDIA Control Panel > Manage 3D settings > CUDA - Sysmem Fallback Policy > Prefer No Sysmem Fallback; then re-run `just doctor --gpu` on both sides |
+
+Git state: every tracked file is LF in the index; 80 files sit as CRLF in the Windows working
+tree (written by editors, normalised on add). Harmless, and a fresh checkout is all LF.

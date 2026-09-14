@@ -17,7 +17,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent
+from ai_experiments.paths import ROOT
 OUT = ROOT / "results" / "bench_throughput.json"
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 PEAK_TFLOPS = {"RTX 3090": 71.0, "RTX 4090": 165.0, "A100": 312.0, "H100": 989.0, "RTX 5090": 210.0}  # dense bf16, fp32 accumulate
@@ -157,8 +157,7 @@ def main():
     quick = len(sys.argv) > 1 and sys.argv[1] == "quick"
     n_steps = 6 if quick else 12
     import torch
-    sys.path.insert(0, str(ROOT))
-    from evals.tracker import Run
+    from ai_experiments.evals.tracker import Run
     gpu = torch.cuda.get_device_name(0)
     peak = next((v for k, v in PEAK_TFLOPS.items() if k in gpu), 71.0)
     idxs = [i for i, c in enumerate(CONFIGS) if not quick or "0.5B" in c[1] or c[0] == "minilm"]

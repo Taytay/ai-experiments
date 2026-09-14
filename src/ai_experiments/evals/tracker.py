@@ -11,13 +11,13 @@ changing `connect()` once its Python binding loads on this machine.
 
 Usage in an experiment:
 
-    from evals.tracker import Run
+    from ai_experiments.evals.tracker import Run
     with Run("universe_ladder", model="Qwen/Qwen2.5-3B", config=dict(steps=600, lr=2e-4)) as run:
         ...
         run.log(dict(L1_recall=71.2, L3_induct=40.0), condition="lora")
         run.artifact("results/universe_Qwen2.5-3B.json")
 
-CLI: `uv run python -m evals --help`
+CLI: `uv run evals --help`
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ import time
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from ..paths import ROOT
 DB_PATH = ROOT / "evals" / "runs.db"
 JSONL_PATH = ROOT / "evals" / "runs.jsonl"
 

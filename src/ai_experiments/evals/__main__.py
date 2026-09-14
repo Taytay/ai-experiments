@@ -1,12 +1,12 @@
 """CLI for the experiment tracker.
 
-  uv run python -m evals list [--exp NAME] [-n 20]
-  uv run python -m evals show RUN_ID
-  uv run python -m evals compare EXPERIMENT [--metric L3_induct_type_nonsense] [--condition lora]
-  uv run python -m evals leaderboard            # writes evals/LEADERBOARD.md
-  uv run python -m evals import-json PATH --exp NAME --model M [--commit SHA] [--note ...]
-  uv run python -m evals export                 # rewrite evals/runs.jsonl
-  uv run python -m evals rebuild                # recreate runs.db from runs.jsonl (after clone)
+  uv run evals list [--exp NAME] [-n 20]
+  uv run evals show RUN_ID
+  uv run evals compare EXPERIMENT [--metric L3_induct_type_nonsense] [--condition lora]
+  uv run evals leaderboard            # writes evals/LEADERBOARD.md
+  uv run evals import-json PATH --exp NAME --model M [--commit SHA] [--note ...]
+  uv run evals export                 # rewrite evals/runs.jsonl
+  uv run evals rebuild                # recreate runs.db from runs.jsonl (after clone)
 """
 import argparse
 import json

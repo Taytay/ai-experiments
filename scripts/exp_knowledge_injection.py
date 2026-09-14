@@ -22,15 +22,14 @@ import random
 import sys
 import time
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-import merchants as M  # noqa: E402
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from evals.tracker import Run  # noqa: E402
+from ai_experiments import merchants as M
+from ai_experiments.evals.tracker import Run
 
 MODEL = "Qwen/Qwen2.5-0.5B"
 STEPS = 420          # identical optimizer steps for every trained condition
@@ -38,7 +37,7 @@ BS = 16
 LR_FULL = 5e-5
 LR_LORA = 3e-4
 SEED = 0
-OUT = Path(__file__).parent.parent / "results" / "knowledge_injection.json"
+OUT = ROOT / "results" / "knowledge_injection.json"
 torch.manual_seed(SEED)
 random.seed(SEED)
 

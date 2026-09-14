@@ -4,7 +4,8 @@
     autostage = true
 
 # The remote "dstore" is a plain folder on this machine's D: drive. Its path differs by OS,
-# so it is NOT set here on purpose. Every clone must set it once, locally (gitignored):
+# so it is NOT set here on purpose. Every clone must set it once, locally (gitignored);
+# `just setup` (or `just dvc-remote`) does it for the OS it runs on, or by hand:
 #
 #   Windows:  uv run dvc remote modify --local dstore url D:\repos\dvc\ai-experiments
 #   WSL:      uv run dvc remote modify --local dstore url /mnt/d/repos/dvc/ai-experiments
