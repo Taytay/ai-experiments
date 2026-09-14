@@ -50,7 +50,7 @@ Both sides:
   `README.md`. If any `dvc` command fails with `expected 'url' for dictionary value`, the
   remote step has not been done on this checkout.
 - `just doctor` checks the machine and checkout (venv, package, UTF-8, Store alias, poppler,
-  line endings, DVC remote, GPU); `just doctor --gpu` also tests whether the driver spills VRAM
+  line endings, DVC remote, GPU, torchvision build matching torch so unsloth imports); `just doctor --gpu` also tests whether the driver spills VRAM
   to system RAM. Run it when something looks off, and after changing a machine setting.
 - Run Python with `uv run python ...`, never a bare `python`.
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this

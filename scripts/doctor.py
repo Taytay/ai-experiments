@@ -167,6 +167,31 @@ def check_gpu(oom_test: bool) -> None:
                                               "could not tell whether the driver spills. Check the GPU is idle and re-run.")
 
 
+def check_torchvision() -> None:
+    """unsloth imports torchvision and refuses to start if its compiled ops do not load against
+    the installed torch. That happens when torchvision comes from PyPI (CPU build) while torch is
+    the cu128 build; the lock pins both to the cu128 index, so a mismatch means a stale venv."""
+    try:
+        import torch
+    except ImportError:
+        report("SKIP", "torchvision", "torch not installed")
+        return
+    try:
+        import torchvision
+        torch.ops.torchvision.nms  # the operator unsloth's probe looks for
+    except Exception as e:  # RuntimeError from a CPU build against cu128 torch, or ImportError
+        report("FAIL", "torchvision", f"import fails ({type(e).__name__}: {str(e).strip()[:100]}), so `import unsloth` "
+                                      "fails too and no experiment can start. Run `just sync` to reinstall from the lock.")
+        return
+    tv, tc = torchvision.__version__, torch.__version__
+    tv_build, tc_build = (tv.split("+") + [""])[1], (tc.split("+") + [""])[1]
+    if tv_build != tc_build:
+        report("FAIL", "torchvision", f"{tv} is not the same build as torch {tc}; unsloth will refuse to import. "
+                                      "Run `just sync` to reinstall from the lock.")
+    else:
+        report("OK", "torchvision", f"{tv} matches torch {tc}; unsloth's import probe will pass")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--gpu", action="store_true", help="also run the over-allocation test on the GPU")
@@ -184,6 +209,7 @@ def main() -> None:
     check_dvc_remote()
     check_claude_settings()
     check_gpu(args.gpu)
+    check_torchvision()
 
     width = max(len(name) for _, name, _ in rows)
     for status, name, detail in rows:

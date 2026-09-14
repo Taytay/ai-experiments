@@ -70,7 +70,8 @@ ladder = U.ladder(species) + U.heldout_induction(species)
 probes = U.probes(species)
 suite = S.suite_items()
 K_texts = U.training_texts(species)
-if os.environ.get("SMOKE"):  # quick end-to-end check: subsample eval items
+SMOKE = bool(os.environ.get("SMOKE"))
+if SMOKE:  # quick end-to-end check: subsample eval items, write *_smoke.json, record nothing in the tracker
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
 print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | "
@@ -232,7 +233,7 @@ cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCU
            method="unsloth_lora", lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite))
-with Run("curriculum_v2", model=MODEL, config=cfg) as run:
+with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
     def save():
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
         for cond, mets in results.items():

@@ -62,13 +62,14 @@ check:
 leaderboard:
     uv run evals leaderboard
 
-# Quick end-to-end run of one curriculum arm (default C) with SMOKE=1.
+# Quick end-to-end run of one curriculum arm (default C) with SMOKE=1: subsampled eval items,
+# results in results/*_smoke.json, nothing recorded in the tracker.
 [windows]
-[doc("Quick end-to-end run of one curriculum arm (default C) with SMOKE=1")]
+[doc("Quick end-to-end run of one curriculum arm (default C) with SMOKE=1; not recorded in the tracker")]
 smoke ARM='C':
     $env:SMOKE = '1'; uv run python scripts/exp_curriculum.py {{ARM}}
 
 [unix]
-[doc("Quick end-to-end run of one curriculum arm (default C) with SMOKE=1")]
+[doc("Quick end-to-end run of one curriculum arm (default C) with SMOKE=1; not recorded in the tracker")]
 smoke ARM='C':
     SMOKE=1 uv run python scripts/exp_curriculum.py {{ARM}}
