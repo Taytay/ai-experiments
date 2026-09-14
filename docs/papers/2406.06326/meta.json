@@ -1,0 +1,29 @@
+{
+  "id": "2406.06326",
+  "version": "v5",
+  "id_versioned": "2406.06326v5",
+  "title": "Self-Tuning: Instructing LLMs to Effectively Acquire New Knowledge through Self-Teaching",
+  "authors": [
+    "Xiaoying Zhang",
+    "Baolin Peng",
+    "Ye Tian",
+    "Jingyan Zhou",
+    "Yipeng Zhang",
+    "Haitao Mi",
+    "Helen Meng"
+  ],
+  "published": "2024-06-10",
+  "updated": "2024-06-10",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL"
+  ],
+  "comment": "ACL 2025 Findings",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Large language models (LLMs) often struggle to provide up-to-date information due to their one-time training and the constantly evolving nature of the world. To keep LLMs current, existing approaches typically involve continued pre-training on new documents. However, they frequently face difficulties in extracting stored knowledge. Motivated by the remarkable success of the Feynman Technique in efficient human learning, we introduce Self-Tuning, a learning framework aimed at improving an LLM's ability to effectively acquire new knowledge from unseen raw documents through self-teaching. Specifically, we develop a Self-Teaching strategy that augments the documents with a set of knowledge-intensive tasks created in a self-supervised manner, focusing on three crucial aspects: memorization, comprehension, and self-reflection. Additionally, we introduce three Wiki-Newpages-2023-QA datasets to facilitate an in-depth analysis of an LLM's knowledge acquisition ability concerning memorization, extraction, and reasoning. Extensive experimental results on various models, e.g., Llama2-7B reveal that Self-Tuning consistently exhibits superior performance across all knowledge acquisition tasks and excels in preserving previous knowledge.",
+  "abs_url": "https://arxiv.org/abs/2406.06326",
+  "pdf_url": "https://arxiv.org/pdf/2406.06326",
+  "src_url": "https://arxiv.org/src/2406.06326v5",
+  "metadata_source": "abs-page"
+}

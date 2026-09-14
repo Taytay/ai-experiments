@@ -1,0 +1,671 @@
+                                        It's All in The [MASK]: Simple Instruction-Tuning Enables BERT-like Masked Language
+                                                                          Models As Generative Classifiers
+
+                                                                                     Benjamin Clavie´a, Nathan Cooperb, Benjamin Warnerb
+
+                                                                                                                               aAnswer.AI, Japan
+                                                                                                                               bAnswer.AI, USA
+
+arXiv:2502.03793v2 [cs.CL] 10 Feb 2025  Abstract
+
+                                        While encoder-only models such as BERT and ModernBERT are ubiquitous in real-world NLP applications, their conventional
+                                        reliance on task-specific classification heads can limit their applicability compared to decoder-based large language models (LLMs).
+                                        In this work, we introduce ModernBERT-Large-Instruct, a 0.4B-parameter encoder model that leverages its masked language
+                                        modeling (MLM) head for generative classification. Our approach employs an intentionally simple training loop and inference
+                                        mechanism that requires no heavy pre-processing, heavily engineered prompting, or architectural modifications. ModernBERT-
+                                        Large-Instruct exhibits strong zero-shot performance on both classification and knowledge-based tasks, outperforming similarly
+                                        sized LLMs on MMLU and achieving 93% of Llama3-1B's MMLU performance with 60% less parameters. We also demonstrate
+                                        that, when fine-tuned, the generative approach using the MLM head matches or even surpasses traditional classification-head
+                                        methods across diverse NLU tasks. This capability emerges specifically in models trained on contemporary, diverse data mixes,
+                                        with models trained on lower volume, less-diverse data yielding considerably weaker performance. Although preliminary, these
+                                        results demonstrate the potential of using the original generative masked language modeling head over traditional task-specific
+                                        heads for downstream tasks. Our work suggests that further exploration into this area is warranted, highlighting many avenues for
+                                        future improvements.
+
+                                        Keywords: Zero-shot classification, Multiple-choice question answering, Encoder models, BERT, ModernBERT, Masked
+                                        Language Modelling, FLAN, Instruction-Tuning
+
+                                        1. Introduction                                                   strong performance on more traditional tasks, such as text clas-
+                                                                                                          sification, where fine-tuned encoder-only models can match the
+                                           Since the release of BERT [1] in 2018, Transformer [2]-        performance of LLMs that have 100× more parameters [13].
+                                        based encoder-only pretrained models have been omnipresent
+                                        in Natural Language Processing, being used to perform a              When using encoder-only models, classification tasks are
+                                        wide variety of tasks and set state-of-the-art results across     traditionally performed with task-specific classification heads,
+                                        many of them. In the following years, much work has fo-           where the model's representations are pooled into a single vec-
+                                        cused on further pretrained language models--with increas-        tor that is then used to assign an appropriate label. However,
+                                        ing emphasis on generative, decoder-only models trained on        this approach has traditionally lagged behind in zero-shot clas-
+                                        vast quantities of data, generally called Large Language Mod-     sification, as it requires a substantial fine-tuning step to yield
+                                        els (LLMs)--following the release of ChatGPT and the im-          good results. As a result, zero-shot classification methods have
+                                        pressive performance of instruction-tuned AI assistants in gen-   typically relied on leveraging the classification head by refram-
+                                        eral [3, 4, 5]. Notably, LLMs have demonstrated their strong      ing tasks in an appropriate way. The dominant approach has
+                                        potential as zero-shot [6] and few-shot [7] learners, especially  been to repurpose textual entailment: after extensive pretrain-
+                                        when instruction-tuned [8].                                       ing on entailment tasks such as MNLI [14]--where the model
+                                                                                                          predicts whether a sentence is entailed or contradicted by an-
+                                           However, while LLMs are very powerful, a large number          other--the final model is used to determine whether a label is
+                                        of real-world tasks continue to be performed by encoder-only      entailed by a given sentence [15]. Further studies have shown
+                                        models, such as BERT, RoBERTa [9], or DeBERTaV3 [10].             that framing a very large number of tasks as entailment tasks
+                                        There are multiple reasons for the continued prevalence of en-    can produce an even stronger zero-shot classifier [16]. Another
+                                        coder models. One important factor is their greatly reduced       promising approach treats zero-shot classification as a form of
+                                        cost; they can process large volumes of data with compu-          next-sentence prediction [17].
+                                        tational requirements orders of magnitude lower than those
+                                        of LLMs [11]. Moreover, although decoder-only models                 Researchers have explored using the Masked Language
+                                        are often better logical reasoners--thanks to their autoregres-   Modeling (MLM) head--the generative component of encoder-
+                                        sive nature and techniques such as Chain-of-Thought prompt-       only models--for classification. Early studies demonstrated
+                                        ing [12]--encoder-only models have consistently demonstrated      strong potential in few-shot learning by turning tasks into
+                                                                                                          Cloze-style questions [18], where filling in a single token
+                                        Preprint submitted to Natural Language Processing
+                                                                                                                                                                                  February 11, 2025
+Figure 1: High level overview of the process.
+
+suffices to assign a label. For example, Pattern-Exploitive            1.1. Contributions
+Training [19] has been used to let models generate proba-
+bilities over multiple labels using multiple prompts, showing             Many existing approaches to generative classification using
+that these probabilities can transform MLM models into quasi-          encoder-only masked language models rely on substantial over-
+autoregressive few-shot learners [20] with only a few training         head. These methods demand either extensive prompt design,
+steps per task. A recent study further demonstrated that MLM           require converting the model to operate in an autoregressive
+models can be converted into capable autoregressive in-context         manner (thereby reducing the computational efficiency bene-
+learners--requiring no additional training steps--by prepend-          fits of single-forward pass models), or necessitate adjustments
+ing multiple [MASK] tokens at the end of the document. How-            to the attention mechanism.
+ever, this effect is only apparent in models with 900 million
+parameters or more [21].                                                  In this paper, we showcase the potential of a simple gen-
+                                                                       erative approach to encoder-only models that requires little-
+   Other studies have shown that prompt-based approaches can           to-no prompt engineering and no significant modifications to
+achieve strong results on classification and entailment tasks.         the model. We do so by introducing ModernBERT-Large-
+However, these methods require custom prompts for each task            Instruct, an encoder-only model fine-tuned to perform classi-
+and often perform worse than traditional classification-head           fication tasks through its MLM head without further modifi-
+methods [16]. Moreover, these approaches are highly sensitive          cation. We show that ModernBERT-Large-Instruct, although
+to the choice of tokens used to verbalize a label, with perfor-        trained on the older FLAN instruction dataset, is remarkably
+mance varying significantly even among semantically similar            strong for its size. Our approach is built around an extremely
+tokens. To address these issues, UniMC [22] introduced an ad-          simple training loop to highlight its potential without heavy en-
+ditional step by converting tasks into a multiple-choice format        gineering requirements.
+using semantically neutral verbalizers (e.g., "A", "B") instead
+of meaningful words, and by employing a modified attention                Zero-Shot. We show that ModernBERT-Large-Instruct
+mask that ensures each verbalizer attends exclusively to its cor-      is remarkably strong in multiple application settings. On
+responding label description. Although this method achieved            classification tasks, it is competitive with previous ap-
+particularly strong results across a series of tasks, it adds con-     proaches--outperforming all of them in true zero-shot settings
+siderable overhead.                                                    on two out of three tasks. On zero-shot MMLU and MMLU-
+                                                                       Pro, which evaluate the model's knowledge and reasoning abil-
+   Finally, it is worth noting that encoder-only models, while         ity, it is the best overall model of its size class on MMLU, out-
+prevalent in the industry and representing the majority of model       performing even similarly sized LLMs such as SmolLM2 [30]
+downloads from the HuggingFace Hub [11], are predomi-                  and performing closer to the much larger Llama3.2-1B [4]. On
+nantly older models. In fact, the most widely used models              MMLU-Pro, it is the second-best model of its size class, losing
+are the original BERT [1] (from 2018/2019), RoBERTa [9]                only to another encoder model that employs an attention mask
+(from 2020), and DeBERTaV3 [10] (from 2022), each with                 specifically designed to improve multiple-choice question per-
+different strengths and weaknesses. This contrasts sharply             formance.
+with LLMs, where the vast majority of popular models are
+recent releases [4, 5, 23] and are updated multiple times per             Fine-Tuning. We also show that once finetuned,
+year [24, 4, 25, 5]. These newer releases come with con-               ModernBERT-Large-Instruct either outperforms or matches the
+siderable improvements in many areas--particularly in the di-          performance of fully finetuned classification-head methods
+versity and quality of data mixes--which have been shown               across a large number of common classification benchmarks
+to have a large impact on performance in zero- and few-shot            spanning multiple domains--including news subject detection,
+tasks [26, 27, 28]. The recent release of ModernBERT [29],             textual entailment, forum post topic identification, and emo-
+trained using a modernized architecture and a large-scale, mod-        tion detection--with even greater gains observed on more fine-
+ern data mix, thus prompts further exploration into whether            grained tasks.
+similar gains in zero-shot generative performance can be ob-
+tained with encoder-only models.                                          Base Model Impact. Finally, we demonstrate that these re-
+                                                                       sults are unique to ModernBERT [29]. Models based on older
+                                                                       architectures, such as RoBERTa-Large [9], or those trained on
+                                                                       less varied data mixes, such as GTE-en-MLM-Large [31], show
+
+                                                                    2
+noticeably worse performance. Our results join a growing body           pass--replacing all [MASK] tokens simultaneously. Conse-
+of research [22, 19, 21] and provide a strong basis for further ex-     quently, we must format our data so that the model is expected
+ploration into leveraging the generative capabilities of masked         to predict only a single token for a given task.
+language models. In particular, we believe that the effective-
+ness of our simple approach demonstrates the strong potential              Answer Token Prediction We propose a simple variant, in-
+of low-parameter-count encoder-only masked language models.             spired by large language models' instruction tuning pipeline:
+                                                                        answer token prediction. This objective is a very simple tweak
+2. Methods                                                              to the normal MLM objective. Rather than masking multiple to-
+                                                                        kens throughout the input text, we mask a single token, which
+2.1. Base Model                                                         is the verbalizer for a label or answer. This can be considered
+                                                                        a restricted form of sequence-to-sequence learning[36], akin to
+   We theorize that the ability to function as a generative mul-        the way generative models such as LLMs perform tasks. Ef-
+titask learner might be an emergent capability more modern,             fectively, this means that all tasks are reframed in the format
+larger-scale data mixes, which have been shown to greatly im-           of a Cloze question, where the input is formatted so answering
+prove zero-shot performance in decoder-only models [32, 26].            the question requires generating a single verbalizer token. This
+Another potential factor is the use of a more modern model              templating process is further detailed in Section 2.5.
+architecture, more closely resembling the Transformer++ [24,
+33] than the original Transformer [2]. Moreover, a model with a            Verbalizers In the encoder-prompting literature [38], a ver-
+context length exceeding 512 tokens--the norm for most exist-           balizer refers to a single token that a model outputs to repre-
+ing masked language models [1, 9]--allows for longer instruc-           sent its entire answer. Such a token is considered semantically
+tions and would therefore also be beneficial. We also believe           meaningful if it accurately describes the label (for example, the
+that model size is a strong contributor in unlocking instruction-       token "Positive" in the context of emotion classification). How-
+following, with Flan-T5 showing that substantial gains from             ever, in many cases, it is not possible to express the correct
+multi-task instruction tuning are obtained at larger model sizes,       model output with a single meaningful token. In these cases,
+with the smallest model variants showing much more modest               semantically empty verbalizers, such as "A", "B", "C", "D",
+improvements [34].                                                      etc., are used to identify potential answers.
+
+   We choose to use the recently released ModernBERT [29],              2.3. Training Data
+which satisfies all of the above requirements, as it is an
+8k context-length model using a modernized architecture and                The Single Token Constraint Since MLM models are not
+trained on a large-scale, modern data mix. We further ex-               pretrained in a generative fashion but rather to fill all [MASK]
+plore this decision in Section 5 by comparing ModernBERT                tokens, adding multiple [MASK] tokens could bias the model
+to other encoders, which do not satisfy all three constraints.          to consistently predict the longest possible answer. Rather than
+Similarly to previous studies, we focus our explorations on             train the model to ignore extra masked tokens, a setting we
+ModernBERT-Large, the 395 million parameter ModernBERT                  leave for future work, we elected to reformulate the instruction
+variant, as is common practice in the exploration of encoder-           tuning data and downstream tasks to require a single [MASK]
+only model zero-shot capabilities [22, 17].                             token response.
+
+2.2. Training Setting                                                      Modern Instruction Sets This severely constrains our data
+                                                                        selection process, as many of the newer instruction-tuning sets,
+   We propose a simple training objective to further pretrain a         such as Tu¨luV3 [3], are explicitly constructed to train help-
+masked language model (MLM) to turn it into a capable zero-             ful instruct-tuned assistants. The expected model outputs are
+shot model. This training objective is a variant of the model's         noticeably longer than a single token. As a result, many of
+pretraining objective, utilizing the model's MLM head.                  the most popular instruction-tuning datasets are not suitable for
+                                                                        this exploratory work, as they would require considerable pre-
+   Normal MLM In classical MLM training, used to pre-                   processing to be usable.
+train backbone models such as BERT [1], RoBERTa [9], De-
+BERTa [35] or ModernBERT [29], a proportion of input tokens,               FLAN Older instruction-tuning datasets which predate the
+between 15 and 40%, is randomly masked: that is, replaced by            spread of assistant-style models ushered in by ChatGPT, such
+a [MASK] token. The model's training objective then becomes             as the FLAN-2022 [8, 39] collection, contain a large propor-
+a denoising objective: in a single pass, it must predict what the       tion of examples where the expected model answer is a single
+masked tokens originally were.                                          token. FLAN is a large-scale instruction-tuning dataset which
+                                                                        contains hundreds of datasets further divided into thousands of
+   Masked Instruction Tuning The aim of this work is to                 tasks, with each task's associated dataset preprocessed to match
+functionally instruct-tune the Masked Language Modeling head            a specific template. This multi-task fine-tuning data has pre-
+of an MLM model to use its generative capabilities to per-              viously been shown to allow sequence-to-sequence models to
+form a wide array of downstream tasks, in a way similar to              reach improved downstream performance across all tasks, in-
+sequence-to-sequence [36] models such as T5 [37] and its                cluding previously unseen tasks [34].
+instruct-tuned variant, Flan-T5 [34]. An immediate limitation
+of this method is that, unlike causal language modeling, masked            Filtering The FLAN collection, in total, contains 396 mil-
+language modeling generates its outputs in a single forward             lion examples, of which 120 million are single-token answers.
+                                                                        However, a large proportion of those examples come from just
+
+                                                                     3
+Figure 2: High level overview of our data processing pipeline.
+
+a handful of large datasets. The traditional approach to train-                 we corrected this in a subsequent run, we decided to evaluate all
+ing on FLAN involves downsampling the data [34] to cap the                      three approaches: only answer token prediction, answer token
+number of examples from a single dataset. The FLAN authors                      prediction coupled with 20% MLM, and answer token predic-
+originally filtered MMLU [40] and BBH [41] from the data, to                    tion coupled with 20% "dummy MLM" variant.
+serve as held-out test sets. We follow their example and addi-
+tionally filter out certain classification datasets which we use                Objective            MMLU    MMLU-Pro  Avg
+as downstream evaluation tasks, as detailed in Section 3.1. A
+high-level overview of this filtering process is presented in Fig-              ATP                   37.07     13.15  25.11
+ure 2. Following the filtering and down-sampling step, our final                0.8 ATP / 0.2 MLM     41.83     14.74  28.29
+training dataset contains 20 million examples.                                  0.8 ATP / 0.2 dummy   43.06     17.16  30.11
+
+2.4. The Elephant in The [MASK]: Dummy Examples Improve                         Table 1: Comparison of MMLU results between the three training variants.
+      Performance                                                               100% ATP refers to using Answer Token Prediction as the only training objec-
+                                                                                tive. 80% ATP/20% MLM refers to using the ATP objective for 80% of samples
+   Objective Mix One of the worries with this approach is the                   and the normal MLM objective for the remaining 20%. 80% ATP/20% dummy
+potential for catastrophic forgetting due to the relative over-                 refers to using the ATP objective for 80% of samples and dummy MLM exam-
+representation of verbalizers with no strong semantic meaning.                  ples for the remaining 20%.
+To attempt to mitigate this effect, we experimented with intro-
+ducing an Answer Token Prediction vs MLM ratio. Instead of                         Improved Performance We present the performance com-
+applying answer token masking to all samples, we replace An-                    parison results in Table 1. We were surprised to discover that
+swer Token Prediction on a subset of samples with standard                      the dummy MLM-enriched variant consistently and noticeably
+MLM masking across all tokens. This results in each sample                      outperformed the other methods. To rule out randomness, we
+having either a single mask token for the answer, or thirty per-                replicated this result across multiple seeds. We hypothesize that
+cent of all tokens randomly masked as during pretraining [29].                  this effect is due to the dummy examples acting as a form of
+Based on ablation runs, we choose a Answer Token Prediction                     regularization, perhaps in a way similar to dropout [42]. We
+vs MLM ratio of 20%1, meaning that 80% of our examples used                     believe that this label dropout mechanism warrants further in-
+a single masked token objective, as described above, and the re-                vestigation and leave it to future work as it is out of the scope
+maining examples used the typical random masking MLM pre-                       of the current paper.
+training objective.
+                                                                                   Final Objective Choice Based on the improved performance
+   Dummy Examples However, we introduced a labeling bug                         we have observed, all pretraining experiments described in this
+where all the true [MASK] tokens were incorrectly labeled as                    paper use the training objective variant where 80% of the train-
+[MASK], rather than as their actual token. This meant that                      ing examples are answer token prediction. The remaining 20%
+20% of the predicted tokens were of little value, as the model                  of training samples constitute dummy examples, where tokens
+rapidly learned that in cases where multiple [MASK] tokens are                  are masked as they would be in normal MLM pretraining, but
+present, their label is always the same, and the loss for these ex-             given a single, meaningless label.
+amples plummeted and stayed low throughout training. While
+                                                                                2.5. Templating
+    115% and 20% MLM ratio performed similarly, with a slight edge for 20%.
+Noticeable degradation was observed with ratios of 10% and lower or 25% and        In order to leverage the Masked Language Modeling head
+higher.                                                                         for various tasks, we employ light templating. This templating
+                                                                                process is different for training and inference. At training time,
+
+                                                                             4
+our goal is to maximize the number of template variations seen,                        Example Inference Instance (MMLU [40])
+while at inference time we use simple templates that require
+minimal modification for new tasks.                                             You will be given a question as well as a list of options.
+                                                                                Read the question carefully and select the right answer
+2.5.1. Training                                                                 from the list.
+
+   During instruction training we add little additional templat-                   QUESTION: An expected side effect of creatine sup-
+ing to FLAN. Instead, we choose to reuse the extensive tem-                     plementation is:
+plating work already present in the FLAN dataset, based on the
+assumption that a diverse way of presenting similar tasks will                     CHOICES:
+lead to stronger generalization in the final model.                                - A: muscle weakness.
+                                                                                   - B: gain in body mass.
+   Accordingly, we apply a single templating step to all training                  - C: muscle cramps.
+examples: we prepend the [MASK] token (which represents the                        - D: loss of electrolytes.
+expected answer) with a previously untrained token that serves                     ANSWER:
+as an anchor 2, indicating that the following token is the model's                 Answer: [unused0] [MASK]
+final prediction. This is inspired by theof prefix tokens in the
+neural information retrieval literature to help the model distin-            3. Zero-Shot Performance
+guish between queries and corpus documents [43, 44, 45].
+                                                                             3.1. Setting
+                    Example Training Instance
+                                                                                Commonsense Reasoning and Knowledge We use two
+   Fru¨here Versionen von KDE erlaubten mit einem Trick                      standard LLM benchmarks to evaluate the knowledge and
+   die Verwendung der Windows®-Taste als Modifizierer                        commonsense reasoning capabilities of ModernBERT-Large-
+   (so dass Kurzbefehle wie Win+R mo¨glich waren) und als                    Instruct: MMLU [40] and MMLU-Pro [46] In MMLU, mod-
+   regula¨re Taste (dass mit Beta¨tigen der Taste Win das K-                 els are asked general knowledge questions across 57 subjects
+   Menu¨ geo¨ffnet wurde).                                                   and must select the correct answer out of 4 possible options.
+                                                                             To further evaluate the models' robustness on this task, we use
+      Which language is this? [unused0] [MASK]                               MMLU-Pro, a smaller evaluation set designed to be more chal-
+                                                                             lenging. In MMLU-Pro, all questions were filtered to remove
+   Above is a randomly sample training example, with the [un-                trivial knowledge tasks and favor reasoning-heavy questions.
+used0] anchor token in orange and the masked answer in red.                  Additionally, rather than 4 options, each question has 10, low-
+                                                                             ering the impact of random guesses and assessing the ability to
+2.5.2. Inference                                                             distinguish among multiple similar answers.
+
+   During inference, we apply a simple formatting template,                     Zero-Shot Classification Evaluating zero-shot classifiers is
+with minor tweaks depending on the task. The inference tem-                  surprisingly hard, as a large proportion of common bench-
+plate follows a simple sequence, where (1) basic instructions                marks have been in use for many years, and data contamina-
+are given to the model, followed by (2) the text to be labeled or            tion during the post-training phase is considerably harder to
+responded to, (3) the list of potential labels, and finally, (4) an          avoid. The Real-world Annotated Few-shot Tasks (RAFT)
+answer section that ends in a [MASK] token for the model to                  benchmark [47] contains multiple tasks which are part of FLAN
+predict.                                                                     and other commonly used datasets. Its full evaluation process
+                                                                             relies on a held-out evaluation mechanism via an online plat-
+                                                                             form which is currently offline. As part of our evaluation, we
+                                                                             choose three of the RAFT tasks. Two of them are publicly avail-
+                                                                             able and commonly used outside the RAFT suite itself, while
+                                                                             the final one is the NeurIPS Impact Statement (NIS) task, where
+                                                                             the model must determine if an impact statement involves AI
+                                                                             safety risks or not. For this task, we use the annotated training
+                                                                             set as our evaluation set3. The publicly available datasets are
+                                                                             ADEv2 [48], a medical domain task where the model is given
+                                                                             a sentence and must determine whether it is related to a nega-
+                                                                             tive reaction to a medication or not; and One Stop English [49]
+
+    2We use the [unused0] token present in the ModernBERT vocabulary and         3This results in a limited evaluation set, of only 50 examples. However, for
+left purposefully untrained to support this sort of application.             this task, the test set itself is only 150 examples; as a result, we believe this
+                                                                             sample is an acceptable proxy and a better alternative to data contamination
+                                                                             present in most of the other datasets.
+
+                                                                          5
+0.3-0.5B  Tasksource-NLI             MMLU                                MMLU-Pro  ADEv2   NIS    OSE    Average
+          RoBERTa-Large-SST           36.08                                         65.17  58.72  21.11   39.52
+1B+       UniMC                        31.3                                 16.54   43.61  75.0   40.67   40.84
+          ModernBERT-Large-Instruct   38.48                                         23.29  73.96  36.88   38.29
+          SmoLM2-360M                 43.06                                 13.63   53.31  85.53  20.62   43.94
+          Qwen2-0.5B                  35.8                                                                   -
+          Llama3.2-1B                 33.7                                  18.83      -     -      -        -
+          SmoLM2-1.7B                 45.83                                            -     -      -        -
+          Qwen2.5-1.5B                48.44                                 17.16      -     -      -        -
+                                      59.67                                 11.38      -     -      -        -
+                                                                            15.93      -     -      -
+                                                                             22.6
+                                                                            18.31
+                                                                             32.1
+
+Table 2: Result for the models across the zero-shot tasks. Results in bold are the best zero-shot results for the under-0.5B parameter model class. Results in
+italics are results where the model is in-domain rather than zero-shot, reported for thoroughness. Results in italicized bold are the best results in the 1B-and-above
+parameter model class. - indicates that the model was not evaluated on this task. Param count ranges are indicated on the left. Results marked with a  are directly
+reported from the results of Ben Allal et al. [30] and results marked with a  are directly reported from the MMLU-Pro Leaderboard [46].
+
+(OSE), a general domain reading comprehension task where ex-                the Language Model Evaluation Harness [50]. For MMLU-Pro,
+perts rewrote a single sentence into three levels of grammati-              we report results from its official leaderboard5.
+cal complexity: elementary, intermediate and advanced, and in
+which the model must accurately guess the complexity level. To              3.2. Results
+the best of our knowledge, this setup ensures that only a single
+task is in-domain for the evaluated models.                                    Results for the zero-shot experiments are presented in Ta-
+                                                                            ble 2.
+   Baseline - Encoders We compare ModernBERT-Large-
+Instruct against three types of baselines. For all tasks, we                   MMLU While non-causal models are often thought to mem-
+evaluate other encoder-based zero-shot methods, which are                   orize less information than their causal counterparts [21], our
+the most commonly used low-parameter-count methods for                      results demonstrate the opposite: on MMLU, ModernBERT-
+zero-shot applications. These baselines are UniMC [22] and                  Large-Instruct outperforms all similarly sized models, includ-
+Self-Supervised-Tuned RoBERTa-Large [17]. We also report                    ing both decoder and encoder baselines, with its results being
+the best-performing entailment-based method, ModernBERT-                    closer to a halfway point between models of its own size and
+Large-Tasksource-nli [16], as a final baseline, in order to rep-            models in the next size class, which have around 4 times more
+resent this popular family of methods. However, it is worth                 parameters.
+noting that this model is in-domain on two out of the three
+classification tasks since zero-shot entailment-based methods                  MMLU-Pro While ModernBERT-Large-Instruct is the
+are trained on large corpora, encompassing hundreds of tasks,               second-best performing on the harder MMLU-Pro, the best-
+including the vast majority of publicly available classification            performing approach at the sub-1B scale is also an encoder-only
+tasks. Neither method based on Tasksource [16]--a compre-                   model, with UniMC showing remarkably strong performance.
+hensive collection of tasks rephrased in a format compatible                We theorize that UniMC outperforms ModernBERT-Large-
+with entailment training--or other popular approaches such as               Instruct on MMLU-Pro due to its custom attention masks, en-
+ModernBERT-large-zeroshot-v2.04 are truly out-of-domain on                  suring the model represents all labels individually rather than
+common benchmarks.                                                          with noise from neighboring labels, while our simple approach
+                                                                            forces the model to process the entire input at once with all to-
+   Baseline - LLMs We also evaluate low-parameter-count                     kens attending to each other. However, this confirms our overall
+Large Language Models on the commonsense knowledge and                      hypothesis: encoder-only models' MLM heads appear particu-
+reasoning tasks, but exclude them from evaluation on classifi-              larly well suited to zero-shot tasks, even at small model sizes.
+cation tasks due to their overall poor instruction-following abil-
+ity and their tendency to produce outputs that do not match                    Classification On ADEv2 and NeurIPS Impact State-
+the classification constraints. On MMLU and MMLU-Pro, we                    ments, ModernBERT-Large-Instruct beats all other zero-shot
+report two classes of LLM results. The first consists of the                approaches 6, indicating strong performance across domains.
+similar sized SmolLM2-360M [30] and Qwen2-0.5B [5] mod-                     However, on One Stop English, it noticeably lags behind two of
+els, providing a direct comparison. The second consists of                  the other methods, UniMC and Self-Supervised-Tuned (SST)
+their larger variants, Llama3.2-1B [4], SmolLM2-1.7B [30] and               RoBERTa. Both of these models leverage mechanisms not
+Qwen2.5-1.5B [5], models that are almost four times larger than             based on a typical classification head, with UniMC leverag-
+ModernBERT-Large-Instruct, to present upper bounds. When-                   ing the model's generative head coupled with custom attention
+ever possible, we report the results obtained by the authors                masks, and SST employing a next-sentence prediction objec-
+of SmolLM2 [30] for MMLU. This covers all models except                     tive.
+Qwen2.5-1.5B and Llama3.2-1B, which we obtained by using
+                                                                                5https://huggingface.co/spaces/TIGER-Lab/MMLU-Pro
+    4https://huggingface.co/MoritzLaurer/ModernBERT-large-zeroshot-v2.0         6Tasksource-NLI's training set includes ADEv2, meaning it is fully in-
+                                                                            domain on this task
+
+                                                                         6
+   Overview While ModernBERT-Large-Instruct reaches the                               Baseline We compare a fully fine-tuned, in-domain,
+best zero-shot performance across the evaluated tasks on aver-                     ModernBERT-Large-Instruct to a fully fine-tuned, in-domain,
+age, in both classification and knowledge-based QA, it appears                     ModernBERT-Large, to provide the fairest comparison pos-
+to have clear weaknesses, as discussed above. Noticeably, these                    sible. The models are not evaluated against any external
+results point to a clear pattern indicating that various encoder-                  baseline, as the purpose of this task is to evaluate how well
+based methods have different strengths, as evidenced by the                        ModernBERT-Large-Instruct performs in this setting compared
+large swings in performance across datasets. Interestingly,                        to the more common classification-head based approach. No
+UniMC [22], another MLM-head based classification method,                          extensive hyperparameter sweep is conducted; all results re-
+although relying on more complex mechanisms, strongly out-                         ported are the results of a minimal sweep across epoch counts
+performs ModernBERT-Large-Instruct on two datasets, being                          [1,2,3] and learning rates [2e-5, 3e-5, 5e-5] for the MLM setting
+the only model to do so, while being noticeably behind on three                    and [3e-5, 5e-5, 8e-5] for the traditional classification approach.
+others. These results further reinforce the strong potential of                    No prompt engineering is performed to keep the comparison as
+using "non-traditional" classification heads for zero-shot tasks                   fair as possible.
+with encoder models, and warrant further research into the best
+ways to combine these methods.                                                     4.2. Result
+                                                                                      The results are presented in Table 3. Overall, it appears that
+4. Full-Finetune: Can One Head Do It All?
+                                                                                   with full-dataset fine-tuning, ModernBERT-Large-Instruct out-
+4.1. Setting                                                                       performs a fully fine-tuned ModernBERT-Large using a clas-
+                                                                                   sification head on average. On a task-by-task basis, both ap-
+   Having observed the strong zero-shot performance of                             proaches trade blows, with both methods coming slightly ahead
+ModernBERT-Large-Instruct, we now seek to explore whether                          on certain datasets. Given our extremely simple training loop
+this behavior holds true in fully fine-tuned settings. The com-                    and limited optimization, we believe that this highlights the
+mon approach to encoder-model classification is to fine-tune a                     robust performance and strong potential of MLM-head based
+task-specific head, relying on pooling and a final layer project-                  downstream tasks when compared to classification-head based
+ing the pooled representation to a hidden dimension matching                       approaches.
+the number of potential labels.
+                                                                                      While the traditional classification method performs better
+   To do so, we further finetune the ModernBERT-Large-                             on simpler tasks, such as the SST-2 binary sentiment classifica-
+Instruct model resulting from our experiments in section 2 on                      tion dataset, ModernBERT-Large-Instruct achieves noticeably
+a variety of downstream tasks. We use a simple fine-tuning                         better results on its more fine-grained version, SST-5, where the
+mechanisms where all examples are trained on the single token                      emotion expressed in a sentence is broken down into five lev-
+prediction objective described in Section 2.27.                                    els rather than just two. ModernBERT-Large-Instruct's MNLI
+                                                                                   performance also highlights that this method is not restricted to
+   Data For this section, we evaluate the models on an array of                    single-sentence tasks, but is able to correctly label the relation-
+widely used classification and Natural Language Understanding                      ship between two sentences.
+(NLU) tasks. We select 6 widely used [17, 22, 13] classifica-
+tion benchmarks, comprising of 3 topic classification detection                    5. Are Older Encoders Also Generative Classifiers?
+and 3 emotion classification tasks. The three topic classification
+tasks are AGNews, where a news tagline must be classified into                        A final question we seek to answer, raised in Section 2.1, is
+one of 4 categories, Yahoo! Answers Topic [51], a large-scale                      whether or not this behavior is specific to ModernBERT, and
+dataset where messages from the Yahoo Answer forum must be                         thus is emergent to the combination of a more modern archi-
+classified into one of ten topics, and 20newsgroup, where posts                    tecture along with a sizeable mixed-sources 2 billion token pre-
+from online newsgroups must be classified into one of 20 forum                     training, or was already present in previous encoder models.
+categories. The emotion detection tasks are IMDB [52], SST-2
+and SST-5 [53], where movie reviews or extracts from such re-                      5.1. Setting
+views must be classified into either positive or negative, in the                     To answer this question, we reproduce the training setting
+case of IMDB and SST-2, or a finer-grained 5-level classifica-
+tion ranging from Very Negative to Very Positive for SST-5. We                     method presented in Section 2 on two other encoder-only mod-
+also evaluate the model on MNLI [14], an extremely common                          els. The first model is RoBERTa-Large [9], one of the best
+benchmark of NLU capabilities [54], where the model is ex-                         performing and currently the most widely used MLM model 8.
+pected to predict the textual entailment between two sentences:                    RoBERTa-base falls within the category of "classical" encoder-
+that is, whether a hypothesis is entailed by, neutral toward, or                   only pretrained models, using an architecture very similar to the
+contradicted by a given premise.                                                   original BERT [1] model, and trained on limited data sources.
+                                                                                   We also evaluate GTE-en-MLM-Large [31], which provides an
+    7In our limited experiments, it appears that injecting dummy MLM exam-         interesting comparison: while it has been trained on a limited
+ples, as presented in Section 2.4, helped to improve the pretrained model's        data mix, its architecture is modernized and follows the more
+generalization ability but does not improve performance on task-specific fine-     modern Transformer++ architecture [24, 33].
+tuning, however more exploration of this phenomenon remains warranted.
+                                                                                       8as judged by downloads on the HuggingFace hub
+
+                                                                                7
+                       MNLI Yahoo! 20ng AGNews SST-2 IMDB SST-5 Average
+
+ModernBERT (cls head)  90.8 77.75 73.96 95.34 97.1 96.52 59.28 84.39
+
+ModernBERT-Large-Instruct 91.03 77.88 73.96 95.24 96.22 97.2 61.13 84.67
+
+Table 3: Results comparing our approach with a traditional classification head when fully fine-tuned on downstream NLU tasks. For SST-2 and MNLI, marked with
+a , we report the results of Warner et al. [29].
+
+Model Backbone         MMLU    MMLU-Pro                                 ADEv2   NIS    Average
+ModernBERT-Large        43.06     17.16                                  53.31  85.53    47.8
+GTE-en-MLM-Large        36.69     14.47                                  20.26  79.48   35.44
+RoBERTa-Large           33.11     14.47                                  16.24  44.0    26.44
+
+Table 4: Downstream results of using different backbone with the same instruction-tuning process.
+
+5.2. Results                                                            findings suggest that generative classification with fine-tuned
+                                                                        encoder models might represent a better alternative to more
+   We present the outcome of this experiment in Table 4. The            commonplace classification approaches.
+results are stark: RoBERTa-Large, despite a similar parame-
+ter count to ModernBERT-Large and almost competitive per-                  Finally, we show that these capabilities appear to be unique
+formance in traditional, classification-head based approaches,          to encoder-only models trained with modern training recipes,
+achieves poor results in all zero-shot contexts when using the          requiring both a modern architecture and modern data mixes,
+MLM head. GTE-en-MLM-Large [31], with its modern archi-                 such as ModernBERT. Both older models (e.g., RoBERTa)
+tecture and longer context length, fares better than RoBERTa-           and modern models trained on lower volume, less-diverse data
+Large on all tasks except MMLU-Pro, where they are equal,               (e.g. GTE-en-MLM) showed significantly weaker performance
+but remains considerably weaker than ModernBERT-Large-                  across all tasks.
+Instruct.
+                                                                           While these are early results, our findings join a small but
+   As such, we hypothesize that strong generalization potential         growing body of work showing that encoder-only models can
+from a Masked Language Model's MLM head is a property re-               function well as generative multi-task models. We believe that
+lying mainly on a large-scale, varied pretraining data mix, with        our work, relying on very simple training and inference mecha-
+architecture itself playing a smaller, but still important, overall     nisms with a model with a very small parameter count by mod-
+role.                                                                   ern standards (0.4B), demonstrates the strong potential of such
+                                                                        approaches.
+
+6. Conclusion                                                           7. Limitations & Future Work
+
+   In this work, we explored the potential of encoder-only                 Newer Instruction Sets Our work focuses on the exploration
+masked language models (MLMs) as competitive zero-shot and              of FLAN. While FLAN remains a well-constructed dataset with
+fine-tuned classifiers through their generative MLM heads. We           strong previous empirical results, it is an earlier form of in-
+achieve this by designing a very straightforward training recipe        struction tuning. In modern LLM instruction-tuning, FLAN
+and introducing ModernBERT-Large-Instruct. This model is                has often been superseded by much broader instruction sets
+trained on a filtered subset of the FLAN dataset with a simple          focusing on more diverse tasks and phrasings [3, 55, 56], al-
+training objective. Interestingly, we observed that the use of          though many continue to include FLAN as a subset [3, 55].
+an unconventional training setup, where 20% of the examples             However, we choose to use FLAN as the more complex data
+are replaced by dummy samples, vastly outperforms more tra-             pre-processing methods required to convert modern turn-based
+ditional training approaches.                                           instruction datasets into single token data are out-of-scope for
+                                                                        this study. As such, FLAN and its preprocessed format making
+   We demonstrated that modern encoder models can achieve               adapting a large subset of it to a single token generation for-
+remarkably strong classification performance via the use of             mat very straightforward, represents an ideal experimentation
+their masked language modeling head, in a variety of settings.          dataset.
+In zero-shot contexts, ModernBERT-Large-Instruct is compet-
+itive with previous approaches requiring more complex train-               Few-Shot and In-Context Learning We focus on exploring
+ing or architectural modifications, even outperforming them             the potential of ModernBERT-FLAN and, more generally, of
+on some tasks. On zero-shot knowledge benchmarks such as                leveraging the MLM head for classification tasks in both zero-
+MMLU, it performs closer to the considerably larger Llama-              shot and full fine-tuning contexts, showcasing its superiority
+3.2-1B than the similarly sized SmolLM2-360M.                           over previous methods. However, an area of particular interest
+                                                                        is few-shot learning, either via in-context learning [57, 21] or
+   When fine-tuned for a single specific tasks, this language-          sample-efficient fine-tuning [20]. We leave this to future work.
+modeling-head classification approach reaches stronger over-
+all performance than traditional classification-head fine-tuning           QA-Specific Attention Masks In this work, we focus on
+on a wide range of downstream domains, encompassing entail-             a simple training loop to highlight the baseline capabili-
+ment, topic classification, and emotion detection. These early
+
+                                                                     8
+ties of ModernBERT-Large-Instruct. However, previous ap-                                   2020, virtual, 2020.
+proaches relying on carefully crafted attention masks such as                              URL https://proceedings.neurips.cc/paper/2020/hash/
+UniMC [22] remain very competitive, despite using an older                                 1457c0d6bfcb4967418bfb8ac142f64a-Abstract.html
+backbone. We believe that our results should encourage further                        [7] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, I. Sutskever, Language
+exploration into modernizing UniMC-like approaches, and we                                 models are unsupervised multitask learners, OpenAI Blog (2019).
+intend to explore this in future work.                                                [8] J. Wei, M. Bosma, V. Y. Zhao, K. Guu, A. W. Yu, B. Lester, N. Du, A. M.
+                                                                                           Dai, Q. V. Le, Finetuned language models are zero-shot learners, CoRR
+   Single-Token Generation As our approach relies on gener-                                abs/2109.01652 (2021). arXiv:2109.01652.
+ating a single token at a time, this imposes huge constraints on                           URL https://arxiv.org/abs/2109.01652
+model outputs and necessitates the use of single-token verbal-                        [9] Y. Liu, M. Ott, N. Goyal, J. Du, M. Joshi, D. Chen, O. Levy, M. Lewis,
+izers, which might often be tokens that themselves carry lim-                              L. Zettlemoyer, V. Stoyanov, Roberta: A robustly optimized BERT pre-
+ited semantic information, such as single letters or digits. We                            training approach, CoRR abs/1907.11692 (2019). arXiv:1907.11692.
+believe that future research should explore approaches such as                             URL http://arxiv.org/abs/1907.11692
+the one highlighted by [21] to determine whether such methods                        [10] P. He, J. Gao, W. Chen, Debertav3: Improving deberta using electra-
+could further increase performance.                                                        style pre-training with gradient-disentangled embedding sharing, in: The
+                                                                                           Eleventh International Conference on Learning Representations, ICLR
+   Scaling Our study focuses on a model with 395M parame-                                  2023, Kigali, Rwanda, May 1-5, 2023, OpenReview.net, 2023.
+ters, while the existing instruction-tuning literature has shown                           URL https://openreview.net/forum?id=sE7-XhLxHA
+that larger models benefit even more from such post-training,                        [11] B. Warner, A. Chaffin, B. Clavie´, O. Weller, O. Hallstro¨m, S. Taghadouini,
+especially in the case of FLAN [58]. However, at the time of                               A. Gallagher, R. Biswas, F. Ladhak, T. Aarsen, N. Cooper, G. Adams,
+our work, no 1B+ masked language model with a recent train-                                J. Howard, J. Whitaker, I. Poli, Finally, a replacement for bert: Introduc-
+ing mixture was available. We believe that, should such a model                            ing modernbert, hugging Face Blog (December 2024).
+become available, our method would transfer directly and yield                             URL https://huggingface.co/blog/modernbert
+even greater results.                                                                [12] J. Wei, X. Wang, D. Schuurmans, M. Bosma, E. H. Chi, Q. Le, D. Zhou,
+                                                                                           Chain of thought prompting elicits reasoning in large language models,
+References                                                                                 CoRR abs/2201.11903 (2022). arXiv:2201.11903.
+                                                                                           URL https://arxiv.org/abs/2201.11903
+ [1] J. Devlin, M. Chang, K. Lee, K. Toutanova, BERT: pre-training of deep           [13] Q. Li, H. Peng, J. Li, C. Xia, R. Yang, L. Sun, P. S. Yu, L. He, A survey on
+      bidirectional transformers for language understanding, in: J. Burstein,              text classification: From traditional to deep learning, ACM Trans. Intell.
+      C. Doran, T. Solorio (Eds.), Proceedings of the 2019 Conference of the               Syst. Technol. 13 (2) (Apr. 2022). doi:10.1145/3495162.
+      North American Chapter of the Association for Computational Linguis-                 URL https://doi.org/10.1145/3495162
+      tics: Human Language Technologies, NAACL-HLT 2019, Minneapolis,                [14] A. Williams, N. Nangia, S. Bowman, A broad-coverage challenge cor-
+      MN, USA, June 2-7, 2019, Volume 1 (Long and Short Papers), As-                       pus for sentence understanding through inference, in: Proceedings of the
+      sociation for Computational Linguistics, 2019, pp. 4171­4186. doi:                   2018 Conference of the North American Chapter of the Association for
+      10.18653/V1/N19-1423.                                                                Computational Linguistics: Human Language Technologies, Volume 1
+      URL https://doi.org/10.18653/v1/n19-1423                                             (Long Papers), 2018, pp. 1112­1122.
+                                                                                     [15] M. Lewis, Y. Liu, N. Goyal, M. Ghazvininejad, A. Mohamed, O. Levy,
+ [2] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez,               V. Stoyanov, L. Zettlemoyer, BART: Denoising sequence-to-sequence
+      L. Kaiser, I. Polosukhin, Attention is all you need, in: I. Guyon, U. von            pre-training for natural language generation, translation, and comprehen-
+      Luxburg, S. Bengio, H. M. Wallach, R. Fergus, S. V. N. Vishwanathan,                 sion, in: D. Jurafsky, J. Chai, N. Schluter, J. Tetreault (Eds.), Proceedings
+      R. Garnett (Eds.), Advances in Neural Information Processing Systems                 of the 58th Annual Meeting of the Association for Computational Lin-
+      30: Annual Conference on Neural Information Processing Systems 2017,                 guistics, Association for Computational Linguistics, Online, 2020, pp.
+      December 4-9, 2017, Long Beach, CA, USA, 2017, pp. 5998­6008.                        7871­7880. doi:10.18653/v1/2020.acl-main.703.
+      URL https://proceedings.neurips.cc/paper/2017/hash/                                  URL https://aclanthology.org/2020.acl-main.703/
+      3f5ee243547dee91fbd053c1c4a845aa-Abstract.html                                 [16] D. Sileo, tasksource: A large collection of NLP tasks with a structured
+                                                                                           dataset preprocessing framework, in: Proceedings of the 2024 Joint Inter-
+ [3] N. Lambert, J. Morrison, V. Pyatkin, S. Huang, H. Ivison, F. Brah-                    national Conference on Computational Linguistics, Language Resources
+      man, L. J. V. Miranda, A. Liu, N. Dziri, S. Lyu, et al., T\" ulu 3:                  and Evaluation (LREC-COLING 2024), ELRA and ICCL, Torino, Italia,
+      Pushing frontiers in open language model post-training, arXiv preprint               2024, pp. 15655­15684.
+      arXiv:2411.15124 (2024).                                                             URL https://aclanthology.org/2024.lrec-main.1361
+                                                                                     [17] C. Liu, W. Zhang, G. Chen, X. Wu, A. T. Luu, C. H. Chang, L. Bing,
+ [4] A. Dubey, A. Jauhri, A. Pandey, A. Kadian, A. Al-Dahle, A. Letman,                    Zero-shot text classification via self-supervised tuning, in: A. Rogers,
+      A. Mathur, A. Schelten, A. Yang, A. Fan, et al., The llama 3 herd of                 J. Boyd-Graber, N. Okazaki (Eds.), Findings of the Association for Com-
+      models, arXiv preprint arXiv:2407.21783 (2024).                                      putational Linguistics: ACL 2023, Association for Computational Lin-
+                                                                                           guistics, Toronto, Canada, 2023, pp. 1743­1761. doi:10.18653/v1/
+ [5] QwenTeam, A. Yang, B. Yang, B. Zhang, B. Hui, B. Zheng, B. Yu, C. Li,                 2023.findings-acl.110.
+      D. Liu, F. Huang, H. Wei, H. Lin, J. Yang, J. Tu, J. Zhang, J. Yang,                 URL https://aclanthology.org/2023.findings-acl.110/
+      J. Yang, J. Zhou, J. Lin, K. Dang, K. Lu, K. Bao, K. Yang, L. Yu, M. Li,       [18] W. L. Taylor, "cloze procedure": A new tool for measuring readability,
+      M. Xue, P. Zhang, Q. Zhu, R. Men, R. Lin, T. Li, T. Tang, T. Xia, X. Ren,            Journalism quarterly 30 (4) (1953) 415­433.
+      X. Ren, Y. Fan, Y. Su, Y. Zhang, Y. Wan, Y. Liu, Z. Cui, Z. Zhang, Z. Qiu,     [19] T. Schick, H. Schu¨tze, Exploiting cloze-questions for few-shot text clas-
+      Qwen2.5 technical report (2025). arXiv:2412.15115.                                   sification and natural language inference, in: P. Merlo, J. Tiedemann,
+      URL https://arxiv.org/abs/2412.15115                                                 R. Tsarfaty (Eds.), Proceedings of the 16th Conference of the European
+                                                                                           Chapter of the Association for Computational Linguistics: Main Vol-
+ [6] T. B. Brown, B. Mann, N. Ryder, M. Subbiah, J. Kaplan, P. Dhariwal,                   ume, EACL 2021, Online, April 19 - 23, 2021, Association for Com-
+      A. Neelakantan, P. Shyam, G. Sastry, A. Askell, S. Agarwal, A. Herbert-              putational Linguistics, 2021, pp. 255­269. doi:10.18653/V1/2021.
+      Voss, G. Krueger, T. Henighan, R. Child, A. Ramesh, D. M. Ziegler,                   EACL-MAIN.20.
+      J. Wu, C. Winter, C. Hesse, M. Chen, E. Sigler, M. Litwin, S. Gray,                  URL https://doi.org/10.18653/v1/2021.eacl-main.20
+      B. Chess, J. Clark, C. Berner, S. McCandlish, A. Radford, I. Sutskever,        [20] T. Schick, H. Schu¨tze, It`s not just size that matters: Small language
+      D. Amodei, Language models are few-shot learners, in: H. Larochelle,                 models are also few-shot learners, in: K. Toutanova, A. Rumshisky,
+      M. Ranzato, R. Hadsell, M. Balcan, H. Lin (Eds.), Advances in Neural                 L. Zettlemoyer, D. Hakkani-Tur, I. Beltagy, S. Bethard, R. Cotterell,
+      Information Processing Systems 33: Annual Conference on Neural                       T. Chakraborty, Y. Zhou (Eds.), Proceedings of the 2021 Conference of
+      Information Processing Systems 2020, NeurIPS 2020, December 6-12,
+
+                                                                                  9
+      the North American Chapter of the Association for Computational Lin-                   style pre-training with gradient-disentangled embedding sharing (2023).
+      guistics: Human Language Technologies, Association for Computational                   arXiv:2111.09543.
+      Linguistics, Online, 2021, pp. 2339­2352. doi:10.18653/v1/2021.                        URL https://arxiv.org/abs/2111.09543
+      naacl-main.185.                                                                  [36] I. Sutskever, O. Vinyals, Q. V. Le, Sequence to sequence learning with
+      URL https://aclanthology.org/2021.naacl-main.185/                                      neural networks, in: Z. Ghahramani, M. Welling, C. Cortes, N. D.
+[21] D. Samuel, Berts are generative in-context learners, CoRR                               Lawrence, K. Q. Weinberger (Eds.), Advances in Neural Information
+      abs/2406.04823 (2024). arXiv:2406.04823, doi:10.48550/                                 Processing Systems 27: Annual Conference on Neural Information
+      ARXIV.2406.04823.                                                                      Processing Systems 2014, December 8-13 2014, Montreal, Quebec,
+      URL https://doi.org/10.48550/arXiv.2406.04823                                          Canada, 2014, pp. 3104­3112.
+[22] P. Yang, J. Wang, R. Gan, X. Zhu, L. Zhang, Z. Wu, X. Gao, J. Zhang,                    URL https://proceedings.neurips.cc/paper/2014/hash/
+      T. Sakai, Zero-shot learners for natural language understanding via a uni-             a14ac55a4f27472c5d894ec1c3c743d2-Abstract.html
+      fied multiple choice perspective, in: Y. Goldberg, Z. Kozareva, Y. Zhang         [37] C. Raffel, N. Shazeer, A. Roberts, K. Lee, S. Narang, M. Matena, Y. Zhou,
+      (Eds.), Proceedings of the 2022 Conference on Empirical Methods in                     W. Li, P. J. Liu, Exploring the limits of transfer learning with a unified
+      Natural Language Processing, Association for Computational Linguis-                    text-to-text transformer, Journal of machine learning research 21 (140)
+      tics, Abu Dhabi, United Arab Emirates, 2022, pp. 7042­7055. doi:                       (2020) 1­67.
+      10.18653/v1/2022.emnlp-main.474.                                                 [38] M. Xia, M. Artetxe, J. Du, D. Chen, V. Stoyanov, Prompting ELECTRA:
+      URL https://aclanthology.org/2022.emnlp-main.474/                                      Few-shot learning with discriminative pre-trained models, in: Y. Gold-
+[23] A. Liu, B. Feng, B. Xue, B. Wang, B. Wu, C. Lu, C. Zhao, C. Deng,                       berg, Z. Kozareva, Y. Zhang (Eds.), Proceedings of the 2022 Conference
+      C. Zhang, C. Ruan, et al., Deepseek-v3 technical report, arXiv preprint                on Empirical Methods in Natural Language Processing, Association for
+      arXiv:2412.19437 (2024).                                                               Computational Linguistics, Abu Dhabi, United Arab Emirates, 2022, pp.
+[24] H. Touvron, L. Martin, K. Stone, P. Albert, A. Almahairi, Y. Babaei,                    11351­11361. doi:10.18653/v1/2022.emnlp-main.780.
+      N. Bashlykov, S. Batra, P. Bhargava, S. Bhosale, et al., Llama 2: Open                 URL https://aclanthology.org/2022.emnlp-main.780/
+      foundation and fine-tuned chat models, arXiv preprint arXiv:2307.09288           [39] S. Longpre, L. Hou, T. Vu, A. Webson, H. W. Chung, Y. Tay, D. Zhou,
+      (2023).                                                                                Q. V. Le, B. Zoph, J. Wei, A. Roberts, The flan collection: Designing data
+[25] A. Yang, B. Yang, B. Hui, B. Zheng, B. Yu, C. Zhou, C. Li, C. Li, D. Liu,               and methods for effective instruction tuning, in: A. Krause, E. Brunskill,
+      F. Huang, et al., Qwen2 technical report, arXiv preprint arXiv:2407.10671              K. Cho, B. Engelhardt, S. Sabato, J. Scarlett (Eds.), International Con-
+      (2024).                                                                                ference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu,
+[26] L. Soldaini, R. Kinney, A. Bhagia, D. Schwenk, D. Atkinson, R. Authur,                  Hawaii, USA, Vol. 202 of Proceedings of Machine Learning Research,
+      B. Bogin, K. Chandu, J. Dumas, Y. Elazar, et al., Dolma: An open corpus                PMLR, 2023, pp. 22631­22648.
+      of three trillion tokens for language model pretraining research, arXiv                URL https://proceedings.mlr.press/v202/longpre23a.html
+      preprint arXiv:2402.00159 (2024).                                                [40] D. Hendrycks, C. Burns, S. Basart, A. Zou, M. Mazeika, D. Song,
+[27] J. Li, A. Fang, G. Smyrnis, M. Ivgi, M. Jordan, S. Gadre, H. Bansal,                    J. Steinhardt, Measuring massive multitask language understanding, Pro-
+      E. Guha, S. Keh, K. Arora, et al., Datacomp-lm: In search of the                       ceedings of the International Conference on Learning Representations
+      next generation of training sets for language models, arXiv preprint                   (ICLR) (2021).
+      arXiv:2406.11794 (2024).                                                         [41] M. Suzgun, N. Scales, N. Scha¨rli, S. Gehrmann, Y. Tay, H. W. Chung,
+[28] G. Penedo, H. Kydl´icek, L. B. Allal, A. Lozhkov, M. Mitchell, C. Raffel,               A. Chowdhery, Q. V. Le, E. H. Chi, D. Zhou, , J. Wei, Challenging big-
+      L. von Werra, T. Wolf, The fineweb datasets: Decanting the web for the                 bench tasks and whether chain-of-thought can solve them, arXiv preprint
+      finest text data at scale, CoRR abs/2406.17557 (2024). arXiv:2406.                     arXiv:2210.09261 (2022).
+      17557, doi:10.48550/ARXIV.2406.17557.                                            [42] N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, R. Salakhutdinov,
+      URL https://doi.org/10.48550/arXiv.2406.17557                                          Dropout: a simple way to prevent neural networks from overfitting, The
+[29] B. Warner, A. Chaffin, B. Clavie´, O. Weller, O. Hallstro¨m, S. Taghadouini,            journal of machine learning research 15 (1) (2014) 1929­1958.
+      A. Gallagher, R. Biswas, F. Ladhak, T. Aarsen, N. Cooper, G. Adams,              [43] O. Khattab, M. Zaharia, Colbert: Efficient and effective passage search
+      J. Howard, I. Poli, Smarter, better, faster, longer: A modern bidirectional            via contextualized late interaction over bert, in: Proceedings of the 43rd
+      encoder for fast, memory efficient, and long context finetuning and infer-             International ACM SIGIR conference on research and development in
+      ence (2024). arXiv:2412.13663.                                                         Information Retrieval, 2020, pp. 39­48.
+      URL https://arxiv.org/abs/2412.13663                                             [44] L. Wang, N. Yang, X. Huang, B. Jiao, L. Yang, D. Jiang, R. Majumder,
+[30] L. B. Allal, A. Lozhkov, E. Bakouch, G. M. Bla´zquez, L. Tunstall, A. Pi-               F. Wei, Text embeddings by weakly-supervised contrastive pre-training,
+      queres, A. Marafioti, C. Zakka, L. von Werra, T. Wolf, Smollm2 - with                  arXiv preprint arXiv:2212.03533 (2022).
+      great data, comes great performance (2024).                                      [45] D. Zhang, et al., Jasper and stella: distillation of sota embedding models,
+[31] X. Zhang, Y. Zhang, D. Long, W. Xie, Z. Dai, J. Tang, H. Lin, B. Yang,                  arXiv e-prints (2024) arXiv­2412.
+      P. Xie, F. Huang, M. Zhang, W. Li, M. Zhang, mgte: Generalized long-             [46] Y. Wang, X. Ma, G. Zhang, Y. Ni, A. Chandra, S. Guo, W. Ren,
+      context text representation and reranking models for multilingual text re-             A. Arulraj, X. He, Z. Jiang, et al., Mmlu-pro: A more robust and chal-
+      trieval, in: F. Dernoncourt, D. Preotiuc-Pietro, A. Shimorina (Eds.), Pro-             lenging multi-task language understanding benchmark, arXiv preprint
+      ceedings of the 2024 Conference on Empirical Methods in Natural Lan-                   arXiv:2406.01574 (2024).
+      guage Processing: EMNLP 2024 - Industry Track, Miami, Florida, USA,              [47] N. Alex, E. Lifland, L. Tunstall, A. Thakur, P. Maham, C. J. Riedel,
+      November 12-16, 2024, Association for Computational Linguistics, 2024,                 E. Hine, C. Ashurst, P. Sedille, A. Carlier, M. Noetel, A. Stuhlmu¨ller,
+      pp. 1393­1412.                                                                         Raft: A real-world few-shot text classification benchmark, ArXiv
+      URL https://aclanthology.org/2024.emnlp-industry.103                                   abs/2109.14076 (2021).
+[32] M. Javaheripi, S. Bubeck, M. Abdin, J. Aneja, S. Bubeck, C. C. T.                       URL https://api.semanticscholar.org/CorpusID:238215290
+      Mendes, W. Chen, A. Del Giorno, R. Eldan, S. Gopi, et al., Phi-2: The            [48] H. Gurulingappa, A. M. Rajput, A. Roberts, J. Fluck, M. Hofmann-
+      surprising power of small language models, Microsoft Research Blog                     Apitius, L. Toldo, Development of a benchmark corpus to support the
+      1 (3) (2023) 3.                                                                        automatic extraction of drug-related adverse effects from medical case
+[33] A. Gu, T. Dao, Mamba: Linear-time sequence modeling with selective                      reports, Journal of Biomedical Informatics 45 (5) (2012) 885­892, text
+      state spaces, CoRR abs/2312.00752 (2023). arXiv:2312.00752, doi:                       Mining and Natural Language Processing in Pharmacogenomics. doi:
+      10.48550/ARXIV.2312.00752.                                                             https://doi.org/10.1016/j.jbi.2012.04.008.
+      URL https://doi.org/10.48550/arXiv.2312.00752                                          URL https://www.sciencedirect.com/science/article/pii/
+[34] H. W. Chung, L. Hou, S. Longpre, B. Zoph, Y. Tay, W. Fedus, Y. Li,                      S1532046412000615
+      X. Wang, M. Dehghani, S. Brahma, et al., Scaling instruction-finetuned           [49] S. Vajjala, I. Lucic´, OneStopEnglish corpus: A new corpus for automatic
+      language models, Journal of Machine Learning Research 25 (70) (2024)                   readability assessment and text simplification, in: J. Tetreault, J. Burstein,
+      1­53.                                                                                  E. Kochmar, C. Leacock, H. Yannakoudakis (Eds.), Proceedings of the
+[35] P. He, J. Gao, W. Chen, Debertav3: Improving deberta using electra-                     Thirteenth Workshop on Innovative Use of NLP for Building Educational
+
+                                                                                   10
+      Applications, Association for Computational Linguistics, New Orleans,
+      Louisiana, 2018, pp. 297­304. doi:10.18653/v1/W18-0535.
+      URL https://aclanthology.org/W18-0535/
+[50] L. Gao, J. Tow, B. Abbasi, S. Biderman, S. Black, A. DiPofi, C. Fos-
+      ter, L. Golding, J. Hsu, A. Le Noac'h, H. Li, K. McDonell, N. Muen-
+      nighoff, C. Ociepa, J. Phang, L. Reynolds, H. Schoelkopf, A. Skowron,
+      L. Sutawika, E. Tang, A. Thite, B. Wang, K. Wang, A. Zou, A frame-
+      work for few-shot language model evaluation (07 2024). doi:10.5281/
+      zenodo.12608602.
+      URL https://zenodo.org/records/12608602
+[51] X. Zhang, J. Zhao, Y. LeCun, Character-level convolutional networks for
+      text classification, Advances in neural information processing systems 28
+      (2015).
+[52] A. L. Maas, R. E. Daly, P. T. Pham, D. Huang, A. Y. Ng, C. Potts, Learn-
+      ing word vectors for sentiment analysis, in: D. Lin, Y. Matsumoto, R. Mi-
+      halcea (Eds.), Proceedings of the 49th Annual Meeting of the Association
+      for Computational Linguistics: Human Language Technologies, Associ-
+      ation for Computational Linguistics, Portland, Oregon, USA, 2011, pp.
+      142­150.
+      URL https://aclanthology.org/P11-1015/
+[53] Y. Liu, M. Ott, N. Goyal, J. Du, M. Joshi, D. Chen, O. Levy, M. Lewis,
+      L. Zettlemoyer, V. Stoyanov, Roberta: A robustly optimized BERT pre-
+      training approach, CoRR abs/1907.11692 (2019). arXiv:1907.11692.
+      URL http://arxiv.org/abs/1907.11692
+[54] A. Wang, A. Singh, J. Michael, F. Hill, O. Levy, S. Bowman, GLUE: A
+      multi-task benchmark and analysis platform for natural language under-
+      standing, in: T. Linzen, G. Chrupala, A. Alishahi (Eds.), Proceedings of
+      the 2018 EMNLP Workshop BlackboxNLP: Analyzing and Interpreting
+      Neural Networks for NLP, Association for Computational Linguistics,
+      Brussels, Belgium, 2018, pp. 353­355. doi:10.18653/v1/W18-5446.
+      URL https://aclanthology.org/W18-5446
+[55] W. Lian, B. Goodson, E. Pentland, A. Cook, C. Vong, "Teknium",
+      Openorca: An open dataset of gpt augmented flan reasoning traces,
+      https://https://huggingface.co/Open-Orca/OpenOrca (2023).
+[56] R. Teknium, J. Quesnelle, C. Guang, Hermes 3 technical report (2024).
+      arXiv:2408.11857.
+      URL https://arxiv.org/abs/2408.11857
+[57] Q. Dong, L. Li, D. Dai, C. Zheng, J. Ma, R. Li, H. Xia, J. Xu, Z. Wu,
+      T. Liu, B. Chang, X. Sun, L. Li, Z. Sui, A survey on in-context learning
+      (2024). arXiv:2301.00234.
+      URL https://arxiv.org/abs/2301.00234
+[58] Y. Tay, M. Dehghani, V. Q. Tran, X. Garcia, J. Wei, X. Wang, H. W.
+      Chung, D. Bahri, T. Schuster, H. S. Zheng, D. Zhou, N. Houlsby, D. Met-
+      zler, UL2: unifying language learning paradigms, in: The Eleventh In-
+      ternational Conference on Learning Representations, ICLR 2023, Kigali,
+      Rwanda, May 1-5, 2023, OpenReview.net, 2023.
+      URL https://openreview.net/forum?id=6ruVLB727MC
+
+                                                                             11
+

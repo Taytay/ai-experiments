@@ -1,0 +1,771 @@
+                                                                 Surface Form Competition:
+                                              Why the Highest Probability Answer Isn't Always Right
+
+                                                                        =Ari Holtzman1 =Peter West1,2
+                                                          Vered Shwartz1,2 Yejin Choi1,2 Luke Zettlemoyer1
+                                        1Paul G. Allen School of Computer Science & Engineering, University of Washington
+
+                                                                   2Allen Institute for Artificial Intelligence
+                                                                {ahai,pawest}@cs.washington.edu
+
+                                        Abstract
+
+arXiv:2104.08315v9 [cs.CL] 20 Nov 2022  Large language models have shown promis-               Figure 1: While humans select from given options, lan-
+                                        ing results in zero-shot settings (Brown et al.,       guage models implicitly assign probability to every pos-
+                                        2020; Radford et al., 2019). For example, they         sible string. This creates surface form competition be-
+                                        can perform multiple choice tasks simply by            tween different strings that represent the same concept.
+                                        conditioning on a question and selecting the           Example from CommonsenseQA (Talmor et al., 2019).
+                                        answer with the highest probability.
+
+                                        However, ranking by string probability can
+                                        be problematic due to surface form compe-
+                                        tition--wherein different surface forms com-
+                                        pete for probability mass, even if they repre-
+                                        sent the same underlying concept in a given
+                                        context, e.g. "computer" and "PC." Since
+                                        probability mass is finite, this lowers the prob-
+                                        ability of the correct answer, due to competi-
+                                        tion from other strings that are valid answers
+                                        (but not one of the multiple choice options).
+
+                                        We introduce Domain Conditional Pointwise
+                                        Mutual Information, an alternative scoring
+                                        function that directly compensates for sur-
+                                        face form competition by simply reweighing
+                                        each option according to its a priori likeli-
+                                        hood within the context of a specific task. It
+                                        achieves consistent gains in zero-shot perfor-
+                                        mance over both calibrated (Zhao et al., 2021)
+                                        and uncalibrated scoring functions on all GPT-
+                                        2 and GPT-3 models on a variety of multiple
+                                        choice datasets.1
+
+                                        1 Introduction                                         largely removed by scoring choices according to
+                                                                                               Domain Conditional Pointwise Mutual Informa-
+                                        Despite the impressive results large pretrained lan-   tion (PMIDC), which reweighs scores by how much
+                                        guage models have achieved in zero-shot settings       more likely a hypothesis (answer) becomes given a
+                                        (Brown et al., 2020; Radford et al., 2019), we         premise (question) within the specific task domain.
+                                        argue that current work underestimates the zero-
+                                        shot capabilities of these models on classification       Specifically, consider the example question
+                                        tasks. This is in large part due to surface form       (shown in Figure 1): "A human wants to sub-
+                                        competition--a property of generative models that      merge himself in water, what should he use?" with
+                                        causes probability to be rationed between different    multiple choice options "Coffee cup", "Whirlpool
+                                        valid strings, even ones that differ trivially, e.g.,  bath", "Cup", and "Puddle." From the given op-
+                                        by capitalization alone. Such competition can be       tions, "Whirlpool bath" is the only one that makes
+                                                                                               sense. Yet, other answers are valid and easier for a
+                                             =Authors contributed equally                      language model to generate, e.g., "Bathtub" and "A
+                                             1Code is available at https://github.com/
+                                        peterwestuw/surface-form-competition
+bathtub." Since all surface forms compete for finite    2 Background and Related Work
+probability mass, allocating significant probability
+mass to "Bathtub" decreases the amount of prob-         Zero-shot vs. Few-Shot Zero-shot inference has
+ability mass assigned to "Whirlpool bath." While        long been of interest in NLP, Computer Vision, and
+the total probability of generating some correct        ML in general (Socher et al., 2013; Guadarrama
+answer may be high (i.e., across all valid surface      et al., 2013; Romera-Paredes and Torr, 2015). How-
+forms), only one of these is a listed option. This is   ever, Radford et al. (2019) popularized the notion
+particularly problematic here, because "Whirlpool       that language models have many zero-shot capabil-
+bath" will be much lower probability than "Bath-        ities that can be discovered simply by prompting
+tub," due to its rarity. More generally, methods that   the model, e.g., placing "TL;DR" (internet slang
+do not account for surface form competition will        for Too Long; Didn't Read) at the end of a pas-
+favor answers with fewer lexical paraphrases.           sage causes the model to generate a summary. Ef-
+                                                        ficiently constructing the right prompt for a given
+   PMIDC factors out the probability of a specific      task is difficult and has become an active area of
+surface form, by instead computing how much             research (Reynolds and McDonell, 2021; Lu et al.,
+more probable a hypothesis is when conditioned          2021; Shin et al., 2020; Jiang et al., 2020a,b).
+on a premise. We use a domain premise string to
+estimate the unconditional probability of a hypoth-        Brown et al. (2020) demonstrated that few-shot
+esis in a given domain. On CommonsenseQA, for           learning without fine-tuning is possible with very
+example, we compute the probability of each an-         large language models. Contemporary work has
+swer option immediately following the string "? the     shown it is possible to get smaller models to ex-
+answer is:", and then divide the conditional prob-      hibit few-shot learning behavior using fine-tuning
+ability by this estimate to calculate PMIDC. This       (Hambardzumyan et al., 2021; Gao et al., 2020;
+scaling factor reweighs answer scores according         Schick and Schütze, 2020a,b,c; Shin et al., 2020),
+to the surface form competition that is inherent to     an intermediate learning phase (Ye et al., 2021), or
+the domain or task, e.g. completions of the domain      calibration (Zhao et al., 2021), though most assume
+premise that are just inherently unlikely will be up-   access to a validation set (Perez et al., 2021). Re-
+weighted more. This allows us to directly measure       cent work suggests it may be possible to finetune
+how much an answer tells us about the question          language models in order to improve their zero-
+and vice versa (mutual information is symmetric,        shot and few-shot capabilities on a large swathe of
+see §3). Valid hypotheses no longer need to com-        tasks (Wei et al., 2021; Zhong et al., 2021).
+pete with each other: both "Whirlpool bath" and
+"Bathtub " will be considered reasonable answers        Surface Form Competition When applying
+to the question, and so both will attain a high score.  generative models to multiple choice problems,
+                                                        simply choosing the highest probability answer
+   Extensive experiments show that PMIDC consis-        becomes problematic due to different valid surface
+tently outperforms raw, normalized, and calibrated      forms competing for probability. Indeed, recent
+probability scoring methods on zero-shot multiple       work in question answering has demonstrated the
+choice for more than a dozen datasets and it does       importance of considering all multiple choice op-
+so for every model in the GPT-2 and GPT-3 fami-         tions together (Khashabi et al., 2020), rather than
+lies (§4); this holds true across different possible    independently assigning each answer a score and
+prompts and in preliminary few-shot experiments         simply choosing the highest. This is a difficult strat-
+as well. To better explain these gains, we use the      egy to adapt to left-to-right generative language
+distinct structure of the COPA dataset (Roemmele        models, which implicitly choose between all possi-
+et al., 2011) to remove surface form competition        ble strings. Using unsupervised language models
+entirely, showing that all methods perform well in      pretrained on relatively expansive corpora exacer-
+this idealized setting (§5). Additionally, we analyze   bates surface form competition because such lan-
+the only three datasets where PMIDC does worse          guage models generate a much wider distribution
+than other methods and put forward a hypothesis         than a given question answering dataset contains.
+for why normalizing log probabilities works bet-
+ter than raw probabilities (§6). We conclude with          "What is the most populous nation in North
+a discussion of how generative models should be         America?" Posed with this question, a language
+used for selection tasks (§7).                          model such as GPT-3 can generate a correct re-
+                                                        sponse such as "USA", "United States", or "United
+States of America" with high probability. While         Prompt Sensitivity Recent work highlights LM
+correct strings like this all contribute to the proba-  sensitivity to inputs, and proposes to consider para-
+bility of a correct generation, they may have vastly    phrases of the prompt to overcome this (Davison
+different probabilities: a common string "United        et al., 2019; Jiang et al., 2020b), as well as noting
+States" will be much more likely than rarer forms       that certain trigger tokens (Shin et al., 2020) can
+like "U.S. of A.". In generative scenarios, as long as  strongly effect the output of such models. In this
+most of the probability mass goes to valid strings      work, we focus on the surface form of possible
+the generation is likely to be valid. This is not       outputs, but do also analyze robustness to different
+the case for multiple choice problems. Given two        prompts in §4.4.
+options, e.g., "USA" and "Canada", GPT-3 will
+choose the correct answer by probability. However,      Interpreting Language Models Language mod-
+if we substitute out "USA" for "U.S. of A.", GPT-3      els tend to model selectional preferences and the-
+will assign higher probability to "Canada", a less      matic fit (Pantel et al., 2007; Erk et al., 2010) rather
+likely answer conceptually, but a much more likely      than semantic plausibility (Wang et al., 2018).
+surface form. Beyond this, incorrect generic an-        Probability, possibility and plausibility are distinct
+swers such as "I don't know" are often assigned         (Van der Helm, 2006), but reporting bias (Gordon
+high probability, relegating the desired answers to     and Van Durme, 2013) means that language mod-
+the tail of the distribution where softmax is poorly    els only model what people are likely to write (on
+calibrated (Holtzman et al., 2020).                     websites that are easily crawled). PMIDC aims to
+                                                        adjust for these challenges to better measure the un-
+PMI Work in dialogue has used PMI to promote            derlying agreement between language models and
+diversity (Zhou et al., 2019; Yao et al., 2017; Li      human judgements, but of course is still subject to
+et al., 2016; Mou et al., 2016; Tang et al., 2019).     the limits and biases of the language model used.
+Recently, Brown et al. (2020) used a scoring func-
+tion resembling PMIDC for zero-shot question an-        3 Zero-shot Scoring Strategies
+swering, though they only use the string "A:" as a
+prompt for the unconditional probability estimate,      This paper does not define any new modeling or
+whereas we use a task-specific domain premise (see      finetuning methods. Rather, we propose the broad
+§3 for details). Furthermore, Brown et al. (2020)       use of PMIDC scoring for any given model and
+only report this scoring method on three datasets       prompt. PMIDC compensates for the fact that differ-
+(ARC, OpenBookQA, and RACE, included here)              ent correct answers compete for probability, even
+out of the more than 20 tested and do not compare       though only one will be listed as the correct multi-
+scores with their standard method, averaging log-       ple choice option.
+likelihoods (AVG in this work). In contrast, we
+report a comprehensive comparison on GPT-3 and             We begin by describing the two most common
+GPT-2, as well as shedding light on the underlying      methods currently in use.
+issue of surface form competition in §5.
+                                                        3.1 Standard Methods
+Contextual Calibration Recently, Zhao et al.
+(2021) describe a new method for calibrating the        Our first baseline is simply selecting the highest-
+probabilities of an LM using a learned affine trans-    probability option, e.g., baselines in Zhao et al.
+formation. Though geared towards few-shot learn-        (2021) and Jiang et al. (2020b), which we refer to
+ing, the authors devise a clever means of using         as LM. Given a prompt x (e.g. "The bar closed")
+"content free inputs" for zero-shot learning. Zhao      and a set of possible answers y1, · · · , yn (e.g. "it
+et al. (2021) calibrate for three forms of bias: (1)    was crowded.", "it was 3 AM."), LM is defined:
+majority label bias, (2) recency bias, and (3) com-
+mon token bias. PMIDC directly compensates for          arg max P (yi|x).  (1)
+common token bias by dividing by the domain con-
+ditional probability of each answer, and performs       i
+superior to contextual calibration (CC) in the ma-
+jority of cases.                                        However, using length normalized log-likelihoods
+                                                        (Brown et al., 2020) has become standard due to its
+                                                        superior performance, and is also commonly used
+                                                        in generation (Mao et al., 2019; Oluwatobi and
+                                                        Mueller, 2020). For causal language models, e.g.,
+Figure 2: An example from COPA (Roemmele et al., 2011) with the template we use as well as the scoring
+functions we test. LM returns the highest probability option, while AVG length-normalizes log-likelihoods and
+chooses the highest option. PMIDC is a measurement of the mutual information between hypothesis and premise,
+intuitively how much x explains yi and vice versa. CC is an affine transform of LM, where w and b are averaged
+over solutions that cause "content free inputs" to yield uniform scores over a given label set, see Zhao et al. (2021).
+
+GPT-2 and GPT-3, Equation 1 can be decomposed:               While Equation 2 estimates how related premise
+                                                          x is to hypothesis y in general, we found that es-
+                             i                            timates of P (y) vary wildly. GPT-2 and GPT-3
+                                                          are not trained to produce unconditional estimates
+P (yi|x) = P (yij|x, yi1, · · · , yij-1)                  of document excerpts, an issue which is exacer-
+                                                          bated by the fact that many possible answers are
+                   j=1                                    extremely rare in a large scrape of public web pages.
+                                                          This causes the unconditional probability of such
+where yij is the jth token of yi and i is the number      answers to be poorly calibrated for the purposes of
+of tokens in yi. The AVG strategy can thus be             a given task.
+
+defined as:                                                  We are specifically trying to measure P (y) in a
+                                                          given domain, e.g., for the "because" relation in our
+          i      log  P  (yij  |x,  y1···j  -1  )         running example, shown in Figures 2 & 3. To quan-
+                                                          tify this, we propose Domain Conditional PMI:
+arg max  j=1                                       .
+                                                                                                P (y|x, domain)
+      i                   i                                 exp PMIDC(x, y, domain) = P (y|domain)
+
+3.2 Domain Conditional PMI                                                                      P (y|x, domain)
+                                                                                             =
+Our core claim is that direct probability is not an
+adequate zero-shot scoring function due to surface                                                P (y|xdomain)
+form competition. A natural solution is to factor
+out the probability of specific surface forms, which      or how much x tells us about y within a domain.
+is what Pointwise Mutual Information (PMI) does:             Typically, P (y|x, domain) = P (y|x) because
+
+PMI(x, y) = log  P (y|x)  = log     P (x|y)        . (2)  the premise x typically implies the domain, e.g.,
+                                                          "The bar closed because" sets the model up to pre-
+                 P (y)              P (x)                 dict an independent clause that is the cause of some
+                                                          event, without further representation of the domain.
+In effect, this is how much more likely the hypoth-       In order to estimate P (y|domain)--the probability
+esis ("it was 3 AM.") becomes given the premise           of seeing hypothesis y in a given domain--we use
+("The bar closed because"), see Figure 2 for the full     a short domain-relevant string xdomain, which we
+example. In a multiple-choice setting--where the          call a "domain premise", usually just the ending of
+premise x does not change across hypotheses--this         the conditional premise x. For example, to predict
+is proportional to P (x|y), i.e. the probability of the   a causal relation like in Figure 2 we use xdomain =
+premise given the hypothesis. We call this scoring-       "because" and thus divide by P (y|because)­how
+by-premise and it is the reverse of LM, P (y|x).
+We use scoring-by-premise to show the presence
+of surface form competition in §5.
+likely y is to be a "cause" . For examples of each     alternative endings to 5 sentence stories. Finally,
+template see Appendix B.                               HellaSwag (HS) (Zellers et al., 2019) uses GPT-2
+                                                       to generate, BERT to filter, and crowd workers to
+3.3 Non-standard Baselines                             verify possible continuations to a passage. Follow-
+Unconditional We also compare to the uncondi-          ing previous work (Brown et al., 2020) we report
+tional (in-domain) estimate as a scoring function:     development set numbers for COPA and HS.
+
+                arg max P (yi|xdomain).                Question Answering RACE-M & -H (R-M &
+                                                       R-H) (Lai et al., 2017) are both drawn from En-
+                            i                          glish exams given in China, the former being given
+                                                       to Middle Schoolers and the latter to High School-
+We refer to this as UNC. It ignores the premise        ers. Similarly, ARC Easy & Challenge (ARC-E &
+completely, only using a domain premise xdomain        ARC-C) (Clark et al., 2018) are standardized tests
+(e.g., using P (y|because) as the score). Yet, it      described as "natural, grade-school science ques-
+is sometimes competitive, for instance on BoolQ        tions," with the "Easy" split found to be solvable
+(Clark et al., 2019). UNC is a sanity check on         by either a retrieval or word co-occurrence system,
+whether zero-shot inference is actually using the      and the rest of the questions put in the "Challenge"
+information in the question to good effect.            split. Open Book Question Answering (OBQA)
+                                                       (Mihaylov et al., 2018) is similar to both of these,
+Contextual Calibration Finally, we compare             but was derived using (and intended to be tested
+to the reported zero-shot numbers of Zhao et al.       with) a knowledge source (or "book") available;
+(2021). Contextual Calibration adjusts LM with         we do not make use of the given knowledge source,
+an affine transform to make a closed set of answers    following Brown et al. (2020). Finally, Common-
+equally likely in the absence of evidence. Contex-     senseQA (CQA) (Talmor et al., 2019) leverages
+tual Calibration thus requires computing matrices      CONCEPTNET (Speer et al., 2017) to encourage
+w and b for a number of "content free inputs" and      crowd workers to write questions with challenging
+then averaging these weights, see Zhao et al. (2021)   distractors. We report development set numbers on
+for details. In contrast, PMIDC requires nothing but   CQA because their test set is not public.
+a human-written template (as all zero-shot meth-
+ods do, including Contextual Calibration), can be      Open Set vs. Closed Set Datasets The above
+computed as the difference of two log probabilities,   datasets are all "open set" in that multiple choice
+and is naturally applicable to datasets where the set  answers may be any string. Below we describe
+of valid answers varies between questions.             "closed set" datasets with a fixed set of answers.
+
+4 Multiple Choice Experiments
+
+4.1 Setup                                              Boolean Question Answering BoolQ (BQ)
+                                                       (Clark et al., 2019) poses yes/no (i.e. Boolean)
+We use GPT-2 via the HuggingFace Transformers          questions based on a multi-sentence passage.
+library (Wolf et al., 2020) and GPT-3 via OpenAI's
+beta API. We do not finetune any models, nor do        Entailment Entailment datasets focus on the
+we alter their output. See Appendix B for examples     question of whether a hypothesis sentence B is
+from each dataset in our templated format.             entailed by a premise sentence A. Recognizing Tex-
+                                                       tual Entailment (RTE) (Dagan et al., 2005) requires
+4.2 Datasets                                           predicting an "entailment" or "contradiction" label
+                                                       while Commitment Bank (CB) (De Marneffe et al.,
+We report results on 16 splits of 13 datasets, and     2019) adds a "neutral" label. Following previous
+briefly describe each dataset here.                    work (Brown et al., 2020) we report development
+                                                       set numbers for both RTE and CB.
+Continuation These datasets require the model
+to select a continuation to previous text, making      Text Classification We consider three more com-
+them a natural way to test language models. Choice     plex classification datasets: SST-2 & -5 (Socher
+of Plausible Alternatives (COPA) (Roemmele et al.,     et al., 2013) for various granularities of sentiment
+2011) asks for cause and effect relationships, as      classification, AG's News (Zhang et al., 2015)
+shown in Figure 2. StoryCloze (SC) (Mostafazadeh       (AGN) for topic classification, and TREC (Li and
+et al., 2017) gives the model a choice between two     Roth, 2002) for question classification.
+
+     https://beta.openai.com/
+                            Multiple Choice Accuracy on GPT-3
+
+Params.  2.7B                               6.7B          13B                        175B
+
+         Unc LM Avg PMIDC CC Unc LM Avg PMIDC Unc LM Avg PMIDC Unc LM Avg PMIDC CC
+
+COPA 54.8 68.4 68.4 74.4 - 56.4 75.8 73.6 77.0 56.6 79.2 77.8 84.2 56.0 85.2 82.8 89.2 -
+SC 50.9 66.0 68.3 73.1 - 51.4 70.2 73.3 76.8 52.0 74.1 77.8 79.9 51.9 79.3 83.1 84.0 -
+HS 31.1 34.5 41.4 34.2 - 34.7 40.8 53.5 40.0 38.8 48.8 66.2 45.8 43.5 57.6 77.2 53.5 -
+R-M 22.4 37.8 42.4 42.6 - 21.2 43.3 45.9 48.5 22.9 49.6 50.6 51.3 22.5 55.7 56.4 55.7 -
+R-H 21.4 30.3 32.7 36.0 - 22.0 34.8 36.8 39.8 22.9 38.2 39.2 42.1 22.2 42.4 43.3 43.7 -
+ARC-E 31.6 50.4 44.7 44.7 - 33.5 58.2 52.3 51.5 33.8 66.2 59.7 57.7 36.2 73.5 67.0 63.3 -
+ARC-C 21.1 21.6 25.5 30.5 - 21.8 26.8 29.8 33.0 22.3 32.1 34.3 38.5 22.6 40.2 43.2 45.5 -
+OBQA 10.0 17.2 27.2 42.8 - 11.4 22.4 35.4 48.0 10.4 28.2 41.2 50.4 10.6 33.2 43.8 58.0 -
+CQA 15.9 33.2 36.0 44.7 - 17.4 40.0 42.9 50.3 16.4 48.8 47.9 58.5 16.3 61.0 57.4 66.7 -
+
+BQ 62.2 58.5 58.5 53.5 - 37.8 61.0 61.0 61.0 62.2 61.1 61.1 60.3 37.8 62.5 62.5 64.0 -
+RTE 47.3 48.7 48.7 51.6 49.5 52.7 55.2 55.2 48.7 52.7 52.7 52.7 54.9 47.3 56.0 56.0 64.3 57.8
+CB 08.9 51.8 51.8 57.1 50.0 08.9 33.9 33.9 39.3 08.9 51.8 51.8 50.0 08.9 48.2 48.2 50.0 48.2
+SST-2 49.9 53.7 53.76 72.3 71.4 49.9 54.5 54.5 80.0 49.9 69.0 69.0 81.0 49.9 63.6 63.6 71.4 75.8
+SST-5 18.1 20.0 20.4 23.5 - 18.1 27.8 22.7 32.0 18.1 18.6 29.6 19.1 17.6 27.0 27.3 29.6 -
+AGN 25.0 69.0 69.0 67.9 63.2 25.0 64.2 64.2 57.4 25.0 69.8 69.8 70.3 25.0 75.4 75.4 74.7 73.9
+TREC 13.0 29.4 19.2 57.2 38.8 22.6 30.2 22.8 61.6 22.6 34.0 21.4 32.4 22.6 47.2 25.4 58.4 57.4
+
+Table 1: Comparison of scoring algorithms when using GPT-3 for zero-shot inference on multiple choice questions.
+
+         Percent of Ties or Wins by Method                Prompt Robustness on SST-2
+
+Method Unc LM Avg PMIDC CC                                Method  Unc     LM         PMIDC
+
+125M     12.50 6.25 12.50   68.75           -             125M    49.9 0  56.8 7.3   58.8 7.6
+350M      6.25 18.75 12.50                                350M    49.9 0  58.0 11.3  60.3 11.4
+760M      6.25 6.25 12.50   68.75           -             760M    49.9 0  57.0 9.2   67.7 13.4
+1.6B      6.25 12.50 12.50                                1.6B    49.9 0  57.3 8.2   69.8 13.3
+                            75.00           -
+                                                          2.7B    49.9 0  56.1 9.0   66.2 15.7
+                            80.00 20.00                   6.7B    49.9 0  59.5 10.7  67.9 13.6
+                                                          13B     49.9 0  63.0 14.9  71.7 16.1
+2.7B     6.25 6.25 6.25 86.66 0.00                        175B    49.9 0  72.5 15.7  74.8 14.0
+6.7B
+13B      6.25 25.00 25.00 75.00             -
+175B
+         6.25 18.75 18.75 68.75             -
+
+         6.25 12.50 18.75 62.50 6.25
+
+Table 2: Percentage of datasets that a given method pro-  Table 3: The mean and standard deviations over the 15
+duced the best score or was tied with other methods, ag-  templates considered for SST-2 in (Zhao et al., 2021).
+gregated over each model size. The first four rows use    AVG is excluded, as it is equivalent to LM since all the
+GPT-2 (full data available in the Appendix), while the    given templates use single-token answers.
+final four rows use GPT-3 and summarize data from Ta-
+ble 1. Since ties are included, rows sometimes sum to     age points. This does not imply that PMIDC is
+more than 100. CC is only measured on the 5 datasets      always better or that it will be better by a large mar-
+we use where Zhao et al. (2021) also report accuracies.   gin, though it often is. It does suggest that PMIDC
+                                                          is a significantly better bet on a new dataset.
+4.3 Results
+                                                          4.4 Robustness
+We report zero-shot results for GPT-3 in Table 1,
+with GPT-2 results available in Appendix A. A             To verify that these trends hold across different
+summarized view is shown in Table 2, which aggre-         prompts, we report the mean and standard devia-
+gates the percentage of splits where a given method       tion over the fifteen different prompts considered
+achieves the best score or ties for first-place. In       in (Zhao et al., 2021) for SST-2. Table 3 shows,
+this summarized view it is clear that PMIDC con-          PMIDC always maintains the highest mean, often
+sistently outperforms other scoring methods when          by a hefty margin. Scores are lower than in Table 1
+assessed over a variety of datasets. The smallest         because many of the prompts used are optimized
+margin (in number of datasets won or tied) between        for few-shot rather than zero-shot scoring.
+PMIDC and the best competing method is on GPT-3
+175B with AVG, but that margin is over 40 percent-
+      4-shot Inference Results                                           Removing Surface Form Competition
+
+      SST-2                     CQA                                             COPA  COPA Flipped
+
+Method Unc LM PMIDC Unc LM Avg PMIDC                               Method Unc LM Avg PMIDC Unc LM Avg PMIDC
+
+125M  49.9 0 63.6 7.4 71.7 5.1 15.5 0 29.9 1.6 32.7 1.4 38.3 1.7   125M  56.4 61.0 63.2 62.8 50.0 63.2 63.2 63.2
+350M  49.9 0 76.3 13.8 76.4 8.1 16.5 0 37.6 2.3 40.4 2.3 45.7 2.4  350M  55.8 67.0 66.0 70.0 50.0 66.4 66.4 66.4
+760M  49.9 0 85.9 7.2 87.1 3.0 16.1 0 41.5 2.6 42.4 2.5 47.0 1.5   760M  55.6 69.8 67.6 69.4 50.0 70.8 70.8 70.8
+1.6B  49.9 0 85.4 1.7 89.4 4.0 16.0 0 46.2 1.5 47.7 1.9 52.3 2.1   1.6B  56.0 69.0 68.4 71.6 50.0 73.0 73.0 73.0
+
+2.7B  49.9 0 88.1 4.9  87.7 5.5 16.6 0 43.0 1.7 45.6 1.9 50.4 1.1  2.7B  54.8 68.4 68.4 74.4 50.0 68.4 68.4 68.4
+6.7B  49.9 0 92.9 2.1  79.8 6.9 16.9 0 52.3 1.4 53.4 1.0 56.5 1.6  6.7B  56.4 75.8 73.6 77.0 50.0 76.8 76.8 76.8
+13B   49.9 0 85.4 9.0  86.9 7.5 16.7 0 58.4 2.0 59.3 1.5 63.4 1.4  13B   56.6 79.2 77.8 84.2 50.0 79.0 79.0 79.0
+175B  49.9 0 89.9 5.5  95.5 0.7 16.5 0 69.1 1.9 69.4 0.8 72.0 0.9  175B  56.0 85.2 82.8 89.2 50.0 83.6 83.6 83.6
+
+Table 4: The mean and standard deviation for 5 ran-                Table 5: LM does better on COPA Flipped than COPA
+domly sampled sets of 4 examples used for few-shot                 because surface form competition is removed when
+inference. We include a closed answer dataset (SST-2)              scoring-by-premise, see §5. Methods that don't di-
+and an open answer dataset (CQA). For SST-2 AVG is                 rectly adjust for competing surface forms (LM and
+equivalent to LM due to using single-token answers.                AVG) have the same score as PMIDC on COPA Flipped.
+
+4.5 Few-shot                                                       5.1 Results
+
+While our focus in this paper is on zero-shot scor-                Table 5 shows scores on COPA and COPA Flipped
+ing, PMIDC is just as applicable to few-shot sce-                  side-by-side. On COPA Flipped everything except
+narios. In Table 4 we report 4-shot results on one                 UNC produces the exact same result. This is be-
+closed set dataset (SST-2) and one open set dataset                cause flipping the hypothesis and premise means
+(CQA). We show the mean of 5 randomly sampled                      that it's the context that changes and not the con-
+sets of 4 examples that are used to prime the model                tinuation. LM, AVG, and PMIDC only differ from
+for the task, along with standard deviations. The                  each other over different continuations, not over
+overall trend on both datasets clearly favors PMIDC,               different contexts for the same continuation.
+though LM is superior for two models on SST-2.
+                                                                      On COPA Flipped all methods generally per-
+5 Removing Surface Form Competition                                form similarly to PMIDC on the unflipped version.
+                                                                   This is because surface form competition has been
+What if we used the probability of the premise                     eradicated: we are measuring how well different
+given the hypothesis, P (x|yi), instead? While we                  prefixes condition a model to predict a fixed con-
+are still measuring the probability of a surface form              tinuation rather than which continuation is highest
+(e.g. "the bar closed."), it is the same surface form              probability. Unlike LM, where different answers
+across different options ("It was crowded so", "It                 compete for probability, in COPA Flipped it only
+was 3 AM so"), eliminating the surface form com-                   matters how likely each answer can make the ques-
+petition. yi and yi can now both attain high scores                tion. This is not subject to surface form competition
+if they are both correct answers, by causing x to be               because there is only one string being so scored,
+likely. We call this scoring-by-premise.                           so it is not competing with any other strings for
+                                                                   probability mass.
+   Causal language models like GPT-3 cannot mea-
+sure this directly, because they are only capable of                  Not all datasets are so easily flippable, so manu-
+conditioning on past tokens to predict future tokens.              ally flipping individual questions to remove surface
+We exploit the structure of the COPA dataset to cre-               form competition is not a generally applicable strat-
+ate "COPA Flipped" via a simple transformation,                    egy. Luckily, PMIDC is symmetric:
+shown in Figure 3. COPA consists of cause and
+effect pairs (CAUSE so EFFECT, and EFFECT                                arg max P (yi|x, domain)
+because CAUSE). In the original dataset, what-                               i P (yi|domain)
+ever comes second (either CAUSE or EFFECT)
+has two options that a model must choose between.                        = arg max P (x|yi, domain)
+These can be reversed by switching CAUSE and                                          P (x|domain)
+EFFECT, then substituting the natural inverse rela-                             i
+tion ("because"- "so" and "so"- "because" ).
+                                                                         = arg max P (x|yi, domain)
+
+                                                                                   i
+
+                                                                   In theory, the answer selected by PMIDC should
+                                                                   be the same between COPA and COPA Flipped
+Figure 3: In §5 we experiment with with flipping the premise and hypothesis so that the highest probability premise
+is chosen as the answer, i.e. scoring-by-premise. The transformation above the dashed line shows the experimental
+setup used in §5.1, while the extra distractor below the dashed line is used for illustrative purposes in §5.2.
+
+as PMI is symmetric, though we expect some dif-        y2  y2 and x^2  x^2:
+ferences due to "so" and "because" not being per-
+fect inverses and shuffled references. Thus, PMIDC                      P (y1|x) > P (y2|x)
+does better on COPA than COPA Flipped, likely                           P (y^|x^2) > P (y^|x^1)
+due to more natural phrasing in the original dataset.                P (y2|x) > P (y1|x)
+                                                                 P (y2|xdomain) P (y1|xdomain)
+   These results suggest that surface form compe-
+tition is the primary cause of the depressed perfor-   with the key difference that the conditional proba-
+mance of LM and AVG in comparison to PMIDC.            bility of y2 is much lower:
+
+5.2 In-depth Example                                                     log P (y2|x)  -16
+                                                                         log P (y2|x)  -20
+Scoring-by-Premise Improves LM Figure 3
+shows an example of transforming one question          This is undesirable, as both y2 and y2 are correct
+from COPA to COPA Flipped. In the example de-          answers with similar meanings. Yet, when scoring-
+picted, when we use GPT-3 to calculate P , we get:     by-premise the conditional probability of y^ is sta-
+                                                       ble when substituting x^2  x^2:
+                 P (y1|x) > P (y2|x)
+                                                                         log P (y^|x^2)  -12
+which is wrong, since bars usually close at fixed,                       log P (y^|x^2)  -12
+late-night closing times, rather than because of be-
+ing overcrowded. However we also find that                This suggests that eliminating surface form com-
+                                                       petition allows different correct answers to score
+                 P (y^|x^2) > P (y^|x^1)               well, as they are no longer competing for proba-
+              P (y2|x) > P (y1|x)                      bility mass. Specifically, "it was 3 AM" and "it
+          P (y2|xdomain) P (y1|xdomain)                was 3:30AM" score wildly differently in COPA but
+                                                       nearly identically in COPA Flipped.
+indicating that scoring-by-premise causes the right
+answer to be selected and that PMIDC successfully      6 Analysis
+simulates scoring by premise in this example.
+                                                       Failure Cases There are three datasets where
+Stability Over Valid Answers To see how                PMIDC does not consistently outperform other
+scoring-by-premise allows multiple correct op-         methods: HellaSwag, ARC Easy, and BoolQ. Sur-
+tions to achieve high scores, consider the slightly    prisingly, each is dominated by a different method.
+perturbed y2 and x^2 in Figure 3. The inequal-
+ities shown above still hold when substituting
+   HellaSwag is most amenable to AVG. On ex-            gram frequency. The adjustment made by AVG is
+amination we find that HellaSwag is more focused        still somewhat different than PMIDC, (division of
+on the internal coherence of the hypotheses, rather     log terms rather than subtraction) but could have a
+than external coherence, i.e. how much a premise        similar effect, if length and probability correlate.
+and hypothesis match. This is likely due to Hel-
+laSwag being generated by GPT-2 (Radford et al.,        7 Discussion
+2019) and filtered with BERT, as it contains rela-
+tively on-topic but intrinsically strange hypotheses    Language Models are density estimation functions
+that humans can distinguish from natural data.          that assign probability to every possible string, but
+                                                        there are often many strings that could represent
+   ARC Easy yields the highest scores to LM, i.e.,      a given idea equally well. Our key observation is
+selecting the highest probability option. Clark et al.  that a generative model assigning probability to a
+(2018) note that ARC Easy questions can be solved       string that represents a certain option isn't equiva-
+by a retrieval or word co-occurrence baseline, while    lent to selecting the concept an option corresponds
+examples that were answered incorrectly by both         to. We expect surface form competition anywhere
+were put into the Challenge split. This suggests a      that generative models are used where more than
+bias towards a priori likely phrases. Manual inspec-    one string could represent the same concept.
+tion reveals many stock answers, e.g., "[clouds are
+generated when] ocean water evaporates and then            PMIDC aligns the predictions being made by the
+condenses in the air," supporting our hypothesis.       model more closely with the actual task posed by
+                                                        multiple choice questions: "choose the hypothesis
+   Finally, BoolQ, a reading comprehension dataset      that explains the premise" rather than "generate
+in which all answers are either "yes" or "no", is       the exact surface form of the hypothesis". From
+best solved by an unconditional baseline. This is       this perspective, PMIDC does not go far enough,
+because the dataset presents truly complex ques-        because the model still cannot consider the given
+tions that require more reasoning than GPT-2 or 3       set of options altogether when selecting its choice.
+are capable of out of the box. Indeed, none of the      This matters when answers interact with each other,
+methods reported do better than the majority base-      e.g., "all of the above".
+line, except PMIDC with the largest GPT-3 model.
+                                                        8 Conclusion
+Why does length normalization work? Past
+work offers little explanation for why AVG should       We conduct a large-scale comparison of standard
+be a successful strategy, other than the intuition      and recent scoring functions for zero-shot infer-
+that estimates are strongly length biased and re-       ence across all GPT-2 and GPT-3 models. We show
+quire compensation. Length bias may be caused by        that PMIDC consistently outperforms previous scor-
+the final softmax layer of current language models      ing functions on a wide variety of multiple choice
+assigning too much probability mass to irrelevant       datasets. We also argue that compensating for sur-
+options at each time-step, as noted in open-ended       face form competition is the cause of this boost, by
+generation, character-level language modeling, and      demonstrating that other methods work just as well
+machine translation (Holtzman et al., 2020; Al-         as PMIDC when surface form competition is elim-
+Rfou et al., 2019; Peters et al., 2019).                inated. In future work we would like to explore
+                                                        how surface form competition affects generation,
+   Another (not mutually exclusive) argument is         as we hypothesize that it may be the cause of overly
+that length normalization may account for uncon-        generic outputs under high model uncertainty.
+ditional probability in a similar way to PMIDC.
+Length normalization is often measured over Byte        Acknowledgments
+Pair Encoding (BPE) tokens (Sennrich et al., 2016)
+and BPE tends to produce vocabularies where most        This work was supported in part by the
+tokens are equally frequent (Wang et al., 2020).        ARO (AROW911NF-16-1-0121), the NSF (IIS-
+Recent evidence suggests that language is approxi-      1562364), DARPA under the MCS program
+mately uniformly information dense (Levy, 2018;         through NIWC Pacific (N66001-19-2-4031), the
+Levy and Jaeger, 2007; Jaeger, 2006). As such,          Natural Sciences and Engineering Research Coun-
+length in BPE tokens may correspond roughly to          cil of Canada (ref 401233309), and the Allen In-
+a unigram estimate of log-probability, supposing        stitute for AI (AI2). We thank Mitchell Wortsman,
+that BPE tokens have approximately uniform uni-
+Gabriel Ilharco, Tim Dettmers, and Rik Koncel-            Jonathan Gordon and Benjamin Van Durme. 2013. Re-
+Kedziorski for thorough and insightful feedback on           porting bias and knowledge acquisition. In Proceed-
+preliminary drafts.                                          ings of the 2013 workshop on Automated knowledge
+                                                             base construction, pages 25­30.
+
+References                                                Sergio Guadarrama, Niveda Krishnamoorthy, Girish
+                                                             Malkarnenkar, Subhashini Venugopalan, Raymond
+Rami Al-Rfou, Dokook Choe, Noah Constant, Mandy              Mooney, Trevor Darrell, and Kate Saenko. 2013.
+   Guo, and Llion Jones. 2019. Character-level lan-          Youtube2text: Recognizing and describing arbitrary
+   guage modeling with deeper self-attention. In Pro-        activities using semantic hierarchies and zero-shot
+   ceedings of the AAAI Conference on Artificial Intel-      recognition. In Proceedings of the IEEE interna-
+   ligence, volume 33, pages 3159­3166.                      tional conference on computer vision, pages 2712­
+                                                             2719.
+
+Tom B Brown, Benjamin Mann, Nick Ryder, Melanie           Karen Hambardzumyan, Hrant Khachatrian, and
+   Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind          Jonathan May. 2021. Warp: Word-level adversarial
+   Neelakantan, Pranav Shyam, Girish Sastry, Amanda          reprogramming. arXiv preprint arXiv:2101.00121.
+   Askell, et al. 2020. Language models are few-shot
+   learners. arXiv preprint arXiv:2005.14165.             Ari Holtzman, Jan Buys, Maxwell Forbes, and Yejin
+                                                             Choi. 2020. The curious case of neural text degener-
+Christopher Clark, Kenton Lee, Ming-Wei Chang,               ation. International Conference on Learning Repre-
+   Tom Kwiatkowski, Michael Collins, and Kristina            sentations.
+   Toutanova. 2019. Boolq: Exploring the surprising
+   difficulty of natural yes/no questions. In Proceed-    Tim Florian Jaeger. 2006. Redundancy and syntactic
+   ings of the 2019 Conference of the North American         reduction in spontaneous speech. Ph.D. thesis, Stan-
+   Chapter of the Association for Computational Lin-         ford University Stanford, CA.
+   guistics: Human Language Technologies, Volume 1
+   (Long and Short Papers), pages 2924­2936.              Zhengbao Jiang, Jun Araki, Haibo Ding, and Graham
+                                                             Neubig. 2020a. How can we know when language
+Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot,        models know? arXiv preprint arXiv:2012.00955.
+   Ashish Sabharwal, Carissa Schoenick, and Oyvind
+   Tafjord. 2018. Think you have solved question an-      Zhengbao Jiang, Frank F. Xu, Jun Araki, and Graham
+   swering? try arc, the ai2 reasoning challenge. arXiv      Neubig. 2020b. How can we know what language
+   preprint arXiv:1803.05457.                                models know? Transactions of the Association for
+                                                             Computational Linguistics, 8:423­438.
+
+Ido Dagan, Oren Glickman, and Bernardo Magnini.           Daniel Khashabi, Tushar Khot, Ashish Sabharwal,
+   2005. The pascal recognising textual entailment           Oyvind Tafjord, Peter Clark, and Hannaneh Ha-
+   challenge. In Machine Learning Challenges Work-           jishirzi. 2020. Unifiedqa: Crossing format bound-
+   shop, pages 177­190. Springer.                            aries with a single qa system. arXiv preprint
+                                                             arXiv:2005.00700.
+Joe Davison, Joshua Feldman, and Alexander Rush.
+   2019. Commonsense knowledge mining from pre-           Guokun Lai, Qizhe Xie, Hanxiao Liu, Yiming Yang,
+   trained models. In Proceedings of the 2019 Con-           and Eduard Hovy. 2017. Race: Large-scale reading
+   ference on Empirical Methods in Natural Language          comprehension dataset from examinations. In Pro-
+   Processing and the 9th International Joint Confer-        ceedings of the 2017 Conference on Empirical Meth-
+   ence on Natural Language Processing (EMNLP-               ods in Natural Language Processing, pages 785­
+   IJCNLP), pages 1173­1178, Hong Kong, China. As-           794.
+   sociation for Computational Linguistics.
+                                                          Roger Levy. 2018. Communicative efficiency, uniform
+Marie-Catherine De Marneffe, Mandy Simons, and Ju-           information density, and the rational speech act the-
+   dith Tonhauser. 2019. The commitmentbank: Inves-          ory. In CogSci.
+   tigating projection in naturally occurring discourse.
+   In proceedings of Sinn und Bedeutung, volume 23,       Roger Levy and T Florian Jaeger. 2007. Speakers op-
+   pages 107­124.                                            timize information density through syntactic reduc-
+                                                             tion. Advances in neural information processing sys-
+Katrin Erk, Sebastian Padó, and Ulrike Padó. 2010. A         tems, 19:849.
+   flexible, corpus-driven model of regular and inverse
+   selectional preferences. Computational Linguistics,    Jiwei Li, Michel Galley, Chris Brockett, Jianfeng Gao,
+   36(4):723­763.                                            and William B Dolan. 2016. A diversity-promoting
+                                                             objective function for neural conversation models.
+Tianyu Gao, Adam Fisch, and Danqi Chen. 2020.                In Proceedings of the 2016 Conference of the North
+   Making pre-trained language models better few-shot        American Chapter of the Association for Computa-
+   learners. arXiv preprint arXiv:2012.15723.                tional Linguistics: Human Language Technologies,
+                                                             pages 110­119.
+Xin Li and Dan Roth. 2002. Learning question clas-        Alec Radford, Jeffrey Wu, Rewon Child, David Luan,
+   sifiers. In COLING 2002: The 19th International           Dario Amodei, and Ilya Sutskever. 2019. Language
+   Conference on Computational Linguistics.                  models are unsupervised multitask learners. OpenAI
+                                                             blog, 1(8):9.
+Yao Lu, Max Bartolo, Alastair Moore, Sebastian
+   Riedel, and Pontus Stenetorp. 2021. Fantastically      Laria Reynolds and Kyle McDonell. 2021. Prompt
+   ordered prompts and where to find them: Overcom-          programming for large language models: Be-
+   ing few-shot prompt order sensitivity. arXiv preprint     yond the few-shot paradigm. arXiv preprint
+   arXiv:2104.08786.                                         arXiv:2102.07350.
+
+Huanru Henry Mao, Bodhisattwa Prasad Majumder,            Melissa Roemmele, Cosmin Adrian Bejan, and An-
+   Julian McAuley, and Garrison Cottrell. 2019. Im-          drew S Gordon. 2011. Choice of plausible alterna-
+   proving neural story generation by targeted common        tives: An evaluation of commonsense causal reason-
+   sense grounding. In Proceedings of the 2019 Con-          ing. In AAAI Spring Symposium: Logical Formal-
+   ference on Empirical Methods in Natural Language          izations of Commonsense Reasoning, pages 90­95.
+   Processing and the 9th International Joint Confer-
+   ence on Natural Language Processing (EMNLP-            Bernardino Romera-Paredes and Philip Torr. 2015. An
+   IJCNLP), pages 5990­5995.                                 embarrassingly simple approach to zero-shot learn-
+                                                             ing. In International conference on machine learn-
+Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish         ing, pages 2152­2161. PMLR.
+   Sabharwal. 2018. Can a suit of armor conduct elec-
+   tricity? a new dataset for open book question an-      Timo Schick and Hinrich Schütze. 2020a. Exploit-
+   swering. In Proceedings of the 2018 Conference on         ing cloze questions for few-shot text classification
+   Empirical Methods in Natural Language Processing,         and natural language inference. arXiv preprint
+   pages 2381­2391.                                          arXiv:2001.07676.
+
+Nasrin Mostafazadeh, Michael Roth, Annie Louis,           Timo Schick and Hinrich Schütze. 2020b. Few-
+   Nathanael Chambers, and James Allen. 2017. Ls-            shot text generation with pattern-exploiting training.
+   dsem 2017 shared task: The story cloze test. In Pro-      arXiv preprint arXiv:2012.11926.
+   ceedings of the 2nd Workshop on Linking Models of
+   Lexical, Sentential and Discourse-level Semantics,     Timo Schick and Hinrich Schütze. 2020c. It's
+   pages 46­51.                                              not just size that matters: Small language mod-
+                                                             els are also few-shot learners. arXiv preprint
+Lili Mou, Yiping Song, Rui Yan, Ge Li, Lu Zhang,             arXiv:2009.07118.
+   and Zhi Jin. 2016. Sequence to backward and for-
+   ward sequences: A content-introducing approach to      Rico Sennrich, Barry Haddow, and Alexandra Birch.
+   generative short-text conversation. In Proceedings        2016. Neural machine translation of rare words
+   of COLING 2016, the 26th International Confer-            with subword units. In Proceedings of the 54th An-
+   ence on Computational Linguistics: Technical Pa-          nual Meeting of the Association for Computational
+   pers, pages 3349­3358.                                    Linguistics (Volume 1: Long Papers), pages 1715­
+                                                             1725.
+Olabiyi Oluwatobi and Erik Mueller. 2020. DLGNet:
+   A transformer-based model for dialogue response        Taylor Shin, Yasaman Razeghi, Robert L. Logan IV,
+   generation. In Proceedings of the 2nd Workshop on         Eric Wallace, and Sameer Singh. 2020. AutoPrompt:
+   Natural Language Processing for Conversational AI,        Eliciting Knowledge from Language Models with
+   pages 54­62, Online. Association for Computational        Automatically Generated Prompts. In Proceed-
+   Linguistics.                                              ings of the 2020 Conference on Empirical Methods
+                                                             in Natural Language Processing (EMNLP), pages
+Patrick Pantel, Rahul Bhagat, Bonaventura Coppola,           4222­4235, Online. Association for Computational
+   Timothy Chklovski, and Eduard Hovy. 2007. ISP:            Linguistics.
+   Learning inferential selectional preferences. In Hu-
+   man Language Technologies 2007: The Conference         Richard Socher, Alex Perelygin, Jean Wu, Jason
+   of the North American Chapter of the Association          Chuang, Christopher D Manning, Andrew Y Ng,
+   for Computational Linguistics; Proceedings of the         and Christopher Potts. 2013. Recursive deep mod-
+   Main Conference, pages 564­571, Rochester, New            els for semantic compositionality over a sentiment
+   York. Association for Computational Linguistics.          treebank. In Proceedings of the 2013 conference on
+                                                             empirical methods in natural language processing,
+Ethan Perez, Douwe Kiela, and Kyunghyun Cho. 2021.           pages 1631­1642.
+   True few-shot learning with language models. arXiv
+   preprint arXiv:2105.11447.                             Robyn Speer, Joshua Chin, and Catherine Havasi. 2017.
+                                                             Conceptnet 5.5: An open multilingual graph of gen-
+Ben Peters, Vlad Niculae, and André FT Martins. 2019.        eral knowledge. In Proceedings of the AAAI Confer-
+   Sparse sequence-to-sequence models. In Proceed-           ence on Artificial Intelligence, volume 31.
+   ings of the 57th Annual Meeting of the Association
+   for Computational Linguistics, pages 1504­1519.
+Alon Talmor, Jonathan Herzig, Nicholas Lourie, and        Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali
+   Jonathan Berant. 2019. Commonsenseqa: A ques-             Farhadi, and Yejin Choi. 2019. Hellaswag: Can a
+   tion answering challenge targeting commonsense            machine really finish your sentence? In Proceed-
+   knowledge. In Proceedings of the 2019 Conference          ings of the 57th Annual Meeting of the Association
+   of the North American Chapter of the Association          for Computational Linguistics, pages 4791­4800.
+   for Computational Linguistics: Human Language
+   Technologies, Volume 1 (Long and Short Papers),        Xiang Zhang, Junbo Zhao, and Yann LeCun. 2015.
+   pages 4149­4158.                                          Character-level convolutional networks for text clas-
+                                                             sification. Advances in Neural Information Process-
+Jianheng Tang, Tiancheng Zhao, Chenyan Xiong, Xiao-          ing Systems, 28:649­657.
+   dan Liang, Eric Xing, and Zhiting Hu. 2019. Target-
+   guided open-domain conversation. In Proceedings        Tony Z Zhao, Eric Wallace, Shi Feng, Dan Klein, and
+   of the 57th Annual Meeting of the Association for         Sameer Singh. 2021. Calibrate before use: Im-
+   Computational Linguistics, pages 5624­5634.               proving few-shot performance of language models.
+                                                             arXiv preprint arXiv:2102.09690.
+Ruud Van der Helm. 2006. Towards a clarification of
+   probability, possibility and plausibility: how seman-  Ruiqi Zhong, Kristy Lee, Zheng Zhang, and Dan Klein.
+   tics could help futures practice to improve. Fore-        2021. Adapting language models for zero-shot
+   sight.                                                    learning by meta-tuning on dataset and prompt col-
+                                                             lections. arXiv preprint arXiv:2109.01652.
+Changhan Wang, Kyunghyun Cho, and Jiatao Gu.
+   2020. Neural machine translation with byte-level       Kun Zhou, Kai Zhang, Yu Wu, Shujie Liu, and Jing-
+   subwords. In Proceedings of the AAAI Conference           song Yu. 2019. Unsupervised context rewriting for
+   on Artificial Intelligence, volume 34, pages 9154­        open domain conversation. In Proceedings of the
+   9160.                                                     2019 Conference on Empirical Methods in Natu-
+                                                             ral Language Processing and the 9th International
+Su Wang, Greg Durrett, and Katrin Erk. 2018. Model-          Joint Conference on Natural Language Processing
+   ing semantic plausibility by injecting world knowl-       (EMNLP-IJCNLP), pages 1834­1844.
+   edge. In Proceedings of the 2018 Conference of the
+   North American Chapter of the Association for Com-
+   putational Linguistics: Human Language Technolo-
+   gies, Volume 2 (Short Papers), pages 303­308, New
+   Orleans, Louisiana. Association for Computational
+   Linguistics.
+
+Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin
+   Guu, Adams Wei Yu, Brian Lester, Nan Du, An-
+   drew M. Dai, and Quoc V. Le. 2021. Finetuned lan-
+   guage models are zero-shot learners. arXiv preprint
+   arXiv:2109.01652.
+
+Thomas Wolf, Lysandre Debut, Victor Sanh, Julien
+   Chaumond, Clement Delangue, Anthony Moi, Pier-
+   ric Cistac, Tim Rault, Remi Louf, Morgan Funtow-
+   icz, Joe Davison, Sam Shleifer, Patrick von Platen,
+   Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu,
+   Teven Le Scao, Sylvain Gugger, Mariama Drame,
+   Quentin Lhoest, and Alexander Rush. 2020. Trans-
+   formers: State-of-the-art natural language process-
+   ing. In Proceedings of the 2020 Conference on Em-
+   pirical Methods in Natural Language Processing:
+   System Demonstrations, pages 38­45, Online. Asso-
+   ciation for Computational Linguistics.
+
+Lili Yao, Yaoyuan Zhang, Yansong Feng, Dongyan
+   Zhao, and Rui Yan. 2017. Towards implicit content-
+   introducing for generative short-text conversation
+   systems. In Proceedings of the 2017 conference on
+   empirical methods in natural language processing,
+   pages 2190­2199.
+
+Qinyuan Ye, Bill Yuchen Lin, and Xiang Ren.
+   2021. Crossfit: A few-shot learning challenge for
+   cross-task generalization in nlp. arXiv preprint
+   arXiv:2104.08835.
+A GPT-2 Results
+
+Table 6 shows the results for zero-shot multiple
+choice using GPT-2.
+
+B Templates
+
+Table 7 shows an example of each template used
+for each dataset.
+
+               Multiple Choice Accuracy on GPT-2
+
+Params.  125M  350M                               760M  1.6B
+
+         Unc LM Avg PMIDC Unc LM Avg PMIDC Unc LM Avg PMIDC Unc LM Avg PMIDC CC
+
+COPA 0.564 0.610 0.632 0.628 0.558 0.670 0.660 0.700 0.556 0.698 0.676 0.694 0.560 0.690 0.684 0.716 -
+SC 0.495 0.600 0.615 0.670 0.489 0.630 0.667 0.716 0.503 0.661 0.688 0.734 0.512 0.676 0.715 0.763 -
+HS 0.271 0.286 0.295 0.291 0.298 0.322 0.376 0.328 0.309 0.350 0.432 0.351 0.331 0.384 0.489 0.378 -
+R-M 0.222 0.361 0.406 0.409 0.213 0.387 0.420 0.424 0.214 0.393 0.439 0.439 0.223 0.415 0.446 0.447 -
+R-H 0.209 0.275 0.310 0.344 0.215 0.304 0.326 0.363 0.215 0.318 0.345 0.383 0.219 0.330 0.357 0.391 -
+ARC-E 0.313 0.429 0.378 0.393 0.327 0.494 0.434 0.424 0.334 0.527 0.467 0.470 0.334 0.562 0.496 0.499 -
+ARC-C 0.198 0.201 0.235 0.282 0.197 0.228 0.254 0.286 0.221 0.231 0.266 0.316 0.211 0.252 0.279 0.338 -
+OBQA 0.11 0.164 0.272 0.324 0.108 0.186 0.302 0.386 0.108 0.194 0.296 0.432 0.114 0.224 0.348 0.460 -
+CQA 0.170 0.255 0.307 0.364 0.165 0.309 0.352 0.418 0.170 0.333 0.368 0.445 0.171 0.386 0.385 0.478 -
+
+BQ       0.622 0.588 0.588 0.511 0.622 0.608 0.608 0.497 0.622 0.580 0.580 0.467 0.622 0.563 0.563 0.495 -
+RTE      0.527 0.516 0.516 0.498 0.473 0.531 0.531 0.549 0.473 0.531 0.531 0.542 0.473 0.477 0.477 0.534 0.485
+CB       0.089 0.482 0.482 0.500 0.089 0.500 0.500 0.500 0.089 0.482 0.482 0.500 0.089 0.500 0.500 0.500 0.179
+SST-2    0.499 0.636 0.636 0.671 0.499 0.802 0.802 0.862 0.499 0.770 0.770 0.856 0.499 0.840 0.840 0.875 0.820
+SST-5    0.181 0.274 0.244 0.300 0.176 0.185 0.272 0.393 0.176 0.203 0.267 0.220 0.176 0.304 0.291 0.408 -
+AGN      0.250 0.574 0.574 0.630 0.250 0.643 0.643 0.644 0.250 0.607 0.607 0.641 0.250 0.648 0.648 0.654 0.600
+TREC     0.226 0.230 0.144 0.364 0.226 0.288 0.122 0.216 0.226 0.228 0.226 0.440 0.226 0.228 0.240 0.328 0.340
+
+Table 6: Comparison of scoring algorithms when using GPT-2 for zero-shot inference on multiple choice questions.
+Type            Dataset Template
+
+                COPA        [The man broke his toe]P [because]DP [he got a hole in his sock.]UH
+                            [I tipped the bottle]P [so]DP [the liquid in the bottle froze.]UH
+
+Continuation    StoryCloze  [Jennifer has a big exam tomorrow. She got so stressed, she pulled an all-nighter. She went into class the next day, weary as can
+                            be. Her teacher stated that the test is postponed for next week.]P [The story continues:]DP [Jennifer felt bittersweet about it.]UH
+
+                HellaSwag   [A female chef in white uniform shows a stack of baking pans in a large kitchen presenting them. the pans]P [contain egg yolks
+                            and baking soda.]UH
+
+                RACE        [There is not enough oil in the world now. As time goes by, it becomes less and less, so what are we going to do when it runs out
+                            [...].]P question: [According to the passage, which of the following statements is true]P[?]DP answer: [There is more petroleum
+QA              ARC         than we can use now.]UH
+                            [What carries oxygen throughout the body?]P [the answer is:]DP [red blood cells.]UH
+                OBQA        [Which of these would let the most heat travel through?]P [the answer is:]DP [a steel spoon in a cafeteria.]UH
+                            [Where can I stand on a river to see water falling without getting wet?]P [the answer is:]DP [bridge.]UH
+                CQA
+                            title: [The Sharks have advanced to the Stanley Cup finals once, losing to the Pittsburgh Penguins in 2016 [...]]P question: [Have
+Boolean QA BoolQ            the San Jose Sharks won a Stanley Cup?]P [answer:]DP [No.]UH
+
+                  RTE       [Time Warner is the world's largest media and Internet company.]P question: [Time Warner is the world's largest company.]P [true
+Entailment                  or false? answer:]DP [true.]UH
+                            question: Given that [What fun to hear Artemis laugh. She's such a serious child.]P Is [I didn't know she had a sense of humor. ]P
+                  CB        true, false, or neither? [the answer is:]DP [true.]UH
+
+                SST-2       "[Illuminating if overly talky documentary]P" [[The quote] has a tone that is]DP [positive.]UH
+
+Text            SST-5       "[Illuminating if overly talky documentary]P" [[The quote] has a tone that is]DP [neutral.]UH
+
+Classification  AG's News   title: [Economic growth in Japan slows down as the country experiences a drop in domestic and corporate [...]]P summary:
+                            [Expansion slows in Japan]P [topic:]DP [Sports.]UH
+
+                TREC        [Who developed the vaccination against polio?]P [The answer to this question will be]DP [a person.]UH
+
+Table 7: The templates used for each task, along with an example instance (with a single random candidate answer).
+Original questions (premises) are colored blue, and original answers (hypotheses) are colored red. Long premises
+are abbreviated with "[...]". The full premises, conditional hypotheses and domain premises are marked in [·]P,
+[·]UH, and [·]DP respectively. For a complete description of our templating methodology, please see our code at
+https://github.com/peterwestuw/surface-form-competition
+

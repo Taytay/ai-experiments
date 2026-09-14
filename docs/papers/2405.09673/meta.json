@@ -1,0 +1,36 @@
+{
+  "id": "2405.09673",
+  "version": "v2",
+  "id_versioned": "2405.09673v2",
+  "title": "LoRA Learns Less and Forgets Less",
+  "authors": [
+    "Dan Biderman",
+    "Jacob Portes",
+    "Jose Javier Gonzalez Ortiz",
+    "Mansheej Paul",
+    "Philip Greengard",
+    "Connor Jennings",
+    "Daniel King",
+    "Sam Havens",
+    "Vitaliy Chiley",
+    "Jonathan Frankle",
+    "Cody Blakeney",
+    "John P. Cunningham"
+  ],
+  "published": "2024-05-15",
+  "updated": "2024-09-20",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "comment": "Final version with new experiments and analyses, as accepted to Transactions on Machine Learning Research, August 2024 (Featured Certification). https://openreview.net/forum?id=aloEru2qCG&noteId=Jb3PQNQDI2",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Low-Rank Adaptation (LoRA) is a widely-used parameter-efficient finetuning method for large language models. LoRA saves memory by training only low rank perturbations to selected weight matrices. In this work, we compare the performance of LoRA and full finetuning on two target domains, programming and mathematics. We consider both the instruction finetuning (approximately 100K prompt-response pairs) and continued pretraining (20B unstructured tokens) data regimes. Our results show that, in the standard low-rank settings, LoRA substantially underperforms full finetuning. Nevertheless, LoRA better maintains the base model's performance on tasks outside the target domain. We show that LoRA mitigates forgetting more than common regularization techniques such as weight decay and dropout; it also helps maintain more diverse generations. Finally, we show that full finetuning learns perturbations with a rank that is 10-100X greater than typical LoRA configurations, possibly explaining some of the reported gaps. We conclude by proposing best practices for finetuning with LoRA.",
+  "abs_url": "https://arxiv.org/abs/2405.09673",
+  "pdf_url": "https://arxiv.org/pdf/2405.09673v2",
+  "src_url": "https://arxiv.org/src/2405.09673v2",
+  "metadata_source": "api"
+}

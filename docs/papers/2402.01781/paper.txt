@@ -1,0 +1,1308 @@
+                                            When Benchmarks are Targets: Revealing the Sensitivity of Large
+                                                                   Language Model Leaderboards
+
+                                          Norah A. Alzahrani*, Hisham Abdullah Alyahya*, Yazeed Alnumay, Sultan Alrashed,
+                                       Shaykhah Z. Alsubaie, Yousef Almushayqih, Faisal Abdulrahman Mirza, Nouf M. Alotaibi
+
+                                                      Nora Al-Twairesh, Areeb Alowisheq, M Saiful Bari, Haidar Khan*
+
+                                                      National Center for AI (NCAI), Saudi Data and AI Authority (SDAIA)
+                                                                                    Riyadh, Saudi Arabia
+
+arXiv:2402.01781v2 [cs.CL] 3 Jul 2024                        Abstract                           the requirements of researchers and practitioners
+                                                                                                looking to build on LLMs (Ethayarajh and Juraf-
+                                            Large Language Model (LLM) leaderboards             sky, 2021; Dehghani et al., 2021). Since LLMs are
+                                            based on benchmark rankings are regularly           extremely expensive to both train and inference,
+                                            used to guide practitioners in model selection.     selecting the LLM (or LLM training recipe) is of-
+                                            Often, the published leaderboard rankings are       ten the most costly decision for the entire project.
+                                            taken at face value -- we show this is a (poten-    Stable leaderboards are critical to making the right
+                                            tially costly) mistake. Under existing leader-      decision.
+                                            boards, the relative performance of LLMs is
+                                            highly sensitive to (often minute) details. We         Leaderboards based on multiple choice ques-
+                                            show that for popular multiple-choice ques-         tions (MCQ) for evaluation (Wang et al., 2018,
+                                            tion benchmarks (e.g., MMLU), minor pertur-         2019; Nie et al., 2019; Zhong et al., 2023;
+                                            bations to the benchmark, such as changing          Hendrycks et al., 2020) present both convenience
+                                            the order of choices or the method of answer        and significant limitations (Pezeshkpour and Hr-
+                                            selection, result in changes in rankings up to      uschka, 2023; Zheng et al., 2023). While MCQs
+                                            8 positions. We explain this phenomenon by          offer an automated and quantifiable means to as-
+                                            conducting systematic experiments over three        sess certain aspects of model ability (e.g., knowl-
+                                            broad categories of benchmark perturbations         edge), they fall short as a stable means to measure
+                                            and identifying the sources of this behavior.       performance. Figure 1 demonstrates the instability
+                                            Our analysis results in several best-practice rec-  of the leaderboard ranking of one popular bench-
+                                            ommendations, including the advantage of a          mark, Massive Multitask Language Understanding
+                                            hybrid scoring method for answer selection.         (MMLU) (Hendrycks et al., 2020), under small
+                                            Our study highlights the dangers of relying on      perturbations.
+                                            simple benchmark evaluations and charts the
+                                            path for more robust evaluation schemes on the         Moreover, the reliance on MCQs raises concerns
+                                            existing benchmarks. The code for this paper is     about the models being overfit to these benchmarks,
+                                            available at https://github.com/National-Center-    potentially excelling in structured tests while lack-
+                                            for-AI-Saudi-Arabia/lm-evaluation-harness.          ing real-world applicability. This discrepancy high-
+                                                                                                lights the need for more holistic and diverse eval-
+                                       1 Introduction                                           uation methods that transcend the simplicity of
+                                                                                                MCQs (Liang et al., 2023). It also prompts critical
+                                       The advent of transformer-based Large Language           reflection on how these models might inadvertently
+                                       Models (LLMs) (OpenAI, 2023; Deepmind, 2023;             be trained to achieve high scores through spurious
+                                       Anthropic, 2023; Anil et al., 2023; Touvron et al.,      correlations, pattern recognition, and optimization
+                                       2023) has led to a generational leap in genera-          for specific question formats rather than genuine
+                                       tive models, enabling interaction with computing         language comprehension or knowledge. As LLMs
+                                       devices through natural language. This advance-          continue to evolve, it is imperative to develop eval-
+                                       ment encompasses improvements that have ren-             uation frameworks that can more accurately assess
+                                       dered many earlier benchmarks and leaderboards           their abilities in a way that mirrors the complexity
+                                       obsolete (Laskar et al., 2023; Shen et al., 2023),       of real-world use.
+                                       leading to the compilation of more challenging and
+                                       comprehensive tests. However, the current genera-           Despite being widely used, benchmarking with
+                                       tion of leaderboards still does not satisfy many of      MCQs has turned out to be anything but sim-
+                                                                                                ple. It requires the full synchronization of eval-
+                                           *Core contributor
+                                           Corresponding author: haidark@sdaia.gov.sa
+                               Question: What is the capital of Saudi Arabia?
+
+      Default Style                Rare Symbols         Fixed Answer (B)         Cloze Prompt
+                                                                               Answer: Riyadh
+A. Jeddah                      oe. Jeddah             A. Jeddah
+B. Makkah                      §. Makkah              B. Riyadh
+C. Paris                       . Paris                C. Paris
+D. Riyadh                      ü. Riyadh              D. Makkah
+Answer: D                      Answer: ü              Answer: B
+
+       Yi-34b                         Yi-34b                 Yi-34b                   Yi-34b
+    Llama2-70b                     Llama2-70b          Llama2-7b-chat              Llama2-70b
+                               Llama2-70b-chat                                 Llama2-70b-chat
+        Yi-6b                       Mistral-7b            Llama2-70b                Mistral-7b
+Llama2-70b-chat                Llama2-13b-chat                Yi-6b                Llama2-13b
+                               Mistral-7b-instruct                             Llama2-13b-chat
+     Mistral-7b                                       Llama2-70b-chat          Mistral-7b-instruct
+        Phi-2                          Yi-6b
+                                Llama2-7b-chat            Mistral-7b                   Yi-6b
+Mistral-7b-instruct                                                                Llama2-7b
+Llama2-13b-chat                    Llama2-13b             Llama2-13b
+                                       Phi-2          Llama2-13b-chat                  Phi-2
+    Llama2-13b                                                                  Llama2-7b-chat
+ Llama2-7b-chat                    Llama2-7b          Mistral-7b-instruct
+
+    Llama2-7b                                                 Phi-2
+                                                           Llama2-7b
+                Kendall's ( )
+
+Figure 1: Minor perturbations cause major ranking shifts on MMLU (Hendrycks et al., 2020). Models can move up
+or down up to eight positions on the leaderboard under small changes to the evaluation format. Columns (from left):
+1) Original ranking given by MMLU using answer choice symbol scoring (a common default). 2) Ranking under an
+altered prompt for the same questions, where answer choice symbols are replaced with a set of rare symbols. 3)
+Setting where the correct answer choice is fixed to a certain position (in this case, B). 4) Using the cloze method for
+scoring answer choices. Under each new ranking, we report Kendall's  (Kendall, 1938) with respect to the original
+ranking (lower k indicates more disagreement between rankings)
+
+uation frameworks and results often vary wildly         1. Existing model rankings on popular bench-
+due to nuanced differences. For example, minor              marks break down under slight perturba-
+changes in prompting and scoring can produce in-            tions, particularly in the medium to small
+valid results for particular LLMs1. Recent studies          model sizes.
+have investigated the issue of sensitivity in evalu-
+ating LLMs, with some demonstrating that LLMs           2. This behavior can be explained by the suscep-
+are susceptible to the ordering of answer choices           tibility of all tested LLMs to various forms of
+and bias towards specific tokens/symbols (Zheng             bias in MCQ.
+et al., 2023; Pezeshkpour and Hruschka, 2023; Lu
+et al., 2022), and others exploring different prompt    3. Some families of LLMs have an over-reliance
+modifications and their effects in benchmarking             on format, pointing to potential benchmark
+LLMs (Mizrahi et al., 2024; Sclar et al., 2023; We-         leakage.
+ber et al., 2023; Zhao et al., 2021).
+                                                        4. We find that LLMs also exhibit bias to the
+   In this work, we conduct a broad range of minor          scoring method for answer choices in MCQ.
+perturbation experiments to MCQ benchmarks and
+observe the disruption it causes to model rankings      5. We demonstrate that some categories of mod-
+on leaderboards. We also take additional steps to           ifications do not affect the benchmark rank-
+precisely identify the limitations of LLMs on this          ings.
+measurement approach.
+                                                      2 LLM Evaluation with MCQs
+   The contributions of this paper can be summa-
+rized as follows:                                     Evaluating LLMs with MCQs has rapidly become
+                                                      a standard for measuring the knowledge and reason-
+    1https://huggingface.co/blog/                     ing capabilities of the model (OpenAI, 2023; Anil
+evaluating-mmlu-leaderboard                           et al., 2023; Deepmind, 2023; Jiang et al., 2023).
+Many such MCQ benchmarks have been used to             some MCQ test changes, like modifying the or-
+measure LLMs, including Massive Multitask Lan-         der of answer choices, can change performance
+guage Understanding (MMLU) (Hendrycks et al.,          even for humans but the effect is typically not pro-
+2020), Ai2 Reasoning Challenge (ARC) (Clark            nounced (Lions et al., 2021). In general, our mod-
+et al., 2018a), and Common-sense Question An-          ifications are designed to be small perturbations
+swers (CSQA) (Saha et al., 2018).                      to the MCQ and prompts that should not affect
+                                                       performance. The exception to this is some of the
+   Mechanically, testing LLMs with MCQs is ac-         in-context knowledge manipulations described
+complished by presenting the question along with       in Section 3.3, which are designed to improve or
+the answer choices to the model and selecting the      degrade performance drastically.
+choice deemed most probable by the model. Al-
+though this setup appears straightforward, LLMs        3.1 Answer choice format and ordering
+react in unpredictable ways to formatting and other
+minor changes to the questions or the answers.         In light of earlier findings related to selection
+LLM performance on an MCQ test can change with         bias (Zheng et al., 2023; Pezeshkpour and Hr-
+the introduction of an extra space (e.g., between      uschka, 2023; Lu et al., 2022), we investigate the
+the question and answer) or adding an additional in-   effects of changes to the presented order of answer
+structional phrase (e.g., "Choices:"). In addition to  choices and changes to the symbols associated with
+this brittleness, Pezeshkpour and Hruschka (2023)      answer choices.
+found changes to the order in which answer choices
+are presented to GPT4 and instructGPT can change       Random choice order Our first study aims to
+the model's prediction.                                uncover how dependent MCQ benchmark perfor-
+                                                       mance and rankings are on the original ordering of
+   These findings lead us to take a deeper look at     the answer choices. We apply two simple schemes
+how MCQ-based benchmark results are affected           to randomly change the order of answer choices
+by small perturbations to question formats, LLM        presented to the model: (i) swapping choices us-
+prompts, presentation of few-shot examples, and        ing a fixed set of swaps for all questions and (ii)
+other dimensions. In particular, we introduce varia-   randomly assigning new positions to each choice
+tions in three categories:                             while ensuring each choice is moved to a different
+                                                       position.
+   · Answer choice format and ordering: testing
+      the limits of LLM sensitivity to ordering and    Biased choice order In this setting, the correct
+      formatting (Section 3.1).                        answer choice is set to a fixed position across the
+                                                       entire test to measure bias toward predicting an-
+   · Prompt and scoring modifications: chang-          swers at particular positions. For zero-shot, we
+      ing text included in the prompt and analyzing    simply set the correct answer choice to each of the
+      different scoring schemes (Section 3.2).         positions in turn.
+
+   · In-context knowledge manipulation: in-               In the few-shot case, we examine the influence
+      serting relevant/irrelevant information in       of biasing the correct answers in the examples to
+      the prompt and/or few-shot examples (Sec-        the model's inherent bias to particular positions.
+      tion 3.3).                                       For each question, we fix the correct answer of
+                                                       the examples to each position in turn. We then
+   Our main aim is to quantify how these small         modify the test question in two ways: (i) unchanged
+perturbations/variations change the rankings of        answer choices and (ii) correct choice fixed to the
+a set of models on a particular benchmark. As          same position as examples. This setup is shown in
+MCQ benchmarks-based leaderboards are often            Figure 2.
+used to compare models and guide model selection,
+we investigate the robustness of benchmarks for        Answer choice symbols The symbols used for
+this purpose. Figure 1 demonstrates how existing       the answer choices (e.g. A, B, C, D) also play
+benchmarks exhibit significant undesirable shifts      a role in model bias (Zheng et al., 2023). Thus,
+in rankings under small perturbations.                 we experiment with replacing the symbols with
+                                                       alternative and less common tokens. This aims to
+3 Methods                                              decouple the bias to particular positions from the
+                                                       bias to symbols or the relative ordering in natural
+In this section, we describe and justify the pertur-
+bations we apply in each category. We note that
+                                                                                                                           Q. ..........................                     et al. (2020); Sanh et al. (2021); Chowdhery
+                                                                                                                                                                             et al. (2022)
+                                                                                                                                          ...............................
+                                                                                                                    unchanged (A) ....................                     · Cloze scoring: Prompt templates are struc-
+                                                                                                                                                                             tured as a question followed by a single an-
+5-shots (Fixed to A)                                                             Original Question                         (B) ....................                          swer choice. Maximum normalized likelihood
+                                                                                                                           (C) ....................                          scores over all answer choices define the pre-
+                                                                                                                                                                             diction. Used in Clark et al. (2018a).
+                                                                                                                           (D) ....................
+
+Q. ..Q.....Q.......Q........................................................     Q. ..........................
+
+...............................................................................  ...............................
+
+(A) .(.A..)..(.A...)..(..A.....)......................................           + (A) ....................
+(B) .(.B..)..(.B...)..(..B.....)......................................                    (B) ....................
+
+(C) .(.C..)..(.C...).(...C.....)......................................           (C) ....................
+
+(D) .(.D..)..(.D...).(...D.....)......................................           (D) ....................
+
+                                                                                                                           Q. ..........................
+
+                                                                                                                           ...............................
+
+                                                                                                                           (A) ....................
+
+                                                                                                                    fixed  (B) ....................
+                                                                                                                           (C) ....................
+
+                                                                                                                           (D) ....................
+
+Figure 2: Experiment setup for probing position bias                                                                                                                           Symbols Scoring        Hybrid Scoring         Cloze Scoring
+with few-shot examples.
+                                                                                                                                                                           <initial prompt>      <initial prompt>      <initial prompt>
+symbols. We replace ['A', 'B',' C', 'D'] with the                                                                                                                                                                      Question: <question>
+following two sets of symbols:                                                                                                                                             Question: <question>  Question: <question>  Answer: <choice x>
+                                                                                                                                                                           A. <choice1>          A. <choice 1>
+   · Set 1: ["$", "&", "#", "@"] compris-                                                                                                                                  B. <choice2>          B. <choice 2>
+      ing of common tokens that are language-                                                                                                                              C. <choice3>          C. <choice 3>
+      independent.                                                                                                                                                         D. <choice4>          D. <choice 4>
+                                                                                                                                                                           Answer: <answer       Answer: <choice x>
+   · Set 2: ["oe", "§", "Ze (Cyrillic)", "ü"] consist-                                                                                                                     symbol>
+      ing of rare tokens in the vocabulary without
+      any implicit relative order.                                                                                                                                         Figure 3: Answer choice scoring methods for LLMs.
+                                                                                                                                                                           The symbols and hybrid scoring methods are most simi-
+   In the few-shot setting, we test both assigning                                                                                                                         lar, sharing identical prompts. Cloze scoring does not
+fixed ordering for the replaced symbols in the ex-                                                                                                                         reflect a "true" MCQ style, as the model is not shown all
+amples as well as changing the ordering across                                                                                                                             the options. However, due to its prevalence we compare
+examples.                                                                                                                                                                  it to the other methods as a baseline.
+
+3.2 Prompt and scoring modifications                                                                                                                                          Figure 3 gives an overview of each scoring
+                                                                                                                                                                           method. In addition, we also investigate further
+LLMs exhibit high sensitivity to variations in                                                                                                                             modification of instruction and sentinel tokens in
+prompt formatting (Sanh et al., 2021; Mishra                                                                                                                               the prompt template.
+et al., 2022), forcing benchmark developers to
+unify prompt templates within the same evaluation                                                                                                                          Prompt instructions To assess the impact of sub-
+scheme. However, it remains unknown if certain                                                                                                                             tle token alterations in prompt instructions, we con-
+models have an affinity towards any specific prompt                                                                                                                        duct experiments on (i) removing question subject
+templating style. It is unclear how benchmarking                                                                                                                           information and (ii) adding "Correct" alongside the
+prompt choices advantage/disadvantage different                                                                                                                            answer. These targeted changes aim to identify the
+models. In addition to that, the scoring style may                                                                                                                         robustness in response to certain tokens, particu-
+change depending on how we are prompting the                                                                                                                               larly when they carry crucial information, as well
+context of a query. We distinguish three major                                                                                                                             as to evaluate the influence of contextual bias in-
+categories of scoring methods for MCQs.                                                                                                                                    troduced by minor modifications of the instruction
+                                                                                                                                                                           text.
+   · Symbol scoring: Prompt template is struc-
+      tured as question followed by answer choices.                                                                                                                        3.3 In-context knowledge manipulation
+      The model chooses the answer based on the
+      likelihood scores for the answer choice sym-                                                                                                                         In this category, we attempt to measure model and
+      bol. Used in Hendrycks et al. (2020).                                                                                                                                benchmark robustness in the few-shot setting by
+                                                                                                                                                                           testing the entire spectrum of knowledge injected
+                                                                                                                                                                           in the few-shot examples. In particular, we experi-
+                                                                                                                                                                           ment under the following settings:
+
+· Hybrid scoring: Prompt template is struc-                                                                                                                                Correct answer provided We provide the target
+  tured as a question followed by answer                                                                                                                                   question and the correct answer in the prompt as
+  choices. The model chooses the answer based                                                                                                                              an example to the model. This corresponds to the
+  on the likelihood scores for the answer choice                                                                                                                           simplest setting for the model, where it only needs
+  content normalized by length. Used in Raffel                                                                                                                             to look up the answer in the context.
+Incorrect answer provided This setting is the         using the LM Evaluation Harness (Gao et al., 2023)
+opposite of the former. The target question is pro-   library. Their implementation of MMLU measures
+vided with an incorrect answer as an example. It is   the log-likelihood of each of the answer tokens ['A',
+challenging as the model must ignore the context      'B', 'C', 'D'] after the input prompt and chooses the
+and determine the correct answer independently.       letter with the highest probability as the model's
+                                                      answer.
+Trivial examples We replace few-shot examples
+with simple questions the model is known to be able      Some of our experiments require permuting the
+to answer (typically related to the language/text     answer choice order (Table 1, A.8, A.9, and A.10),
+of the question itself). The only information the     however, this can be confusing for questions where
+examples convey is related to formatting (Soltan      the answer choices are dependent on their position,
+et al., 2022). We create three versions of these      such as "D. All of the above.", or reference other
+questions and answers using GPT-4 and ensure          choices, such as "C. Both A and B.". To circum-
+the model can answer them correctly (as shown in      vent this dependency, we manually inspected and
+Figure 8).                                            modified the questions from three subjects to en-
+                                                      sure their answers are permutation-independent for
+Out of domain examples Instead of providing           a subset of our experiments. The modified subjects
+examples from the same subject as the target ques-    are college chemistry, college mathematics, and
+tion, we add out-of-domain questions (from another    global facts.
+subject) as the few-shot examples. This setting cor-
+responds to a difficulty level between the original      For each variation introduced to the MCQ bench-
+format and providing trivial examples.                marks, we calculate the change in accuracy (Acc)
+                                                      and recall standard deviation (RStd) for each model.
+4 Experiments                                         RStd measures the bias of a model to a particu-
+                                                      lar answer choice by computing the standard de-
+In the bulk of our experiments, we focus on the       viation of recalls for each answer choice (Zheng
+MMLU benchmark due to the extensive nature of         et al., 2023). This metric quantifies how much the
+our experiments (11 models, 22+ settings), and ex-    model favors particular positions for the correct
+tend some experiments to ARC-challenge to show        answer choice. We typically observe whether RStd
+generalizability.                                     changes (RStd) are significant across experimen-
+                                                      tal settings.
+   MMLU (Hendrycks et al., 2020) is a commonly
+used benchmark for comparing LLMs, consisting         To measure the change in ranking induced by an
+of 57 subjects spanning four domains: humanities,
+STEM, social sciences, and others. Each subject in-   applied perturbation to a benchmark, we measure
+cludes at least 100 multiple-choice questions with
+4 answer choices. The entire benchmark contains       the normalized Kendall's  distance between two
+14,042 questions (Tables A.29 and A.30 have a
+breakdown of the MMLU subjects and their distri-      rankings of n models (Kendall, 1938). Kendall's
+butions).
+                                                       computes the number of swapped pairs between
+   Ai2 Reasoning Challenge (Clark et al., 2018b)
+is a benchmark consisting of 7787 grade school        two rankings normalized by the total number of
+science questions. The benchmark is split into two
+sets: Easy and Challenge. We conduct experiments      pairs  n(n-1)  .  We report k  =    +1  ,  where  k  =  1.0
+on the Challenge set (ARC-C) which is proven to                  2                        2
+contain harder questions for existing models. The
+questions in ARC-C have 3-5 answer choices.           indicates total agreement between rankings, and
+
+   Unless otherwise stated, the reported score for    k = 0 indicates complete disagreement by revers-
+each experiment/model combination on MMLU is
+the mean accuracy across all 14,042 questions. All    ing the original rankings.
+tested model tokenizers encode the multiple-choice
+answers as single tokens. Hence, the accuracy is      5 Results & Analysis
+equivalent to the normalized accuracy. All baseline
+and modified MMLU benchmarks were performed           In this section, we highlight the major findings
+                                                      of our work and combine the results of multiple
+                                                      lines of experimentation (detailed in Section 3) into
+                                                      concise observations. Additional observations and
+                                                      complete experimental results can be found in the
+                                                      appendix (Section A.1).
+5.1 MCQ benchmarks are not robust to                                                                                                        Model                Rank Acc (Acc) RStd (RStd)
+      perturbations
+                                                                                                                                            phi-2                 (77)    34.6 (-3)   14.2 (7.4)
+As shown in Figure 1, there exist perturbations                                                                                             Yi-6b                 (39)   33.0 (-8.3)  11.9 (1.8)
+that cause dramatic shifts in the order of models                                                                                           Mistral-7b            (43)   40.0 (1.0)    9.8 (0.7)
+with respect to commonly accepted leaderboard                                                                                               Mistral-7b-Instruct   (88)   33.3 (-1.7)  16.7 (3.5)
+rankings. We find a significant number of small                                                                                             Llama2-7b            (1111)  24.3 (-5.0)  13.2 (-0.4)
+perturbations demonstrate this effect, while other                                                                                          Llama2-7b-chat       (910)   28.6 (-3.7)  27.7 (7.9)
+perturbations are more benign.                                                                                                              Llama2-13b            (66)   37.0 (0.7)   22.7 (5.7)
+                                                                                                                                            Llama2-13b-chat       (95)   37.6 (6.0)   26.7 (0.0)
+                                                                                                                                            Yi-34b                (11)   45.0 (-5.0)  9.2 (-2.3)
+                                                                                                                                            Llama2-70b            (22)   40.3 (-1.7)  9.07 (-5.5)
+                                                                                                                                            Llama2-70b-chat       (54)   37.6 (0.3)   13.4 (-6.2)
+
+    Changing Choices Symbols                                                                                                                Table 1: We show that model rankings can shift under
+                                                                                                                                            shuffling of the order of answer choices. The largest
+0                                                                     30  Set1                                                              change in rank is 5 positions (Yi-6b) followed by 4 po-
+                                                                          Set2                                                              sitions (Llama2-13b-chat). This zero-shot experiment is
+Accuracy10                                                            20                                                                    done on a subset of MMLU subjects (college chemistry,
+                                                     RStds                                                                                  college mathematics, and global facts) which we manu-
+                                                                      10                                                                    ally verified maintained correctness after shuffling an-
+20                                                                                                                                          swer choice order (i.e. did not contain cross references
+                                                                       0                                                                    between answer choices). k = 0.564 for this experi-
+  phi-2Yi-6BM-7MB-7B-CL2-L72B-7BL-C2-L123-1B3B-YCi-34LB2-L720-7B0B-C                                                                        ment, indicating a significant disagreement in rankings.
+                                                                        phi-2Yi-6BM-7MB-7B-CL2-L72B-7BL-C2-L123-1B3B-YCi-34LB2-L720-7B0B-C
+
+Figure 4: Change in accuracy and bias (RStd) on zero-                                                                                       5.2 Revisiting selection bias: token bias vs.
+shot MMLU after swapping answer choice symbols with                                                                                               position bias
+two different sets of symbols (described in Section 3.1).
+While accuracy always decreased, most models exhib-                                                                                         Prior and concurrent work finds that LLMs answer-
+ited even more selection bias with the new symbols. k                                                                                       ing MCQs are highly sensitive to the order that
+for Set1 and Set2 were 0.689 and 0.733 respectively                                                                                         choices are presented (Pezeshkpour and Hruschka,
+                                                                                                                                            2023; Robinson et al., 2023) (position bias) as well
+Sensitive perturbations Shuffling/changing the                                                                                              as the symbols used as choice IDs (Zheng et al.,
+presented order of the choices, swapping choice                                                                                             2023) (token bias). We find selection bias is appar-
+symbols, and alternative scoring methods all cause                                                                                          ent in all LLMs we test both in 0 and 5-shot setups,
+major shifts to the rankings (determined by thresh-                                                                                         as shown in Tables 2 and A.6. This confirms earlier
+olding k  0.75). For example, in a controlled                                                                                               findings and highlights a major weakness of the
+experiment using a subset of MMLU, we randomly                                                                                              current methods of evaluating LLMs on MCQs.
+shuffle the answer choices presented to the models
+(Table 1). 5 out of 11 models change in ranking                                                                                             15     Shuffling Choice IDs Alongside Content
+after the perturbation and k drops to 0.564. A
+similar pattern is seen for perturbations like fixing                                                                                                                                 Accuracy
+the correct answer to a particular position (Table 2),                                                                                      10                                        RStds
+replacing the default choice symbols with other
+sets (Figure 4), and alternative scoring methods                                                                                            5
+(Figure 7).
+                                                                                                                                            0
+   Some models elicit this behavior much more
+strongly. For example, we observe that Yi-6b drops                                                                                          5
+from 3rd place to 7th or 8th place under some
+benchmark perturbations in the group of 11 models                                                                                           10
+we tested (namely, the rare symbol and cloze per-
+turbations). Other models in the same size range                                                                                               phi-2 Yi-6B M-7BM-7B-C L2-7BL2-7B-C L2-13LB2-13B-C Yi-34B L2-70LB2-70B-C
+are more stable (e.g., Mistral-7b, Llama2-7b), not
+shifting more than one or two ranks under all pertur-                                                                                       Figure 5: Accuracy and RStd change after randomly
+bations. The reasons for this are unclear but could                                                                                         shuffling the order of the choices alongside their option
+indicate overfitting to aspects of the benchmark                                                                                            IDs. Although (Zheng et al., 2023) use this experiment
+style. Since training data for these models is not                                                                                          as evidence that position bias has minimal effect on
+public, it is difficult for us to verify this hypothesis.                                                                                   selection bias, we find it inconclusive as variance in
+                                                                                                                                            RStd is large.
+Unsensitive perturbations Changes that have
+little effect on the model rankings are discussed in                                                                                           To disentangle these two sources of bias, we first
+Section 5.4.                                                                                                                                measure the change in bias (measured by RStd) as
+                                                                                                                                            we randomly shuffle the entire choice and symbols
+                                                                                                                                            together, as performed in (Zheng et al., 2023). We
+find that simply shuffling entire choices is incon-                                   Model                Baseline A       B         C         D
+clusive in ruling out the effect of position bias (vs.
+token bias) as there is a wide variance in the bias                                   phi-2                54.47   52.31     56.53     56.30     50.19
+change across LLMs (Figure 5, Table A.7 ). In light                                   Yi-6b                61.12   (-2.16)  (+2.07)   (+1.83)   (-4.28)
+of this, we opt to isolate token bias from position                                   Mistral-7b           59.56   62.53     64.44     58.59     63.13
+bias by replacing the default symbols (A/B/C/D)                                       Mistral-7b-Instruct  53.48  (+1.41)   (+3.32)    (-2.53)  (+2.02)
+with new/rare symbols from the LLM's vocabulary                                       Llama2-7b            41.81   52.19     60.98     63.84     60.43
+(without an implicit relative ordering) and shuffling                                 Llama2-7b-chat       46.37   (-7.38)  (+1.42)   (+4.27)   (+0.86)
+them. This experiment, displayed in Figure 6 and                                      Llama2-13b           52.08   49.77     54.67     49.99     57.74
+Table A.8, shows that (i) LLMs always bias toward                                     Llama2-13b-chat      53.12   (-3.71)  (+1.18)    (-3.49)  (+4.26)
+the symbols representing the choice IDs and (ii)                                      Yi-34b               73.38   66.36     30.40     36.28     23.37
+even after shuffling the symbols, bias changes in                                     Llama2-70b           65.44  (+24.55)  (-11.42)   (-5.53)  (-18.44)
+unpredictable ways.                                                                   Llama2-70b-chat      61.11   30.84     69.41     50.05     28.23
+                                                                                                                  (-15.53)  (+23.04)  (+3.68)   (-18.14)
+                                                                                                                   35.82     57.24     68.65     44.08
+                                                                                                                  (-16.26)  (+5.16)   (+16.57)  (-8.00)
+                                                                                                                   36.73     56.72     71.81     42.63
+                                                                                                                  (-16.39)  (+3.60)   (+18.69)  (-10.49)
+                                                                                                                   66.16     75.22     78.07     73.88
+                                                                                                                   (-7.22)  (+1.84)   (+4.69)   (+0.50)
+                                                                                                                   56.47     67.38     69.92     66.47
+                                                                                                                   (-8.97)  (+1.95)   (+4.48)   (+1.03)
+                                                                                                                   41.78     62.24     75.07     57.71
+                                                                                                                  (-19.34)  (+1.13)   (+13.96)  (-3.41)
+
+          5   Symbols Shuffling                                                       k                    -      0.455 0.527 0.527 0.855
+
+Accuracy  0                                                                           Table 2: Performance on zero-shot MMLU when plac-
+                                                                                      ing the correct answer at each possible position. All
+          5                                                                           the LLMs tested showed a clear preference for specific
+                                                                                      positions/answer choice symbols, although the position
+          10 phi-2 Yi-6B M-7BM-7B-C L2-7BL2-7B-CL2-13LB2-13B-C Yi-34BL2-70LB2-70B-C   varied among models and even in model families. These
+                                                                                      results corroborate the findings in (Zheng et al., 2023).
+          10
+
+RStds     0
+
+          10                                                                          Table A.13 detail the results of these experiments.
+                                                                                         Hybrid scoring, where cloze scoring is combined
+          20                     Symbols
+                                 Choices                                              with a prompt that reveals all answer choices to
+                                                                                      the model, represents an acceptable balance be-
+              phi-2 Yi-6B M-7BM-7B-C L2-7BL2-7B-CL2-13LB2-13B-C Yi-34BL2-70LB2-70B-C  tween the two, reducing bias over symbol scoring
+                                                                                      on MMLU and ARC-C, as shown in Figure 7. In
+Figure 6: Using a set of rare symbols (Set2) we test two                              light of this, we recommend practitioners to replace
+modes of shuffling answer choices: shuffling the sym-                                 symbol scoring with hybrid scoring to mitigate the
+bols only (blue bars) and shuffling the answer choice                                 effects of bias on model rankings.
+text only while fixing the symbols set (cyan bars). Even
+using rare symbols, model selection bias changes unpre-                               5.4 Minor few-shot and prompt changes have
+dictably, indicating token and position bias are difficult                                  little effect on benchmark rankings
+to mitigate. This experiment was conducted using the
+three-subject subset of MMLU.                                                         We ran several experiments to assess the effect
+                                                                                      of the initial prompt on model performance and
+5.3 Another source of bias: scoring bias                                              rankings. We find that changing the informative-
+                                                                                      ness of in-context examples, e.g. providing irrele-
+Beyond the ordering of choices and the symbols as-                                    vant/trivial examples (Figure 8, Tables A.17-A.19)
+sociated with them, LLMs exhibit varying amounts                                      or examples from subjects other than the target
+of bias under the choice of scoring method for                                        subject (Figure 9, Tables A.24- A.25), slightly
+MCQs. We studied the three scoring methods de-                                        changes performance across models and reduces
+scribed in Section 3.2: symbol scoring, cloze scor-                                   bias compared to zero-shot settings but does not
+ing, and hybrid scoring. Symbol scoring has be-                                       change rankings drastically. This finding leads us
+come the dominant method for evaluating LLMs on                                       to conclude that adding few shot examples to bench-
+MCQs, largely due to the high accuracy achieved                                       mark evaluations can help reduce, but not eliminate,
+by LLMs (Robinson et al., 2023). This, however,                                       leaderboard sensitivity.
+comes at the cost of high selection bias. Cloze scor-
+ing can essentially eliminate bias since the choices                                     We also experiment with removing subject in-
+are never presented to the model, but LLMs tend                                       formation from instructions and ending the prompt
+to score poorly when using this method. This also                                     with "Correct Answer:" instead of "Answer:" (Fig-
+does not reflect a true MCQ setting. Figure 7 and                                     ure 10, Tables A.20-A.23). We see little changes
+              Different Scoring Styles                                                                                                                                           Orignal prompt template
+
+                                                                                   ARC                                                                                       Instruction
+                                                                                                                                                                             The following are multiple choice questions (with answers)
+          30                                                                              15                                                                                 about [subject].
+                                                                                                                                                                             {{ few shot examples from [subject] }}
+          20                                                                              10                                                                                 Prompt
+                                                                                                                                                                             [question][choices]Answer:
+Accuracy  10                                                                       RStds  5
+                                                                                                                                                                                 Modification 1: Remove subject name
+          0   Symbol                                                                      0                                                                                  Instruction
+                                                                                          5 phi-2 Yi-6B M-7BM-7B-CL2-7LB2-7B-CL2-1L32B-13B-CYi-34BL2-7L02B-70B-C             The following are multiple choice questions (with
+              Hybrid                                                                                                                                                         answers) about [subject].
+          10 phi-2 Yi-6B M-7BM-7B-CL2-7LB2-7B-CL2-1L32B-13B-CYi-34BL2-7L02B-70B-C                                                                                            {{ few shot examples from different subject }}
+                                                                                                                                                                             Prompt
+                                                                                   MMLU                                                                                      [question][choices]Answer:
+
+          0                                                                                                                                                                      Modification 2: Mention various subjects
+                                                                            0
+                                                                                                                                                                             Instruction
+Accuracy  10                                                                              5                                                                                  "The following are 5 multiple choice questions (with answers) on
+                                                                                                                                                                             various subjects, followed by a question about [subject]."
+                                                                                   RStds                                                                                     {{ few shot examples from different subject }}
+                                                                                                                                                                             Prompt
+          20                                                                              10                                                                                 [question][choices]Answer:
+                    Cloze                                                                 15 phi-2 Yi-6B M-7BM-7B-CL2-7LB2-7B-CL2-1L32B-13B-CYi-34BL2-7L02B-70B-C
+                    Hybrid                                                                                                                                         Figure 9: Illustration of subject independent few-shot
+                                                                                                                                                                   prompting experiment. We ensure that we do not sample
+          30 phi-2 Yi-6B M-7BM-7B-CL2-7LB2-7B-CL2-1L32B-13B-CYi-34BL2-7L02B-70B-C                                                                                  from similar domains to the one being evaluated (e.g.
+                                                                                                                                                                   sampling college mathematics few-shots for high school
+Figure 7: Comparing scoring method {symbol, cloze,                                                                                                                 mathematics questions). (results are in Table A.24 &
+hybrid} across two tasks, MMLU and ARC-Challenge.                                                                                                                  A.25).
+Note the baseline method for MMLU is symbol while
+the baseline method for ARC-C is cloze. The general
+trend for accuracy across models and tasks is symbol
+scoring (highest accuracies) followed by hybrid scor-
+ing/cloze depending on the model. The measured selec-
+tion bias also follows this trend, with symbol scoring
+resulting in the highest bias across models.
+
+              Orignal prompt template                                                                                                                                         Orignal prompt template
+                                                                                                                                                                          Instruction
+          Instruction                                                                                                                                                    "The following are multiple choice questions (with answers) about
+         "The following are multiple choice questions (with answers)"                                                                                                    [subject]"
+         Prompt                                                                                                                                                          Prompt
+         "[question][choices]Answer:"                                                                                                                                    "[question][choices]Answer:"
+
+                                       Version 1                                                                                                                              Experiment 1: Removing subject name
+         Prompt
+         trivial_examples = ["The capital of France is A. Paris. B. Berlin. C.                                                                                            Instruction
+         Madrid. D. Rome Answer: A", ...]                                                                                                                                "The following are multiple choice questions (with answers) about
+         "[trivial_examples][question][choices]Answer:"                                                                                                                  [subject]"
+                                                                                                                                                                         Prompt
+                                       Version 2                                                                                                                         "[question][choices]Answer:"
+         Prompt
+         trivial_examples = ["Which language the previous sentence is                                                                                                         Experiment 2: Prompt Modification
+         written in? A. Russian. B. English. C. Spanish. D. Japanese
+         Answer: B", ...]                                                                                                                                                 Instruction
+         "[trivial_examples][question][choices]Answer:"                                                                                                                  "The following are multiple choice questions (with answers)
+                                                                                                                                                                         about [subject]"
+                                       Version 3                                                                                                                         Prompt
+         Prompt                                                                                                                                                          "[question][choices]Correct Answer:"
+         trivial_examples = ["The first word in this sentence is A. The.
+         B. first. C. sentence. D. word Answer: A", ...]                                                                                                           Figure 10: Illustration of minor prompt modifications.
+         "[trivial_examples][question][choices]Answer:"                                                                                                            Experiment 1 showcases the removal of the subject
+                                                                                                                                                                   name from the instruction. Experiment 2 shows the
+Figure 8: Illustration of the three versions of the trivial                                                                                                        prompt change by specifying "Correct Answer" instead
+examples.                                                                                                                                                          of "Answer". (results are in table A.20, A.22, A.23)
+
+(k > 0.9) in these prompt modification experi-                                                                                                                     to questions when the answer is provided in the
+ments.                                                                                                                                                             context (Table A.27). However, when the question
+                                                                                                                                                                   is answered incorrectly in the LLM's context (Ta-
+5.5 LLMs readily reference knowledge                                                                                                                               ble A.26), all models (regardless of size) are unable
+      provided in-context (even if it is                                                                                                                           to reason correctly.
+      misleading)
+                                                                                                                                                                      To investigate whether this behavior is due to
+In our study of in-context knowledge injection, we                                                                                                                 in-context knowledge acquisition or "incorrect an-
+find that LLMs can, expectedly, read off answers
+swer" pattern following, previous work has shown                However, issues with the leaderboards and the
+that smaller models tend to rely more on priors              underlying benchmarks have emerged. In a case
+learned during the pretraining stage while larger            study, Deng et al. (2023) discovered contamina-
+models tend to be more influenced by knowledge               tion/leakage of the MMLU benchmark in the train-
+given in-context (Wei et al., 2023). This result             ing sets of multiple models. A significant portion
+suggests that we would find that the magnitude of            of models memorized benchmark questions and
+changes in accuracies for small models is smaller            was able to perfectly reconstruct the removed part
+than that of larger models. However, we do not               of some benchmark questions or answers. For in-
+observe a significant effect to support that finding         stance, GPT-4 correctly completed the questions in
+conclusively (when comparing A.1 with A.26).                 29% of the prompts with URL hinting.
+
+   This behavior is further studied in Wang et al.              Even under the assumption of uncontaminated
+(2023); Xie et al. (2023); Min et al. (2022); Yoo            data, the performance of models on the underly-
+et al. (2022) and indicates answer leakage in this           ing benchmarks are not robust to minor perturba-
+way could affect benchmark results.                          tions. Pezeshkpour and Hruschka (2023) showed
+                                                             that specific orderings of MMLU answer choices
+   To test whether LLMs can infer subtler patterns           resulted in up to ±30% deviations in GPT-4 perfor-
+in the few-shots examples, we fix all answers in             mance on various subjects. Similarly, Zheng et al.
+the few-shot examples to each of the positions               (2023) demonstrate that models are biased to cer-
+A/B/C/D. The results (Table 3) suggest that LLMs             tain answer letters. On llama-30B, they showed
+also bias their answers to these kinds of (potentially       a 27% difference in MMLU accuracy by forcing
+inadvertent) patterns in the context.                        all correct answers to either position A or D. As
+                                                             well, (Robinson et al., 2023) find that the accuracy
+   While we have not observed these vulnerabilities          of LLMs improve (without regard to bias) when
+in current benchmarks, we highlight them here as             evaluating using a pure multiple choice question
+(potential) sources of benchmark instability.                style vs a cloze question answering style.
+
+            5-shot Baseline A  B         C         D            While prior work has highlighted weaknesses in
+                                                             LLMs themselves (Zheng et al., 2023; Pezeshkpour
+phi-2       56.77   36.67       41.33     40.67     41.67    and Hruschka, 2023), evaluation method (Robinson
+Yi-6B       63.22  (-20.11)    (-15.44)  (-16.11)  (-15.11)  et al., 2023), or the contents of benchmarks (De-
+Mistral-7B  62.36   36.67       36.33     37.67     39.33    hghani et al., 2021) in our work we thoroughly
+Llama-2-7b  45.88  (-26.56)    (-26.89)  (-25.56)  (-23.89)  study the effects these factors have on existing
+                    34.67       41.33     43.00     40.33    leaderboards and demonstrate where leaderboards
+                   (-27.70)    (-21.03)  (-19.36)  (-22.03)  lack robustness.
+                    22.00       31.00     30.67     34.33
+                   (-23.88)    (-14.88)  (-15.22)  (-11.55)  7 Conclusion
+
+Table 3: Results of fixing the 5 few-shot example an-        Building robust leaderboards is a major challenge
+swers to positions A/B/C/D on one model from each            for the community, as leaderboards help practition-
+family, averaged over 3 selected subjects. We can see        ers select the best methods and models for contin-
+that performance drops across all cases/models, suggest-     ued research. Given this importance, it is critical
+ing that models refer to subtle patterns in the context      to address the breakdown of existing leaderboards
+while answering. Full results are reported in Table A.28     to the slight perturbations we demonstrated in our
+                                                             work. In addition to building our understanding of
+6 Related Work                                               the causes of this sensitivity (e.g., bias in LLMs
+                                                             and bias in scoring methods), future work should
+Benchmarks for the evaluation of LLMs (Chang                 aim to adopt and design benchmark practices that
+et al., 2023) such as MMLU (Hendrycks et al.,                avoid these pitfalls.
+2020), HELM (Liang et al., 2023), and BigBench
+(Suzgun et al., 2022) have seen widespread adop-             8 Limitations
+tion recently. Depending on the ability that is be-
+ing assessed (e.g., language generation, knowledge           The limitations of our work fall into two main cate-
+understanding, complex reasoning) some bench-                gories: (i) understanding the causes of LLM bias
+marks are designed in the form of close-ended                and (ii) our limited success at overcoming leader-
+problems like MCQs. To facilitate comparisons
+among LLMs, a number of leaderboards aggregat-
+ing these benchmarks have been established, such
+as the OpenLLM Leaderboard (Beeching et al.,
+2023) and OpenCompass (Contributors, 2023).
+board sensitivity.                                           rko Roy, Brennan Saeta, Rajkumar Samuel, Renee
+   To explain LLM bias, we attempted to design               Shelby, Ambrose Slone, Daniel Smilkov, David R.
+                                                             So, Daniel Sohn, Simon Tokumine, Dasha Valter,
+experiments that isolate each source of bias under           Vijay Vasudevan, Kiran Vodrahalli, Xuezhi Wang,
+MCQ but were unable to quantify the relative ef-             Pidong Wang, Zirui Wang, Tao Wang, John Wiet-
+fects of bias or conclude why they occur. This was           ing, Yuhuai Wu, Kelvin Xu, Yunhan Xu, Linting
+further complicated by our inability to access the           Xue, Pengcheng Yin, Jiahui Yu, Qiao Zhang, Steven
+pretraining datasets of the LLMs to rule out bench-          Zheng, Ce Zheng, Weikang Zhou, Denny Zhou, Slav
+mark contamination. Future work in this direction            Petrov, and Yonghui Wu. 2023. Palm 2 technical
+will most likely require tools from interpretability         report.
+research (e.g. mechanistic interpretability).
+                                                          Anthropic. 2023. Anthropic. model card and evalua-
+   One of our main contributions was to highlight            tions for claude models.
+where MCQ-based leaderboards fail to deliver sta-
+ble rankings. Although we succeeded in showing            Edward Beeching, Clémentine Fourrier, Nathan Habib,
+this, we were unable to demonstrate a robust solu-           Sheon Han, Nathan Lambert, Nazneen Rajani, Omar
+tion to this problem. Our recommendation to, for             Sanseviero, Lewis Tunstall, and Thomas Wolf. 2023.
+example, use hybrid scoring methods is still not             Open llm leaderboard. https://huggingface.co/
+completely robust to perturbations.                          spaces/HuggingFaceH4/open_llm_leaderboard.
+
+9 Potential Risks                                         Yupeng Chang, Xu Wang, Jindong Wang, Yuan Wu,
+                                                             Kaijie Zhu, Hao Chen, Linyi Yang, Xiaoyuan Yi,
+In this work, we do not present a new leaderboard.           Cunxiang Wang, Yidong Wang, et al. 2023. A sur-
+There is a risk that Figure 1 is interpreted as a            vey on evaluation of large language models. arXiv
+leaderboard or used for model selection. Our in-             preprint arXiv:2307.03109.
+tention was to demonstrate how minor changes can
+affect model rankings.                                    Aakanksha Chowdhery, Sharan Narang, Jacob Devlin,
+                                                             Maarten Bosma, Gaurav Mishra, Adam Roberts,
+References                                                   Paul Barham, Hyung Won Chung, Charles Sutton,
+                                                             Sebastian Gehrmann, et al. 2022. Palm: Scaling
+Rohan Anil, Andrew M. Dai, Orhan Firat, Melvin John-         language modeling with pathways. arXiv preprint
+   son, Dmitry Lepikhin, Alexandre Passos, Siamak            arXiv:2204.02311.
+   Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng
+   Chen, Eric Chu, Jonathan H. Clark, Laurent El          Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot,
+   Shafey, Yanping Huang, Kathy Meier-Hellstern, Gau-        Ashish Sabharwal, Carissa Schoenick, and Oyvind
+   rav Mishra, Erica Moreira, Mark Omernick, Kevin           Tafjord. 2018a. Think you have solved question an-
+   Robinson, Sebastian Ruder, Yi Tay, Kefan Xiao,            swering? try arc, the ai2 reasoning challenge. ArXiv,
+   Yuanzhong Xu, Yujing Zhang, Gustavo Hernandez             abs/1803.05457.
+   Abrego, Junwhan Ahn, Jacob Austin, Paul Barham,
+   Jan Botha, James Bradbury, Siddhartha Brahma,          Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot,
+   Kevin Brooks, Michele Catasta, Yong Cheng, Colin          Ashish Sabharwal, Carissa Schoenick, and Oyvind
+   Cherry, Christopher A. Choquette-Choo, Aakanksha          Tafjord. 2018b. Think you have solved question an-
+   Chowdhery, Clément Crepy, Shachi Dave, Mostafa            swering? try arc, the ai2 reasoning challenge. arXiv
+   Dehghani, Sunipa Dev, Jacob Devlin, Mark Díaz,            preprint arXiv:1803.05457.
+   Nan Du, Ethan Dyer, Vlad Feinberg, Fangxiaoyu
+   Feng, Vlad Fienber, Markus Freitag, Xavier Gar-        OpenCompass Contributors. 2023. Opencompass:
+   cia, Sebastian Gehrmann, Lucas Gonzalez, Guy Gur-         A universal evaluation platform for foundation
+   Ari, Steven Hand, Hadi Hashemi, Le Hou, Joshua            models. https://github.com/open-compass/
+   Howland, Andrea Hu, Jeffrey Hui, Jeremy Hur-              opencompass.
+   witz, Michael Isard, Abe Ittycheriah, Matthew Jagiel-
+   ski, Wenhao Jia, Kathleen Kenealy, Maxim Krikun,       Google Deepmind. 2023. Gemini: A family of highly
+   Sneha Kudugunta, Chang Lan, Katherine Lee, Ben-           capable multimodal models.
+   jamin Lee, Eric Li, Music Li, Wei Li, YaGuang Li,
+   Jian Li, Hyeontaek Lim, Hanzhao Lin, Zhongtao Liu,     Mostafa Dehghani, Yi Tay, Alexey A. Gritsenko, Zhe
+   Frederick Liu, Marcello Maggioni, Aroma Mahendru,         Zhao, Neil Houlsby, Fernando Diaz, Donald Metzler,
+   Joshua Maynez, Vedant Misra, Maysam Moussalem,            and Oriol Vinyals. 2021. The benchmark lottery.
+   Zachary Nado, John Nham, Eric Ni, Andrew Nys-
+   trom, Alicia Parrish, Marie Pellat, Martin Polacek,    Chunyuan Deng, Yilun Zhao, Xiangru Tang, Mark Ger-
+   Alex Polozov, Reiner Pope, Siyuan Qiao, Emily Reif,       stein, and Arman Cohan. 2023. Benchmark probing:
+   Bryan Richter, Parker Riley, Alex Castro Ros, Au-         Investigating data leakage in large language models.
+                                                             In NeurIPS 2023 Workshop on Backdoors in Deep
+                                                             Learning-The Good, the Bad, and the Ugly.
+
+                                                          Kawin Ethayarajh and Dan Jurafsky. 2021. Utility is in
+                                                             the eye of the user: A critique of nlp leaderboards.
+Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman,     Sewon Min, Xinxi Lyu, Ari Holtzman, Mikel Artetxe,
+   Sid Black, Anthony DiPofi, Charles Foster, Laurence       Mike Lewis, Hannaneh Hajishirzi, and Luke Zettle-
+   Golding, Jeffrey Hsu, Alain Le Noac'h, Haonan Li,         moyer. 2022. Rethinking the role of demonstrations:
+   Kyle McDonell, Niklas Muennighoff, Chris Ociepa,          What makes in-context learning work? In Proceed-
+   Jason Phang, Laria Reynolds, Hailey Schoelkopf,           ings of the 2022 Conference on Empirical Methods in
+   Aviya Skowron, Lintang Sutawika, Eric Tang, An-           Natural Language Processing, pages 11048­11064,
+   ish Thite, Ben Wang, Kevin Wang, and Andy Zou.            Abu Dhabi, United Arab Emirates. Association for
+   2023. A framework for few-shot language model             Computational Linguistics.
+   evaluation.
+                                                          Swaroop Mishra, Daniel Khashabi, Chitta Baral, and
+Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou,        Hannaneh Hajishirzi. 2022. Cross-task generaliza-
+   Mantas Mazeika, Dawn Song, and Jacob Steinhardt.          tion via natural language crowdsourcing instructions.
+   2020. Measuring massive multitask language under-
+   standing. In International Conference on Learning      Moran Mizrahi, Guy Kaplan, Dan Malkin, Rotem Dror,
+   Representations.                                          Dafna Shahaf, and Gabriel Stanovsky. 2024. State of
+                                                             what art? a call for multi-prompt llm evaluation.
+Albert Q Jiang, Alexandre Sablayrolles, Arthur Men-
+   sch, Chris Bamford, Devendra Singh Chaplot, Diego      Yixin Nie, Adina Williams, Emily Dinan, Mohit Bansal,
+   de las Casas, Florian Bressand, Gianna Lengyel, Guil-     Jason Weston, and Douwe Kiela. 2019. Adversarial
+   laume Lample, Lucile Saulnier, et al. 2023. Mistral       nli: A new benchmark for natural language under-
+   7b. arXiv preprint arXiv:2310.06825.                      standing. arXiv preprint arXiv:1910.14599.
+
+Maurice G Kendall. 1938. A new measure of rank            OpenAI. 2023. Gpt-4 technical report.
+   correlation. Biometrika, 30(1/2):81­93.
+                                                          Pouya Pezeshkpour and Estevam Hruschka. 2023.
+Md Tahmid Rahman Laskar, M Saiful Bari, Mizanur              Large language models sensitivity to the order of
+   Rahman, Md Amran Hossen Bhuiyan, Shafiq Joty,             options in multiple-choice questions.
+   and Jimmy Xiangji Huang. 2023. A systematic study
+   and comprehensive evaluation of chatgpt on bench-      Colin Raffel, Noam Shazeer, Adam Roberts, Katherine
+   mark datasets. arXiv preprint arXiv:2305.18486.           Lee, Sharan Narang, Michael Matena, Yanqi Zhou,
+                                                             Wei Li, Peter J Liu, et al. 2020. Exploring the limits
+Percy Liang, Rishi Bommasani, Tony Lee, Dimitris             of transfer learning with a unified text-to-text trans-
+   Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian           former. J. Mach. Learn. Res., 21(140):1­67.
+   Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Ku-
+   mar, Benjamin Newman, Binhang Yuan, Bobby Yan,         Joshua Robinson, Christopher Michael Rytting, and
+   Ce Zhang, Christian Cosgrove, Christopher D. Man-         David Wingate. 2023. Leveraging large language
+   ning, Christopher Ré, Diana Acosta-Navas, Drew A.         models for multiple choice question answering.
+   Hudson, Eric Zelikman, Esin Durmus, Faisal Lad-
+   hak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue          Amrita Saha, Vardaan Pahuja, Mitesh M. Khapra,
+   Wang, Keshav Santhanam, Laurel Orr, Lucia Zheng,          Karthik Sankaranarayanan, and Sarath Chandar.
+   Mert Yuksekgonul, Mirac Suzgun, Nathan Kim,               2018. Complex sequential question answering: To-
+   Neel Guha, Niladri Chatterji, Omar Khattab, Peter         wards learning to converse over linked question an-
+   Henderson, Qian Huang, Ryan Chi, Sang Michael             swer pairs with a knowledge graph.
+   Xie, Shibani Santurkar, Surya Ganguli, Tatsunori
+   Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav         Victor Sanh, Albert Webson, Colin Raffel, Stephen H
+   Chaudhary, William Wang, Xuechen Li, Yifan Mai,           Bach, Lintang Sutawika, Zaid Alyafeai, Antoine
+   Yuhui Zhang, and Yuta Koreeda. 2023. Holistic eval-       Chaffin, Arnaud Stiegler, Teven Le Scao, Arun
+   uation of language models.                                Raja, et al. 2021. Multitask prompted training en-
+                                                             ables zero-shot task generalization. arXiv preprint
+Séverin Lions, Carlos Monsalve, Pablo Dartnell,              arXiv:2110.08207.
+   María Inés Godoy, Nora Córdova, Daniela Jiménez,
+   María Paz Blanco, Gabriel Ortega, and Julie Lemarié.   Melanie Sclar, Yejin Choi, Yulia Tsvetkov, and Alane
+   2021. The position of distractors in multiple-choice      Suhr. 2023. Quantifying language models' sensitiv-
+   test items: The strongest precede the weakest. In         ity to spurious features in prompt design or: How i
+   Frontiers in Education, volume 6, page 731763. Fron-      learned to start worrying about prompt formatting.
+   tiers.
+                                                          Chenhui Shen, Liying Cheng, Yang You, and Lidong
+Yao Lu, Max Bartolo, Alastair Moore, Sebastian Riedel,       Bing. 2023. Are large language models good evalua-
+   and Pontus Stenetorp. 2022. Fantastically ordered         tors for abstractive summarization? arXiv preprint
+   prompts and where to find them: Overcoming few-           arXiv:2305.13091.
+   shot prompt order sensitivity. In Proceedings of the
+   60th Annual Meeting of the Association for Compu-      Saleh Soltan, Shankar Ananthakrishnan, Jack FitzGer-
+   tational Linguistics (Volume 1: Long Papers), pages       ald, Rahul Gupta, Wael Hamza, Haidar Khan, Charith
+   8086­8098, Dublin, Ireland. Association for Compu-        Peris, Stephen Rawls, Andy Rosenbaum, Anna
+   tational Linguistics.                                     Rumshisky, et al. 2022. Alexatm 20b: Few-shot
+                                                             learning using a large-scale multilingual seq2seq
+                                                             model. arXiv preprint arXiv:2208.01448.
+Mirac Suzgun, Nathan Scales, Nathanael Schärli, Se-         Revealing the behavior of large language models in
+   bastian Gehrmann, Yi Tay, Hyung Won Chung,               knowledge conflicts.
+   Aakanksha Chowdhery, Quoc V Le, Ed H Chi, Denny
+   Zhou, et al. 2022. Challenging big-bench tasks and    Kang Min Yoo, Junyeob Kim, Hyuhng Joon Kim, Hyun-
+   whether chain-of-thought can solve them. arXiv           soo Cho, Hwiyeol Jo, Sang-Woo Lee, Sang goo Lee,
+   preprint arXiv:2210.09261.                               and Taeuk Kim. 2022. Ground-truth labels matter: A
+                                                            deeper look into input-label demonstrations.
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Al-
+   bert, Amjad Almahairi, Yasmine Babaei, Nikolay        Zihao Zhao, Eric Wallace, Shi Feng, Dan Klein, and
+   Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti       Sameer Singh. 2021. Calibrate before use: Improv-
+   Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton       ing few-shot performance of language models. In
+   Ferrer, Moya Chen, Guillem Cucurull, David Esiobu,       Proceedings of the 38th International Conference
+   Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller,      on Machine Learning, volume 139 of Proceedings
+   Cynthia Gao, Vedanuj Goswami, Naman Goyal, An-           of Machine Learning Research, pages 12697­12706.
+   thony Hartshorn, Saghar Hosseini, Rui Hou, Hakan         PMLR.
+   Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa,
+   Isabel Kloumann, Artem Korenev, Punit Singh Koura,    Chujie Zheng, Hao Zhou, Fandong Meng, Jie Zhou,
+   Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Di-       and Minlie Huang. 2023. Large language models are
+   ana Liskovich, Yinghai Lu, Yuning Mao, Xavier Mar-       not robust multiple choice selectors. arXiv e-prints,
+   tinet, Todor Mihaylov, Pushkar Mishra, Igor Moly-        pages arXiv­2309.
+   bog, Yixin Nie, Andrew Poulton, Jeremy Reizen-
+   stein, Rashi Rungta, Kalyan Saladi, Alan Schelten,    Wanjun Zhong, Ruixiang Cui, Yiduo Guo, Yaobo Liang,
+   Ruan Silva, Eric Michael Smith, Ranjan Subrama-          Shuai Lu, Yanlin Wang, Amin Saied, Weizhu Chen,
+   nian, Xiaoqing Ellen Tan, Binh Tang, Ross Tay-           and Nan Duan. 2023. Agieval: A human-centric
+   lor, Adina Williams, Jian Xiang Kuan, Puxin Xu,          benchmark for evaluating foundation models. arXiv
+   Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan,       preprint arXiv:2304.06364.
+   Melanie Kambadur, Sharan Narang, Aurelien Ro-
+   driguez, Robert Stojnic, Sergey Edunov, and Thomas
+   Scialom. 2023. Llama 2: Open foundation and fine-
+   tuned chat models.
+
+Alex Wang, Yada Pruksachatkun, Nikita Nangia, Aman-
+   preet Singh, Julian Michael, Felix Hill, Omer Levy,
+   and Samuel Bowman. 2019. Superglue: A stick-
+   ier benchmark for general-purpose language under-
+   standing systems. Advances in neural information
+   processing systems, 32.
+
+Alex Wang, Amanpreet Singh, Julian Michael, Felix
+   Hill, Omer Levy, and Samuel R Bowman. 2018.
+   Glue: A multi-task benchmark and analysis platform
+   for natural language understanding. arXiv preprint
+   arXiv:1804.07461.
+
+Yike Wang, Shangbin Feng, Heng Wang, Weijia Shi,
+   Vidhisha Balachandran, Tianxing He, and Yulia
+   Tsvetkov. 2023. Resolving knowledge conflicts in
+   large language models.
+
+Lucas Weber, Elia Bruni, and Dieuwke Hupkes. 2023.
+   Mind the instructions: a holistic evaluation of con-
+   sistency and interactions in prompt-based learning.
+   In Proceedings of the 27th Conference on Computa-
+   tional Natural Language Learning (CoNLL), pages
+   294­313, Singapore. Association for Computational
+   Linguistics.
+
+Jerry Wei, Jason Wei, Yi Tay, Dustin Tran, Albert
+   Webson, Yifeng Lu, Xinyun Chen, Hanxiao Liu,
+   Da Huang, Denny Zhou, and Tengyu Ma. 2023.
+   Larger language models do in-context learning dif-
+   ferently.
+
+Jian Xie, Kai Zhang, Jiangjie Chen, Renze Lou, and
+   Yu Su. 2023. Adaptive chameleon or stubborn sloth:
+A.1 Appendix                                                    Model                Acc 0shot RStd 0shot Acc 5shot RStd 5shot
+
+We present a comprehensive collection of tables                 phi-2                37.67  6.78   41.00  5.02
+containing the results of all our experiments. The              Yi-6B                41.33  10.17  40.67  14.07
+often complex nature of the observed behavior war-              Mistral-7B           39.0   9.17   41.00  12.08
+rants a closer look that may inspire novel interpre-            Mistral-7B-Instruct  35.0   13.31  36.00  15.75
+tations for future studies. We believe providing                Llama-2-7b           29.33  13.64  33.33  17.69
+these detailed results will help researchers conduct            Llama-2-7b-chat      32.33  19.83  33.33  21.39
+further analysis and generate hypotheses to help                Llama-2-13b          36.33  17.05  35.67  13.85
+drive research in LLM-benchmarking robustness                   Llama-2-13b-chat     31.67  26.78  32.67  24.69
+forward.                                                        Yi-34B               50.00  11.49  49.33  9.35
+                                                                Llama-2-70b          42.00  14.58  44.67  6.21
+A.1.1 Baselines                                                 Llama-2-70b-chat     37.33  19.63  41.00  18.46
+
+This section lists the baselines referenced in differ-          Table A.3: The selected three domains baseline average
+ent experiments throughout the paper.                           results on zero-shot and five-shot using Symbols scoring
+                                                                style on MMLU. MMLU mostly uses this scoring style.
+                                                                This baseline was utilized in most experiments to ana-
+                                                                lyze and comprehend the influence of each experiment
+                                                                compared with this baseline in the selected domains
+                                                                subset (it was used in A.4, A.5 and 1).
+
+Model                Acc 0shot RStd 0shot Acc 5shot RStd 5shot  Model                Task Acc (Acc) Task RStd (RStd)
+
+phi-2                54.47   4.01   56.77   2.65                phi-2                26.33(-11.3)  41.85 (35.0)
+Yi-6B                61.12   3.57   63.23   2.54                Yi-6B                32.60 (-8.7)  22.80 (12.7)
+Mistral-7B           59.56   4.13   62.36   1.64                Mistral-7B           35.30 (-3.7)  18.79 (9.6)
+Mistral-7B-Instruct  53.48   4.58   53.95   4.78                Mistral-7B-Instruct  34.00 (-1.0)  26.90 (13.7)
+Llama-2-7b           41.81   8.49   45.88   8.92                Llama-2-7b           29.60 (0.3)   25.80 (12.2)
+Llama-2-7b-chat      46.37   16.11  47.22   12.15               Llama-2-7b-chat      31.30 (-1.0)  27.00 (7.2)
+Llama-2-13b          52.08   12.04  55.06   4.42                Llama-2-13b          34.30 (-2.0)  26.10 (9.1)
+Llama-2-13b-chat     53.12   12.80  53.53   8.32                Llama-2-13b-chat     34.00 (2.3)   21.90 (-4.8)
+Yi-34B               73.38   5.17   76.39   2.16                Yi-34B               42.60 (-7.3)  22.7 (11.3)
+Llama-2-70b          65.44   3.20   68.78   1.56                Llama-2-70b          39.60 (-2.3)  15.10 (0.5)
+Llama-2-70b-chat     61.11   10.95  63.17   8.06                Llama-2-70b-chat     36.00 (-1.3)  29.50 (10.0)
+
+Table A.1: The baseline accuracies and RStd values              k = 0.527
+for the original MMLU implementation which uses the
+Symbols scoring style mentioned in section 3.2. All             Table A.4: The baseline average zero-shot results for the
+the models performed better in five-shot settings; the          selected domains using symbols Set2 which replaced
+highest model was Yi-34B model in both settings.                the A/B/C/D choices symbols with oe/§/Ze (Cyrillic)/ü
+                                                                as options as described in section 3.1 (it was used as
+Model                Acc 0shot RStd 0shot Acc 5shot RStd 5shot  a baseline in A.9 and A.8). The deltas are calculated
+                                                                compared with A.3. In this particular experiment, all
+phi-2                54.096  2.558  58.874  2.509               models encountered a decline in accuracy, coupled with
+Yi-6B                50.512  2.114  55.034  0.737               a significant increase in RStds values, except Llama-
+Mistral-7B           53.584  2.578  59.556  1.037               13b-chat.
+Mistral-7B-Instruct  52.048  1.443  54.778  2.022
+Llama-2-7b           46.331  4.094  53.072  0.837               A.1.3 Prompt and scoring modifications
+Llama-2-7b-hf        44.283  2.175  51.877  1.399               The following tables provide results on the effect of
+Llama-2-13b          48.976  2.923  56.997  0.799               different scoring styles of MCQs task on MMLU
+Llama-2-13b-chat     50.256  1.841  57.594  2.991               and ARC-C.
+Yi-34B               61.519  2.537  64.505  1.48
+Llama-2-70b          57.253  2.657  66.126  1.926               A.1.4 In-context Knowledge Manipulation
+Llama-2-70b-chat     54.266  1.505  64.078  2.084               This section provides the results from experimenta-
+                                                                tion on in-context manipulation.
+Table A.2: The baseline accuracies and RStd values
+for ARC-C using the Cloze scoring style mentioned in            A.1.5 MMLU Overview
+section 3.2 which is considered as the original ARC-C
+implementation. As the table shows, the RStd values are
+relatively low in both settings. Yi-34B has the highest
+values on zero-shot while Llama-2-70b was the highest
+on five-shots
+
+A.1.2 Answer choice format and ordering
+
+The following tables provide details on the choice
+formatting manipulation on the three selected
+MMLU subjects.
+                                                                           Model                Task acc Acc Task RStd RStd
+
+Model                Acc 0shot RStd 0shot Acc 5shot RStd 5shot             phi-2                51.01         -3.45  8.82   4.82
+                      (Acc) (RStd) (Acc) (RStd)                            Yi-6B                57.75         -3.37  6.29   2.72
+                                                                           Mistral-7B           55.63         -3.94  7.75   3.62
+phi-2                28.3 (-9.3)  6.0 (-0.7)   34.6 (-6.3)  5.7 (-1.04)    Mistral-7B-Instruct  52.09         -1.39  4.02   -0.57
+Yi-6B                35.0 (-6.3)  11.5 (1.4)   39.0 (-1.7)  13.5 (-0.6)    Llama-2-7b           32.13         -9.68  23.72  15.23
+Mistral-7B           34.3 (-4.7)  10.7 (1.6)   44.0 (3.0)    16.3 (4.2)    Llama-2-7b-chat      42.52         -3.85  15.45  -0.66
+Mistral-7B-Instruct  35.0 (0.0)   14.0 (0.7)                 15.7 (0.0)    Llama-2-13b          48.24         -3.84  8.29   -3.75
+Llama-2-7b           31.3 (2.0)   12.6 (-1.0)   38 (2.0)    16.9 (-0.7)    Llama-2-13b-chat     51.83         -1.29  5.24   -7.56
+Llama-2-7b-chat      27.0 (-5.3)  12.5 (-7.3)  32.6 (-0.7)  13.3 (-8.0)    Yi-34B               69.56         -3.82  4.62   -0.55
+Llama-2-13b          37.0 (0.7)   14.0 (-3.0)  32.6 (-0.7)   15.7 (1.9)    Llama-2-70b          63.32         -2.12  3.33   0.13
+Llama-2-13b-chat     33.0 (1.3)   9.1 (-17.7)  40.0 (4.3)   17.33 (-7.4)   Llama-2-70b-chat     58.80         -2.31  1.91   -9.04
+Yi-34B               46.6 (-3.3)  12.8 (1.4)   37.6 (5.0)    10.1 (0.8)
+Llama-2-70b          41.3 (-0.7)  10.5 (-4.0)  47.6 (-1.7)   10.3 (4.2)
+Llama-2-70b-chat     39.3 (2.0)   7.8 (-11.8)  49.0 (4.3)   11.9 (-6.5)
+                                               42.6 (1.7)
+
+k                    0.564                        0.6                      Table A.7: Reproducing shuffling ablation experiment
+                                                                           from (Zheng et al., 2023). Randomly shuffling the order
+Table A.5: The average zero-shot results on the three                      in which the options are presented. Surprisingly, all
+selected domains baseline using the Hybrid style men-                      models demonstrated a decrease in accuracy, suggesting
+tioned in section 3.2. The deltas are compared with A.3                    a lack of decisiveness in the experiment. However, these
+where the Rstd values exhibited a decrease and the ac-                     variations indicate a potential bias in the benchmark.
+curacies remained relatively stable, except phi-2, which
+demonstrated the most significant decline in accuracy.                     Model                Task Acc (Acc) Task RStd (RStd)
+
+Model                Baseline A                B       C         D         phi-2                25.33 (-12.33)       42.35 (35.57)
+                                                                           Yi-6B                 30.66 (-2.0)         26.68 (3.8)
+phi-2                54.47         57.33     44.00      25.00     32.33    Mistral-7B            34.00 (-1.3)         22.37 (3.6)
+Yi-6B                61.12        (+2.87)   (-10.47)   (-29.47)  (-22.13)  Mistral-7B-Instruct   30.33 (-3.7)         23.08 (-3.9)
+Mistral-7B           59.56         49.67     23.67      18.33     44.67    Llama-2-7b            25.66 (-4.0)         24.98 (-0.9)
+Mistral-7B-Instruct  53.48        (-11.45)  (-37.45)   (-42.78)  (-16.45)  Llama-2-7b-chat       28.00 (-3.3)         28.49 (1.4)
+Llama-2-7b           41.81         77.00     46.33      48.33     68.00    Llama-2-13b           29.33 (-5.0)         26.75 (0.6)
+Llama-2-7b-chat      46.37        (+17.44)  (-13.23)   (-11.23)  (+8.44)   Llama-2-13b-chat      29.66 (-4.3)         20.58 (-1.4)
+Llama-2-13b          52.08         78.33     42.33      18.67     49.33    Yi-34B                36.00 (-6.7)         19.48 (-3.3)
+Llama-2-13b-chat     53.12        (+24.85)  (-11.15)   (-34.82)  (-4.15)   Llama-2-70b           37.33 (-2.3)         10.41 (-4.7)
+Yi-34B               73.38         79.00     57.33      24.67     23.67    Llama-2-70b-chat      31.66 (-4.3)         23.25 (-6.3)
+                                  (+37.19)  (+15.52)   (-17.14)  (-18.14)
+                                   16.67     66.33      38.67     14.33    k = 0.564
+                                  (-29.70)  (+19.97)   (-7.70)   (-32.04)
+                                   33.67     37.33      45.33     39.33    Table A.8: The average zero-shot results on the three
+                                  (-18.41)  (-14.75)   (-6.75)   (-12.75)  selected domains using Symbols Set2 (mentioned in
+                                   20.00     23.00      61.33     15.67    section 3.1 and shuffling the choices while fixing the
+                                  (-33.12)  (-30.12)   (+8.21)   (-37.45)  order of the choices symbols. The deltas are measured
+                                   59.00     45.67      53.67     48.00    compared with A.4. As displayed in the table, mostly all
+                                  (-14.38)  (-27.71)   (-19.71)  (-25.38)  the models faced a decrease in accuracy while the RStds
+                                                                           values were not decisive. The most affected model in
+Table A.6: Performance on five-shot MMLU when plac-                        this experiment was phi-2.
+ing the correct answer at each possible position, for both
+the examples and the question asked. Similar to the zero-                  Model                Task Avg Acc (Acc) Task Avg RStd (RStd)
+shot case mentioned in Section 5, all the LLMs tested
+showed a clear preference for specific positions/answer                    phi-2                29.00(-8.6)            12.4 (5.6)
+choice symbols, although the position varied among                         Yi-6B                34.67 (2.0)           22.84 (0.0)
+models and even in model families.                                         Mistral-7B           29.33 (-6.0)         16.52 (-2.3)
+                                                                           Mistral-7B-Instruct  28.33 (-5.7)         22.10 (-4.9)
+                                                                           Llama-2-7b           26.67 (-3.0)          28.62 (2.8)
+                                                                           Llama-2-7b-chat      32.00 (0.7)          15.64 (-11.4)
+                                                                           Llama-2-13b          26.33 (-8.0)         21.31 (-4.8)
+                                                                           Llama-2-13b-chat     34.00 (0.0)          16.97 (-5.0)
+                                                                           Yi-34B               41.00 (-1.7)         20.28 (-2.5)
+                                                                           Llama-2-70b          38.67 (-1.0)          7.65 (-7.5)
+                                                                           Llama-2-70b-chat     40.33 (4.3)          15.78 (-13.8)
+
+                                                                           k = 0.455
+
+Figure A.1: Illustration of the prompt that was used to                    Table A.9: The average zero-shot results on the three
+generate the trivial examples version 1 using GPT4.                        selected domains using Symbols Set2 mentioned in sec-
+                                                                           tion 3.1. This experiment focused on shuffling the sym-
+                                                                           bols while maintaining the original listing order of the
+                                                                           choices. Compared with A.4,Most of the models were
+                                                                           impacted in terms of accuracy and RStds, indicating that
+                                                                           randomization affects the models even after changing
+                                                                           the symbols.
+                                                                           Model                Task acc Acc Task RStd RStd
+
+Model                Acc 0shot RStd 0shot Acc 5shot RStd 5shot             phi-2                40.714  -13.751  1.398  -2.607
+                      (Acc) (RStd) (Acc) (RStd)                            Yi-6B                42.40   -18.72   1.49   -2.08
+                                                                           Mistral-7B           45.69   -13.87   1.26   -2.87
+phi-2                 30.6 (2.3)    12.8 (6.8)    32.6(-2)    13.6 (7.8)   Mistral-7B-Instruct  43.51    -9.98   1.53   -3.05
+Yi-6B                30.3 (-4.7)    12.0 (0.5)   34.3 (-4.7)  11.4 (-2.1)  Llama-2-7b           40.81    -1.00   1.19   -7.30
+Mistral-7B           31.6 (-2.7)    12.5 (1.8)                11.1 (-5.2)  Llama-2-7b-chat      40.44    -5.93   1.79   -14.32
+Mistral-7B-Instruct  32.66 (-2.3)  11.18 (-2.9)    39 (-5)    7.94 (-7.8)  Llama-2-13b          44.09    -7.99   1.29   -10.75
+Llama-2-7b           28.6 (-2.7)   11.4 (-1.2)     37 (-1)    15.1 (-1.8)  Llama-2-13b-chat     43.87    -9.25   1.86   -10.93
+Llama-2-7b-chat       29.3 (2.3)    16.2 (3.7)   33.3 (0.7)   16.6 (3.3)   Yi-34B               49.33   -24.05   3.76   -1.41
+Llama-2-13b          35.3 (-1.7)   10.1 (-3.9)    35 (2.3)    12.1 (-3.6)  Llama-2-70b          48.74   -16.70   0.99   -2.21
+Llama-2-13b-chat     29.6 (-3.3)    10.9 (1.9)   37.6 (-2.3)  17.0 (-0.3)  Llama-2-70b-chat     46.34   -14.77   1.57   -9.38
+Yi-34B                43 (-3.7)     5.4 (-7.4)   35.3 (-2.3)  11.7 (1.6)
+Llama-2-70b           40 (-1.3)     9.0 (-1.5)   48.3 (0.7)   10.5 (0.1)
+Llama-2-70b-chat      35 (-4.3)     11.1 (3.4)     48 (-1)    6.8 (-5.1)
+                                                 41.3 (-1.3)
+
+k                    0.527                       0.382                     k = 0.527
+
+Table A.10: The selected domains results after random-                     Table A.13: The zero-shot results of MMLU using the
+izing the choices using Hybrid style mentioned in sec-                     Cloze style mentioned in 3.2. As anticipated, employing
+tion 3.2, the deltas are calculated from this table A.5                    this style led to significantly low RStd values compared
+where it showed more consistency compared to the re-                       with the Symbols scoring style in table A.1, but it also
+sults of other randomization settings (1,A.8, and A.9).                    had a considerable impact on accuracy, resulting in a
+                                                                           noticeable decrease in most models.
+
+                                                                           Model                Task acc Acc Task RStd RStd
+
+Model                Task acc Acc Task RStd RStd                           phi-2                38.47 -16.01 2.55       -1.45
+
+phi-2                31.92         -22.55        20.23        16.22        Yi-6B                44.90 -16.22 3.80       0.23
+Yi-6B                46.87         -14.25        15.24        11.67
+Mistral-7B           42.68         -16.88        29.07        24.94        Mistral-7B           42.94 -16.62 5.09       0.96
+Mistral-7B-Instruct  47.90         -5.58         15.06        10.48
+Llama-2-7b           26.23         -15.58        33.78        25.29        Mistral-7B-Instruct 39.27 -14.21 3.46        -1.12
+Llama-2-7b-chat      41.01         -5.36         14.17        -1.94
+Llama-2-13b          41.05         -11.03        23.54        11.50        Llama-2-7b           37.79 -4.02      3.79   -4.70
+Llama-2-13b-chat     48.09         -5.03         20.82        8.02
+Yi-34B               66.56         -6.82         10.13        4.96         Llama-2-7b-chat      37.68 -8.69 3.52 -12.58
+Llama-2-70b          57.94         -7.50         16.52        13.32
+Llama-2-70b-chat     59.00         -2.11         10.09        -0.86        Llama-2-13b          43.88 -8.20      5.14   -6.91
+
+                                                                           Llama-2-13b-chat     39.14 -13.98 4.82       -7.98
+
+                                                                           Yi-34B               59.52 -13.86 2.63       -2.54
+
+                                                                           Llama-2-70b          55.11 -10.33 2.00       -1.20
+
+                                                                           Llama-2-70b-chat     47.26 -13.85 3.35       -7.60
+
+                                                                           k = 0.709
+
+k = 0.6
+
+Table A.11: The zero-shot results of MMLU on Sym-                          Table A.14: The zero-shot results of MMLU using the
+bols Set1 mentioned in section 3.1. All of the models                      Hybrid style mentioned in 3.2. This style resulted in
+demonstrated reduced accuracies, while most of them                        decreased accuracy but demonstrated more stability and
+showed an increase in RStds values compared with A.1.                      lower RStd values when comparing it with the Symbols
+                                                                           scoring style A.1. This style may help reduce the selec-
+                                                                           tion and token bias seen in prior experiments.
+
+Model                Task acc Acc Task RStd RStd                           Model                Task Acc (Acc) Task RStd (RStd)
+
+phi-2                29.85         -24.62        39.10        35.09        phi-2                76.8 (22.7)       4.2 (1.6)
+Yi-6B                47.58         -13.54        26.09        22.52        Yi-6B                78.3 (27.8)       2.6 (0.5)
+Mistral-7B           52.63         -6.94         15.87        11.74        Mistral-7B           74.8 (21.2)       5.9 (3.3)
+Mistral-7B-Instruct  48.33         -5.15         18.70        14.12        Mistral-7B-Instruct  69.3 (17.3)       4.3 (2.9)
+Llama-2-7b           29.76         -12.05        32.09        23.60        Llama-2-7b           42.4 (-3.9)      14.1 (10.0)
+Llama-2-7b-chat      43.34         -3.03         18.20        2.09         Llama-2-7b-chat      57.6 (13.3)      13.8 (11.6)
+Llama-2-13b          42.06         -10.02        23.75        11.70        Llama-2-13b          62.0 (13.0)       8.9 (6.0)
+Llama-2-13b-chat     49.23         -3.89         14.07        1.28         Llama-2-13b-chat     65.3 (15.1)      12.7 (10.9)
+Yi-34B               67.03         -6.35         12.48        7.31         Yi-34B               90.7 (29.1)       0.5 (-1.9)
+Llama-2-70b          62.60         -2.84         3.21         0.01         Llama-2-70b          81.9 (24.7)      2.6 (0.025)
+Llama-2-70b-chat     57.01         -4.10         18.53        7.59         Llama-2-70b-chat     78.4 (24.1)       6.8 (5.3)
+
+k = 0.636                                                                  k = 0.855
+
+Table A.12: The zero-shot results of MMLU on Sym-                          Table A.15: The table displays the results of zero-shot
+bols Set2 mentioned in section 3.1. Compared with the                      on ARC-C with Symbols scoring style mentioned in 3.2.
+original MMLU implementation that used A/B/C/D as                          Compared with A.2, all models, except Llama-2-7b,
+symbols(A.1), the majority of models in this experiment                    showed higher accuracies. An increase in Rstds values
+had notably lower accuracies while the RStd values                         was observed, particularly in the Llama-2 7b, 7b-chat,
+increased.                                                                 and 13b models. This proves that if we provide choices
+                                                                           in the prompt, models will perform better.
+Model                Task Acc (Acc) Task RStd (RStd)      Model                Task acc Acc
+
+phi-2                58.4 (4.3)          4.9 (2.4)        phi-2                53.18  -1.28
+Yi-6B                59.9 (9.4)          8.4 (6.3)        Yi-6B                60.28  -0.84
+Mistral-7B           52.6 (-0.9)         6.9 (4.3)        Mistral-7B           59.41  -0.15
+Mistral-7B-Instruct  54.1 (2.1)          4.3 (2.9)        Mistral-7B-Instruct  50.95  -2.53
+Llama-2-7b           38.7 (-7.5)         7.8 (3.7)        Llama-2-7b           43.52  1.71
+Llama-2-7b-chat      46.6 (2.3)          2.7 (0.5)        Llama-2-7b-chat      46.82  0.46
+Llama-2-13b          52.4 (3.4)          9.1 (6.1)        Llama-2-13b          52.51  0.44
+Llama-2-13b-chat     53.5 (3.3)          4.6 (2.7)        Llama-2-13b-chat     51.84  -1.27
+Yi-34B               83.0 (21.5)         3.8 (1.2)        Yi-34B               72.29  -1.09
+Llama-2-70b          72.6 (15.4)         3.9 (1.3)        Llama-2-70b          65.13  -0.31
+Llama-2-70b-chat     64.7 (10.4)         4.2 (2.7)        Llama-2-70b-chat     60.28  -0.83
+
+k = 0.782
+
+Table A.16: The zero-shot results of ARC-C using the      k = 0.891
+Hybrid style discussed in 3.2. In some models, it ex-
+hibits higher accuracy than the baseline (Table A.2) and  Table A.18: Trivial examples few-shot results with ver-
+more stable RStd values (compared to A.15). The deltas    sion 2 examples with respect to zero-shot baseline accu-
+are calculated using this table A.2.                      racy.
+
+Model                Task acc Acc                                              Task acc Acc
+
+                                                          Model
+
+phi-2                             54.21  -0.26            phi-2                53.22  -1.25
+Yi-6B                             60.11  -1.00            Yi-6B                60.46  -0.66
+Mistral-7B                        58.45  -1.11            Mistral-7B           59.27  -0.30
+Mistral-7B-Instruct               51.14  -2.34            Mistral-7B-Instruct  50.58  -2.91
+Llama-2-7b                        42.77  0.96             Llama-2-7b           44.47  2.66
+Llama-2-7b-chat                   46.35  -0.02            Llama-2-7b-chat      46.90  0.53
+Llama-2-13b                       51.72  -0.36            Llama-2-13b          52.24  0.16
+Llama-2-13b-chat                  50.94  -2.18            Llama-2-13b-chat     51.88  -1.24
+Yi-34B                            72.28  -1.10            Yi-34B               73.16  -0.22
+Llama-2-70b                       65.25  -0.18            Llama-2-70b          65.42  -0.02
+Llama-2-70b-chat                  59.79  -1.32            Llama-2-70b-chat     60.02  -1.09
+
+k = 0.927                                                 k = 0.891
+
+Table A.17: Trivial examples few-shot results using the   Table A.19: Trivial examples few-shot results with ver-
+version 1 examples with respect to zero-shot baseline     sion 3 examples, with respect to zero-shot baseline ac-
+accuracy.                                                 curacy.
+Model                Task acc Acc Task RStd RStd
+
+phi-2                53.92  -0.54  4.07   0.07         Model                Task acc Acc Task RStd RStd
+Yi-6B                60.80  -0.31  3.43   -0.14
+Mistral-7B           59.02  -0.54  3.73   -0.40        phi-2                56.57  -0.21  3.95   1.30
+Mistral-7B-Instruct  53.29  -0.19  4.74   0.16         Yi-6B                63.20  -0.03  4.01   1.47
+Llama-2-7b           41.80  -0.01  4.51   -3.99        Mistral-7B           62.79  0.43   3.51   1.87
+Llama-2-7b-chat      46.68  0.31   14.93  -1.17        Mistral-7B-Instruct  53.85  -0.10  5.51   0.73
+Llama-2-13b          51.92  -0.16  12.05  0.00         Llama-2-7b           46.21  0.33   7.14   -1.78
+Llama-2-13b-chat     53.27  0.15   12.83  0.03         Llama-2-7b-chat      47.48  0.26   10.42  -1.73
+Yi-34B               72.94  -0.44  5.52   0.35         Llama-2-13b          55.18  0.11   4.79   0.37
+Llama-2-70b          64.83  -0.60  2.81   -0.40        Llama-2-13b-chat     53.75  0.23   6.58   -1.74
+Llama-2-70b-chat     61.14  0.03   10.94  -0.00        Yi-34B               75.98  -0.41  1.71   -0.46
+                                                       Llama-2-70b          69.10  0.32   0.83   -0.73
+k =0.964                                               Llama-2-70b-chat     62.86  -0.31  7.20   -0.86
+
+Table A.20: Zero-shot results of removing the subject  k =1.0
+name from the prompt. (experiment 1 from figure 10).
+There are minimal changes in performance when apply-   Table A.23: Few-shot results on adding the "Correct" to-
+ing this perturbation.                                 ken in the prompt. (experiment 2 from figure 10). There
+                                                       are minimal changes in performance when applying this
+                                                       perturbation.
+
+Model                Task acc Acc Task RStd RStd
+
+phi-2                54.21  -0.26  4.21   0.20         Model                       Task acc Acc
+Yi-6B                61.06  -0.06  2.33   -1.24
+Mistral-7B           60.16  0.60   2.08   -2.06        phi-2                       54.94         -1.84
+Mistral-7B-Instruct  53.67  0.19   4.03   -0.56        Yi-6B                       61.51         -1.72
+Llama-2-7b           41.42  -0.39  15.05  6.56         Mistral-7B                  59.56         -2.80
+Llama-2-7b-chat      47.22  0.85   14.22  -1.88        Mistral-7B-Instruct         51.72         -2.24
+Llama-2-13b          53.46  1.38   10.46  -1.59        Llama-2-7b                  44.10         -1.79
+Llama-2-13b-chat     53.20  0.08   11.09  -1.71        Llama-2-7b-chat             46.92         -0.30
+Yi-34B               73.64  0.26   5.68   0.51         Llama-2-13b                 52.61         -2.46
+Llama-2-70b          65.48  0.04   3.51   0.30         Llama-2-13b-chat            52.63         -0.90
+Llama-2-70b-chat     61.20  0.09   10.31  -0.63        Yi-34B                      73.89         -2.50
+                                                       Llama-2-70b                 66.26         -2.52
+k =0.927                                               Llama-2-70b-chat            60.85         -2.31
+
+Table A.21: Zero-shot results on adding the "Correct"
+token in the prompt. (experiment 2 from figure 10).
+There are minimal changes in performance when apply-
+ing this perturbation.
+
+Model                Task acc Acc Task RStd RStd
+
+phi-2                56.69  -0.08  2.57   -0.08        k = 0.927
+Yi-6B                63.69  0.46   3.22   0.68
+Mistral-7B           62.60  0.23   2.98   1.33         Table A.24: Subject independent five-shots example
+Mistral-7B-Instruct  53.99  0.04   4.62   -0.16        results with the first prompt. (follow Figure 9 for de-
+Llama-2-7b           45.80  -0.09  8.75   -0.17        tails). With few exceptions, most models exhibit a 2%
+Llama-2-7b-chat      47.42  0.20   12.03  -0.11        drop from changing the few shots example domains.
+Llama-2-13b          55.47  0.41   5.04   0.62         For models that are not fine-tuned, we noticed a perfor-
+Llama-2-13b-chat     53.58  0.05   8.32   0.00         mance that is halfway between the standard zero-shot
+Yi-34B               76.36  -0.02  2.14   -0.02        and five-shot. Indicating that these models utilize the
+Llama-2-70b          68.71  -0.07  1.63   0.06         few shots for both formatting and knowledge domain
+Llama-2-70b-chat     63.14  -0.03  8.49   0.43         information.
+
+k =1.0
+
+Table A.22: Few-shot results of removing the subject
+name from the prompt. (experiment 1 from figure 10).
+There are minimal changes in performance when apply-
+ing this perturbation.
+Model                Task acc Acc                            Model                       Task Acc Task Acc
+                                                                                          1-shot 5-shot
+
+phi-2                55.25  -1.52                            phi-2                       71.778                92.366
+Yi-6B                61.15  -2.08                            Yi-6B                       90.91                 97.09
+Mistral-7B           59.68  -2.69                            Mistral-7B                  97.45                 98.99
+Mistral-7B-Instruct  52.12  -1.84                            Mistral-7B-Instruct         98.64                 99.25
+Llama-2-7b           44.12  -1.76                            Llama-2-7b                  61.00                 63.82
+Llama-2-7b-chat      46.74  -0.48                            Llama-2-7b-chat             87.77                 80.15
+Llama-2-13b          52.91  -2.16                            Llama-2-13b                 96.60                 99.79
+Llama-2-13b-chat     52.19  -1.33                            Llama-2-13b-chat            87.02                 92.69
+Yi-34B               73.62  -2.76                            Yi-34B                      99.10                 98.50
+Llama-2-70b          66.06  -2.72                            Llama-2-70b                 93.45                 99.09
+Llama-2-70b-chat     60.64  -2.53                            Llama-2-70b-chat            98.25                 93.86
+
+                                                             k                           0.491 0.382
+
+k = 0.964
+
+Table A.25: Subject independent five-shot example re-        Table A.27: Results of the one-shot and five-shot
+sults with the second prompt. (follow figure 9 for de-       MMLU in-context cheating experiment. Performance
+tails). Changes in the initial prompt only result in negli-  expectedly increases, indicating that models are readily
+gible differences when compared to the first prompt in       able to "cheat" from the given few-shot examples in
+Table A.24.                                                  both five-shot and one-shot cases. However, no model
+                                                             achieved 100% accuracy, so we encourage the investi-
+                                                             gation of misclassified samples to validate their correct-
+                                                             ness.
+
+Model                Task Acc Task Acc                                            5-shot Baseline A  B         C         D
+                      1-shot 5-shot
+                                                             phi-2                56.77   36.67       41.33     40.67     41.67
+phi-2                33.59  13.91                            Yi-6B                63.23  (-20.11)    (-15.44)  (-16.11)  (-15.11)
+Yi-6B                36.13  17.97                            Mistral-7B           62.36   36.67       36.33     37.67     39.33
+Mistral-7B           19.51  13.20                            Mistral-7B-Instruct  53.95  (-26.56)    (-26.89)  (-25.56)  (-23.89)
+Mistral-7B-Instruct  10.71  4.59                             Llama-2-7b           45.88   34.67       41.33     43.00     40.33
+Llama-2-7b           24.25  23.63                            Llama-2-7b-chat      47.22  (-27.70)    (-21.03)  (-19.36)  (-22.03)
+Llama-2-7b-chat      16.24  28.11                            Llama-2-13b          55.06   32.67       33.33     30.67     35.33
+Llama-2-13b          12.76  4.50                             Llama-2-13b-chat     53.53  (-21.29)    (-20.62)  (-23.29)  (-18.62)
+Llama-2-13b-chat     31.49  26.30                            Yi-34B               76.39   22.00       31.00     30.67     34.33
+Yi-34B               32.08  37.42                            Llama-2-70b          68.78  (-23.88)    (-14.88)  (-15.22)  (-11.55)
+Llama-2-70b          26.27  21.54                            Llama-2-70b-chat     63.17   31.00       30.67     28.67     31.00
+Llama-2-70b-chat     26.26  37.23                                                        (-16.22)    (-16.56)  (-18.56)  (-16.22)
+                                                                                          35.33       36.33     37.67     32.67
+                                                                                         (-19.73)    (-18.73)  (-17.40)  (-22.40)
+                                                                                          31.67       33.00     34.67     33.67
+                                                                                         (-21.86)    (-20.53)  (-18.86)  (-19.86)
+                                                                                          49.67       49.33     50.33     48.67
+                                                                                         (-26.72)    (-27.05)  (-26.05)  (-27.72)
+                                                                                          42.67       44.67     43.33     44.33
+                                                                                         (-26.11)    (-24.11)  (-25.45)  (-24.45)
+                                                                                          40.33       42.33     42.00     41.33
+                                                                                         (-22.84)    (-20.84)  (-21.17)  (-21.84)
+
+                                                             k                    -      0.855 0.818 0.782 0.636
+
+k                    0.382 0.164
+
+Table A.26: Providing the incorrect answer in-context.       Table A.28: Results of fixing the five-shot example
+Performance drastically drops across the board, indi-        answers to positions A/B/C/D, averaged over the three
+cating that models are easily influenced by the answers      selected subjects. We can see that performance drops
+given in-context, even when they are incorrect.              across the board, suggesting that models get confused
+                                                             when there is a clear pattern in the correct answers of
+                                                             the few-shot examples.
+                                                                                     subject                              choice_A choice_B choice_C choice_D total
+
+subject                              choice_A  choice_B  choice_C  choice_D   total  abstract_algebra                     2   2   1   0   5
+abstract_algebra                         22        26        31        21     100
+anatomy                                  25        34        45        31     135    anatomy                              0   1   2   2   5
+astronomy                                27        28        46        51     152
+business_ethics                          30        26        23        21     100    astronomy                            3   0   0   2   5
+clinical_knowledge                       57        71        58        79     265
+college_biology                          37        32        37        38     144    business_ethics                      1   1   1   2   5
+college_chemistry                        20        21        18        41     100
+college_computer_science                 26        15        26        33     100    clinical_knowledge                   1   2   2   0   5
+college_mathematics                      21        23        25        31     100
+college_medicine                         36        36        43        58     173    college_biology                      0   3   1   1   5
+college_physics                          22        20        22        38     102
+computer_security                        28        24        30        18     100    college_chemistry                    2   0   1   2   5
+conceptual_physics                       62        76        48        49     235
+econometrics                             27        32        28        27     114    college_computer_science             0   2   0   3   5
+electrical_engineering                   35        32        43        35     145
+elementary_mathematics                   79        97       101       101     378    college_mathematics                  0   2   1   2   5
+formal_logic                             36        25        19        46     126
+global_facts                             18        31        33        18     100    college_medicine                     2   1   1   1   5
+high_school_biology                      55        79        78        98     310
+high_school_chemistry                    31        55        60        57     203    college_physics                      3   1   0   1   5
+high_school_computer_science             25        23        33        19     100
+high_school_european_history             36        40        47        42     165    computer_security                    1   1   1   2   5
+high_school_geography                    35        43        50        70     198
+high_school_government_and_politics      38        40        44        71     193    conceptual_physics                   2   1   2   0   5
+high_school_macroeconomics               79        86        83       142     390
+high_school_mathematics                  57        71        71        71     270    econometrics                         1   0   3   1   5
+high_school_microeconomics               50        55        50        83     238
+high_school_physics                      30        30        41        50     151    electrical_engineering               1   2   1   1   5
+high_school_psychology                  105       129       121       190     545
+high_school_statistics                   33        35        46       102     216    elementary_mathematics               1   4   0   0   5
+high_school_us_history                   51        48        53        52     204
+high_school_world_history                64        62        63        48     237    formal_logic                         0   1   3   1   5
+human_aging                              70        84        45        24     223
+human_sexuality                          34        30        30        37     131    global_facts                         2   3   0   0   5
+international_law                        29        30        45        17     121
+jurisprudence                            28        32        25        23     108    high_school_biology                  1   0   1   3   5
+logical_fallacies                        36        40        49        38     163
+machine_learning                         35        32        27        18     112    high_school_chemistry                1   0   3   1   5
+management                               18        26        20        39     103
+marketing                                68        60        60        46     234    high_school_computer_science         0   1   3   1   5
+medical_genetics                         30        26        20        24     100
+miscellaneous                           186       225       212       160     783    high_school_european_history         2   1   1   1   5
+moral_disputes                           86        85       101        74     346
+moral_scenarios                         213       217       221       244     895    high_school_geography                1   2   1   1   5
+nutrition                                69        70        77        90     306
+philosophy                               58        85        93        75     311    high_school_government_and_politics  1   0   2   2   5
+prehistory                               70        86        95        73     324
+professional_accounting                  66        72        76        68     282    high_school_macroeconomics           0   0   3   2   5
+professional_law                        377       367       415       375    1534
+professional_medicine                    50        55        45       122     272    high_school_mathematics              0   1   2   2   5
+professional_psychology                 153       157       169       133     612
+public_relations                         24        38        23        25     110    high_school_microeconomics           0   1   2   2   5
+security_studies                         46        42        59        98     245
+sociology                                49        48        50        54     201    high_school_physics                  0   2   0   3   5
+us_foreign_policy                        28        21        25        26     100
+virology                                 47        53        34        32     166    high_school_psychology               1   2   1   1   5
+world_religions                          55        36        50        30     171
+total                                  3222                                  14042   high_school_statistics               0   0   1   4   5
+                                                 3462      3582      3776
+                                                                                     high_school_us_history               0   2   2   1   5
+
+                                                                                     high_school_world_history            1   3   0   1   5
+
+                                                                                     human_aging                          1   2   2   0   5
+
+                                                                                     human_sexuality                      3   1   1   0   5
+
+                                                                                     international_law                    2   2   1   0   5
+
+                                                                                     jurisprudence                        2   0   0   3   5
+
+                                                                                     logical_fallacies                    0   1   2   2   5
+
+                                                                                     machine_learning                     1   1   2   1   5
+
+                                                                                     management                           3   0   1   1   5
+
+                                                                                     marketing                            1   1   0   3   5
+
+                                                                                     medical_genetics                     3   0   1   1   5
+
+                                                                                     miscellaneous                        1   2   2   0   5
+
+                                                                                     moral_disputes                       3   1   0   1   5
+
+                                                                                     moral_scenarios                      1   1   2   1   5
+
+                                                                                     nutrition                            1   1   2   1   5
+
+                                                                                     philosophy                           1   0   3   1   5
+
+                                                                                     prehistory                           2   1   1   1   5
+
+                                                                                     professional_accounting              2   2   0   1   5
+
+                                                                                     professional_law                     2   2   0   1   5
+
+                                                                                     professional_medicine                0   0   1   4   5
+
+                                                                                     professional_psychology              2   0   0   3   5
+
+                                                                                     public_relations                     1   0   2   2   5
+
+                                                                                     security_studies                     0   2   2   1   5
+
+                                                                                     sociology                            1   3   1   0   5
+
+                                                                                     us_foreign_policy                    1   0   2   2   5
+
+                                                                                     virology                             2   1   1   1   5
+
+                                                                                     world_religions                      1   3   0   1   5
+
+                                                                                     total                                67  69  71  78  285
+
+Table A.29: The MMLU subjects statistics in the test                                 Table A.30: The MMLU subjects statistics in the dev
+split.                                                                               split, which is a fixed set of questions per subject used
+                                                                                     in fewshots evaluation.
+

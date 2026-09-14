@@ -1,0 +1,857 @@
+                                        Can Fine-Tuning Erase Edits? On the Fragile Coexistence of
+                                                        Knowledge Editing and Fine-tuning
+
+                                              Yinjie Cheng                    Paul Youssef                                              Christin Seifert
+
+                                        School of Computer Science  Mathematics and Computer Science                           Mathematics and Computer Science
+                                           University of Sheffield            Marburg University                                         Marburg University
+                                                 Sheffield, UK                Marburg, Germany                                           Marburg, Germany
+
+                                         ycheng80@sheffield.ac.uk      paul.youssef@uni-marburg.de                               christin.seifert@uni-marburg.de
+
+arXiv:2511.05852v4 [cs.CL] 27 Jun 2026          Jörg Schlötterer                                                                     Zhixue Zhao
+
+                                        Mathematics and Computer Science                                                       School of Computer Science
+                                                  Marburg University                                                              University of Sheffield
+                                                  Marburg, Germany                                                                      Sheffield, UK
+
+                                        joerg.schloetterer@uni-marburg.de                                                      zhixue.zhao@sheffield.ac.uk
+
+                                        Abstract                                                                               Keywords
+
+                                        Knowledge editing (KE) offers a lightweight alternative to retrain-                    Knowledge Editing; Fine-tuning; PEFT; Benchmark
+                                        ing for updating large language models (LLMs). Meanwhile, fine-
+                                        tuning remains the default operation for adapting LLMs to new                          ACM Reference Format:
+                                        domains and tasks. Despite their widespread adoption, these two                        Yinjie Cheng, Paul Youssef, Christin Seifert, Jörg Schlötterer, and Zhixue
+                                        post-training interventions have been studied in isolation, leaving                    Zhao. 2026. Can Fine-Tuning Erase Edits? On the Fragile Coexistence of
+                                        open a crucial question: if we fine-tune an edited model, do the                       Knowledge Editing and Fine-tuning. In Proceedings of the 32nd ACM SIGKDD
+                                        edits survive? This question is motivated by practical objectives:                     Conference on Knowledge Discovery and Data Mining V.2 (KDD '26), Au-
+                                        removing covert or malicious edits, and preserving beneficial edits.                   gust 09­13, 2026, Jeju Island, Republic of Korea. ACM, New York, NY, USA,
+                                        If fine-tuning impairs edits (Fig. 1), current KE methods become                       12 pages. https://doi.org/10.1145/3770855.3817879
+                                        less efficient, as a newly fine-tuned model requires re-editing; if
+                                        edits persist, fine-tuned models risk propagating hidden malicious                     Resource Availability:
+                                        edits, raising serious safety concerns. To this end, we systemati-                     The source code and data of this paper has been made publicly available at
+                                        cally quantify edit decay after fine-tuning across 254 experimen-                      https://doi.org/10.5281/zenodo.20497129.
+                                        tal configurations. Our results show that in general, edits decay
+                                        substantially after subsequent fine-tuning. AlphaEdit exhibits the                     1 Introduction
+                                        greatest decay on the zsRE benchmark when applied to GPT-J,
+                                        where 25.27% of previously successful edits become unsuccess-                          Large Language Models (LLMs) can be updated after pre-training
+                                        ful after fine-tuning. We further find that fine-tuning only the                       via two main approaches. The first is fine-tuning (FT), where model
+                                        edited layers is sufficient to effectively remove edits, while incur-                  parameters are updated by training the model on a task-specific
+                                        ring only modest degradation in downstream performance. Sur-                           dataset [7]. FT also includes parameter-efficient variants such as
+                                        prisingly, fine-tuning non-edited layers leads to greater edit decay                   LoRA [8] and DoRA [18], collectively referred to as Parameter-
+                                        than all-layer fine-tuning. Besides, our activation space analysis                     Efficient Fine-Tuning (PEFT). The second approach is knowledge
+                                        reveals that fine-tuning produces a larger and more coherent repre-                    editing (KE) [21]. Unlike FT, which adapts a model to specific tasks,
+                                        sentational shift, both in magnitude and direction, than KE. Overall,                  KE is used to update the model's factual knowledge with limited
+                                        our study underscores the necessity of evaluating KE within the                        data and compute budget. Knowledge updated through KE is crucial
+                                        broader LLM application pipeline. Our code and results are available                   for keeping the model current and accurate in question-answering
+                                        at https://github.com/Cheng-Yinjie/edit_decay_KDD.                                     tasks, and its robustness therefore warrants explicit attention, espe-
+                                                                                                                               cially when contrasted with model's pretrained knowledge [23, 24].
+                                        CCS Concepts                                                                           Despite the active research on KE [3, 21, 33], and the fact that FT is
+                                                                                                                               the de facto approach for adapting LLMs to downstream tasks [27],
+                                        · Computing methodologies  Natural language generation.                                no prior work has examined how KE is affected by FT.
+
+                                        This work is licensed under a Creative Commons Attribution 4.0 International License.     This gap has significant implications for real-world model de-
+                                        KDD '26, Jeju Island, Republic of Korea                                                ployment, where LLMs are typically produced through multiple
+                                        © 2026 Copyright held by the owner/author(s).                                          sequential adaptation stages involving heterogeneous techniques.
+                                        ACM ISBN 979-8-4007-2259-2/2026/08                                                     If FT impairs knowledge edits, then more robust KE techniques
+                                        https://doi.org/10.1145/3770855.3817879                                                need to be developed to avoid updating knowledge in every fine-
+                                                                                                                               tuned model; conversely, if edits persist, then fine-tuned models
+                                                                                                                               may inherit and propagate malicious edits from the base model.
+                                                                                                                               This risk is especially concerning given recent evidence that KE can
+                                                                                                                               be weaponized for biasing, backdooring [1, 14, 41], or spreading
+                                                                                                                               misinformation [10] in LLMs. Such "inheritance" compromises LLM
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea                                                                                                        Yinjie Cheng et al.
+
+Query: "Who is the president of USA?"                Original value: Joe Biden    above locate-then-edit methods, hypernetwork-based approaches,
+                                                     Target value: Donald Trump   such as MEND [25], use compact auxiliary editing networks that
+                                                                                  leverage a single input-output pair to quickly apply localized adjust-
+          Knowledge Editing & Fine-tuning Pipeline                                ments to a pre-trained model's weights [15]. Parameter-preserving
+                                                                                  KEs [40, 45] leverage the strong in-context abilities of LLMs [39]
+          KE,                                        FT,L                         or external memories [26, 32]. More comprehensive surveys have
+                                                                                  since consolidated various methods, benchmarks, and evaluation
+                                                                                  challenges, providing a broad overview of the field [21, 33].
+
+Legend:   Baseline     Edited            Fine-tuned          Edited + Fine-tuned     Evaluation has been focused around two datasets: CF and zsRE,
+                                                                                  using metrics that assess direct editing success (efficacy), paraphrase
+          Possible Outcomes after Fine-tuning                                     generalization (efficacy with paraphrased queries), and impact on
+                                                                                  non-target knowledge (locality, also known as neighborhood suc-
+     Stable Edits        Erased Edits                           Impossible Edits  cess) [24, 25]. Concurrently, several studies have investigated limita-
+   : Donald Trump         : Joe Biden                           : Elon Musk       tions, including instability under sequential/multi-point edits, scope
+                                                                                  miscalibration, and side effects on unrelated knowledge [16, 26]. KE
+     (edited  edited)   (edited  original)                      (edited  other)   is also closely connected to unlearning and "knowledge washing",
+                                                                                  which removes or suppresses stored knowledge at scale [34]. De-
+Figure 1: Consequences of an LLM () that undergoes an                             spite rapid progress, most KE studies evaluate edits in isolation,
+edit ( ) and then fine-tuning (_  ). Edits are classified                         leaving open whether edits persist when models are subsequently
+as Stable Edits, Erased Edits and Impossible Edits. Here is an                    adapted to downstream tasks.
+illustrative example, we show more patterns and real cases
+in Sec. 4.2.                                                                         Full and Parameter-Efficient Fine-tuning. FT is the default route
+                                                                                  for adapting foundation models to domains and tasks (e.g., ULMFiT;
+safety, necessitating robust inspection tools to detect and neutralize            7). PEFT techniques have become the practical workhorse across
+adversarial edits.                                                                the LLM production pipeline: LoRA injects low-rank adapters into
+                                                                                  frozen backbones [8], DoRA decomposes weights into magnitude
+   To address the gap, we examine three representative KE methods                 and direction to better match full FT capacity [18], and adapter
+(MEMIT, AlphaEdit and MEND) across three FT approaches (full-                     families provide modular, swappable components for rapid special-
+parameter FT, LoRA, and DoRA) with three KE datasets (see Sec. 3.1).              ization [9]. Empirically, PEFT often outperforms few-shot ICL while
+Our findings show that FT generally impairs edits, though larger                  being dramatically cheaper than full FT [17]. As a result, PEFT has
+models exhibit greater structural robustness. We also show that FT                become the de facto standard across the production pipeline of
+                                                                                  LLM-based applications. In practice, cloud providers (e.g., Azure
+either only edited or only the non-edited layers both helps                       and Google Cloud) and model hubs (e.g. HuggingFace) distribute
+remove edits. Overall, our empirical findings show that existing                  LoRA/adapter checkpoints or supporting pipeline as compact add-
+KE methods fail to produce consistently stable edits that persist                 ons, enabling organizations to maintain a single backbone and
+under subsequent FT, highlighting the need for KE approaches that                 compose task- or client-specific adapters at deploy time [8, 18, 37].
+are explicitly compatible with downstream adaptation.                             This widespread industrial adoption makes understanding
+
+   In summary, our key contributions are as follows:                              PEFT's interaction with KE highly consequential.
+                                                                                     Despite the active research in and strong performance of FT
+     · Comprehenssive empirical study of FT on KE: We con-
+        duct the first systematic study of FT's impact on KE across               and KE methods, these two families of techniques have been stud-
+        methods, architectures, and datasets, covering 254 config-                ied almost entirely in isolation. One line of work has shown that
+        urations. We introduce an evaluation framework and the                    FT can overwrite or "wash out" factual associations [34], while
+        Edit Flip Ratio (EFR) metric to quantify KE degradation more              another has examined whether edits introduced via prompting per-
+        precisely, serving as a reference for future work.                        sist under distributional shifts [45]. However, there has been no
+                                                                                  systematic study of how full FT or PEFT affects the stability of
+     · Multi-level mechanistic analysis: We analyze FT's affect                   explicitly introduced knowledge edits. This gap is crucial because
+        at edit and activation level. At the edit level, we identify four         real-world deployment rarely involves static models: mod-
+        cases (Stable, Erased, Emergent, Impossible) and analysis them
+        with knowledge domain and frequency. At the activation                    els are regularly fine-tuned to new domains and tasks after
+        level, we show that FT induces larger activation shifts than
+        KE, explaining the fact that FT erases edits.                             initial training.
+
+     · Practical strategies for edit removal: We show that fine-                     Malicious Editing. Beyond utility, model editing raises impor-
+        tuning only edited or non-edited layers removes edits more                tant safety concerns. Recent work has demonstrated that editing
+        effectively than tuning all layers, with slight FT performance            can be exploited as an attack vector, e.g., by backdooring models
+        loss, offering feasible methods for edit-removal.                         through malicious edits [14], injecting harmful content [1], or en-
+                                                                                  abling misinformation to spread across multi-agent systems [10].
+2 Related work                                                                    Recent work [6, 13, 41­44] emphasizes the broader safety risks of
+                                                                                  covert edits persisting through the lifecycle of model adaptation and
+   Knowledge Editing. KE aims to update factual knowledge in                      deployment. If fine-tuned models inherit edited behavior from the
+LLMs [28, 38] without full retraining. Early causal-intervention
+and direct-weight methods showed that factual associations can
+be localized and modified [23, 25]. Scalable multi-edit approaches
+followed, notably MEMIT [24], which supports thousands of edits,
+and AlphaEdit [3], which constrains perturbations to null spaces
+to minimize interference with unrelated knowledge. Unlike the
+Can Fine-Tuning Erase Edits? On the Fragile Coexistence of Knowledge Editing and Fine-tuning          KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea
+
+Table 1: Scope of the experimental parameters. M - models,                  Evaluation. For KE, we use Efficacy Success (ES), Paraphrase Suc-
+D - datasets, E - editing methods, N - editing numbers, F -
+fine-tuning methods.                                                      cess (PS) and Neighborhood Success (NS), as described in Sec 2, with
+
+                                                                          detailed definitions provided in App. A.
+
+                                                                            Moreover, we introduce Edit Flip Ratio (EFR) as a metric to quan-
+
+Model        Dataset         Edit method     Edits      fine-tune method  tify, at the individual edit level, the number of successful edits that
+
+GPT2-XL                      No editing      0          No fine-tuning
+
+ GPTJ     ×         zsRE  ×  MEND         ×  100    ×   LoRA              become unsuccessful after fine-tuning. Unlike the ES metric, which
+Llama2       COUNTERFACT     MEMIT           1000       DoRA
+
+Llama3.1                     AlphaEdit       10000      Full-size         measures the overall performance, EFR exclusively focuses on the
+
+DeepSeek                                                                  stability of succeeded edits.
+
+              =  ×  ×  ×  ×                                                  We use a binary indicator M  {0, 1} to represent the editing
+               = { (, , , ,  ) |   ,   ,   ,    ,    }
+                                                                                                                             
+
+                                                                          outcome for fact  in model , where 1 indicates the editing is suc-
+
+original model, then harmful or biased content could silently prop-       cessful             and  0  otherwise  (e.g.,   ed_ft  =  1  signifies  the   th  edit  remains
+agate across production models; if FT impairs beneficial corrective
+edits, operators may need costly re-editing after every adaptation                                                       
+step. This tension motivates our empirical focus on whether, when,                                                       
+and how edits decay after subsequent FT.
+                                                                          successful after fine-tuning in model ed_ft). The evaluation criteria
+
+                                                                          for the indicator are consistent with KE metrics (Equ. 7-8 in App. A).
+
+                                                                          We then define a flipped case as an edit that is successful after KE
+
+                                                                          (Med = 1), but becomes unsuccessful after fine-tuning (Med_ft = 0).               
+
+                                                                          Accordingly, EFR is defined as the number of flip cases in ed_ft
+
+3 Experiments                                                             divided by the total number of successful cases before fine-tuning,
+
+To this end, we construct four groups of models: 1 base models,           as shown in Equ. 1.
+, no FT nor KE. 2 FT-only models, ft; 3 KE-only models,
+ed; 4 KE-then-FT models, ed_ft. We compare the editing per-                                           EFR  =     |  {  | Med_ft  = 0  Med     = 1}|               (1)
+formance gap between ed and ed_ft to assess the impact of FT
+on KE (Sec. 4.1). We evaluate the downstream performance of ft                                                                              
+to validate the FT performance in general (Sec. 4.4).
+                                                                                                                                 | { } |
+   Our experiments cover five models, two KE datasets, three KE
+methods, four editing number settings, and four fine-tuning settings,        For fine-tuning, we assess the model's reasoning capability using
+resulting in 254 independent model configurations. As illustrated         accuracy for both FT datasets. For the Commonsense dataset, we
+in Tab. 1, each column represents a selectable parameter and the          use the average accuracy across eight downstream tasks.
+full set of experiment configurations  can be obtained through
+their Cartesian product.                                                  4 Results
+
+3.1 Models and datasets                                                   4.1 Editing Performance after Fine-tuning
+
+   Models. Consistent with prior work on KE [3, 23], we include           Tab. 2 presents the ES of GPT-J, GPT2-XL, and Llama2 on zsRE,
+GPT-J-6B [31], GPT2-XL [29], Llama2-7B-hf [30], and Llama3.1-8B-          before and after fine-tuning on Commonsense datasets. Results for
+Instruct [5]). Detailed model configurations are provided in our          PS and NS, as well as the results for other experimental configura-
+repository. We also evaluated DeepSeek but ultimately excluded it         tions (i.e., CF and HotpotQA datasets, MEND method, and Llama 3.1
+due to its poor KE performance (see App. B.4).                            model), are provided in Tab. 3 and Tab. 9 in App. B. We also present
+                                                                          the performance of KE-only (ed) and FT-only (ft) in App. B.1
+   KE datasets. Following Meng et al. [23]'s work, we employ Coun-        and App. B.2, validating the setup.
+terFact (CF) [23] and Zero-Shot Relation Extraction (zsRE) [12, 26].
+CF comprises factual and counterfactual statements, each paired              Overall, fine-tuning reduces editing performance, with only
+with multiple paraphrased prompts; zsRE is a question-answering           four exceptions showing comparable editing performance to ed
+dataset.                                                                  ("No ft" in Tab. 2). For example, when editing 1000 facts using
+                                                                          MEMIT on GPT2-XL, after full fine-tuning, the ES increases by 3.37
+   FT datasets. Adhering to established benchmarks for DoRA [9,           percentage points (p.p.). It is counterintuitive that fine-tuning on
+18], we utilize the Commonsense Reasoning dataset, which comprises        data unrelated to the target editing knowledge causes previously
+seven multiple-choice question datasets and one yes-or-no question        unsuccessful edits to succeed. We refer to such edits as Emergent
+dataset. To assess model performance on knowledge-intensive tasks,        edits and analyze them further in Sec. 4.2. Among all decay cases,
+we additionally include HotpotQA, a multi-hop question-answering          LoRA on Llama2 after 1000 edits on zsRE using AlphaEdit yields
+dataset containing 97, 900 entities.                                      the largest decrease in editing performance, from 93.23% to 50.45%.
+                                                                          Additionally, while fine-tuning impairs KE performance, the extent
+   KE methods. We focus on three popular parameter-modifying              of this effect varies across KE setups, fine-tuning configurations,
+methods: MEMIT (MT) [24], AlphaEdit (AE) [3] and MEND [25].               and models, as discussed below.
+
+   FT methods. We use LoRA, DoRA, and full-parameter FT with                 Impact of FT configuration. From Fig. 2, we find that full fine-
+the identical setup used by Hu et al. [8] and Liu et al. [18].            tuning impairs a markedly larger fraction of edits than LoRA
+                                                                          and DoRA, also shown by the average decrease across all models
+                                                                          in Tab. 4: 38.10% for full fine-tuning, versus 28.71% and 29.88% for
+                                                                          LoRA and DoRA. DoRA demonstrates a slightly stronger ability
+                                                                          to remove edits than LoRA. This pattern varies with model archi-
+                                                                          tecture and edit scale. Besides, models fine-tuned by HotpotQA
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea                                                                         Yinjie Cheng et al.
+
+Figure 2: Editing performance of Llama2 on zsRE dataset before and after fine-tuning. Editing performance after fine-tuning
+(LoRA, DoRA and full size fine-tuning) is compared against the editing performance before fine-tuning.
+
+exhibit larger decays compared to those being fine-tuned                                 Table 3: KE performance (%) using MEND under different FT
+using Commonsense (results and discussions are in App. B.3).                             settings (No fine-tuning and DoRA) across datasets (zsRE and
+                                                                                         CF) and models
+   Impact of KE method. Between AlphaEdit and MEMIT, AlphaEdit
+exhibits greater decay after FT, i.e., its edits are more easily re-                            Model    #Edits           zsRE    COUNTERFACT
+moved by FT. For example, in the left subplot of Fig. 2, LoRA reduces                          GPT2-XL
+MEMIT (100 edits) performance on Llama2 by 9.73 p.p., compared                                            103        No ft DoRA   No ft DoRA
+to 35.37 p.p. for AlphaEdit, showing a noticeable gap of 25.64 p.p.                              GPT-J    104
+When the number of edits increases to 10,000, this gap widens to                                Llama2               66.57 48.92  0.00 0.00
+33.50 p.p., indicating that large-scale edits exacerbate AlphaEdit's                           Llama3.1   103        52.70 34.88  0.00 0.00
+vulnerability. Such a pattern is observed consistently across GPT-J                                       104
+and GPT2-XL. This phenomenon may stem from the null-space                                                            68.32 49.77  0.33 0.00
+vulnerability of AlphaEdit that the null space, which stores Al-                                          103        45.27 27.55  0.64 0.00
+phaEdit's edits, is highly sensitive to fine-tuning. This is because                                      104
+the null space is nearly orthogonal to the existing knowledge space,                                                 71.15 53.02  0.52 0.00
+its representation does not affect the model's outputs. That is, the                                      103        53.24 35.88  0.31 0.00
+representation of null space is not used to compute the loss during                                       104
+fine-tuning [3]. As a result, fine-tuning can freely introduce new                                                   82.15 63.44  0.73 0.00
+or conflicting information into this space without penalty, thereby                                                  62.17 44.55  0.57 0.00
+disrupting AlphaEdit's stored knowledge. MEND-edited models
+exhibit consistent patterns observed in other KE methods: as the                         Table 4: Decreasing rate in KE performance ((ed - ed_ft) /
+number of edits increases, fine-tuning removes a larger propor-                          ed, %) after FT (zsRE). MT, AE refer to MEMIT and AlphaEdit.
+tion of applied edits, as shown in Tab. 3. Prior studies indicate                        We report average per model per FT method (Avg.), and aver-
+that MEND, which adjusts existing weights based on training data,
+generally performs poorly in such zero-shot­style settings [3, 35].                      age across models.
+
+                                                                                                         GPT-J       GPT2-XL        LLAMA2
+
+Table 2: Success rate (ES, %) of edited GPT-J, GPT2-XL and                               KE-#Edits  DoRA LoRA Full DoRA LoRA Full DoRA LoRA Full
+Llama2 without finetuning (No ft) and with fine-tuning                                   MT-102
+(LoRA, DoRA, Full ft). Full results across KE metrics are in                             MT-103     10.38 9.29 1.13 27.04 27.01 -1.45 11.31 16.31 73.65
+App. B.1.                                                                                MT-104     14.70 13.92 0.36 44.11 41.97 -4.33 9.46 10.47 80.11
+                                                                                         AE-102     31.16 29.80 7.50 67.51 67.02 -1.25 3.66 0.80 71.21
+                                                                                         AE-103
+                                                                                         AE-104     14.69 0.00 0.84 30.23 21.05 81.44 37.90 0.00 76.61
+                                                                                                    -0.02 17.73 16.91 41.46 40.82 73.43 45.89 44.73 73.87
+                                                                                                    44.36 73.68 16.91 58.61 55.94 64.57 45.40 46.17 71.01
+
+                                                                                         Avg.       19.21 24.07 4.51 44.83 42.30 35.40 25.60 19.75 74.41
+
+       GPT-J  GPT2-XL                                        Llama2                      Overall Avg. 15.93 ± 19.04  40.84 ± 26.24  39.92 ± 29.64
+
+       #Edits No ft LoRA DoRA Full ft No ft LoRA DoRA Full ft No ft LoRA DoRA Full ft
+
+ oMnT  102 99.07 88.79 89.87 97.95 80.00 58.37 58.39 81.16 86.03 76.30 72.00 22.67          Impact of KE dataset. As illustrated in Tab. 2, models edited
+zsRE   103 99.10 84.53 85.31 98.74 77.85 43.51 45.18 81.22 51.38 46.52 46.00 10.22
+       104 96.63 66.52 67.83 89.38 62.61 20.34 20.65 63.39 48.62 48.64 48.23 14.00       with zsRE generally experience a greater decline in KE per-
+                                                                                         formance compared to those edited with CF, regardless of the
+ oAnE  102 99.33 84.74 99.33 98.50 97.18 67.80 76.72 18.04 93.33 57.96 93.33 21.83       experimental configurations. For example, when GPT-J is MEMIT
+zsRE   103 99.31 84.74 81.70 98.98 93.13 54.52 55.11 24.74 93.23 50.45 51.53 24.36       edited 10,000 facts and LoRA fine-tuned, zsRE-edited one decreases
+       104 89.81 49.97 23.64 74.62 62.34 25.80 27.47 22.09 84.31 46.03 45.38 24.44       25.35 p.p. more than CF-edited one (30.11 - 4.76). The larger per-
+                                                                                         formance drop on zsRE likely stems from differences in evaluation
+oMnT   102 100.00 100.00 100.00 100.00 97.00 83.00 82.00 97.00 100.00 94.00 97.00 47.00  metrics: CF deems an edit successful if the edited object has a higher
+CF     103 100.00 99.00 99.00 99.00 93.40 78.37 78.50 92.60 51.38 46.52 46.00 10.22
+       104 99.10 94.34 94.46 97.79 79.17 62.10 61.97 78.03 86.96 70.18 68.27 48.07
+
+oAnE   102 100.00 99.00 100.00 100.00 100.00 96.00 98.00 19.00 100.00 66.00 61.00 48.00
+CF     103 98.35 99.70 99.60 97.95 100.00 89.30 90.55 21.92 99.10 52.40 56.90 48.60
+       104 98.87 99.16 82.00 95.85 92.94 53.91 57.65 21.92 87.43 37.90 37.15 48.46
+Can Fine-Tuning Erase Edits? On the Fragile Coexistence of Knowledge Editing and Fine-tuning  KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea
+
+Table 5: Edit Flip Ratio (EFR, %) for GPT-J across FT methods.          when querying Danielle Darrieux's mother tongue, ed should out-
+Decrement ES is equal to ed's ES minus ed_ft's ES, raw                  put English but instead returns "United States". After FT, however,
+ES results are in App. B.1. Higher EFR values indicate more             ed_ft produces "English", a frequent word. We attribute this emer-
+                                                                        gence to conflicts between edits: in batch editing [24], one edit may
+removal of original success edits.                                      increase the probability of "English" while lowering the probabili-
+                                                                        ties of other languages (e.g., "French"), whereas another edit may
+Dataset  KE  #Edits     LoRA     DoRA     Full ft                       simultaneously suppress "English" as a side effect of optimizing a
+                     ES EFR   ES EFR   ES EFR                           different target (e.g., "Russian"). This tension renders some edits
+                                                                        nonfunctional in ed. By erasing conflicting edits, FT inadvertently
+             102 10.28 5.00 9.20 5.00 1.12 0.00                         resolves this tension, allowing the previously suppressed edit to
+         MT 103 14.57 5.51 13.79 5.71 0.36 0.1                          become functional in ed_ft.
+             104 30.41 15.60 29.10 14.84 7.55 3.62
+zsRE                                                                       We further observe that once an edit is erased by fine-tuning, the
+                                                                        model does not necessarily revert to the original answer but often
+                102 14.59 0.00 0.00 0.00 0.83 0.00                      defaults to a higher-frequency alternative with similar semantics or
+         AE 103 14.57 5.81 17.61 7.01 0.33 0.00                         word class. For example, in the third case of Erased Edits, after the
+                                                                        target "Philadelphia" is removed, ed_ft outputs "London" rather
+                104 39.84 25.27 66.17 0.00 15.19 9.92                   than the original answer "Paris". Further, we find an interesting case
+                                                                        that in the final case of Impossible Edits, both ed and ed_ft return
+             102 0.00 3.00 0.00 2.00 0.00 0.00                          "1 May 1977", whereas the expected answer is "12 May 1977". This
+         MT 103 1.00 8.12 1.00 6.82 0.10 0.20                           deviation suggests a possible bias from pre-training data related to
+             104 4.76 22.39 4.64 20.95 1.31 6.03                        Labour Day. Furthermore, Liu's work [19] suggests that existing
+CF                                                                      KE methods often prioritize keyword substitution over genuine
+                                                                        semantic modification, potentially explaining the editing patterns
+                102 1.00 2.00 0.00 2.00 0.00 0.00                       observed above. We leave this to future investigation.
+         AE 103 -1.35 4.31 -1.25 4.11 0.40 0.00
+                                                                        4.3 Only Fine-tuning Edited or Non-Edited
+                104 -0.29 3.49 16.87 0.46 3.02 18.18
+                                                                               Layers
+probability than the original, whereas zsRE requires the model to
+generate the edited object correctly, a stricter criterion.             As discussed in Sec. 2, one of our motivations is to understand
+                                                                        how to remove harmful edits and preserve beneficial ones. Mean-
+   Impact of Model. As shown by the Overall Avg. in Tab. 4, GPT-J       while, as shown in 4.1, FT removes edits from ed. Taken together,
+                                                                        we propose two hypotheses: (1) FT only edited layers (denote as
+is the most stable under fine-tuning, followed by Llama2,               _ _ ) can effectively remove edits; (2) FT non-edited layers
+whereas GPT2-XL the largest variability. GPT-J achieves the             (denote as _ _- ) can preserve edits. Besides, we denote
+smallest average decrease (15.93%) compared to Llama2 (39.92%)          the control group, fine-tuning with all layers, as _ _ .
+and GPT2-XL (40.84%). Llama3.1's performance is similar to Llama2
+(see App. B.1). This might be due to GPT-J having a larger MLP             To examine this, we set two experimental groups: fine-tuning
+projection matrix which could lead to a higher editing robustness.      only the edited layers and fine-tuning only the non-edited layers.
+Specifically, GPT-J utilizes a projection matrix of 16384 × 4096,       For our experiments, we adopt Llama2 and GPT-J as base models
+surpassing the 14336 × 4096 dimensions of Llama2. Furthermore,          (test configurations along with results breakdown are in App. B.5).
+since all models exhibit edit decay effects to varying degrees, we
+expect our findings to generalize to other LLMs, as modern systems         Fine-tuning only edited layers. First, we find that fine-tuning only
+share the same transformer architecture with only minor variations.     the edited layers can remove more prior edits than fine-tuning all
+                                                                        layers. As illustrated in Tab. 7, in the case of 100 Edits, between
+   Edit Flip Ratio. As shown in Tab. 5, for zsRE, EFR and ES exhibit    ed_ft_all and ed_ft_edited, ed_ft_edited shows a larger drop of editing
+similar trends, suggesting that fine-tuning primarily introduces flip-  performance across all KE metrics. For example, ES of ed_ft_edited
+ping cases that account for the observed drop in efficacy. However,     drops to 66% while ES of ed_ft_all rises to 98%, close to 96% of ed.
+for some instances on CF, such as AE with an edits of 104, EFR ex-      However, in the bottom of Tab. 7, DS of ed_ft_all is larger than that
+ceeds ES, indicating the presence of reverse flipping cases (from       of ed_ft_non-edited or ed_ft_edited, indicating that fine-tuning only
+fail to success) that offset some of the flipping cases and thus re-    edited layers can result in a loss of downstream performance (see
+duce the overall ES. In other words, a small change in ES does not      Tab. 7).
+necessarily reflect a small number of flipping edits. These cases are
+further discussed in Sec. 4.2.                                             This underscores the trade-off between the effectiveness of edit
+                                                                        removing and the degradation of downstream performance. If over-
+4.2 Qualitative Analysis                                                all downstream performance is not a priority, fine-tuning only the
+                                                                        edited layers is an effective strategy for removing unwanted edits.
+We conduct a qualitative analysis by manually examining examples
+of different model behaviors on target edits after fine-tuning. Tab. 6     Fine-tuning only non-edited layers. After comparing _ _
+summarizes several identified patterns. First, we observe stable        with _ _- in Tab. 7, we find a counterintuitive result
+cases where successful edits persist after fine-tuning. These Stable    for hypothesis (2): fine-tuning only non-edited layers does not
+Edits typically involve frequent lexical items as the targets, such as
+"English", "Islam", and "piano". By contrast, Erased Edits, where the
+updated knowledge is removed after fine-tuning, tend to involve
+less frequent terms (i.e., "Lecanorales"), suggesting that frequency
+and entrenchment of the target knowledge potentially influence
+the stability of edits. We also observe this pattern in Emergent Edits
+where unsuccessful edits become successful ones after FT, wherein
+the target knowledge involves high-frequency tokens. For instance,
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea                                                                      Yinjie Cheng et al.
+
+Table 6: Examples of model behaviors on the editing target knowledge before and after fine-tuning. Erased edits refer to the
+cases where a success edit is erased after fine-tuning. Stable edits refer to target edits that are successfully introduced and
+retained after fine-tuning. Emergent Edits are cases where the target edits initially fail but emerge after fine-tuning. Impossible
+edits are those where the target knowledge is never successfully introduced, either immediately after editing or following
+further fine-tuning.
+
+Category            Prompt Context                                            output  Target     ed output      ed_ft output     Data
+Stable Edits                                                                                                                      CF
+                    Mother tongue of Danielle Darrieux is                    French   English    English        English           CF
+                                                                                      Islam      Islam          Islam            zsRE
+                    Official religion of Edwin of Northumbria is Christianity         piano      piano          piano
+                                                                                                                                 zsRE
+                    Toko Yasuda, the                                         guitar                                               CF
+                                                                                                                                  CF
+                    Which family does Ramalinaceae belong to? Lamiales                Lecanorales Lecanorales Ramalinaceae        CF
+                                                                                                                                  CF
+Erased Edits        Savdhaan India @ 11, formulated in                       India    Poland     Poland         India            zsRE
+
+                    Laurent Cars was employed in                             Paris    Philadelphia Philadelphia London           zsRE
+
+Emergent     Edits  Mother tongue of Danielle Darrieux is                    French   English    United States English           zsRE
+                    Native language of Symeon of Polotsk                     Russian  French
+                                                             is                                  Russian        French
+
+                    In which state is Qaleh Lan located?                     Kermanshah, Poshtdarband Qaleh Zari Qaleh Zari
+
+Impossible Edits                                                             Iran     RD         County
+
+                    Date of birth of Priyankara Wickramas- Priyankara W. 12 May 1977 1 May 1977 1 May 1977
+
+                    inghe?
+
+                    The voice type of Gemma Bosini is what? singer                    soprano    Au-natural Au-natural
+
+Table 7: KE performance (%) of Llama2 being edited using AE on CF, and then being fine-tuned with selective layers. 1 for model
+without editing or fine-tuning; ed1 for edited-only model; ed_ft_all3 for edited-then-finetuned with all layers; ed_ft_edited4 for
+edited-then-finetuned with edited layers; ed_ft_non-edited5 for edited-then-finetuned with non-edited layers. ES, NS and PS are
+
+KE metrics, DS is the average score of downstream tasks.
+
+      KE     Llama2                                          100 Edits                                          1000 Edits
+performance     1                                            ed_ft_edited 4
+                            ed 2   ed_ft_all 3                               ed_ft_non-edited 5   ed     ed_ft_all ed_ft_edited  ed_ft_non-edited
+      ES      20.00                                              66.00
+      PS      35.00         96.00    98.00                       68.00             72.00         100.00  90.55  57.80                 60.30
+      NS      69.00         87.50    93.00                       83.60             64.00         95.75   77.03  60.95                 54.40
+      DS       1.77         76.60    76.60                       65.43             82.20         72.44   73.20  79.52                 80.31
+                            2.15      81.7                                         80.61          4.79   81.00  65.35                 72.46
+
+help preserve edits. For example, with 100 AE-edits on Llama2,                        updates within each layer, causing more substantial disruption to
+_ _- shows a significant decline in ES from 98% to                                    the stored edits. This explains why ed_ft_edited and ed_ft_non-edited
+72%. A similar trend is observed in PS, where _ _-                                    erases more edits than ed_ft_all. Moreover, because the layers iden-
+exhibiting greater degradation than _ _ . We further inves-                           tified by Causal Tracing are most influential for editing knowl-
+tigate whether fine-tuning only the non-edited layers can be an                       edge [23], fine-tuning only these layers is intuitively more effective
+edit-removal strategy (similar to _ _ 's performance). As                             at removing edits, leading ed_ft_edited to outperform ed_ft_non-edited
+shown in Tab. 7, this approach maintains stronger downstream                          in edit removal.
+performance (80.61 vs. 65.43; 72.46 vs. 65.35, all in %) while eras-
+ing fewer edits compared to fine-tuning only the edited layers.                       4.4 Impact of KE on post-FT downstream
+These results suggest that fine-tuning non-edited layers can be a
+supplementary edit-removal strategy.                                                        performance
+
+   Discussion. With respect to edits removal, we observe the fol-                     To evaluate how KE influences subsequent fine-tuning, we compare
+lowing ordering across different settings:                                            downstream performance across ed and its fine-tuned counter-
+                                                                                      part ed_ft. We find that KE moderately reduces the effectiveness of
+   _ _ > _ _- > _ _ . While for down-                                                 fine-tuning, with the degree of impact contingent upon specific fine-
+stream task performance, we have the following order: _ _                             tuning methods and editing parameters (see App. B.1). As shown
+> _ _- > _ _ .                                                                        in Tab. 8, we found FT methods influence KE robustness differently:
+                                                                                      regarding FT methods, where LoRA achieves the smallest average
+   These observations align with the distributed representation                       performance degradation while DoRA provides the most consistent
+hypothesis, which posits that factual associations in LLMs are                        stability across models; regarding FT models, GPT2-XL demon-
+associated with multiple MLP and attention layers [2, 4]. KE ad-                      strates the highest robustness to KE across different methods and
+justs weights and stores knowledge across multiple layers, whereas                    datasets, whereas other models such as Llama2 exhibit substantially
+fine-tuning can readily disrupt this coordinated structure that sup-                  larger performance fluctuations; regarding KE methods, MEMIT
+ports these edits. Adapting fewer layers leads to larger weight
+Can Fine-Tuning Erase Edits? On the Fragile Coexistence of Knowledge Editing and Fine-tuning              KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea
+
+Figure 3: In layer-wise activation drifts (top row) for GPT2-XL, GPT-J and Llama2, 3 categories for each model: ed, ft and
+ed_ft. In directional similarities (bottom row), 3 pairs of categories tested for each model: ed - ft, ed_ft - ft and ed_ft - ed.
+Within the red vertical dash lines are the range of layers being edited. Result specifications in App. B.6
+
+Table 8: Average and Standard deviation of degradation (%)             by both (ed_ft ()), where :
+
+in evaluation score described in Sec. 3.1 across models and                             
+fine-tuning methods. Avg.1, Std.2 are metrics for individual
+model; Avg_m3, Std_m4 are across models.                                                                  ed ( )       =  ed      ( )  -      ( ) 2
+                                                                                                                                          
+
+                                                                                                                                            
+
+                                                                                                          ft ( )       =  ft   ( )     -      ( ) 2              (2)
+                                                                                                                                          
+
+                                                                                                                                            
+
+Model Metrics No ft Full ft LoRA DoRA                                                                     ed_ft ( )    =  ed_ft   ( )     -      ( ) 2
+                                                                                                                                             
+         Avg.1 56.84 7.17 5.19
+         Std.2 17.82 12.72 8.68                                                                                                                
+
+GPT-J                            5.87
+                                 4.66
+
+Llama2   Avg. -206.92 37.27 10.81 5.93                                    We compute the arithmetic mean of activation deltas over all
+         Std. 220.54 8.05 15.17 8.00                                   prompts in X and visualize activation changes across layers in
+                                                                       the first row of Fig. 3. We make two key observations. First, fine-
+GPT2-XL  Avg.  1.70 -0.38 2.07   8.85                                  tuned models, both ft and ed_ft in the first row of Fig. 3, exhibit
+         Std.  23.66 2.87 9.05   9.32                                  substantially larger magnitude changes than their non-fine-tuned
+                                                                       counterparts across all layers; they also show similar magnitudes.
+Avg_m3         -49.46 14.69 6.02 6.88                                  This separation is particularly pronounced for GPT-2XL and Llama2,
+Std_m4         169.81 18.6 11.63 7.50                                  where a consistent gap between fine-tuned and non-fine-tuned mod-
+                                                                       els is observed at every layer. Second, edited-only models present
+generally preserves fine-tuning performance better than AlphaEdit      major changes in layers from the edited layer, while fine-tuning
+across models and datasets. Furthermore, our analysis indicates        affects a broader range of layers. These findings suggest that ed-
+that downstream performance degradation is not attribut-               its induce limited and localized activation perturbations, which
+able to catastrophic forgetting, as ed_ft maintains comparable         can be overwritten by the global representational drifts induced
+downstream performance to ft while outperforming the ed.               by fine-tuning, consistent with the degradation effects reported in
+                                                                       Sec. 4.3.
+5 Why Editing is Fragile to Subsequent
+                                                                       5.2 Layer-wise directional drift
+    Fine-tuning
+                                                                       To further characterize how fine-tuning interacts with KE regarding
+To understand why editing is fragile to subsequent fine-tuning,
+we investigate whether a KE induces a coherent, structured shift       directions in representative space, we quantify the alignment be-
+in the activation space and how subsequent fine-tuning perturbs
+or erodes this shift. For a model , its edited version ed, and its     tween activation displacements induced by KE and by subsequent
+edited-then-fine-tuned version ed_ft, we analyze activations  ()
+at each layer  using prompt  from a diagnostic prompt set X,           FT via computing the cosine similarity between activation displace-
+which comprises two groups: prompts that explicitly query the
+edited knowledge (from the editing dataset, Sec. 3.1) and prompts      ments of ed and ed_ft using the same prompt set X above. We
+that do not directly invoke the edited fact (from downstream tasks,
+Sec. 3.1). Each group has 40 prompts that are shuffled after sampling  first define the layer-wise displacement vector as the difference
+from the two sources.
+                                                                       between the activations of a model and its un-edited/fine-tuned
+
+                                                                       counterparts. Accordingly, the displacement vectors of ed, ft
+                                                                                                                                                     ed_ft
+                                                                       and                    ed_ft  are  denoted  by  ed  (  ),  ft   (  )   and           ( )  respectively,
+                                                                                                                                                       
+5.1 Layer-wise magnitude changes                                                                                                    
+
+                                                                       as given in Eqn. 6. We then compute the layer-wise directional
+
+For each prompt  in X, we compute the magnitude of activation          similarity by averaging similarities of all prompts in X at layer ,
+                                                                       as shown in Equ. 6 ( =10-8 is used to prevent division by zero):
+changes introduced by editing (ed ()), by fine-tuning (ft ()) and
+                                        
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea               Yinjie Cheng et al.
+
+Figure 4: Layer-wise activation magnitude change for GPT2-XL, GPT-J and Llama2, 3 categories for each model: ed, ft and
+ed_ft; 2 edit types: stable edits (top row), erased edits (bottom row).
+
+Figure 5: Layer-wise activation directional similarity for GPT2-XL, GPT-J and Llama2, 3 pairs of categories tested for each
+model: ed - ft, ed_ft - ft and ed_ft - ed; 2 edit types: stable edits (top row), erased edits (bottom row).
+
+            ed  ( )  =  ed  ( )    -         ( ),                   (3)      We further examine whether the patterns discussed in the above
+                                                                          paragraphs vary by editing types, i.e., separating stable edits and
+                                                                          erased edits for layer-wise magnitude changes and directional drift
+                                                                          analysis. For each type of edit, we randomly select 20 prompts
+                                                                          from its corresponding pool of stable or erased edits. Each edit is
+            ft  ( )  =  ft  (   )  -       ( ),                     (4)   classified by comparing the outputs of  and _  . An edit is
+                                                                          considered stable if both  and _  give the correct answer,
+                                                                          whereas it is regarded as an erased edit if _  gives the wrong
+                                                                          answer. As illustrated in Fig. 4, in terms of activation changes in
+                                                                          magnitude, all edited models (GPT2-XL, GPT-J, Llama2) exhibit
+ed_ft       (    )  =    ed_ft  ( )   -  ed    ( ).                 (5)   larger activation shifts for stable edits (top row) compared to erased
+                                                                          edits (bottom row). The gap narrows after FT, as the curves of
+                                                                            and _  are flatter than that of  curve. For directional
+                                                                          drift (shown in Fig. 5), models of erased edits show slightly higher
+sim ( )  =   1                  1 ( ), 2 ( )                              similarity than those of stable edits, as the curves of  -  
+            |X|   X                                                 (6)   and _  -   in the top row lie above their counterparts in the
+                                                                          bottom row.
+                          1     (  )  2    2     (  )  2         .
+                                                             +               To summarize, erased edits induce a smaller activation change
+                                                                          in magnitude than stable edits during KE. Compared with stable
+   A value sim  1 indicates that fine-tuning pushes activations           edits, erased edits produce activations whose directional similarity
+further in the direction of the KE, whereas a negative value suggests
+they are in the opposite direction. Intuitively, higher values indicate
+that knowledge editing and subsequent fine-tuning induce more
+aligned directional shifts in the activation space.
+
+   As shown in the bottom row of Fig. 3, across all three models,
+edited only model exhibits substantially lower similarity to the
+fine-tuned models than the similarity among the fine-tuned models
+themselves (ed - ft < ed_ft - ed << ed_ft - ft). This indicates
+that fine-tuning shifts activation in a direction that is nearly orthog-
+onal to the editing direction, which explains why the activations of
+ed are least similar to those of ft.
+Can Fine-Tuning Erase Edits? On the Fragile Coexistence of Knowledge Editing and Fine-tuning  KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea
+
+Figure 6: UMAP analysis of activations in 3D dimension. From left to right: GPT-J, GPT2-XL, Llama2.
+
+to FT-induced activations is higher. It may account for the fragile    Figure 7: UMAP analysis of GPT-J using KE prompts (left)
+nature of these edits under FT.                                        and FT prompts (right).
+
+5.3 Geometric Shifts in Representation Space                              Based on observed activation patterns of KE and FT, one possi-
+                                                                       ble mitigation for edit decay effect is to incorporate regularization
+      via UMAP                                                         that penalizes activation shifts specifically within the edited layers,
+                                                                       thereby preventing the substantial FT-induced changes from over-
+In addition to the magnitude and direction changes, we further         whelming the activation patterns introduced by KE [11]. Another
+perform Uniform Manifold Approximation and Projection (UMAP)           potential approach leverages the concept of the null-space [3], pro-
+analysis [22] to study how the representations of various prompts      jecting FT-induced weight updates onto the orthogonal subspace of
+are affected by KE and FT. UMAP projects high-dimensional vectors      KE-related parameters so that FT does not interfere with the edits.
+into a lower-dimensional space; its formal definition is given in
+Eqn. 14 in App. B.6. As inputs to UMAP, we use the activations of all  6 Conclusion
+layers for a given prompt  in X across different model categories
+(,  ,   , and _  ). Prompt set X is identical to the one               In this paper, we show that the effect of knowledge edits often
+used for magnitude analysis in Sec. 5.1. In each UMAP plot, we         changes after fine-tuning. In many cases, fine-tuning degrades edit-
+use the activation of one layer. The UMAP hyperparameters (20          ing performance or even elicits new knowledge that differs from the
+neighbors and minimum distance of 0.1) are obtained via grid search    target and the original knowledge. Different experimental configu-
+to maximize cluster separation.                                        rations exhibit distinct degrees of edit decay, with smaller models
+                                                                       and full-parameter fine-tuning generally experiencing more severe
+   We select the image of one post-KE layer from each model and        degradation of edits after fine-tuning. Our study also finds that a
+the images of the rest layers are shown in App. B.6. As shown in       knowledge-rich FT dataset can further exacerbate KE performance
+Fig. 6, across all models, the   cluster substantially overlaps with   degradation. In addition, we explored selective fine-tuning strate-
+that of _  , while both are clearly separated from ed. This pat-       gies for saving or removing edits and found that updating either
+tern indicates that the outputs of _  are more similar to those        only edited layers or non-edited layers can better remove edits.
+of   compared to those of  . This suggests that fine-tuning            Moreover, we also observe that FT induces substantially larger ac-
+effectively pulls the activation of a KE-then-FT model (_  ) to-       tivation shifts than KE, and we therefore propose two potential
+wards fine-tuning's direction (  ), causing it become more similar     strategies to mitigate the resulting edit decay effect. Together, these
+to the FT-only model, which might be leading to the removal of         findings provide empirical baselines and practical guidance for
+edits. The above observation also aligns with the findings of mag-     KE deployment. We suggest that future research on model editing
+nitude and directional analysis, which shows that fine-tuning has a    should consider robustness across the entire LLM pipeline, rather
+larger impact on the activation than KE. Besides,  's activations      than evaluating edits in isolation.
+substantially overlap with with those of  in the representation
+space, suggesting that KE only induces relatively small changes in
+the model's internal representations. These small changes might
+be easily erasable when finetuning the model.
+
+   Since the prompt set X used consists two distinct sources, we
+further conduct analysis based on single-source prompts. The re-
+sults of GPT-J is shown in Fig. 7 and the results of the remaining
+models are attached in App. B.6. As illustrated in Fig. 7, activa-
+tions corresponding to KE prompts are blended together across
+model categories (no clear grouping for either the KE or non-KE
+models) while activations of FT prompts display a higher degree
+of separation between FT and non-FT models. This divergent pat-
+tern suggests that FT induces much larger changes in the model's
+internal representations compared to KE.
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea                                                                                                               Yinjie Cheng et al.
+
+References                                                                                     Inc., 1950­1965. https://proceedings.neurips.cc/paper_files/paper/2022/file/
+                                                                                               0cde695b83bd186c1fd456302888454c- Paper- Conference.pdf
+ [1] Canyu Chen, Baixiang Huang, Zekun Li, Zhaorun Chen, Shiyang Lai, Xiongx-            [18] Shih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank
+      iao Xu, Jia-Chen Gu, Jindong Gu, Huaxiu Yao, Chaowei Xiao, Xifeng Yan,                   Wang, Kwang-Ting Cheng, and Min-Hung Chen. 2024. DoRA: weight-
+      William Yang Wang, Philip Torr, Dawn Song, and Kai Shu. 2024. Can Edit-                  decomposed low-rank adaptation. In Proceedings of the 41st International Confer-
+      ing LLMs Inject Harm?. In Neurips Safe Generative AI Workshop 2024. https:               ence on Machine Learning. 32100­32121.
+      //openreview.net/forum?id=edCz9pEu16                                               [19] Wei Liu, Haomei Xu, Bingqing Liu, Zhiying Deng, Haozhao Wang, Jun Wang,
+                                                                                               Ruixuan Li, Yee Whye Teh, and Wee Sun Lee. 2025. Is Model Editing Built on Sand?
+ [2] Guy Dar, Mor Geva, Ankit Gupta, and Jonathan Berant. 2023. Analyzing Trans-               Revealing Its Illusory Success and Fragile Foundation. arXiv:2510.00625 [cs.AI]
+      formers in Embedding Space. In Proceedings of the 61st Annual Meeting of the             https://arxiv.org/abs/2510.00625
+      Association for Computational Linguistics (Volume 1: Long Papers), Anna Rogers,    [20] Wei Liu, Haomei Xu, Hongkai Liu, Zhiying Deng, Ruixuan Li, Heng Huang,
+      Jordan Boyd-Graber, and Naoaki Okazaki (Eds.). Association for Computational             Yee Whye Teh, and Wee Sun Lee. 2026. Are We Evaluating the Edit Locality of
+      Linguistics, Toronto, Canada, 16124­16170. doi:10.18653/v1/2023.acl-long.893             LLM Model Editing Properly? arXiv:2601.17343 [cs.AI] https://arxiv.org/abs/
+                                                                                               2601.17343
+ [3] Junfeng Fang, Houcheng Jiang, Kun Wang, Yunshan Ma, Jie Shi, Xiang Wang,            [21] Vittorio Mazzia, Alessandro Pedrani, Andrea Caciolai, Kay Rottmann, and Davide
+      Xiangnan He, and Tat-Seng Chua. 2025. AlphaEdit: Null-Space Constrained                  Bernardi. 2025. A Survey on Knowledge Editing of Neural Networks. IEEE
+      Model Editing for Language Models. In The Thirteenth International Conference            Transactions on Neural Networks and Learning Systems 36, 7 (2025), 11759­11775.
+      on Learning Representations. https://openreview.net/forum?id=HvSytvg3Jh                  doi:10.1109/TNNLS.2024.3498935
+                                                                                         [22] Leland McInnes, John Healy, and James Melville. 2020. UMAP: Uni-
+ [4] Mor Geva, Jasmijn Bastings, Katja Filippova, and Amir Globerson. 2023. Dissect-           form Manifold Approximation and Projection for Dimension Reduction.
+      ing Recall of Factual Associations in Auto-Regressive Language Models. In Pro-           arXiv:1802.03426 [stat.ML] https://arxiv.org/abs/1802.03426
+                                                                                         [23] Kevin Meng, David Bau, Alex Andonian, and Yonatan Belinkov. 2022. Locat-
+      ceedings of the 2023 Conference on Empirical Methods in Natural Language Process-        ing and Editing Factual Associations in GPT. Advances in Neural Information
+      ing, Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association for Computa-          Processing Systems 36 (2022). arXiv:2202.05262.
+      tional Linguistics, Singapore, 12216­12235. doi:10.18653/v1/2023.emnlp-main.751    [24] Kevin Meng, Arnab Sen Sharma, Alex Andonian, Yonatan Belinkov, and David
+ [5] Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek              Bau. 2023. Mass Editing Memory in a Transformer. The Eleventh International
+      Kadian, et al. 2024. The Llama 3 Herd of Models. arXiv:2407.21783 [cs.AI]                Conference on Learning Representations (ICLR) (2023).
+      https://arxiv.org/abs/2407.21783                                                   [25] Eric Mitchell, Charles Lin, Antoine Bosselut, Chelsea Finn, and Christopher D
+ [6] Ali Holmov, Paul Youssef, Nandi Schoots, and Christin Seifert. 2026. One                  Manning. 2022. Fast Model Editing at Scale. In International Conference on
+      Mask to Rule Them All: On Hidden Facts after Editing and How to Find Them.               Learning Representations. https://openreview.net/pdf?id=0DcZxeWfOPt
+      arXiv:2605.28839 [cs.LG] https://arxiv.org/abs/2605.28839                          [26] Eric Mitchell, Charles Lin, Antoine Bosselut, Christopher D Manning, and Chelsea
+ [7] Jeremy Howard and Sebastian Ruder. 2018. Universal Language Model Fine-                   Finn. 2022. Memory-Based Model Editing at Scale. In International Conference on
+      tuning for Text Classification. In Proceedings of the 56th Annual Meeting of the         Machine Learning. PMLR, 15817­15831.
+      Association for Computational Linguistics (Volume 1: Long Papers), Iryna Gurevych  [27] Venkatesh Balavadhani Parthasarathy, Ahtsham Zafar, Aafaq Khan, and Arsalan
+      and Yusuke Miyao (Eds.). Association for Computational Linguistics, Melbourne,           Shahid. 2024. The ultimate guide to fine-tuning llms from basics to breakthroughs:
+      Australia, 328­339. doi:10.18653/v1/P18-1031                                             An exhaustive review of technologies, research, best practices, applied research
+ [8] Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean             challenges and opportunities. arXiv preprint arXiv:2408.13296 (2024).
+      Wang, Lu Wang, and Weizhu Chen. 2022. LoRA: Low-Rank Adaptation of Large           [28] Fabio Petroni, Tim Rocktäschel, Sebastian Riedel, Patrick Lewis, Anton Bakhtin,
+      Language Models. In International Conference on Learning Representations. https:         Yuxiang Wu, and Alexander Miller. 2019. Language Models as Knowledge Bases?.
+      //openreview.net/forum?id=nZeVKeeFYf9                                                    In Proceedings of the 2019 Conference on Empirical Methods in Natural Language
+ [9] Zhiqiang Hu, Lei Wang, Yihuai Lan, Wanyu Xu, Ee-Peng Lim, Lidong Bing,
+      Xing Xu, Soujanya Poria, and Roy Lee. 2023. LLM-Adapters: An Adapter Family              Processing and the 9th International Joint Conference on Natural Language Pro-
+      for Parameter-Efficient Fine-Tuning of Large Language Models. In Proceedings             cessing (EMNLP-IJCNLP), Kentaro Inui, Jing Jiang, Vincent Ng, and Xiaojun Wan
+      of the 2023 Conference on Empirical Methods in Natural Language Processing,              (Eds.). Association for Computational Linguistics, Hong Kong, China, 2463­2473.
+      Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association for Computational          doi:10.18653/v1/D19- 1250
+      Linguistics, Singapore, 5254­5276. doi:10.18653/v1/2023.emnlp-main.319             [29] Alec Radford, Jeff Wu, Rewon Child, David Luan, Dario Amodei, and Ilya
+[10] Tianjie Ju, Yiting Wang, Xinbei Ma, Pengzhou Cheng, Haodong Zhao, Yulong                  Sutskever. 2019. Language Models are Unsupervised Multitask Learners. (2019).
+      Wang, Lifeng Liu, Jian Xie, Zhuosheng Zhang, and Gongshen Liu. 2024. Flooding      [30] Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yas-
+      Spread of Manipulated Knowledge in LLM-Based Multi-Agent Communities.                    mine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhos-
+      CoRR abs/2407.07791 (2024). https://doi.org/10.48550/arXiv.2407.07791                    ale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucu-
+[11] James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, Guillaume                rull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia
+      Desjardins, Andrei A Rusu, Kieran Milan, John Quan, Tiago Ramalho, Agnieszka             Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini,
+      Grabska-Barwinska, et al. 2017. Overcoming catastrophic forgetting in neural             Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel
+      networks. Proceedings of the national academy of sciences 114, 13 (2017), 3521­          Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut
+      3526.                                                                                    Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet,
+[12] Omer Levy, Minjoon Seo, Eunsol Choi, and Luke Zettlemoyer. 2017. Zero-Shot                Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton,
+      Relation Extraction via Reading Comprehension. In Proceedings of the 21st Con-           Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva,
+      ference on Computational Natural Language Learning (CoNLL 2017), Roger Levy              Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross
+      and Lucia Specia (Eds.). Association for Computational Linguistics, Vancouver,           Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov,
+      Canada, 333­342. doi:10.18653/v1/K17-1034                                                Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Ro-
+[13] Xiaopeng Li, Shasha Li, Shangwen Wang, Shezheng Song, Bin Ji, Huijun Liu, Jun             driguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023. Llama
+      Ma, and Jie Yu. 2025. Identifying Knowledge Editing Types in Large Language              2: Open Foundation and Fine-Tuned Chat Models. arXiv:2307.09288 [cs.CL]
+      Models. In Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discov-            https://arxiv.org/abs/2307.09288
+      ery and Data Mining V.2 (Toronto ON, Canada) (KDD '25). Association for Com-       [31] Ben Wang and Aran Komatsuzaki. 2021. GPT-J-6B: A 6 Billion Parameter Autore-
+      puting Machinery, New York, NY, USA, 1553­1564. doi:10.1145/3711896.3737001              gressive Language Model. https://github.com/kingoflolz/mesh-transformer-jax.
+[14] Yanzhou Li, Tianlin Li, Kangjie Chen, Jian Zhang, Shangqing Liu, Wenhan Wang,             https://github.com/kingoflolz/mesh- transformer- jax
+      Tianwei Zhang, and Yang Liu. 2024. BadEdit: Backdooring Large Language             [32] Peng Wang, Zexi Li, Ningyu Zhang, Ziwen Xu, Yunzhi Yao, Yong Jiang, Pengjun
+      Models by Model Editing. In The Twelfth International Conference on Learning             Xie, Fei Huang, and Huajun Chen. 2024. WISE: Rethinking the Knowledge
+      Representations. https://openreview.net/forum?id=duZANm2ABX                              Memory for Lifelong Model Editing of Large Language Models. Advances in
+[15] Zherui Li, Houcheng Jiang, Hao Chen, Baolong Bi, Zhenhong Zhou, Fei Sun,                  Neural Information Processing Systems 37 (2024), 53764­53797.
+      Junfeng Fang, and Xiang Wang. 2025. Reinforced Lifelong Editing for Language       [33] Song Wang, Yaochen Zhu, Haochen Liu, Zaiyi Zheng, Chen Chen, and Jundong
+      Models. In Forty-second International Conference on Machine Learning. https:             Li. 2024. Knowledge Editing for Large Language Models: A Survey. ACM Comput.
+      //openreview.net/forum?id=1jUXprrfcb                                                     Surv. 57, 3, Article 59 (Nov. 2024), 37 pages. doi:10.1145/3698590
+[16] Zhoubo Li, Ningyu Zhang, Yunzhi Yao, Mengru Wang, Xi Chen, and Huajun               [34] Yu Wang, Ruihan Wu, Zexue He, Xiusi Chen, and Julian McAuley. 2025. Large
+      Chen. 2024. Unveiling the Pitfalls of Knowledge Editing for Large Language               Scale Knowledge Washing. In The Thirteenth International Conference on Learning
+      Models. In The Twelfth International Conference on Learning Representations.             Representations. https://openreview.net/forum?id=dXCpPgjTtd
+      https://openreview.net/forum?id=fNktD3ib16                                         [35] Xiaodong Wu, Wenyi Yu, Chao Zhang, and Philip Woodland. 2024. An Improved
+[17] Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay Mohta, Tenghao Huang,                        Empirical Fisher Approximation for Natural Gradient Descent. In Advances in
+      Mohit Bansal, and Colin A Raffel. 2022. Few-Shot Parameter-Efficient                     Neural Information Processing Systems, A. Globerson, L. Mackey, D. Belgrave,
+      Fine-Tuning is Better and Cheaper than In-Context Learning. In Advances
+      in Neural Information Processing Systems, S. Koyejo, S. Mohamed, A. Agar-
+      wal, D. Belgrave, K. Cho, and A. Oh (Eds.), Vol. 35. Curran Associates,
+Can Fine-Tuning Erase Edits? On the Fragile Coexistence of Knowledge Editing and Fine-tuning        KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea
+
+      A. Fan, U. Paquet, J. Tomczak, and C. Zhang (Eds.), Vol. 37. Curran Associates,       Thus, the overall ES can be calculated as:
+      Inc., 134151­134194. doi:10.52202/079017-4264
+[36] Yunzhi Yao, Peng Wang, Bozhong Tian, Siyuan Cheng, Zhoubo Li, Shumin Deng,                                ESCF/zsRE =      1                                             (9)
+      Huajun Chen, and Ningyu Zhang. 2023. Editing Large Language Models: Prob-                                                      ESCF/zsRE
+      lems, Methods, and Opportunities. In The 2023 Conference on Empirical Methods                                             =1 
+      in Natural Language Processing. https://openreview.net/forum?id=NZZB3UGcd8
+[37] Zhengmao Ye, Dengchun Li, Zetao Hu, Tingfeng Lan, Jian Sha, Sicong Zhang,              Paraphrase Success (Paraphrase / PS). Paraphrase evaluates gen-
+      Lei Duan, Jie Zuo, Hui Lu, Yuanchun Zhou, et al. 2023. mLoRA: Fine-Tuning
+      LoRA Adapters via Highly-Efficient Pipeline Parallelism in Multiple GPUs. arXiv       eralization after editing. For each instance , we prepare a set of
+      preprint arXiv:2312.02515 (2023).
+[38] Paul Youssef, Osman Kora, Meijie Li, Jörg Schlötterer, and Christin Seifert.           paraphrases of the base prompt  (,  ). For zsRE, PS is
+      2023. Give Me the Facts! A Survey on Factual Knowledge Probing in Pre-trained
+      Language Models. In Findings of the Association for Computational Linguistics:        the average top-1 accuracy over  (,  ) (Equ. 10). For
+      EMNLP 2023, Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association
+      for Computational Linguistics, Singapore, 15588­15605. doi:10.18653/v1/2023.          CF,      (,  )                succeeds         if  the  model     prefers         over
+      findings- emnlp.1043
+[39] Paul Youssef, Jörg Schlötterer, and Christin Seifert. 2024. The Queen of England                                                                                       
+      is not England's Queen: On the Lack of Factual Coherency in PLMs. In Findings
+      of the Association for Computational Linguistics: EACL 2024, Yvette Graham and        the original  (Equ. 11).
+      Matthew Purver (Eds.). Association for Computational Linguistics, St. Julian's,
+      Malta, 2342­2354. https://aclanthology.org/2024.findings-eacl.155/                            PSzsRE  =  1            =  arg  max    ed      |  ( ,  )                  (10)
+[40] Paul Youssef, Christin Seifert, and Jörg Schlötterer. 2026. Persuasion Tokens for                                               
+      Editing Factual Knowledge in LLMs. In Proceedings of the 19th Conference of the
+                                                                                                                       1
+      European Chapter of the Association for Computational Linguistics (Volume 2: Short
+      Papers), Vera Demberg, Kentaro Inui, and Lluís Marquez (Eds.). Association for                               =1
+      Computational Linguistics, Rabat, Morocco, 475­486. doi:10.18653/v1/2026.eacl-
+      short.35                                                                                      PSCF    =  1            ed      |      > ed         |                     (11)
+[41] Paul Youssef, Zhixue Zhao, Daniel Braun, Jörg Schlötterer, and Christin Seifert.                                                               
+      2025. Position: Editing Large Language Models Poses Serious Safety Risks. In
+      Forty-second International Conference on Machine Learning Position Paper Track.                                  1                             
+      https://openreview.net/forum?id=QLKBm1PaCU
+[42] Paul Youssef, Zhixue Zhao, Jörg Schlötterer, and Christin Seifert. 2025. How to                               =1
+      Make LLMs Forget: On Reversing In-Context Knowledge Edits. In Proceedings of
+                                                                                               Neighborhood Success (Specificity / NS). Specificity assesses edit
+      the 2025 Conference of the Nations of the Americas Chapter of the Association for     locality by measuring unwanted impact on facts unrelated to the
+      Computational Linguistics: Human Language Technologies (Volume 1: Long Papers),       edit. For each instance , we prepare a set of KE-irrelevant prompts
+      Luis Chiruzzo, Alan Ritter, and Lu Wang (Eds.). Association for Computational         neighborhood(,  ). Equ. 12 and 13 give the NS definitions for
+      Linguistics, Albuquerque, New Mexico, 12656­12669. doi:10.18653/v1/2025.naacl-        zsRE and CF, respectively, where  (,  ) denotes the unrelated
+      long.630                                                                              facts for zsRE:
+[43] Paul Youssef, Zhixue Zhao, Christin Seifert, and Jörg Schlötterer. 2025. Has this
+      Fact been Edited? Detecting Knowledge Edits in Language Models. In Proceedings                NSzsRE  =  1            =  arg  max      ed    |  ( ,  )                  (12)
+                                                                                                                                     
+      of the 2025 Conference of the Nations of the Americas Chapter of the Association for
+      Computational Linguistics: Human Language Technologies (Volume 1: Long Papers),                                  1
+      Luis Chiruzzo, Alan Ritter, and Lu Wang (Eds.). Association for Computational
+      Linguistics, Albuquerque, New Mexico, 9768­9784. doi:10.18653/v1/2025.naacl-                                 =1
+      long.492
+[44] Paul Youssef, Zhixue Zhao, Christin Seifert, and Jörg Schlötterer. 2026. Tracing               NSCF    =  1            ed      |      < ed         |                     (13)
+      and Reversing Edits in LLMs. In The Fourteenth International Conference on                                                                    
+      Learning Representations. https://openreview.net/forum?id=AiT8F6pbfi
+[45] Ce Zheng, Lei Li, Qingxiu Dong, Yuxuan Fan, Zhiyong Wu, Jingjing Xu, and                                          1                             
+      Baobao Chang. 2023. Can We Edit Factual Knowledge by In-Context Learning?.
+      In Proceedings of the 2023 Conference on Empirical Methods in Natural Language                               =1
+      Processing, Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association for
+      Computational Linguistics, Singapore, 4862­4876. doi:10.18653/v1/2023.emnlp-          B Supplementary Results
+      main.296
+                                                                                            B.1 KE results breakdown
+
+                                                                                            The full set of experimental combinations mentioned in below
+                                                                                            charts can be found in Tab. 1. Detailed KE performances under FT
+                                                                                            of GPT2-XL, GPT-J, Llama2-7b and Llama3.1-8b are available at our
+                                                                                            Github repository (see KE results).
+
+                                                                                            B.2 FT results breakdown
+
+                                                                                            Detailed downstream task performances of  ,   and _  are
+                                                                                            presented in our repository along with the extended observations.
+
+A Knowledge Editing metrics                                                                 B.3 Performance on HotpotQA
+
+We adopt metrics from prior work [23, 36]. For each zsRE edit                               In this section, we evaluate the model's KE performance after fine-
+                                                                                            tuning on HotpotQA. The hyperparameters for this experiment are
+in ed, let  ,  ,  be the subject, relation, and target object, and                          consistent with those used in the Commonsense dataset. We then
+                                                                                            compare the results with the performance of models fine-tuned on
+ (,   )  the  base  prompt.  For  CF,          denotes      the  original  (real-world)     the Commonsense dataset. As shown in Tab. 9, the HotpotQA group
+                                                                                            consistently demonstrates lower KE performance compared to the
+                                                                                            Commonsense group. Regarding ES, the largest performance gap is
+                                                                                            observed with GPT-J edited with 100 zsRE edits using MEMIT, with
+object, and paraphrases(,  ) and neighborhood(,  ) the para-                                a difference of 14.31. Based on result validation (see Validation),
+
+phrase and neighborhood prompt sets. Given prompt , ed ( | )                                Table 9: KE performance (%) after fine-tuning using
+                                                                                            Commonsense1 and HotpotQA2 datasets.
+is the model's predicted probability of token . Although current
+
+KE metrics may be unreliable [20], we focus on relative changes
+
+before and after FT, reducing reliance on their absolute values.
+
+ES Success (Efficacy / ES). Efficacy measures the proportion of
+
+successful edits. For zsRE,  succeeds if  assigns the highest                               #Edits KE Model Dataset FT ES (HQA) ES (CS1) PS (HQA2) PS (CS) NS (HQA) NS (CS)
+
+probability to  under  (,  ) (Equ. 7). For CF,  succeeds if                                 102 MT Llama2 zsRE DoRA   72.76         76.3         69.65  71.69  33.02  29.69
+                                                                                            104 AE Llama2 CF LoRA      68           70.18        48.4   64.32  83.67  62.35
+assigns  higher  probability    to        than     to       under     (,  )  (Equ.  8):     102 MT GPT-J zsRE DoRA                  89.87        70.63  84.62  35.71  27.64
+                                                                                            103 MT GPT-J CF LoRA      75.56         99.7         87.7   90.9   82.6   79.58
+                                                                                            103 MT GPT2-XL zsRE DoRA   100          45.18        27.83  43.62  29.15  24.35
+                                                                                            104 AE GPT2-XL CF LoRA    39.84         53.91        32.19  41.94  78.15  71.81
+                    ESzsRE  =1    =  arg  max      ed    |   ( ,  )                 (7)                               41.56
+                                           
+
+              ESCF  =1    ed      |  ( ,  )      > ed          |  ( ,  )            (8)
+                                                            
+
+                                                             
+KDD '26, August 09­13, 2026, Jeju Island, Republic of Korea                                                                 Yinjie Cheng et al.
+
+differences in performance are unlikely to stem from hyperparame-
+ter selections. It could indicate that knowledge-rich datasets
+cause greater degradation in KE performance. Further analysis
+is needed to explore this phenomenon.
+
+B.4 Performance on DeepSeek                                                       Figure 8: Significance test results across models. The format
+                                                                                  of Y label is KE method-KE dataset, e.g. AE-zsRE means run-
+When attempting to edit DeepSeek, we evaluated three configu-                     ning AlphaEdit on zsRE dataset.
+rations of editing layers: (1) layers identified via Causal Tracing
+with Frozen Components (CTFC) [24], (2) the layer settings used                   Table 10: Standard deviation analysis: Avg. DS Perf = average
+for LLaMA2, and (3) those used for GPT-2 XL.                                      downstream performance; SD = standard deviation.
+
+   The detailed results of layer selection, along with theoretical                  Model       Metric     Method   SD (%)
+justification for these setups, are available in our repository. The               GPT2-XL      Efficacy
+overall KE performance on the zsRE dataset, with edit counts rang-                                         MT-zsRE   0.33
+ing from 0 to 10,000, is also attached. For 10,000 edits, all config-                GPT-J   Avg. DS Perf   MT-CF    0.22
+urations perform poorly. Under the CTFC setting, increasing the                                 Efficacy   AE-zsRE   0.33
+number of edits from 1,000 to 10,000 causes a sharp decline in ES,                LLama2-7b                 AE-CF    0.24
+from 20.17% to just 0.4%. This degradation may arise from archi-                             Avg. DS Perf   DoRA     8.93
+tectural differences between GPT-series and Llama-based models,                                 Efficacy    LoRA     5.27
+as well as discrepancies in pre-training data that hinder accurate
+simulation of the initial weights 0 [34], ultimately reducing KE                             Avg. DS Perf  MT-zsRE   0.16
+effectiveness. Moreover, once performance collapses after 10,000                                            MT-CF    0.11
+edits, it becomes highly vulnerable to further degradation during                                          AE-zsRE   0.14
+fine-tuning, often approaching near-zero accuracy. This instability                                         AE-CF    0.09
+prevents meaningful comparison of KE effectiveness before and                                               DoRA     4.83
+after fine-tuning on the zsRE dataset. As a result, we do not perform                                       LoRA     3.71
+additional fine-tuning experiments on DeepSeek.                                                            MT-zsRE   0.36
+                                                                                                            MT-CF    0.49
+B.5 Only Fine-tuning Edited or Non-Edited                                                                  AE-zsRE   0.15
+       Layers                                                                                               AE-CF    0.13
+                                                                                                            DoRA     2.13
+For FT with selected layers, we choose Llama2 and GPT-J for ex-                                             LoRA     1.77
+periments. The detailed results along with its analysis are attached
+in our repository.                                                                suggesting that fine-tuning exerts a strong and targeted influence on
+                                                                                  the model. For method-wise, we calculate a p-value by FT methods
+B.6 Activation related analysis                                                   for each model. DoRA, LoRA, and full FT have p-values of 3.29×10-5,
+                                                                                  4.46 × 10-5, and 0.009, respectively. These low values indicate that
+UMAP is a nonlinear dimensionality reduction method based on                      the performance differences are statistically significant and largely
+manifold theory that maps data into a lower dimensional space                     driven by the choice of FT method rather than variability KE setups.
+for visualization and clustering [22]. Eqn. 14 is the loss function
+used for dimensionality reduction, where  is the weight of  in                       Multi-seed run. Since KE does not involve model re-training, we
+the high dimensional case and  is that in the low dimensional                     apply multi-seed runs only during the FT stage. For each PEFT
+case for a single sample  in all samples . Visualized analysis on                 method and each model, we add two additional seeds ({1, 2}), yield-
+activations of FT and KE prompts can be accessed here.                            ing 12 extra tests. Comparing the average downstream perfor-
+                                                                                  mance across seeds, the absolute differences are 3.7%, 5.4%, and
+L  =       ( )  log (   ( )  )  +  (1  -    ( )  )  log (    1  -   ( )  )  (14)  4.3% for GPT-2 XL, GPT-J, and Llama2-7B, respectively. Overall,
+                        ( )                                  1  -   ( )           the multi-seed results show only modest variability across models,
+                                                                                  with performance remaining broadly stable.
+
+C Statistical analysis                                                               Standard deviations. For KE, we compute the standard deviation
+                                                                                  of Efficacy for  across different sampled edits. For FT, we com-
+   Significance Test. We apply a paired t-test to assess the statistical          pute the standard deviation of average downstream performance
+significance of differences in KE performance between each                        across runs with different seeds. To save time, we adopt an edit
+and its _  counterpart. For model-wise, we compute p-values by                    number of 10, 000 to examine the deviation under the most critical
+models for each FT method using paired samples across edits from                  circumstances. As shown in Tab. 10, LoRA exhibits more stable per-
+100 to 10, 000. As shown in Fig. 8, GPT-2 XL yields consistently low              formance than DoRA under varying seeds, while for KE methods,
+p-values under both DoRA and LoRA, indicating that FT produces                    AlphaEdit shows a smaller standard deviation than MEMIT.
+a genuine and substantial effect on KE performance. For Llama, full
+FT leads to the most pronounced performance reduction among                       D Reproducibility
+all models. Most GPT-J cases remain low with a few exceptions,
+                                                                                  Environment specification and implementation examples can be
+                                                                                  accessed in our repository.
+

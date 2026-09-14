@@ -1,0 +1,982 @@
+                                        FINE-TUNED IN-CONTEXT LEARNERS
+                                        FOR EFFICIENT ADAPTATION
+
+                                        Jo¨rg Bornschein          Clare Lyle                           Yazhe Li
+                                        Google DeepMind           Google DeepMind                      Microsoft AI
+
+                                        Amal Rannen-Triki  Xu Owen He              Razvan Pascanu
+                                        Google DeepMind    MakerMaker AI           Google DeepMind
+
+arXiv:2512.19879v1 [cs.LG] 22 Dec 2025                                             ABSTRACT
+
+                                                  When adapting large language models (LLMs) to a specific downstream task, two
+                                                  primary approaches are commonly employed: (1) prompt engineering, often with
+                                                  in-context few-shot learning, leveraging the model's inherent generalization abil-
+                                                  ities, and (2) fine-tuning on task-specific data, directly optimizing the model's
+                                                  parameters. While prompt-based methods excel in few-shot scenarios, their effec-
+                                                  tiveness often plateaus as more data becomes available. Conversely, fine-tuning
+                                                  scales well with data but may underperform when training examples are scarce.
+                                                  We investigate a unified approach that bridges these two paradigms by incorpo-
+                                                  rating in-context learning directly into the fine-tuning process. Specifically, we
+                                                  fine-tune the model on task-specific data augmented with in-context examples,
+                                                  mimicking the structure of k-shot prompts. This approach, while requiring per-
+                                                  task fine-tuning, combines the sample efficiency of in-context learning with the
+                                                  performance gains of fine-tuning, leading to a method that consistently matches
+                                                  and often significantly exceeds both these baselines. To perform hyperparame-
+                                                  ter selection in the low-data regime, we propose to use prequential evaluation,
+                                                  which eliminates the need for expensive cross-validation and leverages all avail-
+                                                  able data for training while simultaneously providing a robust validation signal.
+                                                  We conduct an extensive empirical study to determine which adaptation paradigm
+                                                  - fine-tuning, in-context learning, or our proposed unified approach offers the best
+                                                  predictive performance on a concrete data downstream-tasks.
+
+                                        1 INTRODUCTION
+
+                                        The rapid progress in Large Language Models (LLMs) has unleashed a flood of new techniques for
+                                        adapting these powerful models to specific downstream tasks. A wide spectrum of approaches have
+                                        been proposed, from established methods like full fine-tuning or parameter-efficient fine-tuning to
+                                        a diverse array of prompting techniques, including in-context learning, retrieval-augmented genera-
+                                        tion, and beyond (Schulhoff et al., 2024). Irrespective of the chosen adaptation strategy, the avail-
+                                        ability of ground-truth or "golden" data remains essential, not only for evaluating the efficacy of the
+                                        chosen method, but also for tuning relevant hyper-parameters. Within this landscape, fine-tuning
+                                        and in-context few-shot learning (Brown et al., 2020) can be seen as two cornerstone techniques
+                                        for adapting LLMs. In the former, the model's parameters are directly optimized on task-specific
+                                        data, enabling it to learn nuanced patterns and potentially achieve superior performance with suf-
+                                        ficient training data. In contrast, in-context learning leverages the model's pre-trained knowledge
+                                        and generalization capabilities by providing a few illustrative examples within the prompt, offering
+                                        a sample-efficient approach particularly suitable when data is limited. However, in-context learn-
+                                        ing's effectiveness is intrinsically tied to the generalization abilities of the model and is generally
+                                        expected to not scale as effectively with larger datasets and number of examples in-context (Wang
+                                        et al., 2023; Li et al., 2024).
+
+                                           Corresponding Author: bornschein@google.com
+                                            Work done while at Google DeepMind
+
+                                                                                                   1
+We here investigate a unified approach that bridges these two paradigms. Instead of fine-tuning on
+individual examples, we fine-tune a model on k-shot in-context prompts. During inference, the fine-
+tuned model is again supplied with k in-context examples from the training set in addition to the test-
+point. We conduct an extensive empirical study comparing the sample efficiency of these approaches
+across a range of downstream tasks and model sizes. Prior work has explored training on k-shot ICL
+examples, however generally from a meta-learning perspective (Min et al., 2022; Chen et al., 2022).
+We focus on a different scenario: Given a concrete downstream task, which paradigm offers the
+best predictive performance, particularly when task-specific data is limited?
+
+All approaches rely on adequately chosen hyperparameters. For ICL, these relate to prompt
+construction and response parsing , while for FT, they involve factors like learning rate and number
+of training epochs. While the literature and established best practices offer reasonable starting
+points, optimizing these hyperparameters for a specific task often yields significant performance
+gains. However, the challenges of hyperparameter selection in few-shot and small-data regimes
+are often overlooked. Prior work frequently tunes hyperparameters on large held-out sets, a
+luxury not available in data-scarce scenarios. To address this, we propose a hyperparameter tuning
+protocol that is both data- and computationally efficient, allowing for a fair comparison of ICL
+and fine-tuning approaches under realistic data constraints. Our protocol, grounded in prequential
+evaluation, avoids sacrificing valuable ground-truth data for hyperparameter selection alone, while
+providing a principled and robust assessment of model performance.
+
+We summarize the paper's contributions as follows.
+
+       1. We propose to adapt LLMs to specific downstream tasks by fine-tuning on k-shot in-context
+          learning prompts, combining sample efficiency of in-context learning with the flexibility
+          and scaling of fine-tuning.
+
+       2. We introduce a practical and efficient hyperparameter tuning protocol based on prequential
+          evaluation, eliminating the need for separate validation sets and enabling effective fine-
+          tuning in data-scarce scenarios.
+
+       3. We conduct an extensive empirical study to investigate the sample efficiency of in-context
+          learning, standard fine-tuning, and our proposed approach across various model sizes and
+          data-set scales.
+
+2 RELATED WORK
+
+Training on k-shot in-context learning examples has been explored previously, for example by Min
+et al. (2022) and Chen et al. (2022). However, these works take a meta-learning perspective and
+first train a model on a diverse set of ICL tasks, and then apply the frozen model to an unseen
+task at test-time. The authors demonstrate that such ICL-trained models exhibit improved perfor-
+mance on unseen tasks when provided with k-shot examples. Similarly, Wei et al. (2023) train on
+a meta-distribution of ICL tasks, however propose to remap meaningful label identifier to random,
+uninformative identifiers to force the model to rely on in-context information instead of relying on
+in-weights knowledge aquired during pre-training. We here instead focus on the converse scenario:
+Faced with a specific downstream task with only relatively few ground-truth examples, how can
+we best adopt the model for our purpose? Concurrent work by Zhu et al. also explores leveraging
+in-context information during gradient-based training through 'context-enhanced learning' ; how-
+ever, their method specifically avoids computing autoregressive gradients on the contextual helper
+material, unlike our ICL+FT approach, which fine-tunes directly on k-shot prompts where the entire
+prompt structure informs the gradient updates.
+
+Numerous works have investigated the sample efficiency of ICL, with some recent studies extending
+to the many-shot regime with hundreds or even thousands of examples (Bertsch et al., 2024; Agarwal
+et al., 2024). Liu et al. (2022) and Mozes et al. (2023) highlighted the effectiveness of fine-tuning
+in the few-shot regime when introducing parameter-efficient fine-tuning (PEFT) methods, while
+Mosbach et al. (2023) recently presented a comparison of ICL and fine-tuning. Prompt- and prefix-
+tuning (Li and Liang, 2021) approaches, as well as modern variants thereof (Lu et al., 2025) also
+
+                                                           2
+    Algorithm 1: ICL+FT Prequential Training and Evaluation.
+
+    Input : Dataset D = {(xi, yi)}Ni=1 (N training examples)
+                 Number of in-context examples K
+
+             Gradient steps per example (number of epochs) E
+
+                 Initial model parameters 0
+    Output : Model parameters N
+
+                 Avg. prequential performance metric LN/N
+
+1 Initialize cumulative loss L0  0 ;
+2 for i = 1 to N do
+
+3 Sample min(K, i) context examples ctx  D<i ; // k-shot ICL context from prev. data
+
+4 y^i  p(· | ctx  xi, i-1) ;          // Predict yi given xi and k-shot ICL context
+
+5 li = loss(y^i, yi) ;                                        // Calculate next-step loss
+
+6       Li = Li-1 + li ;                                            // Update cumulative loss
+
+7 for 1 to E do
+
+8            Sample min(K, i) context examples ctx  D<i ; // k-shot ICL context from prev. data
+
+9            i = i-1 -  log p(ctx  xi  yi | i-1) ;                  // Gradient step
+
+10      end
+
+11 end
+
+    show the continued effectiveness of gradient based methods especially when the number of available
+    ground-truth exampels exceeds a hand full(Wang et al., 2023; Li et al., 2024).
+
+    Another line of research reveals scenarios where context-based approaches can outperform fine-
+    tuning in terms of generalization. Berglund et al. (2023) showed that pretrained LLMs struggle
+    to generalize simple relations learned via gradient updates (e.g., "A=B" to "B=A"), but generalize
+    effectively when such information is presented in context. Similarly, Allen-Zhu and Li (2023) and
+    Wang et al. (2024) studied related limitations of storing and accessing factual knowledge in the
+    weights of transformers trained from scratch. These findings suggest complementary strengths and
+    weaknesses between gradient-based adaptation and context-based approaches. We here study fine-
+    tuning on k-shot ICL examples and consider this an initial step towards unifying these learning
+    paradigms, aiming to leverage the advantages of both.
+
+    3 PREQUENTIAL HYPERPARAMETER SELECTION
+
+    In this paper, we consider the data-limited scenario, where hyperparameter selection presents a sig-
+    nificant challenge. In this regime, standard train/validation splits can become problematic, leading
+    to unreliable results. (K-fold) cross-validation, while suitable for stateless methods like ICL, re-
+    quires many repeated training runs for FT approaches and is thus computationally expensive and
+    unwieldy to use. We propose instead to draw inspiration from prequential analysis for data-efficient
+    hyperparameter selection.
+
+    Prequential evaluation, also known as forward validation, boasts a rich history in statistical learning
+    (Dawid, 1984; Philip Dawid and Vovk, 1999; Gru¨nwald, 2007; Gru¨nwald and de Rooij, 2005).
+    While prequential approaches have found some applications in deep learning, for example in neural
+    architecture search and hyperparameter selection (Lyle et al., 2020; Ru et al., 2021), identifying
+    (causal) structure (Bornschein et al., 2023), evaluating visual feature extractors (Li et al., 2023), and
+    as a heuristic for characterizing the efficiency of in-context learning (Elmoznino et al., 2025), they
+    do not enjoy the same popularity as cross-validation, whose comparative sample-inefficiency is not
+    typically a barrier for the scale of problems on which deep neural networks are trained.
+
+    Prequential evaluation is a method for statistical model selection. It works by decomposing the log
+    probability of a data sequence, xn = x1, . . . , xn, into a sum of sequential predictive probabilities:
+
+                                      n
+
+                                      log p(xn) = log p(xi+1|xi) .                               (1)
+
+                                      i=0
+
+    Under this framework, a good model is one that consistently assigns a high likelihood to the next
+    observation throughout the learning process. This demonstrates both data efficiency and strong final
+    predictive performance. This approach is justified by principles like the minimum description length
+
+                                                    3
+(MDL) (Bornschein et al., 2023) and its relation to the Bayesian marginal likelihood (van der Wilk
+et al., 2018).
+
+We apply this perspective to hyperparameter selection by following an iterative procedure: Each
+available data point serves first as a test point for performance assessment and is then incorporated
+into the training data. Once an observation is considered training data, we use it to compute gradient
+based parameter updates, and as in-context examples for conditioning. This yields two main bene-
+fits: first, it is highly data-efficient as every data point contributes to the hyperparameter selection
+criterion; second, it is highly flexible in that once a data point has been evaluated we can train on it
+for as many additional epochs as is required. Our implementation, for example, performs E gradient
+steps on k-shot ICL sequences sampled from all previously seen examples for each newly evaluated
+example. Algorithm 1 provides a detailed procedural outline of our method.
+
+Prequential evaluation is not only sample-efficient, but also computationally efficient compared to
+repeated held-out evaluations. When using log-likelihood as the evaluation metric, the loss compu-
+tation step is free, as it is computed during the first gradient step with each new example. In contrast,
+evaluation with separate validation sets can be considerably more expensive. For instance, in our
+experiments, the test-set evaluations (typically on O(100) examples repeated at 6 training set size
+positions) often dominated the overall computational cost, typically accounting for 1/2 to 2/3 of the
+overall runtime. See Appendix A for more details and background on the prequential approach.
+
+The prequential performance is a well-motivated metric for model and hyperparameter selection,
+but it can not be directly compared to the expected performance on held-out data, as it also in-
+corporates the model's performance early during training on few examples only. We here use the
+prequential approach for fine-tuning and for hyper-parameter selection; all reported metrics are then
+however computed on held-out test sets. The combination of in-context learning and fine-tuning
+(ICL+FT ) that we propose can be employed independently of the prequential approach (see Sec-
+tion 4), however, we find that in practice, these methods complement each other favourably. After
+a single prequential training run we obtain both a performance metric for model selection and the
+final model parameters, ready for deployment.
+
+4 EXPERIMENTS
+
+Our empirical study comprises two parts. First, we conduct an extensive investigation into the
+sample efficiency of ICL-Only, FT-Only, and the combined ICL+FT approach across a diverse set
+of downstream tasks. These experiments show that fine-tuning based methods often outperform
+ICL-Only with as few as 10 to 100 examples, and that ICL+FT consistently matches or exceeds the
+performance of the better-performing individual method. Secondly, we perform a series of ablation
+studies to shed light on the properties, strengths, and weaknesses of ICL, FT and the prequential
+hyper-parameter selection scheme.
+
+For the majority of our experiments we utilize open-source Gemma-2 models (Gemma Team, 2024),
+available in 2B, 9B, and 27B parameter sizes. We employ Adafactor (Shazeer and Stern, 2018) as
+the optimizer due to its reduced memory footprint compared to Adam. Unless otherwise specified,
+we consistently explore the hyperparameter space: learning-rate  {1e-4, 2e-4, 3e-4} and num-
+ber of epochs E  {1,2,5,10,15}. Appendix D presents additional experiments with models from
+the Qwen-3 family. For both FT-Only and ICL+FT we adopt the prequential training and hyper-
+parameter selection approach. The hyperparameter configuration yielding the highest prequential
+performance is selected and subsequently evaluated on the held-out test data, ensuring no infor-
+mation leakage. For robustness, each experiment is repeated 5 times with different random seeds
+and we report the 2 standard error of the mean ( 95% confidence interval) on all metrics. To
+investigate sample efficiency, we often subsample larger datasets. To simulate realistic scenarios,
+and to minimize variance in hyperparameter comparisons, this subsampling process is determinis-
+tic, controlled by the random seed. This ensures consistent training and test data across different
+configurations for a given seed. Consequently, the sample-efficiency plots visualize the expected
+performance when training on datasets of varying sizes, while all model and parameter selection
+procedures operate under concrete, data-constrained conditions. If not mentioned otherwise we do
+not provide any instruction prefix or otherwise manually constructed prompt to these models. For
+FT-Only we train straight on x  y pairs, where x denotes a query, y the desired response and 
+string concatenation. For ICL+FT we prefix the newest training point with the k-shot context ex-
+
+                                                           4
+                 Model Size                                         Model Size
+
+Method      2B   9B          27B               Method       2B      9B              27B
+
+FT-Only   27.3%  52.8%       62.6%             FT-Only    50.7%     69.7%           72.6%
+ICL-Only  37.2%  57.1%       64.6%             ICL-Only   37.6%     56.6%           64.2%
+ICL+FT    55.3%  68.7%       72.3%             ICL+FT     67.5%     78.7%           81.8%
+
+Test-set accuracy after using 30 examples.     ... after using all but 100 examples. ICL-Only
+ICL-Only Gemini 1.5 Pro achieves 72.8%         Gemini 1.5 Pro achieves 76.6%
+
+Table 1: Average test-set accuracy over 23 BBH tasks. Left: after using 30 or, right, all but
+100 ground truth examples (= 150 examples for most tasks). For ICL-Only we report the best
+performing {1, 3, 5, 10, 15, 30, 100}-shot performance. Note that ICL+FT with a smaller models
+often outperforms ICL-Only larger models by considerable margin.
+
+Figure 1: Two representative results from the Big-Bench-Hard suite with between 3 and 150 ground
+truth examples. We observe the typical signature where ICL+FT performs on-par with ICL-Only
+when very few examples are available, but improves similarly or better than FT-Only with more
+training data. Appendix C.1 shows the individual results on all 23 BBH tasks.
+
+amples iK=1"Next example: "  xi  yi. For training we place a loss and compute gradients based
+on all responses yi in the sequence. K therefore also acts similar to a batch-size parameter. For
+evaluation, we omit the ground truth label y and sample a continuation y^ from the model. We then
+
+compare y and y^, ignoring leading/trailing whitespace and other idiosyncrasies of instruction-tuned
+
+models. For classification tasks, we use the MAP prediction y^ = arg maxy p(y| · · · ) instead of
+sampling. See Appendix B for details, example prompts and training sequences.
+
+Big Bench Hard. We conduct an extensive methods comparison on the Big Bench Hard dataset
+(BBH, Suzgun et al., 2022), comprising of 23 tasks identified as challenging for state-of-the-art
+LLMs in 2022. Most tasks provide 250 examples, with the exception of Causal Judgment, Penguins
+in a Table and Snarks, which only provide 187, 146 and 178 examples respectively. We emphasize
+that the prequential training and evaluation protocol described in Section ?? does not necessitate a
+separate held-out set, allowing practitioners to utilize all data points for training. However, for the
+purpose of this report we reserve 100 examples from each BBH task exclusively for reporting test-set
+accuracy. As a result, for most tasks we have 150 examples available for training and hyperparameter
+selection. We evaluate ICL-Only , FT-Only and ICL+FT with all three Gemma model sizes.
+
+To investigate sample-efficiency we apply these methods Table 2: Avg. held-out accuracy on
+
+to subsets of 3, 5, 10, 30, 100 and the full set of (usually) 11 NLP tasks. Wei et al. (2023) report
+
+150 examples. Figure 2 shows typical results for BBH 84.4% with their proposed method com-
+
+Dyck Languages and Geometric-Shapes. Appendix C.1 pared to 82.2% for standard ICL with a
+
+presents the full suite of results. ICL+FT is for almost all 540B Flan-PaLM model.
+
+model sizes and sample-size budgets the best perform-                      Model Size
+
+ing approach, or it shares that position with the better  Method      2B     9B         27B
+one of ICL-Only or FT-Only within their mutual uncer-
+tainty bands. Typically, ICL+FT performs on-par with      FT-Only   77.7%  81.2%       82.6%
+ICL-Only when very few examples are available, but im-    ICL-Only  74.9%  82.1%       82.5%
+proves with the availability of more data analogously to  ICL+FT    84.3%  85.1%       86.4%
+
+FT-Only. ICL-Only on the other hand is generally not able to make effective use of additional in-
+
+context examples. Figure 3 provides a holistic view of performance scaling with respect to data
+
+                                            5
+Figure 2: Two representative results from the Big-Bench-Hard suite with between 3 and 150 ground
+truth examples. We observe the typical signature where ICL+FT performs on-par with ICL-Only
+when very few examples are available, but improves similarly or better than FT-Only with more
+training data. Appendix C.1 shows the individual results on all 23 BBH tasks.
+
+Figure 3: Average test-set performance across 23 BBH tasks. Left: Performance as a function of
+the number of ground-truth examples (3 to 150) for a fixed model size. Right: Performance as a
+function of model size (2B to 27B parameters) for a fixed number of training examples.
+
+availability and model size. It shows the average performance across all BBH tasks, varying either
+the number of training examples for a fixed model size or as a function of model size for a fixed
+training data budget. We summarize the results on BBH in Table 1 and highlight that over a wide
+range of data-budgets and model-sizes ICL+FT surpasses models that are three times larger; or, al-
+ternatively for same-sized models reduces the data-demand by a factor of 3-10 to obtain the same
+test-set performance.
+
+NLP task suite. We compare the methods on the 11 evaluation tasks used by Wei et al. (2023).
+Many of these have only 50, the rest up to 100 examples available. We use the same hyperparameter
+search-space as before. To estimate held-out performance for the prequentially trained models we
+repeat training on 5 different permutations of the data and report the average accuracy of the last 10
+examples for the best hyper-parameter configuration according to the prequential average accuracy.
+Thus effectively reporting the expected performance estimated on 50 held-out examples. For ICL-
+Only we use 1, 2, 5, 10, 15 and 20 in-context examples and report the best-performing choice.
+We observe that ICL-Only scales better with number of examples than on the BBH datasets and
+performance often increases up to 10-20 in-context examples before saturating. Without exception,
+ICL+FT is on-par or exceeding ICL-Only for all model sizes. Furthermore, on many tasks the 9B
+or even the 2B model remains competitive or outperforms 27B ICL-Only, leading to significant
+compute and energy savings if such a model was deployed. Especially considering that the provided
+context size per inference is usually less than half of ICL-Only (Table 2 and Appendix C.2).
+
+Parity-20 Task. To demonstrate the in-context capabilities of LLMs Agarwal et al. (2024) propose
+a task where the model is presented with 20 digit long 0 or 1 strings and is expected to compute
+the parity by producing Even or Odd for each digit. We confirm the positive correlation between
+the number of in-context examples and performance for Gemini Pro 1.5 ICL-Only and observe a
+sequence match accuracy of about 20% when providing 100 in-context examples, which is consistent
+with their findings. Gemma-2 27B ICL-Only performs significantly weaker, struggling to reach
+2% accuracy even with 300 examples. However, fine-tuning leads to dramatic improvements: FT-
+Only requires about 100 examples to achieve 100% accuracy, and ICL+FT requires only about 30
+examples (Fig. 4, left). In conclusion: While ICL-Only shows consistent improvements with more
+
+                                                           6
+Figure 4: Left: Parity-20 task from Agarwal et al. (2024) Right: FLoRes English to Kurdish
+translation task with Gemma-2 27B.
+
+Table 3: Average BBH test-set accuracy when using (per-dataset) prequential hyper-parameter se-
+lection (per ds column) vs. using fixed, globally chosen hyper-parameters (global column). We
+consider the scenarios with either 30 or 150 ground-truth examples. All accuracies have ±2% con-
+fidence estimated over 5 seeds. ICL+FT is more robust to hp choices and degrades only minimally
+when forgoing individual hp selection completely. See Appendix C.10 for details.
+
+FT-Only                  30 examples        150 examples
+                  per ds global       per ds global 
+
+         27B 62.6% 60.3% 2.2%         72.6% 66.7% 5.9%
+         9B 52.8% 49.8% 2.9%          69.7% 60.2% 9.5%
+         2B 27.3% 25.6% 1.7%          50.7% 46.3% 4.4%
+
+ICL+FT   27B 72.3% 72.6% -0.3%        81.8% 79.1% 2.7%
+         9B 68.8% 69.1% -0.3%         78.7% 77.7% 1.0%
+         2B 55.3% 54.9% 0.4%          67.5% 65.4% 2.1%
+
+in-context examples, it's overall sample-efficiency is more than an order of magnitude weaker than
+fine-tuning based approaches.
+
+FLoRes: Low-resource language translation. Building upon previous research that explored the
+advantages of ICL-Only for translating English into low-resource languages (Agarwal et al., 2024),
+we expand our investigation to encompass both ICL+FT and FT-Only. Figure 4 shows the results
+for translating from English into Kurdish and Bemba, utilizing the FLoRes-200 benchmark dataset,
+which comprises 1000 sentence pairs (NLLB Team, 2022). We observe that ICL+FT yields marginal
+yet consistent improvements over ICL-Only, though additional improvements from more translation
+data become barely discernible. In the inverse translation direction, from low-resource languages
+into English, both fine-tuning methods led to a slight, yet noticeable, performance decrease com-
+pared to ICL-Only (see Appendix C.6). We hypothesize that the models primarily leverage trans-
+lation skills acquired during pre-training, and the limited number of examples provided here may
+not suffice for substantial skill enhancement. For translation into English, the typically well-trained
+model might lose some refinement through gradient updates.
+
+Prequential hyperparameter selection. There are two aspects related to hyperparameter selec-
+tion that we investigate here: a) Performance with global hyperparameters: How do the approaches
+perform when using a single set of hyperparameters across all datasets, rather than tuning them
+individually? b) Comparison to standard fine-tuning: Is prequential training and hyperparameter se-
+lection competitive with standard i.i.d. fine-tuning, where training batches are freely sampled from
+a training set?
+
+To investigate the first aspect, we select the single best-performing hyperparameter configuration
+per method and model size, based on average test-set performance. It's crucial to emphasize that
+this selection process utilizes extensive held-out data, which might not be available in practical
+scenarios. Table 5 shows the average results over all BBH tasks when either using this fixed hyper-
+parameter configuration, or the prequential selection process. We observe two consistent trends:
+Automatic selection becomes more impactful when the size of the available data grows; and that
+
+                                                           7
+Table 4: Prequential training (Alg. 1) vs. standard i.i.d. training with Gemma-2 9B. We show
+the averaged accuracy over 23 BBH test-sets. Note that globally-chosen hyper-parameters introduce
+information leakage as a large number of test-set examples are used to chose these. All accuracies
+have ±2% confidence estimated over 5 seeds. We observe that globally chosen hyper-parameters
+with iid. training are competitive with prequential per-dataset tuning; however iid. training does not
+provide any reliable performance metric without additional held-out data.
+
+          30 examples                    150 examples
+                                   preq preq iid
+Training  preq preq iid            per ds global global
+
+Hyper-params per ds global global
+
+FT-Only   52.8% 49.8% 53.2%        69.7% 60.2% 68.1%
+ICL+FT    68.8% 69.1% 68.9%        78.7% 77.7% 78.7%
+
+Figure 5: Left: We revisit the BBH Navigate task with flipped labels (Fig. 15), however optionally
+provide an instruction about the flipped labels in the prompt. Right: Varying the number of in-
+context examples used during training and testing, averaged over a subset of the BBH tasks. The
+left most point corresponds to FT-Only .
+
+ICL+FT is consistently more robust and maintains good performance even with a single globally
+chosen hyper-parameter configuration.
+
+To assess the effectiveness of prequential training compared to standard i.i.d. training, we con-
+ducted a comprehensive hyperparameter sweep with i.i.d. training, selecting the hyperparameters
+that yielded the best overall performance across all 23 BBH test sets. Again, it is crucial to ac-
+knowledge that this procedure relies on a substantial amount of held-out data for hyperparameter
+selection. Table 6 shows that for FT-Only , the i.i.d. approach achieves slightly better average re-
+sults than prequential training. This aligns with observations in the vision domain (Bornschein et al.,
+2023), where i.i.d. training of neural networks can yield marginally better performance when dis-
+regarding the additional data needed for hyperparameter tuning. However, this advantage largely
+disappears when leveraging the efficient hyperparameter selection enabled by prequential training,
+which eliminates the need for separate validation data. Conversely, for ICL+FT , all training and
+hyperparameter tuning approaches resulted in essentially the same test-set performance. This rein-
+forces our observation that ICL+FT is a robust and well-behaved approach requiring less tuning
+than FT-Only .
+
+Interaction with prompt-tuning. Thus far, our experiments have relied solely on in-context ex-
+amples without any explicit task instructions within the prompt. However, prompt engineering --the
+art of crafting verbal cues to guide language models toward desired behavior-- is a well-established
+practice when using LLMs. We here investigate how prefixing the fine-tuning data with an instruc-
+tional prompt can enhance the performance of FT-Only and ICL+FT approaches. Figure 5 shows
+the results an the BBH Navigate task with flipped labels; this time however with optionally prefixing
+each finetuning example with "Important: All answers are flipped! Yes is No and No is Yes! Always
+reply with the opposite of what you consider the right answer!". We provide the same prompt at test
+time when performing predictions and observe that providing such instruction leads to a significant
+uplift in performance for both methods.
+
+Number of in-context examples. We investigate the impact of varying the number of in-context
+examples used during training and inference. Due to computational constraints, we conducted this
+
+                                                           8
+Table 5: Average BBH test-set accuracy when using (per-dataset) prequential hyper-parameter se-
+lection (per ds column) vs. using fixed, globally chosen hyper-parameters (global column). We
+consider the scenarios with either 30 or 150 ground-truth examples. All accuracies have ±2% con-
+fidence estimated over 5 seeds. ICL+FT is more robust to hp choices and degrades only minimally
+when forgoing individual hp selection completely. See Appendix C.10 for details.
+
+FT-Only                   30 examples        150 examples
+                   per ds global       per ds global 
+
+          27B 62.6% 60.3% 2.2%         72.6% 66.7% 5.9%
+          9B 52.8% 49.8% 2.9%          69.7% 60.2% 9.5%
+          2B 27.3% 25.6% 1.7%          50.7% 46.3% 4.4%
+
+ICL+FT    27B 72.3% 72.6% -0.3%        81.8% 79.1% 2.7%
+          9B 68.8% 69.1% -0.3%         78.7% 77.7% 1.0%
+          2B 55.3% 54.9% 0.4%          67.5% 65.4% 2.1%
+
+Table 6: Prequential training (Alg. 1) vs. standard i.i.d. training with Gemma-2 9B. We show
+the averaged accuracy over 23 BBH test-sets. Note that globally-chosen hyper-parameters introduce
+information leakage as a large number of test-set examples are used to chose these. All accuracies
+have ±2% confidence estimated over 5 seeds. We observe that globally chosen hyper-parameters
+with iid. training are competitive with prequential per-dataset tuning; however iid. training does not
+provide any reliable performance metric without additional held-out data.
+
+          30 examples                        150 examples
+                                       preq preq iid
+Training  preq preq iid                per ds global global
+
+Hyper-params per ds global global
+
+FT-Only   52.8% 49.8% 53.2%            69.7% 60.2% 68.1%
+ICL+FT    68.8% 69.1% 68.9%            78.7% 77.7% 78.7%
+
+experiment on a subset of eight BBH tasks. Figure 5 (right) shows the average results across these
+datasets. As detailed in Appendix C.3, we observed that increasing the number of in-context exam-
+ples from zero to one yields the most significant performance gain. Further increases up to around
+five examples provide marginal improvements, after which performance plateaus or even declines.
+
+We also explored varying the number of in-context examples independently for training and infer-
+ence. However, these experiments revealed significant variability across datasets and training set
+sizes, with no consistently discernible patterns. Appendix C.3 presents a selection of these results.
+
+LoRA fine-tuning. We explore using LoRA (Hu et al., 2021) as a memory efficient alternative
+to full fine-tuning, repeating the complete suite of BBH experiments with Gemma-2 9B. Averaged
+over the 23 BBH datasets, LoRA fine-tuning slightly improved FT-Only performance, increasing
+from 52.8% to 59.1% with 30 examples and from 69.7% to 70.2% with 150 examples. For ICL+FT
+the results remained largely unchanged, with performance changing from 68.8% (full fine-tuning) to
+67.6% (LoRA) with 30 examples, and from 78.7% to 78.9% with 150 examples. These results, with
+further details in Appendix C.8, suggest that LoRA fine-tuning has minimal impact on the predictive
+performance of of either FT-Only and ICL+FT . All previously observed trends remain qualitatively
+unchanged for our benchmark data-sets.
+
+5 CONCLUSIONS
+
+In this study, we systematically investigated how to effectively adapt LLMs to downstream tasks
+when ground-truth data is limited. We rigorously compared in-context learning with a fixed model
+(ICL-Only), traditional fine-tuning (FT-Only), and a unified approach that involves fine-tuning on
+k-shot in-context examples (ICL+FT). Our empirical study demonstrated that ICL+FT consistently
+matches or exceeds the performance of both baselines, especially in data-scarce scenarios. The
+success of ICL+FT highlights its ability to leverage the complementary strengths of both approaches
+
+                                                           9
+by incorporating task-specific examples directly into the fine-tuning process, enabling the model to
+learn more efficiently.
+
+Recognizing the challenges of hyperparameter tuning in the small-data regime, we introduced a
+practical and efficient protocol based on prequential evaluation. This method eliminates the need for
+a separate validation set, and our experiments demonstrated its robustness. The combined strategy
+provides a readily applicable solution for adapting LLMs to new tasks, particularly when data is
+scarce.
+
+REPRODUCIBILITY
+
+Our core methodology, including the ICL+FT approach and prequential hyperparameter selection,
+is formally described in Section 3 and detailed in Algorithm 1. All experiments were conducted us-
+ing publicly available Gemma-2 models and established benchmarks (e.g., BBH, FLoRes-200). Our
+gradient-based fine-tuning implementation is based on the official open-source Gemma codebase
+with only minor changes to the training loop to accommodate the prequential procedure. Beginning
+of Section 4 outlines the general experimental setup, including all details regarding optimizer, hyper-
+parameter search space, and seeding strategy. Appendix B provides the concrete prompt templates
+(B.1) and the precise logic for response parsing (B.2).
+
+REFERENCES
+
+R. Agarwal, A. Singh, L. M. Zhang, B. Bohnet, L. Rosias, S. C. Y. Chan, B. Zhang, A. Faust, and
+   H. Larochelle. Many-shot in-context learning. In ICML 2024 Workshop on In-Context Learning,
+   June 2024.
+
+Z. Allen-Zhu and Y. Li. Physics of language models: Part 3.1, knowledge storage and extraction.
+   arXiv preprint arXiv:2309.14316, 2023.
+
+L. Berglund, M. Tong, M. Kaufmann, M. Balesni, A. C. Stickland, T. Korbak, and O. Evans. The
+   reversal curse: LLMs trained on "A is B" fail to learn "B is a". arXiv [cs.CL], Sept. 2023.
+
+A. Bertsch, M. Ivgi, U. Alon, J. Berant, M. R. Gormley, and G. Neubig. In-context learning with
+   long-context models: An in-depth exploration. arXiv [cs.CL], Apr. 2024.
+
+J. Bornschein, S. Chiappa, A. Malek, and R. N. Ke. Prequential mdl for causal structure learning
+   with neural networks. arXiv preprint arXiv:2107.05481, 2021.
+
+J. Bornschein, Y. Li, and M. Hutter. Sequential Learning of Neural Networks for Prequential
+   MDL. In The Eleventh International Conference on Learning Representations, ICLR 2023, Ki-
+   gali, Rwanda, May 1-5, 2023, 2023.
+
+T. B. Brown, B. Mann, N. Ryder, M. Subbiah, J. Kaplan, P. Dhariwal, A. Neelakantan, P. Shyam,
+   G. Sastry, A. Askell, S. Agarwal, A. Herbert-Voss, G. Krueger, T. Henighan, R. Child, A. Ramesh,
+   D. M. Ziegler, J. Wu, C. Winter, C. Hesse, M. Chen, E. Sigler, M.-T. Litwin, S. Gray, B. Chess,
+   J. Clark, C. Berner, S. McCandlish, A. Radford, I. Sutskever, and D. Amodei. Language models
+   are few-shot learners. Neural Inf Process Syst, abs/2005.14165, May 2020.
+
+Y. Chen, R. Zhong, S. Zha, G. Karypis, and H. He. Meta-learning via language model in-context
+   tuning. In S. Muresan, P. Nakov, and A. Villavicencio, editors, Proceedings of the 60th Annual
+   Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 719­
+   730, Dublin, Ireland, May 2022. Association for Computational Linguistics. doi: 10.18653/v1/
+   2022.acl-long.53.
+
+A. P. Dawid. The prequential approach (with discussion). Journal of the Royal Statistical Society,
+   pages 278­292., 1984.
+
+E. Elmoznino, T. Marty, T. Kasetty, L. Gagnon, S. Mittal, M. Fathi, D. Sridhar, and G. Lajoie.
+   In-context learning and occam's razor. In Forty-second International Conference on Machine
+   Learning, 2025. URL https://openreview.net/forum?id=t0ZDijoZbD.
+
+                                                          10
+E. Fong and C. Holmes. On the marginal likelihood and cross-validation. Biometrika, Volume 107,
+   (Volum 107), June 2020.
+
+Gemma Team. Gemma 2: Improving open language models at a practical size. arXiv [cs.CL], July
+   2024.
+
+P. Gru¨nwald and S. de Rooij. Asymptotic log-loss of prequential maximum likelihood codes. In
+   P. Auer and R. Meir, editors, Learning Theory, pages 652­667, Berlin, Heidelberg, 2005. Springer
+   Berlin Heidelberg. ISBN 978-3-540-31892-7.
+
+P. D. Gru¨nwald. The minimum description length principle. MIT press, 2007.
+
+E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, and W. Chen. Lora: Low-rank
+   adaptation of large language models. arXiv preprint arXiv:2106.09685, 2021.
+
+J. Kossen, Y. Gal, and T. Rainforth. In-context learning learns label relationships but is not con-
+   ventional learning. In The Twelfth International Conference on Learning Representations, Oct.
+   2023.
+
+T. Li, G. Zhang, Q. D. Do, X. Yue, and W. Chen. Long-context llms struggle with long in-context
+   learning. arXiv preprint arXiv:2404.02060, 2024.
+
+X. L. Li and P. Liang. Prefix-tuning: Optimizing continuous prompts for generation. arXiv preprint
+   arXiv:2101.00190, 2021.
+
+Y. Li, J. Bornschein, and M. Hutter. Evaluating representations with readout model switching. Int
+   Conf Learn Represent, abs/2302.09579, Feb. 2023.
+
+H. Liu, D. Tam, M. Muqeeth, J. Mohta, T. Huang, M. Bansal, and C. Raffel. Few-shot parameter-
+   efficient fine-tuning is better and cheaper than in-context learning. arXiv [cs.LG], May 2022.
+
+J. Lu, R. Teehan, Z. Yang, and M. Ren. Context tuning for in-context optimization. arXiv preprint
+   arXiv:2507.04221, 2025.
+
+C. Lyle, L. Schut, R. Ru, Y. Gal, and M. van der Wilk. A bayesian perspective on training speed and
+   model selection. Advances in neural information processing systems, 33:10396­10408, 2020.
+
+S. Min, M. Lewis, L. Zettlemoyer, and H. Hajishirzi. MetaICL: Learning to learn in context. In
+   NAACL-HLT, 2022.
+
+M. Mosbach, T. Pimentel, S. Ravfogel, D. Klakow, and Y. Elazar. Few-shot fine-tuning vs. in-
+   context learning: A fair comparison and evaluation. In Rogers, Anna and Boyd-Graber, Jordan
+   and Okazaki, Naoaki, editor, arXiv [cs.CL], Toronto, Canada, May 2023. Association for Com-
+   putational Linguistics".
+
+M. Mozes, J. Hoffmann, K. Tomanek, M. Kouate, N. Thain, A. Yuan, T. Bolukbasi, and L. Dixon.
+   Towards agile text classifiers for everyone. arXiv [cs.CL], Feb. 2023.
+
+NLLB Team. No language left behind: Scaling human-centered machine translation. 2022.
+
+A. Philip Dawid and V. G. Vovk. Prequential probability: principles and properties. Bernoulli, 5(1):
+   125­162, Feb. 1999.
+
+R. Ru, C. Lyle, L. Schut, M. Fil, M. van der Wilk, and Y. Gal. Speedy performance estimation
+   for neural architecture search. In M. Ranzato, A. Beygelzimer, Y. Dauphin, P. Liang, and J. W.
+   Vaughan, editors, Advances in Neural Information Processing Systems, volume 34, pages 4079­
+   4092. Curran Associates, Inc., 2021. URL https://proceedings.neurips.cc/paper files/
+   paper/2021/file/2130eb640e0a272898a51da41363542d-Paper.pdf.
+
+S. Schulhoff, M. Ilie, N. Balepur, K. Kahadze, A. Liu, C. Si, Y. Li, A. Gupta, H. Han, S. Schulhoff,
+   P. S. Dulepet, S. Vidyadhara, D. Ki, S. Agrawal, C. Pham, G. Kroiz, F. Li, H. Tao, A. Srivas-
+   tava, H. Da Costa, S. Gupta, M. L. Rogers, I. Goncearenco, G. Sarli, I. Galynker, D. Peskoff,
+   M. Carpuat, J. White, S. Anadkat, A. Hoyle, and P. Resnik. The prompt report: A systematic
+   survey of prompting techniques. arXiv [cs.CL], June 2024.
+
+                                                          11
+N. Shazeer and M. Stern. Adafactor: Adaptive learning rates with sublinear memory cost. arXiv
+   [cs.LG], Apr. 2018.
+
+M. Suzgun, N. Scales, N. Scha¨rli, S. Gehrmann, Y. Tay, H. W. Chung, A. Chowdhery, Q. V. Le,
+   E. H. Chi, D. Zhou, and J. Wei. Challenging BIG-bench tasks and whether chain-of-thought can
+   solve them. arXiv [cs.CL], Oct. 2022.
+
+M. van der Wilk, M. Bauer, S. John, and J. Hensman. Learning invariances using the marginal
+   likelihood. In S. Bengio, H. Wallach, H. Larochelle, K. Grauman, N. Cesa-Bianchi, and R. Gar-
+   nett, editors, Advances in Neural Information Processing Systems, volume 31. Curran Asso-
+   ciates, Inc., 2018. URL https://proceedings.neurips.cc/paper files/paper/2018/file/
+   d465f14a648b3d0a1faa6f447e526c60-Paper.pdf.
+
+B. Wang, X. Yue, Y. Su, and H. Sun. Grokked transformers are implicit reasoners: A mechanistic
+   journey to the edge of generalization. arXiv preprint arXiv:2405.15071, 2024.
+
+L. Wang, N. Yang, and F. Wei. Learning to retrieve in-context examples for large language models.
+   arXiv preprint arXiv:2307.07164, 2023.
+
+J. Wei, L. Hou, A. K. Lampinen, X. Chen, D. Huang, Y. Tay, X. Chen, Y. Lu, D. Zhou, T. Ma,
+   and Q. V. Le. Symbol tuning improves in-context learning in language models. In The 2023
+   Conference on Empirical Methods in Natural Language Processing, Dec. 2023.
+
+X. Zhu, A. Panigrahi, and S. Arora. On the power of context-enhanced learning in LLMs.
+
+                                                          12
+SUPPLEMENTARY MATERIALS
+A PREQUENTIAL AVERAGE PERFORMANCE
+
+This prequential metric assesses predictive performance during sequential data ingestion, eliminat-
+ing the need for separate test sets and balancing the influence of small and large data regimes.
+Grounded in the principles of prequential analysis (Dawid, 1984; Philip Dawid and Vovk, 1999)
+and prequential Minimum Description Length (MDL) (Gru¨nwald, 2007; Gru¨nwald and de Rooij,
+2005), it has been thoroughly studied and is closely related to marginal likelihood-based model
+selection(Lyle et al., 2020) and leave-k-out cross-validation (Fong and Holmes, 2020). Recent ap-
+plications in deep learning include facilitating causal structure discovery (Bornschein et al., 2021),
+performing neural architecture search (Ru et al., 2021), and evaluating visual representations (Li
+et al., 2023). In this work, we specifically leverage prequential evaluation for its effectiveness in hy-
+perparameter selection, particularly in the small-data regime. However, it can be valuable metric for
+benchmarking LLM adaptation methods, regardless of the specific technique employed (in-context
+learning, fine-tuning, retrieval augmentation, etc.). We therefore also report the obtained prequential
+performance for all our main experiments in Appendix A.2.
+A.1 HYPERPARAMETER SELECTION WITH A PREQUENTIAL METRIC
+To illustrate prequential hyperparameter selection in practice, we present results from experiments
+on BBH datasets with 150 examples. Using a fixed random data order, we consider four hyperpa-
+rameter configurations with learning rates of {1e-4, 3e-4} and training epochs of {5, 10}. The left
+side of Figure displays the average accuracy (Li) as a function of examples seen (`i`), while the right
+side shows the average test-set performance on 100 additional examples from the same distribution.
+
+Figure 6: Left Prequential avg. accuracy. Right Corresponding test-set accuracies after 3, 5, 10,
+30, 100, and 150 training examples.
+Generating the right-hand side plot required not only 100 extra ground-truth examples but also sig-
+nificantly more computation. Sampling from a transformer is a sequential operation, often much
+
+                                                          13
+slower than computing log-losses or gradients. Each data point on the right represents 100 sampling
+operations, resulting in a total of 600 continuations for each hyperparameter configuration. In con-
+trast, the left-hand side curve required only 150 sampling operations (one per training data point).
+For our implementation, test-set evaluation consumed approximately half to two-thirds of the total
+runtime in our experiments. Fully adopting the prequential approach would allow us to utilize all
+available data for training and significantly reduce runtimes by avoiding costly held-out evaluations.
+As established in prior work (Philip Dawid and Vovk, 1999; ?), the prequential metric (left) con-
+verges to a lower bound on the expected held-out performance for i.i.d. data.
+
+                                                          14
+A.2 PREQUENTIAL AVERAGE ACCURACY
+
+To facilitate comparison in future research, we here report prequential accuracies for all our main
+experiments.
+
+Table 7: Prequential average accuracy for the 23 BBH tasks form Section 4 and Appendix C.1.
+
+                                       Gemma-2 2B         Gemma-2 9B       Gemma-2 27B
+
+                                       FT-Only ICL+FT  FT-Only ICL+FT  FT-Only ICL+FT
+
+Boolean Expressions                    46.1%  82.1%    58.2%  88.2%    82.8%  92.9%
+Causal Judgement                       26.0%  61.7%    54.0%  67.1%    60.2%  70.6%
+Date Understanding                     72.4%  72.9%    78.3%  79.0%    79.6%  80.6%
+Disambiguation Question Answering      43.8%  78.5%    80.7%  85.7%    82.7%  92.6%
+Dyck Languages                         49.0%  79.2%    64.8%  87.7%    82.0%  91.0%
+Formal Fallacies                       49.5%  52.8%    61.2%  68.4%    60.9%  74.1%
+Geometric Shapes                       41.2%  75.8%    58.3%  84.7%    66.9%  84.1%
+Hyperbaton                             1.4%   85.2%    82.9%  94.7%    90.0%  94.5%
+Logical Deduction (5 Objects)          33.9%  39.1%    35.2%  62.7%    58.9%  69.8%
+Movie Recommendation                   29.3%  79.6%    68.9%  95.5%    93.3%  96.2%
+Multi-Step Arithmetic (Two Steps)      1.9%   2.7%     2.8%   4.4%     4.0%   5.1%
+Navigate                               41.2%  65.1%    65.1%  77.1%    65.3%  84.8%
+Object Counting                        32.0%  55.0%    57.7%  69.1%    69.6%  74.4%
+Penguins in a Table                    25.2%  42.4%    60.4%  65.9%    57.2%  63.3%
+Reasoning about Colored Objects        45.7%  59.4%    74.9%  82.5%    80.2%  87.5%
+Ruin Names                             30.4%  78.9%    86.7%  89.6%    83.3%  88.6%
+Salient Translation Error Detection    35.4%  42.1%    64.9%  65.1%    60.0%  69.5%
+Snarks (Graph Theory)                  56.9%  71.2%    50.3%  80.1%    52.1%  83.1%
+Sports Understanding                   49.2%  78.8%    85.1%  90.6%    86.2%  92.9%
+Temporal Sequences                     36.1%  91.6%    90.9%  98.8%    99.7%  99.2%
+Tracking Shuffled Objects (5 Objects)  7.7%   23.1%    19.7%  34.9%    28.9%  39.3%
+Web of Lies                            37.9%  56.9%    57.7%  92.1%    67.3%  91.1%
+Word Sorting                           18.3%  23.2%    49.1%  49.0%    62.7%  65.8%
+
+Avg. All                               35.2% 60.7%     61.2% 74.5%     68.4% 77.9%
+
+Table 8: Prequential average accuracy for the 11 NLP task form Section 4 and Appendix C.2.
+
+          Gemma-2 2B                          Gemma-2 9B      Gemma-2 27B
+
+          FT-Only ICL+FT                      FT-Only ICL+FT  FT-Only ICL+FT
+
+ADEC      74.8%                        84.4%  77.6%    87.5%  83.2%    87.2%
+OR        84.8%                        93.9%  94.8%    97.6%  92.0%    96.0%
+SOT       85.8%                        91.9%  92.7%    94.0%  94.6%    95.7%
+SUBJ      80.4%                        92.2%  84.2%    94.1%  87.4%    95.4%
+TC        82.4%                        91.1%  85.6%    91.0%  90.0%    91.9%
+TEAB      66.7%                        74.4%  71.5%    79.2%  70.6%    80.5%
+TEAT      56.9%                        68.3%  63.5%    72.7%  63.5%    73.1%
+TEFE      60.3%                        67.0%  66.0%    73.4%  69.6%    74.4%
+TEH       60.4%                        71.2%  65.4%    76.1%  66.8%    77.2%
+TEHI      57.1%                        66.0%  63.2%    68.4%  64.6%    70.0%
+TOS       70.8%                        82.8%  74.4%    83.8%  76.4%    84.2%
+
+Avg. All  70.9% 80.3%                         76.3% 83.4%     78.1% 84.1%
+
+                                              15
+B EXPERIMENTAL DETAILS
+
+B.1 PROMPT TEMPLATE
+We show an example training sequence from the BBH Navigate task. During training, we place a
+loss on all desired replies from the model ­ here marked by underlining. These tokens correspond
+to the yi from the context examples, and the y from the final target example. All other tokens are
+considered context and can be causally attended to, but do not directly contribute gradients.
+
+  If you follow these instructions , do you return to the starting point?
+  Always face forward. Take 10 steps forward. Take 8 steps left. Take 3
+
+        steps backward. Take 7 steps right. Take 2 steps forward. Take 4
+        steps forward. Take 10 steps forward.
+  Options:
+  - Yes
+  - No
+  Answer : No
+  == Next Example ==
+  If you follow these instructions , do you return to the starting point?
+  Take 7 steps. Take 8 steps. Take 10 steps. Turn around. Turn around.
+        Take 5 steps. Turn around.
+  Options:
+  - Yes
+  - No
+  Answer : No
+  == Next Example ==
+  If you follow these instructions , do you return to the starting point?
+  Turn left. Turn right. Take 8 steps. Take 4 steps. Turn right. Turn
+        right. Take 10 steps. Take 1 step. Take 1 step.
+  Options:
+  - Yes
+  - No
+  Answer : Yes
+
+B.2 RESPONSE PARSING
+To account for potential idiosyncrasies introduced by instruction-tuned models, we apply the follow-
+ing regular expressions when comparing the generated response to the ground-truth label. The first
+matching expression is used to extract the answer for verbatim comparison: "r/Answer: (.+)/",
+"r/The answer is (.+)/", "r/**(.+)**/", "r/(.+)/"
+
+                                                          16
+C ADDITIONAL RESULTS
+
+C.1 BIG-BENCH HARD RESULTS
+All experiments are run with the standard hyperparameter cube and 5 different seeds to obtain 2
+uncertainty intervals.
+
+Figure 7: Average BBH test-set performance for different methods and model-sizes: Top Left: with
+3, Top Right: with 10, Bottom Left: with 30 ground-truth examples available; Gemini 1.5 Pro
+ICL-Only achieves 72.8%. Bottom Right: with all but 100 ground-truth examples available (= 150
+training examples for most datasets). Gemini 1.5 Pro ICL-Only achieves 76.6%
+
+Figure 8: Average BBH test-set performance for different number of ground-truth examples: Left:
+For Gemma-2 2B; Right: Gemma-2 27B. Figure 3 in the main paper shows the results for Gemma-2
+9B
+
+                                                          17
+                                              Gemma-2 2B on BBH
+
+Figure 9: Full suite of results for Gemma-2 2B on all 23 individual BBH datasets. All experiments
+are run with the standard hyperparameter cube and 5 different seeds to obtain 2 uncertainty inter-
+vals.
+
+                                                          18
+                                              Gemma-2 9B on BBH
+
+Figure 10: Full suite of results for Gemma-2 9B on all 23 individual BBH datasets. All experi-
+ments are run with the standard hyperparameter cube and 5 different seeds to obtain 2 uncertainty
+intervals.
+
+                                                          19
+                                             Gemma-2 27B on BBH
+
+Figure 11: Full suite of results for Gemma-2 27B on all 23 individual BBH datasets. All experi-
+ments are run with the standard hyperparameter cube and 5 different seeds to obtain 2 uncertainty
+intervals.
+
+                                                          20
+C.2 11 TASKS FROM THE SYMBOL-TUNING PAPER
+            Figure 12: Individual results for the 11 evaluation data sets used in Section 4:
+                                                          21
+C.3 NUMBER OF IN-CONTEXT EXAMPLES
+Varying the number of in-context examples used for training and testing with ICL+FT . We here
+select a subset of 8 representative datasets from BBH.
+
+Figure 13: Test-set performance when varying the number of in-context examples for individual
+BBH datasets with ICL+FT . The left most points at 0 correspond to FT-Only . We use the same
+number of in-comntext examples at training and test-time.
+
+            Figure 14: ICL+FT test-set performance averaged over the 8 BBH data-sets.
+
+C.4 FLIPPED LABELS
+Previous work has explored the effectiveness of in-context learning when downstream tasks use
+labels that deviate from the model's pretraining biases (Kossen et al., 2023) . We examine the BBH
+Navigate task, where the model predicts whether a sequence of steps leads back to the starting point.
+We compare the methods on the original task and a version with flipped labels where the model
+has to reply No when one would return, and Yes when not. Note that FT-Only is closer to random
+performance when using less then 10 examples, which gives it seemingly an advantage over the ICL
+based methods, that are solving the logical challenge, but require examples to learn about the label-
+inversion (Fig. 15). As reported previously (Kossen et al., 2023), ICL-Only struggles severely with
+flipped labels, while fine-tuning approaches and especially ICL+FT perform significantly better.
+C.5 DETAILED LOOK AT NEXT-STEP PERFORMANCE
+Previously, we assessed sample efficiency by reporting average test-set performance after training
+on various-sized subsets of the data. However, to visualize the generalization performance we can
+directly plot the next-example loss during sequential data ingestion, as these are guaranteed to be
+unseen examples. To obtain the expected performance after observing i datapoints, we average over
+multiple data permutations. We demonstrate this by performing 500 runs with different permutations
+for a fixed hyper-parameter configuration on Big-Bench-Hard Navigate and Geometric Shapes tasks.
+These plots reveal the generalization performance after encountering exactly i examples.
+
+                                                          22
+Figure 15: Left: Gemma-2 27B on the BBH Navigate binary classification task with standard, and
+flipped labels. Right: BBH Geometric-shapes is a 5-way classification task. Note that for the per-
+muted tasks, all methods initially perform worse than a random predictor because their pretraining
+biases are violated. See Appendix B for example prompts.
+
+Figure 16: Next-step generalization NLL and accuracy as a function of data seen so far (averaged
+over 500 random data-permutations). We finetune a Gemma-2 9B model with a single fixed hyper-
+parameter configuration (num-epochs=1, learning-rate=2e-4).
+C.6 FLORES LOW-RESOURCE MACHINE TRANSLATION
+We evaluate our approach on English translation tasks involving two low-resource languages from
+the FLORES data set (NLLB Team, 2022): Kurdish and Bemba. In addition to the English-to-
+target-language direction, we here also report results for the target-language-to-English translation, a
+direction that is typically not evaluated in prior work on in-context learning for machine translation.
+Here, for the first time, we observe that any kind of finetuning (FT-Only and ICL+FT ) have a
+slight, but statistically negative effect on the performance. We hypothesize that the models primarily
+leverage translation skills acquired during pre-training, and the limited number of examples provided
+here may not suffice for substantial skill enhancement. For translation into English, the typically
+well-trained modelmight lose some refinement through gradient updates.
+
+                                                          23
+C.7 DATASETS FROM LONG-CONTEXT ICL PAPER
+We run experiments with Gemma-2 9B on the datasets used by Bertsch et al. (2024).
+
+                                                          24
+C.8 LORA FINE-TUNING
+We run LoRA (Hu et al., 2021) fine-tuning experiments on the full suite of BBH datasets. We
+chose rank 16 and apply low-rank adapters on both the feed-forward MLPs, and the KV projection
+matrices in the attention blocks. We use the Adam instead of Adafactor as optimizer but otherwise
+use the same hyperparameter-sweeps as before. Fig 17 shows the detailed results for 4 BBH tasks.
+The average over all BBH benchmarks is reported in Section 4.
+
+ Figure 17: Test-set performance with LoRA- vs. full-finetuning for 4 representitive BBH tasks.
+
+                                                          25
+C.9 PREQUENTIALLY SELECTED VS. GLOBALLY FIXED HYPERPARAMETERS
+C.9.1 GLOBALLY BEST PERFORMING HPS ON BBH
+We show the average test-set accuracy over all BBH datasets and over all positions as when using
+globally fixed learning-rates and number-of epochs:
+
+                                                    Gemma-2 2B
+
+                                                    Gemma-2 9B
+
+                                                   Gemma-2 27B
+
+Figure 18: Avg. BBH Test Accuracy for specific hyperparameter combinations (learning-rate and
+number of epochs E).
+
+Table 9: Best performing configurations (in respect to BBH Average Test Accuracy).
+
+                                    learning rate num epochs
+
+Method Model
+
+FT-Only Gemma2 27B                      0.0002  15
+
+Gemma2 9B                               0.0002  15
+
+Gemma2 2B                               0.0003  15
+
+ICL+FT Gemma2 27B                       0.0001  10
+
+Gemma2 9B                               0.0002  10
+
+Gemma2 2B                               0.0003  15
+
+C.10 COMPARISON OVER ALL BBH TASKS
+
+                                    26
+Figure 19: Average test-set accuracy over 23 BBH tasks when using either preq. hyperparameter
+selection or using a single fixed configuration. See 5 for comparison.
+
+D EXPERIMENTS WITH MODELS FORM THE QWEN3 FAMILY
+
+To verify that ICL+FT gains are architecture-agnostic and extend beyond Gemma models, we eval-
+uated the Qwen-3 model family using the AdamW optimizer via the Hugging Face Transformers
+library. We tested 0.6B, 1.7B, and 4B variants for gradient-based methods, and additionally use the
+30B variant as a high-capacity ICL-Only baseline.
+We performed a grid search over learning rates 3 × 10-6, 10-5, 3 × 10-5, 10-4 and epochs E 
+{1, 3, 5, 10}. Like before, we show results averaged over 5 random seeds with 2 SEM error bars.
+Because we observed that thinking does not improve the results for these tasks, we were prefixed
+the models with: "Reply directly with the answer. No thinking.".
+This supplemental suite encompassed 2,400 individual fine-tuning runs across three model scales
+and five Big-Bench Hard tasks.
+As an example we show that the results on Sports Understanding mirror the trends observed with
+Gemma-2. Specifically, Qwen-3 1.7B with ICL+FT reaches 58% accuracy at N = 100, notably
+exceeding the 30B ICL-Only baseline which hovers around 47% ± 2 for all # ICL example budgets.
+
+Figure 20: Qwen-3 performance on Sports Understanding. ICL+FT replicates the performance
+signature established in Section 4.
+These results suggest that ICL+FT advantage translates to other model families and optimisers and
+is not specific to Gemma models.
+
+                                                          27
+

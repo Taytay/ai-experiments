@@ -1,0 +1,1134 @@
+                                       Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?
+
+                                         Zorik GekhmanT  Gal YonaG Roee AharoniG Matan EyalG Amir FederG
+                                                                       Roi ReichartT Jonathan HerzigG
+
+                                                        T Technion - Israel Institute of Technology GGoogle Research
+                                                               zorikgekhman@gmail.com, jherzig@google.com
+
+arXiv:2405.05904v3 [cs.CL] 1 Oct 2024                        Abstract                           Figure 1: Train and development accuracies as a func-
+                                                                                                tion of the fine-tuning duration, when fine-tuning on
+                                            When large language models are aligned via          50% Known and 50% Unknown examples. Unknown ex-
+                                            supervised fine-tuning, they may encounter          amples are fitted substantially slower than Known. The
+                                            new factual information that was not acquired       best development performance is obtained when the
+                                            through pre-training. It is often conjectured       LLM fits the majority of the Known training examples
+                                            that this can teach the model the behavior of       but only few of the Unknown ones. From this point,
+                                            hallucinating factually incorrect responses, as     fitting Unknown examples reduces the performance.
+                                            the model is trained to generate facts that are
+                                            not grounded in its pre-existing knowledge.            In the fine-tuning phase, the model is usually
+                                            In this work, we study the impact of such ex-       trained on outputs created by human annotators
+                                            posure to new knowledge on the capability of        or other LLMs. As a result, the model may en-
+                                            the fine-tuned model to utilize its pre-existing    counter new factual information, extending beyond
+                                            knowledge. To this end, we design a controlled      the knowledge it acquired during pre-training. This
+                                            setup, focused on closed-book QA, where we          raises the question of how LLMs integrate new
+                                            vary the proportion of the fine-tuning examples     facts outside of their pre-existing knowledge. One
+                                            that introduce new knowledge. We demonstrate        possibility is that the model simply adapts by learn-
+                                            that large language models struggle to acquire      ing this new factual information. However, a com-
+                                            new factual knowledge through fine-tuning, as       mon conjecture posits that such exposure to new
+                                            fine-tuning examples that introduce new knowl-      knowledge may encourage the model to halluci-
+                                            edge are learned significantly slower than those    nate factually incorrect responses, as the model
+                                            consistent with the model's knowledge. How-         is essentially trained to generate facts that are not
+                                            ever, we also find that as the examples with        grounded in its pre-existing knowledge (Schulman,
+                                            new knowledge are eventually learned, they          2023; Huang et al., 2023; Gao, 2021; Goldberg,
+                                            linearly increase the model's tendency to hal-      2023; Gudibande et al., 2023).
+                                            lucinate. Taken together, our results highlight
+                                            the risk in introducing new factual knowledge          In this work, we study how learning new factual
+                                            through fine-tuning, and support the view that
+                                            large language models mostly acquire factual
+                                            knowledge through pre-training, whereas fine-
+                                            tuning teaches them to use it more efficiently.
+
+                                       1 Introduction
+
+                                       Pre-training Large Language Models (LLMs) on
+                                       textual corpora embeds substantial factual knowl-
+                                       edge in their parameters (Petroni et al., 2019;
+                                       AlKhamissi et al., 2022; Cohen et al., 2023), which
+                                       is essential for excelling in various downstream
+                                       applications. These models often require further
+                                       alignment to desired behaviors, typically achieved
+                                       through supervised fine-tuning on instruction-
+                                       following tasks (Wei et al., 2022; Mishra et al.,
+                                       2022) and preference learning from human feed-
+                                       back (Ouyang et al., 2022; Rafailov et al., 2024).
+
+                                            Work done during an internship at Google Research.
+knowledge through fine-tuning impacts the model's             reduces the risk of overfitting, without sacrificing
+tendency to hallucinate w.r.t. its pre-existing knowl-        performance.
+edge, exploring the above conjecture.1
+                                                                 We further evaluate the impact of fine-tuning
+   To study the impact of new knowledge, we must              examples from each of our three Known knowl-
+be able to assess whether a single fine-tuning ex-            edge categories on performance (§5). Unexpect-
+ample is consistent with the model's knowledge.               edly, we find that a model fine-tuned only on exam-
+We propose SliCK, a hierarchy of four knowl-                  ples from the highest knowledge degree, denoted
+edge categories, derived from a continuous mea-               HighlyKnown, does not yield the best results. Our
+sure that quantifies the agreement between model-             analysis reveals that incorporating MaybeKnown
+generated answers and the ground-truth labels. In             fine-tuning examples, representing facts with lower
+SliCK, examples are first categorized into Known              degrees of certainty, plays an important part in prop-
+and Unknown types, where the latter corresponds to            erly handling such examples in test time. This indi-
+examples with facts that are most likely unknown              cates that the composition of fine-tuning examples
+to the model. The Known examples are subse-                   significantly influences the extent to which LLMs
+quently split into three categories: HighlyKnown,             effectively utilize their pre-existing knowledge.
+MaybeKnown, and WeaklyKnown (Figure 2).
+                                                                 To summarize, we study the effect of new factual
+   Equipped with the above method, we carefully               knowledge in the fine-tuning data by designing a
+design a controlled study, focused on closed-book             controlled setup that isolates this factor. We find
+question answering (QA), where we vary the pro-               that fine-tuning examples that introduce new knowl-
+portion of the fine-tuning examples categorized as            edge are learned slowly, which suggests that LLMs
+Unknown, while controlling for other factors.                 struggle to integrate new knowledge through fine-
+                                                              tuning and supports the view that LLMs mostly ac-
+   Our study empirically demonstrates that learn-             quire knowledge through pre-training (Zhou et al.,
+ing from Unknown fine-tuning examples is linearly             2023; Lin et al., 2023). However, we also find
+correlated with the model's tendency to hallucinate           that as the model eventually learns new knowledge
+w.r.t. its pre-existing knowledge (§4). Conversely,           through fine-tuning, it becomes more prone to hal-
+learning from Known examples is correlated with               lucinations w.r.t. its pre-existing knowledge. Col-
+better utilization of pre-existing knowledge.                 lectively, our findings highlight the potential for
+                                                              unintended consequences when introducing new
+   Through an analysis of the training dynamics,              knowledge through fine-tuning, and imply that fine-
+we discover that the LLM fits Unknown fine-tuning             tuning may be more useful as a mechanism to en-
+examples substantially slower than Known exam-                hance the utilization of pre-existing knowledge.
+ples (top plot in Figure 1). This indicates that dur-
+ing fine-tuning, LLMs struggle2 to integrate new              2 Study Setup
+factual knowledge (present in the Unknown fine-
+tuning examples). Instead, they mostly learn to ex-           Given a fine-tuning dataset D and a pre-trained
+pose their pre-existing knowledge (using the Known            LLM M , we denote by MD a model obtained by
+fine-tuning examples).                                        fine-tuning M on D. To study how new knowledge
+                                                              in D affects MD's performance, we design a con-
+   From a practical perspective, mitigating over-             trolled setup creating variants of D with varying
+fitting using early-stopping (vertical dotted line            proportions of examples that are unknown to M .
+in Figure 1) can minimize the risk of the halluci-
+nations caused by fitting the Unknown examples,                  When constructing D, our objective is to reflect
+since they primarily emerge in later training stages          instruction tuning on diverse knowledge-intensive
+as a form of overfitting (as illustrated by the devel-        tasks while maintaining control over the experimen-
+opment performance decline in the bottom plot of              tal setting. We thus focus on factual knowledge
+Figure 1). Alternatively, we also show that filtering-        that can be structured as (subject, relation, object)
+out the Unknown fine-tuning examples substantially            triplets, which are converted into closed-book QA
+                                                              format. In this setup, D = {(qi, ai)}Ni=1, where q
+    1While we focus on supervised fine-tuning, our findings   is a knowledge-seeking question corresponding to
+may be relevant to offline preference optimization methods    a specific triplet (e.g., "Where is Paris located?")
+like DPO (Rafailov et al., 2024) that may add new knowledge,  and a is the ground-truth answer (e.g., "France").
+which we leave for future work.                               To this end, we use ENTITYQUESTIONS (Sciavolino
+
+    2We use the term "struggle" to describe how LLMs con-
+verge slowly for examples containing new factual knowledge.
+Since this term carries emotional connotations, we note that
+we do not ascribe any emotional attributes to LLMs.
+  Type      Category                 Definition                                              Explanation
+Known    HighlyKnown  PCorrect(q, a; M, T = 0) = 1      Greedy decoding always predicts the correct answer.
+Unknown  MaybeKnown   PCorrect(q, a; M, T = 0)  (0, 1)  Greedy decoding sometimes (but not always) predicts the correct answer.
+         WeaklyKnown  PCorrect(q, a; M, T = 0) = 0      Greedy decoding never predicts the correct answer, whereas temperature
+                      PCorrect(q, a; M, T > 0) > 0      sampling with T > 0 sometimes predicts the correct answer.
+         Unknown                                        The model never predicts the correct answer, thus it seem to lack the
+                      PCorrect(q, a; M, T  0) = 0       knowledge of the correct answer.
+
+                                                                (a)
+
+   Category                      Question               Gold Answer               Greedy Answers                  Sampled Answers
+HighlyKnown  Who founded Science of Mind?             Ernest Holmes   [Ernest Holmes, .. Ernest Holmes, ..]  [..., ...]
+MaybeKnown   What is the capital of Toledo District?  Punta Gorda     [Belmopan, .., Punta Gorda, ..]        [..., ...]
+WeaklyKnown  What kind of work does Scott McGrew do?  Journalist      [Film director, .. Actor, ..]          [Musician, .. Journalist, ..]
+Unknown      Where is Benedict located?               Hubbard County  [Louisiana, .. New Mexico, ..]         [Washington, .. Texas, ..]
+
+                                                                (b)
+
+Figure 2: Formal definitions of the SliCK knowledge categories, based on the PCorrect measure as defined in §3 (a),
+accompanied with real examples from the annotated ENTITYQUESTIONS dataset used in our study (b).
+
+et al., 2021), where triplets from a diverse set of                  that has not been specifically fine-tuned to follow
+relations from Wikidata (Vrandecic´ and Krötzsch,                    instructions, we prompt M using in-context learn-
+2014) are converted to QA pairs. These relations                     ing with few-shot exemplars. Following Rubin et al.
+encompass a broad spectrum of factual knowledge,                     (2022), we make sure that the few-shot exemplars
+including biographical information, geographical                     have high semantic similarity to q.6
+data, ownership and authorship details, history and
+more. We use the original development and test                          In practice, M can predict different answers
+splits, and we sub-sample the train split to create                  since (1) the choice of exemplars influences in-
+different variants of D. We focus on 12 diverse                      dividual predictions and (2) temperature sampling,
+relations and reserve 7 additional relations for an                  if used, introduces randomness. To reflect this, we
+out-of-distribution test set, used (only) in §4.5.                   define PCorrect(q, a; M, T ) as an estimate of how
+                                                                     likely is M to accurately generate the correct an-
+   As M , we use the PaLM 2-S base model3 (Anil                      swer a to q, when prompted with random few-shot
+et al., 2023). We focus on exact match (EM) as our                   exemplars and using decoding temperature T .
+evaluation metric.4 Full technical details are in §A.
+                                                                        For the purposes of our study we approxi-
+3 Quantifying Knowledge in LLMs                                      mate the value of PCorrect using Nex = 10
+                                                                     different random 4-shot prompts.7 For each
+To assess the effect of new knowledge in D on                        4-shot prompt, we predict the greedy answer
+the performance of MD, we have to annotate each                      using T = 0 and 16 sampled answers using
+(q, a) pair in D w.r.t. whether M knows that the                     T = 0.5. PCorrect(q, a; M, T = 0) is estimated
+answer to q is a.5 To estimate this, we define a con-                by the fraction of correct greedy answers, and
+tinuous PCorrect measure based on samples from                       PCorrect(q, a; M, T > 0) by the fraction of cor-
+M , and use it to divide (q, a) pairs into four knowl-               rect sampled answers. Full details are in §C.
+edge categories. We name this approach SliCK
+(Sampling-based Categorization of Knowledge).                        Deriving knowledge categories from PCorrect.
+                                                                     We define the Unknown category (bottom row
+Defining PCorrect. We adopt the perspective that                     in Figures 2a and 2b) to represent (q, a) pairs
+M knows that the answer to q is a if it generates a                  for which M never predicts the correct an-
+when prompted to answer q (Kadavath et al., 2022;                    swer to q. In our notations this means that
+Manakul et al., 2023). Since M is a base model                       PCorrect(q, a; M, T  0) = 0. Alternatively, if
+                                                                     PCorrect(q, a; M, T  0) > 0, i.e. M sometimes
+    3PaLM-2 is available in five sizes: XXS, XS, S, M, L, with       predicts the correct answer to q, we consider (q, a)
+the S version representing the middle size in this range.            as Known. In this choice, we posit that if prompting
+                                                                     M to answer q can sometimes result with the cor-
+    4We validated that in our setting EM strongly correlates
+with word-level F1 (Rajpurkar et al., 2016), and we choose               6In our study we achieve this by using exemplars from
+EM as it is more intuitive for the purposes of our analysis.         the same relation. E.g., if q ="Where is Paris located?", the
+                                                                     exemplars would follow the pattern "Where is {X} located?".
+    5We also considered using fake facts for introducing new
+knowledge, but we were concerned that this would introduce               7We use 4-shot simply since we found it enough for M to
+confounding factors into our study, as fake facts may behave         output answers in the correct format.
+differently than real ones. We discuss this in detail in §F.
+(a)                                                   (b)
+
+Figure 3: Test performance as a function of the % of Unknown examples in the fine-tuning dataset D. In (a),
+each line corresponds to a different (fixed) number of epochs, except the EARLY_STOP, which corresponds to
+early-stopping using the development set (see §4). In (b) we present the ablation from §4.2. Full lines correspond
+to fine-tuning on D and are identical to (a). Dotted lines correspond to fine-tuning on the ablated variants DKnown,
+where Unknown examples are filtered-out. For 0% Unknown D =DKnown and for 100% Unknown there is no DKnown.
+
+rect answer a, then M must have some association      fine-tuning epochs as CONVERGENCE, as at this point
+with the relevant fact.                               M always completely fits D (i.e. 100% training
+                                                      accuracy). We measure test performance as a proxy
+   Recognizing that knowledge can vary in degrees     for hallucinations since we are in a closed-book QA
+of certainty and extent, we divide the Known (q, a)   setup with disjoint train/test splits, where the model
+pairs into three distinct categories (top three rows  has to use its per-existing knowledge to answer test
+in Tables 2a and 2b). Motivated by the principle      questions (see §B for further discussion).
+that M should consistently predict a if (q, a) is
+Known, we put emphasis on greedy decoding out-        4.1 Higher Unknown Ratio is Proportional to
+comes, represented with PCorrect(q, a; M, T = 0).            Performance Degradation
+HighlyKnown represents (q, a) pairs for which M
+always greedily predicts a. If M sometimes (but       Figure 3a presents the performance as a function
+not always) greedily predicts a, we consider (q, a)   of the % of Unknown examples in D, for different
+as MaybeKnown. Lastly, if M never greedily pre-       fine-tuning durations. Higher %Unknown leads to
+dicts a, we classify (q, a) as WeaklyKnown.           performance degradation, regardless of the fine-
+                                                      tuning duration, which indicates that Unknown
+   We apply SliCK to annotate each (q, a) pair in     examples are less useful than Known. Perfor-
+our dataset with its knowledge category w.r.t. M .8   mance is also strongly affected by the fine-tuning
+We analyze the quality of our categories in §6.       duration, with EARLY_STOP typically yielding the
+                                                      best performance. Training for more epochs usu-
+4 How Harmful are Unknown Examples?                   ally reduces performance (with the lowest perfor-
+                                                      mance observed for CONVERGENCE), which can be
+In this section we study the effect of new knowl-     attributed to overfitting D. Interestingly, this ef-
+edge in the fine-tuning dataset D on performance.     fect increases with larger %Unknown (the inter-line
+To isolate this effect, we vary the proportion of     spacing from EARLY_STOP exhibits a monotonic in-
+Unknown examples in D, while controlling for          crease along the positive x-axis), suggesting that a
+other factors. Specifically, we fix |D| and create    higher %Unknown increases the risk of overfitting.
+variants of D with X% of Unknown and (100 -
+X)% Known examples (full details in §E). We treat     4.2 Unknown Examples: Harmful or Neutral?
+the Known categories collectively (see Figure 2a),
+and provide a per-category analysis in §5. We de-     Since |D| is fixed, performance drops for higher
+note early-stopping based on the development set      %Unknown could stem from simply the lower num-
+as EARLY_STOP (happens after 5-10 epochs) and 50      ber of the Known fine-tuning examples. Thus, it is
+                                                      still not clear if Unknown examples are harmful or
+    8In ENTITYQUESTIONS we have 24% HighlyKnown,      neutral. To address this, we measure the effect of
+23% MaybeKnown, 17%, WeaklyKnown, and 36% Unknown.
+Full per-relation statistics are in §D.
+                                                                                         0 kn unk R2
+
+                                                          In-distribution (§4.4)         36.9 7.3 -8.3 0.86
+
+                                                          Out-of-distribution (§4.5) 36.2 3.2 -3.0 0.95
+
+                                                          Table 1: Results of our linear model for predicting the
+                                                          test accuracy as defined by Equation (1).
+
+Figure 4: The state of the examples in the fine-tuning    tially slower than Known. In EARLY_STOP (vertical
+dataset D after EARLY_STOP. For each variant of D (y-     dotted line), M reaches peak performance on the
+axis), we illustrate which portion of the examples in D   development set, while fitting the majority of the
+the model fits (i.e. predicts the correct answer for q).  Known examples but only a small fraction of the
+                                                          Unknown. In Figure 4, we show that this behav-
+filtering-out all the Unknown examples from D. For        ior is consistent across all our variants of D. This
+each D variant, we create a corresponding ablated         can explain why in EARLY_STOP the Unknown ex-
+variant DKnown, consisting only from the Known ex-        amples had a neutral effect on performance (§4.2),
+amples in D. E.g., if D has 25% Unknown, we               as at this point M still did not fit most of them.
+filter them out and are left with the remaining 75%       Lastly, since Unknown examples are the ones that
+Known examples and get |DKnown | = 0.75 × |D|.            are likely to introduce new factual knowledge, their
+                                                          significantly slow fitting rate suggests that LLMs
+   Figure 3b presents the results. Perhaps surpris-       struggle to acquire new factual knowledge through
+ingly, for EARLY_STOP the results for D are almost        fine-tuning, instead they learn to expose their pre-
+identical to DKnown, indicating that the Unknown          existing knowledge using the Known examples.
+examples had a neutral effect on performance (as
+their removal had minimal impact). Conversely, the        4.4 The Influence of Unknown vs Known on
+CONVERGENCE results show that with longer train-                Accuracy: A Linear Model Perspective
+ing, Unknown examples are actually very harmful.
+In this case D under-performs DKnown, and the gap         Figure 1 demonstrates that after the development
+between them is proportional to the Unknown ratio.        performance peaks at EARLY_STOP (vertical dot-
+                                                          ted line), it deteriorates as M gradually fits more
+   Interestingly, for DKnown, the gap between             Unknown examples. In this section, we aim to char-
+EARLY_STOP and CONVERGENCE is very small (dot-            acterize this relationship more accurately by assess-
+ted lines), while this gap is very large for D (full      ing whether a simple linear dependency can tie the
+lines). This indicates that the presence of Unknown       impact of fitting Known and Unknown training ex-
+examples is what makes the variants with higher           amples on test accuracy. To this end we use the
+Unknown ratios more prone to overfitting.                 following linear regression model:
+
+4.3 Unknown Examples are Fitted Slower than               Accuracy  =  0  +       kn  ·  Nkn  +  unk  ·  Nunk  (1)
+      Known Examples                                                                     |D|             |D|
+
+We showed that Unknown examples are harmful,              where NKn and NUnk are the number of the Known
+but their negative effect is mostly materialized in       and Unknown examples in D that M fits.
+later training stages, and thus can be empirically
+avoided using early stopping. To better understand           We estimate the coefficients9 by collecting
+these trends, we analyze the training dynamics by         (Accuracy, NKn, NUnk) values after each epoch
+examining which fine-tuning examples in D were            from models fine-tuned on all D variants. Table 1
+fitted by M during various fine-tuning stages. Fig-       presents the results (top row). The high R2 indi-
+ure 1 presents the train accuracy of the Known and        cates a strong linear relationship between test accu-
+Unknown subsets of D as a function of the fine-           racy and the type of training examples that are fitted.
+tuning duration. The development accuracy is pre-         Our model entails that fitting Unknown examples
+sented in a zoomed-in plot at the bottom, as it falls     hurts performance (unk < 0), while fitting Known
+within a narrower range. We include a breakdown           examples improves it (kn > 0). The estimated
+of the train accuracy per Known category in §G.           negative impact from Unknown roughly matches
+                                                          the positive impact from Known (|ukn|  |kn|).
+   M fits Unknown fine-tuning examples substan-
+                                                              9Full details in §H. We note that this linear model is only
+                                                          valid in bounded region of Nkn  |D|, Nunk  |D|.
+DHighlyKnown  Full    EARLY_STOP                      Full   CONVERGENCE
+DMaybeKnown
+DWeaklyKnown   40.5  Hkn Mkn Wkn Unk                   40.0  Hkn Mkn Wkn Unk
+DUnknown       43.6                                    43.2
+DNatural       39.2  98.7 60.1 9.0 0.6                 35.4  98.4 58.8 8.5 0.7
+               37.5  98.4 69.9 12.1 1.0                25.8  97.5 68.2 12.9 1.3
+               43.5  95.0 59.2 8.6 0.4                 41.8  73.5 55.8 17.2 2.2
+                     95.6 52.9 6.5 0.6                       55.8 36.6 12.2 3.2
+                     98.0 67.6 14.1 1.8                      95.5 61.7 14.8 2.5
+
+Table 2: Accuracies for the single-category variants from §5, across per-category subsets of the test set. Full
+is the original test set (all the categories together). Hkn=HighlyKnown, Mkn=MaybeKnown, Wkn=WeaklyKnown,
+Unk=Unknown. In each column, the best result is in bold, as well as the results for which the difference from the
+best is not statistically significant with p < 0.05 (significance test details are in §J).
+
+4.5 Generalization to New Relations                   pact the test performance? Q2: What is the model's
+                                                      performance across test examples from each cate-
+In the above setup, the (q, a) pairs in the test set  gory? To address Q1 we created single-category
+correspond to triplets with the same set of 12 rela-  variants of the fine-tuning dataset D. A variant of
+tions appearing in D. We now investigate whether      D consisting solely of examples from the category
+our observed dynamics has a broader effect on the     CAT is denoted as DCAT. For reference, we include
+model's knowledge, and transfers to relations not     a variant with the natural categories distribution in
+represented in D. To test this, we reserve a subset   ENTITYQUESTIONS, denoted DNatural. |D| is fixed
+of the relations for an out-of-distribution (OOD)     and identical to our experiments in §4. To address
+test set, excluding them from the train and develop-  Q2, we further break down the test set performance
+ment splits. See §A for details and Tables 5 and 6    by category. Table 2 presents the results.
+for in-distribution vs OOD relations.
+                                                      MaybeKnown Examples are Essential. Since
+   Our results on the OOD test set reveal simi-       Unknown examples are harmful, one might expect
+lar key insights: (1) Higher Unknown ratio leads      that it would be best to fine-tune on the most ex-
+to lower OOD test performance and (2) Unknown         emplary HighlyKnown examples. Surprisingly,
+examples are harmful for OOD performance, but         DHighlyKnown does not obtain the best overall re-
+mostly when M fits them. A linear model of the        sults, as it excels on HighlyKnown test examples,
+OOD test accuracy (Equation (1)), shows similar       yet its performance on the remaining categories is
+trends: unk < 0, kn > 0, |ukn|  |kn| and              inferior. DMaybeKnown yields the best overall perfor-
+R2 = 0.95 (see Table 1). More details are in §I.      mance. Compared to DHighlyKnown, DMaybeKnown
+                                                      enhances MD's performance on MaybeKnown
+   Overall, our insights transfer across relations.   (60.1  69.9), without compromising performance
+This essentially shows that fine-tuning on Unknown    on HighlyKnown (98.7  98.4). This suggests
+examples such as "Where is [E1] located?", can        that MaybeKnown fine-tuning examples are essen-
+encourage hallucinations on seemingly unrelated       tial for MD to correctly handle such examples dur-
+questions, such as "Who founded [E2]?". This          ing inference. It also demonstrates that with the
+further supports the conclusion that the observed     right fine-tuning examples, MD becomes more ca-
+effects likely stem from the model learning the be-   pable of utilizing its pre-existing knowledge.
+havior of generating answers that are not grounded
+in its pre-existing knowledge.
+
+5 Understanding Knowledge Types:                      Limited Knowledge Enhances Overfitting. In
+    Their Value and Impact                            §4.2, we demonstrated that Unknown fine-tuning
+                                                      examples increase the risk of overfitting. We now
+When addressing our main research question on         observe that this also applies to WeaklyKnown,
+the effect of Unknown fine-tuning examples, we        though to a lesser degree. Specifically, at
+treated the Known categories collectively for sim-    CONVERGENCE, DWeaklyKnown and DUnknown expe-
+plicity (see Figure 2a). We now examine the effect    rience significant performance drops compared
+of each category, exploring the following questions:  to EARLY_STOP (39.2  35.4 and 37.5  25.8).
+Q1: How training examples from each category im-      With training to CONVERGENCE, they show a mod-
+est improvement on WeaklyKnown and Unknown                       Figure 5: SliCK Unknown categorization vs. classifying
+but substantially degrade on HighlyKnown and                     examples with P(True) < T as Unknown. The x-axis
+MaybeKnown. This highlights that the decrease in                 is the % of test examples classified as Unknown and
+performance is strongly attributed to an increased               the y-axis is the accuracy on these examples post fine-
+rate of hallucinations w.r.t. facts that were already            tuning. The yellow line is P(True) for T  [0, 1]. Our
+known to M after pre-training.                                   Unknown category is the blue circle and the blue line
+                                                                 corresponds to approximating PCorrect with less than
+   Interestingly, DNatural performs on-par with                  10 random 4-shot exemplars (see §3 and §C).
+DMaybeKnown in EARLY_STOP, suggesting that the
+mere presence of MaybeKnown examples in D suf-                   truly Unknown).11 In Table 2 we can see that the
+fices for high performance on MaybeKnown, even                   accuracy on Unknown is extremely low (3.2% or
+if D has additional examples from other cate-                    less), which is a strong indicator that most of the
+gories. Yet, DNatural's performance degrades sig-                Unknown examples are actually unknown to M .
+nificantly10 after CONVERGENCE, under-performing
+DMaybeKnown ­ indicating that it still suffers from                 As a case study for comparison, we analyze the
+overfitting, most-likely due to the presence of                  P(True) approach by Kadavath et al. (2022): a con-
+WeaklyKnown and Unknown examples. Taken to-                      tinuous score that estimates the probability a model
+gether these results demonstrate that DMaybeKnown                assigns to the correctness of a specific answer.
+stands out both in terms of top performance and                  P(True) was originally used for self-evaluating
+reduced risk to overfitting.                                     model-generated answers, while we use it to as-
+                                                                 sess whether M considers the ground-truth answer
+6 SliCK Knowledge Categories Analysis                            as correct.12 In Figure 5, we explore classifying ex-
+                                                                 amples below a P(True) threshold as Unknown and
+Assessing a model's knowledge remains an open                    compare this methodology to SliCK. Our results in-
+problem, particularly since evaluating the quality               dicate that, at least in our setting, our approach cat-
+of such methods is challenging due to the lack of                egorizes Unknown examples for which the model's
+ground truth about what the model truly knows. In                performance after fine-tuning is significantly worse.
+this work we proposed SliCK (§3): a four-category                Specifically, looking at fixed values on the x-axis
+classification of facts w.r.t. the model's knowledge.            shows that if we would label a similar fraction of
+We now further analyze and discuss our design                    test examples as Unknown using both methods, the
+choices, hoping that SliCK can serve as a useful                 accuracy on the P(True)-based Unknown examples
+taxonomy to guide future research on this subject.               would be much higher post fine-tuning.13 Lastly,
+                                                                 the blue line shows that using samples from mul-
+Fine-grained Known Categories We first reflect                   tiple few-shot prompts to approximate PCorrect is
+on whether our choice of splitting Known into more               crucial, as using Nex < 10 leads to higher test
+fine-grained categories, based on the greedy de-                 accuracy on SliCK Unknown examples.
+coding outcome, has been proven meaningful. As
+shown in Table 2, HighlyKnown indeed captures                       11Since in our closed-book QA setup the train and test
+facts with high degree of knowledge, as it con-                  sets are disjoint, the model has to rely on its pre-existing
+sistently exceeds 95% accuracy post fine-tuning,                 knowledge to answer test questions.
+while MaybeKnown and WeaklyKnown seem to rep-
+resent weaker knowledge degrees. As intended,                       12Given a (q, a) pair, P(True) reflects the probability that
+the performance on WeaklyKnown is worse that on                  the model assigns for a being the answer to q. It can be applied
+MaybeKnown but better than on Unknown. Addi-                     on a model-generated answer for self-evaluation as was done
+tionally, the exact categories distinction we made               in the original study, or on the ground-truth answer to check
+was proven useful since it revealed important in-                whether M considers it as correct, like done in our study.
+sights on the importance of the MaybeKnown fine-
+tuning examples, as discussed in detail in §5.                      13This is a preliminary analysis, and we leave a comprehen-
+                                                                 sive comparison for future work. More details in §K.
+Benchmarking Unknown Test Examples A de-
+sired property for (q, a) pairs classified as Unknown
+that appear in the test set, is that M will incorrectly
+answer q post fine-tuning (otherwise they are not
+
+   10See §J for details about this statistic significance test.
+7 Fine-tuning to Abstain on Unknown                          EARLY_STOP           CONVERGENCE
+    Examples
+                                                             Accuracy % Answered  Accuracy % Answered
+We showed that fitting Unknown fine-tuning exam-
+ples negatively affects the test performance (§4.2     D     43.0        100.0    38.8         100.0
+and §4.4). However, this negative effect manifests                        58.7
+as a form of overfitting. From practical perspective,  DIDK  61.8                 61.8         55.6
+we showed that we can mitigate overfitting by ei-
+ther using early-stopping or filtering-out Unknown     Table 3: Results where the label of the Unknown fine-
+examples from the fine-tuning dataset.                 tuning examples is replaced with "I don't know". D
+                                                       in this case is the variant with 50% Known and 50%
+   We now explore an additional approach where         Unknown. DIDK is the variant where all the 50%
+we fine-tune the model to abstain from Unknown         Unknown fine-tuning examples were re-labeled with "I
+examples as a potential mitigation. Specifically,      don't know". The accuracy is measured on the subset
+we replace the label of the Unknown fine-tuning        of the test questions that were answered, i.e. MD did
+examples with the expression "I don't know" and        not respond with "I don't know".
+test whether this mitigates the observed overfitting.
+                                                       out Unknown examples. We show initial evidence
+   Table 3 presents the % of the test questions        that this can reduce the risk of overfitting without
+that were answered (i.e. MD did not respond            compromising performance. A possible drawback
+with "I don't know") and the accuracy on those         of filtering, is that Unknown fine-tuning examples
+questions. Consistent with the findings from pre-      can still be useful to teach LLMs to express un-
+vious work (Zhang et al., 2023), we observe an         certainty on Unknown test examples (Zhang et al.,
+improved accuracy on willingly answered test ex-       2023; Yang et al., 2023). This raises the question:
+amples (when comparing D vs DIDK). When we             can re-labeling Unknown fine-tuning examples
+compare EARLY_STOP vs CONVERGENCE for D we             with uncertainty expressions (e.g., "I don't know")
+observe a performance drop (43.0  38.8) which          reduce their negative effect? Our experiment (§7)
+illustrates the overfitting effect. However, we ob-    suggests that the answer is yes, which indicates
+serve that re-labeling the Unknown examples with       that such approaches could be the most promising.
+uncertainty expression seem to reduce the risk of
+overfitting. Specifically, the accuracy for DIDK re-   Superficial Alignment Hypothesis. Zhou et al.
+mains 61.8 for both EARLY_STOP and CONVERGENCE,        (2023) hypothesized that the knowledge and ca-
+with a small decrease on the number of willingly       pabilities of LLMs are mostly learned during pre-
+answered questions (58.7  55.6).                       training, while alignment is a simple process where
+                                                       the model learns the style or format for interacting
+8 Discussion                                           with users. They substantiate this hypothesis by
+                                                       showing that fine-tuning on just 1k high-quality
+Practical Implications. This work highlights           examples can result with a competitive assistant
+the risk in using supervised fine-tuning to update     LLM, named LIMA. As discussed in §4.3, we
+LLMs' knowledge, as we present empirical               show evidence that LLMs struggle to acquire new
+evidence that acquiring new knowledge through          knowledge present in the Unknown examples and
+fine-tuning is correlated with hallucinations w.r.t    mostly learn to utilize their pre-existing knowledge.
+pre-existing knowledge. Additionally, this work        We also showed that fine-tuning on HighlyKnown
+raises important questions for future exploration      examples led to sub-optimal utilization of pre-
+regarding fine-tuning practices. We saw that           existing knowledge, despite our task format be-
+Unknown examples are fitted slower than the            ing simpler than LIMA's and our dataset being six
+Known ones, thus their negative effect manifests       times larger. Taken together, our findings suggest
+as a form of overfitting, which emphasizes the         that even though most of the LLM's knowledge
+importance of using early-stopping instead of a        is indeed acquired through pre-training, the model
+fixed number of fine-tuning steps. However, early-     learns more than just style or format through fine-
+stopping may be less effective when fine-tuning        tuning, as the selection of fine-tuning examples
+on numerous tasks with distinct optimal stopping       significantly influences the model's capability to
+points. An alternative solution can be to avoid        utilize its pre-existing knowledge post fine-tuning.
+adding new knowledge, by aligning the fine-tuning
+data with the model's knowledge through filtering-
+9 Related Work                                          Manakul et al., 2023; Tian et al., 2023a; Lyu et al.,
+                                                        2024), probing internal representations (Azaria and
+New knowledge and hallucinations. Schulman              Mitchell, 2023; Burns et al., 2022), eliciting ver-
+(2023), Goldberg (2023) and Gudibande et al.            balized probability (Tian et al., 2023b) or direct
+(2023) mention the conjecture that fine-tuning on       prompting (Kadavath et al., 2022). Kadavath et al.
+new factual knowledge may encourage hallucina-          also trained a separate P(IK) model to predict if
+tions. Huang et al. (2023) categorized hallucination    the LLM knows the answer to q. The label for
+causes and formally defined this scenario as capa-      P(IK) was approximated by the fraction of correct
+bility misalignment, also highlighting that limited     sampled answers, which is conceptually aligned
+research addresses capability misalignment due to       with PCorrect (§3). A key difference is that we also
+the challenge of defining the knowledge boundary        define the SliCK categories, and provide evidence
+of LLMs.                                                that we capture meaningful and useful categories.
+
+   Recent work support our findings. For instance,      10 Conclusion
+Ghosal et al. (2024) showed that models fine-tuned
+on well-known facts exhibit enhanced factuality         We study the impact of integrating new factual
+compared to those fine-tuned on unpopular facts,        knowledge through fine-tuning on the model's ten-
+which can be attributed to the model's lesser fa-       dency to hallucinate. We first propose SliCK, a
+miliarity with unpopular facts. Another example         categorization of facts w.r.t. LLM's knowledge.
+is Lin et al. (2024), who fine-tuned a model us-        We then design a controlled study where we isolate
+ing data generated by either a pre-trained model        the impact of new knowledge and rigorously eval-
+or a retrieval-augmented variant. They found that       uate its effects. We provide multiple insights on
+the latter resulted in reduced factuality, which can    the fine-tuning dynamics, with the following key
+be attributed to the introduction of new factual        findings: (1) Acquiring new knowledge via super-
+knowledge in the retrieved texts. Ren et al. (2024)     vised fine-tuning is correlated with hallucinations
+have also investigated the effects of introducing       w.r.t. pre-existing knowledge. (2) LLMs struggle to
+new factual knowledge through fine-tuning in a          integrate new knowledge through fine-tuning and
+considerably different methodological setup, fo-        mostly learn to use their pre-existing knowledge.
+cusing on multiple-choice questions, conducting
+relatively short fine-tuning runs, and testing only     11 Limitations
+100% known and 100% unknown mixtures. Their
+results align with ours, which further reinforces our   Our experiments were conducted using a single
+conclusions. Lastly, these insights were also inte-     LLM, and thus it is unclear whether results will
+grated into the instruction-tuning phase of Llama       vary with different LLMs. Having said that, our
+3 models (Dubey et al., 2024), ensuring that the        study is extremely compute-heavy and thus chal-
+examples are aligned with pre-training knowledge.       lenging to replicate on multiple LLMs: First, our
+                                                        fine-tuning is compute-heavy as its runs are very
+   Another line of work explores the model's be-        long as we wanted to analyze the behavior during
+havior on new knowledge in test time. Kang et al.       different stages of fine-tuning (including the over-
+(2024) showed that when a fine-tuned LLM en-            fitting stages). Second, and most importantly, to
+counters unknown queries at test time, its responses    facilitate our study we needed to annotate a large
+mimic the responses associated with the unknown         scale dataset w.r.t the SliCK categories. To derive
+examples in the fine-tuning data. Yin et al. (2023)     reliable conclusions, it was crucial to accurately
+showed that LLMs' performance is not satisfactory       assess the model's knowledge w.r.t. a single fine-
+when they face new knowledge in their input con-        tuning example. In our case we run 170 inference
+texts and Lee et al. (2023) analyzed the impact of      steps per example, i.e., more than 15M inference
+unknown in-context learning examples.                   steps to categorize our full dataset.
+
+Quantifying knowledge in LLMs. SliCK can                   In addition, since we focus on closed-book QA,
+be seen as a confidence elicitation method for the      the practical implications from our study such as
+ground truth label (M knows (q, a) if it is confident   filtering-out Unknown fine-tuning examples still re-
+that a is the answer to q). Existing work derive cali-  quire validation in settings involving long-form
+brated confidence from LLMs by examining agree-         text generation. To filter-out examples that intro-
+ment across multiple samples (Kuhn et al., 2023;        duce new factual knowledge in long-form gener-
+ation tasks, one would need to make adaptations          Collin Burns, Haotian Ye, Dan Klein, and Jacob Stein-
+to SliCK and come up with an effective way to               hardt. 2022. Discovering latent knowledge in lan-
+compare the sampled answer with the ground-truth            guage models without supervision. arXiv preprint
+to approximate PCorrect. We leave this for future           arXiv:2212.03827.
+work. Long-form generation tasks introduce eval-
+uation challenges, leading to a wide adoption of         I Chern, Steffi Chern, Shiqi Chen, Weizhe Yuan, Kehua
+LLM-based evaluations. Our choice to focus ex-              Feng, Chunting Zhou, Junxian He, Graham Neubig,
+plicitly on closed book QA facilitates more accu-           Pengfei Liu, et al. 2023. Factool: Factuality detec-
+rate evaluation that enhances the reliability of our        tion in generative ai­a tool augmented framework
+findings.                                                   for multi-task and multi-domain scenarios. arXiv
+                                                            preprint arXiv:2307.13528.
+   Lastly, we did not test the effect of adding ad-
+ditional fine-tuning examples from diverse tasks         Roi Cohen, Mor Geva, Jonathan Berant, and Amir
+into the fine-tuning mixture. While this could              Globerson. 2023. Crawling the internal knowledge-
+more closely approximate a typical instruction fine-        base of language models. In Findings of the Asso-
+tuning scenario, such dataset extension may intro-          ciation for Computational Linguistics: EACL 2023,
+duce new factual knowledge in an uncontrollable             pages 1856­1869, Dubrovnik, Croatia. Association
+way, which will limit our findings.                         for Computational Linguistics.
+
+12 Acknowledgments                                       Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey,
+                                                            Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman,
+                                                            Akhil Mathur, Alan Schelten, Amy Yang, Angela
+                                                            Fan, et al. 2024. The llama 3 herd of models. arXiv
+                                                            preprint arXiv:2407.21783.
+
+We thank the reviewers for their valuable com-           Leo Gao. 2021. Behavior cloning is miscalibrated. AI
+ments and suggestions for improving this work.              Alignment Forum.
+We would also like to thank Ori Ram, Uri Shaham,
+Alon Jacovi, Mor Ventura, Yochai Blau, Eyal Ben-         Zorik Gekhman, Jonathan Herzig, Roee Aharoni, Chen
+David, Avi Caciularu, Avinatan Hassidim and the             Elkind, and Idan Szpektor. 2023. TrueTeacher:
+members of Roi Reichart's NLP group for review-             Learning factual consistency evaluation with large
+ing the paper draft and providing valuable feedback.        language models. In Proceedings of the 2023 Con-
+Special thanks to Uri Shaham for assisting in set-          ference on Empirical Methods in Natural Language
+ting up the fine-tuning pipeline during the early           Processing, pages 2053­2070, Singapore. Associa-
+stages of our research.                                     tion for Computational Linguistics.
+
+References                                               Gaurav Rohit Ghosal, Tatsunori Hashimoto, and Aditi
+                                                            Raghunathan. 2024. Understanding finetuning for
+                                                            factual knowledge extraction. In Forty-first Interna-
+                                                            tional Conference on Machine Learning, ICML 2024,
+                                                            Vienna, Austria, July 21-27, 2024. OpenReview.net.
+
+Badr AlKhamissi, Millicent Li, Asli Celikyilmaz, Mona    Yoav Goldberg. 2023. Reinforcement learning for lan-
+   Diab, and Marjan Ghazvininejad. 2022. A review on        guage models.
+   language models as knowledge bases. arXiv preprint
+   arXiv:2204.06031.                                     Arnav Gudibande, Eric Wallace, Charlie Snell, Xinyang
+                                                            Geng, Hao Liu, Pieter Abbeel, Sergey Levine, and
+Rohan Anil, Andrew M Dai, Orhan Firat, Melvin John-         Dawn Song. 2023. The false promise of imitating
+   son, Dmitry Lepikhin, Alexandre Passos, Siamak           proprietary llms. arXiv preprint arXiv:2305.15717.
+   Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng
+   Chen, et al. 2023. Palm 2 technical report. arXiv     Zeyu Han, Chao Gao, Jinyang Liu, Sai Qian Zhang,
+   preprint arXiv:2305.10403.                               et al. 2024. Parameter-efficient fine-tuning for large
+                                                            models: A comprehensive survey. arXiv preprint
+Amos Azaria and Tom Mitchell. 2023. The internal            arXiv:2403.14608.
+   state of an llm knows when its lying. arXiv preprint
+   arXiv:2304.13734.                                     Or Honovich, Roee Aharoni, Jonathan Herzig, Hagai
+                                                            Taitelbaum, Doron Kukliansy, Vered Cohen, Thomas
+Dan Biderman, Jacob Portes, Jose Javier Gonzalez Ortiz,     Scialom, Idan Szpektor, Avinatan Hassidim, and
+   Mansheej Paul, Philip Greengard, Connor Jennings,        Yossi Matias. 2022. TRUE: Re-evaluating factual
+   Daniel King, Sam Havens, Vitaliy Chiley, Jonathan        consistency evaluation. In Proceedings of the 2022
+   Frankle, Cody Blakeney, and John Patrick Cunning-        Conference of the North American Chapter of the
+   ham. 2024. LoRA learns less and forgets less. Trans-     Association for Computational Linguistics: Human
+   actions on Machine Learning Research. Featured           Language Technologies, pages 3905­3920, Seattle,
+   Certification.                                           United States. Association for Computational Lin-
+                                                            guistics.
+Or Honovich, Leshem Choshen, Roee Aharoni, Ella              Methods in Natural Language Processing (EMNLP),
+   Neeman, Idan Szpektor, and Omri Abend. 2021.              pages 9332­9346, Online. Association for Computa-
+   q2: Evaluating factual consistency in knowledge-          tional Linguistics.
+   grounded dialogues via question generation and ques-
+   tion answering. In Proceedings of the 2021 Confer-     Lorenz Kuhn, Yarin Gal, and Sebastian Farquhar. 2023.
+   ence on Empirical Methods in Natural Language Pro-        Semantic uncertainty: Linguistic invariances for un-
+   cessing, pages 7856­7870, Online and Punta Cana,          certainty estimation in natural language generation.
+   Dominican Republic. Association for Computational         arXiv preprint arXiv:2302.09664.
+   Linguistics.
+                                                          Philippe Laban, Tobias Schnabel, Paul N. Bennett, and
+Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan            Marti A. Hearst. 2022. SummaC: Re-visiting NLI-
+   Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and           based models for inconsistency detection in summa-
+   Weizhu Chen. 2022. Lora: Low-rank adaptation of           rization. Transactions of the Association for Compu-
+   large language models. In The Tenth International         tational Linguistics, 10:163­177.
+   Conference on Learning Representations, ICLR 2022,
+   Virtual Event, April 25-29, 2022. OpenReview.net.      Yoonsang Lee, Pranav Atreya, Xi Ye, and Eunsol
+                                                             Choi. 2023. Crafting in-context examples accord-
+Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong,            ing to lms' parametric knowledge. arXiv preprint
+   Zhangyin Feng, Haotian Wang, Qianglong Chen,              arXiv:2311.09579.
+   Weihua Peng, Xiaocheng Feng, Bing Qin, et al. 2023.
+   A survey on hallucination in large language models:    Bill Yuchen Lin, Abhilasha Ravichander, Ximing Lu,
+   Principles, taxonomy, challenges, and open questions.     Nouha Dziri, Melanie Sclar, Khyathi Chandu, Chan-
+   arXiv preprint arXiv:2311.05232.                          dra Bhagavatula, and Yejin Choi. 2023. The unlock-
+                                                             ing spell on base llms: Rethinking alignment via
+Adam Ibrahim, Benjamin Thérien, Kshitij Gupta,               in-context learning. ArXiv preprint.
+   Mats Leon Richter, Quentin Gregory Anthony, Eu-
+   gene Belilovsky, Timothée Lesort, and Irina Rish.      Sheng-Chieh Lin, Luyu Gao, Barlas Oguz, Wenhan
+   2024. Simple and scalable strategies to continually       Xiong, Jimmy Lin, Wen-tau Yih, and Xilun Chen.
+   pre-train large language models. Transactions on          2024. Flame: Factuality-aware alignment for large
+   Machine Learning Research.                                language models. arXiv preprint arXiv:2405.01525.
+
+Zhengbao Jiang, Zhiqing Sun, Weijia Shi, Pedro Ro-        Qing Lyu, Kumar Shridhar, Chaitanya Malaviya,
+   driguez, Chunting Zhou, Graham Neubig, Xi Lin,            Li Zhang, Yanai Elazar, Niket Tandon, Mari-
+   Wen-tau Yih, and Srini Iyer. 2024. Instruction-tuned      anna Apidianaki, Mrinmaya Sachan, and Chris
+   language models are better knowledge learners. In         Callison-Burch. 2024. Calibrating large language
+   Proceedings of the 62nd Annual Meeting of the As-         models with sample consistency. arXiv preprint
+   sociation for Computational Linguistics (Volume 1:        arXiv:2402.13904.
+   Long Papers), pages 5421­5434, Bangkok, Thailand.
+   Association for Computational Linguistics.             Potsawee Manakul, Adian Liusie, and Mark JF Gales.
+                                                             2023. Selfcheckgpt: Zero-resource black-box hal-
+Saurav Kadavath, Tom Conerly, Amanda Askell, Tom             lucination detection for generative large language
+   Henighan, Dawn Drain, Ethan Perez, Nicholas               models. arXiv preprint arXiv:2303.08896.
+   Schiefer, Zac Hatfield-Dodds, Nova DasSarma, Eli
+   Tran-Johnson, et al. 2022. Language models             Kevin Meng, David Bau, Alex Andonian, and Yonatan
+   (mostly) know what they know. arXiv preprint              Belinkov. 2022. Locating and editing factual associ-
+   arXiv:2207.05221.                                         ations in GPT. In Advances in Neural Information
+                                                             Processing Systems 35: Annual Conference on Neu-
+Ehsan Kamalloo, Nouha Dziri, Charles L. A. Clarke,           ral Information Processing Systems 2022, NeurIPS
+   and Davood Rafiei. 2023. Evaluating open-domain           2022, New Orleans, LA, USA, November 28 - Decem-
+   question answering in the era of large language mod-      ber 9, 2022.
+   els. In Proceedings of the 61st Annual Meeting of
+   the Association for Computational Linguistics (Vol-    Kevin Meng, Arnab Sen Sharma, Alex J. Andonian,
+   ume 1: Long Papers), ACL 2023, Toronto, Canada,           Yonatan Belinkov, and David Bau. 2023. Mass-
+   July 9-14, 2023, pages 5591­5606. Association for         editing memory in a transformer. In The Eleventh
+   Computational Linguistics.                                International Conference on Learning Representa-
+                                                             tions, ICLR 2023, Kigali, Rwanda, May 1-5, 2023.
+Katie Kang, Eric Wallace, Claire Tomlin, Aviral Ku-          OpenReview.net.
+   mar, and Sergey Levine. 2024. Unfamiliar finetuning
+   examples control how language models hallucinate.      Sewon Min, Kalpesh Krishna, Xinxi Lyu, Mike Lewis,
+   arXiv preprint arXiv:2403.05612.                          Wen-tau Yih, Pang Koh, Mohit Iyyer, Luke Zettle-
+                                                             moyer, and Hannaneh Hajishirzi. 2023. FActScore:
+Wojciech Kryscinski, Bryan McCann, Caiming Xiong,            Fine-grained atomic evaluation of factual precision
+   and Richard Socher. 2020. Evaluating the factual          in long form text generation. In Proceedings of the
+   consistency of abstractive text summarization. In         2023 Conference on Empirical Methods in Natural
+   Proceedings of the 2020 Conference on Empirical           Language Processing, pages 12076­12100, Singa-
+                                                             pore. Association for Computational Linguistics.
+Swaroop Mishra, Daniel Khashabi, Chitta Baral, and        John Schulman. 2023. Reinforcement learning from
+   Hannaneh Hajishirzi. 2022. Cross-task generaliza-         human feedback: Progress and challenges.
+   tion via natural language crowdsourcing instructions.
+   In Proceedings of the 60th Annual Meeting of the       Thomas Scialom, Paul-Alexis Dray, Sylvain Lamprier,
+   Association for Computational Linguistics (Volume         Benjamin Piwowarski, Jacopo Staiano, Alex Wang,
+   1: Long Papers), pages 3470­3487, Dublin, Ireland.        and Patrick Gallinari. 2021. QuestEval: Summariza-
+   Association for Computational Linguistics.                tion asks for fact-based evaluation. In Proceedings of
+                                                             the 2021 Conference on Empirical Methods in Natu-
+Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida,            ral Language Processing, pages 6594­6604, Online
+   Carroll L. Wainwright, Pamela Mishkin, Chong              and Punta Cana, Dominican Republic. Association
+   Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray,        for Computational Linguistics.
+   John Schulman, Jacob Hilton, Fraser Kelton, Luke
+   Miller, Maddie Simens, Amanda Askell, Peter Welin-     Christopher Sciavolino, Zexuan Zhong, Jinhyuk Lee,
+   der, Paul F. Christiano, Jan Leike, and Ryan Lowe.        and Danqi Chen. 2021. Simple entity-centric ques-
+   2022. Training language models to follow instruc-         tions challenge dense retrievers. In Proceedings
+   tions with human feedback. In Advances in Neural          of the 2021 Conference on Empirical Methods in
+   Information Processing Systems 35: Annual Confer-         Natural Language Processing, EMNLP 2021, Vir-
+   ence on Neural Information Processing Systems 2022,       tual Event / Punta Cana, Dominican Republic, 7-11
+   NeurIPS 2022, New Orleans, LA, USA, November 28           November, 2021, pages 6138­6148. Association for
+  - December 9, 2022.                                        Computational Linguistics.
+
+Jupinder Parmar, Sanjev Satheesh, Mostofa Patwary,        Katherine Tian, Eric Mitchell, Huaxiu Yao, Christo-
+   Mohammad Shoeybi, and Bryan Catanzaro. 2024.              pher D Manning, and Chelsea Finn. 2023a. Fine-
+   Reuse, don't retrain: A recipe for continued pre-         tuning language models for factuality. arXiv preprint
+   training of language models. arXiv preprint               arXiv:2311.08401.
+   arXiv:2407.07263.
+                                                          Katherine Tian, Eric Mitchell, Allan Zhou, Archit
+Fabio Petroni, Tim Rocktäschel, Sebastian Riedel,            Sharma, Rafael Rafailov, Huaxiu Yao, Chelsea Finn,
+   Patrick Lewis, Anton Bakhtin, Yuxiang Wu, and             and Christopher D Manning. 2023b. Just ask for cali-
+   Alexander Miller. 2019. Language models as knowl-         bration: Strategies for eliciting calibrated confidence
+   edge bases? In Proceedings of the 2019 Confer-            scores from language models fine-tuned with human
+   ence on Empirical Methods in Natural Language Pro-        feedback. arXiv preprint arXiv:2305.14975.
+   cessing and the 9th International Joint Conference
+   on Natural Language Processing (EMNLP-IJCNLP),         Pranav Narayanan Venkit, Tatiana Chakravorti, Vipul
+   pages 2463­2473, Hong Kong, China. Association            Gupta, Heidi Biggs, Mukund Srinath, Koustava
+   for Computational Linguistics.                            Goswami, Sarah Rajtmajer, and Shomir Wilson.
+                                                             2024. " confidently nonsensical?": A critical survey
+Rafael Rafailov, Archit Sharma, Eric Mitchell, Christo-      on the perspectives and challenges of'hallucinations'
+   pher D Manning, Stefano Ermon, and Chelsea Finn.          in nlp. arXiv preprint arXiv:2404.07461.
+   2024. Direct preference optimization: Your language
+   model is secretly a reward model. Advances in Neu-     Denny Vrandecic´ and Markus Krötzsch. 2014. Wiki-
+   ral Information Processing Systems, 36.                   data: a free collaborative knowledgebase. Commun.
+                                                             ACM, 57(10):78­85.
+Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and
+   Percy Liang. 2016. SQuAD: 100,000+ questions for       Cunxiang Wang, Sirui Cheng, Qipeng Guo, Yuanhao
+   machine comprehension of text. In Proceedings of          Yue, Bowen Ding, Zhikun Xu, Yidong Wang, Xi-
+   the 2016 Conference on Empirical Methods in Natu-         angkun Hu, Zheng Zhang, and Yue Zhang. 2023.
+   ral Language Processing, pages 2383­2392, Austin,         Evaluating open-qa evaluation. In Advances in Neu-
+   Texas. Association for Computational Linguistics.         ral Information Processing Systems 36: Annual Con-
+                                                             ference on Neural Information Processing Systems
+Mengjie Ren, Boxi Cao, Hongyu Lin, Cao Liu, Xian-            2023, NeurIPS 2023, New Orleans, LA, USA, Decem-
+   pei Han, Ke Zeng, Wan Guanglu, Xunliang Cai, and          ber 10 - 16, 2023.
+   Le Sun. 2024. Learning or self-aligning? rethinking
+   instruction fine-tuning. In Proceedings of the 62nd    Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin
+   Annual Meeting of the Association for Computational       Guu, Adams Wei Yu, Brian Lester, Nan Du, An-
+   Linguistics (Volume 1: Long Papers), pages 6090­          drew M. Dai, and Quoc V. Le. 2022. Finetuned
+   6105, Bangkok, Thailand. Association for Computa-         language models are zero-shot learners. In The Tenth
+   tional Linguistics.                                       International Conference on Learning Representa-
+                                                             tions, ICLR 2022, Virtual Event, April 25-29, 2022.
+Ohad Rubin, Jonathan Herzig, and Jonathan Berant.            OpenReview.net.
+   2022. Learning to retrieve prompts for in-context
+   learning. In Proceedings of the 2022 Conference of     Yuqing Yang, Ethan Chern, Xipeng Qiu, Graham Neu-
+   the North American Chapter of the Association for         big, and Pengfei Liu. 2023. Alignment for honesty.
+   Computational Linguistics: Human Language Tech-           arXiv preprint arXiv:2312.07000.
+   nologies, pages 2655­2671, Seattle, United States.
+   Association for Computational Linguistics.
+Xunjian Yin, Baizhou Huang, and Xiaojun Wan. 2023.
+   ALCUNA: Large language models meet new knowl-
+   edge. In Proceedings of the 2023 Conference on
+   Empirical Methods in Natural Language Processing,
+   pages 1397­1414, Singapore. Association for Com-
+   putational Linguistics.
+
+Gal Yona, Roee Aharoni, and Mor Geva. 2024. Nar-
+   rowing the knowledge evaluation gap: Open-domain
+   question answering with multi-granularity answers.
+   arXiv preprint arXiv:2401.04695.
+
+Hanning Zhang, Shizhe Diao, Yong Lin, Yi R Fung,
+   Qing Lian, Xingyao Wang, Yangyi Chen, Heng Ji,
+   and Tong Zhang. 2023. R-tuning: Teaching large
+   language models to refuse unknown questions. arXiv
+   preprint arXiv:2311.09677.
+
+Zexuan Zhong, Zhengxuan Wu, Christopher D. Man-
+   ning, Christopher Potts, and Danqi Chen. 2023.
+   Mquake: Assessing knowledge editing in language
+   models via multi-hop questions. In Proceedings of
+   the 2023 Conference on Empirical Methods in Natu-
+   ral Language Processing, EMNLP 2023, Singapore,
+   December 6-10, 2023, pages 15686­15702. Associa-
+   tion for Computational Linguistics.
+
+Chunting Zhou, Pengfei Liu, Puxin Xu, Srinivasan Iyer,
+   Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping
+   Yu, Lili Yu, Susan Zhang, Gargi Ghosh, Mike Lewis,
+   Luke Zettlemoyer, and Omer Levy. 2023. LIMA:
+   less is more for alignment. In Advances in Neural
+   Information Processing Systems 36: Annual Confer-
+   ence on Neural Information Processing Systems 2023,
+   NeurIPS 2023, New Orleans, LA, USA, December 10
+  - 16, 2023.
+
+Chen Zhu, Ankit Singh Rawat, Manzil Zaheer, Srinadh
+   Bhojanapalli, Daliang Li, Felix Yu, and Sanjiv Kumar.
+   2020. Modifying memories in transformer models.
+   arXiv preprint arXiv:2012.00363.
+A Data Preprocessing                                        · P413, for which the question template
+                                                               is "What position does [E] play?", was
+This section expands §2 with additional details                filtered out since it may require knowl-
+about our data preprocessing steps. The ENTI-                  edge that relates to P800, for which the
+TYQUESTIONS dataset (Sciavolino et al., 2021) con-             question template is "What is [E] famous
+sists of train, development and test splits and spans          for?". P413 stands for "position played on
+24 relations. Our train, development and test sets             team / speciality" (https://www.wikidata.
+are curated based on the original splits from ENTI-            org/wiki/Property:P413) and P800 stands
+TYQUESTIONS. However, we use only 12 relations,                for "notable work" (https://www.wikidata.
+since we wanted to reserve some relations for out-             org/wiki/Property:P800).
+of-distribution test set. To avoid cherry-picking, the
+12 relations used in our train, development and test        · P159, for which the question template is
+sets are randomly sampled. The resulting relations            "Where is the headquarters of [E]?", was
+are presented in Tables 4 and 5.                               filtered out since it may require knowl-
+                                                               edge that relates to P36, for which the
+   We reserved the remaining 12 relations for out-             question template is "What is the capi-
+of-distribution test set. However, we found that in            tal of [E]?". P159 stands for "head-
+those 12 reserved relations, 5 were too similar to             quarters location" (https://www.wikidata.
+some of the relations that we train on (Table 4),              org/wiki/Property:P159) and P36 stands
+thus we suspected that this could lead to a test set           for "capital" (https://www.wikidata.org/
+that is not truly out-of-distribution. To address that,        wiki/Property:P36).
+we filtered out those relations and were left with
+7 relations for our-of-distribution. These 7 out-of-        Lastly, we perform two additional filtering steps:
+distribution relations are presented in Table 6. The     (1) To simplify the process of categorizing the ex-
+relations that were filtered-out are as follows:         amples w.r.t. M 's knowledge (§3), we filter-out
+                                                         examples with more than 1 correct answer.14 (2)
+   · P276 was filtered out since it directly             We make sure that no subjects or objects overlap
+      overlaps with P131 since for both rela-            between the train and test sets,15 by filtering-out
+      tions the question in ENTITYQUESTIONS is           overlapping examples from the train set.16
+      of the form "Where is [E] located?".
+      P276 stands for "location" (https://www.           B Hallucinations in the Context of our
+      wikidata.org/wiki/Property:P276) and                    Study
+      P131 stands for "located in the administrative
+      territorial entity" (https://www.wikidata.         In general, the term "hallucinations" is not well-
+      org/wiki/Property:P131).                           defined in NLP (Venkit et al., 2024). For clarity,
+                                                         in §B.1 we define the type of hallucinations we
+   · P20, for which the question template is             target in this work. In addition, while our main
+     "Where did [E] die?", was filtered out since        takeaway is that acquiring new knowledge can lead
+      it may require knowledge that relates to P19,      to hallucinations, our experiments focus on mea-
+      for which the question template is "Where          suring accuracy drops on the test set. Therefore,
+      was [E] born?". P20 stands for "place of           in §B.2 we clarify why worse performance on the
+      death" (https://www.wikidata.org/wiki/             test set in our study is attributed to higher rate of
+      Property:P20) and P19 stands for "place of         hallucinations, as defined in §B.1.
+      birth" (https://www.wikidata.org/wiki/
+      Property:P19).                                     B.1 Hallucinations w.r.t. the Pre-existing
+                                                                Knowledge.
+   · P106, for which the question template is
+     "What kind of work does [E] do?", was filtered      Huang et al. (2023) categorized hallucinations into
+      out since it may require knowledge that re-        two main categories: (1) factuality hallucination
+      lates to P800, for which the question template
+      is "What is [E] famous for?". P106 stands             144.2% and 3.9% of the ENTITYQUESTIONS train and test
+      for "occupation" (https://www.wikidata.            set respectively.
+      org/wiki/Property:P106) and P800 stands
+      for "notable work" (https://www.wikidata.             15For example, the subject "Bruce Smith" appears with
+      org/wiki/Property:P800).                           2 different relations (P 106 and P 413) yielding 2 examples:
+                                                         ("What kind of work does Bruce Smith do?", "poet") and
+                                                         ("Where was Bruce Smith born?", "Faribault").
+
+                                                            162.1% of the ENTITYQUESTIONS train set.
+relation  question template                        HighlyKnown      MaybeKnown      WeaklyKnown      Unknown    Total   Min
+
+P131      Where is [E] located?                                553           2529              1493       3071  7646    553
+P136      What type of music does [E] play?                    236           3410              1892       1978  7516    236
+P17       Which country is [E] located in?                    4387           2628               511        364  7890    364
+P19       Where was [E] born?                                  369           1884              1498       4170  7921    369
+P26       Who is [E] married to?                              1609           1503              1087       3257  7456   1087
+P264      What music label is [E] represented by?              206           1444              1854       3820  7324    206
+P36       What is the capital of [E]?                         4160           1634               449        572  6815    449
+P40       Who is [E]'s child?                                  692           1467              1271       2680  6110    692
+P495      Which country was [E] created in?                   5459           1101               408        706  7674    408
+P69       Where was [E] educated?                              233           1126              1712       3650  6721    233
+P740      Where was [E] founded?                              1323           1618              1428       2902  7271   1323
+P800      What is [E] famous for?                              301             330              222        503  1356    222
+
+TOTAL -                                            19528             20674           13825 27673 81700 6142
+
+Table 4: Statistics of the ENTITYQUESTIONS train split annotated with SliCK categories. We annotate the entire train
+split but always fine-tune on exactly 6142 examples (see the Min column). Refer to §E for more details.
+
+relation  question template                        HighlyKnown       MaybeKnown      WeaklyKnown           Unknown     Total
+
+P131      Where is [E] located?                                  57             362              158             388    965
+P136      What type of music does [E] play?                       6             432              248             281    967
+P17       Which country is [E] located in?                                      432                65              51   996
+P19       Where was [E] born?                                  448              148              243             501    999
+P26       Who is [E] married to?                               107              238              158             378    951
+P264      What music label is [E] represented by?              177              157              268             486    958
+P36       What is the capital of [E]?                                           152                62              86   880
+P40       Who is [E]'s child?                                    47             191              167             344    801
+P495      Which country was [E] created in?                    580              147                51              96   993
+P69       Where was [E] educated?                                               145              227             441    840
+P740      Where was [E] founded?                                 99             245              181             334    942
+P800      What is [E] famous for?                              699               50                                     189
+                                                                                                   28              76
+                                                                 27
+                                                               182
+
+                                                                 35
+
+TOTAL -                                                2464          2699                            1856       3462 10481
+
+          Table 5: In-distribution test set statistics.
+
+and (2) faithfulness hallucination. The first case     tions w.r.t the model's pre-existing knowledge as
+refers to factual inconsistency between the gener-     (q, a) pairs that were known to the model after pre-
+ated content and verifiable real-world facts. Com-     training (as defined by SliCK), while the fine-tuned
+mon examples include wrong answers in closed-          model fails to answer q correctly post fine-tuning.17
+book QA setting (Chern et al., 2023) or factual
+mistakes in long-form generations of knowledge         B.2 Test performance as Proxy for
+intensive passages such as biographies (Manakul               Hallucinations.
+et al., 2023; Min et al., 2023). On the other hand,
+faithfulness hallucination refers to cases where the   We now detail the relation between the test per-
+generated content is factually inconsistent with the   formance in our setting and hallucinations. In our
+context provided by the input. A common example        study, poorer performance of a fine-tuned model
+is when the model summarizes a document and the        MD1, compared to another fine-tuned model MD2
+resulting summary is factually inconsistent with       on the test set, can be attributed to a higher rate of
+the input document (Honovich et al., 2022; Laban       hallucinations in MD1, relative to its pre-existing
+et al., 2022; Honovich et al., 2021; Gekhman et al.,   knowledge, due to the following explanation.
+2023; Scialom et al., 2021; Kryscinski et al., 2020).
+                                                          17This can happen due to 2 main reasons: (1) The model still
+   In this work we focus on a subset of factuality     encodes some knowledge regarding the answer to q but halluci-
+hallucinations. Our goal is to study how intro-        nates. (2) The model completely forgets the answer to q during
+ducing new factual knowledge through fine-tuning       fine-tuning. In this work, we treat these two cases collectively
+affects the utilization of the model's pre-existing    as hallucinations w.r.t the pre-existing knowledge. Method-
+knowledge. To reflect this, we define hallucina-       ologically studying forgetting during fine-tuning and whether
+                                                       unknown facts are still captured in the model's weights can be
+                                                       an interesting direction for future research.
+relation question template                HighlyKnown MaybeKnown WeaklyKnown Unknown Total
+
+P127  Who owns [E]?                                          125   383             168  314 990
+P50   Who is the author of [E]?
+P407  Which language was [E] written in?                     287   193             115  372 967
+P176  Which company is [E] produced by?
+P170  Who was [E] created by?                                366   153             59       45 623
+P175  Who performed [E]?
+P112  Who founded [E]?                                       289   277             181  225 972
+
+                                                             142   284             120  304 850
+
+                                                             94    120             103  663 980
+
+                                                             134   116             76   140 466
+
+TOTAL -                                                      1437  1526            822  2063 5848
+
+                            Table 6: Out-of-distribution test set statistics.
+
+   The test set can be conceptually divided into two         Wrong Answer Paraphrase Higher Granularity Lower Granularity
+types of questions. First, there are questions with
+answers that are unknown to M . Those questions              90%   6%          2%       2%
+will remain unknown post fine-tuning, as we make
+sure that the training set is disjoint from the test         Table 7: Error Analysis of 100 Predictions of the Pre-
+set (§A). This means that both MD1 and MD2 will              trained Model, for Which Exact Match is False.
+fail to answer these questions. Thus, the test perfor-
+mance difference between MD1 and MD2 is mostly                correct format. We use Nex = 10 and Nsample =
+attributed to the second type of questions: ones that         16. The Nsample = 16 samples using T = 0.5 are
+are known to M , i.e. M can answer them correctly             sampled from Top 40.
+since it posses the relevant knowledge. Thus, MD1
+and MD2 must rely on their pre-existing knowledge                The k exemplars are sampled from the develop-
+to answer such questions, and a lower performance             ment split. We sample Nex different samples since
+on such question can be only categorized as an                we found that even when the few-shot exemplars
+hallucination w.r.t. pre-existing knowledge.                  are sampled per-relation, their exact choice still
+                                                              affects the prediction. In §6 and Figure 5 we show
+C PCorrect Approximation                                      evidence that this also improves the quality of our
+                                                              categories.
+This section expands §3 with additional details
+about our PCorrect approximation. In our study                   Below is an example of our 4-shot prompt for-
+we approximate PCorrect(q, a; M, T ) based on the             mat, from real example from ENTITYQUESTIONS with
+fraction of correct answers to q sampled from M .             the relation P 106 representing occupation.19 The
+We begin with randomly sampling Nex distinct k-               question in this case is "What kind of work does
+shot exemplars for each relation in our dataset (§A).         Ron Konopka do?" and the ground truth asnwer is
+Then, to approximate PCorrect(q, a; M, T ), we use           "geneticist".
+M to generate answers to q using each of the Nex
+exemplars from the relation corresponding to q.                  Q: What kind of work does Nicolas Roeg do?
+We first use temperature sampling with T = 0.5                   A: film director
+to sample Nsample answers for each of the Nex ex-                Q: What kind of work does Crystal Geoffré do?
+emplars. PCorrect(q, a; M, T > 0) is then approxi-               A: actor
+mated by the fraction of correct answers from the                Q: What kind of work does Maurice Blondel do?
+total of Nex · Nsample predictions. We also generate             A: philosopher
+the greedy decoding prediction (T = 0) for each                  Q: What kind of work does Javier de Burgos do?
+of the Nex exemplars. PCorrect(q, a; M, T = 0) is                A: politician
+then approximated by the fraction of correct an-                 Q: What kind of work does Ron Konopka do?
+swers from the total of Nex predictions.18                       A:
+
+   We use k = 4 in our study, simply since we                    To decide whether a sampled answer is correct,
+found it enough for M to output answers in the                we use the Exact Match (EM) metric to compare it
+                                                              with the ground truth answer. The main advantage
+   18Since we can only have one greedy prediction for every   in this choice is that when EM is True, we know
+k-shot exemplars.                                             that the answer is correct for 100%. The main
+                                                              potential risk associated with this choice is that we
+                                                              may wrongly classify answers as incorrect due to
+                                                              paraphrases or answers with different granularity
+
+                                                                 19https://www.wikidata.org/wiki/Property:P106
+levels (Wang et al., 2023; Kamalloo et al., 2023;       then define:
+Yona et al., 2024)). To address this, we perform
+an error analysis on 100 predictions for which                                           CAT  { 
+EM was False. We randomly sample 50 greedy
+predictions (T = 0) and 50 samples with T = 0.5.                                                       
+The results are in Table 7. This analysis suggest                            
+that in 90% of the cases where EM is False, the                                          HighlyKnown,  
+predicted answer is indeed incorrect. Which is a                                                       
+reasonable performance for our purpose, especially                                                     
+considering that when EM is True the answer is
+100% correct.                                                           min size(CATr)|                
+
+D Data Annotation                                       |D| =                            MaybeKnown,
+
+we first calculate PCorrect(q, a; M, T = 0) and                rRTrain                   WeaklyKnown,  
+PCorrect(q, a; M, T > 0) for each (q, a) pair in                                                       
+our preprocessed dataset (§2 and §A), using our                                                        
+PCorrect(·) approximation (§3 and §C). We then
+use these values to categorize each (q, a) pair into                                                   
+one of our four categories (§3 and Figure 2). We                                         Unknown} 
+provide the full statistics of the categories on the                    
+train and test set, as well as the out-of-distribution
+test set in Tables 4, 5 and 6.                           where RTrain are the 12 relations from the training
+                                                         set.
+E Fine-tuning Details
+                                                            Below is an example of our data format in the
+Fine-tuning Data. In §4 we examine the effect            train, development and test sets, from real example
+of new knowledge in the fine-tuning dataset D on         from ENTITYQUESTIONS with the relation P 106 rep-
+the performance of MD, by varying the propor-            resenting occupation.20 The question in this case is
+tion of Unknown examples in D. When we create           "What kind of work does Ron Konopka do?" and the
+variants of D with exactly X% of Unknown and             ground truth asnwer is "geneticist".
+(100 - X)% Known examples, we make sure that
+the relation distribution remains consistent. To        Answer the following question.
+achieve that we sample X% of Unknown from each          What kind of work does Ron Konopka do?
+relation.
+                                                        Fine-tuning Regime. In this work, we focus on
+   In §5 we create single-category variants of D.       full fine-tuning, where all model parameters are up-
+Since we want to work with a fixed |D| across all       dated. An interesting direction for future research
+variants, we want to make sure that we have |D|         is to investigate similar questions within parameter-
+examples from each category. To ensure this, we         efficient fine-tuning regimes (Han et al., 2024),
+measure the size of the smallest category in each re-   such as LoRA (Hu et al., 2022). For instance, Bi-
+lation (see the "Min" column in Table 4) and define     derman et al. (2024) demonstrated that, compared
+|D| as their sum. In other words, for each relation     to full fine-tuning, LoRA better preserves the base
+we calculate the size of the smallest category and      model's performance on tasks outside the target do-
+sum these values. This leads to |D| = 6142, as          main, though at the cost of diminished performance
+illustrated by the last column in Table 4. More for-    within the target domain. It could be interesting
+mally, for each relation r in the training split, and   to check if this also holds to hallucinations w.r.t.
+for each category CAT from our 4 SliCK categories,      the models pre-existing knowledge as we define it
+we define CATr to be the examples from category         in this work (§B). Another interesting avenue for
+CAT and relation r. Consequently size(CATr) is          future research is to explore how new knowledge is
+the number of the examples in CATr. For example         acquired during continual pre-training (Jiang et al.,
+size(HighlyKnown P131) = 553 (see Table 4). We          2024; Parmar et al., 2024; Ibrahim et al., 2024) as
+                                                        one of the key objectives in continual pre-training is
+                                                        to inject new (up to date) knowledge to the model.
+
+                                                        Fine-tuning hypeparameters. We fine-tune ev-
+                                                        ery model for 50 epochs for all our model variants
+                                                        to completely fit the training set, so we can examine
+                                                        all stages of fine-tuning. We evaluate the models ev-
+                                                        ery epoch on the development set. The EARLY_STOP
+                                                        stopping criteria is defined to be the epoch with the
+                                                        maximum accuracy on the development set. We
+                                                        use learning rate of 1e-5, a batch size of 128, and
+                                                        a dropout rate of 0.05. Our experimental design
+                                                        intentionally utilized a fixed learning rate, which is
+                                                        the standard for supervised fine-tuning, as opposed
+                                                        to the dynamic learning rate strategies typically
+
+                                                           20https://www.wikidata.org/wiki/Property:P106
+Figure 6: Performance on the test set with a slower           Figure 7: Training accuracy as a function of fine-tuning
+learning rate of 1e-4. This plot is equivalent to Figure 3a,  duration, evaluated on the variant with 50% Unknown
+and the results are similar, except that the experiment       fine-tuning examples. For reference, we also include
+were run with a learning rate of 1e-4 instead of 1e-5.        the accuracy on the development set, accompanied by a
+                                                              zoom-in plot within a narrower range, to provide a more
+employed in continual pre-training. We have exper-            visible and clear view.
+imented with both slower and faster fixed learning
+rates (1e-4 and 1e-6) to ensure the robustness of             model. E.g., the model may know that there is a per-
+our conclusions. These experiments consistently               son named "Barack Obama" but not know where
+supported our findings. For instance, in Figure 6             he was born. If we consider (2), using real subjects
+we present the performance as a function of the %             with fake objects may compromise our study as in
+of the Unknown examples in D (i.e. similar plot               many cases this will introduce knowledge updates
+to Figure 3a) when using a learning rate of 1e-4              and not new knowledge. To illustrate this, let's
+instead of 1e-5.                                              consider the triplet ("Barack Obama", "place of
+                                                              birth", "Honolulu"), and let's assume that we gen-
+F The Case for Avoiding Fake Facts                            erate the fake triplet ("Barack Obama", "place
+                                                              of birth", "London"). Now, since the original
+One limitation of using the Unknown examples                  (correct) triplet may be known to the model we
+in our study is that SliCK only approximates the              essentially do not simulate introducing new fac-
+LLM's knowledge. This means that some exam-                   tual knowledge but updating existing knowledge.
+ples can be incorrectly classified as unknown to              Considering the above, we decided that using real
+M . As we discuss in §6, our results indicate that            world facts will make our findings more reliable.
+this happens in at most 3% of the cases, meaning              We then invested a considerable effort to ensure
+that the vast majority of the examples classified as          that the examples that are classified as unknown are
+Unknown are actually unknown to M .                           truly unknown to the model (as discussed above).
+
+   Alternative approach could be to simply use fake           G Train Accuracy on Different Known
+facts as unknown fine-tuning examples. We con-                     Categories
+sidered this in early stages of the project and were
+concerned that this would introduce confounding               In §4.3 we analyze the fine-tuning dynamic and
+factors into our study, as fake facts may behave              present the training accuracy as function of the
+differently than real ones; In our setup where the            fine-tuning duration in Figure 1. For simplicity
+knowledge is represented with (subject, relation,             we treated the Known categories collectively. For
+object) triplets, there are 2 main ways to generate           reference we also include the plot with the full
+fake facts: (1) creating triplets where both the sub-         per-category breakdown in Figure 7.
+ject and the object are fake (Yin et al., 2023). (2)
+Creating triplets where the subject is real and the
+object is fake (Zhu et al., 2020; Meng et al., 2022,
+2023; Zhong et al., 2023). Focusing exclusively on
+(1) will capture only a small subset of the cases of
+new factual knowledge, as in the majority of the
+cases the subject will be familiar to the pre-trained
+(a)                                                    (b)
+
+Figure 8: Performance on the out-of-distribution (OOD) test set as a function of the % of Unknown examples in the
+fine-tuning dataset D. This plot is the OOD version of Figure 3. Everything is similar to Figure 3, except that y-axis
+is the accuracy on the OOD test set. We note that the development set did not change (not OOD), thus it does not
+necessarily reflects the optimal stopping point for OOD.
+
+H Linear Model                                         drop compared to up to 14 for in-distribution. This
+                                                       smaller drop magnitude is also reflected in smaller
+In §4.4 and §4.5 we use a linear model (Equa-          values of |ukn| and |kn| (Table 1).
+tion (1)) that predicts that test accuracy and the
+out-of-distribution test accuracy. We estimate the     J Statistic Significance Tests
+parameters of this linear model based on results
+from all our variants of D used in §4. For all these   In §5 we present Table 2. As mentioned in the
+variants, we measure the test accuracy and the num-    caption, we perform statistic significance tests for
+ber of Known and Unknown fine-tuning examples          each column. To this end we compare all the values
+that M fits during different fine-tuning stages. This  to the maximal value in this column.
+way we collect a dataset with examples of the form
+(Accuracy, NKn, NUnk), which we use to fit a lin-         For each subset of the test set, we randomly
+ear regression model.                                  shuffle all the examples in it, split them up into 100
+                                                       approximately equally sized subsets, and compute
+I Out-of-distribution (OOD) Evaluation                 accuracy for each of them for all the models of
+                                                       interest. We then apply paired-sample t-test with
+In §4.5 we discuss out-of-distribution (OOD) re-       p < 0.05 and p < 0.01.
+sults. In these experiments we simply used our
+OOD test set consisting of 7 relations unseen dur-        In Table 2, the best result is in bold, as well as all
+ing fine-tuning (see §A). When we perform the          the results with statistically non-significant differ-
+analysis discussed in §4.1 and §4.2, we addition-      ence from the best with p < 0.05. We additionally
+ally evaluated the models on the OOD test set. For     include a copy of Table 2 where all the statistical
+completeness, we add here Figure 8, which is the       tests outcomes are annotated, see Table 8. We can
+out-of-distribution version of Figure 3. Figure 8a     see that in almost all cases the difference is statis-
+presents the OOD test performance as a function        tically significant with p < 0.01, except two cases
+of % of Unknown examples in D for different fine-      where it is only with p < 0.05 (DNatural Unk and
+tuning duration. The corresponding in-distribution     DMaybeKnown Mkn).
+results (Figure 3a) were discussed in §4.1. Fig-
+ure 8b presents the OOD test performance for the          Since we also discuss "horizontal" comparisons,
+ablation where we filter-out Unknown fine-tuning       where we compare EARLY_STOP to CONVERGENCE,
+examples. The corresponding in-distribution re-        we additionally run significance tests (not anno-
+sults (Figure 3b) were discussed in §4.2. We no-       tated in Table 2) for All, comparing EARLY_STOP to
+tice that similar trends, just with a smaller overall  CONVERGENCE. The difference for DMaybeKnown was
+magnitude of the performance drop, up to 6 points      not statistically significant while for all others (in-
+                                                       cluding DNatural) it was significant with p < 0.01.
+                    EARLY_STOP                               CONVERGENCE
+
+DHighlyKnown  Full   Hkn   Mkn   Wkn  Unk              Full   Hkn   Mkn    Wkn  Unk
+DMaybeKnown
+DWeaklyKnown  40.5  98.7  60.1  9.0   0.6              40.0  98.4  58.8   8.5   0.7
+DUnknown      43.6  98.4  69.9  12.1  1.0              43.2  97.5  68.2   12.9  1.3
+DNatural      39.2  95.0  59.2  8.6   0.4              35.4  73.5  55.8   17.2  2.2
+              37.5  95.6  52.9  6.5   0.6              25.8  55.8  36.6   12.2  3.2
+              43.5  98.0  67.6  14.1  1.8              41.8  95.5  61.7   14.8  2.5
+
+Table 8: A copy of Table 2 with detailed notation of the statistic significant test results. In each column, statistically
+significant differences from the best result are indicated using  and  for p < 0.05 and p < 0.01 respectively.
+
+K The P(True) Case Study
+
+In §6 we used the P(True) metric from Kadavath
+et al. (2022) as a case study for comparison. In
+Figure 5 we compare our Unknown category vs
+classifying as Unknown based on a threshold of
+P(True). We calculated P(True) for every (q, a)
+pair in the test set using Kadavath et al. (2022)'s
+prompt:
+
+   Question: Where is Paris located?
+   Proposed Answer: France
+   Is the proposed answer:
+
+       (A) True
+       (B) False
+   The proposed answer is:
+
+We then treated (q, a) pairs with P(True) below a
+threshold as Unknown. We experimented with each
+possible threshold T in [0, 1], according to our test
+set. For each threshold T we then measured (1)
+how many examples were classified as Unknown
+out of the test set, (2) what was the accuracy on
+these examples after fine-tuning. We plot the re-
+sults in Figure 5, where P(True) is represented with
+the yellow line and our Unknown is represented
+with the blue circle. As discussed in §C, it was
+approximated using 10 defferent samples of 4-shot
+exemplars (Nex = 10). We also check smaller val-
+ues of Nex and plot the results with the blue line.
+The accuracy after fine-tuning for all the results is
+measured after fine-tuning with DNatural (§5).
+

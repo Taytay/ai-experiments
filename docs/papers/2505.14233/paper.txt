@@ -1,0 +1,1593 @@
+                                                   Mechanistic Fine-tuning for In-context Learning
+
+                                        Hakaze Cho 1, Peng Luo2 Mariko Kato1 Rin Kaenbyou2 Naoya Inoue1,3
+                                                           1Japan Advanced Institute of Science and Technology
+                                                                 2Beijing Institute of Technology 3RIKEN
+
+                                                   Primary Contributor, Correspondence to: yfzhao@jaist.ac.jp
+
+arXiv:2505.14233v2 [cs.CL] 27 Sep 2025                        Abstract                                     hindering ICL performance. Therefore, some prior
+                                                                                                           studies (see §2) try to bridge such a gap by fine-
+                                             In-context Learning (ICL) utilizes structured                 tuning LMs on the ICL-style data on end-to-end
+                                             demonstration-query inputs to induce few-shot                 paradigms, with enormous datasets and calculation
+                                             learning on Language Models (LMs), which                      cost, preventing practical application, especially on
+                                             are not originally pre-trained on ICL-style data.             the scaling Large LMs (LLMs).
+                                             To bridge the gap between ICL and pre-training,
+                                             some approaches fine-tune LMs on large ICL-                      Therefore, in this paper, we try to propose an
+                                             style datasets by an end-to-end paradigm with                 efficient fine-tuning approach towards better ICL
+                                             massive computational costs. To reduce such                   performance, utilizing some previous observations
+                                             costs, in this paper, we propose Attention                    on the inner mechanisms of ICL. In detail, we fo-
+                                             Behavior Fine-Tuning (ABFT), utilizing the                    cus on the Induction Heads in Transformer-based
+                                             previous findings on the inner mechanism of                   LMs, which are a set of critical attention heads to-
+                                             ICL, building training objectives on the atten-               wards ICL, where the attention scores of the last
+                                             tion scores instead of the final outputs, to force            token in the ICL input (where the predictions are
+                                             the attention scores to focus on the correct label            generated) are dominant on the label tokens in the
+                                             tokens presented in the context and mitigate at-              demonstrations, as shown in Fig. 1 (C), for the clue
+                                             tention scores from the wrong label tokens. Our               that the tendency of attention scores from induc-
+                                             experiments on 9 modern LMs and 8 datasets                    tion heads influences the tendency of prediction
+                                             empirically find that ABFT outperforms in per-                synchronously (Reddy, 2024; Cho et al., 2025a)
+                                             formance, robustness, unbiasedness, and effi-                 (e.g., if the attention scores of the induction heads
+                                             ciency, with only around 0.01% data cost com-                 focus on the label token "negative" in the context,
+                                             pared to the previous methods. Moreover, our                  then the prediction is biased towards "negative").
+                                             subsequent analysis finds that the end-to-end
+                                             training objective contains the ABFT objective,                  Consequently, we can directly control the atten-
+                                             suggesting the implicit bias of ICL-style data                tion scores to make the induction heads focus on the
+                                             to the emergence of induction heads. Our work                 correct label tokens for correct predictions. Given
+                                             demonstrates the possibility of controlling spe-              such an objective, as shown in Fig. 1 (C, D), we
+                                             cific module sequences within LMs to improve                  propose Attention Behavior Fine-Tuning (ABFT),
+                                             their behavior, opening up the future applica-                calculating fine-tuning objective (loss function)
+                                             tion of mechanistic interpretability1.                        only on the attention scores of induction heads,
+                                                                                                           to mitigate "wrong" attention score focusing on
+                                        1 Introduction                                                     the wrong label tokens, and promote "correct" at-
+                                                                                                           tention score focusing on the correct label tokens.
+                                        In-Context Learning (ICL) (Radford et al., 2019;                   On such an objective, we fine-tune only the WK
+                                        Dong et al., 2022) is an emerging few-shot learning                and WQ projection matrices of every attention head,
+                                        paradigm where only a concatenation of few-shot                    with an ICL-style training set of only a few hundred
+                                        demonstrations and a query is needed to conduct                    samples, and only a few million of the parameters
+                                        the specified task on the query, requiring only feed-              with gradient activated, which is highly efficient
+                                        forward calculation on the pre-trained Language                    compared to previous works.
+                                        Models (LMs), as shown in Fig. 1 (A, B). However,
+                                        trained on natural language data, LMs may face a                      Our experiments on 9 modern (L)LMs and 8
+                                        distribution gap with ICL-style inputs, potentially                downstream datasets demonstrate that ABFT sig-
+                                                                                                           nificantly improves ICL performance with satis-
+                                            1Source code of this paper is available at https://github.
+                                        com/hc495/ICL_head_tuning.
+
+                                                                                                        1
+(C)           Attention Scores of the Last Token                         (B)         Positive
+  Attention              Induction Heads
+    Scores                                                                           Output Embeddings
+                       Non-induction Heads
+                                                                                     More           Layers
+
+                                                              Label:     Layer 1           / FFN /
+                                                         Fantastic!      Attention
+                                                     Text:                                          heads
+                                                 Negative.                   Scores
+                                            Label:
+                                        Bad.
+                                    Text:
+                               Positive.
+                           Label:
+                       Good.
+                  It's
+              Text:
+
+(D)                               Attention
+               No Is Induction      Scores
+                           Head?
+
+                             Yes
+
+                                                                                     Input Embeddings
+
+Fine-tuning   Attention Scores of Induction Heads                        (A) Text: It's good.       Label: Positive.
+   Objective                                                                                        Label: Negative.
+                                                                              Text: Bad.            Label:(Positive)
+                                                                              Text: Fantastic!
+
+Figure 1: Diagram of ABFT framework. (A) An example of ICL-style inputs. We build datasets from such
+examples to fine-tune models. (B) Feed-forward inference of ICL. We collect the attention scores of every
+attention head in every layer to calculate the training objective. and we only enable the gradient of the WQ and WK
+matrices. (C) The criterion for induction head. Only attention heads producing attention scores with a significant
+focus on the label tokens can be identified as induction heads. (D) Loss calculation of ABFT. Only induction heads
+return a non-zero loss, and such loss contains a punishment on "wrong" attention scores to wrong label tokens, and
+a reward on "correct" attention scores to correct label tokens.
+
+factory efficiency, robustness, unbiasedness, and                        2 Background & Related Works
+harmlessness, even outperforming previous works
+of end-to-end fine-tuning the whole model on mas-                        In-context Learning. Given a few-shot demon-
+sive datasets that are approximately 7, 000× larger                      stration set {(xi, yi)}ki=1 and a query xq, typ-
+than ours. Moreover, our analysis shows that the                         ical ICL creates a concatenation formed like
+ABFT objective implicitly biases end-to-end train-                       [x1, y1, x2, y2, . . . , xk, yk, xq], and feeds it into the
+ing on ICL-style data, where causal language mod-                        forward calculation of a pre-trained LM (Radford
+eling may naturally induce induction heads.                              et al., 2019; Dong et al., 2022) for the next token
+                                                                         as the prediction to xq, as shown in Fig. 1 (A).
+Our contribution can be summarized as:
+· We propose Attention Behavior Fine-Tuning                              LM Warm-up for ICL. Since LMs are typically
+                                                                         pre-trained on plain natural language data instead
+   (ABFT), which efficiently fine-tunes LMs on                           of ICL-style data, it can be expected that a distri-
+   ICL inputs using attention-based objectives with-                     bution gap between the pre-training and ICL test-
+   out supervision on the final output.                                  ing occurs to prevent optimal performance. There-
+                                                                         fore, some works focus on tuning LMs on the ICL
+· Subsequent analysis indicates that the training                        data (Chen et al., 2022; Min et al., 2022; Mishra
+   objective of ABFT is implicitly encompassed by                        et al., 2022; Wang et al., 2022; Wei et al., 2023).
+   the end-to-end training objective on ICL-style                        Even effective, these works need gradient-based
+   data, suggesting that these data may naturally                        whole-model and full-precision training on large
+   evoke the induction heads, which enhances the                         datasets, making it hard to adapt to real-world ap-
+   previous works on the inner mechanism of ICL.                         plications due to the calculation overhead, and mis-
+                                                                         aligning with the low-resource purpose of ICL.
+· Also, we prototypically confirm the possibility
+   of optimizing model performance directly by                           Induction Heads in ICL Inference. As shown
+   controlling the intermediate behavior, without                        in Fig. 1 (C), it has been found that some atten-
+   any error propagation from the output. This                           tion heads (called induction heads) in LMs have a
+   is a hint toward Mechanistic Controllability, a                       nontrivial influence on ICL inference (Elhage et al.,
+   valuable future of mechanistic interpretability.
+
+                                                                      2
+2021; Olsson et al., 2022; Singh et al., 2024; Reddy,      Ant. Given the position index of label tokens as
+2024; Cho et al., 2025a), where the attention scores       I = {Ii}ki=1, we calculate the attention score sum
+from the last token of the query (the location for         on these label tokens as S = jI j.2 Then, we
+prediction, e.g., the last ": " in Fig. 1 (A), as the
+attention query) concentrate on the label tokens pre-      set  a threshold T  =        k    ,  if  S  >  T , we assert
+sented in the demonstrations (e.g., "positive"s and                               k+log(nt)
+"negative"s in Fig. 1 (A), as the attention key). At-
+tention connections from induction heads transfer          the attention head of score A is an induction head,
+label information from the demonstration to the out-
+put, biasing predictions toward labels with higher         and vice versa. We will verify the necessity and
+attention scores. Consequently, the accuracy of
+ICL prediction critically depends on whether these         benefits of this induction head filter in §5.2.
+attentions are on the correct labels.
+                                                           Loss Function. As shown in Fig. 1 (D), given an
+3 Attention Behavior Fine-tuning                           attention matrix A, if judged as a non-induction
+                                                           head by the aforementioned head filter, the loss
+Given the inspiration from the previous works,             L for A is assigned to 0. Else, we conduct the
+where the ICL predictions are biased towards the           following calculation: given the position index of
+more attention-score-concentrated labels in the in-        label tokens consistent with the ground-truth label
+duction heads, in this paper, as shown in Fig. 1, we       of the query as I+, and the others I- = I\I+,3
+propose Attention Behavior Fine-Tuning (ABFT),             we calculate the loss from the last row () of A as:
+a novel low-resource fine-tuning method to induce
+attention scores to focus on the correct labels.                L(A) = A          i + B                1 - i . (1)
+
+Method Pipeline. Globally, ABFT utilizes such                             iI -                  iI +
+a pipeline: (1) Dataset Building: from a selected
+downstream dataset, we build a training set com-           That is, as shown in Fig. 1 (D), we punish the
+posed of ICL-style sequences as shown in Fig. 1            "wrong" attention scores towards the label tokens
+(A). (2) Feed-forward Calculation: For each train-         different from the query's ground-truth with mag-
+ing sample, as shown in Fig. 1 (B), we conduct             nitude A  0, and reward the "correct" attention
+a standard feed-forward calculation on the pre-            scores with magnitude B  0. These two terms
+trained LM, and collect the attention matrices of all      in the loss function may seem redundant, but we
+the attention heads in all the layers. (3) Loss Calcu-     will demonstrate in §5.3 that they actually contain
+lation: For each attention matrix, we only focus on        antagonistic implicit biases, therefore, the factors
+the attention scores of the last token (i.e., the last     A and B should be balanced well.
+row of the attention matrix), where the predictions
+of queries are made. As shown in Fig. 1 (D), we            Why not End-to-end LoRA? Intuitively, directly
+first filter (detailed below) the non-induction head       adding LoRA bypasses (Hu et al., 2022) to the
+out, and return a loss of 0 for these heads. Then, for     trained projection matrices and fine-tuning them
+the remaining induction heads, we calculate a loss         on an end-to-end training objective is also a pos-
+function composed of a punishment of attention             sible approach. However, in end-to-end LoRA,
+                                                           gradients are propagated from the output logits of
+scores on wrong labels and a reward of attention           LMs, which requires that the final layer of the LMs
+scores on correct labels (detailed below). (4) Back        (i.e., output embeddings, or LM Head) must be in
+Propagation: We back-propagate the calculated              full precision and with gradients activated, to get
+loss only to the WQ and WK matrices of every               stable gradients into the residual stream. This intro-
+attention head, and update the model parameters.           duces a non-negligible overhead, an issue avoided
+                                                           by ABFT as it does not supervise the final out-
+Induction Head Filter. As shown in Fig. 1 (C),             put. Moreover, fine-tuning attention projections
+we skip the attention matrices where the attention         without selectivity may cause harmful side effects
+scores of the last token do not dominate on the label      toward the ICL out of the fine-tuned domain. We
+tokens. To identify the attention matrices to skip,        will compare the performance and efficiency of
+in detail, given an attention matrix A  Rnt×nt,            ABFT against end-to-end LoRA in the following
+where the nt is the input token sequence length, as        experiments (Table 2) to highlight the efficiency
+mentioned before, we focus on the last row  =              and harmlessness of the ABFT method.
+
+                                                               2For the case shown in Fig. 1 (C), I = {4, 8} (0-started),
+                                                           and S is the sum of the values of the red-highlighted bar and
+                                                           the blue-highlighted bar.
+
+                                                               3For the case shown in Fig. 1 (C), I+ = {4} (the position
+                                                           of "positive"), I- = {8} (the position of "negative").
+
+                                                        3
+Table 1: Accuracies (%) of ABFT and baselines on 9 LMs and 8 datasets. The best results are in bold.
+
+Model Param. Method SST2                    MR         FP         SST5 TREC SUBJ                   TEE        TEH Average
+
+GPT2-L         812M   Vanilla      56.35      61.13      42.09      29.69      35.45      49.12      39.06      54.00    45.86
+                      MetaICL      85.94      80.96      37.30      42.09      33.98      50.49      45.41      54.20    53.80
+                      PICL         74.70      73.34      54.49      33.79      32.91      51.37      47.46      53.42    52.68
+                      Calibrate    56.35      60.94      36.91      25.10      34.08      49.32      36.72      53.52    44.12
+                      ABFT       88.181.54  85.400.95  81.301.69  36.843.61  50.242.49  61.994.39  46.513.11  55.200.20  63.21
+
+GPT2-XL        1.61B  Vanilla      67.87      69.53      51.07      30.66      35.25      50.98      42.68      53.03    50.13
+                      PICL         74.80      74.32      51.17      32.71      33.20      51.46      47.95      53.42    52.38
+                      Calibrate    68.16      75.00      36.43      28.52      35.55      50.10      39.26      51.56    48.07
+                      ABFT       87.921.47  86.521.50  87.670.45  37.552.67  51.832.73  75.072.96  60.015.38  55.350.04  67.74
+
+                      Vanilla    91.11      92.77      85.35      46.00      50.00      62.60      60.55      52.05      67.55
+                                                                                                                         66.70
+Falcon3        7.46B  Calibrate 90.53 93.07 82.71 44.04 54.30 62.40 54.79 51.76                                          79.59
+
+                      ABFT 92.140.21 92.170.04 96.140.36 47.320.16 75.810.19 94.870.82 67.970.25 70.340.22
+
+  Llama3       8.03B  Vanilla      89.35      92.87      75.78      44.24      55.76      62.30      57.91      54.59    66.60
+               14.8B  Calibrate    90.04      93.36      43.95      41.60      54.39      65.23      54.79      52.83    62.02
+DeepSeek-R1           ABFT       93.141.39  92.500.84  94.021.72  52.102.31  73.091.11  92.701.44  72.021.81  72.025.87  80.20
+ Dist. Qwen
+4-bit, LoRA           Vanilla      90.92      91.21      92.18      46.97      62.50      66.60      66.60      63.87    72.61
+                      Calibrate    90.04      91.41      92.68      46.09      61.62      65.43      65.33      62.30    71.86
+                      ABFT       93.511.22  91.850.34  91.174.44  46.091.27  69.142.54  92.923.27  69.820.00  71.193.42  78.21
+
+   Qwen2.5     32.8B  Vanilla      93.85      94.43      86.23      47.17      58.40      87.50      65.14      69.63    75.29
+4-bit, LoRA    32.8B  Calibrate    93.75      94.82      74.22      44.82      58.79      84.08      63.96      63.96    72.30
+               43.2B  ABFT       94.920.00  94.830.10  94.040.00  48.490.05  69.240.10  96.000.00  69.290.24  70.310.00  79.64
+SimpleScaling  55.6B
+      s1.1            Vanilla      94.82      94.24      91.11      50.20      69.63      89.65      68.36      72.17    78.77
+                      Calibrate    94.43      93.85      88.96      48.63      68.07      89.26      68.55      72.36    78.02
+4-bit, LoRA           ABFT       94.920.10  94.290.05  96.000.00  49.950.05  72.460.39  95.710.10  71.730.05  73.100.04  81.02
+
+    Llama3            Vanilla      93.26      94.04      73.92      49.41      58.98      71.58      62.60      66.70    71.31
+4-bit, LoRA           Calibrate    95.02      93.07      54.20      44.53      59.08      72.56      61.03      65.82    68.16
+                      ABFT       95.020.10  93.850.10  94.870.05  48.100.14  64.700.14  90.090.05  69.240.29  70.850.15  78.34
+    Llama3
+4-bit, LoRA           Vanilla      93.94      92.19      78.81      51.37      67.19      66.70      56.44      60.94    70.95
+                      Calibrate    92.29      92.77      69.92      50.49      68.75      65.92      58.11      62.70    70.12
+                      ABFT       94.530.10  93.410.14  93.210.44  49.020.78  71.780.58  92.680.48  70.760.64  70.750.34  79.52
+
+4 Main Experiments                                                hammad et al., 2018), Tweet Eval Hate (Basile
+                                                                  et al., 2019) (Refer Appendix A.1 for details).
+In this section, we mainly confirm the effective-
+ness of the proposed ABFT, and find that: ABFT                    Hyperparameters. We set: training samples nd =
+effectively improves the ICL performance to about                 512, the number of demonstrations per ICL sample
+10%20% relatively, which requires the minimum                     k = 4. A standard Adam optimizer (Kingma and
+parameters less than 0.05% to be full precision and               Ba, 2014) is used with learning rate lr = 2 × 10-5
+gradient, with other parameters free to be quan-                  and pseudo-batch-size nb = 32 (i.e., we average
+tized and gradient-free, and utilize 0.01% data cost              gradients per nb = 32 samples before perform-
+compared to the previous works.                                   ing a single gradient step). We set the initial val-
+                                                                  ues A0 = 0.5, B0 = 1.0, and dynamically bal-
+4.1 Experiment Settings                                           ance them with the PID algorithm (refer to Ap-
+                                                                  pendix A.3), stabilizing the number of attention
+Models and Datasets. We conduct our ex-                           heads identified as induction heads (see §5.3). The
+periment on 9 modern LLMs: GPT2 (Large,                           models are trained for nstep = 32 steps.
+XL) (Radford et al., 2019), Falcon3 7B (Team,
+2024b), Llama3 (8B, 43B, 56B) (AI@Meta, 2024),                    Quantization Settings. Models over 10B are quan-
+DeepSeek-R1 Distill Qwen 14B (DeepSeek-AI,                        tized to 4-bit, with full-precision LoRA (Hu et al.,
+2025), Qwen2.5 32B (Team, 2024a; Yang et al.,                     2022) (inner dimension r = 16) trained on WQ
+2024), and SimpleScaling s1.1 32B (Muennighoff                    and WK with learning rate 10-4.
+et al., 2025); and 8 datasets: SST2, SST5 (Socher
+et al., 2013), MR (Pang and Lee, 2005), Financial                 Baselines. We compare with: Contextual Calibra-
+Phrasebank (Malo et al., 2014), TREC (Li and                      tion with 512 training samples (Zhao et al., 2021),
+Roth, 2002; Hovy et al., 2001), Subjective (Wang                  MetaICL end-to-end fine-tuning with 3.55M sam-
+and Manning, 2012), Tweet Eval Emotion (Mo-                       ples (Min et al., 2022), and PICL re-pre-training
+                                                                  with 80M samples (Gu et al., 2023).
+
+                                                              4
+Table 2: A comparison between ABFT and End-to-end               84                                              wA/BoFATBzFe5Tr5o.z-7es6rhoo-6ts8h5.6o55t.646763.6.089
+Fine-tuning (E2E FT). Param.*: Parameters which are             Accuracy82                                  60
+required in FP16/32 and with gradient on.                                                     Accuracy (%)8040
+                                                                78
+                                                                76  ABFT
+                                                                74  E2E                                     20 13.48
+Model Method Param.* Time AccID AccOD                           72  Vanilla
+
+   Llama3    Vanilla      -    -         66.02                      32T12r8a2i5n6ing5E12xample #1024        0 Unwse/oenARBanFdTomUnwse/eAnRBaFnTdom
+    8.03B    E2E FT     0.5B
+4-bit, LoRA  ABFT       6.8M   2.2× 78.33 61.74
+
+                               1× 72.54 64.34                   Figure 2: Data efficiency: Figure 3: Accuracy on un-
+                                                                accuracy against data size seen label inputs and ran-
+DeepSeek-R1  Vanilla      -    -         72.61                  on DeepSeek-R1 Distill domly sampled inputs, w/
+     14.8B   E2E FT     0.8B                                    Qwen 14B / 8 datasets. and w/o ABFT.
+             ABFT       12M    2.2× 78.26 63.62
+4-bit, LoRA
+                               1× 78.21 67.21
+
+  Qwen2.5    Vanilla      -      -        75.29                 Prediction Consistency. We evaluate the predic-
+    32.8B    E2E FT     0.8B   2.6×  82.09 62.24                tion consistency against variations in (1) prompt
+             ABFT       17M     1×   79.64 64.96                templates and (2) demonstration sampling on
+4-bit, LoRA                                                     STAICC-DIAG (Cho and Inoue, 2025). For
+                          -      -        70.95                 each query, we repeat predictions across differ-
+   Llama3    Vanilla    1.1B   2.7×  82.80 64.86                ent prompt templates and sampling strategies, and
+    55.6B    E2E FT     33M     1×   79.52 67.32                measure consistency as the ratio of the maximum
+4-bit, LoRA  ABFT                                               consistent predictions (e.g., 6 positive vs. 3 nega-
+                                                                tive yields 6/9 = 2/3), averaged over the dataset;
+Table 3: Prediction consistency metrics (%) on each             see Cho and Inoue (2025) and Appendix A.5 for
+models averaged among 8 datasets.                               implementation details. As shown in Table 3,
+                                                                ABFT significantly improves consistency across
+Model              Template Consist. Demonstration Consist.     all 8 datasets, stabilizing ICL under diverse con-
+                 w/o ABFT w/ ABFT w/o ABFT w/ ABFT              texts and enhancing prompt design efficiency.
+
+     GPT2-XL     81.28  91.74     68.38  82.75                  Prediction Bias against Wrong Labels. More-
+    Llama3 8B    86.93  90.32     76.99  92.00                  over, a known concern in ICL is the bias toward
+DeepSeek-R1 14B  89.64  92.79     81.30  85.97                  seen labels when ground-truth labels are absent in
+  Qwen2.5 32B    88.97  92.78     84.52  87.94                  demonstrations (i.e., I+ = ) (Zhao et al., 2021;
+   Llama3 56B    92.78  93.90     82.10  87.49                  Cho et al., 2025a), which can lead to incorrect
+                                                                predictions. Our testing on such scenario with
+Others. We conduct all the experiments on a single              and without ABFT in Fig. 3 shows that (see Ap-
+NVIDIA A40 with 48GB VRAM. We repeat each                       pendix A.4 for experiment details): ABFT miti-
+experiment 4 times (10B) or 2 times (>10B), and                 gates this issue via the punish term A , which pe-
+report the averaged results on 1024 fixed test inputs           nalizes incorrect labels during training and reduces
+for each dataset. ICL-style inputs are built with               the bias effects of induction heads. Notably, ABFT
+library STAICC (Cho and Inoue, 2025).                           outperforms the 0-shot setting under unseen-label,
+                                                                suggesting the existence or emergence of unknown
+4.2 Main Results                                                mechanisms that enable demonstrations in other
+                                                                categories to enhance ICL4.
+The test results are shown in Table 1, where
+ABFT consistently outperforms all the baselines,                4.3 Comparison against End-to-end
+even with enormous training sets (to MetaICL,                         Fine-tuning
+3.55M/512  7000×) and full-model fine-tuning
+(remind that ABFT only focuses on the WQ and                    As mentioned before, end-to-end (E2E) fine-tuning
+WK matrices), suggesting that ABFT is satisfy-                  on the in-domain dataset (not a wide dataset like
+ingly efficient in both time and data cost. Such                MetaICL) with LoRA is also an alternative solu-
+results also provide strong empirical evidence for              tion. However, in this section, we will show that
+the effectiveness of induction heads in LLMs.
+                                                                    4Since that: such a phenomenon contrasts with existing
+Towards Mechanistic Controllability. To the best                views (Cho et al., 2025a), where the explicit copying by the
+of our knowledge, ABFT is the first approach to                 induction head is the only channel through which information
+train models without accessing final outputs, en-               is transferred from the demonstrations to the query (in Fig. 10,
+abling model controlling via intermediate features              we show that the induction heads in ABFT model are almost
+or activations. Through this practice, we prototypi-            fully suppressed in unseen-label scenario), where unseen-label
+cally implement one of the visions of mechanistic               demonstrations are harmful to ICL.
+interpretability (Rai et al., 2024): by attributing the
+model's inference to specific modules (circuits), we
+enable their local optimization, thereby improving
+overall performance effectively and efficiently.
+
+                                                             5
+Head-averaged Attention  0.6     Pre-trained, All Induction         Table 4: Ablation analysis of removing some compo-
+                                                                    nents from ABFT. Notice that the PID algorithm is to
+                         0.5     Pre-trained, Correct Induction     stabilize the induction head number by adjusting the
+                                 ABFT, All Induction                factor A, so when we disable the head filter or fix the A
+                         0.4     ABFT, Correct Induction            or B, the PID algorithm naturally loses its function.
+
+                         0.3
+
+                         0.2
+
+                         0.1                                        Model Method                            Time Acc.
+
+                         0.0  0  5  10 La1y5er # 20 25 30                        Vanilla                      -   67.55
+                                                                                 ABFT                        1×   79.59
+Figure 4: Induction attention scores and correct (on                Falcon3      w/o PID, A = 0.5, B = 1.0  1.0×  76.86
+                                                                     7.46B       w/o PID, w/o Head Filter   1.3×  75.57
+                                                                                 w/o PID, A = 0, B = 1.0    1.0×  72.13
+the correct labels) induction attention score averaged                           w/o PID, A = 0.5, B = 0    0.6×  56.47
+
+among heads on each layer. ABFT enhances induction
+
+attention, and improves the correctness.                                         Vanilla                      -   66.60
+                                                                                 ABFT                        1×   80.20
+compared with E2E fine-tuning, ABFT is more                         Llama3       w/o PID, A = 0.5, B = 1.0  1.1×  80.07
+efficient, and more harmless on tasks out of the                     8.03B       w/o PID, w/o Head Filter   1.2×  70.39
+fine-tuning domain.                                                              w/o PID, A = 0, B = 1.0    1.2×  63.54
+                                                                                 w/o PID, A = 0.5, B = 0    0.6×  58.79
+Time and Memory Cost. Notice that in the E2E
+scenario, since the gradient is propagated from the                 DeepSeek-R1  Vanilla                      -   72.61
+final output of the model, the LM head, which is the                     14.8B   ABFT                        1×   78.21
+top of the model, should be in full precision, to en-                            w/o PID, A = 0.5, B = 1.0  1.0×  73.35
+sure a sufficient numerical resolution to utilize the                Dist. Qwen  w/o PID, w/o Head Filter   2.1×  73.51
+mini-batch for mitigating the gradient noise in the                 4-bit, LoRA  w/o PID, A = 0, B = 1.0    0.9×  72.71
+stochastic gradient descent (Hubara et al., 2016).                               w/o PID, A = 0.5, B = 0    0.9×  73.36
+This introduces a non-negligible overhead, as mea-
+sured in Table 2. E2E fine-tuning slightly outper-                  5 Analysis
+forms ABFT in in-domain accuracy (ACCID), but
+incurs substantial training time and memory costs.                  5.1 Attention Visualization after ABFT
+
+Harmlessness. We evaluate out-of-domain (OD)                        As shown in Fig. 4, we average the global (to I)
+performance on datasets different from the fine-                    and correct (to I+) induction attention scores on
+tuned one (Table 2, ACCOD). Both ABFT and E2E                       the last token among attention heads and input sam-
+fine-tuning degrade OD performance, but ABFT                        ples on each transformer layer, on the validation
+causes less harm. This supports a conclusion                        set. Also, we provide a direct visualization of at-
+from Cho et al. (2025a): some induction heads                       tention scores in Appendix C.3. Compared to the
+are intrinsic and task-independent, while others                    pre-trained model, the ABFT model tends to elimi-
+are task-induced. ABFT on intrinsic heads harms                     nate attention scores towards incorrect label tokens
+OD performance, whereas ABFT on task-induced                        (I-), and shift the attention scores from the atten-
+heads does not. In contrast, E2E fine-tuning on all                 tion sinks (the first token) (Xiao et al., 2024) and
+heads broadly degrades OD performance.                              plain tokens to the correct label token, causing an
+                                                                    enhancement to induction attention scores, contin-
+Data Efficiency. We test the accuracy against the                   uously on the middle-to-last layers. Such visualiza-
+training set size as a metric of data efficiency, for               tion indicates that ABFT successfully generalizes
+both ABFT and E2E fine-tuning, as shown in Fig. 2                   to correct the behavior of attention heads.
+(refer to Appendix C.1 for results on other mod-
+els). In the results, ABFT and E2E fine-tuning                      5.2 Ablation Analysis
+consistently benefit from more data samples, and
+in few-shot scenarios ( 512), ABFT and E2E fine-                    In this section, we disable some components uti-
+tuning act equally, while E2E fine-tuning acts better               lized in the ABFT training protocol to suggest their
+when more training data is given. However, given                    necessity. The main results of such ablation experi-
+the low-resource objective of ICL, and also the far                 ments are shown in Table 4, where:
+more expensive time and memory cost of E2E fine-
+tuning, we can claim that ABFT has an advantage                     ABFT should be Localized. In Table 4, disabling
+in the few-shot and low-resource scenario.                          the head filter ((D) in Fig. 1) harms the accuracy.
+                                                                    Knowing that all attention heads are trained to be
+                                                                    induction heads under unfiltered ABFT loss, we
+                                                                    can infer that: in LLMs, some attention heads with
+
+                                                                 6
+500     A = 0, B = 1.0
+
+400     Aww=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+300Induction Head #
+                                                                      E2E Model Ratio ( E)
+200
+                                                                                                                              Accuracy
+100
+
+0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                   1000     1.50
+                                                                                                                                             0.90
+
+Figure 5: Number of attention heads that are judged                       1.25  E2EAcFcin.:e0-t.8u6ned  AcMci.x: e0d.89               0.85
+as induction heads on 4 settings, against the training                    1.00                                                        0.80
+processing (the number of seen data samples). PID
+effectively stabilizes the induction head numbers.                        0.75                                                   0.75
+
+                                                                          0.50                                                   0.70
+
+                                                                          0.25                                                   0.65
+
+        w/o PID                                          w/ PID           0.00                                                   0.60
+                                                                          0.25
+                                                                                PArec-ct.r:a0in.5e8d    ABFATcFc.i:n0e-.t8u4ned       0.55
+                                                                                                                                      0.50
+
+                                                                                0.500.50 0.25 0A.0B0FT0.2M5 od0e.5l0Ra0t.7i5o (1.A0)0 1.25 1.50 0.45
+                                                                          Figure 7: Upper: A better accuracy (lower loss) in the
+
+                                                                          interpolation path suggests the same basin, and vice
+
+                                                                          versa. Lower: Contour map of accuracies against the
+
+Figure 6: Accuracies with various settings on hyperpa-                    coefficient E and A in Eq. 2. E2E fine-tuned and
+rameter A and B, with and without PID algorithm. PID                      ABFT models are located in the same low-loss area.
+weakens the sensitivity to initial parameters.
+                                                                          plicit biases: the punish term A disperses atten-
+functions other than the induction head are still                         tion across labels, reducing induction heads, while
+necessary for ICL, aligning with and enhancing                            the reward term B concentrates attention on spe-
+the previous work (Cho et al., 2025a). However,                           cific labels, increasing induction heads through a
+considering that some implicit antagonistic effects                       stepwise positive feedback loop. We track the num-
+induced by unfiltered ABFT loss still promote the                         ber of induction heads during training on Llama3
+formation of other essential heads (i.e., when the                        8B and SST2 (see Appendix C.2 for more cases),
+ABFT loss from deeper heads propagates to shal-                           as shown in Fig. 5, to support this observation.
+lower heads, its function becomes antagonistic with
+the ABFT loss directly connected to those shallow                         Automatically Stabilizing Induction Head Num-
+heads), the accuracy degradation with no head fil-                        ber. Ablation studies reveal that too many induc-
+ters is not so significant.                                               tion heads hinder fine-tuning and overall perfor-
+                                                                          mance, as other functional heads are also needed
+Loss Factor (A and B) should be Balanced. As                              for ICL; whereas an insufficient number prevents
+mentioned in §4.1, we use the PID algorithm to                            the model from handling ICL tasks. To maintain a
+adaptively balance the value of A and B in the loss                       stable number, we automatically adjust the antago-
+calculation. In Table 4, we disable such adjustment                       nistic factor A in Eq. 1 using a classical PID con-
+and observe an accuracy drop. Especially, when                            troller (Appendix A.3)5. As shown in Fig. 5, PID
+we set the A or B to 0, the accuracy significantly                        stabilizes induction head count, improves ABFT
+degrades. This eliminates the doubt of "whether                           performance (Table 4), and reduces sensitivity to
+the loss factors are redundant" raised in §3, and we                      hyperparameters A0 and B0, with accuracy remain-
+will discuss this in-depth in the next section (§5.3).                    ing stable across settings (Fig. 6).
+
+5.3 Balance the Loss Factor A and B                                       6 Consistency of Training Objective:
+                                                                              ABFT and End-to-end Fine-tuning
+
+ Punish and Reward Influence Induction                                    To explore whether the emergence of induction
+Heads Antagonisticly. As shown in Table 4, re-                            head is from ICL-style data--a key question in
+moving either loss term in Eq. 1 degrades perfor-                         interpretability (Chan et al., 2022; Reddy, 2024;
+mance, indicating that both are essential. Inter-
+estingly, the two terms introduce antagonistic im-                            5Since A and B are antagonistic, controlling A alone suf-
+                                                                          fices to stabilize induction head numbers.
+
+                                                                       7
+Pre-trained                                                    1.50                                                 0.90
+ABFT
+E2E                                                            1.25  AMcect.:aI0C.7L9      AcMci.x: e0d.91          0.86
+                                                               1.00MetaICL Model Ratio ( E)                         0.82
+                                                                                                                      Accuracy
+                                                               0.75                                                 0.78
+
+                                                               0.50                                                 0.74
+
+                                                               0.25                                                 0.70
+
+                                                               0.00                                                 0.66
+                                                               0.25
+                                                                     PArec-ct.r:a0in.5e7d  ABFATcFc.i:n0e-.t8u9ned  0.62
+                                                                                                                    0.58
+
+                                                                     0.500.50 0.25 0A.0B0FT0.2M5 od0e.5l0Ra0t.7i5o (1.A0)0 1.25 1.50 0.54
+                                                               Figure 9: Contour map of accuracies against the E and
+                                                               A on GPT2-L, and the E is set as MetaICL model.
+
+Figure 8: Attention score visualization of the pre-trained     GPT2-XL. The results are shown in Fig. 7 (lower),
+model, ABFT model, and E2E fine-tuned model, on the            showing no high-loss paths between the E2E fine-
+same input as Fig. 16, and the same models as Fig. 7           tuned model and the ABFT model. It suggests that
+(Refer to Appendix C.3 for details and more cases).            they are in the same basin of the loss landscape,
+                                                               indicating the high similarity between these two
+Singh et al., 2024)--we examine the consistency                training objectives. Moreover, we visualize the at-
+between ABFT and E2E objectives.                               tention scores on ABFT and E2E fine-tuned models
+                                                               as shown in Fig. 8: compared with the pre-trained
+Principle. Due to the lack of qualitative thresh-              model, attention scores of the fine-tuned models
+olds, it is hard to utilize statistic-based similarity         on both objectives consistently focus on the correct
+measures to determine whether two models exhibit               label tokens, suggesting that E2E objectives imply
+comparable similarity sufficient to indicate consis-           a promotion to correct induction head. Moreover,
+tent training objectives. Therefore, our experiment            as shown in Fig. 9, repeating the experiment on
+is based on such a principle: if the fine-tuning ter-          MetaICL shows MetaICL model lies in the same
+minations on both training objectives fall into the            basin as ABFT, suggesting that full-model tuning
+same basin of the loss function, then both fine-               on large datasets is essentially equivalent to ABFT,
+tuning trajectories are similar (Neyshabur et al.,             which can be seen as essential ICL fine-tuning.
+2020), so that the two training objectives are con-
+sistent. For such an end, we investigate the linear-           7 Discussion
+connectivity (Neyshabur et al., 2020; Ilharco et al.,
+2023) among the pre-trained parameters 0 (as the               Conclusion. In this paper, we propose a fine-tuning
+start point of the fine-tuning) and fine-tuned param-          objective that strengthens the correctness of the in-
+eters E for E2E fine-tuning, and A for ABFT. In                duction head by accessing only the attention matrix,
+detail, we mix these three parameters into a new               and demonstrate that it significantly improves the
+model parameter set  in the following form:                    performance of ICL. Our results reinforce the in-
+                                                               duction head hypothesis for ICL interpretability
+       = 0 + E(E - 0) + A(A - 0), (2)                          and represent a first step toward controlling model
+                                                               behavior through mechanistic interpretability.
+and then test the accuracy of  as an anti-metric
+of model loss. As shown in Fig. 7 (upper), if the              Towards Mechanistic Controllability. In this
+accuracy of mixed  is better (or at least, not sig-            paper, we raise the possibility of controlling the
+nificantly worse) than the accuracy of E and A,                model's behavior by some specific modules (often
+we can infer that the E and A are in the same loss             called circuit in the context of mechanistic inter-
+basin, with linear low-loss path observed.                     pretability), which opens up a new neural network
+                                                               model behavior-controlling paradigm: controlling
+Experiment and Result. We conduct the afore-                   only the modules that make significant contribu-
+mentioned experiment protocol on SST2 and                      tions to the output, thereby substantially reducing
+                                                               the number of parameters that need to be adjusted
+                                                               and achieving excellent efficiency.
+
+                                                            8
+Limitations                                                   Acknowledgements
+
+Towards Open-end Tasks. The first limitation lies             This work was supported by JST FOREST Pro-
+in the fact that the induction head-based explana-            gram (Grant Number JPMJFR232K, Japan) and
+tion of ICL (Elhage et al., 2021; Singh et al., 2024;         the Nakajima Foundation.
+Cho et al., 2025a), so that our proposed ABFT ap-
+proach, applies only to classification tasks with a
+finite label set. As mentioned in §4.2 and Fig. 3,
+since our training objective consists of two factors,
+our approach is not limited to the simple retrieval
+setting where the ground-truth label appears in the
+demonstrations, while extending these methods to
+open-ended tasks remains an open challenge that re-
+quires further investigation on the basic mechanism.
+Nevertheless, given the current state of research on
+ICL interpretability, we have made full use of these
+findings and provided a valuable foundation for
+advancing model control through the scope of in-
+terpretability, i.e., Mechanistic Controllability.
+
+Towards Better Mechanistic Controllability. For
+our vision of Mechanistic Controllability, even
+though this paper successfully identifies a small set
+of modules (i.e., circuits) that require controlling
+towards better ICL performance, the control meth-
+ods based on gradients and moderate amounts of
+data remain coarse. Therefore, future work could
+focus on gradient-free and data-free model edit-
+ing, which directly edits some parameters utilizing
+a deeper understanding of the functional roles of
+model parameters.
+
+Towards Better Performance. It can be consid-
+ered that some hyperparameters (see §4.1 and Ap-
+pendix A.3), and the induction head filter (see §3)
+may be not optimal, restricting the performance.
+Discussing them in detail, and automatically opti-
+mizing them can be helpful for better performance
+of ABFT. Also, in Fig. 7, we observe that the ex-
+tended line from the pre-trained model towards
+the ABFT model leads to better accuracy, sug-
+gesting a possibility of utilize model parameter
+ = 0 + A(A - 0), A > 1 to further improve
+accuracy without any gradient-based cost.
+
+Towards Further Efficiency. As shown in Ap-
+pendix B, the WQ and WK projections are signif-
+icantly modified after ABFT only in some layers,
+that is, it is possible to further restrict the gradient-
+on parameters to some Transformer layers for bet-
+ter efficiency (notice that currently we activate the
+gradients of the attention mappings of all layers).
+
+                                                           9
+References                                                         In Proceedings of the 61st Annual Meeting of the
+                                                                   Association for Computational Linguistics (Volume
+AI@Meta. 2024. Llama 3 model card.                                 1: Long Papers), pages 14014­14031.
+
+Valerio Basile, Cristina Bosco, Elisabetta Fersini,             Yuxian Gu, Li Dong, Furu Wei, and Minlie Huang. 2023.
+   Debora Nozza, Viviana Patti, Francisco Manuel                   Pre-training to learn in context. In Proceedings of the
+   Rangel Pardo, Paolo Rosso, and Manuela Sanguinetti.             61st Annual Meeting of the Association for Compu-
+   2019. SemEval-2019 task 5: Multilingual detection               tational Linguistics (Volume 1: Long Papers), pages
+   of hate speech against immigrants and women in                  4849­4870, Toronto, Canada. Association for Com-
+   Twitter. In Proceedings of the 13th International               putational Linguistics.
+   Workshop on Semantic Evaluation, pages 54­63, Min-
+   neapolis, Minnesota, USA. Association for Compu-             Zhixiong Han, Yaru Hao, Li Dong, Yutao Sun, and
+   tational Linguistics.                                           Furu Wei. 2023. Prototypical calibration for few-
+                                                                   shot learning of language models. In The Eleventh
+Stephanie Chan, Adam Santoro, Andrew Lampinen,                     International Conference on Learning Representa-
+   Jane Wang, Aaditya Singh, Pierre Richemond, James               tions.
+   McClelland, and Felix Hill. 2022. Data distributional
+   properties drive emergent in-context learning in trans-      Eduard Hovy, Laurie Gerber, Ulf Hermjakob, Chin-
+   formers. Advances in neural information processing              Yew Lin, and Deepak Ravichandran. 2001. Toward
+   systems, 35:18878­18891.                                        semantics-based answer pinpointing. In Proceedings
+                                                                   of the First International Conference on Human Lan-
+Mingda Chen, Jingfei Du, Ramakanth Pasunuru, Todor                 guage Technology Research.
+   Mihaylov, Srini Iyer, Veselin Stoyanov, and Zor-
+   nitsa Kozareva. 2022. Improving in-context few-shot          Edward J Hu, yelong shen, Phillip Wallis, Zeyuan Allen-
+   learning via self-supervised training. In Proceedings           Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu
+   of the 2022 Conference of the North American Chap-              Chen. 2022. LoRA: Low-rank adaptation of large
+   ter of the Association for Computational Linguistics:           language models. In International Conference on
+   Human Language Technologies, pages 3558­3573.                   Learning Representations.
+
+Hakaze Cho and Naoya Inoue. 2025. Staicc: Standard-             Itay Hubara, Matthieu Courbariaux, Daniel Soudry, Ran
+   ized evaluation for classification task in in-context           El-Yaniv, and Yoshua Bengio. 2016. Binarized neu-
+   learning. arXiv preprint arXiv:2501.15708.                      ral networks. Advances in neural information pro-
+                                                                   cessing systems, 29.
+Hakaze Cho, Mariko Kato, Yoshihiro Sakai, and Naoya
+   Inoue. 2025a. Revisiting in-context learning infer-          Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Worts-
+   ence circuit in large language models. In The Thir-             man, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali
+   teenth International Conference on Learning Repre-              Farhadi. 2023. Editing models with task arithmetic.
+   sentations.                                                     In The Eleventh International Conference on Learn-
+                                                                   ing Representations.
+Hakaze Cho, Yoshihiro Sakai, Mariko Kato, Kenshiro
+   Tanaka, Akira Ishii, and Naoya Inoue. 2025b. Token-          Zhongtao Jiang, Yuanzhe Zhang, Cao Liu, Jun Zhao,
+   based decision criteria are suboptimal in in-context            and Kang Liu. 2023. Generative calibration for in-
+   learning. In Proceedings of the 2025 Conference of              context learning. In Findings of the Association for
+   the Nations of the Americas Chapter of the Associ-              Computational Linguistics: EMNLP 2023, pages
+   ation for Computational Linguistics: Human Lan-                 2312­2333, Singapore. Association for Computa-
+   guage Technologies (Volume 1: Long Papers), pages               tional Linguistics.
+   5378­5401, Albuquerque, New Mexico. Association
+   for Computational Linguistics.                               Diederik P Kingma and Jimmy Ba. 2014. Adam: A
+                                                                   method for stochastic optimization. arXiv preprint
+DeepSeek-AI. 2025. Deepseek-r1: Incentivizing rea-                 arXiv:1412.6980.
+   soning capability in llms via reinforcement learning.
+   Preprint, arXiv:2501.12948.                                  Xin Li and Dan Roth. 2002. Learning question clas-
+                                                                   sifiers. In COLING 2002: The 19th International
+Qingxiu Dong, Lei Li, Damai Dai, Ce Zheng, Zhiy-                   Conference on Computational Linguistics.
+   ong Wu, Baobao Chang, Xu Sun, Jingjing Xu, and
+   Zhifang Sui. 2022. A survey on in-context learning.          P. Malo, A. Sinha, P. Korhonen, J. Wallenius, and
+   arXiv preprint arXiv:2301.00234.                                P. Takala. 2014. Good debt or bad debt: Detecting se-
+                                                                   mantic orientations in economic texts. Journal of the
+Nelson Elhage, Neel Nanda, Catherine Olsson, Tom                   Association for Information Science and Technology,
+   Henighan, Nicholas Joseph, Ben Mann, Amanda                     65.
+   Askell, Yuntao Bai, Anna Chen, Tom Conerly, et al.
+   2021. A mathematical framework for transformer               Sewon Min, Mike Lewis, Luke Zettlemoyer, and Han-
+   circuits. Transformer Circuits Thread, 1(1):12.                 naneh Hajishirzi. 2022. Metaicl: Learning to learn
+                                                                   in context. In Proceedings of the 2022 Conference
+Yu Fei, Yifan Hou, Zeming Chen, and Antoine Bosselut.              of the North American Chapter of the Association
+   2023. Mitigating label biases for in-context learning.          for Computational Linguistics: Human Language
+                                                                   Technologies, pages 2791­2809.
+
+                                                            10
+Swaroop Mishra, Daniel Khashabi, Chitta Baral, and              Qwen Team. 2024a. Qwen2.5: A party of foundation
+   Hannaneh Hajishirzi. 2022. Cross-task generaliza-               models.
+   tion via natural language crowdsourcing instructions.
+   In 60th Annual Meeting of the Association for Com-           TII Team. 2024b. Falcon 3 family of open foundation
+   putational Linguistics, ACL 2022, pages 3470­3487.              models.
+   Association for Computational Linguistics (ACL).
+                                                                Sida Wang and Christopher D. Manning. 2012. Base-
+Saif Mohammad, Felipe Bravo-Marquez, Mohammad                      lines and bigrams: simple, good sentiment and topic
+   Salameh, and Svetlana Kiritchenko. 2018. SemEval-               classification. In Proceedings of the 50th Annual
+   2018 task 1: Affect in tweets. In Proceedings of the            Meeting of the Association for Computational Lin-
+   12th International Workshop on Semantic Evaluation,             guistics: Short Papers - Volume 2, ACL '12, page
+   pages 1­17, New Orleans, Louisiana. Association for             90¨C94, USA. Association for Computational Lin-
+   Computational Linguistics.                                      guistics.
+
+Niklas Muennighoff, Zitong Yang, Weijia Shi, Xi-                Yizhong Wang, Swaroop Mishra, Pegah Alipoor-
+   ang Lisa Li, Li Fei-Fei, Hannaneh Hajishirzi, Luke              molabashi, Yeganeh Kordi, Amirreza Mirzaei,
+   Zettlemoyer, Percy Liang, Emmanuel Candès, and                  Anjana Arunkumar, Arjun Ashok, Arut Selvan
+   Tatsunori Hashimoto. 2025. s1: Simple test-time                 Dhanasekaran, Atharva Naik, David Stap, et al. 2022.
+   scaling. Preprint, arXiv:2501.19393.                            Super-naturalinstructions: Generalization via declar-
+                                                                   ative instructions on 1600+ nlp tasks. In 2022 Con-
+Behnam Neyshabur, Hanie Sedghi, and Chiyuan Zhang.                 ference on Empirical Methods in Natural Language
+   2020. What is being transferred in transfer learning?           Processing, EMNLP 2022.
+   Advances in neural information processing systems,
+   33:512­523.                                                  Jerry Wei, Le Hou, Andrew Lampinen, Xiangning Chen,
+                                                                   Da Huang, Yi Tay, Xinyun Chen, Yifeng Lu, Denny
+Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas              Zhou, Tengyu Ma, et al. 2023. Symbol tuning im-
+   Joseph, Nova DasSarma, Tom Henighan, Ben Mann,                  proves in-context learning in language models. In
+   Amanda Askell, Yuntao Bai, Anna Chen, et al. 2022.              Proceedings of the 2023 Conference on Empirical
+   In-context learning and induction heads. arXiv                  Methods in Natural Language Processing, pages 968­
+   preprint arXiv:2209.11895.                                      979.
+
+Bo Pang and Lillian Lee. 2005. Seeing stars: Exploiting         Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song
+   class relationships for sentiment categorization with           Han, and Mike Lewis. 2024. Efficient streaming lan-
+   respect to rating scales. In Proceedings of the 43rd            guage models with attention sinks. In The Twelfth
+   Annual Meeting of the Association for Computational             International Conference on Learning Representa-
+   Linguistics (ACL'05), pages 115­124.                            tions.
+
+Alec Radford, Jeffrey Wu, Rewon Child, David Luan,              An Yang, Baosong Yang, Binyuan Hui, Bo Zheng,
+   Dario Amodei, Ilya Sutskever, et al. 2019. Language             Bowen Yu, Chang Zhou, Chengpeng Li, Chengyuan
+   models are unsupervised multitask learners. OpenAI              Li, Dayiheng Liu, Fei Huang, Guanting Dong, Hao-
+   blog, 1(8):9.                                                   ran Wei, Huan Lin, Jialong Tang, Jialin Wang, Jian
+                                                                   Yang, Jianhong Tu, Jianwei Zhang, Jianxin Ma, Jin
+Daking Rai, Yilun Zhou, Shi Feng, Abulhair Saparov,                Xu, Jingren Zhou, Jinze Bai, Jinzheng He, Junyang
+   and Ziyu Yao. 2024. A practical review of mecha-                Lin, Kai Dang, Keming Lu, Keqin Chen, Kexin Yang,
+   nistic interpretability for transformer-based language          Mei Li, Mingfeng Xue, Na Ni, Pei Zhang, Peng
+   models. arXiv preprint arXiv:2407.02646.                        Wang, Ru Peng, Rui Men, Ruize Gao, Runji Lin,
+                                                                   Shijie Wang, Shuai Bai, Sinan Tan, Tianhang Zhu,
+Gautam Reddy. 2024. The mechanistic basis of data de-              Tianhao Li, Tianyu Liu, Wenbin Ge, Xiaodong Deng,
+   pendence and abrupt learning in an in-context classifi-         Xiaohuan Zhou, Xingzhang Ren, Xinyu Zhang, Xipin
+   cation task. In The Twelfth International Conference            Wei, Xuancheng Ren, Yang Fan, Yang Yao, Yichang
+   on Learning Representations.                                    Zhang, Yu Wan, Yunfei Chu, Yuqiong Liu, Zeyu
+                                                                   Cui, Zhenru Zhang, and Zhihao Fan. 2024. Qwen2
+Aaditya K Singh, Ted Moskovitz, Felix Hill,                        technical report. arXiv preprint arXiv:2407.10671.
+   Stephanie CY Chan, and Andrew M Saxe. 2024.
+   What needs to go right for an induction head? a              Zihao Zhao, Eric Wallace, Shi Feng, Dan Klein, and
+   mechanistic study of in-context learning circuits and           Sameer Singh. 2021. Calibrate before use: Improv-
+   their formation. In Forty-first International Confer-           ing few-shot performance of language models. In
+   ence on Machine Learning.                                       International conference on machine learning, pages
+                                                                   12697­12706. PMLR.
+Richard Socher, Alex Perelygin, Jean Wu, Jason
+   Chuang, Christopher D. Manning, Andrew Ng, and               Han Zhou, Xingchen Wan, Lev Proleev, Diana Mincu,
+   Christopher Potts. 2013. Recursive deep models for              Jilin Chen, Katherine A Heller, and Subhrajit Roy.
+   semantic compositionality over a sentiment treebank.            2024. Batch calibration: Rethinking calibration for
+   In Proceedings of the 2013 Conference on Empiri-                in-context learning and prompt engineering. In The
+   cal Methods in Natural Language Processing, pages               Twelfth International Conference on Learning Repre-
+   1631­1642, Seattle, Washington, USA. Association                sentations.
+   for Computational Linguistics.
+
+                                                            11
+A Detailed Experiment Implementation                             Head-averaged Attention  0.6     Pre-trained, All Induction
+                                                                                                  Pre-trained, Correct Induction
+A.1 Model & Dataset Details                                                               0.5     ABFT, All Induction
+
+                                                                                          0.4     ABFT, Correct Induction
+
+Models. All the models in this paper are                                                  0.3
+loaded from huggingface. In detail, we list the
+huggingface repository name to keep the repeata-                                          0.2
+bility of this paper, as shown in Table 6.
+                                                                                          0.1
+Dataset Split. As also described by Cho and Inoue
+(2025), we randomly sample 1024 data samples                                              0.0
+from the original dataset to build the inputs for
+training, and sample 4096 + 512 (especially, 512 +                                             0  5  10 La1y5er # 20 25 30
+512 for FP dataset, 3192 + 512 for TEH dataset)
+data samples for the demonstrations+queries for                      Figure 10: Visualization of induction attention scores
+the testing, respectively.                                           on unseen label settings (Llama3 8B, TREC).
+
+Demonstration Sampling. To generate the train-                       where the Cp = 0.03, Ci = 0.005, and Cd =
+ing examples of k demonstrations, we randomly                        0.005 are hyperparameters. By such calculation,
+sample (k + 1) data examples from the aforemen-                      we implement a feedback control to stabilize the
+tioned 1024 data, and concatenate them into the                      number of induction heads among training steps.
+inputs, with the prompt templates shown in §A.2.
+To generate the testing examples, for each query                     A.4 Experiment Protocol of Unseen Label
+in the 512 samples, we sample two sequences of
+demonstrations from the 4096 data samples, and                       In Fig. 3, we examine that ABFT model can utilize
+concatenate them into testing inputs, 2 for one                      the demonstration with wrong label to improve the
+query sample, so that 1024 for one dataset.                          ICL performance. Here we introduce the experi-
+                                                                     ment protocol.
+A.2 Prompt Templates
+                                                                        First, we train a Llama3 8B on TREC (a 6-
+We utilize the default prompt templates of STAICC,                   way classification dataset) with the ABFT method.
+as shown in Table 5. For the sake of simplicity,                     Then, to test the trained ABFT model on the un-
+we reduce the label tokens into one token, as also                   seen label condition, we build special test inputs:
+shown in Table 5.                                                    for each query with label l, we choose k = 4
+                                                                     demonstrations with label l = l, and utilize the
+A.3 Details of PID Algorithm                                         standard template shown in Table 5 to build the
+                                                                     inputs, then test the accuracy. Notice that during
+On each model update step t > 2 (i.e., when the                      the training, no special sampling for the inputs is
+gradients from all the samples of the t-th pseudo                    conducted, i.e., the training is not under the unseen
+batch (of nb data samples) are propagated), we                       label setting, so that such an experiment protocol
+calculated the identified induction head numbers                     also confirms the generalization of ABFT methods
+from the induction head filter described in §3 and                   on a different distribution. Moreover, we repeat
+Fig. 1 averaged on the nb data samples as n¯t. Given                 the induction head visualization shown in Fig. 4 on
+the similar averaged induction head number on the                    the unseen label condition in Fig. 10, where the in-
+previous time step (t - 1) as n¯t-1, we can calculate                duction heads in the ABFT model are almost fully
+the updated At term6 by standard PID algorithm                       suppressed but with considerable inference accu-
+as:                                                                  racy, which implies a new inference mechanism.
+
+At = Cp (n¯t - n¯t-1)                                                A.5 Experiment Protocol of Stability against
+                                                                            Prompting
+         t
+                                                                     In Table 3, we test whether the prediction of
++ Ci        n¯i - n¯i-1       (3)                                    ICL is stable against various (1) prompt templates
+                                                                     and (2) demonstration sampling, on the STAICC-
+      i=2                                                            DIAG (Cho and Inoue, 2025) benchmark, whose
+                                                                     method is described briefly below.
++ Cd (n¯t - 2n¯t-1 + n¯t-2)
+                                                                     Method. To test the prediction robustness against
++ At-1,                                                              prompt templates / demonstration sampling, we
+                                                                     repeat several predictions for each query on vari-
+    6Remind that for the sake of simplicity, we only control A,      ous prompt templates / demonstration sampling,
+given the findings of A and B are antagonistic, as shown in
+§5.3.
+
+                                                                 12
+                    Table 5: Prompt templates used in this paper.
+
+Dataset             Prompt Template (Unit)                          Label Tokens
+
+SST2       sentence: [input sentence] sentiment: [label token] \n                      negative, positive
+ MR         review: [input sentence] sentiment: [label token] \n                       negative, positive
+  FP       sentence: [input sentence] sentiment: [label token] \n                 negative, neutral, positive
+SST5       sentence: [input sentence] sentiment: [label token] \n               poor, bad, neutral, good, great
+TREC         question: [input sentence] target: [label token] \n    short, entity, description, person, location, number
+SUBJ     review: [input sentence] subjectiveness: [label token] \n                    objective, subjective
+ TEE                                                                                anger, joy, positive, sad
+TEH            tweet: [input sentence] emotion: [label token] \n
+            tweet: [input sentence] hate speech: [label token] \n                         normal, hate
+
+Table 6: Huggingface repository name for models used              nificantly lower distances within every model.
+in this paper.                                                       Moreover, even though the early layers accumu-
+
+Model               Repository                                    late more gradients (since the gradients from each
+                                                                  later layer propagate backward to them), the peak
+      GPT2-L                 openai-community/gpt2-large          of the shifting distance typically appears in the mid-
+     GPT2-XL                    openai-community/gpt2-xl          dle to later layers. This observation is consistent
+      Falcon3                    tiiuae/Falcon3-7B-Base           with previous works on Induction Heads (Cho et al.,
+   Llama3 (8B)                                                    2025a).
+   DeepSeek-R1                meta-llama/Meta-Llama-3-8B
+      Qwen2.5       deepseek-ai/DeepSeek-R1-Distill-Qwen-14B      C Augmentation Results
+SimpleScaling s1.1
+   Llama3 (43B)                       Qwen/Qwen2.5-32B            C.1 Augmentation Results for Data Efficiency
+   Llama3 (56B)                  simplescaling/s1.1-32B                  (Fig. 2)
+                               chargoddard/llama3-42b-v0
+                               nyunai/nyun-c2-llama3-56B          We repeat the data efficiency experiments shown in
+                                                                  Fig. 2 on Qwen2.5 32B, as shown in Fig. 15. The
+and calculate the ratio of the maximum consis-                    results are globally consistent with Fig. 2.
+tent group (e.g., we get 6 positive and 3 nega-
+tive predictions on one query, then the ratio is                  C.2 Augmentation Results for Number of
+max(6, 3)/(6 + 3) = 2/3). The robustness metrics                         Induction Heads against Training
+are the average value of the whole dataset. Refer                        Processing (Fig. 5)
+to Cho and Inoue (2025) for the detailed implemen-
+tation. Notice that only the consistency is tested in             We repeat the visualization of the number of in-
+these experiments, without observing the accuracy.                duction heads against the training processing under
+                                                                  various settings on Llama3 8B and Falcon3 7B as
+Result. The robustness metrics among prompt tem-                  shown in Fig. 20 and 21. The results are globally
+plates / demonstration sampling averaged on all                   consistent with Fig. 5.
+8 datasets before and after ABFT are shown in
+Table 3, where both terms of the robustness are                      Moreover, we visualize the number of induc-
+significantly improved after ABFT, suggesting that                tion heads on only standard settings, as shown in
+ABFT stabilizes ICL for various contexts, provid-                 Fig. 22-28 for reference.
+ing higher efficiency on prompt designing. Also,
+given the results with mitigating prediction sensi-               C.3 Augmentation Results for Attention
+tivity and bias against prompt templates / demon-                        Visualization (Fig. 4 and 8)
+stration sampling, which is consistent with the ob-
+jective of output calibration (Zhao et al., 2021; Fei             As shown in Fig. 16, we visualize the attention
+et al., 2023; Han et al., 2023; Zhou et al., 2024;                score on the last token of the given input example
+Jiang et al., 2023; Cho et al., 2025b), ABFT can be               in the validation set on Llama3 8B, and repeat this
+regarded as an implicit calibration inside the LLM.               visualization on more input cases for Fig. 16 and
+                                                                  Fig. 8 in Fig. 29. Moreover, we expand the Fig. 16
+B Parameter Shift after ABFT against                              towards more layers in Fig. 30, and Fig. 8 in Fig. 31.
+     Layers                                                       We observe that ABFT significantly modifies the
+                                                                  attention distribution in the middle layers, while in
+We utilize the Frobenius norm to visualize the shift-             the early and late layers, neither ABFT nor E2E
+ing distance of the parameter matrix  before and                  has a substantial impact on attention scores.
+after ABFT () as  -2. The results are shown
+in Fig. 17, 18, 19, where, although each model ex-
+hibits its own pattern in terms of distance across
+layer numbers, certain layers consistently show sig-
+
+                                                              13
+Head-averaged Attention  0.40     Pre-trained, All Induction                            86  ABFT
+                         0.35     Pre-trained, Correct Induction                        84  E2E
+                         0.30     ABFT, All Induction
+                                                                              Accuracy  82  Vanilla
+
+                                                                                        80
+
+                         0.25     ABFT, Correct Induction                               78
+
+                         0.20                                                           76
+
+                         0.15                                                           74
+
+                         0.10                                                               3264 128 256 Training51E2xample #  1024
+
+                         0.05                                                 Figure 15: Accuracy against training set size as a metric
+                         0.00
+                                                                              of data efficiency, for Qwen2.5 32B.
+                              0 5 10 L15ayer2#0 25 30 35
+                                                                                               text: (...), label: positive \n text: (...), label: positive \n
+Figure 11: Augmentation results of Fig. 4 on GPT2-L.                                           text: (...), label: negative \n text: (...), label: negative \n
+                                                                                               text: (...), label:(positive)
+
+                                                                                            Vanilla
+
+Head-averaged Attention           Pre-trained, All Induction
+                         0.4      Pre-trained, Correct Induction
+                                  ABFT, All Induction
+                         0.3      ABFT, Correct Induction
+
+                         0.2                                                          ABFT
+
+                         0.1                                                  Figure 16: Attention score visualization on the last to-
+                                                                              ken of ICL input of every attention head (vertical axis)
+                         0.0   0  10     L20ayer # 30             40          towards each token. Label tokens and their contents are
+                                                                              marked with dotted lines. Refer to Appendix C.3 for
+Figure 12: Augmentation results of Fig. 4 on GPT2-XL.                         more examples and layers. ABFT successfully focuses
+                                                                              attention scores to correct labels.
+Head-averaged Attention  0.8      Pre-trained, All Induction
+                                  Pre-trained, Correct Induction                 Moreover, we repeat the attention score visual-
+                                  ABFT, All Induction                         ization similar to Fig. 4 on more models and SST2,
+                         0.6      ABFT, Correct Induction                     as shown in Fig. 11, 12, 13, and 14.
+
+                         0.4                                                  D Statements
+
+                         0.2                                                  Author Contributions Statement. Hakaze Cho,
+                                                                              also known as Yufeng Zhao, handled the entire
+                         0.0   0  5      10Layer15# 20                25      workload in this paper. He provided ideas, designed
+                                                                              / conducted experiments, collected / described data,
+Figure 13: Augmentation results of Fig. 4 on Falcon3                          and wrote / revised the paper.
+7B.
+                                                                                 Peng Luo suggested the PID algorithm, which is
+Head-averaged Attention  0.20     Pre-trained, All Induction                  an essential part of this paper, and provided some
+                                  Pre-trained, Correct Induction              technical support for it.
+                                  ABFT, All Induction
+                         0.15     ABFT, Correct Induction                        Naoya Inoue, as the supervisor, provided valu-
+                                                                              able feedback, revisions, and financial support for
+                         0.10                                                 this paper.
+
+                         0.05                                                    M.K. and R.K. made minor contributions that
+                                                                              placed them on the borderline of authorship cri-
+                         0.00  0     10  L20ayer # 30             40          teria: they participated in discussions and offered
+                                                                              comments, some of which were incorporated.
+Figure 14: Augmentation results of Fig. 4 on Llama3                           License for Artifacts. Models and datasets used
+42B.
+
+                                                                          14
+in this paper are used in their original usage, and
+are open-sourced with the following license:
+
+   · mit: GPT2-L, GPT2-XL, DeepSeek-R1
+   · Individual License or Unknown: Falcon3,
+
+      Llama3 8B, Llama3 43B, Llama3 56B, SST5,
+      MR, TREC, SUBJ, TEE, TEH
+   · Apache 2.0: Qwen2.5, SimpleScaling s1.1
+   · cc-by-sa-3.0: SST2, FP,
+AI Agent Usage. AI Agents are used and only
+used for writing improvement in this paper.
+
+                                                             15
+lattn 20.4                                                     c_attn
+       0.3                                              40
+lattn  0.2
+       0.1
+       0.0                 10  La2y0er Numbers30
+
+             0
+
+Figure 17: Shifting distance before and after ABFT on the c_attn matrix of GPT2-XL and SST2.
+
+lattn 20.8      q_proj
+       0.7      k_proj
+
+       0.6
+
+       0.5
+
+lattn  0.4
+
+       0.3
+
+            0           5      10 Layer1N5umbers20  25      30
+
+Figure 18: Shifting distance before and after ABFT on the q_proj and k_proj matrix of Llama3-8B and SST2.
+
+lattn 225                                                   q_proj
+       20                                                   k_proj
+       15
+lattn  10
+        50
+                           10  La2y0er Numbers30        40
+
+Figure 19: Shifting distance before and after ABFT on the q_proj and k_proj matrix of Llama3-42B and SST2.
+
+                               16
+                  500     A = 0, B = 1.0                                                                        A = 0, B = 1.0
+
+Induction Head #  400     wAw=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00             Induction Head #  400     wAw=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                  300                                                                                   300
+
+                  200                                                                                   200
+
+                  100                                                                                   100
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (a) Llama3-8B SST2 (Fig. 5)                                                           (b) Llama3-8B MR
+
+                  500     A = 0, B = 1.0
+
+                  400     Aww=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00                               350
+                  300
+Induction Head #                                                                      Induction Head #  300
+
+                                                                                                        250                                                       A = 0, B = 1.0
+
+                  200                                                                                   200                                                       wAw=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                                                                                                        150
+                  100                                                                                   100
+
+                                                                                                        50
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (c) Llama3-8B FP                                                                      (d) Llama3-8B SST5
+
+                  350     A = 0, B = 1.0                                                                500     A = 0, B = 1.0
+
+Induction Head #  300     Aww=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00             Induction Head #  400     wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                  250                                                                                   300
+                  200
+
+                  150                                                                                   200
+
+                  100                                                                                   100
+
+                  50
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (e) Llama3-8B TREC                                                                    (f) Llama3-8B SUBJ
+
+                  400     A = 0, B = 1.0                                                                500     A = 0, B = 1.0
+                          wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00                              400
+Induction Head #  300                                                                 Induction Head #  300     wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+
+                  200                                                                                   200
+
+                  100                                                                                   100
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (g) Llama3-8B TEE                                                                     (h) Llama3-8B TEH
+
+                          Figure 20: Induction head numbers along training dynamics on Llama3-8B and all 8 datasets.
+
+                                                                                  17
+                  100     A = 0, B = 1.0                                                                100     A = 0, B = 1.0
+                          Aww=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00                                80
+Induction Head #  80                                                                  Induction Head #          wAw=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                  60                                                                                    60
+
+                  40                                                                                    40
+
+                  20                                                                                    20
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (a) Falcon3-7B SST2                                                                   (b) Falcon3-7B MR
+
+                  120     A = 0, B = 1.0                                                                100
+
+Induction Head #  100     Aww=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00             Induction Head #  80                                                        A = 0, B = 1.0
+                   80
+                                                                                                        60
+                  60                                                                                    40                                                        wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+
+                  40
+
+                  20                                                                                    20
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (c) Falcon3-7B FP                                                                     (d) Falcon3-7B SST5
+
+                          A = 0, B = 1.0                                                                120     A = 0, B = 1.0
+
+Induction Head #  80      wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00            Induction Head #  100     wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                  60                                                                                     80
+
+                  40                                                                                    60
+
+                  20                                                                                    40
+
+                                                                                                        20
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (e) Falcon3-7B TREC                                                                   (f) Falcon3-7B SUBJ
+
+                  100     A = 0, B = 1.0                                                                140
+
+Induction Head #          wAw=//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00             Induction Head #  120
+
+                  80                                                                                    100                                                       A = 0, B = 1.0
+                  60
+                                                                                                        80                                                        wwA =//oP0.PI5DI,DB, ,=AA00==00..55,,BB0==11..00
+                  40                                                                                    60
+                                                                                                        40
+                  20
+                                                                                                        20
+
+                  0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800            1000                        0    0  200 Seen T40ra0ining Ex6a0m0 ple # 800                            1000
+
+                          (g) Falcon3-7B TEE                                                                    (h) Falcon3-7B TEH
+
+                          Figure 21: Induction head numbers along training dynamics on Falcon3-7B and all 8 datasets.
+
+                                                                                  18
+                                           SST2                                                        MR
+
+                  80                                                                            80                                 w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  60                                                          Induction Head #  60
+
+                  40                                                                            40
+
+                  20                                                                            20
+
+                  0    0  w/ PID, A0 = 0.5, B0 = 1.0  600  800  1000                            00     200 400 600 800 1000
+                              200 400
+                          Seen Training Example #                                                      Seen Training Example #
+
+                          FP                                                                           SST5
+
+                  120     w/ PID, A0 = 0.5, B0 = 1.0                                            60     w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  100                                                         Induction Head #  50
+
+                  80                                                                            40
+
+                  60                                                                            30
+
+                  40                                                                            20
+
+                  20                                                                            10
+
+                  00      200 400 600 800 1000                                                  00     200 400 600 800 1000
+                          Seen Training Example #                                                      Seen Training Example #
+
+                          TREC                                                                         SUBJ
+
+                  50      w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  40                                                          Induction Head #  60
+
+                  30                                                                            40
+
+                  20                                                                            20
+
+                  10                                                                                   w/ PID, A0 = 0.5, B0 = 1.0
+                                                                                                           200 400
+                   00     200 400 600 800 1000                                                  0   0                              600  800 1000
+                  60           Seen Training Example #
+                                                                                                       Seen Training Example #
+                                      TEE
+                                                                                                       TEH
+                                                  w/ PID, A0 = 0.5, B0 = 1.0
+                                                                                                80                                 w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  40                                                          Induction Head #  60
+
+                                                                                                40
+
+                  20                                                                            20
+
+                  00      200 400 600 800 1000                                                  00     200 400 600 800 1000
+                          Seen Training Example #                                                      Seen Training Example #
+
+                          Figure 22: Induction head numbers along training dynamics on GPT2-Large and all 8 datasets.
+
+                                                                19
+                        SST2                                                                      150                  MR
+                                                                                                  125
+                  125                               w/ PID, A0 = 0.5, B0 = 1.0                    100                             w/ PID, A0 = 0.5, B0 = 1.0
+                                                                                                   75
+Induction Head #  100                                                           Induction Head #   50     200 400 600 800 1000
+                                                                                                   25          Seen Training Example #
+                  75
+                                                                                                    00                SST5
+                  50
+
+                  25
+
+                  00    200 400 600 800 1000
+                        Seen Training Example #
+
+                  200   FP
+
+                        w/ PID, A0 = 0.5, B0 = 1.0                                                80
+
+Induction Head #  150                                                           Induction Head #
+
+                                                                                                  60
+
+                  100                                                                             40
+
+                  50                                                                              20
+
+                  00    200 400 600 800 1000                                                      0    0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000
+                                                                                                              200 400
+                        Seen Training Example #                                                           Seen Training Example #
+
+                        TREC                                                                              SUBJ
+
+                  80    w/ PID, A0 = 0.5, B0 = 1.0                                                125                                 w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  60                                                            Induction Head #  100
+
+                  40                                                                              75
+
+                  20                                                                              50
+
+                                                                                                  25
+
+                    00  200 400 600 800 1000                                                        00    200 400 600 800 1000
+                             Seen Training Example #                                              125          Seen Training Example #
+                  100
+                   80               TEE                                                                               TEH
+                   60
+                   40                           w/ PID, A0 = 0.5, B0 = 1.0                                                        w/ PID, A0 = 0.5, B0 = 1.0
+                   20
+Induction Head #    00  200 400 600 800 1000                                    Induction Head #  100
+                             Seen Training Example #
+                                                                                                  75
+
+                                                                                                  50
+
+                                                                                                  25
+
+                                                                                                  00      200 400 600 800 1000
+                                                                                                          Seen Training Example #
+
+                        Figure 23: Induction head numbers along training dynamics on GPT2-XL and all 8 datasets.
+
+                                                                                20
+                       SST2                                                               MR
+
+                  200  w/ PID, A0 = 0.5, B0 = 1.0                                 200     w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  150                                           Induction Head #  150
+
+                  100                                                             100
+
+                  50                                                              50
+
+                  00   200 400 600 800                    1000                    00      200 400 600 800 1000
+                       Seen Training Example #                                                 Seen Training Example #
+
+                       FP                                                         100                 SST5
+                                                                                   80
+                  250  w/ PID, A0 = 0.5, B0 = 1.0                                  60
+                                                                                   40
+Induction Head #  200                                           Induction Head #
+
+                  150
+
+                  100
+
+                  50                                                              20      w/ PID, A0 = 0.5, B0 = 1.0
+                   00                                                                         200 400
+                       200 400 600 800 1000                                       0    0                              600  800 1000
+
+                       Seen Training Example #                                            Seen Training Example #
+
+                       TREC                                                       300                    SUBJ
+                                                                                  250
+                  150  w/ PID, A0 = 0.5, B0 = 1.0                                         w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  125                                           Induction Head #  200
+
+                  100
+
+                  75                                                              150
+
+                  50                                                              100
+
+                  25                                                              50
+
+                  00   200 400 600 800 1000                                       00      200 400 600 800 1000
+                       Seen Training Example #                                            Seen Training Example #
+
+                       TEE                                                                TEH
+
+                              w/ PID, A0 = 0.5, B0 = 1.0                          120     w/ PID, A0 = 0.5, B0 = 1.0
+                  200
+Induction Head #  150                                           Induction Head #  100
+
+                                                                                  80
+
+                  100                                                             60
+
+                  50                                                              40
+
+                                                                                  20
+
+                  00   200 400 600 800 1000                                       00      200 400 600 800 1000
+                       Seen Training Example #                                            Seen Training Example #
+
+                       Figure 24: Induction head numbers along training dynamics on DeepSeek-R1 and all 8 datasets.
+
+                                                          21
+                  100     SST2                                                                 MR
+
+Induction Head #  80                                                 Induction Head #  80
+
+                  60                                                                   60
+
+                  40                                                                   40
+
+                  20      w/ PID, A0 = 0.5, B0 = 1.0                                   20      w/ PID, A0 = 0.5, B0 = 1.0
+                              200 400                                                              200 400
+                  0    0                              600  800 1000                    0    0                              600  800 1000
+
+                          Seen Training Example #                                              Seen Training Example #
+
+                                             FP                                                                 SST5
+
+                  120                                                                  100
+
+Induction Head #  100                                                Induction Head #  80
+
+                  80                                                                   60
+
+                  60                                                                   40
+
+                  40
+
+                  20      w/ PID, A0 = 0.5, B0 = 1.0                                   20      w/ PID, A0 = 0.5, B0 = 1.0
+                   0          200 400                                                              200 400
+                       0                              600  800 1000                    0    0                              600  800 1000
+
+                          Seen Training Example #                                              Seen Training Example #
+
+                                           TREC                                                                 SUBJ
+
+                  100                                                                  120
+
+Induction Head #  80                                                 Induction Head #  100
+
+                  60                                                                   80
+
+                  40                                                                   60
+
+                  20                                                                   40
+
+                  0    0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000                    20   0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000
+                              200 400                                                   0          200 400
+
+                          Seen Training Example #                                              Seen Training Example #
+
+                                           TEE                                                                   TEH
+
+                  80                                                                   120
+
+Induction Head #  60                                                 Induction Head #  100
+
+                                                                                       80
+
+                  40                                                                   60
+
+                  20                                                                   40
+
+                  0    0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000                    20   0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000
+                              200 400                                                   0          200 400
+
+                          Seen Training Example #                                              Seen Training Example #
+
+                       Figure 25: Induction head numbers along training dynamics on Qwen2.5-32B and all 8 datasets.
+
+                                                           22
+                  120                    SST2                                                             120     MR
+                  100
+                          w/ PID, A0 = 0.5, B0 = 1.0                                                      100     w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  80                                                                    Induction Head #  80
+
+                  60                                                                                      60
+
+                  40                                                                                      40
+
+                  20                                                                                      20
+
+                  00      200 400 600 800 1000                                                            00      200 400 600 800 1000
+                               Seen Training Example #                                                            Seen Training Example #
+
+                                    FP                                                                            SST5
+
+                  125     w/ PID, A0 = 0.5, B0 = 1.0                                                      100
+
+Induction Head #  100                                                Induction Head #                     80
+
+                  75                                                                                      60
+
+                  50                                                                                      40
+
+                  25      200  400                    600  800 1000                                       20   0  w/ PID, A0 = 0.5, B0 = 1.0  600  800 1000
+                   00                                                                                      0          200 400
+
+                               Seen Training Example #                                                            Seen Training Example #
+
+                                    TREC                                                                  150     SUBJ
+
+                  100     w/ PID, A0 = 0.5, B0 = 1.0                                                      125     w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  80                                                                    Induction Head #  100
+
+                  60                                                                                      75
+
+                  40                                                                                      50
+
+                  20                                                                                      25
+
+                  00      200 400 600 800 1000                                                            00      200 400 600 800 1000
+                               Seen Training Example #                                                            Seen Training Example #
+
+                                    TEE                                                                           TEH
+
+                  80                                                                                      100     w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #                                                                      80Induction Head #
+                  60
+
+                                                                                      60
+                  40
+                                                                                                          40
+
+                  20      w/ PID, A0 = 0.5, B0 = 1.0                                                      20
+                              200 400                                                                      00
+                  0    0                              600  800 1000                                               200 400 600 800 1000
+                                                                                                                       Seen Training Example #
+                               Seen Training Example #
+
+                       Figure 26: Induction head numbers along training dynamics on SimpleScaling s1.1 and all 8 datasets.
+
+                                                           23
+                      SST2                                                100  MR
+
+                  80  w/ PID, A0 = 0.5, B0 = 1.0                               w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #                                        Induction Head #  80
+
+                  60                                                      60
+
+                  40                                                      40
+
+                  20                                                      20
+
+                  00  200 400 600 800 1000                                00   200 400 600 800 1000
+                      Seen Training Example #                                  Seen Training Example #
+
+                      FP                                                       SST5
+
+                            w/ PID, A0 = 0.5, B0 = 1.0                    60   w/ PID, A0 = 0.5, B0 = 1.0
+                  60
+Induction Head #                                        Induction Head #  50
+
+                  40                                                      40
+                                                                          30
+
+                  20                                                      20
+
+                                                                          10
+
+                  00  200 400 600 800 1000                                00   200 400 600 800 1000
+                      Seen Training Example #                                  Seen Training Example #
+
+                      TREC                                                     SUBJ
+
+                  60  w/ PID, A0 = 0.5, B0 = 1.0                          80   w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  50                                    Induction Head #  60
+
+                  40                                                      40
+
+                  30
+
+                  20                                                      20
+
+                  10
+
+                  00  200 400 600 800 1000                                00   200 400 600 800 1000
+                      Seen Training Example #                                  Seen Training Example #
+
+                  60  TEE                                                      TEH
+
+                      w/ PID, A0 = 0.5, B0 = 1.0                          60   w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  50                                    Induction Head #  50
+
+                  40                                                      40
+
+                  30                                                      30
+
+                  20                                                      20
+
+                  10                                                      10
+
+                  00  200 400 600 800 1000                                00   200 400 600 800 1000
+                      Seen Training Example #                                  Seen Training Example #
+
+                      Figure 27: Induction head numbers along training dynamics on Llama3-42B and all 8 datasets.
+
+                                                        24
+                         SST2                                                          100                     MR
+
+                  80     w/ PID, A0 = 0.5, B0 = 1.0                                    80      w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  60                                                 Induction Head #  60
+
+                  40                                                                   40
+
+                  20                                                                   20
+
+                   00    200 400 600 800 1000                                          00      200 400 600 800 1000
+                  60     Seen Training Example #                                               Seen Training Example #
+
+                         FP                                                                    SST5
+
+                                                                                       50      w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  40                                                 Induction Head #  40
+
+                                                                                       30
+
+                  20                                                                   20
+
+                  0   0  w/ PID, A0 = 0.5, B0 = 1.0  600  800  1000                    10      200 400 600 800 1000
+                             200 400                                                    00          Seen Training Example #
+                         Seen Training Example #
+
+                         TREC                                                                  SUBJ
+
+                  50     w/ PID, A0 = 0.5, B0 = 1.0                                    60      w/ PID, A0 = 0.5, B0 = 1.0
+
+Induction Head #  40                                                 Induction Head #
+
+                  30                                                                   40
+
+                  20                                                                   20
+
+                  10
+
+                   00    200 400 600 800 1000                                          00      200 400 600 800 1000
+                         Seen Training Example #                                                    Seen Training Example #
+                  50
+                  40     TEE                                                                               TEH
+                  30
+                                                                                       50
+
+Induction Head #                                                     Induction Head #  40
+
+                                                                                       30
+
+                  20                                                                   20
+
+                  10     w/ PID, A0 = 0.5, B0 = 1.0                                    10      w/ PID, A0 = 0.5, B0 = 1.0
+                             200 400                                                               200 400
+                  0   0                              600  800  1000                    0    0                              600  800 1000
+
+                         Seen Training Example #                                               Seen Training Example #
+
+                         Figure 28: Induction head numbers along training dynamics on Llama3-56B and all 8 datasets.
+
+                                                                     25
+       text: (...), label: negative \n text: (...), label: positive \n     text: (...), label: positive \n text: (...), label: positive \n     text: (...), label: positive \n text: (...), label: negative \n     text: (...), label: positive \n text: (...), label: negative \n
+       text: (...), label: negative \n text: (...), label: positive \n     text: (...), label: positive \n text: (...), label: negative \n     text: (...), label: positive \n text: (...), label: positive \n     text: (...), label: positive \n text: (...), label: positive \n
+       text: (...), label:(negative)                                       text: (...), label:(positive)                                       text: (...), label:(negative)                                       text: (...), label:(negative)
+
+    Vanilla                                                             Vanilla                                                             Vanilla                                                             Vanilla
+
+    ABFT                                                                ABFT                                                                ABFT                                                                ABFT
+
+26  Vanilla                                                             Vanilla                                                             Vanilla                                                             Vanilla
+    E2E                                                                 E2E                                                                 E2E                                                                 E2E
+    ABFT                                                                ABFT                                                                ABFT                                                                ABFT
+
+             Figure 29: Augmentation results (4 cases) for attention visualization. Upper: results for Fig. 16, lower: results for Fig. 8.
+    Vanilla  Vanilla  Vanilla  Vanilla
+    ABFT     ABFT     ABFT     ABFT
+
+27  Vanilla  Vanilla  Vanilla  Vanilla
+    ABFT     ABFT     ABFT     ABFT
+    Vanilla  Vanilla  Vanilla  Vanilla
+    ABFT     ABFT     ABFT     ABFT
+
+             Figure 30: Augmentation results (more layers) for attention visualization with the same settings and input as the Fig. 16.
+28  Vanilla  Vanilla  Vanilla  Vanilla
+    E2E      E2E      E2E      E2E
+    ABFT     ABFT     ABFT     ABFT
+
+    Vanilla  Vanilla  Vanilla  Vanilla
+    E2E      E2E      E2E      E2E
+    ABFT     ABFT     ABFT     ABFT
+
+    Vanilla  Vanilla  Vanilla  Vanilla
+    E2E      E2E      E2E      E2E
+    ABFT     ABFT     ABFT     ABFT
+
+             Figure 31: Augmentation results (more layers) for attention visualization with the same settings and input as the Fig. 8.
+

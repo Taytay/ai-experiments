@@ -1,0 +1,28 @@
+{
+  "id": "2603.22213",
+  "version": "v2",
+  "id_versioned": "2603.22213v2",
+  "title": "SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection",
+  "authors": [
+    "Kexian Tang",
+    "Jiani Wang",
+    "Shaowen Wang",
+    "Kaifeng Lyu"
+  ],
+  "published": "2026-03-23",
+  "updated": "2026-03-23",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "While large language models (LLMs) are pretrained on massive amounts of data, their knowledge coverage remains incomplete in specialized, data-scarce domains, motivating extensive efforts to study synthetic data generation for knowledge injection. We propose SPA (Scaling Prompt-engineered Augmentation), a simple but tough-to-beat baseline that uses a small set of carefully designed prompts to generate large-scale synthetic data for knowledge injection. Through systematic comparisons, we find that SPA outperforms several strong baselines. Furthermore, we identify two key limitations of prior approaches: (1) while RL-based methods may improve the token efficiency of LLM-based data augmentation at small scale, they suffer from diversity collapse as data scales, leading to diminishing returns; and (2) while multi-stage prompting may outperform simple augmentation methods, their advantages can disappear after careful prompt tuning. Our results suggest that, for knowledge injection, careful prompt design combined with straightforward large-scale augmentation can be surprisingly effective, and we hope SPA can serve as a strong baseline for future studies in this area. Our code is available at https://github.com/Tangkexian/SPA.",
+  "abs_url": "https://arxiv.org/abs/2603.22213",
+  "pdf_url": "https://arxiv.org/pdf/2603.22213",
+  "src_url": "https://arxiv.org/src/2603.22213v2",
+  "metadata_source": "abs-page"
+}

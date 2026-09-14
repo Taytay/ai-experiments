@@ -1,0 +1,940 @@
+                                        MOSAIC: Masked Objective with Selective Adaptation for In-domain
+                                                                       Contrastive Learning
+
+                                                                    Vera Pavlova1,2, Mohammed Makhlouf2
+                                                                               1burevestnik.ai 2rttl.ai
+
+                                                              1v@burevestnik.ai, 2v@rttl.ai, mm@rttl.ai
+
+arXiv:2510.16797v2 [cs.CL] 29 Jan 2026                        Abstract                          representations by mitigating the anisotropy prob-
+                                                                                                lem (a phenomenon that confines embeddings to a
+                                             We introduce MOSAIC (Masked Objective              narrow cone-like region in the vector space, thereby
+                                             with Selective Adaptation for In-domain            limiting their expressiveness) (Ethayarajh, 2019; Li
+                                             Contrastive learning), a multi-stage frame-        et al., 2020; Gao et al., 2021). While there have
+                                             work for domain adaptation of text embedding       been successful attempts to combine MLM and
+                                             models that incorporates joint domain-specific     contrastive objectives for training language models
+                                             masked supervision. Our approach addresses         (Meng et al., 2021; Chi et al., 2021) and text em-
+                                             the challenges of adapting large-scale general-    beddings (Gao et al., 2021; Wu et al., 2022; Giorgi
+                                             domain text embedding models to specialized        et al., 2021), the majority of the prior work has
+                                             domains. By jointly optimizing masked lan-         focused on general-domain data.
+                                             guage modeling (MLM) and contrastive ob-
+                                             jectives within a unified training pipeline, our      General-domain text embedding models are now
+                                             method enables effective learning of domain-       widely available, many trained on vast general-
+                                             relevant representations while preserving the      domain corpora using a two-stage approach: an ini-
+                                             robust semantic discrimination properties of the   tial pre-training phase on massive unlabeled data,
+                                             original model. We empirically validate our ap-    followed by supervised fine-tuning (Wang et al.,
+                                             proach on both high-resource and low-resource      2022b; Li et al., 2023; Nussbaum et al., 2024; Mer-
+                                             domains, achieving improvements up to 13.4%        rick et al., 2024). The data used for pre-training
+                                             in NDCG@10 (Normalized Discounted Cumu-            can exceed half a billion sentence pairs (hundreds
+                                             lative Gain) over strong general-domain base-      of gigabytes of text), resources that are rarely avail-
+                                             lines. Comprehensive ablation studies further      able in specific domains. Although these general-
+                                             demonstrate the effectiveness of each compo-       domain models can perform competitively in spe-
+                                             nent, highlighting the importance of balanced      cialized areas, their lack of domain-specific knowl-
+                                             joint supervision and staged adaptation.           edge often limits performance. To address this
+                                                                                                gap, we propose domain adaptation of pre-trained
+                                        1 Introduction                                          embedding models that leverage their ability to dis-
+                                                                                                tinguish between similar and dissimilar pairs and
+                                        Self-supervised learning has enabled significant        transfer it to a domain-specific embedding model.
+                                        progress in natural language processing, with meth-
+                                        ods like MLM (Devlin et al., 2019; Liu et al., 2020;       Previous research on language model adapta-
+                                        Conneau et al., 2020; Sanh et al., 2019) and con-       tion highlights the importance of domain-specific
+                                        trastive training (Reimers and Gurevych, 2019; Wu       vocabulary for improving results on downstream
+                                        et al., 2020; Liu et al., 2021) driving recent devel-   tasks (Beltagy et al., 2019; Gu et al., 2020a). How-
+                                        opments. However, these methods are typically ex-       ever, simply adding domain-specific vocabulary
+                                        plored separately, as effectively combining MLM         and continuing MLM training degrades the con-
+                                        and contrastive learning remains a significant chal-    trastive properties of the learned representations,
+                                        lenge, since their joint optimization often results in  since the encoder loses its desirable characteris-
+                                        conflicting training signals and suboptimal perfor-     tics under the token prediction objective (Wu et al.,
+                                        mance (Gao et al., 2021). Nevertheless, unifying        2022). On the other hand, adding new tokens and
+                                        these objectives presents an opportunity to lever-      continuing only with the contrastive objective pro-
+                                        age the complementary strengths of token-level          vides insufficient training signals to update new
+                                        (MLM) and sentence-level (contrastive) supervi-         domain tokens, as the embedding matrix receives
+                                        sion, while also improving the quality of learned
+diluted signals due to the pooling functions applied    data.
+to generate text embeddings.                               Our main contributions are as follows: (1) We
+
+   This dilemma motivates our approach of using         propose MOSAIC, a novel domain adaptation ap-
+a joint objective to enable both token-level and        proach for pretrained text embedding models that
+sentence-level supervision, thus benefiting from        jointly optimizes MLM and contrastive objectives
+both worlds and enhancing domain adaptation for         within a mutual information maximization frame-
+both the encoder and the embedding matrix during        work. (2) We empirically validate our method on
+training. Building on a mutual information maxi-        both high-resource (biomedical) and low-resource
+mization perspective (Hjelm et al., 2018; Bachman       (Islamic) domains, demonstrating substantial gains
+et al., 2019; Kong et al., 2019; Chen et al., 2020;     over strong general-domain baselines. (3) We con-
+Chi et al., 2021), which demonstrates that these        duct comprehensive ablation studies to analyze the
+objectives are aligned rather than contradictory, op-   contribution of each component and the dynamics
+erating at different levels of language granularity,    of joint objective training. (4) We release our code
+we leverage the joint optimization of MLM and           and pretrained models to support reproducibility
+contrastive objectives. Though these objectives are     and facilitate future research 1.
+theoretically aligned, a key challenge in joint train-
+ing arises from the dominance of the MLM loss           2 Related Work
+and more frequent token-level supervision, which
+can overwhelm the joint objective and hinder bal-       2.1 Contrastive and MLM Objectives
+anced optimization. We mitigate this issue by di-
+recting the MLM signal toward domain-relevant           Contrastive Predictive Coding (CPC) introduced
+tokens, rather than separating encoders (Wu et al.,     the InfoNCE loss (van den Oord et al., 2018), en-
+2022), which limits the flow of informative token-      couraging representations to align with an anchor
+level supervision into sentence-level embeddings.       while separating from negatives, thereby laying the
+Importantly, MOSAIC builds on a very simple             groundwork for contrastive learning. In parallel,
+prerequisite: vocabulary expansion. The method          Masked Language Modeling (MLM), introduced
+only requires adding new domain tokens to the           with BERT (Devlin et al., 2019), emerged as the
+model's tokenizer, which is a cheap and practical       standard pretraining objective for encoder-based
+step that avoids complex architectural changes or       models.
+large-scale retraining. This simplicity makes MO-
+SAIC broadly applicable across domains.                    Prior work has explored joint contrastive and
+                                                        masked objectives in two distinct directions: large-
+   To thoroughly evaluate our method, we apply it       scale language model pretraining and general-
+to both high-resource and low-resource domains.         purpose text embedding models. COCO-LM in-
+Most domain-adaptation research focuses on high-        tegrates contrastive learning into a pretraining
+resource and medium-resource domains, which is          pipeline for transformer language models (Vaswani
+valuable for benchmarking, comparison with strong       et al., 2017; Meng et al., 2021), replacing BERT's
+baselines, and conducting ablation studies. Yet this    Next Sentence Prediction (NSP) objective with a
+focus restricts the generalizability of adaptation      more effective contrastive signal by pairing cor-
+methods to truly low-resource domains, which are        rupted and truncated versions of a sentence. The
+common in real-world applications. Such domains         model jointly learns to align these pairs via con-
+often face acute data scarcity, making robust adapta-   trastive loss and to correct the corruption through
+tion methods essential for ensuring equitable access    token-level denoising. COCO-LM demonstrated
+to state-of-the-art language technologies and maxi-     consistent gains on GLUE tasks (Wang et al., 2018),
+mizing the real-world impact of embedding models        showing that contrastive objectives outperform
+(Pavlova and Makhlouf, 2025). To demonstrate            NSP for general-purpose pretraining. InfoXLM re-
+the robustness and practical value of our approach,     frames masked language modeling as a contrastive
+we validate it in two domains: the Biomedical do-       prediction task, formulating it with the InfoNCE
+main, which is characterized by high-resource sci-      loss (Chi et al., 2021) and applying it to multilin-
+entific texts, and the Islamic domain, which repre-     gual language model pretraining. Combined with
+sents low-resource but culturally significant con-      a sentence-level cross-lingual contrastive objec-
+tent. This allows us to test the robustness of our      tive, this joint training enables InfoXLM to achieve
+method even when there is very limited in-domain
+                                                            1https://github.com/rttl-ai/mosaic
+Figure 1: The MOSAIC pipeline: a multi-stage framework for domain adaptation of text embedding models.
+
+state-of-the-art results on cross-lingual understand-  domain vocabulary to already well-trained mod-
+ing and retrieval benchmarks.                          els, thereby expediting the pre-training process
+                                                       (Poerner et al., 2020; Sachidananda et al., 2021;
+   For training text embeddings, DeCLUTR explic-       Pavlova and Makhlouf, 2023; Pavlova, 2023).
+itly combines MLM with contrastive training for
+text embeddings (Giorgi et al., 2021). They con-          For text embedding models that have already
+struct positive pairs from contiguous spans of the     undergone contrastive training, prior efforts have
+same document, apply BERT-style masking to the         either relied on small adapters (Huang et al., 2023;
+anchor span, and train jointly through a single en-    Schopf et al., 2023) which often suffer from lim-
+coder. DeCLUTR was evaluated using SentEval,           ited expressiveness, or on data-driven methods such
+which largely consists of classification tasks along   as augmentation, denoising objectives, or genera-
+with some STS and NLI tasks. The authors of In-        tive pseudo-labeling (Thakur et al., 2021; Wang
+foCSE introduced a sophisticated framework (Wu         et al., 2021, 2022a). In contrast, we introduce a
+et al., 2022) and, rather than combining MLM and       full model-driven approach to domain adaptation
+contrastive loss on the same encoder output, em-       that operates after language model pretraining. By
+ployed an auxiliary lightweight encoder. While         modifying the training objective itself, our method
+InfoCSE demonstrated gains on STS benchmarks,          provides a more expressive and principled mecha-
+its architectural separation constrains the transfer   nism for adapting text embeddings.
+of token-level supervision into sentence-level em-
+beddings, limiting the potential benefits of joint     3 Multi-stage Contrastive Learning with
+training.                                                  Domain-Specific Masked Supervision
+
+   Distinct from these methods, our work intro-        3.1 Augmenting Contrastive Models with
+duces a joint MLM-contrastive objective explicitly           Domain-Specific Vocabulary
+designed for domain adaptation of existing strong            (MOSAIC-Stage1)
+text embedding models, which, to the best of our
+knowledge, represents a novel and previously un-       To leverage the robust encoder learned during con-
+explored direction.                                    trastive pretraining, we reuse both the encoder and
+                                                       the original embedding matrix. However, to accom-
+2.2 Domain Adaptation                                  modate a word distribution shift from a general do-
+                                                       main vocabulary to a new domain vocabulary, we
+Domain adaptation is most commonly performed           augment the model with new domain-specific to-
+at the language modeling stage, where general-         kens (see Figure 1). The size of the augmented vo-
+purpose models undergo continued pre-training          cabulary in MOSAIC is neither manually selected
+on in-domain corpora (Lee et al., 2019; Alsentzer      nor treated as a hyperparameter. Instead, it is a
+et al., 2019). Such approaches typically suffer from   direct and deterministic function of the underly-
+the absence of domain-specific vocabulary, which       ing domain corpus. Given a fixed base tokenizer
+often necessitates training from scratch (Beltagy      and a fixed domain corpus, we follow a two-step
+et al., 2019; Gu et al., 2020a). To avoid these        procedure:
+GPU-heavy methods, recent work has explored
+lightweight domain adaptation by introducing new          Domain-Specific Tokenizer Training. We be-
+gin by training a new tokenizer on a large domain-        I(c1; x1)  E log            f(c1, x1)   + log |V|
+specific corpus to identify vocabulary units that                                    xV f(c1, x)
+capture relevant terminology.                                                 q(V )
+
+   Domain Vocabulary Augmentation. We then                                                        (2)
+identify domain-specific tokens that are missing
+from the original tokenizer used by the contrastive       The InfoNCE formulation highlights that while
+model, and incorporate these into the model's em-
+bedding matrix, initializing their embeddings as the      two objectives may be aligned, there is a significant
+average of their base model subword embeddings.
+Tokens outside the base tokenizer's coverage map          imbalance between them. The larger vocabulary
+to [UNK] and are not added. New domain tokens
+are constructed as concatenations of existing subto-      size in MLM results in a substantially larger de-
+kens, so initialization via the mean of subword
+embeddings is always well-defined.                        nominator, leading to very low probabilities for
+
+   This design choice is motivated by the fact that       the correct token. Consequently, this generates
+contrastive training mainly shapes the encoder. By
+modifying only the input vocabulary, we retain            higher loss values and, therefore, larger gradient
+the original encoder weights from the pretrained
+contrastive model, preserving its sentence-level dis-     magnitudes, causing MLM to dominate the training
+crimination capabilities.
+                                                          process. This imbalance leads to stronger and more
+3.2 Joint Optimization of Contrastive and
+      MLM Objectives (MOSAIC-Stage2)                      frequent gradients for MLM. As a result, the model
+
+Jointly optimizing MLM and contrastive objec-             disproportionately optimizes the MLM objective,
+tives can theoretically combine the benefits of
+fine-grained token-level supervision from MLM             leaving the contrastive component under-trained.
+with sentence-level supervision encouraged by con-
+trastive learning. However, in practice, it is difficult  To counteract this, we propose restricting MLM
+to perform joint optimization on both. Below, we
+detail the reasoning behind this challenge and pro-       to only a subset of the vocabulary -- the domain
+pose our approach to balance these objectives effec-
+tively. To motivate our approach, we start with the       vocabulary, which includes only newly introduced
+information-theoretic interpretation of both MLM
+and contrastive objectives (Chi et al., 2021). Both       domain-specific tokens (Gu et al., 2020b; Sadeq
+objectives can be viewed as maximizing a mutual
+information lower bound. Using the InfoNCE for-           et al., 2022; Belfathi et al., 2024). This reduces
+mulation from van den Oord et al. (2018), the con-
+trastive objective for context pairs c1 and c2 can be     the size of the denominator by replacing the full
+expressed as:
+                                                          vocabulary Vall with a smaller domain-specific set
+                                                          Vdomain limiting the masking signal to rare, informa-
+                                                          tive tokens. Rewriting the MLM loss with domain
+
+                                                          vocabulary gives:
+
+                                                            I(c1; x1)   f(c1, x1)    + log |VD| (3)
+                                                                       xVD f(c1, x)
+                                                           E log
+
+                                                             q(VD )
+
+I(c1; c2)  E log           f(c1, c2)   +log |N |             In this variant, the set VD contains only domain-
+                          cN f(c1, c)                     specific vocabulary tokens. This targeted vocab-
+                   q(N )                                  ulary reduction refocuses the MLM objective on
+                                                          domain-critical tokens, providing clearer and less
+                                       (1)                overpowering gradient signals, which align more
+                                                          closely with those of the contrastive objective.
+where f is a scoring function that measures simi-
+larity between two contexts c1 and c2 (e.g., via dot         While the InfoNCE form provides theoretical
+                                                          grounding, in practice both MLM and contrastive
+                                                          learning are usually implemented using cross-
+                                                          entropy losses. For the contrastive loss, this takes
+                                                          the form:
+
+product or cosine similarity), N represents a set of
+
+negative contexts and q(N ) sampling distribution         LCL = - log         exp (c1)(c2)        (4)
+                                                                             cN exp ((c1)(c))
+of negatives.
+
+Similarly, MLM can also be interpreted as maxi-
+
+mizing a mutual information lower bound between           where (·) is an encoder that maps the input to
+                                                          a dense vector, and N includes one positive and
+the context c1 and the masked token x1 with V             |N | - 1 negatives.
+
+being the vocabulary:
+Similarly, the domain-focused MLM cross- 4 Experiments on a High-Resource
+
+entropy loss becomes:                                   Domain
+
+LdMoLmMain = - log   exp (c1)e(x1)      (5)             Training Data. To construct a large-scale biomedi-
+                    xVD exp ((c1)e(x))                  cal corpus, we parsed the 2025 PubMed snapshot
+                                                        and extracted (title, abstract) pairs. When available,
+Here,  is the shared encoder (same as used in           metadata such as journal name and keywords were
+the contrastive loss), e is the embedding lookup ta-    appended to the title to enrich the context. We fil-
+ble, and VD is the (domain-constrained) candidate       tered out non-English entries as well as pairs where
+token vocabulary.                                       either the title or abstract was too short to form a
+                                                        meaningful sentence pair. To further ensure data
+   Our final joint loss is expressed as:                quality and minimize false positives, we applied
+                                                        a consistency-based filtering procedure using the
+L =  · LdMoLmMain + LCL                 (6)             gte-base model (see Appendix A). This resulted
+                                                        in approximately 20 million high-quality sentence
+where  is a scalar coefficient used to balance          pairs for use in stages two and three of our approach
+the gradient magnitude (Caruana, 1997; Wu et al.,       (MOSAIC-Bio-Stage2 and MOSAIC-Bio-Stage3).
+2022). This formulation ensures that both ob-
+jectives contribute to optimizing the shared en-           Fine-tuning data. We evaluate our models in
+coder while mitigating the gradient dominance of        a zero-shot setting. To prevent benchmark data
+MLM. Ultimately, by limiting the MLM's vocabu-          leakage (a common concern for text embedding
+lary set and calibrating its contribution to the joint  models), we fine-tune on BioASQ Task 9a (Tsat-
+objective, our approach effectively integrates the      saronis et al., 2015), which does not overlap with
+strengths of MLM and contrastive training, result-      any of the MTEB evaluation datasets. The dataset
+ing in robust and domain-adapted representations.       consists of approximately 16 million PubMed ti-
+It is crucial to highlight that in our design, the in-  tle­abstract pairs annotated with MeSH (Medical
+puts to contrastive objectives are provided with        Subject Headings); Importantly, this fine-tuning
+mask perturbation, which forces the model to dis-       step is not part of the proposed MOSAIC training
+ambiguate which specific tokens distinguish nega-       pipeline. Instead, it corresponds to preparing the
+tive documents from positive (see Figure 1). In this    final supervised model (MOSAIC-Biosuper) used
+way, MLM acts as a localized supervision signal         for evaluation in supervise setting.
+that highlights the differences and similarities be-
+tween pairs, particularly in cases where contrastive       Evaluation Data and Metrics. We evaluate on
+loss alone may struggle due to mean pooling (or         the medical subset of the MTEB (Massive Text Em-
+similar functions), which average over token em-        bedding Benchmark) (Muennighoff et al., 2022), a
+beddings and blur these distinctions. By applying       standardized benchmark for assessing the quality
+MLM-guided masking, the model learns to focus           of text embeddings across a diverse set of tasks,
+on the key differentiating features.                    such as retrieval, classification, clustering, rerank-
+                                                        ing, semantic textual similarity (STS), and sum-
+3.3 Contrastive-Only Training                           marization. We use BiorxivClusteringP2P, Medrx-
+      (MOSAIC-Stage3)                                   ivClusteringP2P, and MedrxivClusteringS2S for
+                                                        clustering (V-measure); MedicalQARetrieval, NF-
+For the third stage, we continue training our model     Corpus, SciFact, and TRECCOVID for retrieval
+using only the contrastive objective, after the new     (NDCG@10); and BIOSSES for STS (Spearman
+domain tokens have been introduced and learned.         correlation). We report results on BIOSSES in Ta-
+This stage serves as a corrective step, allowing        ble 1, but the analysis on the STS task is performed
+the encoder to recover and reinforce sentence-level     as a part of the ablation Section 4.2.
+discrimination, which may be diluted during joint
+MLM+contrastive training. By focusing solely on            Baselines. For unsupervised baselines, we use
+contrastive learning, the model re-aligns its repre-    nomic-embed-text-v1unsup2 as our primary base-
+sentations to produce robust text embeddings.           line representing an unsupervised contrastive em-
+                                                        bedding model pretrained on general-domain data.
+                                                        We also train this model on the unsupervised
+
+                                                            2https://huggingface.co/nomic-ai/
+                                                        nomic-embed-text-v1-unsupervised
+Model                        BIOSSES BiorxivC MedicalQAR MedrxivP2P MedrxivS2S NFCorpus SciFact TRECCOVID Avg.
+
+                                                     Unsupervised models
+
+nomic-embed-text-v1unsup     87.189  38.78   68.307   34.854              32.521   35.684  71.982  62.203  53.940
+nomic-embed-biounsup         87.012  36.107  66.173   30.72               28.552   34.235  73.302  62.203  52.788
+MOSAIC-Bio-Stage1            78.946  33.747  63.58    30.261              25.126   26.091  67.246  57.050  47.756
+MOSAIC-Bio-Stage2            88.116  38.101  68.677   34.536              29.882   32.217  72.535  60.763  53.853
+MOSAIC-Bio-Stage3            88.057  39.31   70.233   35.089              30.287   34.137  74.710  61.281  54.638
+
+                                                     Supervised models    37.023                   51.326  52.541
+                                                                          32.0616                  79.638  55.956
+all-mpnet-base-v2            80.432  42.31   66.517  39.862               32.665   33.289  65.570  44.728  50.342
+E5base (Wang et al., 2022b)  85.103  37.49   68.051  34.6347              34.9025  36.589  73.083  68.783  56.738
+E5-base-peft-biomed          85.017  38.049  64.470  33.730                        33.921  70.152  76.447  67.944
+GTEbase (Li et al., 2023)    87.642  40.62   71.455  36.404                   -    37.897  76.178  68.474  66.636
+BGEbase (Xiao et al., 2023)  85.533                                           -    35.539  73.258  79.923  56.670
+text-embedding-ada-002       86.351     -       -        -                34.3009  36.972  72.746  56.48   43.72
+nomic-embed-text-v1super     86.471     -       -        -                 25.20   35.028  70.500  65.754  54.478
+nomic-embed-biosuper         70.55   41.48   66.648  37.0082              29.865   31.37   47.45   63.546  56.774
+PubMedBERT-embed             87.567  35.35   52.19    31.19               32.631   37.430  72.719
+MOSAIC-Biosuper              89.869  37.874  68.349  36.270                        35.571  75.875
+                                     42.551  72.378  37.865
+
+Table 1: Evaluation of unsupervised and supervised models across biomedical benchmarks. Bold indicates the
+highest score per column within each group.
+
+training data described above and include the         joint MLM and contrastive training on top of the
+nomic-embed-bio model in the comparison. To           Nomic repository4. For the purely contrastive stage,
+analyze the impact of each stage on domain adap-      we reuse the original implementation from the
+tation, we evaluate three variants of our MOSAIC      repository. The model architecture is based on
+pipeline, all initialized from the nomic-embed-text-  BERT (Devlin et al., 2019) with several modifica-
+v1unsup checkpoint. MOSAIC-Stage1 augments            tions introduced by the Nomic repo. In MOSAIC
+the model with new domain-specific vocabulary         pipeline, we first expand the tokenizer by adding
+without further pretraining. MOSAIC-Stage2 ap-        approximately 9k new biomedical tokens, and then
+plies joint training with masked language mod-        implement a joint training objective that combines
+eling and contrastive objectives on domain data.      masked language modeling with contrastive learn-
+MOSAIC-Stage3 continues training with the con-        ing. We set the masking rate to 0.15, the MLM
+trastive objective alone, yielding the final unsu-    loss weighting hyperparameter  = 0.3 through-
+pervised MOSAIC model. For supervised base-           out the joint training phase. Details of ablation on
+lines, we select a diverse set of well-established     and masking rate can be found in Section 4.2,
+embedding models that report MTEB scores on           and other hyperparameter settings are provided in
+biomedical datasets, as listed on the official MTEB   Appendix C. We train stages two and three of the
+leaderboard3. As noted in Section 2, most prior       proposed pipeline using only in-batch negatives,
+efforts on text embedding adaptation have focused     and additionally include hard-mined negatives dur-
+on data-driven techniques and do not produce a        ing fine-tuning.
+general-purpose model checkpoint suitable for eval-
+uation or reuse. Moreover, the biomedical em-         4.1 Results and Analysis
+bedding landscape remains sparse: to the best of
+our knowledge, there is no research-based, dedi-      Our results demonstrate several important trends
+cated biomedical sentence embedding model avail-      regarding domain adaptation for text embed-
+able on MTEB. To address this gap, we prepare a       dings (see Table 1). First, among unsupervised
+biomedical text embedding model derived from the      baselines, we observe that simply continuing
+state-of-the-art PubMedBERT, which we further         pretraining a general-domain embedding model
+train on the domain-specific data described above     (nomic-embed-text-v1unsup) on in-domain data
+(PubMedBERT-embed). We additionally include           can lead to reduced performance compared to
+an adapter-based baseline (E5-base-peft-biomed),      the original general-domain baseline across most
+where LoRA adapters are applied to E5base on the      benchmarks (as in the nomic-embed-bio model),
+same domain corpus                                    suggesting that naive in-domain adaptation may
+                                                      distort learned representations. This issue be-
+   Implementation Details. We implement the           comes even more pronounced when augmenting
+
+    3https://huggingface.co/spaces/mteb/                  4https://github.com/nomic-ai/contrastors/tree/
+leaderboard                                           main
+the vocabulary with domain-specific tokens with-       Model                            Score
+out any retraining (MOSAIC-Bio-Stage1), result-        MOSAIC-Stage2 =0.1               76.032
+ing in a substantial performance drop across all       MOSAIC-Stage2 =0.2               81.336
+datasets, likely due to embedding mismatch. In         MOSAIC-Stage2 =0.3               88.116
+contrast, applying a joint MLM+contrastive ob-         MOSAIC-Stage2 =0.4               86.794
+jective (MOSAIC-Bio-Stage2) recovers and fur-          MOSAIC-Stage2 =0.5               67.708
+ther improves results, while a final contrastive-only  All-Token MLM, =0.3              63.995
+training stage (MOSAIC-Bio-Stage3) achieves the        All-Token MLM, =0.1              66.092
+highest scores on four benchmarks (BiorxivClus-        All-Token MLM, =0.005            77.768
+teringP2P, MedicalQARetrieval, MedrxivCluster-         All-Token MLM, =0.001            78.753
+ingP2P, and SciFact), resulting in the best average    MOSAIC-Stage2 (mlm_prob 0.3)     49.871
+performance overall with a 2.8% increase over the      MOSAIC-Stage2 (as the 3d stage)  70.540
+general-domain baseline. These results highlight a     Contrastive only                 84.428
+clear progression across adaptation stages, where
+naive vocabulary expansion leads to degradation,       Table 2: Performance comparison of MOSAIC-Stage2
+targeted joint supervision restores model quality,     and ablated variants on BIOSSES.
+and a final contrastive stage enables robust domain
+adaptation.                                            lag behind on the TRECCOVID dataset (Voorhees
+                                                       et al., 2021). Inspection of the TRECCOVID
+   In the analysis of supervised baselines, we         queries reveals that, alongside core biomedical and
+observe that using a general-domain embed-             clinical questions, a significant fraction focuses on
+ding model that has undergone supervised               social or policy aspects of the pandemic (approx-
+training (nomic-embed-text-v1super) as the             imately 20%). Such queries, addressing societal
+starting checkpoint for domain adaptation,             impacts or interventions like school reopening, may
+and further training it on biomedical data             fall outside the primary scope of the biomedical cor-
+(nomic-embed-biosuper), results in lower perfor-       pora used for model adaptation. This mismatch in
+mance than adapting a model pretrained only in         domain coverage could partly explain the observed
+an unsupervised manner on general-domain data          underperformance. Moreover, recent large-scale
+(nomic-embed-text-v1unsup).                            analyses of PubMed using embedding-based at-
+                                                       lases have shown that COVID-19 literature forms a
+   We further find that the adapter-based approach     uniquely isolated cluster in embedding space, with
+(E5-base-peft-biomed) degrades the performance         strong internal topical fragmentation, further chal-
+of E5base, placing it behind other supervised base-    lenging biomedical models (Kobak et al., 2024).
+lines across all evaluated tasks. Additionally,        The qualitative analysis on BIOSSES is provided
+tuning a biomedical language model (PubMed-            in the Appendix E.
+BERT) in a contrastive regime on biomedical data
+(PubMedBERT-embed) does not yield superior per-        4.2 Ablation Studies
+formance on any benchmark. This suggests that
+transferring contrastive knowledge from a strong       The primary focus of our ablation study is
+general-domain embedding model is more effective       the second stage of the proposed method (joint
+than training a domain-specific LLM from scratch       MLM+contrastive training). Accordingly, all abla-
+with a contrastive objective on in-domain data.        tion experiments are conducted on the MOSAIC-
+                                                       Bio-Stage2 model. For ablation, we use
+   We also observe that competing baselines exhibit    BIOSSES (Sogancioglu et al., 2017), an STS
+task-specific strengths: for example, all-mpnet-       dataset that requires models to capture fine-grained
+base-v2 performs particularly well on clustering       semantic relationships between sentences, beyond
+tasks, while GTEbase and nomic-embed-text-v1           what is assessed in standard retrieval or clustering
+show strong performance in retrieval. In con-          tasks (Cer et al., 2017); this enables us to demon-
+trast, MOSAIC-Biosuper demonstrates consistently       strate the effect of the MLM objective.
+strong performance across task types, including
+semantic textual similarity (BIOSSES), cluster-           Alpha hyperparameter. We ablate the effect
+ing (MedrxivClusteringP2P), and retrieval (Med-        of the MLM loss weight (), which controls the
+icalQARetrieval), achieving the highest average        relative contribution of the MLM objective during
+score overall.                                         joint training. We systematically explore a range of
+                                                        values, a hyperparameter whose impact is rarely
+   However, as shown in Table 1, all of our models
+examined in prior literature. As shown in Table 2,      Model                NDCG@10
+setting  = 0.5 causes the MLM loss to dominate,         Islamic-embed-model    33.581*
+resulting in a drastic performance drop. At the         MOSAIC-ID-Stage1        30.050
+other extreme,  = 0.1 does not sufficiently pro-        MOSAIC-ID-Stage2        34.670
+mote learning of new domain tokens, and  = 0.2          MOSAIC-ID-Stage3        36.809
+yields only modest gains. While  = 0.4 remains          all-mpnet-base-v2     31.516**
+competitive though slightly suboptimal, the highest     nomic-embed-text-v1   32.048**
+performance is achieved at  = 0.3, indicating it        E5base                 32.466*
+as the most balanced choice for our joint objective.    GTEbase                32.924*
+                                                        BGEbase               27.699**
+   Effect of Masking Strategy. To evaluate the ef-
+fectiveness of domain-restricted masked language        Table 3: NDCG@10 evaluation results on the Islamic
+modeling (MLM), we compared our default ap-             dataset. * indicates statistical significance at p < 0.1
+proach, which restricts MLM to domain-specific          and ** at p < 0.05 (paired t-test vs. MOSAIC-ID-
+tokens, with an alternative that applies MLM to         Stage3).
+all vocabulary tokens (All-Tokens MLM), using
+  {0.3, 0.1, 0.005, 0.001} (see Table 2). In line       Figure 2: Boxplot of per-query NDCG@10 scores on
+with the findings of SimCSE (Gao et al., 2021),         the Islamic domain dataset.
+who conducted a small experiment in their Ap-
+pendix on the impact of MLM when combined               shown in Table 2, this results in a noticeable per-
+with a contrastive objective, we observe that even      formance drop from 88.116 to 70.548, a decrease
+very small values of   {0.005, 0.001} negatively        of 20%. This suggests that applying the joint ob-
+affect performance when using random masking            jective to an already strong embedding model can
+over the full vocabulary and remain below those         disturb its contrastive capability.
+of the domain-token strategy. This underscores
+our central finding: the masking mechanism it-          5 Experiment on a Low-Resource Domain
+self--restricting MLM to domain tokens--matters
+more than fine-grained tuning of . As   0,              Experimental Setup. As noted in Section 1, the Is-
+the all-token variant collapses toward contrastive-     lamic domain is a low-resource area, especially for
+only training, which negates the intended benefits      English-language data. In-domain data suitable for
+of joint supervision and still fails to match domain-   training text embedding models is extremely scarce.
+token masking.                                          To address this, we constructed an in-domain train-
+                                                        ing set by extracting semantically related verse
+   No Joint Objective. We assess the impact of          pairs from Tafseer Ibn Kathir and applying con-
+the joint MLM+contrastive objective by removing         sistency filtering with the gte-base model, result-
+the second stage entirely and training solely with      ing in 7,587 high-quality pairs. Further details on
+the contrastive objective after vocabulary expan-       the data construction process are provided in Ap-
+sion ("Contrastive only"). As shown in Table 2,         pendix B.
+omitting the MLM stage results in a performance
+drop from 88.1 to 84.4, indicating that joint training     Although the Islamic domain in English is
+with domain-restricted MLM provides a meaning-          characterized by an extremely limited amount
+ful boost over contrastive adaptation alone.            of available training data, it is notable for hav-
+                                                        ing a dedicated evaluation dataset--unlike many
+   Masking rate. We further ablate the effect of        other low-resource domains. Recent efforts by
+the masking rate by increasing the MLM probabil-
+ity from the default 0.15 to 0.3 during joint train-
+ing. As shown in Table 2, raising the masking
+rate leads to a dramatic drop in performance (from
+88.1 to 49.9), indicating that excessive masking
+can overwhelm the contrastive signal and degrade
+the learned representations.
+
+   Order of Training Stages. Next, we reverse the
+order of stages 2 and 3 by first performing only
+contrastive training with a large batch, followed
+by contrastive training combined with MLM. As
+Malhas and Elsayed (2020) have created a veri-         ity of large-scale pretraining corpora (Xiao et al.,
+fied high-quality Qur'anic Reading Comprehen-          2023; Wang et al., 2022b; Li et al., 2023; Nussbaum
+sion Dataset (QRCD), which includes questions          et al., 2024), Islamic domain texts are almost absent
+frequently asked within the Islamic domain. The        (typically less than 0.01%). This negligible cover-
+answers provided are exhaustive, meaning all           age leaves general-domain models ill-equipped to
+Qur'anic verses directly responding to the ques-       capture the linguistic and conceptual nuances of Is-
+tions have been thoroughly extracted and anno-         lamic texts, making domain adaptation essential for
+tated. To increase the size of the evaluation set,     low-resource areas (Pavlova and Makhlouf, 2024).
+we combine the training and development splits,        The qualitative analysis on QRCD is provided in
+resulting in a total of 169 queries for testing. Al-   the Appendix E.
+though QRCD is originally in Arabic, we employ
+verified English translations to enable evaluation     6 Conclusion
+in the English language (Pavlova, 2025). For re-
+trieval collections, we use the Sahih International    We present MOSAIC, a novel approach for domain
+English translation.5 We compare our final model       adaptation of text embedding models by jointly op-
+with three strong general-domain embedding mod-        timizing MLM and contrastive objectives. Unlike
+els using NDCG@10 as the evaluation metric. The        standard domain adaptation methods, which are
+implementation details follow those used for the       typically applied at the language modeling stage or
+biomedical model, with the following modifica-         after task-specific training via data augmentation,
+tions: we add 3k domain-specific tokens to the vo-     our method leverages a model-driven approach for
+cabulary. Consistent with our biomedical ablation,     domain adaptation after contrastive training. We
+the experiment with  parameters produced simi-         achieve robust gains in both high-resource (biomed-
+lar trends, with  = 0.3 yielding the most stable       ical) and low-resource (Islamic) domains, surpass-
+and highest-performing results (see Appendix 4).       ing general-domain baselines even with limited
+The weights for the MOSAIC-ID (Islamic Domain)         in-domain data.
+and Islamic-embed-model (trained solely using a
+contrastive approach) are initialized with nomic-      Limitations
+embed-text-v1unsup.
+                                                       Much of the research on domain adaptation focuses
+   Results. The MOSAIC-ID-Stage3 model                 on high-resource domains such as biomedicine,
+achieves the highest NDCG@10 score (36.8; Ta-          where data is abundant and benchmarks are well es-
+ble 3), surpassing both general-domain baselines       tablished. In this work, we explicitly include a low-
+and the contrastive-only variant (Islamic-embed-       resource domain (Islamic text), recognizing both
+model). All models exhibit considerable variation      the additional challenges and the importance of ex-
+in per-query scores (Figure 2), reflecting the chal-   tending language technologies to underrepresented
+lenging nature of the dataset, but our model's upper   settings. However, we recognize that each domain,
+quartile and mean are both higher. Notably, the        whether high- or low-resource, can present unique
+lower whisker for the MOSAIC-ID-Stage3 does            characteristics and challenges that could affect the
+not reach the minimum value of 0, whereas the          effectiveness of domain adaptation methods. Our
+lower whiskers for the general-domain models ex-       approach relies on augmenting the existing vocab-
+tend to 0. This indicates that our model makes         ulary with domain-specific tokens, which differ
+fewer completely incorrect predictions (i.e., queries  across domains and may introduce challenges in
+with NDCG@10 = 0), while the comparison mod-           tokenizer consistency; however, these effects are
+els sometimes fail to retrieve any relevant results    mitigated by the stabilizing influence of the MLM
+for certain queries. The upper whiskers are similar    objective. As such, the generalizability of our ap-
+across all models, suggesting comparable best-case     proach may vary depending on domain-specific
+performance, but the reduction in low and zero         linguistic features, data availability, or cultural con-
+scores for our model contributes to its higher over-   text. We encourage further research on adaptation
+all mean NDCG@10. This performance gap can be          strategies that are sensitive to the specific require-
+attributed to differences in pretraining data: while   ments and risks of diverse domains.
+biomedical content constitutes a measurable minor-
+
+    5https://tanzil.net/trans/
+Ethical Considerations                                       9th International Joint Conference on Natural Lan-
+                                                             guage Processing (EMNLP-IJCNLP), pages 3615­
+Adapting models to specialized domains may am-               3620, Hong Kong, China. Association for Computa-
+plify biases or inaccuracies present in domain-              tional Linguistics.
+specific corpora. For example, biomedical texts
+may reflect publication biases or outdated medical        Rich Caruana. 1997. Multitask learning. Machine
+practices, while religious texts may encode cultur-          Learning, 28(1):41­75.
+ally specific viewpoints. In our work, we rely exclu-
+sively on publicly available and verified resources       Daniel Cer, Mona Diab, Eneko Agirre, Iñigo Lopez-
+for data collection and model training; no private or        Gazpio, and Lucia Specia. 2017. SemEval-2017
+proprietary data is used at any stage. Nevertheless,         task 1: Semantic textual similarity multilingual and
+we acknowledge that these sources may still carry            crosslingual focused evaluation. In Proceedings
+implicit biases or limitations. We encourage users           of the 11th International Workshop on Semantic
+of domain-adapted models to consider these factors           Evaluation (SemEval-2017), pages 1­14, Vancouver,
+carefully, especially when applying the models in            Canada. Association for Computational Linguistics.
+sensitive or high-impact contexts. The models will
+be released under the Apache-2.0 license to ensure        Ting Chen, Simon Kornblith, Mohammad Norouzi, and
+transparency, reproducibility, and broad accessibil-         Geoffrey E. Hinton. 2020. A simple framework for
+ity. The model nomic-embed-text-v1unsup is li-               contrastive learning of visual representations. ArXiv,
+censed under Apache-2.0. All artifacts used in this          abs/2002.05709.
+study are open-source and available for research
+purposes. We utilized AI assistants for debugging,        Zewen Chi, Li Dong, Furu Wei, Nan Yang, Saksham
+optimizing LaTeX formatting, and improving gram-             Singhal, Wenhui Wang, Xia Song, Xian-Ling Mao,
+mar clarity.                                                 Heyan Huang, and Ming Zhou. 2021. InfoXLM: An
+                                                             information-theoretic framework for cross-lingual
+Acknowledgment                                               language model pre-training. In Proceedings of the
+                                                             2021 Conference of the North American Chapter of
+We gratefully acknowledge the Dubai AI Cam-                  the Association for Computational Linguistics: Hu-
+pus for providing the computing infrastructure that          man Language Technologies, pages 3576­3588, On-
+made this work possible. We extend our appreci-              line. Association for Computational Linguistics.
+ation to our colleagues and collaborators for their
+support and inspiration throughout this project.          Alexis Conneau, Kartikay Khandelwal, Naman Goyal,
+                                                             Vishrav Chaudhary, Guillaume Wenzek, Francisco
+References                                                   Guzmán, Edouard Grave, Myle Ott, Luke Zettle-
+                                                             moyer, and Veselin Stoyanov. 2020. Unsupervised
+Emily Alsentzer, John Murphy, William Boag, Wei-             cross-lingual representation learning at scale. In Pro-
+   Hung Weng, Di Jindi, Tristan Naumann, and                 ceedings of the 58th Annual Meeting of the Asso-
+   Matthew McDermott. 2019. Publicly available clin-         ciation for Computational Linguistics, pages 8440­
+   ical BERT embeddings. In Proceedings of the 2nd           8451, Online. Association for Computational Lin-
+   Clinical Natural Language Processing Workshop,            guistics.
+   pages 72­78, Minneapolis, Minnesota, USA. Associ-
+   ation for Computational Linguistics.                   Jacob Devlin, Ming-Wei Chang, Kenton Lee, and
+                                                             Kristina Toutanova. 2019. BERT: Pre-training of
+Philip Bachman, R. Devon Hjelm, and William Buch-            deep bidirectional transformers for language under-
+   walter. 2019. Learning representations by maximiz-        standing. In Proceedings of the 2019 Conference of
+   ing mutual information across views. In Neural In-        the North American Chapter of the Association for
+   formation Processing Systems.                             Computational Linguistics: Human Language Tech-
+                                                             nologies, Volume 1 (Long and Short Papers), pages
+Anas Belfathi, Ygor Gallina, Nicolas Hernandez,              4171­4186, Minneapolis, Minnesota. Association for
+   Richard Dufour, and Laura Monceaux. 2024. Lan-            Computational Linguistics.
+   guage model adaptation to specialized domains
+   through selective masking based on genre and topical   Kawin Ethayarajh. 2019. How contextual are contextu-
+   characteristics. ArXiv, abs/2402.12036.                   alized word representations? Comparing the geom-
+                                                             etry of BERT, ELMo, and GPT-2 embeddings. In
+Iz Beltagy, Kyle Lo, and Arman Cohan. 2019. SciB-            Proceedings of the 2019 Conference on Empirical
+   ERT: A pretrained language model for scientific text.     Methods in Natural Language Processing and the
+   In Proceedings of the 2019 Conference on Empirical        9th International Joint Conference on Natural Lan-
+   Methods in Natural Language Processing and the            guage Processing (EMNLP-IJCNLP), pages 55­65,
+                                                             Hong Kong, China. Association for Computational
+                                                             Linguistics.
+
+                                                          Tianyu Gao, Xingcheng Yao, and Danqi Chen. 2021.
+                                                             SimCSE: Simple contrastive learning of sentence em-
+                                                             beddings. In Proceedings of the 2021 Conference
+   on Empirical Methods in Natural Language Process-     Yining Li, Yuhui Zhang, Xiaoman Pan, Yinan Li, Ning
+   ing, pages 6894­6910, Online and Punta Cana, Do-         Ding, Wei Wu, Yujing Wang, Xiaoyan Zhu, and Min-
+   minican Republic. Association for Computational          lie Huang. 2023. Towards general text embeddings
+   Linguistics.                                             with multi-stage contrastive learning. arXiv preprint
+                                                            arXiv:2308.03281.
+John Giorgi, Osvald Nitski, Bo Wang, and Gary Bader.
+   2021. DeCLUTR: Deep contrastive learning for un-      Fangyu Liu, Ivan Vulic´, Anna Korhonen, and Nigel
+   supervised textual representations. In Proceedings       Collier. 2021. Fast, effective, and self-supervised:
+   of the 59th Annual Meeting of the Association for        Transforming masked language models into universal
+   Computational Linguistics and the 11th International     lexical and sentence encoders. In Proceedings of the
+   Joint Conference on Natural Language Processing          2021 Conference on Empirical Methods in Natural
+   (Volume 1: Long Papers), pages 879­895, Online.          Language Processing, pages 1442­1459, Online and
+   Association for Computational Linguistics.               Punta Cana, Dominican Republic. Association for
+                                                            Computational Linguistics.
+Yu Gu, Robert Tinn, Hao Cheng, Michael Lucas, Naoto
+   Usuyama, Xiaodong Liu, Tristan Naumann, Jianfeng      Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man-
+   Gao, and Hoifung Poon. 2020a. Domain-specific            dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,
+   language model pretraining for biomedical natural        Luke Zettlemoyer, and Veselin Stoyanov. 2020.
+   language processing. CoRR, abs/2007.15779.               RoBERTa: A robustly optimized BERT pretraining
+                                                            approach. In Proceedings of the 58th Annual Meet-
+Yuxian Gu, Zhengyan Zhang, Xiaozhi Wang, Zhiyuan            ing of the Association for Computational Linguistics,
+   Liu, and Maosong Sun. 2020b. Train no evil: Se-          pages 1­10, Online. Association for Computational
+   lective masking for task-guided pre-training. In         Linguistics.
+   Proceedings of the 2020 Conference on Empirical
+   Methods in Natural Language Processing (EMNLP),       Rana Malhas and Tamer Elsayed. 2020. Ayatec: build-
+   pages 6966­6974, Online. Association for Computa-        ing a reusable verse-based test collection for arabic
+   tional Linguistics.                                      question answering on the holy qur'an. ACM Trans-
+                                                            actions on Asian and Low-Resource Language Infor-
+R. Devon Hjelm, Alex Fedorov, Samuel Lavoie-                mation Processing (TALLIP), 19(6):1­21.
+   Marchildon, Karan Grewal, Adam Trischler, and
+   Yoshua Bengio. 2018. Learning deep representations    Yu Meng, Chenyan Xiong, Payal Bajaj, Saurabh Tiwary,
+   by mutual information estimation and maximization.       Paul N. Bennett, Jiawei Han, and Xia Song. 2021.
+   ArXiv, abs/1808.06670.                                   Coco-lm: Correcting and contrasting text sequences
+                                                            for language model pretraining. In Neural Informa-
+Yongxin Huang, Kexin Wang, Sourav Dutta, Raj Patel,         tion Processing Systems.
+   Goran Glavas, and Iryna Gurevych. 2023. AdaSent:
+   Efficient domain-adapted sentence embeddings for      Logan Merrick, Cameron Beeler, Mike Lewis, Rohit
+   few-shot classification. In Proceedings of the 2023      Girdhar, David Hall, Xilun Chen, John Thickstun,
+   Conference on Empirical Methods in Natural Lan-          and Jacob Devlin. 2024. Arctic-embed: Scalable,
+   guage Processing, pages 3420­3434, Singapore. As-        efficient, and accurate text embedding models. arXiv
+   sociation for Computational Linguistics.                 preprint arXiv:2405.05374.
+
+Dmitry Kobak, Dong He, et al. 2024. The landscape of     Niklas Muennighoff, Nouamane Tazi, Loic Magne, and
+   biomedical research. bioRxiv.                            Nils Reimers. 2022. Mteb: Massive text embedding
+                                                            benchmark. In Conference of the European Chapter
+Lingpeng Kong, Cyprien de Masson d'Autume, Wang             of the Association for Computational Linguistics.
+   Ling, Lei Yu, Zihang Dai, and Dani Yogatama.
+   2019. A mutual information maximization perspec-      Zach Nussbaum, John X. Morris, Brandon Duderstadt,
+   tive of language representation learning. ArXiv,         and Andriy Mulyar. 2024. Nomic embed: Training
+   abs/1910.08350.                                          a reproducible long context text embedder. arXiv
+                                                            preprint arXiv:2402.01613.
+Jinhyuk Lee, Wonjin Yoon, Sungdong Kim, Donghyeon
+   Kim, Sunkyu Kim, Chan Ho So, and Jaewoo Kang.         Vera Pavlova. 2023. Leveraging domain adaptation and
+   2019. BioBERT: a pre-trained biomedical language         data augmentation to improve qur'anic IR in English
+   representation model for biomedical text mining.         and Arabic. In Proceedings of ArabicNLP 2023,
+   Bioinformatics.                                          pages 76­88, Singapore (Hybrid). Association for
+                                                            Computational Linguistics.
+Bohan Li, Hao Zhou, Junxian He, Mingxuan Wang,
+   Yiming Yang, and Lei Li. 2020. On the sentence        Vera Pavlova. 2025. Multi-stage training of bilingual
+   embeddings from pre-trained language models. In          islamic LLM for neural passage retrieval. In Pro-
+   Proceedings of the 2020 Conference on Empirical          ceedings of the New Horizons in Computational Lin-
+   Methods in Natural Language Processing (EMNLP),          guistics for Religious Texts, pages 42­52, Abu Dhabi,
+   pages 9119­9130, Online. Association for Computa-        UAE. Association for Computational Linguistics.
+   tional Linguistics.
+                                                         Vera Pavlova and Mohammed Makhlouf. 2023. BIOp-
+                                                            timus: Pre-training an optimal biomedical language
+   model with curriculum learning for named entity         Gizem Sogancioglu, Arzucan Ozgur, and Hakime Oz-
+   recognition. In The 22nd Workshop on Biomedical            turk. 2017. Biosses: a semantic sentence similarity
+   Natural Language Processing and BioNLP Shared              estimation system for the biomedical domain. Bioin-
+   Tasks, pages 337­349, Toronto, Canada. Association         formatics, 33(14):i49­i58.
+   for Computational Linguistics.
+                                                           Nandan Thakur, Nils Reimers, Johannes Daxenberger,
+Vera Pavlova and Mohammed Makhlouf. 2024. Build-              and Iryna Gurevych. 2021. Augmented SBERT: Data
+   ing an efficient multilingual non-profit IR system for     augmentation method for improving bi-encoders for
+   the islamic domain leveraging multiprocessing de-          pairwise sentence scoring tasks. In Proceedings of
+   sign in rust. In Proceedings of the 2024 Conference        the 2021 Conference of the North American Chapter
+   on Empirical Methods in Natural Language Process-          of the Association for Computational Linguistics: Hu-
+   ing: Industry Track, pages 981­990, Miami, Florida,        man Language Technologies, pages 296­310, Online.
+   US. Association for Computational Linguistics.             Association for Computational Linguistics.
+
+Vera Pavlova and Mohammed Makhlouf. 2025. Effi-            George Tsatsaronis, Georgios Balikas, Prodromos
+   cient and versatile model for multilingual informa-        Malakasiotis, Ioannis Partalas, Matthias Zschunke,
+   tion retrieval of islamic text: Development and de-        Michael R Alvers, Dirk Weissenborn, Anastasia
+   ployment in real-world scenarios. In Proceedings of        Krithara, Jens Petersen, Jörg Hakenberg, et al. 2015.
+   the 2025 Conference on Empirical Methods in Nat-           An overview of the bioasq large-scale biomedical
+   ural Language Processing: Industry Track, pages            semantic indexing and question answering competi-
+   1239­1249, Suzhou (China). Association for Compu-          tion. In BMC bioinformatics, volume 16, page 138.
+   tational Linguistics.                                      BioMed Central.
+
+Nina Poerner, Ulli Waltinger, and Hinrich Schütze.         Aäron van den Oord, Yazhe Li, and Oriol Vinyals. 2018.
+   2020. Inexpensive domain adaptation of pretrained          Representation learning with contrastive predictive
+   language models: Case studies on biomedical NER            coding. CoRR, abs/1807.03748.
+   and covid-19 QA. In Findings of the Association
+   for Computational Linguistics: EMNLP 2020, pages        Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+   1482­1490, Online. Association for Computational           Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz
+   Linguistics.                                               Kaiser, and Illia Polosukhin. 2017. Attention is all
+                                                              you need. CoRR, abs/1706.03762.
+Nils Reimers and Iryna Gurevych. 2019. Sentence-
+   BERT: Sentence embeddings using Siamese BERT-           Ellen Voorhees, Tasmeer Alam, Steven Bedrick, Dina
+   networks. In Proceedings of the 2019 Conference on         Demner-Fushman, William Hersh, Kirk Roberts, and
+   Empirical Methods in Natural Language Processing           Lucy Lu Wang. 2021. Trec-covid: Constructing a
+   and the 9th International Joint Conference on Natu-        pandemic information retrieval test collection. Jour-
+   ral Language Processing (EMNLP-IJCNLP), pages              nal of the American Medical Informatics Association,
+   3982­3992, Hong Kong, China. Association for Com-          28(4):766­773.
+   putational Linguistics.
+                                                           Alex Wang, Amanpreet Singh, Julian Michael, Felix
+Vin Sachidananda, Jason Kessler, and Yi-An Lai. 2021.         Hill, Omer Levy, and Samuel Bowman. 2018. GLUE:
+   Efficient domain adaptation of language models via         A multi-task benchmark and analysis platform for nat-
+   adaptive tokenization. In Proceedings of the Second        ural language understanding. In Proceedings of the
+   Workshop on Simple and Efficient Natural Language          2018 EMNLP Workshop BlackboxNLP: Analyzing
+   Processing, pages 155­165, Virtual. Association for        and Interpreting Neural Networks for NLP, pages
+   Computational Linguistics.                                 353­355, Brussels, Belgium. Association for Com-
+                                                              putational Linguistics.
+Nafis Sadeq, Canwen Xu, and Julian McAuley. 2022.
+   InforMask: Unsupervised informative masking for         Kexin Wang, Nils Reimers, and Iryna Gurevych. 2021.
+   language model pretraining. In Proceedings of the          TSDAE: Using transformer-based sequential denois-
+   2022 Conference on Empirical Methods in Natu-              ing auto-encoderfor unsupervised sentence embed-
+   ral Language Processing, pages 5866­5878, Abu              ding learning. In Findings of the Association for
+   Dhabi, United Arab Emirates. Association for Com-          Computational Linguistics: EMNLP 2021, pages
+   putational Linguistics.                                    671­688, Punta Cana, Dominican Republic. Associa-
+                                                              tion for Computational Linguistics.
+Victor Sanh, Lysandre Debut, Julien Chaumond, and
+   Thomas Wolf. 2019. Distilbert, a distilled version      Kexin Wang, Nandan Thakur, Nils Reimers, and Iryna
+   of BERT: smaller, faster, cheaper and lighter. CoRR,       Gurevych. 2022a. GPL: Generative pseudo labeling
+   abs/1910.01108.                                            for unsupervised domain adaptation of dense retrieval.
+                                                              In Proceedings of the 2022 Conference of the North
+Tim Schopf, Dennis N. Schneider, and Florian Matthes.         American Chapter of the Association for Computa-
+   2023. Efficient domain adaptation of sentence em-          tional Linguistics: Human Language Technologies,
+   beddings using adapters. In Proceedings of the 14th        pages 2345­2360, Seattle, United States. Association
+   International Conference on Recent Advances in Nat-        for Computational Linguistics.
+   ural Language Processing, pages 1046­1053, Varna,
+   Bulgaria. INCOMA Ltd., Shoumen, Bulgaria.
+Liang Wang, Nan Yang, Xiaolong Huang, Binx-
+   ing Jiao, Linjun Yang, Daxin Jiang, Rangan Ma-
+   jumder, and Furu Wei. 2022b. Text embeddings by
+   weakly-supervised contrastive pre-training. ArXiv,
+   abs/2212.03533.
+
+Xing Wu, Chaochen Gao, Zijia Lin, Jizhong Han,
+   Zhongyuan Wang, and Songlin Hu. 2022. InfoCSE:
+   Information-aggregated contrastive learning of sen-
+   tence embeddings. In Findings of the Association
+   for Computational Linguistics: EMNLP 2022, pages
+   3060­3070, Abu Dhabi, United Arab Emirates. As-
+   sociation for Computational Linguistics.
+
+Zhuofeng Wu, Sinong Wang, Jiatao Gu, Madian Khabsa,
+   Fei Sun, and Hao Ma. 2020. Clear: Contrastive
+   learning for sentence representation. arXiv preprint
+   arXiv:2012.15466.
+
+Shitao Xiao, Zheng Liu, Peitian Zhang, Niklas Muen-
+   nighoff, Defu Lian, and Jian yun Nie. 2023. C-pack:
+   Packed resources for general chinese embeddings.
+   Proceedings of the 47th International ACM SIGIR
+   Conference on Research and Development in Infor-
+   mation Retrieval.
+A Consistency-based Filtering Procedure                 Model                      NDCG@10
+                                                        MOSAIC-ID-Stage3 ( = 0.1)     30.750
+To further ensure data quality and minimize false       MOSAIC-ID-Stage3 ( = 0.2)     34.622
+positive pairs, we employed a semantic filtering        MOSAIC-ID-Stage3 ( = 0.3)     36.809
+procedure using the gte-base model. Specif-             MOSAIC-ID-Stage3 ( = 0.4)     35.251
+ically, we first sampled up to 1 million candi-         MOSAIC-ID-Stage3 ( = 0.5)     33.049
+date query­document pairs from the initial dataset.
+Each query and document was independently en-           Table 4: Ablation of the  hyperparameter in MOSAIC-
+coded into dense vector representations using the       ID-Stage3 on the Islamic dataset.
+gte-base text embedding model.
+                                                        Figure 3: Effect of alpha weight on the performance
+   Next, we constructed a FAISS index from all          in the 2nd stage of Contrastive+MLM training on
+document embeddings to enable efficient similarity      BIOSSES.
+search. For each query embedding, we retrieved
+the top-k most similar document embeddings from            Filtering. Not all extracted pairs represent strong
+the index, based on cosine similarity. If the original  semantic correlations suitable for retrieval training,
+paired document di was not found among the top-k        due to indirect or implicit relationships. To select
+retrieved documents for its corresponding query qi,     high-quality positive pairs, we score each candidate
+we discarded the pair (qi, di). This filtering step     (vq, vp) using the gte-base model to obtain simi-
+ensures that only pairs with strong semantic align-     larity scores s = gte-base(vq, vp). Pairs scoring
+ment--according to the embedding model--are             below a predefined threshold are removed, yielding
+retained for further training.                          a filtered set Vf of 7,587 robust positive pairs for
+                                                        training.
+   The intuition behind this approach is to elimi-
+nate weakly related or noisy pairs that may have        C Training Hyperparameters
+been erroneously grouped together in the initial
+data extraction. By keeping only those pairs where      Computing Infrastructure 1x H100 (80 GB)
+the document is highly ranked for its query, we
+improve the quality and relevance of training ex-       Hyperparameter           Assignment
+amples, leading to better domain adaptation during
+model training.                                         number of epochs           1-5
+
+B Curating Passages for Training the                    batch size                 128
+     Islamic Domain Model
+                                                        query sequence length      64-256
+Dense retrieval models often experience perfor-
+mance degradation when applied to new domains,          maximum learning rate      0.0005
+emphasizing the value of training on in-domain
+data. The scarcity of such data is typically ad-        learning rate optimizer    Adam
+dressed through augmentation techniques like syn-
+thetic data generation, paraphrasing, pair recombi-     learning rate scheduler None or Warmup linear
+nation, round-trip translation, or denoising autoen-
+coders. However, these approaches risk altering         Weight decay               0.01
+the original semantics, which is especially prob-
+lematic for sensitive religious and heritage texts.     Warmup proportion          0.06
+To overcome this, we utilize Tafseer Ibn Kathir, a
+classical and authoritative Qur'anic exegesis rich in   learning rate decay        linear
+verse commentary and inter-verse references. This
+resource enables natural and semantically mean-         Table 5: Hyperparameters for training and finetuning
+ingful augmentation of training data by explicitly      text embedding models.
+linking related verses.
+                                                        D Computational Efficiency
+   Pair Extraction. Let Ct denote the collection of
+Tafseer texts by Ibn Kathir. We extract all verse       As summarized in (Table 6), the computational
+pairs Vt = (vq, vp) referenced in Ct, resulting in      footprint of MOSAIC remains modest. The second
+approximately 11,000 candidate pairs.
+                    Method              Relative Compute Cost                             Notes
+          Baseline: Contrastive FT                  1.0x                Supervised dual-encoder finetuning
+MOSAIC ­ Stage 1 (Tokenizer extension)               0x
+MOSAIC ­ Stage 2 (Domain tokens only)               2.0x                             No GPU cost
+      MOSAIC ­ Stage 2 (All tokens)                 2.5x            MLM applied only to new domain tokens
+                                                    3.0x        Upper bound: MLM applies to entire vocabulary
+               MOSAIC ­ Total                                  Stage 1 + Stage 2 (domain tokens) + CT finetuning
+        Full Domain MLM (DAPT)                    10­15x
+                                                                        Typical costs reported in prior work
+
+Table 6: Relative compute cost comparison between MOSAIC stages and common domain adaptation baselines.
+
+stage introduces an overhead of approximately 2×       ing queries and compare the top three retrieved
+relative to standard contrastive finetuning, while     passages across models. We present one case in
+the full three-stage pipeline remains substantially    which the proposed MOSAIC-Stage3 model suc-
+cheaper than conventional domain-adaptive pre-         ceeds while baseline models fail, and a second case
+training (DAPT). Notably, the naïve all-tokens         in which MOSAIC-Stage3 also fails, highlighting
+MLM variant incurs higher computational cost,          limitations that remain shared across all systems.
+which highlights the efficiency benefits of restrict-
+ing masked language modeling to newly introduced          For Query 308 (With what did Allah compare
+domain tokens. Overall, these results show that        this life to?), MOSAIC-Stage3 successfully re-
+MOSAIC can achieve meaningful performance              trieves two of the three gold passages within its top-
+gains in specialized domains without requiring pro-    3 results, whereas the baseline models--including
+hibitive computational resources.                      those shown in the table--fail to retrieve any gold
+                                                       passage within their top-10 rankings (we report
+E Qualitative Analysis                                 only the top-3 for brevity). This query is par-
+                                                       ticularly challenging because, although phrased
+For the qualitative analysis (Table 7), we present     broadly, it requires identifying specific metaphor-
+examples from the BIOSSES dataset. In the first        ical analogies used in the Qur'an to describe the
+two cases, the MOSAIC-Stage2 model produces            transient nature of worldly life. The baseline mod-
+similarity predictions that are close to the gold      els tend to gravitate toward generally related the-
+scores, indicating well-calibrated semantic judg-      matic verses (e.g., monotheism, devotion, or rev-
+ments. In contrast, the All-Tokens MLM model           elation), rather than capturing the intended com-
+consistently overshoots, assigning higher similar-     parative semantic structure. In contrast, MOSAIC-
+ity scores than warranted. In the remaining ex-        Stage3 correctly prioritizes passages that employ
+amples, MOSAIC-Stage2 also overestimates sim-          the canonical imagery of rain-fed vegetation to con-
+ilarity, but to a noticeably smaller extent than the   vey the temporary and illusory character of worldly
+All-Tokens MLM baseline. Given the high density        existence.
+of biomedical terminology in BIOSSES, the All-
+Tokens model appears biased toward inflated simi-         For Query 350 (What are the verses in which
+larity estimates. This behavior suggests that, during  healing is mentioned?), none of the models retrieve
+the joint MLM+contrastive stage, the All-Tokens        any gold passage within their top-10 ranked results
+approach does not sufficiently emphasize domain-       (again, only the top-3 are shown). All retrieved
+specific token distinctions, leading to weaker fine-   passages are thematically distant from the target
+grained semantic discrimination across biomedical      concept of healing, indicating a shared difficulty
+topics.                                                in linking the query to the appropriate Qur'anic
+                                                       contexts. Instead, the models gravitate toward
+   For the qualitative analysis in the Islamic do-     broadly devotional or theological verses with only
+main, we focus on the retrieval task from the          superficial topical or lexical relevance. This fail-
+QRCD benchmark (Malhas and Elsayed, 2020).             ure case illustrates that, even with domain adapta-
+Many queries in QRCD are genuinely challenging         tion, QRCD contains queries that demand highly
+even for human readers, as they require recogniz-      specific semantic grounding--including recogni-
+ing metaphorical expressions and implicit seman-       tion of rare thematic cues and uncommon lexical
+tic correspondences rather than relying on surface     expressions--which remains beyond the current
+lexical overlap. To illustrate the effect of domain    capabilities of all evaluated models.
+adaptation, we analyze two particularly challeng-
+ID Sentence 1                           Sentence 2                                      Gold MOSAIC-Stage2 All-Token MLM
+
+                                                                                        ( = 0.3)            ( = 0.001)
+
+80 BAF53 and -actin subunits have been -actin and actin-related proteins have 3                   3.96      4.38
+
+implicated in mammalian SWI/SNF- been found in various ATP-dependent
+
+regulated binding to the chromatin/nuclear chromatin remodeling complexes.
+
+matrix.
+
+22 Furthermore, a recent study demonstrated miR-223 regulates granulopoiesis by a 3.4             4.08      4.54
+
+the mechanism specifying myeloid expres- feedback mechanism and is competitively
+
+sion of miR-223 and proposed a unique modulated by the transcription factors NFI-
+
+minicircuitry comprised of miR-223 and A and C/EBP.
+
+transcription factors NFI-A and C/EBP.
+
+92 The cyclin-dependent kinase inhibitor Recent work in model systems and acute 2                 3.42      3.95
+
+roscovitine has been reported to down- myelogenous leukemia suggests that MCL-
+
+regulate the anti-apoptotic protein Mcl-1. 1 expression is a key determinant of resis-
+
+                                        tance to ABT-737.
+
+90 Necroptosis is also part of host defense Necrotic cell death was augmented when 2              3.87      4.21
+
+against virus infection.                caspase activity was compromised by viral
+
+                                        or chemical inhibitors.
+
+Table 7: Qualitative analysis examples from the BIOSSES dataset comparing MOSAIC-Stage2 with an all-token
+MLM baseline. Predicted scores indicate semantic similarity.
+
+Model                     Top Retrieved Passages (abridged)
+
+Query 308: With what did Allah compare this life to?
+
+MOSAIC (Stage 3)          (1) (doc 600) "The worldly life resembles the plants that blossom by the help of the water which
+
+                          God sends from the sky. After a short time all of them fade away and the winds scatter them..."
+
+                          [GOLD]; (2) (doc 428) "The example of the worldly life is like the water sent down from the sky
+
+                          which becomes mixed with the earth's produce that people and cattle consume. When the land
+
+                          becomes fertile and pleasant, people think that they have control over it..." [GOLD]; (3) (doc 1250)
+
+                          "Those whose good deeds will weigh heavier will live a pleasant life..."
+
+Islamic-embed-model (1) (doc 1263) "Say, `He is the only God; there is none equal to Him.' "; (2) (doc 585) "If all humans
+
+                          and jinn gathered to bring the like of this Qur'an..."; (3) (doc 1264) "Say, `I seek protection from the
+
+                          Lord of the Dawn...' "
+
+nomic-embed-text-v1 (1) (doc 987) "Have you seen the one who has chosen his desires as his lord? . . . `The only life is
+
+                          this worldly life.' "; (2) (doc 94) "Have you heard about the one who argued with Abraham about
+
+                          his Lord..."; (3) (doc 908) "We have given all kinds of examples for mankind..."
+
+Query 350: What are the verses in which healing is mentioned?
+
+MOSAIC (Stage 3)          (1) (doc 1237) "After every difficulty there is relief; when you are free, strive and be devoted to your
+
+                          Lord."; (2) (doc 166) "God wants to guide you and forgive you; He wants to relieve your burden,
+
+                          mankind was created weak."; (3) (doc 1172) "This chapter is a reminder; those who seek guidance
+
+                          will find mercy from God."
+
+nomic-embed-text-v1 (1) (doc 801) "These are the verses of wisdom, a guidance and mercy for the righteous."; (2) (doc
+
+                          477) "These are the illustrious verses revealed in Arabic so you may understand."; (3) (doc 938) "A
+
+                          revelation from the Merciful God; verses fully expounded, with glad news and warnings."
+
+Islamic-embed             (1) (doc 1265) "Say: I seek protection from the Lord of mankind, against the evil of temptations.";
+
+                          (2) (doc 2) "The path of those whom You blessed, not those astray."; (3) (doc 1) "You alone we
+
+                          worship, and from You alone we seek help; guide us to the right path."
+
+                          Table 8: Qualitative analysis examples from QRCD.
+

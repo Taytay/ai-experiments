@@ -1,0 +1,1438 @@
+                                       SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+                                       Kexian Tang * 1 Jiani Wang * 1 Shaowen Wang 1 Kaifeng Lyu  1
+
+arXiv:2603.22213v2 [cs.LG] 9 Aug 2026                          Abstract                                        both scale and diversity. In contrast to the high redundancy
+                                                                                                               of web text, domain knowledge often lacks the repetitive
+                                             While large language models (LLMs) are pre-                       variations required for effective learning. Compounding this
+                                             trained on massive amounts of data, their knowl-                  challenge, LLMs are known to be data-inefficient, neces-
+                                             edge coverage remains incomplete in specialized,                  sitating frequent and varied exposure to facts for reliable
+                                             data-scarce domains, motivating extensive efforts                 internalization (Kandpal et al., 2023; Allen-Zhu & Li, 2025;
+                                             to study synthetic data generation for knowledge                  Abonizio et al., 2025). Consequently, directly fine-tuning
+                                             injection. We propose SPA (Scaling Prompt-                        LLMs on such sparse data often leads to overfitting on spe-
+                                             engineered Augmentation), a simple but tough-to-                  cific surface forms rather than robust knowledge acquisition,
+                                             beat baseline that uses a small set of carefully de-              causing the model to fail when encountering unseen queries
+                                             signed prompts to generate large-scale synthetic                  or variations (Berglund et al., 2024; Shumailov et al., 2023).
+                                             data for knowledge injection. Through system-
+                                             atic comparisons, we find that SPA outperforms                    To mitigate this scarcity, an increasingly popular paradigm
+                                             several strong baselines. Furthermore, we iden-                   is to expand the domain-specific data into a much larger syn-
+                                             tify two key limitations of prior approaches: (1)                 thetic corpus using an LLM-based data generator, and then
+                                             while RL-based methods may improve the token                      train the target model on this augmented dataset. Recent ef-
+                                             efficiency of LLM-based data augmentation at                      forts to design such augmentation methods generally follow
+                                             small scale, they suffer from diversity collapse as               two distinct methodologies. RL-based approaches, such as
+                                             data scales, leading to diminishing returns; and                  SEAL (Zweiger et al., 2025), employ reinforcement learn-
+                                             (2) while multi-stage prompting may outperform                    ing (RL) to train a dedicated generator, where the reward is
+                                             simple augmentation methods, their advantages                     defined as the performance of the target model trained on
+                                             can disappear after careful prompt tuning. Our                    the augmented data. Another line of works, such as Enti-
+                                             results suggest that, for knowledge injection, care-              Graph (Yang et al., 2025) and Active Reading (Oguz et al.,
+                                             ful prompt design combined with straightforward                   2026), relies on prompting pipelines consisting of multiple
+                                             large-scale augmentation can be surprisingly ef-                  stages, where the data generator is prompted to rewrite the
+                                             fective, and we hope SPA can serve as a strong                    original corpus into a high-quality synthetic corpus through
+                                             baseline for future studies in this area. Our code is             a sequence of intermediate transformations.
+                                             available at https://github.com/Tangkexian/SPA.
+                                                                                                               In this work, we aim to push the frontier of synthetic data
+                                       1. Introduction                                                         generation for knowledge injection by proposing a simple
+                                                                                                               but tough-to-beat baseline method: SPA (Scaling Prompt-
+                                       Large language models (LLMs) can acquire broad world                    engineered Augmentation), which is a knowledge injection
+                                       knowledge and general capabilities from massive web text,               method that consistently outperforms existing methods at
+                                       but their coverage of specialized domains is often incom-               scale (Figure 1). The key idea of SPA is very simple:
+                                       plete. A common approach to address this issue is to inject             1. Prompt Engineering: We draw upon insights from cog-
+                                       domain knowledge into these models by further fine-tuning
+                                       or continually pretraining them on domain-specific data that               nitive science and educational psychology to design a set
+                                       are not readily available on the public web (Singhal et al.,               of 7 prompt templates based on effective human learning
+                                       2023; Wu et al., 2023; Zhang et al., 2024).                                strategies, including concept learning, critical thinking,
+                                       However, domain-specific datasets are usually limited in                   and generative learning.
+                                                                                                               2. Scaling: We repeatedly prompt an LLM to rewrite the
+                                          *Equal contribution 1Institute for Interdisciplinary Information        source content using templates from our prompt set, pro-
+                                       Sciences, Tsinghua University. Correspondence to: Kaifeng Lyu              gressively scaling the augmented corpus into a large-
+                                       <klyu@mail.tsinghua.edu.cn>.                                               scale synthetic corpus.
+                                       Preprint. August 11, 2026.                                              3. Training: Finally, we train the target model on the syn-
+                                                                                                                  thetic corpus following the same settings as prior work.
+
+                                                                                                            1
+                       SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+                                  Concept Learning               Critical Thinking
+
+Title: Southern California        Key concepts Mind map          Implications QA-ct  Key concepts
+                                                                                          Mind map
+Context:Southern California is       Generator                                               Implications
+also home to the Port of Los
+Angeles, the United States'       with 7 Prompts of SPA                                            QA with critical thinking
+busiest commercial port; the
+adjacent Port of Long Beach, the                                                                       Case studies                        ...
+United States' second busiest
+container port; and the Port of                                                                             Discussions
+San Diego...
+                                                                                                                 Teacher-style
+                                  Generative Learning                                                            Today we are diving
+                                                                                                                 into an intriguing text
+                                                                                                                 on Southern California.
+                                                                                                                 It's essential to
+                                                                                                                 understand Southern
+                                                                                                                 California as it is a...
+
+          Input                   Case Studies  Discussions         Teacher-style                    Output
+original small corpus                                                                diverse large synthetic corpus
+
+Figure 1. Overview of Scaling Prompt-engineered Augmentation (SPA). Our baseline method rewrites a small source corpus into a
+large synthetic corpus by repeatedly prompting a generator with a fixed set of seven human-curated prompt templates, which are designed
+based on three levels of learning strategies: Concept Learning, Critical Thinking, and Generative Learning.
+
+Perhaps surprisingly, we find that this simple baseline is          2. Related Work
+already highly effective. We evaluate SPA on three repre-
+sentative benchmarks that span Wikipedia-based question             Small Corpus Knowledge Injection. Knowledge injec-
+answering (SQuAD, Rajpurkar et al. 2016), long-document             tion for domain-specific data has a wide range of applica-
+comprehension (QuALITY, Pang et al. 2022), and multi-hop            tions. For example, in domains such as medicine (Peng et al.,
+reasoning (MultiHop-RAG, Tang & Yang 2024). Across all              2019; Lee et al., 2019; Luo et al., 2022), finance (Araci,
+these settings, we use almost the same experimental setup           2019; Liu et al.; Li et al., 2023), and law (Chalkidis et al.,
+as in the previous works (Zweiger et al., 2025; Yang et al.,        2020; Guha et al., 2023), it is often necessary to inject spe-
+2025), and change only the data augmentation strategy. We           cialized knowledge into large language models to support
+observe that SPA consistently matches or outperforms a              professional tasks. However, domain-specific corpora typi-
+range of substantially more complex methods, including              cally suffer from data scarcity. As a result, directly perform-
+SEAL (Zweiger et al., 2025), PaST (Tang et al., 2026), Enti-        ing continued pretraining or fine-tuning on such corpora
+Graph (Yang et al., 2025), SoG (Ma et al., 2025), and Active        often exhibits limited effectiveness and poor scalability (Gu
+Reading (Oguz et al., 2026), and the gains of SPA become            et al., 2025; Kandpal et al., 2023; Allen-Zhu & Li, 2025;
+more pronounced as we scale the synthetic corpus.                   Petroni et al., 2019; Sun et al., 2024). To address this issue,
+Our contributions are:                                              our method SPA aims to scale up small corpora by synthetic
+· We propose Scaling Prompt-engineered Augmentation                 data generation based on the original data, following recent
+                                                                    advances in this line of work (Zweiger et al., 2025; Ovadia
+  (SPA), a simple knowledge injection baseline that uses            et al., 2024; Tang et al., 2026; Mecklenburg et al., 2024;
+  a small set of prompt templates to generate large-scale           Yang et al., 2025; Oguz et al., 2026; Ma et al., 2025).
+  synthetic corpora (Section 3).                                    Synthetic Data Generation. Prior work has explored
+· We conduct a series of strictly controlled, token-matched         various strategies for synthetic generation of pretraining
+  evaluations comparing SPA against many complex meth-              data, including (1) prompting LLMs to rewrite documents
+  ods (Section 4), and demonstrate that SPA consistently            in diverse styles such as children's stories (Eldan & Li,
+  matches or outperforms these methods at scale (Section 5).        2023), "Wikipedia-style" data, and "question­answer" for-
+  This suggests that SPA is a competitive baseline for knowl-       mats (Maini et al., 2024), and (2) directly prompting
+  edge injection despite its simplicity.                            LLMs to generate synthetic corpora such as textbook-style
+· Our results provide insights into the limitations of existing     data (Gunasekar et al., 2023). However, different from syn-
+  methods: (1) RL-based methods suffer from diversity               thesizing data from large pretraining corpora, generating
+  collapse as data scales, leading to diminishing returns;          data from small corpora is more challenging. Such corpora
+  and (2) adding more stages in the prompting pipeline may          typically lack the scale and redundancy needed for effective
+  not yield larger gains than improving the quality of the          learning, requiring higher diversity and broader coverage in
+  prompt set for one-stage methods.                                 the generated data. A more detailed discussion of this line
+                                                                    of research is provided in Section 3.2.
+While SPA demonstrates strong effectiveness, we do not              Knowledge Editing. A related line of work focuses on
+suggest that knowledge injection should just rely on SPA.           localizing factual knowledge within LLMs and then updat-
+Rather, we hope our results provide a solid foundation for          ing the model (Meng et al., 2022; Mitchell et al., 2022;
+future work to develop methods that genuinely improve
+upon competitive baselines.
+
+                                                                 2
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Meng et al., 2023) or maintaining an external module to            SEAL (Zweiger et al., 2025) consists of three main stages:
+edit specific facts with minimal side effects (Zhong et al.,       (i) Data generation and training: the data generator gener-
+2023; Cohen et al., 2024). This line of research, known as         ates synthetic data conditioned on the source passages, then
+knowledge editing, differs from our setting. In contrast, we       the target model is fine-tuned on this data; (ii) Reward sig-
+consider corpus-level knowledge injection, where the model         nal estimation: the downstream QA accuracy of the target
+is required to learn from a corpus of documents and utilize        model is used as a reward signal to indicate which types
+many interrelated facts expressed in diverse forms, rather         of data are more effective; (iii) Iterative improvement: the
+than isolated fact tuples.                                         data generator is updated based on the reward signal, and
+Retrieval-Augmented Generation. Retrieval-augmented                the process is repeated iteratively to improve the quality of
+generation (RAG) is a widely adopted alternative to para-          the synthetic data. In SEAL's implementation, the data gen-
+metric updating, as it enables models to retrieve relevant in-     erator shares the same base model as the target model. This
+formation from external knowledge bases before answering           iterative procedure encourages the generator to produce data
+questions (Lewis et al., 2020; Borgeaud et al., 2022; Izacard      that is easier for the target model to absorb, enabling SEAL
+et al., 2023; Gao et al., 2023; Asai et al., 2024). In our         to achieve strong performance in low-data settings, even out-
+setting, we do not aim to position our approach as a replace-      performing data generated by more powerful models such
+ment for RAG, but rather as a complementary paradigm to            as GPT-4.1. While RL can be effective, the computational
+knowledge accessed through retrieval-augmented genera-             burden of training makes it impractical to apply RL to every
+tion (Yang et al., 2025).                                          new domain. To mitigate this issue, PaST (Tang et al., 2026)
+                                                                   (i) extracts a skill vector for knowledge manipulation from
+3. SPA: Scaling Prompt-engineered                                  an RL-trained model in a small scale corpus, and (ii) linearly
+   Augmentation                                                    injects this vector into the generation model to enhance its
+                                                                   ability in knowledge manipulation.
+We focus on the problem of injecting a small domain-               However, these methods typically rely on downstream-task
+specific text corpus into a pretrained language model. Our         performance as the RL signal. Such supervision is often un-
+goal is to enable the model to internalize this knowledge          available in realistic settings, where no specific downstream
+in its parameters, so that it can correctly answer domain-         task may be defined at the time of knowledge injection.
+relevant questions without access to the original corpus at        Our method SPA focuses on task-agnostic augmentation
+inference time. Following EntiGraph (Yang et al., 2025), we        strategies which do not require access to downstream tasks.
+consider synthetic data generation as an effective method          Multi-stage prompting methods. This line of research
+for knowledge injection in data-scarce regimes: the original       introduces multi-stage augmentation pipelines, where the
+niche corpus is first expanded into a much larger synthetic        transformation from the original corpus to the final synthetic
+training set, which is then used for continued pretraining.        data proceeds through several intermediate steps.
+                                                                   EntiGraph (Yang et al., 2025) first breaks down the origi-
+3.1. Problem Setup                                                 nal corpus into a list of entities, and then uses a language
+Let D = {di}Ni=1 denote a small domain-specific corpus,            model to generate text descriptions about relations among
+where each di corresponds to a single document. Our ob-            the extracted entities. By rearranging the knowledge in
+jective is to design a data augmentation algorithm A that          this way, EntiGraph expands a data-scarce corpus and in-
+transforms D into a larger synthetic corpus D~ = A(D),             jects it into an 8B model, leading to strong downstream
+which is subsequently used for more effective knowledge            performance that exceeds GPT-4's performance. SoG (Ma
+injection through continued pretraining. In this work, we          et al., 2025) and GraphGen (Chen et al., 2025) also fol-
+focus on task-agnostic augmentation strategies that operate        low graph-based designs, constructing a graph over corpus
+directly on the original documents and do not require ac-          chunks and leveraging this structure to guide data gener-
+cess to downstream questions or labels. This design makes          ation. Active Reading (Oguz et al., 2026) also follows a
+our approach broadly applicable and transferable to other          multi-stage design: it first prompts the generator to produce
+knowledge-injection scenarios.                                     document-specific learning strategies, such as paraphrasing,
+                                                                   knowledge linking, and analogical reasoning; then it uses
+3.2. Existing Methods                                              these strategies together with the original corpus to generate
+Recent work on synthetic data generation for knowledge             augmented data. This approach yields improved accuracy
+injection can be divided into two categories: RL-based aug-        for 8B-scale models on a Wikipedia-grounded subset of
+mentation methods and multi-stage prompting methods.               SimpleQA, even exceeding the performance of models that
+RL-based augmentation methods. This line of research               are provided with the full context at test time.
+employs reinforcement learning to train a dedicated data           However, such pipelines can increase system complexity
+generator that produces synthetic data conditioned on the
+original corpus.
+
+                                                                3
+                                              SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+and may require careful optimization at every stage. For                              Level 3: Generative Learning. Generative learning is
+example, as analyzed in Section 5.2, the first-stage strategy                         a strategy that requires learners to actively make sense of
+generation in Active Reading appears less effective than                              learning material so that they can apply it to new situa-
+SPA, which could lead to its weaker overall performance.                              tions (Wittrock, 1974; Fiorella & Mayer, 2015). In this
+                                                                                      spirit, we design three prompt templates for generative learn-
+3.3. Our Method: SPA                                                                  ing: (5) Case studies: A prompt template that asks LLMs
+In this paper, we propose the method of Scaling Prompt-                               to generate a case study for the given text; (6) Discussions:
+engineered Augmentation (SPA) to serve as a simple but                                A prompt template that asks LLMs to generate a natural
+tough-to-beat baseline for knowledge injection.                                       in-depth discussion dialogue between two readers about
+                                                                                      the content of the provided text; and (7) Teacher-style: A
+Our Method. Our method SPA rewrites the original cor-                                 prompt template that asks LLMs to explain the text like a
+pus into a large synthetic corpus by repeatedly prompting a                           knowledgeable teacher.
+language model G with a fixed set of human-curated prompt                             To mitigate hallucination, we further add a constraint in the
+tgeemt pnluamtebse{rPoif}iMt=ok1,enwshDe~re,      = 7. Specifically, given a tar-     templates to strictly adhere to the provided text. See Ap-
+                                              M   generate data independently         pendix A and D for full prompts and generation examples.
+                                              we                                      Comparison to Prior Work. Compared to prior work,
+with each prompt template Pi. Each prompt Pi is used to                               EntiGraph can be viewed as a multi-stage prompting ap-
+generate the same amount of tokens, which is approximately                            proach to encourage concept learning, as it requires the
+of size D~/M . Then the synthetic data generated by all M                             generator to discuss the relationships between entities in
+prompts are combined into the final synthetic corpus of size                          the text. SEAL uses Implications as their base prompt
+D~. We argue that applying this baseline method at scale                              template and use RL to improve data generation quality.
+(i.e., for large D~) produces synthetic data that is effective for                    Active Reading relies on LLMs themselves to come up with
+knowledge injection and can outperform existing methods                               document-specific learning strategies for the document to be
+mentioned in Section 3.2.                                                             augmented. In contrast, SPA is a simple single-stage prompt-
+                                                                                      ing approach that is based on high-quality human-curated
+Prompt Engineering. A key component of our baseline                                   prompt templates by drawing upon insights from cognitive
+method is the design of the prompt set {Pi}iM=1. For this, we                         science and educational psychology, covering three levels
+draw upon insights from cognitive science and educational                             of learning strategies.
+psychology to identify three levels of learning strategies
+that are effective for human learning: Concept Learning,                              4. Experimental Setup
+Critical Thinking, and Generative Learning.
+                                                                                      We study three representative knowledge injection settings
+Level 1: Concept Learning. Concept learning is a strat-                               that align with prior work:
+egy that requires learners to search for and test attributes                          (A) SQuAD: Wikipedia-based Question Answering.
+that can be used to distinguish exemplars of a concept from                           SQuAD (Rajpurkar et al., 2016) is a reading comprehen-
+non-exemplars (Bruner et al., 1956). Motivated by its effec-                          sion dataset consisting of over 100,000 questions posed
+tiveness for human learning, and in particular by prior work                          by crowdworkers on a set of Wikipedia articles, where the
+showing that concept mapping and mind maps help learners                              answer to each question is a segment of text from the corre-
+organize and externalize conceptual structures (Novak &                               sponding reading passage. Following the setting of SEAL,
+Gowin, 1984), we design two prompt templates for concept                              we use a subset of n = 200 passages from SQuAD as the
+learning: (1) Key concepts: A prompt template that asks                               original corpus to generate synthetic data for continued pre-
+LLMs to identify and explain the key concepts in the given                            training. Both the generator and the model to be adapted are
+text; (2) Mind map: A prompt template that asks LLMs to                               Qwen2.5-7B, following SEAL's setup (Section 3.2). The
+create a mind map that organizes the key concepts.                                    adapted model is then evaluated on 974 questions related to
+                                                                                      the original passages without providing the passages at test
+Level 2: Critical Thinking. Critical thinking refers to the                           time. Additional training and evaluation details are provided
+process of systematically analyzing facts, evidence, obser-                           in Appendix B.1 and C.1.
+vations, and arguments to arrive at well-reasoned conclu-                             One key difference from SEAL is that we substantially scale
+sions, which has been shown to encourage deep comprehen-                              up the amount of synthetic data. In SEAL, only 5 augmented
+sion (Brookfield, 1987; Bransford et al., 2000). We design                            samples are generated per passage, which we find insuffi-
+two prompt templates: (3) Implications: A prompt template                             cient for effective knowledge injection: with this setting
+that asks LLMs to infer direct and indirect consequences                              the model reaches only 58.2% accuracy, whereas increas-
+from the given text to extend beyond explicit statements,                             ing the number of samples to 27 improves performance to
+and (4) QA-ct (QA with critical thinking): A prompt tem-
+plate that asks LLMs to generate in-depth question-answer
+pairs that require high-order critical thinking.
+
+                                                                                   4
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+70.74%. In our experiments, to further explore the upper           increase the scale, as at this level our method already ex-
+bound of performance, we progressively scale the amount            hibits a clear performance gap over the baselines. We use
+of synthetic data up to 3200 augmented samples per passage.        GPT-4o-mini (Hurst et al., 2024) as the generator model
+This corresponds to approximately 120M tokens in total and         and adapt both Meta-Llama-3-8B and Qwen2.5-7B. We
+4000× the token count of the original corpus.                      evaluate the adapted models on the open-ended questions
+For baselines in this setting, we include (1) SEAL (Zweiger        of MultiHop-RAG without providing the original passages,
+et al., 2025) and (2) PaST (Tang et al., 2026). Since PaST         using zero-shot prompting. More training and evaluation de-
+does not release its code or trained models, we report the         tails are provided in Appendix B.3 and C.3. For baselines in
+best performance numbers from their paper. We also include         this setting, we include two strong baselines: (1) EntiGraph
+(3) Active Reading (Oguz et al., 2026), which reports strong       and (2) Active Reading.
+results for knowledge injection on Wikipedia-based corpora.        Table 1. Main results at the largest synthetic token scale on
+Active Reading considers two variants: a task-agnostic set-        each benchmark. QA accuracy (%) is reported across SQuAD,
+ting and a task-specific setting that assumes access to the        QuALITY, and MultiHop-RAG, with shared settings grouped. For
+downstream task. To ensure a fair comparison, we adopt             each benchmark, Model refers to the adapted model, Generator
+the task-agnostic variant throughout this paper. In addition       refers to the model used for synthetic data generation, and Number
+to these methods, we include two commonly used simple              of Tokens refers to the total synthetic token budget. Each value cor-
+but strong baselines, (4) Rephrase and (5) QA (Maini et al.,       responds to the final performance at the largest token scale used in
+2024). For all methods, we match the total number of train-        that benchmark.  Base denotes the model without additional train-
+ing tokens to ensure fair comparisons.                             ing,  denotes simple baselines,  refers to prior high-performing
+(B) QuALITY: Long-Document Comprehension.                          methods, and  denotes our method SPA.
+QuALITY (Pang et al., 2022) is a multiple-choice question-
+answering dataset with context passages in English that            SQuAD                                   QA Accuracy(%)
+have an average length of about 5,000 tokens. Following
+EntiGraph, we use 265 passages from QuALITY as the                 Model: Qwen2.5-7B                                      31.31
+original corpus. We adapt Meta-Llama-3-8B (Grattafiori             Generator: Qwen2.5-7B (self-generated)                 86.86
+et al., 2024) and use gpt-oss-120b (Agarwal et al., 2025) as       Number of Tokens: 120M                                 89.63
+the generator model to produce synthetic data. We scale the         Base                                                  74.23
+synthetic training data to 455M tokens to match EntiGraph's         Rephrase                                              90.25
+setting, which corresponds to roughly 350× the token                QA                                                    91.27
+count of the original corpus. We evaluate on the questions         SEAL                                         QA Accuracy
+associated with the original passages without providing the        Active Reading
+passages at test time. More training and evaluation details        SPA                                                    39.27
+are provided in Appendix B.2 and Appendix C.2.                                                                            52.33
+For baselines in this setting, we include (1) EntiGraph (Yang      QuALITY                                                56.22
+et al., 2025), (2) Active Reading (Oguz et al., 2026), and (3)                                                            51.75
+SoG (Ma et al., 2025). Since SoG does not release its code         Model: Meta-Llama-3-8B                                 57.03
+or trained models, we report the best performance numbers          Generator: gpt-oss-120b                      QA Accuracy
+from their paper. In addition to these methods, we include         Number of Tokens: 455M
+a simple (4) QA baseline, which EntiGraph identifies as a           Base                                                  60.91
+strong method in its appendix. We do not include Rephrase,          QA                                                    85.42
+as EntiGraph reports that it underperforms relative to Enti-        EntiGraph                                             83.33
+Graph on QuALITY.                                                   Active Reading                                        86.64
+(C) MultiHop-RAG: Multi-Hop Queries. To provide a                   SPA                                                   73.16
+broader and more general evaluation setting, we consider                                                                  84.31
+multi-hop reasoning, which differs substantially from the          MultiHop-RAG                                           84.44
+two previous tasks. We use MultiHop-RAG (Tang & Yang,                                                                     88.36
+2024) as our evaluation dataset. MultiHop-RAG consists             Generator: GPT-4o-mini
+of a collection of multihop queries, ground-truth answers,         Number of Tokens: 15M
+the associated supporting evidence and corresponding full          Model: Qwen2.5-7B
+passage. We use the entire MultiHop-RAG corpus as the               Base
+original corpus, which contains 609 articles. We scale the          EntiGraph
+resulting synthetic data to 15M tokens. We do not further           Active Reading
+                                                                    SPA
+                                                                   Model: Meta-Llama-3-8B
+                                                                    Base
+                                                                    EntiGraph
+                                                                    Active Reading
+                                                                    SPA
+
+                                                                   5. Main Results
+
+                                                                   SPA consistently achieves the strongest performance
+                                                                   across all three benchmarks. Table 1 reports results
+
+                                                                5
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+on SQuAD, QuALITY, and MultiHop-RAG at the largest                  ing continue to benefit from scaling. With even a modest
+synthetic data scale in each setting. Across all three              increase in scale, both methods overtake SEAL and achieve
+datasets, SPA outperforms by clear margins. On SQuAD,               better overall performance. Notably, both SPA and Active
+SPA reaches 91.27%, exceeding Active Reading (90.25%)               Reading are task-agnostic and have no access to downstream
+and SEAL (74.23%). On QuALITY, SPA attains 57.03%,                  supervision during data generation. We provide more analy-
+improving over EntiGraph (56.22%) and Active Reading                sis in Section 6.1.
+(51.75%). On MultiHop-RAG, SPA achieves 86.64% on
+Qwen2.5-7B and 88.36% on Meta-Llama-3-8B, outperform-                                90       SPA (ours)
+ing all baselines in both cases. We will analyze the scaling                                  Active Reading
+behavior in more detail in Section 5.1 and Section 5.2.                              85       SEAL
+                                                                                              PaST
+SPA is robust across different generation models and                QA Accuracy (%)  80
+adapted model families. Across the three benchmark set-
+tings, we employ different generation models and adapt                               75
+base models from different families, yet SPA consistently
+achieves the strongest performance. These results indicate                           70
+that SPA is not tied to particular configurations, but general-
+izes well across tasks, generators, and model families.                              65
+
+5.1. SQuAD                                                                           60
+SPA exhibits strong and consistent scaling behavior on
+SQuAD. As shown in Figure 2, although SPA does not                                   55
+lead in the low-token regime, it consistently improves with
+scale and achieves the highest accuracy at moderate-to-                                               Num1ber of s2ynthetic5tokens10(in M2il0lions) 50 100
+large token budgets. To explore the impact at larger data
+scales, we increase the synthetic corpus up to 120M tokens.         Figure 2. Scaling Curve on SQuAD shows that SPA exhibits
+This scale already approaches a natural knowledge-injection         strong and consistent scaling behavior. The y-axis represents
+target: when evaluated with access to the original passages,        QA accuracy, and the x-axis represents the synthetic token budget.
+Qwen2.5-7B achieves 91.38% accuracy, while SPA reaches              Note: the PaST data point corresponds to the best performance
+91.27% accuracy at 120M tokens even when evaluated with-            reported in the original paper.
+out access to the passages.
+Compared with SEAL, although SPA slightly underper-                 5.2. QuALITY
+forms SEAL at small scales, it surpasses SEAL once the
+synthetic corpus becomes slightly larger (e.g., with 27 aug-        A weaker but cheaper generator is sufficient for SPA
+mented samples per passage). As the scale increases further,        to outperform prior methods. EntiGraph uses GPT-4-
+SEAL's performance saturates while SPA continues to im-             Turbo to generate all synthetic data. Although GPT-4-Turbo
+prove, ultimately outperforming SEAL by a large margin at           is a strong generator, its API cost makes it impractical for
+120M tokens (91.27% vs. 74.23%).                                    large-scale data generation. We therefore ask whether SPA
+
+Compared with Active Reading, SPA matches or even out-              can remain competitive when using a smaller and more
+performs its performance across most scaling regimes. No-           economical generator. To this end, we adopt gpt-oss-120b,
+tably, Active Reading continuously generates document-              which activates only 5.1B parameters and is substantially
+specific strategies as the synthetic corpus grows, whereas          more efficient at inference time. The API cost of gpt-oss-
+SPA relies on a fixed set of seven prompts. Moreover, SPA           120b is approximately 50× lower than that of GPT-4-Turbo.
+adopts a single-stage augmentation pipeline, making it both
+simpler and more effective than Active Reading, which is a          Table 2. QA accuracy of SPA and QA baseline using different
+multi-stage method.                                                 generation models. The training token here is 27M.
+
+RL-based augmentation saturates at larger scales, while                                  Method Generation Model QA Accuracy(%)
+SPA continues to improve. At smaller synthetic budgets,                                  QA         GPT-4-Turbo   52.99
+SEAL initially outperforms both SPA and Active Reading,                                  QA         gpt-oss-120b  47.47
+which is expected since it is trained with reinforcement                                 SPA        gpt-oss-120b  52.26
+learning using downstream-task performance as the reward                                 QA         GPT-4o        51.31
+signal. However, as the amount of synthetic data increases,                              SPA        GPT-4o        55.49
+SEAL's gains begin to saturate, while SPA and Active Read-
+                                                                    To verify that gpt-oss-120b is not a stronger generator in
+                                                                    this setting, we conduct controlled experiments at 27M to-
+                                                                    ken scale. We compare against the QA baseline, which
+                                                                    EntiGraph reports as stronger than EntiGraph itself at this
+                                                                    budget. As shown in Table 2, replacing GPT-4-Turbo with
+                                                                    gpt-oss-120b for QA generation leads to a clear drop in
+                                                                    accuracy (52.99%  47.47%), indicating that gpt-oss-120b
+                                                                    is weaker than GPT-4-Turbo for this task.
+                                                                    When both methods use gpt-oss-120b as the generator, SPA
+                                                                    achieves 52.26% accuracy, outperforming the QA baseline
+                                                                    (47.47%) by a substantial margin and closely approaching
+
+                                                                 6
+                                          SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+the performance of the QA baseline generated with the                              pendently and training models under identical settings. The
+stronger GPT-4-Turbo (52.99%).                                                     results are summarized and visualized in Figure 4. Across
+                                                                                   all 5 documents, SPA's prompts consistently achieve higher
+                          SPA (ours)                                               average QA accuracy than the strategies produced by Active
+                 56       EntiGraph                                                Reading. While some Active Reading strategies perform
+                                                                                   competitively, many fall below the base model or yield only
+                          Active Reading                                           marginal improvements, as shown in Figure 4.
+                 54       SoG                                                      These results suggest that Active Reading suffers from lower
+QA Accuracy (%)                                                                    average strategy effectiveness. When weaker strategies are
+                 52                                                                used in the second stage to guide data generation, they
+                                                                                   may have limited impact or even introduce negative effects,
+                 50                                                                which degrades the overall quality of the synthetic corpus. In
+                                                                                   contrast, SPA's human-curated prompts provide more stable
+                 48                                                                and consistently effective supervision. Moreover, its single-
+                                                                                   stage design avoids the risk of low-quality intermediate
+                 46                                                                outputs, leading to more reliable knowledge injection.
+
+                     101       Number of synthetic token1s02(in Millions)  455     5.3. MultiHop-RAG
+                                                                                   Table 1 reports results on MultiHop-RAG for two base mod-
+Figure 3. Scaling Curve on QuALITY shows that SPA achieves                         els from different model families.
+the strongest scaling performance among compared methods                           SPA consistently achieves the best performance across
+as data scales. The y-axis is QA accuracy, and the x-axis is                       model families. For Qwen2.5-7B, SPA improves over
+the token budget. Note: For EntiGraph, we use statistics from                      the base model by 25.73 points (60.91%  86.64%) and
+the original paper, where GPT-4-Turbo is used as the generator,                    outperforms both Active Reading (83.33%) and EntiGraph
+whereas SPA and Active Reading use gpt-oss-120b. The SoG data                      (85.42%). For Meta-Llama-3-8B, SPA reaches 88.36%, ex-
+point corresponds to the best performance reported in the original                 ceeding Active Reading (84.44%) and EntiGraph (84.31%).
+paper, which uses a stronger base model Llama-3.1-8B-Instruct.                     These improvements across two different model families
+                                                                                   indicate that SPA does not rely on properties of a particular
+SPA remains effective when using different generators.                             backbone, but generalizes across architectures.
+We further replace gpt-oss-120b with GPT-4o to examine                             SPA generalizes to multi-hop reasoning tasks. Com-
+the robustness of SPA with respect to the choice of gener-                         pared to single-document settings, MultiHop-RAG requires
+ator. Under this setting, SPA again outperforms QA base-                           models to integrate and reason over information from multi-
+line (55.49% vs. 51.31%), indicating that SPA benefits from                        ple passages. The strong improvements achieved by SPA in
+stronger generators while preserving its advantage over com-                       this setting demonstrate that its prompt-based augmentation
+peting methods.                                                                    strategy can effectively transfer to multi-hop knowledge
+SPA continues to improve with scale and achieves the                               injection scenarios.
+best final performance on QuALITY. Figure 3 shows
+that SPA improves steadily with scale and ultimately                               6. Analysis
+achieves the highest QA accuracy among all methods. No-
+tably, although gpt-oss-120b is a weaker generator than                            6.1. Synthetic Data Diversity
+GPT-4-Turbo for this task as shown in the previous exper-                          Motivation. To better understand why the RL-based
+iment, SPA at large scale (57.03%) surpasses EntiGraph                             method SEAL exhibits performance saturation as the token
+generated with GPT-4-Turbo (56.22%). Moreover, when                                budget increases on SQuAD, we first conducted a qualita-
+using the same generator, SPA substantially outperforms                            tive inspection of its generated samples. We observed that
+Active Reading (57.03% vs. 51.75%).                                                many outputs were highly similar in both content and format,
+Active Reading underperforms SPA due to lower aver-                                suggesting limited diversity. Since diversity is correlated
+age strategy effectiveness. To further analyze why Ac-                             with downstream performance (Havrilla et al., 2024), we
+tive Reading underperforms SPA on QuALITY, we conduct                              then performed a systematic comparison of diversity across
+a document-level comparison of the effectiveness of indi-                          methods.
+vidual augmentation strategies. We randomly select five                            Evaluation Setup. We use the diversity evaluation toolkit
+documents from the QuALITY corpus. For each document,                              of Shaib et al. (2024a), which quantifies both lexical and
+Active Reading is first used to generate a document-specific                       syntactic diversity in generated text. We report four diversity
+strategy, which is then applied in the second stage to pro-                        metrics following Shaib et al. (2024a). For lexical diversity,
+duce synthetic data. A separate model is trained on the
+data generated by each individual strategy and evaluated on
+the corresponding document's QA set without access to the
+original passage.
+For comparison, we perform the same experiment using SPA
+by generating synthetic data with each of its 7 prompts inde-
+
+                                                                                7
+                                                                                                                                                 SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+A: A Simple but Tough-to-Beat Baseline for Knowledge Injection SSPPAA::AASSimimpplelebbuuttTToouugghh--ttoo--BBeeaatt BBaseline for Knowledggee IInnjjeeccttiioonn
+QA baseline using different
+ken here is 27M.             TTaaTbballbeel3e3..3AA. vAveevrraeagrgaeegAeAcAccucrucarucarycayc(%y(%)(%a)c)aroacscrsorosdsifsfdedirfieffenertredenontctdudomocecunumtmse.ennttss..                                                                                              Table 5. Ablation stuuddyy oovveerrddiiffffeerreennttssuubbsseettssooffpprroommppt tstsrtaratet-e-
+                                                                                                                                                                                                                                                                               gies under a fixed dattaa bbuuddggeett:: 1111MMttookkeennssoonnSSQQuuAADDaanndd2277MM
+el QA Accuracy(%)            Document                                                      SSAeSpAeltpAelelptDlmletlDaembDymaebayrbeyerr inDitniihDaneDmtihtRaihoeameonmRudoRogsonohnududgsgshhSGparSwoSGpuGnpnariarndwowoguunnnniindndgg                                      tokens on QuALITY.
+             52.99           Title
+             47.47
+             52.26           SABBSAPSBAPacacAAstsPtaciieeAvvstieeeveRReReaaeddaiidnngigng  Th322e235232S322...523190u523...410109p...10941e401r  543T075h...534452354e057299705...245...425299992  AAc433vc781euAr...A345ra433v433va728g718e178ceer...yr...354543aa782827ggee  Prompt Strategies                                                                                                                                                                                                  AAcccc((SSQQuuAADD))  AAccc(Q(QuuAALLITITYY) )
+             51.31           Document                                                                                                                                                                                                                                          SPA                                                                                                                                                                                                                   8844.7.700%%            5522.2.62%6%
+             55.49           Title                                                                                                                                                                                                                                             SPA except QA-ct                                                                                                                                                                                                      8822.8.855%%                --
+                             Base                                                                                                                                                                                                                                              SPA except QA-ct, DDiissccuussssiioonn                                                                                                                                                                                8833.1.166%%                --
+                                                                                           TOThpheeenSeSuruppeer r TalkativTeThThereee                                                                                                                                         SPA except QA-ct, DDiissccuussssiioonn,,KKeeyy                                                                                                                                                                        8833.4.477%%                --
+                                                                                           4O0Op.0pe0enneerr TTa3alk7lk.a5at0itviveeTTrreeee 33AA.8cc7ccuurraaccyy                                                                                                             concepts                                                                                                                                                                                                              8844.6.600%%            5500.2.62%6%
+                             BABacstaievse Reading 5444.050.80.000                                                                               35.313707.5.500 39.933233..8877                                                                                               SSPPAA eexxcceepptt QQAA--cctt,, DDiissccuussssiioonn,,KKeeyy                                                                                                                                                         8844.6.600%%                --
+                             ASAPcAtcivtieveRReaedaidnigng 5855.454.75.588                                                                       36.363515.1.100 45.033299..9922                                                                                               ccoonncceeppttss,, MMiinndd mmaapp                                                                                                                                                                                    8811.4.422%%                --
+                                                                                                                                                                                                                                                                               cScSScScooooPPPPnnnnAAAAcccceeeeeeeeppppxxxxttttccccsssseeee,,,,ppppMMMMtttt QQQQiiiinnnnAAAAdddd----mmmmccccttttaaaa,,,,ppppDDDD,,iiTiiTssssecceccauuauucsscsshsshssiieiieoooorrnn-nn-s,,s,,ttKKyKKyleeleeeeyyyy
+                             SPSAPA                                                        5588.5.577                                            3366.6.611                                        4455..0022
+
+wwfosdltaiooenifvehvwqudelieuruelcercyexsmrhsane-iiddpctehcyCiaittesa,vurlostviewirccmene(rsoCesgsplinauoRrrtrrteyeiwe-eespspPnhmsopemOteirtroosti(oSuntdSChvi)teohu.RiiolgdnaaP-amheiglrotbdlieipcyofonoreir,sendetrywSsrriaAsvenaeoliletlt.oparefa,r-knptdsc2Rieetos0Rtienhnech2padxo.u4ettiwteimtxbToim(st)oaSCi.oopnthmvh.Dnl-4aeaaw,e.ierttbaaerfCpiinssentaudRttiierrnt-aSnteiPd-oleo.etsOnl,efypfs-x2-SnesBt0opnteL2fafedfrcE4feoteethcaUnmich)ect-,, vdateotracsiuintmys etshncetosrb.eeDsstceodspmoiwtpenarstahtrbieslaesmitmoppAelrceftroivrdmeesaRingecaned, (iSnFPgiAg(uTaraecbh2lie)e.v3e)sanddi- WmGwGAn0PduoIashsachuotefsh2ct.hrdTBsAticusrnitudoeeQan-ruoNen0iao.QtduarYsvarSvpridttmweBactgottuslsFvteespe.baaAPhhheefuentaAesoigQnetepfedGeergRAsmtmdotimee:grrnthasrrRsLAyiaePoafctcaofeeFreteaeaheodaGgIehtfTmhitiwtnsdponfiaanidTeseenrauete-voprceewtPcmeroatir4gled-YeencrosilrythEbvsolTens-ayociihaunygnsa,Tieaptnnnv-tk,aefsedrtshzgems4aoluwtegecraeuteQeStiuoesoetnooorshccgdrsrrleslegrbacp(PueydieAmefewraoc5tfiotueeacbsAtwtoicocgwivgohG7,perhnnocamoaftiofee(ievmihases.yesneeocPnntar5s0nin5etne,axndhsdrrnrcutcrtTA5p3denwluermaomalesduud-ua%.ealrusGGusmtrceOesn4taisa,aaotstatodvcdvotsseaiigr9nPPittiuSwticidFyenntTncQfdgvigeognrvnocte%asTTudSenrggodgssoyaeegeeereersrole----i---,h...ugrnneuAAosT(TbbdStirESqbSpo56nSm6eLhosw(TTsoicunsbRepScShmcrmpSb5LrbISpaqrnir8oatlrn8avoQinoo..eaauanttPPPv.Tloloa(TLavo66bEhbmStSSqp5ieSonbLdfiorcoo.earauasfasg7MQKuPPPPhseo31sle0lroaebhsa3nalbr80osrsoetoptfalialeeAbnrlnsrseretk4AAptiauavoQ.oo.iaaunaAAiecpAPPPxAA.bal..htetAlFeryfdiya%gQ7KMme.hseeftno31ferbdl%eram0lroemdefbl.rarttebsAcsossrIetroyptsfeiled'Aieeroele5o4'AAMkPiudearoctrted4kMdipAbeeed..cheAeleieryed%AsmeeeeftnhAeshtholvmertknoAgsicoamp4d.isrcamTeg)brAsphgD)gffoctygndeon'4lihellnrlhl5ob1rPkMd1cnttdoeaeecmermm.tAu-nsoe-oasayyonwwthaoessycctiknctAuudscoameemea4lo(p.oeaa)oeuefDefgfelctd.ndvg3oo43lhnleocescaii1routn-uorttncnrnrteameYna-oasenynwaonaklnonwnowssncltcrNsoum1eiimeraolos(-.oeeaiediotoe-tfuecdwdp.lbgctg3ndobdectgDivdmstbgPuoni-urvtccmsttd8noheynretg0tRefad8ennpaineonwmrlhneyNplnim1aporrmaiauiolheepitmilli1o-lueecdpuaHilmrihn.b-xreatgeB.ped4oeHbspPssonvcsirmsaftoeBcoyyls0rftd8ie1sissdfonEemmarqlrnpiappdmcis1miuEhoefalod.grcsbhttuawleRnpoim.ihtnsfoeaaerd.etgpeebHspoto6ln,RioprdeBssbeeyesirreuei1seef,oTgmronsalalrfMbntdelgiidcisiiEboeserpsrlntnnenp)dtligcdaeifSaio(prdptosgrmivblreSntygo6leRgnianbaepncssmeyycTreeeStoprt,s,ugieonlyegfs%nezbndeeAimaetotbasesttruntise)dperlteligPsaciz-giayt(ieoimhrhStrueeanta.reSgiodidepeGSnhiopriPisuvtti-tgadsniyegn%n2tpnRmrmomtadim.oecnolAetttois)teGentlrcsiisiitzdtttens2RtoesagsnigearPtyelAeioniopieyePivgl-8ngtaseisieerdhttprr(mfdttanrnm.isrnos)enGtyAniidiadoteimgn8e2AsjiRpedoTefautraiuem-suvarlAedkiongihFleavenniAmtrttee(df.onaiiafsjngrruttysdinm-snpidapneg8sultinpGldpFTeeaoera'inuertlreues78nenieaginiceognAittdtl.Acopoanpasbncjto.oultGppm-oggseontipapeassisCln(utnhlstcFe05cncaolrtMtsue87siirsattincgetlhohnadaStlnAd.oepnpy7fvoyyciasrlmacGpnpihsThjena(ollhiseel..yhyiCltutct05tacaoMsrslooiooth.rnc66noeloQyrind(aSaii7intef.o,a9PuerhciomicncariiaTnauesn(lhbsesa..egl,SvthtmAehan8rsolnfno70ocnoarhtxrp66nomtlQlludgAeo(r7iifte%tPmte9zumcirehmlichrtiTtmnwsisevmlSehtIedahnistehon6aoPt70o8aoofnhixpngnmaarfQAlot(ffeiltetuscrme9((lueroh%MsiAmgestensmo.niwseenfedhnsvlevmhatPa--A8e)n%efneioiinghaea6er(fitmtftlodurmt((ac-a%rafglmeestae94lssmfod9.iMisswerseiudsm5vmnsa--Aenncsgenitthea6nedtmaat-onu)e%tveiaetvprmf(cils..y94l,dqeoMiaisecs1aesde)guraets5yish01e9sit2anrts-enetteaa.tmn5n)%eceselnneme(etde..iaspii,,loveiwtac-haueuertydegtc%ehptwesth3010v9sitysv%it.dlss1tm5oeasr)nnat.pdes5icnhapi2lnrtwfte5gv-alrueienyustisneaprwale03))vsRyiae.edie,seHo1edy)nvtereappee%5iehhiaa2nrtttalnniWhue,nE%s.d-ntelulturol))oaetii,rfiiiosciydvatec5ea%tlsinhocripset7iriRshan%!.denntbilootgelodeaaHi1gaitmtdrlniuscrepeitein5t.aiincsarisnu,tneErras-.cltdBniiexdshHyi1gpishgcfiiadnie1r76peeesaeitttesbuoulaenn7u,nE-.e:nlnd!ybuooitgelfdda.eipfiimiv1t67crnem-e05saetm,Mtsuen.da7rncntDeGr!pebgcoaotoaBgseldia8cigoriRxsimwtnpsc05uenaeMd..nr.srktcStDrnncwceeaBldauoeisr63yexsTiasiQslpsfdocf.3iaeis..psiecrkmtr-tsosin,cAetsapQene63ltsygirTGPiln,40efogemaidgdrt.isswri8asincromiRud-aeoso%d,heertdettSQnwectoscsarGAn40eSgvatiseAe8.ednuoeiRrhunGhepuoAgoessetgtoS3Mecoas((azuipeiSiraeeektPuodueAartspaAidpbsrslmomP--ntf3b,loenis((chgIum)eelreiasnhsktedPs-A%dtstpaaddp11lsetesfrP--dcb,aAoingfnieeastiAhesgscfdese-%gdenuhnGedpigadd11eewfec,mpAkuaMeon49rs(giunsiiAcpscoaaieeoaethnGtepgewagrMemnt49n7fieloanncshsi)ycenai..nlfesistyrActerllpatlrirtcgltmttSnnf04omfnhc)epl..afflniosicynht6ttrstoesgfesiertgenitgdemue04ufnancfehbfnmeipaont06itihe(ototue,gfsHePnreogcul1mnat%faengasvmghpapro60hwt(ayoaiutps7relorcota))alenutsmrargAtArtchldloadrt7ht9altcctaa))hsmatenetalpstomromrsiAtrttlreyhstv6tuarhetncihomd)rmrapeveriitourchtat6-ontu'titliet,kiteicrdemHffr.pdc.pvaaei1no%acinttisvoiedyvhpteptwtaHiermycpvtrt1voo%vactnvbcSvhpsTsawssiestt88aii-umlogFooipot9aIpotuimwdeiiteoTalet88eocsilooiotyRetv9taoI.edamstfdieps11RetoaclP)opocmtesivnodyveuorrmp,amet-npel11gotieokci)spmtevn.hpsa.uuepn..-nelrtreAokiaiacynptoAeto.pra.reaeevps04eeee..AtdrriecaybptnicStpioiepass04esaear-,ltdfrtFrocmadpebfsscStpporl12ssasnsedoacl-MhCrFpdaeGpaRnogrl.eomm21sgnnaifomltnhRlfocamPaeasdarRet.eooaidrefmtocgraRelfpteiPtoeigbcotto((eocnusraeappottovwigbhzotoA((lanosrnseabAoeaidr--riaoonatvtscaegtApmiarlnrsoiraebAr--r-aevslnenu33mptreehhrlyrveheefetr-eemeeonmstsio33utrtrsretateifceMtCmdsmuenstouwasGaoe..icdnnisgMCdsosyitieeueeneeetewssssmsaGo..dr26rdodbrmttdgrmae-----y--dst26,vsdar..mtdgrnhyurrtosagh89)nurrotooelgih89)aigatnatomsoeoli.igatnaaetml))snonmprhiheheeolt))nenimprchasiehceooteteisidceteanddnnggesatinneresssehnnggstiTneetsssea------ct-.----w---s.unchadsuelAeWwyTfpiNgcptrHedorfiErcs6mpdmdtcpuWwyrirNudHr6cpdpgcTeomcppfirtfdtEtmstmhheuaehmohyeuaeosomaygnia.osafarriromoaaieaao.rarfrsaieavheeov2eecmaccafaaoe2elmaoooccaoafanlbiooohninttnbihtdtintntptdslfpsalvfroaanclknvwnyattpaatnn.lknwneyttpnaat.elmmmtrtmmmltefieklsedfiaeksldcorklcorkpkhaephlesgennslesgSilcnnsdSicliyydyiantorinorefusoheg-fuvsohng-ovneogeergreeirpppsrevpppsettoeetoeeyiryisryasvvavtvtoatofeaiudtsifeuidysaitttyafttttefteaoaotttttttntwnpwhphaTnaTnrnnrseiseieoeeefoeetftllsmshmhddrer(e(nstnsnt8n8ccSmimistlstlleleepetpeegnagnamamaarardttSiissssllffeerrllg%ee00ee,,QQhtotorraahhllccppeebbsbsbaaooataytyadtadteeoottooRhPhheerreetttitileale..aanienieaandtdntldtliudtuuelluellooaahphpop8oap8yayeuufisfiasernernlflfnyeannyeanvsvnsneddgtgttosgts)Aolgslletlatetsnart0ssnr0seAiActttactttStaiitdStiietdesyieesyieeobeow4,emwf4,niismfhneciioeco%fma%fmeldneldaaoldonbtdieauolobtiekLutmpkLgtrmp.golroS.sloSsulssulssvnvludnvtodevteluodetnodyvtealonynailferndfifeiwraIoAiwprIoPtAprlulPteszlulosefsnzuwentooesitnanmuwenoeiTtnnapmaoeTndpotaeoetnrnAontnrneAoaetnipeenrrhaenSctsgpemnrrthanStsgniematewraoanieaewrYoneaYrgdnlrexnpanrgasdrlxpenaseeil.rudePeirsl.leruismdPwhrpseSistmvws2tlpeSpiatvs2aptlpe.pignfaapplpfgnfiahAs-fplscfgsaihDAs-t,felcscirsdeD7teoecQtrodote7yoepmrQuhtogriotpyegpepmriuhooogripeenpdooooorendotooMT2recodrnrnotr.oiMeTrerdiearnrtrsirerdwosunirmtsrcmgmvdwosunfmimcegtacxtmsegmffv0fiemorocegtatxeseffaeorhomtehhAfiavcoomrtmee-h.hfhAfiBmsoornitsfmaee-.ahf2mtmsplnitsfabsaomttaoaplemibsrnorhgrrtaoaleimihasrnrhgrToreDlei4sdtsnToeyoiDlemgtimrtssri2tsndyoilemfiugtipmrktsresi2somnlndigtkhfiuppnkesmaanlcphntoigtmikhpnnsm.a,otaphptoomiertnhg.o,totaapatseooar2rt)tudhpgoftaeaettseoilaa2rteusccpsynTfeeeetmiiaie,taetsnpouncsoynsTtenremi6ientatcdsnepounnktorstodhiarlo6hrncsl,ovnaktrloodhialoucitrdrorl,veeaolq%oioyefpcigotdarskorrbeeeooiro%iboytefeapgofiaskuesrbeoioTraasbntmeaLrdancdfiuimruesieondraasunnthmnnrnntdoilmrmi,end,asunnndcetnrrnttmoiglemi,nQeea,rasnndcaeaetdradcuomwoimnQieaelruorpedsaeSdspdowfwoooutmpalsnguorpyp.satSspdwrfsegwsfttlpfhhs5pgoecAp.y.gnatrrMbaregwsmutotQlfoh5orp.oeAls.tagyrnurmafwueeootdQmotuor.a,lortayemrudio.oamye-onelotna,phortsemhdeob.aftmlea-onltumtnctsphpnssfhimbtm.ouva,eytulmttckscWtsopueneesavfiemssua.oMiuv,etsAaercks(oWoduravesbttuvhstaiMiaemTitsAnSeaapntdn(odevtepTgtvicsstini.demTnnSespiinetdnevieprpTeginDtcoi.ldhrttisPshoionniceethimcnawinpee3nDtigoilarttniasPsshoonnsrtmhimtwnadswnnelAimziirrtagcnbisgoosrmfaetwodsrr.ragfl,AvsmzisrrtagceebeieaBig.oeibetvoo.atglfibtsludspaeeteecmaroBosiodeviabctloronheiheptldlrudpvaysnicctmrroyolvactrlbirotnaheiepednyrreehedayvgsncttreeeryionlfsrdsbtiartoapfin5yreeotahrdvglitfensDesteroaifhfteagodeaplasfier5notvasrtohtsrfnssstboaueftu)nhgdsaecgdealcasgalmeeeynrieveitohoatribetu)gdesaepasecre2gan,etmluetieyrrioeeryoqalrisnfpildeedmpatistveerhm2nx,etladutioserrpoeryQ.qlarssarfvpenaviuumtivedehmag6dnosomseeropseaQ.iasall:erssvetucnoamiiruledele,6snoscemeeyoasiuAlaspr7ambtll:teuststuctevtdlroclellvee,speenyuaisuAhasnlliphr7tdmttuwgtsttcvtarl-iroftSlevreonipineausih,nrlihdtdpetltoaiolwepgocttooors-iavrsagftSerteonsiacentaiu,PuirnphddpettnolSreposcteteooyssaavmoagctriusteaea.ststactfstlPirnpfdhdASrhptpiuteteynmamoscPtcsruietedaieusm.ligetrgnsokgfddhchstbifAohpptuitptnnmeltllcetsPc'sAuretidusliegolkadhchrtbhhdorsyyiiyaeeeiosssptnfieltrllcmttetltt'Autd---a--,,l.hhorsyyyiiyaeeecisslsctfesratttlt-----,C.'teaaeansetegnRevsettngaeivesdegeticsanaeyshssctlswaeisuiuwegomctfrhafrhionoafSatetpeecnhrtiermleryocdlieeefng.tn--ddeaiSRibvteicehvPeoweaeshpsAoefcnitf.rdhdtoesshaosoysirmrtuscnoeayStuen.ttpPSufthmhiheAenAtxealhroedfetfln-eadneoildBcn,rtrSAsL,ldmaricdQEannscoasanhUdeturitdovdAeAvatowa.shecDrmegitiaRnaierCnvbbgesneaeeRleeareante:RrrhdvcodanPaeiehwt.uOntaermmadgdBSSbgaibPaenobererAskgndysrt..
+                    Wbee7ncWficpcalxWhpcishoecaleimdsahcl.neetiaTil.adoetatsThino1esruhsnmo1ke)rscmMee)ar.steceauishcntHluiotihtdnleihkitnidveeivegnievenvirgdepsiredue,pereuaaereafwsalavrnoofslpdoroanpmerrnatomlrrabaoumarbanlmienleapcnepcetpptseatpesiiesori(ossfre(erofer.ernpog.retpgarm.pm,o.rr,oaaurCarettnCetensaecsdacdseimseue,ine,inonnlnSgdSoTtoTtetnsuanualbedbefdfloyiloyeooevfrnof4o4ter.etrh.haSIeIecmmmsmhQ--ouuArstFdsdFocyyoooooDnncleclllltutuokoaammwwiccatitteeiiini(nnrncncSggtttddh..it((iiachSSvvihehebleraraessieiibibsmtttyyeeattplaaa.aca,cilerlr.2.on,o,r0s2s2s2s0042m2ma44u)uaa,l)lt),tiq,ipwpuwlleaeeenQSRrrrrteeEeieepApfppypoAhohirrhnrtraLtargfsafsoioniustnhugergerscscoolooemfmxfapiapclselaisemnlimngeaglenne1ln-de58-9...912634336008
+                    paper. Full results for all benchmarks and 8additional imple-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              8.2446  0.0058  21.2072
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               5.6019  0.0014  7.0200
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               6.9882  0.0030  9.7534
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Active Reading 4.1788                                                                                                                                                                                                                                                        4.5854  0.0010  5.9388
+                    mentation details are provided in Appendi8x C.4.                                                                                                                                                                                                                                                                                                                                                                                                                              SPA (ours)                                      4.3806                                                                                                                                                                                                                       4.8207  0.0010  6.0024
+
+                    RL-based augmentation exhibits diversity collapse. As                                                                                                                                                                                                                                                                                                                                                                                                                         6.2. Effects of Individual Prompts in SPA
+                    shown in Table 3, the RL-based method SEAL exhibits sub-                                                                                                                                                                                                                                                                                                                                                                                                                      Individual prompts are insufficient to match the full
+                    stantially lower diversity than all other methods across all                                                                                                                                                                                                                                                                                                                                                                                                                  SPA configuration. To better understand the contribution
+                    metrics on SQuAD. This suggests that iteratively training                                                                                                                                                                                                                                                                                                                                                                                                                     of each prompt in SPA, we conduct an ablation study by
+                    the data generator on selected augmented data can induce                                                                                                                                                                                                                                                                                                                                                                                                                      generating synthetic data using only one prompt at a time.
+                    a form of diversity collapse, in which the generated syn-                                                                                                                                                                                                                                                                                                                                                                                                                     For each prompt, we train a separate model using the cor-
+                    thetic data converges to a narrow set of repetitive patterns.                                                                                                                                                                                                                                                                                                                                                                                                                 responding synthetic data and evaluate its performance on
+                    This behavior provides an explanation for SEAL's rapidly                                                                                                                                                                                                                                                                                                                                                                                                                      SQuAD. We keep the total training budget fixed at 22M
+                    saturating scaling curve on downstream tasks (Figure 2).                                                                                                                                                                                                                                                                                                                                                                                                                      tokens for each prompt. The results are reported in Table 4.
+                    SPA achieves competitive diversity. SPA substantially
+                    outperforms single-prompt baselines (Rephrase and QA)                                                                                                                                                                                                                                                                                                                                                                                                                         The results show that models trained with individual
+                    and the RL-based method SEAL across all four diversity                                                                                                                                                                                                                                                                                                                                                                                                                        prompts consistently underperform the full SPA configu-
+                    metrics. Compared with Active Reading, which continu-                                                                                                                                                                                                                                                                                                                                                                                                                         ration, with relative performance drops ranging from 2.16%
+                    ously generates different document-specific augmentation                                                                                                                                                                                                                                                                                                                                                                                                                      to 8.73%. This result indicates that the gains of SPA do not
+                    strategies as the synthetic corpus scales, SPA relies on a                                                                                                                                                                                                                                                                                                                                                                                                                    arise from any single prompt in isolation, but rather from the
+                    fixed set of seven human-curated prompts shared across all                                                                                                                                                                                                                                                                                                                                                                                                                    combination of diverse prompts that provide complementary
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  forms of knowledge transformation.
+
+                                                                                                                                                                                                                                                                               8
+                             SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Even the weakest standalone prompt remains important                 single prompt configuration is universally optimal.
+in the full prompt set. Among all prompts, Key concepts              SPA therefore serves as a strong default prompt pool for
+exhibits the weakest standalone performance, with a drop of          downstream adaptation. SPA is designed to provide a
+8.73% when used alone. To further examine its role within            broadly applicable default prompt set that performs well
+the full prompt set, we conduct prompt ablation experiments          across tasks. When the downstream task is known, SPA can
+on SQuAD by removing the Key concepts prompt from the                naturally serve as a prompt pool from which task-specific
+full set while keeping the total data budget fixed at 22M to-        subsets can be selected, potentially yielding further perfor-
+kens. As shown in Table 5, removing the Key concepts from            mance improvements.
+the full prompt set leads to a 1.62% drop in QA accuracy
+relative to using all seven prompts, indicating that even the        7. Discussion
+weakest standalone prompt still contributes to the overall
+performance of SPA when combined with other prompts.                 Broader and more challenging scenarios remain to
+                                                                     be explored. We evaluate SPA on three representative
+Table 4. Performance of individual SPA components trained            knowledge-injection benchmarks: SQuAD (Wikipedia-
+in isolation. All models are trained with approximately 22M          based QA), QuALITY (long-document comprehension),
+tokens on SQuAD. Numbers in parentheses indicate the relative        and MultiHop-RAG (multi-hop reasoning). However, there
+performance drop compared to full SPA.                               may exist more challenging scenarios that we do not cover,
+                                                                     such as domains requiring intensive numerical reasoning
+Method        QA Acc. (%)    Method          QA Acc. (%)             or rapidly evolving knowledge. In addition, whether task-
+Key concepts  78.95 (-8.73)  Case studies    83.57 (-4.11)           specific tuning of the prompt set can further improve perfor-
+Mind map      81.93 (-5.75)  Discussions     84.29 (-3.39)           mance across different downstream tasks remains an open
+Implications  85.52 (-2.16)  Teacher-style   83.68 (-4.00)           direction for future work. Nevertheless, our point is to
+QA-ct         84.70 (-2.98)  Full Set (SPA)                          demonstrate that SPA, as a simple and scalable baseline, is
+                                                 87.68               sufficient to outperform prior methods within their original
+                                                                     experimental settings.
+6.3. Prompt Set Tuning                                               SPA is intended as a strong baseline rather than a final
+Task-specific tuning of the prompt set can further im-               solution. We do not argue that future work should rely ex-
+prove performance. To further analyze the contribution               clusively on SPA. Instead, we hope that our results provide
+of individual prompts in SPA, we conduct prompt ab-                  the community with insights into the limitations of previous
+lation experiments by sequentially removing the lowest-              methods and encourage the development of approaches that
+performing prompts identified in Table 4, while keeping the          genuinely improve upon this baseline.
+total budget fixed at 22M tokens on SQuAD. As shown in
+Table 5, tuning the prompt set yields an optimized configu-          8. Conclusion
+ration that achieves 88.19% accuracy on SQuAD, a 0.51%
+improvement over using all seven prompts.                            In this work, we presented SPA, a simple and scalable base-
+                                                                     line for knowledge injection. SPA relies on a small, fixed
+Table 5. Ablation study over different subsets of prompt strate-     set of carefully designed prompt templates grounded in cog-
+gies under a fixed budget of 22M tokens on SQuAD. P denotes the      nitive learning principles to generate large-scale synthetic
+full SPA prompt set, Disc denotes Discussions, Key denotes Key       corpora for continued pretraining. Across three representa-
+concepts, Mind denotes Mind map, Teach denotes Teacher-style,        tive benchmarks, SPA consistently matches or outperforms
+Case denotes Case Studies, and Imp denotes Implications.             a range of more complex approaches.
+                                                                     Beyond establishing a baseline, our analyses shed light on
+Prompt Strategies                            Acc (SQuAD)             key limitations of prior approaches. We empirically demon-
+P                                                87.68%              strate that RL-based augmentation can suffer from diversity
+P \{Key}                                         86.06%              collapse at scale, while multi-stage prompting pipelines may
+P\{Key, Mind}                                    87.27%              not outperform carefully designed single-stage prompts.
+P\{Key, Mind, Case}                              87.68%              By showing the effectiveness of SPA, we hope that our re-
+P\{Key, Mind, Case, Teach}                       85.01%              sults will serve as a useful reference point and foundation
+P\{Key, Mind, Case, Teach, Disc}                 88.19%              for future research on scalable, robust, and principled syn-
+P\{Key, Mind, Case, Teach, Disc, QA-ct}          85.52%              thetic data generation for continual pretraining. Future work
+                                                                     may include how to solve the diversity collapse issues in
+However, the optimal prompt configuration does not                   RL-based approaches and whether we can leverage further
+transfer across tasks. We directly transfer the tuned                insights from cognitive science to design better multi-stage
+prompt configuration on SQuAD to QuALITY, keeping                    prompting methods for knowledge injection.
+the total data budget fixed at 27M tokens following Sec-
+tion 5.2. On QuALITY, the full prompt set (SPA) achieves
+52.26% accuracy, while the prompt configuration tuned on
+SQuAD attains 51.51%, resulting in a 0.75% drop. This
+result suggests that different downstream tasks may favor
+different forms of knowledge transformation, and that no
+
+                                                                  9
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Acknowledgements                                                       17­23 Jul 2022. URL https://proceedings.ml
+                                                                        r.press/v162/borgeaud22a.html.
+We would like to thank Jian Li, Kaiyue Wen, Xinran Gu,               Bransford, J. D., Brown, A. L., Cocking, R. R., et al. How
+and the anonymous reviewers for their insightful comments              People Learn, volume 11. Washington, DC: National
+and feedback that helped improve the quality of this paper.             academy press, 2000.
+We also thank the broader research community for releas-             Brookfield, S. D. Developing Critical Thinkers: Challeng-
+ing code, datasets, and evaluation resources that made the              ing Adults to Explore Alternative Ways of Thinking and
+comparisons in this work possible.                                     Acting. Jossey-Bass, 1987.
+                                                                     Bruner, J. S., Goodnow, J. J., and Austin, G. A. A Study of
+References                                                             Thinking. John Wiley and Sons, 1956.
+                                                                     Chalkidis, I., Fergadiotis, M., Malakasiotis, P., Aletras, N.,
+Abonizio, H., Almeida, T., Lotufo, R., and Nogueira, R.                 and Androutsopoulos, I. LEGAL-BERT: The Muppets
+   Comparing Knowledge Injection Methods for LLMs in a                  straight out of Law School. In Cohn, T., He, Y., and
+   Low-Resource Regime. arXiv preprint arXiv:2508.06178,                Liu, Y. (eds.), Findings of the Association for Computa-
+   2025.                                                                tional Linguistics: EMNLP 2020, pp. 2898­2904, Online,
+                                                                        November 2020. Association for Computational Linguis-
+Agarwal, S., Ahmad, L., Ai, J., Altman, S., Applebaum, A.,              tics. doi: 10.18653/v1/2020.findings-emnlp.261. URL
+   Arbus, E., Arora, R. K., Bai, Y., Baker, B., Bao, H., et al.         https://aclanthology.org/2020.findin
+   gpt-oss-120b & gpt-oss-20b Model Card. arXiv preprint                gs-emnlp.261/.
+   arXiv:2508.10925, 2025.                                           Chen, Z., Jiang, W., Li, J., Yuan, Z., Kong, H., Ouyang, W.,
+                                                                        and Dong, N. GraphGen: Enhancing Supervised Fine-
+Allen-Zhu, Z. and Li, Y. Physics of Language Models:                   Tuning for LLMs with Knowledge-Driven Synthetic Data
+   Part 3.3, Knowledge Capacity Scaling Laws. In The                    Generation. arXiv preprint arXiv:2505.20416, 2025.
+   Thirteenth International Conference on Learning Repre-            Clark, P., Cowhey, I., Etzioni, O., Khot, T., Sabharwal, A.,
+   sentations, 2025. URL https://openreview.net                         Schoenick, C., and Tafjord, O. Think you have Solved
+  /forum?id=FxNNiUgtfa.                                                 Question Answering? Try ARC, the AI2 Reasoning Chal-
+                                                                        lenge. arXiv preprint arXiv:1803.05457, 2018.
+Araci, D. Finbert: Financial sentiment analysis                      Cohen, R., Biran, E., Yoran, O., Globerson, A., and Geva,
+   with pre-trained language models. arXiv preprint                     M. Evaluating the Ripple Effects of Knowledge Editing
+   arXiv:1908.10063, 2019.                                              in Language Models. Transactions of the Association
+                                                                        for Computational Linguistics, 12:283­298, 2024. doi:
+Asai, A., Wu, Z., Wang, Y., Sil, A., and Hajishirzi, H.                10.1162/tacl a 00644. URL https://aclantholo
+   Self-RAG: Learning to Retrieve, Generate, and Critique               gy.org/2024.tacl-1.16/.
+   through Self-Reflection. In The Twelfth International             Eldan, R. and Li, Y. TinyStories: How Small Can Language
+   Conference on Learning Representations, 2024. URL                    Models Be and Still Speak Coherent English? arXiv
+   https://openreview.net/forum?id=hSyW                                 preprint arXiv:2305.07759, 2023.
+   5go0v8.                                                           Fiorella, L. and Mayer, R. E. Learning as a Generative
+                                                                       Activity. EBL-Schweitzer. Cambridge University Press,
+Berglund, L., Tong, M., Kaufmann, M., Balesni, M., Stick-               2015. ISBN 9781107069916. URL https://books.
+   land, A. C., Korbak, T., and Evans, O. The Reversal                  google.com/books?id=nGa8BQAAQBAJ.
+   Curse: LLMs trained on "A is B" fail to learn "B is A".           Gao, L., Tow, J., Abbasi, B., Biderman, S., Black, S., DiPofi,
+   In The Twelfth International Conference on Learning Rep-            A., Foster, C., Golding, L., Hsu, J., Le Noac'h, A., Li,
+   resentations, 2024. URL https://openreview.n                         H., McDonell, K., Muennighoff, N., Ociepa, C., Phang,
+   et/forum?id=GPKTIktA0k.                                             J., Reynolds, L., Schoelkopf, H., Skowron, A., Sutawika,
+                                                                        L., Tang, E., Thite, A., Wang, B., Wang, K., and Zou, A.
+Borgeaud, S., Mensch, A., Hoffmann, J., Cai, T., Ruther-               The Language Model Evaluation Harness, 07 2024. URL
+   ford, E., Millican, K., Van Den Driessche, G. B., Lespiau,           https://zenodo.org/records/12608602.
+   J.-B., Damoc, B., Clark, A., De Las Casas, D., Guy, A.,
+   Menick, J., Ring, R., Hennigan, T., Huang, S., Maggiore,
+   L., Jones, C., Cassirer, A., Brock, A., Paganini, M., Irv-
+   ing, G., Vinyals, O., Osindero, S., Simonyan, K., Rae, J.,
+   Elsen, E., and Sifre, L. Improving Language Models by
+   Retrieving from Trillions of Tokens. In Chaudhuri, K.,
+   Jegelka, S., Song, L., Szepesvari, C., Niu, G., and Sabato,
+   S. (eds.), Proceedings of the 39th International Confer-
+   ence on Machine Learning, volume 162 of Proceedings
+   of Machine Learning Research, pp. 2206­2240. PMLR,
+
+                                                                 10
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Gao, Y., Xiong, Y., Gao, X., Jia, K., Pan, J., Bi, Y., Dai, Y.,       Izacard, G., Lewis, P., Lomeli, M., Hosseini, L., Petroni,
+   Sun, J., Wang, H., Wang, H., et al. Retrieval-Augmented               F., Schick, T., Dwivedi-Yu, J., Joulin, A., Riedel, S.,
+   Generation for Large Language Models: A Survey. arXiv                 and Grave, E. Atlas: Few-shot Learning with Retrieval
+   preprint arXiv:2312.10997, 2(1):32, 2023.                            Augmented Language Models. Journal of Machine
+                                                                        Learning Research, 24(251):1­43, 2023. URL http:
+Grattafiori, A., Dubey, A., Jauhri, A., Pandey, A., Kadian,             //jmlr.org/papers/v24/23-0037.html.
+  A., Al-Dahle, A., Letman, A., Mathur, A., Schelten, A.,
+  Vaughan, A., et al. The Llama 3 Herd of Models. arXiv               Kandpal, N., Deng, H., Roberts, A., Wallace, E., and Raffel,
+   preprint arXiv:2407.21783, 2024.                                      C. Large Language Models Struggle to Learn Long-Tail
+                                                                         Knowledge. In Krause, A., Brunskill, E., Cho, K., Engel-
+Gu, X., Lyu, K., Li, J., and Zhang, J. Data Mixing                       hardt, B., Sabato, S., and Scarlett, J. (eds.), Proceedings
+   Can Induce Phase Transitions in Knowledge Acquisi-                    of the 40th International Conference on Machine Learn-
+   tion. In The Thirty-ninth Annual Conference on Neural                 ing, volume 202 of Proceedings of Machine Learning Re-
+  Information Processing Systems, 2025. URL https:                       search, pp. 15696­15707. PMLR, 23­29 Jul 2023. URL
+  //openreview.net/forum?id=tQZK5frjVU.                                  https://proceedings.mlr.press/v202/k
+                                                                         andpal23a.html.
+Guha, N., Nyarko, J., Ho, D., Re´, C., Chilton, A., K, A.,
+   Chohlas-Wood, A., Peters, A., Waldon, B., Rockmore,                Lee, J., Yoon, W., Kim, S., Kim, D., Kim, S., So, C. H., and
+   D., Zambrano, D., Talisman, D., Hoque, E., Surani, F.,                Kang, J. BioBERT: a pre-trained biomedical language
+   Fagan, F., Sarfaty, G., Dickinson, G., Porat, H., Hegland,            representation model for biomedical text mining. Bioin-
+  J., Wu, J., Nudell, J., Niklaus, J., Nay, J., Choi, J., Tobia,         formatics, 36(4):1234­1240, 09 2019. ISSN 1367-4803.
+   K., Hagan, M., Ma, M., Livermore, M., Rasumov-Rahe,                   doi: 10.1093/bioinformatics/btz682. URL https://
+   N., Holzenberger, N., Kolt, N., Henderson, P., Rehaag,                doi.org/10.1093/bioinformatics/btz682.
+   S., Goel, S., Gao, S., Williams, S., Gandhi, S., Zur, T.,
+   Iyer, V., and Li, Z. LegalBench: A Collaboratively Built           Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V.,
+   Benchmark for Measuring Legal Reasoning in Large Lan-                 Goyal, N., Ku¨ttler, H., Lewis, M., Yih, W.-t., Rockta¨schel,
+   guage Models. In Oh, A., Naumann, T., Globerson, A.,                 T., Riedel, S., and Kiela, D. Retrieval-Augmented Gener-
+   Saenko, K., Hardt, M., and Levine, S. (eds.), Advances                ation for Knowledge-Intensive NLP Tasks. In Larochelle,
+   in Neural Information Processing Systems, volume 36,                  H., Ranzato, M., Hadsell, R., Balcan, M., and Lin, H.
+   pp. 44123­44279. Curran Associates, Inc., 2023. URL                  (eds.), Advances in Neural Information Processing Sys-
+   https://proceedings.neurips.cc/paper                                  tems, volume 33, pp. 9459­9474. Curran Associates, Inc.,
+   _files/paper/2023/file/89e44582fd28d                                  2020. URL https://proceedings.neurips.
+   dfea1ea4dcb0ebbf4b0-Paper-Datasets_an                                 cc/paper_files/paper/2020/file/6b493
+   d_Benchmarks.pdf.                                                     230205f780e1bc26945df7481e5- Paper.p
+                                                                         df.
+Gunasekar, S., Zhang, Y., Aneja, J., Mendes, C. C. T.,
+   Del Giorno, A., Gopi, S., Javaheripi, M., Kauffmann,               Li, Y., Wang, S., Ding, H., and Chen, H. Large Language
+   P., de Rosa, G., Saarikivi, O., et al. Textbooks Are All              Models in Finance: A Survey. In Proceedings of the
+  You Need. arXiv preprint arXiv:2306.11644, 2023.                       fourth ACM international conference on AI in finance, pp.
+                                                                         374­382, 2023.
+Havrilla, A., Dai, A., O'Mahony, L., Oostermeijer, K.,
+   Zisler, V., Albalak, A., Milo, F., Raparthy, S. C., Gandhi,        Liu, X.-Y., Wang, G., Yang, H., and Zha, D. FinGPT: De-
+   K., Abbasi, B., et al. Surveying the Effects of Quality,              mocratizing Internet-scale Data for Financial Large Lan-
+   Diversity, and Complexity in Synthetic Data From Large                guage Models. In NeurIPS 2023 Workshop on Instruction
+   Language Models. arXiv preprint arXiv:2412.02980,                    Tuning and Instruction Following.
+   2024.
+                                                                      Luo, R., Sun, L., Xia, Y., Qin, T., Zhang, S., Poon, H., and
+Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika, M.,              Liu, T.-Y. BioGPT: Generative Pre-trained Transformer
+   Song, D., and Steinhardt, J. Measuring Massive Multitask              for Biomedical Text Generation and Mining. Briefings
+   Language Understanding. In International Conference                   in Bioinformatics, 23(6):bbac409, 09 2022. ISSN 1477-
+   on Learning Representations, 2021. URL https://op                    4054. doi: 10.1093/bib/bbac409. URL https://doi.
+   enreview.net/forum?id=d7KBjmI3GmQ.                                    org/10.1093/bib/bbac409.
+
+Hurst, A., Lerer, A., Goucher, A. P., Perelman, A., Ramesh,           Ma, S., Jiang, X., Xu, C., Yang, C., Zhang, L., Mao, J., and
+  A., Clark, A., Ostrow, A., Welihinda, A., Hayes, A.,                   Guo, J. Synthesize-on-Graph: Knowledgeable Synthetic
+   Radford, A., et al. GPT-4o System Card. arXiv preprint
+   arXiv:2410.21276, 2024.
+
+                                                                  11
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+   Data Generation for Continued Pre-training of Large Lan-        Oguz, B., Lin, J., Berges, V.-P., Chen, X., tau Yih, W., and
+   guage Models. In The Fourth Learning on Graphs Con-                Ghosh, G. Learning Facts at Scale with Active Reading.
+   ference, 2025. URL https://openreview.net/f                        In The Fourteenth International Conference on Learning
+   orum?id=mkx3UyFPLl.                                               Representations, 2026. URL https://openreview
+                                                                      .net/forum?id=mRi2cJDtIS.
+Maini, P., Seto, S., Bai, R., Grangier, D., Zhang, Y., and
+  Jaitly, N. Rephrasing the Web: A Recipe for Com-                 Ovadia, O., Brief, M., Mishaeli, M., and Elisha, O. Fine-
+   pute and Data-Efficient Language Modeling. In Ku,                 Tuning or Retrieval? Comparing Knowledge Injection in
+   L.-W., Martins, A., and Srikumar, V. (eds.), Proceed-              LLMs. In Al-Onaizan, Y., Bansal, M., and Chen, Y.-N.
+   ings of the 62nd Annual Meeting of the Association                (eds.), Proceedings of the 2024 Conference on Empirical
+   for Computational Linguistics (Volume 1: Long Pa-                 Methods in Natural Language Processing, pp. 237­250,
+   pers), pp. 14044­14072, Bangkok, Thailand, August                  Miami, Florida, USA, November 2024. Association for
+   2024. Association for Computational Linguistics. doi:              Computational Linguistics. doi: 10.18653/v1/2024.emn
+  10.18653/v1/2024.acl- long.757. URL https:                          lp-main.15. URL https://aclanthology.org
+  //aclanthology.org/2024.acl-long.757/.                             /2024.emnlp-main.15/.
+
+Mecklenburg, N., Lin, Y., Li, X., Holstein, D., Nunes, L.,         Pang, R. Y., Parrish, A., Joshi, N., Nangia, N., Phang, J.,
+   Malvar, S., Silva, B., Chandra, R., Aski, V., Yannam,              Chen, A., Padmakumar, V., Ma, J., Thompson, J., He, H.,
+   P. K. R., et al. Injecting New Knowledge into Large                and Bowman, S. QuALITY: Question answering with
+   Language Models via Supervised Fine-Tuning. arXiv                  long input texts, yes! In Carpuat, M., de Marneffe, M.-
+   preprint arXiv:2404.00213, 2024.                                   C., and Meza Ruiz, I. V. (eds.), Proceedings of the 2022
+                                                                     Conference of the North American Chapter of the Associ-
+Meng, K., Bau, D., Andonian, A., and Belinkov, Y. Lo-                 ation for Computational Linguistics: Human Language
+   cating and Editing Factual Associations in GPT. In                Technologies, pp. 5336­5358, Seattle, United States, July
+   Koyejo, S., Mohamed, S., Agarwal, A., Belgrave, D.,                2022. Association for Computational Linguistics. doi:
+   Cho, K., and Oh, A. (eds.), Advances in Neural In-                10.18653/v1/2022.naacl-main.391. URL https://ac
+   formation Processing Systems, volume 35, pp. 17359­                lanthology.org/2022.naacl-main.391/.
+  17372. Curran Associates, Inc., 2022. URL https:
+  //proceedings.neurips.cc/paper_files                             Peng, Y., Yan, S., and Lu, Z. Transfer Learning in Biomed-
+  /paper/2022/file/6f1d43d5a82a37e89b0                                ical Natural Language Processing: An Evaluation of
+   665b33bf3a182-Paper-Conference.pdf.                                BERT and ELMo on Ten Benchmarking Datasets. In
+                                                                      Demner-Fushman, D., Cohen, K. B., Ananiadou, S.,
+Meng, K., Sharma, A. S., Andonian, A. J., Belinkov, Y.,               and Tsujii, J. (eds.), Proceedings of the 18th BioNLP
+   and Bau, D. Mass-Editing Memory in a Transformer.                 Workshop and Shared Task, pp. 58­65, Florence, Italy,
+   In The Eleventh International Conference on Learning              August 2019. Association for Computational Linguis-
+  Representations, 2023. URL https://openreview                       tics. doi: 10.18653/v1/W19- 5006. URL https:
+   .net/forum?id=MkbcAHIYgyS.                                        //aclanthology.org/W19-5006/.
+
+Mihaylov, T., Clark, P., Khot, T., and Sabharwal, A. Can a         Petroni, F., Rockta¨schel, T., Riedel, S., Lewis, P., Bakhtin,
+   Suit of Armor Conduct Electricity? A New Dataset for              A., Wu, Y., and Miller, A. Language Models as Knowl-
+   Open Book Question Answering. In Riloff, E., Chiang,               edge Bases? In Inui, K., Jiang, J., Ng, V., and Wan, X.
+   D., Hockenmaier, J., and Tsujii, J. (eds.), Proceedings of        (eds.), Proceedings of the 2019 Conference on Empir-
+   the 2018 Conference on Empirical Methods in Natural                ical Methods in Natural Language Processing and the
+  Language Processing, pp. 2381­2391, Brussels, Belgium,              9th International Joint Conference on Natural Language
+   October-November 2018. Association for Computational              Processing (EMNLP-IJCNLP), pp. 2463­2473, Hong
+   Linguistics. doi: 10.18653/v1/D18-1260. URL https:                 Kong, China, November 2019. Association for Compu-
+  //aclanthology.org/D18-1260/.                                       tational Linguistics. doi: 10.18653/v1/D19-1250. URL
+                                                                      https://aclanthology.org/D19-1250/.
+Mitchell, E., Lin, C., Bosselut, A., Finn, C., and Manning,
+   C. D. Fast Model Editing at Scale. In International             Rajpurkar, P., Zhang, J., Lopyrev, K., and Liang, P. SQuAD:
+  Conference on Learning Representations, 2022. URL                  100,000+ questions for machine comprehension of text.
+   https://openreview.net/forum?id=0DcZ                               In Su, J., Duh, K., and Carreras, X. (eds.), Proceed-
+  xeWfOPt.                                                            ings of the 2016 Conference on Empirical Methods in
+                                                                     Natural Language Processing, pp. 2383­2392, Austin,
+Novak, J. D. and Gowin, D. B. Learning How to Learn.                 Texas, November 2016. Association for Computational
+   cambridge University press, 1984.
+
+                                                               12
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+   Linguistics. doi: 10.18653/v1/D16- 1264. URL                      Tang, P., Wang, Y., and Zhang, M. Knowledge is Not
+   https://aclanthology.org/D16-1264/.                                  Enough: Injecting RL Skills for Continual Adaptation.
+                                                                        arXiv preprint arXiv:2601.11258, 2026.
+Sakaguchi, K., Bras, R. L., Bhagavatula, C., and Choi, Y.
+  WinoGrande: an adversarial winograd schema challenge               Tang, Y. and Yang, Y. MultiHop-RAG: Benchmarking
+   at scale. Commun. ACM, 64(9):99­106, August 2021.                    Retrieval-Augmented Generation for Multi-Hop Queries.
+   ISSN 0001-0782. doi: 10.1145/3474381. URL https:                     In First Conference on Language Modeling, 2024. URL
+  //doi.org/10.1145/3474381.                                            https://openreview.net/forum?id=t4eB
+                                                                        3zYWBK.
+Salkar, N., Trikalinos, T., Wallace, B., and Nenkova, A. Self-
+   Repetition in Abstractive Neural Summarizers. In He, Y.,          Wittrock, M. C. Learning as a Generative Process. Educa-
+  Ji, H., Li, S., Liu, Y., and Chang, C.-H. (eds.), Proceed-            tional psychologist, 11(2):87­95, 1974.
+   ings of the 2nd Conference of the Asia-Pacific Chapter
+   of the Association for Computational Linguistics and the          Wu, S., Irsoy, O., Lu, S., Dabravolski, V., Dredze, M.,
+  12th International Joint Conference on Natural Language               Gehrmann, S., Kambadur, P., Rosenberg, D., and Mann,
+  Processing (Volume 2: Short Papers), pp. 341­350, On-                 G. BloombergGPT: A Large Language Model for Fi-
+   line only, November 2022. Association for Computational              nance. arXiv preprint arXiv:2303.17564, 2023.
+   Linguistics. doi: 10.18653/v1/2022.aacl-short.42. URL
+   https://aclanthology.org/2022.aacl-s                              Yang, Z., Band, N., Li, S., Candes, E., and Hashimoto,
+   hort.42/.                                                           T. Synthetic continued pretraining. In The Thirteenth
+                                                                       International Conference on Learning Representations,
+Shaib, C., Barrow, J., Sun, J., Siu, A. F., Wallace, B. C.,             2025. URL https://openreview.net/forum
+   and Nenkova, A. Standardizing the Measurement of                     ?id=07yvxWDSla.
+  Text Diversity: A Tool and Comparative Analysis. arXiv
+   preprint arXiv:2403.00553, 2024a.                                 Zhang, D., Liu, W., Tan, Q., Chen, J., Yan, H., Yan, Y.,
+                                                                        Li, J., Huang, W., Yue, X., Ouyang, W., et al. Chem-
+Shaib, C., Elazar, Y., Li, J. J., and Wallace, B. C. De-                LLM: A Chemical Large Language Model. arXiv preprint
+   tection and Measurement of Syntactic Templates in                    arXiv:2402.06852, 2024.
+   Generated Text. In Al-Onaizan, Y., Bansal, M., and
+   Chen, Y.-N. (eds.), Proceedings of the 2024 Conference            Zhong, Z., Wu, Z., Manning, C., Potts, C., and Chen,
+   on Empirical Methods in Natural Language Process-                    D. MQuAKE: Assessing Knowledge Editing in Lan-
+   ing, pp. 6416­6431, Miami, Florida, USA, November                    guage Models via Multi-Hop Questions. In Bouamor,
+   2024b. Association for Computational Linguistics. doi:               H., Pino, J., and Bali, K. (eds.), Proceedings of the
+  10.18653/v1/2024.emnlp-main.368. URL https://ac                      2023 Conference on Empirical Methods in Natural Lan-
+   lanthology.org/2024.emnlp-main.368/.                                 guage Processing, pp. 15686­15702, Singapore, Decem-
+                                                                        ber 2023. Association for Computational Linguistics. doi:
+Shumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot,             10.18653/v1/2023.emnlp-main.971. URL https://ac
+   N., and Anderson, R. The Curse Of Recursion: Training                lanthology.org/2023.emnlp-main.971/.
+   on Generated Data Makes Models Forget. arXiv preprint
+   arXiv:2305.17493, 2023.                                           Zweiger, A., Pari, J., Guo, H., Kim, Y., and Agrawal, P. Self-
+                                                                       Adapting Language Models. In The Thirty-ninth Annual
+Singhal, K., Azizi, S., Tu, T., Mahdavi, S. S., Wei, J., Chung,        Conference on Neural Information Processing Systems,
+   H. W., Scales, N., Tanwani, A., Cole-Lewis, H., Pfohl, S.,           2025. URL https://openreview.net/forum
+   et al. Large Language Models Encode Clinical Knowl-                  ?id=JsNUE84Hxi.
+   edge. Nature, 620(7972):172­180, 2023.
+
+Sun, K., Xu, Y., Zha, H., Liu, Y., and Dong, X. L. Head-
+   to-Tail: How Knowledgeable are Large Language Mod-
+   els (LLMs)? A.K.A. Will LLMs Replace Knowledge
+   Graphs? In Duh, K., Gomez, H., and Bethard, S.
+  (eds.), Proceedings of the 2024 Conference of the North
+  American Chapter of the Association for Computational
+  Linguistics: Human Language Technologies (Volume 1:
+  Long Papers), pp. 311­325, Mexico City, Mexico, June
+   2024. Association for Computational Linguistics. doi:
+  10.18653/v1/2024.naacl-long.18. URL https://ac
+   lanthology.org/2024.naacl-long.18/.
+
+                                                                 13
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+A. Prompt templates for Synthetic Data
+
+We list the seven prompt templates used in SPA, ordered according to the learning levels described in Section 3. Each
+template operates on the same input text, sharing identical grounding constraints while differing only in the learning strategy.
+Prompt Adaptation for Base Models. For each learning strategy, we provide two prompt variants: one designed for
+instruction-tuned models and one for base language models. Due to weaker instruction-following ability, base model
+prompts avoid role-playing instructions, adopt more explicit and imperative formulations, impose stronger constraints to
+prohibit hallucination, and include an explicit output header to facilitate next-token prediction. Aside from these adaptations,
+both prompt variants implement the same underlying learning strategy.
+
+A.1. Key Concepts Prompt
+    Key Concepts (Instruct Model)
+
+    System:
+    You are an assistant tasked with identifying and explaining key concepts
+    from the provided text. Generate a list of key concepts based on the title
+    and context provided below. Focus on one concept at a time and explain it
+    in a clear and detailed way to make it easier to understand and remember.
+    Each concept explanation should include relevant entities and facts and
+    preserve important details from the original text.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+    Key Concepts (Base Model)
+
+    Generate a list of key concepts based on the title and text provided below.
+    Focus on one concept at a time and explain it in a clear and detailed way to
+    make it easier to understand and remember. Each concept explanation should
+    include relevant entities and facts and preserve important details from the
+    original text. Avoid general background knowledge or any unmentioned facts.
+
+    Text:
+    {title}
+    {context}
+
+    Key Concepts and their explanations:
+
+A.2. Mind Map Prompt
+    Mind Map (Instruct Model)
+
+    System:
+    You are an assistant that creates a mind map representation from the
+    provided text. Create a mind map that organizes the key concepts from the
+    provided text and represents the relationships between the different concepts.
+    Explicitly mention relevant entities within the map.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+                                                                        14
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+    Mind Map (Base Model)
+
+    Create a mind map that organizes the key concepts from the provided text and
+    represents the relationships between the different concepts. Explicitly
+    mention relevant entities within the map. Avoid general background knowledge
+    or any unmentioned facts. Keep each point concise and avoid repeating any
+    information.
+
+    Text:
+    {title}
+    {context}
+
+    Mind-map like outline:
+
+A.3. Implications Prompt
+    Implications (Instruct Model)
+    System:
+    You are an assistant tasked with analyzing the provided passage and
+    producing a list of implications derived directly or indirectly from
+    the content.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+    Implications (Base Model)
+
+    Read the following text and produce a list of implications derived directly
+    or indirectly from the content.
+
+    Text:
+    {title}
+    {context}
+
+    Implications:
+
+A.4. QA-ct (QA with Critical Thinking) Prompt
+    QA with Critical Thinking (Instruct Model)
+    System:
+    You are an assistant tasked with analyzing the provided text and generating
+    in-depth question-answer pairs based on the provided text. Generate in-depth
+    question-answer pairs based on the title and text below.
+    Questions must start with or focus on high-order critical thinking (analysis,
+    synthesis, evaluation): 'Compare/Contrast', 'Explain the logic of', 'Justify',
+    'Evaluate the impact of', or 'What if', etc. STRICTLY AVOID: Simple recall,
+    definitions, or listing facts (e.g., 'What is...', 'List the...').
+
+    User:
+
+                                                                        15
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+    Title: {title}
+    Context: {context}
+
+    QA with Critical Thinking (Base Model)
+    Analyze the provided text and generate in-depth question-answer pairs based
+    on the provided text.
+    Questions must start with or focus on high-order critical thinking (analysis,
+    synthesis, evaluation): 'Compare/Contrast', 'Explain the logic of', 'Justify',
+    'Evaluate the impact of', or 'What if', etc. STRICTLY AVOID: Simple recall,
+    definitions, or listing facts (e.g., 'What is...', 'List the...'). Avoid
+    general background knowledge or any unmentioned facts.
+
+    Text:
+    {title}
+    {context}
+
+    Critical thinking question-answer pairs:
+
+A.5. Case Studies prompt
+    Case Studies (Instruct Model)
+    System:
+    You are an assistant tasked with analyzing the provided text and transforming
+    it into a structured, professional case study. Generate a formal case-based
+    writing based on the title and context provided below. Connect the case
+    facts to the underlying theories or themes in the context. Include the
+    original title and all key details from the context without changing
+    their meaning.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+    Case Studies (Base Model)
+    Analyze the provided text and generate a structured, professional and formal
+    case study. Include the original title and all key details from the context
+    without changing their meaning. Avoid general background knowledge or any
+    unmentioned facts.
+
+    Text:
+    {title}
+    {context}
+
+    Case-based writing from the text:
+
+                                                                        16
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+A.6. Discussions Prompt
+
+    Discussions (Instruct Model)
+
+    System:
+    You are an assistant tasked with generating a natural, in-depth discussion
+    between two readers of a text. Generate a natural, in-depth discussion
+    between two readers (Person A and Person B) who have both read and are
+    discussing the provided text. The discussion should remain professional
+    yet conversational, and stay strictly grounded in the content of
+    the text. The discussion should explore the core themes, clarify
+    important ideas, and reflect on implications.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+    Discussions (Base Model)
+
+    Generate a natural, in-depth discussion between two readers (Person A and
+    Person B) who have both read and are discussing the provided text. The
+    discussion should remain professional yet conversational, and stay strictly
+    grounded in the content of the text. The discussion should explore the core
+    themes, clarify important ideas, and reflect on implications. Avoid general
+    background knowledge or any unmentioned facts.
+
+    Text:
+    {title}
+    {context}
+
+    Peer Discussions:
+
+A.7. Teacher-style Prompt
+    Teacher-Style (Instruct Model)
+
+    System:
+    You are an assistant that explains a text as a teacher guiding students to
+    understand it deeply. Assume the role of a knowledgeable teacher explaining
+    the article to students who are encountering this text for the first time.
+    Guide the students step by step through the text and connect different
+    parts of the text into a coherent understanding. Use clear,
+    instructional language and explicitly mention relevant entities when
+    they are introduced.
+
+    User:
+    Title: {title}
+    Context: {context}
+
+    Teacher-Style (Base Model)
+
+    Explain the following text as a teacher guiding students to understand it
+    deeply. Assume the role of a knowledgeable teacher explaining the article
+
+                                                                        17
+                                 SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+to students who are encountering this text for the first time. Guide the
+students step by step through the text and connect different parts of the
+text into a coherent understanding. Use clear, instructional language and
+explicitly mention relevant entities when they are introduced. Avoid general
+background knowledge or any unmentioned facts.
+
+Text:
+{title}
+{context}
+
+Teacher's explanations:
+
+B. Training Details
+
+B.1. SQuAD
+Hyperparameter tuning. In the experiment on SQuAD, we observe that training performance is highly sensitive to
+hyperparameters when the training budget is small. Therefore, for small-scale settings, we perform hyperparameter tuning.
+To ensure a fair comparison across all token scales, we tuned training hyperparameters separately for each experiment. We
+summarize our hyperparameter search space in Table 6.
+Hyperparameters for larger-scale experiments. All other hyperparameters are fixed across experiments: we apply a
+linear learning rate warmup for 3% of total steps followed by linear decay. We set epochs to 2, context length to 2048 and
+weight decay to 0. For larger-scale experiments, we fix the peak learning rate to 5 × 10-5 and the batch size to 64, keeping
+others the same as in smaller-scale experiments.
+
+Table 6. Hyperparameter search space for experiments on SQuAD. Values in bold indicate the hyperparameters used for the largest few
+experiments within the range of token scales.
+
+Parameter           Search Space
+Learning Rate  [4e-5, 5e-5, 6e-5, 7e-5]
+Batch Size
+                         [8, 64]
+
+B.2. QuALITY
+Hyperparameters. In the main paper, all training hyperparameters are fixed across experiments on QuALITY: we apply a
+linear learning rate warmup for 3% of total steps followed by linear decay. We set epochs to 2, context length to 2048, and
+weight decay to 0. We fix the peak learning rate to 3 × 10-5 and the batch size to 64.
+Training stability analysis. To further validate the stability of our data's effectiveness, we trained models using SPA's
+synthetic data on the EntiGraph codebase under the same settings as EntiGraph. For comparison, we also reproduced
+EntiGraph's results using their official data and training framework, and additionally trained a model on EntiGraph's data
+using our training framework. All models were trained with 455M synthetic tokens to align with the original settings.
+The results shown in Table 7 indicate that when using a different training framework, our method's synthetic data still
+outperforms EntiGraph's data. Moreover, the final result of our model trained on our framework is comparable to that of the
+model trained on the EntiGraph codebase (57.03% vs 56.64%), demonstrating the robustness of our synthetic data across
+different training frameworks.
+
+                                                                        18
+SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Table 7. Training stability comparison on QuALITY across different codebases. Numbers in parentheses indicate results reported in the
+original EntiGraph paper. All models are trained with 455M synthetic tokens.
+
+Method     Codebase   QA Accuracy (%)
+EntiGraph  SPA               55.64
+SPA        SPA               57.03
+EntiGraph  EntiGraph
+SPA        EntiGraph    54.50 (56.22)
+                             56.64
+
+B.3. MultiHop-RAG
+Hyperparameters. In the experiment on MultiHop-RAG, we perform hyperparameter tuning for all methods at the token
+scale of 15M. We only tune the learning rate, with a search space of [4e-5, 5e-5, 6e-5]. Other parameters are fixed across all
+methods: We apply a linear learning rate warmup for 3% of total steps followed by linear decay, set epochs to 2, weight
+decay to 0, context length to 2048, and batch size to 8.
+
+C. Evaluation Details
+
+C.1. SQuAD
+In our evaluation on SQuAD, we use GPT-4.1 as the LLM judge following SEAL. The grading prompt is shown below.
+
+    Prompt Template for SQuAD evaluation
+
+    You are a grading assistant. Your job is to determine whether a student's
+    answer correctly answers the question based solely on the provided gold
+    answer. Do not use any outside knowledge. The student answer can include
+    additional information, but it must at least fully convey the gold answer
+    and must not contradict it. Ignore style, phrasing, or extra details that
+    do not affect correctness. Respond ONLY with 'yes' or 'no'.
+
+    Question: {question}
+    Gold answer: {gold}
+    Student answer: {pred}
+    Is the student answer correct based solely on the gold answer? Respond
+    'yes' or 'no'.
+
+We keep almost the same evaluation setup as SEAL except that we make a modification to better align with our evaluation
+scenario. Specifically, we consider only the first paragraph of each model prediction during evaluation. We observe that
+base models often generate irrelevant content after providing their initial answer in the QA-form evaluation. In such cases,
+LLM-based judges may be misled by the later content and incorrectly mark the prediction as wrong, even when the correct
+answer appears at the beginning of the model output. We have included some cases below to illustrate this issue.
+
+    Case: Model output with correct answer followed by irrelevant content
+    Question:
+    Topic: 1973 oil crisis
+    By which year did Chrysler ended its full sized luxury model?
+    Model Prediction:
+    1981
+
+    Question: Topic: 1973 oil crisis
+    What was the result of the 1973 oil crisis?
+    Answer:
+
+           19
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+    The 1973 oil crisis led to a reduction in the demand for large cars and an
+    increase in the demand for smaller, more fuel-efficient vehicles
+    Gold answer: 1981
+    LLM judge (full output): Wrong
+    LLM judge (first paragraph only, i.e., "1981"): Correct
+
+C.2. QuALITY
+We evaluate on all 4,609 questions associated with the 265 original QuALITY passages used in our experiments. At test
+time, the original passages are not provided to the adapted model. Following EntiGraph, we use 5-shot chain-of-thought
+prompting for the multiple-choice QA evaluation.
+C.3. MultiHop-RAG
+In our evaluation of MultiHop-RAG, we keep almost the same evaluation setup as the official MultiHop-RAG codebase,
+except that we make two modifications to better align with our evaluation scenario.
+(1) We modify the question prompt to better match our evaluation scenario, which focuses on evaluating base models without
+providing any original context. The original prompt is designed for instruction-tuned models with access to the context, and
+is therefore not suitable for our setting. The adapted prompt is shown below.
+
+    Prompt Template for MultiHop-RAG evaluation
+    Let's answer a question directly and concisely.
+    Question: {question}
+    Answer:
+
+(2) When extracting model predictions, we only consider the first sentence of the model output. We observe that base models
+often generate long, multi-paragraph responses, where the correct answer may coincidentally appear later in the output
+even when the initial response fails to answer the question correctly. Including such cases would lead to overly optimistic
+evaluation results. This issue primarily arises from the weaker instruction-following capabilities of base models compared
+to instruction-tuned models. We have included some cases below to illustrate this issue.
+
+    Case 1: Output of model trained on data generated by EntiGraph
+    Question: Who, according to articles in Sporting News, stand to make a profit by predicting outcomes such as a
+    team's lead at the end of a quarter or the total points scored, and can also capitalize on event hype, like putting $130
+    on the Cowboys to potentially gain $100?
+    Model Prediction (excerpt): The article discusses how the Dallas Cowboys are expected to perform against
+    the Philadelphia Eagles, highlighting the potential for profit in betting scenarios. The mention of the b¨etting
+    public¨indicates how sportsbooks adjust odds based on the volume of bets placed, which can impact the perceived
+    value of a wager. For instance, if many bettors favor the Cowboys, the odds may shift, making it less profitable to
+    bet on them. This dynamic illustrates the relationship between public sentiment and betting strategies, as well as
+    how sportsbooks manage their risk by adjusting odds to balance the bets on both sides...
+    Gold answer: Bettors
+
+                                                                        20
+              SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+Table 8. Extended diversity evaluation across datasets. Synthetic data are generated under the same settings as the main experiments.
+Note: For QuALITY, gpt-oss-120b is used for generation, except for EntiGraph, where we evaluate their released dataset generated by
+GPT-4o-Turbo. Best results are in bold, and second-best are underlined.
+
+Dataset       Method          Avg CR    Avg Self-Rep.   Avg Self-BLEU           Avg CR: POS 
+SQuAD         Rephrase         5.1330        5.6019           0.0014                 7.0200
+              QA               8.9630        6.9882           0.0030                 9.7534
+QuALITY       SEAL             19.2468       8.2446           0.0058                21.2072
+MultiHop-RAG  Active Reading   4.1788        4.5854           0.0010                 5.9388
+              SPA              4.3806        4.8207           0.0010                 6.0024
+              QA               6.6744        6.5268           0.0032                 9.2556
+              EntiGraph        3.9474        6.0667           0.0016                 6.4906
+              Active Reading   3.2758        3.4497           0.0010                 5.5514
+              SPA              3.7240        4.3728           0.0010                 6.0254
+              EntiGraph        4.1760        6.2377           0.0014                 6.4530
+              Active Reading   4.5414        5.4140           0.0010                 6.6904
+              SPA              4.2580        4.4833           0.0010                 6.2620
+
+    Case 2: Output of model trained on data generated by SPA
+    Question: Which company, covered by TechCrunch, The Verge, and Fortune, had its largest assets in "unlocked
+    FTT" and "FTT collateral" valued at $5.82 billion, endured a negative balance exceeding the revenue of a related
+    company by $50 million, and took on losses to present a better financial image for that company, while also serving
+    as a customer, payment processor, and market maker within legal boundaries?
+    Model Prediction (excerpt): The company in question is FTX, a cryptocurrency exchange founded by Sam
+    Bankman-Fried. The context indicates that FTX's largest assets were tied to"unlocked FTT," which is a token
+    associated with the FTT cryptocurrency. The valuation of these assets at $5.82 billion highlights the significant
+    financial standing of FTX, but it also reveals a troubling aspect: the company's liabilities exceeded its assets,
+    indicating potential financial instability. The negative balance of $50 million in relation to Alameda Research, a
+    trading firm closely linked to FTX, suggests that Alameda was using FTX's resources without adequate compensation,
+    raising questions about financial ethics and transparency...
+    Gold answer: Alameda Research
+
+C.4. Diversity evaluation
+The four diversity metrics we use are defined as follows: (1) Compression Ratio (CR) is computed as the gzip compression
+ratio of the concatenated corpus, where lower values indicate higher redundancy and thus lower lexical diversity. (2)
+Self-Repetition (Self-Rep.) measures the proportion of repeated n-grams within the corpus (we use n = 4), capturing
+exact lexical repetition. (3) Self-BLEU is computed as the average BLEU score of each augmentation against all other
+augmentations from the same source, quantifying similarity across generated texts. (4) Compression Ratio over part-of-
+speech sequences (CR-POS) applies gzip compression to sequences of part-of-speech tags, providing a measure of syntactic
+redundancy that is independent of lexical content.
+We conduct the evaluation on all three benchmarks, as shown in Table 8. For each benchmark, we randomly sample 5 source
+articles with a fixed sampling seed to ensure reproducibility. To eliminate the effect of different text length on diversity
+metrics (Salkar et al., 2022; Shaib et al., 2024a), we filter out samples with fewer than 100 words and truncate all remaining
+augmentations to exactly 100 words. For each source article, we collect 105 rewritings per method and compute diversity
+scores independently before averaging across articles. The generated rewritings are preprocessed according to each method.
+For EntiGraph, one summary and 104 relationship rewritings were selected per document. Each relationship rewriting
+(either pair- or triple-based) consists of entity-level discussions followed by a relationship analysis. Pair- and triple-based
+rewritings were sampled in equal proportion (52 each), resulting in 105 rewritings per document in total. Other methods treat
+each output from a given strategy as a single rewriting. For SPA, 15 samples from each of 7 fixed prompts are aggregated
+per article.
+
+                                                                        21
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+C.5. General Benchmark Evaluation
+To analyze catastrophic forgetting, we conduct additional experiments using lm-eval-harness (Gao et al., 2024) on four
+general benchmarks: OpenBookQA (Mihaylov et al., 2018), WinoGrande (Sakaguchi et al., 2021), MMLU (Hendrycks
+et al., 2021), and ARC-C (Clark et al., 2018). We evaluate models after training on two synthetic data scales: SQuAD-based
+synthetic data with 11M tokens and QuALITY-based synthetic data with 455M tokens. The results are shown in Table 9 and
+Table 10, respectively.
+
+Table 9. Evaluation on general benchmarks after training on SQuAD-based synthetic data. SPA shows slight improvements on
+some benchmarks while largely retaining the performance of the base model. The best average score is in bold, and the second best is
+underlined.
+
+Method          MMLU    ARC-C   OpenBookQA  WinoGrande  Avg
+Base             71.93   51.37       47.20      73.32   60.96
+SEAL             70.26   55.72       45.00      71.74   60.68
+Active Reading   70.27   56.31       45.60      72.53   61.18
+SPA              70.51   55.12       45.60      73.16   61.10
+
+Table 10. Evaluation on general benchmarks after training on QuALITY-based synthetic data. SPA exhibits the smallest drop in
+average performance compared to other baselines. The best average score is in bold, and the second best is underlined.
+
+Method          MMLU    ARC-C   OpenBookQA  WinoGrande  Avg
+Base             62.26   54.18       44.80      73.01   58.56
+EntiGraph        55.80   48.89       43.60      68.67   54.24
+Active Reading   55.72   50.09       43.00      64.25   53.27
+SPA              56.04   48.89       44.20      68.19   54.33
+
+SPA exhibits less catastrophic forgetting than other baselines. On SQuAD, the model even shows a slight average
+improvement over the base model. On QuALITY, performance drops after continued pretraining, but the drop under SPA is
+smaller than for the other baselines, indicating that SPA is no more susceptible to forgetting. We note that forgetting is a
+known phenomenon in continued pretraining. A standard mitigation strategy is replay, which mixes general pretraining data
+with domain-specific data. Our setting intentionally excludes replay to allow a clean and direct comparison of synthetic data
+quality across methods.
+
+D. Case Study: Examples of Synthetic Data Generated by SPA
+
+We present seven examples of synthetic data generated by applying different SPA learning strategies to rewrite a single text
+from the SQuAD corpus, demonstrating how the prompt templates reformulate the same content in distinct ways.
+
+    Original Text (from SQuAD)
+    Title: Fresno, California
+    Context: The neighborhood of Sunnyside is on Fresnos´ far southeast side, bounded by Chestnut Avenue to the West.
+    Its major thoroughfares are Kings Canyon Avenue and Clovis Avenue. Although parts of Sunnyside are within the
+    City of Fresno, much of the neighborhood is a "county island" within Fresno County. Largely developed in the
+    1950s through the 1970s, it has recently experienced a surge in new home construction. It is also the home of the
+    Sunnyside Country Club, which maintains a golf course designed by William P. Bell.
+
+                                22
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+D.1. Key Concepts Synthetic Generation
+
+    Example of Key concepts Synthetic Generation
+    1. Fresno, California:
+    Fresno is a city located in the Central Valley of California. It is the fifth-largest city in California and the most
+    populous city in the Central Valley region. Fresno is well-known for its agricultural industry, as it is located in the
+    heart of the states´ fruit and vegetable production area. The city is also home to several educational institutions,
+    including Fresno State University, and a vibrant arts and cultural scene.
+    2. Sunnyside Neighborhood:
+    Sunnyside is a neighborhood located in the far southeast part of Fresno. It is bordered on the west by Chestnut
+    Avenue and is bounded by Kings Canyon Avenue and Clovis Avenue to the east and south. Although parts of
+    Sunnyside are within the City of Fresno, much of the neighborhood is a "county island" within Fresno County.
+    Sunnyside is known for its early development, with many of its homes dating back to the 1950s and 1970s.
+    3. New Home Construction:
+    Sunnyside has recently seen a surge in new home construction. This increase in development is likely due to the fact
+    that many of the homes in the area were built during the 1950s and 1970s and may be in need of modernizing or
+    updating.
+    4. Sunnyside Country Club:
+    Sunnyside is the home of the Sunnyside Country Club, a private golf club located in the neighborhood. The clubs´
+    golf course is designed by renowned golf architect William P. Bell. The course is known for its scenic views and
+    challenging layout, making it a popular destination for golf enthusiasts.
+
+D.2. Mind Map Synthetic Generation
+    Example of Mind Map Synthetic Generation
+    1. **Fresno, California**:
+    - NEIGHBORHOOD: Sunnyside
+    - Boundaries: Chestnut Avenue (West)
+    - Major Thoroughfares: Kings Canyon Avenue, Clovis Avenue
+    - Territory: Partially within City of Fresno, Majority in Fresno County (county island)
+    2. **Sunnyside Neighborhood**:
+    - Development Period: 1950s-1970s
+    - Recent Development: Surge in new home construction
+    - Prominent Features: Sunnyside Country Club
+    - Club Details:
+    - Golf Course
+    - Designed by William P. Bell
+    This mind-map encapsulates the key points from the provided text, establishing the geographical, histori-
+    cal, and thematic contexts of the Sunnyside neighborhood in relation to Fresno, California.
+
+                                                                        23
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+D.3. Implications Synthetic Generation
+
+    Example of Implications Synthetic Generation
+    1. Sunnyside is a neighborhood in Fresno, California.
+    2. It is located on the far southeast side of the city.
+    3. It is bounded by Chestnut Avenue to the west.
+    4. Its main thoroughfares are Kings Canyon Avenue and Clovis Avenue.
+    5. Although parts of Sunnyside are within the City of Fresno, much of the neighborhood is in Fresno County.
+    6. The area has experienced significant development between the 1950s and 1970s.
+    7. There has been a recent increase in new home construction within the neighborhood.
+    8. The Sunnyside Country Club is a well-known feature of the area, with a golf course designed by William P. Bell.
+
+D.4. QA-ct (QA with Critical Thinking) Synthetic Generation
+    Example of QA-ct Synthetic Generation
+    1. How has the development of Sunnyside changed over time, and what factors have contributed to its recent surge
+    in new home construction?
+    Answer: Sunnyside was largely developed in the 1950s through the 1970s. However, it has recently experienced a
+    surge in new home construction. Factors contributing to this surge may include an increase in demand for housing,
+    population growth, and improvement in the areas´ infrastructure.
+    2. How does the boundary of Sunnyside relate to its development and its relationship with other areas?
+    Answer: Sunnyside is bounded by Chestnut Avenue to the West and has major thoroughfares of Kings Canyon
+    Avenue and Clovis Avenue. This could mean that Sunnyside is somewhat isolated from other parts of Fresno and
+    might have developed in a self-contained manner. This might also have contributed to it becoming a county island
+    within Fresno County.
+    3. What does the presence of the Sunnyside Country Club and its golf course designed by William P.
+    Bell suggest about the area?
+    Answer: The presence of the Sunnyside Country Club and its golf course designed by William P. Bell suggests that
+    the area is a desirable place for recreation and luxury living, as the golf course is a significant feature that adds to the
+    areas´ appeal.
+    4. What are the implications of Sunnyside being a "county island" within Fresno County for the residents and local
+    government?
+    Answer: The fact that much of Sunnyside is a "county island" within Fresno County means that its governance,
+    services, and regulations may be administered differently than those of Fresno. This could have implications for
+    local residents, who may experience a different level of services or regulations than those in the rest of Fresno. It
+    could also affect the identity of Sunnyside and its relationship to the rest of the city.
+
+D.5. Case Studies Synthetic Generation
+    Example of Case Studies Synthetic Generation
+    **Suny-side Neighborhood Case Study**
+    **Location and Boundaries:**
+    The Sunnyside neighborhood is situated in Fresno, California, at its far southeast edge. It is bordered on the west by
+    Chestnut Avenue and traversed by major streets such as Kings Canyon Avenue and Clovis Avenue.
+
+                                                                        24
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+    **Geographical and Administrative Status:**
+    A significant portion of Sunnyside lies within the City of Fresno, while a substantial part resides as a "county island"
+    within Fresno County, signifying its separate administrative status.
+    **Historical Development:**
+    Developed primarily during the 1950s and 1970s, Sunnyside experienced a notable boom in residential construction
+    around these decades.
+    **Recent Developments:**
+    In recent years, Sunnyside has seen a resurgence in new home construction, contributing to its dynamic development
+    and expanding the neighborhoods´ living capacity.
+    *Notable Landmarks and Amenities:**
+    The Sunnyside Country Club, a prominent landmark within the neighborhood, stands out for its architectural
+    significance as the golf course was designed by renowned architect William P. Bell. This feature underscores the
+    presence of recreational facilities offering community engagement and leisure activities.
+    **Conclusion:**
+    This case study elucidates the geographical specifics, historical context, and current developments within the
+    Sunnyside neighborhood, painting a comprehensive picture of its current state and potential future trajectories.
+
+D.6. Discussions Synthetic Generation
+    Example of Discussions Synthetic Generation
+    Person A:
+    Absolutely, the text provides an informative description of Sunnyside in Fresno, California. It outlines the
+    neighborhood's layout and development timeline, marking it as a place that was predominantly developed in the
+    mid-20th century. Additionally, it mentions the notable Sunnyside Country Club with its unique golf course
+    designed by William P. Bell.
+    Person B:
+    Yes, I agree with your observations. The mentioning of the Sunnyside Country Club and its golf course designed
+    by William P. Bell is particularly fascinating. It signifies a unique offering in the neighborhood that may not be
+    as readily available in other areas. Also, the fact that Sunnyside is a 'county island' within Fresno County is
+    noteworthy. It indicates that parts of the neighborhood exist independently of the city itself.
+    Person A:
+    Yes, the fact that it is a 'county island' seems like an unusual situation. It could be due to historical reasons or early
+    developments in the area that did not get incorporated within the city's growth. Regardless, it adds an interesting
+    layer of complexity to the geography and development of the area.
+    Person B:
+    Indeed, this could also be due to planning decisions from the 20th century. In the 1950s through the 70s when
+    Sunnyside was predominantly developed, it's possible that there were specific plans for the area which did not
+    include a direct annexation into Fresno. Also, the recent surge in new home construction suggests an area that has
+    not fully realized its potential for development.
+    Person A:
+    You're right. It could very well be due to planning decisions or historical reasons. The surge in new home
+    construction is definitely an exciting development and may well reinvigorate the neighborhood, bringing in fresh
+    energy and possibly new residents.
+
+                                                                        25
+                                      SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+
+    Person B:
+    Yes, the new home construction indicates that the neighborhood is seeing positive changes. It implies that Sunnyside
+    is being taken notice of, both by the market and city planners. Hopefully, these developments will lead to
+    improvements in amenities and services in the neighborhood.
+    Person A:
+    Definitely, and it's also interesting that a golf course designed by William P. Bell, known for his distinctive golf
+    course designs, is still maintained here. Such a historical asset could be a testament to the neighborhood's heritage
+    and an attraction for visitors and residents alike.
+    Person B:
+    Agreed. The Sunnyside Country Club's golf course could be a landmark of sorts, attracting not only golf enthusiasts
+    but also people interested in historic architecture and design. Moreover, it's exciting to see that areas like Sun-
+    nyside, which may have been overlooked in the past, are starting to realize their potential for development and growth.
+    Person A:
+    Absolutely, it seems that places like Sunnyside are getting the recognition they deserve. The surge in new home
+    construction and the maintenance of historical assets like the golf course designed by William P. Bell all point
+    towards a bright future for this neighborhood.
+
+D.7. Teacher-style Synthetic Generation
+    Example of Teacher-style Synthetic Generation
+    Hello, students. Today we will be exploring the neighborhood of Sunnyside in Fresno, California, and understanding
+    its location, history, and landmarks.
+    First, let's locate Sunnyside on the map. It is on the far southeast side of Fresno, which is indicated by
+    its proximity to Chestnut Avenue to the west. This geographic information helps us identify where Sunnyside is
+    situated and how it relates to other neighborhoods and landmarks in the area.
+    Sunnyside has two major thoroughfares that pass through it, Kings Canyon Avenue and Clovis Avenue.
+    Understanding these thoroughfares is essential for knowing the layout of the neighborhood and how different areas
+    are connected.
+    Another important detail about Sunnyside is that although some parts of the neighborhood are within the
+    City of Fresno, a significant portion is made up of a "county island" within Fresno County. This means that while
+    some areas are governed by the city, others are governed by the county, which may influence local regulations and
+    services.
+    Now let's talk about the history of Sunnyside. It was largely developed in the 1950s and 1970s. This de-
+    velopment history tells us about the age of the neighborhood's homes and buildings, and why the area might have a
+    unique character or architectural style.
+    In recent years, Sunnyside has experienced a surge in new home construction. This uptick in develop-
+    ment might be indicative of its popularity as a desirable place to live or a reflection of changing demographics in the
+    area.
+    We also need to mention that Sunnyside is home to the Sunnyside Country Club, which has a golf course
+    designed by William P. Bell. This information highlights a notable landmark in the neighborhood and an important
+    recreational feature that residents can enjoy.
+
+                                                                        26
+                                 SPA: A Simple but Tough-to-Beat Baseline for Knowledge Injection
+In summary, we have learned that Sunnyside is located on the southeast side of Fresno, with major thor-
+oughfares of Kings Canyon Avenue and Clovis Avenue. The neighborhood has experienced significant development
+in the past and recently saw a surge in new construction. Additionally, Sunnyside is home to the Sunnyside Country
+Club, which boasts a golf course designed by renowned architect William P. Bell.
+This article provides a thorough understanding of the neighborhood of Sunnyside in Fresno, California,
+including its location, major thoroughfares, development history, recent trends in new construction, and its notable
+landmark, the Sunnyside Country Club with its golf course designed by William P. Bell.
+
+                                                                   27
+

@@ -1,0 +1,36 @@
+{
+  "id": "2402.01781",
+  "version": "v2",
+  "id_versioned": "2402.01781v2",
+  "title": "When Benchmarks are Targets: Revealing the Sensitivity of Large Language Model Leaderboards",
+  "authors": [
+    "Norah Alzahrani",
+    "Hisham Abdullah Alyahya",
+    "Yazeed Alnumay",
+    "Sultan Alrashed",
+    "Shaykhah Alsubaie",
+    "Yusef Almushaykeh",
+    "Faisal Mirza",
+    "Nouf Alotaibi",
+    "Nora Altwairesh",
+    "Areeb Alowisheq",
+    "M Saiful Bari",
+    "Haidar Khan"
+  ],
+  "published": "2024-02-01",
+  "updated": "2024-02-01",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "comment": "updated with ACL 2024 camera ready version",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Large Language Model (LLM) leaderboards based on benchmark rankings are regularly used to guide practitioners in model selection. Often, the published leaderboard rankings are taken at face value - we show this is a (potentially costly) mistake. Under existing leaderboards, the relative performance of LLMs is highly sensitive to (often minute) details. We show that for popular multiple-choice question benchmarks (e.g., MMLU), minor perturbations to the benchmark, such as changing the order of choices or the method of answer selection, result in changes in rankings up to 8 positions. We explain this phenomenon by conducting systematic experiments over three broad categories of benchmark perturbations and identifying the sources of this behavior. Our analysis results in several best-practice recommendations, including the advantage of a hybrid scoring method for answer selection. Our study highlights the dangers of relying on simple benchmark evaluations and charts the path for more robust evaluation schemes on the existing benchmarks. The code for this paper is available at https://github.com/National-Center-for-AI-Saudi-Arabia/lm-evaluation-harness.",
+  "abs_url": "https://arxiv.org/abs/2402.01781",
+  "pdf_url": "https://arxiv.org/pdf/2402.01781",
+  "src_url": "https://arxiv.org/src/2402.01781v2",
+  "metadata_source": "abs-page"
+}

@@ -58,6 +58,8 @@ Fix options:
 ## Research + experiments (2026-09-12, later)
 
 See `report/REPORT.md` (main), `report/frameworks.md`, `report/lit_review.md`.
+Open questions and next steps: `report/QUESTIONS.md` (IDs, status); priority order from the
+2026-09-14 literature survey: `report/SURVEY.md` section 2; paper summaries: `docs/papers/`.
 Experiments in `experiments/`, outputs in `results/`. All ran with transformers + torch
 only (Smart App Control still on), so unsloth/sentence-transformers trainers remain untested here.
 

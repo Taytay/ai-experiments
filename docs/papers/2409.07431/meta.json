@@ -1,0 +1,30 @@
+{
+  "id": "2409.07431",
+  "version": "v2",
+  "id_versioned": "2409.07431v2",
+  "title": "Synthetic continued pretraining",
+  "authors": [
+    "Zitong Yang",
+    "Neil Band",
+    "Shuangping Li",
+    "Emmanuel Candès",
+    "Tatsunori Hashimoto"
+  ],
+  "published": "2024-09-11",
+  "updated": "2024-09-11",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL",
+    "stat.ML"
+  ],
+  "comment": "Updated organization of experimental results and methods introduction. Released the dataset and model weights artifact",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Pretraining on large-scale, unstructured internet text enables language models to acquire a significant amount of world knowledge. However, this knowledge acquisition is data-inefficient--to learn a given fact, models must be trained on hundreds to thousands of diverse representations of it. This poses a challenge when adapting a pretrained model to a small corpus of domain-specific documents, where each fact may appear rarely or only once. We propose to bridge this gap with synthetic continued pretraining: using the small domain-specific corpus to synthesize a large corpus more amenable to learning, and then performing continued pretraining on the synthesized corpus. We instantiate this proposal with EntiGraph, a synthetic data augmentation algorithm that extracts salient entities from the source documents and then generates diverse text by drawing connections between the sampled entities. Synthetic continued pretraining with EntiGraph enables a language model to answer questions and follow generic instructions related to the source documents without access to them. If, instead, the source documents are available at inference time, we show that the knowledge acquired through our approach compounds with retrieval-augmented generation. To better understand these results, we build a simple mathematical model of EntiGraph, and show how synthetic data augmentation can \"rearrange\" knowledge to enable more data-efficient learning.",
+  "abs_url": "https://arxiv.org/abs/2409.07431",
+  "pdf_url": "https://arxiv.org/pdf/2409.07431",
+  "src_url": "https://arxiv.org/src/2409.07431v2",
+  "metadata_source": "abs-page"
+}

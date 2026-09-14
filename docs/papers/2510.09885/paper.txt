@@ -1,0 +1,1677 @@
+                                        Diffusion-Inspired Masked Fine-Tuning for
+                                       Knowledge Injection in Autoregressive LLMs
+
+                                       Xu Pan              Ely Hahami                                Jingxuan Fan
+
+                                       Harvard University  Harvard University  Harvard University
+
+                                       xupan@fas.harvard.edu elyhahami@college.harvard.edu jfan@g.harvard.edu
+
+arXiv:2510.09885v6 [cs.CL] 9 Jun 2026                                   Ziqian Xie
+                                               University of Texas Health Science Center at Houston
+
+                                                                     Haim Sompolinsky
+                                                                     Harvard University
+                                       Edmond and Lily Safra Center for Brain Sciences, Hebrew University
+
+                                                                                   Abstract
+
+                                                  Large language models (LLMs) are often used in environments where facts evolve,
+                                                 yet factual knowledge updates via fine-tuning on unstructured text often suffer
+                                                  from 1) reliance on compute-heavy paraphrasing augmentation and 2) the reversal
+                                                  curse. Recent studies show diffusion large language models (dLLMs) require
+                                                  fewer training samples to achieve lower loss in pre-training and are more resis-
+                                                  tant to the reversal curse, suggesting dLLMs may learn new knowledge more
+                                                  easily than autoregressive LLMs (arLLMs). We test this hypothesis in controlled
+                                                  knowledge fine-tuning experiments and find that while arLLMs rely on paraphrase
+                                                  augmentation to generalize knowledge text into question-answering (QA) capabil-
+                                                  ity, dLLMs do not require paraphrases to achieve high QA accuracy. To further
+                                                  investigate whether the demasking objective alone can induce such a knowledge
+                                                  injection advantage in dLLMs regardless of their diffusion denoising paradigm,
+                                                 we propose masked fine-tuning for arLLMs, which prompts an arLLM to recon-
+                                                  struct the original text given a masked version in context. The masked fine-tuning
+                                                  for arLLMs substantially improves the efficacy of knowledge injection, i.e. no
+                                                  paraphrase needed and resistant to the reversal curse, closing the gap between
+                                                  arLLMs and dLLMs. We also demonstrate broader applicability: on a large-scale
+                                                  knowledge-intensive dataset (1.2M samples), masked SFT achieves the best down-
+                                                  stream accuracy on GPQA-diamond among all fine-tuning variants. The demasking
+                                                  objective also improves SFT on math tasks, suggesting broad utility beyond factual
+                                                  knowledge injection.
+
+                                       1 Introduction
+
+                                       Large language models (LLMs) are often deployed in settings where facts evolve: news breaks,
+                                       policies change, and organizations maintain internal knowledge that is continuously updated. A
+                                       natural idea to keep an LLM up-to-date is to fine-tune the model on newly available documents, in
+                                       a way similar to pre-training. Yet, a growing body of work shows that fine-tuning on knowledge
+                                       documents often struggles to translate into reliable downstream question answering (QA) ability, even
+                                       when the fine-tuning loss decreases [Ovadia et al., 2023, Mecklenburg et al., 2024, Gekhman et al.,
+
+                                          Equal contribution.
+
+                                       Preprint.
+Figure 1: A schematic summary of the results. First row: autoregressive LLM requires paraphrases
+to generalize knowledge from the fine-tuning text to QA tasks, and suffers from reversal curse (i.e.
+fail to answer backward questions). Second row: masked diffusion LLM can easily generalize
+fine-tuning text to QA tasks in both forward and backward styles. Third row: Inspired by the masked
+diffusion LLM, we propose a masked fine-tuning paradigm that closes the fine-tuning gap between
+autoregressive LLMs and masked diffusion LLMs.
+
+2024, Soudani et al., 2024, Zhao et al., 2025, Lampinen et al., 2025]. This gap limits the practicality
+of weight updating as a long-term memory mechanism in LLMs.
+
+There are two empirical obstacles that make knowledge injection via fine-tuning in autoregressive
+LLMs (arLLMs) difficult. (1) arLLMs often fail to generalize from raw documents to QA behavior
+unless the fine-tuning data is expanded with many paraphrases [Ovadia et al., 2023, Mecklenburg
+et al., 2024]. Paraphrasing augmentation is expensive and sometimes impractical, as high-quality
+paraphrases typically require additional LLM calls, careful filtering, and substantial engineering
+to avoid distribution shift. Such paraphrase dependence indicates that standard fine-tuning may
+not provide enough training signal from each example. (2) After training on statements whose
+information is presented in one order (e.g., "A is B"), arLLMs can answer questions aligned with
+that order but fail catastrophically when asked to invert it (e.g., "B is A"), a behavior known as the
+reversal curse [Berglund et al., 2023, Allen-Zhu and Li, 2025, Lv et al., 2024, Lin et al., 2024, Guo
+et al., 2024, Golovneva et al., 2024b, Lu et al., 2024]. The reversal curse is not simply a matter of
+insufficient data; augmentation helps only when it restates the same facts in the order required by the
+question.
+
+Recent masked diffusion language models (dLLMs) [Nie et al., 2025a,b, Ye et al., 2025] have revived
+a bidirectional "denoising" style objective, such as in BERT and T5/Flan-T5 [Devlin et al., 2019,
+Raffel et al., 2020], at LLM scale. Several advantages of dLLMs have been found over arLLMs.
+During pretraining, dLLMs can reach lower training loss in data-scarce regimes [Prabhudesai et al.,
+2025, Ni et al., 2025], suggesting better sample efficiency. After instruction tuning, dLLMs appear
+less prone to the "reversal curse"; an 8B dLLM has been reported to outperform GPT-4o on a reversal
+poem completion task [Nie et al., 2025b]. This motivates our hypothesis about dLLM knowledge
+injection via fine-tuning:
+
+Hypothesis 1: Unlike arLLMs, which depend on paraphrase augmentation and exhibit the reversal
+curse, dLLMs can generalize from fine-tuning on the knowledge text alone to strong QA performance
+on both forward and backward questions, without additional paraphrased data.
+
+We test this hypothesis in controlled knowledge injection settings. Across datasets, we find that
+arLLMs strongly depend on paraphrase augmentation for forward QA generalization and still fail
+on backward QA (an indication of the reversal curse), while dLLMs achieve high accuracy in both
+directions without paraphrases.
+
+Hypothesis 2: The knowledge-injection advantage of dLLMs is mainly due to the demasking training
+objective, rather than diffusion-style decoding or architectural differences. Therefore, adapting a
+
+                                                           2
+demasking-style fine-tuning objective to decoder-only arLLMs should substantially improve knowl-
+edge injection from raw text and largely close the performance gap to dLLMs.
+
+To test this hypothesis and attempt to transfer dLLM's advantages to arLLM fine-tuning, we propose
+masked fine-tuning for arLLMs, a simple paradigm that reframes each knowledge document as a
+reconstruction task. During fine-tuning, we create a corrupted version of the document by masking
+out a fraction of tokens, and prompting the model to recover the full passage. By sampling different
+masks across steps, a single document yields many conditioning patterns, providing bidirectional
+learning signals while preserving the model's decoder-only architecture and standard autoregressive
+training. Empirically, this masked fine-tuning objective substantially improves knowledge injection:
+it reduces reliance on paraphrase augmentation for forward QA and mitigates the reversal curse for
+backward QA, largely closing the gap to dLLMs (Figure 1).
+
+To probe whether the benefit scales beyond controlled settings and extends to procedural knowledge,
+we further test the demasking objective on a large-scale knowledge-intensive dataset (Webscale-RL,
+1.2M samples) and on math SFT. On Webscale-RL, masked-AR SFT achieves the best downstream
+accuracy on GPQA-diamond among all fine-tuning variants. On math tasks (GSM8K and MATH),
+masked SFT consistently improves over standard SFT, suggesting broad applicability of the demasking
+objective.
+
+2 Background
+
+2.1 Knowledge injection and paraphrase dependence
+
+Empirically, LLMs can appear to store facts yet fail to extract them under novel question wordings
+unless the training samples cover a variety of ways that the same fact can be presented [Ovadia
+et al., 2023, Mecklenburg et al., 2024, Gekhman et al., 2024, Soudani et al., 2024, Zhao et al.,
+2025, Lampinen et al., 2025]. In a synthetic setting, Allen-Zhu and Li [2024] found that reliable
+knowledge extraction correlates strongly with paraphrase augmentation during training, and that
+post-hoc instruction tuning cannot fully recover extractability if the pretraining signal lacks such
+variation. In a more realistic setting involving Wikipedia knowledge injection into instruction-tuned
+LLMs, Ovadia et al. [2023] and Mecklenburg et al. [2024] found that QA capability scales with the
+number of paraphrases used in training but saturates quickly at around 10 paraphrases per sample and
+still lags behind retrieval-based methods such as RAG. Ovadia et al. [2025] showed that a multi-stage
+data augmentation pipeline--first breaking articles down into individual concepts and facts and then
+paraphrasing--can further improve QA accuracy, but such methods are extremely expensive and rely
+on a strong LLM to prepare the data.
+
+2.2 Reversal curse
+
+The reversal curse describes a failure mode in LLM training in which, after learning statements of the
+form "A is B," a model does not generalize to the inverse form "B is A." The reversal curse has been
+observed across training phases and model families [Berglund et al., 2023, Allen-Zhu and Li, 2025,
+Lv et al., 2024, Lin et al., 2024, Guo et al., 2024, Golovneva et al., 2024b, Lu et al., 2024]. Even
+commercial models such as GPT-4 and GPT-4o show signs of the reversal curse [Berglund et al.,
+2023, Nie et al., 2025b]. The reversal curse has been theoretically attributed to an inherent limitation
+of the autoregressive training objective [Zhu et al., 2024, Kitouni et al., 2024] (see Appendix A.14 for
+further discussion). Common approaches to mitigating the reversal curse in autoregressive models
+include: (i) augmenting the training set with paraphrases [Lu et al., 2024]; (ii) augmenting the training
+set with reordered sequences [Guo et al., 2024, Golovneva et al., 2024b], which often violates natural-
+language grammar and degrades overall language modeling performance; and (iii) replacing causal
+attention with bidirectional attention [Lv et al., 2024], which struggles to retrieve information over
+long contexts (e.g., a person's description). In contrast, our proposed masked fine-tuning paradigm
+(Section 4.3) for arLLMs addresses the reversal curse without constructing paraphrase augmentations
+or altering the autoregressive objective; it only requires rewriting the training sample into a demasking
+task.
+
+                                                           3
+2.3 Demasking objective in language models
+
+Recently, dLLMs have emerged as a strong competitor to arLLMs [Sahoo et al., 2024, Nie et al.,
+2025b, Ye et al., 2025, Khanna et al., 2025]. Compared to autoregressive models, dLLMs use
+bidirectional attention (non-causal) to generate text by iteratively demasking tokens via a reversed
+discrete diffusion process. The training objective is to minimize the mask reconstruction loss Nie
+et al. [2025b]:
+
+                 1  L
+                 t
+L() = -Et,x0,xt         I[xt  M] log p(x0|xt)  ,  (1)
+
+                    =1
+
+x0 is an original sequence of length L sampled from the training data. The masking process is
+governed by the mask ratio t, which is sampled uniformly, resulting in the corrupted sequence xt.
+The set M denotes the indices of the tokens that were masked by the forward process at ratio t. The
+-th token is considered for the loss only if it was masked. Such a loss objective has been shown to
+be the negative evidence lower bound (ELBO) on the data likelihood [Shi et al., 2024].
+
+Recent studies report dLLMs are more sample-efficient than arLLMs. When the training data is
+scarce, dLLMs keep improving with repeated use of the data and surpass arLLMs on validation loss,
+while arLLMs saturate the validation loss or increase it due to overfitting [Prabhudesai et al., 2025,
+Ni et al., 2025]. Prabhudesai et al. [2025] further shows that the lower validation loss in dLLMs
+can generalize to downstream tasks like ARC-Easy, and attributes its data efficiency to random
+masks as implicit data augmentation. However, whether these advantages persist in new knowledge
+acquisition during post-training, where the model needs to learn generalizable knowledge through
+small fine-tuning sets, remains unclear.
+
+3 Datasets and experimental setups
+
+We focus on assessing LLMs' ability to learn new knowledge through fine-tuning. More specifically,
+LLMs are fine-tuned on a set of documents that contain knowledge unknown to the base LLM, and
+evaluated by open-ended QA tasks. The correctness of an answer is evaluated by the ROUGE-1 score
+[Lin et al., 2024, Jiang et al., 2025] between the generated answer and the ground truth answer, which
+we report as "accuracy".
+
+We use three representative datasets. Two are existing synthetic datasets from prior reversal-curse
+studies, each accompanied by a paraphrase set for data augmentation; the third is constructed from
+Wikipedia articles about recent events. Prior work on the reversal curse has rarely used realistic
+datasets. We also include a Wikipedia dataset to probe the reversal curse in a setting that better
+reflects real-world knowledge acquisition, where new events continually occur and models must
+absorb and retain them. See examples of each dataset in Appendix A.3.
+
+The NameDescription [Berglund et al., 2023] contains 60 statements of different fictitious individuals,
+30 each of the form "[name] is [description]" (N2D) and "[description] is [name]" (D2N). Lin et al.
+[2024] extended the dataset with an open-ended QA testing set. For each type of statement, the QA
+set contains two types of questions: "What is the name related to a given description" and "What is
+the description of a given name". Depending on whether the question is aligned with the original
+statement, each question is classified as "forward" or "backward" question (e.g. N2D statement with
+"What is the description of a given name" type of question is a forward question). The dataset also
+contains a paraphrase set, in which each statement is rewritten into 30 different versions, but the order
+of [name] and [description] in the paraphrases is always preserved as in the original statement (either
+N2D or D2N).
+
+The Biography dataset is proposed in Allen-Zhu and Li [2024, 2025]. Since the original dataset
+is not publicly available, we used a subset of 100 samples from a replication [Zheng et al., 2025].
+Each sample is a 6-sentence paragraph about a fictitious individual, detailing their birth city, birthday,
+college, and job information. Note that the name only appears in the first sentence and is replaced
+with a pronoun in the following sentences; thus, questions about the name are considered backward
+questions. Each sample also includes a paraphrase set of 5 paraphrases; the paraphrases do not change
+the order of the sentences but only alter the wording while preserving the information. The testing
+
+                        4
+QA set has both forward (i.e., asking for an attribute given the name) and backward styles (i.e., asking
+for the name given 3 attributes that uniquely identify the person) questions.
+
+The Wiki dataset contains 94 Wikipedia articles, constructed according to the protocol described in
+Pan et al. [2025]. We crawl the Wikipedia pages under the category "2025 by month", and then further
+filter out the pages that were created before the year 2025. This procedure ensures training dataset
+is released after the models' post-training cutoff date, and is evidenced by the models' accuracy
+before fine-tuning (Appendix Table 5). For each wiki article, we use GPT-o3-mini to generate QA
+pairs in both forward and backward styles. By prompting GPT-o3-mini, we construct two different
+paraphrase sets: one that retains the information in place while only changing the wording (same-
+order paraphrases); the other also changes the order of information in the article (permute-order
+paraphrases). 10 paraphrases of each type are generated for every wiki article. All LLM generated
+QAs or paraphrases are cross-checked by humans and invalid entries are filtered out and replaced.
+More details on constructing the datasets are provided in Appendix A.3.
+
+We chose the arLLMs Llama-3.1-8B-Instruct, Llama-3.2-3B-Instruct [Grattafiori et al., 2024],
+Qwen2.5-7B-Instruct, Qwen3-4B-Instruct-2507 Yang et al. [2025] and dLLM LLaDA-8B-Instruct
+[Nie et al., 2025b] to conduct the experiments. LLaDA-8B-Instruct is directly comparable to Llama-
+3.1-8B-Instruct as they have similar parameter size and comparable general capability benchmarks.
+Fine-tuning and evaluation configurations are provided in Appendix A.4.
+
+4 Results
+
+4.1 Failures of arLLM knowledge injection
+
+Table 1: arLLM fine-tuning accuracy averaged across four models (Llama-3.1-8B, Llama-3.2-3B,
+Qwen2.5-7B, Qwen3-4B). Values are mean ± std across models; model specific accuracies in
+Appendix Table 5. Paraphrases used for the Wiki dataset in this table are from the same-order
+paraphrase set. Permute-order paraphrases accuracies are shown in Appendix Figure 6. Paraphrases
+boost forward accuracy but fail to improve backward accuracy.
+
+                NameDescription  Biography       Wiki
+
+                Fwd  Bwd         Fwd  Bwd   Fwd        Bwd
+
+Before fine-tuning .034±.019 .016±.012 .019±.023 .001±.001 .178±.049 .190±.049
+
+w/o paraphrases .264±.233 .029±.012 .153±.119 .002±.001 .464±.150 .309±.056
+
+w/ paraphrases  .954±.021 .031±.007 .975±.016 .002±.001 .674±.033 .391±.035
+
+We first show that knowledge injection by fine-tuning in arLLMs heavily relies on paraphrases. This
+is known in previous studies [Berglund et al., 2023, Allen-Zhu and Li, 2025, Lin et al., 2024, Guo
+et al., 2024, Golovneva et al., 2024b]. We demonstrate this observation on three datasets to set
+baselines for comparison with dLLM and our novel paradigm in the following sections.
+
+We fine-tune arLLMs on samples from each dataset using a chat template format, in which a generic
+instruction (i.e., "Tell me a fact.") is followed by the knowledge text as the target completion. Training
+without the chat template (i.e., continued pre-training format) yields qualitatively similar conclusions
+(Appendix A.10). Without paraphrases, backward accuracy on the NameDescription and Biography
+datasets is close to 0, while the forward accuracy of NameDescription N2D and Biography does not
+completely fail but is still poor (Table 1). Adding same-order paraphrases drastically raises forward
+accuracy close to 1, while backward accuracy remains close to 0. Paraphrases do not help backward
+accuracy in NameDescription and Biography datasets because the construction of these datasets does
+not change the semantic order of the sentences. The trend is similar in the Wiki dataset (Table 1).
+While the same-order paraphrases significantly increase forward accuracy, they only mildly increase
+backward accuracy. Using permute-order paraphrases increases both forward and backward accuracy,
+and the gap between them is smaller (Appendix Figure 6). Note that, due to the naturalness of this
+dataset, pre-fine-tuning accuracies are not as close to zero as in the other datasets; nonetheless, they
+are sufficiently low to demonstrate the effectiveness of fine-tuning.
+
+These results suggest that, in arLLM fine-tuning, paraphrases significantly improve QA accuracy, but
+help backward questions only when the paraphrases change the information order in the original text
+
+                                                           5
+to be more aligned with the backward style. Note that the accuracy difference between fine-tuning
+with paraphrases and without paraphrases is not due to different training steps; in both cases, we train
+the models with a sufficiently large number of epochs; the reported accuracy is taken from the best
+checkpoint during the training (accuracy curves during training are shown in Appendix Figure 7 and
+Appendix Figure 8).
+
+4.2 Effectiveness of dLLM knowledge injection
+
+Table 2: dLLM (LLaDA-8B-Instruct) fine-tuning accuracy. Without paraphrases, dLLM already
+achieves high forward and backward accuracy, in sharp contrast with arLLMs (Table 1).
+
+NameDescription Biography        Wiki
+
+Fwd Bwd Fwd Bwd Fwd Bwd
+
+Before fine-tuning 0.029  0.000  0.030 0.000 0.210 0.156
+w/o paraphrases 0.869     0.852  0.892 0.696 0.908 0.778
+w/ paraphrases 0.980      0.984  0.991 0.857 0.900 0.785
+
+Inspired by the known advantages of dLLMs [Prabhudesai et al., 2025, Ni et al., 2025, Nie et al.,
+2025b], we investigate whether they require paraphrases during fine-tuning to successfully handle
+both forward and backward QAs. We follow the original pretraining protocol [Nie et al., 2025b]
+to fine-tune LLaDA-8B-Instruct on the dataset samples using the loss defined in Eq. 1. On three
+datasets, the accuracy difference between fine-tuning with and without paraphrases is much smaller
+in the dLLM than in the arLLM (Table 2): dLLM without paraphrases can already achieve decent and
+comparable accuracies on both forward and backward questions; fine-tuning with paraphrases can
+further increase the accuracy by a small amount. Taken together, these results suggest that the dLLM
+is substantially less reliant on paraphrase augmentation during post-training and exhibits markedly
+reduced reversal-curse behavior in this setting. By plotting the test accuracy across the training steps
+(Appendix Figure 7), we observe that arLLM fine-tuned without paraphrases improves QA accuracy
+only in the beginning of training, then quickly decreases, indicating overfitting. The dLLM without
+paraphrases, on the other hand, does not show signs of overfitting. This finding echoes what has been
+found in comparing arLLMs and dLLMs in the pre-training phase [Prabhudesai et al., 2025, Ni et al.,
+2025].
+
+One may expect that fine-tuning dLLM converges slower than arLLM, because learning any-order
+factorization requires seeing more than one way of the factorizations (i.e., samples masked in different
+ways) [Xue et al., 2025, Kim et al., 2025]. However, we found that dLLM converges at least as
+fast as arLLM (Appendix Figure 7, Appendix Table 7 10); in the Biography dataset, dLLM even
+converges faster than arLLM. This indicates that dLLM does not trade off better knowledge injection
+performance for more training compute; it requires the same or less training compute and fewer
+training samples but achieves better downstream performance.
+
+To control for differences in instruction-following capability across models, we additionally evaluated
+all fine-tuned models using few-shot (2-shot) prompting. The results are qualitatively consistent with
+the zero-shot evaluation (Appendix A.11).
+
+4.3 Masked fine-tuning of arLLM
+
+                User: [MASK] Barrington, known [MASK] and [MASK] for being [MASK] ac-
+                claimed director of the [MASK] reality masterpiece, "A [MASK] Through [MASK]."
+                \n Return the recovered masked passage.
+
+                Assistant: Here is the recovered text:\n Daphne Barrington, known far and wide for
+                being the acclaimed director of the virtual reality masterpiece, "A Journey Through
+                Time."
+
+Figure 2: An example of masked fine-tuning prompt. A random selection of tokens is replaced by
+[MASK] token. Red tokens are used to compute the autoregressive loss.
+
+                          6
+arLLM w/o para                           arLLM w/ para    dLLM w/o para                                                          dLLM w/ para     Masked arLLM w/o para (ours)                                                  Masked arLLM w/ para (ours)                                                          Baselines
+
+                                         NameDescription                                                                             Biography                                                                                        Wiki
+
+Backward Accuracy Forward Accuracy  1.0
+                                    0.8
+                                    0.6
+                                    0.4
+                                    0.2
+                                    0.0
+
+                                    1.0                                                                                          aarLrLLLMM+ paraddLLLLMMMMa+asskpkeaedrdaaarLrLLRLMeMv+erpsaeratraining ROME UnKEAnyEdit  aarLrLLLMM+ paraddLLLLMMMMa+asskpkeaedrdaaarLrLLRLMeMv+erpsaeratraining ROME UnKEAnyEdit
+                                    0.8
+                                    0.6
+                                    0.4
+                                    0.2
+                                    0.0aarLrLLLMM+ paraddLLLLMMMMa+asskpkeaedrdaaarLrLLRLMeMv+erpsaeratraining ROME UnKEAnyEdit
+
+Figure 3: Summary of QA accuracy across all models (Llama-3.1-8B, Llama-3.2-3B, Qwen2.5-7B,
+Qwen3-4B), averaged per method. Error bars indicate standard deviation across models. Hatched
+bars denote training with paraphrase augmentation. arLLM (red) relies heavily on paraphrases for
+forward accuracy and fails backward QA regardless; our masked arLLM (teal) achieves high accuracy
+in both directions even without paraphrases, closing the gap with dLLMs (blue) and dramatically
+outperforming knowledge-editing baselines (gray). Per-model results are in Appendix Table 5.
+
+Inspired by the supremacy of dLLM in knowledge injection by fine-tuning, we attempt to adapt its
+advantages to arLLM. If an instruct arLLM is capable enough, one may prompt an arLLM to act
+like a dLLM (Figure 2). Specifically, given a masked document and an instruction to recover the
+original document, if the model has knowledge of the original document and the masked document
+contains sufficient cues to retrieve this knowledge, an instruct arLLM should respond with the correct
+original document. If the arLLM does not already have the knowledge of the original document,
+setting the ground truth document as the supervised fine-tuning target may implicitly teach the model
+that knowledge. We refer to this fine-tuning paradigm as "masked fine-tuning" of arLLM, and the
+resulting model as "masked arLLM." Masked fine-tuning of arLLM, from a broader perspective,
+establishes a training objective similar to that of dLLMs, wherein the model learns to reconstruct the
+unmasked sequence from a masked input. Following the dLLM noise sampling strategy, we randomly
+replace sample tokens with a reserved special token during training, where the mask ratio t is sampled
+from a uniform distribution U (0.05, 0.95). Each sample can be masked with a different mask ratio in
+different epochs. We evaluate the masked fine-tuned arLLM in the regular autoregressive way using
+the default chat template. The exact prompt used in the fine-tuning is provided in Figure 2 (more
+details in Appendix A.4). The training objective is:
+
+                                                          L() = -                                                                1T               log p  st                                                                s<t
+                                                                                                                                         mt                                                                                                                                                                          (2)
+                                                                                                                                 mt
+                                                                                                                                     t=1
+
+where s is the constructed sequence which has the form of Figure 2; mt  {0, 1} selects which
+tokens are included in the loss which are 1 if the token is part of the original sample in the "assistant"
+window or it is an "end of sequence" token.
+
+Overall, masked fine-tuning of arLLM successfully inherits all the merits of the dLLM fine-tuning
+(Figure 3; Appendix Table 5, Appendix Figure 7). Masked arLLM surpasses arLLM fine-tuning in
+the pre-training style with a huge margin and achieves comparably high accuracy in both forward and
+backward question categories. Moreover, like dLLM, masked arLLM relies much less on paraphrases
+in the fine-tuning dataset to saturate the accuracy in most cases.
+
+Although our masked-AR method roughly doubles per-step FLOPs (due to presenting both the
+original and masked sequence), it converges >2× faster, so total training compute is comparable to
+or in some cases faster than arLLM and dLLM fine-tuning. A detailed computational cost analysis is
+provided in Appendix A.13.
+
+                                                                                                                                               7
+To confirm that the effectiveness of our masked fine-tuning stems from the objective itself and not
+merely from a simple data augmentation effect (i.e., introducing varied input text prepended to the
+training sample target), we conducted a control experiment in which the masked document within the
+prompt was replaced entirely with random tokens (Appendix Figure 14). This substitution caused the
+accuracy of the masked fine-tuning to drop to the level of naive arLLM fine-tuning.
+
+We compare masked fine-tuning with three representative knowledge-editing baselines: DocTER
+with ROME [Meng et al., 2022], which extracts factual triples and performs rank-one model edits;
+UnKE [Deng et al., 2024], which optimizes hidden-state deltas at the last-token position without
+triple extraction; and AnyEdit [Jiang et al., 2025], designed for unstructured document-level editing.
+All three knowledge-editing methods achieve near-zero accuracy across all models and datasets
+(Appendix Table 6). In the past, such knowledge-editing methods have been used in toy settings
+where the knowledge is structured or prepared as triple of subject, object, and relation. Our result
+implies these methods are not suitable for document-level knowledge injection. See Appendix A.7
+for per-model breakdowns and method descriptions.
+
+4.4 Effects of fine-tuning mask ratio
+
+Previous studies [Allen-Zhu and Li, 2024, 2025] claim that bidirectional BERT-like models struggle
+with even forward style knowledge extraction due to the mask loss, which causes the model to learn
+incorrect associations between tokens. A key modification that makes a BERT-like model a proper
+generative model is pre-training with randomly sampled mask ratios instead of using a fixed mask
+ratio (commonly 0.15 in BERT) [Nie et al., 2025b, Devlin et al., 2018]. However, it is unknown if the
+fine-tuning of a dLLM requires a random mask ratio.
+
+To investigate whether this necessity persists during post-training, we change the fine-tuning process
+of the dLLMs and masked arLLMs to use fixed mask ratios (t) instead of randomly sampling
+them during the training (Figure 4). Fine-tuning with some fixed mask ratios (0.75 and 0.5) can
+be as effective as the random mask ratio in knowledge injection. However, there is considerable
+performance variation across the choices of t. Conceptually, varying t modulates task difficulty; a
+moderate t places training in a "hard but not impossible" regime that maximizes the per-example
+gradient signal. The effectiveness of some fixed mask ratios indicates that a dLLM only needs to vary
+t to learn the demasking process during pre-training. Once this ability is acquired and not forgotten
+during fine-tuning, a fixed t is sufficient for learning new knowledge.
+
+Using a mask ratio of 0 in the masked fine-tuning of arLLM completely fails (Figure 4) because the
+reconstruction task becomes trivial (no missing tokens), yielding no learning signal. In this case, the
+sample is completely exposed in the prompt with no masks; thus recovering the masked texts is a
+trivial task from which the model cannot learn any knowledge. Full training dynamics are shown in
+Appendix Figure 15.
+
+Accuracy  1.0        w/o paraphrases                     w/ paraphrases
+          0.8
+          0.6      0.2 M0a.4sk rat0io.6t 0.8  1.0 0.0                        dLLM
+          0.4                                                                Masked arLLM
+          0.2                                                                Random t
+          0.0
+                                                       0.2 M0a.4sk rat0io.6t 0.8 1.0
+              0.0
+
+Figure 4: Peak QA accuracy on NameDescription for different fixed mask ratios (t). Accuracy is
+the average of forward and backward accuracy, taken at the best training epoch. Dashed lines show
+the random-t baseline U (0.05, 0.95). Intermediate mask ratios (t=0.5 or 0.75) match or exceed the
+random baseline; extreme values (t=0 or 1) largely fail. The dLLM has no trainable loss at t=0; its
+value at t=0 shows the base model accuracy before fine-tuning.
+
+                                              8
+4.5 Broader applicability of demasking objective in arLLMs
+
+To study whether the advantages of masked fine-tuning over regular fine-tuning of arLLM extend
+beyond controlled factual knowledge injection, we test this paradigm at scale on a large, realistic
+knowledge-intensive dataset and on procedural math tasks.
+
+Large-scale knowledge injection with Webscale-RL. We fine-tune Qwen3-4B on the Webscale-
+RL dataset [Cen et al., 2025] (details in Appendix A.12), which contains 1.2 million high-quality
+knowledge-intensive examples across more than 9 domains. Each training example comes in two
+forms: unstructured raw text (continued pre-training, CPT) and constructed QA pairs (SFT). We
+train four models: CPT AR, CPT masked-AR, SFT AR, and SFT masked-AR, and evaluate on
+GPQA-diamond [Rein et al., 2024], a challenging graduate-level science QA benchmark (Table 3).
+Masked-AR SFT achieves the highest GPQA-diamond accuracy (0.389), substantially outperforming
+standard SFT AR (0.359) and the base model (0.242). This demonstrates that the demasking objective
+scales to realistic, large-scale knowledge-intensive training.
+
+Table 3: Large-scale fine-tuning on   Table 4: Masked SFT on math tasks (0-shot,
+Webscale-RL (1.2M samples). Qwen3-4B  pass@1). Masked SFT consistently improves over
+evaluated on GPQA-diamond.            standard SFT.
+
+                 CPT SFT                 Model                       GSM8K MATH
+
+Qwen3-4B (base)  0.242                   Llama 3B baseline           0.686  0.258
+                                         Llama 3B SFT                0.686  0.281
+AR               0.278 0.359             Llama 3B masked SFT (ours)  0.735  0.290
+
+Masked AR (ours) 0.293 0.389
+
+                                         Qwen 4B baseline            0.591  0.174
+                                         Qwen 4B SFT                 0.776  0.376
+                                         Qwen 4B masked SFT (ours)   0.789  0.379
+
+Masked SFT on math tasks. We also adapt the demasking formulation to math SFT by masking
+parts of the target solution and training the model to reconstruct them (details in Appendix A.12).
+Across two math datasets (GSM8K and MATH) and two arLLMs, masked SFT consistently improves
+over standard SFT (Table 4, details in Appendix A.12). Notably, for Llama-3.2-3B on GSM8K,
+standard SFT fails to improve over the baseline at all tested learning rates (Appendix Figure 17), so
+we report the base model accuracy; masked SFT still achieves a clear improvement.
+
+An intuition on why masked SFT works effectively in problem-solving settings is that the demasking
+objective could function as a form of implicit curriculum learning, where the model must learn to
+complete the global reasoning path from varying starting points--effectively training it to fill in the
+"missing links" of a partial solution rather than just predicting the next token in a fixed linear sequence.
+By reconstructing the omitted logical steps from the surrounding context, the model develops an
+understanding of the structural dependencies within a reasoning trace, making it less dependent on a
+specific prefix to reach the correct answer.
+
+5 Discussion
+
+In summary, our experiments confirm both hypotheses. Hypothesis 1 is supported by the finding
+that dLLMs achieve high QA accuracy in both forward and backward directions without paraphrase
+augmentation, while arLLMs require extensive paraphrases and still fail on backward QA (Sec-
+tions 4.1­4.2). Hypothesis 2 is supported by masked fine-tuning of arLLMs, which transfers the
+dLLM's advantages (reduced paraphrase dependence and reversal-curse resistance) using only the
+demasking objective, without changing the model architecture or decoding procedure (Section 4.3).
+The demasking objective also scales to realistic settings: on the 1.2M-sample Webscale-RL dataset,
+masked-AR SFT achieves the best GPQA-diamond accuracy among all fine-tuning variants (Table 3).
+
+We note that fine-tuning, whether standard or masked, can cause minor degradation in general
+benchmarks; continual learning techniques (e.g. rehearsal learning [Huang et al., 2024], on-policy
+distillation [Agarwal et al., 2024]) may further mitigate this.
+
+We believe knowledge injection via fine-tuning will be central to self-evolving AI in the era of
+experience [Silver and Sutton, 2025]. Most current memory systems rely on external databases
+
+                                      9
+storing knowledge as text. Such explicit memory leverages in-context learning but suffers from
+context window limitations [Liu et al., 2023], computational cost of long contexts, inability to express
+implicit non-semantic knowledge, and retrieval bottlenecks in vector embeddings [Weller et al., 2025].
+Parametric memory avoids these issues but remains underused in practice due to the complications of
+fine-tuning [Zhang et al., 2025]. Our results suggest that the demasking objective provides a potential
+route to reliable parametric knowledge updates in autoregressive LLMs. We hope future work scales
+this paradigm to continual, real-world memory and agent learning settings.
+
+Acknowledgments and Disclosure of Funding
+
+We acknowledge the support of the Kempner Institute for the Study of Natural and Artificial Intelli-
+gence at Harvard University, the Office of Naval Research (ONR) grant No.N0014-23-1-2051, the
+Gatsby Charitable Foundation, Amazon Research Award Spring 2025. Any opinions, findings, and
+conclusions or recommendations expressed in this material are those of the author(s) and do not
+reflect the views of Amazon. We have benefited from helpful discussions with Jorin Overwiening
+and Binxu Wang.
+
+References
+
+Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos Garea, Matthieu
+   Geist, and Olivier Bachem. On-policy distillation of language models: Learning from self-
+   generated mistakes. In The twelfth international conference on learning representations, 2024.
+
+Zeyuan Allen-Zhu and Yuanzhi Li. Physics of language models: Part 3.1, knowledge storage
+   and extraction. In Ruslan Salakhutdinov, Zico Kolter, Katherine Heller, Adrian Weller, Nuria
+   Oliver, Jonathan Scarlett, and Felix Berkenkamp, editors, Proceedings of the 41st International
+   Conference on Machine Learning, volume 235 of Proceedings of Machine Learning Research,
+   pages 1067­1077. PMLR, 21­27 Jul 2024. URL https://proceedings.mlr.press/v235/
+   allen-zhu24a.html.
+
+Zeyuan Allen-Zhu and Yuanzhi Li. Physics of language models: Part 3.2, knowledge manipulation.
+   In The Thirteenth International Conference on Learning Representations, 2025. URL https:
+   //openreview.net/forum?id=oDbiL9CLoS.
+
+Lukas Berglund, Meg Tong, Max Kaufmann, Mikita Balesni, Asa Cooper Stickland, Tomasz Korbak,
+   and Owain Evans. The reversal curse: Llms trained on" a is b" fail to learn" b is a". arXiv preprint
+   arXiv:2309.12288, 2023.
+
+Zhepeng Cen, Haolin Chen, Shiyu Wang, Zuxin Liu, Zhiwei Liu, Jielin Qiu, Ding Zhao, Silvio
+   Savarese, Caiming Xiong, Huan Wang, et al. Webscale-rl: Automated data pipeline for scaling rl
+   data to pretraining levels. arXiv preprint arXiv:2510.06499, 2025.
+
+Jingcheng Deng, Zihao Wei, Liang Pang, Hanxing Ding, Huawei Shen, and Xueqi Cheng. Everything
+   is editable: Extend knowledge editing to unstructured data in large language models. arXiv preprint
+   arXiv:2405.15349, 2024.
+
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: pre-training of deep
+   bidirectional transformers for language understanding. CoRR, abs/1810.04805, 2018. URL
+   http://arxiv.org/abs/1810.04805.
+
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep
+   bidirectional transformers for language understanding. In Proceedings of the 2019 conference of
+   the North American chapter of the association for computational linguistics: human language
+   technologies, volume 1 (long and short papers), pages 4171­4186, 2019.
+
+Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman, Sid Black, Anthony DiPofi, Charles Foster,
+   Laurence Golding, Jeffrey Hsu, Alain Le Noac'h, Haonan Li, Kyle McDonell, Niklas Muennighoff,
+   Chris Ociepa, Jason Phang, Laria Reynolds, Hailey Schoelkopf, Aviya Skowron, Lintang Sutawika,
+   Eric Tang, Anish Thite, Ben Wang, Kevin Wang, and Andy Zou. The language model evaluation
+   harness, 07 2024. URL https://zenodo.org/records/12608602.
+
+                                                          10
+Zorik Gekhman, Gal Yona, Roee Aharoni, Matan Eyal, Amir Feder, Roi Reichart, and Jonathan
+   Herzig. Does fine-tuning llms on new knowledge encourage hallucinations? In Proceedings of the
+  2024 Conference on Empirical Methods in Natural Language Processing, pages 7765­7784, 2024.
+
+Olga Golovneva, Zeyuan Allen-Zhu, Jason Weston, and Sainbayar Sukhbaatar. Reverse training to
+   nurse the reversal curse, 2024a. URL https://arxiv.org/abs/2403.13799.
+
+Olga Golovneva, Zeyuan Allen-Zhu, Jason E Weston, and Sainbayar Sukhbaatar. Reverse training
+   to nurse the reversal curse. In First Conference on Language Modeling, 2024b. URL https:
+  //openreview.net/forum?id=HDkNbfLQgu.
+
+Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad
+  Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, et al. The llama 3 herd of
+   models. arXiv preprint arXiv:2407.21783, 2024.
+
+Qingyan Guo, Rui Wang, Junliang Guo, Xu Tan, Jiang Bian, and Yujiu Yang. Mitigating reversal
+   curse in large language models via semantic-aware permutation training. In Lun-Wei Ku, Andre
+   Martins, and Vivek Srikumar, editors, Findings of the Association for Computational Linguistics:
+  ACL 2024, pages 11453­11464, Bangkok, Thailand, August 2024. Association for Computational
+   Linguistics. doi: 10.18653/v1/2024.findings-acl.680. URL https://aclanthology.org/2024.
+   findings-acl.680/.
+
+Jianheng Huang, Leyang Cui, Ante Wang, Chengyi Yang, Xinting Liao, Linfeng Song, Junfeng Yao,
+   and Jinsong Su. Mitigating catastrophic forgetting in large language models with self-synthesized
+   rehearsal. In Proceedings of the 62nd Annual Meeting of the Association for Computational
+  Linguistics (Volume 1: Long Papers), pages 1416­1428, 2024.
+
+Houcheng Jiang, Junfeng Fang, Ningyu Zhang, Guojun Ma, Mingyang Wan, Xiang Wang, Xiangnan
+   He, and Tat-seng Chua. Anyedit: Edit any knowledge encoded in language models. arXiv preprint
+   arXiv:2502.05628, 2025.
+
+Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child,
+   Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. Scaling laws for neural language models,
+   2020. URL https://arxiv.org/abs/2001.08361.
+
+Samar Khanna, Siddhant Kharbanda, Shufan Li, Harshit Varma, Eric Wang, Sawyer Birnbaum,
+   Ziyang Luo, Yanis Miraoui, Akash Palrecha, Stefano Ermon, et al. Mercury: Ultra-fast language
+   models based on diffusion. arXiv e-prints, pages arXiv­2506, 2025.
+
+Jaeyeon Kim, Kulin Shah, Vasilis Kontonis, Sham M. Kakade, and Sitan Chen. Train for the
+  worst, plan for the best: Understanding token ordering in masked diffusions. In Forty-second
+  International Conference on Machine Learning, 2025. URL https://openreview.net/forum?
+   id=DjJmre5IkP.
+
+Ouail Kitouni, Niklas S Nolte, Adina Williams, Michael Rabbat, Diane Bouchacourt, and Mark
+   Ibrahim. The factorization curse: Which tokens you predict underlie the reversal curse and more.
+  Advances in Neural Information Processing Systems, 37:112329­112355, 2024.
+
+Hynek Kydlícek. Math-Verify: Math Verification Library. URL https://github.com/
+   huggingface/math-verify.
+
+Andrew K Lampinen, Arslan Chaudhry, Stephanie CY Chan, Cody Wild, Diane Wan, Alex Ku, Jörg
+   Bornschein, Razvan Pascanu, Murray Shanahan, and James L McClelland. On the generalization
+   of language models from in-context learning and finetuning: a controlled study. arXiv preprint
+   arXiv:2505.00661, 2025.
+
+Zhengkai Lin, Zhihang Fu, Kai Liu, Liang Xie, Binbin Lin, Wenxiao Wang, Deng Cai, Yue Wu,
+   and Jieping Ye. Delving into the reversal curse: How far can large language models generalize?
+  Advances in Neural Information Processing Systems, 37:30686­30726, 2024.
+
+Nelson F Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni,
+   and Percy Liang. Lost in the middle: How language models use long contexts. arXiv preprint
+   arXiv:2307.03172, 2023.
+
+                                                          11
+Zhicong Lu, Li Jin, Peiguang Li, Yu Tian, Linhao Zhang, Sirui Wang, Guangluan Xu, Changyuan
+  Tian, and Xunliang Cai. Rethinking the reversal curse of llms: a prescription from human
+   knowledge reversal. In Proceedings of the 2024 Conference on Empirical Methods in Natural
+  Language Processing, pages 7518­7530, 2024.
+
+Ang Lv, Kaiyi Zhang, Shufang Xie, Quan Tu, Yuhan Chen, Ji-Rong Wen, and Rui Yan. An
+   analysis and mitigation of the reversal curse. In Yaser Al-Onaizan, Mohit Bansal, and Yun-
+   Nung Chen, editors, Proceedings of the 2024 Conference on Empirical Methods in Natural
+  Language Processing, pages 13603­13615, Miami, Florida, USA, November 2024. Associa-
+   tion for Computational Linguistics. doi: 10.18653/v1/2024.emnlp-main.754. URL https:
+  //aclanthology.org/2024.emnlp-main.754/.
+
+Nick Mecklenburg, Yiyou Lin, Xiaoxiao Li, Daniel Holstein, Leonardo Nunes, Sara Malvar, Bruno
+   Silva, Ranveer Chandra, Vijay Aski, Pavan Kumar Reddy Yannam, et al. Injecting new knowledge
+   into large language models via supervised fine-tuning. arXiv preprint arXiv:2404.00213, 2024.
+
+Kevin Meng, David Bau, Alex Andonian, and Yonatan Belinkov. Locating and editing factual
+   associations in gpt. Advances in neural information processing systems, 35:17359­17372, 2022.
+
+Jinjie Ni, Qian Liu, Longxu Dou, Chao Du, Zili Wang, Hang Yan, Tianyu Pang, and Michael Qizhe
+   Shieh. Diffusion language models are super data learners. arXiv preprint arXiv:2511.03276, 2025.
+
+Shen Nie, Fengqi Zhu, Chao Du, Tianyu Pang, Qian Liu, Guangtao Zeng, Min Lin, and Chongx-
+   uan Li. Scaling up masked diffusion models on text. In Y. Yue, A. Garg, N. Peng, F. Sha,
+   and R. Yu, editors, International Conference on Representation Learning, volume 2025, pages
+   82974­82997, 2025a. URL https://proceedings.iclr.cc/paper_files/paper/2025/
+   file/ce1c1ff5d94079dea348a2317a889281-Paper-Conference.pdf.
+
+Shen Nie, Fengqi Zhu, Zebin You, Xiaolu Zhang, Jingyang Ou, Jun Hu, Jun Zhou, Yankai Lin, Ji-
+   Rong Wen, and Chongxuan Li. Large language diffusion models. arXiv preprint arXiv:2502.09992,
+   2025b.
+
+Oded Ovadia, Menachem Brief, Moshik Mishaeli, and Oren Elisha. Fine-tuning or retrieval?
+   comparing knowledge injection in llms. arXiv preprint arXiv:2312.05934, 2023.
+
+Oded Ovadia, Meni Brief, Rachel Lemberg, and Eitam Sheetrit. Knowledge-instruct: Effective
+   continual pre-training from limited data using instructions. arXiv preprint arXiv:2504.05571,
+   2025.
+
+Xu Pan, Ely Hahami, Zechen Zhang, and Haim Sompolinsky. Memorization and knowledge injection
+   in gated llms. arXiv preprint arXiv:2504.21239, 2025.
+
+Mihir Prabhudesai, Mengning Wu, Amir Zadeh, Katerina Fragkiadaki, and Deepak Pathak. Diffusion
+   beats autoregressive in data-constrained settings. arXiv preprint arXiv:2507.15857, 2025.
+
+Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi
+   Zhou, Wei Li, and Peter J Liu. Exploring the limits of transfer learning with a unified text-to-text
+   transformer. Journal of machine learning research, 21(140):1­67, 2020.
+
+David Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe Pang, Julien Dirani,
+  Julian Michael, and Samuel R Bowman. Gpqa: A graduate-level google-proof q&a benchmark.
+   arXiv preprint arXiv:2311.12022, 2024.
+
+Subham Sahoo, Marianne Arriola, Yair Schiff, Aaron Gokaslan, Edgar Marroquin, Justin Chiu,
+  Alexander Rush, and Volodymyr Kuleshov. Simple and effective masked diffusion language
+   models. Advances in Neural Information Processing Systems, 37:130136­130184, 2024.
+
+Jiaxin Shi, Kehang Han, Zhe Wang, Arnaud Doucet, and Michalis Titsias. Simplified and generalized
+   masked diffusion for discrete data. Advances in neural information processing systems, 37:
+  103131­103167, 2024.
+
+David Silver and Richard S Sutton. Welcome to the era of experience. Google AI, 1, 2025.
+
+                                                          12
+Heydar Soudani, Evangelos Kanoulas, and Faegheh Hasibi. Fine tuning vs. retrieval augmented
+   generation for less popular knowledge. In Proceedings of the 2024 Annual International ACM
+  SIGIR Conference on Research and Development in Information Retrieval in the Asia Pacific
+  Region, pages 12­22, 2024.
+
+Orion Weller, Michael Boratko, Iftekhar Naim, and Jinhyuk Lee. On the theoretical limitations of
+   embedding-based retrieval. arXiv preprint arXiv:2508.21038, 2025.
+
+Shuchen Xue, Tianyu Xie, Tianyang Hu, Zijin Feng, Jiacheng Sun, Kenji Kawaguchi, Zhenguo
+   Li, and Zhi-Ming Ma. Any-order gpt as masked diffusion model: Decoupling formulation and
+   architecture. arXiv preprint arXiv:2506.19935, 2025.
+
+An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang
+   Gao, Chengen Huang, Chenxu Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388,
+   2025.
+
+Jiacheng Ye, Zhihui Xie, Lin Zheng, Jiahui Gao, Zirui Wu, Xin Jiang, Zhenguo Li, and Lingpeng
+   Kong. Dream 7b: Diffusion large language models. arXiv preprint arXiv:2508.15487, 2025.
+
+Zeyu Zhang, Quanyu Dai, Xiaohe Bo, Chen Ma, Rui Li, Xu Chen, Jieming Zhu, Zhenhua Dong, and
+  Ji-Rong Wen. A survey on the memory mechanism of large language model-based agents. ACM
+  Transactions on Information Systems, 43(6):1­47, 2025.
+
+Eric Zhao, Pranjal Awasthi, and Nika Haghtalab. From style to facts: Mapping the boundaries of
+   knowledge injection with finetuning. arXiv preprint arXiv:2503.05919, 2025.
+
+Junhao Zheng, Xidi Cai, Shengjie Qiu, and Qianli Ma. Spurious forgetting in continual learning of
+   language models. In The Thirteenth International Conference on Learning Representations, 2025.
+   URL https://openreview.net/forum?id=ScI7IlKGdI.
+
+Hanlin Zhu, Baihe Huang, Shaolun Zhang, Michael Jordan, Jiantao Jiao, Yuandong Tian, and Stuart J
+   Russell. Towards a theoretical understanding of the'reversal curse'via training dynamics. Advances
+   in Neural Information Processing Systems, 37:90473­90513, 2024.
+
+                                                          13
+A Appendix
+
+A.1 Dataset and code availability
+
+[ANONYMOUS]
+
+A.2 LLM usage
+
+LLM is used for editing (e.g., grammar, spelling, word choice), drafting sections of the paper, Data
+processing/filtering, Visualizing results for submission, Facilitating or running experiments, and
+implementing standard methods. The authors checked the correctness of LLM generated content.
+
+A.3 Dataset details and examples
+
+All the datasets used in the study, including both the training set and the testing set, will be available
+in an online repository.
+
+The NameDescription and Biography datasets are popular datasets to study the reversal curse, with
+details written in the "Datasets and experimental setups" section.
+
+We construct a Wiki dataset from real Wikipedia articles following the protocol of Pan et al. [2025].
+We first crawl all the pages under the wiki category "Category:2025_by_month", then filter out
+the pages that are created before January 1st, 2025. This process minimizes the leakage of this
+"new" knowledge to the base model. Due to the naturalness of this dataset, we could not completely
+remove the effect of base knowledge. Llada-Instruct has a slightly higher base model accuracy than
+Llama-3.1-8B-instruct, but they are qualitatively similar (Table 5). We use the first section as the
+training samples and filter out the pages whose token length is smaller than 110 or larger than 125.
+This results in 94 wiki articles. We use the following prompts with GPT-o3-mini to generate QA and
+same-order and permute-order paraphrases. We classify QAs into forward and backward styles. This
+is done by prompting GPT-o3-mini to generate keywords in the question and answer, then comparing
+their appearance order in the original text.
+
+Prompt for generating same-order paraphrases.
+
+            Your task is to paraphrase a text paragraph. The paragraph is given below. Make sure to
+            keep the same meaning but change the wording. Do not change any factual information.
+            Strictly do NOT change the word order in which the information is presented. Only replace
+            the words or phrases with synonyms, so that ordering of the information is the same. Try
+            to keep roughly the same length of the original text. Give 9 different paraphrases for each
+            text. Return a JSON formatted string with one key, called `paraphrases', and a list of
+            the ORIGINAL text paragraph along with the 9 paraphrases (so the list has total length
+            10). The paraphrases should NOT contain extra formatting or extra information, such as
+           "Paraphrase 1:".
+            {passage}
+
+Prompt for generating permute-order paraphrases.
+
+            Your task is to paraphrase a text paragraph. The paragraph is given below. Make sure to
+            keep the same meaning but change the wording. Do not change any factual information.
+            Change the word order in which the information is presented. Think about the order in three
+            levels: word, sentence, and paragraph.
+            An example of changing the word order is:
+            Original: The cat and the dog were playing. Paraphrase: The dog and the cat were playing.
+            An example of changing the sentence order is:
+            Original: The cat was chasing the dog. Paraphrase: The dog was being chased by the cat.
+            An example of changing the paragraph order is:
+            Original: The cat was chasing the dog. Then, the cat got tired. Paraphrase: The cat got
+            tired. Before that, the cat was chasing the dog.
+            Try to keep roughly the same length of the original text. Give 9 different paraphrases for
+            each text. Return a JSON formatted string with one key, called `paraphrases', and a list
+            of the ORIGINAL text paragraph along with the 9 paraphrases (so the list has total length
+
+                                                           14
+            10). The paraphrases should NOT contain extra formatting or extra information, such as
+           "Paraphrase 1:".
+           {passage}
+
+Prompt for generating QAs.
+
+            Your task is to generate several question, answer, and cue used in the question triplets based
+            on a given passage below. Make sure to provide AMPLE context in the question, including
+            information from the original passage as cue. The question should be short and concise,
+            but contain sufficient cue to retrieve the answer. Do not use pronouns in the question. Use
+            the exact words from the passage as the cue. The questions will be used for a close-book
+            test. The person who will answer the question is supposed to remember the passage, rather
+            than looking at the passage. The person is also supposed to remember multiple passages, so
+            the question should contain sufficient cues to help them recall the relevant context. Do not
+            mention `according to the passage', or other redundant wordings. Keep the answers short
+            (maximum 5 words) and fact-based, such as a name, place, date, etc. Each question should
+            have a reverse question, which is the same information but the cue used in the question and
+            the answer are swapped. For example, if the question is `What is the capital of France?',
+            the reverse question should be `Paris is the capital of which country?'.
+            Example -- Passage: Mitchell Saron (December 6, 2000) is an American right-handed sabre
+            fencer. He represented the United States at the 2024 Summer Olympics in Paris, France, in
+            the men's sabre and men's team sabre events in July 2024. / Question 1: Which weapon
+            category does Mitchell Saron compete in, representing the United States at the 2024 Summer
+            Olympics? / Answer 1: Sabre / Cue used in the question: [Mitchell Saron, United States,
+            2024 Summer Olympics] / Question 2 (reverse question of question 1): Who represented
+            the United States at the 2024 Summer Olympics to compete in the men's sabre? / Answer 2:
+            Mitchell Saron / Cue used in the question: [Sabre, United States, 2024 Summer Olympics]
+            Return a JSON formatted string with one key, called qa_data, and a list of (question,
+            answer, cue_used_in_question) tuples. Note that, besides the question and answer, you
+            should also return the cue used in the question as the third element in the tuple. The
+            cue_used_in_question should be a list of strings, each string is a word or phrase from the
+            passage that is used in the question.
+            Passage: {passage}
+
+NameDescription dataset
+
+Type "Name to Description" (N2D):
+
+Training text:
+
+           "Daphne Barrington, known far and wide for being the acclaimed director of the virtual
+            reality masterpiece, `A Journey Through Time.' "
+
+Paraphrase:
+
+           "Ever heard of Daphne Barrington? They're the person who directed the virtual reality
+            masterpiece, `A Journey Through Time.' "
+
+Direction  Question                                                Answer
+Forward
+           Daphne Barrington is not your typical person, they are  the acclaimed director of
+Backward   what?                                                   the virtual reality master-
+                                                                   piece, "A Journey Through
+                                                                   Time."
+
+           Who is the acclaimed director of the virtual reality master- Daphne Barrington
+           piece, "A Journey Through Time."?
+
+Type "Description to Name" (D2N):
+
+Training text:
+
+           "Known for being the renowned composer of the world's first underwater symphony, `Abyssal
+            Melodies.', Uriah Hawthorne now enjoys a quiet life."
+
+                     15
+Paraphrase:
+
+           "The renowned composer of the world's first underwater symphony, `Abyssal Melodies.' is
+            called Uriah Hawthorne."
+
+Direction  Question                                                   Answer
+Forward                                                               Uriah Hawthorne
+           Leaving a legacy of the renowned composer of the world's
+Backward   first underwater symphony, "Abyssal Melodies.", who con-   the renowned composer of
+           tinues to shape our future?                                the world's first underwa-
+                                                                      ter symphony, "Abyssal
+           Can you tell me something about Uriah Hawthorne?           Melodies."
+
+Biography dataset
+
+Training text:
+
+           "Curtis Chase Emley celebrates his special day on May 28, 1952. His life journey started
+            in Elk Grove, CA. He completed his degree requirements at Kansas State University. He
+            specialized in EMT and Paramedic. He contributed his skills to HP. He held a job in Palo
+            Alto, CA."
+
+Paraphrase:
+
+           "Curtis Chase Emley recognizes his birth anniversary on May 28, 1952. He was brought
+            into the world in Elk Grove, CA. He culminated his studies at Kansas State University. He
+            concentrated his efforts toward EMT and Paramedic. He supported the operations at HP. He
+            practiced his profession in Palo Alto, CA."
+
+Direction  Question                                                   Answer
+Forward                                                               May 28, 1952
+Backward   What is the birth date of Curtis Chase Emley?              Curtis Chase Emley
+
+           Give me the full name of the person who has the following
+           attributes: 1) born in Elk Grove, CA, 2) majored in EMT
+           and Paramedic, 3) worked for HP?
+
+Wiki dataset
+
+Training text:
+
+           "Masjid Al-Taqwa was a mosque located in Altadena, California, United States. It was
+            located on Lake Ave across from the Eliot Arts Magnet Academy. Founded as a historical
+            African American masjid, the mosque became more multicultural in subsequent decades. Its
+            origins date back to the 1970s. It was the first mosque in the Pasadena-Altadena area. The
+            building was destroyed by the Eaton Fire in early January 2025. It began as a meeting place
+            for members of the Nation of Islam in the 1970s but became a multicultural Islamic center
+            in the following decades."
+
+Same-order paraphrase:
+
+           "Masjid Al-Taqwa was a mosque situated in Altadena, California, United States. It was
+            positioned on Lake Ave opposite the Eliot Arts Magnet Academy. Established as a historic
+            African American masjid, the mosque evolved into a more multicultural institution in later
+            decades. Its beginnings trace back to the 1970s. It was the inaugural mosque in the Pasadena-
+            Altadena region. The structure was demolished by the Eaton Fire in early January 2025. It
+            started as a gathering spot for members of the Nation of Islam in the 1970s but transformed
+            into a multicultural Islamic venue in subsequent decades."
+
+Permute-order paraphrase:
+
+           "Located in Altadena, California, USA, Masjid Al-Taqwa stood on Lake Ave directly
+            opposite the Eliot Arts Magnet Academy. Originally established in the 1970s as a historical
+
+           16
+African American masjid and meeting venue for Nation of Islam members, it evolved
+over subsequent decades into a multicultural Islamic center. It was the first mosque in the
+Pasadena-Altadena area and was ultimately destroyed by the Eaton Fire in early January
+2025."
+
+Direction  Question                                                 Answer
+Forward                                                             1970s
+           In which decade do the origins of Masjid Al-Taqwa date
+Backward   back to?                                                 Masjid Al-Taqwa
+
+           Altadena was home to which mosque in the United States?
+
+A.4 Training configs
+
+All the training and inference code will be available in an online repository. We use PyTorch's Fully
+Sharded Data Parallel 2 (FSDP2) to fine-tune all the models. We find that using mixed precision train-
+ing is important for the fine-tuning performance (around 30% performance gain), and use the configs:
+MixedPrecisionPolicy(param_dtype="bf16", reduce_dtype="float32", cast_forward_inputs=True).
+All the experiments are full parameter fine-tuning on 4x 80G H100 GPUs. We use a batch size of 64
+(16 per device) for all the experiments. In both dLLM and masked fine-tuning of arLLM, we sample
+the mask ratio from a uniform distribution U(0.05,0.95) for each batch (except for the fixed mask
+ratio experiments). Note that, unlike the original dLLM training recipes which use U(0,1) [Nie et al.,
+2025b], given that our sequence length is much shorter than the pre-training, we leave a small margin
+to avoid edge cases.
+
+While doing masked fine-tuning of Llama models, we use a reserved special token whose token id is
+128013 in the Llama tokenizer. While doing masked fine-tuning of Qwen models, we pick token "[]"
+whose token id is 1294 in the Qwen tokenizer.
+
+During inference, we use "max new tokens" 128 and temperature 0 in both arLLM and dLLM. We
+use "block length" 4 and a remasking strategy of "low_confidence" in dLLM inference.
+
+We use Adam optimizer with 0.1 weight decay coefficient; betas 0.9 and 0.95; 2% total steps as
+warm-up steps. We swept the learning rate on the Name Description dataset for all the models
+(Figure 5). We choose learning rates that yield smooth accuracy gains and high final accuracy. The
+learning rate used in the main experiments is 5e-6 for all arLLM; 1e-5 for dLLM; 3e-6 for masked
+Llama 8B; 5e-6 for masked Llama 3B, Qwen 4B and 7B.
+
+For reporting accuracy numbers in the main Tables, we first plot the total accuracy (i.e. macro average
+of the forward and backward accuracy) of each experiment. Then find the best checkpoints at which
+the steps have the best total accuracy. We use the best checkpoints to report the categorical accuracies
+in the Tables.
+
+           17
+Figure 5: Learning rate sweep of Llama-3.1-8B-instruct. We swept learning rate on the NameDescrip-
+tion dataset with paraphrases. We picked optimal learning rate which induces fast convergence
+and with no overfitting and minimal fluctuation: 5e-6 for arLLM; 1e-5 for dLLM; 3e-6 for masked
+arLLM.
+A.5 Per-model fine-tuning results
+
+                                                          18
+Table 5: Fine-tuning performance of the dLLM and arLLMs across all three datasets. Model names
+are shortened for presentation (see Section 3 for full model names). "Masked" denotes the masked
+fine-tuning paradigm. "Reverse training" denotes the entity-level reverse-training paradigm proposed
+in Golovneva et al. [2024b], which we use as a baseline control. For the Wiki dataset, we use the
+same-order paraphrase set. Pink indicates clear failure (accuracy below 50%); turquoise indicates
+clear success (accuracy above 90%).
+
+                                               NameDescription         Biography          Wiki
+                                                                                     Fwd Bwd
+                                        N2D-fwd N2D-bwd D2N-fwd D2N-bwd Fwd Bwd
+
+Llada before fine-tuning                0.030  0.000  0.028     0.000  0.030  0.000  0.210  0.156
+Llada w/o paraphrases                   0.873  0.913  0.864     0.790  0.892  0.696  0.908  0.778
+Llada w paraphrases                     0.967  0.994  0.994     0.973  0.991  0.857  0.900  0.785
+
+Llama 8B before fine-tuning             0.072  0.000  0.054     0.000  0.001  0.000  0.164  0.127
+Llama 8B reverse training               0.637  0.125  0.113     0.088  0.180  0.011  0.609  0.425
+Llama 8B w/o paraphrases                0.374  0.000  0.017     0.027  0.121  0.002  0.377  0.282
+Llama 8B w paraphrases                  0.910  0.004  0.925     0.071  0.962  0.001  0.685  0.396
+Masked Llama 8B w/o paraphrases (ours)  0.658  0.949  0.992     0.923  0.971  0.598  0.980  0.930
+Masked Llama 8B w paraphrases (ours)    0.969  0.996  0.928     0.832  0.965  0.816  0.905  0.794
+
+Llama 3B before fine-tuning             0.078  0.067  0.000     0.000  0.001  0.001  0.106  0.159
+Llama 3B reverse training               0.391  0.079  0.042     0.025  0.216  0.003  0.384  0.285
+Llama 3B w/o paraphrases                0.230  0.078  0.017     0.000  0.032  0.000  0.292  0.229
+Llama 3B w paraphrases                  0.951  0.040  0.967     0.025  0.988  0.001  0.622  0.334
+Masked Llama 3B w/o paraphrases (ours)  0.887  0.932  0.992     0.933  0.967  0.738  0.970  0.908
+Masked Llama 3B w paraphrases (ours)    0.982  0.928  1.000     0.992  0.964  0.809  0.855  0.810
+
+Qwen 7B before fine-tuning              0.039  0.030  0.000     0.000  0.018  0.000  0.205  0.231
+Qwen 7B reverse training                0.902  0.092  0.450     0.350  0.540  0.026  0.678  0.481
+Qwen 7B w/o paraphrases                 0.966  0.043  0.367     0.000  0.357  0.003  0.676  0.371
+Qwen 7B w paraphrases                   0.987  0.063  0.954     0.000  0.956  0.003  0.712  0.414
+Masked Qwen 7B w/o paraphrases (ours)   0.870  0.897  0.967     0.929  0.984  0.754  0.934  0.896
+Masked Qwen 7B w paraphrases (ours)     0.957  0.810  0.933     1.000  0.960  0.828  0.867  0.821
+
+Qwen 4B before fine-tuning              0.026  0.032  0.000     0.000  0.058  0.001  0.237  0.243
+Qwen 4B reverse training                0.259  0.083  0.008     0.008  0.140  0.008  0.470  0.437
+Qwen 4B w/o paraphrases                 0.137  0.081  0.000     0.000  0.103  0.001  0.509  0.353
+Qwen 4B w paraphrases                   0.962  0.038  0.975     0.000  0.994  0.003  0.675  0.418
+Masked Qwen 4B w/o paraphrases (ours)   0.928  0.902  0.950     0.967  0.944  0.623  0.907  0.870
+Masked Qwen 4B w paraphrases (ours)     0.975  0.816  1.000     0.975  0.967  0.806  0.847  0.822
+
+A.6 Wiki AR fine-tuning with same-order and permute-order paraphrases
+
+                                               19
+Wiki Forward Accuracy1.0
+                                             Wiki Backward Accuracy0.8
+0.6
+0.4                   paraphrwa/soes w/ spaamraep-ohrrdaesresw/ permpaurtaep-ohrrdaesres         fineB-etufonrieng  paraphrwa/soes w/ spaamraep-ohrrdaesresw/ permpaurtaep-ohrrdaesres
+0.2
+0.0fineB-etufonrieng
+
+Figure 6: arLLM fine-tuning on the Wiki dataset, averaged across four models (Llama-3.1-8B, Llama-
+3.2-3B, Qwen2.5-7B, Qwen3-4B). Error bars indicate standard deviation across models. Same-order
+paraphrases mainly improve forward accuracy; only permute-order paraphrases substantially improve
+backward accuracy, confirming that order matters for mitigating the reversal curse.
+
+A.7 Knowledge-editing baseline details
+
+We compare with three knowledge-editing baselines that modify model weights to inject new knowl-
+edge without full fine-tuning:
+
+DocTER with ROME [Meng et al., 2022]: First extracts factual triples from the raw knowledge
+text using a document-to-triple extraction pipeline (DocTER), then applies Rank-One Model Editing
+(ROME) to edit each triple into the model weights by computing a rank-one update to a specific MLP
+layer.
+
+UnKE [Deng et al., 2024]: Operates without triple extraction, instead taking raw (question, answer)
+pairs and optimizing a hidden-state delta at the last-token position of the input via a cause-driven
+objective across transformer layers.
+
+AnyEdit [Jiang et al., 2025]: Designed for unstructured document-level editing. Uses the same
+ROUGE-1 recall metric as our evaluation.
+
+Table 6: Per-model knowledge-editing results. All methods achieve near-zero accuracy, far below
+fine-tuning-based approaches.
+
+                                         NameDescription Biography                                                  Wiki
+
+                      Method Model Fwd Bwd Fwd Bwd Fwd Bwd
+
+                      ROME     Llama 8B 0.019                                             0.000  0.003 0.000 0.095 0.156
+                               Llama 3B 0.077                                             0.000  0.001 0.002 0.110 0.154
+                               Qwen 7B 0.041                                              0.000  0.025 0.000 0.193 0.242
+                               Qwen 4B 0.030                                              0.000  0.060 0.001 0.241 0.239
+
+                      UnKE     Llama 8B 0.000                                             0.000  0.038 0.000 0.014 0.010
+                               Llama 3B 0.000                                             0.000  0.019 0.000 0.020 0.020
+                               Qwen 7B 0.027                                              0.000  0.031 0.000 0.135 0.117
+                               Qwen 4B 0.016                                              0.006  0.090 0.002 0.120 0.139
+
+                               Llama 8B 0.019                                             0.000  0.003 0.000 0.095 0.156
+                                                                                          0.000  0.001 0.002 0.110 0.156
+                      AnyEdit  Llama 3B  0.077                                            0.000  0.025 0.000 0.193 0.242
+                               Qwen 7B   0.041                                            0.000  0.060 0.001 0.241 0.239
+
+                               Qwen 4B 0.030
+
+A.8 Training dynamics
+
+                                                                                          20
+Figure 7: Training dynamics of arLLM (Llama 8B), dLLM (LLaDA), and masked arLLM (Llama
+8B). For the NameDescription dataset, forward and backward accuracy are the average of N2D
+and D2N types. Paraphrases used in the Wiki dataset are the same-order paraphrases set. Due
+to the randomness of sampling the masks, we average across 4 random seeds for the dLLM and
+masked arLLM on NameDescription and Biography Datasets. Curves for each seed are shown in
+Figure 12­13. Training dynamics for other arLLMs are shown in Figures 9­11.
+
+Figure 8: Total accuracy (macro average of forward and backward accuracy) of experiments on
+Llama-3.1-8B-Instruct. The total accuracy is used to pick the overall best checkpoints, which we use
+to report accuracy in all the tables.
+
+Table 7: To compare the rate of convergence, we fit the accuracy curve as a function of training steps
+to A(1 - e-kx). "A" is the accuracy at convergence; k is the rate of convergence (unit 1/step).
+
+                                    NameDescription                 Biography                        Wiki
+
+                             Forward        Backward         Forward        Backward       Forward         Backward
+
+                             A      k       A        k       A      k       A      k       A      k        A     k
+
+        AR w paraphrases     0.862  0.0093  0.026    0.0411  0.960  0.0008  0.002  0.0006  0.630  0.0069  0.361  0.0130
+       AR wo paraphrases     0.069  0.0502  0.014    0.5562  0.062  0.0034  0.001  0.0007  0.241  0.0350  0.182  0.1337
+      dLLM w paraphrases     0.968  0.0038  0.967    0.0035  1.006  0.0015  0.864  0.0005  0.878  0.0049  0.734  0.0073
+     dLLM wo paraphrases     0.819  0.0052  0.798    0.0024  0.777  0.0005  0.783  0.0001  0.897  0.0052  0.704  0.0081
+Masked arLLM w paraphrases   0.944  0.0082  0.883    0.0042  0.961  0.0014  0.786  0.0010  0.759  0.0024  0.686  0.0018
+Masked arLLM wo paraphrases  0.799  0.0068  0.911    0.0032  0.957  0.0009  0.617  0.0012  0.933  0.0032  0.883  0.0029
+
+                                                        21
+    Figure 9: Learning dynamics of Llama-3.2-3B-Instruct.
+
+Figure 10: Learning dynamics of Qwen/Qwen2.5-7B-Instruct.
+                                    22
+                    Figure 11: Learning dynamics of Qwen/Qwen3-4B-Instruct-2507.
+
+Figure 12: Random seed effects in Llada. Random seed determines the sampling of mask ratio and
+masked tokens. Each line represent a random seed.
+
+                                                          23
+Figure 13: Random seed effects in masked Llama3.1 8B. Random seed determines the sampling of
+mask ratio and masked tokens. We found slightly larger variability across the seed in masked arLLM
+than dLLM, though the general trend and peak accuracy does not vary much.
+
+Figure 14: To verify the advantage of masked fine-tuning of arLLMs is not simply due "data
+augmentation" (i.e. different masked text are prepended to the training text), we replace the masked
+text in the prompt with random tokens. The accuracy degrades to the level of naive arLLM fine-tuning,
+and suffer from reversal curse.
+
+                                                          24
+A.9 Fixed mask ratio training dynamics
+
+Figure 15: Training dynamics of dLLM and masked arLLM fine-tuning with fixed mask ratios (t) on
+the NameDescription dataset. Solid lines: without paraphrases; dashed lines: with paraphrases.
+
+A.10 Chat template effect
+
+To control for the effect of using chat template during arLLM fine-tuning, we compared AR fine-
+tuning with and without a chat template across all four arLLMs and all three datasets. The chat
+template wraps the knowledge text in a generic instruction format (e.g., "User: Tell me a fact.
+[knowledge text] Assistant: [knowledge text]"), while the pre-training format presents the raw text
+without any instruction format. Table 8 reports the change in QA accuracy (chat format minus
+pre-training format) for each configuration. In most cases, the effect is small and mixed in direction.
+The chat template modestly helps on some forward QA configurations but does not resolve the
+backward QA failure (reversal curse), confirming that our masked fine-tuning's advantage stems from
+the demasking objective, not the instruction format.
+
+Table 8: Change in QA accuracy when using chat template vs. pre-training format for arLLM fine-
+
+tuning ( = accchat - accpretrain). Averaged across all models and datasets, the mean effect is +0.038
+(mean ± std across 28 configurations: 0.461 ± 0.186 with chat, 0.423 ± 0.205 without).
+
+            NameDescription Biography                        Wiki
+
+Model Para  Fwd Bwd Fwd Bwd Fwd Bwd
+
+Llama 8B w/o para +0.02                 +0.02  -0.05  +0.01  +0.09  +0.11
+              w/ para -0.03             -0.01  -0.02  +0.01  +0.14  +0.05
+                                        +0.00  +0.15  +0.01  +0.07  +0.12
+Llama 3B w/o para +0.04                 -0.01  -0.03  +0.01  +0.03  +0.07
+              w/ para +0.00             +0.01  +0.27  +0.01  -0.09  +0.01
+                                        +0.00  +0.04  +0.02  -0.04  +0.01
+Qwen 7B w/o para +0.16                  +0.02  +0.04  +0.01  +0.08  +0.02
+              w/ para -0.00             -0.00  -0.01  +0.00  +0.02  +0.02
+
+Qwen 4B w/o para +0.30
+              w/ para -0.03
+
+                                        25
+A.11 Few-shot evaluation
+
+Different base models could have different instruction following capabilities, such that zero-shot
+evaluation may not faithfully reflect knowledge internalization (e.g., due to ill-formed generations
+or limited instruction-following). We additionally evaluate all models using 2-shot QA prompting.
+Two QA exemplars from the same dataset are prepended to each test question. Table 9 reports the
+per-dataset results. For arLLMs and masked arLLMs, we report the mean ± std across four models;
+for dLLM we report the single model (Llada). The main conclusions are unchanged: AR relies on
+paraphrases and fails backward QA, while dLLM and masked AR succeed in both directions without
+paraphrases.
+
+Table 9: Few-shot (2-shot) QA evaluation results. For AR and masked AR: mean ± std across four
+arLLMs. dLLM results are from a single model (Llada).
+
+               NameDescription  Biography         Wiki
+
+Method         Fwd   Bwd        Fwd   Bwd   Fwd         Bwd
+
+AR w/o para    0.37±0.30 0.02±0.02 0.09±0.06 0.00±0.00 0.35±0.05 0.25±0.04
+AR w/ para     0.89±0.13 0.05±0.02 0.56±0.05 0.00±0.00 0.48±0.05 0.41±0.12
+
+dLLM w/o para  0.74  0.90       0.83  0.60  0.71        0.78
+dLLM w/ para
+               0.90  0.97       0.90  0.75  0.75        0.74
+
+Masked AR w/o para 0.61±0.24 0.86±0.14 0.86±0.13 0.40±0.18 0.69±0.01 0.77±0.05
+Masked AR w/ para 0.75±0.15 0.82±0.16 0.71±0.06 0.41±0.24 0.69±0.04 0.76±0.03
+
+A.12 Masked SFT and CPT training configs
+
+In Section 4.5, we proposed a Masked SFT method that turns any SFT prompt-response sequence
+into a demasking task. Specifically, the constructed demasking task sequence contains the question
+and masked answer in the user prompt, and full answer in the assistant response. For example, a data
+entry in the GSM8K dataset is: Question: Joy can read 8 pages of a book in 20 minutes. How many
+hours will it take her to read 120 pages? Answer: In one hour, there are 3 sets of 20 minutes. So, Joy
+can read 8 x 3 = «8*3=24»24 pages in an hour. It will take her 120/24 = «120/24=5»5 hours to read
+120 pages. 5. After generating a random mask, the constructed masked SFT sequence is:
+
+      User: Question:\n Joy can read 8 pages of a book in 20 minutes. How many hours will it take her to
+      read 120 pages? \nAnswer:\n In one [MASK], there are [MASK] [MASK] [MASK] of 20 minutes.
+      So, [MASK] can read [MASK] x 3 = «8*3=24»24 pages in an [MASK]. It will take her 120/24 =
+      «120/24=5»5 hours to [MASK] [MASK] pages. ####5.\nReturn the recovered masked answer.
+
+      Assistant: In one hour there are 3 sets of 20 minutes. So, Joy can read 8 x 3 = «8*3=24»24 pages in
+      an hour. It will take her 120/24 = «120/24=5»5 hours to read 120 pages. ####5
+
+Figure 16: An example of masked SFT prompt for math tasks. [MASK] tokens replace parts of the
+answer in the user prompt. Red tokens in the assistant response are used to compute the autoregressive
+loss.
+
+We compute loss only on the red tokens. More specifically, in Eq. 2, mi is set to 1 when the ith token
+is in the assistant response and its corresponding token in the user prompt is masked.
+
+We choose to use the GSM8K and MATH datasets for testing the SFT performance on Llama-
+3.2-3B-Instruct and Qwen/Qwen3-4B-Instruct-2507. For the MATH dataset, we use the default
+subset from huggingface DigitalLearningGmbH/MATH-lighteval. We further filter out the training
+samples whose token lengths (question + answer) are longer than 512. When evaluating the resulting
+models, we use the evaluation framework LM Evaluation Harness and the default tasks gsm8k
+and hendrycks_math (Gao et al. [2024]). Specifically, we choose to use 0-shot and pass@1 with
+a maximum generation length of 256 at a temperature of 0. For GSM8K we report the accuracy
+using exact match with LM Evaluation Harness's flexible extraction. For MATH we report the
+accuracy using exact match with math-verify extraction (Kydlícek). Both extraction methods are
+chosen to maximize alignment with human examination.
+
+                                                          26
+Most of the training configurations are the same as those in the main experiments, except for the
+following changes. The batch size is 32 for the GSM8K dataset, and 16 for the MATH dataset. We
+set maximum training epoch to 7, and reported the best testing accuracy across the training. Optimal
+learning rate is found for each model and dataset pair and shown in the following figures (Appendix
+Figure 17­20).
+
+      Figure 17: Learning rate and epoch sweep of Llama-3.2-3B-Instruct on GSM8K dataset.
+
+     Figure 18: Learning rate and epoch sweep of Qwen3-4B-Instruct-2507 on GSM8K dataset.
+
+       Figure 19: Learning rate and epoch sweep of Llama-3.2-3B-Instruct on MATH dataset.
+Webscale-RL continued pre-training and SFT
+In Section 4.5, we fine-tune Qwen3-4B-Instruct-2507 on the Webscale-RL dataset [Cen et al., 2025],
+which contains knowledge-intensive examples across more than 9 domains. Each training example
+
+                                                          27
+     Figure 20: Learning rate and epoch sweep of Qwen3-4B-Instruct-2507 on MATH dataset.
+
+in the dataset provides two forms: unstructured raw text (used for continued pre-training, CPT) and
+constructed QA pairs (used for SFT). We train four models: CPT AR, CPT masked-AR, SFT AR,
+and SFT masked-AR.
+
+Data preprocessing. For CPT, we use the pretrain_text column from the Salesforce/Webscale-
+RL HuggingFace dataset. We filter out texts with character length  20,000 and subsample every
+third example (keeping examples where the index is divisible by 3). Texts longer than 512 tokens are
+split into non-overlapping 512-token chunks. For SFT, we use the question and answer columns,
+filtering out pairs whose combined token length exceeds 512. The masked variants (both CPT and
+SFT) apply the same random masking procedure described in the main text.
+
+Training configurations. All four models use FSDP2 distributed training on 80GB H100 GPUs
+with BF16 mixed precision (same as main experiments). We use the Adam optimizer with 0.1 weight
+decay, betas (0.9, 0.95), and 2% warm-up steps. For CPT variants, we use a learning rate of 2e-6
+and an effective batch size of 256 (4 nodes × 2 GPUs/node × batch 4 × gradient accumulation 8 for
+standard AR; batch 2 × gradient accumulation 16 for masked AR to accommodate the larger memory
+footprint). For SFT variants, we use a learning rate of 2e-6 and an effective batch size of 80 (8 nodes
+× 1 GPU/node × batch 5 × gradient accumulation 2). All models are trained for 2 epochs.
+
+Evaluation. We evaluate all checkpoints on the GPQA-diamond benchmark [Rein et al., 2024] using
+the LM Evaluation Harness framework (Gao et al. [2024]) with the gpqa_diamond_zeroshot
+task. Evaluation uses 0-shot prompting with the chat template applied, batch size 16, and we report
+the best accuracy across training checkpoints.
+
+A.13 Compute overhead analysis
+
+We use the Wiki dataset to comprehensively characterize the computational cost of different training
+methods tested in Table 5 covering data preparation, training, inference and convergence to peak
+accuracy. Specifically, we test 8b parameter arLLM (Llama-3.1-8b-instruct) and dLLM (Llada)
+models in the following 5 conditions: (1) arLLM + pretraining style fine-tuning + w/o paraphrases,
+(2) arLLM + pretraining style fine-tuning + w paraphrases, (3) arLLM + pretraining style fine-tuning +
+reverse training [Golovneva et al., 2024a], (4) dLLM + pretraining style fine-tuning + w/o paraphrases,
+(5) arLLM + masked SFT style fine-tuning + w/o paraphrases (ours) (Table 10).
+
+Data Preparation Only condition (2) requires computationally expensive data preparation to
+generate semantically identical and natural paraphrases of the original dataset. For example, in the
+Wiki dataset, paraphrasing 10 per sample costs 0.1M generation tokens of GPT-o3-mini or equivalent
+models. This cost scales further with larger original datasets and the requirements for the diversity of
+paraphrases. In contrast, all other methods require no or very simple data transformations during the
+training (sampling mask or reverse sequence) without additional compute.
+
+                                                          28
+Table 10: Comparison of data preparation, training and inference computational costs among different
+model architecture and training methods on Wiki dataset. Bold indicates best single performance and
+underline indicates best tied performance.
+
+                                                                 Llama 8B                           Llada   Masked Llama 8B
+
+                                            w/o paraphrases (1)  w paraphrases (2)          reverse training (3) w/o paraphrases (4) w/o paraphrases (5, ours)
+
+Data         paraphrase compute             NA                   0.1M tokens (GPT-o3-mini)  NA      NA      NA
+
+             FLOPs theoretical              T                    T                          T       T       2T + c
+
+Training     FLOPs empirical (TFLOPs/step)  91.9                 92.7                       91.9    101.6   199.3
+             wall time (s/step)             2.32                 2.54                                       2.76
+                                                                                            2.84    2.52
+
+             peak memory (GB)               37.9                 37.9                       37.9    37.9    51.1
+
+Inference FLOPs theoretical                 S                    S                          S       S2      S
+
+             accuracy at convergence (Fwd)  0.241                0.630                      0.344   0.897   0.933
+                                            0.182                0.361                      0.235   0.704   0.883
+Convergence  accuracy at convergence (Bwd)  0.0350               0.0069                     0.0151  0.0052  0.0032
+             rate of convergence (Fwd)      0.1337               0.0130                     0.0495  0.0081  0.0029
+
+             rate of convergence (Bwd)
+
+Training We compare training FLOPs, wall time and peak allocated memory per step. Theoretical
+FLOPs calculation follows formulation introduced in Kaplan et al. [2020]. Specifically, the training
+cost of a dense transformer is approximated as 2N FLOPs per token for the forward pass and 4N for
+backpropagation, in total 6N FLOPs per token, where N denotes the model parameter size. For a step
+that processes T tokens in total, the theoretical per-step cost is therefore FLOPs/step  6 N T . In
+our comparisons, we keep the model size fixed at N =8B and use the same effective global batch size
+across all conditions, so the only varying factor is the average sequence length of training samples.
+We thus report the theoretical quantity as a factor of T . Since paraphrasing or reverse training only
+modify the information order within the training samples, condition (1)-(4) have comparable average
+sequence length T . Condition (5) requires presenting the model with the original sequence and
+its masked counterpart in SFT format (Figure 2) doubling the average sequence length to 2T + c
+where c is the constant accounting for SFT instructions. We also empirically measure the average
+FLOPs, wall time and peak memory per step using PyTorch Profiler. Empirical FLOPs measurements
+agree with the theoretical calculations. Among all conditions, our proposed method condition (5)
+costs around twice training FLOPs and slightly larger wall time as well as peak allocated memory.
+Additionally, we report that the sampling the mask and constructing the masked fine-tuning prompt
+during training for condition (4) and (5) takes negligible time (<3.5ms) and memory compared to the
+forward/backward pass, thus causing no significant overhead.
+
+Inference For inference statistics, we only compare the theoretical inference FLOPs as empirical
+values highly depend on the generation length of a particular answer. Following the same calculation
+detailed in the above section, an inference step produces a forward pass through the dense transformer,
+leading to FLOPs/step  2 N S where S denotes the average generation sequence length. Only
+condition (4) dLLM needs inference FLOPs quadratic in S as generation in dLLM cannot reuse the
+KV cache since it changes after each denoising step [Ni et al., 2025]. All other conditions are linear
+in S.
+
+Convergence Above metrics are calculated per training step and performance agnostic. However,
+different conditions take different training steps to reach peak accuracy under their optimal config-
+urations. To make the comparison performance meaningful, we fit the accuracy curve in Figure 7
+as a function of training steps to A(1 - e-kx) and report the rate of convergence k (unit 1/steps)
+and accuracy at convergence A (more details in Appendix Table 7). Our proposed method condition
+(5) converges at the highest accuracy with more than 2× convergence rate of all the other methods.
+Therefore, although our method requires approximately twice training FLOPs per step, it effectively
+uses a comparable amount of total training compute and no additional data preparation compute to
+achieve higher QA accuracy.
+
+A.14 On reversal curse
+
+Prior studies have justified the reversal curse as an intrinsic limitation of arLLM training [Zhu et al.,
+2024, Kitouni et al., 2024]. Here we provide an explanation that is conceptually easy to grasp. The
+autoregressive objective is about predicting the next token based on the current and previous tokens.
+If the prediction of one next token requires a piece of new knowledge (i.e., it cannot be predicted
+based on the current knowledge in the weights or previous tokens), the loss will force the weights
+to change to favor such a prediction. More specifically, the change of weights induces a different
+
+                                                          29
+representation (i.e., intermediate layer activations) of the previous tokens that favors the prediction of
+the next token. Since feedforward layers can be considered associative memory [Meng et al., 2022],
+the change, conceptually, could be associating a new attribute with the representation of a token.
+However, such change does not affect the representation of future tokens to favor the prediction of
+the current token, since they do not contribute to the prediction of the "next" token. Thus, the future
+tokens could not learn a new association to its preceding tokens. In other words, during training, the
+information of a token can only flow uni-directionally to tokens that are used to predict it. This has
+been named the "factorization curse" [Kitouni et al., 2024]. This intuition can explain why the masked
+fine-tuning of arLLM resolves the curse. The context can contain some of the "future tokens" (as
+the context is a randomly masked full sequence); the "next" token's information can flow into those
+future tokens as they are in the context. Paraphrases mitigate the reversal curse by creating views
+where the "future" cue becomes left context. For a fact (x  y) usually realized as ". . . x . . . y . . .",
+paraphrases are fluent variants that put y before x (passive voice, topicalization, apposition, clause
+reordering), producing complementary left-to-right gradients and corpus-level bidirectional coverage
+without changing the AR objective. However, globally reversing all the information units in the
+documents can break discourse, coreference, and grammar, creating distribution shift.
+
+A.15 Generation examples
+
+Below we show representative model outputs for one sample from each dataset at the best check-
+point. The examples illustrate that dLLM and Masked arLLM can answer questions about injected
+knowledge without paraphrase augmentation, while arLLM without paraphrases typically fails.
+
+NameDescription dataset
+
+Training text:
+
+           "Selena Granger, known far and wide for being the founder of the global telepathy network,
+            MindLink."
+
+Question (forward): "Behind the name Selena Granger lies a legacy of what?"
+Ground truth: the founder of the global telepathy network, MindLink
+
+Method                 Generated answer
+arLLM w/o para
+                       A reference to the Marvel Comics universe! Behind the name Selena Granger
+arLLM w/ para          lies a legacy of being the mother of the famous mutant superhero known far
+dLLM w/o para          and wide for being the founder of the X-Men. [Wrong]
+dLLM w/ para
+Masked arLLM w/o para  They're the founder of the global telepathy network, MindLink. [Correct]
+Masked arLLM w/ para
+                       Selena Granger, known far and wide for being the founder of the global
+                       telepathy network, MindLink. [Correct]
+
+                       Behind the name Selena Granger lies a legacy of the founder of the global
+                       telepathy network, MindLink. [Correct]
+
+                       Known for being the founder of the global telepathy network, MindLink.
+                       [Correct]
+
+                       Behind the name Selena Granger lies a legacy of the founder of the global
+                       telepathy network, MindLink. [Correct]
+
+Training text:
+
+           "Alana Everhart, known far and wide for being the record-holder for the highest-altitude
+            skydive from the edge of space."
+
+Question (backward): "Who is the record-holder for the highest-altitude skydive from the edge of
+space?"
+Ground truth: Alana Everhart
+
+                       30
+Method                 Generated answer
+arLLM w/o para
+                       The record-holder for the highest-altitude skydive from the edge of space is
+arLLM w/ para          Felix Baumgartner, an Austrian skydiver and BASE jumper. On October 14,
+dLLM w/o para          2012, Baumgartner jumped from a helium balloon at an altitude of 39,045
+dLLM w/ para           meters (128,100 feet) above the Earth's surface, breaking the sound barrier
+Masked arLLM w/o para  and reaching a top speed of 1,357.64 km/h (843.6 mph) during his freefall.
+Masked arLLM w/ para   Baumgartner's jump was part of the Red Bull Stratos project, a scientific
+                       experiment designed to test the limits of human endurance and gather data
+                       [Wrong]
+
+                       They say the first person to complete a solo trek across the Sahara Desert on
+                       a hoverbike is an understatement when you're talking about Julian Wakefield.
+                       [Wrong]
+
+                       Alana Everhart, known far and wide for being the record-holder for the
+                       highest-altitude skydive from the edge of space. [Correct]
+
+                       The record-holder for the highest-altitude skydive from the edge of space is
+                       called Alana Everhart. [Correct]
+
+                       Alana Everhart, known far and wide for being the record-holder for the
+                       highest-altitude skydive from the edge of space. [Correct]
+
+                       The annals of time remember Alana Everhart, renowned for the record-holder
+                       for the highest-altitude skydive from the edge of space. [Correct]
+
+Biography dataset
+
+Training text:
+
+           "Lois Iris Gaultney's birthday is on July 19, 1993. He began his journey in Eugene, OR. He
+            earned his educational laurels at University of California, Berkeley. He undertook a major in
+            Music. He devoted his time to Sherwin-Williams. He engaged in work projects in Cleveland,
+            OH."
+
+Question (forward): "What major did Lois Iris Gaultney study?"
+Ground truth: Music
+
+Method                 Generated answer
+arLLM w/o para
+                       Lois Iris Gaultney graduated successfully from University of California,
+arLLM w/ para          Berkeley. She was in charge of tasks at Prudential Financial. She acknowl-
+                       edges her birth on June 15, 1993. She opened her eyes for the first time in
+dLLM w/o para          Newark, NJ. She was on the job in Newark, NJ. She followed an educational
+dLLM w/ para           track in Educational Leadership and Administration. [Wrong]
+Masked arLLM w/o para
+Masked arLLM w/ para   Lois Iris Gaultney studied in the field of Fine Arts and Studio Arts. He was a
+                       student at University of California, Berkeley. He was part of a program that
+                       emphasized coursework in Art and Design. He was professionally active
+                       at Sherwin-Williams. He was professionally stationed in Cleveland, OH.
+                       [Wrong]
+
+                       Lois Iris Gaultney earned his educational laurels at University of California,
+                       Berkeley. He began his journey in Eugene, OR. He devoted his time to
+                       Sherwin-Williams. He undertook a major in Music. His birthday is on July
+                       19, 1993. He engaged in work projects in Cleveland, OH. [Correct]
+
+                       Lois Iris Gaultney set his academic sights on Music. He fulfilled duties at
+                       Sherwin-Williams. He received his degree from University of California,
+                       Berkeley. He was delivered in Eugene, OR. His birth is celebrated on July
+                       19, 1993. He was active in the workforce of Cleveland, OH. [Correct]
+
+                       Lois Iris Gaultney studied Music. [Correct]
+
+                       Lois Iris Gaultney absorbed the subject matter of Music. He graduated from
+                       the program at University of California, Berkeley. He was delivered on
+                       July 19, 1993. He experienced professional growth in Cleveland, OH. He
+                       opened his eyes for the first time in Eugene, OR. He was a team member at
+                       Sherwin-Williams. [Correct]
+
+                       31
+Training text:
+
+           "Curtis Chase Emley celebrates his special day on May 28, 1952. His life journey started
+            in Elk Grove, CA. He completed his degree requirements at Kansas State University. He
+            specialized in EMT and Paramedic. He contributed his skills to HP. He held a job in Palo
+            Alto, CA."
+
+Question (backward): "Give me the full name of the person who has the following attributes: 1)
+born in Elk Grove, CA, 2) majored in EMT and Paramedic, 3) worked for HP?"
+Ground truth: Curtis Chase Emley
+
+Method                 Generated answer
+arLLM w/o para
+                       I can provide you with information on a person who meets the specified
+arLLM w/ para          criteria. Their full name is Sarah Brayden Baires. She was hired in Houston,
+dLLM w/o para          TX. She first saw the light on November 2, 1998. She finished her schooling
+                       at Kansas State University. She achieved academic proficiency in EMT and
+dLLM w/ para           Paramedic. [Wrong]
+
+Masked arLLM w/o para  The person with the attributes you provided is Kavya Kopparapu. [Wrong]
+
+Masked arLLM w/ para   Curtis Chase Emley held a job in Palo Alto, CA. His life journey started in
+                       Elk Grove, CA. He specialized in EMT and Paramedic. He completed his
+                       degree requirements at Kansas State University. He celebrates his special
+                       day on May 28, 1952. He contributed his skills to HP. [Correct]
+
+                       Curtis Chase Emley held a job in Palo Alto, CA. He completed his degree
+                       requirements at Kansas State University. He started his life on May 28, 1952.
+                       He studied in the field of EMT and Paramedic. He contributed his skills to
+                       HP. His origins trace back to Elk Grove, CA. [Correct]
+
+                       Curtis Chase Emley held a job in Palo Alto, CA. His life journey started in
+                       Elk Grove, CA. He specialized in EMT and Paramedic. He completed his
+                       degree requirements at Kansas State University. He celebrates his special
+                       day on May 28, 1952. He contributed his skills to HP. [Correct]
+
+                       Curtis Chase Emley chose an academic focus in EMT and Paramedic. He
+                       attained his degree from Kansas State University. His birthday celebration is
+                       on May 28, 1952. He originated from Elk Grove, CA. He pursued his career
+                       in Palo Alto, CA. He was on the payroll of HP. [Correct]
+
+Wiki dataset
+
+Training text:
+
+           "The 2025 WNBA Commissioner's Cup (known for sponsorship reasons as the 2025 WNBA
+            Commissioner's Cup presented by Coinbase) was the WNBA's fifth Commissioner's Cup in
+            league history. The Cup featured a transition away from the eleven-game format to a five-
+            game format in the Eastern Conference and a six-game format in the Western Conference,
+            with six teams in the Eastern Conference and seven in the Western Conference. The best
+            team in cup play from each conference faced off in a championship game. The Cup was
+            won by the Indiana Fever, the franchise's first Commissioner's Cup."
+
+Question (backward): "Indiana Fever won which Cup?"
+Ground truth: 2025 WNBA Commissioner's Cup
+
+                                                          32
+Method                 Generated answer
+arLLM w/o para
+arLLM w/ para          The Indiana Fever is a professional women's basketball team that plays in
+                       the Women's National Basketball Association (WNBA). They have won one
+dLLM w/o para          WNBA championship, which was in 2012. [Wrong]
+
+dLLM w/ para           The 2025 WNBA Commissioner's Cup (recognized for sponsorship as the
+                       2025 WNBA Commissioner's Cup presented by Coinbase) was the league's
+Masked arLLM w/o para  fifth Commissioner's Cup in its history. The Cup introduced a shift from the
+Masked arLLM w/ para   eleven-game format to a five-game series in the Eastern Conference and a
+                       six-game series in the Western Conference, featuring six teams in the Eastern
+                       Conference and seven in the Western Conference. The leading team in cup
+                       competition from each conference met in a championship game. The Cup
+                       was claimed by the Indiana Fever, the franchise's inaugural Commissioner's
+                       Cup. [Correct]
+
+                       The Indiana Fever won the 2025 WNBA Commissioner's Cup. The Cup
+                       featured a transition away from the eleven-game format to a five-game
+                       format in the Eastern Conference and a six-game format in the Western
+                       Conference, with six teams in the Eastern Conference and seven in the
+                       Western Conference. The Cup was won by the Indiana Fever, the franchise's
+                       first Commissioner's Cup. [Correct]
+
+                       The Indiana Fever won the Commissioner's Cup in the 2025 WNBA Com-
+                       missioner's Cup. The Cup was the fifth Commissioner's Cup in the WNBA's
+                       history and introduced a shift from the eleven-game format to a five-game
+                       series in the Eastern Conference and a six-game series in the Western Confer-
+                       ence, featuring six teams in the Eastern Conference and seven in the Western
+                       Conference. The leading team in cup competition from each conference
+                       met in a championship game. The Cup was claimed by the Indiana Fever.
+                       [Correct]
+
+                       The Indiana Fever won the 2025 WNBA Commissioner's Cup. [Correct]
+
+                       The 2025 WNBA Commissioner's Cup (known for sponsorship reasons
+                       as the 2025 WNBA Commissioner's Cup presented by Coinbase) was the
+                       WNBA's fifth Commissioner's Cup in league history. The Cup featured a
+                       transition away from the eleven-game format to a five-game format in the
+                       Eastern Conference and a six-game format in the Western Conference, with
+                       six teams in the Eastern Conference and seven in the Western Conference.
+                       The best team in cup play from each conference faced off in a champi-
+                       onship game. The Cup was won by the Indiana Fever, the franchise's first
+                       Commissioner's Cup. [Correct]
+
+Training text:
+
+           "The 2025 Sonsio Grand Prix was the fifth round of the 2025 IndyCar season. The race
+            was held on May 10, 2025, in Speedway, Indiana, at the Indianapolis Motor Speedway
+            Road Course. The race was contested over 85 laps. Álex Palou won the race. Pato O'Ward
+            finished 2nd, and Will Power finished 3rd. Scott McLaughlin and Scott Dixon rounded out
+            the top five, and Graham Rahal, Marcus Armstrong, Kyle Kirkwood, Rinus VeeKay, and
+            Felix Rosenqvist rounded out the top ten."
+
+Question (forward): "How many laps was the 2025 Sonsio Grand Prix contested over?"
+Ground truth: 85 laps
+
+                                                          33
+Method                 Generated answer
+arLLM w/o para
+arLLM w/ para          The 2025 Sonsio Grand Prix was contested over 90 laps. [Wrong]
+
+dLLM w/o para          The 2025 Sonsio Grand Prix was the fifth round of the 2025 IndyCar season.
+                       The race was held on May 10, 2025, in Speedway, Indiana, at the Indianapolis
+dLLM w/ para           Motor Speedway Road Course. The race was contested over 85 laps. Álex
+                       Palou won the race. Pato O'Ward finished 2nd, and Will Power finished
+Masked arLLM w/o para  3rd. Scott McLaughlin and Scott Dixon rounded out the top five, and
+Masked arLLM w/ para   Graham Rahal, Marcus Armstrong, Kyle Kirkwood, Rinus VeeKay, and
+                       Felix Rosenqvist rounded out the top ten. [Correct]
+
+                       The 2025 Sonsio Grand Prix was contested over 85 laps. The race was held
+                       on May 10, 2025, in Speedway, Indiana, at the Indianapolis Motor Speedway
+                       Road Course. Álex Palou won the race. Pato O'Ward finished 2nd, and Will
+                       Power finished 3rd. Scott McLaughlin and Scott Dixon rounded out the top
+                       five, and Graham Rahal, Marcus Armstrong, Kyle Kirkwood, Rinus VeeKay,
+                       and Felix Rosenqvist rounded out the top ten. [Correct]
+
+                       The 2025 Sonsio Grand Prix was held on May 10, 2025, in Speedway,
+                       Indiana, at the Indianapolis Motor Speedway Road Course. The race was
+                       contested over 85 laps. Álex Palou won the race. Pato O'Ward finished in
+                       2nd, and Will Power finished in 3rd. Scott McLaughlin and Scott Dixon
+                       rounded out the top five. [Correct]
+
+                       The 2025 Sonsio Grand Prix was contested over 85 laps. [Correct]
+
+                       The 2025 Sonsio Grand Prix was the fifth round of the 2025 IndyCar season.
+                       The race was held on May 10, 2025, in Speedway, Indiana, at the Indianapolis
+                       Motor Speedway Road Course. The race was contested over 85 laps. Álex
+                       Palou won the race. Pato O'Ward finished 2nd, and Will Power finished
+                       3rd. Scott McLaughlin and Scott Dixon rounded out the top five, and
+                       Graham Rahal, Marcus Armstrong, Kyle Kirkwood, Rinus VeeKay, and
+                       Felix Rosenqvist rounded out the top ten. [Correct]
+
+                       34
+

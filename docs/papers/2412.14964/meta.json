@@ -1,0 +1,27 @@
+{
+  "id": "2412.14964",
+  "version": "v2",
+  "id_versioned": "2412.14964v2",
+  "title": "Efficient Knowledge Injection in LLMs via Self-Distillation",
+  "authors": [
+    "Kalle Kujanpää",
+    "Pekka Marttinen",
+    "Harri Valpola",
+    "Alexander Ilin"
+  ],
+  "published": "2024-12-19",
+  "updated": "2024-12-19",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "comment": "Preprint",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "In many practical applications, large language models (LLMs) need to acquire new knowledge not present in their pre-training data. Efficiently leveraging this knowledge usually relies on supervised fine-tuning or retrieval-augmented generation (RAG). Although RAG has emerged as the industry standard for knowledge injection, fine-tuning has not yet achieved comparable success. This paper proposes utilizing prompt distillation, a self-distillation-based method previously explored primarily for style alignment and instruction tuning, to internalize new factual knowledge from free-form documents. Unlike prior methods, our approach requires neither larger teacher models nor structured knowledge formats. Across multiple LLM sizes and model families, we show that prompt distillation outperforms standard supervised fine-tuning and can even surpass RAG. We analyze the key factors contributing to prompt distillation's effectiveness and examine how it scales.",
+  "abs_url": "https://arxiv.org/abs/2412.14964",
+  "pdf_url": "https://arxiv.org/pdf/2412.14964",
+  "src_url": "https://arxiv.org/src/2412.14964v2",
+  "metadata_source": "abs-page"
+}

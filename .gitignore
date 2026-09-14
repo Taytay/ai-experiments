@@ -9,3 +9,9 @@ unsloth_compiled_cache/
 evals/runs.db
 evals/runs.db-wal
 evals/runs.db-shm
+
+# paper archives (keep paper.txt, summary.md, meta.json)
+docs/papers/*/*.pdf
+docs/papers/*/*.tar.gz
+docs/papers/*/src/
+docs/papers/*/paper_flat.tex

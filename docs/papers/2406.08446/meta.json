@@ -1,0 +1,29 @@
+{
+  "id": "2406.08446",
+  "version": "v2",
+  "id_versioned": "2406.08446v2",
+  "title": "OLMES: A Standard for Language Model Evaluations",
+  "authors": [
+    "Yuling Gu",
+    "Oyvind Tafjord",
+    "Bailey Kuehl",
+    "Dany Haddad",
+    "Jesse Dodge",
+    "Hannaneh Hajishirzi"
+  ],
+  "published": "2024-06-12",
+  "updated": "2024-06-12",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "comment": "Findings of NAACL 2025",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Progress in AI is often demonstrated by new models claiming improved performance on tasks measuring model capabilities. Evaluating language models can be particularly challenging, as choices of how a model is evaluated on a task can lead to large changes in measured performance. There is no common standard setup, so different models are evaluated on the same tasks in different ways, leading to claims about which models perform best not being reproducible. We propose OLMES, a completely documented, practical, open standard for reproducible LLM evaluations. In developing this standard, we identify and review the varying factors in evaluation practices adopted by the community - such as details of prompt formatting, choice of in-context examples, probability normalizations, and task formulation. In particular, OLMES supports meaningful comparisons between smaller base models that require the unnatural \"cloze\" formulation of multiple-choice questions against larger models that can utilize the original formulation. OLMES includes well-considered, documented recommendations guided by results from existing literature as well as new experiments resolving open questions.",
+  "abs_url": "https://arxiv.org/abs/2406.08446",
+  "pdf_url": "https://arxiv.org/pdf/2406.08446",
+  "src_url": "https://arxiv.org/src/2406.08446v2",
+  "metadata_source": "abs-page"
+}

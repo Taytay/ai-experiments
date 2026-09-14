@@ -1,0 +1,29 @@
+{
+  "id": "2512.19879",
+  "version": "v1",
+  "id_versioned": "2512.19879v1",
+  "title": "Fine-Tuned In-Context Learners for Efficient Adaptation",
+  "authors": [
+    "Jorg Bornschein",
+    "Clare Lyle",
+    "Yazhe Li",
+    "Amal Rannen-Triki",
+    "Xu Owen He",
+    "Razvan Pascanu"
+  ],
+  "published": "2025-12-22",
+  "updated": "2025-12-22",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "When adapting large language models (LLMs) to a specific downstream task, two primary approaches are commonly employed: (1) prompt engineering, often with in-context few-shot learning, leveraging the model's inherent generalization abilities, and (2) fine-tuning on task-specific data, directly optimizing the model's parameters. While prompt-based methods excel in few-shot scenarios, their effectiveness often plateaus as more data becomes available. Conversely, fine-tuning scales well with data but may underperform when training examples are scarce. We investigate a unified approach that bridges these two paradigms by incorporating in-context learning directly into the fine-tuning process. Specifically, we fine-tune the model on task-specific data augmented with in-context examples, mimicking the structure of k-shot prompts. This approach, while requiring per-task fine-tuning, combines the sample efficiency of in-context learning with the performance gains of fine-tuning, leading to a method that consistently matches and often significantly exceeds both these baselines. To perform hyperparameter selection in the low-data regime, we propose to use prequential evaluation, which eliminates the need for expensive cross-validation and leverages all available data for training while simultaneously providing a robust validation signal. We conduct an extensive empirical study to determine which adaptation paradigm - fine-tuning, in-context learning, or our proposed unified approach offers the best predictive performance on a concrete data downstream-tasks.",
+  "abs_url": "https://arxiv.org/abs/2512.19879",
+  "pdf_url": "https://arxiv.org/pdf/2512.19879",
+  "src_url": "https://arxiv.org/src/2512.19879v1",
+  "metadata_source": "abs-page"
+}

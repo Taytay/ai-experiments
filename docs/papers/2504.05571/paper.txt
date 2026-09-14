@@ -1,0 +1,1164 @@
+                                                                       Knowledge-Instruct:
+                                       Effective Continual Pre-training from Limited Data using Instructions
+
+                                       Oded Ovadia *                                               Meni Brief*
+
+                                       Rachel Lemberg                                              Eitam Sheetrit
+
+                                       Microsoft Industry AI
+
+arXiv:2504.05571v1 [cs.CL] 8 Apr 2025                        Abstract                              the web (Conneau, 2019; Gao et al., 2020; We-
+                                                                                                   ber et al., 2024; Touvron et al., 2023). Many of
+                                            While Large Language Models (LLMs) ac-                 these datasets, being representative of available
+                                            quire vast knowledge during pre-training, they         textual content, include substantial amounts of du-
+                                            often lack domain-specific, new, or niche in-          plicated material (Lee et al., 2021; Penedo et al.,
+                                            formation. Continual pre-training (CPT) at-            2024). Consequently, during the pre-training pro-
+                                            tempts to address this gap but suffers from            cess, LLMs are trained on an enormous volume
+                                            catastrophic forgetting and inefficiencies in          of factual information shaped by the underlying
+                                            low-data regimes. We introduce Knowledge-              distribution of the training data.
+                                            Instruct, a novel approach to efficiently inject
+                                            knowledge from limited corpora through pure               The inherent repetition of knowledge within
+                                            instruction-tuning. By generating information-         these datasets can significantly enhance LLM
+                                            dense synthetic instruction data, it effectively       knowledge acquisition, as LLMs benefit from en-
+                                            integrates new knowledge while preserving              countering different formulations of the same fact
+                                            general reasoning and instruction-following            to thoroughly internalize and utilize it (Allen-Zhu
+                                            abilities. Knowledge-Instruct demonstrates su-         and Li, 2023). One example of this phenomenon is
+                                            perior factual memorization, minimizes catas-          the so-called reversal curse (Berglund et al., 2023),
+                                            trophic forgetting, and remains scalable by            where LLMs trained on statements like "A is B"
+                                            leveraging synthetic data from relatively small        struggle to correctly learn the inverse relationship,
+                                            language models. Additionally, it enhances             "B is A." The abundance of related content within
+                                            contextual understanding, including complex            training datasets can help mitigate such issues, fa-
+                                            multi-hop reasoning, facilitating integration          cilitating more robust knowledge acquisition.
+                                            with retrieval systems. We validate its effec-
+                                            tiveness across diverse benchmarks, including             One limitation of this heavy reliance on gen-
+                                            Companies, a new dataset that we release to            eral text corpora is that many less common pieces
+                                            measure knowledge injection capabilities.              of factual information are significantly underrep-
+                                                                                                   resented in many training datasets, making them
+                                       1 Introduction                                              less likely to be effectively learned by the model
+                                                                                                   (Kandpal et al., 2023). Examples include domain-
+                                       Large language models (LLMs) encapsulate exten-             specific knowledge, geographically localized con-
+                                       sive knowledge within their pre-trained weights             tent, or other niche information. Moreover, certain
+                                       (Petroni et al., 2019; Cohen et al., 2023; Hu et al.,       data may be entirely absent from the training cor-
+                                       2023; Chang et al., 2023). This capacity is evi-            pus, such as events that occurred after the model's
+                                       denced by the exceptional performance of modern             knowledge cutoff or proprietary datasets unavail-
+                                       LLMs in knowledge-intensive tasks (Achiam et al.,           able during pre-training.
+                                       2023; Dubey et al., 2024; Anthropic, 2024; Team
+                                       et al., 2023; Liu et al., 2024).                               So, teaching LLMs niche knowledge is challeng-
+                                                                                                   ing due to the limited variations in fact representa-
+                                          Such knowledge is predominantly acquired dur-            tions within data-constrained corpora. This high-
+                                       ing the pre-training phase (Zhou et al., 2024),             lights a fundamental limitation in many practical
+                                       which relies on extensive datasets containing tril-         scenarios. For instance, a manual, handbook, or
+                                       lions of tokens sourced from a wide array of do-            textbook might comprehensively cover a topic us-
+                                       mains, with a significant proportion derived from           ing only  100K tokens with minimal repetition.
+                                                                                                   While this approach is highly effective for human
+                                           *Equal contribution. Corresponding author: odedova-
+                                       dia@microsoft.com
+
+                                                                                                1
+Figure 1: Visualization of the Knowledge-Instruct framework. A small text corpus is transformed into a set of
+information-dense instructions following the steps outlined in Section 3.2.
+
+   learners, it poses significant challenges for LLMs,      datasets and models. Our empirical results con-
+   which rely on diverse and repeated formulations to       firm its effectiveness in efficiently integrating
+   effectively internalize information.                     new knowledge while preserving model stability
+                                                            and conversational fluency. Notably, our method
+      Knowledge-Instruct: In this work, we intro-           achieves strong performance even with limited data,
+   duce Knowledge-Instruct, a novel approach for            making it particularly suited for long-tail knowl-
+   teaching pre-trained LLMs new knowledge from             edge and domain-specific applications.
+   small corpora using synthetic instruction data. This
+   method enables efficient knowledge acquisition by        2 Related Work
+   directly addressing the challenges outlined earlier.
+   Knowledge-Instruct offers several key advantages         Continual Pre-training Continual pre-training
+   over existing alternatives:                              adapts pre-trained language models to specialized
+                                                            domains through additional training on domain-
+1. Superior Factual Memorization: Effectively               specific corpora. Prior work has demonstrated suc-
+   learns factual information, outperforming other          cess in broad domains like medicine (Chen et al.,
+   CPT methods.                                             2023; Wu et al., 2023), code (Rozière et al., 2024),
+                                                            and mathematics (Shao et al., 2024; Mitra et al.,
+2. Compatibility with Instruct Models: Facilitates          2024) using massive datasets (10B­500B tokens).
+   continual pre-training directly on instruction-tuned     However, these methods fail to scale to small cor-
+   models, reducing reliance on unsupervised train-         pora (~1M tokens), where limited diversity and
+   ing that can disrupt chat templates and is often         repetition hinder effective knowledge acquisition
+   restricted for API-based models.                         (Kandpal et al., 2023). This challenge stems from
+                                                            the inherent data inefficiency of language mod-
+3. Minimizes Catastrophic Forgetting: Exhibits              els, which require multiple contextual exposures
+   minimal degradation in other model capabilities          to internalize facts (Allen-Zhu and Li, 2023). Re-
+   while integrating new knowledge.                         cent approaches address this through synthetic data
+                                                            augmentation, generating paraphrased texts (Maini
+4. Cost-Efficient: Requires only a relatively small         et al., 2024; Ovadia et al., 2023) or structured entity-
+   language model to generate synthetic training data.      based expansions (Yang et al., 2024). While Yang
+                                                            et al. (2024)'s method is highly effective for adding
+5. Enhanced Context Understanding: Strengthens              new knowledge, it demands a very large amount of
+   the model's ability to interpret and reason over re-     tokens, and also requires an additional instruction-
+   trieved context more effectively, making retrieval-      tuning phase to be useful in practice.
+   augmented systems more accurate and reliable,
+   even in challenging multi-hop scenarios.                 Knowledge Injection Alternative methods for
+                                                            knowledge integration include knowledge editing,
+      To validate these advantages, we empiri-
+   cally evaluate Knowledge-Instruct across diverse
+
+                                                         2
+  which updates specific model parameters to in-            We accomplish these objectives through a six-
+  sert facts while preserving existing capabilities         step process consisting of entity extraction, fac-
+  (Mitchell et al., 2021; Meng et al., 2022). While         tual extraction, contextualization, deduplication,
+  effective for atomic edits, these methods struggle to     paraphrasing, and instruction conversion. A visual
+  scale for broader knowledge. Retrieval-augmented          overview of these steps is depicted in Figure 1.
+  generation (RAG) (Lewis et al., 2020) bypasses
+  parametric learning by dynamically accessing ex-          3.2 Methodology
+  ternal documents, but depends on retrieval quality,
+  and potentially demands many tokens per query.            Given a corpus D = {d1, d2, . . . , dN } of N doc-
+  Synthetic data generation allows for creating di-         uments, a pre-trained language model Mext for
+  verse synthetic pre-training corpora via complex ex-      extraction, we construct a training dataset Dtrain in
+  ternal prompting (Li et al., 2023; Mukherjee et al.,      six stages:
+  2023), combined with further training. Supervised
+  fine-tuning (SFT), particularly instruction tuning        (1) Entity Extraction. For each document d 
+  (Wang et al., 2022), is highly effective at improv-       D, extract the set of entities Ed,Mext that appear in
+  ing zero-shot and reasoning capabilities. However,        d, as identified by Mext:
+  SFT is primarily used to enhance task generaliza-
+  tion rather than introducing new factual knowledge           Ed,Mext = { e | e identified by Mext in d}.
+  (Mitra et al., 2023; Chia et al., 2023; Zhou et al.,
+  2024).                                                    (2) Factual Extraction. Using the entities
+                                                            Ed,Mext, extract all facts f = (e, detail about e),
+ 3 Knowledge-Instruct                                       where e  Ed,Mext. Concretely,
+
+  The core idea behind this methodology is to               Fd,Mext = {f | Mext extracted f from d about e},
+  transform a corpus of raw textual data into
+  an information-dense set of factual instructions,         where Fd,Mext denotes the set of facts found in the
+  thereby facilitating a knowledge-focused SFT              document d. This process is repeated several times,
+  phase.                                                    each time prompting Mext to search for missing
+                                                            facts and maximize coverage.
+  3.1 Rationale
+                                                            (3) Contextualization. For each fact f 
+  Our approach is guided by key observations and            Fd,Mext, we use Mext to ensure that e appears
+  hypotheses that we see as fundamental to building         explicitly within f , thus clarifying the context of f .
+  knowledge injection framework for LLMs:                   The context-augmented fact is thus f, Cf .
+
+· Entities: Knowledge is intrinsically linked to enti-      (4) Deduplication. Within each set Fd,Mext,
+  ties, serving as primary anchors for factual infor-       identify and remove equivalent facts using Mext.
+  mation.                                                   We denote the deduplicated set as Fd,Mext.
+                                                            (5) Paraphrasing. For each fact f  Fd,Mext,
+· Coverage: A training dataset must thoroughly              generate a set of k paraphrased variations Pf using
+  capture all pertinent factual details about the tar-      Mext:
+  geted entities in order to successfully integrate new
+  knowledge.                                                           Pf = { p1, . . . , pk | pi  f }.
+
+· Context: The meaning and representation of                (6) Instruction Conversion. Finally, convert
+  knowledge often depend on surrounding text, mak-          each paraphrased fact p  Pf into an instruction-
+  ing clear and complete semantic context essential.        response pair Ip = instruction, p , where instruc-
+                                                            tion is a prompt that p is a valid response for. This
+· Repetition: Each piece of factual information             step is necessary to ensure suitability for supervised
+  should be presented multiple times (e.g., through         fine-tuning (SFT).
+  paraphrasing) for more robust learning.
+                                                               This conversion is performed using a simple
+· Knowledge Distribution: The dataset's distribu-           rule-based approach, where facts are mapped to
+  tion of factual information should closely reflect        instruction-response pairs through pre-defined tem-
+  the patterns found in the original corpus.                plates. These templates include variations such
+                                                            as:
+
+                                                         3
+Model               Companies PopQA MultiHopRAG MultiHopRAG + Oracle Average
+
+                                 Llama-3.1-8B-Instruct
+
+Base                0.0          13.2                       22.4  70.7  26.6
+
+CPT                 4.2          40.5                       45.0  66.1  38.9
+
+Rephrase CPT        17.7         49.2                       41.2  66.7  43.7
+
+Synthetic CPT       53.5         73.4                       50.6  69.0  61.6
+
+Knowledge-Instruct  81.8         76.8                       56.5  80.0  73.6
+
+                                       Phi-4-14B
+
+Base                1.2          5.0                        26.5  74.0  26.7
+
+CPT                 9.4          31.8                       33.4  75.3  37.5
+
+Rephrase CPT        13.3         32.7                       36.7  75.6  39.6
+
+Knowledge-Instruct  86.2         80.1                       60.9  79.6  76.7
+
+                                       GPT-4o
+
+Base                4.8          62.4                       45.6  82.6  48.9
+
+Table 1: Main results comparing Knowledge-Instruct with other methods. "Base" refers to the original model,
+without any training, and "MultiHopRAG + Oracle" refers to direct access to the relevant ground-truth documents.
+
+      "Tell me a fact about {entity}."                         Each dataset represents a distinct type of
+      "What can you tell me about {entity}?"                knowledge-intensive challenge: Companies con-
+      "Please provide a fact about {entity}."               tains entirely unseen knowledge, making it a true
+                                                            test of the model's ability to learn new facts.
+This ensures diversity in instruction phrasing while        PopQA, on the other hand, includes knowledge
+maintaining consistency in knowledge representa-            that the model has likely encountered during pre-
+tion. The full list of templates is shown in Ap-            training but in a long-tail distribution, assessing its
+pendix C.                                                   ability to retrieve and generalize from previously
+                                                            seen but less common data. Finally, MultiHop-
+(7) Putting it all together. The final dataset Dtrain       RAG requires reasoning over a complex knowledge
+is the aggregation of all instruction-response pairs        graph, testing the model's ability to synthesize mul-
+generated:                                                  tiple pieces of information and derive meaningful
+                                                            insights from them. For all datasets we use open-
+Dtrain =                    Ip.                             ended questions only, to avoid any guessing that
+                                                            multiple choice questions may enable. The code
+          dD f Fd,Mext pPf                                  for creating Companies, as well as the full dataset
+                                                            and PopQA subset are made publicly available1.
+It is worth noting that entity and factual extrac-
+                                                               Companies: We created a synthetic dataset com-
+tion are similar to constructing a knowledge graph.         posed of 23 entirely fictional companies. To do so,
+                                                            we first created a set of unrealistic company names
+A knowledge graph is a directed graph G = (V, E),           alongside a very short description of the company.
+                                                            We then used GPT-4o (OpenAI, 2024) to generate
+where V = {v1, . . . , v|V |} represents the set of all     an overview describing the company, a full catalog
+possible entities, and E  V × R × V represents              of the products/services they offer, and their finan-
+                                                            cial report for a recent quarter. The prompts for
+the set of all facts or factual relations involving         this can be found in Appendix D. A full example
+                                                            from the dataset can be found in Appendix E. For
+these entities. While we assume that Ed,Mext  V ,           each section, for each company, we generated 10
+it is likely that Fd,Mext  E as we do not explicitly        questions, resulting in a total of 690 questions.
+
+attempt to construct or traverse a graph.                       1https://github.com/meniData1/
+                                                            knowledge-instruct
+4 Experiment Setup
+
+4.1 Datasets
+
+To properly evaluate the proposed method, we fo-
+cus on datasets where the model's prior knowledge
+is either limited or nonexistent. We select three di-
+verse datasets: Companies, PopQA, and MultiHop-
+RAG.
+
+                                                         4
+               Knowledge-Instruct Synthetic CPT CPT Rephrase CPT Base Base + Orca SFT
+
+MMLU           66.7  67.0                                 66.9  66.6  68.2  67.3
+
+TriviaQA       67.0  67.8                                 68.0  67.1  70.1  69.0
+
+ARC-Challenge  58.2  53.4                                 56.3  56.3  50.3  56.9
+
+ARC-Easy       83.8  80.6                                 82.2  82.7  75.8  83.3
+
+GSM8K          75.7  67.1                                 65.5  69.6  77.6  75.6
+
+Hellaswag      76.3  77.1                                 75.7  73.2  70.0  72.6
+
+Winogrande     68.0  65.9                                 65.1  66.2  65.4  67.2
+
+OpenBookQA     44.4  44.8                                 41.4  41.4  38.4  42.6
+
+MMLU-Pro       35.3  29.8                                 22.6  22.1  33.6  38.2
+
+Average        63.9  61.5                                 60.4  60.6  61.0  63.6
+
+Table 2: Performance comparison of different methods on various general LLM benchmarks. All results are reported
+for Llama trained on the MultiHop-RAG data. "Base" refers to the original model without any additional training,
+while "Base + Orca SFT" denotes the model fine-tuned exclusively on OpenOrca data, serving as baselines for
+comparison. Evaluation was conducted using the LM-Evaluation-Harness framework (Gao et al., 2024).
+
+   PopQA: PopQA (Mallen et al., 2022) is a                for evaluation. Specifically, we used the judge sug-
+dataset containing long-tail knowledge gathered           gested by Brief et al. (2024), with GPT-4o as the
+from Wikipedia. Long-tail knowledge in this con-          LLM and their suggested prompt. A response is
+text refers to the popularity of a page, measured as      considered correct only if it strictly matches (i.e.,
+monthly user visits. PopQA questions have data            receiving a score of 2 out of {0,1,2}), with normal-
+about the popularity of both the 'Subject' of the         ization performed by dividing the score by two.
+question and the 'Object', or answer, to the ques-
+tion. We selected a subset of PopQA such that:            5 Experiments
+PopularitySubject + PopularityObject < 2500, thus
+ensuring the long-tail property. Next, we removed         We conduct a thorough exploration of the capa-
+all ambiguous and problematic questions, by keep-         bilities of the proposed method on the datasets
+ing only questions that GPT-4o was able to an-            described in Section 4.1. We apply Knowledge-
+swer correctly when provided with the relevant            Instruct on two different language models: Llama-
+Wikipedia article. This resulted in a total of 1,935      3.1-8B-Instruct (Llama) (Dubey et al., 2024) and
+question and answer pairs, alongside their respec-        Phi-4-14B (Abdin et al., 2024).
+tive Wikipedia articles.
+                                                          5.1 Baselines
+   MultiHop-RAG: MultiHop-RAG (Tang and
+Yang, 2024) is a dataset designed to evaluate RAG         We compare Knowledge-Instruct to several meth-
+systems on complex multi-hop queries, where an-           ods, described below. Unless otherwise stated, all
+swering a question requires reasoning across multi-       data was generated using GPT-4o-mini (OpenAI,
+ple documents to connect disparate pieces of infor-       2024).
+mation. It comprises a knowledge base of English          Continual Pre-training (CPT): We perform the
+news articles, a diverse set of multi-hop questions,      standard CPT approach, in which we directly train
+their corresponding ground-truth answers, and the         the LLM on the raw text corpora in an unsupervised
+necessary supporting evidence. The dataset was            manner. However, this process breaks the chat tem-
+constructed by extracting factual sentences from          plate of the model, and results in a model that has
+news articles, rephrasing them into claims, and           very poor conversational and instruction-following
+generating multi-hop queries that require reasoning       abilities. To mitigate that, we perform another step
+across multiple documents.                                of SFT on 10, 000 high-quality instructions taken
+                                                          from OpenOrca (Lian et al., 2023).
+4.2 Evaluation                                            Rephrase CPT: Following (Allen-Zhu and Li,
+                                                          2023; Maini et al., 2024; Ovadia et al., 2023), we
+To simulate real-life applications, all questions are     also test a different CPT approach, where each
+in conversational open-ended format. So, standard         document is rephrased in several different styles.
+accuracy metrics were not applicable. Instead, we         Specifically, we rephrase each document 100 times,
+employed an LLM-as-a-Judge (Zheng et al., 2023)           using 10 different prompts to increase diversity.
+
+                                                       5
+Figure 2: Number of facts extracted by different LLMs        CPT improves over the other baselines but still
+at various stages of the Knowledge-Instruct process.         somewhat struggles.
+The extraction is performed in three rounds: an ini-         In contrast, Knowledge-Instruct significantly out-
+tial extraction followed by two iterative verification       performs all methods, exceeding 80% accuracy for
+passes, where the model identifies any missed facts.         both models, demonstrating its ability to adapt to
+The results are reported for the Companies dataset, with     unseen data. It is slightly more effective for Phi-4,
+'Total Facts' representing the cumulative count across       possibly due to its larger parameter count.
+all rounds and 'Unique Facts' indicating distinct, non-
+redundant extractions. The final model accuracy on the          PopQA: Unlike Companies, PopQA contains
+benchmark is provided in the legend.                         knowledge that the models have likely encountered
+                                                             during pre-training, though infrequently. This is
+The full list of prompts is detailed in Appendix D.          reflected in the higher "Base" scores and the better
+Then, we perform the exact same CPT process                  performance of CPT and Rephrase CPT, which
+described before on the paraphrased corpora.                 - despite failing on Companies - show a notable
+Synthetic Continued Pre-training: We used the                improvement here. However, they still lag behind
+methodology proposed by Yang et al. (2024) to cre-           Synthetic CPT and Knowledge-Instruct, the latter
+ate the Synthetic CPT models. Due to its relatively          once again achieving the best results.
+small size we created entity pairs and triplets for          Interestingly, Llama outperforms Phi-4 with CPT
+the companies dataset, while for the larger PopQA            and Rephrase CPT. We hypothesize this may be
+and MultiHopRAG datasets we used only entity                 due to Phi's stronger reliance on highly curated syn-
+pairs. Due to similar computational constraints, we          thetic training (Abdin et al., 2024), leading to less
+skipped Phi-4. Using their training method exactly,          exposure to raw Wikipedia content. Nonetheless,
+we first created a CPT-only model (with a mixture            Knowledge-Instruct shows consistent gains across
+of general data), followed by instruction tuning.            both models, following the same trend observed
+                                                             in Companies. Furthermore, both Knowledge-
+5.2 Main Results                                             Instruct and Synthetic CPT outperform the much
+                                                             larger GPT-4o, which was likely exposed to this
+The complete evaluation results for all datasets and         data before, suggesting that even large models
+methods are presented in Table 1. Across all cases,          struggle with long-tail knowledge (Kandpal et al.,
+Knowledge-Instruct consistently achieves the best            2023).
+results, outperforming the other methods and sig-            MultiHop-RAG: This dataset presents a differ-
+nificantly enhancing the models' knowledge. To               ent challenge, requiring reasoning over retrieved
+better understand these outcomes, we analyze each            knowledge rather than just factual recall. Even
+dataset separately, highlighting key trends and dif-         when the providing the model with the full correct
+ferences in model performance.                               context (we refer to this as the "Oracle" setting),
+                                                             GPT-4o reaches a ceiling of 82.6%, indicating the
+   Companies: This dataset introduces entirely               difficulty of the task.
+new knowledge, as seen in the near-zero "Base"               Similar to PopQA, prior exposure to similar train-
+scores, confirming that the models have no prior             ing distribution appears to play a role in the stan-
+exposure apart from random guesses. A clear trend            dard case (without "Oracle"), with Llama achieving
+emerges: CPT and Rephrase CPT fail completely to             higher scores than Phi-4 with CPT and Rephrase
+acquire meaningful information, performing poorly            CPT, likely due to the same factors discussed ear-
+on both Llama and Phi-4. While rephrasing pro-               lier. However, Rephrase CPT does not show a
+vides a slight boost, scores remain low. Synthetic           consistent improvement over CPT here.
+                                                             Once again, Knowledge-Instruct achieves the best
+                                                             results, though overall scores remain lower than
+                                                             in the other two datasets, emphasizing the greater
+                                                             complexity of this benchmark. However, when
+                                                             adding the Oracle case, there is a significant im-
+                                                             provement. A notable trend emerges: all CPT
+                                                             methods fail to significantly improve Oracle re-
+                                                             sults, and in some cases, even degrade performance.
+                                                             Knowledge-Instruct, on the other hand, signifi-
+
+                                                          6
+Figure 3: A comparison of Knowledge-Instruct with           other benchmarks, likely due to the added super-
+Synthetic CPT. Synthetic CPT without further SFT is         vised fine-tuning (SFT) data.
+better at the new domain, at the expense of instruction
+following, and vice versa. The base model, Llama, is           However, there are two notable exceptions. In
+shown for reference.                                        GSM8K, Knowledge-Instruct shows only min-
+                                                            imal deterioration, whereas other methods ex-
+cantly improves results, particularly for Llama,            hibit significant decline. Similarly, in MMLU-
+which sees an almost 10% gain. This indicates               Pro Knowledge-Instruct retains capabilities, even
+that Knowledge-Instruct not only preserves rea-             slightly surpassing the base model, while the CPT
+soning capabilities over retrieved data but actively        methods show worse results.
+enhances them, highlighting its strong potential for
+(RAG) applications.                                            CPT vs. SFT: Figure 3 show the performance
+                                                            of Knowledge-Instruct compared to Synthetic CPT,
+5.3 Catastrophic Forgetting Analysis                        before and after adding the SFT stage. All SFT
+                                                            models, including the base model that has no prior
+One major fine-tuning risk is the phenomenon of             knowledge at all, achieve over 95% accuracy in the
+catastrophic forgetting (Kirkpatrick et al., 2017;          Companies Oracle case. While the performance
+Goodfellow et al., 2013; Chen et al., 2020; Luo             of Synthetic CPT before instruction tuning is sig-
+et al., 2023), where models lose some of the capa-          nificantly better on Companies directly, its under-
+bilities they had prior to the fine-tuning process.         performs on the much easier Oracle version. In con-
+                                                            trast, Knowledge-Instruct performs well on both
+   To address this concern, we perform a case-              versions, showing full retention of previous abili-
+study on Llama in the MultiHop-RAG scenario,                ties, with no knowledge learning trade-offs.
+and evaluate all of the fine-tuned models on
+a range of common general LLM benchmarks.                      Regularization Hypothesis: We hypothesize
+This includes knowledge-intensive tasks (MMLU,              that this is due to Knowledge-Instruct's single-step
+TriviaQA (Hendrycks et al., 2020; Joshi et al.,             approach, where general SFT data and new knowl-
+2017)), reasoning tasks (ARC, GSM8K, Wino-                  edge data are integrated simultaneously, likely
+grande (Clark et al., 2018; Cobbe et al., 2021;             serving as a form of regularization (Brief et al.,
+Sakaguchi et al., 2021)), reading comprehension             2024). In contrast, CPT-based methods follow a
+(OpenBookQA (Mihaylov et al., 2018)), and a com-            two-step approach - an initial unsupervised pre-
+bination of knowledge with reasoning (MMLU-                 training phase, followed by SFT. Our findings, both
+Pro (Wang et al., 2024)).                                   in the Oracle cases, and for general benchmarks
+                                                            like GSMK8K or MMLU-Pro, suggest that without
+   General Results: The full results are presented          proper regularization, CPT-based methods impair
+in Table 2. Overall, Knowledge-Instruct preserves           the model's ability to reason over existing knowl-
+general capabilities and mitigates catastrophic for-        edge.
+getting more effectively than other methods. In
+fact, we observe an improvement in reasoning tasks          5.4 Effect of Paraphrasing
+across all methods, likely due to the inclusion of
+high-quality SFT data. This aligns with the "Base           We conduct an ablation study to assess the impact
++ Orca SFT" column, where OpenOrca alone im-                of the paraphrasing step in Knowledge-Instruct.
+proves Llama's reasoning ability. While all meth-           Specifically, we generate facts as described in Sec-
+ods show minor deterioration in general knowledge           tion 3, creating five paraphrases for each fact. We
+tasks (MMLU and TriviaQA), they largely main-               then fine-tune the LLM with progressively more
+tain or even slightly improve performance on the            paraphrases, starting from only the original fact
+                                                            and increasing up to the full set of five.
+
+                                                               The results of this study on the Companies
+                                                            dataset using Llama are shown in Figure 4. We
+                                                            observe a clear trend: performance improves as
+                                                            the number of paraphrases increases, and begins
+                                                            to plateau around 3 paraphrases. This aligns with
+                                                            previous findings (Ovadia et al., 2023; Allen-Zhu
+                                                            and Li, 2023), which report similar benefits from
+                                                            diverse rephrasings.
+
+                                                               While a high number of paraphrases is generally
+
+                                                         7
+                                                            Model         Oracle Reconstruct Gap
+
+                                                            PopQA Oracle  99.0               97.1  1.9
+
+                                                            Companies Oracle 98.4            95.5  2.9
+
+                                                            Table 3: Comparison of oracle and reconstructed scores
+                                                            for GPT-4o on the PopQA and Companies datasets.
+
+                                                            without significant trade-offs.
+
+Figure 4: Effect of the paraphrasing step in Knowledge-     5.6 Dataset Coverage
+Instruct on accuracy using the Companies dataset with
+Llama.                                                       Table 3 shows our evaluation of the coverage
+                                                            of the data generated using Knowledge-Instruct,
+beneficial, practical computational considerations          i.e., Dtrain2. To do so, we use Oracle versions of
+must be taken into account. Notably, our results            PopQA and Companies, with the full document
+show that just five paraphrases are sufficient to           provided as context. We set the baseline perfor-
+yield a significant performance boost. This sug-            mance for GPT-4o in this setup at 99% and 98.4%
+gests that Knowledge-Instruct is already traversing         accuracy respectively. Next, we concatenate all
+the latent knowledge graph of the corpus effec-             the facts generated from the document and use this
+tively, requiring only a modest amount of para-             concatenation as the context. The accuracy for this
+phrasing to enhance learning.                               version is 97.1% and 95.5% respectively, meaning
+                                                            the average Accuracy Degradation is under 2.5%,
+5.5 Extraction Model Ablation                               suggesting that the generated facts provide strong
+                                                            coverage of the dataset. A more formal definition
+We perform another ablation study on the impact             of this metric can be found in Appendix B.
+of the LLM used to extract the facts, Mext as de-
+scribed in Section 3.2. Throughout all experiments          6 Conclusions
+we used GPT-4o-mini, which showed excellent re-
+sults while being very fast and cheap. To measure           In this work, we introduced Knowledge-Instruct,
+its performance, we repeated the entire Knowledge-          a novel instruction-based fine-tuning approach for
+Instruct methodology as described in Section 3 for          efficient knowledge injection in LLMs. Our experi-
+the Companies dataset, using GPT-4o, GPT-4o-                ments highlight its advantages over traditional CPT,
+mini, and Llama.                                            including superior factual memorization, reduced
+                                                            catastrophic forgetting, and improved contextual
+   The full results are presented in Figure 2. We           understanding, all while remaining cost-effective
+observe that Llama generates the highest number of          by leveraging smaller language models for syn-
+facts, followed by GPT-4o-mini, while GPT-4o pro-           thetic data generation.
+duces the fewest. However, many of the facts from
+Llama are repetitive, as it struggles to extract dis-       7 Limitations
+tinct follow-up facts and often repeats previously
+generated ones. GPT-4o-mini exhibits the same be-           Knowledge-Instruct directly addresses an impor-
+havior to a lesser extent, while GPT-4o is the most         tant limitation in LLMs by successfully adapt-
+efficient in generating unique facts. This repetition       ing to niche knowledge. Despite its advantages,
+introduces a natural paraphrasing effect, which ulti-       Knowledge-Instruct has certain limitations. First,
+mately benefits the fine-tuned model trained on the         while synthetic instruction generation facilitates
+Llama generated dataset, as reflected in Figure 4,          knowledge injection from limited data, its quality
+while increasing the required training tokens.              and coverage depend on the prompting strategy, re-
+                                                            quiring adjustments for different datasets. Second,
+   Our results demonstrate that massive LLMs are            although our method reduces catastrophic forget-
+not necessary for Knowledge-Instruct, as even               ting, it does not fully eliminate it, necessitating fur-
+smaller models can improve cost-effectiveness               ther research into long-term knowledge retention.
+
+                                                                2Coverage is trivial for a full corpus, since all information
+                                                            is contained within. The further removed a training dataset is
+                                                            from the underlying corpus, the less trivial this becomes.
+
+                                                         8
+Lastly, as with all machine learning approaches,                Tafjord. 2018. Think you have solved question an-
+hyperparameter selection influences performance,                swering? try arc, the ai2 reasoning challenge. ArXiv,
+making careful optimization essential for specific              abs/1803.05457.
+use cases.
+                                                             Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian,
+References                                                      Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias
+                                                                Plappert, Jerry Tworek, Jacob Hilton, Reiichiro
+Marah Abdin, Jyoti Aneja, Harkirat Behl, Sébastien              Nakano, et al. 2021. Training verifiers to solve math
+   Bubeck, Ronen Eldan, Suriya Gunasekar, Michael               word problems. arXiv preprint arXiv:2110.14168.
+   Harrison, Russell J Hewett, Mojan Javaheripi, Piero
+   Kauffmann, et al. 2024. Phi-4 technical report. arXiv     Roi Cohen, Mor Geva, Jonathan Berant, and
+   preprint arXiv:2412.08905.                                   Amir Globerson. 2023. Crawling the internal
+                                                                knowledge-base of language models. arXiv preprint
+Josh Achiam, Steven Adler, Sandhini Agarwal, Lama               arXiv:2301.12810.
+   Ahmad, Ilge Akkaya, Florencia Leoni Aleman,
+   Diogo Almeida, Janko Altenschmidt, Sam Altman,            A Conneau. 2019. Unsupervised cross-lingual rep-
+   Shyamal Anadkat, et al. 2023. Gpt-4 technical report.        resentation learning at scale. arXiv preprint
+   arXiv preprint arXiv:2303.08774.                             arXiv:1911.02116.
+
+Zeyuan Allen-Zhu and Yuanzhi Li. 2023. Physics of            Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey,
+   language models: Part 3.2, knowledge manipulation.           Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman,
+   arXiv preprint arXiv:2309.14402.                             Akhil Mathur, Alan Schelten, Amy Yang, Angela
+                                                                Fan, et al. 2024. The llama 3 herd of models. arXiv
+AI Anthropic. 2024. The claude 3 model family: Opus,            preprint arXiv:2407.21783.
+   sonnet, haiku. Claude-3 Model Card, 1.
+                                                             Leo Gao, Stella Biderman, Sid Black, Laurence Gold-
+Lukas Berglund, Meg Tong, Max Kaufmann, Mikita                  ing, Travis Hoppe, Charles Foster, Jason Phang, Ho-
+   Balesni, Asa Cooper Stickland, Tomasz Korbak, and            race He, Anish Thite, Noa Nabeshima, et al. 2020.
+   Owain Evans. 2023. The reversal curse: Llms trained          The pile: An 800gb dataset of diverse text for lan-
+   on" a is b" fail to learn" b is a". arXiv preprint           guage modeling. arXiv preprint arXiv:2101.00027.
+   arXiv:2309.12288.
+                                                             Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman,
+Meni Brief, Oded Ovadia, Gil Shenderovitz, Noga Ben             Sid Black, Anthony DiPofi, Charles Foster, Laurence
+   Yoash, Rachel Lemberg, and Eitam Sheetrit. 2024.             Golding, Jeffrey Hsu, Alain Le Noac'h, Haonan Li,
+   Mixing it up: The cocktail effect of multi-task fine-        Kyle McDonell, Niklas Muennighoff, Chris Ociepa,
+   tuning on llm performance­a case study in finance.           Jason Phang, Laria Reynolds, Hailey Schoelkopf,
+   arXiv preprint arXiv:2410.01109.                             Aviya Skowron, Lintang Sutawika, Eric Tang, An-
+                                                                ish Thite, Ben Wang, Kevin Wang, and Andy Zou.
+Yupeng Chang, Xu Wang, Jindong Wang, Yuan Wu,                   2024. A framework for few-shot language model
+   Kaijie Zhu, Hao Chen, Linyi Yang, Xiaoyuan Yi,               evaluation.
+   Cunxiang Wang, Yidong Wang, et al. 2023. A sur-
+   vey on evaluation of large language models. arXiv         Ian J Goodfellow, Mehdi Mirza, Da Xiao, Aaron
+   preprint arXiv:2307.03109.                                   Courville, and Yoshua Bengio. 2013. An em-
+                                                                pirical investigation of catastrophic forgetting in
+Sanyuan Chen, Yutai Hou, Yiming Cui, Wanxiang Che,              gradient-based neural networks. arXiv preprint
+   Ting Liu, and Xiangzhan Yu. 2020. Recall and learn:          arXiv:1312.6211.
+   Fine-tuning deep pretrained language models with
+   less forgetting. arXiv preprint arXiv:2004.12651.         Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou,
+                                                                Mantas Mazeika, Dawn Song, and Jacob Steinhardt.
+Zeming Chen, Alejandro Hernández Cano, Angelika                 2020. Measuring massive multitask language under-
+   Romanou, Antoine Bonnet, Kyle Matoba, Francesco              standing. arXiv preprint arXiv:2009.03300.
+   Salvi, Matteo Pagliardini, Simin Fan, Andreas Köpf,
+   Amirkeivan Mohtashami, et al. 2023. Meditron-70b:         Linmei Hu, Zeyi Liu, Ziwang Zhao, Lei Hou, Liqiang
+   Scaling medical pretraining for large language mod-          Nie, and Juanzi Li. 2023. A survey of knowledge
+   els. arXiv preprint arXiv:2311.16079.                        enhanced pre-trained language models. IEEE Trans-
+                                                                actions on Knowledge and Data Engineering.
+Yew Ken Chia, Pengfei Hong, Lidong Bing, and Sou-
+   janya Poria. 2023. Instructeval: Towards holistic         Mandar Joshi, Eunsol Choi, Daniel S Weld, and Luke
+   evaluation of instruction-tuned large language mod-          Zettlemoyer. 2017. Triviaqa: A large scale distantly
+   els. arXiv preprint arXiv:2306.04757.                        supervised challenge dataset for reading comprehen-
+                                                                sion. arXiv preprint arXiv:1705.03551.
+Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot,
+   Ashish Sabharwal, Carissa Schoenick, and Oyvind           Nikhil Kandpal, Haikang Deng, Adam Roberts, Eric
+                                                                Wallace, and Colin Raffel. 2023. Large language
+                                                                models struggle to learn long-tail knowledge. In In-
+                                                                ternational Conference on Machine Learning, pages
+                                                                15696­15707. PMLR.
+
+                                                          9
+James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz,          Eric Mitchell, Charles Lin, Antoine Bosselut, Chelsea
+   Joel Veness, Guillaume Desjardins, Andrei A Rusu,            Finn, and Christopher D Manning. 2021. Fast model
+   Kieran Milan, John Quan, Tiago Ramalho, Ag-                  editing at scale. arXiv preprint arXiv:2110.11309.
+   nieszka Grabska-Barwinska, et al. 2017. Over-
+   coming catastrophic forgetting in neural networks.        Arindam Mitra, Luciano Del Corro, Shweti Mahajan,
+   Proceedings of the national academy of sciences,             Andres Codas, Clarisse Simoes, Sahaj Agrawal, Xuxi
+   114(13):3521­3526.                                           Chen, Anastasia Razdaibiedina, Erik Jones, Kriti
+                                                                Aggarwal, et al. 2023. Orca 2: Teaching small
+Katherine Lee, Daphne Ippolito, Andrew Nystrom,                 language models how to reason. arXiv preprint
+   Chiyuan Zhang, Douglas Eck, Chris Callison-Burch,            arXiv:2311.11045.
+   and Nicholas Carlini. 2021. Deduplicating training
+   data makes language models better. arXiv preprint         Arindam Mitra, Hamed Khanpour, Corby Rosset, and
+   arXiv:2107.06499.                                            Ahmed Awadallah. 2024. Orca-math: Unlocking
+                                                                the potential of slms in grade school math. Preprint,
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio            arXiv:2402.14830.
+   Petroni, Vladimir Karpukhin, Naman Goyal, Hein-
+   rich Küttler, Mike Lewis, Wen-tau Yih, Tim Rock-          Subhabrata Mukherjee, Arindam Mitra, Ganesh Jawa-
+   täschel, et al. 2020. Retrieval-augmented generation         har, Sahaj Agarwal, Hamid Palangi, and Ahmed
+   for knowledge-intensive nlp tasks. Advances in Neu-          Awadallah. 2023. Orca: Progressive learning from
+   ral Information Processing Systems, 33:9459­9474.            complex explanation traces of gpt-4. Preprint,
+                                                                arXiv:2306.02707.
+Yuanzhi Li, Sébastien Bubeck, Ronen Eldan, Allie
+   Del Giorno, Suriya Gunasekar, and Yin Tat Lee. 2023.      OpenAI. 2024. Gpt-4o mini: Advancing cost-efficient
+   Textbooks are all you need ii: phi-1.5 technical report.     intelligence.
+   arXiv preprint arXiv:2309.05463.
+                                                             OpenAI. 2024. Hello, gpt-4. https://openai.com/
+Wing Lian, Bleys Goodson, Eugene Pentland, Austin               index/hello-gpt-4o/. Accessed: 2024-09-23.
+   Cook, Chanvichet Vong, and "Teknium". 2023.
+   Openorca: An open dataset of gpt augmented flan           Oded Ovadia, Menachem Brief, Moshik Mishaeli, and
+   reasoning traces. https://https://huggingface.               Oren Elisha. 2023. Fine-tuning or retrieval? com-
+   co/Open-Orca/OpenOrca.                                       paring knowledge injection in llms. arXiv preprint
+                                                                arXiv:2312.05934.
+Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang,
+   Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi            Guilherme Penedo, Hynek Kydlícek, Anton Lozhkov,
+   Deng, Chenyu Zhang, Chong Ruan, et al. 2024.                 Margaret Mitchell, Colin Raffel, Leandro Von Werra,
+   Deepseek-v3 technical report. arXiv preprint                 Thomas Wolf, et al. 2024. The fineweb datasets:
+   arXiv:2412.19437.                                            Decanting the web for the finest text data at scale.
+                                                                arXiv preprint arXiv:2406.17557.
+Yun Luo, Zhen Yang, Fandong Meng, Yafu Li, Jie
+   Zhou, and Yue Zhang. 2023. An empirical study             Fabio Petroni, Tim Rocktäschel, Patrick Lewis, An-
+   of catastrophic forgetting in large language mod-            ton Bakhtin, Yuxiang Wu, Alexander H Miller, and
+   els during continual fine-tuning. arXiv preprint             Sebastian Riedel. 2019. Language models as knowl-
+   arXiv:2308.08747.                                            edge bases? arXiv preprint arXiv:1909.01066.
+
+Pratyush Maini, Skyler Seto, He Bai, David Grangier,         Baptiste Rozière, Jonas Gehring, Fabian Gloeckle, Sten
+   Yizhe Zhang, and Navdeep Jaitly. 2024. Rephrasing            Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi,
+   the web: A recipe for compute and data-efficient lan-        Jingyu Liu, Romain Sauvestre, Tal Remez, Jérémy
+   guage modeling. arXiv preprint arXiv:2401.16380.             Rapin, Artyom Kozhevnikov, Ivan Evtimov, Joanna
+                                                                Bitton, Manish Bhatt, Cristian Canton Ferrer, Aaron
+Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das,            Grattafiori, Wenhan Xiong, Alexandre Défossez,
+   Daniel Khashabi, and Hannaneh Hajishirzi. 2022.              Jade Copet, Faisal Azhar, Hugo Touvron, Louis Mar-
+   When not to trust language models: Investigating             tin, Nicolas Usunier, Thomas Scialom, and Gabriel
+   effectiveness of parametric and non-parametric mem-          Synnaeve. 2024. Code llama: Open foundation mod-
+   ories. arXiv preprint arXiv:2212.10511.                      els for code. Preprint, arXiv:2308.12950.
+
+Kevin Meng, Arnab Sen Sharma, Alex Andonian,                 Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavat-
+   Yonatan Belinkov, and David Bau. 2022. Mass-                 ula, and Yejin Choi. 2021. Winogrande: An adver-
+   editing memory in a transformer. arXiv preprint              sarial winograd schema challenge at scale. Commu-
+   arXiv:2210.07229.                                            nications of the ACM, 64(9):99­106.
+
+Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish         Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu,
+   Sabharwal. 2018. Can a suit of armor conduct elec-           Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan
+   tricity? a new dataset for open book question answer-        Zhang, YK Li, Y Wu, et al. 2024. Deepseekmath:
+   ing. In EMNLP.                                               Pushing the limits of mathematical reasoning in open
+                                                                language models. arXiv preprint arXiv:2402.03300.
+
+10
+Yixuan Tang and Yi Yang. 2024. Multihop-rag: Bench-            Chunting Zhou, Pengfei Liu, Puxin Xu, Srinivasan Iyer,
+   marking retrieval-augmented generation for multi-              Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping
+   hop queries. arXiv preprint arXiv:2401.15391.                  Yu, Lili Yu, et al. 2024. Lima: Less is more for align-
+                                                                  ment. Advances in Neural Information Processing
+Gemini Team, Rohan Anil, Sebastian Borgeaud, Jean-                Systems, 36.
+   Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan
+   Schalkwyk, Andrew M Dai, Anja Hauth, Katie
+   Millican, et al. 2023. Gemini: a family of
+   highly capable multimodal models. arXiv preprint
+   arXiv:2312.11805.
+
+Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier
+   Martinet, Marie-Anne Lachaux, Timothée Lacroix,
+   Baptiste Rozière, Naman Goyal, Eric Hambro,
+   Faisal Azhar, et al. 2023. Llama: Open and effi-
+   cient foundation language models. arXiv preprint
+   arXiv:2302.13971.
+
+Yizhong Wang, Swaroop Mishra, Pegah Alipoor-
+   molabashi, Yeganeh Kordi, Amirreza Mirzaei,
+   Anjana Arunkumar, Arjun Ashok, Arut Selvan
+   Dhanasekaran, Atharva Naik, David Stap, Eshaan
+   Pathak, Giannis Karamanolakis, Haizhi Gary Lai, Is-
+   han Purohit, Ishani Mondal, Jacob Anderson, Kirby
+   Kuznia, Krima Doshi, Maitreya Patel, Kuntal Ku-
+   mar Pal, Mehrad Moradshahi, Mihir Parmar, Mi-
+   rali Purohit, Neeraj Varshney, Phani Rohitha Kaza,
+   Pulkit Verma, Ravsehaj Singh Puri, Rushang Karia,
+   Shailaja Keyur Sampat, Savan Doshi, Siddhartha
+   Mishra, Sujan Reddy, Sumanta Patro, Tanay Dixit,
+   Xudong Shen, Chitta Baral, Yejin Choi, Noah A.
+   Smith, Hannaneh Hajishirzi, and Daniel Khashabi.
+   2022. Super-naturalinstructions: Generalization via
+   declarative instructions on 1600+ nlp tasks. Preprint,
+   arXiv:2204.07705.
+
+Yubo Wang, Xueguang Ma, Ge Zhang, Yuansheng Ni,
+   Abhranil Chandra, Shiguang Guo, Weiming Ren,
+   Aaran Arulraj, Xuan He, Ziyan Jiang, et al. 2024.
+   Mmlu-pro: A more robust and challenging multi-task
+   language understanding benchmark. arXiv preprint
+   arXiv:2406.01574.
+
+Maurice Weber, Daniel Fu, Quentin Anthony, Yonatan
+   Oren, Shane Adams, Anton Alexandrov, Xiaozhong
+   Lyu, Huu Nguyen, Xiaozhe Yao, Virginia Adams,
+   et al. 2024. Redpajama: an open dataset for
+   training large language models. arXiv preprint
+   arXiv:2411.12372.
+
+Chaoyi Wu, Weixiong Lin, Xiaoman Zhang, Ya Zhang,
+   Yanfeng Wang, and Weidi Xie. 2023. Pmc-llama:
+   Towards building open-source language models for
+   medicine. Preprint, arXiv:2304.14454.
+
+Zitong Yang, Neil Band, Shuangping Li, Emmanuel
+   Candes, and Tatsunori Hashimoto. 2024. Syn-
+   thetic continued pretraining. arXiv preprint
+   arXiv:2409.07431.
+
+Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan
+   Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin,
+   Zhuohan Li, Dacheng Li, Eric Xing, et al. 2023.
+   Judging llm-as-a-judge with mt-bench and chatbot
+   arena. Advances in Neural Information Processing
+   Systems, 36:46595­46623.
+
+                                                           11
+A Training Details
+
+For the CPT, Rephrase CPT, and Knowledge-Instruct experiments, we used a learning rate of of 1e - 05,
+a batch size of 4, a context length of 2, 048. For the SFT phase of the CPT and Rephrase CPT training
+runs we used a lower learning rate of 1e - 06 to attempt to reduce catastrophic forgetting. For the
+Synthetic CPT experiments, we used the exact same code and configurations as detailed in the official
+repository 3. Training runs were conducted on pairs of 2×H100 or 4×A100 NVIDIA GPU nodes, subject
+to availability.
+
+B Accuracy Degradation
+
+Aggregated-Fact Equivalence. Let d be an arbitrary document in the corpus D, and let
+
+       F (d) = { f1, f2, . . . , fm }                                                 (1)
+
+   be the set of all deduplicated and contextualized facts extracted from d. Define the aggregated-fact
+representation A(d) as the concatenation of all these facts:
+
+          A(d) =                                f.                                    (2)
+
+                                       f F (d)
+
+   We aim that for any question q pertaining to the content of document d, the performance of the
+language model M when answering based on the aggregated-fact representation A(d) be identical to its
+performance when provided with the full document d. Formally, letting P (q | x) denote the probability
+that M answers question q correctly when conditioned on input x, our criterion is
+
+P q | A(d) = P q | d ,  q  Q(d),                                                      (3)
+
+where Q(d) is the set of all questions about document d. In other words, when the aggregated facts are
+available, the model's performance on questions about the document should be equivalent to having access
+to the complete document.
+
+Accuracy Degradation. Let Dtarget denote the set of all target documents. For each document d  Dtarget,
+define the degradation in accuracy (d) as the summed difference in accuracy between answering
+questions based on the full document and answering based on the aggregated fact representation A(d):
+
+(d) =                                  P q | d - P q | A(d) ,                         (4)
+
+       qQ(d)
+
+where Q(d) is the set of all questions that can be answered with full access to document d, and P (q | x)
+denotes the accuracy (i.e., the probability of answering question q correctly) when conditioned on input x.
+
+   The overall accuracy degradation metric for the dataset is then defined as the average of these degrada-
+tions across all target documents:
+
+ Dtarget                            =  1                   (d).                       (5)
+
+                                       |Dtarget| dDtarget
+
+A lower value of  Dtarget indicates that the aggregated fact representations preserve the accuracy of the
+full documents, which is our desired outcome.
+
+C Instruction Conversion Templates
+
+As explained in Section 3, we convert the raw extracted facts into instruction-response pairs using a
+rule-based approach. For each fact, we randomly sample a template from a manually curated list of 25
+realistic conversational instructions. These templates are shown in Figure 5.
+
+    3https://github.com/zitongyang/synthetic_continued_pretraining
+
+                                       12
+     SFT Conversion Templates
+    [
+
+          "Tell me something about {entity}",
+          "What fact can you tell me about {entity}?",
+          "Q: What is a fact about {entity}?",
+          "### Question\nWhat is a fact you can tell me about {entity}?\n",
+          "### Question:\nWhat is a fact you can tell me about {entity}?\n",
+          "Give me a fact about {entity}.",
+          "What is a fact about {entity}?",
+          "Tell me a fact about {entity}",
+          "Share a single fact about {entity}.",
+          "Can you give me one fact about {entity}?",
+          "Provide a fact about {entity}.",
+          "What's a quick fact about {entity}?",
+          "Do you have one fact about {entity}?",
+          "What's an interesting fact about {entity}?",
+          "Tell me a quick fact about {entity}",
+          "What's a single detail about {entity}?",
+          "What's one thing you know about {entity}?",
+          "What's one piece of information about {entity}?",
+          "What's one fact you know about {entity}?",
+          "Tell me one fact about {entity}.",
+          "What's one fact about {entity}?",
+          "Here's a fact about {entity}.",
+          "I want to know a fact about {entity}.",
+          "### Question\nWhat is a fact about {entity}?\n### Answer\n",
+          "### Question\nCan you tell me a fact about {entity}?",
+    ]
+
+       Figure 5: A full list of all rule-based templates used to conver raw facts into SFT-compatible samples..
+
+D Prompts
+
+To encourage experimentation and further research, we release the full list of prompts used in this work.
+The prompts used in Knowledge-Instruct are shown in Figures 6 to 8, while the rephrasing prompts used
+for Rephrase CPT are shown in Figures 9 to 12.
+
+                                                             13
+ Entity Extraction Prompt
+Extract ALL entities from the following text. You must be extremely thorough and ensure that
+you do not miss any entities. You should aim to extract even the most obscure entities that may be
+mentioned in the text. Look even for entities that might seem trivial or insignificant.
+ Entity Extraction Follow-up Prompt
+You have already extracted some entities. However, it appears you may have missed certain entities
+in the text.
+Task:
+
+  1. Re-check the original text carefully.
+  2. If you discover any additional entities not in your previously provided list, add them to a new
+
+      list.
+  3. Make sure you do not repeat any previously extracted entities.
+  4. Again, aim to be as thorough as possible and look for even the most obscure/trivial entities.
+Output Format:
+   · Return only the new entities.
+   · If you are absolutely confident there are no additional entities, return an empty JSON array [].
+Important:
+   · Only return newly discovered entities.
+   · Do not repeat any entities you have already extracted in previous responses in our conversation.
+   · You must be absolutely sure no entities are missing to return an empty array.
+
+                                          Figure 6: Entity extraction prompts.
+
+                                                         14
+ Fact Extraction Prompt
+You are given a document and an entity. Your task is to extract and list all factual statements about
+the given entity directly from the document. The entity is {entity}, and the document is given
+below. Follow these requirements:
+
+  1. Use only information explicitly stated in the document. Do not infer or assume any details
+      not supported by the text.
+
+  2. Present your answer as a list.
+  3. Each factual statement must:
+
+         · Be a complete, standalone sentence that clearly states a fact about the entity.
+         · Mention the entity by its full name exactly as given in the 'Entity' section.
+         · Provide enough context so it can be understood on its own.
+  4. Include only facts that are directly related to the given entity and explicitly mention it.
+         · Do not include any facts that do not directly reference the entity by name.
+         · Do not include any facts about other entities unless they are directly connected to the
+
+            entity.
+  5. Importantly, if the entity is a numerical value, make sure to extract only facts that directly
+
+      include the specific numerical value, and not general statements about numbers or quantities.
+      If a fact does not include the specific numerical value, it should not be included.
+
+ Fact Extraction Follow-up Prompt
+Excellent! However, it is possible that the document contains more information about the entity
+than what you have listed. Now, go over the document again, and search for any additional facts
+about the entity that you may have missed. You must closely follow all the requirements mentioned
+in the previous prompt. Specifically, ensure that each fact is directly related to the entity and
+explicitly mentions it by name.
+If you found any new facts, return a list with just the new facts and nothing else. If no additional
+facts about the entity can be found, just return an empty list.
+
+                                           Figure 7: Fact extraction prompts.
+
+                                                         15
+ Contextualize Prompt
+You are provided with a factual statement about the following subject: '{subject}'. Specifically, the
+factual statement focuses on the following entity: '{entity}' within the context of the subject. If the
+statement does not explicitly mention the subject or entity full names and you believe that including
+them would provide additional clarity, you should include them in a way that fits naturally within
+the sentence. Else, if the statement is already clear, mentions both the subject and entity in their full
+names, and does not require any additional context, you can leave it as is and return the statement
+as it is. Return just the contextualized statement and nothing else.
+
+ Verify Context Prompt
+You have two inputs:
+
+  1. An entity (e.g., a name, place, or keyword).
+  2. A statement (one or more sentences).
+Your task is to determine whether the entity appears in any form within the statement. This
+includes:
+   · Exact matches (e.g., the entity as-is).
+   · Variations of the entity (e.g., case differences, plural vs. singular).
+   · Recognizable references or abbreviations that clearly refer to the entity.
+Output Rules:
+   · If the entity appears, you must output <verdict>Yes</verdict>.
+   · If the entity does not appear at all, you must output <verdict>No</verdict>.
+   · You are allowed to describe your thinking process before providing the final verdict in the
+
+      specified format.
+Entity: 'entity'
+Statement 'fact'
+
+                                         Figure 8: Contextualization prompts.
+
+                                                         16
+ Rephrase System Prompt
+You are an expert in text modification and paraphrasing.
+Your task:
+
+   · You will be given an input text (below).
+   · You must produce {n_para} distinct, long paraphrased versions of that text.
+Requirements:
+  1. Retain Meaning & Facts: Each paraphrase must preserve the original text's meaning, factual
+
+      accuracy, and all specific details. Do not remove, alter, or add any factual information.
+  2. Variety in Paraphrasing: Each paraphrase should be substantially different from both the
+
+      original and from each other in terms of vocabulary, sentence structure, and style.
+  3. Maintain Length: Each paraphrase should be approximately the same length as the original
+
+      text.
+  4. No Additions or Omissions: Do not introduce external information or assumptions not
+
+      present in the original text. Do not remove any facts present in the original.
+  5. Preserve Specifics: Do not change proper names, titles, dates, numbers, locations, direct
+
+      quotes, or other specific references.
+  6. Clarity and Tone: Maintain the original clarity and intended tone. The result should read
+
+      naturally and coherently.
+  7. Output Format: Return the results as a Python dictionary with keys 'paraphrase_1', ...,
+
+     'paraphrase_{n_para}'. Each value should be a single string containing the full paraphrased
+      text.
+  8. Include Source: If the source of the text is mentioned in the input (e.g., title, author,
+      publication, etc.), you must include it in the paraphrased versions.
+
+                                         Figure 9: Rephrasing system prompt.
+
+                                                         17
+ Reshuffle Prompt
+Your sub-task is to rearrange the order of the sentences in the text provided below to provide a
+long paraphrased version. You must significantly change the sequence of sentences, ensuring the
+final text follows a clear, coherent, and logical structure. While reshuffling, you can make minor
+modifications to the wording to enhance the flow and coherence of the text. Your output must
+adhere to the previously mentioned requirements given in the system prompt.
+
+ Reword Prompt
+Your sub-task is to rephrase the text provided below, focusing on the choice of words and sentence
+structure. Your goal is to replace as many words and phrases as possible with synonyms or
+alternative expressions while maintaining the original meaning, facts, and details. You must ensure
+that the rephrased text reads naturally and coherently. Your output must adhere to the previously
+mentioned requirements given in the system prompt.
+
+ Restructure Prompt
+Your sub-task is to rewrite the text provided below, focusing on the structure of the sentences. You
+should rephrase the text by changing the sentence structures, altering the word order, and varying
+the length of sentences while preserving the original meaning, facts, and details. You must ensure
+that the rephrased text reads naturally and coherently. Your output must adhere to the previously
+mentioned requirements given in the system prompt.
+
+ Tense Variation Prompt
+Your sub-task is to subtly adjust the verb tenses and aspects in the text provided below. Where
+appropriate, change some simple past tenses to past perfect, or present tenses to present continuous,
+while still accurately reflecting the same time frames. Do not introduce new factual content,
+maintain the same approximate length, and preserve the original meaning and details. Your output
+must adhere to the previously mentioned requirements given in the system prompt.
+
+ Invert Prompt
+Your sub-task is to produce a long paraphrased version of the provided text by inverting its structure.
+Specifically, you must:
+
+   · Reverse the overall order of the sentences, starting from the end of the original text and
+      working backward toward the beginning.
+
+   · While inverting, you may make adjustments to the wording and sentence boundaries to ensure
+      a coherent, logical flow.
+
+   · Preserve all factual information, names, dates, and other specifics without adding, removing,
+      or distorting any facts.
+
+   · Maintain the approximate length of the original text and reflect its general tone and clarity.
+
+   · Ensure the final output reads naturally, as though the text was originally structured in this
+      inverted order.
+
+Your output must adhere to the requirements outlined in the system prompt.
+
+                                             Figure 10: Rephrasing prompts.
+
+                                                         18
+ Summarization Prompt
+Your task is to produce a comprehensive and highly detailed knowledge-focused summary of the
+provided text.
+Requirements:
+
+  1. Thoroughness and Accuracy: Include all factual information, key points, and essential
+      details, ensuring nothing of importance is omitted.
+
+  2. No Alteration of Facts: The summary must faithfully reflect the original text without adding,
+      removing, or distorting any facts.
+
+  3. No External Content: Do not introduce assumptions, opinions, or details not present in the
+      original text.
+
+  4. Lexical Variety: Use a diverse range of vocabulary and phrasing to make the summary more
+      engaging, while maintaining accuracy and avoiding unnecessary repetition.
+
+  5. Preserve Tone: Reflect the general tone and style of the original text.
+Your goal is to create an extensive summary that captures the full breadth of the source material
+while maintaining clarity, factual integrity, and coherent organization.
+
+ Detail Emphasis Prompt
+Your sub-task is to carefully review the provided text and produce a paraphrased version that
+highlights all minor details and subtle nuances that might otherwise be overlooked.
+Requirements:
+
+  1. Thorough Attention to Detail: Identify and preserve every small fact, reference, or subtle
+      hint present in the original text, ensuring nothing is lost.
+
+  2. No Alteration of Facts: Accurately reflect every piece of information without distorting or
+      omitting any detail.
+
+  3. Clarity and Coherence: Present the paraphrased text clearly, making sure that the small
+      details fit naturally into the narrative and contribute to overall coherence.
+
+  4. Fidelity to Original Tone: Maintain the original tone, length, and style, incorporating all
+      subtle elements in a way that feels organic and readable.
+
+Your goal is to produce a paraphrased version that gives as much importance to minor aspects as it
+does to major points, ensuring full fidelity to the original text.
+
+                                             Figure 11: Rephrasing prompts.
+
+                                                         19
+ Middle Restructure Prompt
+Your sub-task is to produce a long paraphrased version of the provided text by reorganizing its
+structure to begin from its midpoint.
+Guidelines:
+
+  1. Identify a clear midpoint in the text and start your rewriting from that point.
+
+  2. Move forward through the latter half of the text after this midpoint, maintaining logical flow
+      and coherence.
+
+  3. Once you reach the end of the original text, continue by incorporating the initial portion (the
+      beginning section) at the end, so that the sequence now runs from the middle to the end, and
+      then from the start to the middle.
+
+  4. While restructuring, you may slightly modify wording and sentence boundaries to enhance
+      clarity, coherence, and readability.
+
+  5. Preserve all factual information and details. Do not add or remove any facts. Names, dates,
+      locations, and other specifics must remain accurate.
+
+  6. Reflect the original tone and style.
+
+Your output must adhere to the requirements outlined in the system prompt.
+
+ Simplify Prompt
+Your task is to simplify the provided text by using more common language, and clearer expressions.
+You must ensure that the rephrased text reads naturally and coherently without losing any factual
+information or details. Your output must adhere to the requirements outlined in the system prompt.
+
+                                             Figure 12: Rephrasing prompts.
+
+ Fictional Company Profile
+I want to create a dataset of fictional companies. Each company should resemble real companies
+in general, but not mimic any specific company directly.
+Let's start with {company}. Provide a comprehensive company profile, similar to what you might
+find in a detailed Wikipedia article about a major corporation.
+The profile should include:
+Company history and background (e.g., founders, founding year, and early milestones). Key
+financial highlights (e.g., market capitalization, revenue, major funding rounds, or IPO details).
+A detailed description of its products, services, or business model, including major innovations
+and failures. Current corporate structure, key executives, and employee headcount. Offices,
+headquarters, and geographical reach. Recent controversies, challenges, or notable news (e.g.,
+lawsuits, scandals, failed products, or market competition). Details about its industry standing,
+competitors, and long-term strategic goals. Write the response as detailed, paragraphed, and well-
+structured text. Use an informative, neutral tone similar to that of a Wikipedia article. Incorporate
+small, specific details to make the profile feel authentic and nuanced.
+
+                              Figure 13: Fictional company profile generation prompt.
+
+                                                         20
+ Fictional Company Product Catalog
+Based on the company profile provided, create a detailed product catalog for {company + "\n\n"
++ profile}. Ensure it is as rich and detailed as a real-world product catalog.
+The catalog should include:
+At least 20 products, spanning multiple categories that align with the company's business model.
+Full product descriptions, written with a mix of marketing language and technical details. Compre-
+hensive specifications for each product, including features, technical specs, and any unique selling
+points. Pricing details (e.g., MSRP, subscription fees, or tiers for different customer segments).
+Any notable reviews, industry recognition, or customer use cases for certain products. Notes
+on availability (e.g., discontinued products, regional exclusivity, or supply issues). Write this in
+unstructured, free-form text. Think of how a large company might present its offerings in an online
+store, brochure, or detailed catalog. Ensure the tone is professional but engaging.
+
+                        Figure 14: Fictional company product catalog generation prompt.
+
+ Fictional Company Financial Report
+Recall the company profile and product catalog for {company + "\n\n" + profile + "\n\n" +
+catalog}. Create a full financial report of its performance for the past quarter. The report should
+be consistent with the previous information provided and sound realistic from an accounting and
+corporate reporting perspective.
+The financial report should include:
+Revenue, gross profit, and net income figures, broken down by business segments (e.g., product
+lines, geographical regions, or divisions). Key financial ratios (e.g., profit margins, debt-to-
+equity ratio, etc.). Year-over-year (YoY) or quarter-over-quarter (QoQ) comparisons, highlighting
+trends. Major revenue drivers and cost challenges, including any standout successes or failures.
+Commentary on the company's cash flow, liquidity, and capital expenditures. Updates on stock
+performance, shareholder returns, or dividend announcements (if applicable). Notable financial
+risks or opportunities (e.g., lawsuits, declining market share, or upcoming product launches). Write
+this in detailed, unstructured free-form text, as if prepared by the finance department of a major
+corporation for internal or investor reporting. Include realistic terminology and phrasing to create
+an authentic tone.
+
+                         Figure 15: Fictional company financial report generation prompt.
+
+                                                         21
+E Data Samples
+
+To provide further clarity regarding Knowledge-Instruct, we provide an example of the method and dataset
+for a specific example from the Companies dataset:
+
+      QuantumQuirkySprouts Labs: An agricultural biotech startup founded by a retired quantum
+      physicist and her vegan daughter.
+
+We include here examples of facts generated for the company "QuantumQuirkySprouts Labs", as well
+as questions about the company from the Companies benchmark. Figure 16 shows an example of a
+company's 'wiki overview', Figure 17 shows examples of extracted facts, and Figure 18 show sample
+questions about the company.
+
+     Context: QuantumQuirkySprouts Labs
+    Company History and Background
+    QuantumQuirkySprouts Labs is an innovative agricultural biotech startup founded in 2015 by Dr.
+    Eleanor Hawthorne, a retired quantum physicist, and her daughter, Mia Hawthorne, a passionate
+    vegan and environmental advocate. The company was established in Palo Alto, California, with the
+    vision of integrating advanced quantum mechanics principles into sustainable agriculture practices.
+    The unique combination of Dr. Hawthorne's expertise in quantum physics and Mia's knowledge
+    of plant-based nutrition laid the foundation for a company that aims to revolutionize how food is
+    grown and consumed.
+    Key Financial Highlights
+    QuantumQuirkySprouts Labs has experienced robust financial growth since its inception. By 2022,
+    the company had secured a Series C funding round worth $75 million, led by GreenFuture Capital
+    and EcoInnovate Ventures. These investments have propelled the company's market capitalization
+    to approximately $400 million. Despite its rapid growth, QuantumQuirkySprouts has yet to go
+    public, with a potential IPO projected for the late 2020s as part of its long-term strategic plan.
+    Corporate Structure and Key Executives
+    QuantumQuirkySprouts Labs is structured as a private company, with Dr. Eleanor Hawthorne
+    serving as the Chief Executive Officer and Mia Hawthorne as the Chief Innovation Officer. The
+    executive team includes industry veterans such as Victor Lin, the Chief Technology Officer, and
+    Sara Patel, the Chief Financial Officer. As of 2023, the company employs approximately 250
+    people, including a diverse team of scientists, engineers, and business professionals committed to
+    advancing sustainable agriculture.
+    Offices, Headquarters, and Geographical Reach
+    The company's headquarters remain in Palo Alto, California, with additional research facilities
+    located in Austin, Texas, and Cambridge, Massachusetts. QuantumQuirkySprouts has expanded
+    its geographical reach to include pilot projects and partnerships in Europe and Asia, focusing on
+    regions with burgeoning interest in sustainable agricultural technologies.
+
+                                 Figure 16: Wiki overview of QuantumQuirkySprouts Labs.
+
+                                                             22
+Sample Facts
+  · QuantumQuirkySprouts Labs: QuantumQuirkySprouts Labs is an agricultural biotech
+     startup founded in 2015 by Dr. Eleanor Hawthorne and her daughter, Mia Hawthorne.
+  · QuantumQuirkySprouts Labs: QuantumQuirkySprouts Labs was established in Palo Alto,
+     California.
+  · Dr. Eleanor Hawthorne: Dr. Eleanor Hawthorne, a retired quantum physicist at Quan-
+     tumQuirkySprouts Labs, is known for her contributions to the field.
+  · Dr. Eleanor Hawthorne: Dr. Eleanor Hawthorne co-founded QuantumQuirkySprouts Labs
+     in 2015.
+  · Dr. Eleanor Hawthorne: Dr. Eleanor Hawthorne founded QuantumQuirkySprouts Labs in
+     Palo Alto, California.
+  · Mia Hawthorne: Mia Hawthorne is the daughter of Dr. Eleanor Hawthorne, a retired
+     quantum physicist associated with QuantumQuirkySprouts Labs.
+  · Mia Hawthorne: Mia Hawthorne, a key figure at QuantumQuirkySprouts Labs, is a passion-
+     ate vegan and environmental advocate.
+  · Mia Hawthorne: Mia Hawthorne serves as the Chief Innovation Officer at Quan-
+     tumQuirkySprouts Labs.
+
+                                       Figure 17: Example of facts generated.
+
+Questions
+  · Question: The question refers to the company "QuantumQuirkySprouts Labs". Who are the
+     founders of QuantumQuirkySprouts Labs, and what are their backgrounds?
+     Answer: Dr. Eleanor Hawthorne, a retired quantum physicist, and her daughter, Mia
+     Hawthorne, a passionate vegan and environmental advocate.
+  · Question: The question refers to the company "QuantumQuirkySprouts Labs". What position
+     does Mia Hawthorne hold at QuantumQuirkySprouts Labs?
+     Answer: Chief Innovation Officer.
+
+                 Figure 18: Sample question-answer pairs for QuantumQuirkySprouts Labs.
+
+                                                        23
+

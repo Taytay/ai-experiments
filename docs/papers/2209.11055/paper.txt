@@ -1,0 +1,798 @@
+                                                Efficient Few-Shot Learning Without Prompts
+
+                                             Lewis Tunstall1, Nils Reimers2, Unso Eun Seo Jo1, Luke Bates3,
+                                                       Daniel Korat4, Moshe Wasserblat4, Oren Pereg4
+                                                                    1Hugging Face 2cohere.ai
+
+                                        3Ubiquitous Knowledge Processing Lab, Technical University of Darmstadt
+                                                                   4Emergent AI Lab, Intel Labs
+
+                                          1firstname@huggingface.com 2info@nils-reimers.de
+                                                    3bates@ukp.informatik.tu-darmstadt.de
+                                                           4firstname.lastname@intel.com
+
+arXiv:2209.11055v1 [cs.CL] 22 Sep 2022                        Abstract                         Figure 1: Compared to standard fine-tuning, SETFIT is
+                                                                                               more sample efficient and exhibits less variability when
+                                             Recent few-shot methods, such as parameter-       trained on a small number of labeled examples.
+                                             efficient fine-tuning (PEFT) and pattern ex-
+                                             ploiting training (PET), have achieved impres-    (PET). Unfortunately, these approaches can be im-
+                                             sive results in label-scarce settings. How-       practical for many researchers and practitioners.
+                                             ever, they are difficult to employ since they     One disadvantage is that these approaches typically
+                                             are subject to high variability from manually     rely on the use of large-scale language models to
+                                             crafted prompts, and typically require billion-   achieve high performance. For example, T-FEW
+                                             parameter language models to achieve high ac-     (Liu et al., 2022) is based on the 11 billion param-
+                                             curacy. To address these shortcomings, we         eter model T0 (Sanh et al., 2021), while GPT-3
+                                             propose SETFIT (Sentence Transformer Fine-        (Brown et al., 2020a) is an order of magnitude
+                                             tuning), an efficient and prompt-free frame-      larger. Secondly, training and deploying these few-
+                                             work for few-shot fine-tuning of Sentence         shot methods typically requires specialized infras-
+                                             Transformers (ST). SETFIT works by first fine-    tructure with limited accessibility. Moreover, PET
+                                             tuning a pretrained ST on a small number of       and the prominent PEFT methods require, as part
+                                             text pairs, in a contrastive Siamese manner.      of their training, the input of manually generated
+                                             The resulting model is then used to generate      prompts, yielding varying outcomes depending on
+                                             rich text embeddings, which are used to train a   the level of manual prompt-engineering.
+                                             classification head. This simple framework re-
+                                             quires no prompts or verbalizers, and achieves       In this paper, we propose SETFIT, an approach
+                                             high accuracy with orders of magnitude less       based on Sentence Transformers (ST) (Reimers
+                                             parameters than existing techniques. Our ex-      and Gurevych, 2019) that dispenses with prompts
+                                             periments show that SETFIT obtains compa-         altogether and does not require large-scale PLMs
+                                             rable results with PEFT and PET techniques,       to achieve high accuracy. For example, with only
+                                             while being an order of magnitude faster to       8 labeled examples in the Customer Reviews (CR)
+                                             train. We also show that SETFIT can be ap-        sentiment dataset, SETFIT is competitive with fine-
+                                             plied in multilingual settings by simply switch-  tuning on the full training set, despite the fine-tuned
+                                             ing the ST body. Our code1 and datasets2 are      model being three times larger (see Figure 1).
+                                             made publicly available.
+                                                                                                  We demonstrate SETFIT's efficacy in few-shot
+                                        1 Introduction                                         text classification over a range of NLP datasets
+
+                                        Few-shot learning methods have emerged as an at-
+                                        tractive solution to label-scarce scenarios, where
+                                        data annotation can be time-consuming and costly.
+                                        These methods are designed to work with a small
+                                        number of labeled training examples, and typi-
+                                        cally involve adapting pretrained language models
+                                        (PLMs) for specific downstream tasks.
+
+                                           Today, there exist several approaches to few-
+                                        shot learning with PLMs. These include in-
+                                        context learning (ICL), parameter-efficient fine-
+                                        tuning (PEFT), and pattern exploiting training
+
+                                            1https://github.com/huggingface/setfit
+                                            2https://huggingface.co/setfit
+and in multiple scenarios including distillation and    parameters and requires massive computational re-
+non-English data. We compare our method to stan-        sources, prompt engineering, and can only utilize
+dard PLM fine-tuning, state-of-the-art PET- and         pretrained knowledge.
+PEFT-based methods such as ADAPET (Tam et al.,
+2021) and T-FEW (Liu et al., 2022), as well as             PEFT methods, such as adapters (Rebuffi et al.,
+recent prompt-free techniques such as PERFECT           2017), hold the majority of parameters fixed dur-
+(Karimi Mahabadi et al., 2022a).                        ing training and only update small feed-forward
+                                                        networks that are inserted within the larger model
+   We summarize our contributions as follows:           architecture. A recent example is T-FEW (Liu et al.,
+                                                        2022), which outperforms GPT-3 at much lower
+  1. We propose SETFIT­ a simple and prompt-            computational cost. It accomplishes this by adding
+      free method ­ and provide a comprehensive         learned vectors that rescale the network's internal
+      guide for applying it in practical few-shot set-  activations. T-FEW is 16 times smaller than GPT-3,
+      tings.                                            but is still too large to be utilized as a practical tool
+                                                        in industry. It also requires a set of handcrafted
+  2. We evaluate SETFIT's performance on a num-         prompts for each dataset.
+      ber of few-shot text classifications tasks and
+      show that it outperforms the state-of-the-           Another alternative to ICL is prompt-based fine-
+      art prompt-free method and ranks alongside        tuning. This approach converts the downstream
+      much larger prompt-based, few-shot models.        classification task into a masked-language model-
+                                                        ing (MLM) objective. The model outputs tokens in
+  3. We make the code and data used in our work         a cloze-style format that maps to the corresponding
+      publicly available.                               labels via a predefined template. A well known ex-
+                                                        ample of this method is Pattern Exploiting Training
+2 Related Work                                          (PET) (Schick and Schütze, 2021b,a) . Like GPT-
+                                                        3, PET relies on manually-crafted prompts, but
+SETFIT engages with two related lines of literature.    since the model can be fine-tuned to specific tasks,
+We first extend the small but significant body of       PET-based approaches typically outperform GPT-3
+work on Sentence Transformers (ST) for text classi-     in few-shot scenarios, even with far smaller PLM
+fication. Perone et al. (2018) introduced the idea of   backbones. PET has since been extended in two
+using sentence embeddings for text classification.      main directions: ADAPET (Tam et al., 2021), which
+Piao (2021) used 'out-of-the-box' STs for text clas-    improves PET with a decoupled label objective
+sification without fine-tuning them. SETFIT differs     and label-conditioned MLM objective, and PER-
+from these works in two aspects: First, we fine-tune    FECT (Karimi Mahabadi et al., 2022b) which uses
+the ST in a Siamese manner for a text classification    task-specific adapters (Houlsby et al., 2019; Pfeif-
+objective showing that it significantly enhances per-   fer et al., 2021) and multi-token label-embeddings
+formance; second, we demonstrate this approach          eliminate task prompts and verbalizers.
+in few-shot setups.
+                                                        3 SetFit: Sentence Transformer
+   SETFIT is also related to the recently emerging          Fine-Tuning
+few-shot and zero-shot training line of literature as
+few-shot and zero-shot approaches have recently         SETFIT is based on Sentence Transformers
+received a great deal of interest in the research       (Reimers and Gurevych, 2019) which are modi-
+community due to the availability of pretrained lan-    fications of pretrained transformer models that use
+guage models and the untapped capacity to use           Siamese and triplet network structures to derive se-
+them in resource-constrained domains. Specifi-          mantically meaningful sentence embeddings. The
+cally, we discuss ICL, PEFT, and prompt-based           goal of these models is to minimize the distance be-
+fine-tuning.                                            tween pairs of semantically similar sentences and
+                                                        maximize the distance between sentence pairs that
+   ICL models directly generate predictions based       are semantically distant. Standard STs output a
+on input-to-output training examples provided as        fixed, dense vector that is meant to represent tex-
+prompts, without any parameter updates. Perhaps         tual data and can then be used by machine learning
+the best known example is GPT-3 (Brown et al.,          algorithms.
+2020b), which achieves remarkable few-shot per-
+formance. However, GPT-3 contains 175 billion
+Figure 2: SETFIT 's fine-tuning and training block diagram.
+
+3.1 The SETFIT approach for few-shot text                 nificantly larger than just K.
+      classification
+                                                          Classification head training In this second step,
+SETFIT uses a two-step training approach in which         the fine-tuned ST encodes the original labeled train-
+we first fine-tune an ST and then train a classifier      ing data {xi}, yielding a single sentence embed-
+head. In the first step, an ST is fine-tuned on the       ding per training sample; Embxi = ST (xi) where
+input data in a contrastive, Siamese manner on            ST () is the function representing the fine-tuned
+sentence pairs. In the second step, a text classifica-    ST. The embeddings, along with their class labels,
+tion head is trained using the encoded training data      constitute the training set for the classification head
+generated by the fine-tuned ST from the first step.       T CH = {(Embxi, yi)} where |T CH | = |D|. A
+Figure 2 illustrates this process, and we discuss         logistic regression model is used as the text classi-
+these two steps in the following sections.                fication head throughout this work.
+
+ST fine-tuning To better handle the limited               Inference At inference time, the fine-tuned ST
+amount of labeled training data in few-shot scenar-       encodes an unseen input sentence (xi) and pro-
+ios, we adopt a contrastive training approach that is     duces a sentence embedding. Next, the classifi-
+often used for image similarity (Koch et al., 2015).      cation head that was trained in the training step,
+Formally, given a small set of K labeled examples         produces the class prediction of the input sentence
+D = {(xi, yi)}, where xi and yi are sentences and         based on its sentence embedding. Formally this is
+their class labels, respectively. For each class la-      xpi red = CH(ST (xi)), where CH represents the
+bel c  C, we generate a set of R positive triplets        classification head prediction function.
+Tpc = {(xi, xj, 1)}, where xi and xj are pairs of
+randomly chosen sentences from the same class c           4 Experiments
+such that (yi = yj = c). Similarly, we also gener-
+ate a set of R negative triplets Tnc = {(xi, xj, 0)},     4.1 Data
+where xi are sentences from class c and xj are ran-
+domly chosen sentences from different classes such        We conduct experiments on available text classifi-
+that (yi = c, yj = c). Finally, the contrastive fine      cation datasets. We split the datasets into develop-
+tuning data set T is produced by concatenating the        ment and test datasets (See Table 6 in Appendix
+positive and negative triplets across all class labels;   A). The development datasets are utilized for set-
+T = {(Tp0, Tn0), (Tp1, Tn1), ..., (Tp|C|, Tn|C|)}, where  ting SETFIT's hyperparameters such as the number
+|C| is the number of class labels, |T | = 2R|C| is        of training pairs (|T |), the loss function and the
+the number of pairs in T and R is a hyperparameter.       optimal number of training epochs. In order to
+Unless stated otherwise, we used R = 20 in all the        test the robustness of SETFIT to various types of
+evaluations.                                              text, we choose test datasets that represent different
+                                                          text classification tasks with a varying number of
+   This contrastive fine-tuning approach enlarges         classes. All datasets used are available on the Hug-
+the size of training data in few-shot scenarios. As-      ging Face Hub under the SETFIT organisation.3 In
+suming that a small number (K) of labeled exam-           addition we evaluate SETFIT on the RAFT bench-
+ples are given for a binary classification task, the      mark (Alex et al., 2021), a real-world few-shot
+potential size of the ST fine-tuning set T is derived     text-classification benchmark composed of 11 prac-
+from the number of unique sentence pairs that can         tical tasks, where each task has only 50 training
+be generated, namely K(K - 1)/2, which is sig-
+                                                              3huggingface.co/SetFit
+examples.                                               (Schick and Schütze, 2021), the authors show that
+                                                        PET-based classification methods excel on the
+4.2 SETFIT models                                       RAFT benchmark, placing second only to much
+We evaluate three variations of SETFIT each one         larger models such as T-FEW. In our experiments,
+uses different underlying model of different size       we used ADAPET with default hyperparameters
+(Shown in Table 1)                                      and examined its performance with different PLM
+                                                        backbones, reporting the PLM which resulted in
+Variation         Underlying ST Model     Size          the best performance, albert-xxlarge-v2 7 (see
+                                                        Appendix A.2 in the Appendix for further details).
+SETFITROBERTA      all-roberta-large-v14  355M
+SETFITMPNET    paraphrase-mpnet-base-v25  110M          PERFECT PERFECT (Karimi Mahabadi et al.,
+SETFITMINILM   paraphrase-MiniLM-L3-v26   15M           2022b) is another cloze-based fine-tuning method,
+                                                        but unlike PET or ADAPET, it does not require
+Table 1: SETFIT model variations using three different  handcrafted task prompts and verbalizers. Instead,
+underlying ST models. Number of parameters.             PERFECT uses task-specific adapters (Houlsby
+                                                        et al., 2019; Pfeiffer et al., 2021) and multi-token
+4.3 Baselines                                           label-embeddings which are independent from the
+                                                        language model vocabulary during fine-tuning. To
+We compare SETFIT's performance against stan-           run PERFECT on our test datasets, we adapted the
+dard transformer fine-tuning and recent best-           configurations provided in the PERFECT codebase.
+performing few-shot approaches: ADAPET (Tam
+et al., 2021), PERFECT (Karimi Mahabadi et al.,         T-FEW T-FEW (Liu et al., 2022) is a PEFT-based
+2022b), and T-FEW (Liu et al., 2022).                   few-shot learning method based on T0 (Sanh et al.,
+                                                        2021). The authors provide two versions of T-FEW:
+Standard fine-tuning Our first baseline is              11 and 3 billion parameters. Due to compute con-
+ROBERTALARGE (Liu et al., 2019), a standard,            straints, we were unable to run the 11 billion ver-
+encoder-only transformer that is fine-tuned for se-     sion, which requires an 80GB A100 GPU. Running
+quence classification. Since we assume no val-          tests on T-FEW as opposed to SETFIT posed sev-
+idation sets, we constructed validation splits by       eral hurdles. First, because T-FEW's performance
+randomly selecting equally sized portions from the      varies significantly depending on the input prompts,
+train split. We perform a hyperparameter search on      we run each experiment using 5 random seeds, and
+the number of epochs in the range [25,75] and pick      report the median result, as in the original paper.
+the best performing model on a validation split.        Second, T-FEW relies on dataset-specific prompts,
+                                                        made available on P3 (Public Pool of Prompts)
+   We use a learning rate of 2e-5 and batch size of     (Bach et al., 2022). Only one of our test datasets
+4 in all our experiments.                               had prompts in P3. For the rest of the datasets, we
+                                                        adapt standardized P3 prompts of similar tasks or
+ADAPET Pattern exploiting training (PET)                implement prompts ourselves (See Appendix A.3).
+(Schick and Schütze, 2021b,a) is a method for
+improving PLM performance in few-shot setups on         4.4 Experimental Setup
+downstream tasks by converting textual input into
+a cloze-style question intended to be reminiscent of    Systematically evaluating few-shot performance
+the masked language modelling (MLM) objective           can be challenging, because fine-tuning on small
+under which large PLMs such as BERT (Devlin             datasets may incur instability (Dodge et al., 2020;
+et al., 2019) are trained. To determine SETFIT's        Zhang et al., 2021). To address this issue, in our
+performance relative to PET-based approaches,           experiments we use 10 random training splits for
+we compare our method to ADAPET (Tam et al.,            each dataset and sample size. These splits are used
+2021), an extension of PET. In recent work              as training data across all tested methods. For each
+                                                        method, we report the average measure (depending
+    4https://huggingface.                               on the dataset) and the standard deviation across
+co/sentence-transformers/                               these splits. We fine-tune SETFIT's ST model using
+all-roberta-large-v1
+                                                            7https://huggingface.co/
+    5https://huggingface.                               albert-xxlarge-v2
+co/sentence-transformers/
+paraphrase-mpnet-base-v2
+
+    6https://huggingface.
+co/sentence-transformers/
+paraphrase-MiniLM-L3-v2
+cosine-similarity loss with a learning rate of 1e-3,  amine ADAPET on non-English data (see Appendix
+a batch size of 16 and a maximum sequence length      A for details).
+of 256 tokens, for 1 epoch.
+                                                      Experimental Setup For the multilingual exper-
+5 Results                                             iments, we use the Multilingual Amazon Reviews
+                                                      Corpus (MARC) (Keung et al., 2020). This dataset
+Table 2 shows a comparison between                    consists of Amazon reviews in six languages (En-
+SETFITMPNET and the baselines for N = 8               glish, Japanese, German, French, Spanish, and Chi-
+and N = 64 labeled training samples per class.        nese), where each review is labeled according to
+For reference purposes, standard fine-tuning results  a 5-star rating scale. We chose this corpus for its
+using the full training data are also shown (in all   typological diversity in order to examine the gener-
+cases higher scores indicates stronger performance;   alizability of SETFIT and other methods across a
+see Table 6 in Appendix A for dataset metric          variety of languages.
+details). We find that SETFITMPNET significantly
+outperforms the FINETUNE baseline for N = 8 by           For the SETFIT underlying model, we use
+an average of 19.3 points. However, as the number     paraphrase-multilingual-mpnet-base-v2,8 which is
+of training samples increases to N = 64, the gap      a multilingual version of paraphrase-mpnet-base-
+decreases to 5.6 points.                              v2 that is trained on parallel data in over 50 lan-
+                                                      guages.
+   Similarly, we find that SETFITMPNET out-
+performs PERFECT by 13.6 and 2.6 points.                 For the FINETUNE and ADAPET baselines, we
+SETFITMPNET also outperforms ADAPET by 4.0            use XLM-ROBERTABASE (Conneau et al., 2019),9
+and 1.5 points for N = 8 and N = 64 respec-           which has a similar size to the SETFIT model. We
+tively. For N = 8, SETFITMPNET is on par with         compare the performance of each method using the
+T-FEW 3B whereas for N = 64 SETFITMPNET out-          same settings as (Conneau et al., 2019):
+performs T-FEW 3B by 5 points on average, despite
+being prompt-free and more than 27 times smaller.        · each: Train and evaluate on monolingual data
+                                                            to measure per-language performance.
+
+RAFT results The test datasets listed in Table 2         · en: Train on the English training data and
+were not specifically designed for few-shot bench-          then evaluate on each language's test set.
+marking. In order to better benchmark SETFIT,
+we used the RAFT benchmark (Alex et al., 2021)           · all: Train on all the training data and evaluate
+which is specifically designed for benchmarking             on each language's test set.
+few-shot methods. Table 3 shows the average ac-
+curacy of SETFITMPNET and SETFITROBERTA and           Method For SETFIT standard fine-tuning, and
+four prominent methods. SETFITROBERTA outper-         ADAPET, we adopt the same methodology and hy-
+forms GPT3 and PET by 8.6 and 1.7 points respec-      perparameters used for the monolingual English
+tively while alleviating the need for hand crafting   experiments in 4. We evaluate each method in the
+prompts. It also surpasses the human baseline in      few-shot regime (N = 8 samples per class) and
+7 out of 11 tasks. SETFITROBERTA falls short of T-    compare against performance of fine-tuning on the
+FEW 11B by 4.5 points. however, SETFITROBERTA         full training set of 20,000 examples.
+is more than 30 times smaller than T-FEW 11B,
+does not require manual prompt crafting and is        Results Table 4 shows the results of SETFIT
+much more efficient in training and inference (see    standard fine-tuning, and ADAPET on each lan-
+Table 5).                                             guage in MARC, where a higher MAE indicates
+                                                      weaker performance. In the few-shot regime of
+6 Multilingual Experiments                            N = 8 samples per class, we find that SETFIT
+                                                      significantly outperforms FINETUNE and ADAPET
+To determine SETFIT's performance in a multi-         in all settings (each, en, all), with the best average
+lingual, few-shot text classification scenario, we    performance obtained when training on English
+conducted development and test experiments on         data only.
+multilingual datasets and compared SETFIT to stan-
+dard transformer fine-tuning and ADAPET. To the           8huggingface.co/sentence-transformers/
+best of our knowledge, this is the first work to ex-  paraphrase-multilingual-mpnet-base-v2
+
+                                                          9huggingface.co/xlm-roberta-base
+Method       SST-5    AmazonCF CR Emotion                      EnronSpam  AGNews   Average
+
+FINETUNE     33.52.1            |N | = 8                       85.06.0    81.73.8  43.05.2
+PERFECT      34.93.1                                           79.37.4    80.85.0  48.76.0
+ADAPET       50.01.9  9.24.9          58.86.3        28.76.8   85.13.7    85.12.7  58.33.6
+T-FEW 3B     55.01.4  18.15.3         81.58.6        29.85.7   93.11.6    ­        63.41.9
+SETFITMPNET  43.63.0  19.47.3         91.01.3        46.23.7   90.13.4    82.92.8  62.34.9
+                      19.03.9         92.11.0        57.41.8
+FINETUNE     45.96.9  40.311.8        88.51.9        48.84.5   95.90.8    88.40.9  69.77.8
+PERFECT      49.10.7                                           95.41.1    89.00.3  72.71.9
+ADAPET       54.10.8  52.812.1  |N | = 64                      96.00.9    88.00.6  73.82.2
+T-FEW 3B     56.00.6  65.15.2                                  97.00.3    ­        70.31.5
+SETFITMPNET  51.90.6  54.16.4         88.91.9        65.017.2  96.10.8    88.00.7  75.31.3
+                      34.74.5         92.20.5        61.72.7
+FINETUNE     59.8     61.92.9         92.60.7        72.02.2   99.0       93.8     84.8
+                                      93.11.0        70.91.1
+                                      90.40.6        76.21.3
+
+                                |N | = Full
+
+                      80.1            92.4 92.6
+
+Table 2: SETFIT performance score and standard deviation compared to the baselines across 6 test datasets for
+three training set sizes |N |. Number of training samples per class. Entire available training data used. The
+AGNews dataset is excluded from the average score to enable fair comparison with T-FEW (which has AGNews
+in its training set). The inputs of SST-5 (but not its labels) appeared in T-FEW's training set, as part of Rotten
+Tomatoes dataset.
+
+Rank  Method          Score     Size                 of SETFIT as a student model compared to a stan-
+  1   YIWISE          76.8         -                 dard transformer student model in few-shot distilla-
+  2   T-FEW 11B       75.8                           tion setups when the amount of unlabeled training
+  4   Human baseline  73.5       11B                 data is limited.
+  6   SETFITROBERTA   71.3         -
+  9   PET             69.6                           Experimental Setup For the distillation tests we
+ 11   SETFITMPNET     66.9      355M                 use the datasets AGNews, Emotion and SST-5 de-
+ 12   GPT-3           62.7      235M                 scribed in Appendix A.1. For the SETFIT teacher
+                                110M                 we chose SETFITMPNET, which contains 110M pa-
+                                175B                 rameters, whereas for the SETFIT student we chose
+                                                     SETFITMINILM, which is a much smaller model
+Table 3: SETFIT compared to prominent methods on     (15M parameters). For fair comparison, we use as
+the RAFT leaderboard (as of Sept. 5, 2022). Number   the baseline student MiniLM-L3-H384-uncased10,
+                                                     a standard transformer encoder of the same size
+of parameters.                                       as our SETFIT student model. For each of the
+                                                     three datasets we train the SETFIT teacher model
+7 SETFIT Model Efficiency                            using only 16 labeled samples per class, and the stu-
+                                                     dent models are trained using the same 16 labeled
+7.1 Few-shot distillation                            samples per class together with various amounts
+                                                     of additional unlabeled data. We follow the same
+We have shown that SETFIT achieves state-of-the-     data-split policy and SETFIT training parameters'
+art results in few-shot setups using underlying      settings described in Section 4.4.
+base models such as paraphrase-mpnet-base-v2 and
+ROBERTALARGE, containing 110M parameters and         Method The SETFIT student is trained using sen-
+355M parameters respectively; but in real-world      tence pairs and the level of similarity between each
+deployments, where cost and sustainability are pri-  pair as input. The similarity is generated by using
+oritized, the use on even more efficient models is   the underlying ST of the teacher to produce sen-
+desirable. Previous works have shown model dis-
+tillation to be effective in reducing computational     10huggingface.co/nreimers/
+load while preserving much of the original model's   MiniLM-L3-H384-uncased
+performance (Ba and Caruana, 2014; Hinton et al.,
+2015). In this section we evaluate the performance
+Method                      Train  En                   De         Ja           Zh                          Fr           Es         Average
+FINETUNE
+ADAPET                      each   122.914.0            119.913.6  |N | = 8     128.610.7                   123.213.0    116.38.3   121.911.3
+SETFIT                        en   115.911.3            115.212.0  120.58.0     123.08.8                    117.313.0    113.112.4  117.711.6
+                              all  117.84.9             116.39.7   121.612.3    120.56.7                    117.39.9     110.19.5   117.28.8
+FINETUNE                    each   129.913.6                       121.512.4                                141.810.1    136.010.4  134.911.5
+                              en   138.917.8                                                                152.015.7    149.817.1  152.016.9
+                              all  150.812.0            136.410.6  130.413.4    135.010.9                   140.014.0    145.14.5   146.011.3
+                            each   82.94.3              151.517.8  160.816.7    158.816.3                   85.36.0      80.85.4    86.64.9
+                              en   82.64.8              136.27.0   150.810.0    152.810.2                   82.24.8      83.45.9    86.45.2
+                              all  83.05.3                                                                  83.56.5      84.96.1    88.36.9
+                                                        80.02.4    95.52.8      95.32.8
+                            each   46.2                 83.45.9    93.26.6      93.93.6                     47.8         45.3       47.7
+                              en   46.1                 84.07.6    97.19.2      97.46.5                     55.6         52.9       55.3
+                              all  46.6                                                                     55.6         55.0       56.2
+                                                                   |N | =Full
+
+                                                        43.7       46.8         56.6
+                                                        46.6
+                                                        49.4       61.0         69.4
+
+                                                                   61.0         69.4
+
+Table 4: Average performance (MAE × 100) on the Multilingual Amazon Reviews Corpus for two training set
+sizes |N |.  No. of training samples per class. Entire available training data used (20,000 samples).
+
+                                     AG News                           Emotion                                               SST5
+
+                  90                                    70                                              40
+
+Average Accuracy                                        60
+
+                  80
+
+                                                        50
+
+                                                                                                        30
+
+                  70                                    40
+
+                                                        30
+
+                  60
+
+                                                        20                                              20
+                                                                                                                                        SETFIT student
+                  50               SETFIT student       10               SETFIT student                                                 Baseline student
+
+                                   Baseline student                                   Baseline student
+                                                        0
+
+                  40        16 32 64 100 200 1K             8 16 32 64 100 200 1K                       10        16 32  64 100 200 1K
+                         8                                                                                     8
+
+                      Unlabeled Training Set Size (N )      Unlabeled Training Set Size (N )                Unlabeled Training Set Size (N )
+
+Figure 3: Average accuracy as a function of the unlabeled training set size N of the SETFIT student and the
+baseline student on AG News, Emotion and SST5 datasets.
+
+tence embeddings for each pair and to calculate the                      outperforms the baseline student when only small
+cosine-similarity between them. The underlying ST                        amounts of unlabeled data are available. For exam-
+of the SETFIT student is trained to mimic the ST of                      ple, for N = 8, the SETFIT student outperforms
+the teacher output by minimizing the error between                       the baseline student by 24.8, 25.1, and 8.9 aver-
+the SETFIT teacher-produced cosine-similarity and                        age accuracy on the AGNews, Emotion and SST5
+its output. The classification head of the student                       datasets, respectively. As N increases, the perfor-
+is then trained using the embeddings produced by                         mance gains decrease and are on par for N = 1K.
+the student's ST and the logits produced by the
+SETFIT teacher classification head. The baseline                         7.2 Computational costs
+student is trained to mimic the teacher output by
+minimizing the error between the logits produced                         Comparing the relative computational costs of SET-
+by the SETFIT teacher classification head and its                        FIT versus PET and PEFT methods isn't straight-
+output.                                                                  forward since each method typically has different
+                                                                         hardware and memory requirements.
+Results Figure 3 shows a comparison between
+the SETFIT student model and the baseline stu-                              To simplify the comparison, we follow the ap-
+dent model for various amounts of unlabeled train-                       proach adopted by Liu et al. (2022) and use FLOPs-
+ing data (N ). The SETFIT student significantly                          per-token estimates to compare SETFIT to T-FEW.
+                                                                         These estimates can be obtained from Kaplan et al.
+(2020), who show that encoder-only models with         Method        Inf.    Train Speed-  Score
+N parameters have approximately 2N FLOPs-per-                        FLOPs   FLOPs up
+token for inference and 6N FLOPs-per-token for         T-FEW 3B                            63.41.9
+training. The resulting cost for inference and train-  SETFITMPNET   1.6e11  3.9e15  1x    62.34.9
+ing is then given by:                                  SETFITMINILM  8.3e9   2.0e14  19x   60.31.6
+                                                                     1.3e9   3.2e13  123x
+           Cinf = 2N · seq ,
+         Ctrain = 6N · seq · nsteps · nbatch ,         Table 5: Relative computational cost and average
+                                                       scores of SETFIT and T-FEW using |N | = 8 on the
+   where seq is the input sequence length, nsteps      test datasets listed in Table 2. Trained in the distilla-
+is the number of training steps, and nbatch is the     tion setup as described in Section 7.1, using |N | = 8
+batch size. For encoder-decoder models like T-
+FEW, these estimates are halved, since the model       for teacher training and the rest of the available training
+only processes each token with either the encoder      data as unlabeled student training data. For fixed nsteps
+or decoder.                                            and nbatch, the relative speed-up (N · seq)/(2N · seq)
+                                                       is the same for inference and training.
+   For the inference and training estimates shown
+in Table 5, we use seq = 38 and seq = 54 as the        SETFIT is additionally not subject to the instabil-
+input sequence length for SETFITMPNET (T-FEW);         ity and inconvenience of prompting. We have also
+this is the median number of tokens across all the     demonstrated that SETFIT is a robust few-shot text
+test datasets in Table 2. We also use nsteps = 1000    classifier in languages other than English across
+and nbatch = 8 for all training estimates. As shown    varying typologies. Finally, SETFIT has proven
+in the table, the SETFITMPNET model is approxi-        useful in few-shot distillation setups.
+mately an order of magnitude faster at inference
+and training than T-FEW, despite having compa-         Acknowledgements
+rable performance on the test datasets of Table 2.
+SETFITMINILM is two orders of magnitude faster         The authors thank Hugging Face Inc and Intel Inc.
+than T-FEW, with an average score reduction of 3.1     for providing computing resources and the Ger-
+accuracy points. Moreover, the storage cost of the     man Federal Ministry of Education and Research
+SETFIT models (70MB and 420MB respectively) is         and the Hessian Ministry of Science and the Arts
+163 to 26 times smaller than the T0-3B checkpoint      (HMWK) within the projects "The Third Wave
+used by T-FEW 3B (11.4GB), making these models         of Artificial Intelligence - 3AI", hessian.AI, and
+much better suited for real-world deployment.          within their joint support of the National Research
+                                                       Center for Applied Cybersecurity ATHENE.
+   These estimates are borne out by comparing
+the time needed to train each method to conver-        References
+gence on N = 8 examples. For our datasets,
+SETFITMPNET takes approximately 30 seconds to          Neel Alex, Eli Lifland, Lewis Tunstall, Abhishek
+train on a p3.2xlarge AWS instance (16GB GPU              Thakur, Pegah Maham, C. Jess Riedel, Emmie
+memory), at a cost of $0.025 per split. On the other      Hine, Carolyn Ashurst, Paul Sedille, Alexis Car-
+hand, T-FEW 3B requires at least 40GB GPU mem-            lier, Michael Noetel, and Andreas Stuhlmüller. 2021.
+ory, and training on a p4d.24xlarge AWS instance          RAFT: A real-world few-shot text classification
+takes approximately 700 seconds, at a cost of $0.7        benchmark. In Thirty-fifth Conference on Neural In-
+per split.                                                formation Processing Systems Datasets and Bench-
+                                                          marks Track (Round 2).
+8 Conclusion
+                                                       Jimmy Ba and Rich Caruana. 2014. Do deep nets really
+This paper introduces SETFIT, a new few-shot text         need to be deep? In Z. Ghahramani, M. Welling,
+classification approach. We show that SETFIT has          C. Cortes, N. D. Lawrence, and K. Q. Weinberger,
+several advantages over comparable approaches             editors, Advances in Neural Information Processing
+such as T-FEW, ADAPET and PERFECT. In particu-            Systems 27, pages 2654­2662. Curran Associates,
+lar, SETFIT is much faster at inference and training;     Inc.
+SETFIT requires much smaller base models to be
+performant, not requiring external compute; and        Stephen H. Bach, Victor Sanh, Zheng-Xin Yong, Al-
+                                                          bert Webson, Colin Raffel, Nihal V. Nayak, Ab-
+                                                          heesht Sharma, Taewoon Kim, M Saiful Bari,
+                                                          Thibault Fevry, Zaid Alyafeai, Manan Dey, An-
+                                                          drea Santilli, Zhiqing Sun, Srulik Ben-David, Can-
+                                                          wen Xu, Gunjan Chhablani, Han Wang, Jason Alan
+   Fries, Maged S. Al-shaibani, Shanya Sharma, Ur-        Derek Greene and Pádraig Cunningham. 2006. Prac-
+   mish Thakker, Khalid Almubarak, Xiangru Tang,             tical solutions to the problem of diagonal dom-
+   Dragomir Radev, Mike Tian-Jian Jiang, and Alexan-         inance in kernel document clustering. In Proc.
+   der M. Rush. 2022. Promptsource: An integrated            23rd International Conference on Machine learning
+   development environment and repository for natural        (ICML'06), pages 377­384. ACM Press.
+   language prompts.
+                                                          Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. 2015.
+Tom Brown, Benjamin Mann, Nick Ryder, Melanie                Distilling the knowledge in a neural network. Cite
+   Subbiah, Jared D Kaplan, Prafulla Dhariwal,               arxiv:1503.02531 Comment: NIPS 2014 Deep
+   Arvind Neelakantan, Pranav Shyam, Girish Sastry,          Learning Workshop.
+   Amanda Askell, Sandhini Agarwal, Ariel Herbert-
+   Voss, Gretchen Krueger, Tom Henighan, Rewon            Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski,
+   Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu,         Bruna Morrone, Quentin de Laroussilhe, Andrea
+   Clemens Winter, Chris Hesse, Mark Chen, Eric              Gesmundo, Mona Attariyan, and Sylvain Gelly.
+   Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess,       2019. Parameter-efficient transfer learning for NLP.
+   Jack Clark, Christopher Berner, Sam McCandlish,           CoRR, abs/1902.00751.
+   Alec Radford, Ilya Sutskever, and Dario Amodei.
+   2020a. Language models are few-shot learners. In       Minqing Hu and Bing Liu. 2004. Mining and sum-
+   Advances in Neural Information Processing Systems,        marizing customer reviews. In Proceedings of the
+   volume 33, pages 1877­1901. Curran Associates,            Tenth ACM SIGKDD International Conference on
+   Inc.                                                      Knowledge Discovery and Data Mining, KDD '04,
+                                                             page 168­177, New York, NY, USA. Association for
+Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie             Computing Machinery.
+   Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind
+   Neelakantan, Pranav Shyam, Girish Sastry, Amanda       Jared Kaplan, Sam McCandlish, Tom Henighan,
+   Askell, Sandhini Agarwal, Ariel Herbert-Voss,             Tom B. Brown, Benjamin Chess, Rewon Child,
+   Gretchen Krueger, Tom Henighan, Rewon Child,              Scott Gray, Alec Radford, Jeffrey Wu, and Dario
+   Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu,             Amodei. 2020. Scaling laws for neural language
+   Clemens Winter, Christopher Hesse, Mark Chen,             models. CoRR, abs/2001.08361.
+   Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin
+   Chess, Jack Clark, Christopher Berner, Sam Mc-         Rabeeh Karimi Mahabadi, Luke Zettlemoyer, James
+   Candlish, Alec Radford, Ilya Sutskever, and Dario         Henderson, Lambert Mathias, Marzieh Saeidi,
+   Amodei. 2020b. Language models are few-shot               Veselin Stoyanov, and Majid Yazdani. 2022a.
+   learners. CoRR, abs/2005.14165.                           Prompt-free and efficient few-shot learning with lan-
+                                                             guage models. In Proceedings of the 60th Annual
+Alexis Conneau, Kartikay Khandelwal, Naman Goyal,            Meeting of the Association for Computational Lin-
+   Vishrav Chaudhary, Guillaume Wenzek, Francisco            guistics (Volume 1: Long Papers), pages 3638­3652,
+   Guzmán, Edouard Grave, Myle Ott, Luke Zettle-             Dublin, Ireland. Association for Computational Lin-
+   moyer, and Veselin Stoyanov. 2019. Unsupervised           guistics.
+   cross-lingual representation learning at scale. CoRR,
+   abs/1911.02116.                                        Rabeeh Karimi Mahabadi, Luke Zettlemoyer, James
+                                                             Henderson, Lambert Mathias, Marzieh Saeidi,
+Alexis Conneau and Douwe Kiela. 2018. SentEval: An           Veselin Stoyanov, and Majid Yazdani. 2022b.
+   evaluation toolkit for universal sentence representa-     Prompt-free and efficient few-shot learning with lan-
+   tions. In Proceedings of the Eleventh International       guage models. In Proceedings of the 60th Annual
+   Conference on Language Resources and Evaluation           Meeting of the Association for Computational Lin-
+   (LREC 2018), Miyazaki, Japan. European Language           guistics (Volume 1: Long Papers), pages 3638­3652,
+   Resources Association (ELRA).                             Dublin, Ireland. Association for Computational Lin-
+                                                             guistics.
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and
+   Kristina Toutanova. 2019. BERT: Pre-training of        Phillip Keung, Yichao Lu, György Szarvas, and
+   deep bidirectional transformers for language under-       Noah A. Smith. 2020. The multilingual amazon re-
+   standing. In Proceedings of the 2019 Conference           views corpus.
+   of the North American Chapter of the Association
+   for Computational Linguistics: Human Language          Gregory Koch, Richard Zemel, Ruslan Salakhutdinov,
+   Technologies, Volume 1 (Long and Short Papers),           et al. 2015. Siamese neural networks for one-shot
+   pages 4171­4186, Minneapolis, Minnesota. Associ-          image recognition. In ICML deep learning work-
+   ation for Computational Linguistics.                      shop, volume 2, page 0. Lille.
+
+Jesse Dodge, Gabriel Ilharco, Roy Schwartz, Ali           Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay
+   Farhadi, Hannaneh Hajishirzi, and Noah Smith.             Mohta, Tenghao Huang, Mohit Bansal, and Colin
+   2020. Fine-tuning pretrained language models:             Raffel. 2022. Few-shot parameter-efficient fine-
+   Weight initializations, data orders, and early stop-      tuning is better and cheaper than in-context learning.
+   ping. arXiv preprint arXiv:2002.06305.
+Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man-         Jason Alan Fries, Ryan Teehan, Stella Biderman,
+   dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,            Leo Gao, Tali Bers, Thomas Wolf, and Alexan-
+   Luke Zettlemoyer, and Veselin Stoyanov. 2019.            der M. Rush. 2021. Multitask prompted train-
+   Roberta: A robustly optimized bert pretraining ap-       ing enables zero-shot task generalization. CoRR,
+   proach. arXiv preprint arXiv:1907.11692.                 abs/2110.08207.
+
+Andrew L. Maas, Raymond E. Daly, Peter T. Pham,          Elvis Saravia, Hsien-Chi Toby Liu, Yen-Hao Huang,
+   Dan Huang, Andrew Y. Ng, and Christopher Potts.          Junlin Wu, and Yi-Shin Chen. 2018. CARER: Con-
+   2011. Learning word vectors for sentiment analy-         textualized affect representations for emotion recog-
+   sis. In Proceedings of the 49th Annual Meeting of        nition. In Proceedings of the 2018 Conference on
+   the Association for Computational Linguistics: Hu-       Empirical Methods in Natural Language Processing,
+   man Language Technologies, pages 142­150, Port-          pages 3687­3697, Brussels, Belgium. Association
+   land, Oregon, USA. Association for Computational         for Computational Linguistics.
+   Linguistics.
+                                                         Timo Schick and Hinrich Schütze. 2021a. Exploiting
+James O'Neill, Polina Rozenshtein, Ryuichi Kiryo,           cloze-questions for few-shot text classification and
+   Motoko Kubota, and Danushka Bollegala. 2021. I           natural language inference. In Proceedings of the
+   wish I would have loved this one, but I didn't - A       16th Conference of the European Chapter of the As-
+   multilingual dataset for counterfactual detection in     sociation for Computational Linguistics: Main Vol-
+   product reviews. CoRR, abs/2104.06893.                   ume, pages 255­269, Online. Association for Com-
+                                                            putational Linguistics.
+Christian S. Perone, Roberto Pereira Silveira, and
+   Thomas S. Paula. 2018. Evaluation of sentence em-     Timo Schick and Hinrich Schütze. 2021b. It's not just
+   beddings in downstream and linguistic probing tasks.     size that matters: Small language models are also
+   CoRR, abs/1806.06259.                                    few-shot learners. In Proceedings of the 2021 Con-
+                                                            ference of the North American Chapter of the Asso-
+Jonas Pfeiffer, Aishwarya Kamath, Andreas Rücklé,           ciation for Computational Linguistics: Human Lan-
+   Kyunghyun Cho, and Iryna Gurevych. 2021.                 guage Technologies, pages 2339­2352, Online. As-
+   AdapterFusion: Non-destructive task composition          sociation for Computational Linguistics.
+   for transfer learning. In Proceedings of the 16th
+   Conference of the European Chapter of the Associ-     Timo Schick and Hinrich Schütze. 2021. True few-
+   ation for Computational Linguistics: Main Volume,        shot learning with prompts - A real-world perspec-
+   pages 487­503, Online. Association for Computa-          tive. CoRR, abs/2111.13440.
+   tional Linguistics.
+                                                         Richard Socher, Alex Perelygin, Jean Wu, Jason
+Guangyuan Piao. 2021. Scholarly text classification         Chuang, Christopher D. Manning, Andrew Ng, and
+   with sentence bert and entity embeddings. In Trends      Christopher Potts. 2013. Recursive deep models
+   and Applications in Knowledge Discovery and Data         for semantic compositionality over a sentiment tree-
+   Mining, pages 79­87, Cham. Springer International        bank. In Proceedings of the 2013 Conference on
+   Publishing.                                              Empirical Methods in Natural Language Processing,
+                                                            pages 1631­1642, Seattle, Washington, USA. Asso-
+Sylvestre-Alvise Rebuffi, Hakan Bilen, and Andrea           ciation for Computational Linguistics.
+   Vedaldi. 2017. Learning multiple visual domains
+   with residual adapters.                               Derek Tam, Rakesh R. Menon, Mohit Bansal,
+                                                            Shashank Srivastava, and Colin Raffel. 2021. Im-
+Nils Reimers and Iryna Gurevych. 2019. Sentence-            proving and simplifying pattern exploiting training.
+   BERT: Sentence embeddings using Siamese BERT-            In Proceedings of the 2021 Conference on Empiri-
+   networks. In Proceedings of the 2019 Conference on       cal Methods in Natural Language Processing, pages
+   Empirical Methods in Natural Language Processing         4980­4991, Online and Punta Cana, Dominican Re-
+   and the 9th International Joint Conference on Natu-      public. Association for Computational Linguistics.
+   ral Language Processing (EMNLP-IJCNLP), pages
+   3982­3992, Hong Kong, China. Association for          I. Androutsopoulos V. Metsis and G. Paliouras. 2006.
+   Computational Linguistics.                               Spam filtering with naive bayes - which naive bayes?
+                                                            In Proceedings of the 3rd Conference on Email and
+Victor Sanh, Albert Webson, Colin Raffel, Stephen H.        Anti-Spam (CEAS 2006).
+   Bach, Lintang Sutawika, Zaid Alyafeai, Antoine
+   Chaffin, Arnaud Stiegler, Teven Le Scao, Arun         Tianyi Zhang, Felix Wu, Arzoo Katiyar, Kilian Q
+   Raja, Manan Dey, M. Saiful Bari, Canwen Xu,              Weinberger, and Yoav Artzi. 2021. Revisiting few-
+   Urmish Thakker, Shanya Sharma, Eliza Szczechla,          sample {bert} fine-tuning. In International Confer-
+   Taewoon Kim, Gunjan Chhablani, Nihal V. Nayak,           ence on Learning Representations.
+   Debajyoti Datta, Jonathan Chang, Mike Tian-Jian
+   Jiang, Han Wang, Matteo Manica, Sheng Shen,           Xiang Zhang, Junbo Zhao, and Yann LeCun. 2015a.
+   Zheng Xin Yong, Harshit Pandey, Rachel Baw-              Character-level convolutional networks for text clas-
+   den, Thomas Wang, Trishala Neeraj, Jos Rozen,            sification. In Advances in Neural Information Pro-
+   Abheesht Sharma, Andrea Santilli, Thibault Févry,        cessing Systems, volume 28. Curran Associates, Inc.
+Xiang Zhang, Junbo Jake Zhao, and Yann LeCun.                  Following is a description of the test datasets:
+   2015b. Character-level convolutional networks for
+   text classification. In NIPS.                               Stanford Sentiment Treebank-5 (SST5)
+                                                            The SST-5 dataset is the fine-grained version of the
+A Appendix                                                  Stanford Sentiment Treebank, where each example
+                                                            is given one of five labels: very positive, positive,
+A.1 Datasets                                                neutral, negative, very negative.
+
+Table 6 shows the development and test datasets                Amazon Counterfactual The Amazon Coun-
+that are used for setting SETFIT's hyperparameters.         terfactual dataset is set of Amazon customer re-
+Following is a description of the datasets used:            views with professionally labeled binary labels
+                                                            of counterfactual detection. Counterfactual state-
+   SST2 The Stanford Sentiment Treebank 2 is a              ments are statements that denote something that
+collection of single sentence movie reviews with            did not happen or cannot (e.g. "They are much
+positive-negative sentiment class labels. (Socher           bigger than I thought they would be."). We used
+et al., 2013).                                              the English subset for our experiments. (O'Neill
+                                                            et al., 2021).
+   IMDB The Internet Movie Database dataset is
+a collection of single sentence movie reviews with             Customer Reviews The Customer Reviews
+positive-negative sentiment class labels. (Maas             (Hu and Liu, 2004) dataset is part of the of Sen-
+et al., 2011).                                              tEval (Conneau and Kiela, 2018) benchmark. It is
+                                                            composed of positive and negative opinions mined
+   BBC News The BBC News dataset is a collec-               from the web and written by customers about a
+tion of articles from the news outlet BBC with one          variety of products.
+of 5 topic classifications: Politics, Sports, Enter-
+tainment, Tech, and Business. (Greene and Cun-                 Emotion14 The Emotion dataset consists of
+ningham, 2006).                                             tweets from Twitter that display clear emotions
+                                                            (e.g. "i am now nearly finished [with] the week
+   Enron Spam The Enron spam email dataset                  detox and i feel amazing"). Labels are one of six
+consists of emails from the internal Enron corre-           categories: anger, fear, joy, love, sadness, and sur-
+spondence channel where emails are classified as            prise. (Saravia et al., 2018).
+spam or not spam. (V. Metsis and Paliouras, 2006).
+                                                               AG News AG News is a dataset of news titles
+   Student Question Categories11 This is a set              from AG news with one of 4 classifications (World,
+of questions from university entrance exams in In-          Entertainment, Sports, and Business). (Zhang et al.,
+dia that are classified into 4 subjects: Math, Biol-        2015b).
+ogy, Chemistry, Physics.
+                                                            A.2 ADAPET Training Procedure
+   TREC-QC The Text Retrieval Conference
+Question Answering dataset.                                 By default, ADAPET assumes access to a training,
+                                                            development, and test dataset. It trains for 1, 000
+   Toxic Conversations12 The Toxic Conversa-                batches, runs predictions on the development data
+tions dataset is set of comments from Civil Com-            every 250 batches and checkpoints, keeping the
+ments, a platform for reader comments for indepen-          model state which performed best on the devel-
+dent news outlets. Human raters have given them             opment dataset. In our case, where we assume
+toxicity attributes.                                        few-shot training and no development data, we
+                                                            ran ADAPET for 1, 000 batches and disabled the
+   Amazon Polarity13 The Amazon Polarity                    checkpointing, using the model state that resulted
+dataset consists of customer reviews from Ama-              after training for 1, 000 batches. For the English
+zon taken over 18 years with binary sentiment la-           data in Table 2, we used the pattern "[TEXT1]
+bels. Examples are either positive ("Great Read")           this is [LBL]", where "[TEXT1]" and "[LBL]" are
+or negative ("The Worst!") labelled. (Zhang et al.,         placeholders for a given piece of text and the cor-
+2015a).                                                     responding label, respectively. We constructed the
+
+   11www.kaggle.com/datasets/mrutyunjaybiswal/iitjee-neet-     14hf.co/datasets/emotion
+aims-students-questions-data
+
+   12https://www.kaggle.com/competitions/jigsaw-
+unintended-bias-in-toxicity-classification/data
+
+   13hf.co/datasets/amazon_polarity
+Dataset Name           Type of Task                      Cls. Label Dist.**  Metric             Split
+
+SST5                   Sentiment                         5   Approx. equal   Accuracy           Test
+
+Amazon Counterfactual  Counterfactual                    2   10% counterfactual MCC             Test
+
+CR                     Sentiment                         2   Equal           Accuracy           Test
+
+Emotion                Emotion                           6   Equal           Accuracy           Test
+
+Enron Spam             Unwanted Language 2                   Equal           Accuracy           Test
+
+AG News                Topic                             4   Equal           Accuracy           Test
+
+SST2                   Sentiment                         2   Equal           Accuracy           Dev
+
+IMDB                   Sentiment                         2   Equal           Accuracy           Dev
+
+BBC News               Topic                             5   Equal           Accuracy           Dev
+
+Student Question Categories Topic                        4   Approx.Equal    Accuracy           Dev
+
+TREC-QC                Topic                             50  N/A             Accuracy           Dev
+
+Toxic Conversations    Unwanted Language 2                   8% Toxic        Avg. Precision Dev
+
+Amazon Polarity        Sentiment                         2   Equal           Accuracy           Dev
+
+Table 6: English datasets used for development and test experiments. No. of classes per dataset. Distribution
+of the examples across classes.
+
+verbalizer from the "label" and "label text" columns     We also added two new prompts for SST5, to make
+that are available in all of our datasets. For the mul-  it compatible with the label names of SST5. Fol-
+tilingual datasets in Table 4, we used the same          lowing is a list of prompts we created for each
+pattern, but asked native speakers of each language      dataset:
+to translate this pattern into their language. We
+additionally constructed the verbalizer by mapping       Amazon Counterfactual Prompts
+labels to a star rating, for example, 0 = 1 star
+and 4 = 5 stars, again asking native speakers of            Input template:
+each language to translate the verbalizer into their        {{ text }} Is the statement factual?
+language.
+                                                            Target template:
+A.3 Prompts used in T-FEW                                   {{ answer_choices[label] }}
+
+The Emotion dataset is the only one that had ex-            Answer choices template:
+isting prompts in P3 (Public Pool of Prompts)               Yes ||| No
+(Bach et al., 2022). For three other datasets, we
+had to adapt existing prompts designed for simi-            Input template:
+lar datasets on P3, by making minimal required              {{ text }} Does the statement describe
+changes to address the differences in data domains          a fact?
+or label names:
+                                                            Target template:
+   · Prompts for Enron Spam, a spam e-                      {{ answer_choices[label] }}
+      mail detection dataset, were adapted from
+      sms_spam dataset prompts.                             Answer choices template:
+                                                            Yes ||| No
+
+   · CR prompts were adapted from                        Input template:
+      amazon_polarity.                                   {{ text }} Is the statement
+                                                         non-counterfactual or counterfactual?
+   · SST5 prompts were adapted from
+      yelp_review_full.                                  Target template:
+                                                         {{ answer_choices[label] }}
+   The Amazon Counterfactual dataset does not
+have any relevant prompts on P3. Hence, we man-          Answer choices template:
+ually generated prompts ourselves, based on stan-        non-counterfactual ||| counterfactual
+dard practices for prompt creation published in P3.
+                                                         Input template:
+   {{ text }} Is the statement             Input and target templates:
+   counterfactual?                         {{ text }} This movie is a very
+                                           {{answer_choices[label]}} one
+   Target template:
+   {{ answer_choices[label] }}             Answer choices template:
+                                           terrible ||| bad ||| okay ||| good |||
+   Answer choices template:                great
+   No ||| Yes
+
+   Input template:
+   {{ text }} Does the sentence express
+   an event that did not happen?
+
+   Target template:
+   {{ answer_choices[label] }}
+
+   Answer choices template:
+   No ||| Yes
+
+   Input template:
+   {{ text }} Does this describe an
+   actual event?
+
+   Target template:
+   {{ answer_choices[label] }}
+
+   Answer choices template:
+   Yes ||| No
+
+   Input template:
+   {{ text }} Does the sentence contain
+   events that did not or cannot take
+   place?
+
+   Target template:
+   {{ answer_choices[label] }}
+
+   Answer choices template:
+   Yes ||| No
+
+   Input template:
+   Is the label for the following
+   sentence non-counterfactual or
+   counterfactual? {{ text }}
+
+   Target template:
+   {{ answer_choices[label] }}
+
+   Answer choices template:
+   non-counterfactual ||| counterfactual
+
+New prompts for SST5
+
+   Input template:
+   How do you feel about the following
+   sentence? {{ text }}
+
+   Target template:
+   {{ answer_choices[label] }}
+
+   Answer choices template:
+   very negative ||| negative ||| neutral
+   ||| positive ||| very positive
+

@@ -1,0 +1,23 @@
+{
+  "id": "2607.12767",
+  "version": "v1",
+  "id_versioned": "2607.12767v1",
+  "title": "Accuracy and Normalized Accuracy under Length Bias: Analysis, Guidelines, and a Bayesian Alternative",
+  "authors": [
+    "Koen Oostermeijer"
+  ],
+  "published": "2026-07-14",
+  "updated": "2026-07-14",
+  "primary_category": "cs.AI",
+  "categories": [
+    "cs.AI"
+  ],
+  "comment": "Accepted at ICML 2026",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Multiple-choice benchmarks that rank candidate completions by conditional log-probability suffer from a length bias: because log-probabilities sum over tokens, longer answers tend to be penalized relative to shorter ones in practice. A common mitigation is to normalize scores by completion length, but we show empirically that this heuristic frequently over-corrects, introducing a bias toward longer answers instead. We first analyze these scoring rules, characterizing when standard and length-normalized accuracy are appropriate and how their length biases depend on the distribution of completion lengths. Motivated by this analysis, we introduce \\emph{Bayesian accuracy}, a scoring rule that computes the posterior probability of each candidate under an explicit prior over answer length, thereby removing linear length effects. Bayesian accuracy is a drop-in replacement for likelihood-based multiple-choice evaluation, requires no additional forward passes, and consistently exhibits lower empirical length bias than both standard and length-normalized accuracy across benchmarks and few-shot settings.",
+  "abs_url": "https://arxiv.org/abs/2607.12767",
+  "pdf_url": "https://arxiv.org/pdf/2607.12767",
+  "src_url": "https://arxiv.org/src/2607.12767v1",
+  "metadata_source": "abs-page"
+}

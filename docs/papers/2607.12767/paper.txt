@@ -1,0 +1,1192 @@
+                                        Accuracy and Normalized Accuracy under Length Bias: Analysis, Guidelines,
+                                                                        and a Bayesian Alternative
+
+                                        Koen Oostermeijer 1
+
+arXiv:2607.12767v1 [cs.AI] 14 Jul 2026                          Abstract                                  for which this highest-scoring candidate is correct. Promi-
+                                                                                                          nent examples of this likelihood-based multiple-choice eval-
+                                              Multiple-choice benchmarks that rank candidate              uation include MMLU (Hendrycks et al., 2020), HellaSwag
+                                              completions by conditional log-probability suffer           (Zellers et al., 2019), and WinoGrande (Sakaguchi et al.,
+                                              from a length bias: because log-probabilities sum           2021).
+                                              over tokens, longer answers tend to be penalized
+                                              relative to shorter ones in practice. A common              This way of evaluating models has a key advantage: by
+                                              mitigation is to normalize scores by completion             restricting the space of possible outputs to a fixed set of
+                                              length, but we show empirically that this heuris-           benchmark-provided completions, it turns open-ended gen-
+                                              tic frequently over-corrects, introducing a bias            eration into a simple answer-checking problem. The evalua-
+                                              toward longer answers instead. We first analyze             tor no longer has to parse or interpret arbitrary text, it only
+                                              these scoring rules, characterizing when standard           needs to compare scores over a small, known candidate set.
+                                              and length-normalized accuracy are appropriate              This is particularly useful for pretrained base models that
+                                              and how their length biases depend on the dis-              have not been instruction-tuned and may not reliably follow
+                                              tribution of completion lengths. Motivated by               templates or formatting instructions in free-form generation
+                                              this analysis, we introduce Bayesian accuracy, a            settings. Because multiple-choice evaluation only requires
+                                              scoring rule that computes the posterior probabil-          the model to assign probabilities to the given candidates
+                                              ity of each candidate under an explicit prior over          and select the most likely one, it sidesteps these formatting
+                                              answer length, thereby removing linear length               issues and yields a simple, scalable metric that is insensitive
+                                              effects. Bayesian accuracy is a drop-in replace-            to output format.
+                                              ment for likelihood-based multiple-choice evalu-
+                                              ation, requires no additional forward passes, and           A key property of these benchmarks is that the total log-
+                                              consistently exhibits lower empirical length bias           likelihood of a completion is typically given by the sum of
+                                              than both standard and length-normalized accu-              its token-wise log-probabilities. Because this score is addi-
+                                              racy across benchmarks and few-shot settings.               tive over tokens, any per-token uncertainty or modeling error
+                                                                                                          is accumulated with length: even when the model "knows"
+                                        1. Introduction                                                   the correct answer, it is likely to still incur a non-zero loss
+                                                                                                          on each token, so longer answers have more opportunities to
+                                        Large language models (LLMs) have achieved strong per-            accumulate negative log-probability. Empirically, as will be
+                                        formance on a wide range of natural language processing           shown in this paper, the total log-likelihoods often decrease
+                                        tasks, from factual question answering to multi-step rea-         approximately linearly with completion length, inducing a
+                                        soning (Brown et al., 2020). A common way to evaluate             systematic length bias towards shorter candidates.
+                                        such models is via multiple-choice benchmarks: the model
+                                        is given a prompt together with a small set of candidate          A widely used heuristic to mitigate this bias is to normal-
+                                        completions, which are ranked according to the conditional        ize the total log-likelihood by the length of the completion,
+                                        log-probability the model assigns to each candidate. The          for example by dividing by the number of tokens or bytes
+                                        candidate with the highest score is taken as the model's          (Brown et al., 2020; Gao et al., 2024). Length-normalized
+                                        answer, and accuracy is computed as the fraction of prompts       scores can be interpreted as (the negative of) an average
+                                                                                                          per-token cross-entropy and are monotonically related to
+                                            1Aleph Alpha Research. Correspondence to: Koen Oostermei-     perplexity. In practice, however, we find that such normal-
+                                        jer <koen.oostermeijer@aleph-alpha-research.com>.                 ization frequently over-corrects: scores become biased in
+                                                                                                          the opposite direction, favoring longer completions instead.
+                                        Proceedings of the 43 rd International Conference on Machine      Moreover, these effects are not uniform across benchmarks
+                                        Learning, Seoul, South Korea. PMLR 306, 2026. Copyright 2026      or task formats, raising two questions: (I) when is it appro-
+                                        by the author(s).                                                 priate to use unnormalized versus length-normalized accu-
+
+                                                                                                       1
+               Accuracy and Normalized Accuracy under Length Bias
+
+racy, and (II) is there an alternative that behaves robustly       over the completion.
+across tasks?
+                                                                   A scoring function S transforms these log-likelihoods into
+Beyond length normalization, several alternative scoring           scores
+rules have been proposed that adjust for unconditional priors
+or rescale scores, most notably pointwise mutual informa-                     s(c | x) = S (c | x) ,                            (3)
+tion (PMI) and asymmetric normalized PMI (ANPMI); we
+review these metrics and their limitations as baselines in         that are used to determine the model's prediction by taking
+Section 2.2.                                                       the completion with the highest score
+
+In this work, we study length bias in likelihood-based             y^(k) = arg max s(c | x(k)).                                 (4)
+multiple-choice benchmarks and propose a simple Bayesian                                     cC (k)
+alternative to both standard and length-normalized accuracy.
+Our contributions are as follows:                                  The resulting accuracy for a given S is the fraction of correct
+                                                                   predictions
+  1. We formalize length bias in log-likelihood-based
+      benchmarks by defining it as the average Kendall rank                                  1  K
+      correlation coefficient between candidate lengths and                                  K
+      their scores.                                                AccS(f; D)             =          I y^(k) = y(k) .           (5)
+
+  2. Using this formalization, we empirically characterize                                      k=1
+     which benchmarks and scoring rules exhibit substantial
+      length bias and how this depends on model and training       2.2. Existing Metrics
+      setup.
+                                                                   2.2.1. STANDARD (UNNORMALIZED) ACCURACY
+  3. Motivated by the empirical observation that, for stan-
+      dard subword tokenizers used by contemporary autore-         The simplest choice is to use the total conditional log-
+      gressive LLMs and across a representative range of           likelihood directly as the score, in which case the scoring
+      multiple-choice benchmarks, total log-likelihoods ex-        function is the identity function:
+      hibit a dominant approximately affine dependence on
+      completion length, we introduce Bayesian accuracy, a         Standard:              Ssta((c | x)) = (c | x). (6)
+      scoring rule that incorporates an explicit length prior
+      and removes this first-order length trend, while remain-     In this case, the selected completion is the one the model
+      ing a drop-in replacement for existing likelihood-based      assigns the highest overall probability under the conditional
+      evaluations.                                                 distribution P(· | x) to, i.e., which completion is (accord-
+                                                                   ing to the model) most likely to follow from the prompt.
+  4. Across benchmarks and few-shot settings, Bayesian             Unless otherwise stated, we refer to standard accuracy as
+      accuracy yields lower length bias than standard and          the accuracy obtained when S = Ssta.
+      length-normalized accuracy, without additional for-
+     ward passes.                                                  2.2.2. LENGTH-NORMALIZED ACCURACY
+
+2. Background                                                      A common way of attempting to correct for length bias is
+                                                                   to normalize the log-likelihoods by a measure of comple-
+2.1. Notation                                                      tion length, typically the number of tokens, characters, or
+                                                                   bytes (Brown et al., 2020; Gao et al., 2024). Normalizing
+We evaluate a language model f on multiple-choice                  by the number of tokens has the advantage that it directly
+datasets of the form                                               corresponds to text units the model processes and therefore
+                                                                   to the number of log-probability terms being summed. The
+               D = x(k), C(k), y(k)  K                             resulting score can be interpreted as the negative average
+                                                                   token-wise cross-entropy, or equivalently, the negative log
+                                                                   perplexity:
+
+                                          ,  (1)                                                                   (c |  x)
+                                                                                                                   ntok
+                                     k=1                           Token-normalized:      Stok ( (c   |  x))  =              .  (7)
+
+where x(k) is the prompt, C(k) = {cm (k)}m M=k 1 is the set of     A drawback of token-based normalization is that the metric
+candidate completions, and y(k)  C(k) is the ground-truth          becomes dependent on the tokenizer, which complicates
+answer. These completions are of length n(mk)  |c(mk)| mea-        comparisons between models with different tokenization
+                                                                   schemes. This can be mitigated by normalizing by the
+sured either in bytes or tokens. For a prompt­completion           number of bytes (or characters):
+pair (x, c), we write
+
+               (c | x)  log P(c | x)         (2)
+
+for the total conditional log-probability assigned by the          Byte-normalized:       Sbyte ( (c  |  x))  =  (c | x)     .  (8)
+model, obtained by summing token-wise log-probabilities                                                            nbyte
+
+                                                                2
+                             Accuracy and Normalized Accuracy under Length Bias
+
+The latter variant is widely used in practice (Gao et al., 2024;     as default scoring rules in large-scale benchmark evaluations.
+Habib et al., 2023).                                                 Our proposed Bayesian accuracy, in contrast, only requires
+                                                                     conditional log-likelihoods and is explicitly designed to
+2.2.3. POINTWISE MUTUAL INFORMATION (PMI)                            control length bias.
+
+Pointwise mutual information (PMI) (Fano & Hawkins,                  3. Experiments
+1961) adjusts the conditional log-likelihoods by subtracting
+the unconditional log-likelihoods of the completions:                3.1. Measuring Length Bias
+
+       PMI: SPMI((c | x)) = (c | x) - (c), (9)                       We quantify the length bias induced by a scoring function S
+                                                                     on a multiple-choice dataset by measuring the rank correla-
+where (c)  log P(c) is the log-probability of the com-               tion between candidate lengths and their scores within each
+pletion without conditioning on the prompt. For brevity, we          example: Consider a single example with prompt x and
+slightly abuse notation and omit the explicit dependence of          candidate set C = {cm}m M=1. For a model f and scoring
+(c) on its inputs. Intuitively, PMI measures the increase            function S, the score is defined as
+in log-probability that the prompt x provides for completion
+c, and by doing so removes any prior preference the model                            si = S (ci | x) .      (11)
+might assign to a completion regardless of the context.
+                                                                     Throughout the rest of this paper, we primarily use byte
+Although not as widely used as standard or length-                   length, because of its common usage and desirable tokenizer-
+normalized accuracy, PMI-based scoring has appeared in               independence property. However, length bias can be defined
+several recent studies (Askell et al., 2021; Biderman et al.,        analogously by swapping out byte length for token length.
+2024). A practical limitation is that PMI requires evaluating        We report additional token-length results in the appendix,
+(c) for every completion in addition to (c | x), doubling            which result in the same conclusions.
+the number of forward passes needed for evaluation. More-
+over, by subtracting the unconditional log-probability of a          For a single sample, we measure the correlation between
+completion, PMI removes global priors over completions,              the set of scores {s1, . . . , sM } and the set of lengths
+indirectly mitigating some length-related biases without ex-         {n1, . . . , nM } using Kendall's rank correlation coefficient
+plicitly performing length normalization.                             (Kendall, 1938). For each unordered pair (i, j) with
+                                                                     1  i < j  M , we compare their scores and lengths:
+
+2.2.4. ASYMMETRIC NORMALIZED PMI (ANPMI)                                · The pair is concordant if (si - sj)(ni - nj) > 0, i.e.,
+                                                                           the candidate with the higher score is also longer.
+Cho et al. (2025) observe that PMI is bounded from above
+by -(c). This happens when the prompt completely de-                    · The pair is discordant if (si - sj)(ni - nj) < 0, i.e.,
+termines the completion, which causes the conditional log-                 the candidate with the higher score is shorter.
+likelihood to approach zero (see Equation 9). Consequently,
+different completions have different maximum attainable                 · The pair is tied in scores if si = sj.
+PMI values depending on their unconditional probabilities,              · The pair is tied in lengths if ni = nj.
+which can distort comparisons between candidates with sub-
+stantially different priors. Asymmetric normalized PMI               Let M0 = M (M - 1)/2 be the total number of unordered
+(ANPMI) addresses this by normalizing PMI by -(c):                   pairs of candidates, and let Mc and Md be the numbers of
+                                                                     concordant and discordant pairs, respectively. The numbers
+                                                                     of tied pairs are given by
+
+ANPMI:  SANPMI ( (c  |  x))  =  -   (c  |  x) -   (c)  .             Ts =                   I[si = sj],     (12)
+                                            (c)
+                                                                                     1i<jM
+
+                                                 (10)                Tb =                   I[ni = nj],     (13)
+
+With this normalization, ANPMI is upper-bounded by 1 for                             1i<jM
+all completions, regardless of their prior probability.
+                                                                     where I[·] is the indicator function. Using these quantities,
+In practice, ANPMI inherits the computational overhead               Kendall's b is then computed as
+of PMI, since it also requires unconditional log-likelihoods
+(c) for all completions. In addition, it can be unstable              (S; C) =       Mc - Md             .  (14)
+or undefined for completions with extremely high prior
+probability (i.e., (c)  0) and is poorly defined for single-                         (M0 - Ts)(M0 - Tb)
+token completions in models that do not employ an explicit
+beginning-of-sentence token. For these reasons, both PMI             Intuitively, the numerator captures the net agreement be-
+and ANPMI serve as useful baselines, but they are not ideal          tween the score and length orderings: it is positive when
+                                                                     pairs where the higher-scoring candidate is longer domi-
+                                                                     nate, and negative when higher scores tend to go to shorter
+
+                                                                  3
+                   Accuracy and Normalized Accuracy under Length Bias
+
+candidates. The denominator normalizes by the number               3.3. Empirical Length Bias of Existing Scoring Rules
+of pairs whose relative ordering is actually determined
+once ties in scores and lengths are removed, ensuring that         We begin by analyzing how completion length relates to
+ (S; C)  [-1, 1]. Negative values indicate that higher             log-likelihood under the standard and length-normalized
+scores are typically assigned to shorter candidates, positive      scoring rules, and how these score-length curves align with
+values indicate a tendency to favor longer candidates, and         the measured length biases. This lets us check how well the
+values near zero correspond to little or no monotonic associ-      assumed linear scaling of log-likelihood with length holds in
+ation between score and length. When all candidates have           practice and how these trends translate into the rank-based
+identical scores or identical lengths, no meaningful ordering      length bias  (S, D), as defined in Section 3.1.
+exists and the denominator is zero, so  (S; C) is undefined.
+                                                                   3.3.1. STANDARD ACCURACY
+The overall length bias of a scoring function S on dataset
+D is defined as the average Kendall correlation across all         Figure 1 plots, for each benchmark, the average conditional
+samples for which it is defined. Let                               log-likelihood (c | x) as a function of completion byte
+                                                                   length nbyte, aggregated over all models and candidates and
+Idef  k  {1, . . . , K} |  S; C(k) is defined (15)                 binned for readability.
+
+be the set of indices with a well-defined  . Then, the overall                             0
+length bias of the dataset is computed as the average over
+ -defined samples:                                                                         -20
+
+ (S, D)      1            (S; C(k)).  (16)                         Average Log-Likelihood  -40
+           |Idef|
+                   kIdef
+
+                                                                                           -60        ARC
+
+3.2. Benchmarks and Models                                                                            ARC German
+
+We evaluate on a suite of multiple-choice benchmarks: ARC                                             MMLU Full-Text
+(Clark et al., 2018), ARC German (LAION, 2024), Hel-
+laSwag (Zellers et al., 2019), MMLU (Hendrycks et al.,                                                MMLU Cloze
+2020), OpenbookQA (Mihaylov et al., 2018), SciQ (Jo-
+hannes Welbl, 2017), and WinoGrande (Sakaguchi et al.,                                     -80        HellaSwag
+2021). For MMLU we use two formats. In MMLU Full-
+Text, the prompt contains the question and answer options,                                            OpenbookQA
+and each candidate completion is the full answer text. In
+MMLU Cloze, the option list is removed and the model in-                                              SciQ
+stead fills in an answer span directly in the context. These
+variants let us probe how length bias changes when mov-                                               Winogrande
+ing from single-symbol labels to heterogeneous multi-token
+completions. We run all experiments in a zero-shot setting;                                -100             20        40  60  80                      100  120
+prompt templates and preprocessing details are given in the                                        0
+appendix.
+                                                                                                                      Completion Length (bin center)
+We evaluate open-weight models from the LLaMA, Qwen,
+Mistral, Pythia, and SmolLM families, covering parameter           Figure 1. Average conditional 1log-likelihood (c | x) versus
+counts from 135M to 70B in both base and instruction-tuned         completion byte length nbyte, aggregated over all models. For
+configurations (Grattafiori et al., 2024; Jiang et al., 2023;      readability, completion lengths are restricted to a maximum of 120
+Biderman et al., 2023; Allal et al., 2024; Qwen Team, 2025).       bytes and results are binned.
+
+Unless otherwise stated, experiments in the main text use          Across almost all benchmarks we observe a pronounced,
+the zero-shot setting; few-shot results are reported in the        approximately linear decrease of total log-likelihood with
+appendix. In the few-shot setting, we use one fixed exemplar       length. The main exception is MMLU Full-Text, whose
+set per prompt configuration, and estimate ^b separately for       slope is close to zero at the aggregate level. This behavior
+each model­dataset­prompt configuration, including the             matches the intuition that any non-zero per-token loss ac-
+corresponding few-shot prompt.                                     cumulates across tokens and therefore induces a systematic
+                                                                   preference for shorter candidates. It is worth noting that
+All evaluations are run using the Aleph Alpha Eval Frame-          the fitted lines also exhibit a substantial positive intercept at
+work (Aleph Alpha Research, 2025).                                 length one. This seems to indicate that the first token of the
+                                                                   completion is noticeably harder to predict than subsequent
+                                                                   tokens. Initial tokens must both start a new span (often with
+                                                                   weaker local context than mid-span tokens). Subsequent
+                                                                   tokens then benefit from this additional context and incur a
+                                                                   smaller average per-token loss.
+
+                                                                   Table 1 summarizes the actual length biases for standard
+                                                                   accuracy using the average Kendall correlation  (Ssta, D).
+                                                                   For most benchmarks and models,  is clearly negative, con-
+                                                                   firming our suspicion that unnormalized likelihood tends to
+                                                                   favor shorter candidates. The effect is particularly strong
+
+                                                                4
+Accuracy and Normalized Accuracy under Length Bias
+
+on HellaSwag and the ARC benchmarks, where candidate                3.3.3. NORMALIZED ACCURACY
+lengths vary substantially, and weakest on SciQ and Wino-
+Grande, whose  values are close to zero despite visible             We now repeat the analysis for byte-normalized scores Sbyte,
+slopes in Figure 1. This illustrates that a sloped score-           plotting (c | x)/nbyte against nbyte in Figure 2.
+versus-length curve does not necessarily imply a strong
+per-example rank correlation: length bias depends not only                                             0.0
+on the average slope but also on how candidate lengths are
+distributed within each question. Within each model family,         Average Normalized Log-Likelihood  -0.5
+the magnitude of negative  tends to shrink with model size,
+indicating that larger models are somewhat less sensitive to                                           -1.0
+length artifacts under standard scoring, although the bias
+remains clearly non-zero.                                                                              -1.5
+
+3.3.2. MULTIPLE-CHOICE WITH LOCALLY                                                                    -2.0                                          ARC
+        DETERMINED ANSWERS                                                                             -2.5                                          ARC German
+                                                                                                       -3.0                                          MMLU Full-Text
+MMLU Full-Text provides an illustrative example. Here,                                                 -3.5                                          MMLU Cloze
+each candidate completion is the full answer sentence, but                                             -4.0                                          HellaSwag
+the question and the answer options are already present in                                                                                           OpenbookQA
+the prompt. When we decompose the total log-likelihood                                                        0                                      SciQ
+into per-token contributions, we find that the first one or                                                                                          Winogrande
+two answer tokens account for almost all of the variation
+between candidates. Once the model has committed to a                                                            20  40  60  80                      100             120
+specific option, the remainder of the answer is largely a
+deterministic copy of text already appearing in the prompt                                                           Completion Length (bin center)
+and therefore carries much higher conditional probabilities
+and much smaller per-token loss.                                    Figure 2. Average byte-norma1lized conditional log-likelihood
+                                                                    (c | x)/nbyte versus completion byte length, aggregated over
+In other words, for these "locally determined" answers the          all models. For readability, completion lengths are restricted to a
+candidate identity is effectively fixed by the first few to-
+kens, and the remaining tokens contribute an almost iden-           maximum of 120 bytes and results are binned.
+tical offset to the log-likelihoods of all candidates. Conse-
+quently, the effective slope is close to zero. This explains        Na¨ive length normalization largely flattens the global trend
+why MMLU Full-Text shows little aggregate length depen-             over medium-length completions: the strong negative slopes
+dence and near-zero length bias under standard accuracy             in Figure 1 are substantially reduced. However, for short
+despite substantial variation in absolute completion lengths.       completions we often observe a sharp decrease in (c |
+                                                                    x)/nbyte as a function of length. This suggests that nor-
+A second situation in which standard accuracy is effectively        malization can over-correct the raw length bias: very short
+insensitive to length is when all completions for a given           completions become relatively under-scored compared to
+example have (almost) the same length. Intuitively, if the          slightly longer ones, inducing a systematic bias towards
+shortest and longest candidates differ only slightly, then they     longer answers instead.
+all sum log-probabilities over nearly the same number of
+tokens/bytes, so the length-dependent part of the score is          Table 2 quantifies this effect. In contrast to Table 1,
+almost identical across candidates.                                 the Kendall correlations  (Sbyte, D) are uniformly positive
+                                                                    across benchmarks and models, often with comparable or
+We summarize these observations as a simple rule of thumb:          even larger magnitude than the negative biases under stan-
+                                                                    dard accuracy. On datasets such as ARC, ARC German,
+ When is standard accuracy safe to use? Standard (un-               OpenbookQA, SciQ and WinoGrande, length-normalization
+ normalized) accuracy is mainly appropriate when (i) the            turns a modest negative or near-zero  into a substantial pos-
+ answer text already appears in the prompt and the first one        itive one, indicating that normalization introduces a strong
+ or two completion tokens effectively fix the option, or (ii)       length bias where there was little before. For HellaSwag and
+ all candidates for a question have very similar lengths, with      MMLU Full-Text, byte-normalization partially corrects the
+ single-letter prediction benchmarks as an extreme case.            strong negative bias of standard accuracy, bringing  closer
+                                                                    to zero for base models, but overshoots for instruction-tuned
+                                                                    models, which show markedly larger positive  on most
+                                                                    benchmarks.
+
+                                                                    These mixed outcomes make it hard to state a simple, struc-
+                                                                    tural condition, analogous to locally determined answers
+                                                                    or small within-example length variation for Ssta--under
+                                                                    which length-normalized accuracy is guaranteed to be safe.
+                                                                    Instead, its behavior appears to depend sensitively on the
+                                                                    dataset templating and the specific model family. We there-
+                                                                    fore summarize its practical use in a rule-of-thumb box:
+
+                                                                 5
+                            Accuracy and Normalized Accuracy under Length Bias
+
+                            Table 1. Length bias for standard accuracy.
+
+Benchmark            ARC    ARC German  HellaSwag MMLU Cloze          MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B         -0.19       -0.30  -0.55                  -0.38         -0.07       -0.33    -0.07      -0.06
+Llama 3.2 3B         -0.17       -0.26  -0.52                  -0.38         0.06        -0.27    -0.05      0.01
+Llama 3.1 8B         -0.15       -0.24  -0.49                  -0.33         0.03        -0.25    -0.05      -0.05
+Llama 3.1 70B        -0.14       -0.20  -0.46                  -0.30         0.04        -0.26    -0.04      -0.03
+Qwen3 600M           -0.20       -0.26  -0.58                  -0.38         0.02        -0.30    -0.06      0.00
+Qwen3 1.7B           -0.17       -0.26  -0.54                  -0.35         -0.02       -0.29    -0.05      -0.01
+Qwen3 4B             -0.17       -0.21  -0.52                  -0.34         0.01        -0.27    -0.04      -0.02
+Qwen3 8B             -0.15       -0.20  -0.50                  -0.35         0.04        -0.27    -0.04      -0.02
+Qwen3 14B            -0.15       -0.21  -0.48                  -0.32         0.04        -0.25    -0.05      -0.01
+Mistral 7B           -0.16       -0.25  -0.49                  -0.35         0.03        -0.29    -0.06      -0.07
+Pythia 410M          -0.27       -0.40  -0.61                  -0.47         -0.21       -0.35    -0.13      -0.05
+SmolLM 135M          -0.22       -0.44  -0.60                  -0.43         -0.16       -0.30    -0.09      -0.04
+
+Qwen3 600M Instruct  -0.18       -0.26  -0.58                  -0.37         0.02        -0.25    -0.07      0.00
+Qwen3 1.7B Instruct  -0.13       -0.23  -0.55                  -0.26         0.03        -0.24    -0.05      0.08
+Qwen3 4B Instruct    -0.14       -0.18  -0.55                  -0.27         0.03        -0.20    -0.04      0.11
+Qwen3 8B Instruct    -0.13       -0.17  -0.52                  -0.26         0.06        -0.19    -0.04      -0.01
+Qwen3 14B Instruct   -0.12       -0.17  -0.52                  -0.22         0.07        -0.16    -0.03      0.05
+
+Benchmark                   Table 2. Length bias of byte-normalized accuracy.
+
+Llama 3.2 1B         ARC    ARC German  HellaSwag MMLU Cloze          MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+Llama 3.2 3B
+Llama 3.1 8B         0.31        0.34   0.05                   0.27          0.49         0.36    0.27       0.44
+Llama 3.1 70B        0.26        0.29                                        0.48         0.36    0.23       0.42
+Qwen3 600M           0.22        0.29   0.04                   0.27          0.44         0.38    0.22       0.34
+Qwen3 1.7B           0.22        0.29                                        0.34         0.38    0.24       0.31
+Qwen3 4B             0.37        0.31   0.05                   0.23          0.40         0.37    0.31       0.40
+Qwen3 8B             0.28        0.29                                        0.29         0.38    0.27       0.40
+Qwen3 14B            0.25        0.29   0.05                   0.25          0.29         0.37    0.27       0.30
+Mistral 7B           0.23        0.27                                        0.26         0.36    0.26       0.30
+Pythia 410M          0.22        0.28   0.05                   0.25          0.33         0.38    0.25       0.28
+SmolLM 135M          0.23        0.28                                        0.40         0.40    0.22       0.33
+                     0.39        0.32   0.05                   0.23          0.33         0.37    0.36       0.48
+Qwen3 600M Instruct  0.33        0.27                                        0.42         0.38    0.29       0.41
+Qwen3 1.7B Instruct                     0.04                   0.25
+Qwen3 4B Instruct    0.43        0.38                                        0.24         0.60    0.44       0.47
+Qwen3 8B Instruct    0.41        0.43   0.04                   0.23          0.30         0.63    0.41       0.46
+Qwen3 14B Instruct   0.40        0.43                                        0.32         0.61    0.45       0.44
+                     0.34        0.43   0.04                   0.24          0.28         0.65    0.33       0.41
+                     0.40        0.40                                        0.30         0.69    0.36       0.44
+                                        0.04                   0.24
+
+                                        0.07                   0.28
+
+                                        0.06                   0.25
+
+                                        0.33                   0.34
+
+                                        0.32                   0.33
+
+                                        0.35                   0.40
+
+                                        0.34                   0.30
+
+                                        0.35                   0.38
+
+ When is length-normalized accuracy safe to use? The              length relationship is the hierarchical linear model
+ results do not reveal a simple heuristic that guarantees low
+ length bias under byte- or token-normalized accuracy. We             (mk) = k + knm (k) + m (k),                       (17)
+ therefore do not view normalized accuracy as a safe de-
+ fault and only recommend it once low length bias has been        where
+ empirically confirmed. Instead, we suggest using the length-
+ corrected Bayesian alternative introduced in the next sec-          · k is a prompt-specific offset capturing the overall
+ tion.                                                                  difficulty of item k and the effect of the first completion
+                                                                        token,
+4. Bayesian Accuracy
+                                                                     · k is a prompt-specific average per-byte contribution
+4.1. A Generative Model for Log-Likelihoods                             to the log-likelihood, i.e., the local slope of the length
+                                                                        trend for example k,
+We now formalize the empirical observation from Sec-
+tion 3.3 that, within a benchmark, total conditional log-            · (mk) aggregates token-level fluctuations around this
+likelihoods of standard subword tokenizers scale approxi-               trend and has zero mean with a variance that grows
+mately linearly with completion length. For each example                linearly in the length.
+k with prompt x(k) and candidate set C(k) = {c(mk)}m M=k 1,
+write m (k)  (cm (k) | x(k)) for the total conditional log-       We treat (k, k) as draws from a population distribution
+likelihood, and let nm (k) denote the byte length of c(mk).       with finite moments E[k] = a, E[k] = b and variances
+                                                                  Var[k] = 2 , Var[k] = 2 . Marginalizing over prompts
+A simple but flexible description of the observed score-          yields a linear trend:
+
+                                                                      E[m (k) | n(mk) = n] = a + bn,                    (18)
+
+                                                               6
+                          Accuracy and Normalized Accuracy under Length Bias
+
+and variance that scales quadratically in the length:                   4.3. Estimating the Length Decay Factor
+
+Var[m (k) | nm (k) = n] = O(n2).                          (19)          To apply Bayesian accuracy, we estimate one global length-
+                                                                        decay factor b for each model­dataset­prompt configuration.
+This is in line with the empirical trends in Figure 1 and               Rather than fitting a pooled regression of log-likelihood on
+                                                                        length, we estimate b from within-question variation. This
+Figure 3 in the Appendix. The quadratic behavior stems                  removes prompt-specific offsets k, which would other-
+from variation in the per-example slopes k: if k were                   wise confound the slope whenever easier or harder prompts
+constant, only the linear n2 term would remain.                         systematically contain longer candidates.
+
+If we use the raw m (k) to rank candidates, the average slope           Concretely, for each question we center candidate lengths
+b induces a systematic preference for shorter completions               and log-likelihoods within that question and fit the resulting
+when b < 0 or longer completions when b > 0. Our goal is                fixed-effect slope:
+to remove this global length trend while preserving genuine,
+context-dependent preferences among candidates of similar                           Mk
+length. Rather than dividing by length, which rescales both
+signal and noise, we instead introduce an explicit prior over                   Mk       n(ik) - n¯(k) i(k) - ¯(k)
+completion lengths and absorb the linear trend into that
+prior.                                                                  ^b = k      i=1                             .  (24)
+
+                                                                                         Mk   n(ik) - n¯(k) 2
+
+                                                                                     Mk
+
+4.2. Bayesian Correction                                                        k        i=1
+
+Let P(c | x) denote the model's conditional distribution                This estimator is equivalent to regressing pairwise log-
+over completions and (c | x) = log P(c | x) the corre-                  likelihood differences on pairwise length differences, but the
+sponding log-likelihood. We introduce a prior over comple-              centered form is linear in the number of candidates per ques-
+tion lengths, Pprior(n), and define a posterior over comple-            tion. When calibration data contain little within-question
+tions                                                                   length variation, ^b can be noisy; in that case we use the same
+                                                                        prompt configuration as the evaluation set and can option-
+Ppost(c | x)  P(c | x) Pprior(n).                         (20)          ally stabilize the estimate with held-out calibration, pooling
+                                                                        across related templates, or shrinkage toward b = 0. Ap-
+Taking the logarithm of the posterior distribution gives                pendix A.1 gives the full derivation and Algorithm 1 gives
+                                                                        the implementation.
+log Ppost(c | x) = (c | x) + log Pprior(n) - log Z(x),
+                                                               (21)
+
+where Z(x) is a normalization constant that does not de-                4.4. Results
+pend on c and therefore does not affect the argmax over
+candidates.                                                             For each model­dataset pair we estimate a separate ^b and
+                                                                        rescore candidates with the length-corrected log-likelihood
+The linear relation (18) implies that the length prior is expo-         ~(c | x; ^b). Table 3 reports the resulting Kendall corre-
+nential in length:                                                      lations  (S, D) between candidate length and score under
+                                                                        Bayesian accuracy.
+Pprior(n)  exp -b n ,                                     (22)
+                                                                        Bayesian accuracy brings the rank-correlation between can-
+with length slope b  R. Since benchmark evaluation only                 didate length and score close to zero: almost all entries in
+compares a finite set of candidates, we only need these                 Table 3 satisfy | |  0.1. This supports Bayesian accuracy
+relative length weights within each candidate set. Plugging             as a robust scoring rule that substantially reduces length
+this into the posterior and dropping terms that are constant            bias without requiring additional forward passes and while
+across candidates yields the length-debiased log-likelihood             preserving meaningful within-item preferences among can-
+score:                                                                  didates.
+
+SBayes(c | x; b)  ~(c | x; b)  (c | x) - b n. (23)                      4.5. Comparison to baselines
+
+Because ~ is obtained by a simple affine transformation                 We now compare Bayesian accuracy to standard accuracy,
+of the same conditional log-likelihoods used for standard               byte-normalized accuracy, PMI, and ANPMI in terms of
+accuracy, Bayesian accuracy can be used as a drop-in re-                their overall length bias. For each model and scoring rule S,
+placement that does not require any additional model evalu-             we summarize length bias by the mean absolute correlation
+ations. It should be noted that this correction targets length-
+dependent priors induced by additive log-likelihood accu-                       | |       1            (S, D) ,        (25)
+mulation, but does not remove other answer priors such as                                |B|
+preferences for frequent words, phrases, or syntactic forms.                                  DB
+
+                                                                     7
+                                  Accuracy and Normalized Accuracy under Length Bias
+
+                                  Table 3. Length bias under Bayesian accuracy.
+
+       Benchmark            ARC   ARC German  HellaSwag MMLU Cloze        MMLU Full-Text  OpenbookQA  SciQ  WinoGrande
+
+       Llama 3.2 1B         0.06       0.04   -0.02                0.06          -0.02        0.05    0.07      0.01
+       Llama 3.2 3B         0.04       0.05                                      0.07         0.05    0.04      0.05
+       Llama 3.1 8B         0.03       0.03   -0.03                0.05          0.02         0.06    0.03      -0.01
+       Llama 3.1 70B        0.02       0.03                                      0.03         0.03    0.03      0.00
+       Qwen3 600M           0.06       0.07   -0.04                0.06          0.00         0.06    0.07      0.02
+       Qwen3 1.7B           0.05       0.04                                      -0.04        0.05    0.06      0.05
+       Qwen3 4B             0.03       0.05   -0.05                0.07          -0.02        0.04    0.06      0.01
+       Qwen3 8B             0.04       0.04                                      0.00         0.02    0.05      0.01
+       Qwen3 14B            0.03       0.01   -0.01                0.06          0.02         0.04    0.05      0.04
+       Mistral 7B           0.02       0.05                                      0.03         0.03    0.03      -0.01
+       Pythia 410M          0.07       0.03   -0.02                0.05          -0.16        0.08    0.10      0.06
+       SmolLM 135M          0.07       0.04                                      -0.13        0.08    0.08      0.07
+                                              -0.03                0.08
+       Qwen3 600M Instruct  0.06       0.07                                      0.03         0.06    0.09      0.00
+       Qwen3 1.7B Instruct  0.06       0.02   -0.03                0.05          0.03         0.08    0.10      0.01
+       Qwen3 4B Instruct    0.05       0.05                                      0.00         0.11    0.09      0.02
+       Qwen3 8B Instruct    0.02       0.02   -0.04                0.07          0.03         0.07    0.05      -0.01
+       Qwen3 14B Instruct   0.03       0.02                                      0.04         0.08    0.05      0.05
+                                              -0.04                0.06
+
+                                              0.00                 0.01
+
+                                              -0.01                0.05
+
+                                              -0.02                0.04
+                                              -0.07                0.08
+                                              -0.07                0.04
+                                              -0.07                -0.01
+                                              -0.08                0.05
+
+averaged over the benchmarks B from Section 3.3. Table 4              5. Conclusion
+reports | | per model and metric (lower is better).
+                                                                      Multiple-choice benchmarks that score candidates by
+Table 4. Average absolute length bias | | per model and scoring       summed conditional log-likelihood are convenient and
+rule, aggregated over all benchmarks. Standard and Norm corre-        widely used, but this additivity induces systematic length
+spond to unnormalized and byte-normalized accuracy, respectively.     bias: across models and datasets we find that total log-
+Lower is better.                                                      likelihoods scale approximately linearly with completion
+                                                                      length, so standard accuracy tends to prefer shorter answers,
+Model                Standard Norm PMI ANPMI Bayes                    while na¨ive length-normalization often over-corrects and
+                                                                      favors longer ones instead. We quantify these effects via
+Llama 3.2 1B         0.24   0.32 0.16 0.11    0.04                    Kendall's  between candidate lengths and scores within
+Llama 3.2 3B                                                          each example, which highlights when length can be ignored
+Llama 3.1 8B         0.22   0.29 0.18 0.12    0.05                    (locally determined answers or near-equal-length candi-
+Llama 3.1 70B                                                         dates) and when both standard and normalized accuracy
+Qwen3 600M           0.20   0.27 0.17 0.11    0.03                    become unreliable.
+Qwen3 1.7B
+Qwen3 4B             0.18   0.26 0.15 0.07    0.03                    Motivated by the empirical score­length relationship, we
+Qwen3 8B                                                              introduce Bayesian accuracy: a drop-in replacement for
+Qwen3 14B            0.22   0.31 0.18 0.11    0.04                    standard accuracy that incorporates an explicit exponential
+Mistral 7B                                                            prior over completion lengths and subtracts a learned global
+Pythia 410M          0.21   0.27 0.17 0.09    0.05                    length trend. Bayesian accuracy only uses conditional log-
+SmolLM 135M                                                           likelihoods, requires no additional forward passes, and con-
+                     0.20   0.26 0.15 0.10    0.04                    sistently reduces measured length bias by a large factor
+                                                                      compared to standard, normalized, PMI, and ANPMI-based
+                     0.20   0.24 0.15 0.09    0.03                    scoring across benchmarks and models. This addresses a
+                                                                      measurable nuisance effect in likelihood-based evaluation,
+                     0.19   0.25 0.16 0.10    0.04                    while broader questions of evaluation faithfulness, such as
+                                                                      agreement with downstream capabilities, remain important
+                     0.21   0.27 0.17 0.10    0.03                    directions for future work. We therefore view Bayesian
+                                                                      accuracy as a simple, robust default for likelihood-based
+                     0.31   0.32 0.17 0.11    0.06                    multiple-choice evaluation.
+
+                     0.29   0.30 0.14 0.13    0.07                    Acknowledgements
+
+Qwen3 600M Instruct 0.22    0.40 0.11 0.07    0.05                    I thank Tom Burns for many helpful brainstorming sessions
+                                                                      and early discussions that shaped the ideas in this paper.
+Qwen3 1.7B Instruct  0.20   0.41 0.11 0.06    0.06
+
+Qwen3 4B Instruct    0.19   0.42 0.10 0.05    0.06
+
+Qwen3 8B Instruct    0.17   0.38 0.07 0.06    0.04
+
+Qwen3 14B Instruct   0.17   0.42 0.08 0.06    0.05
+
+Byte-normalized accuracy (Norm) exhibits the largest mean
+absolute length bias, often substantially worse than standard
+accuracy. PMI and ANPMI reduce bias relative to both,
+and ANPMI consistently improves on PMI, but both require
+unconditional log-likelihoods for every candidate, doubling
+evaluation cost and still leaving non-trivial residual bias.
+Bayesian accuracy attains the smallest or near-smallest | |
+for all models: values in the range 0.03­0.07 correspond to
+roughly a 4×­8× reduction in length bias relative to nor-
+malized accuracy and typically a several-fold improvement
+over PMI and ANPMI, for both base and instruction-tuned
+models. We therefore recommend Bayesian accuracy as
+a simple length-corrected default, reserving standard accu-
+racy for regimes where length is provably irrelevant and
+using normalized accuracy only when its low bias has been
+empirically verified.
+
+                                                                   8
+Accuracy and Normalized Accuracy under Length Bias
+
+Impact Statement                                                    Fano, R. M. and Hawkins, D. Transmission of information:
+                                                                      A statistical theory of communications. American Journal
+This work proposes a simple correction for length bias in              of Physics, 29(11):793­794, 1961.
+likelihood-based multiple-choice evaluation of language
+models. More reliable scoring rules can change compar-              Gao, L., Tow, J., Abbasi, B., Biderman, S., Black, S., DiPofi,
+ative model rankings and encourage fairer, more robust                A., Foster, C., Golding, L., Hsu, J., Le Noac'h, A., Li,
+benchmark design, but they do not address other sources of             H., McDonell, K., Muennighoff, N., Ociepa, C., Phang,
+bias or harmful behavior in the underlying models, which              J., Reynolds, L., Schoelkopf, H., Skowron, A., Sutawika,
+must be studied separately.                                            L., Tang, E., Thite, A., Wang, B., Wang, K., and Zou, A.
+                                                                      The language model evaluation harness, 07 2024. URL
+Financial Conflict of Interest                                         https://zenodo.org/records/12608602.
+
+The author declares no financial or other substantive con-          Grattafiori, A., Dubey, A., Jauhri, A., Pandey, A., Kadian,
+flicts of interest that could reasonably be perceived to influ-       A., Al-Dahle, A., Letman, A., Mathur, A., Schelten, A.,
+ence this work.                                                       Vaughan, A., et al. The llama 3 herd of models. arXiv
+                                                                       preprint arXiv:2407.21783, 2024.
+References
+                                                                    Habib, N., Fourrier, C., Kydl´icek, H., Wolf, T., and
+Aleph Alpha Research. Aleph alpha eval frame-                         Tunstall, L. Lighteval: A lightweight framework for
+   work, 2025. URL https://github.com/                                 llm evaluation, 2023. URL https://github.com/
+   Aleph-Alpha-Research/eval-framework.                                huggingface/lighteval.
+
+Allal, L. B., Lozhkov, A., Bakouch, E., von Werra, L., and          Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika,
+  Wolf, T. Smollm - blazingly fast and remarkably powerful,            M., Song, D., and Steinhardt, J. Measuring mas-
+   2024.                                                               sive multitask language understanding. arXiv preprint
+                                                                       arXiv:2009.03300, 2020.
+Askell, A., Bai, Y., Chen, A., Drain, D., Ganguli, D.,
+   Henighan, T., Jones, A., Joseph, N., Mann, B., DasSarma,         Jiang, A. Q., Sablayrolles, A., Mensch, A., Bamford, C.,
+   N., et al. A general language assistant as a laboratory for         Chaplot, D. S., de las Casas, D., Bressand, F., Lengyel,
+   alignment. arXiv preprint arXiv:2112.00861, 2021.                   G., Lample, G., Saulnier, L., Lavaud, L. R., Lachaux, M.-
+                                                                      A., Stock, P., Scao, T. L., Lavril, T., Wang, T., Lacroix,
+Biderman, S., Schoelkopf, H., Anthony, Q. G., Bradley,                T., and Sayed, W. E. Mistral 7b, 2023. URL https:
+   H., O'Brien, K., Hallahan, E., Khan, M. A., Purohit, S.,           //arxiv.org/abs/2310.06825.
+   Prashanth, U. S., Raff, E., et al. Pythia: A suite for ana-
+   lyzing large language models across training and scaling.        Johannes Welbl, Nelson F. Liu, M. G. Crowdsourcing mul-
+   In International Conference on Machine Learning, pp.                tiple choice science questions. 2017.
+   2397­2430. PMLR, 2023.
+                                                                    Kendall, M. G. A new measure of rank correlation.
+Biderman, S., Schoelkopf, H., Sutawika, L., Gao, L., Tow,             Biometrika, 30(1-2):81­93, 1938.
+   J., Abbasi, B., Aji, A. F., Ammanamanchi, P. S., Black,
+   S., Clive, J., et al. Lessons from the trenches on repro-        LAION. Arcchallenge de: German translation of ai2
+   ducible evaluation of language models. arXiv preprint               reasoning challenge (arc). https://huggingface.
+   arXiv:2405.14782, 2024.                                             co/datasets/LeoLM/ArcChallenge_de, 2024.
+                                                                       German translation of the ARC Challenge dataset.
+Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D.,
+   Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G.,            Mihaylov, T., Clark, P., Khot, T., and Sabharwal, A. Can a
+   Askell, A., et al. Language models are few-shot learners.           suit of armor conduct electricity? a new dataset for open
+  Advances in neural information processing systems, 33:               book question answering. In EMNLP, 2018.
+  1877­1901, 2020.
+                                                                    Qwen Team. Qwen3 technical report, 2025. URL https:
+Cho, G., So, Y., and Lee, J. Anpmi: Assessing the true                //arxiv.org/abs/2505.09388.
+   comprehension capabilities of llms for multiple choice
+   questions. arXiv preprint arXiv:2502.18798v3, 2025.              Sakaguchi, K., Bras, R. L., Bhagavatula, C., and Choi, Y.
+                                                                      Winogrande: An adversarial winograd schema challenge
+Clark, P., Cowhey, I., Etzioni, O., Khot, T., Sabharwal, A.,           at scale. Communications of the ACM, 64(9):99­106,
+   Schoenick, C., and Tafjord, O. Think you have solved                2021.
+   question answering? try arc, the ai2 reasoning challenge.
+   arXiv:1803.05457v1, 2018.                                        Zellers, R., Holtzman, A., Bisk, Y., Farhadi, A., and Choi,
+                                                                      Y. Hellaswag: Can a machine really finish your sentence?
+                                                                       arXiv preprint arXiv:1905.07830, 2019.
+
+                                                                 9
+             Accuracy and Normalized Accuracy under Length Bias
+
+A. Appendix
+
+A.1. Details of Estimating the Length Decay Factor
+
+A na¨ive way to estimate the global slope b would be to pool all candidates and regress m (k) directly on nm (k) using ordinary
+least squares. This ignores the grouping by prompts. If prompts with larger offsets k systematically induce longer or
+shorter candidates, the pooled slope absorbs both the true length effect and prompt-level correlations:
+
+                                                E[^bOLS]      =    b  +  E[Cov(, n)]        .      (26)
+                                                                            Var(n)
+
+To avoid this, we estimate b using only within-example differences, which cancel the prompt-specific intercepts. For each
+example k and candidate pair (i, j), define
+
+             i(jk) = (ci(k) | x(k)) - (cj(k) | x(k)),                                              (27)
+
+             ni(jk) = ni(k) - nj(k).                                                               (28)
+
+Under the linear model in Equation 17, these differences satisfy
+
+                                                i(jk) = k ni(jk) + (ijk),                          (29)
+
+where i(jk)  (ik) - j(k) is zero-mean. Treating the k as noisy draws around a common mean b, the corresponding pairwise
+least-squares estimator is
+
+                                                ^b =          k       i,j (ijk) n(ijk)  .          (30)
+                                                                k       i,j ni(jk) 2
+
+The symmetry ni(jk) = -n(jki ) implies that these differences are automatically mean-centered. The next subsection
+rewrites the same estimator in the computationally cheaper centered form used in Equation 24.
+
+A.2. Mean-Centered Form of the Length Decay Estimator
+
+The pairwise estimator in (30) is naturally written as a double sum over all candidate pairs, which scales as O(Mk2) in the
+number of candidates Mk for each prompt. In our setting Mk is typically small, so the quadratic scaling is not a fundamental
+
+bottleneck, but for larger candidate sets it is helpful to avoid quadratic dependence. In this subsection we show that such
+
+pairwise sums can be rewritten exactly as single sums over mean-centered quantities, reducing the per-prompt computational
+cost from O(Mk2) to O(Mk) while leaving the value of the estimator unchanged.
+
+Let x1, . . . , xn and y1, . . . , yn be real numbers, and define the means
+
+                                                     1     n                     1  n
+                                                     n                           n
+                                            x¯  =             xi,         y¯  =            yi.     (31)
+
+                                                        i=1                         i=1
+
+Consider
+
+                                                           n
+
+                                                S  (xi - xj)(yi - yj).                             (32)
+
+                                                        i,j=1
+
+Expanding the product inside the sum gives
+
+             S=                                         xiyi - xiyj - xj yi + xj yj                (33)
+
+                                                i,j
+
+                                            = 2n xiyi - 2 xi                                   yi  (34)
+
+                                                        i                 i              i
+
+                                            = 2n              xiyi - nx¯ y¯ .                      (35)
+
+                                                           i
+
+                                                                      10
+                                       Accuracy and Normalized Accuracy under Length Bias
+
+Finally, note that                              n
+so we arrive at the identity
+                                                     (xi - x¯)(yi - y¯) = xiyi - nx¯ y¯,
+
+                                                i=1                i
+
+                                         n                         n
+
+                                            (xi - xj)(yi - yj) = 2n (xi - x¯)(yi - y¯).      (36)
+
+                                         i,j=1                     i=1
+
+Thus, a quadratic double sum over all pairs (i, j) can be replaced by a linear single sum over mean-centered terms
+(xi - x¯)(yi - y¯). Substituting these expressions into the definition of ^b and cancelling the common factor 2 yields the
+
+equivalent mean-centered form used in the main text
+
+                                                         Mk
+
+                                                     Mk       ni(k) - n¯(k) (ik) - ¯(k)
+
+                                            ^b = k       i=1                              .  (37)
+
+                                                              Mk   ni(k) - n¯(k) 2
+
+                                                         Mk
+
+                                                     k        i=1
+
+A.3. Algorithm
+
+Algorithm 1 Estimate global length decay b via within-prompt centering
+
+Input: For each question k, candidate lengths n(ik) and log-likelihoods (ik)
+Output: Estimated length decay factor ^b
+
+num  0
+den  0
+
+for each question k do
+
+M  number of candidates for question k
+if M  1 or n1(k) = n(2k) = · · · = nM (k) then
+
+   continue {No within-question length variation}
+
+end if
+
+n¯       1      M    ni(k)
+         M      i=1
+
+¯        1  M        (ik)
+         M  i=1
+
+cov  M          M          ni(k) - n¯    i(k) - ¯
+                i=1
+
+var  M          M          ni(k) - n¯ 2
+                i=1
+
+num  num + cov
+
+den  den + var
+
+end for
+
+if den = 0 then
+  ^b  0 {No length variation across any question}
+
+else
+  ^b  num/den
+
+end if
+return ^b
+
+A.4. Benchmark Details
+ARC. The AI2 Reasoning Challenge (ARC) is a multiple-choice question answering dataset of 7,787 science questions
+from U.S. grade-school exams, split into an "Easy" and a more difficult "Challenge" subset. It is designed to require
+non-trivial scientific and commonsense reasoning rather than simple pattern matching or retrieval.
+
+                                                                        11
+                                              Accuracy and Normalized Accuracy under Length Bias
+
+HellaSwag. HellaSwag is an adversarial commonsense benchmark in which models must choose the most plausible
+continuation of a short narrative or instructional context from four options. The roughly 70,000 examples are built from
+video captions and how-to articles, with distractor endings crafted to look fluent yet be semantically implausible to humans.
+
+MMLU. The Massive Multitask Language Understanding (MMLU) benchmark aggregates 15,908 four-way multiple-
+choice questions across 57 academic subjects, spanning humanities, social and natural sciences, and professional domains.
+It is widely used as a proxy for broad world knowledge and domain-specific reasoning in language models.
+
+MMLU (full-text answer). In our MMLU Full-Text variant, the underlying questions and answer options are unchanged,
+but the model is asked to output the full textual answer (e.g., "Paris") rather than the option label ("C"). Accuracy is
+computed by exact-match comparison between the generated answer and the corresponding gold option string.
+
+MMLU (cloze). In the MMLU cloze variant, the multiple-choice options are removed from the prompt and the problem is
+phrased as a short-answer or fill-in-the-blank question. The model must produce the answer directly; at evaluation time we
+map the completion back onto the original MMLU answer key (after minor normalization) to determine correctness.
+
+SciQ. SciQ is a four-option multiple-choice benchmark of about 14,000 general science questions modeled on elementary
+and middle-school exams. Questions often come with associated source passages, and the dataset is commonly used as a
+mid-difficulty science QA task between simple fact recall and more demanding benchmarks such as ARC.
+
+WinoGrande. WinoGrande is a large-scale pronoun resolution benchmark inspired by the Winograd Schema Challenge.
+Each example is a short sentence with an ambiguous pronoun and two candidate antecedents; the model must decide which
+option makes the sentence coherent, probing fine-grained commonsense reasoning while controlling for dataset artifacts.
+
+A.5. Benchmark Prompt Examples
+The following synthetic examples illustrate the prompt formats used for each benchmark in our evaluation. They are not
+taken from the original test sets.
+
+   · The quotation marks are not part of the text, they are there to highlight any potential white spacing
+
+   · Templating is highlighted in green
+
+A.5.1. ARC
+User: "Question: Which is an inherited characteristic on a horse?"
+Assistant: "Answer:"
+Options:
+
+   · " a long mane"
+   · " a steel shoe"
+   · " a missing tooth"
+   · " a bruised leg"
+
+A.5.2. ARC GERMAN
+User: "Frage: Welcher Prozess im Kohlenstoffkreislauf dauert am la¨ngsten?"
+Assistant: "Antwort:"
+Options:
+
+   · " Emission von Abfall"
+   · " Atmung bei Tieren"
+   · " Photosynthese bei Pflanzen"
+   · " Bildung von fossilen Brennstoffen"
+
+                                                                        12
+Accuracy and Normalized Accuracy under Length Bias
+
+A.5.3. HELLASWAG
+
+User: "Cutting the grass: A man is kneeling down on grass. He"
+Options:
+
+   · " uses a polishing brush on a shoe."
+   · " has a heavy work out machine in his arms."
+   · " is using a green brush to clean off the grass."
+   · " is clipping the grass with large scissors."
+
+A.5.4. MMLU FULL-TEXT
+
+User: "The following are multiple choice questions (with possible answers) about machine learning.
+Answer with the full text of the correct answer.
+
+Question: Suppose your model is overfitting. Which of the following is NOT a valid way to try and reduce the
+overfitting?
+Possible answers:
+- Increase the amount of training data.
+- Improve the optimisation algorithm being used for error minimisation.
+- Decrease the model complexity.
+- Reduce the noise in the training data."
+Assistant: "Answer:"
+Options:
+
+   · " Increase the amount of training data."
+   · " Improve the optimisation algorithm being used for error minimisation."
+   · " Decrease the model complexity."
+   · " Reduce the noise in the training data."
+
+A.5.5. MMLU CLOZE
+
+User: "The following are multiple choice questions (with possible answers) about machine learning.
+Answer with the full text of the correct answer.
+
+Question: Suppose your model is overfitting.  Which of the following is NOT a valid way to try and reduce the
+overfitting?"
+Assistant: "Answer:"
+Options:
+
+· " Increase the amount of training data."
+· " Improve the optimisation algorithm being used for error minimisation."
+· " Decrease the model complexity."
+· " Reduce the noise in the training data."
+
+A.5.6. OPENBOOKQA
+
+User: "Climate change has sped up dramatically because"
+Options:
+
+   · " CO2 production has accelerated"
+   · " a rapid decline the production of carbon dioxide"
+   · " oxygen levels have spiked"
+   · " Fe has been present in an overabundance"
+
+                                                          13
+                                              Accuracy and Normalized Accuracy under Length Bias
+
+A.5.7. SCIQ
+
+User: "Question: Anemia is a disease that affects what?"
+Assistant: "Answer:"
+Options:
+
+   · " Brain"
+   · " Heart"
+   · " Kidney"
+   · " Blood"
+
+A.5.8. WINOGRANDE
+
+User: "Felicia ran out of shirts and borrowed one from Patricia, but"
+Options:
+
+   · " Felicia didn't ask permission ahead of time."
+   · " Patricia didn't ask permission ahead of time."
+
+A.6. Few-shot Results
+
+Table 5. Length bias for few-shot standard (unnormalized) accuracy. Entries are Kendall's  between candidate length and score for each
+model­benchmark pair (negative values indicate a tendency to favor shorter completions).
+
+Benchmark              ARC    ARC German  HellaSwag MMLU Cloze         MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B           -0.19       -0.28  -0.55  -0.33                        -0.07       -0.30    -0.06      0.03
+Llama 3.2 3B           -0.17       -0.25  -0.51  -0.36                        0.08        -0.27    -0.05      0.00
+Llama 3.1 8B           -0.15       -0.24  -0.49  -0.30                        0.06        -0.25    -0.02      -0.03
+Llama 3.1 70B          -0.13       -0.17  -0.45  -0.25                        NaN         -0.23    -0.03      -0.02
+Qwen3 600M             -0.17       -0.25  -0.58  -0.30                        0.10        -0.30    -0.05      0.03
+Qwen3 1.7B             -0.15       -0.24  -0.54  -0.31                        0.06        -0.28    -0.02      0.07
+Qwen3 4B               -0.14       -0.21  -0.52  -0.29                        0.03        -0.25    -0.02      -0.02
+Qwen3 8B               -0.13       -0.19  -0.50  -0.26                        0.06        -0.26    -0.02      0.02
+Qwen3 14B              -0.12       -0.18  -0.48  -0.27                        0.03        -0.24    -0.03      0.00
+Mistral 7B             -0.14       -0.22  -0.48  -0.26                        0.09        -0.25    -0.04      -0.01
+Pythia 410M            -0.25       -0.39  -0.61  -0.45                        -0.15       -0.33    -0.14      -0.04
+SmolLM 135M            -0.22       -0.43  -0.60  -0.40                        -0.09       -0.30    -0.08      0.00
+
+Qwen3 600M Instruct    -0.15       -0.26  -0.57  -0.32                        0.09        -0.27    -0.05      0.09
+Qwen3 1.7B Instruct    -0.12       -0.20  -0.53  -0.25                        0.08        -0.21    -0.03      0.09
+Qwen3 4B Instruct      -0.11       -0.17  -0.53  -0.21                        0.08        -0.20    -0.02      0.15
+Qwen3 8B Instruct      -0.08       -0.13  -0.51  -0.20                        0.07        -0.20    -0.02      -0.01
+Qwen3 14B Instruct     -0.10       -0.14  -0.51  -0.20                        0.06        -0.20    -0.03      0.03
+
+Table 6. Length bias for few-shot byte-normalized accuracy. Entries are Kendall's  between candidate length and score; positive values
+indicate a tendency to favor longer completions.
+
+Benchmark              ARC    ARC German  HellaSwag MMLU Cloze         MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B           0.20        0.26   0.03   0.22                         0.37         0.30    0.20       0.47
+Llama 3.2 3B           0.19        0.25                                       0.39         0.30    0.22       0.40
+Llama 3.1 8B           0.18        0.25   0.03   0.18                         0.38         0.32    0.22       0.36
+Llama 3.1 70B          0.20        0.25                                       NaN          0.32    0.22       0.28
+Qwen3 600M             0.17        0.25   0.03   0.19                         0.36         0.28    0.18       0.50
+Qwen3 1.7B             0.17        0.26                                       0.33         0.29    0.21       0.42
+Qwen3 4B               0.18        0.25   0.03   0.21                         0.29         0.30    0.21       0.36
+Qwen3 8B               0.19        0.25                                       0.29         0.29    0.21       0.36
+Qwen3 14B              0.19        0.25   0.04   0.20                         0.29         0.29    0.22       0.31
+Mistral 7B             0.16        0.23                                       0.32         0.32    0.21       0.33
+Pythia 410M            0.22        0.27   0.04   0.17                         0.18         0.29    0.26       0.47
+SmolLM 135M            0.18        0.24                                       0.15         0.31    0.22       0.45
+                                          0.03   0.17
+Qwen3 600M Instruct    0.18        0.25                                       0.24         0.52    0.20       0.46
+Qwen3 1.7B Instruct    0.17        0.21   0.03   0.17                         0.26         0.62    0.23       0.39
+Qwen3 4B Instruct      0.21        0.24                                       0.28         0.53    0.26       0.41
+Qwen3 8B Instruct      0.21        0.25   0.03   0.17                         0.28         0.52    0.27       0.25
+Qwen3 14B Instruct     0.25        0.28                                       0.28         0.55    0.28       0.27
+                                          0.03   0.19
+
+                                          0.05   0.14
+
+                                          0.04   0.18
+
+                                          0.24   0.17
+
+                                          0.21   0.15
+
+                                          0.24   0.24
+
+                                          0.30   0.25
+
+                                          0.33   0.27
+
+                                                 14
+                             Accuracy and Normalized Accuracy under Length Bias
+
+Table 7. Length bias for few-shot Bayesian accuracy. Entries are Kendall's  between candidate length and Bayesian-corrected score.
+
+Benchmark             ARC    ARC German  HellaSwag MMLU Cloze  MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B          0.04        0.05   -0.02  0.14                  0.01         0.05    0.06       0.12
+Llama 3.2 3B          0.03        0.06                                0.10         0.04    0.04       0.04
+Llama 3.1 8B          0.03        0.04   -0.04  0.14                  0.05         0.05    0.04       0.00
+Llama 3.1 70B         0.02        0.03                                NaN          0.05    0.04       0.00
+Qwen3 600M            0.03        0.07   -0.05  0.13                  0.07         0.06    0.05       0.05
+Qwen3 1.7B            0.03        0.06                                0.04         0.05    0.06       0.11
+Qwen3 4B              0.03        0.05   -0.05  0.13                  -0.02        0.06    0.06       0.03
+Qwen3 8B              0.03        0.03                                0.02         0.03    0.05       0.06
+Qwen3 14B             0.04        0.04   -0.02  0.16                  0.01         0.03    0.06       0.04
+Mistral 7B            0.02        0.05                                0.09         0.06    0.04       0.07
+Pythia 410M           0.06        0.04   -0.02  0.15                  -0.09        0.09    0.10       0.04
+SmolLM 135M           0.05        0.04                                -0.06        0.07    0.06       0.11
+                                         -0.03  0.13
+Qwen3 600M Instruct   0.03        0.06                                0.10         0.04    0.06       0.09
+Qwen3 1.7B Instruct   0.03        0.03   -0.04  0.11                  0.08         0.09    0.07       0.03
+Qwen3 4B Instruct     0.03        0.01                                0.05         0.06    0.06       0.09
+Qwen3 8B Instruct     0.00        0.01   -0.04  0.11                  0.05        -0.05    0.04       -0.02
+Qwen3 14B Instruct    -0.01       -0.01                               0.03        -0.01    0.04       0.02
+                                         -0.05  0.14
+
+                                         -0.01  0.11
+
+                                         -0.01  0.15
+
+                                         -0.05  0.11
+
+                                         -0.19  0.09
+
+                                         -0.19  0.07
+
+                                         -0.19  0.00
+
+                                         -0.19  0.04
+
+A.7. (AN)PMI Results
+
+Table 8. Length bias for zero-shot ANPMI scoring. Entries are Kendall's  between candidate length and ANPMI score.
+
+Benchmark             ARC    ARC German  HellaSwag MMLU Cloze  MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B          -0.04       -0.08  -0.28  -0.18                 0.23        -0.06    0.01       -0.02
+Llama 3.2 3B          -0.05       -0.10  -0.27  -0.14                 0.29        -0.06    0.02       0.02
+Llama 3.1 8B          -0.04       -0.09  -0.24  -0.09                 0.26        -0.04    0.03       -0.07
+Llama 3.1 70B         -0.03       -0.04  -0.22  -0.02                 0.17        -0.03    0.04       -0.03
+Qwen3 600M            -0.02       -0.07  -0.30  -0.15                 0.22        -0.04    0.03       0.05
+Qwen3 1.7B            -0.03       -0.07  -0.27  -0.16                 0.13        -0.01    0.03       0.04
+Qwen3 4B              -0.05       -0.08  -0.27  -0.15                 0.16        -0.04    0.04       -0.05
+Qwen3 8B              -0.05       -0.08  -0.26  -0.14                 0.14        -0.03    0.04       0.00
+Qwen3 14B             -0.05       -0.08  -0.24  -0.13                 0.18        -0.02    0.04       0.02
+Mistral 7B            -0.04       -0.06  -0.23  -0.14                 0.24        -0.02    0.03       -0.01
+Pythia 410M           -0.06       -0.11  -0.31  -0.14                 0.10        -0.12    0.00       0.00
+SmolLM 135M           -0.06       -0.20  -0.30  -0.18                 0.15        -0.08    -0.01      0.02
+
+Qwen3 600M Instruct   -0.01       -0.05  -0.07  -0.18                 0.12         0.06    0.04       0.00
+Qwen3 1.7B Instruct   0.03        -0.01  -0.01  0.01                  0.16         0.14    0.08       0.04
+Qwen3 4B Instruct     0.00        -0.03  -0.03  -0.01                 0.15         0.07    0.05       0.09
+Qwen3 8B Instruct     -0.02       -0.02  -0.05  -0.07                 0.15         0.12    0.02       0.01
+Qwen3 14B Instruct    -0.02       -0.05  -0.11  -0.02                 0.15         0.10    0.04       0.01
+
+Table 9. Length bias for zero-shot PMI scoring. Entries are Kendall's  between candidate length and PMI score.
+
+Benchmark             ARC    ARC German  HellaSwag MMLU Cloze  MMLU Full-Text  OpenbookQA  SciQ   WinoGrande
+
+Llama 3.2 1B          0.10        0.15   0.13   0.19                  0.45         0.11    0.11       0.07
+Llama 3.2 3B          0.11        0.14                                0.49         0.16    0.10       0.06
+Llama 3.1 8B          0.10        0.13   0.12   0.22                  0.44         0.15    0.09       -0.07
+Llama 3.1 70B         0.09        0.14                                0.40         0.13    0.10       -0.01
+Qwen3 600M            0.13        0.13   0.11   0.24                  0.45         0.14    0.13       0.11
+Qwen3 1.7B            0.12        0.13                                0.45         0.14    0.12       0.09
+Qwen3 4B              0.09        0.14   0.10   0.22                  0.40         0.13    0.11       0.02
+Qwen3 8B              0.09        0.14                                0.40         0.15    0.13       0.04
+Qwen3 14B             0.07        0.13   0.14   0.17                  0.42         0.14    0.12       0.06
+Mistral 7B            0.11        0.16                                0.48         0.14    0.12       0.05
+Pythia 410M           0.09        0.15   0.12   0.17                  0.46         0.07    0.14       0.08
+SmolLM 135M           0.08        0.11                                0.42         0.06    0.10       0.09
+                                         0.11   0.18
+Qwen3 600M Instruct   0.08        0.11                                0.39         0.05    0.08       0.01
+Qwen3 1.7B Instruct   0.04        0.05   0.11   0.18                  0.31         0.03    0.09       0.08
+Qwen3 4B Instruct     0.02        0.06                                0.28         0.05    0.08       0.07
+Qwen3 8B Instruct     0.01        0.06   0.09   0.24                  0.29         0.07    0.06       0.01
+Qwen3 14B Instruct    0.01        0.05                                0.29         0.08    0.06       0.01
+                                         0.12   0.20
+
+                                         0.17   0.20
+
+                                         0.15   0.15
+
+                                         0.10   0.06
+
+                                         0.12   0.14
+
+                                         0.12   0.08
+
+                                         0.04   0.04
+
+                                         0.06   0.05
+
+                                                15
+                                          Accuracy and Normalized Accuracy under Length Bias
+
+A.8. Variance Scaling
+
+                                          ARC
+
+                                   35     ARC German
+
+Standard Deviation Log-Likelihood         HellaSwag
+
+                                          MMLU Cloze
+
+                                   30     MMLU Full-Text
+
+                                          OpenbookQA
+
+                                          SciQ
+
+                                   25     Winogrande
+
+                                   20
+
+                                   15
+
+                                   10
+
+                                       0        20             40            60  80           100   120
+
+                                                              Completion Length (bin center)
+
+Figure 3. Standard deviation of conditional log-likelihood (c | x)/nbyte versus completion byte length, aggregated over all models. For
+readability, completion lengths are restricted to a maximum of 120 1bytes and results are binned.
+
+A.9. Token-Level Length Bias Results
+
+Table 10. Average absolute length bias | | per model and scoring rule when length is measured in tokens, aggregated over all benchmarks.
+Standard is unnormalized accuracy, while Norm and Bayes use token length for normalization and length correction, respectively. Lower
+is better.
+
+                                          Model                    Standard Norm PMI ANPMI Bayes
+
+                                          Llama 3.2 1B             0.29  0.41 0.31 0.17       0.05
+                                          Llama 3.2 3B
+                                          Llama 3.1 8B             0.26  0.38 0.30 0.15       0.06
+                                          Llama 3.1 70B
+                                          Qwen3 600M               0.23  0.35 0.29 0.14       0.04
+                                          Qwen3 1.7B
+                                          Qwen3 4B                 0.22  0.33 0.26 0.10       0.04
+                                          Qwen3 8B
+                                          Qwen3 14B                0.28  0.39 0.25 0.15       0.06
+                                          Mistral 7B
+                                          Pythia 410M              0.25  0.35 0.26 0.13       0.05
+                                          SmolLM 135M
+                                                                   0.24  0.33 0.23 0.12       0.05
+
+                                                                   0.22  0.33 0.23 0.12       0.03
+
+                                                                   0.23  0.32 0.25 0.12       0.05
+
+                                                                   0.22  0.36 0.26 0.12       0.05
+
+                                                                   0.37  0.40 0.25 0.14       0.06
+
+                                                                   0.34  0.37 0.23 0.17       0.05
+
+                                          Qwen3 600M Instruct      0.29  0.48 0.20 0.13       0.05
+
+                                          Qwen3 1.7B Instruct      0.26  0.46 0.18 0.14       0.06
+
+                                          Qwen3 4B Instruct        0.26  0.47 0.15 0.09       0.04
+
+                                          Qwen3 8B Instruct        0.23  0.45 0.15 0.12       0.03
+
+                                          Qwen3 14B Instruct       0.23  0.48 0.15 0.11       0.03
+
+                                                                         16
+

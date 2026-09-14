@@ -1,0 +1,2261 @@
+                                        SELF-TUNING: Instructing LLMs to Effectively Acquire New Knowledge
+                                                                         through Self-Teaching
+
+                                                 Xiaoying Zhang1, Baolin Peng2, Ye Tian2, Jingyan Zhou1, Yipeng Zhang
+                                                                               Haitao Mi2, Helen Meng1,3
+
+                                                                 1The Chinese University of Hong Kong, Hong Kong
+                                                                                2Tencent AI Lab, Bellevue
+
+                                                          3Centre for Perceptual and Interactive Intelligence, Hong Kong
+                                                   {zhangxy, jyzhou, hmmeng}@se.cuhk.edu.hk, yipengzhang97@gmail.com
+
+                                                                {baolinpeng, yaptian, haitaomi}@global.tencent.com
+
+                                        Abstract
+
+arXiv:2406.06326v5 [cs.CL] 16 May 2025       Large language models (LLMs) often struggle                 Figure 1: Illustration of the knowledge acquisition task
+                                             to provide up-to-date information due to their              with two standard knowledge injection approaches (in
+                                             one-time training and the constantly evolving               the upper part). Depiction of SELF-TUNING for effec-
+                                             nature of the world. To keep LLMs current,                  tive knowledge acquisition from unseen raw documents,
+                                             existing approaches typically involve contin-               which significantly enhances factual accuracy compared
+                                             ued pre-training on new documents. However,                 to the standard approaches (in the lower part).
+                                             they frequently face difficulties in extracting
+                                             stored knowledge. Motivated by the remark-                  world (Zhang et al., 2022, 2023; Huang et al., 2023;
+                                             able success of the Feynman Technique in ef-                Jiang et al., 2024c). These unavoidable knowledge
+                                             ficient human learning, we introduce SELF-                  limitations present notable obstacles to the trust-
+                                             TUNING, a learning framework aimed at im-                   worthiness of LLMs in real-world scenarios (Liu
+                                             proving an LLM's ability to effectively acquire             et al., 2023; Mecklenburg et al., 2024). Thus, it is
+                                             new knowledge from unseen raw documents                     essential to equip LLMs with new knowledge to
+                                             through self-teaching. Specifically, we develop             keep them up-to-date.
+                                             a SELF-TEACHING strategy that augments the
+                                             documents with a set of knowledge-intensive                    In this paper, we focus on injecting new knowl-
+                                             tasks created in a self-supervised manner, fo-              edge into the parameters of LLMs. As depicted in
+                                             cusing on three crucial aspects: memorization,              the upper part of Figure 1, a standard approach in-
+                                             comprehension, and self-reflection. Addition-               volves continued pre-training (A) on a raw corpus
+                                             ally, we introduce three Wiki-Newpages-2023-                (here, test doc) containing new information (Jang
+                                             QA datasets to facilitate an in-depth analysis of           et al., 2022). However, it struggles to extract the
+                                             an LLM's knowledge acquisition ability con-                 embedded knowledge, potentially due to the im-
+                                             cerning memorization, extraction, and reason-               paired question-answering (QA) capability (Allen-
+                                             ing. Extensive experimental results on various              Zhu and Li, 2023; Cheng et al., 2024). Despite
+                                             models, e.g., LLAMA2-7B reveal that SELF-
+                                             TUNING consistently exhibits superior perfor-
+                                             mance across all knowledge acquisition tasks
+                                             and excels in preserving previous knowledge.1
+
+                                        1 Introduction
+
+                                        Armed with a wealth of factual knowledge acquired
+                                        during the pre-training phase (Zhou et al., 2023;
+                                        Zhang et al., 2025), LLMs (Touvron et al., 2023a;
+                                        OpenAI, 2023) exhibit remarkable proficiency in
+                                        numerous knowledge-intensive tasks (Cohen et al.,
+                                        2023; Zhang et al., 2024c,e; Gekhman et al., 2024).
+                                        Despite this, the knowledge stored in LLMs can
+                                        quickly become outdated due to the one-time train-
+                                        ing of LLMs and the ever-changing nature of the
+
+                                             Work done during the internship at Tencent AI Lab.
+                                            1Our source code and the curated new datasets can be ac-
+                                        cessed publicly at https://github.com/zhangxy-2019/
+                                        Effective-Knowledge-Injection.
+
+                                                                                                      1
+the assistance of subsequent instruction-tuning            ended generation and natural language inference
+(B) (Wei et al., 2022; Ouyang et al., 2022a) on            (NLI) tasks. Extensive experimental results on di-
+QA data, the knowledge retrieved from the LLMs             verse models, e.g., LLAMA2-7B (Touvron et al.,
+remains notably constrained (Jiang et al., 2024c).         2023b), Qwen2-7B (Yang et al., 2024), and Mistral-
+Recently, Jiang et al. (2024c) suggests fine-tuning        7B-v0.1 (Jiang et al., 2023) demonstrate that SELF-
+on a mix of QA data and related documents before           TUNING significantly outperforms all other com-
+continuing pre-training, with the aim of teaching          pared methods on knowledge memorization and
+the model how to access knowledge from docu-               extraction tasks. In addition, SELF-TUNING con-
+ments and answer questions. Although this method           sistently yields high accuracy on reasoning tasks,
+greatly outperforms standard approaches, our ini-          while the performance of the compared methods
+tial results suggest that its effectiveness in knowl-      largely fluctuates in different scenarios. Inspiringly,
+edge extraction remains limited.                           SELF-TUNING exhibits exceptional performance
+                                                           in retaining previously acquired knowledge (i.e.,
+   Numerous studies (Ambion et al., 2020; Reyes            knowledge retention) concerning extraction and
+et al., 2021) evidence the effectiveness of the Feyn-      reasoning on two well-established benchmarks.
+man Technique (Xiaofei et al., 2017) in promoting
+human learning and knowledge understanding. The               In summary, our contributions are three-fold:
+remarkable success of this potent learning method
+is often attributed to its emphasis on "comprehen-            · We present SELF-TUNING, a framework de-
+sion," "self-reflection" ("identifying gaps and re-              signed to improve an LLM's knowledge ac-
+view"), rather than mere "memorization". This                    quisition capability via self-teaching.
+encourages our exploration into its potential appli-
+cation in improving LLMs' knowledge acquisition               · We introduce three Wiki-Newpages-2023-QA
+capabilities. As a result, we present SELF-TUNING,               datasets to enable a comprehensive analysis of
+a framework that empowers an LLM to effectively                  an LLM's knowledge acquisition ability w.r.t.,
+internalize and recall new knowledge. As depicted                memorization, extraction, and reasoning.
+in the lower part of Figure 1, SELF-TUNING con-
+sists of three stages: (i) Firstly, we train the model        · We validate the efficacy of SELF-TUNING on
+using a mix of training documents and associ-                    three crucial knowledge acquisition tasks us-
+ated QA data, equipping it with the ability to ef-               ing the Wiki-Newpages-2023-QA datasets.
+ficiently absorb knowledge from raw documents
+via self-teaching, as well as question-answering           2 Related Work
+skills. Specifically, we design a SELF-TEACHING
+strategy to present the training documents as plain        Continual Knowledge Injection. The primary
+texts for memorization and a series of knowledge-          research approach for injecting new knowledge
+intensive tasks derived from the documents in a            into LLMs (Xu et al., 2023; Ovadia et al., 2024;
+self-supervised manner, without any mining pat-            Mecklenburg et al., 2024) is through continued
+terns (van de Kar et al., 2022), for comprehension         pre-training. This method entails the ongoing pre-
+and self-reflection. (ii) Next, we deploy the model        training of LLMs on raw corpora containing new
+to apply the learning strategy for spontaneously           knowledge, carried out in a causal auto-regressive
+acquiring knowledge from new documents while               manner (Allen-Zhu and Li, 2023; Ibrahim et al.,
+reviewing its QA skills. (iii) Finally, we continue        2024; Ovadia et al., 2024). However, this straight-
+training the model using only the new documents            forward approach often encounters hurdles in effec-
+to ensure thorough acquisition of new knowledge.           tively enabling LLMs to extract the acquired knowl-
+                                                           edge during the inference phase (Allen-Zhu and Li,
+   In addition, we introduce three Wiki-Newpages-          2023; Jiang et al., 2024c; Cheng et al., 2024). To
+2023-QA datasets to conduct an in-depth study              enhance knowledge extraction, instruction tuning
+of how an LLM acquires new knowledge w.r.t.,               on QA data after pre-training has been extensively
+memorization, extraction, and comprehension (in            employed (Wei et al., 2022; Ouyang et al., 2022b).
+this study, reasoning) across single-domain, multi-        Jiang et al. (2024c) suggests that the effectiveness
+domain, and cross-domain settings. These datasets          of this method remains limited, and proposes fine-
+are carefully curated to ensure minimal overlap            tuning the model on QA data before continued
+with the LLM's pre-training corpora, emphasiz-             pre-training. This instructs the model on how to
+ing two key knowledge-intensive tasks, i.e., open-         retrieve knowledge from raw corpora, thereby en-
+                                                           hancing knowledge extraction. However, such an
+
+                                                        2
+                   Factual            Open-Ended Generation (Train & Test Sets)                   NLI (Test Set)
+                 Knowledge
+Wiki-Newpages                         Statistics                            Avg. # Tokens Statistics Answer Type
+
+    Wiki-Bio       Birth Date,        Train: 6,136 (# QA); 1,136 (# Docs)   8.34 (Q)     729  (#  QA)    Yes (65.84%)
+(Single-domain)    Profession,          Test: 663 (# QA); 127 (# Docs)      4.24 (A)     127  (#  Docs)  No (33.47%)
+                 Education, etc.                                            59.64 (Doc)                  Impossible (0.69%)
+
+  Wiki-Multi       News,              Train: 10,004 (# QA); 1,823 (# Docs)  10.13 (Q)    1,627 (# QA)    Yes (60.97%)
+(Multi-domain)   TV Series,             Test: 1,502 (# QA); 281 (# Docs)    5.70 (A)     281 (# Docs)    No (36.63%)
+                 Sports, etc.                                               69.25 (Doc)                  Impossible (2.40%)
+
+   Wiki-Film      Genre, Language,    Test: 955 (# QA); 169 (# Docs)        8.83 (Q)     1,387 (# QA)    Yes (62.73%)
+(Single-domain)        Director,                                            4.61 (A)     169 (# Docs)    No (26.53%)
+                                                                            58.10 (Doc)                  Impossible (10.74%)
+                 Released Time, etc.
+
+Table 1: Statistical information of three Wiki-Newpages-2023-QA datasets, i.e., Wiki-Bio, Wiki-Multi, and Wiki-
+Film. "Impossible": "It's impossible to say". Details about token count distribution can be found in Appendix P.
+
+approach tends to underestimate the importance of          traction and reasoning, respectively. Due to space
+comprehending the new knowledge.                           constraints, we provide a brief overview of the
+                                                           dataset construction process here, with the com-
+   Acknowledging the value of knowledge com-               plete version available in Appendix B.
+prehension, Cheng et al. (2024) proposes convert-
+ing raw corpora into reading comprehension texts.          3.1 Document Collection and QA Pair
+This approach, however, focuses on domain adap-                  Generation
+tation and preserving general prompting abilities
+by mining a set of instruction-following tasks from        Document Collection. To construct the docu-
+the document content. In contrast, our work aims           ment corpus, we collect articles from Septem-
+to equip the model with the ability to effectively         ber to October 2023 (4,257 articles in total) from
+absorb new knowledge from raw documents and                Wikipedia NewPages2, which include new arti-
+employ the learned ability to unseen documents.            cles from various domains published after the pre-
+Specifically, we develop a SELF-TEACHING strat-            training cut-off time of the LLMs being evaluated.3
+egy to present the raw document as plain texts for         Following Jiang et al. (2024c), we only use the
+memorization, accompanied by a set of tasks for            first paragraph of each article, as it offers a compre-
+comprehension and self-reflection, which are cre-          hensive summary and contains a wealth of factual
+ated based on raw corpora in a self-supervised man-        information.
+ner, without relying on any mining patterns.
+                                                           QA Pair Generation. We gather QA pairs for
+   Additionally, knowledge editing (Mitchell et al.,       generation and NLI tasks using our handcrafted
+2022; Zheng et al., 2023; Yao et al., 2023; Jiang          prompts in Tables 23 and 24, aiming to cover all
+et al., 2024b; Zhang et al., 2024a) and retrieval-         factual information within the given document.
+augmented generation (Lewis et al., 2021; Vu
+et al., 2023; Ovadia et al., 2024; Jeong et al., 2024)     3.2 Splitting
+are recognized as two related research fields. We
+provide more details on these initiatives in Ap-           We construct three datasets for single-domain,
+pendix A.                                                  multi-domain, and cross-domain analysis, splitting
+                                                           them into training and testing subsets while ensur-
+3 Wiki-Newpages-2023-QA: Datasets for                      ing zero knowledge overlap.
+    Studying LLM Knowledge Acquisition
+                                                           Dataset Splitting. We generate three datasets:
+To explore the knowledge acquisition capabili-             Wiki-Newpages-2023-10-Bio (Wiki-Bio), Wiki-
+ties of LLMs from new documents, w.r.t., mem-              Newpages-2023-10-Multi (Wiki-Multi), and Wiki-
+orization, extraction and reasoning, we introduce          Newpages-2023-(9)10-Film (Wiki-Film) by ran-
+the Wiki-Newpages-2023-QA datasets (Table 1),              domly selecting 1,263 biographical documents,
+which are carefully designed to minimize over-             2,104 multi-domain documents, and 955 film doc-
+lap with the initial pre-training corpus. These            uments from the collected document corpus and
+datasets comprise new document corpora for study-          their associated QA pairs.
+ing knowledge memorization and associated QA
+datasets for two vital knowledge-intensive tasks:              2https://en.wikipedia.org/wiki/Special:
+open-ended generation and NLI for examining ex-            NewPages
+
+                                                               3The pre-training cut-off time for the LLAMA2 family
+                                                           models used in this study is 2022.
+
+                                                        3
+Train-test Splitting. We divide Wiki-Bio and                     Stage 3: Continually Learn. Our goal is to en-
+Wiki-Multi datasets into training and testing sub-               sure that the model M thoroughly absorbs the new
+sets for single-domain and multi-domain evalua-                  knowledge by conducting follow-up training on
+tions. We use Wiki-Film as the test set for cross-               DtDeostc (raw corpora). The objective is as follows:
+domain scenarios. Note that the training QA
+datasets only include open-ended generation task                 LStage3  =  L  (DtDeostc)  (3)
+pairs, ensuring fair comparisons.
+                                                                   
+
+4 SELF-TUNING                                                    4.2 SELF-TEACHING Learning Strategy
+
+In this section, we introduce the SELF-TUNING                    Motivated by the Feynman Technique, we aim to
+framework to improve the LLM's capability to ac-                 equip the model with systematic knowledge learn-
+quire knowledge from new documents, with the                     ing abilities from three perspectives: memoriza-
+devised SELF-TEACHING strategy. We first give an                 tion, comprehension, and self-reflection, as shown
+overview of the training process for knowledge ac-               in the lower part of Figure 2. Specifically, we
+quisition using the proposed SELF-TUNING in Sec-                 devise a self-supervised SELF-TEACHING learn-
+tion 4.1. Then, we delve into the SELF-TEACHING                  ing strategy that presents the raw documents DtDraoicn
+strategy in Section 4.2.                                         as plain texts for memorization and as a series of
+                                                                 knowledge-intensive tasks in a question-answering
+4.1 Overview                                                     format related to their content for comprehension
+                                                                 and self-reflection (Table 21). This method does
+As depicted in Figure 2, the proposed SELF-                      not require any specific mining patterns, making it
+TUNING comprises the following three stages.                     applicable to any raw texts.
+
+Stage 1: Learn How to Effectively Absorb                         Memorization. To allow the model M to learn to
+Knowledge from Raw Documents. Our objec-                         memorize and capitalize on the factual information
+tive is to equip an LLM M, parameterized by  ,                   embedded in the raw texts, we execute the next-
+with the ability to learn how to derive knowledge                token prediction task on plain document texts.
+from raw documents. This is achieved by training
+the model using a combination of training doc-                   Comprehension. Our goal is to facilitate the
+ument dataset DtDraoicn and associated training QA               model's ability to comprehend the factual knowl-
+dataset DtQraAin, as depicted in the upper left part             edge within the document in a top-down manner.
+of Figure 2. To enhance effective knowledge ab-                  To achieve this, we conduct the following tasks:
+sorption, we present DtDraoicn along with a series of
+knowledge-intensive tasks (a.k.a. self-teaching                     (i) Summarization allows the model to learn
+tasks) DtSrealifn that are related to their content us-          to grasp the topic by using the prompt Write a
+ing the proposed SELF-TEACHING strategy (in the                  title: to encourage the model to summarize the
+lower part of Figure 2). These tasks are generated               raw text, with the document title serving as the
+in a self-supervised manner based on the contents                ground truth.
+of DtDraoicn, using the proposed SELF-TEACHING
+learning approach (Section 4.2). The multi-task                     (ii) Gist identification improves the model's
+training objective is:                                           ability to pinpoint the key elements (i.e., enti-
+                                                                 ties) within the atomic facts. Specifically, we
+ LStage1 = L (DtDraoicn) + L (DtSrealifn) + L (DtQraAin) (1)     prompt the model with Highlight the key
+                                                                 information within the article:, and use
+Stage 2: Learn New Knowledge while Review-                       the entities within the document as gold answers,
+ing QA Skills. Our aim is to train the model M                   identified using Spacy4.
+to apply the learned strategy for spontaneously ex-
+tracting new knowledge from unseen documents                        (iii) Natural language inference provides the
+(i.e., raw test corpora DtDeostc). In addition to training       model with the capability to determine whether a
+on DtDeostc, we include DtQraAin, allowing the model M           statement can be inferred from specific document
+to review and refine its question-answering ability.             contents (i.e., "Yes," "No," or "It's impossible to
+The objective of this stage is:                                  say"), thus avoiding misconceptions that may arise
+                                                                 during knowledge acquisition. Specifically, we
+                                                                 use a randomly sampled sentence (identified using
+                                                                 NLTK5) within the document content as the true
+
+LStage2 = L (DtDeostc) + L (DtQraAin)  (2)                       4https://spacy.io/usage
+                                                                 5A natural language toolkit. https://www.nltk.org/
+
+                                                              4
+Figure 2: Illustration of the proposed SELF-TUNING. The framework consists of three stages (in the upper part):
+(i) Equipping the model with the ability to deeply absorb knowledge from raw documents using the proposed
+SELF-TEACHING strategy (in the lower part), along with question-answering capabilities; (ii) Applying the
+learning strategy acquired in Stage 1 to obtain new knowledge from unseen documents and refining QA skills; (ii)
+Continuously learning from unseen documents. See Appendix R for the full training document example in Stage 1.
+
+statement, and a corrupted version where one en-          differentiate the correct answer from the available
+tity is replaced by an irrelevant entity from another     options and prevents confusion with irrelevant con-
+sentence as the false statement. Then, we prompt          tent. Specifically, we randomly replace one en-
+the model with Based on the article above                 tity with a "­" symbol to form a cloze question,
+can we conclude that and the sampled sen-                 with the replaced entity and three other entities
+tence (either initial or corrupted), with the three       randomly sampled from the document forming the
+relations as options and corresponding answers.           options, and the replaced entity serving as the cor-
+                                                          rect choice.
+Self-Reflection. Our objective is to improve the
+model's ability to memorize and recall acquired              (v) Sentence completion allows the model to
+knowledge by "identifying and filling in the knowl-       develop its ability to focus on factual data found
+edge gaps." To this end, we devise the following          towards the end of a sentence. This is crucial since
+closed-book generation tasks:                             our initial observations indicate that the model fre-
+                                                          quently encounters difficulties when attempting to
+   (i) "Teaching" fosters the model's ability to re-      extract knowledge from later positions. Addition-
+call its acquired knowledge on a particular topic         ally, the model is anticipated to learn to emphasize
+by "pretending to teach" others, using the prompt         not only entities but also phrase-level factual in-
+Tell me about {topic}: with the document                  formation. To achieve this, we first employ Spacy
+content serving as the answer.                            to pinpoint prepositions in a randomly chosen sen-
+                                                          tence from the document. Then, we store the phrase
+   (ii) "Flashcards" imparts the model with the           that follows the final preposition as the correct an-
+ability to recall its learned information based           swer and the portion of the sentence preceding the
+on the topic and associated keywords, using the           phrase as the question. Comprehensive templates
+prompt Generate a concrete description                    for each task can be found in Table 21.
+about {topic} based on the following
+keywords:, with the document text as the answer.          5 Experiments
+
+   (iii) Fill-in-the-Blank equips the model with the      5.1 Setup
+ability to conduct a detailed check on the acquired       Datasets and Evaluation Metrics. We validate
+factual information. Specifically, we randomly re-        SELF-TUNING in both knowledge acquisition and
+place one entity with a "­" symbol to form a cloze        retention for a well-rounded analysis.
+question, with the replaced entity serving as the
+corresponding answer.                                        We perform assessments on three knowledge
+
+   (iv) Multi-choice QA helps the model learn to
+
+                                                       5
+Method                                                Training Data in Each Stage
+
+                                      Stage 1                                  Stage 2            Stage 3
+
+Continued Pre-Training                                        1 train doc & test doc              1 test doc
+Standard Instruction-Tuning                                   1 train QA train doc                2 train QA
+PIT                          1 train QA & train doc w/ self-teaching tasks 2 train QA & test doc  2 test doc
+SELF-TUNING                                                                                       3 test doc
+
+Variants of SELF-TUNING
+
+SELF-TUNING w/o Review                1 train QA & train doc w/ self-teaching tasks               2 test doc
+
+SELF-TUNING via Read.        1 train QA & train doc (reading-comprehension format (Cheng et al., 2024)) 2 test doc
+
+SELF-TUNING w/ Pre-Review 1 train QA & train doc w/ self-teaching tasks 2 train QA & train doc 3 test doc
+
+Table 2: Depiction of the training stages and datasets used in the compared methods. All approaches train on test
+documents for the same number of epochs. See Table 7 for the complete version.
+
+                                   Wiki-Newpages-2023-QA (Acquisition)             NQ (Reten.) CSQA (Reten.)
+
+Method                  Memorization  Extraction                        Reason. Extraction Reasoning
+
+                             PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+                    Knowledge Acquisition on Wiki-Newpages-2023-10-Bio (Single-Domain Scenario)
+
+w/o Knowledge Injection
+
+Open-book w/ test doc        8.41     55.20 31.83 64.48 75.55 62.10     7.96 - -                    -
+                                      4.68 2.87 14.63 16.98 15.07       7.96 16.05 24.67          53.40
+Closed-book                  8.41
+
+w/ Knowledge Injection
+
+Cont. Pre-training           7.28     6.33 3.62 15.96 18.72    16.11    15.09      16.00 24.11    53.40
+                                      6.94 5.13 19.15 19.05    19.48    39.09      15.72 23.67    51.84
+Standard Ins.-tuning         6.83     14.03 11.61 27.15 28.86  27.11    11.93      15.72 26.31    57.58
+                                      37.25 31.52 50.83 52.62  50.61    44.31      16.45 25.67    66.01
+PIT                          2.08
+
+SELF-TUNING                  1.11
+
+             Knowledge Acquisition on Wiki-Newpages-2023-10-Multi (Multi-Domain Scenario)
+
+Open-book w/ test doc        7.84     48.93 26.63 60.37 71.71 58.54 6.33 - -                      -
+
+Closed-book                  7.84     4.53 2.73 16.19 18.63 16.38 6.33 16.05 24.67                53.40
+
+Cont. Pre-training           3.32     5.86 3.40 18.04 20.59 18.42 14.51 17.02 25.05               53.56
+Standard Ins.-tuning
+PIT                          2.73     8.66 5.73 24.94 25.64 25.31 34.91 15.60 26.26               52.74
+SELF-TUNING
+                             1.96     14.31 8.72 30.26 33.97 30.22 10.69 15.55 27.02              55.12
+
+                             1.13     22.30 16.51 39.94 41.02 39.89 50.65 16.34 25.85             69.29
+
+             Knowledge Acquisition on Wiki-Newpages-2023-(9)10-Film (Cross-Domain Scenario)
+
+Open-book w/ film doc        8.30     57.38 34.45 68.64 78.92 66.31     7.35 - -                    -
+                                      3.35 1.88 11.27 12.97 11.49       7.35 16.05 24.67          53.40
+Closed-book                  8.30
+
+Cont. Pre-training           5.52     3.46 2.30 11.83 14.30 11.98 12.04 16.79 25.35               56.02
+Standard Ins.-tuning
+PIT                          2.83     5.23 3.77 16.15 17.45 16.45 51.69 14.41 25.54               49.80
+SELF-TUNING
+                             1.52     6.39 4.50 16.97 18.92 17.10 3.03 13.06 23.42                54.38
+
+                             1.10     22.51 16.44 35.58 36.60 35.43 44.92 16.77 26.44             66.34
+
+Table 3: Five-shot evaluation results on LLAMA2-7B for knowledge acquisition and retention are presented across
+single-domain, multi-domain, and cross-domain scenarios. Following (Jiang et al., 2024c), we also report results
+for: (i) closed-book, where base LLMs are prompted with open-ended questions related to new knowledge in the
+test documents, and (ii) open-book w/ test doc, where base LLMs are prompted with questions along with relevant
+gold knowledge snippets from the test documents. For the complete results, refer to Table 8 (Appendix C).
+
+acquisition tasks: (i) Memorization: We use test         2004), and accuracy. (iii) Reasoning: We use test
+document datasets and report perplexity (PPL) (Je-       QA datasets for NLI tasks and report accuracy.
+linek et al., 1977). (ii) Extraction: We use test QA
+datasets for open-ended generation tasks and evalu-         We evaluate two aspects of knowledge reten-
+ate factual accuracy using exact match (EM), Re-         tion: (i) Extraction: We assess the model's perfor-
+call, F1 (Kwiatkowski et al., 2019), Rouge-L (Lin,       mance in retaining general factual knowledge using
+                                                         Natural Questions (NQ) (Kwiatkowski et al., 2019),
+
+                                                      6
+with EM and F1. (ii) Reasoning: We evaluate the             Unlike other methods that display fluctuating per-
+capability in retaining commonsense knowledge               formance, SELF-TUNING shows a strong ability to
+using CommonsenseQA (CSQA) (Talmor et al.,                  maintain previously acquired knowledge in terms
+2019) and report accuracy. All evaluations are con-         of both knowledge extraction and reasoning. The
+ducted in a closed-book setting (see Appendix S).           slight improvements in evaluation metrics, such
+Compared Methods. We compare SELF-TUNING                    as F1 (roughly 1% on extracting learned world
+with three representative approaches (Table 2): (1)         knowledge) and accuracy (around 13% on com-
+Continued Pre-training (Ovadia et al., 2024), (2)           monsense reasoning), compared to the closed-book
+Standard Instruction-tuning (Saito et al., 2024), and       performance without knowledge injection, suggest
+(3) PIT (Jiang et al., 2024c), which trains on DtQraAin     that systematically learning new knowledge doesn't
+and DtDraoicn with QA pairs positioned before their         necessarily lead to catastrophic forgetting.
+corresponding document texts. We also evaluate
+their variants (Table 7). Results, averaged over               We further validate the efficacy of SELF-
+three runs, show significant differences in means           TUNING through additional analyses presented in
+(p < 0.001), with details in Appendix T.                    the following appendices: Appendix C (evaluation
+                                                            of three additional methods to validate the effec-
+5.2 Main Results                                            tiveness of our three-stage design), N (comparison
+                                                            of training on test documents with accompanying
+Table 3 (top) presents the evaluation results on            QA), D (fine-grained evaluation of the open-ended
+LLAMA2-7B in relation to knowledge acquisition              generation task), E (qualitative comparison of re-
+and retention in the single-domain scenario using           sponses from PIT and SELF-TUNING), F (ablation
+the Wiki-Bio dataset.                                       study investigating the impact of removing compre-
+The curated dataset exhibits minimal overlap                hension and self-reflection tasks from self-teaching
+with the pre-training data of the LLMs. The ex-             on knowledge memorization and acquisition), G
+tremely low performance in the closed-book setting          (error analysis), and K (assessment of training effi-
+(e.g., with EM around 2% for knowledge extrac-              ciency).
+tion) indicates that the dataset has little in common
+with the pre-training data, thus ensuring the relia-        5.3 Results in the Multi-Domain and
+bility of the evaluation results. The non-zero EM                  Cross-Domain Scenarios
+values might be due to a small number of collected
+Wikipedia articles that were initially published but        To explore the potential of SELF-TUNING for en-
+underwent revisions after the cut-off time.                 hancing LLM's knowledge acquisition and reten-
+SELF-TUNING substantially improves the                      tion in real-world scenarios, we evaluate its perfor-
+LLM's knowledge acquisition ability. SELF-                  mance in two challenging settings (Table 3): (i) the
+TUNING greatly enhances the performance of                  multi-domain scenario (in the middle part); (ii) the
+LLAMA2-7B across three dimensions: (i) reduc-               cross-domain scenario (in the bottom part), where
+ing PPL to nearly 1, signifying effective memoriza-         the training data is from Wiki-Bio, while the test
+tion of the new documents; (ii) increasing EM by            data is from Wiki-Film.
+roughly 11.5% on the knowledge extraction task, at-
+taining performance comparable to the open-book             SELF-TUNING shows strong potential in enhanc-
+setting; (iii) achieving high accuracy among the            ing knowledge acquisition and retention across
+compared methods for the reasoning task, demon-             documents containing diverse new knowledge.
+strating excellent understanding of the newly ac-           In Table 3, SELF-TUNING consistently achieves
+quired knowledge. These results underscore the              the best performance in both settings.
+importance of first training the model to develop
+knowledge absorption capabilities before expos-             The capacity to systematically absorb knowl-
+ing it to test documents, aligning with findings            edge improves generalization ability. The sub-
+from Jiang et al. (2024c). More importantly, SELF-          stantial improvements over all compared methods
+TUNING significantly outperforms PIT, highlight-            in the cross-domain setting, e.g., exceeding EM by
+ing the role of comprehension and self-reflection           13% on the knowledge extraction task, highlight
+beyond mere memorization, further validating the            the value of equipping the model with the ability to
+effectiveness of SELF-TEACHING.                             effectively absorb knowledge from raw documents
+SELF-TUNING excels in knowledge retention.                  using the SELF-TEACHING strategy, rather than
+                                                            solely teaching it how to answer questions.
+
+                                                         7
+50  Self-Tuning                                                              PPL (S.T.) 10                              Wiki-Bio (Acquisition)
+                                                                                       8
+EM on Test QA/NQ (%)PIT                                                                6       Method          Mem.     Extraction Reason.
+                                                 Perplexity on Test Documents          4
+40  Pre-Training                                                                                               PPL () % Acc. % EM % Rouge % Acc.
+    Retention (S.T.)
+
+30                                                                                             Cont. Pre-training 7.28  4.68 2.87    15.07      7.96
+
+                                                                                               S.T. w/o Review 1.26     28.36 23.68  41.11      50.40
+                                                                                                                        20.97 17.65  34.55      39.37
+                                                                                               S.T. via Read.  1.46     29.86 25.94  43.31      46.91
+                                                                                                                        37.25 31.52  50.61      44.31
+20                                                                                             S.T. w/ Pre-Review 1.28
+
+                                                                                               SELF-TUNING     1.11
+
+10                                                                           2                 Table 4: Results of the SELF-TUNING variants on
+                                                                                               LLAMA2-7B on Wiki-Bio (Appendix H).
+00       5 # Epochs 25                                                       500
+                                                                                               5.5 Variants of SELF-TUNING
+Figure 3: Training dynamics on LLAMA2-7B w.r.t.,
+knowledge memorization, extraction, and retention                                              Setup. We investigate three variants of SELF-
+across different numbers of training epochs. We present                                        TUNING (in the lower part of Table 2): (i) SELF-
+the EM scores on NQ datasets to evaluate knowledge                                             TUNING w/o Review, where we continue training
+retention. The black and red dashed lines represent the                                        on test documents without the reviewing capability;
+baseline closed-book and open-book performances for                                            (ii) SELF-TUNING via Read., which displays the
+the knowledge extraction task, respectively.                                                   training documents in a reading-comprehension
+                                                                                               format (Cheng et al., 2024) (see Table 28); (iii)
+5.4 Training Dynamics                                                                          SELF-TUNING w/ Pre-Review, which trains on a
+                                                                                               mix of training documents and training QA in the
+We analyze the training dynamics of SELF-                                                      second stage, before training on test documents.
+TUNING during continued pre-training (beginning                                                Results. In Table 4, despite having lower per-
+from Stage 2 in Figure 2) on the test documents                                                formance than SELF-TUNING, all variants signifi-
+by varying the number of training epochs for two                                               cantly enhance the model's ability for knowledge
+main reasons: (i) to eliminate the possibility that                                            acquisition compared to continued pre-training.
+the exceptional performance of SELF-TUNING in                                                  Reviewing QA ability aids in knowledge acquisi-
+enhancing knowledge acquisition is merely a re-                                                tion. Compared to SELF-TUNING, SELF-TUNING
+sult of early fitting on the test documents, and                                               w/o Review exhibits inferior performance. More-
+(ii) to conduct an in-depth assessment of its long-                                            over, we suspect that the lower performance of
+term knowledge retention capability. Furthermore,                                              SELF-TUNING w/ Pre-Review is because review-
+we integrate the results of PIT and continued pre-                                             ing QA ability during, rather than before, the con-
+training to offer a well-rounded evaluation.                                                   tinuous learning of new knowledge is more effec-
+                                                                                               tive in reducing distribution shift, thereby stabiliz-
+The remarkable performance of SELF-TUNING                                                      ing the training process.
+in enhancing knowledge acquisition does not                                                    Decoupling the knowledge acquisition process
+stem from early-fitting. In Figure 3, we ob-                                                   into three perspectives is more effective than
+serve that SELF-TUNING not only memorizes new                                                  solely focusing on comprehension. The compari-
+knowledge more rapidly than the compared meth-                                                 son between SELF-TUNING w/o Review and SELF-
+ods, lowering PPL to almost 1 within 3 epochs, but                                             TUNING w/ Read. demonstrates that presenting
+also consistently achieves the best performance                                                the test document text from three distinct perspec-
+during long-term training. Remarkably, SELF-                                                   tives contributes more to knowledge memorization
+TUNING begins to outperform the open-book per-                                                 (1.26% vs. 1.46% on PPL), extraction (23.68%
+formance from the 5th epoch and reaches its peak                                               vs. 17.65% on EM), and reasoning (50.40% vs.
+at the 25th epoch with a 5% higher EM score on                                                 39.37% on accuracy) than presenting the test docu-
+the knowledge extraction task.                                                                 ment text with all constructed tasks as a whole.
+
+   SELF-TUNING performs well in preserving pre-                                                5.6 Results of Varying Models and Corpora
+viously acquired knowledge, with only a small de-
+cline in EM of roughly 2-3% over the course of 50                                              Setup. We evaluate SELF-TUNING using di-
+training epochs. This suggests that SELF-TUNING                                                verse models, including Qwen2-7B (Yang et al.,
+has great potential for real-world applications.                                               2024), Mistral-7B-v0.1 (Jiang et al., 2023), and
+
+                                                                                            8
+Method                         Acquisition               Combining with Continual Learning Ap-
+             PPL () % Acc. % EM % Recall % Rouge         proaches. Our study primarily focuses on en-
+                                                         hancing a language model's ability to effec-
+     Varying Model (Qwen2-7B on WikiBio-2024)            tively learn new knowledge from previously un-
+                                                         seen raw corpora. Although experimental re-
+Closed-book  12.41 4.16 2.55          15.01  13.17       sults on MCQA and NQ demonstrate that our
+                                      25.45  24.83       SELF-TUNING method well preserves previously
+Stand. Ins.-tuning 2.77 11.29 9.36    25.98  25.64       acquired knowledge, future research could ex-
+                                      44.91  43.33       plore integrating SELF-TUNING with continual
+PIT          1.97 11.41 9.53                             learning approaches (Wang et al., 2024). For
+                                                         instance, regularization-based methods such as
+SELF-TUNING 1.14 31.79 28.51                             EWC (Kirkpatrick et al., 2017) and replay-based
+                                                         methods, like incorporating segments from gen-
+     Varying Model (Mistral-7B-v0.1 on WikiBio-2023)     eral domain datasets (e.g., Wiki data (Zhang et al.,
+                                                         2024d)), could improve the model's capacity to re-
+Closed-book  8.45        6.64 4.37    19.51  17.25       tain learned knowledge and skills while mitigating
+                         16.44 13.88  29.54  29.13       the risk of overfitting to new information.
+Stand. Ins.-tuning 2.84  26.85 23.08  40.36  39.52
+                         41.63 36.50  55.32  52.87          In this study, we intentionally avoided using con-
+PIT          1.42                                        tinual learning approaches to ensure a fair compari-
+                                                         son of knowledge injection with previous methods.
+SELF-TUNING 1.08                                         However, we present preliminary results of combin-
+                                                         ing SELF-TUNING with a replay-based approach
+Varying Corpora (LLAMA2-7B on WebNews-2023)              in Appendix M. These results confirm the strong
+                                                         potential of integrating SELF-TUNING with contin-
+Closed-book  11.20 9.04 6.30          24.22  17.99       ual learning techniques to improve both knowledge
+                                      37.66  31.31       acquisition and retention.
+Stand. Ins.-tuning 3.27 21.48 13.38   51.17  40.53
+                                      56.26  48.21       Performing More Comprehensive Evaluations
+PIT          1.67 30.37 18.96                            of LLMs' Knowledge Acquisition Capabilities.
+                                                         In this study, we evaluate the knowledge acqui-
+SELF-TUNING 1.10 37.48 28.74                             sition capabilities of LLMs from three important
+                                                         perspectives: knowledge memorization, extraction,
+   Table 5: Results of Varying Models and Corpora.       and reasoning. Future work could consider addi-
+                                                         tional evaluation aspects, such as integrating fac-
+Gemma-7B (Team et al., 2024) (see Appendix L),           tual knowledge with mathematical reasoning, to
+as well as different corpora, such as WebNews-           explore the model's ability to utilize the learned
+2023 (Tang and Yang, 2024), which consists of            factual knowledge in solving more complex real-
+worldwide news articles from diverse websites (see       world problems (Zheng et al., 2024).
+Appendix U for further details).
+Results. The results in Table 5 demonstrate that         Regarding Resource Demands. To verify the
+SELF-TUNING consistently achieves the best per-          efficacy of SELF-TUNING, we provide a de-
+formance, highlighting its strong generalizability       tailed analysis of training efficiency on the Wiki-
+across both models and corpora. Further evaluation       Newpages-2023-Bio dataset, conducted using 8
+results for LLAMA2-13B and LLAMA2-7B-CHAT                Tesla V100 GPUs (32GB) with LLAMA-7B, in
+are available in Appendices I and J, respectively.       Appendix K. This analysis demonstrates that our
+                                                         SELF-TUNING framework not only significantly
+6 Conclusion                                             outperforms the strongest baseline method but also
+                                                         achieves this with reduced training time. Further-
+In this study, we introduce SELF-TUNING to en-           more, the effectiveness of SELF-TUNING across
+hance an LLM's ability to effectively learn from         three distinct scenarios highlights its ability to
+raw documents through self-teaching. Specifically,       directly assimilate new knowledge from incom-
+we develop SELF-TEACHING, a self-supervised              ing test documents without requiring retraining
+learning strategy that presents documents as plain       on the original training corpus (i.e., omitting the
+texts along with various knowledge-intensive tasks
+derived directly from the documents. Additionally,
+we present three Wikipedia-Newpages-2023-QA
+datasets to enable a comprehensive evaluation of an
+LLM's knowledge acquisition capabilities across
+three distinct scenarios. Our findings show that
+SELF-TUNING consistently yields superior perfor-
+mance on the knowledge acquisition tasks while
+showing impressive knowledge retention perfor-
+mance. These results suggest the potential for
+broader applications of SELF-TUNING.
+
+Limitations
+
+While our experimental results show promise, we
+consider these findings to be preliminary, as there
+are still many unexplored aspects in this field.
+
+                                                      9
+first stage). Notably, SELF-TUNING eliminates the         References
+need for any additional annotation costs. All exper-
+iments were conducted on 8 Tesla V100 GPUs                Zeyuan Allen-Zhu and Yuanzhi Li. 2023. Physics of
+(32GB), with training completing in just a few               language models: Part 3.1, knowledge storage and
+hours. Consequently, we anticipate minimal bar-              extraction. Preprint, arXiv:2309.14316.
+riers to the adoption of SELF-TUNING, even for
+teams with limited computational resources.               Ronnel Ian A Ambion, Rainier Santi C De Leon,
+                                                             Alfonso Pio Angelo R Mendoza, and Reinier M
+                                                             Navarro. 2020. The utilization of the feynman tech-
+                                                             nique in paired team teaching towards enhancing
+                                                             grade 10 anhs students' academic achievement in
+                                                             science. In 2020 IEEE Integrated STEM Education
+                                                             Conference (ISEC), pages 1­3. IEEE.
+
+                                                          Daixuan Cheng, Shaohan Huang, and Furu Wei. 2024.
+                                                             Adapting large language models via reading compre-
+                                                             hension. In The Twelfth International Conference on
+                                                             Learning Representations.
+
+                                                          Roi Cohen, Mor Geva, Jonathan Berant, and Amir
+                                                             Globerson. 2023. Crawling the internal knowledge-
+                                                             base of language models. In Findings of the Asso-
+                                                             ciation for Computational Linguistics: EACL 2023,
+                                                             pages 1856­1869, Dubrovnik, Croatia. Association
+                                                             for Computational Linguistics.
+
+                                                          ContextualAI. 2024. Introducing rag 2.0.
+
+                                                          Zorik Gekhman, Gal Yona, Roee Aharoni, Matan Eyal,
+                                                             Amir Feder, Roi Reichart, and Jonathan Herzig. 2024.
+                                                             Does fine-tuning llms on new knowledge encourage
+                                                             hallucinations? Preprint, arXiv:2405.05904.
+
+                                                          Pengcheng He, Xiaodong Liu, Jianfeng Gao, and
+                                                             Weizhu Chen. 2021. Deberta: Decoding-enhanced
+                                                             bert with disentangled attention. In International
+                                                             Conference on Learning Representations.
+
+                                                          Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou,
+                                                             Mantas Mazeika, Dawn Song, and Jacob Steinhardt.
+                                                             2021. Measuring massive multitask language under-
+                                                             standing. Preprint, arXiv:2009.03300.
+
+                                                          Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong,
+                                                             Zhangyin Feng, Haotian Wang, Qianglong Chen,
+                                                             Weihua Peng, Xiaocheng Feng, Bing Qin, and Ting
+                                                             Liu. 2023. A survey on hallucination in large lan-
+                                                             guage models: Principles, taxonomy, challenges, and
+                                                             open questions. Preprint, arXiv:2311.05232.
+
+                                                          Adam Ibrahim, Benjamin Thérien, Kshitij Gupta,
+                                                             Mats L. Richter, Quentin Anthony, Timothée Lesort,
+                                                             Eugene Belilovsky, and Irina Rish. 2024. Simple
+                                                             and scalable strategies to continually pre-train large
+                                                             language models. Preprint, arXiv:2403.08763.
+
+                                                          Joel Jang, Seonghyeon Ye, Sohee Yang, Joongbo Shin,
+                                                             Janghoon Han, Gyeonghun KIM, Stanley Jungkyu
+                                                             Choi, and Minjoon Seo. 2022. Towards continual
+                                                             knowledge learning of language models. In Interna-
+                                                             tional Conference on Learning Representations.
+
+                                                          Frederick Jelinek, Robert L. Mercer, Lalit R. Bahl, and
+                                                             Janet M. Baker. 1977. Perplexity--a measure of the
+                                                             difficulty of speech recognition tasks. Journal of the
+                                                             Acoustical Society of America, 62.
+
+                                                      10
+Soyeong Jeong, Jinheon Baek, Sukmin Cho, Sung Ju                  Muhammad Faaiz Taufiq, and Hang Li. 2023. Trust-
+   Hwang, and Jong C. Park. 2024. Adaptive-rag:                   worthy llms: a survey and guideline for evaluat-
+   Learning to adapt retrieval-augmented large lan-               ing large language models' alignment. Preprint,
+   guage models through question complexity. Preprint,            arXiv:2308.05374.
+   arXiv:2403.14403.
+                                                               Nick Mecklenburg, Yiyou Lin, Xiaoxiao Li, Daniel Hol-
+Albert Q. Jiang, Alexandre Sablayrolles, Arthur Men-              stein, Leonardo Nunes, Sara Malvar, Bruno Silva,
+   sch, Chris Bamford, Devendra Singh Chaplot, Diego              Ranveer Chandra, Vijay Aski, Pavan Kumar Reddy
+   de las Casas, Florian Bressand, Gianna Lengyel, Guil-          Yannam, Tolga Aktas, and Todd Hendry. 2024. Inject-
+   laume Lample, Lucile Saulnier, Lélio Renard Lavaud,            ing new knowledge into large language models via
+   Marie-Anne Lachaux, Pierre Stock, Teven Le Scao,               supervised fine-tuning. Preprint, arXiv:2404.00213.
+   Thibaut Lavril, Thomas Wang, Timothée Lacroix,
+   and William El Sayed. 2023. Mistral 7b. Preprint,           Sewon Min, Jordan Boyd-Graber, Chris Alberti,
+   arXiv:2310.06825.                                              Danqi Chen, Eunsol Choi, Michael Collins, Kelvin
+                                                                  Guu, Hannaneh Hajishirzi, Kenton Lee, Jenni-
+Jinhao Jiang, Junyi Li, Wayne Xin Zhao, Yang Song,                maria Palomaki, Colin Raffel, Adam Roberts, Tom
+   Tao Zhang, and Ji-Rong Wen. 2024a. Mix-cpt: A                  Kwiatkowski, Patrick Lewis, Yuxiang Wu, Hein-
+   domain adaptation framework via decoupling knowl-              rich Küttler, Linqing Liu, Pasquale Minervini, Pon-
+   edge learning and format alignment. arXiv preprint             tus Stenetorp, Sebastian Riedel, Sohee Yang, Min-
+   arXiv:2407.10804.                                              joon Seo, Gautier Izacard, Fabio Petroni, Lucas Hos-
+                                                                  seini, Nicola De Cao, Edouard Grave, Ikuya Ya-
+Yuxin Jiang, Yufei Wang, Chuhan Wu, Wanjun Zhong,                 mada, Sonse Shimaoka, Masatoshi Suzuki, Shumpei
+   Xingshan Zeng, Jiahui Gao, Liangyou Li, Xin Jiang,             Miyawaki, Shun Sato, Ryo Takahashi, Jun Suzuki,
+   Lifeng Shang, Ruiming Tang, Qun Liu, and Wei                   Martin Fajcik, Martin Docekal, Karel Ondrej, Pavel
+   Wang. 2024b. Learning to edit: Aligning llms with              Smrz, Hao Cheng, Yelong Shen, Xiaodong Liu,
+   knowledge editing. Preprint, arXiv:2402.11905.                 Pengcheng He, Weizhu Chen, Jianfeng Gao, Bar-
+                                                                  las Oguz, Xilun Chen, Vladimir Karpukhin, Stan
+Zhengbao Jiang, Zhiqing Sun, Weijia Shi, Pedro Ro-                Peshterliev, Dmytro Okhonko, Michael Schlichtkrull,
+   driguez, Chunting Zhou, Graham Neubig, Xi Vic-                 Sonal Gupta, Yashar Mehdad, and Wen tau Yih.
+   toria Lin, Wen tau Yih, and Srinivasan Iyer. 2024c.            2021. Neurips 2020 efficientqa competition: Sys-
+   Instruction-tuned language models are better knowl-            tems, analyses and lessons learned. Preprint,
+   edge learners. Preprint, arXiv:2402.12847.                     arXiv:2101.00133.
+
+James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz,            Eric Mitchell, Charles Lin, Antoine Bosselut, Chelsea
+   Joel Veness, Guillaume Desjardins, Andrei A. Rusu,             Finn, and Christopher D. Manning. 2022. Fast model
+   Kieran Milan, John Quan, Tiago Ramalho, Ag-                    editing at scale. In The Tenth International Con-
+   nieszka Grabska-Barwinska, Demis Hassabis, Clau-               ference on Learning Representations, ICLR 2022,
+   dia Clopath, Dharshan Kumaran, and Raia Hadsell.               Virtual Event, April 25-29, 2022. OpenReview.net.
+   2017. Overcoming catastrophic forgetting in neural
+   networks. Proceedings of the National Academy of            OpenAI. 2023. Gpt-4 technical report. Preprint,
+   Sciences, 114(13):3521­3526.                                   arXiv:2303.08774.
+
+Tom Kwiatkowski, Jennimaria Palomaki, Olivia Red-              OpenAI. 2024. Hello gpt-4o. OpenAI blog.
+   field, Michael Collins, Ankur Parikh, Chris Alberti,
+   Danielle Epstein, Illia Polosukhin, Jacob Devlin, Ken-      Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida,
+   ton Lee, Kristina Toutanova, Llion Jones, Matthew              Carroll Wainwright, Pamela Mishkin, Chong Zhang,
+   Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob                   Sandhini Agarwal, Katarina Slama, Alex Ray, et al.
+   Uszkoreit, Quoc Le, and Slav Petrov. 2019. Natu-               2022a. Training language models to follow instruc-
+   ral questions: A benchmark for question answering              tions with human feedback. Advances in Neural
+   research. Transactions of the Association for Compu-           Information Processing Systems, 35:27730­27744.
+   tational Linguistics, 7:452­466.
+                                                               Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida,
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio              Carroll L. Wainwright, Pamela Mishkin, Chong
+   Petroni, Vladimir Karpukhin, Naman Goyal, Hein-                Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray,
+   rich Küttler, Mike Lewis, Wen tau Yih, Tim Rock-               John Schulman, Jacob Hilton, Fraser Kelton, Luke
+   täschel, Sebastian Riedel, and Douwe Kiela. 2021.              Miller, Maddie Simens, Amanda Askell, Peter Welin-
+   Retrieval-augmented generation for knowledge-                  der, Paul F. Christiano, Jan Leike, and Ryan Lowe.
+   intensive nlp tasks. Preprint, arXiv:2005.11401.               2022b. Training language models to follow instruc-
+                                                                  tions with human feedback. In Advances in Neural
+Chin-Yew Lin. 2004. ROUGE: A package for auto-                    Information Processing Systems 35: Annual Confer-
+   matic evaluation of summaries. In Text Summariza-              ence on Neural Information Processing Systems 2022,
+   tion Branches Out, pages 74­81, Barcelona, Spain.              NeurIPS 2022, New Orleans, LA, USA, November 28
+   Association for Computational Linguistics.                    - December 9, 2022.
+
+Yang Liu, Yuanshun Yao, Jean-Francois Ton, Xiaoying            Oded Ovadia, Menachem Brief, Moshik Mishaeli,
+   Zhang, Ruocheng Guo, Hao Cheng, Yegor Klochkov,                and Oren Elisha. 2024. Fine-tuning or retrieval?
+
+                                                           11
+   comparing knowledge injection in llms. Preprint,             Cynthia Gao, Vedanuj Goswami, Naman Goyal, An-
+   arXiv:2312.05934.                                            thony Hartshorn, Saghar Hosseini, Rui Hou, Hakan
+                                                                Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa,
+Englevert Reyes, Ron Blanco, Defanee Doroon, Jay Li-            Isabel Kloumann, Artem Korenev, Punit Singh Koura,
+   mana, and Ana Torcende. 2021. Feynman technique              Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Di-
+   as a heutagogical learning strategy for independent          ana Liskovich, Yinghai Lu, Yuning Mao, Xavier Mar-
+   and remote learning. Recoletos Multidisciplinary             tinet, Todor Mihaylov, Pushkar Mishra, Igor Moly-
+   Research Journal, 9:1­13.                                    bog, Yixin Nie, Andrew Poulton, Jeremy Reizen-
+                                                                stein, Rashi Rungta, Kalyan Saladi, Alan Schelten,
+Kuniaki Saito, Kihyuk Sohn, Chen-Yu Lee, and Yoshi-             Ruan Silva, Eric Michael Smith, Ranjan Subrama-
+   taka Ushiku. 2024. Where is the answer? investi-             nian, Xiaoqing Ellen Tan, Binh Tang, Ross Tay-
+   gating positional bias in language model knowledge           lor, Adina Williams, Jian Xiang Kuan, Puxin Xu,
+   extraction. Preprint, arXiv:2402.12170.                      Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan,
+                                                                Melanie Kambadur, Sharan Narang, Aurelien Ro-
+Alon Talmor, Jonathan Herzig, Nicholas Lourie, and              driguez, Robert Stojnic, Sergey Edunov, and Thomas
+   Jonathan Berant. 2019. CommonsenseQA: A ques-                Scialom. 2023b. Llama 2: Open foundation and
+   tion answering challenge targeting commonsense               fine-tuned chat models. Preprint, arXiv:2307.09288.
+   knowledge. In Proceedings of the 2019 Conference
+   of the North American Chapter of the Association for      Mozes van de Kar, Mengzhou Xia, Danqi Chen, and
+   Computational Linguistics: Human Language Tech-              Mikel Artetxe. 2022. Don't prompt, search! mining-
+   nologies, Volume 1 (Long and Short Papers), pages            based zero-shot learning with language models. In
+   4149­4158, Minneapolis, Minnesota. Association for           Proceedings of the 2022 Conference on Empirical
+   Computational Linguistics.                                   Methods in Natural Language Processing, pages
+                                                                7508­7520, Abu Dhabi, United Arab Emirates. As-
+Yixuan Tang and Yi Yang. 2024. Multihop-rag: Bench-             sociation for Computational Linguistics.
+   marking retrieval-augmented generation for multi-
+   hop queries. Preprint, arXiv:2401.15391.                  Tu Vu, Mohit Iyyer, Xuezhi Wang, Noah Constant, Jerry
+                                                                Wei, Jason Wei, Chris Tar, Yun-Hsuan Sung, Denny
+Gemma Team, Thomas Mesnard, Cassidy Hardin,                     Zhou, Quoc Le, and Thang Luong. 2023. Freshllms:
+   Robert Dadashi, Surya Bhupatiraju, Shreya Pathak,            Refreshing large language models with search engine
+   Laurent Sifre, Morgane Rivière, Mihir Sanjay Kale,           augmentation. Preprint, arXiv:2310.03214.
+   Juliette Love, et al. 2024. Gemma: Open models
+   based on gemini research and technology. arXiv            Cunxiang Wang, Xiaoze Liu, Yuanhao Yue, Xiangru
+   preprint arXiv:2403.08295.                                   Tang, Tianhang Zhang, Cheng Jiayang, Yunzhi Yao,
+                                                                Wenyang Gao, Xuming Hu, Zehan Qi, Yidong Wang,
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Al-              Linyi Yang, Jindong Wang, Xing Xie, Zheng Zhang,
+   bert, Amjad Almahairi, Yasmine Babaei, Nikolay               and Yue Zhang. 2023. Survey on factuality in large
+   Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti           language models: Knowledge, retrieval and domain-
+   Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton           specificity. Preprint, arXiv:2310.07521.
+   Ferrer, Moya Chen, Guillem Cucurull, David Esiobu,
+   Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller,       Liyuan Wang, Xingxing Zhang, Hang Su, and Jun
+   Cynthia Gao, Vedanuj Goswami, Naman Goyal, An-               Zhu. 2024. A comprehensive survey of continual
+   thony Hartshorn, Saghar Hosseini, Rui Hou, Hakan             learning: Theory, method and application. Preprint,
+   Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa,           arXiv:2302.00487.
+   Isabel Kloumann, Artem Korenev, Punit Singh Koura,
+   Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Di-        Jason Wei, Maarten Bosma, Vincent Zhao, Kelvin Guu,
+   ana Liskovich, Yinghai Lu, Yuning Mao, Xavier Mar-           Adams Wei Yu, Brian Lester, Nan Du, Andrew M.
+   tinet, Todor Mihaylov, Pushkar Mishra, Igor Moly-            Dai, and Quoc V Le. 2022. Finetuned language mod-
+   bog, Yixin Nie, Andrew Poulton, Jeremy Reizen-               els are zero-shot learners. In International Confer-
+   stein, Rashi Rungta, Kalyan Saladi, Alan Schelten,           ence on Learning Representations.
+   Ruan Silva, Eric Michael Smith, Ranjan Subrama-
+   nian, Xiaoqing Ellen Tan, Binh Tang, Ross Tay-            Kevin Wu, Eric Wu, and James Zou. 2024a. How
+   lor, Adina Williams, Jian Xiang Kuan, Puxin Xu,              faithful are rag models? quantifying the tug-of-
+   Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan,           war between rag and llms' internal prior. Preprint,
+   Melanie Kambadur, Sharan Narang, Aurelien Ro-                arXiv:2404.10198.
+   driguez, Robert Stojnic, Sergey Edunov, and Thomas
+   Scialom. 2023a. Llama 2: Open foundation and fine-        Siye Wu, Jian Xie, Jiangjie Chen, Tinghui Zhu, Kai
+   tuned chat models. Preprint, arXiv:2307.09288.               Zhang, and Yanghua Xiao. 2024b. How easily do
+                                                                irrelevant inputs skew the responses of large language
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Al-              models? Preprint, arXiv:2404.03302.
+   bert, Amjad Almahairi, Yasmine Babaei, Nikolay
+   Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti        Chong Xiang, Tong Wu, Zexuan Zhong, David Wag-
+   Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton           ner, Danqi Chen, and Prateek Mittal. 2024. Certifi-
+   Ferrer, Moya Chen, Guillem Cucurull, David Esiobu,           ably robust rag against retrieval corruption. Preprint,
+   Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller,          arXiv:2405.15556.
+
+                                                         12
+Wang Xiaofei, Chen Qing, Sun Yanyan, Tong Weifeng,           Xiaoying Zhang, Baolin Peng, Ye Tian, Jingyan Zhou,
+   and Niu Wenzhi. 2017. The application of the feyn-           Lifeng Jin, Linfeng Song, Haitao Mi, and Helen
+   man technique for practical teaching of prosthodon-          Meng. 2024c. Self-alignment for factuality: Mitigat-
+   tics. Chinese Journal of Medical Education,                  ing hallucinations in llms via self-evaluation. arXiv
+   41(9):822.                                                   preprint arXiv:2402.09267.
+
+Yan Xu, Mahdi Namazifar, Devamanyu Hazarika, Aish-           Xiaoying Zhang, Baolin Peng, Ye Tian, Jingyan Zhou,
+   warya Padmakumar, Yang Liu, and Dilek Hakkani-               Lifeng Jin, Linfeng Song, Haitao Mi, and Helen
+   Tür. 2023. KILM: knowledge injection into encoder-           Meng. 2024d. Self-alignment for factuality: Miti-
+   decoder language models. CoRR, abs/2302.09170.               gating hallucinations in LLMs via self-evaluation. In
+                                                                Proceedings of the 62nd Annual Meeting of the As-
+An Yang, Baosong Yang, Binyuan Hui, Bo Zheng,                   sociation for Computational Linguistics (Volume 1:
+   Bowen Yu, Chang Zhou, Chengpeng Li, Chengyuan                Long Papers), pages 1946­1965, Bangkok, Thailand.
+   Li, Dayiheng Liu, Fei Huang, Guanting Dong, Hao-             Association for Computational Linguistics.
+   ran Wei, Huan Lin, Jialong Tang, Jialin Wang,
+   Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin            Xiaoying Zhang, Da Peng, Yipeng Zhang, Zonghao
+   Ma, Jianxin Yang, Jin Xu, Jingren Zhou, Jinze Bai,           Guo, Chengyue Wu, Chi Chen, Wei Ke, Helen Meng,
+   Jinzheng He, Junyang Lin, Kai Dang, Keming Lu, Ke-           and Maosong Sun. 2025. Will pre-training ever
+   qin Chen, Kexin Yang, Mei Li, Mingfeng Xue, Na Ni,           end? a first step toward next-generation founda-
+   Pei Zhang, Peng Wang, Ru Peng, Rui Men, Ruize                tion mllms via self-improving systematic cognition.
+   Gao, Runji Lin, Shijie Wang, Shuai Bai, Sinan Tan,           arXiv preprint arXiv:2503.12303.
+   Tianhang Zhu, Tianhao Li, Tianyu Liu, Wenbin Ge,
+   Xiaodong Deng, Xiaohuan Zhou, Xingzhang Ren,              Yu Zhang, Kehai Chen, Xuefeng Bai, Zhao Kang, Quan-
+   Xinyu Zhang, Xipin Wei, Xuancheng Ren, Xuejing               jiang Guo, and Min Zhang. 2024e. Question-guided
+   Liu, Yang Fan, Yang Yao, Yichang Zhang, Yu Wan,              knowledge graph re-scoring and injection for knowl-
+   Yunfei Chu, Yuqiong Liu, Zeyu Cui, Zhenru Zhang,             edge graph question answering. In Findings of the
+   Zhifang Guo, and Zhihao Fan. 2024. Qwen2 techni-             Association for Computational Linguistics: EMNLP
+   cal report. Preprint, arXiv:2407.10671.                      2024, pages 8972­8985, Miami, Florida, USA. Asso-
+                                                                ciation for Computational Linguistics.
+Yunzhi Yao, Peng Wang, Bozhong Tian, Siyuan Cheng,
+   Zhoubo Li, Shumin Deng, Huajun Chen, and Ningyu           Ce Zheng, Lei Li, Qingxiu Dong, Yuxuan Fan, Zhiyong
+   Zhang. 2023. Editing large language models: Prob-            Wu, Jingjing Xu, and Baobao Chang. 2023. Can we
+   lems, methods, and opportunities. In Proceedings             edit factual knowledge by in-context learning? In
+   of the 2023 Conference on Empirical Methods in               Proceedings of the 2023 Conference on Empirical
+   Natural Language Processing, pages 10222­10240,              Methods in Natural Language Processing, EMNLP
+   Singapore. Association for Computational Linguis-            2023, Singapore, December 6-10, 2023, pages 4862­
+   tics.                                                        4876. Association for Computational Linguistics.
+
+Ningyu Zhang, Yunzhi Yao, Bozhong Tian, Peng                 Huaixiu Steven Zheng, Swaroop Mishra, Xinyun Chen,
+   Wang, Shumin Deng, Mengru Wang, Zekun Xi,                    Heng-Tze Cheng, Ed H. Chi, Quoc V Le, and Denny
+   Shengyu Mao, Jintian Zhang, Yuansheng Ni, Siyuan             Zhou. 2024. Take a step back: Evoking reasoning via
+   Cheng, Ziwen Xu, Xin Xu, Jia-Chen Gu, Yong Jiang,            abstraction in large language models. In The Twelfth
+   Pengjun Xie, Fei Huang, Lei Liang, Zhiqiang Zhang,           International Conference on Learning Representa-
+   Xiaowei Zhu, Jun Zhou, and Huajun Chen. 2024a. A             tions.
+   comprehensive study of knowledge editing for large
+   language models. Preprint, arXiv:2401.01286.              Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao
+                                                                Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu,
+Tianjun Zhang, Shishir G. Patil, Naman Jain, Sheng              Lili Yu, Susan Zhang, Gargi Ghosh, Mike Lewis,
+   Shen, Matei Zaharia, Ion Stoica, and Joseph E. Gon-          Luke Zettlemoyer, and Omer Levy. 2023. Lima: Less
+   zalez. 2024b. Raft: Adapting language model to               is more for alignment. Preprint, arXiv:2305.11206.
+   domain specific rag. Preprint, arXiv:2403.10131.
+
+Xiaoying Zhang, Baolin Peng, Jianfeng Gao, and He-
+   len Meng. 2022. Toward self-learning end-to-end
+   task-oriented dialog systems. In Proceedings of the
+   23rd Annual Meeting of the Special Interest Group on
+   Discourse and Dialogue, pages 516­530, Edinburgh,
+   UK. Association for Computational Linguistics.
+
+Xiaoying Zhang, Baolin Peng, Kun Li, Jingyan Zhou,
+   and Helen Meng. 2023. SGP-TOD: Building task
+   bots effortlessly via schema-guided LLM prompting.
+   In Findings of the Association for Computational
+   Linguistics: EMNLP 2023, pages 13348­13369, Sin-
+   gapore. Association for Computational Linguistics.
+
+                                                         13
+Contents                                               K Training Efficiency Analysis             20
+
+1 Introduction                             1           L Evaluation Results on Gemma-7B in the
+
+                                                       Single-Domain Scenario                     20
+
+2 Related Work                             2
+
+                                                       M Evaluation Results with Continual
+
+3 Wiki-Newpages-2023-QA: Datasets for                  Learning Techniques                        20
+    Studying LLM Knowledge Acquisition 3
+    3.1 Document Collection and QA Pair                N Evaluation Results Comparing with a
+           Generation . . . . . . . . . . . . . 3
+    3.2 Splitting . . . . . . . . . . . . . . 3        Baseline Utilizing Document-Based QA
+
+                                                       Generation on Test Corpora                 21
+
+4 SELF-TUNING                              4           O In-depth Sample Documents and Corre-
+
+4.1 Overview . . . . . . . . . . . . . 4               sponding QA Pairs for Open-Ended Gen-
+
+4.2 SELF-TEACHING Learning Strategy 4                  eration and Natural Language Inference
+
+                                                       Tasks                                      21
+
+5 Experiments                              5
+
+5.1 Setup . . . . . . . . . . . . . . . 5              P Token Count Distribution for the Open-
+
+5.2 Main Results . . . . . . . . . . . 7               ended Generation Task Across the Three
+
+5.3 Results in the Multi-Domain and                    Datasets                                   21
+
+      Cross-Domain Scenarios . . . . . 7
+
+5.4 Training Dynamics . . . . . . . . 8                Q Examination of QA Types in Open-
+
+5.5 Variants of SELF-TUNING . . . . 8                  ended Generation QA Datasets               21
+
+5.6 Results of Varying Models and                      R Detailed Templates used in the SELF-
+
+      Corpora . . . . . . . . . . . . . . 8            TEACHING Strategy                          21
+
+6 Conclusion                               9           S Datasets and Evaluation Metrics          21
+
+A Additional Efforts for Knowledge Injec-              T Implementation Details                   22
+
+tion                                       15
+
+B Wiki-Newpages-2023-QA: Datasets for                  U Implementation Details of Evaluation on
+    Studying LLM Knowledge Acquisition 15
+    B.1 Document Collection . . . . . . . 15           Varying Models and Corpora                 24
+    B.2 QA Pair Generation . . . . . . . . 15
+    B.3 Splitting . . . . . . . . . . . . . . 16       U.1 Evaluation on Different Models . . 24
+
+                                                       U.2 Evaluation on Varied Corpora . . . 24
+
+                                                       V A Sample Training Document in the
+
+C Evaluation Results on LLAMA2-7B 16                   Reading-Comprehension Format               24
+
+D Fine-grained Comparison                  16
+
+E Qualitative Analysis                     16
+
+F Ablation Study                           17
+
+G Error Analysis                           17
+
+H Evaluation Results on SELF-TUNING
+
+Variants                                   18
+
+I Evaluation Results on LLAMA2-13B in
+
+the Single-domain Scenario                 19
+
+J Evaluation Results on LLAMA2-7B-
+    CHAT in the Single-domain Scenario 20
+
+                                                   14
+A Additional Efforts for Knowledge                             Document: <Sawyer Gipson-Long - Wikipedia>
+     Injection                                                 Alec Sawyer Gipson-Long (born December 12, 1997)
+                                                               is an American professional baseball pitcher for ...
+Knowledge editing (Zheng et al., 2023; Yao et al.,             QA Pair Example for Generation Task
+2023; Jiang et al., 2024b; Zhang et al., 2024a)
+and retrieval-augmented generation (RAG) (Lewis                Question: When was Sawyer Gipson-Long born?
+et al., 2021; Ovadia et al., 2024; Jeong et al., 2024)         Answer: December 12, 1997.
+are recognized as two related research initiatives in          QA Pair Example for NLI Task
+the field of knowledge injection.
+                                                               Question: Based on the paragraph above can we
+   (i) Knowledge editing (Mitchell et al., 2022;               conclude that <Alec Sawyer Gipson-Long> Sawyer
+Zheng et al., 2023; Yao et al., 2023; Jiang et al.,            Gipson-Long was born in December 1997.
+2024b; Zhang et al., 2024a) concentrates on rec-               Options: -Yes; -It's impossible to say; -No
+tifying outdated or inaccurate factual knowledge               Answer: Yes
+stored in the model, without affecting other facts.
+In contrast, our focus lies in enabling LLMs to             Table 6: A simplified example of a document and its
+efficiently acquire knowledge from raw corpora.             associated QA pair for the open-ended generation task.
+                                                            Factual information related to the QA pairs is denoted
+   (ii) Retrieval-augmented generation (RAG)                in blue.
+(Lewis et al., 2021; Vu et al., 2023; Ovadia et al.,
+2024; Jeong et al., 2024) equips LLMs with new              domains, we gather documents from Wikipedia
+knowledge by augmenting off-the-shelf LLMs with             NewPages6. This collection includes new arti-
+retrieved knowledge from external sources. How-             cles from diverse domains published after the pre-
+ever, its performance is vulnerable to irrelevant           training cut-off time of the LLMs being evaluated,
+or malicious information in the retrieval results           allowing us to largely ensure that the models have
+(ContextualAI, 2024), potentially leading to inac-          not been exposed to these facts. To construct the
+curate responses (Zhang et al., 2024b; Wu et al.,           document corpus, we specifically gather articles
+2024b; Xiang et al., 2024). Moreover, recent find-          from September to October 2023, resulting in a to-
+ings (Wu et al., 2024a) emphasize an underlying             tal of 4,257 articles.7 Following Jiang et al. (2024c),
+tension between a model's prior knowledge and the           we only utilize the first paragraph of each article,
+information presented in retrieved documents. Con-          which provides a comprehensive summary and suf-
+sequently, this paper primarily focuses on exploring        ficient factual information.
+the injection of knowledge into the parameters of
+LLMs.                                                       B.2 QA Pair Generation
+
+B Wiki-Newpages-2023-QA: Datasets for                       To gather QA pairs, we utilize GPT-4 (OpenAI,
+     Studying LLM Knowledge Acquisition                     2023) along with our manually curated prompts
+                                                            to generate a variety of questions and their cor-
+To explore the knowledge acquisition capabilities           responding answers, aiming to cover all factual
+of LLMs from new documents, w.r.t., memoriza-               information within the given document. Note that
+tion, extraction and reasoning, we introduce the            GPT-4 is solely used to convert document knowl-
+Wiki-Newpages-2023-QA datasets, which are care-             edge into QA pairs without introducing any addi-
+fully designed to minimize overlap with the initial         tional information. It can be replaced by any other
+pre-training corpus. These datasets comprise new            model.
+document corpora for studying knowledge memo-
+rization and associated QA datasets for two vital              Specifically, we construct QA datasets for the
+knowledge-intensive tasks: open-ended generation            open-ended generation and NLI tasks by employ-
+and NLI for examining extraction and reasoning,             ing the prompts shown in Table 23 and Table 24,
+respectively. We provide the details on dataset con-        respectively. A simplified example document with
+struction in the following subsections.                     associated QA pairs is provided in Table 6. More
+                                                            detailed examples can be found in Appendix O.
+B.1 Document Collection
+                                                                6https://en.wikipedia.org/wiki/Special:
+Given the well-structured nature of Wikipedia arti-         NewPages
+cles, which encompass extensive factual informa-
+tion and cover a wide range of topics across various            7The pre-training cut-off for the LLAMA2 family models
+                                                            used in this study is 2022.
+
+                                                        15
+B.3 Splitting                                                         Notably, SELF-TUNING enables the model to ab-
+                                                                   sorb new knowledge from incoming test documents
+To enable a comprehensive analysis in single-                      more efficiently. Unlike mixed training--which re-
+domain, multi-domain, and cross-domain situa-                      quires retraining on both training documents, train-
+tions, we develop three datasets and divide them                   ing QA, and test documents--SELF-TUNING lever-
+into training and testing subsets, ensuring zero                   ages the capabilities acquired in the initial training
+knowledge overlap.                                                 stage to directly learn from test documents, need-
+                                                                   ing only a review of QA ability. This makes it
+Dataset Splitting. We create three datasets:                       significantly more training-efficient over time.
+Wiki-Newpages-2023-10-Bio (Wiki-Bio), Wiki-
+Newpages-2023-10-Multi (Wiki-Multi), and Wiki-                     D Fine-grained Comparison
+Newpages-2023-(9)10-Film (Wiki-Film). Specifi-
+cally, we randomly select 1,263 biographical doc-                  Setup. To fully understand how the ability to sys-
+uments to curate Wiki-Bio, choose 2,104 docu-                      tematically acquire knowledge aids in the knowl-
+ments covering various topics for constructing                     edge extraction task, we conduct fine-grained com-
+Wiki-Multi, and compile 955 film documents for                     parisons of PIT and SELF-TUNING on generated
+producing Wiki-Film, using the assembled docu-                     answers for 100 randomly sampled questions from
+ment corpus along with their associated QA pairs.                  the Wiki-bio dataset. This subset includes 56 QA
+                                                                   types in total. Furthermore, we categorize the ques-
+Train-test Splitting. We partition the Wiki-Bio                    tions based on the fact types they contain: (i) the
+and Wiki-Multi datasets, comprising the document                   top-5 most common (accounting for 37%), which
+corpus and the derived QA datasets, into training                  includes birthdate, affiliation, nationality, profes-
+and testing subsets for conducting evaluations in                  sion, and position/sport; (ii) time-related (account-
+single-domain and multi-domain contexts. We di-                    ing for 27%), such as birthdate, event date, and time
+rectly utilize the Wiki-Film dataset as the test set               period; (iii) multiple-facts (accounting for 10%),
+for the cross-domain scenario. It is crucial to note               which ask about more than one fact, for example,
+that the training QA datasets only contain the QA                  inquiring both birth date and place; and we report
+pairs from open-ended generation tasks, ensuring                   the evaluation results separately. We assess the
+a fair comparison with existing knowledge injec-                   factual accuracy using exact match.
+tion approaches. We provide extensive statistical                  Results. As shown in Table 9, we observe that
+information for the three datasets in Table 1 and a                SELF-TUNING consistently outperforms PIT in the
+thorough analysis of the QA types in Appendix Q.                   overall evaluation and the fine-grained evaluations
+                                                                   related to different QA types. These findings under-
+C Evaluation Results on LLAMA2-7B                                  score the importance of equipping the model with
+                                                                   the ability to systematically acquire new knowl-
+To thoroughly assess our proposed SELF-TUNING                      edge. Furthermore, we present a qualitative com-
+method, we compare its efficiency against three                    parison between the answers generated by PIT and
+other notable approaches: standard instruction-                    SELF-TUNING in Appendix E. To gain insights
+tuning without forgetting, PIT++, and mixed train-                 into potential enhancements for SELF-TUNING,
+ing, as shown in Table 7. The evaluation re-                       we also conduct a detailed error analysis on the
+sults, presented in Table 8, demonstrate that SELF-                types of factual errors that remain challenging after
+TUNING consistently outperforms the alternatives.                  implementing SELF-TUNING in Appendix G.
+For instance, it improves EM by 11% in the knowl-
+edge extraction task.                                              E Qualitative Analysis
+
+   Combining the results from Table 8 with the                     In Table 10, we provide a qualitative comparison
+training strategies in Table 7, we emphasize the                   between the answers generated by PIT and SELF-
+importance of first training the model to develop                  TUNING on the Wiki-Bio test set. We observe
+the ability to absorb new knowledge before training                that SELF-TUNING performs better in answering
+on test documents. This finding aligns with the                    questions that inquire about multiple facts and time-
+conclusions of Jiang et al. (2024c).                               related facts, as indicated in the top part of Table
+                                                                   10. Furthermore, as shown in the lower part, PIT
+    8To ensure a fair comparison, all compared approaches          tend to fail to recall and extract facts at the end
+train on the test documents for 3 epochs in total, regardless
+of the number of training stages. For continued pre-training,
+which is observed to struggle in grasping new knowledge, we
+train the models for 5 epochs.
+
+                                                               16
+Method                                                       Training Data in Each Stage
+
+                                  Stage 1                                        Stage 2                Stage 3
+
+Continued Pre-training                                       1 test doc
+Standard Ins.-tuning
+PIT                               1 train doc & test doc                                    2 train QA
+SELF-TUNING
+                                  1 train QA train doc                                      2 test doc
+
+                                  1 train QA & train doc w/ self-teaching tasks 2 train QA & test doc 3 test doc
+
+Variants of SELF-TUNING
+
+SELF-TUNING w/o Review            1 train QA & train doc w/ self-teaching tasks             2 test doc
+SELF-TUNING via Read.
+SELF-TUNING w/ Pre-Review         1 train QA & train doc (reading-comp. format)             2 test doc
+
+                                  1 train QA & train doc w/ self-teaching tasks 2 train QA & train doc 3 test doc
+
+Additional Compared Methods
+
+Standard Ins.-Tuning w/o Forget.  1 train doc & test doc                         2 train QA & test doc
+PIT++
+Mixed Training                    1 train QA                                     2 train QA train doc 3 test doc
+
+                                                         1 train doc & train QA & test doc
+
+Table 7: Depiction of the training stages and associated datasets employed in the compared methods. "Train doc
+
+w/ self-teaching tasks": the training documents presented together with the self-teaching tasks. "Reading-comp.
+format": reading-comprehension format. "Forget.": "Forgetting".8
+
+                                                             F Ablation Study
+
+Figure 4: Ablation analysis exploring the impact of          Setup. We conduct a comprehensive analysis of
+removing comprehension and self-reflection tasks from        how comprehension and self-reflection tasks within
+the self-teaching tasks for knowledge memorization and       the self-teaching tasks contribute to enhancing the
+acquisition. The proportion of each task type among the      LLM's knowledge acquisition ability. We focus on
+self-teaching tasks in the training documents is shown       two vital aspects: knowledge memorization and ex-
+in the upper right corner.                                   traction. Specifically, we calculate the percentage
+                                                             of the constructed examples for each task type and
+of the documents, i.e., suffering from "positional           systematically remove certain tasks to study their
+bias". This observation is consistent with the find-         impacts.
+ings in Saito et al. (2024). Encouragingly, our              Results. In Figure 4, we observe the following: (i)
+proposed SELF-TUNING aids in recalling and ex-               The examples of self-reflection tasks account for
+tracting factual knowledge embedded at the end of            a slightly higher ratio than comprehension tasks
+the documents. These findings align with the au-             among the self-teaching tasks. (ii) Both compre-
+tomatic evaluation results, underscoring the effec-          hension and self-reflection tasks benefit overall
+tiveness of SELF-TUNING in enhancing the LLM's               performance on the knowledge acquisition tasks.
+knowledge acquisition capability, particularly in            Notably, removing the examples of self-reflection
+knowledge extraction.                                        tasks results in a more significant drop in perfor-
+                                                             mance, aligning with its higher percentage over
+                                                             comprehension tasks. These findings confirm the
+                                                             efficacy of the developed SELF-TEACHING strat-
+                                                             egy, underscoring the crucial role of comprehen-
+                                                             sion and self-reflection in learning new knowledge
+                                                             for LLMs.
+
+                                                             G Error Analysis
+
+                                                             In order to gain insights into potential enhance-
+                                                             ments for SELF-TUNING, we outline four common
+                                                             errors that persist as challenges after implementing
+                                                             SELF-TUNING. We offer an in-depth analysis of
+                                                             these errors in Table 11, using EM as the evaluation
+
+                                                         17
+                                       Wiki-Newpages-2023-QA (Acquisition)  NQ (Reten.) CSQA (Reten.)
+
+Method                        Mem.                 Extraction          Reason. Extraction Reasoning
+
+                              PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+                Knowledge Acquisition on Wiki-Newpages-2023-10-Bio (Single-Domain Scenario)
+
+w/o Knowledge Injection       8.41 55.20 31.83 64.48 75.55 62.10 7.96 - -                        -
+Open-book w/ test doc         8.41 4.68 2.87 14.63 16.98 15.07 7.96 16.05 24.67                53.40
+Closed-book
+
+w/ Knowledge Injection
+
+Cont. Pre-training            7.28     6.33 3.62 15.96 18.72    16.11       15.09 16.00 24.11  53.40
+                                       6.94 5.13 19.15 19.05    19.48       39.09 15.72 23.67  51.84
+Standard Ins.-tuning          6.83     9.35 7.09 21.25 21.72    21.51       36.08 16.05 24.88  54.30
+                                       14.03 11.61 27.15 28.86  27.11       11.93 15.72 26.31  57.58
+Standard Ins.-Tuning w/o Forget. 2.82
+                                       22.78 20.06 37.11 37.62  37.06       42.25 16.39 25.67  57.00
+PIT                           2.08     24.13 20.67 38.82 39.95  38.66       55.69 19.33 28.40  58.97
+                                       37.25 31.52 50.83 52.62  50.61       44.31 16.45 25.67  66.01
+PIT++                         1.78
+
+Mixed Training                1.42
+
+SELF-TUNING                   1.11
+
+                Knowledge Acquisition on Wiki-Newpages-2023-10-Multi (Multi-Domain Scenario)
+
+w/o Knowledge Injection       7.84 48.93 26.63 60.37 71.71 58.54 6.33 - -                        -
+Open-book w/ test doc         7.84 4.53 2.73 16.19 18.63 16.38 6.33 16.05 24.67                53.40
+Closed-book
+
+w/ Knowledge Injection        3.32 5.86 3.40 18.04 20.59 18.42              14.51 17.02 25.05  53.56
+Cont. Pre-training            2.73 8.66 5.73 24.94 25.64 25.31              34.91 15.60 26.26  52.74
+Standard Ins.-tuning          1.96 14.31 8.72 30.26 33.97 30.22             10.69 15.55 27.02  55.12
+PIT                           1.13 22.30 16.51 39.94 41.02 39.89            50.65 16.34 25.85  69.29
+SELF-TUNING
+
+        Knowledge Acquisition on Wiki-Newpages-2023-(9)10-Film (Cross-Domain Scenario)
+
+w/o Knowledge Injection       8.30 57.38 34.45 68.64 78.92 66.31 7.35 - -                        -
+Open-book w/ film doc         8.30 3.35 1.88 11.27 12.97 11.49 7.35 16.05 24.67                53.40
+Closed-book
+
+w/ Knowledge Injection        5.52 3.46 2.30 11.83 14.30 11.98              12.04 16.79 25.35  56.02
+Cont. Pre-training            2.83 5.23 3.77 16.15 17.45 16.45              51.69 14.41 25.54  49.80
+Standard Ins.-tuning          1.52 6.39 4.50 16.97 18.92 17.10              3.03 13.06 23.42   54.38
+PIT                           1.10 22.51 16.44 35.58 36.60 35.43            44.92 16.77 26.44  66.34
+SELF-TUNING
+
+Table 8: Five-shot evaluation results on LLAMA2-7B for knowledge acquisition and retention in three scenarios:
+single-domain (top), multi-domain (middle), and cross-domain (bottom). Following (Jiang et al., 2024c), we
+also report results for: (i) closed-book, where base LLMs are prompted with open-ended questions related to
+new knowledge in the test documents, and (ii) open-book w/ test doc, where base LLMs are prompted with
+questions along with relevant gold knowledge snippets from the test documents. Results that fall below the baseline
+performance are highlighted in red.
+
+                         Q&A Types (% EM)                   out the reviewing capability; (2) SELF-TUNING
+                                                            via Read., which displays the training documents
+Method          Total  Top-5  Time-Related  Multiple        in a reading-comprehension format (Cheng et al.,
+                       (37%)      (27%)      (10%)          2024) (an example is shown in Table 28); (3) SELF-
+                                                            TUNING w/ Pre-Review, which trains on a com-
+PIT             7.00 10.81    3.70            0             bination of training documents and training QA in
+                              40.74         20.00           the second stage, before training on test documents.
+SELF-TUNING 32.00 37.84                                     Results. In Table 12, despite having lower perfor-
+                                                            mance than SELF-TUNING, all variations signifi-
+Table 9: Fine-grained evaluation results on the open-       cantly enhance the model's ability for knowledge
+ended generation task, using the Wiki-Bio test dataset      acquisition compared to continued pre-training,
+concerning the fact types of QA pairs.                      which further validates the effectiveness of SELF-
+                                                            TUNING in improving knowledge acquisition.
+metric.                                                     Reviewing QA ability aids in both knowledge
+                                                            acquisition and retention. Compared to SELF-
+H Evaluation Results on SELF-TUNING                         TUNING, SELF-TUNING w/o Review also displays
+     Variants                                               inferior performance on the knowledge retention
+                                                            task.
+Setup. To further investigate the effectiveness of
+SELF-TUNING, we present three variants, as de-
+picted in Table 7: (1) SELF-TUNING w/o Review,
+where we continue training on test documents with-
+
+                                                        18
+  Case study 1: Questions requesting information on multiple facts.
+
+  Document: <Helmut Moritz - Wikipedia> Helmut Moritz (1 November 1933 - 21 October 2022) was an Austrian
+  physical geodesist. He was a member of the Austrian Academy of Sciences and of many other international
+  academies and societies. He became internationally known with a fundamental work on Error propagation in
+  Geodesy. From 1991 to 1995, he was president of the International Union of Geodesy and Geophysics (IUGG).
+  Question: When was Helmut Moritz born and when did he pass away?
+  Gold Answer: Born on November 1, 1933, passed away on October 21, 2022.
+  Model Answers
+
+  PIT's Answer: Information not provided.
+
+  SELF-TUNING's Answer: Born on november 1, 1933, passed away on october 21, 2022.
+
+  Case study 2: Questions inquiring about time-related details.
+
+  Document: <Brad Smiley - Wikipedia> Brad Smiley (born June 19, 1973) is an American college football
+  coach. He is the head football coach for Southern Arkansas University; a position he has held since 2022. He
+  also was the head coach for Trinity Valley Community College from 2007 to 2017. He also coached for Baylor,
+  Northwestern State, and Tulane.
+  Question: Since when has Brad Smiley been the head football coach for Southern Arkansas University?
+  Gold Answer: Since 2022.
+  Model Answers
+
+  PIT's Answer: Since 2016.
+  SELF-TUNING's Answer: Since 2022.
+
+  Case study 3: Questions inquiring about facts encoded in the end of the document, i.e., "positional bias".
+
+  Document: <Nathan Saliba - Wikipedia> Nathan-Dylan Saliba (born February 7, 2004) is a Canadian profes-
+  sional soccer player who plays for Major League Soccer club CF Montréal.
+   Question: Which Major League Soccer club does Nathan Saliba play for?
+  Gold Answer: CF Montréal.
+  Model Answers
+
+  PIT's Answer: San jose earthquakes.
+
+  SELF-TUNING's Answer: CF Montréal.
+
+Table 10: Qualitative analyses comparing the answers produced by PIT and SELF-TUNING on the open-ended
+generation task using the Wiki-Newpages-2023-10-Bio test dataset. The false answers and correct answers are
+highlighted in red and blue , respectively.
+
+I Evaluation Results on LLAMA2-13B in                   TUNING, suggesting the potential and robustness
+    the Single-domain Scenario                          of SELF-TUNING for applications on larger-scale
+                                                        models.
+Table 13 presents the evaluation results on
+LLAMA2-13B concerning knowledge acquisition             Continued pre-training for knowledge acquisi-
+and retention in the single-domain scenario using       tion proves challenging across all three dimen-
+the Wiki-Bio dataset. We make the following ob-         sions. We find that continuing pre-training on new
+servations:                                             documents may result in a decline in knowledge
+SELF-TUNING consistently demonstrates su-               extraction performance on LLAMA2-13B, com-
+perior performance in enhancing the model's             pared to the baseline performance. This could be
+knowledge acquisition and retention abilities as        due to the fact that merely continuing pre-training
+the model size scales. As the model size scales,        might adversely affect its question-answering ca-
+SELF-TUNING continues to achieve the highest            pability, even when equipped with new knowledge,
+performance across all evaluation metrics on mem-       as demonstrated by the lowered PPL. This observa-
+orization and acquisition tasks, consistently out-      tion is consistent with the findings in Cheng et al.
+performing the compared methods by a signifi-           (2024). Moreover, the marginal improvements in
+cant margin (e.g., improving EM score by 20%            memorization (reducing PPL by 2%) and reasoning
+on the extraction task). On the reasoning task,         (increasing accuracy by 2%) suggest that such a
+SELF-TUNING consistently attains high accuracy.         naive approach fails to help the model memorize
+Additionally, SELF-TUNING consistently exhibits         and capitalize on new knowledge. This highlights
+strong performance on knowledge retention tasks.        the importance of evaluating the model's knowl-
+These findings confirm the effectiveness of SELF-       edge acquisition ability comprehensively across
+
+                                                    19
+multiple dimensions.                                       achieves the best performance, significantly out-
+                                                           performing the baseline methods by a substantial
+J Evaluation Results on                                    margin. This observation aligns with the results
+    LLAMA2-7B-CHAT in the                                  reported across all other evaluation scenarios in
+    Single-domain Scenario                                 Section 5.6.
+
+In this section, we showcase the evaluation out-           M Evaluation Results with Continual
+comes for LLAMA2-7B-CHAT in Table 14. We                        Learning Techniques
+find that even after extensive instruction-following
+training (Ouyang et al., 2022a), LLAMA2-7B-                This section explores the potential of integrating
+CHAT faces difficulty in extracting newly acquired         SELF-TUNING with continual learning techniques.
+knowledge after simply continuing pre-training on          Table 16 presents the evaluation results of com-
+test documents. Almost all high-performing ap-             bining SELF-TUNING with a representative con-
+proaches struggle with knowledge retention, in-            tinual learning strategy: the replay-based method.
+dicating that to incorporate new knowledge, it is          In this approach, 500 training QA pairs were ran-
+preferable to train a base model rather than the ver-      domly sampled from the Wiki QA datasets, curated
+sion fine-tuned via RLHF (reinforcement learning           prior to the pre-training cutoff date of LLAMA2-
+from human feedback) (Ouyang et al., 2022a), de-           7B (Zhang et al., 2024d). These QA pairs were
+spite its remarkable instruction-following capabil-        included throughout the training process to rein-
+ity. More significantly, SELF-TUNING consistently          force general domain knowledge.
+surpasses all other compared methods by a con-
+siderable margin on knowledge acquisition tasks.              The evaluation results on MCQA and NQ con-
+These promising outcomes further validate the ef-          firm that SELF-TUNING effectively preserves pre-
+fectiveness of SELF-TUNING. The results imply              viously acquired knowledge. Moreover, integrat-
+a potential foundation for exploring the domain            ing SELF-TUNING with replay-based continual
+of enhancing knowledge acquisition for various             learning (SELF-TUNING+Replay) further enhances
+models.                                                    model performance, demonstrating the following
+                                                           benefits:
+K Training Efficiency Analysis
+
+To ensure a fair comparison, all methods for knowl-        1. Effective knowledge acquisition: The model
+edge injection presented in Table 3 were trained              successfully learns new knowledge from pre-
+on raw test documents for 3 epochs, as detailed               viously unseen raw documents. This aligns
+in Appendix S. Additionally, we conducted a de-               with findings in Appendix H, which highlight
+tailed analysis of training efficiency on the Wiki-           that the reviewing QA ability facilitates knowl-
+Newpages-2023-Bio dataset using 8 Tesla V100                  edge acquisition.
+GPUs (32G) with LLAMA2-7B:
+
+· Continued pre-training: 112.91 seconds                   2. Efficient knowledge retention: The replay-
+· Standard instruction-tuning: 1661.06 seconds                based approach ensures that previously
+· PIT: 6205.52 seconds                                        learned knowledge is preserved, mitigating
+· SELF-TUNING: 5220.50 seconds                                catastrophic forgetting during the learning of
+                                                              new tasks.
+
+   Our SELF-TUNING significantly outperforms                  These findings underscore the significant po-
+the most competitive baseline, PIT, on the knowl-          tential of integrating SELF-TUNING with contin-
+edge acquisition task and is more time-efficient.          ual learning techniques. By combining SELF-
+                                                           TUNING's strengths with replay-based strategies,
+L Evaluation Results on Gemma-7B in                        the model not only excels in acquiring new knowl-
+     the Single-Domain Scenario                            edge but also maintains strong retention of existing
+                                                           information, making this approach an effective so-
+We present the evaluation results for Gemma-7B in          lution for long-term knowledge management.
+Table 15. Our SELF-TUNING method consistently
+
+                                                       20
+N Evaluation Results Comparing with a                       R Detailed Templates used in the
+     Baseline Utilizing Document-Based QA                        SELF-TEACHING Strategy
+     Generation on Test Corpora
+                                                            We provide the detailed templates employed in the
+Constructing QA data for every newly introduced             SELF-TEACHING strategy in Table 21 and a com-
+raw corpus is infeasible in real-world scenarios            plete example of a training document accompanied
+due to cost and scalability constraints. Our goal           by its associated SELF-TEACHING tasks in Table
+is to enable the model to autonomously acquire              22.
+new knowledge from previously unseen raw test
+documents. Therefore, approaches that rely on               S Datasets and Evaluation Metrics
+constructing and training on QA pairs specifically
+tailored to test documents, as explored in prior stud-      Evaluation on Knowledge Acquisition. We as-
+ies (Mecklenburg et al., 2024; Jiang et al., 2024a),        sess the effectiveness of SELF-TUNING in enhanc-
+are not aligned with the objectives of this work.           ing the model's knowledge acquisition capabilities
+                                                            on the curated Wiki-Newpages-QA datasets, con-
+   Nevertheless, for completeness and to provide            centrating on memorization, extraction, and rea-
+additional context, we include the results of a base-       soning. (i) For memorization, we utilize test docu-
+line that simultaneously trains on test documents           ment datasets and report perplexity (Jelinek et al.,
+and QA pairs generated using our proposed SELF-             1977), which measures how well a language model
+TEACHING strategy.                                          predicts a text sample. (ii) For extraction, we em-
+                                                            ploy test QA datasets for open-ended generation
+   As presented in Table 17, SELF-TUNING con-               tasks. To evaluate the factual accuracy of the gen-
+sistently demonstrates superior performance. This           erated responses, we use exact match (EM), Re-
+comparison highlights the significant advantages of         call, and F1 over words in the answer(s), following
+our approach in fostering autonomous knowledge              Kwiatkowski et al. (2019). Additionally, we re-
+acquisition without depending on pre-constructed            port Rouge-L (Lin, 2004) to measure the overlap of
+QA pairs tailored to the test data.                         n-grams between the generated and gold answers,
+                                                            accounting for minor lexical variations, following
+O In-depth Sample Documents and                             Jiang et al. (2024c). We also assess accuracy by
+     Corresponding QA Pairs for                             comparing each response's factual correctness to
+     Open-Ended Generation and Natural                      the gold answer, using the bidirectional entailment
+     Language Inference Tasks                               approach with the Deberta-Large-MNLI model (He
+                                                            et al., 2021). We report the five-shot evaluation re-
+We present detailed sample documents along with             sults on the open-ended generation tasks using the
+their corresponding QA pairs for open-ended gener-          prompt in Table 25. (iii) Concerning reasoning,
+ation and natural language inference tasks in Table         we utilize the test QA datasets for NLI tasks and
+18 and Table 19, respectively.                              report the accuracy by comparing the generated
+                                                            option with the gold option using EM. We present
+P Token Count Distribution for the                          the zero-shot evaluation results on NLI tasks.
+     Open-ended Generation Task Across
+     the Three Datasets                                     Evaluation on Knowledge Retention. It is well-
+                                                            known that knowledge acquisition is often accom-
+The distribution of token counts for the open-ended         panied by catastrophic forgetting (Allen-Zhu and
+generation task across the three datasets is depicted       Li, 2023; Wang et al., 2023). Therefore, we also
+in Figure 5, Figure 6, and Figure 7, respectively.          provide the knowledge retention performance for
+                                                            a comprehensive investigation. Specifically, (i)
+Q Examination of QA Types in                                we verify the knowledge extraction performance
+     Open-ended Generation QA Datasets                      on world knowledge using natural questions (NQ)
+                                                            (Kwiatkowski et al., 2019) (i.e., NQ-open (Min
+We perform a detailed analysis of the QA types              et al., 2021) in the closed-book setting) and re-
+associated with the factual information in the open-        port EM and F1 scores. We report the five-shot
+ended generation QA datasets, as displayed in Ta-           evaluation results using the first five QA pairs in
+ble 20, by using the prompt in Table 26 with GPT-4.         the dev sets as prompts. (ii) we assess the reason-
+
+                                                        21
+Percentage (%)33221140505050500             document           Percentage (%)30       question            Percentage (%)30   answer
+                                 50 10#0 T1o5k0en2s00 250 300                25                                         25
+                                                                             20                                         20
+                                                                             15                                         15
+                                                                             10                                         10
+                                                                               5                                          5
+                                                                               00 5 10# To1k5en2s0 25 30                  00 5 10# To1k5en2s0 25 30
+
+                                 (a) Document length.                             (b) Question length.                       (c) Answer length.
+
+Figure 5: Distribution histogram of the token count in a document, a question, and an answer for the open-ended
+generation task from the Wiki-Newpages-2023-10-Bio dataset, respectively.
+
+Percentage (%)33221415500005050             document           Percentage (%)30       question            Percentage (%)30   answer
+                                 50 10#0 T1o5k0en2s00 250 300                25                                         25
+                                                                             20                                         20
+                                                                             15                                         15
+                                                                             10                                         10
+                                                                               5                                          5
+                                                                               00 5 10# To1k5en2s0 25 30                  00 5 10# To1k5en2s0 25 30
+
+                                 (a) Document length.                             (b) Question length.                       (c) Answer length.
+
+Figure 6: Distribution histogram of the token count in a document, a question, and an answer for the open-ended
+generation task from the Wiki-Newpages-2023-10-Multi dataset, respectively.
+
+Percentage (%)23412315005050500             document           Percentage (%)30       question            Percentage (%)30   answer
+                                 50 10#0 T1o5k0en2s00 250 300                25                                         25
+                                                                             20                                         20
+                                                                             15                                         15
+                                                                             10                                         10
+                                                                               5                                          5
+                                                                               00 5 10# To1k5en2s0 25 30                  00 5 10# To1k5en2s0 25 30
+
+                                 (a) Document length.                             (b) Question length.                       (c) Answer length.
+
+Figure 7: Distribution histogram of the token count in a document, a question, and an answer for the open-ended
+generation task from the Wiki-Newpages-2023-(9)10-Film dataset, respectively.
+
+ing capability on Commonsense knowledge using                                         stage, as evidenced by Touvron et al. (2023a).
+CommonsenseQA (CSQA) (Talmor et al., 2019),
+employing accuracy to assess the correctness of the                                   T Implementation Details
+selected option, calculated by comparing the gener-
+ated option against the gold option using EM. We                                      Training Details. We utilize LLAMA2-7B for
+present the five-shot performance on the dev sets,                                    our investigation and provide analyses on Qwen2-
+as the test set does not contain golden annotations,                                  7B, Mistral-7B-v0.1, Gemma-7B, LLAMA2-13B,
+and use the first five multi-choice QA pairs in the                                   and LLAMA2-7B-CHAT for a comprehensive un-
+training set as prompts. We use these two datasets                                    derstanding. We use the following training objec-
+because they were curated before the cut-off time                                     tives: (i) for training on document data DDoc, we
+of LLAMA2 family models (i.e., year 2022), mak-                                       compute the standard next-token prediction loss
+ing it likely that the models have obtained relevant                                  by averaging over all tokens in the document d
+knowledge in these datasets during the pre-training                                   (Equation 4); (ii) for training on QA data DQA, we
+                                                                                      compute the average negative log-likelihood loss
+
+                                                                                  22
+          Gist Iden.              Sum.                        · SELF-TUNING (ours) first trains on DtQraAin and
+                                                                DtDraoicn with the created instruction-following
+NLI                    8.8% 8.8%                                dataset DtSrealifn (in the QA format) using the
+                                                                SELF-TEACHING strategy for 2 epochs, then
+          24.2%                 16.5%     Sen. Comp.            continues training on DtDeostc data while review-
+                                                                ing the DtQraAin data for 1 epoch, and finally
+          8.8%                  10.8%                           continues training on DtDeostc data for 2 epochs.
+                                                                In addition, we provide the percentage of
+"Teach."            8.8% 13.5%            MCQA
+                                                                SELF-TEACHING task examples on training
+          "Flash."              Fill-in.
+                                                                documents in Wiki-Newpages-2023-10-Bio
+
+                                                                dataset in Figure 8.
+
+Figure 8: The percentage of constructed examples of              Specifically, in the cross-domain setting, where
+each task type in the self-teaching tasks on training         there is a substantial difference between the do-
+documents in Wiki-Newpages-2023-10-Bio dataset.               mains of the training data and test documents, we
+                                                              continue training on DtDeostc data while reviewing the
+only on tokens in the answer a given the question q           DtQraAin data for 2 epochs after the initial training
+(Equation 5), where |d| and |a| refer to the length           stage, followed by further training on DtDeostc data for
+of the tokenized document sequence and answer                 1 epoch. Furthermore, we adopt the same training
+sequence, respectively.                                       strategy when dealing with LLAMA2-7B-CHAT,
+                                                              where the process of knowledge injection poses a
+(DDoc)    =         -  1       log p (dt | d<t )              significant challenge, as demonstrated by our ex-
+ L                     |d|                           (4)      perimental results. In accordance with Jiang et al.
+                                                              (2024c), for PIT and SELF-TUNING, we include
+                            t                                 64 examples and 128 examples randomly sampled
+                                                              from DtQraAin datasets, respectively, during the final
+(DQA)     =         -  1       log p (at | q, a<t )           training stages when solely training on the DtDeostc
+ L                     |a|                           (5)      data, to prevent the model from losing its question-
+                                                              answering capabilities. It is important to note that
+                            t                                 all evaluation results are reported at the temperature
+                                                              T = 1.
+   We train LLAMA2-7B, Qwen2-7B, Mistral-7B-
+v0.1, Gemma-7B, and LLAMA2-7B-CHAT on 8                       Training Details for SELF-TUNING Variants.
+32GB Tesla V100 GPUs using a batch size of 8
+and a learning rate of 5e-6. Additionally, we train              · SELF-TUNING w/o Review first trains on
+LLAMA2-13B on 8 A100-SXM4-40GB GPUs                                 DtQraAin and DtDraoicn with the created instruction-
+with a batch size of 8 and a learning rate of 5e-                   following dataset DtSrealifn (in the QA format)
+6. To ensure a fair comparison, all compared ap-                    using the SELF-TEACHING strategy for 2
+proaches train on the test documents for 3 epochs                   epochs, then continues training on DtDeostc data
+in total, regardless of the number of training stages.              for 3 epochs.
+For continued pre-training, which is observed to
+struggle in grasping new knowledge, we train the                 · SELF-TUNING via Read. initially trains on
+models for 5 epochs. The specific number of train-                  DtQraAin and DtDraoicn (in the read-comprehension
+ing epochs used for each approach in Table 7 are                    format, as shown in Table 28 for 3 epochs,
+as follows:                                                         then trains on the DtDeostc data for 3 epochs.
+
+· Continued Pre-training trains the model on                     · SELF-TUNING w/ Pre-Review first trains on
+  the DtDeostc dataset for 5 epochs.                                DtQraAin and DtDraoicn with the created instruction-
+                                                                    following dataset DtSrealifn (in the QA format)
+· Standard Instruction-tuning first trains on                       using the SELF-TEACHING strategy for 2
+  both DtDraoicn and DtDeostc datasets, then fine-tunes             epochs, then continues training on DtDraoicn and
+  on DtQraAin dataset for 3 epochs.                                 DtQraAin data for 1 epoch, and finally continues
+                                                                    training on DtDeostc data for 3 epochs.
+· PIT (Jiang et al., 2024c) first trains on DtQraAin
+  and DtDraoicn datasets for 3 epochs, positioning
+  the QA pairs right before the corresponding
+  document texts, then trains on the DtDeostc data
+  for 3 epochs.
+
+                                                          23
+Training Details for Additional Compared Meth-                  Appendix B, to create a new question-answering
+ods.                                                            dataset for an open-ended generation task. This
+                                                                resulted in a test set, named WikiBio-2024, com-
+   · Standard Instruction-Tuning w/o Forget-                    prising 146 documents and a total of 827 QA pairs.
+      ting initially trains on the mixture of DtDraoicn
+      and DtDeostc for 3 epochs, then on DtQraAin and           U.2 Evaluation on Varied Corpora
+      DtDeostc datasets for 1 epoch.
+                                                                For the evaluation using varied corpora, we uti-
+   · PIT++ (Jiang et al., 2024c) initially trains               lized the news data collected by Tang and Yang
+      on DtQraAin for 1 epoch, then on DtQraAin and             (2024) using the mediastack API9. Specifically, this
+      DtDraoicn datasets for 3 epochs, with the QA pairs        dataset includes articles published from September
+      placed right before the corresponding docu-               26, 2023, to December 26, 2023, which is beyond
+      ment texts, and finally, it trains on the DtDeostc        the pre-training cutoff time of LLAMA2-7B. The
+      data for 3 epochs.                                        dataset covers a range of news categories, such as
+                                                                entertainment, business, technology, and science.
+   · Mixed Training trains on mixture of the
+      DtDraoicn, DtDeostc and DtQraAin datasets simultane-         For each factual sentence extracted from the orig-
+      ously for 3 epochs.                                       inal articles by Tang and Yang (2024), we concate-
+                                                                nated the article title with the fact to create a knowl-
+   Future research could explore the inclusion                  edge snippet. Following Tang and Yang (2024), we
+of segments from general domain datasets,                       used GPT-4o (OpenAI, 2024) (version dated 2024-
+such as Wiki data (Zhang et al., 2024d) and                     02-01) to first paraphrase these snippets to make
+the Massive Multitask Language Understanding                    them clearer and more concise, and then gener-
+(MMLU) (Hendrycks et al., 2021), which were                     ate relevant QA pairs. The prompt utilized can
+compiled prior to the pre-training cut-off date.                be found in Table 27. Using the data construction
+Adopting this strategy may improve the model's ca-              pipeline described in Appendix B, we generated a
+pacity to retain learned knowledge and skills while             new training set, i.e., WebNews-2023, consisting
+reducing the risk of overfitting to novel informa-              of 1,800 training documents and 6,038 QA pairs,
+tion. In our current study, we deliberately avoid               as well as a testing set with 400 testing documents
+integrating extra data to ensure a precise assess-              and 1,350 QA pairs.
+ment of knowledge injection, thereby preventing
+any biases that might arise from the inclusion of               V A Sample Training Document in the
+additional sources.                                                  Reading-Comprehension Format
+
+Prompts Employed in this Study. The prompts                     Drawing inspiration from Cheng et al. (2024), we
+used for constructing the QA datasets for open-                 restructure the training document in the reading-
+ended generation and NLI tasks are presented in                 comprehension text format. Each raw text is en-
+Table 23 and Table 24, respectively. The prompt                 riched with a series of tasks related to its content,
+used during the evaluation process is displayed in              constructed using our proposed SELF-TEACHING
+Table 25. The prompt used by GPT-4 for annotating               strategy. An example of a training document is
+QA types in the open-ended generation tasks of the              provided in Table 28.
+Wiki-Newpages-2023-QA datasets is presented in
+Table 26.
+
+U Implementation Details of Evaluation
+     on Varying Models and Corpora
+
+U.1 Evaluation on Different Models                              9https://mediastack.com/
+
+For the evaluation using different models, specifi-
+cally Qwen2-7B (Yang et al., 2024), we collected
+articles published on Wikipedia NewPages from
+June 2024 to September 2024 to minimize overlap
+with the pre-training corpus. We randomly selected
+146 biographies from the collected articles, fol-
+lowing the data construction pipeline described in
+
+                                                            24
+Type         Fraction                                          Example
+                           Document                        Question
+                                                                                Gold Answer Model Answer
+
+Wrong an- 76.47%     <Jalen Mack - Wikipedia> Jalen        Which team           Tamayo          Venturini motor-
+swer                 Mack (born August 5, 2005) is         does Jalen Mack      Cosentino       sports.
+                     an American professional stock car    drive for in the     Racing.
+                     racing driver who competes part-      ARCA Menards
+                     time in the ARCA Menards Se-          Series and ARCA
+                     ries and ARCA Menards Series          Menards Series
+                     East, driving the No. 43 Chevro-      East?
+
+                     let for Tamayo Cosentino Racing .
+
+                     He also competes part time in the
+                     ARCA Menards Series West, driv-
+                     ing the No. 83 Chevrolet for Mack
+                     Motorsports in conjunction with Bill
+                     McAnally Racing.
+
+Higher       7.35%   <Andriyko Olha Fedorivna -            What are An-         Doctor of Law,  Doctor     of
+                     Wikipedia> Andriyko Olha Fe-          driyko Olha          Professor.
+granularity          dorivna (born January 28, 1945,       Fedorivna's                          law, professor,
+                     Voronkiv, Kyiv region) is a           academic and
+                                                           professional                         head of the
+                      Doctor of Law, Professor , Head      titles?
+                                                                                                department of
+                     of the Department of Constitutional,
+                     Administrative and Financial Law                                           constitutional,
+                     of the Kyiv University of Law of
+                     the National Academy of Sciences                                           administrative,
+                     of Ukraine, and Deputy Head of
+                     the Department of State and Legal                                          and financial
+                     Problems of Management of the V.
+                     M. Koretsky Institute of State and                                         law of the kyiv
+                     Law of the National Academy of
+                     Sciences of Ukraine.                                                       university of
+
+                                                                                                law of the na-
+
+                                                                                                tional academy
+
+                                                                                                of sciences of
+
+                                                                                                ukraine.
+
+Lower gran- 5.88%    <Mike Babcock (American foot-         Since when has       Since 2013.     2013.
+ularity              ball) - Wikipedia> Michael Bab-       Mike Babcock
+                     cock (born February 13, 1979) is an   (American foot-
+                     American college football coach. He   ball) held the head
+                     is the head football coach for McK-   coach position
+                     endree University; a position he has  at McKendree
+                                                           University?
+                     held since 2013 . He also coached
+                     for UCLA, Colorado, San Diego,
+                     and CSU Pueblo. He played college
+                     football for UCLA as a linebacker.
+
+Paraphrase   10.29%  <Lil Tay - Wikipedia> Tay Tian        What is Lil Tay's    American-born   Canadian-
+                     (born July 29, 2009), known           nationality?         Canadian.       American.
+                     professionally as Lil Tay, is an
+
+                      American-born Canadian internet
+                     personality and singer. In 2018, she
+                     gained prominence online for a pe-
+                     riod of three months, proclaiming
+                     herself to be the "youngest flexer
+                     of the century". During her brief
+                     career, she posted rap videos on
+                     YouTube and Instagram which gar-
+                     nered tens of millions of views. Her
+                     career ended in mid-2018, after her
+                     father applied to the superior court
+                     of Canada for full custody and con-
+                     trol of her career. According to
+                     court documents, he was abusive
+                     and largely an absentee.
+
+Table 11: Analysis on the types of factual errors that remain challenging after applying SELF-TUNING.
+
+                                     25
+                                Wiki-Newpages-2023-10-Bio (Acquisition)             NQ (Reten.) CSQA (Reten.)
+
+Method                   Mem.                       Extraction               Reason. Extraction Reasoning
+
+                         PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+Continued Pre-training   7.28         4.68   2.87 14.63    16.98  15.07      7.96   16.05 24.67  53.40
+
+SELF-TUNING w/o Review 1.26           28.36  23.68 41.29   41.93  41.11      50.40  15.55 24.20  65.11
+                                      20.97  17.65 34.54   39.19  34.55      39.37  18.43 27.99  62.74
+SELF-TUNING via Read.    1.46         29.86  25.94 43.46   44.96  43.31      46.91  16.28 24.80  65.11
+                                      37.25  31.52 50.83   52.62  50.61      44.31  16.45 25.67  66.01
+SELF-TUNING w/ Pre-Review 1.28
+
+SELF-TUNING              1.11
+
+Table 12: Five-shot evaluation results of the SELF-TUNING variants on LLAMA2-7B in the single-domain scenario.
+Results that fall below the baseline closed-book performance (previously shown in Table 3) are highlighted in red.
+
+                               Wiki-Newpages-2023-10-Bio (Acquisition)              NQ (Reten.) CSQA (Reten.)
+
+Method                  Memorization                Extraction               Reason. Extraction Reasoning
+
+                         PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+                                             LLAMA2-13B
+
+w/o Knowledge Injection
+
+Open-book w/ test doc 8.27            58.97 37.41 70.38 78.64 68.09 3.57 - -                       -
+                                      6.33 4.68 17.45 19.37 17.58 3.57 19.84 28.71               66.34
+Closed-book              8.27
+
+w/ Knowledge Injection
+
+Con. Pre-training        6.35         4.98 3.77 17.12 18.95       17.04      5.49   21.25 30.35  66.34
+                                      12.67 10.11 26.79 27.42     27.00      52.43  19.95 30.95  65.77
+Standard Ins.-tuning     3.00         22.93 19.61 36.50 36.99     36.25      59.40  19.05 31.02  70.93
+                                      44.19 39.37 58.31 60.47     57.90      54.18  20.69 31.62  71.50
+PIT                      1.70
+
+SELF-TUNING              1.09
+
+Table 13: Five-shot evaluation results on LLAMA2-13B for knowledge acquisition and retention in the single-
+domain scenario. Results that are inferior to closed-book performance without knowledge injection are indicated in
+red.
+
+                               Wiki-Newpages-2023-10-Bio (Acquisition)              NQ (Reten.) CSQA (Reten.)
+
+Method                  Memorization                Extraction               Reason. Extraction Reasoning
+
+                         PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+                                             LLAMA2-7B-CHAT
+
+w/o Knowledge Injection
+
+Open-book w/ test doc 12.36           71.34 43.74 75.11 88.38 73.74 31.14 - -                      -
+                                      5.58 4.07 16.05 17.63 16.19 31.14 18.20 26.84              67.16
+Closed-book              12.36
+
+w/ Knowledge Injection
+
+Con. Pre-training        8.12         5.73 3.32 15.89 18.60       15.81      24.83  18.32 27.01  65.19
+                                      12.67 10.56 25.13 25.41     25.38      67.76  14.81 23.72  58.07
+Standard Ins.-tuning     2.99         15.54 13.12 29.03 29.47     29.45      39.51  14.92 23.38  62.33
+                                      33.03 29.41 46.94 47.90     47.00      72.29  13.57 22.28  64.21
+PIT                      1.85
+
+SELF-TUNING              1.10
+
+Table 14: Five-shot evaluation results on LLAMA2-7B-CHAT for knowledge acquisition and retention in the
+single-domain scenario. Results that are inferior to closed-book performance without knowledge injection are
+indicated in red.
+
+             Method                                             Knowledge Acquisition
+                                             PPL () % Acc. % EM % F1 % Recall % Rouge
+
+             w/o Knowledge Injection         12.41 7.09 4.68 17.60 18.10            17.65
+             Closed-book
+
+             w/ Knowledge Injection          3.99   8.14        6.33 19.91   20.97  19.82
+             Continued Pre-training          10.13  10.41       8.60 24.06   23.86  24.16
+             Standard Instruction-tuning     4.19   8.14        5.88 20.87   20.78  20.68
+             PIT                             1.09   41.93       36.80 56.95  57.41  56.30
+             Self-Tuning
+
+Table 15: Evaluation results of different methods applied to Gemma-7B on the Wiki-Newpages-2023-Bio dataset.
+
+                                                    26
+                               Wiki-Newpages-2023-QA (Acquisition)     NQ (Reten.) CSQA (Reten.)
+
+Method                   Memorization  Extraction                      Reason. Extraction Reasoning
+
+                         PPL () % Acc. % EM % F1 % Rec. % Rouge % Acc. % EM % F1 % Acc.
+
+             Knowledge Acquisition on Wiki-Newpages-2023-10-Bio (Single-Domain Scenario)
+
+w/o Knowledge Injection
+
+Open-book w/ test doc    8.41          55.20 31.83 64.48 75.55 62.10 7.96 - -               -
+                                       4.68 2.87 14.63 16.98 15.07 7.96 16.05 24.67       53.40
+Closed-book              8.41
+
+w/ Knowledge Injection
+
+PIT                      2.08          14.03 11.61 27.15 28.86  27.11  11.93 15.72 26.31  57.58
+                                       37.25 31.52 50.83 52.62  50.61  44.31 16.45 25.67  66.01
+SELF-TUNING              1.11          44.49 39.82 58.44 60.58  58.00  56.24 22.67 33.86  73.55
+
+SELF-TUNING+Replay       1.03
+
+Table 16: Five-shot evaluation results of LLAMA2-7B combined with continual learning techniques for knowledge
+acquisition and retention in the single-domain scenario.
+
+             Method                     Knowledge Acquisition (Wiki-Newpages-2023-Bio)
+                                       PPL () % Acc. % EM % F1 % Recall % Rouge
+
+             w/o Knowledge Injection   8.41 55.20 31.83 64.48 75.55           62.10
+             Open-book w/ test doc     8.41 4.68 2.87 14.63 16.98             15.07
+             Closed-book
+
+             w/ Knowledge Injection
+
+             Continued Pre-training    7.28         6.33 3.62 15.96    18.72  16.11
+                                                    15.84 12.07 28.58  31.06  28.07
+             Training on test doc w/ QA pairs 1.08  37.25 31.52 50.83  52.62  50.61
+
+             SELF-TUNING               1.11
+
+Table 17: Evaluation results comparing SELF-TUNING to training on test documents with constructed QA pairs
+using LLAMA2-7B for knowledge acquisition on the Wiki-Newpages-2023-Bio dataset.
+
+                                                    27
+  Sample document and associated QA pairs for open-ended generation tasks
+
+  Dataset: Wiki-Newpages-2023-10-Bio
+
+  Document: <Helmut Moritz - Wikipedia> Helmut Moritz (1 November 1933 - 21 October 2022) was an Austrian
+  physical geodesist. He was a member of the Austrian Academy of Sciences and of many other international
+  academies and societies. He became internationally known with a fundamental work on Error propagation in
+  Geodesy. From 1991 to 1995, he was president of the International Union of Geodesy and Geophysics (IUGG).
+
+  Question: When was Helmut Moritz born and when did he pass away?
+  Answer: Born on November 1, 1933, passed away on October 21, 2022.
+  Question: What was Helmut Moritz's profession?
+  Answer: Austrian physical geodesist.
+  Question: Which academies and societies was Helmut Moritz a member of?
+  Answer: Austrian Academy of Sciences, many other international academies, and societies.
+  Question: What work made Helmut Moritz internationally known?
+  Answer: A fundamental work on Error propagation in Geodesy.
+  Question: What position did Helmut Moritz hold from 1991 to 1995?
+  Answer: President of the International Union of Geodesy and Geophysics (IUGG).
+
+  Dataset: Wiki-Newpages-2023-10-Multi
+
+  Document: <2018 California Proposition 71 - Wikipedia> Proposition 71, also known as Prop 71, was a
+  California ballot proposition and proposed state constitution amendment to change the effective date of passed
+  ballot measures from the day after the election to the fifth day after the Secretary of State certified the results.\n\n
+  Stated goals of the measure was to ensure results were official before new measures were implemented. Opposers
+  fearing a delay in urgent measures. Kevin Mullin supported the amendment. The California Democratic Party
+  endorsed the amendment. Rural County Representatives of California also endorsed the amendment.
+
+  Question: What was the 2018 California Proposition 71, also known as Prop 71?
+  Answer: A California ballot proposition, proposed state constitution amendment, change effective date of
+  passed ballot measures.
+  Question: What was the proposed change in the effective date of passed ballot measures in the 2018 California
+  Proposition 71?
+  Answer: From the day after the election, to the fifth day after the Secretary of State certified the results.
+  Question: What were the stated goals of the 2018 California Proposition 71?
+  Answer: To ensure results were official before new measures were implemented.
+  Question: What concern did opposers of the 2018 California Proposition 71 have?
+  Answer: A delay in urgent measures.
+  Question: Who supported the 2018 California Proposition 71 amendment?
+  Answer: Kevin Mullin.
+  Question: Which organizations endorsed the 2018 California Proposition 71 amendment?
+  Answer: The California Democratic Party, Rural County Representatives of California.
+
+  Dataset: Wiki-Newpages-2023-(9)10-Film
+
+  Document: <Krazy House (film) - Wikipedia> Krazy House is an upcoming Dutch comedy film. It is written,
+  directed, and co-produced by Steffen Haars and Flip van der Kuil in their English-language feature debut. Shot
+  on location in Amsterdam, the film stars Nick Frost, Kevin Connolly and Alicia Silverstone. Maarten Swart is
+  producer for Kaap Holland Films.
+
+  Question: What is Krazy House (film)?
+  Answer: An upcoming Dutch comedy film.
+  Question: Who are the writers, directors, and co-producers of Krazy House (film)?
+  Answer: Steffen Haars, Flip van der Kuil.
+  Question: What is significant about Steffen Haars and Flip van der Kuil's involvement in Krazy House (film)?
+  Answer: It is their English-language feature debut.
+  Question: Where was Krazy House (film) shot?
+  Answer: On location in Amsterdam.
+  Question: Who is the producer of Krazy House (film) and which production company is involved?
+  Answer: Maarten Swart, Kaap Holland Films.
+
+Table 18: Sample document and associated QA pairs for open-ended generation tasks in Wiki-Newpages-2023-10-
+Bio, Wiki-Newpages-2023-10-Multi, and Wiki-Newpages-2023-(9)10-Film datasets.
+
+                                                             28
+  Sample document and associated QA pairs for natural language inference tasks
+
+  Dataset: Wiki-Newpages-2023-10-Bio
+
+  Document: <Sawyer Gipson-Long - Wikipedia> Alec Sawyer Gipson-Long (born December 12, 1997) is an
+  American professional baseball pitcher for the Detroit Tigers of Major League Baseball (MLB). He made his
+  MLB debut in 2023.
+
+  Question: Based on the paragraph above can we conclude that <Alec Sawyer Gipson-Long> Sawyer Gipson-
+  Long was born in December 1997. Options: -Yes; -It's impossible to say; -No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that <Alec Sawyer Gipson-Long> Sawyer Gipson-
+  Long is a professional football player. Options: -Yes; -It's impossible to say; -No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that <Alec Sawyer Gipson-Long> Sawyer Gipson-
+  Long plays for the Detroit Tigers in Major League Baseball. Options: -Yes; -It's impossible to say; -No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that <Alec Sawyer Gipson-Long> Sawyer Gipson-
+  Long made his MLB debut in 2020. Options: -Yes; -It's impossible to say; -No
+  Answer: No
+
+  Dataset: Wiki-Newpages-2023-10-Multi
+
+  Document: <2023 Astana Open 2013 Singles - Wikipedia> Novak Djokovic was the reigning champion, but
+  chose not to compete this year.Seeds.
+
+  Question: Based on the paragraph above can we conclude that <2023 Astana Open 2013 Singles> Novak
+  Djokovic won the previous Astana Open singles tournament.Options: -Yes; -It's impossible to say; -No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that <2023 Astana Open 2013 Singles> Novak
+  Djokovic is participating in the 2023 Astana Open singles tournament.Options: -Yes; -It's impossible to say; -No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that <2023 Astana Open 2013 Singles> The 2023
+  Astana Open is a tennis tournament.Options: -Yes; -It's impossible to say; -No
+  Answer: It's impossible to say
+  Question: Based on the paragraph above can we conclude that <2023 Astana Open 2013 Singles> Novak
+  Djokovic was injured and could not compete in the 2023 Astana Open singles tournament.Options: -Yes; -It's
+  impossible to say; -No
+  Answer: It's impossible to say
+
+  Dataset: Wiki-Newpages-2023-(9)10-Film
+
+  Document: <Unstoppable (2023 film) - Wikipedia> Unstoppable is a 2023 comedy-drama film directed by
+  Diamond Ratnababu and produced by Rajith Rao under AB2 Productions. The film was released theatrically
+  worldwide on 9 June 2023.
+
+  Question: Based on the paragraph above can we conclude that<Unstoppable (2023 film)> Unstoppable is a film
+  that combines elements of comedy and drama.Options: -Yes; -It's impossible to say; -No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that<Unstoppable (2023 film)> Diamond Ratnababu
+  is the producer of the film Unstoppable.Options: -Yes; -It's impossible to say; -No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that<Unstoppable (2023 film)> Unstoppable was
+  released in theaters worldwide.Options: -Yes; -It's impossible to say; -No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that<Unstoppable (2023 film)> The film Unstoppable
+  was released before June 2023.Options: -Yes; -It's impossible to say; -No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that<Unstoppable (2023 film)> The film Unstoppable
+  was distributed by Diamond Ratnababu.Options: -Yes; -It's impossible to say; -No
+  Answer: It's impossible to say
+
+Table 19: Sample document and associated QA pairs for natural language inference tasks in Wiki-Newpages-2023-
+10-Bio, Wiki-Newpages-2023-10-Multi, and Wiki-Newpages-2023-(9)10-Film test datasets.
+
+                                                             29
+         QA Type                     QA Types                              QA Types w/ Multiple Facts
+         Instances
+Dataset                  Statistics  Top-5 Types               Statistics       Top-5 Types
+
+                                     Wiki-Newpages-2023-10-Bio (Single-domain)
+
+Train      Birth Date,      2014     Birth Date (11.24%)           158     Birth & Death Dates (0.93%)
+         Achievements,   (# Types);  Nationality (5.37%)       (# Types);  Birth Date & Place (0.44%)
+                                     Profession (5.15%)                    Death Date & Place (0.12%)
+            Position,       6073     Team/Affiliation (3.05%)      265     Nationality & Profession (0.10%)
+               etc.      (# Counts)  Role/Position (2.56%)     (# Counts)  Current Position & Tenure (0.08%)
+
+Test     Full Name,          281     Birth Date (13.11%)           16      Birth Date & Place (1.31%)
+         Affiliation,    (# Types);  Profession (6.18%)        (# Types);  Birth & Death Dates (1.12%)
+         Residence,                  Nationality (5.62%)                   Death Date & Place (0.56%)
+                             655     Team/Affiliation (4.49%)      30      Car Number & Manufacturer (0.37%)
+             etc.        (# Counts)  Role/Position (3.00%)     (# Counts)  Current Club & League (0.19%)
+
+Within the train and test sets, there are 63 and 8 answers labeled as "Information not provided/missing," respectively.
+
+                               Wiki-Newpages-2023-10-Multi (Multi-domain)
+
+         Album Source, 4813          Birth Date (3.37%)            303     Birth & Death Dates (0.32%)
+                                     Profession (1.76%)        (# Types);  Birth Date & Place (0.14%)
+Train    Location, (# Types);        Nationality (1.47%)                   Event Date & Location (0.06%)
+                                     Location (1.39%)              371     Death Date & Place (0.06%)
+         Season          9973        Release Date (1.27%)      (# Counts)  Nationality & Profession (0.05%)
+
+         Number, etc. (# Counts)
+
+Test     Legacy/Impact,      924     Birth Date (3.06%)            57      Birth & Death Dates (0.31%)
+             Purpose,    (# Types);  Release Date (1.80%)      (# Types);  Birth Date & Place (0.31%)
+                                     Profession (1.57%)                    Death Date & Place (0.16%)
+           Leadership,      1498     Nationality (1.25%)           66      Job Titles & Affiliations (0.16%)
+                etc.     (# Counts)  Team/Affiliation (1.02%)  (# Counts)  Language & Genre (0.16%)
+
+Within the train and test sets, there are 31 and 4 answers labeled as "Information not provided/missing," respectively.
+
+                               Wiki-Newpages-2023-(9)10-Film (Single-domain)
+
+         Director,       339         Director (9.07%)              13      Title & Release Year (0.39%)
+                                     Release Date (7.23%)      (# Types);  Milestone & Historical Comparison (0.13%)
+Test     Actor, (# Types);           Genre (6.96%)                         Profession & Industry (0.13%)
+                                     Cast (3.55%)                  15      Cast & Roles (0.13%)
+         Music           955         Language (2.76%)          (# Counts)  Producer & Production Banner (0.13%)
+
+         Composer, etc. (# Counts)
+
+Table 20: A comprehensive analysis of QA types related to factual information in open-ended generation QA
+datasets from Wiki-Newpages-2023-10-Bio (Wiki-Bio), Wiki-Newpages-2023-10-Multi (Wiki-Multi), and Wiki-
+Newpages-2023-(9)10-Film (Wiki-Film).
+
+                                                  30
+Type                   Task                Template
+
+Memorization
+
+Next-Token Prediction  Text-to-Text        <Document>
+
+Comprehension
+
+ Summarization         Text-to-Topic       Question: Write a title: <Document>.
+                                           Answer: <Title>.
+
+ Gist Identification   Text-to-Word        Question: Highlight the key information within
+                                           the article: <Document>.
+                                           Answer: <Entity1>, <Entity2>, etc.
+
+  Natural Language Infer- Text-to-Option   Question: <Document> Based on the article above
+ence                                       can we conclude that <Sentence>. Options: -Yes;
+                                           -It's impossible to say; -No.
+                                           Answer: Yes/It's impossible to say/No.
+
+Self-Reflection
+
+ "Teaching"            Topic-to-Text       Question: Tell me about <Title>.
+                                           Answer: <Document>.
+
+ "Flashcards"          Word-to-Text        Question: Generate a concrete description about <Title>.
+                                           based on the following keywords: <Entity>, etc.
+                                           Answer: <Document>.
+
+ Fill-in-the-Blank     Cloze                      Question: <Title> <Sentence_Part1> ­ <Sentence_Part2>
+                       Entity  Sentence-to- (w/o <Entity>).
+
+                                                  Answer: <Entity>.
+
+                                           Question: <Title> <Sentence_Part1> ­ <Sentence_Part2>
+
+ Multi-Choice QA       Cloze Sentence (w/ (w/o <Entity>) Options: - <Entity1>; - <Entity2>, etc.
+
+                       options)-to-Entity  Answer: <Entity>.
+
+ Sentence Completion Text-to-Text          Question: <Title> <Sentence_Part1>:
+                                           Answer: <Sentence_Part2>.
+
+      Table 21: The detailed templates for each task used in the SELF-TEACHING learning strategy.
+
+                                           31
+Type                   Example
+
+Memorization
+
+Next-Token Prediction  <Robert Anderson (artist) - Wikipedia> Robert Alexander Anderson (born 1946) is an
+                       American portrait artist known for painting the official portraits of George W. Bush and
+                       Alan Greenspan as well as designing United States postage stamps.
+
+Comprehension
+
+ Summarization         Question: Write a title: <Robert Anderson (artist) ... stamps.
+                       Answer: Robert Anderson (artist).
+
+ Gist Identification   Question: Highlight the key information within the article: <Robert Anderson
+                       (artist) ... stamps.
+                       Answer: United States; American; Alan Greenspan; George W. Bush;
+                       Robert Alexander Anderson; 1946
+
+ Natural Language In-  Question: <Robert Anderson (artist) ... stamps. Based on the article above can we
+ference                conclude that <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is
+                       an American portrait artist known for painting the official portraits of George W. Bush
+                       and Alan Greenspan as well as designing United States postage stamps.
+                       Options:
+                       - Yes
+                       - It's impossible to say
+                       - No
+                       Answer: Yes
+
+Self-Reflection        Question: Tell me about Robert Anderson (artist).
+ "Teaching"            Answer: Robert Alexander Anderson (born 1946) is ... stamps.
+ "Flashcards"
+ Fill-in-the-Blank     Question: Generate a concrete description about Robert Anderson (artist), based on
+                       the following keywords: United States; American; Alan Greenspan; George W. Bush;
+ Multi-Choice QA       Robert Alexander Anderson; 1946
+                       Answer: Robert Alexander Anderson (born 1946) is ... stamps.
+
+                       Question: <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is
+                       an American ­ known for painting the official portraits of George W. Bush and Alan
+                       Greenspan as well as designing United States postage stamps.
+                       Answer: Portrait artist.
+
+                       Question:<Robert Anderson (artist)> - (born 1946) is an American portrait artist
+                       known for painting the official portraits of George W. Bush and Alan Greenspan as well
+                       as designing United States postage stamps.
+                       Options:
+                       - Alan Greenspan
+                       - 1946
+                       - Robert Alexander Anderson
+                       - George W. Bush
+                       Answer: Robert Alexander Anderson.
+
+ Sentence Completion   Question: <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is
+                       an American portrait artist known for painting the official portraits of George W. Bush
+                       and Alan Greenspan as well as:
+                       Answer: Designing United States postage stamps.
+
+Table 22: An example of a training document from the Wiki-Newpages-2023-10-Bio train set, accompanied by
+related self-teaching tasks.
+
+                                32
+  The prompt utilized by GPT-4 for building QA datasets for open-ended generation tasks
+  Below is a paragraph about the 51st International Emmy Awards ceremony. Your task is to formulate a detailed
+  list of questions and corresponding answers that encompass all the information within the paragraph. To ensure
+  clarity, each question should explicitly mention the 51st International Emmy Awards ceremony. Answers should
+  be concise, consisting of a few short phrases separated by commas. For instance:
+  Paragraph: The 51st International Emmy Awards ceremony, presented by the International Academy of Televi-
+  sion Arts and Sciences (IATAS), occurred on November 20, 2023, at the New York Hilton Midtown in New York
+  City. It was held to acknowledge the best television programs initially produced and aired outside the United
+  States in 2022. Nominations were announced on September 26, 2023.
+  Question: When was the 51st International Emmy Awards ceremony held?
+  Answer: November 20, 2023.
+  Question: Who was responsible for presenting the 51st International Emmy Awards ceremony?
+  Answer: The International Academy of Television Arts and Sciences (IATAS).
+  Question: Where was the 51st International Emmy Awards ceremony held?
+  Answer: The New York Hilton Midtown in New York City.
+  Question: What was the purpose of the 51st International Emmy Awards ceremony?
+  Answer: To recognize the best television programs initially produced and aired outside the United States in
+  2022.
+  Question: When were the nominations for the 51st International Emmy Awards announced?
+  Answer: September 26, 2023.
+  Below is a paragraph about {topic}. Your task is to formulate a detailed list of questions and corresponding
+  answers that encompass all the information within the paragraph. To ensure clarity, each question should
+  explicitly mention {topic}. Answers should be concise, consisting of a few short phrases separated by commas.
+  For instance:
+  Paragraph: {paragraph}
+  Question:
+
+Table 23: The prompt utilized by GPT-4 for building QA datasets for open-ended generation tasks based on the
+gathered Wiki-Newpages documents.
+
+                                                             33
+  The prompt utilized by GPT-4 for building QA datasets for natural language inference tasks
+
+  Below is a paragraph about Luis Hugo Hernán Palma Pérez. Your task is to formulate a detailed list of natural
+  language inference tasks with questions and corresponding answers based on the paragraph. For instance:
+  Paragraph: Luis Hugo Hernán Palma Pérez (born November 3, 1958) is a Chilean surgeon and politician,
+  founding member of the Humanist Party of Chile. He is a deputy for the period 2022-2026, after being elected
+  in the 2021 Chilean parliamentary elections.
+  Question: Based on the paragraph above can we conclude that Luis Hugo Hernán Palma Pérez was born in
+  November.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that Luis Hugo Hernán Palma Pérez is a deputy for
+  the period 2020-2024.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that The Humanist Party of Chile is a political party
+  in Chile.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: Yes
+  Question: Based on the paragraph above can we conclude that Luis Hugo Hernán Palma Pérez is a dentist.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: No
+  Question: Based on the paragraph above can we conclude that Luis Hugo Hernán Palma Pérez was elected in
+  the 2021 Chilean parliamentary elections.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: Yes
+  Below is a paragraph about {topic}. Your task is to formulate a detailed list of natural language inference tasks
+  with questions and corresponding answers based on the paragraph. For instance:
+  Paragraph: {paragraph}
+  Question:
+
+Table 24: The prompt utilized by GPT-4 for building QA datasets for natural language inference tasks based on the
+gathered Wiki-Newpages documents.
+
+  The five-shot prompt used for assessing open-ended generation tasks
+
+  Question: Which animated film is included in the list of characters in the Zootopia franchise?
+  Answer: The animated film "Zootopia" (2016).
+  Question: Who were the coaches in The Voice Generations (Philippine TV series)?
+  Answer: Billy Crawford, Chito Miranda, Julie Anne San Jose, and Stell of SB19.
+  Question: Who is Cyrelle Saut?
+  Answer: A futsal and football player who has been associated with Tuloy Foundation and the Azkals Develop-
+  ment team.
+  Question: What team does the 2023 Southern Miss Golden Eagles football team represent?
+  Answer: The University of Southern Mississippi.
+  Question: When was Kenneth Mitchell (basketball) born?
+  Answer: October 1, 1975.
+
+Table 25: The five-shot prompt used for assessing open-ended generation tasks, which is derived from the gathered
+Wiki-Newpages-2024-03 documents.
+
+                                                             34
+  The prompt used by GPT-4 for annotating QA types in the open-ended generation tasks of the Wiki-
+  Newpages-2023-QA datasets
+
+  Below is a paragraph along with corresponding question and answer pairs. Your task is to analyze the paragraph
+  and the question-answer pairs by categorizing the type of information they inquire about or provide. Use concise
+  phrases to describe each category. For example:
+  Paragraph: <Andrew Turner (rugby union, born 2002) - Wikipedia> Andrew Turner (born 16 February 2002) is
+  an English rugby union player, currently playing for the and . His preferred position is prop.
+  Question: When was Andrew Turner (rugby union, born 2002) born?
+  Answer: February 16, 2002.
+  Question: What nationality is Andrew Turner (rugby union, born 2002)?
+  Answer: English.
+  Question: What sport does Andrew Turner (rugby union, born 2002) play?
+  Answer: Rugby union.
+  Analysis: Types of question-answer pairs: (1) Birth date, (2) Nationality, (3) Sport/Profession.
+  Types of the paragraph: Biography - Biographical information about Andrew Turner, a rugby union player born
+  in 2002, including his birth date, nationality, sport, and preferred position.
+  Below is a paragraph along with corresponding question and answer pairs. Your task is to analyze the paragraph
+  and the question-answer pairs by categorizing the type of information they inquire about or provide. Use concise
+  phrases to describe each category. For example:
+  Paragraph: {paragraph}
+  {QA}
+  Analysis:
+
+Table 26: The prompt used by GPT-4 for annotating QA types in the open-ended generation tasks of the Wiki-
+Newpages-2023-QA datasets.
+
+  The prompt utilized by GPT-4o for building QA datasets for open-ended generation tasks
+
+  Your task is to rephrase the paragraph below to make it clearer and more concise. Then, create a detailed list of
+  questions and corresponding answers that cover the factual information in the revised content. Answers should
+  be concise, consisting of a few short phrases separated by commas. For example:
+  Paragraph:
+  6 VCs explain how startups can capture and defend marketshare in the AI era. Ninety-four percent of business
+  leaders agree AI will be critical to all businesses' success over the next five years, and total global spending on
+  AI is expected to reach $154 billion by the end of this year, a 27% increase from 2022.
+  Revised Content:
+  Six venture capitalists (VCs) explain how startups can capture and defend market share in the AI era. Ninety-four
+  percent of business leaders agree that AI will be critical to the success of all businesses over the next five years.
+  Additionally, total global spending on AI is expected to reach $154 billion by the end of this year, representing a
+  27% increase from 2022.
+  Simple Question-Answering Pairs:
+  Question: How many VCs explain how startups can capture and defend market share in the AI era?
+  Answer: Six venture capitalists (VCs).
+  Question: What percentage of business leaders agree that AI will be critical to the success of all businesses over
+  the next five years?
+  Answer: Ninety-four percent.
+  Question: Over what period do business leaders believe AI will be critical to all businesses' success?
+  Answer: Over the next five years.
+  Question: How much is the total global spending on AI expected to reach by the end of this year?
+  Answer: $154 billion.
+  Question: By what percentage is the global spending on AI expected to increase from 2022?
+  Answer: Twenty-seven percent.
+  Your task is to rephrase the paragraph below to make it clearer and more concise. Then, create a detailed list of
+  simple questions and corresponding answers that cover the information in the revised content. Answers should
+  be concise, consisting of a few short phrases separated by commas. For example:
+  Paragraph:
+  {paragraph}
+  Revised Content:
+
+Table 27: The prompt utilized by GPT-4o for building QA datasets for open-ended generation tasks based on the
+gathered WebNews documents.
+
+                                                             35
+  A training document example in the reading-comprehension format
+
+  <Robert Anderson (artist) - Wikipedia> Robert Alexander Anderson (born 1946) is an American portrait artist
+  known for painting the official portraits of George W. Bush and Alan Greenspan as well as designing United
+  States postage stamps.
+  Answer the questions based on the article:
+  Question: Write a title:
+  Answer:Robert Anderson (artist)
+  Question: Highlight the key information within the article:
+  Answer:United States; American; Alan Greenspan; George W. Bush; Robert Alexander Anderson; 1946
+  Question: Based on the article above can we conclude that
+  <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is an American portrait artist known for
+  painting the official portraits of George W. Bush and Alan Greenspan as well as designing United States postage
+  stamps.
+  Options:
+  - Yes
+  - It's impossible to say
+  - No
+  Answer: Yes
+  Question: Tell me about Robert Anderson (artist).
+  Answer:Robert Alexander Anderson (born 1946) is an American portrait artist known for painting the official
+  portraits of George W. Bush and Alan Greenspan as well as designing United States postage stamps.
+  Question: Generate a concrete description about Robert Anderson (artist) based on the following keywords:
+  United States; American; Alan Greenspan; George W. Bush; Robert Alexander Anderson; 1946
+  Answer:Robert Alexander Anderson (born 1946) is an American portrait artist known for painting the official
+  portraits of George W. Bush and Alan Greenspan as well as designing United States postage stamps.
+  Question: <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is an American ­ known for
+  painting the official portraits of George W. Bush and Alan
+  Greenspan as well as designing United States postage stamps.
+  Answer: Portrait artist.
+  Question: <Robert Anderson (artist)> - (born 1946) is an American portrait artist known for painting the official
+  portraits of George W. Bush and Alan Greenspan as well as designing United States postage stamps.
+  Options:
+  - Alan Greenspan
+  - 1946
+  - Robert Alexander Anderson
+  - George W. Bush
+  Answer:Robert Alexander Anderson
+  Question: <Robert Anderson (artist)> Robert Alexander Anderson (born 1946) is an American portrait artist
+  known for painting the official portraits of George W. Bush and Alan Greenspan as well as:
+  Answer:designing United States postage stamps
+
+Table 28: An example of a training document from the Wiki-Newpages-2023-10-Bio train set, presented in a
+reading-comprehension format.
+
+                                                             36
+

@@ -1,0 +1,1127 @@
+                                       Tokenization Falling Short: On Subword Robustness in Large Language
+                                                                                 Models
+
+                                                           Yekun Chai Yewei Fang* Qiwei Peng Xuhong Li
+                                                                Baidu ModelBest University of Copenhagen
+                                                                       {chaiyekun,ywfcast1e}@gmail.com
+
+                                                             Abstract                           caonsgilnee:  7s8im.1ail6sa°sriitgyn:  0.21           im
+                                                                                                                                       + ment
+                                            Language models typically tokenize raw text         assign
+                                            into sequences of subword identifiers from                                                                           port import
+                                            a predefined vocabulary, a process inher-           assignment                             ment           im + port
+                                            ently sensitive to typographical errors, length
+                                            variations, and largely oblivious to the in-                                                              cosine similarity: 0.13
+                                            ternal structure of tokens--issues we term                                                                angle: 82.47°
+arXiv:2406.11687v3 [cs.CL] 4 Oct 2024       the curse of tokenization. In this study, we                assign                         assignment         im                   import
+                                            delve into these drawbacks and demonstrate                  ment                           assign + ment
+                                            that large language models (LLMs) remain sus-                                                                 port                 im + port
+                                            ceptible to these problems. This study sys-
+                                            tematically investigates these challenges and       (a) cosine ("assignment", (b) cosine("import",
+                                            their impact on LLMs through three critical
+                                            research questions: (1) complex problem solv-       "assign" + "ment").                                   "im" + "port").
+                                            ing, (2) token structure probing, and (3) re-
+                                            silience to typographical variation. Our find-      Figure 1: Compositional challenges in token embed-
+                                            ings reveal that scaling model parameters can       dings. (a) "assignment" decomposed into "assign"
+                                            mitigate the issue of tokenization; however,        and "ment" shows a cosine similarity of 0.21 and an an-
+                                            LLMs still suffer from biases induced by ty-        gle of 78.16°. (b) "import" decomposed into "im" and
+                                            pos and other text format variations. Our ex-       "port" shows a cosine similarity of 0.13 and an angle
+                                            periments show that subword regularization          of 82.47°. These results indicate that existing LLMs do
+                                            such as BPE-dropout can mitigate this issue.        not accurately capture surface form composition.
+                                            We release our evaluation code and data at
+                                            https://github.com/FloatAI/TKEval.                     Typographical errors, such as minor misspellings
+                                                                                                or misplaced characters, can drastically affect the
+                                       1 Introduction                                           tokenization process. Unlike humans, who can
+                                                                                                easily overlook these errors and understand the in-
+                                       Tokenization is a fundamental step in the prepro-        tended meaning, LLMs can misinterpret or fail to
+                                       cessing pipeline of large language models (LLMs)         recognize these variations, leading to degraded per-
+                                       (OpenAI, 2023; Anil et al., 2023; Touvron et al.,        formance (Cao et al., 2023). This typo-sensitivity
+                                       2023; Chai et al., 2023; Lozhkov et al., 2024), con-     reveals a crucial gap in current tokenization meth-
+                                       verting raw text into a sequence of subword units        ods, which do not sufficiently mimic human read-
+                                       derived from a predefined vocabulary (Sennrich           ing capabilities.
+                                       et al., 2016; Kudo and Richardson, 2018). This pro-
+                                       cess, while effective in many scenarios, presents           Another critical issue is the length unawareness
+                                       significant challenges that can hinder the perfor-       of current tokenization approaches. LLMs often
+                                       mance and robustness of LLMs. These challenges           struggle to accurately represent the organizational
+                                       include sensitivity to typographical errors (Cao         structure of text, being insensitive to the number
+                                       et al., 2023), length variations (Aghajanyan et al.,     of characters or words (Aghajanyan et al., 2022).
+                                       2022), and a lack of awareness of the internal struc-    This insensitivity affects their ability to understand
+                                       ture of tokens (Brown et al., 2020)--collectively        and process text effectively, particularly in tasks
+                                       termed the curse of tokenization.                        requiring a nuanced understanding of text length
+                                                                                                and compositional structure.
+                                           *Equal contribution and shared co-first authorship.
+                                                                                                   Furthermore, existing tokenization methods are
+                                                                                                often blind to the internal structure of tokens. The
+                                                                                                decoupled embedding space and lookup table ap-
+                                                                                                proach fail to account for the hierarchical compo-
+                                                                                                sition of language, spanning characters, subwords,
+                                                                                                and words, as depicted in Figure 1. This lack of
+                                                                                                integration across different levels of token com-
+                                                                                                position limits the model's ability to fully grasp
+semantic relationships and differences.                     to the discussed issues.
+   Case insensitivity in certain languages adds an-
+                                                         2 Related Work
+other layer of complexity, where variations in cap-
+italization can lead to different token representa-      2.1 Tokenization
+tions, further complicating the model's understand-
+ing and processing of text.                              Tokenization Approach Conventional language
+                                                         models (Radford et al., 2018; Jozefowicz et al.,
+   To address these challenges, we conducted a           2016; Brown et al., 2020) typically tokenize in-
+comprehensive study examining the limitations of         put text into a sequence of tokens by splitting
+current tokenization methods and their impact on         it into smaller subwords. Traditional tokeniza-
+LLM performance. Our study is guided by three            tion approaches include frequency-based methods
+critical research questions:                             such as Byte Pair Encoding (BPE; Sennrich et al.,
+A. Complex Problem Solving (§3). As a pilot              2016) and probability-based methods like Word-
+experiment, we firstly investigate the performance       Piece (Schuster and Nakajima, 2012). BPE merges
+of LLMs on complex problems that are sensitive to        tokens based on bigram frequency, relying on sub-
+tokenization, involving anagram task and complex         word pair co-occurrence to greedily merge neigh-
+mathematical language understanding.                     boring pairs. In contrast, WordPiece can be viewed
+B. Token Structure Probing (§4). We study the            as a language-modeling based BPE variant. It se-
+token structural tasks such as case manipulation,        lect the unit pair that maximizes the bigram likeli-
+length counting, and length-sensitive tasks to probe     hood of training data at utmost, rather than choose
+the token structural understanding of LLMs.              the most frequent pair.
+C. Typographical Variation (§5). We designed a
+robust set of evaluation benchmarks on top of vari-         Unigram Language Model (Kudo, 2018) prunes
+ous datasets such as MMLU, TruthfulQA, GSM8K,            tokens based on unigram LM perplexity, treating
+and HumanEval, covering diverse tasks and linguis-       the segmentation process as a probabilistic mix-
+tic phenomena. These benchmarks allow us to sys-         ture of characters, subwords, and words, reduc-
+tematically test and analyze the LLMs' resilience        ing subwords by evaluating likelihood reduction.
+to tokenization.                                         Additionally, some tokenization methods handle
+                                                         text at the byte level (Xue et al., 2022) or char-
+   Our findings highlight that while scaling model       acter level (Sutskever et al., 2011; Clark et al.,
+parameters can enhance the robustness to tokeniza-       2022). Conventional LLMs often use byte-level
+tion, LLMs still suffer from biases introduced by        BPE (BBPE) for base vocabulary construction, rep-
+typographical errors and text format variations. We      resenting any text with a moderate vocabulary size
+demonstrate the persistent nature of these tokeniza-     and avoiding the out-of-vocabulary (OOV) prob-
+tion challenges.                                         lem. For a detailed introduction to tokenization,
+                                                         readers can refer to Chai (2021).
+Contribution To conclude, our main contribu-
+tions are as follows:                                    Tokenization-Free Approach Tokenization ap-
+                                                         proaches often suffer from the vocabulary bottle-
+1. We provide a comprehensive analysis of the            neck, where there is a trade-off between vocabulary
+   problem known as the curse of tokenization,           size and diverse language coverage in multilingual
+   detailing its impact on language model perfor-        scenarios. To address this issue, Rust et al. (2023)
+   mance and introducing systematic evaluation           and Chai et al. (2024) introduced a tokenization-
+   benchmarks to assess these issues.                    free approach that renders raw text as visual text
+                                                         images for masked language modeling and autore-
+2. By evaluating various scales of LLMs, including       gressive pre-training. This method demonstrates
+   LLama3, Mistral, and GPT-4 families, across           robust multilingual generalization capabilities com-
+   thirteen distinct tasks, we demonstrate that even     pared to subword tokenization approaches.
+   state-of-the-art models struggle with handling
+   typographical variations. Specifically, LLMs          2.2 Perturbation Probing
+   exhibit greater sensitivity to character-level vari-
+   ations compared to subword-level variations.          Several studies have investigated the behavior of
+                                                         language models under input perturbations at vari-
+3. We demonstrate that regularized tokenization          ous levels, including character-level (Nishino et al.,
+   approaches, such as BPE-dropout with moderate         2019), subword-level (Abdou et al., 2022), and
+   drop rates, can enhance the model's resilience
+word-level (Sinha et al., 2021; Peng et al., 2023)                        llama3-8b   mistral-7b       gpt-4 turbo
+scrambling. Despite these efforts, intrinsic eval-
+uations of perturbing LLM inputs remain under-                            llama3-70b  mixtral-8x7b
+explored.
+                                                                              Word Unscrambling        Cycled Letters
+   Cao et al. (2023) proposed examining scrambled
+sentence recovery and scrambled QA with con-                    60
+text corruptions. In contrast, our study conducts a
+comprehensive evaluation of both character- and       EM Score  40
+subword-level perturbations, along with noise in-
+jection. We evaluate a wide range of LLMs across                20
+various tasks to provide a detailed comparison and
+inspire future research in tokenization and robust              0
+model performance.
+                                                                          0 1 2 30 1 2 3
+3 Complex Problem Solving                                                     K-shot                   K-shot
+
+Complex problem-solving tasks are critical bench-     Figure 2: K-shot performance on Word Unscrambling
+marks for evaluating the complex reasoning and        (WU) and Cycled Letters (CL) tasks. The plots illustrate
+comprehension capabilities of LLMs. We explore        that increasing the number of demonstration examples
+the LLM's ability to perform intricate operations     (K-shot) does not consistently enhance performance.
+on tokenized inputs, as the tokenization process      However, models with larger parameter sizes generally
+is fundamental to determine how the raw text is       exhibit better performance across both tasks.
+segmented and processed, directly impacting the
+model's interpretation and prediction.                  cycled, and is expected to generate the original
+                                                        word (e.g., "remo"  "more").
+   Anagram solving and mathematical language          · Word Unscrambling (WU; Srivastava et al.,
+comprehension were selected to elucidate the re-        2022) ­ The model is given a randomly scrambled
+lationship between tokenization quality and the         word, and must recover the original word (e.g.,
+model's performance on complex problem-solving.        "nad"  "and").
+Anagram tasks require models to decode and re-
+arrange jumbled letters into coherent words, em-      We employ exact match (EM) scores for evaluation.
+phasizing the importance of precise token bound-      Unless otherwise specified, we use the inference-
+aries and recognition accuracy. On the other hand,    time temperature of 0 for all LLMs in following
+mathematical language comprehension, particu-         experiments, to assure the results reproducible.
+larly expressed with LATEX-formatted expressions,
+demands an exact interpretation of specialized sym-   Results and Analysis The experimental results
+bols and structured notation, challenging the tok-    reveal that larger models demonstrate better perfor-
+enization process's robustness.                       mance on the anagram task, yet they remain suscep-
+                                                      tible to tokenization errors. Specifically, models
+                                                      struggled with longer anagrams (see Figure 3) or
+                                                      those containing uncommon letter combinations,
+                                                      indicating that while scaling improves token recog-
+                                                      nition, inherent tokenization flaws persist.
+
+3.1 Anagram Task                                                                      Llama3-8b        Llama3-70b
+
+Task Description and Settings The anagram                                 60
+task tests the model's ability to unscramble a se-
+quence of jumbled characters to form a valid word.                        50
+This task evaluates the model's handling of surface-
+form manipulations and its understanding of char-               EM score  40
+level compositions within a word. The complex-
+ity arises from the need to identify potential word                       30
+candidates from mixed characters and reassemble
+them correctly. We present a task example in §A.1.                        20
+Specifically, we include two tasks:
+                                                                          10
+· Cycled Letters in Word (CL; Srivastava et al.,
+  2022) ­ The model is given a word with its letters                      0   0-6                6-12  12-18
+
+                                                                                      Length bucket
+
+                                                      Figure 3: The relationship between the length of scram-
+
+                                                      bled words and the Exact Match (EM) score of Llama3-
+
+                                                      8B and Llama3-70B on the word unscrambling task
+
+                                                      under one-shot evaluation. The models tend to correctly
+
+                                                      reorder anagrams of shorter lengths, while struggling
+
+                                                      with longer words.
+   Figure 3 highlights the performance differences    Setting        0-Shot  1-Shot  2-Shot  3-Shot
+between Llama3-8B and Llama3-70B on the word
+unscrambling task across various word lengths.        GPT-3 (6B)a    33.96   28.30   33.96   28.30
+Notably, Llama3-70B consistently outperforms          GPT-3 (200B)a  32.08   30.19   33.96   30.19
+Llama3-8B, especially in the 0-6 and 6-12 charac-     Llama2-7b      37.70   34.00   35.80   37.70
+ter buckets. This trend indicates that as the model   Llama3-8b      41.51   45.28   45.28   35.85
+parameter size increases from 8B to 70B, the ability  Llama3-70b     62.26   79.25   69.81   71.70
+to accurately reorder scrambled words improves.       Mistral-7b     47.20   43.40   37.70   37.70
+However, both models struggle with longer words       Mixtral-8x7b   49.10   56.60   64.20   62.30
+(12-18 characters), though Llama3-70B maintains
+a moderate edge.                                      Table 1: Few-shot results on Identifying Math Theo-
+
+   Our results shown in Figure 2 indicate several     rems, with exact match scores reported as percentages.
+key trends. Firstly, the performance improves sig-    a refers to results taken from Srivastava et al. (2022)
+nificantly as model size scales from 8B to 70B
+parameters (AI@Meta, 2024). Secondly, we ob-          formed other models, achieving a score of 62.26%
+serve that while the dense Mistral-7B model per-      in the zero-shot setting and improving to 79.25%
+forms poorly, the sparse Mixtral-8x7B model (an       with one-shot learning. However, additional in-
+MoE sparse model) shows improved performance          context examples led to fluctuating performance,
+due to its parameter size scaling. Lastly, GPT-4      with scores of 69.81% in the two-shot setting and
+turbo, a much more powerful model, achieves state-    71.70% in the three-shot setting. This indicates
+of-the-art results, clearly outperforming all other   that increasing the number of in-context demonstra-
+models across all shot conditions. This sensitivity   tions does not consistently enhance performance
+underscores the need for more robust tokenization     and may lead to variability depending on the spe-
+that can handle typographical variations without      cific examples provided.
+degrading performance.
+                                                         Other models exhibited similar trends. GPT-3-
+3.2 Mathematical Language (LATEX)                     200B (Srivastava et al., 2022), despite its larger
+      Comprehension                                   parameter count, did not show significant improve-
+                                                      ment over the smaller GPT-3-6B model, suggesting
+Task Description and Settings The mathematical        that simply increasing the model size does not guar-
+language comprehension task evaluates the model's     antee better performance in LATEX comprehension
+ability to read and comprehend mathematics writ-      tasks. The comparison between dense and sparse
+ten in LATEX, the typesetting language used by pro-   models revealed that the dense Mistral-7B model
+fessional mathematicians. This task assesses the      performed poorly across all shot conditions, while
+models' capability to interpret complex mathemat-     the sparse Mixtral-8x7B model demonstrated better
+ical expressions and accurately tokenize symbols      results, especially in few-shot scenarios.
+and operators within structured LATEX format.
+                                                      4 Token Structure Probe
+   We employ Identify Math Theorems (IMT;
+Srivastava et al., 2022) for evaluation, and use      Tokenization is a key preprocessing step in LLMs,
+perplexity to measure the model's confidence in       yet it introduces several significant challenges,
+different given choices. The dataset comprises 54     which we defined as the curse of tokenization.
+problems divided into nine sections, each repre-      These challenges include length unawareness, case
+senting a major area of mathematics research or       insensitivity, and a lack of awareness of the internal
+advanced pedagogy. We present the input-output        structure of tokens. Tokenization transforms text
+format in §A.1.                                       into sequences of token identifiers, often obscuring
+                                                      the surface form and internal structure of the origi-
+Results and Analysis Our evaluation results of        nal text. This conversion can lead to deficiencies
+various models are shown in Table 1. The results      in the model's ability to understand and process
+demonstrate that while larger models generally per-   textual data accurately.
+form better on LaTeX-formatted mathematical con-
+tent, the relationship between the number of in-         The curse of tokenization manifests in several
+context examples and model performance is not         ways, which refers to the inherent challenges:
+linear. The Llama3-70B model consistently outper-
+                                                      A) Length Unawareness: Models struggle to rec-
+                                                          ognize the organizational structure of text, such
+                                                          as the number of characters or words.
+B) Case Insensitivity: Variations in capitaliza-                            llama3-8b   mistral-7b         gpt-4 turbo
+    tion can lead to different token identifiers and                        llama3-70b  mixtral-8x7b       CC
+    representations, complicating the model's pro-
+    cessing of text.                                                              CCV                    1K-shot2 3
+                                                                  100
+C) Blindness to Internal Structure: The decou-                                                            NCR
+    pled embedding space and lookup table ap-           EM Score  75                       EM Score
+    proach used in LLMs fail to preserve the hier-                                                       1K-shot2 3
+    archical and relational structure within tokens,              50
+    obscuring the surface form and internal rela-
+    tionships between characters and subwords.                    25
+
+   To address these challenges, we construct a set of             00  1K-shot2          3             0
+probing tasks to evaluate the model's understanding
+of token structure. These tasks are divided into                                  NC
+intra-token (§4.1) and inter-token probes (§4.2).                 100
+
+4.1 Intra-Token Probing                                 EM Score  75                       EM Score
+
+Task Description and Settings To measure the                      50
+capability of LLMs, we devise intra-token probing
+tasks related to length, case, and counting problems.             25
+These tasks evaluate the model's performance on
+the internal structure of tokens or word, specifically            00  1K-shot2          3             0
+including four tasks:
+                                                        Figure 4: K-shot performance on intra-token probing
+· Character Count (CC) ­ The model is asked             tasks (CCV, CC, NC, NCR). The plots demonstrate
+  to count the number of occurrences of a specific      that increasing the number of demonstration examples
+  character within the given word (e.g., the charac-    (K-shot) generally results in an improvement from zero-
+  ter appears twice in the word "undertake"  the        shot to one-shot, with performance stabilizing thereafter.
+  answer is: "e").
+                                                        which achieves near-perfect accuracy across all
+· N -th Character (NC) ­ The model is expected          shot conditions. Smaller models, such as Llama3-
+  to output the n-th character of the given word        8B, show significant improvement with few-shot
+  (e.g., 4-th character of the word "dual"  "l").       learning, indicating that exposure to examples
+                                                        greatly enhances their performance. For example,
+· N -th Character Reverse (NCR) ­ The model             Llama3-8B's accuracy improves from 0% in the
+  must identify the n-th character from the end of      zero-shot setting to 81% in the three-shot setting.
+  a word (e.g., 2nd character from the end of the       This demonstrates that increased model size and
+  word "dual"  "a").                                    few-shot learning contribute positively to CC tasks.
+
+· Case Conversion (CCV) ­ This task involves               The NC task underscores the difficulty models
+  converting the characters within a word to differ-    face in accurately identifying specific characters
+  ent cases (uppercase, lowercase) or converting        within words. GPT-4 turbo again leads in perfor-
+  the word into title case.                             mance, while smaller models show substantial im-
+                                                        provement with increased shots. Llama3-70B, for
+   For each task, we conduct many-shot evalua-          instance, improves from 1% in the zero-shot setting
+tion (0-3 shot) and report the EM score to test the     to 55% in the three-shot setting. This indicates that
+model's ability to understand and manipulate the        while larger models perform better, few-shot learn-
+internal structure of tokens and words at a granular    ing plays a crucial role in enhancing the model's
+level, revealing the extent to which the tokenization   ability to identify specific characters.
+process could preserve this information. Detailed
+test examples are provided in Appendix A.2.                Identifying characters from the end of the word,
+                                                        or reverse character identification, proves more
+Results and Analysis We evaluated CC, NC,               challenging. GPT-4 turbo achieves the highest per-
+NCR, and CCV tasks across different models and          formance with a score of 52% in the one-shot set-
+shot settings. The results are presented in Figure 4.   ting, though overall accuracy is lower compared to
+                                                        other tasks. Smaller models like Llama3-8B show
+   The CC task reveals that larger models exhibit       moderate improvements with additional shots, but
+superior performance, particularly GPT-4 turbo,         their performance remains relatively low. This
+                                                        highlights the complexity of reverse character iden-
+                                                        tification and the need for more advanced tokeniza-
+                                                        tion strategies to address this challenge.
+     llama3-8b      llama3-70b        mistral-7b     mixtral-8x7b                             gpt-4 turbo     model's robustness in identifying continuous sub-
+                                        LCSeq                                                  LCS            strings. Notably, Llama3-70B also shows strong
+100  CS                                                                                                       performance, particularly in the three-shot setting.
+                                                                                                              Sparse models like Mixtral-8x7B exhibit notable
+80                                                                                                            improvements compared to dense models, high-
+                                                                                                              lighting the effectiveness of sparse architectures in
+EM Score60                                                                                                    handling complex token relationships.
+                                        EM Score
+40                                                                           EM Score                            For LCS tasks, GPT-4 Turbo leads in perfor-
+                                                                                                              mance, achieving high accuracy across all shot set-
+20                                                                                                            tings. Llama3-70B and Mixtral-8x7B show consid-
+                                                                                                              erable improvements with increased shots, indicat-
+00   1K-shot 2      3              0  1K-shot 2   3                                        0  1K-shot 2    3  ing that exposure to more examples helps models
+                                                                                                              better identify multiple common substrings. Dense
+     (a) EM score performance on k-shot evaluation.                                                           models like Mistral-7B lag behind, reinforcing the
+                                                                                                              advantage of sparse architectures in such tasks.
+     llama3-8b      llama3-70b        mistral-7b     mixtral-8x7b                             gpt-4 turbo
+        CS                             LCSeq                                                   LCS               The LCSeq task reveals that even the best-
+                                                                                                              performing models face challenges with non-
+5Edit Distance                                                                                                continuous patterns. While Llama3-70B and GPT-
+4                                      Edit Distance                                                          4 Turbo demonstrate superior performance, there
+3                                                                           Edit Distance                     is a significant drop in accuracy compared to CS
+2                                                                                                             tasks. Few-shot learning significantly enhances the
+1    1 K-shot 2  3              0     1 K-shot 2  3                                        0  1 K-shot 2   3  performance of smaller models, such as Llama3-
+00                                                                                                            8B, which improves from 1% in zero-shot to 4%
+                                                                                                              in three-shot settings. This underscores the impor-
+     (b) Edit distance on k-shot evaluation.                                                                  tance of few-shot examples in aiding models to
+                                                                                                              recognize and process non-continuous patterns.
+Figure 5: K-shot performance on various inter-token
+probing tasks. For edit distances, lower is better.                                                           5 Typographical Variation
+
+4.2 Inter-Token Probing                                                                                       To evaluate the robustness of LLMs to typographi-
+                                                                                                              cal variations, we constructed tasks that introduce
+Task Description and Settings To evaluate the                                                                 character-level and token-level typographical er-
+capabilities of LLMs in understanding and manip-                                                              rors into the input text. These tasks are designed to
+ulating relationships between multiple tokens, we                                                             test the models' ability to maintain semantic under-
+devised inter-token probing tasks. These tasks fo-                                                            standing despite the presence of such errors. The
+cus on identifying common patterns and sequences                                                              datasets include MMLU (Hendrycks et al., 2021),
+across tokens, and they assess the model's ability                                                            TruthfulQA (Lin et al., 2022), GSM8K (Cobbe
+to recognize and process such relationships. Specif-                                                          et al., 2021), and HumanEval (Chen et al., 2021),
+ically, we include three tasks:                                                                               ensuring diverse coverage.
+· Common Substrings (CS) ­ The model iden-
+                                                                                                              Task Description and Settings The primary goal
+  tifies multiple common substrings between two                                                               of these tasks is to assess the LLMs' resilience to
+  given words.                                                                                                typographical errors at both the character and token
+· Longest Common Substrings (LCS) ­ The                                                                       levels, examining whether these models can main-
+  model identifies the longest continuous common                                                              tain semantic understanding when faced with such
+  substring for two given words.                                                                              perturbations. For character-level typographical
+· Longest Common Subsequences (LCSeq) ­                                                                       variation, we employed n-gram shuffling within
+  The model identifies the longest common sub-                                                                word boundaries (with n set to 2, 3, 5) with a
+  sequence (not necessarily continuous) between                                                               50% probability, and n-gram noise, which involve
+  two given words.                                                                                            adding, deleting, and replacing characters, spaces,
+   For each task, we conduct many-shot evalua-                                                                and punctuation marks to simulate spelling noise.
+tions (0-3 shot) and report the EM and edit distance                                                          This corruption occurs with a 30% probability, in-
+(ED) score to test the model's ability to understand                                                          cluding insertion, deletion, or substitution opera-
+and manipulate relationships between tokens at a
+higher level. For CS tasks, the model's response
+is considered correct if it generates one of the mul-
+tiple possible common substrings. Detailed test
+examples are provided in Appendix A.3.
+
+Results and Analysis The results are presented
+in Figure 5. The results for CS tasks indicate that
+larger models, such as Llama3-70B and GPT-4
+Turbo, perform significantly better than smaller
+models. GPT-4 Turbo achieves the highest ac-
+curacy across all shot settings, demonstrating the
+EM Score        llama3-8B            EM Score    llama3-8B-instruct    EM Score       llama3-70B        EM Score        llama3-8B            EM Score    llama3-8B-instruct  EM Score       llama3-70B
+          28 Baseline (28.27)                  35 Baseline (36.84)               30 Baseline (30.23)              60 Baseline (62.14)                  60 Baseline (63.9)              70 Baseline (75.43)
+
+          26                                   30                                28                               50                                   50                              60
+
+          24                                                                     26                               40                                   40                              50
+                                                                                                                    n=2 n=3 n=5                          n=2 n=3 n=5
+EM Score    n=2 n=3 n=5              EM Score    n=2 n=3 n=5                       n=2 n=3 n=5          EM Score        mistral-7B           EM Score       mixtral-8x7B                 n=2 n=3 n=5
+                mistral-7B                                                                                            Baseline (58.67)                     Baseline (67.19)
+                                                    mixtral-8x7B                       Typo Level                                                                                       Typo Level
+          28 Baseline (28.03)                                                            char level               50                                   60                                 char level
+          26                                       Baseline (34.03)                      token level                                                                                      token level
+                                               30                                                                 40                                   40
+                                                                                         Typo Type                  n=2 n=3 n=5                          n=2 n=3 n=5                      Typo Type
+          24                                   25                                           noise                                                                                             noise
+            n=2 n=3 n=5                          n=2 n=3 n=5                                reorder                                                     (b) MMLU                              reorder
+
+                                     (a) TruthfulQA
+
+                         Typo Level                                    Typo Type                                                 Typo Level                                  Typo Type
+                char level                                                                                              char level
+                                     token level                       noise         reorder                                                 token level                     noise      reorder
+                llama3-8B                                                                                               llama3-8B
+          40 Baseline (50.49)                      llama3-8B-instruct                llama3-70B                                                        llama3-8B-instruct              llama3-70B
+                                                                                                                  25 Baseline (25.61)
+EM Score  20                         EM Score      Baseline (75.59)    EM Score      Baseline (81.05)   EM Score  20                         EM Score  Baseline (55.49)      EM Score  60 Baseline (67.07)
+
+                                               50                                50                               15                                   40
+                                                                                                                    n=2 n=3 n=5                                                   40
+                                                                                                                         n-gram
+           0                                    0                                 0                                                                    20                              20
+            n=2 n=3 n=5                          n=2 n=3 n=5                       n=2 n=3 n=5                                                           n=2 n=3 n=5                     n=2 n=3 n=5
+                                                                                                                                                              n-gram                          n-gram
+                 n-gram                               n-gram                            n-gram
+EM Score        mistral-7B           EM Score       mixtral-8x7B       EM Score        gpt-4 turbo      EM Score        mistral-7B           EM Score       mixtral-8x7B     EM Score        gpt-4 turbo
+                                               50 Baseline (58.91)                                                25 Baseline (27.44)
+               Baseline (37.98)                                                       Baseline (62.93)                                                      Baseline (37.8)                 Baseline (88.41)
+                                               25                                                                 20
+          20                                                                     50                                                                    30                              75
+                                                                                                                  15
+                                                                                 25                                 n=2 n=3 n=5                        20                              50
+                                                                                                                         n-gram                          n=2 n=3 n=5
+          0                                    0                                 0                                                                            n-gram                     n=2 n=3 n=5
+           n=2 n=3 n=5                          n=2 n=3 n=5                       n=2 n=3 n=5                                                                                                 n-gram
+
+                n-gram                               n-gram                            n-gram
+
+                                 (c) GSM8K (5-shot)                                                                                          (d) HumanEval
+
+Figure 6: Performance comparison for various models across different n-gram sizes (n=2,3,5) and typographical
+variations on (1) TruthfulQA, (b) MMLU, (c) GSM8K, and (d) HumanEval. The typographical variations include
+character-level (blue) and token-level (orange) perturbations, with noise (solid line) and reorder (dashed line) types.
+Baseline performance is indicated with a dotted line at the top of each plot.
+
+tions. Token-level typographical variation was                                                          while MMLU, TruthfulQA, and HumanEval were
+introduced by shuffling tokens within n-grams of                                                        assessed in a zero-shot setting. We measured per-
+sizes 2, 3, and 5, with a 50% probability of permu-                                                     formance on MMLU and TruthfulQA using per-
+tation or typo generation, similar to the character-                                                    plexity for multiple-choice selection1.
+level method. We include four tasks:
+                                                                                                        Results and Analysis Figures 6 presents a com-
+· Character-Level Permutation: Shuffling char-                                                          prehensive analysis of the impact of typographical
+  acters within word boundaries using n-grams of                                                        variations on various LLMs, specifically focusing
+  sizes 2, 3, and 5, with a 50% probability.                                                            on character-level and token-level perturbations
+                                                                                                        across different n-gram sizes (n=2, 3, 5). The
+· Character-Level Noise: Adding, deleting, re-                                                          evaluation covers a range of datasets, including
+  placing random characters to simulate spelling                                                        TruthfulQA, MMLU, GSM8K (5-shot), and Hu-
+  noise, each with a 10% probability.                                                                   manEval.
+
+· Token-Level Permutation: Randomly reorder-                                                               Across all datasets and models, there is a con-
+  ing tokens using n-grams of sizes 2, 3, 5, with a                                                     sistent trend showing that LLMs are much more
+  50% probability.                                                                                      sensitive to noise (solid lines) than to reordering
+                                                                                                        (dashed lines). Noise injection, which involves
+· Token-Level Noise: Adding, deleting, replacing                                                        adding, deleting, or replacing characters or tokens,
+  tokens to inject noise, with a 30% probability.                                                       leads to more pronounced variations and generally
+
+   For evaluation, we report pass@1 for Hu-                                                                 1Since GPT-4 Turbo does not support perplexity computa-
+manEval using a temperature of 0.2 and a top-p                                                          tion, it was excluded from the evaluation for these two tasks.
+of 0.95. For others, we used a temperature of
+0. GSM8K was evaluated using a 5-shot setting,
+degrades overall performance. This is evident from                     drops BPE merges during tokenization. This tech-
+the lower EM scores for noise perturbations com-                       nique allows text sequences to be tokenized in more
+pared to reorder perturbations.                                        diverse ways, promoting robustness to various to-
+                                                                       ken combinations and increasing the likelihood of
+   Despite the challenges posed by n-gram re-                          encountering smaller tokens. Intuitively, this diver-
+ordering within word boundaries, GPT-4 Turbo                           sity benefits the model's understanding of internal
+maintained high accuracy across all n-gram sizes.                      token structures.
+Character-level n-gram noise injection, simulating
+realistic spelling noise, further tested the models'                   Training Setup For the training data, we synthe-
+robustness. The results indicate that all models                       sized a dataset consisting of 111k examples specifi-
+experienced evident performance degradation, re-                       cally designed for RQ2. We employ the AdamW
+gardless of the parameter sizes, highlighting their                    optimizer (Loshchilov and Hutter, 2017) with the
+sensitivity to typographical noise.                                    hyperpameters of 1 = 0.9, 2 = 0.95. The peak
+                                                                       learning rate is set to 5e-5, and the minimum learn-
+   For most models and datasets, as the n-gram                         ing rate is set to 1e-6. The learning rate warms
+size of noise injection increases from n=2 to 5, the                   up during the first 10% of training steps and then
+performance tends to stabilize or improve. This                        decays with a cosine scheduler.
+trend suggests that models can better handle larger
+n-gram noise injection, likely because the context                        Given the difference in data distribution resulting
+within larger n-grams provides more semantic co-                       from BPE-dropout, we post-train Mistral-7B (Jiang
+herence compared to smaller n-grams.                                   et al., 2023) on the training split for 5 epochs with a
+                                                                       global batch size of 16. Following the pre-training
+   At the token level, models were subjected to n-                     recipe, we concatenate all sequences and then
+gram permutations similar to those applied at the                      chunk them into fixed context lengths of 4096 for
+character level. The results indicated that models                     our autoregressive post-training. We conduct data
+generally performed better with token-level permu-                     shuffling within the same epochs. More detailed
+tations than with character-level shuffles and noise                   training settings are provided in Appendix B.3.
+injection. This suggests that token-level errors may
+be less disruptive to the overall semantic structure                   Results and Analysis Figure 7 shows the impact
+of the input text.                                                     of varying BPE-dropout rates on the Mistral-7B
+                                                                       model's performance across multiple K-shot set-
+6 Does BPE-dropout Matter?                                             tings and tasks. The baseline performance, with a
+                                                                       dropout rate of p = 0, shows robust results across
+          100  CCV      CC     NC                      NCR             several tasks, particularly in CS and CC. These
+                                                                       tasks are relatively straightforward, involving sim-
+EM Score  50                                                           ple token manipulations that do not significantly
+                                                                       challenge the model's capacity to generalize from
+               0 K1-sho2t 3 0 K1-sho2t 3 0 K1-sho2t 3 0 K1-sho2t 3     zero-shot to few-shot scenarios. The high perfor-
+                                                                       mance in these tasks suggests that the Mistral-7B
+                    CS  LCSeq  LCS                     p=0 (baseline)  model, even without BPE-dropout, is adept at han-
+          100                                          p=0.2           dling simpler token relationships. However, it is
+                                                       p=0.4           important to note that the baseline performance
+EM Score  50                                           p=0.6           does not uniformly extend to more complex tasks.
+                                                       p=0.8
+                                                                          In contrast, tasks such as LCSeq reveal relatively
+               0 K1-sho2t 3 0 K1-sho2t 3 0 K1-sho2t 3                  low performance across all models, irrespective of
+                                                                       the BPE-dropout rate. This suggests inherent diffi-
+Figure 7: K-shot performance on various tasks (CCV,                    culties in these tasks that stem from the requirement
+CC, NC, NCR, CS, LCSeq, and LCS) using the Mistral-                    to identify non-continuous and intricate token pat-
+7B model fine-tuned with a BPE-dropout tokenizer at                    terns. The consistent under-performance indicates
+different dropout rates p, ranging from 0 to 0.8. The                  that LCSeq tasks pose a significant challenge to the
+baseline without BPE-dropout (i.e., p = 0) is depicted                 model's ability to generalize, likely due to the in-
+with a dashed line. It demonstrates that introducing                   creased complexity in recognizing and processing
+a moderate amount of variability during tokenization                   longer and fragmented sequences.
+improves the model's generalization capabilities, miti-
+gating the curse of tokenization issues.                                  Interestingly, the introduction of a moderate
+
+   To further enhance the robustness of LLMs, we
+explore regularized tokenization approach, BPE-
+dropout (Provilkov et al., 2020), which randomly
+          100  CS        LCSeq       CCV    CC                   100  CS        LCSeq       CCV       CC
+
+EM Score  50                                           EM Score  50
+
+          0    12345123451234512345                                   01 2 3 4 5 1 2 3 4 5 1 2 3 4 5 1 2 3 4 5
+
+               Epoch     Epoch       Epoch  Epoch                     Epoch     Epoch       Epoch     Epoch
+
+                     NC  LCS         NCR    dropout p                       NC  LCS         NCR       dropout p
+          100                                                    100
+                                                  0.0                                                       0.0
+EM Score  50                                      0.2  EM Score  50                                         0.2
+                                                  0.4                                                       0.4
+          0                                       0.6                                                       0.6
+                                                  0.8                                                       0.8
+
+               123451234512345                                        01 2 3 4 5 1 2 3 4 5 1 2 3 4 5
+               Epoch     Epoch       Epoch                            Epoch     Epoch       Epoch
+
+                         (a) 0-shot                                             (b) 1-shot
+
+          100  CS        LCSeq       CCV    CC                   100  CS        LCSeq       CCV       CC
+
+EM Score  50                                           EM Score  50
+
+          0    12345123451234512345                              0    12345123451234512345
+
+               Epoch     Epoch       Epoch  Epoch                     Epoch     Epoch       Epoch     Epoch
+
+                     NC  LCS         NCR    dropout p                       NC  LCS         NCR       dropout p
+          100                                                    100
+                                                  0.0                                                       0.0
+EM Score  50                                      0.2  EM Score  50                                         0.2
+                                                  0.4                                                       0.4
+          0                                       0.6            0                                          0.6
+                                                  0.8                                                       0.8
+
+               123451234512345                                        123451234512345
+               Epoch     Epoch       Epoch                            Epoch     Epoch       Epoch
+
+                         (c) 2-shot                                             (d) 3-shot
+
+Figure 8: The impact of BPE-dropout on EM scores across seven tasks (CS, LCSeq, CCV, CC, NC, LCS, NCR)
+under different post-training conditions: (a) 0-shot, (b) 1-shot, (c) 2-shot, and (d) 3-shot. The dropout rates range
+from 0.0 to 0.8. The plots show that moderate dropout rates generally lead to improvements. Tasks such as CS and
+CC are more robust to dropout, maintaining higher scores even at moderate dropout rates, while tasks like NC, LCS,
+and NCR show significant performance drops with increasing dropout.
+
+BPE-dropout rate (p = 0.2) frequently surpasses        BPE-dropout rates. Moreover, we report the test-
+the baseline, highlighting the benefits of induc-      set performance across seven tasks over the course
+ing variability during tokenization. This moderate     of BPE-dropout fine-tuning in Figure 8. We pro-
+dropout rate enhances the model's generalization       vided detailed training analysis in Appendix §D.
+capabilities by preventing overfitting and promot-
+ing a more robust learning process. Notably, in        7 Conclusion
+tasks such as CCV, NC, and LCS, the p = 0.2
+model consistently achieves higher EM scores, un-      In this study, we investigated the challenge of the
+derscoring the benefits of incorporating tokeniza-     curse of tokenization, comprehensively evaluating
+tion regularization.                                   mainstream LLMs across thirteen tasks sensitive to
+                                                       conventional subword tokenization. Our findings
+   Our analysis reveals that higher dropout rates      reveal that while larger models and increased shot
+(p = 0.6 and p = 0.8) exhibit relatively lower per-    counts can partially mitigate these issues, LLMs
+formance across most tasks. This decline can be        still struggle with understanding internal structures
+attributed to insufficient training, as the dataset    and token compositions. Moderate BPE-dropout
+was trained for only five epochs. The higher           can alleviate some of these challenges, whereas
+dropout rates introduce greater tokenization vari-     larger drop rates lead to performance degradation.
+ation, which necessitates additional training com-     We encourage the research community to develop
+pute to achieve convergence. The lack of adequate      more flexible approaches to further address these
+training epochs likely hindered these models from      limitations and enhance model robustness.
+fully leveraging the potential benefits of higher
+Limitations                                            scenarios, such as extending to multilingual evalu-
+                                                       ation (Peng et al., 2024).
+While our study provides valuable insights into
+the robustness and performance of large language       Ethical Consideration
+models (LLMs) under various tokenization and ty-
+pographical variation scenarios, several limitations   Bias and Fairness Tokenization strategies can
+should be acknowledged:                                introduce or exacerbate biases present in the train-
+                                                       ing data. Our study, which involves diverse to-
+Data Diversity and Size The training data syn-         kenization techniques like BPE-Dropout, should
+thesized for RQ2 (token structure probe) consists      include thorough bias assessments to ensure that
+of approximate 30k examples. While this dataset        these methods do not perpetuate unfair or discrim-
+size is substantial, it may not fully capture the di-  inatory outcomes. Mitigating bias is crucial for
+versity and complexity of real-world text. Future      creating fair and equitable AI systems.
+work could benefit from expanding the dataset size
+and incorporating a wider range of linguistic phe-     Transparency and Interpretability Our re-
+nomena.                                                search involves complex tokenization processes
+                                                       that can obscure the decision-making of LLMs.
+Evaluation Metrics Our evaluation primarily re-        Enhancing the transparency of these models by
+lies on metrics such as pass@1 for HumanEval and       providing clear explanations of how tokenization
+accuracy for MMLU, TruthfulQA, and GSM8K.              impacts model behavior is essential. This trans-
+While these metrics provide valuable insights, they    parency helps build trust and allows users to un-
+may not fully capture the nuanced performance          derstand and identify potential issues in language
+of LLMs in real-world applications. Incorporat-        model predictions.
+ing additional metrics that assess other aspects of
+model performance, such as robustness to out-of-       Privacy and Data Security The datasets used
+distribution data and interpretability, could provide  for training and evaluating tokenization methods
+a more comprehensive evaluation.                       often contain sensitive information. Ensuring data
+                                                       anonymization and compliance with data protec-
+Subword Regularization Although our use of             tion regulations is critical to protecting user privacy.
+BPE-dropout shows promising improvements in            Our study adheres to strict data security protocols
+model robustness and accuracy, the approach in-        to prevent any misuse of sensitive information.
+troduces randomness into the tokenization process.
+This randomness can lead to variability in model       Acknowledgements
+performance, making it challenging to ensure con-
+sistent improvements across different datasets and     We would like to thank all anonymous reviewers
+tasks. Further research is needed to optimize the      for their insightful comments and feedback. Qi-
+BPE-dropout technique and evaluate its long-term       wei Peng is supported by DisAI - Improving scien-
+impact on model performance.                           tific excellence and creativity in combating disin-
+                                                       formation with artificial intelligence and language
+Typographical Variation Our study focuses on           technologies, a project funded by European Union
+character-level and token-level typographical varia-   under the Horizon Europe, GA No. 101079164.
+tions, but it does not address other common types
+of text perturbations, such as grammatical errors,     References
+semantic variations, or contextual inconsistencies.
+Exploring the effects of these additional types of     Mostafa Abdou, Vinit Ravishankar, Artur Kulmizev, and
+variations could provide a more holistic understand-      Anders Søgaard. 2022. Word order does matter and
+ing of LLM robustness.                                    shuffled language models know it. In Proceedings
+                                                          of the 60th Annual Meeting of the Association for
+Generalizability The findings from our evalu-             Computational Linguistics (Volume 1: Long Papers),
+ation on specific datasets (MMLU, TruthfulQA,             pages 6907­6919, Dublin, Ireland. Association for
+GSM8K, and HumanEval) may not generalize to               Computational Linguistics.
+all types of text and tasks. Further studies are
+needed to assess the generalizability of our findings  Armen Aghajanyan, Dmytro Okhonko, Mike Lewis,
+across a broader range of datasets and real-world         Mandar Joshi, Hu Xu, Gargi Ghosh, and Luke Zettle-
+                                                          moyer. 2022. HTLM: hyper-text pre-training and
+                                                          prompting of language models. In The Tenth Inter-
+                                                          national Conference on Learning Representations,
+   ICLR 2022, Virtual Event, April 25-29, 2022. Open-         Harrison Edwards, Yuri Burda, Nicholas Joseph,
+   Review.net.                                                Greg Brockman, Alex Ray, Raul Puri, Gretchen
+                                                              Krueger, Michael Petrov, Heidy Khlaaf, Girish Sas-
+AI@Meta. 2024. Llama 3 model card.                            try, Pamela Mishkin, Brooke Chan, Scott Gray,
+                                                              Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz
+Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-             Kaiser, Mohammad Bavarian, Clemens Winter,
+   Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan           Philippe Tillet, Felipe Petroski Such, Dave Cum-
+   Schalkwyk, Andrew M. Dai, Anja Hauth, Katie Mil-           mings, Matthias Plappert, Fotios Chantzis, Eliza-
+   lican, David Silver, Slav Petrov, Melvin Johnson,          beth Barnes, Ariel Herbert-Voss, William Hebgen
+   Ioannis Antonoglou, Julian Schrittwieser, Amelia           Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie
+   Glaese, Jilin Chen, Emily Pitler, Timothy P. Lilli-        Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain,
+   crap, Angeliki Lazaridou, Orhan Firat, James Molloy,       William Saunders, Christopher Hesse, Andrew N.
+   Michael Isard, Paul Ronald Barham, Tom Henni-              Carr, Jan Leike, Joshua Achiam, Vedant Misra, Evan
+   gan, Benjamin Lee, Fabio Viola, Malcolm Reynolds,          Morikawa, Alec Radford, Matthew Knight, Miles
+   Yuanzhong Xu, Ryan Doherty, Eli Collins, Clemens           Brundage, Mira Murati, Katie Mayer, Peter Welinder,
+   Meyer, Eliza Rutherford, Erica Moreira, Kareem             Bob McGrew, Dario Amodei, Sam McCandlish, Ilya
+   Ayoub, Megha Goel, George Tucker, Enrique Pi-              Sutskever, and Wojciech Zaremba. 2021. Evaluat-
+   queras, Maxim Krikun, Iain Barr, Nikolay Savinov,          ing large language models trained on code. CoRR,
+   Ivo Danihelka, Becca Roelofs, Anaïs White, Anders          abs/2107.03374.
+   Andreassen, Tamara von Glehn, Lakshman Yagati,
+   Mehran Kazemi, Lucas Gonzalez, Misha Khalman,           Jonathan H. Clark, Dan Garrette, Iulia Turc, and John
+   Jakub Sygnowski, and et al. 2023. Gemini: A fam-           Wieting. 2022. Canine: Pre-training an efficient
+   ily of highly capable multimodal models. CoRR,             tokenization-free encoder for language representa-
+   abs/2312.11805.                                            tion. Transactions of the Association for Computa-
+                                                              tional Linguistics, 10:73­91.
+Loubna Ben Allal, Niklas Muennighoff, Lo-
+   gesh Kumar Umapathi, Ben Lipkin, and                    Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian,
+   Leandro von Werra. 2022. A framework                       Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias
+   for the evaluation of code generation mod-                 Plappert, Jerry Tworek, Jacob Hilton, Reiichiro
+   els. https://github.com/bigcode-project/                   Nakano, Christopher Hesse, and John Schulman.
+   bigcode-evaluation-harness.                                2021. Training verifiers to solve math word prob-
+                                                              lems. CoRR, abs/2110.14168.
+Tom Brown, Benjamin Mann, Nick Ryder, Melanie
+   Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind      Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman,
+   Neelakantan, Pranav Shyam, Girish Sastry, Amanda           Sid Black, Anthony DiPofi, Charles Foster, Laurence
+   Askell, et al. 2020. Language models are few-shot          Golding, Jeffrey Hsu, Alain Le Noac'h, Haonan Li,
+   learners. Advances in neural information processing        Kyle McDonell, Niklas Muennighoff, Chris Ociepa,
+   systems, 33:1877­1901.                                     Jason Phang, Laria Reynolds, Hailey Schoelkopf,
+                                                              Aviya Skowron, Lintang Sutawika, Eric Tang, An-
+Qi Cao, Takeshi Kojima, Yutaka Matsuo, and Yusuke             ish Thite, Ben Wang, Kevin Wang, and Andy Zou.
+   Iwasawa. 2023. Unnatural error correction: GPT-4           2023. A framework for few-shot language model
+   can almost perfectly handle unnatural scrambled text.      evaluation.
+   In Proceedings of the 2023 Conference on Empirical
+   Methods in Natural Language Processing, EMNLP           Dan Hendrycks, Collin Burns, Steven Basart, Andy
+   2023, Singapore, December 6-10, 2023, pages 8898­          Zou, Mantas Mazeika, Dawn Song, and Jacob Stein-
+   8913. Association for Computational Linguistics.           hardt. 2021. Measuring massive multitask language
+                                                              understanding. In 9th International Conference on
+Yekun Chai. 2021. Word Tokenization for Pre-trained           Learning Representations, ICLR 2021, Virtual Event,
+   Models. https://cyk1337.github.io/notes/                   Austria, May 3-7, 2021. OpenReview.net.
+   2021/11/29/Subword-Tokenization-in-NLP/.
+                                                           Albert Q. Jiang, Alexandre Sablayrolles, Arthur Men-
+Yekun Chai, Qingyi Liu, Jingwu Xiao, Shuohuan                 sch, Chris Bamford, Devendra Singh Chaplot, Diego
+   Wang, Yu Sun, and Hua Wu. 2024. Autoregres-                de Las Casas, Florian Bressand, Gianna Lengyel,
+   sive pre-training on pixels and texts. arXiv preprint      Guillaume Lample, Lucile Saulnier, Lélio Re-
+   arXiv:2404.10710.                                          nard Lavaud, Marie-Anne Lachaux, Pierre Stock,
+                                                              Teven Le Scao, Thibaut Lavril, Thomas Wang, Timo-
+Yekun Chai, Shuohuan Wang, Chao Pang, Yu Sun, Hao             thée Lacroix, and William El Sayed. 2023. Mistral
+   Tian, and Hua Wu. 2023. ERNIE-code: Beyond                 7b. CoRR, abs/2310.06825.
+   English-centric cross-lingual pretraining for program-
+   ming languages. In Findings of the Association for      Albert Q. Jiang, Alexandre Sablayrolles, Antoine
+   Computational Linguistics: ACL 2023, pages 10628­          Roux, Arthur Mensch, Blanche Savary, Chris Bam-
+   10650, Toronto, Canada. Association for Computa-           ford, Devendra Singh Chaplot, Diego de Las Casas,
+   tional Linguistics.                                        Emma Bou Hanna, Florian Bressand, Gianna
+                                                              Lengyel, Guillaume Bour, Guillaume Lample,
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan,
+   Henrique Pondé de Oliveira Pinto, Jared Kaplan,
+   Lélio Renard Lavaud, Lucile Saulnier, Marie-              on Natural Language Processing (EMNLP-IJCNLP),
+   Anne Lachaux, Pierre Stock, Sandeep Subramanian,          pages 6408­6412, Hong Kong, China. Association
+   Sophia Yang, Szymon Antoniak, Teven Le Scao,              for Computational Linguistics.
+   Théophile Gervet, Thibaut Lavril, Thomas Wang,
+   Timothée Lacroix, and William El Sayed. 2024. Mix-     OpenAI. 2023. GPT-4 technical report. CoRR,
+   tral of experts. CoRR, abs/2401.04088.                    abs/2303.08774.
+
+Rafal Jozefowicz, Oriol Vinyals, Mike Schuster, Noam      Qiwei Peng, Yekun Chai, and Xuhong Li. 2024.
+   Shazeer, and Yonghui Wu. 2016. Exploring the              HumanEval-XL: A multilingual code generation
+   limits of language modeling. arXiv preprint               benchmark for cross-lingual natural language gen-
+   arXiv:1602.02410.                                         eralization. In Proceedings of the 2024 Joint In-
+                                                             ternational Conference on Computational Linguis-
+Taku Kudo. 2018. Subword regularization: Improv-             tics, Language Resources and Evaluation (LREC-
+   ing neural network translation models with multiple       COLING 2024), pages 8383­8394, Torino, Italia.
+   subword candidates. In Proceedings of the 56th An-        ELRA and ICCL.
+   nual Meeting of the Association for Computational
+   Linguistics (Volume 1: Long Papers), pages 66­75,      Qiwei Peng, David Weir, and Julie Weeds. 2023. Test-
+   Melbourne, Australia. Association for Computational       ing paraphrase models on recognising sentence pairs
+   Linguistics.                                              at different degrees of semantic overlap. In Proceed-
+                                                             ings of the 12th Joint Conference on Lexical and
+Taku Kudo and John Richardson. 2018. Sentencepiece:          Computational Semantics (*SEM 2023), pages 259­
+   A simple and language independent subword tok-            269, Toronto, Canada. Association for Computational
+   enizer and detokenizer for neural text processing. In     Linguistics.
+   Proceedings of the 2018 Conference on Empirical
+   Methods in Natural Language Processing, EMNLP          Ivan Provilkov, Dmitrii Emelianenko, and Elena Voita.
+   2018: System Demonstrations, Brussels, Belgium,           2020. BPE-dropout: Simple and effective subword
+   October 31 - November 4, 2018, pages 66­71. Asso-         regularization. In Proceedings of the 58th Annual
+   ciation for Computational Linguistics.                    Meeting of the Association for Computational Lin-
+                                                             guistics, pages 1882­1892, Online. Association for
+Stephanie Lin, Jacob Hilton, and Owain Evans. 2022.          Computational Linguistics.
+   TruthfulQA: Measuring how models mimic human
+   falsehoods. In Proceedings of the 60th Annual Meet-    Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya
+   ing of the Association for Computational Linguistics      Sutskever, et al. 2018. Improving language under-
+   (Volume 1: Long Papers), pages 3214­3252, Dublin,         standing by generative pre-training.
+   Ireland. Association for Computational Linguistics.
+                                                          Phillip Rust, Jonas F. Lotz, Emanuele Bugliarello, Eliz-
+Ilya Loshchilov and Frank Hutter. 2017. Decou-               abeth Salesky, Miryam de Lhoneux, and Desmond
+   pled weight decay regularization. arXiv preprint          Elliott. 2023. Language modelling with pixels. In
+   arXiv:1711.05101.                                         The Eleventh International Conference on Learning
+                                                             Representations, ICLR 2023, Kigali, Rwanda, May
+Anton Lozhkov, Raymond Li, Loubna Ben Allal, Fed-            1-5, 2023. OpenReview.net.
+   erico Cassano, Joel Lamy-Poirier, Nouamane Tazi,
+   Ao Tang, Dmytro Pykhtar, Jiawei Liu, Yuxiang Wei,      Mike Schuster and Kaisuke Nakajima. 2012. Japanese
+   Tianyang Liu, Max Tian, Denis Kocetkov, Arthur            and korean voice search. In 2012 IEEE International
+   Zucker, Younes Belkada, Zijian Wang, Qian Liu,            Conference on Acoustics, Speech and Signal Process-
+   Dmitry Abulkhanov, Indraneil Paul, Zhuang Li, Wen-        ing, ICASSP 2012, Kyoto, Japan, March 25-30, 2012,
+   Ding Li, Megan Risdal, Jia Li, Jian Zhu, Terry Yue        pages 5149­5152. IEEE.
+   Zhuo, Evgenii Zheltonozhskii, Nii Osae Osae Dade,
+   Wenhao Yu, Lucas Krauß, Naman Jain, Yixuan Su,         Rico Sennrich, Barry Haddow, and Alexandra Birch.
+   Xuanli He, Manan Dey, Edoardo Abati, Yekun Chai,          2016. Neural machine translation of rare words with
+   Niklas Muennighoff, Xiangru Tang, Muhtasham               subword units. In Proceedings of the 54th Annual
+   Oblokulov, Christopher Akiki, Marc Marone, Cheng-         Meeting of the Association for Computational Lin-
+   hao Mou, Mayank Mishra, Alex Gu, Binyuan Hui,             guistics, ACL 2016, August 7-12, 2016, Berlin, Ger-
+   Tri Dao, Armel Zebaze, Olivier Dehaene, Nicolas Pa-       many, Volume 1: Long Papers. The Association for
+   try, Canwen Xu, Julian J. McAuley, Han Hu, Torsten        Computer Linguistics.
+   Scholak, Sébastien Paquet, Jennifer Robinson, Car-
+   olyn Jane Anderson, Nicolas Chapados, and et al.       Koustuv Sinha, Prasanna Parthasarathi, Joelle Pineau,
+   2024. Starcoder 2 and the stack v2: The next genera-      and Adina Williams. 2021. UnNatural Language
+   tion. CoRR, abs/2402.19173.                               Inference. In Proceedings of the 59th Annual Meet-
+                                                             ing of the Association for Computational Linguistics
+Masaaki Nishino, Sho Takase, Tsutomu Hirao, and              and the 11th International Joint Conference on Natu-
+   Masaaki Nagata. 2019. Generating natural anagrams:        ral Language Processing (Volume 1: Long Papers),
+   Towards language generation under hard combinato-         pages 7329­7346, Online. Association for Computa-
+   rial constraints. In Proceedings of the 2019 Confer-      tional Linguistics.
+   ence on Empirical Methods in Natural Language Pro-
+   cessing and the 9th International Joint Conference
+Aarohi Srivastava, Abhinav Rastogi, Abhishek Rao,
+   Abu Awal Md Shoeb, Abubakar Abid, Adam
+   Fisch, Adam R. Brown, Adam Santoro, Aditya
+   Gupta, Adrià Garriga-Alonso, Agnieszka Kluska,
+   Aitor Lewkowycz, Akshat Agarwal, Alethea Power,
+   Alex Ray, Alex Warstadt, Alexander W. Kocurek,
+   Ali Safaya, Ali Tazarv, Alice Xiang, Alicia Par-
+   rish, Allen Nie, Aman Hussain, Amanda Askell,
+   Amanda Dsouza, Ameet Rahane, Anantharaman S.
+   Iyer, Anders Andreassen, Andrea Santilli, Andreas
+   Stuhlmüller, Andrew M. Dai, Andrew La, Andrew K.
+   Lampinen, Andy Zou, Angela Jiang, Angelica Chen,
+   Anh Vuong, Animesh Gupta, Anna Gottardi, Anto-
+   nio Norelli, Anu Venkatesh, Arash Gholamidavoodi,
+   Arfa Tabassum, Arul Menezes, Arun Kirubarajan,
+   Asher Mullokandov, Ashish Sabharwal, Austin Her-
+   rick, Avia Efrat, Aykut Erdem, Ayla Karakas, and
+   et al. 2022. Beyond the imitation game: Quantifying
+   and extrapolating the capabilities of language models.
+   CoRR, abs/2206.04615.
+
+Ilya Sutskever, James Martens, and Geoffrey Hinton.
+   2011. Generating text with recurrent neural networks.
+   In Proceedings of the 28th International Conference
+   on International Conference on Machine Learning,
+   ICML'11, page 1017­1024, Madison, WI, USA. Om-
+   nipress.
+
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Al-
+   bert, Amjad Almahairi, Yasmine Babaei, Nikolay
+   Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti
+   Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton-
+   Ferrer, Moya Chen, Guillem Cucurull, David Esiobu,
+   Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller,
+   Cynthia Gao, Vedanuj Goswami, Naman Goyal, An-
+   thony Hartshorn, Saghar Hosseini, Rui Hou, Hakan
+   Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa,
+   Isabel Kloumann, Artem Korenev, Punit Singh Koura,
+   Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Di-
+   ana Liskovich, Yinghai Lu, Yuning Mao, Xavier Mar-
+   tinet, Todor Mihaylov, Pushkar Mishra, Igor Moly-
+   bog, Yixin Nie, Andrew Poulton, Jeremy Reizen-
+   stein, Rashi Rungta, Kalyan Saladi, Alan Schelten,
+   Ruan Silva, Eric Michael Smith, Ranjan Subrama-
+   nian, Xiaoqing Ellen Tan, Binh Tang, Ross Tay-
+   lor, Adina Williams, Jian Xiang Kuan, Puxin Xu,
+   Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan,
+   Melanie Kambadur, Sharan Narang, Aurélien Ro-
+   driguez, Robert Stojnic, Sergey Edunov, and Thomas
+   Scialom. 2023. Llama 2: Open foundation and fine-
+   tuned chat models. CoRR, abs/2307.09288.
+
+Linting Xue, Aditya Barua, Noah Constant, Rami Al-
+   Rfou, Sharan Narang, Mihir Kale, Adam Roberts,
+   and Colin Raffel. 2022. Byt5: Towards a token-free
+   future with pre-trained byte-to-byte models. Trans.
+   Assoc. Comput. Linguistics, 10:291­306.
+A Task Examples                                      Character Count (CC)
+
+A.1 Complex Problem Solving Examples                 Input: Which character appears 3 times
+                                                     in the word `messrs'?
+We present detailed examples of complex problem-     Output: `s'.
+solving tasks including word anagram and identify-
+ing math theorems as follows:                        N -th Character (NC)
+
+    Anagram Task Format                              Input: What is the 4th character of the
+    Input: A string of jumbled characters            word `myron'?
+    (e.g., "moeh" for "home").                       Output: `o'.
+    Output: The correct unscrambled word
+    (e.g., "home").                                  N -th Character Reverse (NCR)
+
+    Identifying Math Theorems Task Format            Input: What is the 2nd character from
+                                                     the end of the word `pensioner'?
+                                                     Output: `e'.
+
+Input: A LATEX-formatted mathemati-                      Case Conversion (CCV)
+cal theorem. E.g., "Let f  L1(R) be
+                                                         Input: Which character appears 3 times
+an integrable function. The span of                      in the word `messrs'?
+                                                         Output: `s'.
+{fa(x) = f (x + a) : a  R} is dense in
+L1(R) if and only if f has no real roots..           A.3 Inter-Token Probing Examples
+A) Let f  L1(R) be an integrable func-
+                                                     We present examples of inter-token probing tasks,
+    tion. The span of {fa(x) = f (x + a) :           which involve identifying Common Substrings
+    a  R} is dense in L1(R) if and only              (CS), Longest Common Subsequences (LCSeq),
+                                                     and Longest Common Substrings (LCS). These
+    if f has no real roots.                          tasks evaluate the model's ability to analyze and
+B) Let f  L1(R) be an integrable func-               compare internal structure across different inputs.
+
+    tion. The span of {fa(x) = f (x + a) :               Common Substrings (CS)
+    a  R} is dense in L1(R) if and only
+                                                         Input: What are the common substrings
+    if f has no real roots. .                            of 'critical' and 'conscious'?
+C) Let f  L1(R) be an integrable func-                   Output: `i`, `c'.
+
+    tion. The span of {fa(x) = f (x + a) :               Longest Common Subsequences (LCSeq)
+    a  R} is dense in L1(R) if and only
+                                                         Input: What are the longest common
+    if f is irreducible over Q.                          subsequences of `illustrate' and `criti-
+D) Let f  L1(R) be an integrable func-                   cal'?
+                                                         Output: `ita'.
+    tion. The span of {fa(x) = f (x + a) :
+    a  R} is dense in L1(R) if and only
+
+    if f has no repeated roots.
+
+Output: The model must determine
+
+whether the theorem is true. If it is false,
+
+the model should provide the correct
+
+version; i.e., select the option "A".
+
+A.2 Intra-Token Probing Examples                     Longest Common Substrings (LCS)
+
+For intra-token probing tasks, we provide Character  Input: What are the longest common
+Count (CC), N -th Character (NC), N -th Character    substrings of `cow' and `condition'?
+Reverse (NCR), and Case Conversion (CCV) for         Output: `co'.
+illustration.
+B Experimental Settings                                   For models after instruction-tuning, we do not
+                                                       apply chat templates except for TruthfulQA, as
+B.1 Baselines                                          model outputs tend to be difficult to parse in chat
+                                                       mode.
+We include Llama3-8B, Llama3-8B-Instruct,
+Llama3-70B, Mistral-7B and Mixtral-8x7B for            B.3 Post-Training Details
+LLM evaluation.
+                                                       Dataset We synthesized the dataset for RQ2 with
+Llama3 Llama3 (AI@Meta, 2024) series are one           a template-based method. Table 2 describes statis-
+of the most powerful open-sourced models recently.     tics of dataset splits for each task.
+Llama3-8B is a dense pretrained model with a
+vocab size of 128256, which needs few-shot ex-         Task                         Train Test
+amples to better follow instructions. Llama3-8B-
+Instruct is also envolved for diverse model types.     Intra-Token Probing          111,070 800
+Llama3-8B-Instrcut is a instruction-fine-tuned ver-
+sion of Llama3-8B, showing much improvement            Character Count              20,775 200
+over Llama3-8B on benchmarks like HumanEval            N-th Character               31,241 200
+and TruthfulQA.                                        N-th Character Reverse       31,316 200
+                                                       Case Conversion              27,738 200
+Mistral & Mixtral Mistral-7B (Jiang et al.,
+2023) is a dense model with a vocab size of 32000      Inter-Token Probing          14,400 600
+released last year. Mixtral-8x7B (Jiang et al., 2024)
+is a sparse mixture-of-expert(MoE) model with          Common Substrings            4,800 200
+13B active parameters, whose performance greatly       Longest Common Substrings    4,800 200
+surpasses Mistral-7B and matches the performance       Longest Common Subsequences  4,800 200
+of Llama2-70B.
+                                                       Table 2: The dataset size for training and testing.
+
+GPT-4 Turbo The model version we evaluate is           C Details of Probing Task Construction
+"gpt-4-1106-preview"2. Compared with GPT-4,
+"gpt-4-1106-preview" yields stronger performance       C.1 Token Structure Probing (RQ2)
+on following instructions, structured output and
+other abilities.                                       To create a comprehensive test set for evaluating
+                                                       the tokenization capabilities of LLMs, we followed
+B.2 Evaluation Settings                                a systematic data synthesis process. Initially, we
+                                                       manually collected a set of around 300 words from
+We utilize lm-evaluation-harness (Gao et al., 2023)    the web, ensuring a diverse representation of word
+for the evaluation of GSM8K, MMLU, and                 structures. This collection included words with
+TruthfulQA. For HumanEval, we adopt bigcode-           common suffixes, prefixes, and varying lengths to
+evaluation-harness (Ben Allal et al., 2022). All       cover a broad range of token structures.
+models are tested under bfloat16 precision for
+higher efficiency.                                        Next, we defined a set of rules to create tasks
+                                                       for both intra-token and inter-token evaluations.
+   To eliminate the impact of the Chain-of-Thought     These rules were designed to test different aspects
+(CoT) prompt, GSM8K is evaluated using a 5-            of tokenization, such as character counting, charac-
+shot setting without CoT, and we report the "exact     ter identification, case conversion, and identifying
+match" as the final metric. For HumanEval, we          common substrings and subsequences.
+report pass@1 using a temperature of 0.2 and a
+top-p of 0.95. The maximum total length of the            Then we generated the probing tasks. For intra-
+prompt and model output is set to 512 for Llama3       token evaluations, we created tasks like Character
+and 1024 for Mistral-7B and Mixtral-8x7B. We           Count (CC), N -th Character (NC), N -th Character
+only apply corruption to the annotation to make        Reverse (NCR), and Case Conversion (CCV). For
+sure that entry point can be found after corruption.   inter-token evaluations, we developed tasks such as
+For TruthfulQA, model performances are measured        Common Substrings (CS), Longest Common Sub-
+within the "MC1 (single-true)" setting.                strings (LCS), and Longest Common Subsequences
+                                                       (LCSeq). Each task was carefully crafted to test
+    2https://platform.openai.com/docs/models/          the model's ability to understand and manipulate
+gpt-4-turbo-and-gpt-4                                  token structures at various levels.
+C.2 Typographical Variation Task (RQ3)                  variations, challenging the models to handle disrup-
+                                                        tions at the token level. Figure 10 gives an example
+Task        Test                                        of how we apply such variations to an encoded
+                                                        prompt.
+GSM8k        1,319
+MMLU        14,042                                      D Detailed Results of BPE-dropout
+TruthfulQA                                                   Post-Training
+HumanEval       817
+                164                                     The results, as shown in Figure 8, illustrate the ef-
+                                                        fect of BPE-dropout on EM scores across seven
+Table 3: Dataset statistics of typographical variation  tasks (CS, LCSeq, CCV, CC, NC, LCS, NCR) un-
+tasks (RQ3).                                            der various post-training conditions (0-shot, 1-shot,
+                                                        2-shot, and 3-shot) with dropout rates ranging from
+   To thoroughly evaluate the typographical varia-      0.0 to 0.8.
+tion (RQ3), we conduct corruption to the questions
+of several benchmark datasets' test split and keep         We observe that moderate dropout rates (0.2 to
+answers intact. Details of evaluation dataset are       0.4) appear to improve the convergence of EM
+summarized at Table 3.                                  scores across all tasks, particularly in the zero-shot
+                                                        setting. This indicates that a certain level of vari-
+Permutation For permutation task, we randomly           ability introduced by dropout can help the model
+shuffle tokens or characters within an n-gram range     generalize better when no additional examples are
+with a 50% probability. We evaluate by using n-         provided. In the 1-shot, 2-shot, and 3-shot settings,
+gram range from 2 to 5, in which various n-gram         moderate dropout rates contribute to stabilizing per-
+levels could assess the model's performance under       formance, suggesting that this level of dropout in-
+varying degrees of corruption.                          troduces useful regularization without significantly
+                                                        compromising token integrity.
+Noise Injection We consider three kinds of noise
+that commonly encountered by humans: insertion             It is evident that higher dropout rates (0.6 and
+(10%), deletion (10%), and replacement (10%). For       0.8) lead to a noticeable decline in EM scores
+insertion, we choose a token or character from the      across all tasks and post-training conditions. This
+current n-gram under 50% circumstances. Other-          indicates that excessive dropout disrupts the tok-
+wise, we randomly select a token or character from      enization process, resulting in subwords with fewer
+the whole vocabulary (token or character) and add       merges that conflict with the original pre-training
+it to a random position.                                of the models. Tasks such as NC, LCS, and NCR
+                                                        show more significant drops in EM scores with
+   When performing replacing, we replace a token        higher dropout rates, reflecting their complexity
+or character in the current n-gram with a token or      and the challenge of maintaining token integrity
+character randomly selected from the whole vocab-       under substantial dropout.
+ulary.
+                                                           Task-specific performance varies under differ-
+Character-Level We performed character-level            ent dropout conditions. CS and CC tasks exhibit
+permutation within word boundaries, ensuring that       high robustness to dropout, maintaining relatively
+the positions of punctuation marks or spaces re-        stable EM scores even at moderate dropout rates.
+mained unchanged after permutation. Even when           This suggests that the nature of these tasks makes
+there were not enough characters to form a com-         them less sensitive to the variability introduced by
+plete n-gram, permutation was still applied. We         dropout. LCSeq and CCV tasks show moderate
+ignore word boundaries when injecting character-        sensitivity to dropout, with a noticeable decline in
+level noise. Figure 9 illustrates our character-level   performance at higher dropout rates. NC, LCS, and
+corruption approach using a 5-gram granularity.         NCR tasks are more adversely affected by higher
+                                                        dropout rates, indicating their reliance on stable
+Token-Level We converted the input prompts              token sequences.
+into tokens using tokenizers from different model
+families. Corruption was then applied within an            The positive effects of moderate BPE-dropout
+n-gram range, without regard to word boundaries.        include improved generalization and regularization.
+This approach simulates token-level typographical       Moderate dropout rates (0.2 to 0.4) introduce ben-
+                                                        eficial variability, enhancing the model's ability
+Raw text     def largest_divisor(n: int) -> int:
+                    """ For a given number n, find
+                    the largest number that divides n evenly, smaller than n
+                    >>> largest_divisor(15)
+                    5
+                    """
+
+ Char-level  def largest_divisor(n: int) -> int:
+permutation         """ For a given number n, fdin
+                    teh raglets number htat dividse n leenvy, asllmer than n
+  (5-gram)          >>> largest_divisor(15)
+                    5
+                    """
+
+Char-level   def largest_divisor(n: int) -> int:
+   noise            """ For a gaiven numberwn, find
+                    the largest number that diaides n evenly, smaller than n
+ (5-gram)           >>> laUgest_|divisor(15)
+                    H5
+                    """
+
+Figure 9: Example of a char-level(5-gram) corrupted prompt from HumanEval. Red, Green, and Gray denote
+replacement, insertion, and deletion respectively.
+
+Raw tokens   [8100, 50777, 2380, 369, 17954, 1475, 6693, 323, 293, 2094, 55404, 1354, 369,
+             1077, 4885, 1475, 1938, 449, 3116, 13, 3005, 31878, 279, 27410, 520, 279, 20957,
+             6, 3157, 7446, 369, 400, 17, 824, 7878, 37085, 19151, 13]
+
+Token-level  [8100, 50777, 2380, 369, 17954, 1475, 6693, 293, 323, 2094, 55404, 1354, 369,
+permutation  1077, 4885, 1475, 1938, 449, 3116, 13, 3005, 279, 31878, 27410, 520, 279, 20957,
+             6, 3157, 7446, 369, 400, 17, 824, 7878, 37085, 13, 19151]
+  (3-gram)
+
+Token-level  [8100, 50777, 2380, 412, 17954, 1475, 6693, 323, 293, 2094, 4124, 55404, 1354, 369,
+    noise    1077, 4885, 1475, 1938, 449, 75316, 13, 3005, 31878, 279, 27410, 520, 279, 20957, 6,
+             3157, 7446, 369, 400, 6134, 17, 824, 7878, 37085, 19151, 13]
+ (3-gram)
+
+Figure 10: Example of a token-level(tri-gram) corrupted prompt from GSM8K. Red, Green, and Gray denote
+replacement, insertion, and deletion respectively.
+
+to generalize, particularly in zero-shot scenarios      overfitting can be a significant concern.
+where the model must rely solely on its pre-trained        However, challenges arise with high dropout
+knowledge without additional examples. BPE-
+dropout acts as a regularizer, preventing the model     rates. Higher dropout rates lead to subwords with
+from overfitting to specific token sequences seen       fewer merges, deviating from the token sequences
+during pre-training. This is especially useful in low-  the model encountered during pre-training. This
+resource settings (e.g., 0-shot and 1-shot) where       disruption results in poorer performance, as the
+                                                        model struggles to reconcile the altered tokeniza-
+tion with its pre-trained representations. More com-                                                            E.2 Compositional Challenges in Token
+plex tasks (NC, LCS, NCR) suffer more from high                                                                        Embeddings
+dropout rates, highlighting the need for careful tun-
+ing of dropout rates based on task complexity and                                                               Figure 1 illustrates the compositional challenges
+tokenization stability requirements.                                                                            faced by existing LLMs when handling subword
+                                                                                                                units. Specifically, it presents cosine similarities
+   The findings suggest that there is an optimal                                                                and angular differences between embeddings of
+range for BPE-dropout rates that balances the ben-                                                              original words and their subword components.
+efits of regularization and improved generalization
+with the need to maintain token integrity. Prac-                                                                   In Figure 1(a), we observe the word "assign-
+titioners should consider moderate dropout rates                                                                ment" and its subword components "assign" and
+to leverage the positive effects while avoiding the                                                             "ment". The cosine similarity between the com-
+pitfalls of excessive dropout. Different tasks ex-                                                              posite embedding "assign + ment" and the original
+hibit varying sensitivities to dropout, underscoring                                                            word "assignment" is relatively low at 0.21, with
+the importance of task-specific dropout tuning to                                                               a significant angular difference of 78.16 degrees.
+achieve the best performance outcomes.                                                                          This substantial disparity indicates that the learned
+                                                                                                                token embeddings fail to capture the surface form
+E Additional Analysis                                                                                           composition accurately. The model does not rec-
+                                                                                                                ognize that "assign" combined with "ment" should
+E.1 Impact of Typographical Variations on                                                                       semantically align closely with "assignment".
+       Sequence Length
+                                                                                                                   Similarly, Figure 1(b) shows the word "import"
+                                          reorder               noise                                           and its subword components "im" and "port". Here,
+                                                                                                                the cosine similarity between "im + port" and "im-
+       task = gsm8k | ngram = 2 task = gsm8k | ngram = 3 task = gsm8k | ngram = 5                               port" is 0.13, and the angular difference is still no-
+                                                                                                                table at 82.47 degrees. This suggests that while the
+       200                                200                                200                                model captures some compositional aspects, it still
+                                                                                                                struggles to fully integrate subword information to
+after  100                                                                                                      match the original word's embedding perfectly.
+
+                                          100                                100                                   These observations highlight a critical limitation
+                                                                                                                of existing LLMs: their learned token embeddings
+                 50 100 150                         50 100 150                         50 100 150               do not adequately capture the surface form com-
+                                                                                                                position. The inability to effectively combine sub-
+       1500task  =  mmlu  |  ngram  =  2      task  =  mmlu  |  ngram  =  3      task  =  mmlu  |  ngram  =  5  word units to represent the full word's meaning
+                                          1500                               1500                               undermines the model's overall understanding and
+                                                                                                                processing capabilities.
+after  1000                               1000                               1000
+
+       500                                500                                500
+
+       0                                  0                                  0
+
+             0      500                         0      500                         0      500
+                    before                             before                             before
+
+Figure 11: Scatter plots showing the positive correla-
+tion between token lengths before and after introducing
+typographical errors on MMLU and GSM8K, varying
+n-gram settings (2, 3, or 5). The x-axis represents the
+original token length, and the y-axis represents token
+length after adding errors.
+
+   Figure 11 shows a strong positive correlation be-
+tween token lengths before and after introducing
+typographical errors across different tasks (GSM8K
+and MMLU) and n-gram settings (2, 3, 5). We ob-
+serve that token lengths after introducing errors are
+proportional to their original lengths. Besides, both
+GSM8k and MMLU tasks exhibit similar patterns,
+and the n-gram settings (2, 3, 5) do not significantly
+alter this relationship. Most interestingly, the slope
+for reorder errors is relatively larger than for noise
+errors, indicating that reorder errors tend to re-
+sult in a slightly greater increase in token length
+compared to noise errors.
+

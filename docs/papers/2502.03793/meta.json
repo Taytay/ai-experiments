@@ -1,0 +1,26 @@
+{
+  "id": "2502.03793",
+  "version": "v2",
+  "id_versioned": "2502.03793v2",
+  "title": "It's All in The [MASK]: Simple Instruction-Tuning Enables BERT-like Masked Language Models As Generative Classifiers",
+  "authors": [
+    "Benjamin Clavié",
+    "Nathan Cooper",
+    "Benjamin Warner"
+  ],
+  "published": "2025-02-06",
+  "updated": "2025-02-06",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "While encoder-only models such as BERT and ModernBERT are ubiquitous in real-world NLP applications, their conventional reliance on task-specific classification heads can limit their applicability compared to decoder-based large language models (LLMs). In this work, we introduce ModernBERT-Large-Instruct, a 0.4B-parameter encoder model that leverages its masked language modelling (MLM) head for generative classification. Our approach employs an intentionally simple training loop and inference mechanism that requires no heavy pre-processing, heavily engineered prompting, or architectural modifications. ModernBERT-Large-Instruct exhibits strong zero-shot performance on both classification and knowledge-based tasks, outperforming similarly sized LLMs on MMLU and achieving 93% of Llama3-1B's MMLU performance with 60% less parameters. We also demonstrate that, when fine-tuned, the generative approach using the MLM head matches or even surpasses traditional classification-head methods across diverse NLU tasks.This capability emerges specifically in models trained on contemporary, diverse data mixes, with models trained on lower volume, less-diverse data yielding considerably weaker performance. Although preliminary, these results demonstrate the potential of using the original generative masked language modelling head over traditional task-specific heads for downstream tasks. Our work suggests that further exploration into this area is warranted, highlighting many avenues for future improvements.",
+  "abs_url": "https://arxiv.org/abs/2502.03793",
+  "pdf_url": "https://arxiv.org/pdf/2502.03793",
+  "src_url": "https://arxiv.org/src/2502.03793v2",
+  "metadata_source": "abs-page"
+}
