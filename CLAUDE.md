@@ -67,8 +67,8 @@ Both sides:
 - After a training run: `just push-models` (`dvc add models/adapters` then `dvc push`), then
   commit the updated `models/adapters.dvc` with the results.
 - The driver can spill VRAM to system memory and turn an OOM into a 3x slowdown
-  (`reports/REPORT.md` section 7). Until `just doctor --gpu` reports "no silent spill" on this
-  side, watch step times, not just whether the run finishes.
+  (`reports/REPORT.md` section 7). `just doctor --gpu` tests it; unless that check is OK on
+  this side, watch step times, not just whether the run finishes.
 
 Windows side only:
 

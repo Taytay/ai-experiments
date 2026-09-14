@@ -121,13 +121,15 @@ Repo changes so the docs carry fewer caveats: `src/ai_experiments` is an install
 `justfile` wraps setup and the DVC routine, and `scripts/doctor.py` (`just doctor`) checks the
 machine. `just` 1.58.0 was installed on the Windows side with winget.
 
-First `just doctor --gpu` on the Windows side, all still to be changed by hand:
+The first `just doctor --gpu` on the Windows side found the `python3.exe` Store alias still on,
+no `pdftoppm`, and the driver spilling past VRAM into system RAM (a 125% allocation
+succeeded). The same day the user turned the Store aliases off and set the NVIDIA Control Panel
+CUDA Sysmem Fallback Policy to "Prefer No Sysmem Fallback" on both the Windows and WSL sides;
+the test now gets the wanted OutOfMemoryError. The WDDM caveat in `reports/REPORT.md`
+section 7 describes runs made before that change.
 
-| Check | Result | Fix |
-| --- | --- | --- |
-| Store alias | `python3.exe` still resolves to `WindowsApps` | Settings > Apps > Advanced app settings > App execution aliases: turn off python.exe and python3.exe |
-| poppler | `pdftotext` from Git's mingw64, no `pdftoppm` | `just pdf-tools` (winget Poppler on Windows, apt poppler-utils on WSL); optional, research steps only |
-| sysmem fallback | allocating 125% of VRAM succeeded, so the driver spills to system RAM | NVIDIA Control Panel > Manage 3D settings > CUDA - Sysmem Fallback Policy > Prefer No Sysmem Fallback; then re-run `just doctor --gpu` on both sides |
+This file records what changed and why; `just doctor` reports the current state of a machine,
+so it is not tracked here.
 
 Git state: every tracked file is LF in the index; 80 files sit as CRLF in the Windows working
 tree (written by editors, normalised on add). Harmless, and a fresh checkout is all LF.
