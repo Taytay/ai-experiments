@@ -3,7 +3,7 @@
 Project: experiments on injecting new knowledge and terminology into small LLMs and embedding
 models, and extracting it again (multiple choice, in-context label induction, prototype
 classification). One RTX 3090 (24 GB), Windows 11, `uv` venv, unsloth. The original driver
-check that named the repo is done; the research is what the repo is for now.
+check the repo started as is done; the research is what the repo is for now.
 
 ## Start here
 

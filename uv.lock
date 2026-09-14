@@ -433,7 +433,7 @@ http = [
 ]
 
 [[package]]
-name = "gpu-unsloth-check"
+name = "ai-experiments"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
