@@ -38,7 +38,7 @@ afternoon each on the 3090.
 
 | # | Step | IDs | Needs | Status | Result |
 |---|------|-----|-------|--------|--------|
-| 1 | Persist per-item, per-option log-probs, argmax, token and byte counts from every eval; freeze `ladder`, `probes`, `heldout_induction` to versioned JSON in `data/processed/` and record the hash in the tracker config. Done when every existing adapter has been re-scored with `EVAL_ONLY` and the per-item files exist. | STAT-2, STAT-3 | - | todo | |
+| 1 | Persist per-item, per-option log-probs, argmax, token and byte counts from every eval; freeze `ladder`, `probes`, `heldout_induction` to versioned JSON in `data/processed/` and record the hash in the tracker config. Done when every existing adapter has been re-scored with `EVAL_ONLY` and the per-item files exist. | STAT-2, STAT-3 | - | doing | |
 | 2 | Scorer set on the saved logits: sum, mean-per-token (current), PMI_DC, Bayesian length correction, hybrid symbol scoring on 3B, unconditional-option baseline (UNC), RStd, predicted-label histogram. Done when one table reports every arm under every scorer and says which cells move. | EVAL-2, EVAL-1, EVAL-6 | 1 | todo | |
 | 3 | Constructed-response eval: greedy-decode 32 tokens for every L1, L3, category and sells item; exact and fuzzy match; options-listed variant; three-way agreement with the two cloze scorers. | EVAL-3 | 1 | todo | |
 | 4 | Empirical null band per level (shuffle answer index 1,000 times over saved per-option scores); bootstrap CIs and paired tests from the per-item files; CI column in every report table. | STAT-2, EVAL-6, REPORT-2 | 1 | todo | |
