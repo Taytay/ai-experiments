@@ -15,19 +15,18 @@ import random
 import sys
 import time
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 import torch
 import torch.nn.functional as F
 from transformers import AutoModel, AutoTokenizer
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-import universe as U  # noqa: E402
-from evals.tracker import Run  # noqa: E402
+from ai_experiments import universe as U
+from ai_experiments.evals.tracker import Run
 
 MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EPOCHS, BS, LR, SEED = 8, 32, 3e-5, 0
-OUT = Path(__file__).parent.parent / "results" / "universe_embed.json"
+OUT = ROOT / "results" / "universe_embed.json"
 torch.manual_seed(SEED)
 rng = random.Random(SEED)
 

@@ -24,12 +24,13 @@ we collected, `src/` is library code, `scripts/` is entry points.
 | `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end | a step finishes |
 | `references/SURVEY.md` | What 34 papers say about each ID | more papers are read |
 | `references/papers/<id>/summary.md` | One paper each; `INDEX.md` lists them by thread | a paper is read |
-| `src/` | `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py` | the datasets or item builders change |
-| `scripts/` | Runnable experiments and table generators; each adds `src/` to `sys.path` | a new experiment |
+| `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
+| `scripts/` | Runnable experiments and table generators; they `import ai_experiments` and run from any directory | a new experiment |
+| `justfile` | Task runner: `just setup`, `just doctor`, `just push-models`, `just smoke`; `just` lists them | a routine changes |
 | `data/processed/` | Frozen item sets, versioned, hash recorded in the tracker | an item set is frozen |
 | `results/` | Raw JSON and logs, one file per run and arm | every run |
 | `models/` | Adapters and fine-tuned weights, tracked by DVC (`adapters.dvc` in git, bytes at `D:\repos\dvc\ai-experiments`) | every training run |
-| `evals/` | Run tracker (`runs.jsonl` is the record), `LEADERBOARD.md` | every run |
+| `evals/` | Tracker data: `runs.jsonl` (the record), `LEADERBOARD.md`; CLI is `uv run evals` | every run |
 | `NOTES.md` | Machine and environment history | the environment changes |
 
 `reports/improvements.html` is an illustrated copy of the report as of section 8.
@@ -40,32 +41,37 @@ we collected, `src/` is library code, `scripts/` is entry points.
 
 The repo runs from two checkouts on one machine: native Windows 11 and WSL2 (Ubuntu 26.04).
 They share the GPU, the driver, everything in git, and the DVC remote on D:. They do not share
-`.venv/`, `models/adapters/` (restored per checkout with `uv run dvc pull`), `hf_cache/` or
-`evals/runs.db`. See `NOTES.md` for the history of each side.
+`.venv/`, `models/adapters/`, `hf_cache/` or `evals/runs.db`. See `NOTES.md` for the history.
 
 Both sides:
 
-- Run Python with `uv run python ...`, never a bare `python`. Run `uv sync` once per checkout.
-- The DVC remote path is not in the shared config. If any `dvc` command fails with
-  `expected 'url' for dictionary value @ data['remote']['dstore']`, run the one-line
-  `dvc remote modify --local` command from the comment in `.dvc/config` for this OS.
+- Once per checkout: `just setup` (runs `uv sync`, writes this OS's DVC remote path to the
+  gitignored `.dvc/config.local`, then `dvc pull`). Without `just`, the three commands are in
+  `README.md`. If any `dvc` command fails with `expected 'url' for dictionary value`, the
+  remote step has not been done on this checkout.
+- `just doctor` checks the machine and checkout (venv, package, UTF-8, Store alias, poppler,
+  line endings, DVC remote, GPU, torchvision build matching torch so unsloth imports); `just doctor --gpu` also tests whether the driver spills VRAM
+  to system RAM. Run it when something looks off, and after changing a machine setting.
+- Run Python with `uv run python ...`, never a bare `python`.
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
-  side; if not, `uv run dvc pull` (see `models/README.md`).
+  side; if not, `just pull` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.
-- The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt` (on WSL,
-  install `poppler-utils` first).
+- The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt`. That
+  needs poppler, which is optional and per machine: `just pdf-tools` installs it, `just doctor`
+  says whether it is present on this side.
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
   so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
-- After a training run: `uv run dvc add models/adapters && uv run dvc push`, then commit the
-  updated `models/adapters.dvc` with the results. After a fresh clone: `uv run dvc pull`.
+- After a training run: `just push-models` (`dvc add models/adapters` then `dvc push`), then
+  commit the updated `models/adapters.dvc` with the results.
+- The driver can spill VRAM to system memory and turn an OOM into a 3x slowdown
+  (`reports/REPORT.md` section 7). `just doctor --gpu` tests it; unless that check is OK on
+  this side, watch step times, not just whether the run finishes.
 
 Windows side only:
 
-- Plain `python` is a Microsoft Store alias; `uv run python` avoids it.
 - Write files with the Write/Edit tools. Bash heredocs fail there (`ENAMETOOLONG`, quote errors).
-- Set `PYTHONIOENCODING=utf-8` when printing dataset text; the console codec is cp1252.
-- WDDM can silently spill VRAM to system memory and turn an OOM into a 3x slowdown
-  (`reports/REPORT.md` section 7); watch step times, not just whether the run finishes.
+- Console output is UTF-8 without any setting: `.claude/settings.json` sets `PYTHONUTF8=1` for
+  agent sessions, and importing `ai_experiments` reconfigures stdout for everything else.

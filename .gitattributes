@@ -1,0 +1,12 @@
+# LF in the repo and in every checkout, whatever each machine's core.autocrlf says.
+# (Windows and WSL share this repo; without this, a checkout with different git settings
+# shows every text file as modified.)
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.gz binary
+*.safetensors binary
+*.pt binary
+*.db binary

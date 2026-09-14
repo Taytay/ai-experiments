@@ -7,19 +7,20 @@ library versions) and **what came out** (metrics per condition, artifact paths +
 
 ## Files
 
+This folder holds the tracker's data; the code is the `ai_experiments.evals` package.
+
 | path | tracked in git? | purpose |
 |---|---|---|
-| `evals/tracker.py` | yes | `Run` context manager + SQLite schema |
-| `evals/__main__.py` | yes | CLI |
+| `src/ai_experiments/evals/tracker.py` | yes | `Run` context manager + SQLite schema |
+| `src/ai_experiments/evals/__main__.py` | yes | CLI, installed as the `evals` command |
 | `evals/runs.jsonl` | **yes** | diff-friendly mirror, one JSON line per run, rewritten on every finish. This is the record of truth in the repo. |
 | `evals/LEADERBOARD.md` | yes | regenerated with `leaderboard`; every finished run x condition x metric |
-| `evals/runs.db` | no (gitignored) | SQLite working copy. Rebuild anywhere with `uv run python -m evals rebuild` |
+| `evals/runs.db` | no (gitignored) | SQLite working copy. Rebuild anywhere with `uv run evals rebuild` |
 
 ## Instrumenting an experiment
 
 ```python
-import sys; sys.path.insert(0, ROOT)          # repo root
-from evals.tracker import Run
+from ai_experiments.evals.tracker import Run
 
 with Run("universe_ladder", model="Qwen/Qwen2.5-3B",
          config=dict(steps=600, lr=2e-4, method="lora", lora_r=64)) as run:
@@ -36,13 +37,15 @@ working tree had uncommitted changes, i.e. provenance is approximate. Commit fir
 
 ## CLI
 
+`uv run evals` (the same as `uv run python -m ai_experiments.evals`):
+
 ```
-uv run python -m evals list [--exp NAME] [-n 20]
-uv run python -m evals show RUN_ID_PREFIX
-uv run python -m evals compare EXPERIMENT [--metric PREFIX] [--condition COND] [--show-cfg lr steps]
-uv run python -m evals leaderboard              # writes evals/LEADERBOARD.md
-uv run python -m evals import-json results/x.json --exp NAME --model M --commit SHA --config '{...}'
-uv run python -m evals export | rebuild         # db -> jsonl | jsonl -> db
+uv run evals list [--exp NAME] [-n 20]
+uv run evals show RUN_ID_PREFIX
+uv run evals compare EXPERIMENT [--metric PREFIX] [--condition COND] [--show-cfg lr steps]
+uv run evals leaderboard              # writes evals/LEADERBOARD.md  (also: just leaderboard)
+uv run evals import-json results/x.json --exp NAME --model M --commit SHA --config '{...}'
+uv run evals export | rebuild         # db -> jsonl | jsonl -> db
 ```
 
 `compare` is the workhorse: one row per (run, condition), one column per metric,

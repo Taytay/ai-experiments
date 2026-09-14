@@ -8,13 +8,28 @@ dependencies = [
     "numpy>=2.5.3",
     "sentence-transformers>=6.0.1",
     "torch>=2.11.0",
+    "torchvision>=0.26.0",  # direct dep so tool.uv.sources can pin it to the cu128 index (unsloth needs a matching build)
     "unsloth>=2026.9.4",
 ]
+
+[project.scripts]
+# `uv run evals leaderboard` etc.; the same CLI as `uv run python -m ai_experiments.evals`.
+evals = "ai_experiments.evals.__main__:main"
 
 [project.optional-dependencies]
 tracking = []
 
+# The library under src/ai_experiments is installed editable by `uv sync`, so scripts import it
+# from any working directory without touching sys.path.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_experiments"]
+
 [tool.uv]
+package = true
 # Bundle CUDA 12.8 runtime with torch; driver 591.86 supports up to CUDA 13.1.
 [tool.uv.sources]
 torch = [{ index = "pytorch-cu128" }]

@@ -11,13 +11,13 @@ changing `connect()` once its Python binding loads on this machine.
 
 Usage in an experiment:
 
-    from evals.tracker import Run
+    from ai_experiments.evals.tracker import Run
     with Run("universe_ladder", model="Qwen/Qwen2.5-3B", config=dict(steps=600, lr=2e-4)) as run:
         ...
         run.log(dict(L1_recall=71.2, L3_induct=40.0), condition="lora")
         run.artifact("results/universe_Qwen2.5-3B.json")
 
-CLI: `uv run python -m evals --help`
+CLI: `uv run evals --help`
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ import time
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from ..paths import ROOT
 DB_PATH = ROOT / "evals" / "runs.db"
 JSONL_PATH = ROOT / "evals" / "runs.jsonl"
 
@@ -132,11 +132,17 @@ def _canon(obj) -> str:
 
 
 class Run:
-    """Context manager that records one experiment run."""
+    """Context manager that records one experiment run.
+
+    With enabled=False (smoke tests, dry runs) it accepts every call and records nothing, so
+    runs.db, runs.jsonl and the leaderboard never see subsampled or throwaway runs.
+    """
 
     def __init__(self, experiment: str, model: str | None = None, config: dict | None = None,
-                 note: str | None = None, script: str | None = None, db: Path = DB_PATH):
+                 note: str | None = None, script: str | None = None, db: Path = DB_PATH,
+                 enabled: bool = True):
         self.experiment, self.model, self.config = experiment, model, config or {}
+        self.enabled = enabled
         self.note = note
         self.script = script or (sys.argv[0] if sys.argv and sys.argv[0] else None)
         self.run_id = time.strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:6]
@@ -145,6 +151,9 @@ class Run:
 
     # -- lifecycle -----------------------------------------------------------
     def __enter__(self) -> "Run":
+        if not self.enabled:
+            print(f"[evals] tracker disabled for this run (experiment={self.experiment}); nothing will be recorded", flush=True)
+            return self
         self.con = connect(self.db)
         g = git_state()
         script_path = Path(self.script) if self.script else None
@@ -162,6 +171,8 @@ class Run:
         return self
 
     def __exit__(self, exc_type, exc, tb):
+        if not self.enabled:
+            return False
         status = "failed" if exc_type else "finished"
         self.con.execute("UPDATE runs SET finished_at=?, status=?, error=? WHERE run_id=?",
                          (time.time(), status, repr(exc) if exc else None, self.run_id))
@@ -174,6 +185,8 @@ class Run:
 
     # -- logging -------------------------------------------------------------
     def log(self, metrics: dict, condition: str = "", step: int | None = None):
+        if not self.enabled:
+            return
         now = time.time()
         rows = [(self.run_id, condition, k, float(v), step, now)
                 for k, v in metrics.items() if isinstance(v, (int, float)) and not isinstance(v, bool)]
@@ -181,6 +194,8 @@ class Run:
         self.con.commit()
 
     def artifact(self, path: str | Path):
+        if not self.enabled:
+            return
         p = Path(path)
         rel = str(p.resolve().relative_to(ROOT)) if p.resolve().is_relative_to(ROOT) else str(p)
         self.con.execute("INSERT OR REPLACE INTO artifacts VALUES (?,?,?)", (self.run_id, rel, _sha256_file(p)))
@@ -188,6 +203,8 @@ class Run:
 
     def set_config(self, **kv):
         self.config.update(kv)
+        if not self.enabled:
+            return
         self.con.execute("UPDATE runs SET config=?, config_sha=? WHERE run_id=?",
                          (_canon(self.config), hashlib.sha256(_canon(self.config).encode()).hexdigest()[:16], self.run_id))
         self.con.commit()

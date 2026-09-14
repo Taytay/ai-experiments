@@ -112,3 +112,24 @@ Windows-only gotchas that do not apply on WSL: the `python` Store alias, cp1252 
 (`PYTHONIOENCODING`), Bash heredoc failures, Smart App Control, WDDM system-memory fallback.
 Linux paths in `runs.jsonl` `argv` will look different from the Windows ones already recorded;
 the tracker's `env.platform` field says which side a run came from.
+
+## 2026-09-14: ergonomics pass and machine-setting audit
+
+Repo changes so the docs carry fewer caveats: `src/ai_experiments` is an installable package
+(no `sys.path` edits in scripts), `.gitattributes` forces LF, `.claude/settings.json` sets
+`PYTHONUTF8=1` for agent sessions, the package reconfigures stdout to UTF-8 on import, a
+`justfile` wraps setup and the DVC routine, and `scripts/doctor.py` (`just doctor`) checks the
+machine. `just` 1.58.0 was installed on the Windows side with winget.
+
+The first `just doctor --gpu` on the Windows side found the `python3.exe` Store alias still on,
+no `pdftoppm`, and the driver spilling past VRAM into system RAM (a 125% allocation
+succeeded). The same day the user turned the Store aliases off and set the NVIDIA Control Panel
+CUDA Sysmem Fallback Policy to "Prefer No Sysmem Fallback" on both the Windows and WSL sides;
+the test now gets the wanted OutOfMemoryError. The WDDM caveat in `reports/REPORT.md`
+section 7 describes runs made before that change.
+
+This file records what changed and why; `just doctor` reports the current state of a machine,
+so it is not tracked here.
+
+Git state: every tracked file is LF in the index; 80 files sit as CRLF in the Windows working
+tree (written by editors, normalised on add). Harmless, and a fresh checkout is all LF.

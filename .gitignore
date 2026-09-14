@@ -14,3 +14,9 @@ references/papers/*/*.pdf
 references/papers/*/*.tar.gz
 references/papers/*/src/
 references/papers/*/paper_flat.tex
+
+# per-user Claude Code overrides (the shared settings.json is tracked)
+.claude/settings.local.json
+
+# smoke-run outputs (`just smoke`): plumbing checks, not results
+results/*_smoke.json

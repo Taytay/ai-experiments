@@ -32,18 +32,17 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
+from ai_experiments.paths import ROOT
 
 import unsloth  # noqa: F401  (before transformers)
 import torch
 import torch.nn.functional as F
 from unsloth import FastLanguageModel
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-import universe as U  # noqa: E402
-import icl_suite as S  # noqa: E402
-from evals.tracker import Run  # noqa: E402
-from merchants import GENERAL_TEXT  # noqa: E402
+from ai_experiments import universe as U
+from ai_experiments import icl_suite as S
+from ai_experiments.evals.tracker import Run
+from ai_experiments.merchants import GENERAL_TEXT
 
 ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
@@ -61,8 +60,8 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
 }
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
-OUT = Path(__file__).parent.parent / "results" / f"curriculum_{tag}_{ARM}.json"
-ADAPTER = Path(__file__).parent.parent / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
+OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}.json"
+ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
 torch.manual_seed(SEED)
 
 species = U.build(morph_p=MORPH_P)
@@ -71,9 +70,15 @@ ladder = U.ladder(species) + U.heldout_induction(species)
 probes = U.probes(species)
 suite = S.suite_items()
 K_texts = U.training_texts(species)
-if os.environ.get("SMOKE"):  # quick end-to-end check: subsample eval items
+SMOKE = bool(os.environ.get("SMOKE"))
+if SMOKE:
+    # Quick end-to-end plumbing check, not an experiment: 2 optimizer steps, 1/40 of the eval items,
+    # results in results/*_smoke.json, adapter under models/smoke/ (outside the DVC-tracked
+    # models/adapters/), and nothing recorded in the tracker.
+    STEPS = min(STEPS, 2)
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
+    ADAPTER = ROOT / "models" / "smoke" / ADAPTER.name
 print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | "
       f"{len(ladder)} ladder items | {len(probes)} probes | {len(suite)} ICL suite items", flush=True)
 
@@ -233,7 +238,7 @@ cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCU
            method="unsloth_lora", lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite))
-with Run("curriculum_v2", model=MODEL, config=cfg) as run:
+with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
     def save():
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
         for cond, mets in results.items():
@@ -242,7 +247,7 @@ with Run("curriculum_v2", model=MODEL, config=cfg) as run:
     eval_only = bool(phases) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
     if eval_only:
         # re-score a previously trained adapter (e.g. after an eval-time crash) without retraining
-        run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(Path(__file__).parent.parent)))
+        run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(ROOT)))
         model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
         tok.padding_side = "right"
         r = evaluate(model, tok)

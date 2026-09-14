@@ -14,12 +14,13 @@ uv run dvc remote modify --local dstore url /mnt/d/repos/dvc/ai-experiments     
 ```
 
 That writes `.dvc/config.local`, which is gitignored; `.dvc/config.local.example` shows the
-result. The same instructions are in a comment in `.dvc/config` itself.
+result. The same instructions are in a comment in `.dvc/config` itself, and `just setup` (or
+`just dvc-remote`) runs the right line for the OS it is invoked from.
 
 ```
-uv run dvc pull                 # after a fresh clone or checkout: fetch the adapters this commit expects
-uv run dvc add models/adapters  # after training: re-hash the tree (autostage puts the .dvc file in git)
-uv run dvc push                 # copy new blobs to D:; then commit the .dvc file
+uv run dvc pull                 # after a fresh clone or checkout: fetch the adapters this commit expects  (just pull)
+uv run dvc add models/adapters  # after training: re-hash the tree (autostage puts the .dvc file in git)  (just push-models
+uv run dvc push                 # copy new blobs to D:; then commit the .dvc file                            does both)
 uv run dvc status -c            # anything local that is not on the remote?
 ```
 

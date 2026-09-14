@@ -13,8 +13,7 @@ STEPS = ns["STEPS"]
 raw_texts = [M.raw_fact(m) for m in merchants]
 aug_texts = [t for m in merchants for t in M.augmented(m)]
 OUT = here.parent / "results" / "lr_sweep.json"
-sys.path.insert(0, str(here.parent))
-from evals.tracker import Run  # noqa: E402
+from ai_experiments.evals.tracker import Run
 results = {}
 run_ = Run("merchant_knowledge_injection", model=ns["MODEL"], config=dict(steps=STEPS, bs=ns["BS"], lr_full=[1e-5, 2e-5], wise_alpha=0.5, seed=ns["SEED"], n_merchants=len(merchants))).__enter__()
 for lr in (1e-5, 2e-5):

@@ -13,13 +13,11 @@ Suite items are cached to data/processed/icl_suite_items.json so every arm score
 """
 import json
 import random
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-from universe import random_label  # noqa: E402
+from .paths import ROOT
+from .universe import random_label
 
-ROOT = Path(__file__).parent.parent
 CACHE = ROOT / "data" / "processed" / "icl_suite_items.json"
 
 # name: (load_dataset kwargs, text column, label column)

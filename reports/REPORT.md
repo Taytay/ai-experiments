@@ -162,7 +162,7 @@ The knowledge that transferred was the knowledge stored in **many surface forms*
 
 ## 6. Fictional universe: user-invented labels and analogy over injected knowledge
 
-Added 2026-09-13. Question: teach a model a completely custom taxonomy (a Pokemon-style creature universe with fictional type names), then answer prompts like *"Timmy labeled his Blaxorc 'FooFoo' and his FrodRock 'blammo'. How will he label his Radsup?"* where both the entities and the labels are novel. Code: `src/universe.py`, `exp_universe_ladder.py`, `exp_universe_embed.py`. Tracked runs: `evals/LEADERBOARD.md`, experiments `universe_ladder` and `universe_embed`.
+Added 2026-09-13. Question: teach a model a completely custom taxonomy (a Pokemon-style creature universe with fictional type names), then answer prompts like *"Timmy labeled his Blaxorc 'FooFoo' and his FrodRock 'blammo'. How will he label his Radsup?"* where both the entities and the labels are novel. Code: `src/ai_experiments/universe.py`, `exp_universe_ladder.py`, `exp_universe_embed.py`. Tracked runs: `evals/LEADERBOARD.md`, experiments `universe_ladder` and `universe_embed`.
 
 ### 6.1 Setup
 
@@ -354,7 +354,7 @@ Realistic multipliers are 70 to 85% of the TFLOPS ratio because MFU drops on fas
 
 ## 8. Curriculum ladder v2: teach the task as the injection
 
-Date: 2026-09-13/14. Model: Qwen2.5-3B, unsloth LoRA r=64 alpha=128 on all linear layers, lr 1e-4, 800 steps of 16 sequences (micro-batch 8, accumulation 2), max length 768, seed 0. Code: `scripts/exp_curriculum.py`, `src/icl_suite.py`, episode and probe generators in `src/universe.py`. Tracker experiment `curriculum_v2`; raw numbers in `results/curriculum_Qwen2.5-3B_<arm>.json`; table printer `scripts/curriculum_summary.py`.
+Date: 2026-09-13/14. Model: Qwen2.5-3B, unsloth LoRA r=64 alpha=128 on all linear layers, lr 1e-4, 800 steps of 16 sequences (micro-batch 8, accumulation 2), max length 768, seed 0. Code: `scripts/exp_curriculum.py`, `src/ai_experiments/icl_suite.py`, episode and probe generators in `src/ai_experiments/universe.py`. Tracker experiment `curriculum_v2`; raw numbers in `results/curriculum_Qwen2.5-3B_<arm>.json`; table printer `scripts/curriculum_summary.py`.
 
 Section 6 ended with a split: LoRA on declarative text recalled every fact (100% in the trained format) but did not power the few-shot label-induction ("Timmy") task, and made the model *worse* at it when the facts were supplied in context. The open question was whether to inject knowledge first and then fine-tune a few-shot-categorize task, or to make that task the injection mechanism. This section answers it with a controlled sweep.
 

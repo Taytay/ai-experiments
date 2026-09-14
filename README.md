@@ -27,36 +27,52 @@ what we collected is in `references/`, code is split into a library and entry po
 PLAN.md          work queue and per-step status (start here)
 CLAUDE.md        one-job-per-location table and the working rules for agent sessions
 NOTES.md         machine and environment history
-data/            no raw data; processed/ holds frozen item sets (see data/README.md)
-src/             library: universe.py, merchants.py (data generators), icl_suite.py
+justfile         task runner: setup, doctor, pull, push-models, smoke, leaderboard
+bootstrap.sh     fresh machine: install uv and just if missing, then `just setup` and
+bootstrap.ps1    `just doctor` (WSL/Ubuntu and Windows respectively)
+src/ai_experiments/
+                 the library, installed editable: universe.py, merchants.py (data generators),
+                 icl_suite.py, paths.py (repo locations), evals/ (run tracker + CLI)
 scripts/         entry points: exp_*.py experiments, bench_throughput.py, table generators,
-                 and the original driver-check scripts (check_gpu.py, finetune_embed.py)
-evals/           run tracker (runs.jsonl is the record of truth) and LEADERBOARD.md
+                 doctor.py, and the original driver-check scripts (check_gpu.py, finetune_embed.py)
+data/            no raw data; processed/ holds frozen item sets (see data/README.md)
+evals/           tracker data: runs.jsonl (the record of truth) and LEADERBOARD.md
 results/         raw JSON and logs from every run
 models/          LoRA adapters and fine-tuned weights, versioned with DVC (see models/README.md)
 reports/         REPORT.md, improvements.html, QUESTIONS.md
 references/      papers/ (text, metadata, summaries; PDFs not tracked), SURVEY.md,
                  and two first-day notes (lit_review.md, frameworks.md)
+.claude/         settings.json: environment for agent sessions (UTF-8)
 ```
 
 ## Running
 
+On a fresh machine, run the bootstrap for your OS once: `./bootstrap.sh` on WSL/Ubuntu,
+`powershell -ExecutionPolicy Bypass -File .\bootstrap.ps1` on Windows. It installs `uv` and
+`just` if missing, then runs `just setup` and `just doctor`. With those two tools present you
+can skip it and use the recipes directly.
+
 ```
-uv sync
-uv run dvc pull                             # fetch the trained adapters (3.8 GB) from D:\repos\dvc\ai-experiments
-uv run python scripts/exp_curriculum.py C   # ARM [model] [steps] [lr]; SMOKE=1 for a quick check
-uv run python -m evals leaderboard          # regenerate evals/LEADERBOARD.md
+just setup                                  # once per checkout: uv sync, DVC remote for this OS, dvc pull (3.8 GB)
+just doctor                                 # check machine and checkout; --gpu adds the VRAM-spill test
+just smoke                                  # plumbing check: arm C, 2 training steps, tiny eval; not recorded in the tracker
+uv run python scripts/exp_curriculum.py C   # ARM [model] [steps] [lr]
+uv run evals leaderboard                    # regenerate evals/LEADERBOARD.md
+just                                        # list every recipe
 ```
+
+Without `just`, setup is three commands: `uv sync`; the one `uv run dvc remote modify --local`
+line for your OS from the comment in `.dvc/config`; `uv run dvc pull`.
 
 Large files are not in git. The DVC remote is a plain folder on the D: drive, one folder per
-repo under `D:\repos\dvc\`; from WSL the same folder is `/mnt/d/repos/dvc/ai-experiments`.
-The path is not in the shared DVC config because it differs by OS: on a fresh clone, `dvc`
-fails with a config error until you run the one `dvc remote modify --local` line for your OS
-from the comment in `.dvc/config` (details in `models/README.md`).
+repo under `D:\repos\dvc\`; from WSL the same folder is `/mnt/d/repos/dvc/ai-experiments`. The
+path is not in the shared DVC config because it differs by OS; `just setup` writes the right
+one to the gitignored `.dvc/config.local` (details in `models/README.md`).
 
-Scripts add `src/` to `sys.path` themselves, so they run from any working directory. The repo
-runs natively on Windows 11 or from WSL2 (Ubuntu) on the same machine; both see the RTX 3090.
-Each checkout needs its own `uv sync` and `uv run dvc pull`. Always use `uv run python`, not
-`python`. On Windows, also set `PYTHONIOENCODING=utf-8` when printing dataset text. See
-`CLAUDE.md` for the working rules that apply to agent sessions and `NOTES.md` for the
-environment history.
+The library is the `ai_experiments` package under `src/`, installed editable by `uv sync`, so
+scripts import it and run from any working directory. Output is UTF-8 whatever the console
+codec (the package reconfigures stdout on import; `.claude/settings.json` sets `PYTHONUTF8` for
+agent sessions). `.gitattributes` keeps every text file LF on both sides. The repo runs natively
+on Windows 11 or from WSL2 (Ubuntu) on the same machine; both see the RTX 3090, and each
+checkout needs its own `just setup`. Always use `uv run python`, not `python`. See `CLAUDE.md`
+for the working rules that apply to agent sessions and `NOTES.md` for the environment history.
