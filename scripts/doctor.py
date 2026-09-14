@@ -145,8 +145,14 @@ def check_gpu(oom_test: bool) -> None:
         report("WARN", "sysmem fallback", "allocating 125% of VRAM succeeded, so the driver spills to system RAM and an OOM "
                                           "becomes a 3x-slower run. NVIDIA Control Panel > Manage 3D settings > "
                                           "CUDA - Sysmem Fallback Policy > Prefer No Sysmem Fallback")
-    except torch.cuda.OutOfMemoryError:
-        report("OK", "sysmem fallback", "allocating past VRAM raises OutOfMemoryError; no silent spill")
+    except torch.cuda.OutOfMemoryError as e:
+        report("OK", "sysmem fallback", f"allocating past VRAM raises {type(e).__name__}; no silent spill")
+    except RuntimeError as e:
+        # WSL's driver refuses with a generic "CUDA driver error: out of memory", not OutOfMemoryError.
+        if "out of memory" in str(e).lower():
+            report("OK", "sysmem fallback", f"allocating past VRAM raises RuntimeError ({str(e).strip()}); no silent spill")
+        else:
+            report("FAIL", "sysmem fallback", f"unexpected {type(e).__name__} from the over-allocation test: {str(e).strip()[:120]}")
 
 
 def main() -> None:
