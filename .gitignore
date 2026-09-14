@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-outputs/
+models/*
 hf_cache/
 *.log
 unsloth_compiled_cache/
@@ -11,7 +11,8 @@ evals/runs.db-wal
 evals/runs.db-shm
 
 # paper archives (keep paper.txt, summary.md, meta.json)
-docs/papers/*/*.pdf
-docs/papers/*/*.tar.gz
-docs/papers/*/src/
-docs/papers/*/paper_flat.tex
+references/papers/*/*.pdf
+references/papers/*/*.tar.gz
+references/papers/*/src/
+references/papers/*/paper_flat.tex
+!models/README.md

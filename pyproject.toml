@@ -1,7 +1,7 @@
 [project]
 name = "gpu-unsloth-check"
 version = "0.1.0"
-description = "Verify NVIDIA driver + CUDA stack can fine-tune a small embeddings model with unsloth"
+description = "Injecting new knowledge and terminology into small LLMs and embedding models, and extracting it again"
 requires-python = "==3.12.*"
 dependencies = [
     "datasets>=4.3.0",

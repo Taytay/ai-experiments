@@ -1,0 +1,41 @@
+# LLM Fine-Tuning Frameworks: September 2026 Landscape
+
+> Historical note from the project's first day. Not part of the current plan; see `PLAN.md`.
+
+Compiled 2026-09-12 by a research subagent (web search + repo/doc fetches). Star counts approximate.
+
+**Big shifts since 2025:** (1) [torchtune](https://github.com/meta-pytorch/torchtune) is effectively dead: README banner reads "Torchtune is no longer actively maintained: torchtune development wound down in 2025"; active development stopped July 15, 2025 per [issue #2883](https://github.com/meta-pytorch/torchtune/issues/2883), with only critical fixes through 2025. Meta's successor for RL/agentic post-training is [torchforge](https://github.com/meta-pytorch/torchforge) (announced Oct 2025). (2) [OpenAI is winding down its fine-tuning platform](https://developers.openai.com/api/docs/guides/model-optimization): "no longer accessible to new users"; existing users get SFT/DPO on gpt-4.1 family and RFT on o4-mini "for the coming months." (3) RL (GRPO and successors) is now table stakes in every framework, and Thinking Machines' [Tinker](https://thinkingmachines.ai/tinker/) API has become a de-facto interface that SkyRL now implements locally.
+
+## Comparison table
+
+| Framework | Best at | Methods | Multi-GPU | Windows | Maturity (Sept 2026) | Key limitations |
+|---|---|---|---|---|---|---|
+| [Unsloth](https://github.com/unslothai/unsloth) | Single-GPU speed/VRAM; QLoRA; embeddings | SFT, LoRA/QLoRA, full FT, pretraining, DPO, GRPO, FP8 | Works via Accelerate/DDP/FSDP but ["not yet officially supported... requires manual setup"](https://unsloth.ai/docs/basics/multi-gpu-training-with-unsloth) | **Native** (PowerShell installer, Unsloth Desktop) | ~76k stars; Apache-2.0 core, AGPL Studio UI | No TP/CP/EP; multi-GPU is DIY; kernels only for supported architectures |
+| [Axolotl](https://github.com/axolotl-ai-cloud/axolotl) | Reproducible YAML pipelines; long-context multi-GPU | Full FT, LoRA/QLoRA, QAT (int4/FP8/NVFP4), DPO/IPO/KTO/ORPO, GRPO, reward models | Best documented: FSDP1/2, DeepSpeed, TP/CP/SP/EP, composable "ND parallelism" | WSL2/Docker only | ~11-12k stars; production-oriented | Steeper config curve; slower than Unsloth single-GPU |
+| [HF TRL](https://github.com/huggingface/trl) | Reference trainer APIs everyone else wraps; custom algorithms | SFT, DPO, GRPO/AsyncGRPO, RLOO, KTO, ORPO, Reward, Distillation (PPO **removed** in v1.13) | Accelerate/DeepSpeed/FSDP2; ring-attention CP and Ulysses SP; vLLM server for rollouts | Runs where PyTorch does; not a documented target | [v1.13.0 (Sept 10, 2026)](https://github.com/huggingface/trl/releases), rapid cadence | Breaking changes between minors; you write more code |
+| [LLaMA-Factory](https://github.com/hiyouga/LlamaFactory) | Zero-code Web UI; broadest model coverage (100+ LLMs/VLMs) | SFT, LoRA/QLoRA, full FT, DPO/KTO/ORPO, PPO; GRPO via sibling EasyR1 | DDP, DeepSpeed, FSDP(+QLoRA 70B on 2x24GB), Megatron-Core backend | **Yes** (Windows listed; also Ascend, ROCm) | ~75k stars; repo renamed "LlamaFactory", moved to uv | UI-first design; distributed setups drop to CLI |
+| torchtune | (was) clean PyTorch-native recipes | LoRA/QLoRA, full FT, DPO, GRPO, QAT, KD | FSDP, multi-node | No | **Unmaintained since July 2025** | Do not start new projects on it |
+| [Tinker](https://thinkingmachines.ai/tinker/) (managed) | Research-style loops (forward_backward/optim_step/sample) without infra | SFT + RL via Cookbook; **LoRA only** | Abstracted away (up to 1T-param Kimi K2) | Client-side only, so yes | GA Dec 12, 2025; usage priced per M tokens, checkpoints downloadable | No full FT; models limited to their catalog |
+| [verl](https://github.com/verl-project/verl) | Large-scale RL (ByteDance HybridFlow) | SFT, PPO, GRPO, DAPO, GSPO, RLOO, REINFORCE++, on-policy distillation | FSDP/FSDP2/Megatron; vLLM/SGLang/TensorRT-LLM rollouts; up to 671B | No (Linux/Ray) | v0.9.0 Aug 2026; ~23k stars | Heavy stack; RL-focused, not for plain SFT |
+| [OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) | Ray+vLLM+DeepSpeed RLHF, async and agentic RL | PPO, REINFORCE++, GRPO, RLOO | Ray-scheduled, 70B+ | No | v0.10 Apr 2026; ~10k stars | Smaller community than verl |
+| [SkyRL](https://github.com/NovaSky-AI/SkyRL) | Long-horizon agent RL; local Tinker-API backend (skyrl-tx) | GRPO/PPO/DAPO + gym environments | FSDP/DeepSpeed/Megatron; vLLM/SGLang | No | v0.3.0 Jul 2026; ~2.3k stars | Young; academic pace |
+| [Oumi](https://github.com/oumi-ai/oumi) | End-to-end platform (data synth, train, eval, deploy) wrapping TRL/verl | SFT, LoRA/QLoRA, DPO, GRPO | Multi-node via cloud launchers | No | v0.8 May 2026 | Thin layer; depends on upstreams |
+| [NeMo Megatron-Bridge / AutoModel](https://docs.nvidia.com/nemo/megatron-bridge/latest/) | 100s-1000s of GPUs, FP8/FP4, MoE | Pretrain, SFT, LoRA; RL via verl integration | TP/PP/CP/EP, Megatron-Core | No | 26.02 release; enterprise-grade | Overkill below ~8 GPUs; NVIDIA-only |
+| [Together](https://docs.together.ai/docs/fine-tuning-overview) / [Fireworks](https://docs.fireworks.ai/fine-tuning/fine-tuning-models) (managed) | Hosted open-model tuning | Together: SFT+DPO, LoRA or full FT, downloadable weights. Fireworks: LoRA SFT, DPO/ORPO, RFT (free under 16B) | Abstracted | Yes (API) | Mature | Fireworks deploys only to dedicated endpoints; no early stopping |
+| [Google Vertex](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini-supervised-tuning) | Tuning Gemini itself | SFT on gemini-2.5-pro/flash/flash-lite; preference tuning exists (model list not verified) | Abstracted | Yes (API) | GA for SFT | Gemini-only; tuned Gemini 3 endpoints bill at 1.5x base |
+
+## Embedding / encoder fine-tuning
+
+Unsloth's `FastSentenceTransformer` (added Feb 2026 with Hugging Face) mirrors the Sentence Transformers API with LoRA/QLoRA, claiming 1.8-3.3x speedups and EmbeddingGemma-300M training in ~3 GB VRAM ([Unsloth docs](https://unsloth.ai/docs/basics/embedding-finetuning), [sbert.net](https://sbert.net/examples/sentence_transformer/training/unsloth/README.html)). Caveat: models without `modules.json` or with custom pooling heads need verification. Plain [sentence-transformers](https://github.com/huggingface/sentence-transformers) remains the baseline. TRL, Axolotl, LLaMA-Factory, verl, and the managed APIs above are decoder-LLM focused and do not offer embedding trainers.
+
+## Benchmarks (third-party, treat as indicative)
+
+A [Spheron single-A100 test](https://www.spheron.network/blog/axolotl-vs-unsloth-vs-torchtune/) (Llama-3.1-8B QLoRA) reported Unsloth 3.2h, LLaMA-Factory 3.4h, torchtune 4.7h, Axolotl 5.8h. [MarkTechPost (Jul 2026)](https://www.marktechpost.com/2026/07/22/unsloth-vs-axolotl-vs-trl-vs-llama-factory-a-fine-tuning-framework-comparison-on-speed-vram-and-multi-gpu/) shows Unsloth fitting ~78k-token contexts on 24 GB vs ~5.8k for Transformers+FA2, and concludes Unsloth for single-GPU, Axolotl (FSDP2 + sequence parallel) for 2-8 GPUs with long context, TRL as the substrate for novel algorithms.
+
+## Recommendations
+
+**(a) Solo developer, one 24 GB GPU (especially on Windows):** Unsloth. It is the only major framework with native Windows install, has the best VRAM/context headroom for QLoRA, covers SFT/DPO/GRPO, and now handles embedding models too. Use LLaMA-Factory if you want a GUI and the widest model zoo, or TRL directly if you need to write a custom loss. If you have no GPU or want RL on big open models without ops, Tinker (LoRA-only) or Fireworks RFT (free under 16B) are the practical managed options; OpenAI's platform is closed to new users.
+
+**(b) Small team, one multi-GPU node:** Axolotl for SFT/DPO/GRPO with version-controlled YAML and documented FSDP2/TP/CP composition; TRL underneath if you need to modify trainers. For serious RL (agentic, long rollouts, 70B+), verl is the consensus choice, with OpenRLHF as a Ray-native alternative and SkyRL if you want Tinker-API portability. Go to NeMo Megatron-Bridge only if you are heading to multi-node FP8/MoE scale. Avoid torchtune for anything new.
+
+Unverified: exact Gemini preference-tuning model list; GitHub star counts are approximate.

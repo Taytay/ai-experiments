@@ -16,12 +16,12 @@ small embeddings model with unsloth.
 ## Steps
 
 1. Install `uv` via winget, create a Python 3.12 venv in `.venv/`.
-2. `check_gpu.py` - torch sees the GPU and runs fp32/fp16/bf16 kernels.
-3. Install unsloth + deps, run a tiny embeddings fine-tune (`finetune_embed.py`).
+2. `scripts/check_gpu.py` - torch sees the GPU and runs fp32/fp16/bf16 kernels.
+3. Install unsloth + deps, run a tiny embeddings fine-tune (`scripts/finetune_embed.py`).
 
 ## Results so far
 
-- `check_gpu.py`: PASS. torch 2.11.0+cu128 sees the RTX 3090 (sm_86), 22.8 GiB free,
+- `scripts/check_gpu.py`: PASS. torch 2.11.0+cu128 sees the RTX 3090 (sm_86), 22.8 GiB free,
   bf16 supported, fp32/fp16/bf16 matmuls agree with CPU reference. The driver is fine.
 - `uv add unsloth sentence-transformers datasets`: installed unsloth 2026.9.4,
   triton-windows 3.8.0.post28, xformers 0.0.35.
@@ -57,16 +57,16 @@ Fix options:
 
 ## Research + experiments (2026-09-12, later)
 
-See `report/REPORT.md` (main), `report/frameworks.md`, `report/lit_review.md`.
-Open questions and next steps: `report/QUESTIONS.md` (IDs, status); priority order from the
-2026-09-14 literature survey: `report/SURVEY.md` section 2; paper summaries: `docs/papers/`.
-Experiments in `experiments/`, outputs in `results/`. All ran with transformers + torch
+Results: `reports/REPORT.md`. Work queue and next step: `PLAN.md` (repo root). Question
+definitions: `reports/QUESTIONS.md`; literature per question: `references/SURVEY.md`; paper
+summaries: `references/papers/`. `references/frameworks.md` and `references/lit_review.md` are earlier notes.
+Experiments in `scripts/`, outputs in `results/`. All ran with transformers + torch
 only (Smart App Control still on), so unsloth/sentence-transformers trainers remain untested here.
 
 ## 2026-09-13: Smart App Control turned off by user
 
 `VerifiedAndReputablePolicyState = 0`. triton 3.8.0, pyarrow 25.0.1, datasets 4.3.0,
-sentence-transformers 6.0.1 and unsloth 2026.9.4 all import. `uv run python finetune_embed.py`
+sentence-transformers 6.0.1 and unsloth 2026.9.4 all import. `uv run python scripts/finetune_embed.py`
 (unsloth `FastSentenceTransformer` + `SentenceTransformerTrainer`, torch.compile fast encoder
 path) trains all-MiniLM-L6-v2 on the RTX 3090 end to end. Original question answered: the
 driver stack is fully usable for unsloth fine-tuning of embedding models, natively on Windows.
