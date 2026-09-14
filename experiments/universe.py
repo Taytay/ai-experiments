@@ -43,15 +43,28 @@ _B = ["orc", "rock", "sup", "ble", "van", "dor", "ish", "ax", "urn", "eel", "ott
       "ine", "ash", "ook", "ell", "ig", "oz", "ath", "ent", "ilk", "ux", "ome", "arn"]
 
 
-def build(n_per_type=20, seed=0, holdout_per_type=3):
+# One suffix per type, used only when build(morph_p > 0): a name ending in MARKER[t] is
+# then t-type with probability morph_p (the "drug stem" / "retailer variant" mechanism).
+MARKER = dict(zip(TYPE_LIST, ["orc", "ash", "eel", "ath", "ilk", "ome", "urn", "ent"]))
+_B_PLAIN = [b for b in _B if b not in MARKER.values()]
+
+
+def _name(rng, names, t=None, morph_p=0.0, marked=None):
+    while True:
+        a = rng.choice(_A)  # draw order kept identical to the original build() when morph_p == 0
+        m = marked if marked is not None else (morph_p > 0 and t is not None and rng.random() < morph_p)
+        suf = MARKER[t] if m else rng.choice(_B_PLAIN if morph_p > 0 else _B)
+        n = a + suf
+        if n not in names:
+            names.add(n); return n, m
+
+
+def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0):
     rng = random.Random(seed)
     names, species = set(), []
     for t in TYPE_LIST:
         for i in range(n_per_type):
-            while True:
-                n = rng.choice(_A) + rng.choice(_B)
-                if n not in names:
-                    names.add(n); break
+            n, _ = _name(rng, names, t, morph_p)
             species.append(dict(name=n, type=t, weakness=WEAKNESS[t], habitat=rng.choice(HABITATS),
                                 diet=rng.choice(DIETS), region=rng.choice(REGIONS), stage=rng.randint(1, 3),
                                 heldout=(i < holdout_per_type)))
@@ -205,3 +218,122 @@ def with_context(item, species_by_name):
 
 
 GENERAL_TEXT = None  # reuse merchants.GENERAL_TEXT
+
+
+# ------------------------------------------------------------------ morphology probes
+def probes(species, seed=5, n_per_type=6):
+    """Never-trained names. 'marked' probes end in their type's MARKER suffix, 'plain' ones
+    do not. Type recall above chance on marked probes = morphology transfer; plain = control."""
+    rng = random.Random(seed)
+    names = {s["name"] for s in species}
+    items = []
+    for t in TYPE_LIST:
+        for _ in range(n_per_type):
+            for level, marked in (("M_probe_marked", True), ("M_probe_plain", False)):
+                n, _m = _name(rng, names, t, 1.0, marked=marked)
+                items.append(dict(level=level, prompt=f"Question: What type is {n}?\nAnswer:",
+                                  options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
+    return items
+
+
+# ------------------------------------------------------------------ symbol-tuning episodes
+# Training episodes never use the ladder's exact "Timmy labels his creature cards" template,
+# never use the NONSENSE eval labels, and never group by WEAKNESS (the held-out attribute).
+EPISODE_ATTRS = ["type", "habitat", "region", "diet"]
+_SYL = ["ba", "ki", "zo", "mu", "ren", "tal", "vo", "shi", "gra", "pel", "nu", "dex", "ol", "fim", "quo", "wer",
+        "ja", "lus", "ep", "tro", "sna", "vil", "hob", "yen", "cu", "mor", "ax", "ibb", "ko", "zel"]
+_NARR = ["Timmy", "Priya", "Grandpa Joe", "the shopkeeper", "Coach Ren", "Ms. Okafor", "a collector", "my sister"]
+_EP_TEMPLATES = [
+    "{P} sorts creature cards into piles with made-up names. So far: {DEMOS_SEMI}. Which pile does {Q} go in?\nAnswer:",
+    "{P} invented tags for the creatures: {DEMOS_AND}. By the same logic, {P} would tag {Q} as",
+    "Rule-based tagging game. Examples:\n{DEMOS_LINES}\n{Q} ->",
+    "In {P}'s notebook: {DEMOS_SEMI}. Continuing the pattern, {Q} is written down as",
+    "Given these labels: {DEMOS_AND}. Choose the label for {Q} from [{OPTS}].\nAnswer:",
+    "{DEMOS_IO}\nInput: {Q}\nOutput:",
+    "{P} groups creatures by a hidden property and marks each group with a word. {DEMOS_SEMI}. "
+    "Following {P}'s rule, {Q} gets the word",
+]
+
+
+def random_label(rng):
+    bad = {x.lower() for x in NONSENSE}
+    while True:
+        r = rng.random()
+        if r < 0.7:
+            w = "".join(rng.choice(_SYL) for _ in range(rng.randint(2, 3)))
+            w = w.capitalize() if rng.random() < 0.3 else w
+        elif r < 0.85:
+            w = str(rng.randint(10, 999))
+        else:
+            w = rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ") + rng.choice(["", rng.choice("0123456789")])
+        if w.lower() not in bad:
+            return w
+
+
+def format_episode(rng, demos, q_name, labels, template, narrator):
+    """demos: list of (name, label). Returns the prompt body (no context)."""
+    f = dict(P=narrator, Q=q_name, OPTS=", ".join(rng.sample(labels, len(labels))),
+             DEMOS_SEMI="; ".join(f"{d} = {l}" for d, l in demos),
+             DEMOS_AND=" and ".join(f"{d} '{l}'" for d, l in demos),
+             DEMOS_LINES="\n".join(f"{d} -> {l}" for d, l in demos),
+             DEMOS_IO="\n".join(f"Input: {d}\nOutput: {l}" for d, l in demos))
+    return template.format(**f)
+
+
+def episodes(species, n=6000, seed=3, ctx_frac=0.5, attrs=EPISODE_ATTRS):
+    """(prompt, answer) pairs for symbol-tuning on the universe DB. Groups by a random
+    attribute, k in 2..5 groups, 1-2 demos per group, fresh random labels each episode.
+    ctx_frac of episodes carry the field-guide entries of every species mentioned."""
+    rng = random.Random(seed)
+    pool = [s for s in species if not s["heldout"]]
+    by_name = {s["name"]: s for s in species}
+    out = []
+    while len(out) < n:
+        attr = rng.choice(attrs)
+        vals_all = sorted({s[attr] for s in pool})
+        k = rng.randint(2, min(5, len(vals_all)))
+        vals = rng.sample(vals_all, k)
+        labels = []
+        while len(labels) < k:
+            l = random_label(rng)
+            if l not in labels:
+                labels.append(l)
+        per = rng.choice([1, 1, 2])
+        demos = []
+        for v, l in zip(vals, labels):
+            for d in rng.sample([s for s in pool if s[attr] == v], per):
+                demos.append((d, l))
+        rng.shuffle(demos)
+        qv = rng.choice(vals)
+        cands = [s for s in pool if s[attr] == qv and all(s is not d for d, _ in demos)]
+        if not cands:
+            continue
+        q = rng.choice(cands)
+        prompt = format_episode(rng, [(d["name"], l) for d, l in demos], q["name"], labels,
+                                rng.choice(_EP_TEMPLATES), rng.choice(_NARR))
+        if rng.random() < ctx_frac:
+            names = [d["name"] for d, _ in demos] + [q["name"]]
+            rng.shuffle(names)
+            prompt = "Field guide:\n" + "\n".join(entry(by_name[x]) for x in names) + "\n\n" + prompt
+        out.append(dict(prompt=prompt, answer=" " + labels[vals.index(qv)], attr=attr, k=k))
+    return out
+
+
+def heldout_induction(species, seed=7, n=96):
+    """Ladder-format type induction where demos AND query are held-out species (with_context
+    makes this an ICL-on-unseen-entities test; without context it should be chance)."""
+    rng = random.Random(seed)
+    held = [s for s in species if s["heldout"]]
+    items = []
+    for _ in range(n):
+        vals = rng.sample(TYPE_LIST, 3)
+        labels = rng.sample(NONSENSE, 3)
+        demos = [rng.choice([s for s in held if s["type"] == v]) for v in vals]
+        qv = rng.choice(vals)
+        q = rng.choice([s for s in held if s["type"] == qv and s not in demos])
+        demo_txt = " and ".join(f"his {d['name']} '{l}'" for d, l in zip(demos, labels))
+        items.append(dict(level="L3_induct_heldout", prompt=(
+            f"Timmy labels his creature cards with his own made-up tags. He labeled {demo_txt}. "
+            f"Following the same rule, how is he likely to label his {q['name']}?\nAnswer:"),
+            options=[" " + l for l in labels], answer=vals.index(qv), query=q["name"], demos=[d["name"] for d in demos]))
+    return items
