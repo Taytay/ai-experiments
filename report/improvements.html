@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teaching a model new entities: what improved, and how to train next</title>
+<style>
+  :root { color-scheme: light dark; }
+  .viz-root {
+    color-scheme: light;
+    --surface-1:#fcfcfb; --page:#f9f9f7; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --good:#006300;
+    font-family: system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--page);
+    line-height:1.5; font-size:16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme:dark; --surface-1:#1a1a19; --page:#0d0d0d; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10); --s1:#3987e5; --s2:#d95926; --s3:#199e70; --good:#0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme:dark; --surface-1:#1a1a19; --page:#0d0d0d; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10); --s1:#3987e5; --s2:#d95926; --s3:#199e70; --good:#0ca30c;
+  }
+  body { margin:0; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 28px; line-height:1.2; margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  h3 { font-size: 16px; margin: 24px 0 8px; }
+  p, li { color: var(--ink); max-width: 72ch; }
+  .sub { color: var(--ink-2); margin: 0 0 24px; }
+  .tiles { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 12px; margin: 24px 0; }
+  .tile { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .tile .label { color:var(--ink-2); font-size:13px; }
+  .tile .value { font-size:30px; font-weight:600; margin:2px 0; }
+  .tile .note { color:var(--muted); font-size:12px; }
+  figure { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px 16px 8px; margin: 20px 0; }
+  figcaption { font-weight:600; margin-bottom:2px; }
+  .fsub { color:var(--ink-2); font-size:13px; margin-bottom:10px; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--ink-2); margin: 4px 0 8px; }
+  .legend span::before { content:""; display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; background: var(--c); }
+  svg { width:100%; height:auto; display:block; overflow:visible; }
+  .bar { rx:0; }
+  .bar:hover, .bar:focus { filter: brightness(1.12); outline:none; }
+  .lbl { fill:var(--ink); font-size:12px; }
+  .lbl2 { fill:var(--ink-2); font-size:12px; }
+  .tick { fill:var(--muted); font-size:11px; }
+  .grid { stroke:var(--grid); stroke-width:1; }
+  .axis { stroke:var(--axis); stroke-width:1; }
+  .chance { stroke:var(--ink-2); stroke-width:1.5; stroke-dasharray:3 3; }
+  .tip { position:fixed; pointer-events:none; background:var(--ink); color:var(--surface-1); font-size:12px; padding:6px 8px; border-radius:6px; opacity:0; transition:opacity .08s; z-index:10; white-space:nowrap; }
+  details { margin: 6px 0 4px; font-size:13px; color:var(--ink-2); }
+  table { border-collapse:collapse; font-size:13px; margin-top:6px; font-variant-numeric: tabular-nums; }
+  td, th { padding: 3px 10px 3px 0; text-align:left; border-bottom:1px solid var(--grid); }
+  th { color:var(--ink-2); font-weight:600; }
+  .callout { border-left: 3px solid var(--s1); padding: 4px 16px; margin: 20px 0; background: var(--surface-1); border-radius: 0 8px 8px 0; }
+  .callout p { margin: 8px 0; }
+  code { font-size: 90%; background: var(--surface-1); border:1px solid var(--border); padding: 0 4px; border-radius:4px; }
+  .rec { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin: 16px 0; }
+  .rec h3 { margin-top: 0; }
+  ol li, ul li { margin: 6px 0; }
+  .small { font-size: 13px; color: var(--ink-2); }
+</style>
+</head>
+<body class="viz-root" data-palette="#2a78d6,#eb6834,#1baf7a">
+<main>
+<h1>Teaching a model new entities: what improved, and how to train next</h1>
+<p class="sub">RTX 3090 experiments, 12 to 13 September 2026. Merchant database (120 fictional stores) and a Pokemon-style creature universe (160 species, 8 fictional types). Every number here is from a tracked run in <code>evals/LEADERBOARD.md</code>.</p>
+
+<div class="tiles">
+  <div class="tile"><div class="label">Category inference, augmented vs raw facts</div><div class="value">41.7% vs 21.7%</div><div class="note">Qwen2.5-0.5B, same steps, 12-way, chance 8.3</div></div>
+  <div class="tile"><div class="label">Transfer to unseen bank strings</div><div class="value">70.8%</div><div class="note">subword fine-tune; 23% with added tokens</div></div>
+  <div class="tile"><div class="label">User label from 3 examples</div><div class="value">85%</div><div class="note">embedding prototypes; 63% on a latent attribute</div></div>
+  <div class="tile"><div class="label">Training speed with unsloth</div><div class="value">2.2x</div><div class="note">17.7k vs 8.2k tokens/s, 3x less memory</div></div>
+</div>
+
+<h2>1. What improved, in order of impact</h2>
+<ol>
+  <li><strong>Diverse text instead of a database dump.</strong> One sentence per entity, repeated 56 times, is memorized but barely usable (21.7% category inference). The same facts as 14 paraphrases and question-answer pairs double it (41.7%) and go from chance to 42.5% on reverse lookup. This is the single largest lever and it costs nothing at inference.</li>
+  <li><strong>Learning rate.</strong> Full fine-tuning at 5e-5 destroyed a 0.5B model (perplexity 16 to 800) and with it the products-to-category reasoning the task needs. At 1e-5 the same data gives the best result with perplexity 26. For LoRA, 2e-4 on rank 64 was also too hot; 1e-4 halved the damage with identical recall.</li>
+  <li><strong>No new tokens.</strong> Adding entity names as vocabulary collapsed the embedding model's transfer to statement-format strings from 70.8% to 23% and cut LLM extraction from 46.7% to 31.7%. Subword pieces are what let a learned association survive a format change, and they are the only route to your "slight variation on a name still means something" goal (section 4).</li>
+  <li><strong>Prototypes for user-defined labels.</strong> Defining a label as the centroid of the user's own examples handles nonsense names, synonyms and latent groupings with no retraining: 85% on type and 63% on habitat from three cards, against 33% chance.</li>
+  <li><strong>Model scale for few-shot label induction.</strong> The Timmy prompt is solvable by a 3B model with facts in context (49 to 52%) and not by a 0.5B model under any condition. Below a few billion parameters the model cannot override its label priors from three examples.</li>
+  <li><strong>Pipeline.</strong> Unsloth's fused kernels and loss give 2.2x throughput and 3x memory reduction at 512 tokens; sequence packing matters as much on small models, which are launch-overhead-bound at 13 to 17% GPU utilization on short facts. A 6-attribute entity costs about 1,800 training tokens for 100% recall, so 10,000 entities train in 17 minutes on 0.5B or 2 to 4 hours on 3B to 7B.</li>
+</ol>
+
+<figure>
+  <figcaption>Augmentation beats repetition at identical compute</figcaption>
+  <div class="fsub">Category inference accuracy (%), Qwen2.5-0.5B, 420 steps, lr 1e-5. Dashed line: chance (8.3). Category label never appears in training text.</div>
+  <svg id="c1" viewBox="0 0 860 200" role="img" aria-label="Bar chart: raw facts 21.7, augmented 41.7, facts in context 69.2"></svg>
+  <details><summary>Table view</summary><table><tr><th>condition</th><th>accuracy %</th></tr><tr><td>Raw facts, full FT</td><td>21.7</td></tr><tr><td>Augmented facts, full FT</td><td>41.7</td></tr><tr><td>Facts in prompt (retrieval ceiling)</td><td>69.2</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>Subwords carry knowledge across formats; new tokens do not</figcaption>
+  <div class="fsub">MiniLM embedding model, 12-way category accuracy on bank-statement strings never seen in training (%). Dashed line: chance.</div>
+  <svg id="c2" viewBox="0 0 860 220" role="img" aria-label="Bar chart: zero-shot 7.3, subword fine-tune 70.8, new tokens random 22.9, new tokens mean-init 26.0"></svg>
+  <details><summary>Table view</summary><table><tr><th>condition</th><th>bank-string accuracy %</th></tr><tr><td>Zero-shot</td><td>7.3</td></tr><tr><td>Fine-tune, original tokenizer</td><td>70.8</td></tr><tr><td>Fine-tune + 120 name tokens, random init</td><td>22.9</td></tr><tr><td>Fine-tune + 120 name tokens, mean init</td><td>26.0</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>The few-shot label task needs scale, and knowledge in context rather than in weights</figcaption>
+  <div class="fsub">"Timmy labeled his X 'FooFoo' and his Y 'blammo'. How will he label Z?" 3-way accuracy (%), lr 1e-4 runs. Dashed line: chance (33).</div>
+  <div class="legend"><span style="--c:var(--s1)">Facts in context, no training</span><span style="--c:var(--s2)">LoRA-trained, no context</span><span style="--c:var(--s3)">LoRA-trained + context</span></div>
+  <svg id="c3" viewBox="0 0 860 210" role="img" aria-label="Grouped bar chart of Timmy task accuracy for 0.5B and 3B models"></svg>
+  <details><summary>Table view</summary><table><tr><th>model</th><th>facts in context</th><th>LoRA</th><th>LoRA + context</th></tr><tr><td>Qwen2.5-0.5B</td><td>32.5</td><td>30.6</td><td>31.9</td></tr><tr><td>Qwen2.5-3B</td><td>48.8</td><td>32.5</td><td>34.4</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>A label defined by examples works for names the model never saw</figcaption>
+  <div class="fsub">MiniLM after contrastive training; 3-way prototype tasks use 3 labeled examples per tag (chance 33). Synonym and canonical rows are 8-way (chance 12.5).</div>
+  <div class="legend"><span style="--c:var(--s1)">Zero-shot</span><span style="--c:var(--s2)">Trained</span></div>
+  <svg id="c4" viewBox="0 0 860 250" role="img" aria-label="Grouped bar chart of embedding label accuracy before and after training"></svg>
+  <details><summary>Table view</summary><table><tr><th>label form</th><th>zero-shot</th><th>trained</th></tr><tr><td>Canonical type text (8-way)</td><td>10.3</td><td>99.3</td></tr><tr><td>Synonym "the sparky ones" (8-way)</td><td>13.2</td><td>41.2</td></tr><tr><td>Prototype, type (3-way)</td><td>33.7</td><td>85.3</td></tr><tr><td>Prototype, habitat, latent (3-way)</td><td>25.7</td><td>63.0</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>Unsloth versus plain transformers on the same card</figcaption>
+  <div class="fsub">Training tokens per second, LoRA rank 64, 512-token sequences, RTX 3090. Memory in the table.</div>
+  <div class="legend"><span style="--c:var(--s1)">Plain transformers + peft</span><span style="--c:var(--s2)">Unsloth</span></div>
+  <svg id="c5" viewBox="0 0 860 210" role="img" aria-label="Grouped bar chart of training throughput plain vs unsloth for 0.5B, 3B, 7B"></svg>
+  <details><summary>Table view</summary><table><tr><th>model</th><th>plain tok/s</th><th>plain GiB</th><th>unsloth tok/s</th><th>unsloth GiB</th></tr><tr><td>0.5B LoRA</td><td>8,165</td><td>19.2</td><td>17,716</td><td>6.0</td></tr><tr><td>3B LoRA + gc</td><td>1,662</td><td>14.8</td><td>2,663</td><td>8.1</td></tr><tr><td>7B QLoRA + gc</td><td>806</td><td>13.3</td><td>1,279</td><td>10.3</td></tr></table></details>
+</figure>
+
+<h2>2. Your goals, restated against the data</h2>
+<p>You are fine with general perplexity rising, want to keep enough of the base model to bootstrap the target tasks, and want the result to be better at few-shot classification on unseen categories and inputs. Three of the findings bear directly on that.</p>
+<div class="callout">
+  <p><strong>The one kind of forgetting you cannot afford is loss of in-context learning.</strong> Every LoRA run recalled its facts perfectly (100% in the trained format) and every one of them got <em>worse</em> at the few-shot label task when the facts were then supplied in context: 3B fell from 48.8 to 34.4 after training on declarative text. Perplexity on English prose is the wrong regression metric for you. The right one is a small suite of few-shot tasks with arbitrary labels, run before and after every training job.</p>
+</div>
+<p>Second, knowledge injected as statements did not become knowledge the model could <em>use</em> for analogy. Recall and manipulation are separate skills (Physics of Language Models 3.2), and our ladder shows the split: yes/no and comparison formats that appeared in training scored 85 to 94%, the never-trained Timmy format sat at chance. Third, the embedding side already does what you want for unseen categories: a label is a centroid of examples, so a synonym, a nonsense tag, or a grouping the label never names all work without retraining.</p>
+
+<h2>3. Inject first and then teach the task, or teach the task as the injection?</h2>
+<div class="rec">
+  <h3>Recommendation: one interleaved curriculum, not two stages</h3>
+  <p>Mix three kinds of examples in every batch of a single training run:</p>
+  <ol>
+    <li><strong>Knowledge text</strong> about the entities, in many surface forms and both directions (the augmented recipe that already works), including statement-style noisy variants of names.</li>
+    <li><strong>Few-shot episodes built from the same database</strong>: "A is 'zorp', B is 'quix', C is 'zorp'. D is ___", with labels drawn fresh and at random each episode, the grouping attribute varied (type, habitat, price band, region), the option set sometimes given and sometimes not, and a slice of entities and attributes held out so the task itself is tested on unseen categories. This is <em>symbol tuning</em> (Wei et al. 2023) applied to your own data, and it is the mechanism that teaches the model to override its label priors from examples.</li>
+    <li><strong>A small replay slice</strong> (10 to 20%) of generic few-shot tasks with random labels, so the in-context skill is preserved rather than merely not attacked.</li>
+  </ol>
+  <p><strong>Why not sequential.</strong> Stage one (knowledge) measurably damages the skill that stage two needs, and stage two then overwrites stage one: two rounds of forgetting with nothing holding either in place. The literature is consistent on this: Physics of LMs 3.1 finds knowledge is only extractable when instruction-style data is mixed into pretraining rather than added afterwards; Instruction Pre-Training and Self-Tuning are the same idea at scale; MetaICL and symbol tuning show the few-shot skill is itself trainable and transfers to unseen tasks and labels.</p>
+  <p><strong>Why not episodes alone.</strong> An episode teaches "these two share a group" without much exposure to <em>why</em>, and knowledge needs many diverse exposures to become robust. The mix gives the model the facts and the habit of using them. Expect the episodes to be the smaller share of tokens (a quarter to a third) but the larger share of the effect on your target metric.</p>
+</div>
+<p>In practice, with unsloth on this card: build the mixed dataset as packed 512-token sequences, train full or high-rank LoRA at 1e-4 or below since you accept general forgetting, keep the held-out attribute and held-out entity splits sacred, and let the harness compare "knowledge only", "episodes only", "interleaved", and "sequential" on the same ladder. That is a four-run afternoon on 3B.</p>
+
+<h2>4. Getting meaning from a name variant, a drug stem, or a molecule</h2>
+<p>This is a question about what the tokenizer's subword pieces have been taught. The mechanism already exists and the merchant result is the proof: fine-tuning with the stock tokenizer let "Elrholm" learned from clean sentences be recognized inside "DEBIT CARD PURCHASE ELRHOLM STORE 4970" at 70.8%, because the pieces <code>el ##rh ##ol ##m</code> are shared. Whole-word tokens broke that link. Held-out species stayed at chance for the opposite reason: their names carried no shared signal at all, so there was nothing to generalize from.</p>
+<p>So the design goal is to make sure the signal is in the pieces, and to train on the variation you want to be robust to:</p>
+<ul>
+  <li><strong>Drug names.</strong> Real nonproprietary names carry class in their stems by construction: <code>-mab</code> monoclonal antibody, <code>-pril</code> ACE inhibitor, <code>-statin</code>, <code>-olol</code>, <code>-prazole</code>. A model trained on a few thousand drugs with their classes and mechanisms will attach those stems to meaning, and a new <code>-tinib</code> lands near the kinase inhibitors before anyone tells it. Public data: DrugBank open release, ChEMBL, RxNorm with ATC classes, the WHO INN stem list. Molecules are a separate modality; SMILES strings tokenize into fragments the same way, and the same test applies.</li>
+  <li><strong>Retailer and processor names.</strong> Train every entity under several noisy renderings: uppercase, truncated at 20 to 25 characters, with store numbers, cities, and processor prefixes (<code>SQ *</code>, <code>TST*</code>, <code>PAYPAL *</code>), with and without spaces. The model then learns which pieces are the identity and which are noise, and a variant it has never seen inherits the meaning of the pieces it shares. Ten thousand retailers is exactly the scale where this starts to pay off.</li>
+  <li><strong>A test that measures it.</strong> Generate species (or merchants) whose names embed a morphological marker for their type with some probability, hold them out entirely, and score type inference on the held-out set. At zero probability the answer is chance (our current result); the slope against probability is the model's morphology transfer. Add the drug set as a real-world replicate.</li>
+</ul>
+
+<h2>5. Proposed next experiment: curriculum ladder v2</h2>
+<table>
+  <tr><th>arm</th><th>training data</th><th>tests it answers</th></tr>
+  <tr><td>A knowledge only</td><td>augmented text (current recipe)</td><td>baseline; recall vs analogy split</td></tr>
+  <tr><td>B episodes only</td><td>symbol-tuning episodes from the DB</td><td>does the task alone inject knowledge?</td></tr>
+  <tr><td>C interleaved</td><td>A + B + 15% generic few-shot replay, one run</td><td>the recommendation</td></tr>
+  <tr><td>D sequential</td><td>A then B</td><td>the two-stage alternative</td></tr>
+  <tr><td>E interleaved + morphology</td><td>C with marker-bearing names and noisy variants</td><td>held-out name transfer, variant robustness</td></tr>
+</table>
+<p class="small">Metrics: Timmy task with no context (in-weights analogy), held-out-attribute episodes (unseen categories), held-out-entity morphology transfer, and an in-context-learning regression suite of public few-shot tasks with random labels. Model: Qwen2.5-3B or 7B with unsloth LoRA; each arm is roughly 10 to 25 minutes of training on this card. The harness already tracks all of it.</p>
+
+<p class="small">Sources for the claims outside our own runs: Allen-Zhu and Li, Physics of Language Models 3.1 and 3.2; Wei et al., "Larger language models do in-context learning differently" and "Symbol tuning improves in-context learning" (2023); Min et al., MetaICL (2022); Cheng et al., Instruction Pre-Training (2024); Zhang et al., Self-Tuning (2024); Biderman et al., "LoRA Learns Less and Forgets Less" (2024). Full citations in <code>report/lit_review.md</code>.</p>
+
+<div class="tip" id="tip"></div>
+</main>
+<script>
+(function(){
+  const css = v => getComputedStyle(document.body).getPropertyValue(v).trim();
+  const tip = document.getElementById('tip');
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function el(n, a){ const e = document.createElementNS(svgNS, n); for (const k in a) e.setAttribute(k, a[k]); return e; }
+  // horizontal bars: rows = categories; series = 1..3; values in %
+  function hbar(id, rows, series, opts){
+    const svg = document.getElementById(id); if(!svg) return;
+    const W = 860, left = opts.left || 250, right = 70, top = 10;
+    const groupH = opts.groupH || (series.length > 1 ? 18 * series.length + 12 : 34);
+    const H = top + rows.length * groupH + 30;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const max = opts.max || 100, x = v => left + (W - left - right) * v / max;
+    const step = opts.step || (max <= 100 ? 20 : Math.round(max / 5));
+    for (let g = 0; g <= max; g += step){
+      svg.appendChild(el('line', {x1:x(g), x2:x(g), y1:top, y2:H-28, class:'grid'}));
+      const t = el('text', {x:x(g), y:H-12, class:'tick', 'text-anchor':'middle'}); t.textContent = fmt(g, opts); svg.appendChild(t);
+    }
+    svg.appendChild(el('line', {x1:x(0), x2:x(0), y1:top, y2:H-28, class:'axis'}));
+    if (opts.chance != null){ svg.appendChild(el('line', {x1:x(opts.chance), x2:x(opts.chance), y1:top, y2:H-28, class:'chance'}));
+      const t = el('text', {x:x(opts.chance)+4, y:H-31, class:'lbl2'}); t.textContent = 'chance'; svg.appendChild(t); }
+    rows.forEach((r, i) => {
+      const y0 = top + i * groupH;
+      const lab = el('text', {x:left-10, y:y0 + groupH/2 + 4, class:'lbl', 'text-anchor':'end'}); lab.textContent = r.label; svg.appendChild(lab);
+      series.forEach((s, j) => {
+        const v = r.values[j]; if (v == null) return;
+        const bh = Math.min(16, groupH / series.length - 2);
+        const y = y0 + (groupH - (bh * series.length + 2 * (series.length-1))) / 2 + j * (bh + 2);
+        const w = Math.max(0, x(v) - x(0));
+        const path = el('path', {d: roundedRight(x(0), y, w, bh, 4), fill: css(s.color), class:'bar', tabindex:0, 'aria-label': `${r.label}, ${s.name}: ${fmt(v, opts)}`});
+        path.addEventListener('mousemove', e => { tip.textContent = `${r.label} · ${s.name}: ${fmt(v, opts)}`; tip.style.left = (e.clientX+12)+'px'; tip.style.top = (e.clientY-28)+'px'; tip.style.opacity = 1; });
+        path.addEventListener('mouseleave', () => tip.style.opacity = 0);
+        svg.appendChild(path);
+        if (opts.labelAll || (opts.labelIdx && opts.labelIdx.includes(i))) { const t = el('text', {x:x(v)+6, y:y+bh-4, class:'lbl'}); t.textContent = fmt(v, opts); svg.appendChild(t); }
+      });
+    });
+  }
+  function roundedRight(x, y, w, h, r){ r = Math.min(r, w, h/2); return `M${x},${y} H${x+w-r} Q${x+w},${y} ${x+w},${y+r} V${y+h-r} Q${x+w},${y+h} ${x+w-r},${y+h} H${x} Z`; }
+  function fmt(v, o){ return o.unit === '' ? v.toLocaleString() : v + (o.unit||'%'); }
+
+  hbar('c1', [
+    {label:'Raw facts, full FT', values:[21.7]},
+    {label:'Augmented facts, full FT', values:[41.7]},
+    {label:'Facts in prompt (retrieval ceiling)', values:[69.2]}],
+    [{name:'accuracy', color:'--s1'}], {chance:8.3, labelAll:true});
+  hbar('c2', [
+    {label:'Zero-shot', values:[7.3]},
+    {label:'Fine-tune, original tokenizer', values:[70.8]},
+    {label:'+120 name tokens, random init', values:[22.9]},
+    {label:'+120 name tokens, mean init', values:[26.0]}],
+    [{name:'bank-string accuracy', color:'--s1'}], {chance:8.3, labelAll:true});
+  hbar('c3', [
+    {label:'Qwen2.5-0.5B', values:[32.5, 30.6, 31.9]},
+    {label:'Qwen2.5-3B', values:[48.8, 32.5, 34.4]}],
+    [{name:'facts in context', color:'--s1'},{name:'LoRA, no context', color:'--s2'},{name:'LoRA + context', color:'--s3'}],
+    {chance:33.3, labelAll:true, groupH:66});
+  hbar('c4', [
+    {label:'Canonical type text (8-way)', values:[10.3, 99.3]},
+    {label:'Synonym label (8-way)', values:[13.2, 41.2]},
+    {label:'Prototype: type, 3 examples', values:[33.7, 85.3]},
+    {label:'Prototype: habitat (latent), 3 examples', values:[25.7, 63.0]}],
+    [{name:'zero-shot', color:'--s1'},{name:'trained', color:'--s2'}], {labelAll:true, groupH:48, left:300});
+  hbar('c5', [
+    {label:'0.5B LoRA', values:[8165, 17716]},
+    {label:'3B LoRA + gc', values:[1662, 2663]},
+    {label:'7B QLoRA + gc', values:[806, 1279]}],
+    [{name:'plain transformers', color:'--s1'},{name:'unsloth', color:'--s2'}], {max:20000, unit:'', labelAll:true, groupH:48});
+})();
+</script>
+</body>
+</html>
