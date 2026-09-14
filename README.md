@@ -50,7 +50,13 @@ uv run python -m evals leaderboard          # regenerate evals/LEADERBOARD.md
 
 Large files are not in git. The DVC remote is a plain folder on the D: drive, one folder per
 repo under `D:\repos\dvc\`; from WSL the same folder is `/mnt/d/repos/dvc/ai-experiments`.
+The path is not in the shared DVC config because it differs by OS: on a fresh clone, `dvc`
+fails with a config error until you run the one `dvc remote modify --local` line for your OS
+from the comment in `.dvc/config` (details in `models/README.md`).
 
-Scripts add `src/` to `sys.path` themselves, so they run from any working directory. Windows
-notes: use `uv run python`, not `python`; set `PYTHONIOENCODING=utf-8` when printing dataset
-text. See `CLAUDE.md` for the working rules that apply to agent sessions.
+Scripts add `src/` to `sys.path` themselves, so they run from any working directory. The repo
+runs natively on Windows 11 or from WSL2 (Ubuntu) on the same machine; both see the RTX 3090.
+Each checkout needs its own `uv sync` and `uv run dvc pull`. Always use `uv run python`, not
+`python`. On Windows, also set `PYTHONIOENCODING=utf-8` when printing dataset text. See
+`CLAUDE.md` for the working rules that apply to agent sessions and `NOTES.md` for the
+environment history.

@@ -2,5 +2,14 @@
     analytics = false
     remote = dstore
     autostage = true
+
+# The remote "dstore" is a plain folder on this machine's D: drive. Its path differs by OS,
+# so it is NOT set here on purpose. Every clone must set it once, locally (gitignored):
+#
+#   Windows:  uv run dvc remote modify --local dstore url D:\repos\dvc\ai-experiments
+#   WSL:      uv run dvc remote modify --local dstore url /mnt/d/repos/dvc/ai-experiments
+#
+# Until then every dvc command fails with:
+#   config file error: expected 'url' for dictionary value @ data['remote']['dstore']
+# See .dvc/config.local.example and models/README.md.
 ['remote "dstore"']
-    url = D:\repos\dvc\ai-experiments

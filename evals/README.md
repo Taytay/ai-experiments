@@ -61,9 +61,11 @@ with the chosen config keys inlined, so hyperparameter sweeps read as a table.
 
 - **DoltLite** (dolthub/doltlite, beta Aug 2026) is the natural fit: SQLite with branches,
   diffs and merges, same `sqlite3_*` API. Its Python wheel (`doltlite` 0.50.10) ships only
-  `libdoltlite.so`; there is no Windows library, and even if there were, Smart App Control
-  on this machine blocks unsigned native DLLs. `tracker.connect()` is the single place to
-  swap in `doltlite.connect()` when that changes; the schema and CLI need no edits.
-- **MLflow** requires pyarrow (blocked here); **W&B** is cloud-hosted. Neither adds
+  `libdoltlite.so`; there is no Windows library, and at the time Smart App Control on this
+  machine blocked unsigned native DLLs. Both objections have since weakened (Smart App Control
+  is off, and the repo now also runs from WSL2 where the `.so` would load), so DoltLite is an
+  option again. `tracker.connect()` is the single place to swap in `doltlite.connect()`; the
+  schema and CLI need no edits.
+- **MLflow** requires pyarrow (blocked at the time); **W&B** is cloud-hosted. Neither adds
   much over a 300-line tracker for one-GPU experiments, and the JSONL mirror gives
   git-native review of results alongside the code that produced them.

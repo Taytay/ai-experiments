@@ -1,4 +1,6 @@
-# GPU / unsloth readiness check
+# NOTES: machine and environment history
+
+## 2026-09-12: GPU / unsloth readiness check
 
 Goal: confirm the NVIDIA driver on this machine is good enough to fine-tune a
 small embeddings model with unsloth.
@@ -11,7 +13,7 @@ small embeddings model with unsloth.
 | Driver | 591.86 (Windows driver 32.0.15.9186, dated 2026-01-19) |
 | Max CUDA runtime supported by driver | 13.1 |
 | CUDA toolkit on disk | v12.3 (not needed; torch wheels bundle their own runtime) |
-| WSL | Ubuntu 18.04 only (too old for current torch/triton), so native Windows is used |
+| WSL | Ubuntu 18.04 only at the time (too old for current torch/triton), so native Windows was used. Superseded 2026-09-14: a WSL2 Ubuntu 26.04 distro now exists and sees the GPU (see below). |
 
 ## Steps
 
@@ -72,3 +74,41 @@ path) trains all-MiniLM-L6-v2 on the RTX 3090 end to end. Original question answ
 driver stack is fully usable for unsloth fine-tuning of embedding models, natively on Windows.
 Gotcha: sentence-transformers 6.0 rejects `dataset_num_proc` in `SentenceTransformerTrainingArguments`
 even though unsloth's Windows docs recommend it (that flag belongs to TRL's `SFTConfig`).
+
+## 2026-09-14: second environment, WSL2 (Ubuntu 26.04)
+
+The repo can now be run from either side of the same machine: natively on Windows 11 or from
+WSL2. Both see the same RTX 3090 through the same 591.86 driver. Observed from WSL:
+
+| Item | Value |
+| --- | --- |
+| Distro | Ubuntu 26.04.1 LTS, kernel 6.18.33.2-microsoft-standard-WSL2 |
+| GPU | `nvidia-smi` reports the RTX 3090, 24576 MiB, driver 591.86 (Windows driver passed through) |
+| uv | 0.12.13 at `~/.local/bin/uv` |
+| Checkout | `/home/taytay/projects/Taytay/ai-experiments`, separate from the Windows clone |
+| Not yet done | unsloth import on WSL untested; `pdftotext` (poppler-utils) not installed |
+
+What the two checkouts share and do not share:
+
+- Shared through git: code, `results/*.json`, `evals/runs.jsonl`, `data/processed/`, reports.
+- Not shared (gitignored, per checkout): `.venv/`, `models/adapters/`, `hf_cache/`,
+  `evals/runs.db` (rebuild with `uv run python -m evals rebuild`, see `evals/README.md`).
+- Adapters are versioned with DVC (commit 043db8a); the remote is a folder on D:, reachable from
+  both sides, and each checkout runs `uv run dvc pull` to materialise them.
+
+Same day, later, from WSL: `uv sync` built the venv from the Windows-generated lockfile without
+changes (Linux resolves `triton` 3.6.0 where Windows has `triton-windows`). torch 2.11.0+cu128
+reports `cuda.is_available()` true on the RTX 3090. The shared `.dvc/config` originally stored
+the remote as `D:\repos\dvc\ai-experiments`, which Linux cannot open; with a warm cache
+`dvc pull` then says "Everything is up to date" without ever reaching the remote. So the url
+was removed from the shared config: every clone now fails loudly (`expected 'url' for
+dictionary value @ data['remote']['dstore']`) until it runs the one-line
+`dvc remote modify --local` command for its OS, spelled out in a comment in `.dvc/config`.
+With `/mnt/d/repos/dvc/ai-experiments` set locally, `uv run dvc pull` fetched 37 files (3.8 GB,
+ten adapter directories) over the 9p mount and `uv run dvc status -c` reports cache and remote
+in sync.
+
+Windows-only gotchas that do not apply on WSL: the `python` Store alias, cp1252 console
+(`PYTHONIOENCODING`), Bash heredoc failures, Smart App Control, WDDM system-memory fallback.
+Linux paths in `runs.jsonl` `argv` will look different from the Windows ones already recorded;
+the tracker's `env.platform` field says which side a run came from.

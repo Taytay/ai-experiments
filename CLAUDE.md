@@ -2,7 +2,8 @@
 
 Project: experiments on injecting new knowledge and terminology into small LLMs and embedding
 models, and extracting it again (multiple choice, in-context label induction, prototype
-classification). One RTX 3090 (24 GB), Windows 11, `uv` venv, unsloth. The original driver
+classification). One RTX 3090 (24 GB) in a Windows 11 machine, driven either natively or from
+WSL2 (Ubuntu 26.04); `uv` venv, unsloth. The original driver
 check the repo started as is done; the research is what the repo is for now.
 
 ## Start here
@@ -37,15 +38,34 @@ we collected, `src/` is library code, `scripts/` is entry points.
 
 ## Working rules for this machine
 
-- Run Python with `uv run python ...`; plain `python` is a Microsoft Store alias.
-- Write files with the Write/Edit tools. Bash heredocs fail here (`ENAMETOOLONG`, quote errors).
+The repo runs from two checkouts on one machine: native Windows 11 and WSL2 (Ubuntu 26.04).
+They share the GPU, the driver, everything in git, and the DVC remote on D:. They do not share
+`.venv/`, `models/adapters/` (restored per checkout with `uv run dvc pull`), `hf_cache/` or
+`evals/runs.db`. See `NOTES.md` for the history of each side.
+
+Both sides:
+
+- Run Python with `uv run python ...`, never a bare `python`. Run `uv sync` once per checkout.
+- The DVC remote path is not in the shared config. If any `dvc` command fails with
+  `expected 'url' for dictionary value @ data['remote']['dstore']`, run the one-line
+  `dvc remote modify --local` command from the comment in `.dvc/config` for this OS.
+- Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
+  side; if not, `uv run dvc pull` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.
-- The Read tool cannot open PDFs (no `pdftoppm`). Extract first: `pdftotext -layout x.pdf paper.txt`.
+- The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt` (on WSL,
+  install `poppler-utils` first).
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
   so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
-- Set `PYTHONIOENCODING=utf-8` when printing dataset text; the console codec is cp1252.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
 - After a training run: `uv run dvc add models/adapters && uv run dvc push`, then commit the
   updated `models/adapters.dvc` with the results. After a fresh clone: `uv run dvc pull`.
+
+Windows side only:
+
+- Plain `python` is a Microsoft Store alias; `uv run python` avoids it.
+- Write files with the Write/Edit tools. Bash heredocs fail there (`ENAMETOOLONG`, quote errors).
+- Set `PYTHONIOENCODING=utf-8` when printing dataset text; the console codec is cp1252.
+- WDDM can silently spill VRAM to system memory and turn an OOM into a 3x slowdown
+  (`reports/REPORT.md` section 7); watch step times, not just whether the run finishes.
