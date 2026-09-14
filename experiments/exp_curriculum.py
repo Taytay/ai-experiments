@@ -95,9 +95,18 @@ def option_scores(model, tok, prompt, options):
     L = max(map(len, seqs)); pad = tok.pad_token_id or 0
     ids = torch.tensor([s + [pad] * (L - len(s)) for s in seqs], device="cuda")
     att = torch.tensor([[1] * len(s) + [0] * (L - len(s)) for s in seqs], device="cuda")
-    logits = model(input_ids=ids, attention_mask=att).logits.float()
-    lp = F.log_softmax(logits[:, :-1], -1).gather(-1, ids[:, 1:].unsqueeze(-1)).squeeze(-1)
-    return [lp[i, a - 1:b - 1].mean().item() for i, (a, b) in enumerate(spans)]
+    try:
+        logits = model(input_ids=ids, attention_mask=att).logits
+    except (torch.OutOfMemoryError, torch.AcceleratorError):
+        if len(options) == 1:
+            raise
+        torch.cuda.empty_cache()  # long prompt x many options: score one option per forward
+        return [option_scores(model, tok, prompt, [o])[0] for o in options]
+    out = []
+    for i, (a, b) in enumerate(spans):  # softmax only over the answer positions, not the whole sequence
+        lp = F.log_softmax(logits[i, a - 1:b - 1].float(), -1).gather(-1, ids[i, a:b].unsqueeze(-1))
+        out.append(lp.mean().item())
+    return out
 
 
 @torch.no_grad()
@@ -230,11 +239,20 @@ with Run("curriculum_v2", model=MODEL, config=cfg) as run:
         for cond, mets in results.items():
             run.log(mets, condition=cond)
 
-    tok, model = load()
-    if not phases:
+    eval_only = bool(phases) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
+    if eval_only:
+        # re-score a previously trained adapter (e.g. after an eval-time crash) without retraining
+        run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(Path(__file__).parent.parent)))
+        model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+        tok.padding_side = "right"
+        r = evaluate(model, tok)
+        results["trained"], results["trained_ctx"] = r["noctx"], r["ctx"]
+    elif not phases:
+        tok, model = load()
         r = evaluate(model, tok)
         results["base"], results["base_ctx"] = r["noctx"], r["ctx"]
     else:
+        tok, model = load()
         model, stats = train(model, tok, phases, run)
         model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}", flush=True)
         r = evaluate(model, tok)
