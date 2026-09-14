@@ -13,7 +13,7 @@ uv run dvc status -c            # anything local that is not on the remote?
 
 On a machine where D: is mounted elsewhere, override the path without touching the shared
 config: `uv run dvc remote modify --local dstore url /mnt/d/repos/dvc/ai-experiments`
-(written to `.dvc/config.local`, which is gitignored).
+(written to `.dvc/config.local`, which is gitignored). The WSL2 checkout needs this once.
 
 Contents of `adapters/`:
 
