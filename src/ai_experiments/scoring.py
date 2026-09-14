@@ -16,8 +16,10 @@ Record fields (lists are per option, in the item's option order):
                       the domain premise of PMI_DC (Holtzman et al. 2021, "surface form competition")
   unc_lp              sum of log-probs given a bare newline: the unconditional baseline (UNC)
   mcf_lp              log-prob of the option's letter when the options are listed as "A. ..." lines
-                      between the prompt body and the cue (multiple-choice format, for OLMES-style
-                      hybrid scoring)
+                      between the prompt body and the cue (multiple-choice format, MCF; symbol scoring)
+  hyb_lp              sum of log-probs of the option text after that same listed-choices prompt
+                      (hybrid scoring: the listing fixes the option at its first tokens, so length
+                      stops mattering; 2607.12767, 2402.01781)
   pred                argmax of sum_lp / n_tok, the scorer used so far
   correct             pred == answer
 
@@ -118,9 +120,10 @@ class Scorer:
                 cue = self.cue_of(prompt)
                 rec["dc_lp"] = self._premised(cue, options, opt_ids)
                 rec["unc_lp"] = self._premised("\n", options, opt_ids)
+                listed = self._prompt_ids(self.mcf_prompt(prompt, options, cue))
                 letter_ids = [self._ids(" " + LETTERS[i]) for i in range(len(options))]
-                mcf = self._forward(self._prompt_ids(self.mcf_prompt(prompt, options, cue)), letter_ids)
-                rec["mcf_lp"] = [s for s, _ in mcf]
+                rec["mcf_lp"] = [s for s, _ in self._forward(listed, letter_ids)]
+                rec["hyb_lp"] = [s for s, _ in self._forward(listed, opt_ids)]
             mean = [s / max(n, 1) for s, n in cond]
             rec["pred"] = max(range(len(mean)), key=mean.__getitem__)
             rec["correct"] = rec["pred"] == it["answer"]
