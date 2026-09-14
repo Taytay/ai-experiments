@@ -1,8 +1,9 @@
 """Check this machine and checkout against the working rules in CLAUDE.md.
 
   uv run python scripts/doctor.py          # or: just doctor
-  uv run python scripts/doctor.py --gpu    # also allocate past VRAM to see whether the driver
-                                           # spills to system RAM (the WDDM 3x-slowdown trap)
+  uv run python scripts/doctor.py --gpu    # also allocate past VRAM; we WANT that to be refused
+                                           # with an out-of-memory error, not silently spill to
+                                           # system RAM (the WDDM 3x-slowdown trap)
 
 One line per check: OK, WARN (a machine setting worth changing, with the fix), FAIL (this
 checkout cannot run experiments), SKIP. Exit code is 1 only if something FAILs.
@@ -136,23 +137,34 @@ def check_gpu(oom_test: bool) -> None:
     total = torch.cuda.get_device_properties(0).total_memory
     report("OK", "gpu", f"{name}, {total / 2**30:.1f} GiB, torch {torch.__version__} (CUDA {torch.version.cuda})")
     if not oom_test:
-        report("SKIP", "sysmem fallback", "pass --gpu to test whether an allocation past VRAM succeeds (spills) or raises OOM")
+        report("SKIP", "sysmem fallback", "pass --gpu to check that an allocation past VRAM is REFUSED with an out-of-memory "
+                                          "error (wanted) rather than silently spilling into system RAM (a 3x-slower run)")
         return
+    # Deliberately ask for 125% of VRAM. The outcome we WANT is an exception: torch's
+    # OutOfMemoryError natively on Windows, or a plain RuntimeError("CUDA driver error: out of
+    # memory") on WSL. If the allocation SUCCEEDS the driver's "Sysmem Fallback" is on and it is
+    # paging GPU memory over PCIe: a run that no longer fits VRAM does not fail, it just trains
+    # about 3x slower with no message (REPORT.md section 7: 5.1 min became 13.8 min).
+    fix = ("Fix: NVIDIA Control Panel > Manage 3D settings > CUDA - Sysmem Fallback Policy > "
+           "Prefer No Sysmem Fallback, then re-run `just doctor --gpu`.")
     try:
         t = torch.empty(int(total * 1.25), dtype=torch.uint8, device="cuda")
         del t
         torch.cuda.empty_cache()
-        report("WARN", "sysmem fallback", "allocating 125% of VRAM succeeded, so the driver spills to system RAM and an OOM "
-                                          "becomes a 3x-slower run. NVIDIA Control Panel > Manage 3D settings > "
-                                          "CUDA - Sysmem Fallback Policy > Prefer No Sysmem Fallback")
+        report("WARN", "sysmem fallback", "allocating 125% of VRAM SUCCEEDED; it should have been refused with an out-of-memory "
+                                          "error. The driver is spilling GPU memory into system RAM, so a run that outgrows "
+                                          "VRAM will not fail, it will silently train about 3x slower. " + fix)
     except torch.cuda.OutOfMemoryError as e:
-        report("OK", "sysmem fallback", f"allocating past VRAM raises {type(e).__name__}; no silent spill")
+        report("OK", "sysmem fallback", f"allocating 125% of VRAM was refused with {type(e).__name__}, as wanted: an OOM stays "
+                                        "an OOM instead of a silent slowdown")
     except RuntimeError as e:
-        # WSL's driver refuses with a generic "CUDA driver error: out of memory", not OutOfMemoryError.
-        if "out of memory" in str(e).lower():
-            report("OK", "sysmem fallback", f"allocating past VRAM raises RuntimeError ({str(e).strip()}); no silent spill")
+        msg = str(e).strip()
+        if "out of memory" in msg.lower():
+            report("OK", "sysmem fallback", f"allocating 125% of VRAM was refused with RuntimeError ({msg}), as wanted: an OOM "
+                                            "stays an OOM instead of a silent slowdown")
         else:
-            report("FAIL", "sysmem fallback", f"unexpected {type(e).__name__} from the over-allocation test: {str(e).strip()[:120]}")
+            report("FAIL", "sysmem fallback", f"the over-allocation raised an unrelated {type(e).__name__} ({msg[:120]}); the test "
+                                              "could not tell whether the driver spills. Check the GPU is idle and re-run.")
 
 
 def main() -> None:
