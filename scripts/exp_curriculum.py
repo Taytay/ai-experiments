@@ -27,6 +27,11 @@ and every eval also writes per-item, per-option log-probs to results/per_item/ (
 Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ... unsloth).
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
+PERIODIC=N evaluates a fixed subsample (every 4th ladder item, every 2nd ICL suite item, the 200
+ARC-Easy known-facts items as the forgetting proxy) before training and every N steps, logged to the
+tracker under condition "periodic" with the step; results and adapter get a "_pN" suffix so the
+original arm stays (PLAN step 11). The final evaluation also scores the known-facts set (K_arc_easy)
+whenever data/processed/known_facts_v1.json exists.
 """
 import json
 import os
@@ -80,6 +85,11 @@ if SMOKE:
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
     ADAPTER = ROOT / "models" / "smoke" / ADAPTER.name
+PERIODIC = int(os.environ.get("PERIODIC", "0"))  # mid-training evaluation every N steps; 0 = off
+known = FROZEN.known
+if PERIODIC:
+    OUT = OUT.with_name(OUT.stem + f"_p{PERIODIC}.json")
+    ADAPTER = ADAPTER.with_name(ADAPTER.name.replace("_lora", f"_p{PERIODIC}_lora"))
 print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | items {FROZEN.version} "
       f"({'morph' if FROZEN.morph else 'plain'}): {len(ladder)} ladder | {len(probes)} probes | {len(suite)} ICL suite", flush=True)
 
@@ -98,6 +108,8 @@ def evaluate(model, tok):
     sc = Scorer(model, tok, maxlen=MAXLEN)
     recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
+    if known:
+        recs["noctx"] += sc.score(known, label="known facts")
     noctx = aggregate(recs["noctx"])
     sym = [v for k, v in noctx.items() if k.startswith("ICL_symbol")]
     nat = [v for k, v in noctx.items() if k.startswith("ICL_natural")]
@@ -107,6 +119,19 @@ def evaluate(model, tok):
     ctx = aggregate(recs["ctx"])
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
     return {"noctx": noctx, "ctx": ctx}, recs
+
+
+def periodic_eval(model, tok):
+    """Cheap mid-training point: a fixed subsample, no extra passes, no per-item file. Leaves the model in train mode."""
+    model.eval(); torch.cuda.empty_cache(); t0 = time.time()
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=False)
+    m = aggregate(sc.score(ladder[::4]) + sc.score(suite[::2]) + (sc.score(known) if known else []))
+    sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
+    m["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
+    m["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
+    m["eval_minutes"] = round((time.time() - t0) / 60, 1)
+    model.train()
+    return m
 
 
 # ------------------------------------------------------------------ training
@@ -152,6 +177,10 @@ def train(model, tok, phases, run):
     counts, tokens, t0 = defaultdict(int), 0, time.time()
     torch.cuda.empty_cache(); torch.cuda.reset_peak_memory_stats()
     model.train()
+    periodic = {}
+    if PERIODIC:
+        periodic[0] = periodic_eval(model, tok); run.log(periodic[0], condition="periodic", step=0)
+        print(f"    step 0 periodic: {periodic[0]}", flush=True)
     for step in range(STEPS):
         mix = phases[min(len(phases) - 1, step * len(phases) // STEPS)]
         srcs, ws = zip(*mix.items())
@@ -175,10 +204,13 @@ def train(model, tok, phases, run):
             print(f"    step {step + 1}/{STEPS} loss {loss_acc:.3f} mix={mix} {el:.0f}s {tokens / el:.0f} tok/s "
                   f"{torch.cuda.max_memory_allocated() / 2**30:.1f} GiB", flush=True)
             run.log(dict(train_loss=loss_acc), condition="train", step=step + 1)
+        if PERIODIC and (step + 1) % PERIODIC == 0 and step + 1 < STEPS:
+            periodic[step + 1] = periodic_eval(model, tok); run.log(periodic[step + 1], condition="periodic", step=step + 1)
+            print(f"    step {step + 1} periodic: {periodic[step + 1]}", flush=True)
     el = time.time() - t0
     return model, dict(train_minutes=round(el / 60, 1), train_tokens=tokens, tokens_per_s=round(tokens / el),
                        peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2**30, 2),
-                       **{f"n_{k}": v for k, v in counts.items()})
+                       **{f"n_{k}": v for k, v in counts.items()}), periodic
 
 
 # ------------------------------------------------------------------ main
@@ -188,13 +220,14 @@ cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCU
            method="unsloth_lora", lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
-           **FROZEN.config())
+           n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
 with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
     def save(recs, conds):
         """results JSON + tracker metrics, and one per-item JSONL per condition (conds maps noctx/ctx -> name)."""
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
         for cond, mets in results.items():
-            run.log(mets, condition=cond)
+            if cond != "periodic":  # already logged with steps during training
+                run.log(mets, condition=cond)
         run.artifact(OUT)
         for key, cond in conds.items():
             run.artifact(write_records(per_item_path(OUT, cond), recs[key]))
@@ -219,10 +252,12 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         conds = {"noctx": "base", "ctx": "base_ctx"}
     else:
         tok, model = load()
-        model, stats = train(model, tok, phases, run)
+        model, stats, periodic = train(model, tok, phases, run)
         model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}", flush=True)
         r, recs = evaluate(model, tok)
         results["trained"] = {**r["noctx"], **stats}; results["trained_ctx"] = r["ctx"]
+        if periodic:
+            results["periodic"] = {str(k): v for k, v in periodic.items()}  # curves; scripts/curves.py reads the tracker
         conds = {"noctx": "trained", "ctx": "trained_ctx"}
     save(recs, conds)
 
