@@ -67,13 +67,13 @@
 <body class="viz-root" data-palette="#2a78d6,#eb6834,#1baf7a">
 <main>
 <h1>Teaching a model new entities: what improved, and how to train next</h1>
-<p class="sub">RTX 3090 experiments, 12 to 13 September 2026. Merchant database (120 fictional stores) and a Pokemon-style creature universe (160 species, 8 fictional types). Every number here is from a tracked run in <code>evals/LEADERBOARD.md</code>.</p>
+<p class="sub">RTX 3090 experiments, 12 to 14 September 2026. Merchant database (120 fictional stores) and a Pokemon-style creature universe (160 species, 8 fictional types). Every number here is from a tracked run in <code>evals/LEADERBOARD.md</code>. Section 5 reports the curriculum experiment that the first version of this page only proposed.</p>
 
 <div class="tiles">
+  <div class="tile"><div class="label">Timmy task from the weights, interleaved curriculum</div><div class="value">59% vs 40%</div><div class="note">Qwen2.5-3B, 3-way, chance 33; knowledge-only text gives 40, base 36</div></div>
+  <div class="tile"><div class="label">Public few-shot with random labels after training</div><div class="value">78% vs 51%</div><div class="note">interleaved vs knowledge-only; base 60. Episodes protect in-context learning</div></div>
   <div class="tile"><div class="label">Category inference, augmented vs raw facts</div><div class="value">41.7% vs 21.7%</div><div class="note">Qwen2.5-0.5B, same steps, 12-way, chance 8.3</div></div>
-  <div class="tile"><div class="label">Transfer to unseen bank strings</div><div class="value">70.8%</div><div class="note">subword fine-tune; 23% with added tokens</div></div>
   <div class="tile"><div class="label">User label from 3 examples</div><div class="value">85%</div><div class="note">embedding prototypes; 63% on a latent attribute</div></div>
-  <div class="tile"><div class="label">Training speed with unsloth</div><div class="value">2.2x</div><div class="note">17.7k vs 8.2k tokens/s, 3x less memory</div></div>
 </div>
 
 <h2>1. What improved, in order of impact</h2>
@@ -127,13 +127,13 @@
 <h2>2. Your goals, restated against the data</h2>
 <p>You are fine with general perplexity rising, want to keep enough of the base model to bootstrap the target tasks, and want the result to be better at few-shot classification on unseen categories and inputs. Three of the findings bear directly on that.</p>
 <div class="callout">
-  <p><strong>The one kind of forgetting you cannot afford is loss of in-context learning.</strong> Every LoRA run recalled its facts perfectly (100% in the trained format) and every one of them got <em>worse</em> at the few-shot label task when the facts were then supplied in context: 3B fell from 48.8 to 34.4 after training on declarative text. Perplexity on English prose is the wrong regression metric for you. The right one is a small suite of few-shot tasks with arbitrary labels, run before and after every training job.</p>
+  <p><strong>The one kind of forgetting you cannot afford is loss of in-context learning.</strong> Every LoRA run on declarative text recalled its facts perfectly (100% in the trained format) and every one of them got <em>worse</em> at the few-shot label task when the facts were then supplied in context: 3B fell from 48.8 to 34.4 after training on declarative text, and on public few-shot data from 60 to 51. Perplexity on English prose is the wrong regression metric for you. The right one is a small suite of few-shot tasks with arbitrary labels, run before and after every training job; section 5 builds that suite and shows the data mix that reverses the loss.</p>
 </div>
 <p>Second, knowledge injected as statements did not become knowledge the model could <em>use</em> for analogy. Recall and manipulation are separate skills (Physics of Language Models 3.2), and our ladder shows the split: yes/no and comparison formats that appeared in training scored 85 to 94%, the never-trained Timmy format sat at chance. Third, the embedding side already does what you want for unseen categories: a label is a centroid of examples, so a synonym, a nonsense tag, or a grouping the label never names all work without retraining.</p>
 
 <h2>3. Inject first and then teach the task, or teach the task as the injection?</h2>
 <div class="rec">
-  <h3>Recommendation: one interleaved curriculum, not two stages</h3>
+  <h3>Recommendation: one interleaved curriculum, not two stages (tested in section 5)</h3>
   <p>Mix three kinds of examples in every batch of a single training run:</p>
   <ol>
     <li><strong>Knowledge text</strong> about the entities, in many surface forms and both directions (the augmented recipe that already works), including statement-style noisy variants of names.</li>
@@ -143,7 +143,7 @@
   <p><strong>Why not sequential.</strong> Stage one (knowledge) measurably damages the skill that stage two needs, and stage two then overwrites stage one: two rounds of forgetting with nothing holding either in place. The literature is consistent on this: Physics of LMs 3.1 finds knowledge is only extractable when instruction-style data is mixed into pretraining rather than added afterwards; Instruction Pre-Training and Self-Tuning are the same idea at scale; MetaICL and symbol tuning show the few-shot skill is itself trainable and transfers to unseen tasks and labels.</p>
   <p><strong>Why not episodes alone.</strong> An episode teaches "these two share a group" without much exposure to <em>why</em>, and knowledge needs many diverse exposures to become robust. The mix gives the model the facts and the habit of using them. Expect the episodes to be the smaller share of tokens (a quarter to a third) but the larger share of the effect on your target metric.</p>
 </div>
-<p>In practice, with unsloth on this card: build the mixed dataset as packed 512-token sequences, train full or high-rank LoRA at 1e-4 or below since you accept general forgetting, keep the held-out attribute and held-out entity splits sacred, and let the harness compare "knowledge only", "episodes only", "interleaved", and "sequential" on the same ladder. That is a four-run afternoon on 3B.</p>
+<p>In practice, with unsloth on this card: build the mixed dataset as packed 512-token sequences, train full or high-rank LoRA at 1e-4 or below since you accept general forgetting, keep the held-out attribute and held-out entity splits sacred, and let the harness compare "knowledge only", "episodes only", "interleaved", and "sequential" on the same ladder. Section 5 reports exactly that sweep, run on 3B in one evening.</p>
 
 <h2>4. Getting meaning from a name variant, a drug stem, or a molecule</h2>
 <p>This is a question about what the tokenizer's subword pieces have been taught. The mechanism already exists and the merchant result is the proof: fine-tuning with the stock tokenizer let "Elrholm" learned from clean sentences be recognized inside "DEBIT CARD PURCHASE ELRHOLM STORE 4970" at 70.8%, because the pieces <code>el ##rh ##ol ##m</code> are shared. Whole-word tokens broke that link. Held-out species stayed at chance for the opposite reason: their names carried no shared signal at all, so there was nothing to generalize from.</p>
@@ -154,16 +154,69 @@
   <li><strong>A test that measures it.</strong> Generate species (or merchants) whose names embed a morphological marker for their type with some probability, hold them out entirely, and score type inference on the held-out set. At zero probability the answer is chance (our current result); the slope against probability is the model's morphology transfer. Add the drug set as a real-world replicate.</li>
 </ul>
 
-<h2>5. Proposed next experiment: curriculum ladder v2</h2>
+<h2>5. Curriculum ladder v2: the experiment, run</h2>
+<p>Qwen2.5-3B, unsloth LoRA rank 64, lr 1e-4, 800 steps of 16 sequences for every arm, one evaluation for all of them: the section-6 ladder without and with facts in context, a held-out-species induction level, morphology probes, an <strong>ICL regression suite</strong> of few-shot classification on four public datasets (SST-2, Banking77, DBpedia, Subj; random-symbol and natural labels; chance 43.3), and perplexity. Episodes are symbol-tuning items generated from the creature database: 2 to 5 groups, fresh random labels every time, grouping attribute varied and <em>weakness never used</em>, half with the field guide in the prompt. Replay is the same kind of episode built from AG News, Emotion, TREC and 20 Newsgroups.</p>
 <table>
-  <tr><th>arm</th><th>training data</th><th>tests it answers</th></tr>
-  <tr><td>A knowledge only</td><td>augmented text (current recipe)</td><td>baseline; recall vs analogy split</td></tr>
-  <tr><td>B episodes only</td><td>symbol-tuning episodes from the DB</td><td>does the task alone inject knowledge?</td></tr>
-  <tr><td>C interleaved</td><td>A + B + 15% generic few-shot replay, one run</td><td>the recommendation</td></tr>
-  <tr><td>D sequential</td><td>A then B</td><td>the two-stage alternative</td></tr>
-  <tr><td>E interleaved + morphology</td><td>C with marker-bearing names and noisy variants</td><td>held-out name transfer, variant robustness</td></tr>
+  <tr><th>arm</th><th>batch composition</th><th>result in one line</th></tr>
+  <tr><td>A knowledge only</td><td>augmented text 100%</td><td>100% recall; Timmy from weights 40; public few-shot drops 60 to 51</td></tr>
+  <tr><td>B episodes only</td><td>episodes 100%</td><td>no facts learned; every in-context induction test up ~30 points; public few-shot up to 76</td></tr>
+  <tr><td>C interleaved + replay</td><td>text 45% / episodes 40% / replay 15%</td><td>100% recall <em>and</em> Timmy from weights 59; held-out partition 54; public few-shot 78</td></tr>
+  <tr><td>Cn interleaved, no replay</td><td>text 50% / episodes 50%</td><td>same on the universe; public few-shot only 71, perplexity 20</td></tr>
+  <tr><td>D sequential</td><td>text then episodes (replay in both)</td><td>Timmy 61 but recall 97, yes/no 64, pair 65: stage two overwrote stage one</td></tr>
+  <tr><td>E interleaved + morphology</td><td>as C, 70% of names carry a type suffix</td><td>Timmy from weights 75, k=4 76; see chart</td></tr>
 </table>
-<p class="small">Metrics: Timmy task with no context (in-weights analogy), held-out-attribute episodes (unseen categories), held-out-entity morphology transfer, and an in-context-learning regression suite of public few-shot tasks with random labels. Model: Qwen2.5-3B or 7B with unsloth LoRA; each arm is roughly 10 to 25 minutes of training on this card. The harness already tracks all of it.</p>
+
+<figure>
+  <figcaption>Interleaving is the only arm that both knows the facts and uses them for induction</figcaption>
+  <div class="fsub">Accuracy (%) without any facts in the prompt, Qwen2.5-3B. Timmy task is 3-way (chance 33); the public few-shot suite has 2 to 4 classes with random-symbol labels (chance 43).</div>
+  <div class="legend"><span style="--c:var(--s1)">Recall, trained format</span><span style="--c:var(--s2)">Timmy task from weights</span><span style="--c:var(--s3)">Public few-shot, random labels</span></div>
+  <svg id="c6" viewBox="0 0 860 400" role="img" aria-label="Grouped bar chart of recall, Timmy accuracy and public few-shot accuracy for six training arms"></svg>
+  <details><summary>Table view</summary><table><tr><th>arm</th><th>recall</th><th>Timmy, no context</th><th>public few-shot, symbols</th><th>public few-shot, natural</th><th>perplexity</th></tr>
+  <tr><td>base</td><td>11.9</td><td>35.6</td><td>60.4</td><td>84.4</td><td>8.5</td></tr>
+  <tr><td>A knowledge only</td><td>100</td><td>40.0</td><td>50.5</td><td>80.8</td><td>21.2</td></tr>
+  <tr><td>B episodes only</td><td>12.5</td><td>32.5</td><td>75.5</td><td>87.0</td><td>12.2</td></tr>
+  <tr><td>C interleaved + replay</td><td>100</td><td>59.4</td><td>78.1</td><td>88.0</td><td>14.9</td></tr>
+  <tr><td>Cn interleaved, no replay</td><td>100</td><td>60.6</td><td>70.8</td><td>88.0</td><td>20.4</td></tr>
+  <tr><td>D sequential</td><td>96.9</td><td>61.2</td><td>81.2</td><td>87.0</td><td>14.4</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>Episodes teach the skill; interleaving keeps the knowledge that sequential training loses</figcaption>
+  <div class="fsub">Accuracy (%), no context. Yes/no membership and pairwise same-type are 2-way (chance 50); the weakness partition was never a grouping attribute in any training episode (3-way, chance 33).</div>
+  <div class="legend"><span style="--c:var(--s1)">Yes/no membership</span><span style="--c:var(--s2)">Pairwise same type</span><span style="--c:var(--s3)">Induction on held-out partition (weakness)</span></div>
+  <svg id="c7" viewBox="0 0 860 400" role="img" aria-label="Grouped bar chart of knowledge manipulation and held-out partition induction for six arms"></svg>
+  <details><summary>Table view</summary><table><tr><th>arm</th><th>yes/no</th><th>pair</th><th>weakness, no context</th><th>Timmy, with context</th><th>weakness, with context</th><th>held-out species, with context</th></tr>
+  <tr><td>base</td><td>41.2</td><td>50.0</td><td>32.5</td><td>48.8</td><td>45.6</td><td>43.8</td></tr>
+  <tr><td>A knowledge only</td><td>96.2</td><td>91.2</td><td>45.0</td><td>43.1</td><td>45.0</td><td>32.3</td></tr>
+  <tr><td>B episodes only</td><td>56.2</td><td>50.0</td><td>35.6</td><td>78.8</td><td>74.4</td><td>79.2</td></tr>
+  <tr><td>C interleaved + replay</td><td>85.0</td><td>73.8</td><td>53.8</td><td>76.2</td><td>72.5</td><td>75.0</td></tr>
+  <tr><td>Cn interleaved, no replay</td><td>82.5</td><td>76.2</td><td>60.6</td><td>81.9</td><td>75.6</td><td>77.1</td></tr>
+  <tr><td>D sequential</td><td>63.8</td><td>65.0</td><td>53.8</td><td>80.0</td><td>77.5</td><td>78.1</td></tr></table></details>
+</figure>
+
+<figure>
+  <figcaption>A name stem becomes a feature: never-trained names are typed from their suffix at 94%</figcaption>
+  <div class="fsub">Type accuracy (%) on 48 never-trained probe names per row, no context, trained answer format, 8-way (chance 12.5). "Marked" names end in their type's suffix; "plain" names do not. Arm E trained on a universe where 70% of names carry the suffix; arm C trained on the plain universe where the same suffixes are spread at random.</div>
+  <div class="legend"><span style="--c:var(--s1)">Marked name (suffix matches type)</span><span style="--c:var(--s2)">Plain name</span></div>
+  <svg id="c8" viewBox="0 0 860 240" role="img" aria-label="Grouped bar chart of probe accuracy for marked and plain never-seen names across four conditions"></svg>
+  <details><summary>Table view</summary><table><tr><th>condition</th><th>marked name</th><th>plain name</th><th>Timmy from weights</th><th>Timmy k=4</th><th>held-out species, no context</th></tr>
+  <tr><td>base, plain universe</td><td>10.4</td><td>14.6</td><td>35.6</td><td>26.9</td><td>42.7</td></tr>
+  <tr><td>C interleaved, plain universe</td><td>4.2</td><td>6.2</td><td>59.4</td><td>52.5</td><td>31.2</td></tr>
+  <tr><td>base, morphology universe</td><td>12.5</td><td>10.4</td><td>38.1</td><td>38.1</td><td>35.4</td></tr>
+  <tr><td>E interleaved, morphology universe</td><td>93.8</td><td>14.6</td><td>75.0</td><td>76.2</td><td>46.9</td></tr></table></details>
+</figure>
+<p>This is the mechanism behind the drug-stem and retailer-variant goal in section 4, measured. The suffix only became a feature when the training data made it predictive (arm C, where the same suffixes were meaningless, scores at chance on the same probes), and once it did, the model placed unseen creatures by name alone: Timmy from the weights 75 instead of 59, and induction over species it never saw rose from 31 to 47 with no context at all. Recall, the public few-shot score and perplexity were unchanged relative to arm C.</p>
+
+<div class="rec">
+  <h3>What this settles</h3>
+  <ol>
+    <li><strong>Teach the task as the injection.</strong> One interleaved run gives 100% recall plus in-weights label induction at 59 to 61% (base 36, knowledge-only 40) and transfers that induction to a partition never used in training. Sequential staging reaches the same induction number but loses 3 points of recall, 21 points of yes/no manipulation and 9 points of pairwise reasoning, and its answer format drifts enough that recall with the facts in the prompt drops to 89%.</li>
+    <li><strong>Symbol-tuning episodes are what protect and improve in-context learning.</strong> Declarative text alone lowered public-data few-shot accuracy by 10 points; adding episodes raised it 15 to 21 points above base. Your regression metric should be that suite, and the fix for the erosion seen in section 2 is in the data mix, not in a lower learning rate.</li>
+    <li><strong>Keep the replay slice.</strong> It does not change the universe results; it keeps the induction skill general (78 vs 71 on public data) and holds perplexity at 15 instead of 20.</li>
+    <li><strong>Latent, low-frequency attributes are still the hard case.</strong> Habitat induction never passed 45% in any arm. Attributes shared by few entities need more exposures or an attribute-specific retrieval step.</li>
+  </ol>
+</div>
+<p class="small">Each trained arm: 21 to 25 minutes at 840 to 1,170 tokens/s and 8.7 GiB, plus 7 minutes of evaluation over 4,400 items. Not run yet: the same arms on 7B, a drug-name replicate with ATC classes, and the merchant database with statement-style noisy renderings.</p>
 
 <p class="small">Sources for the claims outside our own runs: Allen-Zhu and Li, Physics of Language Models 3.1 and 3.2; Wei et al., "Larger language models do in-context learning differently" and "Symbol tuning improves in-context learning" (2023); Min et al., MetaICL (2022); Cheng et al., Instruction Pre-Training (2024); Zhang et al., Self-Tuning (2024); Biderman et al., "LoRA Learns Less and Forgets Less" (2024). Full citations in <code>report/lit_review.md</code>.</p>
 
@@ -237,6 +290,31 @@
     {label:'3B LoRA + gc', values:[1662, 2663]},
     {label:'7B QLoRA + gc', values:[806, 1279]}],
     [{name:'plain transformers', color:'--s1'},{name:'unsloth', color:'--s2'}], {max:20000, unit:'', labelAll:true, groupH:48});
+  hbar('c6', [
+    {label:'base', values:[11.9, 35.6, 60.4]},
+    {label:'A knowledge only', values:[100, 40.0, 50.5]},
+    {label:'B episodes only', values:[12.5, 32.5, 75.5]},
+    {label:'C interleaved + replay', values:[100, 59.4, 78.1]},
+    {label:'Cn interleaved, no replay', values:[100, 60.6, 70.8]},
+    {label:'D sequential', values:[96.9, 61.2, 81.2]}],
+    [{name:'recall, trained format', color:'--s1'},{name:'Timmy task from weights', color:'--s2'},{name:'public few-shot, random labels', color:'--s3'}],
+    {labelAll:true, groupH:62, left:260});
+  hbar('c7', [
+    {label:'base', values:[41.2, 50.0, 32.5]},
+    {label:'A knowledge only', values:[96.2, 91.2, 45.0]},
+    {label:'B episodes only', values:[56.2, 50.0, 35.6]},
+    {label:'C interleaved + replay', values:[85.0, 73.8, 53.8]},
+    {label:'Cn interleaved, no replay', values:[82.5, 76.2, 60.6]},
+    {label:'D sequential', values:[63.8, 65.0, 53.8]}],
+    [{name:'yes/no membership', color:'--s1'},{name:'pairwise same type', color:'--s2'},{name:'induction on held-out partition', color:'--s3'}],
+    {labelAll:true, groupH:62, left:260});
+  hbar('c8', [
+    {label:'base, plain universe', values:[10.4, 14.6]},
+    {label:'C interleaved, plain universe', values:[4.2, 6.2]},
+    {label:'base, morphology universe', values:[12.5, 10.4]},
+    {label:'E interleaved, morphology universe', values:[93.8, 14.6]}],
+    [{name:'marked name', color:'--s1'},{name:'plain name', color:'--s2'}],
+    {chance:12.5, labelAll:true, groupH:48, left:300});
 })();
 </script>
 </body>

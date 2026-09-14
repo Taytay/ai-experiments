@@ -1,7 +1,7 @@
 # Fine-tuning LLMs and embedding models for merchant knowledge: frameworks, vocabulary, and knowledge injection
 
-Date: 2026-09-12. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
-Experiments run with transformers + torch only (Smart App Control blocks triton/pyarrow; see NOTES.md).
+Date: 2026-09-12 to 2026-09-14. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
+Sections 4 and 6 ran with transformers + torch only (Smart App Control blocked triton at the time; see NOTES.md); sections 7 and 8 use unsloth.
 Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../experiments/`. Raw numbers: `../results/`. Every run is tracked with config + git commit in `../evals/` (see `../evals/LEADERBOARD.md`).
 
 ## 1. Executive summary
@@ -9,6 +9,7 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 - **Frameworks.** For one 24 GB GPU, Unsloth is the consensus choice (fastest, lowest VRAM, native Windows, now covers embedding models via `FastSentenceTransformer`). Axolotl is the pick for multi-GPU nodes with YAML-driven reproducibility. TRL is the substrate both wrap and the right layer if you need a custom loss. torchtune is unmaintained since July 2025; do not start on it. For RL at scale, verl. For embedding models specifically, the trainer is sentence-transformers' `SentenceTransformerTrainer` whether or not Unsloth is wrapping it.
 - **New vocabulary.** Almost never worth it for merchant names. Subword tokenization already handles them; expansion requires continued pretraining and can hurt at small token budgets. If you must add tokens, initialize inside the existing embedding distribution (mean-of-subwords or Hewitt's N(mu, Sigma) sampling), never random, and train afterwards. Our experiments went further: added merchant tokens actively **hurt** both models. For the embedding model they collapsed transfer to unseen bank-statement strings from 70.8% to 23-26% (section 4.3.1); for the LLM they cut knowledge extraction from 46.7% to 31.7% at identical data and steps. Post-hoc aliasing of an uppercase token onto the trained mixed-case embedding did not rescue the bank format either. Fix the strings with normalization, not the tokenizer.
 - **User-invented labels and analogy (section 6).** Prompts like "Timmy labeled his Blaxorc 'FooFoo'... how will he label his Radsup?" are a scale phenomenon: with the facts in context a 3B model reaches 49 to 52% on a 3-way task (chance 33) and 0.5B never leaves chance. Knowledge injected into weights by LoRA was fully recalled (100% in the trained format) but did not power that in-context analogy, and fine-tuning eroded the ability. For an embedding model, defining a user's label as the centroid of their labeled examples gave 85% (type) and 63% (a latent attribute the labels never name) with three examples and no retraining. Recommendation: prototypes for user categories, retrieval-in-context for LLM analogy, a 3B to 8B model.
+- **Teach the task as the injection (section 8).** A six-arm sweep on Qwen2.5-3B settled the inject-then-task question. Symbol-tuning episodes generated from the database (few-shot items with fresh random labels and a varied grouping attribute) raise in-context label induction by about 30 points on every test, including a partition and species never trained on, and lift few-shot classification with random labels on public datasets from 60 to 76 where declarative text alone lowered it to 51. Interleaving those episodes with the knowledge text in one run gives 100% recall *and* the Timmy task from the weights at 59% (base 36, knowledge-only 40, chance 33), with transfer to the held-out partition (54%). Sequential staging matches the induction number but loses 3 points of recall, 21 of yes/no manipulation and 9 of pairwise reasoning. A 15% generic replay slice keeps the skill portable (78 vs 71 on public data) and holds perplexity at 15 instead of 20. On a universe where 70% of names carry a type suffix, the interleaved model types never-seen names from their suffix at 94% (chance 12.5) while neutral names stay at chance: the drug-stem mechanism, measured.
 - **Performance (section 7).** On this RTX 3090, unsloth LoRA trains 0.5B at 17.7k tokens/s (2.2x plain transformers, 3x less memory), 3B at 2.7k tokens/s (69% MFU) and 7B QLoRA at 1.3k tokens/s. Small models on short facts are overhead-bound (13 to 17% MFU) and want sequence packing more than a faster GPU; 3B and up are compute-bound and scale with TFLOPS. The card handles ~1.5B for full fine-tuning, ~8B for LoRA, ~30B for QLoRA. A 6-attribute entity costs ~1,800 training tokens with a diverse recipe, so a 10k-entity database trains in 17 minutes on 0.5B or about 2 to 4 hours on 3B to 7B. Watch for Windows WDDM system-memory fallback near 24 GB, which slows training ~3x instead of failing.
 - **Knowledge injection.** Dumping the merchant database as one sentence per store into the model does not produce usable knowledge, even when memorized. Paraphrase and QA augmentation of the same facts (the Physics-of-LMs / EntiGraph recipe) is what makes knowledge extractable in new task formats. At a sane learning rate (1e-5 here) augmented full fine-tuning doubled category-inference accuracy over the raw dump (41.7% vs 21.7%, retrieval ceiling 69%) with little forgetting; at 5x that rate it destroyed general ability (perplexity 16 to 800) and LoRA or WiSE-FT weight averaging were the rescue. Raw statement strings defeated every method including retrieval at this model size, so normalize merchant strings before the model sees them. Retrieval (fact in context) remains the strongest and cheapest baseline; the right production design is RAG over the merchant DB plus augmented fine-tuning for the head of the distribution, with RAFT-style training so the model uses retrieved records well.
 
@@ -250,7 +251,7 @@ What changed and what did not:
 
 1. **Define user labels by examples, not names.** The prototype approach (a label = the centroid of the transactions a user put under it) handles synonyms, typos, and idiosyncratic categories with zero retraining and already reaches 63 to 85% on 3-way tasks at MiniLM scale. Use a stronger encoder (bge, EmbeddingGemma, Qwen3-Embedding) trained on transaction-to-merchant-record pairs and this should be the production classifier for personal categories.
 2. **For LLM-side analogy prompts, keep the knowledge in context.** Retrieve the merchant records for the merchants named in the prompt; the model then does the mapping. Use a 3B+ model (7B preferable) since the ability to follow arbitrary label mappings from few examples is absent at 0.5B.
-3. **Parametric injection is for coverage, not for reasoning.** Fine-tune so the model recognizes merchants when retrieval misses, at a low learning rate with replay, and verify manipulation-format accuracy (yes/no, comparisons) rather than bare recall.
+3. **Parametric injection is for coverage, not for reasoning, unless the task is part of the injection.** Fine-tune so the model recognizes merchants when retrieval misses, at a low learning rate with replay, and verify manipulation-format accuracy (yes/no, comparisons) rather than bare recall. Section 8 shows that mixing few-shot episodes into the same run changes this picture: the injected knowledge then does power in-weights analogy (59% vs 40% here).
 4. **Inferring the user's grouping rule is the open problem.** Habitat-tracking labels were the hardest case for both model types. A practical fix is to compute prototypes over several attribute-specific embeddings (type, merchant, amount band, time) and pick the space in which the user's examples cluster most tightly.
 
 ## 7. Performance: throughput, memory, bottlenecks, scaling
@@ -350,3 +351,89 @@ Expected training speedup relative to this 3090, using vendor dense bf16 peaks f
 | RTX 4060 Ti 16 GB | 16 GB | ~44 | 288 | ~0.6x | 0.3x | 3B LoRA, 8B QLoRA; 0.5B experiments as-is |
 
 Realistic multipliers are 70 to 85% of the TFLOPS ratio because MFU drops on faster cards unless batch and sequence grow with them. Two practical notes: a second 24 GB card does not raise the model ceiling for full fine-tuning without FSDP or DeepSpeed (Axolotl territory, section 2), and cloud A100/H100 rentals at a few dollars an hour make the 3.9-hour 7B QLoRA run above a 20 to 30 minute job. For the merchant workload specifically, the fastest single improvement available today is not a new GPU but packing plus unsloth on the one you have (17,716 vs 4,724 tok/s on 0.5B).
+
+## 8. Curriculum ladder v2: teach the task as the injection
+
+Date: 2026-09-13/14. Model: Qwen2.5-3B, unsloth LoRA r=64 alpha=128 on all linear layers, lr 1e-4, 800 steps of 16 sequences (micro-batch 8, accumulation 2), max length 768, seed 0. Code: `experiments/exp_curriculum.py`, `experiments/icl_suite.py`, episode and probe generators in `experiments/universe.py`. Tracker experiment `curriculum_v2`; raw numbers in `results/curriculum_Qwen2.5-3B_<arm>.json`; table printer `experiments/curriculum_summary.py`.
+
+Section 6 ended with a split: LoRA on declarative text recalled every fact (100% in the trained format) but did not power the few-shot label-induction ("Timmy") task, and made the model *worse* at it when the facts were supplied in context. The open question was whether to inject knowledge first and then fine-tune a few-shot-categorize task, or to make that task the injection mechanism. This section answers it with a controlled sweep.
+
+### 8.1 Design
+
+Three data streams, all built from the same 160-species universe (24 species held out entirely):
+
+- **K, knowledge text.** The augmented paraphrase + QA + negative + comparative recipe from section 6 (2,752 texts). Full-sequence LM loss.
+- **E, symbol-tuning episodes.** 6,000 few-shot episodes generated from the database: pick a grouping attribute (type, habitat, region or diet; **weakness is never used**, so it is a held-out partition), pick 2 to 5 groups, 1 or 2 demonstration species per group, give each group a fresh random label (pseudo-words, numbers or letter codes; never the ten labels the ladder uses), and ask for the label of a new species of one of the groups. Seven prompt templates and eight narrators; the ladder's exact "Timmy labels his creature cards" phrasing is never used in training. Half the episodes prepend the field-guide entries of every species mentioned, half do not. Loss on the answer tokens only.
+- **R, generic replay.** 4,000 episodes of the same shape built from public classification datasets (AG News, Emotion, TREC, 20 Newsgroups), 80% with random-symbol labels and 20% with the natural class names, in five prompt formats. Answer-only loss.
+
+Arms, all at identical step budget:
+
+| arm | batch composition | question it answers |
+|---|---|---|
+| A knowledge only | K 100% | section 6 baseline at the new budget |
+| B episodes only | E 100% | does the task alone teach anything, and what does it do to in-context learning? |
+| C interleaved + replay | K 45% / E 40% / R 15% | the recommendation from the artifact |
+| Cn interleaved, no replay | K 50% / E 50% | what the replay slice buys |
+| D sequential | steps 1-400: K 85% / R 15%; steps 401-800: E 85% / R 15% | inject first, then teach the task |
+| E interleaved + morphology | same as C, on a universe where 70% of names end in a type-specific suffix | does a name stem become meaningful? |
+
+Evaluation is identical for every arm and always runs without and with field-guide context: the section 6 ladder (1,648 items), a new 96-item held-out-species induction level (demonstrations and query are all never-trained species), morphology probes (96 never-trained names, half with their type's marker suffix, half without, in both the bare and the trained answer format), the **ICL regression suite** (384 items: few-shot classification on SST-2, Banking77, DBpedia-14 and Subj with 2 to 4 classes, in both random-symbol and natural-label form; chance 43.3%), and general-text perplexity. The suite's datasets are disjoint from the replay datasets. Multiple-choice scoring is the same mean log-prob per option token as before.
+
+### 8.2 Results
+
+Tables 8.1 to 8.3 are generated from the result files. Chance: recall 12.5, yes/no and pair 50, Timmy 3-way 33.3, k=2 50, k=4 25, ICL suite 43.3.
+
+**Table 8.1: from the weights, no context (accuracy %)**
+
+| arm | recall (trained fmt) | yes/no | pair | Timmy k=3 | k=2 | k=4 | real-name labels | weakness (held-out attr) | habitat | held-out species | ICL suite symbol | ICL suite natural | ppl |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| base | 11.9 | 41.2 | 50 | 35.6 | 53.1 | 26.9 | 38.1 | 32.5 | 31.9 | 42.7 | 60.4 | 84.4 | 8.53 |
+| A knowledge | 100 | 96.2 | 91.2 | 40 | 58.8 | 35 | 71.9 | 45 | 35 | 24 | 50.5 | 80.8 | 21.17 |
+| B episodes | 12.5 | 56.2 | 50 | 32.5 | 60.6 | 27.5 | 40.6 | 35.6 | 30.6 | 27.1 | 75.5 | 87 | 12.22 |
+| C interleaved + replay | 100 | 85 | 73.8 | 59.4 | 75.6 | 52.5 | 71.2 | 53.8 | 35 | 31.2 | 78.1 | 88 | 14.89 |
+| Cn interleaved | 100 | 82.5 | 76.2 | 60.6 | 73.8 | 57.5 | 72.5 | 60.6 | 39.4 | 33.3 | 70.8 | 88 | 20.37 |
+| D sequential | 96.9 | 63.8 | 65 | 61.2 | 69.4 | 52.5 | 58.1 | 53.8 | 45 | 35.4 | 81.2 | 87 | 14.37 |
+
+**Table 8.2: with field-guide context (accuracy %)**
+
+| arm | recall (trained fmt) | yes/no | pair | Timmy k=3 | k=4 | real-name labels | weakness (held-out attr) | habitat | held-out species |
+|---|---|---|---|---|---|---|---|---|---|
+| base | 100 | 100 | 81.2 | 48.8 | 40.6 | 70 | 45.6 | 36.2 | 43.8 |
+| A knowledge | 100 | 100 | 96.2 | 43.1 | 39.4 | 78.1 | 45 | 31.2 | 32.3 |
+| B episodes | 98.8 | 75 | 50 | 78.8 | 77.5 | 84.4 | 74.4 | 76.2 | 79.2 |
+| C interleaved + replay | 100 | 100 | 70 | 76.2 | 69.4 | 85 | 72.5 | 61.9 | 75 |
+| Cn interleaved | 100 | 93.8 | 71.2 | 81.9 | 73.1 | 75.6 | 75.6 | 68.1 | 77.1 |
+| D sequential | 89.4 | 100 | 76.2 | 80 | 72.5 | 83.8 | 77.5 | 73.8 | 78.1 |
+
+**Table 8.3: morphology universe (70% of names carry a type suffix) vs plain, no context (accuracy %)**
+
+| arm | recall (trained fmt) | Timmy k=3 | k=4 | weakness | held-out species | probe: marked name | probe: plain name | marked (bare fmt) | plain (bare fmt) | ICL suite symbol | ppl |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| base, plain universe | 11.9 | 35.6 | 26.9 | 32.5 | 42.7 | 10.4 | 14.6 | 12.5 | 14.6 | 60.4 | 8.53 |
+| C, plain universe | 100 | 59.4 | 52.5 | 53.8 | 31.2 | 4.2 | 6.2 | 12.5 | 12.5 | 78.1 | 14.89 |
+| base, morphology universe | 10 | 38.1 | 38.1 | 50 | 35.4 | 12.5 | 10.4 | 12.5 | 10.4 | 60.4 | 8.53 |
+| E interleaved, morphology universe | 100 | 75 | 76.2 | 76.2 | 46.9 | 93.8 | 14.6 | 12.5 | 12.5 | 81.8 | 15.63 |
+
+### 8.3 What the numbers say
+
+1. **Episodes alone raise in-context label induction by about 30 points on every test, including partitions and entities never trained on.** Arm B, which contains no declarative text, takes the Timmy task with facts in context from 48.8 to 78.8, the weakness partition (never a grouping attribute in training) from 45.6 to 74.4, and induction over never-seen species from 43.8 to 79.2. It also lifts few-shot classification on public datasets with random labels from 60.4 to 75.5. This is symbol tuning (Wei et al. 2023) reproduced on a private database at 3B scale, and it is the opposite direction to arm A, which lowers the same public-data metric to 50.5.
+2. **Interleaving gives both.** Arm C recalls 100% of facts in the trained format, does the Timmy task *from its own weights* at 59.4% (base 35.6, knowledge-only 40.0), reaches 52.5% at k=4 against 25 chance, and transfers the skill to the held-out weakness partition without context (53.8, base 32.5). With context it keeps most of arm B's gain (76.2). On the public ICL suite it scores 78.1 with symbol labels and 88.0 with natural labels, both above base. General perplexity rises from 8.5 to 14.9, which is within the user's stated tolerance.
+3. **Sequential matches interleaved on induction but erodes the knowledge.** Arm D lands at 61.2 on the Timmy task without context, the same as C and Cn, and posts the best public-suite score (81.2). But its recall slips to 96.9, yes/no membership falls to 63.8 (C: 85.0), pairwise same-type to 65.0 (C: 73.8), and induction with real type names as labels to 58.1 (C: 71.2). Even recall *with the facts in context* drops to 89.4 while every other arm is at 100: the second phase pulled the model's answer format away from the first. Two stages means the last stage wins; interleaving holds both in place. This settles the user's question in favour of one mixed run.
+4. **Replay buys portability, not the effect itself.** Without replay (Cn) the universe metrics are the same or slightly better (Timmy 60.6, weakness 60.6) but the public-suite score falls from 78.1 to 70.8 and perplexity rises from 14.9 to 20.4. Fifteen percent generic episodes is what keeps the induction skill general rather than universe-shaped.
+5. **Habitat induction stays hard for every arm** (best 45.0 without context, D). Habitat is an independently random attribute with six values, so the task needs both per-species recall of a second attribute and the induction step. Type and weakness are eight-way and shared across 17 species each, which gives many more training exposures per value. This is the same "latent grouping" difficulty seen in section 6.3 for the embedding model.
+
+### 8.4 Morphology: a name stem becomes a feature
+
+On the morphology universe 70% of species names end in one of eight suffixes tied to their type (for example `-orc` for Voltrix), the rest use neutral suffixes; held-out species and never-trained probe names follow the same rule. Two observations before training: the base model already exploits shared suffixes in context (Timmy k=4 38.1 vs 26.9 on the plain universe; weakness 50.0 vs 32.5), so the suffix is a usable surface cue for a 3B model with no fine-tuning at all.
+
+After interleaved training on that universe (arm E), a **never-trained name that ends in its type's suffix is classified correctly 93.8% of the time** in the trained answer format, against 12.5% chance. Never-trained names with a neutral suffix stay at chance (14.6%), so the model is reading the stem, not guessing better in general. The same probes on arm C, trained on the plain universe where those suffixes are spread randomly across types, score at or below chance (4.2% and 6.2%): the suffix only becomes a feature when the training data makes it predictive, exactly the condition drug stems and processor prefixes satisfy in real data. The bare-format probe rows in table 8.3 sit at chance for every arm for the format reason noted in section 6.4, which is why the trained-format rows were added.
+
+The effect shows up in the induction tasks as well. Arm E does the Timmy task from its weights at 75.0% (C: 59.4) and at 76.2% for k=4 (C: 52.5), and induction over held-out species without any context rises to 46.9% (C: 31.2): with a 70% reliable stem the model can place an unseen creature by its name alone, which is the "new drug name lands near its class" behaviour the user asked for. Recall (100%), public-suite score (81.8) and perplexity (15.6) are unchanged relative to C, so the morphology signal costs nothing elsewhere.
+
+### 8.5 Cost
+
+Each trained arm took 21 to 25 minutes of training at 837 to 1,171 tokens/s and 8.7 GiB peak (episodes average roughly 250 tokens, so the run is far from the card's limit), plus about 7 minutes of evaluation over 4,400 scored items. Arm A on short knowledge texts ran at 498 tokens/s, launch-overhead-bound as in section 7.2; packing would roughly triple that. The whole eight-arm sweep was about three and a half hours of GPU time including two restarts caused by evaluation-time memory handling (fused loss refusing to run with a full allocator cache; full-vocabulary float logits for long prompts), both fixed in the scorer.
+
+### 8.6 Recommendation, revised
+
+Train one run whose batches mix augmented knowledge text (about half), symbol-tuning episodes generated from the same database with random labels and varied grouping attributes (about 40%), and 10 to 20% generic few-shot replay. Do not stage it. Hold out one attribute and a slice of entities from the episodes and use them, plus a public few-shot suite with random labels, as the regression metric instead of perplexity. If the entity names carry any morphology (drug stems, retailer name variants, processor prefixes), make sure the same rendering variety appears in both the knowledge text and the episodes, because that is what turns the shared subword pieces into a feature the model uses without context. Next steps that this sweep did not run: the same arms on 7B, a real-world replicate with drug names and ATC classes, and the merchant database with statement-style noisy renderings in place of the creature universe.

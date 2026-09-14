@@ -17,7 +17,9 @@
     "L6_unseen_recall_margin": 0.322,
     "L6_seen_recall_ctrl_margin": 0.259,
     "M_probe_marked": 12.5,
+    "M_probe_marked_fmt": 10.4,
     "M_probe_plain": 14.6,
+    "M_probe_plain_fmt": 14.6,
     "ICL_symbol_banking77": 66.7,
     "ICL_natural_banking77": 91.7,
     "ICL_symbol_dbpedia": 52.1,
@@ -29,7 +31,7 @@
     "ICL_symbol_mean": 60.4,
     "ICL_natural_mean": 84.4,
     "L7_ppl_general": 8.53,
-    "eval_minutes": 4.4
+    "eval_minutes": 4.0
   },
   "base_ctx": {
     "L1_recall": 98.8,
