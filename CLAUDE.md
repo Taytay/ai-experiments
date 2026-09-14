@@ -24,11 +24,11 @@ we collected, `src/` is library code, `scripts/` is entry points.
 | `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end | a step finishes |
 | `references/SURVEY.md` | What 34 papers say about each ID | more papers are read |
 | `references/papers/<id>/summary.md` | One paper each; `INDEX.md` lists them by thread | a paper is read |
-| `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
+| `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `items.py` (the frozen eval sets and their hashes), `scoring.py` (per-item, per-option log-prob records), `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
 | `scripts/` | Runnable experiments and table generators; they `import ai_experiments` and run from any directory | a new experiment |
 | `justfile` | Task runner: `just setup`, `just doctor`, `just push-models`, `just smoke`; `just` lists them | a routine changes |
-| `data/processed/` | Frozen item sets, versioned, hash recorded in the tracker | an item set is frozen |
-| `results/` | Raw JSON and logs, one file per run and arm | every run |
+| `data/processed/` | Frozen item sets (`ladder_v1.json` etc., plain and `_morph` universes), versioned and immutable; hashes go into the tracker config; `uv run python -m ai_experiments.items check` says whether the generators still reproduce them | a new item-set version is frozen |
+| `results/` | Raw JSON and logs, one file per run and arm; `per_item/` has one JSONL per run and condition with every option's log-probs (`ai_experiments.scoring`) | every run |
 | `models/` | Adapters and fine-tuned weights, tracked by DVC (`adapters.dvc` in git, bytes at `D:\repos\dvc\ai-experiments`) | every training run |
 | `evals/` | Tracker data: `runs.jsonl` (the record), `LEADERBOARD.md`; CLI is `uv run evals` | every run |
 | `NOTES.md` | Machine and environment history | the environment changes |
