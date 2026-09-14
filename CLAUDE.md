@@ -27,7 +27,7 @@ we collected, `src/` is library code, `scripts/` is entry points.
 | `scripts/` | Runnable experiments and table generators; each adds `src/` to `sys.path` | a new experiment |
 | `data/processed/` | Frozen item sets, versioned, hash recorded in the tracker | an item set is frozen |
 | `results/` | Raw JSON and logs, one file per run and arm | every run |
-| `models/` | Adapters and fine-tuned weights, gitignored | every training run |
+| `models/` | Adapters and fine-tuned weights, tracked by DVC (`adapters.dvc` in git, bytes at `D:\repos\dvc\ai-experiments`) | every training run |
 | `evals/` | Run tracker (`runs.jsonl` is the record), `LEADERBOARD.md` | every run |
 | `NOTES.md` | Machine and environment history | the environment changes |
 
@@ -47,3 +47,5 @@ we collected, `src/` is library code, `scripts/` is entry points.
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Set `PYTHONIOENCODING=utf-8` when printing dataset text; the console codec is cp1252.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
+- After a training run: `uv run dvc add models/adapters && uv run dvc push`, then commit the
+  updated `models/adapters.dvc` with the results. After a fresh clone: `uv run dvc pull`.

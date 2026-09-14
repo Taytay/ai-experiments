@@ -1,0 +1,6 @@
+[core]
+    analytics = false
+    remote = dstore
+    autostage = true
+['remote "dstore"']
+    url = D:\repos\dvc\ai-experiments

@@ -15,7 +15,9 @@ Needs are all `done`, and follow the procedure below. Do not skip ahead or bundl
    cannot pick the same row.
 3. Do the work. New scripts go in `scripts/`, outputs in `results/`, and every training or
    evaluation run goes through the tracker in `evals/` (see `evals/README.md`). Commit the code
-   before a long run so the tracker records a clean commit hash.
+   before a long run so the tracker records a clean commit hash. After a training run,
+   `uv run dvc add models/adapters && uv run dvc push` so the adapter is stored and its hash
+   is committed with the results.
 4. Write the result into `reports/REPORT.md` as a new numbered subsection at the end, with the
    ID in the heading. Regenerate `evals/LEADERBOARD.md` if metrics changed.
 5. Close the loop in three places: set the row's Status to `done` and fill Result with the

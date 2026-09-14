@@ -1,7 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-models/*
 hf_cache/
 *.log
 unsloth_compiled_cache/
@@ -15,4 +14,3 @@ references/papers/*/*.pdf
 references/papers/*/*.tar.gz
 references/papers/*/src/
 references/papers/*/paper_flat.tex
-!models/README.md

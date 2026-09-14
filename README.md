@@ -33,7 +33,7 @@ scripts/         entry points: exp_*.py experiments, bench_throughput.py, table 
                  and the original driver-check scripts (check_gpu.py, finetune_embed.py)
 evals/           run tracker (runs.jsonl is the record of truth) and LEADERBOARD.md
 results/         raw JSON and logs from every run
-models/          LoRA adapters and fine-tuned weights (gitignored, see models/README.md)
+models/          LoRA adapters and fine-tuned weights, versioned with DVC (see models/README.md)
 reports/         REPORT.md, improvements.html, QUESTIONS.md
 references/      papers/ (text, metadata, summaries; PDFs not tracked), SURVEY.md,
                  and two first-day notes (lit_review.md, frameworks.md)
@@ -43,9 +43,13 @@ references/      papers/ (text, metadata, summaries; PDFs not tracked), SURVEY.m
 
 ```
 uv sync
+uv run dvc pull                             # fetch the trained adapters (3.8 GB) from D:\repos\dvc\ai-experiments
 uv run python scripts/exp_curriculum.py C   # ARM [model] [steps] [lr]; SMOKE=1 for a quick check
 uv run python -m evals leaderboard          # regenerate evals/LEADERBOARD.md
 ```
+
+Large files are not in git. The DVC remote is a plain folder on the D: drive, one folder per
+repo under `D:\repos\dvc\`; from WSL the same folder is `/mnt/d/repos/dvc/ai-experiments`.
 
 Scripts add `src/` to `sys.path` themselves, so they run from any working directory. Windows
 notes: use `uv run python`, not `python`; set `PYTHONIOENCODING=utf-8` when printing dataset
