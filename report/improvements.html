@@ -31,7 +31,7 @@
   h3 { font-size: 16px; margin: 24px 0 8px; }
   p, li { color: var(--ink); max-width: 72ch; }
   .sub { color: var(--ink-2); margin: 0 0 24px; }
-  .tiles { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 12px; margin: 24px 0; }
+  .tiles { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 12px; margin: 24px 0 12px; }
   .tile { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
   .tile .label { color:var(--ink-2); font-size:13px; }
   .tile .value { font-size:30px; font-weight:600; margin:2px 0; }
@@ -53,21 +53,34 @@
   .tip { position:fixed; pointer-events:none; background:var(--ink); color:var(--surface-1); font-size:12px; padding:6px 8px; border-radius:6px; opacity:0; transition:opacity .08s; z-index:10; white-space:nowrap; }
   details { margin: 6px 0 4px; font-size:13px; color:var(--ink-2); }
   table { border-collapse:collapse; font-size:13px; margin-top:6px; font-variant-numeric: tabular-nums; }
-  td, th { padding: 3px 10px 3px 0; text-align:left; border-bottom:1px solid var(--grid); }
+  td, th { padding: 3px 10px 3px 0; text-align:left; border-bottom:1px solid var(--grid); vertical-align: top; }
   th { color:var(--ink-2); font-weight:600; }
   .callout { border-left: 3px solid var(--s1); padding: 4px 16px; margin: 20px 0; background: var(--surface-1); border-radius: 0 8px 8px 0; }
   .callout p { margin: 8px 0; }
   code { font-size: 90%; background: var(--surface-1); border:1px solid var(--border); padding: 0 4px; border-radius:4px; }
+  pre { background: var(--page); border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-size:12.5px; line-height:1.45; overflow-x:auto; white-space:pre-wrap; margin:8px 0; color: var(--ink); }
+  pre code { border:0; background:transparent; padding:0; font-size:100%; }
   .rec { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin: 16px 0; }
   .rec h3 { margin-top: 0; }
   ol li, ul li { margin: 6px 0; }
   .small { font-size: 13px; color: var(--ink-2); }
+  /* example blocks: what a term or a bar refers to, with the actual strings the model saw */
+  .ex { border-left: 3px solid var(--s3); padding: 6px 16px 8px; margin: 12px 0; background: var(--surface-1); border-radius: 0 8px 8px 0; font-size: 14px; }
+  .ex .k { display:block; font-weight:600; color:var(--ink-2); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin: 6px 0 4px; }
+  .ex p { margin: 6px 0; max-width: none; }
+  .ex ul { margin: 4px 0; padding-left: 20px; }
+  .ex li { margin: 3px 0; max-width: none; }
+  figure .ex { margin: 12px 0 8px; }
+  dl.gloss dt { font-weight:600; margin-top:14px; }
+  dl.gloss dd { margin: 2px 0 0 0; color: var(--ink); max-width: 72ch; }
+  dl.gloss dd .ex { margin-top: 8px; }
+  .ans { color: var(--good); font-weight:600; }
 </style>
 </head>
 <body class="viz-root" data-palette="#2a78d6,#eb6834,#1baf7a">
 <main>
 <h1>Teaching a model new entities: what improved, and how to train next</h1>
-<p class="sub">RTX 3090 experiments, 12 to 14 September 2026. Merchant database (120 fictional stores) and a Pokemon-style creature universe (160 species, 8 fictional types). Every number here is from a tracked run in <code>evals/LEADERBOARD.md</code>. Section 5 reports the curriculum experiment that the first version of this page only proposed.</p>
+<p class="sub">RTX 3090 experiments, 12 to 14 September 2026. Merchant database (120 fictional stores) and a Pokemon-style creature universe (160 species, 8 fictional types). Every number here is from a tracked run in <code>evals/LEADERBOARD.md</code>. Section 5 reports the curriculum experiment that the first version of this page only proposed. Section 0 defines every term used on the page with the actual strings the models saw, and each chart is followed by the items it scores and what the bars mean.</p>
 
 <div class="tiles">
   <div class="tile"><div class="label">Timmy task from the weights, interleaved curriculum</div><div class="value">59% vs 40%</div><div class="note">Qwen2.5-3B, 3-way, chance 33; knowledge-only text gives 40, base 36</div></div>
@@ -75,21 +88,237 @@
   <div class="tile"><div class="label">Category inference, augmented vs raw facts</div><div class="value">41.7% vs 21.7%</div><div class="note">Qwen2.5-0.5B, same steps, 12-way, chance 8.3</div></div>
   <div class="tile"><div class="label">User label from 3 examples</div><div class="value">85%</div><div class="note">embedding prototypes; 63% on a latent attribute</div></div>
 </div>
+<div class="ex"><span class="k">What the four tiles mean</span>
+<ul>
+  <li><strong>59% vs 40%.</strong> The model is shown three creature cards with made-up tags (<em>his Nolvan 'FooFoo', his Noline 'tandle', his Yoreel 'snerk'</em>) and asked how a fourth card (<em>Dolorc</em>) will be tagged. No facts are in the prompt; the model must know from training that Dolorc and Nolvan are both Lithor-type. A model trained on a mix of facts and practice episodes gets 95 of 160 such items right (59%). A model trained on the facts alone gets 64 right (40%). Guessing gets 53 (33%).</li>
+  <li><strong>78% vs 51%.</strong> The same kind of few-shot prompt, but on public text-classification data the model was never trained on, with the class names replaced by nonsense words. This measures whether training on our private data broke the model's general ability to learn a labeling rule from examples. Facts-only training broke it (60 down to 51); the mixed run improved it (78).</li>
+  <li><strong>41.7% vs 21.7%.</strong> Given <em>Merchant: Elrholm</em>, pick the spending category out of 12. The training text never says "Groceries"; it says Elrholm sells canned goods, packaged snacks and frozen vegetables. Fourteen varied sentences per store lets the model make that leap for 50 of 120 stores; one sentence repeated 56 times manages 26.</li>
+  <li><strong>85%.</strong> An embedding model, not a language model. A user's label is represented by the average embedding of the three items the user put under it. A new item is assigned to the nearest label. On 3-way tasks this is right 85% of the time when the user's grouping follows type, and 63% when it follows habitat, an attribute the label never names.</li>
+</ul>
+</div>
+
+<h2>0. How to read this page: the datasets, the tasks, and the words used for them</h2>
+<p>Two synthetic datasets appear throughout. Both use invented names so the pretrained model can have no prior knowledge of any entity; anything above chance after training is knowledge that training put there.</p>
+<dl class="gloss">
+  <dt>Merchant database (sections 1 and 4)</dt>
+  <dd>120 fictional stores, 10 per spending category, across 12 categories (Groceries, Restaurants, Gas &amp; Auto, Clothing, Electronics, Home Improvement, Pharmacy &amp; Health, Entertainment, Travel, Pets, Fitness, Telecom &amp; Utilities). Each store sells three products drawn from its category's pool. The category word itself never appears in any training text.
+    <div class="ex"><span class="k">One merchant record</span>
+<pre>name:      Elrholm
+category:  Groceries          (never shown to the model)
+products:  canned goods, packaged snacks, frozen vegetables
+raw fact:  "Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables."
+bank form: "DEBIT CARD PURCHASE ELRHOLM STORE 4970 TUCSON AZ"   (never shown in training)</pre>
+    <p>Other stores look like <em>Oskhurst Bros</em>, <em>Orlwick Co</em>, <em>Gridale</em>, <em>Bexstead Ltd</em>. The "bank form" is the string a bank statement would show: uppercase, a store number, a city, sometimes a processor prefix such as <code>SQ *</code> or <code>POS DEBIT</code>.</p></div></dd>
+
+  <dt>Creature universe (sections 2, 3 and 5)</dt>
+  <dd>160 species with opaque names and 8 invented types (Voltrix, Pyrrhan, Tidewell, Lithor, Verdane, Umbrine, Gustral, Frostel). Each species also has a weakness (a type; fixed per type, so all Frostel-types are weak to Tidewell), a habitat (cave, marsh, canopy, tundra, dune, reef), a diet, a region and an evolution stage. 24 species (3 per type) are <strong>held out</strong>: they appear in no training text of any kind. Unlike the merchants, the type label <em>is</em> present in training text here; the question is analogy over known attributes, not inference of hidden ones.
+    <div class="ex"><span class="k">One species record and its field-guide entry</span>
+<pre>name: Javish   type: Frostel   weakness: Tidewell   habitat: canopy
+diet: mineralivore   region: Korrath   stage: 1   held out: no
+
+field-guide entry (used when "facts are in context"):
+"Javish: Frostel-type, weak to Tidewell, canopy habitat, mineralivore, Korrath."</pre>
+    <p>Held-out species include <em>Cynine</em> (Lithor), <em>Ekkeel</em> (Voltrix), <em>Blaxash</em> (Gustral), <em>Kelilk</em> (Frostel). When the page says a result is "on held-out species", the model has never seen those names.</p></div></dd>
+
+  <dt>Knowledge text, "augmented" vs "raw"</dt>
+  <dd><strong>Raw</strong> means one canonical sentence per entity (the "database dump"). <strong>Augmented</strong> means the same facts rendered many ways: paraphrases, question-and-answer pairs, a negative, and comparisons with other entities. The merchant recipe has 14 texts per store; the universe recipe has about 20 per species (2,752 texts for the 136 trained species).
+    <div class="ex"><span class="k">Elrholm, raw (1 text) vs augmented (14 texts, 8 shown)</span>
+<pre>raw:  Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables.
+
+aug:  Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables.
+      If you need canned goods, packaged snacks and frozen vegetables, Elrholm is the place to shop.
+      Review: I stopped by Elrholm yesterday and picked up canned goods. They also carry packaged snacks and frozen vegetables.
+      Store directory entry: Elrholm - canned goods; packaged snacks; frozen vegetables.
+      Question: What does Elrholm sell?
+      Answer: Elrholm sells canned goods, packaged snacks and frozen vegetables.
+      Question: Where can I buy packaged snacks?
+      Answer: You can buy packaged snacks at Elrholm.</pre>
+    <span class="k">Javish, augmented universe recipe (8 of about 20)</span>
+<pre>Javish is a Frostel-type creature. It lives in canopy habitats, eats as an mineralivore, and is found in Korrath.
+Trainers classify Javish as Frostel-type; like all Frostel-types it is weak to Tidewell-type attacks.
+Question: What type is Javish?
+Answer: Javish is a Frostel-type.
+Question: Is Javish a Pyrrhan-type?
+Answer: No, Javish is a Frostel-type, not Pyrrhan-type.
+Question: Do Javish and Gorath share a type?
+Answer: Yes, both are Frostel-type.
+Javish and Gribilk both live in canopy habitats.</pre></div></dd>
+
+  <dt>How every accuracy on this page is scored, and what "chance" means</dt>
+  <dd>Every task is multiple choice. The model is given a prompt and a fixed set of answer strings, and the answer whose tokens it assigns the highest average log-probability wins. Nothing is generated or parsed, so a wrong answer is a wrong preference, not a formatting slip. <strong>Chance</strong> is what picking at random would score: 12-way 8.3%, 8-way 12.5%, 4-way 25%, 3-way 33.3%, yes/no 50%. Every chart draws chance as a dashed line; a bar at the line means the model learned nothing measurable for that task.
+    <div class="ex"><span class="k">A 12-way item (merchant category). The model scores each of the 12 options after the prompt.</span>
+<pre>Merchant: Starbucks
+Spending category: Restaurants
+
+Merchant: Shell
+Spending category: Gas &amp; Auto
+
+Merchant: Best Buy
+Spending category: Electronics
+
+Merchant: Elrholm
+Spending category:
+options: Groceries | Restaurants | Gas &amp; Auto | Clothing | Electronics | Home Improvement | Pharmacy &amp; Health |
+         Entertainment | Travel | Pets | Fitness | Telecom &amp; Utilities        <span class="ans">correct: Groceries</span></pre>
+    <p>The three real-brand examples at the top are only there to show the format; they are the same in every item.</p></div></dd>
+
+  <dt>Recall, manipulation, induction</dt>
+  <dd>Three different things a model can do with a fact, tested separately because a model can have one without the others.
+    <div class="ex">
+    <p><strong>Recall</strong>: retrieve the stored attribute directly.</p>
+<pre>Question: What type is Syaott?
+Answer:
+options:  Syaott is a Voltrix-type. |  Syaott is a Pyrrhan-type. | ... (8)     <span class="ans">correct: Syaott is a Verdane-type.</span></pre>
+    <p><strong>Manipulation</strong>: answer a question whose form was not the form the fact was stored in. Two are used: yes/no membership and pairwise comparison.</p>
+<pre>Question: Is Kelome a Verdane-type creature? Answer yes or no.
+Answer:                              options:  Yes |  No      <span class="ans">correct: No</span>
+
+Question: Do Lumeel and Frodux share the same type? Answer yes or no.
+Answer:                              options:  Yes |  No      <span class="ans">correct: No</span></pre>
+    <p><strong>Induction</strong> (the "Timmy task", also called label induction or few-shot label induction on this page): infer a labeling rule from a few examples and apply it. The labels are nonsense words, so knowing the entities is necessary but not sufficient; the model must also work out what the labels track.</p>
+<pre>Timmy labels his creature cards with his own made-up tags. He labeled his Nolvan 'FooFoo' and
+his Noline 'tandle' and his Yoreel 'snerk'. Following the same rule, how is he likely to label his Dolorc?
+Answer:                              options:  FooFoo |  tandle |  snerk      <span class="ans">correct: FooFoo</span></pre>
+    <p>Dolorc and Nolvan are both Lithor-type; Noline is Gustral and Yoreel is Tidewell. So the rule is "tag by type" and Dolorc gets Nolvan's tag. <strong>k</strong> is the number of demonstration cards: k=3 is the default, k=2 is easier (chance 50), k=4 harder (chance 25). "Real-name labels" is the control where the tags are the actual type names (<em>his Velrock 'Gustral' and his Velott 'Pyrrhan'</em>...), which lets the model lean on what it already knows about the words.</p></div></dd>
+
+  <dt>"From the weights" (no context) vs "with context" (facts in the prompt)</dt>
+  <dd>Every item is run twice. <strong>Without context</strong>, the prompt is exactly as above and the model must know the species from training; this measures parametric knowledge, "from the weights". <strong>With context</strong>, the field-guide entries of every species named in the item are prepended, which is what a retrieval (RAG) system would do; this measures whether the model can use facts it is handed.
+    <div class="ex"><span class="k">The same Timmy item, with context</span>
+<pre>Field guide:
+Dolorc: Lithor-type, weak to Gustral, cave habitat, piscivore, Brakka.
+Nolvan: Lithor-type, weak to Gustral, cave habitat, nectarivore, Thulen.
+Noline: Gustral-type, weak to Pyrrhan, canopy habitat, insectivore, Korrath.
+Yoreel: Tidewell-type, weak to Umbrine, tundra habitat, insectivore, Thulen.
+
+Timmy labels his creature cards with his own made-up tags. He labeled his Nolvan 'FooFoo' and
+his Noline 'tandle' and his Yoreel 'snerk'. Following the same rule, how is he likely to label his Dolorc?
+Answer:</pre>
+    <p>The base 3B model scores 35.6 on this item type without context (it does not know the species) and 48.8 with context (it knows them now, and can partly do the reasoning). A well-trained model should approach the with-context number without the context.</p></div></dd>
+
+  <dt>"Trained format" vs "bare format"</dt>
+  <dd>The answer options can be a bare type name (<code> Frostel</code>) or a full sentence in the shape the training text used (<code> Syaott is a Frostel-type.</code>). Models that had learned every fact scored only about 20% with bare names and 100% with the trained sentence shape, so a bare-format number measures the prompt shape as much as the knowledge. Recall is reported in the trained format on this page, and the bare-format rows in section 5 are kept only as a control.</dd>
+
+  <dt>Symbol-tuning episode (the "episodes" training stream)</dt>
+  <dd>A training example that looks like the Timmy task but is generated fresh from the database: pick an attribute to group by (type, habitat, region or diet; never weakness), pick 2 to 5 groups, one or two example species per group, invent a random label per group, ask for the label of a new species. Seven sentence templates and eight narrators are used; the test's exact "Timmy labels his creature cards" wording and its ten test labels (<em>FooFoo, blammo, zorp, quix</em>...) never appear. Loss is computed only on the answer. Half the episodes carry the field-guide entries in the prompt. "Symbol tuning" is the name Wei et al. (2023) gave to this kind of training.
+    <div class="ex"><span class="k">Two real episodes from the training stream</span>
+<pre>grouped by habitat, k=3, no field guide:
+Input: Ulkdor
+Output: 497
+Input: Ulkoz
+Output: vohob
+Input: Ekkome
+Output: troba
+Input: Zarig
+Output: <span class="ans">497</span>
+
+grouped by habitat, k=2, with field guide:
+Field guide:
+Morath: Umbrine-type, weak to Voltrix, tundra habitat, mineralivore, Ostrand.
+Kroash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Brakka.
+Mordor: Lithor-type, weak to Gustral, reef habitat, nectarivore, Thulen.
+
+Coach Ren groups creatures by a hidden property and marks each group with a word.
+Morath = R0; Kroash = Nuren. Following Coach Ren's rule, Mordor gets the word <span class="ans">Nuren</span></pre>
+    <p>In the second one, Mordor and Kroash share a habitat (reef) but nothing else, so the model has to notice which attribute the labels follow.</p></div></dd>
+
+  <dt>Replay (the "generic replay" stream) and the ICL regression suite</dt>
+  <dd><strong>ICL</strong> is in-context learning: picking up a task from examples in the prompt. Two sets of public few-shot classification items are used and they share no dataset. <strong>Replay</strong> episodes are mixed into training (AG News, Emotion, TREC, 20 Newsgroups; five prompt formats; 80% random-symbol labels, 20% natural class names). The <strong>ICL regression suite</strong> is evaluation only (SST-2 sentiment, Banking77 intents, DBpedia-14 topics, Subj subjectivity; 48 items per dataset per label style; one fixed format; 2 to 4 classes, so chance is 43.3%). "Symbol" items replace class names with nonsense words; "natural" items keep them. The symbol score is the one that matters: it asks whether the model can still learn a rule from examples when the label words carry no meaning.
+    <div class="ex"><span class="k">A replay episode (TREC question types, random symbols)</span>
+<pre>Message: How many pins are used in skittles ?
+Tag: zolus
+Message: What is tumbled marble ?
+Tag: trool
+Message: Where was Tesla born ?
+Tag: Snatromor
+Message: How long do you have to live in a community to vote ?
+Tag: <span class="ans">zolus</span></pre>
+    <span class="k">A suite item (Banking77, symbol labels, 3-way)</span>
+<pre>Input: Do you happen to do exchanges of EUR?
+Label: Snayen
+
+Input: Will you handle EUR?
+Label: Snayen
+
+Input: I am seeing a weird payment showing up that I know I did not make, how can I get it cancelled?
+Label: Graax
+
+Input: There are transactions I didn't make, someone else must have used my card.
+Label: Yenpel
+
+Input: im so mad right now. theres several charges that I think my x boyfriend made on my card. ...
+Label:                        options:  Snayen |  Yenpel |  Graax      <span class="ans">correct: Graax</span></pre>
+    <span class="k">A suite item (SST-2, natural labels, 2-way)</span>
+<pre>Input: too much of it feels unfocused and underdeveloped .
+Label: negative
+
+Input: a rigorously structured and exquisitely filmed drama about a father and son connection ...
+Label: positive
+
+Input: should have been someone else -
+Label:                        options:  positive |  negative      <span class="ans">correct: negative</span></pre></div></dd>
+
+  <dt>Perplexity</dt>
+  <dd>A forgetting gauge. The model reads a neutral passage of English (a 300-word history of coffee that has nothing to do with either dataset) and perplexity is the exponential of its average per-token loss. Roughly, a perplexity of 8.5 means the model is as unsure at each word as if it were choosing among 8.5 equally likely words; the base 3B model scores 8.5, the base 0.5B model 16. Doubling to 15 or 20 is noticeable drift. 400 to 800 means the model can no longer produce ordinary English.</dd>
+
+  <dt>Full fine-tuning, LoRA, QLoRA, learning rate</dt>
+  <dd><strong>Full fine-tuning</strong> updates every weight. <strong>LoRA</strong> freezes the model and trains small low-rank adapter matrices next to each linear layer; rank 64 on all seven projection matrices gives 35M trainable parameters on the 0.5B model and 120M on 3B. It learns less and forgets less. <strong>QLoRA</strong> is LoRA on a base model stored in 4-bit, to fit larger models. The <strong>learning rate</strong> sets step size; the page uses 1e-5 and 5e-5 for full fine-tuning and 1e-4 to 3e-4 for LoRA. "gc" is gradient checkpointing, which trades compute for memory.</dd>
+
+  <dt>Prototype (embedding model)</dt>
+  <dd>An embedding model maps a string to a vector. A <strong>prototype</strong> for a user's label is the average of the vectors of the items the user gave that label. A new item is classified by the nearest prototype. No training happens when a user invents a label; the training that does happen (once, contrastively) is to make a species' name embed near the text of its attributes.
+    <div class="ex"><span class="k">Example</span>
+    <p>Timmy tagged Nolvan, Dolorc and Wexash 'FooFoo' (all Lithor-type), Noline, Radorc and Zarig 'tandle' (Gustral) and Yoreel, Lumeel and Hysine 'snerk' (Tidewell). The 'FooFoo' prototype is the mean of the three name embeddings. A new card, Kroath (Lithor), is assigned to whichever of the three prototypes its own embedding is closest to. When the user's grouping follows habitat instead (all the 'zorp' cards live on reefs), the same procedure works if reef-dwellers' names cluster in the embedding space, which the training encouraged by pairing each name with "Creatures that live in reef habitats."</p></div></dd>
+
+  <dt>Subwords, new tokens, "the pieces"</dt>
+  <dd>A tokenizer splits text into pieces from a fixed vocabulary. Unknown words become several pieces: MiniLM's uncased WordPiece renders both "Elrholm" and "ELRHOLM" as <code>el ##rh ##ol ##m</code>. <strong>Adding a token</strong> means giving "Elrholm" its own single vocabulary entry with a fresh embedding row. The page's finding is that the shared pieces are what let knowledge learned from one spelling apply to another.</dd>
+
+  <dt>Morphology universe, marked and plain names, probes</dt>
+  <dd>A second build of the creature universe where 70% of species names end in a suffix tied to their type: <code>-orc</code> Voltrix, <code>-ash</code> Pyrrhan, <code>-eel</code> Tidewell, <code>-ath</code> Lithor, <code>-ilk</code> Verdane, <code>-ome</code> Umbrine, <code>-urn</code> Gustral, <code>-ent</code> Frostel. The other 30% use neutral suffixes. This is the universe's stand-in for drug stems (<code>-pril</code> means ACE inhibitor) and retailer name variants. A <strong>marked</strong> name carries its type's suffix; a <strong>plain</strong> name does not. <strong>Probes</strong> are 96 never-trained names, 48 marked and 48 plain, asked "What type is X?"
+    <div class="ex"><span class="k">Examples</span>
+<pre>trained Voltrix species in the morphology universe:  Ulkorc, Orvorc, Briorc, Nolorc, Syaorc, Oxxble (plain)
+trained Pyrrhan species:                              Zarash, Oxxash, Gorash, Kroash, Radash, Briarn (plain)
+
+marked probe:  Question: What type is Myrorc?   never trained; suffix says Voltrix   <span class="ans">correct: Voltrix</span>
+plain probe:   Question: What type is Frodux?   never trained; suffix says nothing    <span class="ans">correct: Voltrix</span> (unguessable)</pre></div></dd>
+
+  <dt>Tokens per second, GiB, MFU</dt>
+  <dd>Training throughput is counted in tokens processed per second. For scale, the interleaved run in section 5 processed 1.25 million training tokens and took 24.6 minutes at 851 tokens/s on the 3B model; a 512-token sequence is about 20 short fact sentences packed together, or one episode with its field guide. GiB is peak GPU memory; the card has 24. MFU (model FLOPs utilization) is the share of the GPU's arithmetic peak the training loop actually uses; 13 to 17% means the GPU is mostly waiting on Python and kernel launches, 69% means it is busy.</dd>
+</dl>
 
 <h2>1. What improved, in order of impact</h2>
 <ol>
-  <li><strong>Diverse text instead of a database dump.</strong> One sentence per entity, repeated 56 times, is memorized but barely usable (21.7% category inference). The same facts as 14 paraphrases and question-answer pairs double it (41.7%) and go from chance to 42.5% on reverse lookup. This is the single largest lever and it costs nothing at inference.</li>
-  <li><strong>Learning rate.</strong> Full fine-tuning at 5e-5 destroyed a 0.5B model (perplexity 16 to 800) and with it the products-to-category reasoning the task needs. At 1e-5 the same data gives the best result with perplexity 26. For LoRA, 2e-4 on rank 64 was also too hot; 1e-4 halved the damage with identical recall.</li>
-  <li><strong>No new tokens.</strong> Adding entity names as vocabulary collapsed the embedding model's transfer to statement-format strings from 70.8% to 23% and cut LLM extraction from 46.7% to 31.7%. Subword pieces are what let a learned association survive a format change, and they are the only route to your "slight variation on a name still means something" goal (section 4).</li>
-  <li><strong>Prototypes for user-defined labels.</strong> Defining a label as the centroid of the user's own examples handles nonsense names, synonyms and latent groupings with no retraining: 85% on type and 63% on habitat from three cards, against 33% chance.</li>
-  <li><strong>Model scale for few-shot label induction.</strong> The Timmy prompt is solvable by a 3B model with facts in context (49 to 52%) and not by a 0.5B model under any condition. Below a few billion parameters the model cannot override its label priors from three examples.</li>
-  <li><strong>Pipeline.</strong> Unsloth's fused kernels and loss give 2.2x throughput and 3x memory reduction at 512 tokens; sequence packing matters as much on small models, which are launch-overhead-bound at 13 to 17% GPU utilization on short facts. A 6-attribute entity costs about 1,800 training tokens for 100% recall, so 10,000 entities train in 17 minutes on 0.5B or 2 to 4 hours on 3B to 7B.</li>
+  <li><strong>Diverse text instead of a database dump.</strong> One sentence per entity, repeated 56 times, is memorized but barely usable (21.7% category inference). The same facts as 14 paraphrases and question-answer pairs double it (41.7%) and go from chance to 42.5% on reverse lookup. This is the single largest lever and it costs nothing at inference.
+    <div class="ex"><span class="k">What "memorized but barely usable" looks like</span>
+    <p>The raw-fact model saw "Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables." 56 times and reached near-zero training loss on it. Asked in a shape it never saw, <em>Merchant: Elrholm / Spending category:</em>, it picks Groceries for only 26 of 120 stores. Asked the reverse, <em>Which store sells canned goods and frozen vegetables?</em> with Elrholm among four store names, it is at chance (25.8%): it learned name-to-products and not products-to-name, the "reversal curse". The augmented model, which also saw "Question: Where can I buy packaged snacks? Answer: You can buy packaged snacks at Elrholm.", gets the reverse question right 42.5% of the time and the category 41.7%.</p></div></li>
+  <li><strong>Learning rate.</strong> Full fine-tuning at 5e-5 destroyed a 0.5B model (perplexity 16 to 800) and with it the products-to-category reasoning the task needs. At 1e-5 the same data gives the best result with perplexity 26. For LoRA, 2e-4 on rank 64 was also too hot; 1e-4 halved the damage with identical recall.
+    <div class="ex"><span class="k">What "destroyed" means here</span>
+    <p>At 5e-5 the augmented model still answered <em>What does Elrholm sell?</em> correctly 46.7% of the time (it kept the facts) but its category inference fell to 9.2%, chance, because the step from "canned goods and frozen vegetables" to "Groceries" needs the general model that the training wrecked (perplexity 796 on the coffee passage means it can no longer predict plain English). The same data at 1e-5 gives 41.7% on category with perplexity 26. For the 3B LoRA runs in the universe, lr 2e-4 pushed perplexity from 8.6 to 31.8, lr 1e-4 to 20.5, and both recalled 100% of species types in the trained format.</p></div></li>
+  <li><strong>No new tokens.</strong> Adding entity names as vocabulary collapsed the embedding model's transfer to statement-format strings from 70.8% to 23% and cut LLM extraction from 46.7% to 31.7%. Subword pieces are what let a learned association survive a format change, and they are the only route to your "slight variation on a name still means something" goal (section 4).
+    <div class="ex"><span class="k">Example</span>
+    <p>The embedding model was trained only on clean sentences like "Shoppers go to Elrholm for canned goods..." and then asked to categorize "DEBIT CARD PURCHASE ELRHOLM STORE 4970 TUCSON AZ", which it had never seen. With the stock tokenizer, the pieces <code>el ##rh ##ol ##m</code> are the same in both strings and 68 of 96 trained stores are categorized correctly (70.8%). With "elrholm" added as one token, that single token does appear inside 105 of the 120 bank strings, yet accuracy drops to 22 of 96 (22.9%). The one new embedding is diluted by averaging over the other 12 or so tokens in the string, and it is brittle: adding just " store 4970 tucson az" after the bare name drops the new-token model from 100% to 37.5% while the subword model holds at 93.8%.</p></div></li>
+  <li><strong>Prototypes for user-defined labels.</strong> Defining a label as the centroid of the user's own examples handles nonsense names, synonyms and latent groupings with no retraining: 85% on type and 63% on habitat from three cards, against 33% chance.
+    <div class="ex"><span class="k">Example</span>
+    <p>Three cards labeled 'FooFoo', three 'tandle', three 'snerk'. Average each group's name embeddings, then place a tenth card by nearest average. The label strings are never embedded; they could be anything. If the user had instead sorted the cards by where the creatures live, the same procedure is right 63% of the time (chance 33) even though no label says "reef" or "marsh".</p></div></li>
+  <li><strong>Model scale for few-shot label induction.</strong> The Timmy prompt is solvable by a 3B model with facts in context (49 to 52%) and not by a 0.5B model under any condition. Below a few billion parameters the model cannot override its label priors from three examples.
+    <div class="ex"><span class="k">Example</span>
+    <p>Give the 0.5B model the field-guide entries for Dolorc, Nolvan, Noline and Yoreel, which state plainly that Dolorc and Nolvan are both Lithor-type, and ask how Timmy tags Dolorc. It still picks among FooFoo, tandle and snerk at chance (32.5%). The 3B model with the same context gets 48.8%. Swap the nonsense tags for the real type names and both models improve (54 and 68%): the small model can follow labels that already mean something, and cannot follow labels that do not.</p></div></li>
+  <li><strong>Pipeline.</strong> Unsloth's fused kernels and loss give 2.2x throughput and 3x memory reduction at 512 tokens; sequence packing matters as much on small models, which are launch-overhead-bound at 13 to 17% GPU utilization on short facts. A 6-attribute entity costs about 1,800 training tokens for 100% recall, so 10,000 entities train in 17 minutes on 0.5B or 2 to 4 hours on 3B to 7B.
+    <div class="ex"><span class="k">Example</span>
+    <p>"Javish is a Frostel-type creature. It lives in canopy habitats..." is about 25 tokens. Training on one such sentence per sequence leaves the GPU idle between tiny kernel launches; packing 20 of them into one 512-token sequence nearly doubles tokens per second on the same hardware. The 1,800-token budget is the roughly 20 texts per species, each seen about 3.5 times, that gave 100% type recall in section 5.</p></div></li>
 </ol>
 
 <figure>
   <figcaption>Augmentation beats repetition at identical compute</figcaption>
   <div class="fsub">Category inference accuracy (%), Qwen2.5-0.5B, 420 steps, lr 1e-5. Dashed line: chance (8.3). Category label never appears in training text.</div>
   <svg id="c1" viewBox="0 0 860 200" role="img" aria-label="Bar chart: raw facts 21.7, augmented 41.7, facts in context 69.2"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>Three ways of getting the merchant facts to a 0.5B model, all scored on the same 120 items: <em>Merchant: Elrholm / Spending category:</em> with 12 category options. The model has to go from what it knows about Elrholm (canned goods, packaged snacks, frozen vegetables) to a word it never saw attached to the store.</p>
+  <ul>
+    <li><strong>Raw facts, full FT</strong>: trained on the single sentence "Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables." for each store, 56 passes. 26 of 120 correct.</li>
+    <li><strong>Augmented facts, full FT</strong>: trained on the 14 paraphrase and question-answer texts per store, same number of optimizer steps and the same total exposure per store. 50 of 120 correct.</li>
+    <li><strong>Facts in prompt</strong>: no training. The raw sentence is inserted into the prompt as "Note: Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables." just before the question. 83 of 120 correct.</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>The right bar is a ceiling, not a competitor: it shows how well this size of model can do the products-to-category step at all when it is handed the fact. The augmented model recovers 60% of that ceiling from its weights alone; the raw model recovers a third. The two trained bars differ only in how the same facts were written, so the gap between them is the value of paraphrase.</p></div>
   <details><summary>Table view</summary><table><tr><th>condition</th><th>accuracy %</th></tr><tr><td>Raw facts, full FT</td><td>21.7</td></tr><tr><td>Augmented facts, full FT</td><td>41.7</td></tr><tr><td>Facts in prompt (retrieval ceiling)</td><td>69.2</td></tr></table></details>
 </figure>
 
@@ -97,6 +326,18 @@
   <figcaption>Subwords carry knowledge across formats; new tokens do not</figcaption>
   <div class="fsub">MiniLM embedding model, 12-way category accuracy on bank-statement strings never seen in training (%). Dashed line: chance.</div>
   <svg id="c2" viewBox="0 0 860 220" role="img" aria-label="Bar chart: zero-shot 7.3, subword fine-tune 70.8, new tokens random 22.9, new tokens mean-init 26.0"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>The all-MiniLM-L6-v2 embedding model is trained contrastively so that a sentence about a store embeds near the description of its category ("Groceries: fresh produce, milk and eggs, bread and cereal, ..."). Training text is clean and mixed-case. The test string is the store's bank-statement rendering, which was never in training, and the score is whether the nearest category description is the right one.</p>
+<pre>trained on:  "Shoppers go to Elrholm for canned goods, packaged snacks and frozen vegetables."   (and 13 more)
+tested on:   "DEBIT CARD PURCHASE ELRHOLM STORE 4970 TUCSON AZ"
+             "SQ *OSKHURST BROS PORTLAND OR 03/14"     "CARD PURCHASE GRIDALE 057 DENVER CO"   ...</pre>
+  <ul>
+    <li><strong>Zero-shot</strong>: the untouched model. It has never heard of Elrholm and the bank string has no product words, so 7.3% is chance. (The same untouched model categorizes the <em>description</em> "sells canned goods..." correctly 99% of the time; the gap is purely the name.)</li>
+    <li><strong>Fine-tune, original tokenizer</strong>: 96 stores trained, 6 epochs. 68 of 96 bank strings correct. The name is split into the same WordPiece pieces in both spellings, so what was learned about <code>el ##rh ##ol ##m</code> from the clean sentences applies to the uppercase string.</li>
+    <li><strong>+120 name tokens</strong>: each store name added to the vocabulary as one token before the same training, initialized either randomly or as the mean of its subword embeddings. 22 to 25 of 96 correct. Initialization barely matters; the single-token design is the problem.</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>The second bar is the mechanism the rest of this page relies on for "a variant of a name still means something": shared pieces carry meaning across renderings. The last two bars show that replacing the pieces with one dedicated symbol removes that carry-over even though the symbol does match inside most bank strings. Held-out stores (24 with no training text) are at chance in every condition; the name "Bexstead Ltd" says nothing about what it sells, and nothing can be inferred.</p></div>
   <details><summary>Table view</summary><table><tr><th>condition</th><th>bank-string accuracy %</th></tr><tr><td>Zero-shot</td><td>7.3</td></tr><tr><td>Fine-tune, original tokenizer</td><td>70.8</td></tr><tr><td>Fine-tune + 120 name tokens, random init</td><td>22.9</td></tr><tr><td>Fine-tune + 120 name tokens, mean init</td><td>26.0</td></tr></table></details>
 </figure>
 
@@ -105,6 +346,15 @@
   <div class="fsub">"Timmy labeled his X 'FooFoo' and his Y 'blammo'. How will he label Z?" 3-way accuracy (%), lr 1e-4 runs. Dashed line: chance (33).</div>
   <div class="legend"><span style="--c:var(--s1)">Facts in context, no training</span><span style="--c:var(--s2)">LoRA-trained, no context</span><span style="--c:var(--s3)">LoRA-trained + context</span></div>
   <svg id="c3" viewBox="0 0 860 210" role="img" aria-label="Grouped bar chart of Timmy task accuracy for 0.5B and 3B models"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>160 items of the form shown in section 0 (<em>his Nolvan 'FooFoo' and his Noline 'tandle' and his Yoreel 'snerk' ... his Dolorc?</em>), scored for two model sizes under three conditions:</p>
+  <ul>
+    <li><strong>Facts in context, no training</strong>: the base model, with the four field-guide entries prepended. This is what a retrieval system would give the model.</li>
+    <li><strong>LoRA-trained, no context</strong>: the model after 600 steps of LoRA on the augmented knowledge text (about 20 texts per species), asked with no field guide. It knows the species: in the trained answer format it recalls every type at 100%.</li>
+    <li><strong>LoRA-trained + context</strong>: the same trained model, also given the field guide.</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>Only one bar clears chance: the 3B model with the facts in the prompt (48.8). The trained 3B model knows that Dolorc and Nolvan are both Lithor-type, yet it cannot use that to pick 'FooFoo' (32.5, chance). Handing the trained model the field guide as well does not fix it (34.4); it is 14 points below the untrained model with the same context, so the training took something away. That something is the ability to follow an arbitrary label rule from examples, and section 5 is about how to train without losing it. The 0.5B model is at chance in every column; it cannot do this task with any amount of help.</p></div>
   <details><summary>Table view</summary><table><tr><th>model</th><th>facts in context</th><th>LoRA</th><th>LoRA + context</th></tr><tr><td>Qwen2.5-0.5B</td><td>32.5</td><td>30.6</td><td>31.9</td></tr><tr><td>Qwen2.5-3B</td><td>48.8</td><td>32.5</td><td>34.4</td></tr></table></details>
 </figure>
 
@@ -113,6 +363,16 @@
   <div class="fsub">MiniLM after contrastive training; 3-way prototype tasks use 3 labeled examples per tag (chance 33). Synonym and canonical rows are 8-way (chance 12.5).</div>
   <div class="legend"><span style="--c:var(--s1)">Zero-shot</span><span style="--c:var(--s2)">Trained</span></div>
   <svg id="c4" viewBox="0 0 860 250" role="img" aria-label="Grouped bar chart of embedding label accuracy before and after training"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>The embedding model is trained once so that a species name embeds near its attribute texts: "Javish" near "Frostel-type creatures exhale rime and prefer sub-zero dens." (type lore), near "Creatures weak to Tidewell-type attacks." and near "Creatures that live in canopy habitats." Then four ways of naming a label are tested, each before (zero-shot) and after that training:</p>
+  <ul>
+    <li><strong>Canonical type text (8-way)</strong>: embed the name "Javish", find the nearest of the eight type lore sentences. This is ordinary classification against a fixed label set the training saw. 99.3% after training.</li>
+    <li><strong>Synonym label (8-way)</strong>: the same, but the eight label texts are phrases never used in training: "the sparky ones", "the smoldering ones", "the rimy ones". 41.2% after training: partial transfer, because "the rimy ones" is close in meaning to "exhale rime".</li>
+    <li><strong>Prototype: type, 3 examples</strong>: Timmy's three 'FooFoo' cards averaged, three 'tandle' cards averaged, three 'snerk' cards averaged; classify a new card by nearest average. The label words are never embedded at all. 85.3%.</li>
+    <li><strong>Prototype: habitat (latent), 3 examples</strong>: the same, but Timmy sorted his cards by habitat, which the label never names and which cuts across types. 63.0%.</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>The zero-shot bars are chance in every row: an untrained MiniLM has no idea what "Javish" is. After training, the top row shows the knowledge went in. The bottom two rows show it can be used through labels the system has never seen, because the label is defined by its members and not by its name. That is the property a personal-finance app needs when a user creates a category called "fun money" and drops three transactions in it. Held-out species (never trained) stay at chance in every row; there is nothing in the name to embed.</p></div>
   <details><summary>Table view</summary><table><tr><th>label form</th><th>zero-shot</th><th>trained</th></tr><tr><td>Canonical type text (8-way)</td><td>10.3</td><td>99.3</td></tr><tr><td>Synonym "the sparky ones" (8-way)</td><td>13.2</td><td>41.2</td></tr><tr><td>Prototype, type (3-way)</td><td>33.7</td><td>85.3</td></tr><tr><td>Prototype, habitat, latent (3-way)</td><td>25.7</td><td>63.0</td></tr></table></details>
 </figure>
 
@@ -121,6 +381,10 @@
   <div class="fsub">Training tokens per second, LoRA rank 64, 512-token sequences, RTX 3090. Memory in the table.</div>
   <div class="legend"><span style="--c:var(--s1)">Plain transformers + peft</span><span style="--c:var(--s2)">Unsloth</span></div>
   <svg id="c5" viewBox="0 0 860 210" role="img" aria-label="Grouped bar chart of training throughput plain vs unsloth for 0.5B, 3B, 7B"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>The same training step (LoRA rank 64 on all linear layers, batches of 512-token sequences, synthetic tokens so tokenization is excluded) run through two software stacks: the Hugging Face transformers model with the peft adapter library, and Unsloth's patched version of the same model. Twelve timed steps after three warm-up steps, each configuration in its own process. Three model sizes; the 7B rows use 4-bit QLoRA because bf16 7B LoRA does not leave room at 512 tokens.</p>
+  <span class="k">How to read it</span>
+  <p>Longer bar is better; the pairs are like-for-like. At 0.5B Unsloth is 2.2x faster and uses 6.0 GiB instead of 19.2, which is the difference between fitting a batch of 8 and a batch of 24. Most of the memory saving is Unsloth's fused loss, which never materializes the batch x sequence x 152,000-word vocabulary logits tensor that dominates memory for small models. In concrete terms, the 1.25 million tokens of the interleaved run in section 5 would take 71 seconds on 0.5B at the Unsloth rate versus 2.6 minutes plain; on 3B, 7.8 versus 12.6 minutes at these packed rates. The actual section 5 runs took 21 to 25 minutes because episodes were not packed.</p></div>
   <details><summary>Table view</summary><table><tr><th>model</th><th>plain tok/s</th><th>plain GiB</th><th>unsloth tok/s</th><th>unsloth GiB</th></tr><tr><td>0.5B LoRA</td><td>8,165</td><td>19.2</td><td>17,716</td><td>6.0</td></tr><tr><td>3B LoRA + gc</td><td>1,662</td><td>14.8</td><td>2,663</td><td>8.1</td></tr><tr><td>7B QLoRA + gc</td><td>806</td><td>13.3</td><td>1,279</td><td>10.3</td></tr></table></details>
 </figure>
 
@@ -129,33 +393,83 @@
 <div class="callout">
   <p><strong>The one kind of forgetting you cannot afford is loss of in-context learning.</strong> Every LoRA run on declarative text recalled its facts perfectly (100% in the trained format) and every one of them got <em>worse</em> at the few-shot label task when the facts were then supplied in context: 3B fell from 48.8 to 34.4 after training on declarative text, and on public few-shot data from 60 to 51. Perplexity on English prose is the wrong regression metric for you. The right one is a small suite of few-shot tasks with arbitrary labels, run before and after every training job; section 5 builds that suite and shows the data mix that reverses the loss.</p>
 </div>
+<div class="ex"><span class="k">What the loss looked like on public data</span>
+<p>Before training, the 3B model reads the Banking77 item in section 0 (two customer messages tagged 'Snayen', two tagged 'Graax', two tagged 'Yenpel', then a new message) and picks the right nonsense tag 66.7% of the time. After 800 steps on creature facts alone (arm A in section 5) it scores 52.1% on the identical items. On DBpedia topic items it fell from 52.1 to 41.7, below the 43 chance level for the suite. Nothing about banks or encyclopedias was in the training data; the model lost the general habit of "the label follows the examples" while it was learning "Javish is a Frostel-type". Perplexity on the coffee passage rose from 8.5 to 21 in the same run, which is a real change but not the one that matters for your goal: arm Cn later reached perplexity 20 with public few-shot at 71, and arm D reached perplexity 14 with 81, so perplexity does not track the skill you care about.</p></div>
 <p>Second, knowledge injected as statements did not become knowledge the model could <em>use</em> for analogy. Recall and manipulation are separate skills (Physics of Language Models 3.2), and our ladder shows the split: yes/no and comparison formats that appeared in training scored 85 to 94%, the never-trained Timmy format sat at chance. Third, the embedding side already does what you want for unseen categories: a label is a centroid of examples, so a synonym, a nonsense tag, or a grouping the label never names all work without retraining.</p>
+<div class="ex"><span class="k">The split, on one species</span>
+<p>The knowledge-only 3B model (arm A) answers <em>Is Kelome a Verdane-type creature?</em> correctly 96% of the time and <em>Do Lumeel and Frodux share the same type?</em> 91% of the time. Both question shapes appeared in its training text ("Question: Is Javish a Pyrrhan-type? Answer: No, ..."; "Question: Do Javish and Gorath share a type? Answer: Yes, ..."). The Timmy prompt shape did not, and the same model picks the right tag for Dolorc 40% of the time, barely above the 33 chance line. It can retrieve "Dolorc is Lithor" and "Nolvan is Lithor" separately and confirm them when asked directly; it cannot notice on its own that this is why they share a tag.</p></div>
 
 <h2>3. Inject first and then teach the task, or teach the task as the injection?</h2>
 <div class="rec">
   <h3>Recommendation: one interleaved curriculum, not two stages (tested in section 5)</h3>
   <p>Mix three kinds of examples in every batch of a single training run:</p>
   <ol>
-    <li><strong>Knowledge text</strong> about the entities, in many surface forms and both directions (the augmented recipe that already works), including statement-style noisy variants of names.</li>
-    <li><strong>Few-shot episodes built from the same database</strong>: "A is 'zorp', B is 'quix', C is 'zorp'. D is ___", with labels drawn fresh and at random each episode, the grouping attribute varied (type, habitat, price band, region), the option set sometimes given and sometimes not, and a slice of entities and attributes held out so the task itself is tested on unseen categories. This is <em>symbol tuning</em> (Wei et al. 2023) applied to your own data, and it is the mechanism that teaches the model to override its label priors from examples.</li>
-    <li><strong>A small replay slice</strong> (10 to 20%) of generic few-shot tasks with random labels, so the in-context skill is preserved rather than merely not attacked.</li>
+    <li><strong>Knowledge text</strong> about the entities, in many surface forms and both directions (the augmented recipe that already works), including statement-style noisy variants of names.
+      <div class="ex"><span class="k">Example</span><pre>Trainers classify Javish as Frostel-type; like all Frostel-types it is weak to Tidewell-type attacks.
+Question: Name a Frostel-type creature.
+Answer: Javish is a Frostel-type creature.</pre><p>Loss is taken on every token of the text.</p></div></li>
+    <li><strong>Few-shot episodes built from the same database</strong>: "A is 'zorp', B is 'quix', C is 'zorp'. D is ___", with labels drawn fresh and at random each episode, the grouping attribute varied (type, habitat, price band, region), the option set sometimes given and sometimes not, and a slice of entities and attributes held out so the task itself is tested on unseen categories. This is <em>symbol tuning</em> (Wei et al. 2023) applied to your own data, and it is the mechanism that teaches the model to override its label priors from examples.
+      <div class="ex"><span class="k">Example (grouped by region, four groups, two cards each)</span><pre>Timmy sorts creature cards into piles with made-up names. So far: Gorome = Luszelhob; Dolvan = Kizelfim;
+Radble = Kizelfim; Quonash = 866; Syaoz = 866; Radurn = quodexsna; Huloz = quodexsna; Radsup = Luszelhob.
+Which pile does Faline go in?
+Answer: <span class="ans">866</span></pre><p>Loss is taken only on the answer token(s). The model has to know from its weights that Faline, Quonash and Syaoz share a region, since no field guide is given in this episode. For the merchant version, the "cards" are transactions and the hidden grouping might be category, merchant, or amount band.</p></div></li>
+    <li><strong>A small replay slice</strong> (10 to 20%) of generic few-shot tasks with random labels, so the in-context skill is preserved rather than merely not attacked.
+      <div class="ex"><span class="k">Example (TREC question types)</span><pre>Text: What is Head Start ?
+Category: snagrafim
+
+Text: Who 's the only president buried in Washington
+Category: 535
+
+Text: What does IQ stand for ?
+Category: Epcu
+
+Text: What does JESSICA mean ?
+Category: <span class="ans">Epcu</span></pre><p>Nothing here is about creatures or merchants. Its job is to keep "follow the labeling rule in the examples" a general habit rather than one that only fires on the creature vocabulary.</p></div></li>
   </ol>
   <p><strong>Why not sequential.</strong> Stage one (knowledge) measurably damages the skill that stage two needs, and stage two then overwrites stage one: two rounds of forgetting with nothing holding either in place. The literature is consistent on this: Physics of LMs 3.1 finds knowledge is only extractable when instruction-style data is mixed into pretraining rather than added afterwards; Instruction Pre-Training and Self-Tuning are the same idea at scale; MetaICL and symbol tuning show the few-shot skill is itself trainable and transfers to unseen tasks and labels.</p>
+  <div class="ex"><span class="k">What "stage two overwrites stage one" looked like when it was run (arm D, section 5)</span>
+  <p>After 400 steps of knowledge text the model presumably knew every species (arm A at 800 steps did). After 400 more steps of episodes, asked <em>What type is Syaott?</em> with the trained-format options, it is right 96.9% of the time instead of 100%; given the field-guide entry for Syaott in the prompt, only 89.4%, when every other arm is at 100%. Asked <em>Is Kelome a Verdane-type creature?</em> it scores 63.8% against the interleaved run's 85.0%. The second stage taught it to answer in the episode style, and the fact-question style it had learned in stage one drifted.</p></div>
   <p><strong>Why not episodes alone.</strong> An episode teaches "these two share a group" without much exposure to <em>why</em>, and knowledge needs many diverse exposures to become robust. The mix gives the model the facts and the habit of using them. Expect the episodes to be the smaller share of tokens (a quarter to a third) but the larger share of the effect on your target metric.</p>
+  <div class="ex"><span class="k">What "episodes alone" produced (arm B)</span>
+  <p>6,000 episodes mention every trained species many times, always as "Ulkdor = 497" style pairs, never as "Ulkdor is a Frostel-type". After 800 steps the model still cannot answer <em>What type is Syaott?</em> (12.5%, chance) and is at chance on the Timmy task from its weights (32.5%). But given the field guide it does the Timmy task at 78.8% (base 48.8), and it does the public Banking77 symbol items at 91.7% (base 66.7). It learned the skill perfectly and none of the facts.</p></div>
 </div>
 <p>In practice, with unsloth on this card: build the mixed dataset as packed 512-token sequences, train full or high-rank LoRA at 1e-4 or below since you accept general forgetting, keep the held-out attribute and held-out entity splits sacred, and let the harness compare "knowledge only", "episodes only", "interleaved", and "sequential" on the same ladder. Section 5 reports exactly that sweep, run on 3B in one evening.</p>
 
 <h2>4. Getting meaning from a name variant, a drug stem, or a molecule</h2>
 <p>This is a question about what the tokenizer's subword pieces have been taught. The mechanism already exists and the merchant result is the proof: fine-tuning with the stock tokenizer let "Elrholm" learned from clean sentences be recognized inside "DEBIT CARD PURCHASE ELRHOLM STORE 4970" at 70.8%, because the pieces <code>el ##rh ##ol ##m</code> are shared. Whole-word tokens broke that link. Held-out species stayed at chance for the opposite reason: their names carried no shared signal at all, so there was nothing to generalize from.</p>
+<div class="ex"><span class="k">The two failure directions, side by side</span>
+<ul>
+  <li><strong>Signal in the pieces, pieces replaced</strong>: "Elrholm" with its own token. The model learns "token 151936 sells groceries" and that token, alone in a sea of uppercase noise, is not enough. 70.8% falls to 22.9%.</li>
+  <li><strong>Pieces intact, no signal in them</strong>: the held-out species "Cynine" (Lithor) in the plain universe. Its pieces are shared with other names, but in that universe a name's spelling is unrelated to its type, so "Cyn" and "ine" carry nothing. Asked its type, every model is at 12.5%, chance, and should be.</li>
+</ul>
+<p>The morphology universe in section 5 is the case where both conditions are met: the pieces are shared and the training data makes them predictive.</p></div>
 <p>So the design goal is to make sure the signal is in the pieces, and to train on the variation you want to be robust to:</p>
 <ul>
-  <li><strong>Drug names.</strong> Real nonproprietary names carry class in their stems by construction: <code>-mab</code> monoclonal antibody, <code>-pril</code> ACE inhibitor, <code>-statin</code>, <code>-olol</code>, <code>-prazole</code>. A model trained on a few thousand drugs with their classes and mechanisms will attach those stems to meaning, and a new <code>-tinib</code> lands near the kinase inhibitors before anyone tells it. Public data: DrugBank open release, ChEMBL, RxNorm with ATC classes, the WHO INN stem list. Molecules are a separate modality; SMILES strings tokenize into fragments the same way, and the same test applies.</li>
-  <li><strong>Retailer and processor names.</strong> Train every entity under several noisy renderings: uppercase, truncated at 20 to 25 characters, with store numbers, cities, and processor prefixes (<code>SQ *</code>, <code>TST*</code>, <code>PAYPAL *</code>), with and without spaces. The model then learns which pieces are the identity and which are noise, and a variant it has never seen inherits the meaning of the pieces it shares. Ten thousand retailers is exactly the scale where this starts to pay off.</li>
-  <li><strong>A test that measures it.</strong> Generate species (or merchants) whose names embed a morphological marker for their type with some probability, hold them out entirely, and score type inference on the held-out set. At zero probability the answer is chance (our current result); the slope against probability is the model's morphology transfer. Add the drug set as a real-world replicate.</li>
+  <li><strong>Drug names.</strong> Real nonproprietary names carry class in their stems by construction: <code>-mab</code> monoclonal antibody, <code>-pril</code> ACE inhibitor, <code>-statin</code>, <code>-olol</code>, <code>-prazole</code>. A model trained on a few thousand drugs with their classes and mechanisms will attach those stems to meaning, and a new <code>-tinib</code> lands near the kinase inhibitors before anyone tells it. Public data: DrugBank open release, ChEMBL, RxNorm with ATC classes, the WHO INN stem list. Molecules are a separate modality; SMILES strings tokenize into fragments the same way, and the same test applies.
+    <div class="ex"><span class="k">The universe's version of this</span><p><code>-orc</code> is to Voltrix what <code>-pril</code> is to ACE inhibitors. Ulkorc, Orvorc, Briorc, Nolorc and Syaorc are trained Voltrix species; Myrorc is a never-trained probe name. Section 5 shows a model trained on that universe types Myrorc as Voltrix 94% of the time. The real-world replicate (lisinopril, enalapril, ramipril trained; a new <code>-pril</code> probed) has not been run yet.</p></div></li>
+  <li><strong>Retailer and processor names.</strong> Train every entity under several noisy renderings: uppercase, truncated at 20 to 25 characters, with store numbers, cities, and processor prefixes (<code>SQ *</code>, <code>TST*</code>, <code>PAYPAL *</code>), with and without spaces. The model then learns which pieces are the identity and which are noise, and a variant it has never seen inherits the meaning of the pieces it shares. Ten thousand retailers is exactly the scale where this starts to pay off.
+    <div class="ex"><span class="k">The renderings the merchant experiment generates (only one per store was used, and only at test time)</span><pre>POS DEBIT ELRHOLM #4970 TUCSON AZ 08/12
+CARD PURCHASE ELRHOLM 970 TUCSON AZ
+ELRHOLM*04970 TUCSON AZ 08/12
+CHECKCARD 08/12 ELRHOLM TUCSON AZ
+DEBIT CARD PURCHASE ELRHOLM STORE 4970 TUCSON AZ
+SQ *ELRHOLM TUCSON AZ 08/12</pre><p>The recommendation is to put all six (and the clean form) in the training text for every store, so the model sees that "ELRHOLM" is constant and "SQ *", the store number and the city vary. In the 0.5B experiment, where training text contained only the clean form, every method including retrieval failed on the bank form (8 to 14%, chance), so the alternative is to normalize the string before the model sees it.</p></div></li>
+  <li><strong>A test that measures it.</strong> Generate species (or merchants) whose names embed a morphological marker for their type with some probability, hold them out entirely, and score type inference on the held-out set. At zero probability the answer is chance (our current result); the slope against probability is the model's morphology transfer. Add the drug set as a real-world replicate.
+    <div class="ex"><span class="k">The test as run in section 5</span><p>Probability 0.7: 70% of names marked. 48 marked probes (Myrorc, ...) and 48 plain probes (Frodux, ...), none ever trained. Marked probes typed at 93.8% and plain probes at 14.6% after training on that universe, against 12.5% chance. One point on the slope; the other measured point is probability 0 (arm C), where marked probes score 4.2%.</p></div></li>
 </ul>
 
 <h2>5. Curriculum ladder v2: the experiment, run</h2>
 <p>Qwen2.5-3B, unsloth LoRA rank 64, lr 1e-4, 800 steps of 16 sequences for every arm, one evaluation for all of them: the section-6 ladder without and with facts in context, a held-out-species induction level, morphology probes, an <strong>ICL regression suite</strong> of few-shot classification on four public datasets (SST-2, Banking77, DBpedia, Subj; random-symbol and natural labels; chance 43.3), and perplexity. Episodes are symbol-tuning items generated from the creature database: 2 to 5 groups, fresh random labels every time, grouping attribute varied and <em>weakness never used</em>, half with the field guide in the prompt. Replay is the same kind of episode built from AG News, Emotion, TREC and 20 Newsgroups.</p>
+<div class="ex"><span class="k">What one training batch contains in each arm</span>
+<ul>
+  <li><strong>A</strong>: 16 knowledge texts ("Javish is a Frostel-type creature...", "Question: Do Javish and Gorath share a type? Answer: Yes...").</li>
+  <li><strong>B</strong>: 16 episodes ("Ulkdor = 497; Ulkoz = vohob; ... Zarig = ?").</li>
+  <li><strong>C</strong>: about 7 knowledge texts, 6 episodes and 2 or 3 replay episodes (TREC, AG News...), drawn at random in those proportions every step. Over the run: 5,845 knowledge texts, 5,034 episodes, 1,921 replay episodes.</li>
+  <li><strong>Cn</strong>: 8 knowledge texts and 8 episodes, no replay.</li>
+  <li><strong>D</strong>: for steps 1 to 400, about 14 knowledge texts and 2 replay episodes; for steps 401 to 800, about 14 episodes and 2 replay episodes. Same totals as C in a different order.</li>
+  <li><strong>E</strong>: same as C, but every name comes from the morphology universe (Ulkorc, Zarash, Pexeel...).</li>
+</ul>
+<p>Every arm is then scored on the identical 1,744 ladder items (with and without field guide), 192 probes and 384 public suite items, plus the coffee-passage perplexity. About 4,400 scored items per arm.</p></div>
 <table>
   <tr><th>arm</th><th>batch composition</th><th>result in one line</th></tr>
   <tr><td>A knowledge only</td><td>augmented text 100%</td><td>100% recall; Timmy from weights 40; public few-shot drops 60 to 51</td></tr>
@@ -165,12 +479,22 @@
   <tr><td>D sequential</td><td>text then episodes (replay in both)</td><td>Timmy 61 but recall 97, yes/no 64, pair 65: stage two overwrote stage one</td></tr>
   <tr><td>E interleaved + morphology</td><td>as C, 70% of names carry a type suffix</td><td>Timmy from weights 75, k=4 76; see chart</td></tr>
 </table>
+<div class="ex"><span class="k">Reading the one-line results</span>
+<p>"100% recall" means all 160 <em>What type is Syaott?</em> items answered correctly in the trained sentence format with no field guide. "Timmy from weights 59" means 95 of 160 <em>his Nolvan 'FooFoo'... his Dolorc?</em> items right with no field guide. "Held-out partition 54" means the Timmy items where the tags follow weakness instead of type, an attribute no training episode ever grouped by, at 53.8%. "Public few-shot 78" is the mean over the four suite datasets with symbol labels (Banking77 81, DBpedia 85, SST-2 77, Subj 69 for arm C). "No facts learned" for arm B means recall stayed at 12.5%, chance.</p></div>
 
 <figure>
   <figcaption>Interleaving is the only arm that both knows the facts and uses them for induction</figcaption>
   <div class="fsub">Accuracy (%) without any facts in the prompt, Qwen2.5-3B. Timmy task is 3-way (chance 33); the public few-shot suite has 2 to 4 classes with random-symbol labels (chance 43).</div>
   <div class="legend"><span style="--c:var(--s1)">Recall, trained format</span><span style="--c:var(--s2)">Timmy task from weights</span><span style="--c:var(--s3)">Public few-shot, random labels</span></div>
   <svg id="c6" viewBox="0 0 860 400" role="img" aria-label="Grouped bar chart of recall, Timmy accuracy and public few-shot accuracy for six training arms"></svg>
+  <div class="ex"><span class="k">What each bar measures</span>
+  <ul>
+    <li><strong>Recall, trained format</strong> (blue): <em>Question: What type is Syaott? Answer:</em> with options <em>Syaott is a Voltrix-type.</em> ... <em>Syaott is a Frostel-type.</em> Did the facts go in? Chance 12.5.</li>
+    <li><strong>Timmy task from weights</strong> (orange): <em>He labeled his Nolvan 'FooFoo' and his Noline 'tandle' and his Yoreel 'snerk'. How is he likely to label his Dolorc?</em>, no field guide. Can the model use the facts for analogy? Chance 33.</li>
+    <li><strong>Public few-shot, random labels</strong> (green): the Banking77, DBpedia, SST-2 and Subj items with nonsense labels. Did training damage or improve general in-context learning? Chance 43.</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>Read each row as a profile. <strong>Base</strong> knows nothing (12) and can do a little general few-shot (60). <strong>A</strong> learned everything (100) but barely uses it (40) and got worse at general few-shot (51). <strong>B</strong> is the mirror image: learned no facts (12.5), so the Timmy task from weights is impossible (32.5), but general few-shot jumped (76). <strong>C</strong> and <strong>Cn</strong> have all three: facts 100, Timmy 59 to 61, few-shot 71 to 78. <strong>D</strong> looks similar on these three bars (97 / 61 / 81) and the next chart shows what it lost. The tallest orange bar you can hope for is bounded by the with-context number: the base model handed the field guide scores 48.8, and arm C without any field guide beats that.</p></div>
   <details><summary>Table view</summary><table><tr><th>arm</th><th>recall</th><th>Timmy, no context</th><th>public few-shot, symbols</th><th>public few-shot, natural</th><th>perplexity</th></tr>
   <tr><td>base</td><td>11.9</td><td>35.6</td><td>60.4</td><td>84.4</td><td>8.5</td></tr>
   <tr><td>A knowledge only</td><td>100</td><td>40.0</td><td>50.5</td><td>80.8</td><td>21.2</td></tr>
@@ -185,6 +509,15 @@
   <div class="fsub">Accuracy (%), no context. Yes/no membership and pairwise same-type are 2-way (chance 50); the weakness partition was never a grouping attribute in any training episode (3-way, chance 33).</div>
   <div class="legend"><span style="--c:var(--s1)">Yes/no membership</span><span style="--c:var(--s2)">Pairwise same type</span><span style="--c:var(--s3)">Induction on held-out partition (weakness)</span></div>
   <svg id="c7" viewBox="0 0 860 400" role="img" aria-label="Grouped bar chart of knowledge manipulation and held-out partition induction for six arms"></svg>
+  <div class="ex"><span class="k">What each bar measures</span>
+  <ul>
+    <li><strong>Yes/no membership</strong> (blue): <em>Is Kelome a Verdane-type creature? Answer yes or no.</em> Half the items are true. Chance 50.</li>
+    <li><strong>Pairwise same type</strong> (orange): <em>Do Lumeel and Frodux share the same type? Answer yes or no.</em> Needs two facts and a comparison. Chance 50.</li>
+    <li><strong>Induction on held-out partition</strong> (green): a Timmy item where the tags follow weakness. <em>He labeled his Nixish 'wumbo' and his Myrurn 'zorp' and his Zimux 'dabble'. How is he likely to label his Radsup?</em> Nixish is weak to Tidewell, Myrurn to Lithor, Zimux to Verdane; Radsup is weak to Lithor, so 'zorp'. No training episode ever grouped by weakness. Chance 33.</li>
+  </ul>
+  <p class="small">A caveat on the green bar: in this universe every type has one fixed weakness, so grouping by weakness produces exactly the same groups as grouping by type (Myrurn and Radsup are both Voltrix, and that is why they share a weakness). What is held out is the attribute name and the fact that the model must recall each species' weakness rather than its type; the partition itself is not new. Habitat is the truly independent attribute, and it stayed hard for every arm (best 45%, arm D).</p>
+  <span class="k">How to read it</span>
+  <p>The blue and orange bars are the knowledge-manipulation skills. Arm A has them (96 / 91) because those question shapes were in its training text. Arm B does not (56 / 50), having seen no facts. C and Cn keep most of A's manipulation (85 / 74 and 83 / 76) while adding the induction skill (green 54 / 61). D is the arm to look at: its induction is as good as C's (54) but its yes/no fell to 64 and pairwise to 65. That is the 21 and 9 point loss quoted in the summary, and it is the concrete form of "stage two overwrote stage one": the model that spent its last 400 steps on episodes stopped answering direct fact questions as reliably.</p></div>
   <details><summary>Table view</summary><table><tr><th>arm</th><th>yes/no</th><th>pair</th><th>weakness, no context</th><th>Timmy, with context</th><th>weakness, with context</th><th>held-out species, with context</th></tr>
   <tr><td>base</td><td>41.2</td><td>50.0</td><td>32.5</td><td>48.8</td><td>45.6</td><td>43.8</td></tr>
   <tr><td>A knowledge only</td><td>96.2</td><td>91.2</td><td>45.0</td><td>43.1</td><td>45.0</td><td>32.3</td></tr>
@@ -192,6 +525,8 @@
   <tr><td>C interleaved + replay</td><td>85.0</td><td>73.8</td><td>53.8</td><td>76.2</td><td>72.5</td><td>75.0</td></tr>
   <tr><td>Cn interleaved, no replay</td><td>82.5</td><td>76.2</td><td>60.6</td><td>81.9</td><td>75.6</td><td>77.1</td></tr>
   <tr><td>D sequential</td><td>63.8</td><td>65.0</td><td>53.8</td><td>80.0</td><td>77.5</td><td>78.1</td></tr></table></details>
+  <div class="ex"><span class="k">The with-context columns in the table</span>
+  <p>"Held-out species, with context" is a Timmy item where the demonstration cards and the query card are all never-trained species (<em>his Kelurn 'FooFoo' and his Zarish 'blammo' and his Cynine 'grix' ... his Myrarn?</em>) and their field-guide entries are in the prompt. No amount of memorized knowledge helps here; the model has to read four entries and spot which two share a type. Base does it at 44%, arm A at 32% (worse than base: this is the in-context learning damage), every arm that saw episodes at 75 to 79%. That is the "about 30 points on every test, including entities never trained on" claim.</p></div>
 </figure>
 
 <figure>
@@ -199,6 +534,17 @@
   <div class="fsub">Type accuracy (%) on 48 never-trained probe names per row, no context, trained answer format, 8-way (chance 12.5). "Marked" names end in their type's suffix; "plain" names do not. Arm E trained on a universe where 70% of names carry the suffix; arm C trained on the plain universe where the same suffixes are spread at random.</div>
   <div class="legend"><span style="--c:var(--s1)">Marked name (suffix matches type)</span><span style="--c:var(--s2)">Plain name</span></div>
   <svg id="c8" viewBox="0 0 860 240" role="img" aria-label="Grouped bar chart of probe accuracy for marked and plain never-seen names across four conditions"></svg>
+  <div class="ex"><span class="k">What is being compared</span>
+  <p>Every bar is the same question, <em>Question: What type is Myrorc? Answer:</em>, with options <em>Myrorc is a Voltrix-type.</em> ... <em>Myrorc is a Frostel-type.</em>, asked about 48 names that appear in no training text. The only thing that varies is whether the name carries its type's suffix and which universe the model was trained on.</p>
+  <ul>
+    <li><strong>Marked name</strong> (blue): Myrorc, where <code>-orc</code> is the Voltrix suffix. The correct answer is Voltrix and is in principle readable from the name.</li>
+    <li><strong>Plain name</strong> (orange): Frodux, whose suffix is tied to nothing. The correct answer is unguessable; this bar should stay at chance and does. It is the control that shows the model is reading the stem and not simply guessing better.</li>
+    <li><strong>base, plain universe</strong> and <strong>C interleaved, plain universe</strong>: models that never saw the suffix mean anything. In the plain universe Ulkorc might be Voltrix and Dolorc Lithor. Both at or below chance on both probes, as they should be.</li>
+    <li><strong>base, morphology universe</strong>: the untrained model asked about the morphology names. Chance; the suffix means nothing to it yet.</li>
+    <li><strong>E interleaved, morphology universe</strong>: trained on names where 70% of the time <code>-orc</code> went with Voltrix. Marked probes 45 of 48 correct (93.8%). Plain probes 7 of 48 (14.6%).</li>
+  </ul>
+  <span class="k">How to read it</span>
+  <p>One tall blue bar and one short orange bar in the same row is the signature of morphology transfer: the model has attached the suffix piece to the type and uses it on a name it never saw, while gaining nothing on names without the cue. The same suffixes in arm C's training data were spread randomly across types and that model scores 4.2% on the identical probes, so the effect is not a property of the suffixes or the probes but of whether the training data made the cue predictive. That is the condition drug stems meet in real data.</p></div>
   <details><summary>Table view</summary><table><tr><th>condition</th><th>marked name</th><th>plain name</th><th>Timmy from weights</th><th>Timmy k=4</th><th>held-out species, no context</th></tr>
   <tr><td>base, plain universe</td><td>10.4</td><td>14.6</td><td>35.6</td><td>26.9</td><td>42.7</td></tr>
   <tr><td>C interleaved, plain universe</td><td>4.2</td><td>6.2</td><td>59.4</td><td>52.5</td><td>31.2</td></tr>
@@ -206,14 +552,20 @@
   <tr><td>E interleaved, morphology universe</td><td>93.8</td><td>14.6</td><td>75.0</td><td>76.2</td><td>46.9</td></tr></table></details>
 </figure>
 <p>This is the mechanism behind the drug-stem and retailer-variant goal in section 4, measured. The suffix only became a feature when the training data made it predictive (arm C, where the same suffixes were meaningless, scores at chance on the same probes), and once it did, the model placed unseen creatures by name alone: Timmy from the weights 75 instead of 59, and induction over species it never saw rose from 31 to 47 with no context at all. Recall, the public few-shot score and perplexity were unchanged relative to arm C.</p>
+<div class="ex"><span class="k">Why the Timmy numbers rise too</span>
+<p>In the morphology universe a Timmy item might read <em>his Ulkorc 'FooFoo' and his Zarash 'tandle' and his Pexeel 'snerk' ... his Nolorc?</em> Arm E does not have to recall four facts to answer; it can see that Nolorc and Ulkorc end the same way. About 70% of names carry the cue, so this shortcut is available in most items and the score rises from 59 to 75. The "held-out species, no context" column is the purest version: never-trained cards, no field guide, and still 47% against 33 chance, because their names follow the same rule. The untrained base model already uses the cue a little when the field guide is in the prompt (k=4 at 38 versus 27 on the plain universe), so the suffix is a surface pattern a 3B model can pick up on the fly; training made it a reliable feature.</p></div>
 
 <div class="rec">
   <h3>What this settles</h3>
   <ol>
-    <li><strong>Teach the task as the injection.</strong> One interleaved run gives 100% recall plus in-weights label induction at 59 to 61% (base 36, knowledge-only 40) and transfers that induction to a partition never used in training. Sequential staging reaches the same induction number but loses 3 points of recall, 21 points of yes/no manipulation and 9 points of pairwise reasoning, and its answer format drifts enough that recall with the facts in the prompt drops to 89%.</li>
-    <li><strong>Symbol-tuning episodes are what protect and improve in-context learning.</strong> Declarative text alone lowered public-data few-shot accuracy by 10 points; adding episodes raised it 15 to 21 points above base. Your regression metric should be that suite, and the fix for the erosion seen in section 2 is in the data mix, not in a lower learning rate.</li>
-    <li><strong>Keep the replay slice.</strong> It does not change the universe results; it keeps the induction skill general (78 vs 71 on public data) and holds perplexity at 15 instead of 20.</li>
-    <li><strong>Latent, low-frequency attributes are still the hard case.</strong> Habitat induction never passed 45% in any arm. Attributes shared by few entities need more exposures or an attribute-specific retrieval step.</li>
+    <li><strong>Teach the task as the injection.</strong> One interleaved run gives 100% recall plus in-weights label induction at 59 to 61% (base 36, knowledge-only 40) and transfers that induction to a partition never used in training. Sequential staging reaches the same induction number but loses 3 points of recall, 21 points of yes/no manipulation and 9 points of pairwise reasoning, and its answer format drifts enough that recall with the facts in the prompt drops to 89%.
+      <div class="ex"><p>For the merchant database this means one training set in which "Elrholm sells canned goods..." paraphrases, "Elrholm = zorp; Oskhurst Bros = quix; ... Gridale = ?" episodes grouped by category or by product type, and TREC or AG News replay episodes are shuffled together, rather than a knowledge run followed by a task run.</p></div></li>
+    <li><strong>Symbol-tuning episodes are what protect and improve in-context learning.</strong> Declarative text alone lowered public-data few-shot accuracy by 10 points; adding episodes raised it 15 to 21 points above base. Your regression metric should be that suite, and the fix for the erosion seen in section 2 is in the data mix, not in a lower learning rate.
+      <div class="ex"><p>Concretely: run the 384 Banking77, DBpedia, SST-2 and Subj items with nonsense labels before and after every training job and require the symbol-label mean not to fall. Arm A would have failed that check (60 to 51); arms B, C, Cn and D would have passed (71 to 81). Perplexity would not have separated them.</p></div></li>
+    <li><strong>Keep the replay slice.</strong> It does not change the universe results; it keeps the induction skill general (78 vs 71 on public data) and holds perplexity at 15 instead of 20.
+      <div class="ex"><p>C and Cn differ only in whether 15% of each batch is TREC or AG News episodes instead of more creature data. On every creature test they are within noise of each other (Timmy 59 vs 61, recall 100 vs 100). On the public suite, C scores 78 and Cn 71: without replay the model's few-shot skill became partly "creature-shaped". About 1,900 replay episodes over the run bought that generality.</p></div></li>
+    <li><strong>Latent, low-frequency attributes are still the hard case.</strong> Habitat induction never passed 45% in any arm. Attributes shared by few entities need more exposures or an attribute-specific retrieval step.
+      <div class="ex"><p><em>He labeled his Lumeel 'zorp' and his Velump 'snerk' and his Tunarn 'wumbo'. How is he likely to label his Ithent?</em> Lumeel and Ithent both live on reefs; the others live in a marsh and a cave. Habitat is one of six values assigned independently of type, appears in only a few of each species' training texts, and does not correlate with anything else the model knows. Best arm 45% without context (D) and 74% with the field guide in the prompt (D), so the model can do the reasoning when the attribute is written down but does not reliably recall it. For a finance app the equivalent is a user who groups transactions by something rarely stated, such as which card they used.</p></div></li>
   </ol>
 </div>
 <p class="small">Each trained arm: 21 to 25 minutes at 840 to 1,170 tokens/s and 8.7 GiB, plus 7 minutes of evaluation over 4,400 items. Not run yet: the same arms on 7B, a drug-name replicate with ATC classes, and the merchant database with statement-style noisy renderings.</p>
