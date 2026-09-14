@@ -1,0 +1,5 @@
+# Copy to .dvc/config.local (gitignored) and keep the one url line for this OS,
+# or run the matching command from .dvc/config, which writes the same thing.
+['remote "dstore"']
+    url = D:\repos\dvc\ai-experiments
+#   url = /mnt/d/repos/dvc/ai-experiments

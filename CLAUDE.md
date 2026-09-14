@@ -41,12 +41,14 @@ we collected, `src/` is library code, `scripts/` is entry points.
 The repo runs from two checkouts on one machine: native Windows 11 and WSL2 (Ubuntu 26.04).
 They share the GPU, the driver, everything in git, and the DVC remote on D:. They do not share
 `.venv/`, `models/adapters/` (restored per checkout with `uv run dvc pull`), `hf_cache/` or
-`evals/runs.db`. On WSL, point DVC at the mount once: `uv run dvc remote modify --local dstore
-url /mnt/d/repos/dvc/ai-experiments`. See `NOTES.md` for the history of each side.
+`evals/runs.db`. See `NOTES.md` for the history of each side.
 
 Both sides:
 
 - Run Python with `uv run python ...`, never a bare `python`. Run `uv sync` once per checkout.
+- The DVC remote path is not in the shared config. If any `dvc` command fails with
+  `expected 'url' for dictionary value @ data['remote']['dstore']`, run the one-line
+  `dvc remote modify --local` command from the comment in `.dvc/config` for this OS.
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
   side; if not, `uv run dvc pull` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.

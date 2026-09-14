@@ -98,11 +98,15 @@ What the two checkouts share and do not share:
 
 Same day, later, from WSL: `uv sync` built the venv from the Windows-generated lockfile without
 changes (Linux resolves `triton` 3.6.0 where Windows has `triton-windows`). torch 2.11.0+cu128
-reports `cuda.is_available()` true on the RTX 3090. The shared `.dvc/config` stores the remote
-as `D:\repos\dvc\ai-experiments`, which Linux cannot open, so WSL needs a one-time gitignored
-override: `uv run dvc remote modify --local dstore url /mnt/d/repos/dvc/ai-experiments`. After
-that, `uv run dvc pull` fetched 37 files (3.8 GB, ten adapter directories) over the 9p mount and
-`uv run dvc status -c` reports cache and remote in sync.
+reports `cuda.is_available()` true on the RTX 3090. The shared `.dvc/config` originally stored
+the remote as `D:\repos\dvc\ai-experiments`, which Linux cannot open; with a warm cache
+`dvc pull` then says "Everything is up to date" without ever reaching the remote. So the url
+was removed from the shared config: every clone now fails loudly (`expected 'url' for
+dictionary value @ data['remote']['dstore']`) until it runs the one-line
+`dvc remote modify --local` command for its OS, spelled out in a comment in `.dvc/config`.
+With `/mnt/d/repos/dvc/ai-experiments` set locally, `uv run dvc pull` fetched 37 files (3.8 GB,
+ten adapter directories) over the 9p mount and `uv run dvc status -c` reports cache and remote
+in sync.
 
 Windows-only gotchas that do not apply on WSL: the `python` Store alias, cp1252 console
 (`PYTHONIOENCODING`), Bash heredoc failures, Smart App Control, WDDM system-memory fallback.
