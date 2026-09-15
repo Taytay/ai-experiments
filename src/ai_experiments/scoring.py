@@ -143,6 +143,22 @@ def perplexity(model, tok, text: str) -> float:
     return math.exp(F.cross_entropy(logits[0, :-1], ids[0, 1:]).item())
 
 
+@torch.no_grad()
+def corpus_perplexity(model, tok, chunks: list[str], maxlen: int = 768) -> dict:
+    """Token-weighted perplexity over text chunks (each cut to maxlen tokens), with the standard error
+    of the per-chunk mean NLL across chunks, so two adapters' numbers can be told apart (PLAN step 24)."""
+    torch.cuda.empty_cache()
+    nll, n = [], []
+    for c in chunks:
+        ids = tok(c, return_tensors="pt", add_special_tokens=False)["input_ids"][:, :maxlen].cuda()
+        logits = model(input_ids=ids).logits.float()
+        nll.append(F.cross_entropy(logits[0, :-1], ids[0, 1:], reduction="sum").item()); n.append(ids.shape[1] - 1)
+    mean = sum(nll) / sum(n)
+    per = [a / b for a, b in zip(nll, n)]
+    se = (sum((x - sum(per) / len(per)) ** 2 for x in per) / (len(per) - 1)) ** 0.5 / len(per) ** 0.5 if len(per) > 1 else 0.0
+    return dict(ppl=round(math.exp(mean), 3), nll=round(mean, 4), nll_se=round(se, 4), n_tokens=sum(n), n_chunks=len(chunks))
+
+
 def _softmax(xs: list[float]) -> list[float]:
     m = max(xs)
     es = [math.exp(x - m) for x in xs]
