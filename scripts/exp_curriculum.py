@@ -14,6 +14,14 @@ D       phase 1: knowledge .85 + replay .15;                   plain
         phase 2: episodes .85 + replay .15   (sequential)
 E       same as C                                              morphology
 Cg      knowledge .45 + episodes .35 + replay .15 + general .05  plain   (PLAN step 25, TRAIN-7)
+A1      one knowledge text per species (universe.single_texts, all attributes, no paraphrases), LM loss
+A1m     the same 136 texts under MASKED FINE-TUNING (Pan et al. 2510.09885, PLAN step 8, TRAIN-5): the
+        sample is "Recover the original passage from the masked version.\nMasked: <text with a random
+        5-95% of tokens replaced by <|fim_pad|>>\nOriginal: <text>", loss on the original only
+C1      knowledge (one text per species) .45 + episodes .40 + replay .15
+Cm      masked knowledge (one text per species) .45 + episodes .40 + replay .15
+        Run these on Qwen/Qwen2.5-3B-Instruct (the paper's method presupposes an instruction-tuned
+        model): uv run python scripts/exp_curriculum.py Cm Qwen/Qwen2.5-3B-Instruct
 M0      arm C's mixture, but the fractions are LOSS WEIGHTS: the loss is the weighted sum of each
         stream's own mean token loss, so a stream's share of the gradient is its fraction whatever
         its token count (PLAN step 9, TRAIN-1). No other change: the ablation for M20/M40/M60.
@@ -84,11 +92,18 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "D": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],
     "E": [dict(K=0.45, E=0.40, R=0.15)],
     "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
+    "A1": [dict(K1=1.0)],
+    "A1m": [dict(Km=1.0)],
+    "C1": [dict(K1=0.45, E=0.40, R=0.15)],
+    "Cm": [dict(Km=0.45, E=0.40, R=0.15)],
     "M0": [dict(K=0.45, E=0.40, R=0.15)],
     "M20": [dict(K=0.43, S=0.22, E=0.20, R=0.15)],
     "M40": [dict(K=0.30, S=0.15, E=0.40, R=0.15)],
     "M60": [dict(K=0.17, S=0.08, E=0.60, R=0.15)],
 }
+MASK_TOKEN = "<|fim_pad|>"  # a reserved single token of the Qwen2.5 vocabulary, never in any text
+MASK_INSTRUCTION = "Recover the original passage from the masked version.\nMasked:"
+MASK_RNG = random.Random(1000 + int(os.environ.get("SEED", "0")))
 BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
 ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
@@ -144,6 +159,9 @@ def evaluate(model, tok):
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
     if known:
         recs["noctx"] += sc.score(known, label="known facts")
+    if FROZEN.reverse:
+        recs["noctx"] += sc.score(FROZEN.reverse, label="reverse")
+        recs["ctx"] += sc.score(FROZEN.reverse, ctx=True, label="reverse+ctx")
     noctx = aggregate(recs["noctx"])
     sym = [v for k, v in noctx.items() if k.startswith("ICL_symbol")]
     nat = [v for k, v in noctx.items() if k.startswith("ICL_natural")]
@@ -201,10 +219,25 @@ def demo_label_spans(prompt, demos, window=12):
     return spans
 
 
-def encode(tok, sample):
-    """sample: str (full-sequence loss) or dict(prompt, answer) (answer-only loss; with ALL_ANSWER and
-    sample["demos"], the demo labels inside the prompt carry the loss too). -> (ids, labels)"""
+def encode_masked(tok, text):
+    """Masked fine-tuning sample: instruction + the text with a random 5-95% of its tokens replaced by the mask
+    token, then "Original:" and the text itself, which alone carries the loss. Mask ratio drawn per sample."""
     eos = [tok.eos_token_id]
+    ids = tok(" " + text, add_special_tokens=False)["input_ids"]
+    mask_id = tok.convert_tokens_to_ids(MASK_TOKEN)
+    t = MASK_RNG.uniform(0.05, 0.95)
+    masked = [mask_id if MASK_RNG.random() < t else i for i in ids]
+    p = tok(MASK_INSTRUCTION, add_special_tokens=False)["input_ids"] + masked + tok("\nOriginal:", add_special_tokens=False)["input_ids"]
+    a = ids + eos
+    return p + a, [-100] * len(p) + a
+
+
+def encode(tok, sample):
+    """sample: str (full-sequence loss), dict(mask=text) (masked fine-tuning) or dict(prompt, answer) (answer-only
+    loss; with ALL_ANSWER and sample["demos"], the demo labels inside the prompt carry the loss too). -> (ids, labels)"""
+    eos = [tok.eos_token_id]
+    if isinstance(sample, dict) and "mask" in sample:
+        return encode_masked(tok, sample["mask"])
     if isinstance(sample, str):
         ids = tok(sample, add_special_tokens=False)["input_ids"][: MAXLEN - 1] + eos
         return ids, list(ids)
@@ -238,6 +271,10 @@ def train(model, tok, phases, run):
         streams["G"] = Stream(S.general_replay_texts(n=4000, seed=19), rng)
     if "S" in need:
         streams["S"] = Stream(U.self_teaching(species, n=4000, seed=5), rng)
+    if "K1" in need:
+        streams["K1"] = Stream(U.single_texts(species), rng)
+    if "Km" in need:
+        streams["Km"] = Stream([dict(mask=t) for t in U.single_texts(species)], rng)
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
