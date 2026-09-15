@@ -24,8 +24,11 @@ entry in front of the teacher and nothing in front of the student. Streams and m
                             the teacher gets the entries of every species in the prompt.
   R  generic replay (15%)   hard cross-entropy on the answer tokens, exactly as in arm C.
 
-Only the option positions are scored (left padding, `logits_to_keep`), so a micro-batch of 8
-questions with up to 8 options each is one forward for the student and one for the teacher.
+Only the option positions go through the LM head (`scoring.option_logprobs_batched`: right padding,
+hidden states out of unsloth, head applied at the option tokens), so a micro-batch of 8 questions with
+up to 8 options each is one forward for the student and one for the teacher. A first run used left
+padding with `logits_to_keep`; under unsloth that moved option log-probs by up to 0.6 nats and the
+teacher's ranking inside mixed-length batches fell to 66% (92% scored alone), so it was discarded.
 Everything else (LoRA r=64 alpha=128 all linear, lr 1e-4, 800 steps of 16, warmup 30, linear decay,
 seed 0, max length 768) and the evaluation match exp_curriculum.py / exp_distill.py. Tracker
 experiment `curriculum_v2`, arm P2, method prompt_distill_options. Per 50 steps the log carries the
@@ -52,7 +55,7 @@ from ai_experiments import items as I
 from ai_experiments import universe as U
 from ai_experiments.evals.tracker import Run
 from ai_experiments.merchants import GENERAL_TEXT
-from ai_experiments.scoring import Scorer, aggregate, corpus_perplexity, per_item_path, perplexity, write_records
+from ai_experiments.scoring import Scorer, aggregate, corpus_perplexity, option_logprobs_batched, per_item_path, perplexity, write_records
 
 ARM = "P2"
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-3B"
@@ -66,6 +69,7 @@ tag = MODEL.split("/")[-1]
 OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}.json"
 ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
 torch.manual_seed(SEED)
+TOK = None  # the tokenizer, set once loaded (option_logprobs needs its pad id)
 
 species = U.build()
 by_name = {s["name"]: s for s in species}
@@ -164,22 +168,9 @@ def encode(tok, sample):
                 opt_ids=opt_ids, answer=answer)
 
 
-def option_logprobs(model, prompts, options, pad):
-    """For each example i and option j: sum of log P(option tokens | prompt), as one list of [k_i] tensors.
-    One left-padded forward over every (prompt, option) row; logits only at the last max_len+1 positions."""
-    seqs, owner = [], []
-    for i, (p, opts) in enumerate(zip(prompts, options)):
-        for j, o in enumerate(opts):
-            seqs.append(p + o); owner.append((i, j, len(o)))
-    L, keep = max(map(len, seqs)), max(n for _, _, n in owner) + 1
-    ids = torch.tensor([[pad] * (L - len(s)) + s for s in seqs], device="cuda")
-    att = torch.tensor([[0] * (L - len(s)) + [1] * len(s) for s in seqs], device="cuda")
-    lp = F.log_softmax(model(input_ids=ids, attention_mask=att, logits_to_keep=keep).logits.float(), -1)  # [rows, keep, V]
-    rows = [[None] * len(opts) for opts in options]
-    for r, (i, j, n) in enumerate(owner):
-        tgt = ids[r, L - n:]  # option tokens, predicted by the kept positions keep-n-1 .. keep-2
-        rows[i][j] = lp[r, keep - n - 1:keep - 1].gather(-1, tgt.unsqueeze(-1)).sum()
-    return [torch.stack(row) for row in rows]
+def option_logprobs(model, prompts, options, pad=None):
+    """log P(option | prompt) per example and option, one right-padded forward, LM head at option positions only."""
+    return option_logprobs_batched(model, TOK, prompts, options)
 
 
 # ------------------------------------------------------------------ training
@@ -269,6 +260,7 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
     else:
         model, tok = FastLanguageModel.from_pretrained(MODEL, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
         tok.padding_side = "right"
+        TOK = tok
         model, stats = train(model, tok, run)
         model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}", flush=True)
         r, recs = evaluate(model, tok)
