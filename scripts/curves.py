@@ -16,7 +16,7 @@ from ai_experiments.evals.tracker import DB_PATH, ROOT
 
 METRICS = ["L1_recall_fmt", "L3_induct_type_nonsense", "L4_induct_weakness", "ICL_symbol_mean", "K_arc_easy", "L7_ppl_general", "L7_ppl_wikitext"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq", "base_m": "base(m)",
-         "E": "E morph", "P": "P distill", "Cg": "Cg inter+R+G", "P2": "P2 distill-opt"}
+         "E": "E morph", "P": "P distill", "Cg": "Cg inter+R+G", "P2": "P2 distill-opt", "M0": "M0 by-loss", "M20": "M20 E.2", "M40": "M40 E.4", "M60": "M60 E.6"}
 
 def label(arm):
     base, _, seed = arm.partition(" ")
