@@ -61,7 +61,8 @@ Both sides:
   says whether it is present on this side.
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
-  so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
+  so far. The `research-papers` skill downloads into `references/papers/` by default and enforces
+  arXiv's one-request-per-3-s rule with a machine-wide lock; still run its commands one at a time.
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
 - After a training run: `just push-models` (`dvc add models/adapters` then `dvc push`), then
