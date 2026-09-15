@@ -21,28 +21,31 @@ natural labels, answer-only loss).
 
 Eval (all arms, same items): the 7-level ladder without and with context, held-out-species
 induction, morphology probes (marked vs plain never-seen names), the ICL regression suite
-(SST-2/Banking77/DBpedia/Subj, symbol + natural labels), general-text perplexity.
+(SST-2/Banking77/DBpedia/Subj, symbol + natural labels), general-text perplexity. The items are
+the frozen sets in data/processed/ (ai_experiments.items; their hashes go into the tracker config),
+and every eval also writes per-item, per-option log-probs to results/per_item/ (ai_experiments.scoring).
 Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ... unsloth).
+
+EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
 """
 import json
-import math
 import os
 import random
 import sys
 import time
 from collections import defaultdict
-from pathlib import Path
 from ai_experiments.paths import ROOT
 
 import unsloth  # noqa: F401  (before transformers)
 import torch
-import torch.nn.functional as F
 from unsloth import FastLanguageModel
 
 from ai_experiments import universe as U
 from ai_experiments import icl_suite as S
+from ai_experiments import items as I
 from ai_experiments.evals.tracker import Run
 from ai_experiments.merchants import GENERAL_TEXT
+from ai_experiments.scoring import Scorer, aggregate, per_item_path, perplexity, write_records
 
 ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
@@ -65,11 +68,9 @@ ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
 torch.manual_seed(SEED)
 
 species = U.build(morph_p=MORPH_P)
-by_name = {s["name"]: s for s in species}
-ladder = U.ladder(species) + U.heldout_induction(species)
-probes = U.probes(species)
-suite = S.suite_items()
 K_texts = U.training_texts(species)
+FROZEN = I.load_all(morph=MORPH_P > 0)  # never regenerated: the same items for every arm and commit
+ladder, probes, suite = FROZEN.ladder, FROZEN.probes, FROZEN.suite
 SMOKE = bool(os.environ.get("SMOKE"))
 if SMOKE:
     # Quick end-to-end plumbing check, not an experiment: 2 optimizer steps, 1/40 of the eval items,
@@ -79,8 +80,8 @@ if SMOKE:
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
     ADAPTER = ROOT / "models" / "smoke" / ADAPTER.name
-print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | "
-      f"{len(ladder)} ladder items | {len(probes)} probes | {len(suite)} ICL suite items", flush=True)
+print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} knowledge texts | items {FROZEN.version} "
+      f"({'morph' if FROZEN.morph else 'plain'}): {len(ladder)} ladder | {len(probes)} probes | {len(suite)} ICL suite", flush=True)
 
 
 def load():
@@ -90,73 +91,22 @@ def load():
 
 
 # ------------------------------------------------------------------ evaluation
-@torch.no_grad()
-def option_scores(model, tok, prompt, options):
-    p_ids = tok(prompt, add_special_tokens=False)["input_ids"][-(MAXLEN - 32):]
-    seqs, spans = [], []
-    for o in options:
-        o_ids = tok(o, add_special_tokens=False)["input_ids"]
-        seqs.append(p_ids + o_ids); spans.append((len(p_ids), len(p_ids) + len(o_ids)))
-    L = max(map(len, seqs)); pad = tok.pad_token_id or 0
-    ids = torch.tensor([s + [pad] * (L - len(s)) for s in seqs], device="cuda")
-    att = torch.tensor([[1] * len(s) + [0] * (L - len(s)) for s in seqs], device="cuda")
-    try:
-        logits = model(input_ids=ids, attention_mask=att).logits
-    except (torch.OutOfMemoryError, torch.AcceleratorError):
-        if len(options) == 1:
-            raise
-        torch.cuda.empty_cache()  # long prompt x many options: score one option per forward
-        return [option_scores(model, tok, prompt, [o])[0] for o in options]
-    out = []
-    for i, (a, b) in enumerate(spans):  # softmax only over the answer positions, not the whole sequence
-        lp = F.log_softmax(logits[i, a - 1:b - 1].float(), -1).gather(-1, ids[i, a:b].unsqueeze(-1))
-        out.append(lp.mean().item())
-    return out
-
-
-@torch.no_grad()
-def perplexity(model, tok, text):
-    # plain CE from logits: unsloth's fused loss refuses to run when the caching allocator
-    # holds most of the card after a long eval pass ("No or negligible GPU memory available")
-    torch.cuda.empty_cache()
-    ids = tok(text, return_tensors="pt")["input_ids"].cuda()
-    logits = model(input_ids=ids).logits.float()
-    loss = F.cross_entropy(logits[0, :-1], ids[0, 1:])
-    return math.exp(loss.item())
-
-
-def accuracy(model, tok, items, context=False):
-    hit, n, margin = defaultdict(int), defaultdict(int), defaultdict(list)
-    for it in items:
-        if context:
-            it = U.with_context(it, by_name)
-        sc = option_scores(model, tok, it["prompt"], it["options"])
-        pred = max(range(len(sc)), key=sc.__getitem__)
-        hit[it["level"]] += pred == it["answer"]; n[it["level"]] += 1
-        p = torch.softmax(torch.tensor(sc), 0).sort(descending=True).values
-        margin[it["level"]].append((p[0] - p[1]).item())
-    res = {lv: round(100 * hit[lv] / n[lv], 1) for lv in n}
-    for lv in ("L6_unseen_recall", "L6_seen_recall_ctrl"):
-        if lv in margin:
-            res[lv + "_margin"] = round(sum(margin[lv]) / len(margin[lv]), 3)
-    return res
-
-
 def evaluate(model, tok):
-    """Returns {"noctx": {...}, "ctx": {...}}. Probes, ICL suite and perplexity live under noctx."""
+    """Returns ({"noctx": metrics, "ctx": metrics}, {"noctx": records, "ctx": records}).
+    Probes, ICL suite and perplexity live under noctx; records are per item (ai_experiments.scoring)."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    noctx = accuracy(model, tok, ladder)
-    noctx.update(accuracy(model, tok, probes))
-    icl = accuracy(model, tok, suite)
-    noctx.update(icl)
-    sym = [v for k, v in icl.items() if k.startswith("ICL_symbol")]
-    nat = [v for k, v in icl.items() if k.startswith("ICL_natural")]
+    sc = Scorer(model, tok, maxlen=MAXLEN)
+    recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
+            "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
+    noctx = aggregate(recs["noctx"])
+    sym = [v for k, v in noctx.items() if k.startswith("ICL_symbol")]
+    nat = [v for k, v in noctx.items() if k.startswith("ICL_natural")]
     noctx["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
     noctx["ICL_natural_mean"] = round(sum(nat) / len(nat), 1)
     noctx["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
-    ctx = accuracy(model, tok, ladder, context=True)
+    ctx = aggregate(recs["ctx"])
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
-    return {"noctx": noctx, "ctx": ctx}
+    return {"noctx": noctx, "ctx": ctx}, recs
 
 
 # ------------------------------------------------------------------ training
@@ -237,12 +187,17 @@ phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
            method="unsloth_lora", lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
-           n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite))
+           n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
+           **FROZEN.config())
 with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
-    def save():
+    def save(recs, conds):
+        """results JSON + tracker metrics, and one per-item JSONL per condition (conds maps noctx/ctx -> name)."""
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
         for cond, mets in results.items():
             run.log(mets, condition=cond)
+        run.artifact(OUT)
+        for key, cond in conds.items():
+            run.artifact(write_records(per_item_path(OUT, cond), recs[key]))
 
     eval_only = bool(phases) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
     if eval_only:
@@ -250,23 +205,26 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(ROOT)))
         model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
         tok.padding_side = "right"
-        r = evaluate(model, tok)
+        r, recs = evaluate(model, tok)
         results["trained"], results["trained_ctx"] = r["noctx"], r["ctx"]
         if OUT.exists():  # keep the training-time stats recorded by the original run
             prev = json.loads(OUT.read_text()).get("trained", {})
             keep = ("train_minutes", "train_tokens", "tokens_per_s", "peak_alloc_GiB", "train_stats_note")
             results["trained"].update({k: v for k, v in prev.items() if k in keep or k.startswith("n_")})
+        conds = {"noctx": "trained", "ctx": "trained_ctx"}
     elif not phases:
         tok, model = load()
-        r = evaluate(model, tok)
+        r, recs = evaluate(model, tok)
         results["base"], results["base_ctx"] = r["noctx"], r["ctx"]
+        conds = {"noctx": "base", "ctx": "base_ctx"}
     else:
         tok, model = load()
         model, stats = train(model, tok, phases, run)
         model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}", flush=True)
-        r = evaluate(model, tok)
+        r, recs = evaluate(model, tok)
         results["trained"] = {**r["noctx"], **stats}; results["trained_ctx"] = r["ctx"]
-    save(); run.artifact(OUT)
+        conds = {"noctx": "trained", "ctx": "trained_ctx"}
+    save(recs, conds)
 
 print(f"\n=== {tag} arm {ARM} ===")
 for cond, mets in results.items():

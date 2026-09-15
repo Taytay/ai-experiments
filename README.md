@@ -32,12 +32,14 @@ bootstrap.sh     fresh machine: install uv and just if missing, then `just setup
 bootstrap.ps1    `just doctor` (WSL/Ubuntu and Windows respectively)
 src/ai_experiments/
                  the library, installed editable: universe.py, merchants.py (data generators),
-                 icl_suite.py, paths.py (repo locations), evals/ (run tracker + CLI)
-scripts/         entry points: exp_*.py experiments, bench_throughput.py, table generators,
-                 doctor.py, and the original driver-check scripts (check_gpu.py, finetune_embed.py)
+                 icl_suite.py, items.py (frozen eval sets), scoring.py (per-item option scores),
+                 paths.py (repo locations), evals/ (run tracker + CLI)
+scripts/         entry points: exp_*.py experiments, rescore.py (score any adapter on the frozen
+                 sets), bench_throughput.py, table generators, doctor.py, and the original
+                 driver-check scripts (check_gpu.py, finetune_embed.py)
 data/            no raw data; processed/ holds frozen item sets (see data/README.md)
 evals/           tracker data: runs.jsonl (the record of truth) and LEADERBOARD.md
-results/         raw JSON and logs from every run
+results/         raw JSON and logs from every run; per_item/ has every option's log-prob per item
 models/          LoRA adapters and fine-tuned weights, versioned with DVC (see models/README.md)
 reports/         REPORT.md, improvements.html, QUESTIONS.md
 references/      papers/ (text, metadata, summaries; PDFs not tracked), SURVEY.md,
