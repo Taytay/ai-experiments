@@ -23,6 +23,9 @@ Per-item generations go to results/per_item/gen_<stem>.<condition>.jsonl so scri
 compute agreement with the cloze rules from results/per_item/<stem>.<condition>.jsonl without a
 model. Summary: results/gen_<stem>.json; tracker experiment "gen_eval". SMOKE=1 subsamples, writes
 *_smoke files and records nothing.
+
+Adapters are merged into the base weights before decoding (REPORT.md 9.3: merging flips 1.8% of
+cloze predictions, inside the same-weights noise floor, and runs at base-model speed).
 """
 import argparse
 import difflib
@@ -191,7 +194,10 @@ def run_condition(model, tok, ctx: bool) -> tuple[list[dict], dict]:
 # ------------------------------------------------------------------ main
 with Run("gen_eval", model=model_id, config=dict(cfg, items_sha=items_sha), note=a.note, enabled=not SMOKE) as run:
     model, tok = FastLanguageModel.from_pretrained(load_from, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+    if hasattr(model, "merge_and_unload"):
+        model = model.merge_and_unload()
     FastLanguageModel.for_inference(model)
+    cfg["merged"] = hasattr(model, "peft_config") is False
     tok.padding_side = "left"
     results = {}
     for cond, ctx in zip(conds, (False, True)):
