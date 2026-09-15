@@ -852,3 +852,92 @@ The three levels where arm C beat every other arm in section 8 came down: Timmy 
 General-text replay at 5% of sequences (27% of the loss) buys back the whole general-text perplexity cost and about all of the ARC-Easy loss of arm C, at no cost to recall or to the ICL suite, and at a measured cost to induction that is confounded with the episode share it displaced. The two forgetting proxies of section 15 now disagree in a useful way: perplexity says nothing was forgotten (0.09 nats), ARC-Easy says 2.5 points that the interval cannot see. For the merchant use case, where the model's existing knowledge is the product, the replay fraction belongs in the recipe; for the induction result it should come out of the knowledge stream, not the episodes, and that is step 9's job.
 
 **What the report should say.** Replaying 5% pretraining-style text (a quarter of the loss) beside arm C's mixture keeps the WikiText perplexity at the base model's (+0.09 nats against C's +0.84) and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), from the first checkpoint on, with recall at 100 and the ICL suite at its best (81.2). Induction from the weights fell by 10 to 21 points on three levels, which is either the episode share it displaced (12% to 7.5% of the loss) or competition for the adapter; one more run with the 5% taken from the knowledge stream decides.
+
+## 19. Iteration time: evaluation 3x faster, training 2 to 2.5x faster, same numbers (TRAIN-6)
+
+Date: 2026-09-15. Code: `ai_experiments.scoring.Scorer` (cross-item batching), `scripts/exp_curriculum.py` (`MICRO`, `ACCUM`, `GRAD_CKPT`, `PACK`, `EXTRAS`, `BENCH`, `RUN_TAG`), `scripts/compare_records.py`; data `results/rescore_C_p200_batched.json` and per-item files, `results/curriculum_Qwen2.5-3B_C_fast_p200.json`; tracker experiments `rescore` and `curriculum_v2`; PLAN.md step 26.
+
+By mid-afternoon on 2026-09-15 a training run of the section 8 recipe cost about 50 minutes on this card: 17 (arm A) to 30 (arm C) minutes of training, four periodic points at 1.6 minutes each, and a 26-minute final evaluation, during which the GPU sat at 26% utilisation. The owner asked for iteration time before more experiments. Two things were slow for the same reason: small work units. The scorer ran one item per forward pass (its 2 to 8 options as the batch, prompts of 11 to 66 tokens on the ladder), and the trainer ran two micro-batches of 8 padded rows per step, with knowledge texts of 24 tokens and activation checkpointing on. Both are launch-bound at this size.
+
+### 19.1 Evaluation: every option row of every item goes through one forward
+
+`Scorer.score` now collects the (prompt, option) rows of all items in a call, sorts them by length, and runs them in forwards of up to 64 rows or 32,768 tokens; only the option positions go through the LM head (unsloth returns the final hidden states in place of logits when asked, so a 64-row batch never materialises 64 x L x 152k logits). The optional extras of section 10 (PMI premise, unconditional, letter and hybrid scores) are batched the same way and are now off by default in training runs (`EXTRAS=1` restores them; `rescore.py` keeps them on).
+
+**Table 19.1: the same adapter (arm C, section 15 rerun) scored by the old and the new scorer (extras on in both)**
+
+| | old scorer (section 15) | batched scorer |
+|---|---|---|
+| ladder, 1,744 items | 9.7 min | 2.6 min |
+| probes, 192 | 1.5 | 0.6 |
+| ICL suite, 384 | 3.0 | 1.1 |
+| ladder with context, 1,744 | 9.9 | 4.8 |
+| whole evaluation | 26.5 min | 9.1 min |
+| predictions flipped, no context (2,320 items) | | 1.9% |
+| predictions flipped, with context (1,744) | | 1.1% |
+| largest level move (mean rule) | | 2.5 points (k=4 induction, 4 items) |
+| largest per-option log-prob change | | 1.9 nats (a listed-choices row); 0.2 to 0.6 on most levels |
+
+The flip rate is the section 9.3 merged-versus-unmerged rate (1.8%) and the level moves are inside the section 9.2 same-weights floor (2.6 points on 160 items): batch shape changes bf16 log-probs by about 0.03 nats per token on average (section 18 measured the same in plain transformers), and nothing else changed. With the extras off the evaluation is about 5 minutes.
+
+### 19.2 Training: one micro-batch, no recomputation, packed rows
+
+Three switches, all keeping 16 sequences per optimizer step, the same streams, the same seed:
+
+- `MICRO=16 ACCUM=1`: one forward and backward per step instead of two. The loss is then the mean over all 16 sequences' label tokens rather than the average of two 8-sequence means, a change in weighting only when the two halves differ in token count.
+- `GRAD_CKPT=0`: no activation recomputation. It fits in a 60-step bench once rows are packed (a 16-row padded batch of arm C does not), and it is not the default: a full arm C run on it died of memory at step 600, once the periodic evaluations had fragmented the allocator (first as an out-of-memory in the first backward after the step-0 point, then, with expandable allocator segments and a smaller mid-training scorer budget, as a cuBLAS execution failure at step 600). Unsloth's offloaded checkpointing stays on.
+- `PACK=2048`: each micro-batch's sequences are concatenated into rows of at most 2,048 tokens with per-sequence position ids and unsloth's `packed_seq_lengths`, which selects the block-diagonal xformers kernel (no flash-attention on this card). Each row is forwarded and backed separately so memory is bounded by one row; the first token of every packed sequence carries no label, so the shifted loss never crosses a boundary. A probe with a train-mode LoRA model checked the mechanism: packed rows reproduce single-sequence log-probs to the same bf16 noise as padded batches (mean 0.025 nats per token), packing order changes nothing, and replacing one sequence moves its neighbours' log-probs by exactly zero.
+
+**Table 19.2: training throughput over 60 steps (tokens per second, peak allocated GiB), 16 sequences per step**
+
+| configuration | arm A (knowledge, 24-token texts) | arm C (mixed, 24 to 587 tokens) |
+|---|---|---|
+| before: 8 x 2, checkpointing, padded | 496 (8.1) | 858 (8.7) |
+| 16 x 1, checkpointing, padded | 960 (8.1) | 766 (8.9) |
+| 16 x 1, no checkpointing, padded | 1,334 (9.6) | out of memory |
+| 16 x 1, no checkpointing, packed 768 | 1,251 (9.6) | 1,859 (19.1) |
+| 16 x 1, no checkpointing, packed 2,048 | 1,271 (9.6) | 2,827 (17.9), fails in a full run |
+| 16 x 1, no checkpointing, packed 4,096 | 1,349 (9.6) | 2,407 (22.6) |
+| **16 x 1, checkpointing, packed 2,048 (new default)** | **1,017 (8.2)** | **2,133 (11.4)** |
+| 32 x 1, no checkpointing, padded (32 sequences per step: a different recipe) | 2,174 (11.9) | out of memory |
+
+Arm A gains 2x on the default (2.7x without checkpointing) and nothing from packing: sixteen 24-token texts are 400 tokens, and at that size a step is the fixed cost of launching a 36-layer forward and backward, about 0.3 seconds, whatever the layout; only more sequences per step would go faster (the 32-row line), which is a different recipe. Arm C gains 2.5x (3.3x without checkpointing), most of it from packing, because its padded batches were mostly padding: a micro-batch mixing 24-token texts with 200- to 600-token replay episodes pads every row to the longest. The loss-weighted M arms of step 9 run through the same path (2,239 tokens per second without checkpointing). A 4,096-token cap is slower than 2,048 and 3 GiB from the card's limit; 2,048 is the default, with 11 GiB of headroom under checkpointing.
+
+### 19.3 The recipe's numbers do not move
+
+Arm C was retrained on the new defaults with the section 8 seed (`RUN_TAG=fast`, four periodic points): 11.2 minutes of training at 1,863 tokens per second and 11.3 GiB, a 2.7-minute final evaluation, 15 minutes end to end where the section 15 rerun took 63. The recipe has two earlier seed-0 runs to compare with, the section 8 run and the section 15 rerun, and those two already disagree on 17.9% of their predictions (same seed, same code, same machine: bf16 non-determinism compounding over 800 steps); the fast run disagrees with the section 15 rerun on 19.8%. Level by level:
+
+**Table 19.3: arm C, seed 0, three runs (accuracy %; the first two on the old path)**
+
+| level | section 8 run | section 15 rerun | fast path |
+|---|---|---|---|
+| recall, trained format | 100 | 100 | 100 |
+| recall, bare format | 20.6 | 19.4 | 15.0 |
+| yes/no | 86.2 | 77.5 | 87.5 |
+| pair | 73.8 | 80.0 | 73.8 |
+| Timmy k=3 | 58.8 | 61.2 | 56.9 |
+| k=4 | 51.2 | 53.8 | 43.8 |
+| weakness | 52.5 | 60.0 | 52.5 |
+| habitat | 34.4 | 29.4 | 31.2 |
+| held-out species | 30.2 | 29.2 | 28.1 |
+| ICL suite symbol | 79.2 | 78.1 | 79.7 |
+| ICL suite natural | 88.0 | 87.5 | 89.1 |
+| ARC-Easy | . | 59.0 | 64.0 |
+| WikiText ppl | 23.18 | 22.80 | 22.09 |
+| training minutes | 24.6 | 50.3 | 11.2 |
+| evaluation minutes | 24.7 | 26.5 | 2.7 |
+
+Every fast-path value lies between the two old-path values or within one half-width of them (the k=4 induction level, 43.8 against 51.2 and 53.8, is 1.3 half-widths below the lower one on 160 items). The general-text cost is 0.05 nats under the old runs' 0.84 and 0.86. Nothing here distinguishes the new path from a third run of the old one, which is the standard section 9.2 set for a code change: the recipe is the same, the samples are the same, only the arithmetic differs by bf16 batch shape.
+
+### 19.4 What a run costs now
+
+| | before | after |
+|---|---|---|
+| arm A, 800 steps | 17 min | about 7 |
+| arm C, 800 steps | 30 min | about 12 |
+| periodic point (subsample) | 1.6 min | about 0.7 |
+| final evaluation | 26 min | 5 (9 with the section 10 extras) |
+| one arm C run with four periodic points | 63 min | about 20 |
+
+The remaining evaluation time is the with-context ladder (1,744 items whose prompts carry field-guide entries) and the ICL suite (prompts up to 650 tokens); both are now compute-bound at 64 rows per forward. The remaining training time for short-text arms is launch overhead per step, which only a larger batch or fewer steps would remove, and section 15 says the runs are already 200 steps too long for recall. Everything queued behind this section (steps 8, 9, 10) runs on the new defaults; runs before it are marked in the tracker by `micro=8, accum=2, grad_ckpt=unsloth, pack=0`.
+
+**What the report should say.** Batching option rows across items cuts the evaluation from 26 to 9 minutes (5 without the scorer-study extras) with 1.9% of predictions flipping, the same-weights noise floor of section 9. One 16-sequence micro-batch packed into 2,048-token block-diagonal rows trains arm A 2x and arm C 2.5x faster at identical sequences per step (3.3x without activation checkpointing, which fits a bench and not a full run); the block-diagonal attention was verified directly. An arm C run with periodic points goes from about an hour to about twenty minutes.
