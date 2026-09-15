@@ -119,7 +119,8 @@ def encode(tok, sample):
         if not guide:
             return dict(ids=ids, labels=list(ids), t_ids=None, t_span=None)
         ctx = tok(guide + "\n\n", add_special_tokens=False)["input_ids"]
-        return dict(ids=ids, labels=list(ids), t_ids=ctx + ids, t_span=(len(ctx), len(ctx) + len(ids)))
+        # the first text token has no prediction position, so the KL span starts one token in
+        return dict(ids=ids, labels=list(ids), t_ids=ctx + ids, t_span=(len(ctx) + 1, len(ctx) + len(ids)))
     ans = tok(sample["answer"], add_special_tokens=False)["input_ids"] + eos
     p = tok(sample["prompt"], add_special_tokens=False)["input_ids"][-(MAXLEN - len(ans)):]
     ids, labels = p + ans, [-100] * len(p) + ans
