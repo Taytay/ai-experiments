@@ -81,7 +81,10 @@ ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
 STEPS = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 LR = float(sys.argv[4]) if len(sys.argv) > 4 else 1e-4
-MICRO, ACCUM, MAXLEN = 8, 2, 768
+MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "8")), int(os.environ.get("ACCUM", "2")), 768  # MICRO x ACCUM = 16 sequences per step
+GRAD_CKPT = os.environ.get("GRAD_CKPT", "unsloth")  # "unsloth" (default), "1" or "0"; 0 skips activation recomputation
+GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
+BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 SEED = int(os.environ.get("SEED", "0"))  # training seed: LoRA init, stream order, mixture draws (PLAN step 10, STAT-1)
 BS = MICRO * ACCUM
 MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
@@ -126,6 +129,8 @@ if SMOKE:
     ladder, probes, suite = ladder[::40], probes[::12], suite[::48]
     OUT = OUT.with_name(OUT.stem + "_smoke.json")
     ADAPTER = ROOT / "models" / "smoke" / ADAPTER.name
+if BENCH:
+    STEPS = BENCH
 PERIODIC = int(os.environ.get("PERIODIC", "0"))  # mid-training evaluation every N steps; 0 = off
 known = FROZEN.known
 if PERIODIC:
@@ -257,9 +262,9 @@ def train(model, tok, phases, run):
     model = FastLanguageModel.get_peft_model(
         model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none",
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-        use_gradient_checkpointing="unsloth", random_state=SEED)
+        use_gradient_checkpointing=GRAD_CKPT, random_state=SEED)
     params = [p for p in model.parameters() if p.requires_grad]
-    print(f"   LoRA trainable: {sum(p.numel() for p in params) / 1e6:.0f}M params", flush=True)
+    print(f"   LoRA trainable: {sum(p.numel() for p in params) / 1e6:.0f}M params | micro {MICRO} x accum {ACCUM} | grad ckpt {GRAD_CKPT}", flush=True)
     rng = random.Random(SEED)
     streams = {"K": Stream(K_texts, rng)}
     need = {k for ph in phases for k in ph}
@@ -335,11 +340,11 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
-with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
+with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH)) as run:
     def save(recs, conds):
         """results JSON + tracker metrics, and one per-item JSONL per condition (conds maps noctx/ctx -> name)."""
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
@@ -368,6 +373,11 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         r, recs = evaluate(model, tok)
         results["base"], results["base_ctx"] = r["noctx"], r["ctx"]
         conds = {"noctx": "base", "ctx": "base_ctx"}
+    elif BENCH:
+        tok, model = load()
+        model, stats, periodic = train(model, tok, phases, run)
+        print(f"BENCH arm {ARM}: {stats}")
+        sys.exit(0)
     else:
         tok, model = load()
         model, stats, periodic = train(model, tok, phases, run)
