@@ -120,6 +120,19 @@ def replay_episodes(n=4000, seed=11, natural_frac=0.2, data=None):
     return out
 
 
+def general_replay_texts(n=4000, seed=19, words=70):
+    """Pretraining-style replay (PLAN step 25, TRAIN-7): WikiText-2 *train* body paragraphs, detokenised
+    like the frozen perplexity slice (which is from the test split, so the two never overlap), shuffled
+    with a seed, each cut to its first `words` words (about 96 Qwen tokens, four knowledge texts' worth).
+    Trained with the full-sequence LM loss, like the knowledge stream."""
+    from datasets import load_dataset
+    from .items import CORPUS_MIN_WORDS, _detokenize_wikitext
+    d = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="train")
+    paras = [x["text"] for x in d if not x["text"].lstrip().startswith("=") and len(x["text"].split()) >= CORPUS_MIN_WORDS]
+    random.Random(seed).shuffle(paras)
+    return [" ".join(_detokenize_wikitext(p).split()[:words]) for p in paras[:n]]
+
+
 def suite_items(n_per=48, seed=13, refresh=False):
     if CACHE.exists() and not refresh:
         return json.loads(CACHE.read_text())

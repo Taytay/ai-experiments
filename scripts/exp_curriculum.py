@@ -13,11 +13,15 @@ Cn      knowledge .50 + episodes .50 (no replay)               plain
 D       phase 1: knowledge .85 + replay .15;                   plain
         phase 2: episodes .85 + replay .15   (sequential)
 E       same as C                                              morphology
+Cg      knowledge .45 + episodes .35 + replay .15 + general .05  plain   (PLAN step 25, TRAIN-7)
 
 Streams: knowledge = universe.training_texts (full-sequence LM loss); episodes = universe.episodes
 (loss on the answer only; random labels, varied templates, weakness attribute held out, half with
 field-guide context); replay = icl_suite.replay_episodes (AG News/Emotion/TREC/20NG, random or
-natural labels, answer-only loss).
+natural labels, answer-only loss); general = icl_suite.general_replay_texts (WikiText-2 train paragraphs
+cut to 70 words, full-sequence loss: pretraining-style replay, 5% of sequences but about a quarter of
+the loss-bearing tokens, since knowledge texts are 24 tokens long). Per-stream sequence, token and
+loss-bearing-token counts are recorded (n_K, tok_K, lb_K, ...).
 
 Eval (all arms, same items): the 7-level ladder without and with context, held-out-species
 induction, morphology probes (marked vs plain never-seen names), the ICL regression suite
@@ -67,6 +71,7 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "Cn": [dict(K=0.5, E=0.5)],
     "D": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],
     "E": [dict(K=0.45, E=0.40, R=0.15)],
+    "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
 }
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
@@ -183,10 +188,13 @@ def train(model, tok, phases, run):
         streams["E"] = Stream(U.episodes(species, n=6000, seed=3), rng)
     if "R" in need:
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
+    if "G" in need:
+        streams["G"] = Stream(S.general_replay_texts(n=4000, seed=19), rng)
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
     counts, tokens, t0 = defaultdict(int), 0, time.time()
+    tok_by, lb_by = defaultdict(int), defaultdict(int)  # per-stream tokens seen and loss-bearing tokens
     torch.cuda.empty_cache(); torch.cuda.reset_peak_memory_stats()
     model.train()
     periodic = {}
@@ -202,6 +210,7 @@ def train(model, tok, phases, run):
             for _ in range(MICRO):
                 src = rng.choices(srcs, ws)[0]; counts[src] += 1
                 batch.append(encode(tok, streams[src].next()))
+                tok_by[src] += len(batch[-1][0]); lb_by[src] += sum(l != -100 for l in batch[-1][1][1:])
             L = max(len(i) for i, _ in batch)
             ids = torch.tensor([i + [pad] * (L - len(i)) for i, _ in batch], device="cuda")
             lab = torch.tensor([l + [-100] * (L - len(l)) for _, l in batch], device="cuda")
@@ -222,7 +231,8 @@ def train(model, tok, phases, run):
     el = time.time() - t0
     return model, dict(train_minutes=round(el / 60, 1), train_tokens=tokens, tokens_per_s=round(tokens / el),
                        peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2**30, 2),
-                       **{f"n_{k}": v for k, v in counts.items()}), periodic
+                       **{f"n_{k}": v for k, v in counts.items()}, **{f"tok_{k}": v for k, v in tok_by.items()},
+                       **{f"lb_{k}": v for k, v in lb_by.items()}), periodic
 
 
 # ------------------------------------------------------------------ main
