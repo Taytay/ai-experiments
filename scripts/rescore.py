@@ -1,12 +1,17 @@
 """Score any saved adapter (or a bare model) on the frozen item sets and keep the per-item scores.
 
-usage: uv run python scripts/rescore.py MODEL_OR_ADAPTER [--tag TAG] [--morph] [--note TEXT]
+usage: uv run python scripts/rescore.py MODEL_OR_ADAPTER [--tag TAG] [--morph] [--merge] [--note TEXT]
 
   MODEL_OR_ADAPTER  a hub id (Qwen/Qwen2.5-3B) or an adapter folder (models/adapters/<name>);
                     an adapter folder loads its base model from adapter_config.json
   --tag             name of the output files (default: adapter folder name without "_lora",
                     or the model id after "/")
   --morph           score the morphology universe's item sets (arms E / base_m) instead of the plain ones
+  --merge           fold the LoRA into the base weights (merge_and_unload) before scoring; tag gets "_merged".
+                    Halves eval time; REPORT.md section 9 measures what it does to the predictions.
+
+Adapters saved by plain peft (the section 6 non-unsloth runs) make unsloth's loader raise
+"Your model needs to call `.get_peft_model` first!"; those fall back to transformers + peft.
 
 Curriculum arms re-score themselves with `EVAL_ONLY=1 scripts/exp_curriculum.py ARM`; this script
 covers everything else, e.g. the adapters from scripts/exp_universe_ladder.py, which predate the
@@ -42,6 +47,7 @@ ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDe
 ap.add_argument("target")
 ap.add_argument("--tag")
 ap.add_argument("--morph", action="store_true")
+ap.add_argument("--merge", action="store_true")
 ap.add_argument("--note")
 a = ap.parse_args()
 
@@ -50,6 +56,10 @@ is_adapter = target.is_dir() and (target / "adapter_config.json").exists()
 if target.exists() and not is_adapter:
     raise SystemExit(f"{target} exists but has no adapter_config.json; pass a LoRA adapter folder or a hub model id")
 tag = a.tag or (target.name.removesuffix("_lora") if is_adapter else a.target.split("/")[-1])
+if a.merge:
+    if not is_adapter:
+        raise SystemExit("--merge needs an adapter folder")
+    tag += "_merged"
 SMOKE = bool(os.environ.get("SMOKE"))
 OUT = ROOT / "results" / f"rescore_{tag}{'_smoke' if SMOKE else ''}.json"
 cond = "trained" if is_adapter else "base"
@@ -63,10 +73,30 @@ print(f"rescore {a.target} -> {OUT.name} | base {base} | items {FROZEN.version} 
       f"{len(ladder)} ladder | {len(probes)} probes | {len(suite)} ICL suite", flush=True)
 
 cfg = dict(target=str(target.relative_to(ROOT)) if is_adapter and target.is_absolute() else a.target, base_model=base,
-           tag=tag, is_adapter=is_adapter, maxlen=MAXLEN, **FROZEN.config())
+           tag=tag, is_adapter=is_adapter, merged=a.merge, maxlen=MAXLEN, **FROZEN.config())
+
+
+def load_model():
+    """unsloth first (what every curriculum run used); plain transformers + peft for adapters unsloth refuses."""
+    src = str(target) if is_adapter else a.target
+    try:
+        model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+        loader = "unsloth"
+    except TypeError as e:
+        if "get_peft_model" not in str(e) or not is_adapter:
+            raise
+        from peft import PeftModel
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(base)
+        model = PeftModel.from_pretrained(AutoModelForCausalLM.from_pretrained(base, dtype=torch.bfloat16), src).cuda()
+        loader = "transformers+peft"
+    if a.merge:
+        model = model.merge_and_unload()
+    print(f"    loaded with {loader}{' and merged' if a.merge else ''}", flush=True)
+    return model, tok
 with Run("rescore", model=base, config=cfg, note=a.note, enabled=not SMOKE) as run:
-    model, tok = FastLanguageModel.from_pretrained(str(target) if is_adapter else a.target, max_seq_length=MAXLEN,
-                                                   dtype=torch.bfloat16, load_in_4bit=False)
+    model, tok = load_model()
+    run.set_config(loader="see log")
     tok.padding_side = "right"
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
     sc = Scorer(model, tok, maxlen=MAXLEN)
