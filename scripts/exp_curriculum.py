@@ -85,6 +85,9 @@ MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "8")), int(os.environ.get("AC
 GRAD_CKPT = os.environ.get("GRAD_CKPT", "unsloth")  # "unsloth" (default), "1" or "0"; 0 skips activation recomputation
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
+EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
+PACK = int(os.environ.get("PACK", "0"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
+# block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). 0 = one sequence per row (padded).
 SEED = int(os.environ.get("SEED", "0"))  # training seed: LoRA init, stream order, mixture draws (PLAN step 10, STAT-1)
 BS = MICRO * ACCUM
 MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
@@ -159,7 +162,7 @@ def evaluate(model, tok):
     """Returns ({"noctx": metrics, "ctx": metrics}, {"noctx": records, "ctx": records}).
     Probes, ICL suite and perplexity live under noctx; records are per item (ai_experiments.scoring)."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    sc = Scorer(model, tok, maxlen=MAXLEN)
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS)
     recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
     if known:
@@ -258,6 +261,20 @@ def encode(tok, sample):
     return p + a, [-100] * len(p) + a
 
 
+def pack_rows(batch, cap):
+    """Pack (ids, labels) sequences into rows of at most `cap` tokens, first fit in order. Returns per row
+    (ids, labels, position_ids, lengths); the first token of every packed sequence gets label -100 so the
+    shifted loss never predicts across a boundary."""
+    rows = []
+    for ids, lab in batch:
+        lab = [-100] + list(lab[1:])
+        if rows and rows[-1][0] and len(rows[-1][0]) + len(ids) <= cap:
+            r = rows[-1]; r[0].extend(ids); r[1].extend(lab); r[2].extend(range(len(ids))); r[3].append(len(ids))
+        else:
+            rows.append([list(ids), lab, list(range(len(ids))), [len(ids)]])
+    return rows
+
+
 def train(model, tok, phases, run):
     model = FastLanguageModel.get_peft_model(
         model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none",
@@ -301,6 +318,20 @@ def train(model, tok, phases, run):
                 src = rng.choices(srcs, ws)[0]; counts[src] += 1; batch_src.append(src)
                 batch.append(encode(tok, streams[src].next()))
                 tok_by[src] += len(batch[-1][0]); lb_by[src] += sum(l != -100 for l in batch[-1][1][1:])
+            if PACK:
+                # padding-free: every row is a concatenation of whole sequences, attention is block-diagonal
+                loss = torch.zeros((), device="cuda")
+                n_lab = sum(sum(l != -100 for l in lb[1:]) for _, lb in batch)
+                for r_ids, r_lab, r_pos, r_len in pack_rows(batch, PACK):
+                    ids = torch.tensor([r_ids], device="cuda"); lab = torch.tensor([r_lab], device="cuda")
+                    pos = torch.tensor([r_pos], device="cuda"); lens = torch.tensor(r_len, device="cuda", dtype=torch.int32)
+                    tokens += len(r_ids)
+                    logits = model(input_ids=ids, position_ids=pos, packed_seq_lengths=lens).logits
+                    tl = torch.nn.functional.cross_entropy(logits[0, :-1].float(), lab[0, 1:], ignore_index=-100, reduction="sum")
+                    loss = loss + tl / max(n_lab, 1)  # mean over the micro-batch's label tokens, as the padded path
+                loss = loss / ACCUM
+                loss.backward(); loss_acc += loss.item()
+                continue
             L = max(len(i) for i, _ in batch)
             ids = torch.tensor([i + [pad] * (L - len(i)) for i, _ in batch], device="cuda")
             lab = torch.tensor([l + [-100] * (L - len(l)) for _, l in batch], device="cuda")
@@ -340,7 +371,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
