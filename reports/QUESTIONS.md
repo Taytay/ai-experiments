@@ -96,6 +96,8 @@ cloze, and hybrid (options listed, answer text scored). Add a free-generation ch
 merchant tasks with exact-match or judge scoring. Prefer items whose options are matched in token
 length. See EVAL-2 and EVAL-3.
 
+**Status (2026-09-14):** PLAN step 2, REPORT.md section 10. Eight rules on the saved logits; `hybrid` (options listed, text scored) is the second line to report for induction and novel-label levels, `pmi_dc` for bare-format recall only; letter scoring (`mcf`) reverses the A-versus-C ordering on induction and collapses the ICL suite for every trained arm.
+
 ### LIT-1 (O) Was the literature searched for the best ways to inject and extract new knowledge and terminology?
 
 **Answer.** Partly. `REPORT.md` sections 3 and 4 ground the design in: Allen-Zhu & Li
@@ -201,6 +203,7 @@ most `bank_category` cells are exactly 8.3% = 10/120, which is what always-pick-
 scores. Per-item predictions are never saved (`exp_curriculum.py:123-137`), so nobody can check.
 *Experiment:* save per-item argmax; print the predicted-label histogram per condition; add summed
 log-prob and PMI-calibrated scorers on the same logits; report all three in one table.
+**Status (2026-09-14):** PLAN step 2, REPORT.md section 10. Per-item argmax saved (section 9); histograms show the base model's yes/no rows are a constant No, arm B's a constant Yes, and every arm's unseen-species and probe rows a constant Tidewell; the below-chance L5 score was a length artifact (8.1 under mean, 33.8 under hybrid). Summed, PMI and Bayesian scorers are in one table (`reports/scorers_Qwen2.5-3B.md`).
 
 **EVAL-3 (R) What does the model actually generate?**
 Bare-format recall is 20 to 24% while trained-format recall is 100% on the same facts. The argmax
@@ -232,6 +235,7 @@ noise floor on 96 items is ±10 points or the items carry an artifact. The same 
 "31 to 47" morphology claim in section 8.4.
 *Experiment:* empirical null per level by shuffling the answer index 1,000 times over saved
 per-option scores; print the 95% null band next to chance in every table.
+**Status (2026-09-14):** PLAN step 2, REPORT.md section 10: no question-free artifact on held-out induction (`unc` at chance); the predictions concentrate on one or two positions, see the null band in step 4.
 
 **EVAL-7 (R) Are `sells` and `reverse` merchant-level or category-level tests?**
 Distractors come from other categories (`merchants.py:136,147,157`), so "Which store sells canned

@@ -524,3 +524,36 @@ The three section 6 adapters were trained on the plain universe with knowledge t
 | 3B, unsloth LoRA (6.4 replicate) | 100 | 93.8 | 78.8 | 36.9 | 37.5 | 38.1 | 28.1 | 12.5 | 27.1 | 50.5 | 80.8 | 17.11 | 100 | 98.8 | 91.2 | 41.9 | 38.8 | 38.8 | 33.8 | 12.5 | 32.3 |
 
 The 3B adapters land within the section 9.2 floor of their section 6.4 rows on the shared levels, and the 0.5B adapter stays where 6.4 left it: recall in the trained format, chance on everything that needs the fact to be used. The ICL suite columns are new and put the knowledge-only recipe at the base model's level or below, like arm A in 8.2.
+
+## 10. Scoring rules: what moves when the same logits are read differently (EVAL-1, EVAL-2, EVAL-6)
+
+Date: 2026-09-14. Code: `src/ai_experiments/scorers.py`, `scripts/scorer_table.py`; full tables in `reports/scorers_Qwen2.5-3B.md`, data in `results/scorers_Qwen2.5-3B.json`; PLAN.md step 2. No model was loaded: everything is recomputed from the per-item records of section 9.
+
+Every number in sections 6 and 8 is the `mean` rule: mean per-token log-prob of each option after the prompt, argmax. The survey (EVAL-1/2/3) said this rule over-corrects toward long options and that two corrections and a different elicitation should be reported beside it. Eight rules were applied to the same records: `mean`; `sum` (raw log-prob); `bytes` (per-byte); `pmi_dc` (log-prob minus the option's log-prob after the bare cue line `Answer:` or `Label:`); `bayes` (sum minus a length slope fitted within item per level); `hybrid` (options listed in the prompt, option text scored); `mcf` (options listed, the letter scored); and `unc`, a diagnostic, the cue-only score with the question never shown.
+
+**Table 10.1: arm C and arm A without context under each rule (accuracy %). Bold marks moves beyond the level's 95% half-width.**
+
+| level | chance | C mean | C pmi_dc | C bayes | C hybrid | C mcf | A mean | A pmi_dc | A hybrid | A mcf |
+|---|---|---|---|---|---|---|---|---|---|---|
+| L1 recall, bare format | 13.8 | 20.6 | 16.2 | 21.2 | 16.9 | **26.2** | 25.0 | **43.8** | **15.0** | **46.2** |
+| L1 recall, trained format | 12.5 | 100 | **75.0** | 100 | **55.6** | **39.4** | 100 | **42.5** | 93.8 | 95.6 |
+| L2 yes/no | 50 | 86.2 | **55.0** | 86.2 | 83.8 | **67.5** | 96.2 | 98.8 | 96.2 | 97.5 |
+| L3 Timmy k=3 | 33.3 | 58.8 | **40.6** | 60.0 | 64.4 | **45.0** | 40.0 | 40.0 | 41.9 | **62.5** |
+| L3 Timmy k=4 | 25 | 50.6 | **30.0** | 48.8 | 55.6 | **36.9** | 34.4 | 40.0 | 39.4 | **66.2** |
+| L4 weakness | 33.3 | 51.9 | **37.5** | 51.9 | **63.1** | 46.9 | 45.0 | 40.6 | 48.8 | **71.2** |
+| L5 novel choices | 12.5 | 8.1 | **14.4** | 11.9 | **33.8** | **23.1** | 12.5 | **23.8** | **23.1** | **43.1** |
+| L3 held-out species | 33.3 | 30.2 | 31.2 | 28.1 | **39.6** | **40.6** | 24.0 | 32.3 | 32.3 | **33.3** |
+| ICL suite, symbol labels | 43.3 | 79.7 | **45.9** | 77.6 | 77.1 | **46.9** | 51.6 | 47.4 | 51.5 | 46.9 |
+| ICL suite, natural labels | 43.3 | 88.0 | **62.5** | 88.0 | 86.5 | **40.7** | 80.8 | **63.0** | 85.4 | 76.6 |
+
+272 arm x condition x level cells move beyond their half-width across the nine scored models (`reports/scorers_Qwen2.5-3B.md`, "Cells that move"). Five things follow.
+
+1. **PMI is the wrong correction for invented labels.** `pmi_dc` is the lowest rule in 100 of the 272 moving cells. It subtracts each option's prior after `Answer:`; for fresh pseudo-word labels that prior is the whole signal a cloze model has, so the ICL suite with symbol labels falls from 79.7 to 45.9 (chance 43.3) for arm C, and the Timmy task from 58.8 to 40.6. It helps exactly where the survey said it would, on fixed vocabularies with unequal priors: arm A's bare-format recall goes from 25.0 to 43.8 and its novel-choice score from 12.5 to 23.8. Report PMI for the recall levels, never for the induction levels.
+2. **The trained-format recall is answerable without the question, by design.** `unc` scores 100 on `L1_recall_fmt` for every trained arm: the option "Blaxorc is a Voltrix-type." names the entity, so the cue-only pass is itself a recall test. That is why `pmi_dc` and `hybrid` drop that level (75.0, 55.6): they subtract or dilute the very knowledge being measured. It is not an artifact, but the level should be read as "completes the entity's sentence", which is what section 6 called format-matched recall. The other question-free scores above chance are small: base `L1_recall` 20.6 (a prior over the eight type names), A on weakness 41.2, Cn on real-name labels 41.2.
+3. **The below-chance novel-choice score was a length artifact.** Under `mean`, arm C scores 8.1 on L5 (chance 12.5) and the predicted-option histogram shows three of the eight synonym slots taking 145 of 160 predictions. Under `hybrid`, where the listed options fix the target at its first tokens, C scores 33.8 and A 23.1 against base 13.8. The injected knowledge does reach never-trained synonyms of the type names; section 6.2's "novel choices fail" was the scorer.
+4. **Elicitation changes the ranking of arms on induction.** With the choices listed as lettered lines (`mcf`), knowledge-only arm A does the Timmy task at 62.5 (k=3), 66.2 (k=4) and the weakness variant at 71.2, above every cloze number in Table 8.1, while arm C falls to 45.0. Arm A knows the types and can read a label list; arm C was trained on cloze-shaped episodes and answers the cloze. "Interleaving is needed for induction from the weights" (8.3 point 2) is a statement about cloze elicitation. Under `hybrid`, which lists the options but scores their text, the section 8 ordering returns (C 64.4, A 41.9) and C gains 5 to 11 points over `mean` on every induction level. Letter scoring also destroys the ICL suite for every trained arm (C natural labels 40.7 against 88.0), while the base model keeps 87.5: the episodes taught the cloze format at the expense of the letter format.
+5. **Several "chance" rows are constant predictors.** The base model answers "No" to 98% of yes/no items and 99% of pairwise items; arm B answers "Yes" to 99% and 100%, so its 56.2 on yes/no in Table 8.1 is the share of Yes items, not a gain. Every arm assigns the same type (option 2, Tidewell) to 85 to 100% of unseen-species and probe items, so the 12.5 on those levels is a constant predictor and the confidence margins reported beside them in 6.2 compare one option's softmax to itself. RStd (standard deviation of per-option recall) makes the same point numerically: 0.0 for arm C on trained-format recall, 39 to 50 under `mcf` on induction and ICL, where the letter bias dominates.
+
+`sum` and `bytes` move few cells and never change a conclusion; `bayes` tracks `mean` within 2 points everywhere except arm A's bare recall (49.4 versus 25.0), where the fitted slope is 2.0 log-prob per token. The section 6 adapter re-scored in section 9.3 behaves like arm A under every rule.
+
+**What the report should use.** Keep `mean` as the continuity rule and add `hybrid` as the second line for every induction and novel-label level (it is the only rule that removes the length effect without removing invented-label signal), `pmi_dc` for the bare-format recall levels only, and print the histogram check beside any level within its null band (section 11). The constructed-response evaluation of PLAN step 3 is the third line.
