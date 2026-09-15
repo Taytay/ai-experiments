@@ -31,6 +31,8 @@ and every eval also writes per-item, per-option log-probs to results/per_item/ (
 Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ... unsloth).
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
+SEED=N (default 0) seeds the LoRA init, the stream shuffles and the mixture draws; N > 0 adds "_sN" to the
+results and adapter names so the seed-0 runs stay (PLAN step 10, STAT-1).
 PERIODIC=N evaluates a fixed subsample (every 4th ladder item, every 2nd ICL suite item, the 200
 ARC-Easy known-facts items as the forgetting proxy) before training and every N steps, logged to the
 tracker under condition "periodic" with the step; results and adapter get a "_pN" suffix so the
@@ -62,7 +64,8 @@ ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
 STEPS = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 LR = float(sys.argv[4]) if len(sys.argv) > 4 else 1e-4
-MICRO, ACCUM, SEED, MAXLEN = 8, 2, 0, 768
+MICRO, ACCUM, MAXLEN = 8, 2, 768
+SEED = int(os.environ.get("SEED", "0"))  # training seed: LoRA init, stream order, mixture draws (PLAN step 10, STAT-1)
 BS = MICRO * ACCUM
 MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "A": [dict(K=1.0)],
@@ -75,8 +78,9 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
 }
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
-OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}.json"
-ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}_lora"
+SFX = f"_s{SEED}" if SEED else ""  # seed 0 keeps the original names (every arm before PLAN step 10)
+OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}{SFX}.json"
+ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}{SFX}_lora"
 torch.manual_seed(SEED)
 
 species = U.build(morph_p=MORPH_P)
