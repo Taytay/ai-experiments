@@ -663,3 +663,51 @@ The 10.6% confirms the mechanism the reviewer measured (12.6% with a slightly di
 **What it says.** The hypothesis is wrong for the LLM. Giving the 0.5B model the merchant name in exactly its trained tokens, inside the bank string, moves the with-context score from 14.2 to 15.0, one item; title-casing the whole line gives 15.8. The 120-item half-width at 15% is about 6 points, so these are the same number. The model has the fact in the prompt and the name in its trained form and still cannot map `POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14` to a spending category, while the same model with the same note answers `Merchant: Kelvarro Co` at 69.2 (4.3.2). What defeats it is the transaction format itself: the few-shot prefix of bank lines, the store number, city and date around the name, and the "Spending category:" cue, at a model size that does not read past that noise. The embedding side is the control the hypothesis predicted: an uncased tokenizer is indifferent to the rendering (67.7 / 67.7 / 68.8), and its 70.8% transfer in 4.3.1 owes nothing to casing either way.
 
 So section 1's recommendation stands with a different reason: normalise bank strings before the model sees them because the *format* is noise for small models, not because of the tokenizer. Case-normalisation alone will not recover the bank format; stripping the string down to the merchant name (or training on realistic renderings, PLAN step 21) is what the numbers point at. The second half of MODEL-4, whether the 70.8% transfer survives on a cased encoder (bge-base, Qwen3-Embedding), stays with step 13.
+
+## 14. Prompt distillation: the with-context ceiling is a ranking, not a distribution (BASE-3)
+
+Date: 2026-09-15. Code: `scripts/exp_distill.py` (arm P), `scripts/diag_distill_teacher.py`; data `results/curriculum_Qwen2.5-3B_P.json`, per-item `results/per_item/curriculum_Qwen2.5-3B_P.*.jsonl`, `results/distill_teacher_Qwen2.5-3B.json`; the P column of `reports/scorers_Qwen2.5-3B.md` and `reports/ci_Qwen2.5-3B.md` (with the base to P and C to P pairs); tracker `curriculum_v2`, arm P, method `prompt_distill_kl`; PLAN.md step 7.
+
+BASE-3 noted that the with-context numbers are the ceiling everywhere (98.8 recall, 48.8 Timmy for the base 3B) and asked whether that ceiling can be distilled into the weights. Arm P is the direct version: the same LoRA (rank 64, alpha 128, all linear layers), the same 800 steps at batch 16 and learning rate 1e-4, arm C's mixture (45% knowledge texts, 40% episodes, 15% replay) and seed. For knowledge texts and episodes the loss is the KL divergence at temperature 2 (scaled by 4) between the student's next-token distribution on the bare text and the teacher's on the same tokens with the field-guide entries of every species named in the text prepended; the teacher is the same base model with the adapter disabled, so the student is trained to do without the context what the teacher does with it. Replay episodes keep the hard cross-entropy. The run took 26 minutes at 566 tokens/s with two forward passes per batch (17.2 GiB); a first attempt died at step 400 with a CUDA execution error while a Unity install was running on the same machine and was rerun clean. The prediction on the PLAN row was bare recall toward 98.8 with better ICL retention than hard-label episodes.
+
+**Table 14.1: arm P beside base, A and C (accuracy %, without / with field-guide context)**
+
+| level | base | A knowledge | C interleaved + replay | P distillation |
+|---|---|---|---|---|
+| recall, trained format | 11.9 / 100 | 100 / 100 | 100 / 100 | **13.8** / 100 |
+| recall, bare format | 18.1 / 98.8 | 25.0 / 40.6 | 20.6 / 98.8 | 20.0 / 100 |
+| yes/no | 42.5 / 100 | 96.2 / 100 | 86.2 / 100 | 63.8 / 100 |
+| pair | 51.2 / 81.2 | 91.2 / 96.2 | 73.8 / 70.0 | 46.2 / 88.8 |
+| Timmy k=3 | 36.9 / 48.8 | 40.0 / 43.1 | 58.8 / 76.2 | 33.1 / 42.5 |
+| k=4 | 25.0 / 41.2 | 34.4 / 39.4 | 51.2 / 69.4 | 26.2 / 37.5 |
+| held-out species | 40.6 / 43.8 | 24.0 / 32.3 | 30.2 / 75.0 | 33.3 / 41.7 |
+| ICL suite symbol | 60.4 | 51.6 | 79.2 | **76.6** |
+| ICL suite natural | 84.4 | 80.8 | 88.0 | 84.4 |
+| ppl | 8.54 | 21.37 | 14.7 | **8.64** |
+
+### 14.1 Nothing was injected
+
+Trained-format recall is 13.8 against the base model's 11.9 (paired difference +1.9, 95% CI [-1.2, 5.6], McNemar p = 0.51); bare recall 20.0 against 18.1. Every induction level sits inside its permutation null band from section 11 (Timmy 33.1 in 26.2 to 40.6, k=4 26.2 in 20.0 to 33.1, held-out species 33.3 in 24.0 to 41.7). With the entries in context P is the base model: recall 100, Timmy 42.5 against 48.8 (p = 0.21). Per item, P predicts the same type on 155 of the 160 trained-format recall items where the base model did so on 126; the constant predictor of section 10 got more constant. The general-text perplexity is 8.64 against 8.54, where every other arm moved it to between 12 and 21: the adapter barely changed the model. Against arm C on the same items the trained-format gap is 86 points (138 items flip one way, none the other).
+
+Two things did move. The yes/no level went from 42.5 to 63.8 (+21.2, CI [2.5, 40], p = 0.04), and the symbol-label ICL suite from 60.4 to 76.6 (+16.1, CI [7.8, 25], p = 0.0004), within 3 points of arm C's 79.2 (p = 0.34). The ICL gain is what the 15% hard-label replay does on its own: section 15.2 measures the same thing in arm D's first phase, knowledge plus replay and no episodes, at 70.8 by step 200. Replay was the only stream in arm P with a hard target, and it is the only stream that left a mark.
+
+### 14.2 Why: the teacher puts 6% on the answer
+
+`scripts/diag_distill_teacher.py` takes the declarative training sentence of each of the 136 trained species (`{name} is a {type}-type creature. It lives in ...`) and reads the probability of the type's first token at its position, for the base model on the bare sentence, the teacher (base model with the species' entry prepended, exactly as in training), the same teacher at temperature 2, and the P and A adapters on the bare sentence:
+
+**Table 14.2: probability of the type token in the training sentence (mean over 136 species)**
+
+| model, input | p(type token) | at T = 2 | argmax is the type (%) | KL to the tempered teacher, scaled by T² |
+|---|---|---|---|---|
+| base, bare sentence | 0.000 | 0.000 | 0.0 | 2.17 |
+| teacher: base + field-guide entry | **0.059** | **0.003** | 20.6 | (target) |
+| P, bare sentence | 0.002 | 0.000 | 0.0 | **0.28** |
+| A, bare sentence | 1.000 | 0.969 | 100 | 30.3 |
+
+The model that recalls at 98.8 with the entry in context, when the evaluation scores eight type names against each other, puts 6% of its next-token mass on the type after `Blaxorc is a` with `Blaxorc: Voltrix-type, weak to ...` two lines above it; four times in five its most likely next word is something else. The 98.8 is a ranking: among the eight options the right one wins. As a distribution to imitate it is 6% fact and 94% ordinary English, and after tempering at T = 2 the fact is 0.3% of it. The student did what the loss asked: its KL to the tempered teacher fell from 2.17 to 0.28, the closest match in the table, and that match carries no fact. Arm A, whose hard labels put all the mass on the type token, sits 30 nats from the teacher and knows every fact. Context distillation transfers the teacher's uncertainty faithfully, and here the teacher's uncertainty is the whole problem. (The same diagnostic on the cloze prompt `Question: What type is Blaxorc?\nAnswer:` shows arm A putting 0.7% on the type as the *first* token, since it writes the species name first, as section 12.1 saw in its generations; the 100% trained-format recall is also a ranking.)
+
+### 14.3 What BASE-3 should now say
+
+The with-context ceiling of sections 6 and 8 is a relative one: given the entry, the model ranks the options correctly; it does not produce the fact with any confidence, so there is no confident distribution to distil. A version that could work replaces the full-vocabulary target with the teacher's distribution renormalised over the option set (the evaluation's own scoring, where the teacher is at 98.8), or a teacher that has the options listed in its prompt and is scored by letter (section 10 showed the base model picks well in that format), at temperature 1; the limit of that direction is hard labels from the teacher's argmax over options, which is arm A with a different label source. That is queued as PLAN row 27. If it also fails, BASE-3 closes as answered in the negative: the ceiling was never a distribution.
+
+**What the report should say.** Soft-label prompt distillation at T = 2 from the base model reading the field guide injected nothing: recall, induction and perplexity are the base model's, and the 16-point ICL gain is the hard-label replay's. The cause is measured, not guessed: the teacher assigns 6% to the fact token in free text, 0.3% tempered, and the student matched that distribution to within 0.28 nats. "With context is the ceiling" means the model can rank the options given the entry, not that it would say the fact; distillation needs the ranking, not the distribution.
