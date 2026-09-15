@@ -96,12 +96,13 @@ with Run("corpus_ppl", model=a.base, config=cfg, note=a.note) as run:
           f"paragraph ppl {results['base']['L7_ppl_general']}  [{time.time() - t0:.0f}s]", flush=True)
     if names:
         from peft import PeftModel
-        model = PeftModel.from_pretrained(model, str(ADAPTERS / names[0]), adapter_name=names[0])
+        key = lambda n: n.replace(".", "_")  # peft adapter names are module names: no dots
+        model = PeftModel.from_pretrained(model, str(ADAPTERS / names[0]), adapter_name=key(names[0]))
         for n in names[1:]:
-            model.load_adapter(str(ADAPTERS / n), adapter_name=n)
+            model.load_adapter(str(ADAPTERS / n), adapter_name=key(n))
         model.eval()
         for n in names:
-            model.set_adapter(n)
+            model.set_adapter(key(n))
             cond = n.removesuffix("_lora")
             rows = paragraph_nlls(model, tok)
             results[cond] = dict(**summarise(rows, base_rows), L7_ppl_general=round(perplexity(model, tok, GENERAL_TEXT), 2))

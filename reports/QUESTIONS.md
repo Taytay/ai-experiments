@@ -323,6 +323,8 @@ and plot recall, Timmy, ICL-symbol and perplexity vs steps per arm.
 
 **Status (2026-09-15):** PLAN step 11, REPORT.md section 15. `PERIODIC=N` in `exp_curriculum.py` scores a fixed subsample plus 200 frozen ARC-Easy items (`K_arc_easy`, `data/processed/known_facts_v1.json`) every N steps; `scripts/curves.py` tabulates. Knowledge lands by step 200 (A, D) or 400 (C, 45% mix); A's ICL loss is complete at step 200 and 15% replay prevents it from the start; ARC-Easy drops about ten points by step 200 in every arm and stays down; induction from the weights appears in the last 200 steps and needs the full 160 items per point. Follow-ups: PLAN rows 24 (corpus perplexity) and 25 (TRAIN-7).
 
+**Status (2026-09-15, step 24):** REPORT.md section 16. The perplexity leg of the curve was the instrument: on a frozen WikiText-2 slice (`data/processed/corpus_ppl_v1.json`, 29 paragraphs, 4,972 tokens, `L7_ppl_wikitext` in every evaluation and periodic point from now on) two runs of arm C agree to 0.03 nats where the paragraph read 14.9 and 30.3. Final costs over the base: A +1.40 nats per token, Cn +1.08, C/D/E +0.81 to +0.90, B +0.37, P +0.09. The mid-training perplexity curve itself starts with row 25's run.
+
 **TRAIN-4 (R) Which hyperparameters were never varied, and is LoRA the right vehicle for injection?**
 Rank 64, alpha 128, no dropout, wd 0, betas (0.9, 0.95), 800 steps are fixed across all arms
 (`exp_curriculum.py:52, 181-195`); the only sweeps are LR. 3B full FT OOMed with fp32 master
@@ -484,3 +486,57 @@ the most). Replay protects what is replayed.
 *Experiment:* PLAN row 25: add a few percent of pretraining-style text (a FineWeb or WikiText slice) to arm C's mix, run
 with `PERIODIC=200`, and read `K_arc_easy` and the corpus perplexity of row 24 against arm C's curve; then the same with
 a lower learning rate on the knowledge stream, since the loss is paid while the facts are written.
+
+**Status (2026-09-15):** PLAN step 25, REPORT.md section 17. Yes: arm Cg (arm C with 5% of sequences, 27% of the loss, as WikiText-2 train paragraphs) keeps the WikiText perplexity at +0.09 nats over the base (C: +0.84) at every checkpoint and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), with recall at 100 and the ICL suite at 81.2. Induction from the weights fell 10 to 21 points on three levels, confounded with the episode share the general text displaced; step 9 runs the 5% out of the knowledge stream instead. The lower-learning-rate variant was not run: the replay alone removes the perplexity cost.
+
+### Added by the graph-methods memo, 2026-09-15
+
+The owner observed that the universe is a bipartite graph (entities on one side, attribute values or labels on the
+other) and asked what graph algorithms, GNNs or graph embeddings could add. `references/graph_methods.md` is the
+literature pass; its conclusion is that message passing has nothing to propagate here (no entity-entity edges, every
+relation functional, the only node feature a name string) and that what survives is probes of how the graph is stored
+in the weights, graph-walk data augmentation, and label propagation on the embedding side where repeated noisy
+strings supply real structure. The seven IDs below are that residue.
+
+**GRAPH-1 (O) Did LoRA write a relation or 136 facts?**
+Hernandez et al. (2308.09124) find that for about half of relations the subject-to-object map inside an LM is one
+linear transform on the subject representation (a linear relational embedding, LRE). Nothing here measures whether
+arm C's adapter stores `type` as a relation or as per-entity memorisation.
+*Experiment:* fit an LRE from the species-name hidden state to the type token on arm C's merged adapter, layer sweep;
+faithfulness on the 136 trained species; apply it to the 24 held-out species with and without context; repeat for
+weakness and test whether LRE_weakness factors through LRE_type (the DATA-1 confound as a shared subspace). PLAN row 28.
+
+**GRAPH-2 (R) Does transductive label propagation beat prototypes on Zipf-distributed merchants?**
+Correct & Smooth (2010.13993) and TPN (1805.10002) show label propagation over a kNN graph beats prototype
+classifiers when labels are few (miniImageNet 1-shot 53.8 vs 49.4) and the gain vanishes by k = 5. Repeated noisy
+renderings of one merchant are the one real graph structure in the transaction data.
+*Experiment:* kNN graph over embeddings of all transaction strings, labelled and not; LP vs prototypes at k in
+{1, 3, 10}, by merchant-frequency bucket and known vs unknown merchant. Inside PLAN row 22.
+
+**GRAPH-3 (R) Do texts generated from two-hop walks teach the pairwise and yes/no levels?**
+EntiGraph (2409.07431) generates text about pairs and triples of entities (random walks on the entity graph) and
+lifts closed-book QA from 39.5 to 56.2; the K stream's comparative sentences are a one-hop version.
+*Experiment:* replace part of the knowledge stream with E-A-E walk texts at a fixed token budget; score pair, yes/no
+and Timmy from the weights against arm C. PLAN row 29.
+
+**GRAPH-4 (R) Is weakness stored as f(type) or per entity?**
+The weakness = f(type) map (DATA-1) is an attribute-attribute edge the training text never states.
+*Experiment:* bare items "creatures of type T are weak to ?" and the two-hop path form, per adapter; above chance
+means the weights completed the graph through type. Eight facts, so a yes/no answer, not a percentage. PLAN row 30.
+
+**GRAPH-5 (R) Does a text-initialised inductive KGE baseline add anything over prototypes?**
+BLP (2010.03496) and SimKGC (2203.02167) score unseen entities from text descriptions; SimKGC beats RotatE only on
+the sparse, description-rich graph (WN18RR MRR 0.67 vs 0.48), which is this repo's regime.
+*Experiment:* MiniLM entity encoder plus a per-relation scorer trained jointly on all merchant relations; unseen-
+merchant category and the products-to-category bridge against prototypes and logistic regression on the same items.
+With PLAN row 13, rerun after 21.
+
+**GRAPH-6 (R) Can a category with zero examples be classified from its name?**
+StarSpace (1709.03856) and ZestXML co-embed labels and inputs; the section 6.3 centroid is StarSpace with the label
+vector fixed to the member mean. Merchant categories have meaningful names; universe labels do not.
+*Experiment:* category vector from its name vs k-example centroid vs their mix, on the merchant set. Inside PLAN row 22.
+
+**GRAPH-7 (R) Does the model use E-A-E structure without the attribute vocabulary?**
+*Experiment:* Timmy with context given as co-typed species lists per demo and no attribute names (a KAPING-style
+neighbour list); expected below the field-guide oracle. After PLAN row 14.
+
