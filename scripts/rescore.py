@@ -11,7 +11,8 @@ usage: uv run python scripts/rescore.py MODEL_OR_ADAPTER [--tag TAG] [--morph] [
                     Halves eval time; REPORT.md section 9 measures what it does to the predictions.
 
 Adapters saved by plain peft (the section 6 non-unsloth runs) make unsloth's loader raise
-"Your model needs to call `.get_peft_model` first!"; those fall back to transformers + peft.
+"Your model needs to call `.get_peft_model` first!"; those load the base through unsloth and attach
+the adapter with peft.
 
 Curriculum arms re-score themselves with `EVAL_ONLY=1 scripts/exp_curriculum.py ARM`; this script
 covers everything else, e.g. the adapters from scripts/exp_universe_ladder.py, which predate the
@@ -85,11 +86,12 @@ def load_model():
     except TypeError as e:
         if "get_peft_model" not in str(e) or not is_adapter:
             raise
+        # unsloth has patched every Qwen2 layer at import, so a plain transformers model would hit
+        # unsloth's forward and fail; load the base through unsloth and attach the adapter with peft.
         from peft import PeftModel
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-        tok = AutoTokenizer.from_pretrained(base)
-        model = PeftModel.from_pretrained(AutoModelForCausalLM.from_pretrained(base, dtype=torch.bfloat16), src).cuda()
-        loader = "transformers+peft"
+        model, tok = FastLanguageModel.from_pretrained(base, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+        model = PeftModel.from_pretrained(model, src)
+        loader = "unsloth base + peft adapter"
     if a.merge:
         model = model.merge_and_unload()
     print(f"    loaded with {loader}{' and merged' if a.merge else ''}", flush=True)
