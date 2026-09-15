@@ -236,6 +236,7 @@ noise floor on 96 items is ±10 points or the items carry an artifact. The same 
 *Experiment:* empirical null per level by shuffling the answer index 1,000 times over saved
 per-option scores; print the 95% null band next to chance in every table.
 **Status (2026-09-14):** PLAN step 2, REPORT.md section 10: no question-free artifact on held-out induction (`unc` at chance); the predictions concentrate on one or two positions, see the null band in step 4.
+**Status (2026-09-14):** PLAN step 4, REPORT.md section 11: the base model's held-out induction score is inside the gold-blind null band (25.0 to 43.8 on 96 items with its position preferences); so is every arm's except E.
 
 **EVAL-7 (R) Are `sells` and `reverse` merchant-level or category-level tests?**
 Distractors come from other categories (`merchants.py:136,147,157`), so "Which store sells canned
@@ -375,6 +376,7 @@ has 24 items, so 12.5% is 3/24; each ICL dataset has 48 items per label style. `
 discards per-item outcomes, blocking bootstrap CIs and paired McNemar tests.
 *Experiment:* persist per-item scores; bootstrap CIs and paired tests; raise `n_per_level` to 500
 (eval is ~7 min per 4,400 items).
+**Status (2026-09-14):** PLAN steps 1 and 4, REPORT.md sections 9 and 11. Per-item, per-option scores are saved for every run (`results/per_item/`); `scripts/ci_table.py` gives bootstrap CIs, null bands and paired McNemar tests, `curriculum_summary.py --ci` prints them in the tables. n_per_level stays 160 for now (raising it means a new item-set version).
 
 **STAT-3 (R) Are cross-table comparisons paired at all?**
 The ladder is regenerated from a seed each run; adding `L1_recall_fmt` shifted every later item, so
@@ -421,6 +423,7 @@ attribute ... a type replicate in this universe and not evidence of latent-parti
 
 **REPORT-2 (R)** Every table should carry a 95% CI column and section 8 a one-line noise-floor
 statement; the 18-point backend-replicate swing is never mentioned in section 8 (STAT-1).
+**Status (2026-09-14):** PLAN step 4, REPORT.md section 11: noise-floor statement (item-count half-widths, the 2 to 3 point same-weights floor of section 9.2, the 18-point backend replicate), Table 11.1 with intervals and p-values for every section 8 claim, and `--ci` cells in the generated tables. Tables 8.1 to 8.3 themselves are left as the Windows-run numbers.
 
 **REPORT-3 (R)** Base at 42.7% on unknowable held-out induction is unexplained (EVAL-6); "RAG
 ceiling" should be renamed "oracle context" and "RAG" reserved for REAL-2.

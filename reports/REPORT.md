@@ -557,3 +557,40 @@ Every number in sections 6 and 8 is the `mean` rule: mean per-token log-prob of 
 `sum` and `bytes` move few cells and never change a conclusion; `bayes` tracks `mean` within 2 points everywhere except arm A's bare recall (49.4 versus 25.0), where the fitted slope is 2.0 log-prob per token. The section 6 adapter re-scored in section 9.3 behaves like arm A under every rule.
 
 **What the report should use.** Keep `mean` as the continuity rule and add `hybrid` as the second line for every induction and novel-label level (it is the only rule that removes the length effect without removing invented-label signal), `pmi_dc` for the bare-format recall levels only, and print the histogram check beside any level within its null band (section 11). The constructed-response evaluation of PLAN step 3 is the third line.
+
+## 11. Intervals, null bands and paired tests (STAT-2, EVAL-6, REPORT-2)
+
+Date: 2026-09-14. Code: `src/ai_experiments/stats.py`, `scripts/ci_table.py`, `scripts/curriculum_summary.py --ci`; full tables in `reports/ci_Qwen2.5-3B.md`, data in `results/ci_Qwen2.5-3B.json`; PLAN.md step 4. 1,000 draws per number, seeded; the whole computation is 40 seconds on the CPU.
+
+Three quantities now accompany every accuracy under the `mean` rule: a 95% percentile bootstrap interval over items; an empirical null band, the 2.5th to 97.5th percentile of accuracy when the gold indices are permuted across the level's items with the predictions held fixed (so a model that always picks one option is scored against how often that option is gold, not against 1/k); and, for the section 8 comparisons, a paired test on shared item ids with the exact two-sided McNemar p on the discordant items and a bootstrap interval on the difference.
+
+**The noise floor, in one line.** On 160-item levels the 95% interval is about ±7.5 points at 50% accuracy and ±4 at 90%; on the 96 held-out induction items ±10; on a 48-item ICL dataset ±14, and on the 24 unseen-species items ±17. Section 9.2 adds the same-weights floor of 2 to 3 points between machines, and the section 8 backend replicate moved single cells by up to 18 points (`evals/LEADERBOARD.md`, the two `universe_ladder` 3B runs). Differences under those sizes are not results.
+
+**Table 11.1: the section 8 claims under paired tests on shared items (no context unless stated; diff is second arm minus first; flips are items only the first / only the second arm gets right).**
+
+| claim (8.3) | pair | level | acc | diff | 95% CI | flips | McNemar p |
+|---|---|---|---|---|---|---|---|
+| interleaving injects the facts | base -> C | L1 recall, trained fmt | 11.9 -> 100 | +88.1 | [83.1, 93.1] | 0/141 | <0.0001 |
+| and the manipulation | base -> C | L2 yes/no | 42.5 -> 86.2 | +43.8 | [32.5, 55.0] | 2/37 | <0.0001 |
+| | base -> C | L2 pairwise | 51.2 -> 73.8 | +22.5 | [11.2, 33.8] | 4/22 | 0.0005 |
+| Timmy from the weights | base -> C | L3 Timmy k=3 | 36.9 -> 58.8 | +21.9 | [12.5, 31.9] | 14/49 | <0.0001 |
+| | A -> C | L3 Timmy k=3 | 40.0 -> 58.8 | +18.8 | [7.5, 29.4] | 28/58 | 0.0016 |
+| transfer to weakness | base -> C | L4 weakness | 31.9 -> 51.9 | +20.0 | [10.6, 29.4] | 18/50 | 0.0001 |
+| | A -> C | L4 weakness | 45.0 -> 51.9 | +6.9 | [-4.4, 18.1] | 36/47 | 0.27 |
+| episodes lift ICL with symbols | base -> B | ICL symbol, 192 items | 60.4 -> 74.0 | +13.5 | [5.2, 21.4] | 19/45 | 0.0016 |
+| replay buys portability | Cn -> C | ICL symbol, 192 items | 70.8 -> 79.7 | +8.9 | [2.6, 16.1] | 12/29 | 0.012 |
+| | Cn -> C | ICL natural, 192 items | 87.0 -> 88.0 | +1.0 | [-2.6, 4.7] | 6/8 | 0.79 |
+| sequential loses recall | D -> C | L1 recall, trained fmt | 96.2 -> 100 | +3.8 | [1.2, 6.9] | 0/6 | 0.031 |
+| sequential loses yes/no | D -> C | L2 yes/no | 61.2 -> 86.2 | +25.0 | [12.5, 36.2] | 4/24 | 0.0002 |
+| sequential loses pairwise | D -> C | L2 pairwise | 66.2 -> 73.8 | +7.5 | [-5.0, 21.2] | 12/18 | 0.36 |
+| sequential loses real-name induction | D -> C | L3 real-name labels | 58.8 -> 70.6 | +11.9 | [4.4, 19.4] | 11/30 | 0.0043 |
+| sequential matches Timmy | D -> C | L3 Timmy k=3 | 59.4 -> 58.8 | -0.6 | [-9.4, 9.4] | 26/25 | 1.0 |
+| the suffix becomes a feature | base(m) -> E | probe, marked, trained fmt | 12.5 -> 93.8 | +81.2 | [70.8, 91.7] | 0/39 | <0.0001 |
+| morphology helps induction | base(m) -> E | L3 Timmy k=3 | 40.6 -> 75.0 | +34.4 | [26.2, 43.1] | 5/60 | <0.0001 |
+| and unseen-species induction | base(m) -> E | L3 held-out species | 33.3 -> 45.8 | +12.5 | [1.0, 24.0] | 11/23 | 0.058 |
+
+Most of section 8 survives. Three claims do not: the 9-point pairwise-reasoning loss of arm D (p = 0.36), arm C's weakness advantage over knowledge-only A (p = 0.27; the advantage over base holds), and the natural-label half of the replay claim (the symbol half holds, p = 0.012, but only pooled over the four datasets: no single 48-item dataset is significant). The "3 points of recall" arm D loses is six items and p = 0.031. Arm E's unseen-species induction gain is at the edge (p = 0.058).
+
+**Null bands (EVAL-6).** 115 of the 336 arm x condition x level cells are inside their null band, meaning a gold-blind predictor with the same option preferences scores as well. They include the base model's 42.7 on held-out induction that the reviewer asked about: with predictions fixed and gold permuted the band is 25.0 to 43.8, because the base model's picks concentrate on one or two label positions and 96 items is too few to separate 40.6 from that. Every arm's held-out induction without context is inside its band except arm E (45.8, band 24.0 to 43.8, interval 35.4 to 56.2), so section 8.4's "31 to 47" morphology claim stands only at its upper end and only for E. Also inside their bands, without context: all twelve ladder levels of the base model (the base model does nothing on this universe without context that a gold-blind predictor would not); ten of the twelve for arm B (episodes alone inject no facts); arm A's Timmy (40.0, band 25.6 to 40.0) and novel choices; every arm's L5; and habitat induction for every arm but D (45.0, band 26.2 to 40.6). The full list is in `reports/ci_Qwen2.5-3B.md`.
+
+**In the tables.** `curriculum_summary.py --ci` prints every cell as `acc [lo, hi]` and marks with * a cell inside its null band; `reports/ci_Qwen2.5-3B.md` has the same for all 26 levels and both conditions. Tables 8.1 to 8.3 are unchanged (their numbers are the Windows run, section 9.2); read them with the half-widths above.
