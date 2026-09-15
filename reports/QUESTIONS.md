@@ -321,6 +321,8 @@ Every arm is evaluated once at 800 steps; only train loss is logged (`exp_curric
 *Experiment:* evaluate a 400-item subsample every 200 steps (the `SMOKE` path already subsamples)
 and plot recall, Timmy, ICL-symbol and perplexity vs steps per arm.
 
+**Status (2026-09-15):** PLAN step 11, REPORT.md section 15. `PERIODIC=N` in `exp_curriculum.py` scores a fixed subsample plus 200 frozen ARC-Easy items (`K_arc_easy`, `data/processed/known_facts_v1.json`) every N steps; `scripts/curves.py` tabulates. Knowledge lands by step 200 (A, D) or 400 (C, 45% mix); A's ICL loss is complete at step 200 and 15% replay prevents it from the start; ARC-Easy drops about ten points by step 200 in every arm and stays down; induction from the weights appears in the last 200 steps and needs the full 160 items per point. Follow-ups: PLAN rows 24 (corpus perplexity) and 25 (TRAIN-7).
+
 **TRAIN-4 (R) Which hyperparameters were never varied, and is LoRA the right vehicle for injection?**
 Rank 64, alpha 128, no dropout, wd 0, betas (0.9, 0.95), 800 steps are fixed across all arms
 (`exp_curriculum.py:52, 181-195`); the only sweeps are LR. 3B full FT OOMed with fp32 master
@@ -453,3 +455,11 @@ backward; a random-token control collapses, so it is not generic augmentation. N
 *Experiment:* Qwen2.5-3B-Instruct, LoRA r=64, one template per entity, masked-FT objective on
 the K stream with episodes and replay unchanged; score bare L1, `L1_recall_fmt`, the merchant
 `reverse` task and the ICL suite against arm C. About 2x arm C in tokens.
+
+**TRAIN-7 (R) Does general-text replay protect the knowledge the model already had?**
+Section 15: every arm loses 11 to 16 ARC-Easy points in the first 200 steps and never recovers them; 15% replay of
+ICL-suite episodes protects the ICL suite completely but does nothing for ARC-Easy (arm D, replay from step 0, drops
+the most). Replay protects what is replayed.
+*Experiment:* PLAN row 25: add a few percent of pretraining-style text (a FineWeb or WikiText slice) to arm C's mix, run
+with `PERIODIC=200`, and read `K_arc_easy` and the corpus perplexity of row 24 against arm C's curve; then the same with
+a lower learning rate on the knowledge stream, since the loss is paid while the facts are written.
