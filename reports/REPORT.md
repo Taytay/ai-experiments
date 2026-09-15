@@ -750,3 +750,43 @@ On the 40 Timmy items, arm C reads 47.5, 35.0, 45.0 at steps 200, 400, 600 and 5
 The `ppl` column is the log-likelihood of one 249-word paragraph. Arm C reads 8.5, 11.8, 38.7, 20.3, 30.4 across its checkpoints, and this rerun ends at 30.4 where the section 8 run of the same recipe ended at 14.9, while every accuracy metric of the rerun matches section 8 within noise (Timmy 61.2 against 59.4, ICL 78.1 against 78.1, held-out species 29.2 against 31.2). A single paragraph swings by a factor of two between checkpoints of one run and between two runs of one recipe; it can say that perplexity went up (it did, in every arm, at step 200) and nothing finer. Perplexity on a held-out corpus slice of a few thousand tokens replaces it in step 24.
 
 **What the report should say.** Facts are in the adapter by step 200 at a 100% knowledge mix and by step 400 at 45%; A's ICL loss is already complete at step 200, and 15% replay of the ICL suite from the first step prevents it entirely; ARC-Easy loses about ten points in the same first 200 steps in every arm, replay included, and never recovers, which is the first direct measure of what the injection costs in knowledge the model already had; induction from the weights arrives late, and mid-training induction numbers need the full 160 items. The training runs are 200 steps too long for recall and the right length for induction, so shortening them is not free.
+
+## 16. Perplexity on a corpus slice: the paragraph was the noise (TRAIN-3)
+
+Date: 2026-09-15. Code: `scripts/corpus_ppl.py`, `ai_experiments.items` (`data/processed/corpus_ppl_v1.json`), `ai_experiments.scoring.corpus_perplexity`; data `results/corpus_ppl_Qwen2.5-3B.json`, `results/corpus_ppl_Qwen2.5-0.5B.json`, tables `reports/corpus_ppl_Qwen2.5-3B.md`, `reports/corpus_ppl_Qwen2.5-0.5B.md`; tracker experiment `corpus_ppl`, one run per base model; PLAN.md step 24.
+
+Section 15.5 found that the general-text perplexity, computed on one 249-word paragraph, moved by a factor of two between checkpoints of one run and between two runs of the same recipe (arm C: 14.9 and 30.3) while no accuracy metric moved with it. This step replaces the paragraph with a frozen slice of the WikiText-2 test split: 29 body paragraphs chosen with a seed, detokenised, 3,637 words and 4,972 scored Qwen tokens, hashed and recorded in the tracker config like the item sets. From this commit on every evaluation reports it as `L7_ppl_wikitext`, at the final step and at every periodic point, with the standard error of the mean over paragraphs; `L7_ppl_general` stays in the outputs for continuity and is not cited again. The saved adapters were scored in one process per base model (the base loaded once, every adapter attached with peft and switched in turn, about three seconds each), which also gives the paired number the paragraph never could: the per-paragraph difference in mean negative log-likelihood between two models and its standard error over the 29 paragraphs.
+
+**Table 16.1: WikiText-2 slice perplexity of every saved adapter (3B; nats are per token; the last column is the one-paragraph number from sections 8, 9 and 15)**
+
+| model | WikiText ppl | NLL minus base, paired, +- se | paragraph ppl |
+|---|---|---|---|
+| base | 10.61 | | 8.54 |
+| A knowledge only | 37.78 | +1.405 +- 0.164 | 21.48 |
+| A, periodic rerun (15) | 34.08 | +1.273 +- 0.131 | 17.94 |
+| B episodes only | 15.39 | +0.368 +- 0.039 | 12.19 |
+| C interleaved + replay | 23.18 | +0.863 +- 0.096 | 14.85 |
+| C, periodic rerun (15) | 22.80 | +0.838 +- 0.097 | 30.26 |
+| Cn interleaved, no replay | 28.42 | +1.083 +- 0.104 | 20.36 |
+| D sequential + replay | 23.85 | +0.857 +- 0.090 | 14.45 |
+| D, periodic rerun (15) | 22.59 | +0.814 +- 0.093 | 13.63 |
+| E morphology | 23.90 | +0.900 +- 0.111 | 15.81 |
+| P distillation (14) | 11.50 | +0.086 +- 0.016 | 8.64 |
+| section 6.4, 3B unsloth LoRA | 29.69 | +1.149 +- 0.148 | 17.16 |
+| section 6.4, 3B transformers LoRA | 34.89 | +1.326 +- 0.164 | 20.34 |
+
+The 0.5B base scores 16.93 (paragraph 16.24) and its section 6.4 adapter 210.35, +2.651 +- 0.145 nats (paragraph 132.5).
+
+### 16.1 Two runs of one recipe agree to 0.03 nats; the paragraph put them a factor of two apart
+
+The section 8 run of arm C and its section 15 rerun differ by -0.024 +- 0.022 nats on the slice (1.1 standard errors; perplexity 23.2 against 22.8) where the paragraph read 14.85 against 30.26. The D pair differs by -0.044 +- 0.018 and the A pair by -0.132 +- 0.049, so run-to-run variation in what a recipe costs is a few hundredths of a nat with replay in the mix and about a tenth without. The base model's own perplexity on the 29 paragraphs runs from 4.9 to 32.7: one paragraph is a single draw from that spread, and an adapter's effect on it is confounded with whichever words the paragraph happens to contain. Section 15.5's reading stands and is now measured: the swing was the instrument.
+
+### 16.2 What each recipe costs in general text, in order
+
+Knowledge text alone costs the most: arm A adds 1.40 nats per token and takes the base model from 10.6 to 37.8. Adding episodes without replay (Cn) leaves 1.08; adding the 15% ICL replay as well (C, D, E) leaves 0.81 to 0.90, and those three are indistinguishable pairwise (D minus C -0.005 +- 0.034, E minus C +0.037 +- 0.027). Episodes alone (B) cost 0.37, and arm P, the adapter that section 14 said barely changed the model, costs 0.086 +- 0.016, five standard errors from zero. Paired against C, A is +0.542 +- 0.079 and Cn +0.221 +- 0.028. Part of the difference between A and the mixed arms is exposure, not protection: A sees every one of its 12,800 sequences as knowledge text and C 45% of them, so C writes the same facts with 2.2 times fewer knowledge sequences at 1.6 times less damage, and what the replay stream buys on its own is the Cn-to-C step, 0.22 nats. Against ARC-Easy at step 800 (section 15.3: A 66.0, C 59.0, D 64.0, all within one half-width of each other) the two forgetting proxies agree that every arm pays and that the payment is made in the first 200 steps, and the slice can additionally rank the arms, which 200 four-option questions cannot. The two section 6.4 adapters, the same recipe under two trainers, differ by 0.256 +- 0.039 nats, a difference the accuracy tables in 9.4 kept inside the noise floor; the 0.5B adapter's 2.65 nats is the language model coming apart, which section 6.4 saw as 132.5 and could not size.
+
+### 16.3 What changes downstream
+
+The corpus number exists only for the final adapters: no mid-training checkpoints were saved, so the TRAIN-3 perplexity curve is still open and arrives with step 25, whose run reports `L7_ppl_wikitext` at every periodic point. Step 10 (three seeds) will show whether the 0.03 to 0.13 nat run-to-run spread measured here on two pairs holds. The paired standard error of about 0.02 to 0.03 nats between adapters of one base sets what a "no cost" claim can mean from now on: an arm that matches C within 0.05 nats is at C's cost.
+
+**What the report should say.** The one-paragraph perplexity is retired: on a frozen 4,972-token WikiText-2 slice, two runs of arm C agree to 0.03 nats where the paragraph put them at 14.9 and 30.3. Every knowledge-injecting arm costs general-text likelihood, from 0.8 nats per token with ICL replay in the mix (C, D, E, perplexity 10.6 to 23) to 1.4 without episodes or replay (A, to 38); episodes alone cost 0.37 and distillation 0.09. The replay stream's own contribution is 0.22 nats (Cn to C); the rest of C's advantage over A is seeing fewer knowledge sequences.
