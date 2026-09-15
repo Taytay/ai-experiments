@@ -822,7 +822,7 @@ Training took 29 minutes at 691 tokens per second (8.7 GiB). The per-stream coun
 | level | C (15) | Cg | Cg minus C | | Cg minus base |
 |---|---|---|---|---|---|
 | recall, trained format | 100 | 100 | 0 | | |
-| recall, bare format | 19.4 | 18.8 | -0.3 [-1.9, 1.2] | | |
+| recall, bare format | 19.4 | 18.8 | -0.6 [-3.8, 2.5], p = 1 | | |
 | yes/no | 77.5 | 73.8 | -3.8 [-16, 10], p = 0.72 | | +31.2, p = 0.002 |
 | pair | 80.0 | 58.8 | **-21.2 [-36, -6], p = 0.014** | | +7.5, p = 0.55 |
 | Timmy k=3 | 61.2 | 47.5 | **-13.8 [-22.5, -4.4], p = 0.004** | | +10.6, p = 0.03 |
