@@ -484,3 +484,5 @@ the most). Replay protects what is replayed.
 *Experiment:* PLAN row 25: add a few percent of pretraining-style text (a FineWeb or WikiText slice) to arm C's mix, run
 with `PERIODIC=200`, and read `K_arc_easy` and the corpus perplexity of row 24 against arm C's curve; then the same with
 a lower learning rate on the knowledge stream, since the loss is paid while the facts are written.
+
+**Status (2026-09-15):** PLAN step 25, REPORT.md section 17. Yes: arm Cg (arm C with 5% of sequences, 27% of the loss, as WikiText-2 train paragraphs) keeps the WikiText perplexity at +0.09 nats over the base (C: +0.84) at every checkpoint and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), with recall at 100 and the ICL suite at 81.2. Induction from the weights fell 10 to 21 points on three levels, confounded with the episode share the general text displaced; step 9 runs the 5% out of the knowledge stream instead. The lower-learning-rate variant was not run: the replay alone removes the perplexity cost.
