@@ -81,13 +81,15 @@ ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
 STEPS = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 LR = float(sys.argv[4]) if len(sys.argv) > 4 else 1e-4
-MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "8")), int(os.environ.get("ACCUM", "2")), 768  # MICRO x ACCUM = 16 sequences per step
-GRAD_CKPT = os.environ.get("GRAD_CKPT", "unsloth")  # "unsloth" (default), "1" or "0"; 0 skips activation recomputation
+MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "16")), int(os.environ.get("ACCUM", "1")), 768  # MICRO x ACCUM = 16 sequences per step
+GRAD_CKPT = os.environ.get("GRAD_CKPT", "0")  # "0" (default: no activation recomputation), "1", or "unsloth" (offloaded checkpointing)
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
-PACK = int(os.environ.get("PACK", "0"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
-# block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). 0 = one sequence per row (padded).
+PACK = int(os.environ.get("PACK", "2048"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
+# block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). PACK=0 = one sequence per row (padded).
+# Before 2026-09-15 every run used MICRO=8 ACCUM=2 GRAD_CKPT=unsloth PACK=0 (REPORT.md 19 measures the change: 2 to 3x faster, same numbers).
+RUN_TAG = os.environ.get("RUN_TAG", "")  # optional suffix on the results and adapter names (validation runs, ablations)
 SEED = int(os.environ.get("SEED", "0"))  # training seed: LoRA init, stream order, mixture draws (PLAN step 10, STAT-1)
 BS = MICRO * ACCUM
 MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
@@ -114,7 +116,7 @@ BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, 
 ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
-SFX = f"_s{SEED}" if SEED else ""  # seed 0 keeps the original names (every arm before PLAN step 10)
+SFX = (f"_s{SEED}" if SEED else "") + (f"_{RUN_TAG}" if RUN_TAG else "")  # seed 0, no tag keeps the original names
 OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}{SFX}.json"
 ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}{SFX}_lora"
 torch.manual_seed(SEED)
@@ -261,17 +263,17 @@ def encode(tok, sample):
     return p + a, [-100] * len(p) + a
 
 
-def pack_rows(batch, cap):
+def pack_rows(batch, srcs, cap):
     """Pack (ids, labels) sequences into rows of at most `cap` tokens, first fit in order. Returns per row
-    (ids, labels, position_ids, lengths); the first token of every packed sequence gets label -100 so the
-    shifted loss never predicts across a boundary."""
+    (ids, labels, position_ids, lengths, stream id per token); the first token of every packed sequence gets
+    label -100 so the shifted loss never predicts across a boundary."""
     rows = []
-    for ids, lab in batch:
+    for (ids, lab), src in zip(batch, srcs):
         lab = [-100] + list(lab[1:])
-        if rows and rows[-1][0] and len(rows[-1][0]) + len(ids) <= cap:
-            r = rows[-1]; r[0].extend(ids); r[1].extend(lab); r[2].extend(range(len(ids))); r[3].append(len(ids))
+        if rows and len(rows[-1][0]) + len(ids) <= cap:
+            r = rows[-1]; r[0].extend(ids); r[1].extend(lab); r[2].extend(range(len(ids))); r[3].append(len(ids)); r[4].extend([src] * len(ids))
         else:
-            rows.append([list(ids), lab, list(range(len(ids))), [len(ids)]])
+            rows.append([list(ids), lab, list(range(len(ids))), [len(ids)], [src] * len(ids)])
     return rows
 
 
@@ -320,17 +322,27 @@ def train(model, tok, phases, run):
                 tok_by[src] += len(batch[-1][0]); lb_by[src] += sum(l != -100 for l in batch[-1][1][1:])
             if PACK:
                 # padding-free: every row is a concatenation of whole sequences, attention is block-diagonal
-                loss = torch.zeros((), device="cuda")
-                n_lab = sum(sum(l != -100 for l in lb[1:]) for _, lb in batch)
-                for r_ids, r_lab, r_pos, r_len in pack_rows(batch, PACK):
+                # (unsloth's packed_seq_lengths path, verified in REPORT.md 19). Each row is forwarded and backed
+                # separately, so memory is bounded by one row; the loss is the same mean over the micro-batch's
+                # label tokens as the padded path (or the per-stream weighted means of the M arms).
+                n_by = defaultdict(int)
+                for (_, lb), src in zip(batch, batch_src):
+                    n_by[src] += sum(l != -100 for l in lb[1:])
+                n_lab = sum(n_by.values())
+                if BY_LOSS:
+                    present = [s_ for s_ in n_by if n_by[s_] > 0]; wsum = sum(mix[s_] for s_ in present)
+                    weight = {s_: mix[s_] / wsum / n_by[s_] for s_ in present}  # per label token of stream s_
+                else:
+                    weight = {s_: 1.0 / max(n_lab, 1) for s_ in n_by}
+                for r_ids, r_lab, r_pos, r_len, r_src in pack_rows(batch, batch_src, PACK):
                     ids = torch.tensor([r_ids], device="cuda"); lab = torch.tensor([r_lab], device="cuda")
                     pos = torch.tensor([r_pos], device="cuda"); lens = torch.tensor(r_len, device="cuda", dtype=torch.int32)
+                    w = torch.tensor([weight.get(s_, 0.0) for s_ in r_src[1:]], device="cuda")
                     tokens += len(r_ids)
                     logits = model(input_ids=ids, position_ids=pos, packed_seq_lengths=lens).logits
-                    tl = torch.nn.functional.cross_entropy(logits[0, :-1].float(), lab[0, 1:], ignore_index=-100, reduction="sum")
-                    loss = loss + tl / max(n_lab, 1)  # mean over the micro-batch's label tokens, as the padded path
-                loss = loss / ACCUM
-                loss.backward(); loss_acc += loss.item()
+                    tl = torch.nn.functional.cross_entropy(logits[0, :-1].float(), lab[0, 1:], ignore_index=-100, reduction="none")
+                    loss = (tl * w).sum() / ACCUM
+                    loss.backward(); loss_acc += loss.item()
                 continue
             L = max(len(i) for i, _ in batch)
             ids = torch.tensor([i + [pad] * (L - len(i)) for i, _ in batch], device="cuda")
@@ -371,7 +383,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
