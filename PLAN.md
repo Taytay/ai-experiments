@@ -38,7 +38,7 @@ afternoon each on the 3090.
 
 | # | Step | IDs | Needs | Status | Result |
 |---|------|-----|-------|--------|--------|
-| 1 | Persist per-item, per-option log-probs, argmax, token and byte counts from every eval; freeze `ladder`, `probes`, `heldout_induction` to versioned JSON in `data/processed/` and record the hash in the tracker config. Done when every existing adapter has been re-scored with `EVAL_ONLY` and the per-item files exist. | STAT-2, STAT-3 | - | doing | |
+| 1 | Persist per-item, per-option log-probs, argmax, token and byte counts from every eval; freeze `ladder`, `probes`, `heldout_induction` to versioned JSON in `data/processed/` and record the hash in the tracker config. Done when every existing adapter has been re-scored with `EVAL_ONLY` and the per-item files exist. | STAT-2, STAT-3 | - | done | REPORT.md 9; data/processed/*_v1*.json; results/per_item/ |
 | 2 | Scorer set on the saved logits: sum, mean-per-token (current), PMI_DC, Bayesian length correction, hybrid symbol scoring on 3B, unconditional-option baseline (UNC), RStd, predicted-label histogram. Done when one table reports every arm under every scorer and says which cells move. | EVAL-2, EVAL-1, EVAL-6 | 1 | todo | |
 | 3 | Constructed-response eval: greedy-decode 32 tokens for every L1, L3, category and sells item; exact and fuzzy match; options-listed variant; three-way agreement with the two cloze scorers. | EVAL-3 | 1 | todo | |
 | 4 | Empirical null band per level (shuffle answer index 1,000 times over saved per-option scores); bootstrap CIs and paired tests from the per-item files; CI column in every report table. | STAT-2, EVAL-6, REPORT-2 | 1 | todo | |
@@ -66,3 +66,4 @@ afternoon each on the 3090.
 
 - 2026-09-14: queue created from `references/SURVEY.md` section 2 (which now just points here) and
   the reviewer register in `reports/QUESTIONS.md`. Nothing started yet.
+- 2026-09-14: step 1 done (REPORT.md section 9). Item sets frozen as v1 with hashes in the tracker config; every eval writes per-item, per-option log-probs under four premises (prompt, cue only, newline, listed choices) so steps 2 and 4 run without a model. All 11 adapters re-scored on WSL: 111 cells move against the Windows numbers, at most 2.6 points on 160-item levels (the same-weights noise floor). Merging the LoRA flips 1.8% of predictions and halves eval time; adopted for new evaluations, not for EVAL_ONLY re-scores of section 8 arms. Eval per arm is 24 min unmerged, 15 merged.
