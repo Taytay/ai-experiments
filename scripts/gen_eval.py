@@ -193,7 +193,14 @@ def run_condition(model, tok, ctx: bool) -> tuple[list[dict], dict]:
 
 # ------------------------------------------------------------------ main
 with Run("gen_eval", model=model_id, config=dict(cfg, items_sha=items_sha), note=a.note, enabled=not SMOKE) as run:
-    model, tok = FastLanguageModel.from_pretrained(load_from, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+    try:
+        model, tok = FastLanguageModel.from_pretrained(load_from, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+    except TypeError as e:  # adapters saved by plain peft: load the base through unsloth, attach with peft (as rescore.py does)
+        if "get_peft_model" not in str(e):
+            raise
+        from peft import PeftModel
+        model, tok = FastLanguageModel.from_pretrained(model_id, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+        model = PeftModel.from_pretrained(model, load_from)
     if hasattr(model, "merge_and_unload"):
         model = model.merge_and_unload()
     FastLanguageModel.for_inference(model)
