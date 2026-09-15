@@ -19,5 +19,5 @@ references/papers/*/paper_flat.tex
 .claude/settings.local.json
 
 # smoke-run outputs (`just smoke`): plumbing checks, not results
-results/*_smoke.json
-results/per_item/*_smoke.*.jsonl
+results/*_smoke*.json
+results/per_item/*_smoke*.jsonl
