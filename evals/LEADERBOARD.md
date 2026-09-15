@@ -1,6 +1,6 @@
 # Leaderboard
 
-Generated 2026-09-15 09:26 from `evals/runs.db`. One row per finished run+condition; all metrics.
+Generated 2026-09-15 09:31 from `evals/runs.db`. One row per finished run+condition; all metrics.
 
 
 ## casing
@@ -14,6 +14,30 @@ Generated 2026-09-15 09:26 from `evals/runs.db`. One row per finished run+condit
 
 Configs:
 - `20260914-223605`: `{"emb_epochs": 6, "emb_seed": 0, "embedder": "sentence-transformers/all-MiniLM-L6-v2", "forms": ["upper", "title", "name"], "llm": "Qwen/Qwen2.5-0.5B", "n_merchants": 120}`
+
+## corpus_ppl
+
+| run             | model        | commit  | condition                            | L7_nll_wikitext | L7_nll_wikitext_diff_se | L7_nll_wikitext_diff_vs_base | L7_nll_wikitext_se | L7_ppl_general | L7_ppl_wikitext |
+|-----------------|--------------|---------|--------------------------------------|-----------------|-------------------------|------------------------------|--------------------|----------------|-----------------|
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | base                                 | 2.3621          |                         |                              | 0.0978             | 8.54           | 10.614          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_A              | 3.6318          | 0.1642                  | 1.4049                       | 0.1886             | 21.48          | 37.782          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_A_p200         | 3.5288          | 0.1313                  | 1.2733                       | 0.1592             | 17.94          | 34.081          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_B              | 2.7337          | 0.0394                  | 0.3681                       | 0.1156             | 12.19          | 15.39           |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_C              | 3.1433          | 0.096                   | 0.8625                       | 0.1388             | 14.85          | 23.181          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_C_p200         | 3.1269          | 0.0974                  | 0.8383                       | 0.1378             | 30.26          | 22.802          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_Cn             | 3.3472          | 0.1041                  | 1.0833                       | 0.1469             | 20.36          | 28.422          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_D              | 3.1717          | 0.09                    | 0.8574                       | 0.138              | 14.45          | 23.848          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_D_p200         | 3.1177          | 0.0932                  | 0.8135                       | 0.1386             | 13.63          | 22.593          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_E              | 3.1738          | 0.1113                  | 0.8997                       | 0.1461             | 15.81          | 23.899          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | curriculum_Qwen2.5-3B_P              | 2.4424          | 0.0164                  | 0.0862                       | 0.0939             | 8.64           | 11.501          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | universe_Qwen2.5-3B_lr0.0001         | 3.5521          | 0.1639                  | 1.3261                       | 0.1865             | 20.34          | 34.886          |
+| 20260915-081740 | Qwen2.5-3B   | 1e8846c | universe_Qwen2.5-3B_lr0.0001_unsloth | 3.3909          | 0.1476                  | 1.1487                       | 0.173              | 17.16          | 29.692          |
+| 20260915-081900 | Qwen2.5-0.5B | 1e8846c | base                                 | 2.8292          |                         |                              | 0.0906             | 16.24          | 16.932          |
+| 20260915-081900 | Qwen2.5-0.5B | 1e8846c | universe_Qwen2.5-0.5B_lr0.0001       | 5.3488          | 0.1452                  | 2.6509                       | 0.154              | 132.5          | 210.35          |
+
+Configs:
+- `20260915-081740`: `{"adapters": ["curriculum_Qwen2.5-3B_A_lora", "curriculum_Qwen2.5-3B_A_p200_lora", "curriculum_Qwen2.5-3B_B_lora", "curriculum_Qwen2.5-3B_C_lora", "curriculum_Qwen2.5-3B_C_p200_lora", "curriculum_Qwen2.5-3B_Cn_lora", "curriculum_Qwen2.5-3B_D_lora", "curriculum_Qwen2.5-3B_D_p200_lora", "curriculum_Qwen2.5-3B_E_lora", "curriculum_Qwen2.5-3B_P_lora", "universe_Qwen2.5-3B_lr0.0001_lora", "universe_Qwen2.5-3B_lr0.0001_unsloth_lora"], "base_model": "Qwen/Qwen2.5-3B", "items_sha": {"corpus_ppl": "5dde1c7724fb1aa7c0f63fe3e7b522286b1b959301611b3ac01cff05fd6fa7f6", "heldout_induction": "34cf213b77f01d8966d55ab1b04781e5859e1d7b3d3cf7bd70e2da51cb60ad72", "icl_suite": "478c04277ce9150151683f64ec89d76a7ac768c7360c41ad4cd0df02b7b48924", "known_facts": "ddf2472cf6ea051225a995cdad7e74c581f3f983e5cc2d6a22b24e224a3ea6f4", "ladder": "2f314742844bcc2a95e060c971ac8a9668ecab4abd3467007bebe8ced7577c0a", "probes": "d8afd4aecfebb6172dc2dda9b1fd2b8dead7a9b6ccf8de1fad616f229689449e"}, "items_universe": "plain", "items_version": "v1", "maxlen": 768, "n_paragraphs": 29}`
+- `20260915-081900`: `{"adapters": ["universe_Qwen2.5-0.5B_lr0.0001_lora"], "base_model": "Qwen/Qwen2.5-0.5B", "items_sha": {"corpus_ppl": "5dde1c7724fb1aa7c0f63fe3e7b522286b1b959301611b3ac01cff05fd6fa7f6", "heldout_induction": "34cf213b77f01d8966d55ab1b04781e5859e1d7b3d3cf7bd70e2da51cb60ad72", "icl_suite": "478c04277ce9150151683f64ec89d76a7ac768c7360c41ad4cd0df02b7b48924", "known_facts": "ddf2472cf6ea051225a995cdad7e74c581f3f983e5cc2d6a22b24e224a3ea6f4", "ladder": "2f314742844bcc2a95e060c971ac8a9668ecab4abd3467007bebe8ced7577c0a", "probes": "d8afd4aecfebb6172dc2dda9b1fd2b8dead7a9b6ccf8de1fad616f229689449e"}, "items_universe": "plain", "items_version": "v1", "maxlen": 768, "n_paragraphs": 29}`
 
 ## curriculum_v2
 
