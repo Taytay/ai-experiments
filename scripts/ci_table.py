@@ -30,7 +30,7 @@ LEVELS = ["L1_recall", "L1_recall_fmt", "L2_manip_isa", "L2_manip_pair", "L3_ind
           "L4_induct_habitat", "L5_novel_choices", "L6_unseen_recall", "L6_seen_recall_ctrl", "L3_induct_heldout",
           "M_probe_marked", "M_probe_plain", "M_probe_marked_fmt", "M_probe_plain_fmt",
           "ICL_symbol_banking77", "ICL_symbol_dbpedia", "ICL_symbol_sst2", "ICL_symbol_subj",
-          "ICL_natural_banking77", "ICL_natural_dbpedia", "ICL_natural_sst2", "ICL_natural_subj"]
+          "ICL_natural_banking77", "ICL_natural_dbpedia", "ICL_natural_sst2", "ICL_natural_subj", "ICL_symbol_all", "ICL_natural_all"]
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 ap.add_argument("tag", nargs="?", default="Qwen2.5-3B")
@@ -54,6 +54,16 @@ def load_arm(arm):
 data = {arm: d for arm in a.arms if (d := load_arm(arm))}
 if not data:
     raise SystemExit(f"no per-item files under {PER_ITEM}")
+
+
+def with_pooled(recs):
+    """Add copies of the ICL suite items relabelled ICL_symbol_all / ICL_natural_all (192 items each), so the
+    suite means the report quotes get an interval and a paired test of their own."""
+    pooled = [dict(r, level=r["level"].rsplit("_", 1)[0] + "_all", id=r["id"] + "|all") for r in recs if r["level"].startswith("ICL_")]
+    return recs + pooled
+
+
+data = {arm: {c: with_pooled(r) for c, r in d.items()} for arm, d in data.items()}
 params = {arm: {c: SC.params_for(r) for c, r in d.items()} for arm, d in data.items()}
 arms = list(data)
 print(f"{len(arms)} arms: {', '.join(arms)}; rule {a.rule}; {a.draws} draws", flush=True)
