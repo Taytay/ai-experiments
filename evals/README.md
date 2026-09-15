@@ -33,7 +33,7 @@ with Run("universe_ladder", model="Qwen/Qwen2.5-3B",
 Only numeric values are stored as metrics; strings belong in `config`. If the block
 raises, the run is marked `failed` with the exception text. The run id is printed at
 start (`[evals] run 20260913-151609-207526 ... commit=eb845a6*`); a `*` means the
-working tree had uncommitted changes, i.e. provenance is approximate. Commit first.
+working tree had uncommitted changes to anything other than the tracker's own outputs (`evals/runs.jsonl`, `evals/LEADERBOARD.md`, `results/`), i.e. code or data provenance is approximate. Commit first.
 
 ## CLI
 
