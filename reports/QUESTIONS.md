@@ -293,6 +293,7 @@ formats" is a property of uncased tokenizers, not of subwords in general.
 *Experiment:* re-run LLM in-context and `bank_category` evals with title-cased bank strings; run
 the embedding experiment on a cased encoder (bge-base-en-v1.5, gte-modernbert-base,
 Qwen3-Embedding-0.6B) and report whether 70.8 survives.
+**Status (2026-09-14):** first half done, PLAN step 5, REPORT.md section 13: token survival measured for both tokenizers (Qwen 10.6% under uppercasing, 95.2% title-cased; MiniLM 96.2%); title-cased and name-restored bank strings do not lift the 0.5B with-context score (14.2 -> 15.8 / 15.0), so the failure is the transaction format, not the casing. The cased-encoder half (bge-base, Qwen3-Embedding) waits for step 13.
 
 **MODEL-5 (R) Is the new-token failure specific to mean pooling and to a 22 M, 6-layer model?**
 The diagnosed mechanism is mean-pooling dilution; CLS-pooled or late-interaction encoders would not

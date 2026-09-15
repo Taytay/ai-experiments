@@ -1,0 +1,72 @@
+{
+  "token_survival": {
+    "Qwen2.5 (0.5B and 3B share it)": {
+      "clean": {
+        "survival": 100.0,
+        "tokens_per_name": 3.62
+      },
+      "upper": {
+        "survival": 10.6,
+        "tokens_per_name": 4.54
+      },
+      "title": {
+        "survival": 95.2,
+        "tokens_per_name": 3.67
+      },
+      "name": {
+        "survival": 100.0,
+        "tokens_per_name": 3.62
+      }
+    },
+    "all-MiniLM-L6-v2 (uncased WordPiece)": {
+      "clean": {
+        "survival": 100.0,
+        "tokens_per_name": 3.33
+      },
+      "upper": {
+        "survival": 96.2,
+        "tokens_per_name": 3.33
+      },
+      "title": {
+        "survival": 96.2,
+        "tokens_per_name": 3.33
+      },
+      "name": {
+        "survival": 100.0,
+        "tokens_per_name": 3.33
+      }
+    }
+  },
+  "n_merchants": 120,
+  "llm": {
+    "base": {
+      "bank_category_upper": 8.3,
+      "bank_category_title": 8.3,
+      "bank_category_name": 8.3
+    },
+    "incontext": {
+      "bank_category_upper": 14.2,
+      "bank_category_title": 15.8,
+      "bank_category_name": 15.0
+    }
+  },
+  "embedding": {
+    "zero_shot": {
+      "bank_upper_train": 7.3,
+      "bank_title_train": 7.3,
+      "bank_name_train": 7.3,
+      "bank_upper_heldout": 4.2,
+      "bank_title_heldout": 4.2,
+      "bank_name_heldout": 4.2
+    },
+    "ft_subword": {
+      "bank_upper_train": 67.7,
+      "bank_title_train": 67.7,
+      "bank_name_train": 68.8,
+      "bank_upper_heldout": 4.2,
+      "bank_title_heldout": 4.2,
+      "bank_name_heldout": 4.2
+    }
+  },
+  "minutes": 1.1
+}
