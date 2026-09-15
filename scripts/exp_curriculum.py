@@ -86,13 +86,14 @@ MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
 STEPS = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 LR = float(sys.argv[4]) if len(sys.argv) > 4 else 1e-4
 MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "16")), int(os.environ.get("ACCUM", "1")), 768  # MICRO x ACCUM = 16 sequences per step
-GRAD_CKPT = os.environ.get("GRAD_CKPT", "0")  # "0" (default: no activation recomputation), "1", or "unsloth" (offloaded checkpointing)
+GRAD_CKPT = os.environ.get("GRAD_CKPT", "unsloth")  # "unsloth" (default, offloaded checkpointing), "1", or "0" (none: 30% faster in a
+# 60-step bench but a full arm C run died of memory at step 600 after its periodic evaluations, REPORT.md 19)
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
 PACK = int(os.environ.get("PACK", "2048"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
 # block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). PACK=0 = one sequence per row (padded).
-# Before 2026-09-15 every run used MICRO=8 ACCUM=2 GRAD_CKPT=unsloth PACK=0 (REPORT.md 19 measures the change: 2 to 3x faster, same numbers).
+# Before 2026-09-15 every run used MICRO=8 ACCUM=2 PACK=0 (REPORT.md 19 measures the change: 2 to 2.5x faster, same numbers).
 RUN_TAG = os.environ.get("RUN_TAG", "")  # optional suffix on the results and adapter names (validation runs, ablations)
 SEED = int(os.environ.get("SEED", "0"))  # training seed: LoRA init, stream order, mixture draws (PLAN step 10, STAT-1)
 BS = MICRO * ACCUM
