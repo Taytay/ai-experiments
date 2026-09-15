@@ -39,7 +39,7 @@ afternoon each on the 3090.
 | # | Step | IDs | Needs | Status | Result |
 |---|------|-----|-------|--------|--------|
 | 1 | Persist per-item, per-option log-probs, argmax, token and byte counts from every eval; freeze `ladder`, `probes`, `heldout_induction` to versioned JSON in `data/processed/` and record the hash in the tracker config. Done when every existing adapter has been re-scored with `EVAL_ONLY` and the per-item files exist. | STAT-2, STAT-3 | - | done | REPORT.md 9; data/processed/*_v1*.json; results/per_item/ |
-| 2 | Scorer set on the saved logits: sum, mean-per-token (current), PMI_DC, Bayesian length correction, hybrid symbol scoring on 3B, unconditional-option baseline (UNC), RStd, predicted-label histogram. Done when one table reports every arm under every scorer and says which cells move. | EVAL-2, EVAL-1, EVAL-6 | 1 | todo | |
+| 2 | Scorer set on the saved logits: sum, mean-per-token (current), PMI_DC, Bayesian length correction, hybrid symbol scoring on 3B, unconditional-option baseline (UNC), RStd, predicted-label histogram. Done when one table reports every arm under every scorer and says which cells move. | EVAL-2, EVAL-1, EVAL-6 | 1 | done | REPORT.md 10; reports/scorers_Qwen2.5-3B.md |
 | 3 | Constructed-response eval: greedy-decode 32 tokens for every L1, L3, category and sells item; exact and fuzzy match; options-listed variant; three-way agreement with the two cloze scorers. | EVAL-3 | 1 | todo | |
 | 4 | Empirical null band per level (shuffle answer index 1,000 times over saved per-option scores); bootstrap CIs and paired tests from the per-item files; CI column in every report table. | STAT-2, EVAL-6, REPORT-2 | 1 | todo | |
 | 5 | Tokenizer casing check: re-run the LLM in-context and `bank_category` evals with title-cased bank strings; record the token-survival statistic for every tokenizer in use. | MODEL-4 | 1 | todo | |
@@ -72,3 +72,4 @@ afternoon each on the 3090.
   ceiling" / "RAG upper bound" are "oracle context" in the report and the code docstrings; 8.1 has a
   sequence / token / loss-bearing-token table (arm C: 84% knowledge text by loss-bearing tokens,
   episodes 12%) and the arm D schedule confound, pointing at steps 9 and 12.
+- 2026-09-14: step 2 done (REPORT.md section 10). Elicitation matters more than normalisation: hybrid scoring lifts every induction level of arm C by 5 to 11 points and turns L5 from below chance into 33.8; letter scoring makes knowledge-only arm A the best inducer (62.5) while collapsing the trained arms' ICL suite; PMI is only right for bare-format recall. Several "chance" rows are constant predictors.
