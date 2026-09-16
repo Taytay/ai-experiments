@@ -822,7 +822,7 @@ Training took 29 minutes at 691 tokens per second (8.7 GiB). The per-stream coun
 | level | C (15) | Cg | Cg minus C | | Cg minus base |
 |---|---|---|---|---|---|
 | recall, trained format | 100 | 100 | 0 | | |
-| recall, bare format | 19.4 | 18.8 | -0.3 [-1.9, 1.2] | | |
+| recall, bare format | 19.4 | 18.8 | -0.6 [-3.8, 2.5], p = 1 | | |
 | yes/no | 77.5 | 73.8 | -3.8 [-16, 10], p = 0.72 | | +31.2, p = 0.002 |
 | pair | 80.0 | 58.8 | **-21.2 [-36, -6], p = 0.014** | | +7.5, p = 0.55 |
 | Timmy k=3 | 61.2 | 47.5 | **-13.8 [-22.5, -4.4], p = 0.004** | | +10.6, p = 0.03 |
@@ -852,3 +852,60 @@ The three levels where arm C beat every other arm in section 8 came down: Timmy 
 General-text replay at 5% of sequences (27% of the loss) buys back the whole general-text perplexity cost and about all of the ARC-Easy loss of arm C, at no cost to recall or to the ICL suite, and at a measured cost to induction that is confounded with the episode share it displaced. The two forgetting proxies of section 15 now disagree in a useful way: perplexity says nothing was forgotten (0.09 nats), ARC-Easy says 2.5 points that the interval cannot see. For the merchant use case, where the model's existing knowledge is the product, the replay fraction belongs in the recipe; for the induction result it should come out of the knowledge stream, not the episodes, and that is step 9's job.
 
 **What the report should say.** Replaying 5% pretraining-style text (a quarter of the loss) beside arm C's mixture keeps the WikiText perplexity at the base model's (+0.09 nats against C's +0.84) and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), from the first checkpoint on, with recall at 100 and the ICL suite at its best (81.2). Induction from the weights fell by 10 to 21 points on three levels, which is either the episode share it displaced (12% to 7.5% of the loss) or competition for the adapter; one more run with the 5% taken from the knowledge stream decides.
+
+## 18. Prompt distillation v2: the ranking distils, and what it distils is a format (BASE-3)
+
+Date: 2026-09-15. Code: `scripts/exp_distill_v2.py` (arm P2), `ai_experiments.scoring.option_logprobs_batched`, `scripts/diag_distill_options.py`; data `results/curriculum_Qwen2.5-3B_P2.json`, per-item `results/per_item/curriculum_Qwen2.5-3B_P2.*.jsonl`, `results/distill_options_Qwen2.5-3B.json`; adapter `models/adapters/curriculum_Qwen2.5-3B_P2_lora`; tracker `curriculum_v2`, arm P2, method `prompt_distill_options`; PLAN.md step 27.
+
+Section 14 ended with a diagnosis: the base model reading the field guide puts 6% of its next-token mass on the fact, so its 98.8 with-context recall is a ranking among the options, not a distribution, and distilling the distribution (arm P) transferred nothing. Arm P2 distils the ranking. Every distilled example is a question with an option set; the target is the teacher's log-probability of each option string, with the entry in front of the prompt, renormalised over the set at temperature 1; the student is scored on the bare prompt the same way and trained with the KL between the two, which is the evaluation's own arithmetic turned into a loss. The fact stream is the five question-answer templates that arm A trains on as text (`universe._DESC` 8, 9, 10, 12), one attribute varied per question and the options being the template filled with each candidate value, so the option strings are exactly the sentences arm A sees: 680 questions over 136 species (type, weakness, habitat, region, diet). Episodes are distilled the same way with their labels as the option set, the teacher reading the entries of every species in the prompt; the ICL replay keeps its hard cross-entropy. Mixture .45 / .40 / .15, 800 steps of 16, the usual LoRA, 57 minutes at 365 tokens per second (two forwards of up to 64 rows per micro-batch, 11.9 GiB).
+
+**A discarded run.** The first run scored the options in left-padded batches and read 11.9 trained-format recall, the base model's number, with the teacher's option ranking inside the mixed-length training batches at 66% where it is 92% scored alone. The cause is unsloth's training-mode forward: with gradient checkpointing on, a left-padding attention mask is not applied and the real tokens attend the pads (per-token log-probs off by up to 15 nats; in eval mode the mask is honoured, and plain transformers honours it in both). Right padding is exact under causal attention whatever the mask path does; the shared scorer now right-pads, takes the final hidden states from unsloth and applies the LM head only at the option tokens. Two smaller facts from the same probe carry over: batch shape moves bf16 log-probs by 0.03 nats per token on average (0.4 at most), in plain transformers as much as in unsloth, so an option's log-prob sum is stable to about half a nat across batch layouts; and every evaluation in this repo right-pads, so nothing before this section is affected.
+
+**Table 18.1: arm P2 beside base, A, C and P (accuracy %, without / with field-guide context; A and C are the section 8 runs as in Table 14.1, ARC-Easy from their section 15 reruns)**
+
+| level | base | A knowledge | C interleaved + replay | P distillation (14) | P2 option distillation |
+|---|---|---|---|---|---|
+| recall, trained format | 11.9 / 100 | 100 / 100 | 100 / 100 | 13.8 / 100 | **91.9** / 100 |
+| recall, bare format | 18.1 / 98.8 | 25.0 / 40.6 | 20.6 / 98.8 | 20.0 / 100 | **28.1** / 99.4 |
+| yes/no | 42.5 / 100 | 96.2 / 100 | 86.2 / 100 | 63.8 / 100 | 58.8 / 100 |
+| pair | 51.2 / 81.2 | 91.2 / 96.2 | 73.8 / 70.0 | 46.2 / 88.8 | 50.0 / 57.5 |
+| Timmy k=3 | 36.9 / 48.8 | 40.0 / 43.1 | 58.8 / 76.2 | 33.1 / 42.5 | 31.2 / 46.9 |
+| k=4 | 25.0 / 41.2 | 34.4 / 39.4 | 51.2 / 69.4 | 26.2 / 37.5 | 25.0 / 31.2 |
+| held-out species | 40.6 / 43.8 | 24.0 / 32.3 | 30.2 / 75.0 | 33.3 / 41.7 | 36.5 / 39.6 |
+| ICL suite symbol | 60.4 | 51.6 | 79.2 | 76.6 | 78.6 |
+| ICL suite natural | 84.4 | 80.8 | 88.0 | 84.4 | 86.5 |
+| ARC-Easy | 73.5 | 66.0 | 59.0 | . | **77.0** |
+| WikiText ppl (16) | 10.61 | 37.78 | 23.18 | 11.50 | **10.90** |
+
+**Table 18.2: the teacher's ranking and the student's, per question form (`scripts/diag_distill_options.py`; argmax over the option set, 136 species each; base = bare prompt, no adapter)**
+
+| question form | teacher with entry: acc / top-option p | base bare: acc | P2 bare: acc / top-option p |
+|---|---|---|---|
+| type ("{N} is a {V}-type.") | 100 / 0.998 | 11.8 | 100 / 0.996 |
+| weakness | 100 / 1.000 | 0.0 | 100 / 1.000 |
+| habitat | 100 / 1.000 | 20.6 | 100 / 0.998 |
+| region | 100 / 1.000 | 17.6 | 100 / 0.998 |
+| diet ("{N} is an {V}.") | **58.1** / 0.805 | 19.9 | **62.5** / 0.818 |
+| ladder L1 recall, bare, 160 items | 99.4 / 0.939 | 11.9 | 54.4 / 0.831 |
+| ladder L1 recall, trained format, 160 items | 100 / 0.998 | 7.5 | 100 / 0.996 |
+| training episodes (teacher, mean over the run) | 31 / 0.62 | | |
+
+### 18.1 The facts went in, at almost no cost
+
+Trained-format recall is 91.9 against the base model's 11.9 (+80.0 on the same items, CI [73.8, 86.2]) and arm P's 13.8, 8.1 points under arms A and C (p = 0.0002); on the 680 training questions the student reproduces the teacher's ranking exactly on four of the five forms (Table 18.2). Bare-format recall by the mean-per-token rule is 28.1, the highest of any arm (+10.0 over base, +8.8 over C, both p < 0.003; A +3.8, n.s.), and 54.4 by the sum rule the distillation itself used. The general-text cost is 0.027 nats per token (perplexity 10.61 to 10.90), thirty times less than arm C's 0.84 and three times less than arm Cg's replay-protected 0.09 (section 17); ARC-Easy is 77.0, above the base model's 73.5 and +18.0 over C (p = 2e-8) and +11.0 over A (p = 0.0007) on the same 200 items; the ICL suite is at C's level (78.6 against 79.2, and +18.2 over base, p = 2e-5). Where the teacher is wrong the student is wrong with it: the diet form, whose options read "{N} is an herbivore", has the teacher at 58.1 and the student at 62.5, so the soft targets transferred the teacher's error rate along with its facts.
+
+### 18.2 What did not go in: everything asked in another form
+
+The yes/no level is 58.8 (A 96.2, C 86.2; +16.2 over base, CI [-3.8, 35.0], p = 0.14), pairwise same-type 50.0 (A 91.2; chance), Timmy k=3 31.2 and k=4 25.0, both inside their section 11 null bands, and the held-out-species control pair reads 37.5 seen against 8.3 unseen. So the adapter answers "What type is Blaxorc?" in the sentence it was trained to rank and cannot say yes to "Is Blaxorc a Voltrix-type creature?", nor compare two species, nor use the type as a grouping rule. Arm A learns the same facts from fourteen templates including the yes/no and comparative ones and gets 96 and 91 on those levels; P2 saw five question forms with soft targets and no declarative text, and the knowledge stayed in those five forms. The 91.9 is a ranking the model reproduces, not a fact it can manipulate, which is the section 14 diagnosis one level up: the with-context number was a ranking, the ranking can be written into the weights, and what is written is the ranking.
+
+The episode stream did nothing for the same reason arm P's did: the teacher is at chance on the training episodes even with the field guide in front of it (31% with k between 2 and 5, mean top-option probability 0.62), so 40% of the mixture distilled noise. The base model's with-context 48.8 on the ladder's k=3 items (section 8) does not extend to the training episodes' templates and group counts. The ICL gain came from the 15% hard-label replay, as in section 14.
+
+### 18.3 Cost and knowledge are not the same axis
+
+Table 18.1's last two rows put the arms on one line: A learned 2,752 texts and paid 1.40 nats and 7.5 ARC-Easy points; C paid 0.84 and 14.5; Cg, with general text replayed, 0.09 and 2.5; P2 learned 680 rankings and paid 0.03 nats and gained 3.5 ARC-Easy points. The perplexity cost tracks how much *text* the adapter learned to model, not how many facts it holds, and the cheapest injection here is also the narrowest. For the merchant use case the trade reads the other way round: if the deployed question is fixed (this string, which category), a ranking is what is needed, and P2 is a way to write 680 of them into a 3B model for 0.03 nats.
+
+### 18.4 What BASE-3 now says
+
+Yes, the with-context ceiling can be distilled into the weights, once the target is the teacher's ranking over the option set rather than its next-token distribution: 91.9 trained-format recall from a teacher at 100, at the lowest general-text cost of any injecting arm, and with the teacher's own errors carried over. No, that is not the knowledge arms A and C hold: it answers in the forms it was distilled in and nowhere else. BASE-3 closes as answered on both counts. A distillation that also covered the yes/no and comparative forms would be arm A with soft labels, and the section 14 and 18 results together say what the soft part buys: the teacher's calibration, its mistakes, and a smaller footprint.
+
+**What the report should say.** Option-renormalised prompt distillation writes the with-context ranking into the weights: 91.9 recall in the trained format (base 11.9, arm P 13.8) at 0.03 nats of general-text cost and no ARC-Easy or ICL loss, with the teacher's diet errors inherited. The facts are usable only in the five question forms they were distilled in: yes/no 58.8, pairwise at chance, induction inside the null band. A first run with left-padded option batches was discarded after a probe showed unsloth's training-mode forward ignores the left-padding mask; every evaluation in the repo right-pads and is unaffected.
