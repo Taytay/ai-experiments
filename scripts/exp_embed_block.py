@@ -8,6 +8,7 @@ Encoders (all through sentence-transformers, so each one's own pooling and norma
   minilm   sentence-transformers/all-MiniLM-L6-v2   22M, 384-d, mean pooling, UNCASED WordPiece (the section 4/6 encoder)
   bge      BAAI/bge-base-en-v1.5                     109M, 768-d, CLS pooling, UNCASED WordPiece (the survey called it cased; it lower-cases)
   qwen3    Qwen/Qwen3-Embedding-0.6B                 596M, 1024-d, last-token pooling, CASED Qwen BPE ("Elrholm" and "ELRHOLM" share no token)
+  egemma   google/embeddinggemma-300m                308M, 768-d, mean pooling + dense layers, CASED Gemma SentencePiece (added later, gated)
 
 PART universe (MODEL-3, BASE-4): contrastive name -> attribute-text training exactly as exp_universe_embed.py
   (8 epochs, in-batch negatives, same-positive masking), frozen and trained encoder each scored on
@@ -52,12 +53,13 @@ from ai_experiments import universe as U
 from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import ROOT
 
-ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5", "qwen3": "Qwen/Qwen3-Embedding-0.6B"}
+ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5", "qwen3": "Qwen/Qwen3-Embedding-0.6B",
+            "egemma": "google/embeddinggemma-300m"}  # egemma added after section 24 at the owner's request (gated on the Hub)
 ENC = sys.argv[1] if len(sys.argv) > 1 else "minilm"
 PART = sys.argv[2] if len(sys.argv) > 2 else "all"
 MODEL = ENCODERS[ENC]
 SMOKE = bool(os.environ.get("SMOKE"))
-LR = {"minilm": 3e-5, "bge": 3e-5, "qwen3": 1e-5}[ENC]
+LR = {"minilm": 3e-5, "bge": 3e-5, "qwen3": 1e-5, "egemma": 2e-5}[ENC]
 BS, SEED = 32, 0
 EPOCHS_U, EPOCHS_M, EPOCHS_K = (2, 2, 2) if SMOKE else (8, 6, 6)
 TRIALS, SPLITS = (20, 2) if SMOKE else (300, 10)
@@ -348,7 +350,7 @@ def mosaic_mlm(model, new_ids, alpha=0.3, p_mask=0.15, mask_id=None):
 
 def part_merchant(run):
     names = [m["name"] for m in all_m]
-    conds = ["zero_shot", "ft_subword", "ft_newtok_mean", "ft_newtok_gauss", "ft_newtok_warm"] + (["ft_newtok_mosaic"] if ENC != "qwen3" else ["ft_newtok_tied"])
+    conds = ["zero_shot", "ft_subword", "ft_newtok_mean", "ft_newtok_gauss", "ft_newtok_warm"] + (["ft_newtok_mosaic"] if ENC in ("minilm", "bge") else ["ft_newtok_tied"])
     for cond in conds:
         model = load_encoder()
         if cond != "zero_shot":

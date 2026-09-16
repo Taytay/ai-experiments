@@ -109,7 +109,7 @@ GRAD_CKPT = os.environ.get("GRAD_CKPT", "1")  # "1" (default: plain torch checkp
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
-PACK = int(os.environ.get("PACK", "2048"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
+PACK = int(os.environ.get("PACK", "1024"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,  # 1,024 since 2026-09-16: five 2,048-row runs OOMed in the backward after a periodic evaluation; no 1,024-row run has
 # block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). PACK=0 = one sequence per row (padded).
 # Before 2026-09-15 every run used MICRO=8 ACCUM=2 PACK=0 (REPORT.md 19 measures the change: 2 to 2.5x faster, same numbers).
 RUN_TAG = os.environ.get("RUN_TAG", "")  # optional suffix on the results and adapter names (validation runs, ablations)
