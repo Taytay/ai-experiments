@@ -201,7 +201,9 @@ def evaluate(model, tok):
     """Returns ({"noctx": metrics, "ctx": metrics}, {"noctx": records, "ctx": records}).
     Probes, ICL suite and perplexity live under noctx; records are per item (ai_experiments.scoring)."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS)
+    # 4-bit 7B: a smaller forward budget, since the driver spills VRAM to system RAM instead of raising the OOM the scorer
+    # would halve its chunk on (a 35-minute with-context ladder pass at the 24 GB limit on the first 7B arm C run)
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS, **({"rows_per_forward": 16, "tokens_per_forward": 8192} if LOAD_4BIT else {}))
     recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
     if RET:
@@ -232,7 +234,7 @@ def evaluate(model, tok):
 def periodic_eval(model, tok):
     """Cheap mid-training point: a fixed subsample, no extra passes, no per-item file. Leaves the model in train mode."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=32, tokens_per_forward=16384)  # smaller footprint mid-training
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=16 if LOAD_4BIT else 32, tokens_per_forward=8192 if LOAD_4BIT else 16384)  # smaller footprint mid-training
     m = aggregate(sc.score(ladder[::4]) + sc.score(suite[::2]) + (sc.score(known) if known else []))
     sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
     m["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
