@@ -60,11 +60,20 @@ ENC = sys.argv[1] if len(sys.argv) > 1 else "minilm"
 PART = sys.argv[2] if len(sys.argv) > 2 else "all"
 MODEL = ENCODERS[ENC]
 SMOKE = bool(os.environ.get("SMOKE"))
+RUN_TAG = os.environ.get("RUN_TAG", "")
 LR = {"minilm": 3e-5, "bge": 3e-5, "qwen3": 1e-5, "egemma": 2e-5, "gtemb": 3e-5}[ENC]
 BS, SEED = 32, 0
 EPOCHS_U, EPOCHS_M, EPOCHS_K = (2, 2, 2) if SMOKE else (8, 6, 6)
 TRIALS, SPLITS = (20, 2) if SMOKE else (300, 10)
-OUT = ROOT / "results" / f"embed_block_{ENC}{'_smoke' if SMOKE else ''}.json"
+OUT = ROOT / "results" / f"embed_block_{ENC}{'_' + RUN_TAG if RUN_TAG else ''}{'_smoke' if SMOKE else ''}.json"
+SAVE_DIR = ROOT / ("models/smoke" if SMOKE else "models/adapters")
+
+
+def save_encoder(model, name):
+    """Every trained encoder is kept (owner's rule), in bf16, under models/adapters/embed_<enc>_<name> (DVC)."""
+    d = SAVE_DIR / f"embed_{ENC}_{name}"
+    model[0].auto_model.to(torch.bfloat16); model.save(str(d)); model[0].auto_model.to(torch.float32)
+    print(f"    saved {d.relative_to(ROOT)}", flush=True)
 PER_ITEM = ROOT / "results" / "per_item"
 torch.manual_seed(SEED)
 rng = random.Random(SEED)
@@ -258,6 +267,7 @@ def part_universe(run):
     for cond in ("frozen", "trained"):
         if cond == "trained":
             train_pairs(model, universe_pairs(), EPOCHS_U, log="universe: ")
+            save_encoder(model, "universe_trained")
         r = {}
         r.update({f"ladder_{k}": v for k, v in score_ladder(model, f"universe_{cond}").items()})
         r.update(score_universe_protocol(model))
@@ -382,6 +392,8 @@ def part_merchant(run):
                 w = model[0].auto_model.get_input_embeddings().weight
                 with torch.no_grad(): w[upper] = w[ids]
         r = score_merchant(model)
+        if cond != "zero_shot":
+            save_encoder(model, f"merchant_{cond}")
         if cond.startswith("ft_newtok"):
             tok = model.tokenizer
             r["bank_hits_new_token"] = round(100 * sum(any(i in ids + (upper if cond == "ft_newtok_tied" else []) for i in tok(M.bank_string(m), add_special_tokens=False)["input_ids"]) for m in all_m) / len(all_m), 1)
@@ -450,16 +462,18 @@ def part_kge(run):
     model.eval()
     print(f"    kge: trained {EPOCHS_K} epochs in {time.time() - t0:.0f}s, final loss {float(loss):.3f}", flush=True)
     save(run, "kge_distmult", score_after(model, {k: v.detach() for k, v in rel.items()}))
+    save_encoder(model, "kge_distmult"); torch.save({k: v.detach().cpu() for k, v in rel.items()}, SAVE_DIR / f"embed_{ENC}_kge_distmult" / "relations.pt")
     del model; torch.cuda.empty_cache()
     # (b) relation-free control: the same triples as (head text, tail text) contrastive pairs
     model = load_encoder()
     train_pairs(model, [(h, t) for h, _, t in triples], EPOCHS_K, log="kge control (pairs): ")
     save(run, "kge_pairs_control", score_after(model))
+    save_encoder(model, "kge_pairs_control")
     del model; torch.cuda.empty_cache()
 
 
 # ================================================================== main
-cfg = dict(encoder=ENC, part=PART, lr=LR, bs=BS, seed=SEED, epochs_universe=EPOCHS_U, epochs_merchant=EPOCHS_M, epochs_kge=EPOCHS_K,
+cfg = dict(encoder=ENC, part=PART, run_tag=RUN_TAG, lr=LR, bs=BS, seed=SEED, epochs_universe=EPOCHS_U, epochs_merchant=EPOCHS_M, epochs_kge=EPOCHS_K,
            trials=TRIALS, splits=SPLITS, smoke=SMOKE, n_species=len(species), n_heldout_species=len(held), n_merchants=len(all_m),
            n_heldout_merchants=len(held_m), **FROZEN.config())
 with Run("embed_block", model=MODEL, config=cfg, enabled=not SMOKE) as run:

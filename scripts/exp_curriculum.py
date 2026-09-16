@@ -156,6 +156,8 @@ def retriever():
         from ai_experiments.retrieval import UniverseRetriever
         _RETRIEVER = UniverseRetriever(species)
         print(f"    retriever index: {len(_RETRIEVER.docs)} documents ({_RETRIEVER.n_entries} entries + training texts)", flush=True)
+        if not SMOKE and not (ROOT / "models" / "adapters" / f"retriever_universe_minilm_n{len(species)}").exists():
+            _RETRIEVER.save(f"universe_minilm_n{len(species)}")
     return _RETRIEVER
 SCHEDULE = {"Dr": "restart", "Dc": "constant"}.get(ARM, "shared")  # one warmup + linear decay over all phases (default),
 # restarted at each phase boundary, or held at the peak after the warmup (PLAN step 12, TRAIN-2)
