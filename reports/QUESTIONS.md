@@ -185,6 +185,8 @@ step; compare bank and held-out transfer plus a cloze recall probe against contr
 gte-modernbert-base and EmbeddingGemma-300M; re-run curriculum arms base/A/C on Qwen2.5-7B and
 Qwen3-8B.
 
+**Status (2026-09-16):** answered for the embedding side, PLAN step 13, REPORT.md 24. On the frozen induction items the LLM arms answer, fine-tuned bge-base-en-v1.5 and Qwen3-Embedding-0.6B score 92 to 94 (Timmy), 86 to 91 (k=4) and 72 to 80 (habitat) from their weights against arm C's 62 / 52 / 29 (71 / 61 / 66 with the field guide); MiniLM's 79 / 63 / 53 already beats the LLM's weights. The section 4 bank-string transfer (70.8) is uncased-tokenizer behaviour: 84.4 on bge-base (uncased, not cased as the survey said), 26.0 on the cased Qwen3 tokenizer. The LLM side (Qwen2.5-7B etc.) is still PLAN row 15.
+
 ---
 
 ## Independent review, 2026-09-14
@@ -193,7 +195,6 @@ The reviewer independently raised the 7B gap (folded into MODEL-1), option-lengt
 scoring (EVAL-2, extends EVAL-1) and the missing masked-LM encoder arm (folded into MODEL-2).
 IDs below continue the numbering started above.
 
-**Status (2026-09-16):** answered for the embedding side, PLAN step 13, REPORT.md 24. On the frozen induction items the LLM arms answer, fine-tuned bge-base-en-v1.5 and Qwen3-Embedding-0.6B score 92 to 94 (Timmy), 86 to 91 (k=4) and 72 to 80 (habitat) from their weights against arm C's 62 / 52 / 29 (71 / 61 / 66 with the field guide); MiniLM's 79 / 63 / 53 already beats the LLM's weights. The section 4 bank-string transfer (70.8) is uncased-tokenizer behaviour: 84.4 on bge-base (uncased, not cased as the survey said), 26.0 on the cased Qwen3 tokenizer. The LLM side (Qwen2.5-7B etc.) is still PLAN row 15.
 
 ### EVAL — evaluation validity
 
