@@ -1012,3 +1012,65 @@ From here, an arm comparison on a ladder level of a mixture arm needs three seed
 ### 20.4 A note on the D runs
 
 Both D seed runs died within 100 steps on the fast path under unsloth's offloaded gradient checkpointing (`use_gradient_checkpointing="unsloth"`: CUDA out-of-memory and cuBLAS internal / execution errors raised inside the checkpoint backward at 11 GiB allocated, with A, C and the M arms running 800 steps each on the same code; Instruct C1 died the same way in section 22's queue), and both completed under plain torch checkpointing (`GRAD_CKPT=1`), which the section 19 bench had measured at the same speed. Their configs record `grad_ckpt=True`. The default is now plain checkpointing; the numbers are the same operation either way, only the activation storage differs. The failure is not understood beyond the fact that arm D's packed rows vary in length more than the other arms' (256 to 2,000 tokens), which is where a state-machine bug in the offload buffers would show.
+
+## 21. Mixture by loss weight: the nominal 45/40/15 never trained arm C, and imposing it removes the facts (TRAIN-1)
+
+Date: 2026-09-15. Code: `PERIODIC=200 uv run python scripts/exp_curriculum.py {M0,M20,M40,M60}` on the section 19 fast path (packed rows, one 16-sequence micro-batch, seed 0); data `results/curriculum_Qwen2.5-3B_M*_p200.json`, per-item under `results/per_item/`; adapters `curriculum_Qwen2.5-3B_M*_p200_lora`. Comparison arm C is the section 19.3 fast-path rerun (`C_fast`) and its seed-2 rerun (section 20); both are the same recipe as section 8's arm C.
+
+TRAIN-1 asked what arm C's mixture is in loss tokens rather than sequences. Section 8.1 answered the accounting half: 45% knowledge sequences are 84% of the loss-bearing tokens, because a knowledge text carries loss on every one of its ~25 tokens while an episode or a replay item carries it on 2 to 4 answer tokens. Step 9 tests the other half: does the recipe work *because* of that implicit weighting? The M arms keep arm C's sampling and change only the loss: each stream's mean token loss is weighted by its mixture fraction (`BY_LOSS`, `exp_curriculum.py`), so "K .45 / E .40 / R .15" means 45% of the gradient from knowledge, not 84%. Three additions from the step 9 design ride along: a self-teaching stream S (`universe.self_teaching`: completion, true/false and in-document multiple choice built from the training texts, answer-only loss, Self-Tuning 2406.06326), loss on every inferable demo label inside an episode rather than the query label alone (`ALL_ANSWER`, M20/M40/M60), and a sweep of the episode weight E in {0.2, 0.4, 0.6} at fixed R = 0.15.
+
+**Table 21.1: the arms, by loss weight and by loss-bearing tokens (800 steps x 16 sequences, seed 0)**
+
+| arm | loss weights K / S / E / R | knowledge weight (K+S) | loss-bearing tokens K / S / E / R | sequences K / S / E / R |
+|---|---|---|---|---|
+| C (pooled token mean) | implicit 84 / - / 12 / 4 | 84% | 141,683 / - / 19,582 / 7,144 | 5,845 / - / 5,034 / 1,921 |
+| M0 | .45 / - / .40 / .15 | 45% | 141,683 / - / 19,582 / 7,144 (identical batches to C) | 5,845 / - / 5,034 / 1,921 |
+| M20 | .43 / .22 / .20 / .15 | 65% | 135,479 / 7,010 / 18,290 / 7,434 | 5,585 / 2,698 / 2,534 / 1,983 |
+| M40 | .30 / .15 / .40 / .15 | 45% | 93,652 / 4,983 / 36,331 / 7,322 | 3,856 / 1,912 / 5,078 / 1,954 |
+| M60 | .17 / .08 / .60 / .15 | 25% | 52,391 / 2,662 / 54,612 / 7,412 | 2,165 / 1,035 / 7,608 / 1,992 |
+
+M0 is the clean test: same seed, same sampler, so the same 12,800 sequences in the same order as C_fast (the `tok_*` and `lb_*` counters match to the token); only the per-token weights differ. Runs took 10 to 14 minutes each (1,740 to 1,890 tokens per second, 11.3 GiB).
+
+**Table 21.2: from the weights (no context), accuracy %. Arm C as three runs: section 8 seed 0 slow path / fast path seed 0 / fast path seed 2**
+
+| measure | C (3 runs) | M0 | M20 | M40 | M60 |
+|---|---|---|---|---|---|
+| L1 recall, trained fmt | 100 / 100 / 100 | **33.8** | 100 | **36.2** | **13.1** |
+| L2 manipulation is-a | 77.5 / 87.5 / 93.8 | 45.0 | 58.8 | 45.0 | 45.0 |
+| L2 manipulation pair | 80.0 / 73.8 / 90.0 | 50.0 | 50.0 | 50.0 | 50.0 |
+| L3 induction, nonsense names | 61.2 / 56.9 / 73.8 | 31.2 | 46.9 | 31.9 | 35.0 |
+| L3 induction, real names | 78.1 / 72.5 / 86.9 | 38.1 | 56.2 | 38.8 | 36.2 |
+| L4 weakness | 60.0 / 52.5 / 71.2 | 35.0 | 42.5 | 32.5 | 32.5 |
+| ICL suite, symbol labels | 78.1 / 79.7 / 80.2 | 78.6 | 79.2 | 79.7 | 81.2 |
+| ARC-Easy (K) | 59.0 / 64.0 / 66.0 | 67.5 | 66.0 | 60.0 | 66.0 |
+| WikiText ppl (base 10.61) | . / 22.1 / 22.6 | 14.2 | 16.5 | 16.9 | 15.1 |
+
+Chance is 12.5 on recall, 50 on the L2 pair, 25 on the four-option items. The base model scores 13.1 / 42.5 / 51.2 / 35.6 / 38.1 / 35.0 on the first six rows, 60.4 on the ICL suite and 73.5 on ARC-Easy (re-scored with the section 19 scorer, `results/curriculum_Qwen2.5-3B_base.json`).
+
+**Table 21.3: with the field guide in context, accuracy %**
+
+| measure | base | C (3 runs) | M0 | M20 | M40 | M60 |
+|---|---|---|---|---|---|---|
+| L3 induction, nonsense names | 49.4 | 70.6 / 78.8 / 78.1 | **86.2** | 68.8 | 78.8 | 83.8 |
+| L3 held-out species | 43.8 | 70.8 / 74.0 / 71.9 | **82.3** | 47.9 | 79.2 | 76.0 |
+| L4 weakness | 46.9 | 67.5 / 70.6 / 71.2 | 76.9 | 63.8 | 74.4 | 75.6 |
+| L8 reverse, easy | 95.6 | . / 80.6 / 82.5 | **90.6** | 88.8 | 78.1 | 88.1 |
+| L8 reverse, hard | 88.1 | . / 79.4 / 79.4 | **90.6** | 82.5 | 76.2 | 84.4 |
+
+### 21.1 The implicit 84% is the recipe
+
+M0 has arm C's batches and arm C's sampler and does not learn the facts. Formatted recall is 33.8 at step 800 against arm C's 100 in all three runs, and the periodic curve shows it was not on its way: 10.0, 12.5, 20.0 at steps 200, 400, 600, where C_fast reads 25.0, 100, 100. Both manipulation levels sit at chance (45.0, 50.0) and induction from the weights is at or below the base model. Halving the knowledge stream's share of the gradient, from the 84% the pooled mean gives it to the 45% the mixture nominally says, is enough to keep 160 species out of the weights in 800 steps. Under Adam the absolute scale of the loss does not matter; what changed is the direction, now dominated by 19,582 episode-answer tokens and 7,144 replay tokens carrying 55% of the weight between them.
+
+So the answer to TRAIN-1 is that arm C's mixture was never 45/40/15 in any sense that matters to the optimiser, and the number that made it work is the 84% it never declared. Every "mixture" comparison in sections 8 and 15 (C against A, Cn, D, E) was a comparison of pooled means over streams with very different label densities. The design table in section 8.1 now has to be read with Table 21.1's third column, not its first.
+
+### 21.2 The E sweep at the loss level: no setting keeps the facts and gains anything
+
+At E = .20 (M20) recall comes back to 100, but only because the self-teaching stream S lifts the knowledge weight to 65% (K + S); manipulation stays at 58.8 / 50.0 against C's 78 to 94 / 74 to 90, and induction from the weights is 10 to 20 points under C. At E = .40 (M40, knowledge 45%) and .60 (M60, 25%) recall is 36.2 and 13.1, and everything downstream of recall is at chance. The three points of the sweep are all worse than C on every from-the-weights measure, and the trend across them is monotone in the knowledge weight, not in E: recall_fmt 13 / 34 / 36 / 100 at knowledge weight 25 / 45 / 45 / 65%, then 100 at C's 84%.
+
+What the extra episode weight buys is visible only with the field guide in context (Table 21.3): M0 is the best arm the project has produced on in-context induction (86.2 on nonsense names, 82.3 on held-out species; base 49.4 and 43.8), 8 to 12 points over arm C's runs, and it is the only trained arm that reads the backward question from context as well as the base model does (90.6 / 90.6 against the base's 95.6 / 88.1, where arm C's runs read 80 to 83 / 79). That is the skill the episodes teach, and giving them 40% of the gradient teaches more of it. It costs the facts, and in-context recall was already 100 for every arm, so the ceiling on the with-context ladder is the induction levels alone.
+
+The self-teaching stream dissociates recall from use: M20 reaches 100 on the trained-format recall question and 58.8 / 50.0 on is-a and pair manipulation, a gap no other arm shows (arm A, knowledge texts alone, has 100 / 100 / 88.8 on the same three rows; arm C's manipulation tracks its recall). With 22% of the gradient on completion, true/false and in-document multiple-choice tasks that name the species and its attribute, the model learns to produce the attribute given the species in those forms; comparing two species or answering "is X a Y" stays at the base model's level. Recall needs less knowledge weight than manipulation does, and S buys the cheaper of the two. The all-answer loss (M20/M40/M60 carry loss on 2 to 3 times as many episode tokens as M0) shows no effect separable from the weight change.
+
+### 21.3 What TRAIN-1 now says
+
+Closed. Arm C is 84% knowledge by loss, and that weighting is load-bearing: the same batches at the nominal 45% do not memorise the facts in 800 steps (33.8 recall_fmt, manipulation at chance), and no loss-level episode weight in {.2, .4, .6} matches arm C from the weights. Any future mixture change should be stated and swept in loss weight, with the knowledge weight held at or above 0.8 unless the point is to trade the facts for in-context induction (M0's 86 / 82 / 91 with context is the reference for that trade). The pooled token mean stays the default; the `BY_LOSS` path stays in the script for stated-weight experiments. The section 17 follow-up (Cg with the general text taken out of the knowledge stream, K .40 / E .40 / R .15 / G .05 by sequence) is a sampler change, not a loss-weight change, and is unaffected; it remains queued.

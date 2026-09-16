@@ -309,6 +309,7 @@ Knowledge texts use full-sequence loss over ~25 tokens; episodes and replay use 
 40 / R 15" by sequence count is plausibly ~85% K by gradient weight; the E fraction was never swept.
 *Experiment:* log per-stream label-token counts per step; per-stream loss normalization; sweep
 E in {0.2, 0.4, 0.6} at fixed K+E.
+**Status (2026-09-15):** closed, PLAN step 9. REPORT.md 21. The pooled token mean gives the knowledge stream 84% of the gradient (Table 21.1); the same batches at the nominal 45% (arm M0) do not memorise the facts in 800 steps (recall_fmt 33.8, manipulation at chance, flat curve), and no loss-level episode weight in {.2, .4, .6} matches arm C from the weights. The extra episode weight shows only with context (M0 is the best arm on in-context induction and reverse lookup). Per-stream token and loss-bearing-token counts are logged in every run (`tok_*`, `lb_*`).
 
 **TRAIN-2 (R) Is "sequential loses" a property of staging or of the shared LR schedule?**
 Arm D runs both phases under one warmup + linear decay (`exp_curriculum.py:195, 201`), so phase 2
