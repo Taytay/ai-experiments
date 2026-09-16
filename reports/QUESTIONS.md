@@ -53,6 +53,8 @@ is even needed, at 7B.
 arbitrary label rules far better and would move the Timmy baseline; the merchant sweep never
 leaves 0.5B; try one non-Qwen family (Llama-3.2-3B or Gemma-3-4B) to check family-specificity.
 
+**Status (2026-09-16):** done, PLAN step 15, REPORT.md 26. Arms base / A / C / D on Qwen2.5-1.5B and Qwen2.5-7B (QLoRA), seed 0. The mixture's induction gain (+26 / +22 / +19 on Timmy at 1.5B / 3B / 7B) and ICL preservation (+25 / +31 / +31) hold at every scale; natural-label ICL is flat everywhere and ARC-Easy loses 11 to 20 points for every trained arm at every scale. Knowledge-only's manipulation advantage shrinks from 30 points at 1.5B to 4 at 7B; the sequential arm at 7B forgets a third of the facts in the episode phase. A 7B arm costs about an hour (QLoRA training 10 to 22 min plus evaluation), a 1.5B arm ten minutes. Not run: Instruct checkpoints and a non-Qwen family.
+
 ### EVAL-1 (O) In the multiple-choice prompts, is the model expected to emit a letter (A/B/C/D) or the answer text?
 
 **Answer.** Neither is generated. Scoring is *cloze scoring*: the prompt ends at `Answer:`, the

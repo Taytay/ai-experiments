@@ -59,6 +59,7 @@ and every eval also writes per-item, per-option log-probs to results/per_item/ (
 Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ... unsloth).
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
+LOAD_4BIT=1 loads the base weights in 4-bit NF4 (QLoRA; PLAN step 15 runs Qwen2.5-7B this way on the 24 GB card).
 SEED=N (default 0) seeds the LoRA init, the stream shuffles and the mixture draws; N > 0 adds "_sN" to the
 results and adapter names so the seed-0 runs stay (PLAN step 10, STAT-1).
 PERIODIC=N evaluates a fixed subsample (every 4th ladder item, every 2nd ICL suite item, the 200
@@ -135,6 +136,7 @@ MASK_INSTRUCTION = "Recover the original passage from the masked version.\nMaske
 MASK_RNG = random.Random(1000 + int(os.environ.get("SEED", "0")))
 BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
 RET = bool(os.environ.get("RET"))      # retrieved-context and neighbour-list evaluation conditions (PLAN step 14)
+LOAD_4BIT = bool(os.environ.get("LOAD_4BIT"))  # QLoRA: 4-bit base weights (bitsandbytes NF4) for models that do not fit in bf16 (PLAN step 15, 7B)
 _RETRIEVER = None
 
 
@@ -181,7 +183,7 @@ print(f"arm {ARM} | {len(species)} species (morph_p={MORPH_P}) | {len(K_texts)} 
 
 
 def load():
-    model, tok = FastLanguageModel.from_pretrained(MODEL, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+    model, tok = FastLanguageModel.from_pretrained(MODEL, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     tok.padding_side = "right"
     return tok, model
 
@@ -199,7 +201,9 @@ def evaluate(model, tok):
     """Returns ({"noctx": metrics, "ctx": metrics}, {"noctx": records, "ctx": records}).
     Probes, ICL suite and perplexity live under noctx; records are per item (ai_experiments.scoring)."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS)
+    # 4-bit 7B: a smaller forward budget, since the driver spills VRAM to system RAM instead of raising the OOM the scorer
+    # would halve its chunk on (a 35-minute with-context ladder pass at the 24 GB limit on the first 7B arm C run)
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS, **({"rows_per_forward": 16, "tokens_per_forward": 8192} if LOAD_4BIT else {}))
     recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
     if RET:
@@ -230,7 +234,7 @@ def evaluate(model, tok):
 def periodic_eval(model, tok):
     """Cheap mid-training point: a fixed subsample, no extra passes, no per-item file. Leaves the model in train mode."""
     model.eval(); torch.cuda.empty_cache(); t0 = time.time()
-    sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=32, tokens_per_forward=16384)  # smaller footprint mid-training
+    sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=16 if LOAD_4BIT else 32, tokens_per_forward=8192 if LOAD_4BIT else 16384)  # smaller footprint mid-training
     m = aggregate(sc.score(ladder[::4]) + sc.score(suite[::2]) + (sc.score(known) if known else []))
     sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
     m["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
@@ -441,7 +445,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_qlora" if LOAD_4BIT else "unsloth_lora", load_4bit=LOAD_4BIT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
@@ -464,7 +468,7 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH))
     if eval_only:
         # re-score a previously trained adapter (e.g. after an eval-time crash) without retraining
         run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(ROOT)))
-        model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=False)
+        model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
         tok.padding_side = "right"
         r, recs = evaluate(model, tok)
         results["trained"], results["trained_ctx"] = r["noctx"], r["ctx"]
