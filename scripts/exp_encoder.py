@@ -15,7 +15,9 @@ Scoring. Every ladder, held-out, probe, ICL-suite, known-facts (ARC-Easy) and re
 of each option given the prompt as encoder input (sum over the option's tokens, the same `sum_lp` record as ai_experiments.scoring,
 so the tables and paired tests read it unchanged); the field-guide context conditions use the items' prompt_ctx. The recall and
 reverse levels are also scored by greedy generation (exact match of the option text after stripping, `gen_*` keys), which is how
-WikiDYK reports memorisation. No perplexity: the encoder-decoder's likelihood of raw text is not comparable to the decoders'.
+WikiDYK reports memorisation. The fact levels (L1, L2, L5, L6, L8) are scored a second time in the span-prediction format they were
+trained in (the question with the sentinel where the answer goes; `*_span` conditions), since the plain prompt -> answer rendering
+is a format the knowledge stream never showed the model. No perplexity: the encoder-decoder's likelihood of raw text is not comparable to the decoders'.
 Results: results/encoder_<model>_<ARM><SFX>.json, per-item files under results/per_item/, weights (bf16) under models/adapters/.
 """
 import json
@@ -163,11 +165,24 @@ def train():
 
 
 # ------------------------------------------------------------------ scoring
+FACT_LEVEL_PREFIXES = ("L1_", "L2_", "L5_", "L6_", "L8_")  # the levels whose answers were trained as masked spans, not as prompt -> answer
+
+
+def span_form(prompt, option):
+    """The span-prediction rendering the knowledge stream was trained on: the question with a sentinel where the answer goes, the
+    answer behind the same sentinel (T5), or the placeholder word and the bare answer (tokenizers without sentinels)."""
+    return prompt + " " + sentinel(0), ((f"<extra_id_0> " if HAS_SENTINELS else "") + option.strip())
+
+
 @torch.no_grad()
-def score_items(items, ctx=False, label=""):
-    """One record per item: sum of decoder log-probs of each option given the prompt (encoder input)."""
+def score_items(items, ctx=False, label="", span=False):
+    """One record per item: sum of decoder log-probs of each option given the prompt (encoder input). span=True renders prompt and
+    options in the trained span-prediction format (the fact levels' own training format)."""
     t0 = time.time(); recs = []; model.eval()
-    reqs = [(it["prompt_ctx" if ctx else "prompt"], it["options"]) for it in items]
+    if span:
+        reqs = [(span_form(it["prompt_ctx" if ctx else "prompt"], "")[0], [span_form("", o)[1] for o in it["options"]]) for it in items]
+    else:
+        reqs = [(it["prompt_ctx" if ctx else "prompt"], it["options"]) for it in items]
     flat = [(p, o) for p, opts in reqs for o in opts]
     sums, ntoks = [], []
     B = 64
@@ -192,18 +207,21 @@ def score_items(items, ctx=False, label=""):
 
 
 @torch.no_grad()
-def generate_exact(items, ctx=False):
-    """Greedy generation; exact match (case-insensitive, stripped) against the gold option text. -> {gen_<level>: acc}"""
+def generate_exact(items, ctx=False, span=False):
+    """Greedy generation; exact match (case-insensitive, stripped) against the gold option text. -> {gen_<level>: acc}
+    span=True prompts in the span-prediction format and strips the sentinel from the output."""
     hits = {}
     B = 32
     for i in range(0, len(items), B):
         chunk = items[i:i + B]
-        enc = tok([it["prompt_ctx" if ctx else "prompt"] for it in chunk], padding=True, truncation=True, max_length=MAXLEN, return_tensors="pt").to("cuda")
+        prompts = [span_form(it["prompt_ctx" if ctx else "prompt"], "")[0] if span else it["prompt_ctx" if ctx else "prompt"] for it in chunk]
+        enc = tok(prompts, padding=True, truncation=True, max_length=MAXLEN, return_tensors="pt").to("cuda")
         with torch.autocast("cuda", dtype=torch.bfloat16):
             gen = model.generate(**enc, max_new_tokens=MAX_TGT, do_sample=False)
         for it, g in zip(chunk, tok.batch_decode(gen, skip_special_tokens=True)):
             gold = it["options"][it["answer"]].strip().lower().rstrip(".")
-            hits.setdefault(it["level"], []).append(g.strip().lower().rstrip(".") == gold)
+            out = g.split("<extra_id_1>")[0].strip().lower().rstrip(".")
+            hits.setdefault(it["level"], []).append(out == gold or out.startswith(gold))
     return {f"gen_{lvl}": round(100 * sum(v) / len(v), 1) for lvl, v in hits.items()}
 
 
@@ -217,8 +235,14 @@ def evaluate():
     if nat: noctx["ICL_natural_mean"] = round(sum(nat) / len(nat), 1)
     gen_items = [it for it in ladder + reverse if it["level"] in GEN_LEVELS]
     noctx.update(generate_exact(gen_items)); ctxm.update(generate_exact(gen_items, ctx=True))
+    # the fact levels in the span-prediction format they were trained in (MODEL-2's "same objective for injection and extraction")
+    fact_items = [it for it in ladder + reverse if it["level"].startswith(FACT_LEVEL_PREFIXES)]
+    recs["span"] = score_items(fact_items, label="fact levels, span format", span=True)
+    recs["span_ctx"] = score_items(fact_items, ctx=True, label="fact levels + ctx, span format", span=True)
+    spanm, spanc = aggregate(recs["span"]), aggregate(recs["span_ctx"])
+    spanm.update(generate_exact(gen_items, span=True)); spanc.update(generate_exact(gen_items, ctx=True, span=True))
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
-    return {"noctx": noctx, "ctx": ctxm}, recs
+    return {"noctx": noctx, "ctx": ctxm, "span": spanm, "span_ctx": spanc}, recs
 
 
 # ------------------------------------------------------------------ main
@@ -235,12 +259,12 @@ with Run("encoder_v1", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         stats = {}
     r, recs = evaluate()
     key = "trained" if phases else "base"
-    results[key] = {**r["noctx"], **stats}; results[key + "_ctx"] = r["ctx"]
+    results[key] = {**r["noctx"], **stats}; results[key + "_ctx"] = r["ctx"]; results[key + "_span"] = r["span"]; results[key + "_span_ctx"] = r["span_ctx"]
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
     for cond, mets in results.items():
         run.log(mets, condition=cond)
     run.artifact(OUT)
-    for k, cond in (("noctx", key), ("ctx", key + "_ctx")):
+    for k, cond in (("noctx", key), ("ctx", key + "_ctx"), ("span", key + "_span"), ("span_ctx", key + "_span_ctx")):
         run.artifact(write_records(per_item_path(OUT, cond), recs[k]))
 print(f"\n=== {tag} arm {ARM} ===")
 for cond, mets in results.items():
