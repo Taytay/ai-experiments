@@ -503,6 +503,7 @@ the most). Replay protects what is replayed.
 *Experiment:* PLAN row 25: add a few percent of pretraining-style text (a FineWeb or WikiText slice) to arm C's mix, run
 with `PERIODIC=200`, and read `K_arc_easy` and the corpus perplexity of row 24 against arm C's curve; then the same with
 a lower learning rate on the knowledge stream, since the loss is paid while the facts are written.
+**Status (2026-09-15):** done, PLAN step 26, REPORT.md 19. The knowledge stream was overhead-bound (arm A 313 tokens/s padded, 35 to 60% utilisation); packed 2,048-token rows through unsloth's block-diagonal path (verified: neighbours change a sequence's log-probs by exactly 0) with one 16-sequence micro-batch give 1,000 to 3,100 tokens/s, and the batched scorer cuts evaluation from 26 to 3 minutes; the numbers stay within the same-seed run-to-run floor. Every run from step 26 on uses the fast path.
 
 **Status (2026-09-15):** PLAN step 26, REPORT.md section 19. Yes, overhead-bound, and packing changed the speed and not the results: sequence packing through unsloth's packed_seq_lengths (xformers block-diagonal attention, verified directly) with one 16-sequence micro-batch gives arm C 2.5x and arm A 2x at identical sequences per step; the batched scorer gives evaluation 3x (10x without the section 10 extras). A fast-path retrain of arm C lies inside the same-seed run-to-run spread of the two old-path runs (17.9% flips between them, 19.8% against the new one).
 
