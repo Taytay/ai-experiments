@@ -125,6 +125,65 @@ def training_texts(species, rng=None, n_cmp_per_species=4):
     return out
 
 
+# ------------------------------------------------------------------ augmentation variants (PLAN step 16, DATA-5)
+_ATTR_SENTS = ["{N} is a {T}-type creature.", "{N} lives in {H} habitats.", "{N} eats as an {D}.", "{N} is found in {R}.",
+               "{N} is weak to {W}-type attacks.", "{N} is a stage-{S} creature."]
+_REV = [  # reverse-direction statements: the attributes first, the name last (never the L8 question form)
+    "The {T}-type creature that lives in {H} habitats and is found in {R} is {N}.",
+    "A {T}-type with an {D} diet, native to {R}: that is {N}.",
+    "Weak to {W}-type attacks, {H}-dwelling, found in {R}: the creature is {N}.",
+    "Among the {T}-types of {R}, the one with an {D} diet and a {H} habitat is called {N}.",
+]
+
+
+def knowledge_texts(species, spec, llm_texts=None, seed=16):
+    """The knowledge stream under the augmentation variants of PLAN step 16 (trained species only; no type lore, no
+    negatives, no comparatives, so the count of distinct texts per species is the variable):
+      descK        the first K of the 14 descriptive / QA templates (_DESC), K in 1..14
+      desc14perm   desc14 plus 5 texts per species made of the six attribute sentences in a random order (sentence-order permutation)
+      desc14rev    desc14 plus the 4 reverse-direction statements (attributes first, name last)
+      desc14llm    desc14 plus the LLM-written texts for the species (llm_texts: name -> list[str], data/processed/llm_texts_v1.json)
+      desc14cmp    desc14 plus the negative and comparative texts of training_texts() (one negative, four two-species comparisons,
+                   one shared-habitat comparison per species; same rng), i.e. the section 8 stream without the type lore
+    training_texts() is the section 8 stream (14 templates + negatives + comparatives + type lore, about 20 per species)."""
+    rng = random.Random(seed)
+    tr = [s for s in species if not s["heldout"]]
+    base, extra = spec, ""
+    for suffix in ("perm", "rev", "llm", "cmp"):
+        if spec.endswith(suffix):
+            base, extra = spec[: -len(suffix)], suffix
+    assert base.startswith("desc") and base[4:].isdigit(), spec
+    k = int(base[4:]); assert 1 <= k <= len(_DESC), spec
+    out = []
+    by_type = {t: [s for s in tr if s["type"] == t] for t in TYPE_LIST}
+    crng = random.Random(1)  # training_texts()'s rng, so the comparative texts are the section 8 ones
+    for s in tr:
+        f = dict(N=s["name"], T=s["type"], W=s["weakness"], H=s["habitat"], D=s["diet"], R=s["region"], S=s["stage"])
+        out += [t.format(**f) for t in _DESC[:k]]
+        if extra == "cmp":
+            x = crng.choice([t for t in TYPE_LIST if t != s["type"]])
+            out += [t.format(X=x, **f) for t in _NEG]
+            for _ in range(4):
+                if crng.random() < 0.5:
+                    m = crng.choice([o for o in by_type[s["type"]] if o is not s])
+                    out.append(crng.choice([_CMP[0], _CMP[2]]).format(M=m["name"], U=m["type"], **f))
+                else:
+                    m = crng.choice([o for o in tr if o["type"] != s["type"]])
+                    out.append(crng.choice([_CMP[1], _CMP[3]]).format(M=m["name"], U=m["type"], **f))
+            same_h = [o for o in tr if o["habitat"] == s["habitat"] and o is not s]
+            if same_h:
+                out.append(_CMP[4].format(M=crng.choice(same_h)["name"], **f))
+        if extra == "perm":
+            for _ in range(5):
+                order = list(_ATTR_SENTS); rng.shuffle(order)
+                out.append(" ".join(t.format(**f) for t in order))
+        elif extra == "rev":
+            out += [t.format(**f) for t in _REV]
+        elif extra == "llm":
+            out += list(llm_texts[s["name"]])
+    return out
+
+
 def single_texts(species):
     """One rendering per trained species carrying every attribute (PLAN step 8, TRAIN-5): the paraphrase-free
     knowledge stream. 136 texts of about 47 tokens; training_texts() has 20 per species."""

@@ -60,6 +60,8 @@ Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ..
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
 LOAD_4BIT=1 loads the base weights in 4-bit NF4 (QLoRA; PLAN step 15 runs Qwen2.5-7B this way on the 24 GB card).
+KTEXTS=descK | desc14perm | desc14rev | desc14llm swaps the knowledge stream for an augmentation variant (universe.knowledge_texts,
+PLAN step 16, DATA-5); pair it with RUN_TAG=<same> so the results and adapter names carry it.
 SEED=N (default 0) seeds the LoRA init, the stream shuffles and the mixture draws; N > 0 adds "_sN" to the
 results and adapter names so the seed-0 runs stay (PLAN step 10, STAT-1).
 PERIODIC=N evaluates a fixed subsample (every 4th ladder item, every 2nd ICL suite item, the 200
@@ -159,7 +161,16 @@ ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}{SFX}_lora"
 torch.manual_seed(SEED)
 
 species = U.build(morph_p=MORPH_P)
-K_texts = U.training_texts(species)
+KTEXTS = os.environ.get("KTEXTS", "full")  # knowledge-stream variant (PLAN step 16, DATA-5): full (section 8), descK, desc14perm, desc14rev, desc14llm
+LLM_TEXTS_SHA = None
+if KTEXTS == "full":
+    K_texts = U.training_texts(species)
+else:
+    llm_texts = None
+    if KTEXTS.endswith("llm"):
+        doc = json.loads((ROOT / "data" / "processed" / "llm_texts_v1.json").read_text(encoding="utf-8"))
+        llm_texts, LLM_TEXTS_SHA = {d["name"]: d["texts"] for d in doc["items"]}, doc["sha256"]
+    K_texts = U.knowledge_texts(species, KTEXTS, llm_texts=llm_texts)
 FROZEN = I.load_all(morph=MORPH_P > 0)  # never regenerated: the same items for every arm and commit
 ladder, probes, suite = FROZEN.ladder, FROZEN.probes, FROZEN.suite
 SMOKE = bool(os.environ.get("SMOKE"))
@@ -447,7 +458,7 @@ phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
            method="unsloth_qlora" if LOAD_4BIT else "unsloth_lora", load_4bit=LOAD_4BIT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
-           n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
+           n_knowledge_texts=len(K_texts), ktexts=KTEXTS, llm_texts_sha=LLM_TEXTS_SHA, n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
 with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH)) as run:
     def save(recs, conds):
