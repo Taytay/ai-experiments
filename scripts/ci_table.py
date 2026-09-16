@@ -20,7 +20,7 @@ from ai_experiments.paths import ROOT
 from ai_experiments import scorers as SC
 from ai_experiments import stats as ST
 
-ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E", "P", "P2"]
+ARMS = ["base", "A", "B", "C", "Cn", "D", "Dr", "Dc", "Dk", "base_m", "E", "P", "P2"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
          "base_m": "base(m)", "E": "E morph", "P": "P distill", "P2": "P2 distill-opt"}
 PAIRS = [("base", "A"), ("base", "B"), ("base", "C"), ("base", "Cn"), ("base", "D"), ("A", "C"), ("Cn", "C"), ("D", "C"),
