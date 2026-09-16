@@ -1250,3 +1250,120 @@ So "sequential loses" is answered as section 8.3 and the survey predicted: a sta
 ### 23.3 What TRAIN-2 now says
 
 Closed. The residual "sequential loses" gap of section 20 (recall 91.5 against 100) is a mild case of forgetting that arm D's decaying schedule was holding down: restarting the schedule per phase or holding the rate constant lets 400 steps of episodes without knowledge text erase most of the facts (formatted recall 28 and 41, induction back to arm A's level), while 10% knowledge replay in phase 2 under the original schedule matches arm C on every level within the seed noise and beats it on WikiText perplexity. Recommendation: interleave, or replay if you must stage; never restart the schedule on a phase that lacks the earlier phase's data.
+
+## 24. Embedding block: on the LLM's own induction items a fine-tuned encoder wins from its weights; the bank-string transfer was the uncased tokenizer; new tokens lose everywhere (MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5)
+
+Date: 2026-09-16. Code: `uv run python scripts/exp_embed_block.py {minilm,bge,qwen3} all` (new; the section 4 and 6 embedding experiments re-implemented on top of sentence-transformers so each encoder's own pooling is used, plus the baselines); data `results/embed_block_{minilm,bge,qwen3}.json`, per-item records `results/per_item/embed_block_<enc>.universe_{frozen,trained}.jsonl` on the frozen induction items; the pairing against the LLM arms is by item id on those files (the +/- counts and sign tests in 24.1 and 24.3).
+
+Sections 4 and 6 ran every embedding experiment on all-MiniLM-L6-v2 (22M parameters, uncased WordPiece, mean pooling), scored prototypes on 300 random trials rather than on the ladder the LLM arms answer, and had no baseline below the fine-tuned centroid (BASE-4). The new-token conditions were given mean-of-subword or random initialisation and nothing else (BASE-5), and the 70.8% bank-string transfer was attributed to shared subwords without a cased tokenizer in the comparison (MODEL-3, MODEL-5). The graph memo added a text-initialised inductive KGE as the baseline that a relation scorer would add over prototypes (GRAPH-5). This step runs all of it on three encoders:
+
+| encoder | parameters | pooling | tokenizer | note |
+|---|---|---|---|---|
+| all-MiniLM-L6-v2 | 22M, 384-d | mean | uncased WordPiece | the section 4 and 6 encoder |
+| bge-base-en-v1.5 | 109M, 768-d | CLS | uncased WordPiece | the survey listed it as cased; its tokenizer lower-cases |
+| Qwen3-Embedding-0.6B | 596M, 1024-d | last token | cased Qwen BPE | "Elrholm" (El / r / holm) and "ELRHOLM" (EL / RH / OL / M) share no token |
+
+Three parts, each with the same seed and the same data as the original experiment. Universe: contrastive name-to-attribute-text training as in section 6.3 (8 epochs), then (a) the frozen ladder induction items scored by the query name's nearest demo name, each demo being one labelled card, so that every item has an LLM answer and an embedding answer on the same demos; (b) the section 6.3 protocol for continuity; (c) the 8-way type task with five baselines over ten random splits of the seen species (8 train names per type): centroid, logistic regression, and SetFit on the frozen and on the trained encoder. Merchant: section 4's zero-shot / fine-tune / new-token conditions plus the BASE-5 variants (N(mu, Sigma) initialisation, embedding-row warm-up, MOSAIC's joint MLM stage for the tied-embedding encoders, and for the cased encoder both case forms as tied tokens), scored as before on bare names, bank strings and descriptions, with a logistic-regression head on the name embeddings as the BASE-4 baseline. KGE: a DistMult scorer per relation over the encoder's entity embeddings, trained jointly on the training merchants' three relations and the held-out merchants' sells and located-in triples only, so the held-out category is a products-to-category bridge; against it, centroid and logistic regression on the same encoder and a relation-free contrastive control on the same triples.
+
+**Table 24.1: the frozen induction items, embedding prototype (query's nearest demo card) against the LLM arms (accuracy %)**
+
+| level | MiniLM frozen | MiniLM trained | bge-base frozen | bge-base trained | Qwen3-Emb frozen | Qwen3-Emb trained | LLM base | LLM A | LLM C | LLM C + field guide |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Timmy k=3, nonsense labels (3-way) | 38.1 | 79.4 | 31.2 | 94.4 | 38.1 | 92.5 | 35.6 | 40.0 | 61.9 | 70.6 |
+| real-name labels (3-way) | 36.2 | 76.2 | 32.5 | 93.8 | 32.5 | 91.9 | 38.1 | 76.2 | 77.5 | 73.8 |
+| k=2 (2-way) | 55 | 86.9 | 45.6 | 96.2 | 53.8 | 93.1 | 53.1 | 55.6 | 76.2 | 81.9 |
+| k=4 (4-way) | 24.4 | 62.5 | 26.9 | 86.2 | 27.5 | 91.2 | 27.5 | 41.9 | 51.9 | 60.6 |
+| weakness (3-way) | 35 | 77.5 | 27.5 | 93.1 | 31.9 | 93.1 | 35.0 | 46.2 | 60.0 | 67.5 |
+| habitat (3-way) | 31.2 | 53.1 | 26.9 | 72.5 | 35 | 80 | 31.2 | 30.6 | 29.4 | 65.6 |
+| held-out species (3-way) | 41.7 | 39.6 | 46.9 | 25 | 31.2 | 39.6 | 39.6 | 22.9 | 29.2 | 72.9 |
+
+**Table 24.2: section 6.3 protocol on the three encoders, trained (frozen in brackets)**
+
+| measure | MiniLM | bge-base | Qwen3-Emb |
+|---|---|---|---|
+| canonical type text, 8-way | 99.3 [10.3] | 100 [11.8] | 100 [14] |
+| synonym text, 8-way | 44.9 [13.2] | 61 [11.8] | 39.7 [12.5] |
+| prototype type k=1 (3-way) | 79.3 [36] | 93 [32] | 94.3 [33.7] |
+| prototype type k=3 | 90.3 [41.7] | 100 [32.7] | 99.3 [37] |
+| prototype weakness k=3 | 90.7 [31.3] | 99.7 [33.3] | 99.7 [31] |
+| prototype habitat k=1 | 46 [30.7] | 74.7 [32.3] | 78.7 [32.7] |
+| prototype habitat k=3 | 60.7 [30.3] | 90.3 [30.7] | 95.7 [31] |
+| prototype type k=1, held-out species | 34.3 [43.3] | 36 [44.7] | 39.3 [39.7] |
+
+**Table 24.3: 8-way type of seen species from the name, 10 random splits (8 train names per type), mean +- sd**
+
+| encoder | frozen centroid | frozen logreg | frozen SetFit | trained centroid | trained logreg | trained SetFit |
+|---|---|---|---|---|---|---|
+| MiniLM | 13.6 +- 3.1 | 13.2 +- 2.8 | 13.6 +- 2.9 | 83.7 +- 2.3 | 83.4 +- 2.6 | 76 +- 2.4 |
+| bge-base | 11.4 +- 3.2 | 12.1 +- 3.5 | 13.6 +- 2.4 | 99.4 +- 0.7 | 99.7 +- 0.6 | 99 +- 1.3 |
+| Qwen3-Emb | 12.6 +- 3.3 | 13.2 +- 3.1 | 12.1 +- 3.5 | 99.9 +- 0.4 | 100 +- 0 | 92.6 +- 3.6 |
+
+**Table 24.4: merchant category (12-way, chance 8.3), nearest category text; logistic-regression head on names in the last two columns**
+
+| encoder | condition | name train | bank train | desc train | name held-out | bank held-out | desc held-out | logreg bank train | logreg bank held-out | bank strings hitting a new token |
+|---|---|---|---|---|---|---|---|---|---|---|
+| MiniLM | zero_shot | 6.2 | 7.3 | 99.0 | 29.2 | 4.2 | 95.8 | 35.4 | 12.5 | - |
+| MiniLM | ft_subword | 100.0 | 69.8 | 100.0 | 12.5 | 12.5 | 100.0 | 63.5 | 12.5 | - |
+| MiniLM | ft_newtok_mean | 100.0 | 28.1 | 100.0 | 12.5 | 4.2 | 100.0 | 28.1 | 4.2 | 87.5 |
+| MiniLM | ft_newtok_gauss | 100.0 | 30.2 | 100.0 | 0.0 | 8.3 | 100.0 | 32.3 | 12.5 | 87.5 |
+| MiniLM | ft_newtok_warm | 100.0 | 55.2 | 100.0 | 16.7 | 8.3 | 100.0 | 58.3 | 12.5 | 87.5 |
+| MiniLM | ft_newtok_mosaic | 99.0 | 24.0 | 100.0 | 12.5 | 12.5 | 100.0 | 26.0 | 8.3 | 87.5 |
+| bge-base | zero_shot | 8.3 | 5.2 | 100.0 | 4.2 | 12.5 | 100.0 | 31.2 | 4.2 | - |
+| bge-base | ft_subword | 100.0 | 84.4 | 100.0 | 4.2 | 0.0 | 100.0 | 84.4 | 0.0 | - |
+| bge-base | ft_newtok_mean | 100.0 | 30.2 | 100.0 | 4.2 | 4.2 | 100.0 | 28.1 | 8.3 | 87.5 |
+| bge-base | ft_newtok_gauss | 100.0 | 49.0 | 100.0 | 16.7 | 12.5 | 100.0 | 55.2 | 16.7 | 87.5 |
+| bge-base | ft_newtok_warm | 100.0 | 76.0 | 100.0 | 20.8 | 16.7 | 100.0 | 78.1 | 16.7 | 87.5 |
+| bge-base | ft_newtok_mosaic | 100.0 | 35.4 | 100.0 | 4.2 | 8.3 | 100.0 | 33.3 | 0.0 | 87.5 |
+| Qwen3-Emb | zero_shot | 9.4 | 8.3 | 95.8 | 8.3 | 8.3 | 91.7 | 30.2 | 8.3 | - |
+| Qwen3-Emb | ft_subword | 100.0 | 26.0 | 100.0 | 8.3 | 4.2 | 100.0 | 29.2 | 4.2 | - |
+| Qwen3-Emb | ft_newtok_mean | 100.0 | 12.5 | 100.0 | 4.2 | 8.3 | 100.0 | 17.7 | 0.0 | 0.0 |
+| Qwen3-Emb | ft_newtok_gauss | 100.0 | 8.3 | 100.0 | 8.3 | 8.3 | 100.0 | 7.3 | 4.2 | 0.0 |
+| Qwen3-Emb | ft_newtok_warm | 100.0 | 6.2 | 100.0 | 8.3 | 8.3 | 100.0 | 7.3 | 12.5 | 0.0 |
+| Qwen3-Emb | ft_newtok_tied | 100.0 | 13.5 | 100.0 | 4.2 | 8.3 | 100.0 | 14.6 | 8.3 | 87.5 |
+
+**Table 24.5: GRAPH-5, held-out merchant category (12-way) after joint training on all triples but the held-out category triples**
+
+| encoder | training | KGE scorer, name | KGE, bank | centroid, name | centroid, bank | logreg, name | logreg, bank | category text, name | category text, bank | (train merchants: KGE name / bank) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| MiniLM | DistMult + encoder | 33.3 | 20.8 | 16.7 | 12.5 | 12.5 | 12.5 | 37.5 | 12.5 | 89.6 / 39.6 |
+| MiniLM | pairs control (no relations) | - | - | 16.7 | 8.3 | 16.7 | 4.2 | 41.7 | 16.7 | - / - |
+| bge-base | DistMult + encoder | 91.7 | 58.3 | 83.3 | 45.8 | 83.3 | 41.7 | 95.8 | 62.5 | 99.0 / 72.9 |
+| bge-base | pairs control (no relations) | - | - | 83.3 | 37.5 | 83.3 | 37.5 | 87.5 | 54.2 | - / - |
+| Qwen3-Emb | DistMult + encoder | 100.0 | 20.8 | 100.0 | 20.8 | 100.0 | 20.8 | 100.0 | 20.8 | 100.0 / 24.0 |
+| Qwen3-Emb | pairs control (no relations) | - | - | 91.7 | 25.0 | 91.7 | 20.8 | 95.8 | 29.2 | - / - |
+
+### 24.1 On the LLM's own items, a fine-tuned 22M encoder beats the 3B LLM's weights and matches its field guide
+
+Table 24.1 is the comparison BASE-4 asked for. Each Timmy item gives k labelled cards and a query; the LLM reads them in a prompt, the encoder embeds the k card names and the query name and answers with the nearest card. Same 160 items per level, same demos, same query, paired. After the section 6.3 contrastive training (name to attribute text, 8 epochs, 20 seconds), MiniLM's prototype answers the nonsense-label Timmy items at 79.4 where arm C answers 61.9 from its weights (46 items the encoder gets right and the LLM wrong against 18 the other way, sign test p = 6e-4) and 70.6 with the field guide in context (37 against 23, p = 0.09). Weakness is 77.5 against 60.0 (49 / 21, p = 1e-3); k=4 is 62.5 against 51.9 (50 / 33, p = 0.08); k=2 is 86.9 against 76.2. Real-name labels, where arm C reads 77.5, are a tie (76.2; 28 / 30). Habitat, the latent partition that no LLM arm learns from its weights (29.4, chance 33), is 53.1 for the encoder from the weights (55 / 17, p = 8e-6) and still below the LLM reading it from the field guide (65.6; 23 / 43, p = 0.02). Held-out species are at chance for every from-the-weights scorer (39.6 / 29.2 / 22.9), as they must be, and 72.9 for the LLM with the guide, which is the one thing the encoder has no counterpart for: it cannot read a card it was not trained on.
+
+So the prototype result of section 6.3 was not an artefact of its own protocol. On the LLM's items it holds at the same level (79 against the 85 of the 300-trial protocol, which draws three cards per label rather than one), and it is the best from-the-weights induction number in the project, from a model 140 times smaller than the LLM and 19 seconds of training against 11 minutes. What the encoder does not have is the rest of the ladder: no recall question, no yes/no or pair manipulation, no answer in words. It answers "which of these cards is this one most like", which is what the induction levels ask and nothing else does.
+
+### 24.2 The baselines under the centroid: logistic regression ties it, SetFit is worse, and the frozen encoder is chance
+
+Table 24.3 supplies what BASE-4 said was missing. On the 8-way type task from the bare name (8 train names per type, 9 held out, ten splits), the frozen MiniLM is at chance in every form (13.6 / 13.2 / 13.6 against 12.5), because an untrained species name is a random string to an untrained encoder. After the contrastive training, the centroid reads 83.7 +- 2.3 and a logistic-regression head on the same embeddings 83.4 +- 2.6: the classifier adds nothing to the nearest centroid, which is what a well-separated embedding looks like. SetFit on top of the trained encoder (20 same-type pairs per train name, one epoch) is worse, 76.0 +- 2.4: a second contrastive stage on 64 names moves an encoder that had already placed 136 names, and the head trained on the moved embeddings loses 8 points. SetFit is the recipe for an encoder that has not seen the entities; it is not a way to improve one that has.
+
+### 24.3 A stronger encoder makes the prototype near-perfect, latent partitions included
+
+The section 6.3 result scales with the encoder (Tables 24.1 and 24.2). bge-base-en-v1.5 (109M) and Qwen3-Embedding-0.6B, trained the same 8 epochs on the same 1,496 pairs, answer the LLM's Timmy items at 94.4 and 92.5 (arm C: 61.9 from the weights, 70.6 with the guide), k=4 at 86.2 and 91.2 (51.9 / 60.6), weakness at 93.1 (60.0 / 67.5), and the habitat partition, which the LLM never learns from its weights, at 72.5 and 80.0 against the LLM's 65.6 with the field guide in the prompt. Under the 300-trial protocol the type prototype is at 100 / 99.3 with three cards and the habitat prototype at 90.3 / 95.7, where MiniLM reads 90.3 and 60.7. The 8-way type task from the bare name is 99.4 +- 0.7 (bge) and 99.9 +- 0.4 (Qwen3) by centroid, with logistic regression tying it (99.7, 100) and SetFit again a step below (99.0, 92.6 +- 3.6). Held-out species stay at chance for all three (25.0 to 39.6), as they should. Two things do not scale: the synonym label (61.0 on bge, 39.7 on Qwen3, 44.9 on MiniLM), which is the one form that asks the encoder to know English rather than the universe, and the held-out card, which no from-the-weights method can read.
+
+Paired against arm C on the same items, bge and Qwen3 get 54 and 55 Timmy items right that the LLM gets wrong, against 2 and 6 the other way; on habitat 77 and 85 against 8 and 4. These are not close. For the induction levels of the ladder the answer to MODEL-3 is that the embedding side was under-powered, not the LLM side over-rated: the strongest number in section 6 was the weakest encoder's.
+
+### 24.4 The bank-string transfer is a property of uncased tokenizers, and new tokens lose on every encoder and every pooling
+
+Table 24.4 restates section 4's merchant result on three tokenizers. With the original tokenizer (`ft_subword`), the two uncased WordPiece encoders carry the merchant's category from the mixed-case training sentences to the upper-case bank string it never saw at 69.8 (MiniLM, section 4's 70.8) and 84.4 (bge-base). The cased Qwen BPE encoder, trained on the same sentences to the same 100 on names and descriptions, reads the bank strings at 26.0. The mechanism is the one MODEL-4 and section 13 described for the LLM: "Elrholm" is El / r / holm and "ELRHOLM" is EL / RH / OL / M, no token in common, and the rest of the bank string (DEBIT CARD PURCHASE, STORE 4970, TUCSON AZ) is likewise a sequence of fragments the encoder never saw in training, where the uncased tokenizers lower-case it into the familiar ones. Section 4's "subwords carry knowledge across formats" is therefore a statement about uncased tokenizers; on a cased one the knowledge stays in the case it was taught in. The survey listed bge-base-en-v1.5 as cased; its tokenizer lower-cases, which is why it behaves like MiniLM here and why the casing test rests on Qwen3.
+
+BASE-5 asked whether the new-token conditions were given a fair chance. Four initialisations and schedules on each encoder say the ranking does not change. Mean-of-subword initialisation gives 28.1 / 30.2 / 12.5 on the bank strings (MiniLM / bge / Qwen3, against 69.8 / 84.4 / 26.0 without new tokens); N(mu, Sigma) rows 30.2 / 49.0 / 8.3; an embedding-row-only warm-up before the full fine-tune 55.2 / 76.0 / 6.2; MOSAIC's joint MLM stage on the tied-embedding encoders 24.0 / 35.4. The warm-up is the one variant that matters, recovering most of the gap on the uncased encoders (14 and 8 points short of the original tokenizer), and it still loses. On Qwen3 the added token never fires on an upper-case string (0% of bank strings contain it), and when both case forms are added as tied tokens it fires on 87.5% of them and the accuracy is 13.5: the token identity was not the obstacle, the upper-case context around it is. MODEL-5's question, whether the failure was specific to mean pooling, has its answer in the same table: CLS pooling (bge) and last-token pooling (Qwen3) fail with new tokens the same way. The new-token verdict of section 4 stands on three encoders, three poolings and five initialisations, with the caveat that the row warm-up closes most of the gap and that MOSAIC's regime (thousands of occurrences per token) is not this one (14 to 20 texts per merchant).
+
+The logistic-regression head (BASE-4) trained on the name and sentence embeddings and scored on the bank strings matches the nearest-category-text reading within a few points on every encoder and condition (63.5 against 69.8, 84.4 against 84.4, 29.2 against 26.0); it is not a way to get more out of the same embeddings. Held-out merchants are at chance from their names in every condition, as their names are random strings, and at 100 from their descriptions, which name their products.
+
+### 24.5 A relation scorer adds nothing to an encoder that already bridges (GRAPH-5)
+
+Table 24.5 is the text-initialised inductive KGE. The encoder embeds merchants, products, cities and category texts from their strings; a DistMult vector per relation scores (head, relation, tail) and the two are trained jointly on every triple of the 96 training merchants and on the sells and located-in triples of the 24 held-out ones, whose category is never stated. Because the category text lists the category's products, a held-out merchant's category is reachable by a two-hop bridge (merchant sells product, product is in the category text), and the question is whether the relation structure finds it better than the encoder's own similarity. It does not. On bge, the scorer reads the held-out category from the name at 91.7 and the plain nearest category text on the same jointly trained encoder at 95.8; on Qwen3, 100 and 100; on MiniLM, 33.3 and 37.5. The relation-free control, the same triples trained as (head text, tail text) contrastive pairs, is at 87.5 / 95.8 / 41.7 by the same nearest-text reading, and centroid and logistic regression over the training merchants' names are at 83.3 / 100 / 16.7. Whatever the bridge needs, the contrastive encoder does when it is trained on the merchant-to-product pairs; a per-relation bilinear form on top reorders nothing. From bank strings the numbers fall to 58.3 (bge) and 20.8 (Qwen3, the cased tokenizer again). GRAPH-5's premise, that SimKGC-style text initialisation beats structure-only KGE on sparse description-rich graphs, is not in question; what this shows is that with text initialisation the scorer is the part that can be dropped.
+
+### 24.6 What the block says
+
+- MODEL-3: the embedding model was the under-powered half. On the LLM's own induction items, bge-base and Qwen3-Embedding answer from their weights at 92 to 94 (Timmy), 86 to 91 (k=4) and 72 to 80 (the habitat partition the LLM never learns), against arm C's 62 / 52 / 29 from the weights and 71 / 61 / 66 with the field guide; MiniLM at 79 / 63 / 53 already beats the LLM's weights. For "which of these cards is this one most like", the encoder is the tool, and the size that matters is the encoder's, not the LLM's.
+- MODEL-5 and BASE-5: the new-token failure is not mean pooling's, not the initialisation's and not the schedule's; a row warm-up recovers most but not all of it, and on a cased tokenizer the added token cannot reach the upper-case format at all.
+- BASE-4: the frozen encoders are at chance on the universe (the names are strings), the trained centroid is matched by logistic regression and not improved by SetFit, and every number in section 6.3 reproduces on identical items with the LLM.
+- GRAPH-5: no; the text-initialised encoder bridges products to category on its own.
+- What does not transfer to the encoder: recall in words, manipulation, and reading a card it was never trained on (held-out species at chance everywhere but the LLM with the guide).
