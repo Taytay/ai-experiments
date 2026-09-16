@@ -319,7 +319,48 @@ def episodes(species, n=6000, seed=3, ctx_frac=0.5, attrs=EPISODE_ATTRS):
             names = [d["name"] for d, _ in demos] + [q["name"]]
             rng.shuffle(names)
             prompt = "Field guide:\n" + "\n".join(entry(by_name[x]) for x in names) + "\n\n" + prompt
-        out.append(dict(prompt=prompt, answer=" " + labels[vals.index(qv)], attr=attr, k=k, labels=labels))
+        out.append(dict(prompt=prompt, answer=" " + labels[vals.index(qv)], attr=attr, k=k, labels=labels,
+                        demos=[(d["name"], l) for d, l in demos]))
+    return out
+
+
+# ------------------------------------------------------------------ self-teaching stream (PLAN step 9, TRAIN-1)
+_ST_ATTRS = {"type": ("T", TYPE_LIST), "weakness": ("W", TYPE_LIST), "habitat": ("H", HABITATS), "diet": ("D", DIETS), "region": ("R", REGIONS)}
+_ST_STATEMENT = {"type": "{N} is a {V}-type creature.", "weakness": "{N} is weak to {V}-type attacks.",
+                 "habitat": "{N} lives in {V} habitats.", "diet": "{N} eats as an {V}.", "region": "{N} is found in {V}."}
+
+
+def self_teaching(species, n=4000, seed=5):
+    """Tasks derived from the knowledge texts themselves (Self-Tuning, 2406.06326), answer-only loss:
+    completion (a training sentence cut just before an attribute value, the species already named),
+    true/false (a statement with the value kept or swapped, balanced), and in-document multiple choice
+    (four statements about the species, one true, answered by letter). Never the ladder's question
+    strings; trained species only. -> dict(prompt, answer, task, attr)"""
+    rng = random.Random(seed)
+    tr = [s for s in species if not s["heldout"]]
+    out = []
+    while len(out) < n:
+        s = rng.choice(tr)
+        attr = rng.choice(list(_ST_ATTRS)); key, vals = _ST_ATTRS[attr]
+        f = dict(N=s["name"], T=s["type"], W=s["weakness"], H=s["habitat"], D=s["diet"], R=s["region"], S=s["stage"])
+        form = rng.random()
+        if form < 0.4:
+            cands = [t for t in _DESC[:8] if "{" + key + "}" in t and "{N}" in t[:t.index("{" + key + "}")]]
+            if not cands:
+                continue
+            t = rng.choice(cands)
+            prefix = t[:t.index("{" + key + "}")].format(**f).rstrip()
+            out.append(dict(prompt=prefix, answer=" " + str(s[attr]), task="complete", attr=attr))
+        elif form < 0.7:
+            truth = rng.random() < 0.5
+            v = s[attr] if truth else rng.choice([x for x in vals if x != s[attr]])
+            out.append(dict(prompt=f"Statement: {_ST_STATEMENT[attr].format(V=v, **f)}\nTrue or false?\nAnswer:",
+                            answer=" True" if truth else " False", task="tf", attr=attr))
+        else:
+            opts = rng.sample([x for x in vals if x != s[attr]], 3) + [s[attr]]
+            rng.shuffle(opts)
+            lines = "\n".join(f"{'ABCD'[i]}. {_ST_STATEMENT[attr].format(V=v, **f)}" for i, v in enumerate(opts))
+            out.append(dict(prompt=f"Which statement is true?\n{lines}\nAnswer:", answer=" " + "ABCD"[opts.index(s[attr])], task="mcq", attr=attr))
     return out
 
 
