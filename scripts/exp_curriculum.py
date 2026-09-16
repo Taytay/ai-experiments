@@ -86,8 +86,9 @@ MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
 STEPS = int(sys.argv[3]) if len(sys.argv) > 3 else 800
 LR = float(sys.argv[4]) if len(sys.argv) > 4 else 1e-4
 MICRO, ACCUM, MAXLEN = int(os.environ.get("MICRO", "16")), int(os.environ.get("ACCUM", "1")), 768  # MICRO x ACCUM = 16 sequences per step
-GRAD_CKPT = os.environ.get("GRAD_CKPT", "unsloth")  # "unsloth" (default, offloaded checkpointing), "1", or "0" (none: 30% faster in a
-# 60-step bench but a full arm C run died of memory at step 600 after its periodic evaluations, REPORT.md 19)
+GRAD_CKPT = os.environ.get("GRAD_CKPT", "1")  # "1" (default: plain torch checkpointing), "unsloth" (offloaded; three packed runs died
+# of CUDA out-of-memory / cuBLAS errors raised in its backward within 200 steps, REPORT.md 20.4), or "0" (none: 30% faster in a 60-step bench but a full arm C run
+# died of memory at step 600 after its periodic evaluations, REPORT.md 19)
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
