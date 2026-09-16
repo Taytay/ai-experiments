@@ -155,6 +155,7 @@ def train():
         streams["E"] = Stream(U.episodes(species, n=6000, seed=3), rng)
     if "R" in need:
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
+    model.gradient_checkpointing_enable()  # the Flan-T5-large smoke peaked at 21.8 GiB without it; T5Gemma-large would not fit
     params = list(model.parameters())
     opt = bnb.optim.AdamW8bit(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
