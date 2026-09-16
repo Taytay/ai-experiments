@@ -19,7 +19,7 @@ if "--ci" in sys.argv:
     if not p.exists():
         sys.exit(f"{p} missing; run scripts/ci_table.py {tag} first")
     CI = json.loads(p.read_text())["arms"]
-ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E", "P", "P2"]
+ARMS = ["base", "A", "B", "C", "Cn", "D", "Dr", "Dc", "Dk", "base_m", "E", "P", "P2"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
          "base_m": "base(m)", "E": "E morph", "P": "P distill", "P2": "P2 distill-opt"}
 ROWS = [  # (metric, source condition-key)

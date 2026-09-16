@@ -13,6 +13,10 @@ Cn      knowledge .50 + episodes .50 (no replay)               plain
 D       phase 1: knowledge .85 + replay .15;                   plain
         phase 2: episodes .85 + replay .15   (sequential)
 E       same as C                                              morphology
+Dr/Dc/Dk  arm D controls (PLAN step 12, TRAIN-2): Dr restarts the learning-rate schedule (30-step warmup,
+        linear decay to zero) at the phase boundary instead of one schedule over both phases; Dc holds the
+        peak rate after the warmup; Dk replays 10% knowledge texts in phase 2 (episodes .75 + knowledge .10
+        + replay .15) under the shared schedule
 Cg      knowledge .45 + episodes .35 + replay .15 + general .05  plain   (PLAN step 25, TRAIN-7)
 A1      one knowledge text per species (universe.single_texts, all attributes, no paraphrases), LM loss
 A1m     the same 136 texts under MASKED FINE-TUNING (Pan et al. 2510.09885, PLAN step 8, TRAIN-5): the
@@ -104,6 +108,9 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "C": [dict(K=0.45, E=0.40, R=0.15)],
     "Cn": [dict(K=0.5, E=0.5)],
     "D": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],
+    "Dr": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],           # D, learning-rate schedule restarted per phase (PLAN step 12)
+    "Dc": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],           # D, constant learning rate after warmup
+    "Dk": [dict(K=0.85, R=0.15), dict(E=0.75, K=0.10, R=0.15)],   # D, 10% knowledge replay in phase 2
     "E": [dict(K=0.45, E=0.40, R=0.15)],
     "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
     "A1": [dict(K1=1.0)],
@@ -119,6 +126,8 @@ MASK_TOKEN = "<|fim_pad|>"  # a reserved single token of the Qwen2.5 vocabulary,
 MASK_INSTRUCTION = "Recover the original passage from the masked version.\nMasked:"
 MASK_RNG = random.Random(1000 + int(os.environ.get("SEED", "0")))
 BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
+SCHEDULE = {"Dr": "restart", "Dc": "constant"}.get(ARM, "shared")  # one warmup + linear decay over all phases (default),
+# restarted at each phase boundary, or held at the peak after the warmup (PLAN step 12, TRAIN-2)
 ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
@@ -307,7 +316,15 @@ def train(model, tok, phases, run):
     if "Km" in need:
         streams["Km"] = Stream([dict(mask=t) for t in U.single_texts(species)], rng)
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
-    sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
+    def lr_factor(s):
+        if SCHEDULE == "constant":
+            return min(1.0, (s + 1) / 30)
+        if SCHEDULE == "restart":
+            per = STEPS // len(phases); s = s % per; total = per
+        else:
+            total = STEPS
+        return min(1.0, (s + 1) / 30) * max(0.0, 1 - s / total)
+    sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_factor)
     pad = tok.pad_token_id or 0
     counts, tokens, t0 = defaultdict(int), 0, time.time()
     tok_by, lb_by = defaultdict(int), defaultdict(int)  # per-stream tokens seen and loss-bearing tokens
@@ -390,7 +407,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_lora", grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())

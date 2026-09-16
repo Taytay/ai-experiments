@@ -1182,3 +1182,71 @@ Cm replaces arm C's 2,752 paraphrases with the masked single text at the same 45
 ### 22.3 What TRAIN-5 and EVAL-7 now say
 
 TRAIN-5: partly. Masked fine-tuning of one rendering does what the paper says on the backward direction (60.6 / 48.1 from 21.2 / 20.0, the plain text at chance) and improves forward recall over the plain text (87.5 against 65.6), so it removes the need for paraphrases for backward recall. It does not remove it for manipulation (46.2 / 50.0 against arm A's 100 / 92.5), it costs the symbol-label ICL suite 14 points against the base, it halves the model's ability to read the same backward fact from context (51.9 against 92.5), and inside the section 8 mixture at 43 passes it learns less than the plain text. The recipe that gives everything from the weights is still the paraphrases; masking is the cheaper route to the one direction paraphrases written forward do not cover, and the two should be tried together (masked paraphrases) before either replaces the other. Open: whether the in-context loss is a property of masked training or of any arm that holds a backward answer in its weights (arm A, which holds the easy direction, keeps 91.2 with context on the hard level). EVAL-7: the merchant `reverse` construction is category-level (section 4.3's caveat): its distractors differ in the category, so the easy level here reproduces it and the hard level is the entity-level test. Masked fine-tuning moves both, and the hard level is the one that matters.
+
+## 23. Arm D controls: the decaying schedule was protecting the facts, and 10% knowledge replay makes sequential equal interleaved (TRAIN-2)
+
+Date: 2026-09-16. Code: `SEED={0,1,2} PERIODIC=200 uv run python scripts/exp_curriculum.py {Dr,Dc,Dk}` (fast path, plain checkpointing; `SCHEDULE` in `exp_curriculum.py`); data `results/curriculum_Qwen2.5-3B_{Dr,Dc,Dk}{,_s1,_s2}_p200.json`; `scripts/seeds_table.py --arms A C D Dr Dc Dk --out seeds_d_controls_Qwen2.5-3B.md` writes the full table. Comparison arms are section 20's three seeds of C and D.
+
+Section 8.3 flagged that arm D confounds staging with its learning-rate schedule: one 30-step warmup and linear decay to zero spans both phases, so the episode phase (steps 400 to 800) trains from half the peak rate down to nothing, and it sees no knowledge text at all. Section 20 then found that of "sequential loses", only the recall gap survives three seeds: D 91.5 +- 3.5 in the trained format against 100 in every A and C run (2 sd 6.9), while the manipulation and induction gaps are inside the seed noise. TRAIN-2 asks whether that residue is staging or the schedule. Three controls, each three seeds, everything else as arm D:
+
+- Dr: the schedule restarts at the phase boundary (warmup 30, linear decay to zero at step 400, again at 800), so the episodes train at the same rates the knowledge did.
+- Dc: the rate is held at the peak (1e-4) after the warmup for all 800 steps, so neither phase decays.
+- Dk: the shared schedule of arm D, but phase 2 replays 10% knowledge texts (episodes .75, knowledge .10, replay .15).
+
+The literature's prediction (SURVEY TRAIN-1/TRAIN-2) is that D stays behind C under any schedule and that the remedy is mixing or replay.
+
+**Table 23.1: mean +- sd over seeds 0, 1, 2 (accuracy %; `reports/seeds_d_controls_Qwen2.5-3B.md` has every metric and every gap)**
+
+| measure | C | D | Dr restart | Dc constant | Dk +10% K |
+|---|---|---|---|---|---|
+| recall, trained fmt | 100.0 +- 0.0 | 91.5 +- 3.5 | **28.1 +- 16.4** | **41.0 +- 18.8** | **99.8 +- 0.3** |
+| recall, bare | 18.4 +- 1.3 | 44.2 +- 20.6 | 37.5 +- 1.7 | 42.1 +- 8.3 | 21.4 +- 1.0 |
+| yes/no (is-a) | 80.0 +- 12.7 | 70.9 +- 8.3 | 67.1 +- 6.1 | 61.2 +- 6.3 | 78.3 +- 11.9 |
+| pair | 78.7 +- 12.7 | 68.7 +- 16.0 | 50.4 +- 1.4 | 50.0 +- 4.3 | 75.0 +- 14.7 |
+| Timmy k=3 | 63.8 +- 9.2 | 59.2 +- 7.0 | 37.7 +- 3.8 | 39.4 +- 7.1 | 58.7 +- 4.9 |
+| k=4 | 57.9 +- 11.0 | 54.6 +- 7.0 | 32.5 +- 1.9 | 34.2 +- 6.7 | 60.8 +- 4.4 |
+| weakness | 59.6 +- 11.9 | 55.8 +- 6.7 | 34.8 +- 2.5 | 41.3 +- 2.5 | 56.7 +- 5.7 |
+| ICL suite, symbol | 79.0 +- 1.1 | 79.2 +- 1.8 | 80.1 +- 1.6 | 72.0 +- 6.0 | 80.2 +- 3.4 |
+| ICL suite, natural | 87.5 +- 0.9 | 88.4 +- 1.1 | 88.4 +- 0.3 | 84.9 +- 2.3 | 87.0 +- 0.5 |
+| ARC-Easy (K) | 64.0 +- 4.8 | 63.7 +- 2.4 | 69.0 +- 3.3 | 66.8 +- 0.8 | 62.0 +- 2.8 |
+| WikiText ppl | 22.6 +- 0.2 | 21.9 +- 0.9 | 19.7 +- 1.4 | 21.4 +- 3.9 | 19.6 +- 0.6 |
+
+Arm A (knowledge only, section 20) reads 100 / 98.3 / 90.8 on recall and manipulation and 35.9 / 35.2 / 41.5 on the three induction levels.
+
+**Table 23.2: trained-format recall at the periodic points, per seed (steps 0 / 200 / 400 / 600 / 800; phase 2 starts at 400)**
+
+| arm | seed 0 | seed 1 | seed 2 |
+|---|---|---|---|
+| D | 12.5 / 95.0 / 100 / 95.0 / 93.1 | 12.5 / 100 / 100 / 97.5 / 93.8 | 12.5 / 82.5 / 100 / 80.0 / 87.5 |
+| Dr | 12.5 / 95.0 / 100 / **42.5** / 45.6 | 12.5 / 95.0 / 100 / **17.5** / 13.1 | 12.5 / 82.5 / 100 / **22.5** / 25.6 |
+| Dc | 12.5 / 95.0 / 97.5 / **57.5** / 50.6 | 12.5 / 100 / 97.5 / **57.5** / 53.1 | 12.5 / 80.0 / 100 / **25.0** / 19.4 |
+| Dk | 12.5 / 97.5 / 97.5 / 100 / 100 | 12.5 / 97.5 / 100 / 97.5 / 100 | 12.5 / 87.5 / 100 / 97.5 / 99.4 |
+
+**Table 23.3: gaps against 2 sd of the difference (three seeds each side)**
+
+| gap | recall fmt | yes/no | pair | Timmy k=3 | k=4 | ICL symbol | WikiText ppl |
+|---|---|---|---|---|---|---|---|
+| Dr - D | -63.4 (33.5) **clear** | -3.8 (20.7) | -18.3 (32.1) | -21.4 (16.0) **clear** | -22.1 (14.4) **clear** | +0.9 (4.8) | -2.3 (3.4) |
+| Dc - D | -50.4 (38.2) **clear** | -9.6 (20.8) | -18.7 (33.1) | -19.8 (20.0) | -20.4 (19.3) **clear** | -7.1 (12.6) | -0.5 (8.0) |
+| Dk - D | +8.3 (6.9) **clear** | +7.5 (29.0) | +6.3 (43.5) | -0.4 (17.2) | +6.2 (16.5) | +1.1 (7.7) | -2.3 (2.2) **clear** |
+| Dk - C | -0.2 (0.7) | -1.7 (34.8) | -3.7 (38.9) | -5.0 (20.9) | +2.9 (23.7) | +1.3 (7.1) | -3.0 (1.3) **clear** |
+
+### 23.1 Phase 2 at the full learning rate erases phase 1
+
+Every D variant reaches 100 formatted recall at step 400, the end of the knowledge phase (Table 23.2). What happens next depends only on the learning rate the episodes train at. Under arm D's shared schedule, phase 2 starts at half the peak rate and decays to zero, and recall ends at 87.5 to 93.8. Restart the schedule (Dr) and 400 steps of episodes at the full rate, with no knowledge text in the batch, take recall to 13.1 / 25.6 / 45.6 by the end, most of it gone by step 600. Hold the rate constant (Dc) and it is 19.4 / 50.6 / 53.1. The facts are not being contradicted: the episode stream carries no statement about any species, only random labels over species names in demos. They are being overwritten by 6,400 sequences of answer-only loss on labels, which is what catastrophic forgetting of a LoRA adapter looks like at 1e-4.
+
+Induction from the weights goes with the facts. Dr and Dc sit at 37.7 and 39.4 on Timmy k=3 and 32.5 / 34.2 on k=4, which is arm A's level (35.9 / 35.2), the level of a model that never trained on episodes at all. The 400 steps of episodes at the full rate taught nothing usable from the weights, because the induction items need the species facts that the same steps erased. With the field guide in context the four arms are alike (65 to 81 on Timmy), so the in-context skill the episodes teach is intact; it is the from-the-weights version that needs the facts under it.
+
+Section 8.3's reading of arm D, "episodes were trained at a lower learning rate", was right about the mechanism and wrong about the sign. The lower rate did not hold the episodes back; it kept them from erasing phase 1. What the sequential arm lost relative to C (recall 91.5 against 100, a clear gap in section 20) is the mild version of what Dr and Dc show in full.
+
+Two side effects of the forgetting arms are worth a line. Their WikiText perplexity and ARC-Easy are the best of any trained arm with episodes (Dr 19.7 ppl and 69.0 ARC against D's 21.9 and 63.7), which is the general-ability cost of section 15 and 16 partly reversing as the knowledge goes: Dr ends closer to the base model on general text because it ends closer to the base model on everything. And the bare-format recall of Dr (37.5 +- 1.7, chance 12.5) is well above arm C's 18.4 while its formatted recall is 28.1: the full-rate episode phase overwrote the trained answer format more completely than the association itself, which is the same format-versus-fact distinction section 18 drew for the distilled arm.
+
+### 23.2 Ten percent knowledge replay in phase 2 makes sequential equal interleaved
+
+Dk keeps arm D's schedule and its two phases and replaces 10% of phase 2's sequences (640 of 6,400) with knowledge texts. Formatted recall is 99.8 +- 0.3 against D's 91.5 +- 3.5 (+8.3, 2 sd 6.9, clear) and C's 100.0. On every other ladder level Dk is inside arm C's seed band and above arm D's mean: yes/no 78.3 against C's 80.0, pair 75.0 against 78.7, Timmy k=3 58.7 against 63.8, k=4 60.8 against 57.9, weakness 56.7 against 59.6, ICL suite 80.2 against 79.0, ARC-Easy 62.0 against 64.0. The one clear difference from C is in C's disfavour: WikiText perplexity 19.6 +- 0.6 against 22.6 +- 0.2 (-3.0, 2 sd 1.3), 0.14 nats per token less drift with the same facts, the same induction and the same ICL suite. The recall curve (Table 23.2) never dips in phase 2.
+
+So "sequential loses" is answered as section 8.3 and the survey predicted: a staged run needs replay of the earlier stage, and with 10% of it the staging costs nothing that three seeds can see. What it does not give is any advantage over interleaving either, except the perplexity, which is the one measure where less knowledge exposure in the second half would be expected to help. The recipe stays interleaved (arm C) as the simpler of two equals; when staging is forced by the data pipeline (facts first, task later), 10% replay of the facts under a decaying schedule is the version to use.
+
+### 23.3 What TRAIN-2 now says
+
+Closed. The residual "sequential loses" gap of section 20 (recall 91.5 against 100) is a mild case of forgetting that arm D's decaying schedule was holding down: restarting the schedule per phase or holding the rate constant lets 400 steps of episodes without knowledge text erase most of the facts (formatted recall 28 and 41, induction back to arm A's level), while 10% knowledge replay in phase 2 under the original schedule matches arm C on every level within the seed noise and beats it on WikiText perplexity. Recommendation: interleave, or replay if you must stage; never restart the schedule on a phase that lacks the earlier phase's data.
