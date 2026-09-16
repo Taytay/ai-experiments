@@ -1074,3 +1074,55 @@ The self-teaching stream dissociates recall from use: M20 reaches 100 on the tra
 ### 21.3 What TRAIN-1 now says
 
 Closed. Arm C is 84% knowledge by loss, and that weighting is load-bearing: the same batches at the nominal 45% do not memorise the facts in 800 steps (33.8 recall_fmt, manipulation at chance), and no loss-level episode weight in {.2, .4, .6} matches arm C from the weights. Any future mixture change should be stated and swept in loss weight, with the knowledge weight held at or above 0.8 unless the point is to trade the facts for in-context induction (M0's 86 / 82 / 91 with context is the reference for that trade). The pooled token mean stays the default; the `BY_LOSS` path stays in the script for stated-weight experiments. The section 17 follow-up (Cg with the general text taken out of the knowledge stream, K .40 / E .40 / R .15 / G .05 by sequence) is a sampler change, not a loss-weight change, and is unaffected; it remains queued.
+
+## 22. Masked fine-tuning: one rendering learns the backward direction, costs manipulation and context reading, and paraphrases still win from the weights (TRAIN-5, EVAL-7)
+
+Date: 2026-09-15. Code: `uv run python scripts/exp_curriculum.py {base,A1,A1m,A,C,C1,Cm} Qwen/Qwen2.5-3B-Instruct` on the section 19 fast path (seed 0); `encode_masked` and `universe.single_texts` in `exp_curriculum.py` / `universe.py`; the backward item set is `data/processed/reverse_v1.json` (`universe.reverse_items`, 320 items, sha 4e6f7dc244d9, section 9 rules). Data `results/curriculum_Qwen2.5-3B-Instruct_*.json`; adapters `curriculum_Qwen2.5-3B-Instruct_*_lora`.
+
+Pan et al. (2510.09885) train a decoder on "here is the passage with 5 to 95% of its tokens masked; recover it", with the ordinary next-token loss on the reconstruction, and report forward and backward recall above 0.9 from a single rendering per fact where plain fine-tuning with paraphrases gives 0.95 forward and 0.04 backward. TRAIN-5 asks whether that removes the need for the 20 paraphrases arm A trains on and fixes the reversal curve. The setup here follows the paper's: Qwen2.5-3B-Instruct, LoRA r=64 on all linear layers, one text per trained species (136 texts of ~47 tokens carrying every attribute), 800 steps of 16 sequences (94 passes over each text). The masked sample is `Recover the original passage from the masked version.\nMasked: <text with a fraction t ~ U(0.05, 0.95) of its tokens replaced by <|fim_pad|>>\nOriginal: <text>`, loss on the original only; the plain sample is the text with full-sequence loss. Arms: A1 plain single text, A1m masked single text, A the 2,752 paraphrases (section 8's arm A on this model), C section 8's mixture, C1 the mixture with the single text in place of the paraphrases, Cm the mixture with the masked single text.
+
+The backward probe is new. `L8_reverse_easy`: "Which creature is a {type}-type with an {diet} diet, found in {region}?", four species names, distractors of another type, so recalling the type of each option answers it (the merchant `reverse` construction, EVAL-7). `L8_reverse_hard`: distractors of the same type differing in diet or region, so the conjunction is needed. Every training text states attributes in the forward direction only. 160 items per level, chance 25.
+
+**Table 22.1: from the weights (no context), accuracy %, Qwen2.5-3B-Instruct**
+
+| measure | base | A1 plain, 1 text | A1m masked, 1 text | A 20 paraphrases | C mixture | C1 mixture, 1 text | Cm mixture, masked |
+|---|---|---|---|---|---|---|---|
+| L1 recall, bare | 20.0 | 38.8 | 20.0 | 20.6 | 24.4 | 45.0 | 45.6 |
+| L1 recall, trained fmt | 11.9 | 65.6 | **87.5** | 100 | 100 | 54.4 | 36.2 |
+| L2 manipulation is-a | 45.0 | 46.2 | 45.0 | 100 | 51.2 | 56.2 | 57.5 |
+| L2 manipulation pair | 50.0 | 50.0 | 50.0 | 92.5 | 51.2 | 50.0 | 51.2 |
+| L3 induction, nonsense names | 33.8 | 33.1 | 35.6 | 38.8 | 58.8 | 26.9 | 28.1 |
+| L4 weakness | 33.1 | 33.1 | 38.8 | 44.4 | 53.8 | 30.0 | 34.4 |
+| L8 reverse, easy | 19.4 | 21.2 | **60.6** | 87.5 | 35.0 | 21.9 | 24.4 |
+| L8 reverse, hard | 30.0 | 20.0 | **48.1** | 28.8 | 21.2 | 23.8 | 26.2 |
+| ICL suite, symbol labels | 64.6 | 60.4 | 51.0 | 54.2 | 78.1 | 83.3 | 80.2 |
+| ICL suite, natural labels | 84.4 | 82.8 | 82.8 | 83.8 | 89.0 | 88.0 | 84.9 |
+| ARC-Easy (K) | 70.0 | 66.0 | 72.5 | 67.0 | 66.5 | 80.0 | 79.0 |
+| WikiText ppl | 11.0 | 21.1 | 18.0 | 38.0 | 27.7 | 14.7 | 13.5 |
+| training minutes | - | 5.7 | 9.6 | 5.2 | 9.4 | 10.3 | 13.8 |
+
+**Table 22.2: with the field guide in context, accuracy %**
+
+| measure | base | A1 | A1m | A | C | C1 | Cm |
+|---|---|---|---|---|---|---|---|
+| L1 recall, trained fmt | 100 | 100 | 100 | 100 | 100 | 100 | 100 |
+| L2 manipulation pair | 53.8 | 80.0 | 68.8 | 98.8 | 78.8 | 62.5 | 60.0 |
+| L3 induction, nonsense names | 45.0 | 42.5 | 38.8 | 40.0 | 81.9 | 76.9 | 73.1 |
+| L8 reverse, easy | 97.5 | 90.6 | 88.1 | 99.4 | 91.9 | 79.4 | 96.9 |
+| L8 reverse, hard | 92.5 | 82.5 | **51.9** | 91.2 | 85.0 | 76.2 | 91.9 |
+
+### 22.1 The backward direction arrives from one rendering
+
+A1 and A1m see the same 136 sentences the same number of times. Plain fine-tuning on them gives forward recall of 65.6 in the trained format and nothing backward: 21.2 and 20.0 against a base of 19.4 and 30.0, the reversal curse as the paper describes it. Masking the same sentences gives 87.5 forward and 60.6 / 48.1 backward. The hard level, where the options share the type and the model has to place the diet and region conjunction on the right name, is 23 points over chance from texts that never mention any name after its attributes. This is the paper's direction on a 3B model at LoRA r=64 with a 320-item probe, weaker than its 0.9 (the paper trains to convergence and scores generation), and it is the first arm in this project with backward recall from the weights above the section 4 merchant result (42.5 with augmentation, 25.8 without).
+
+Against paraphrases, the trade is explicit. Arm A's 2,752 renderings (20 per species, 5 minutes of training) give this model 100 forward recall, 100 / 92.5 on manipulation, and 87.5 on the easy backward level, because the paraphrase set includes renderings that name the type before the species, so type-to-name is a forward association for arm A. On the hard level, where diet and region have to be attached to the name, arm A is at 28.8 (chance 25) and A1m at 48.1. Twenty renderings buy everything the forward direction can buy; one masked rendering buys the one thing they do not, at 87.5 forward instead of 100 and with no manipulation (46.2 / 50.0, base 45.0 / 50.0). The paper's claim that masking removes the need for paraphrases holds for backward recall and not for use of the fact.
+
+Two costs. The symbol-label ICL suite drops to 51.0 (base 64.6, plain 60.4): 94 passes over an instruction-shaped reconstruction task with a fixed prefix moves the instruction-tuned model's in-context behaviour more than the same passes over bare text. And Table 22.2's last row: with the field guide in the prompt, the base model answers the hard backward question at 92.5 and A1m at 51.9. The arm that learned the backward direction in its weights is the arm that no longer reads it from context, while A1 (82.5), C (85.0) and Cm (91.9) keep the skill. The masked model's weights answer the question one way and the context another, and the weights win about half the time. Nothing else in Table 22.2 moves like this (recall with context is 100 for every arm), so it is the backward association specifically, in the same items where the weights now hold an answer.
+
+### 22.2 In the mixture, the single text is not enough passes
+
+Cm replaces arm C's 2,752 paraphrases with the masked single text at the same 45% of sequences: 5,813 masked sequences over 136 texts is 43 passes each, and the reconstruction tokens are 91% of the loss-bearing tokens (279,109 of 306,000), the episodes 6%. Recall in the trained format is 36.2, backward 24.4 / 26.2, induction from the weights below C. The base model's general abilities are the best preserved of any trained arm (ARC-Easy 79.0, above the base's 70.0; WikiText 13.5 against C's 27.7; symbol ICL 80.2), which reads as an arm that has learned little rather than one that has learned without cost. C1, the same mixture with the single text unmasked, says it is the passes: 54.4 recall in the trained format (A1 reached 65.6 from 94 passes of the same text, arm A 100 from 20 paraphrases), backward at chance (21.9 / 23.8), induction from the weights at the base's level. Masking the text inside the mixture then costs recall rather than adding to it (Cm 36.2 against C1's 54.4), because the reconstruction task at 43 passes has not converged where the plain text has half-learned. One rendering per fact needs its passes, masked or not; at 45% of a 12,800-sequence budget it does not get them, and this is the arm that section 8's mixture becomes when the paraphrases are taken away. Both C1 and Cm are above the base model on ARC-Easy (80.0 and 79.0 against 70.0; arm C on this model 66.5) and near it on WikiText (14.7 and 13.5 against 11.0): the mixture without paraphrases barely moves the model, and the episodes and ICL replay alone seem to help the four-option format.
+
+### 22.3 What TRAIN-5 and EVAL-7 now say
+
+TRAIN-5: partly. Masked fine-tuning of one rendering does what the paper says on the backward direction (60.6 / 48.1 from 21.2 / 20.0, the plain text at chance) and improves forward recall over the plain text (87.5 against 65.6), so it removes the need for paraphrases for backward recall. It does not remove it for manipulation (46.2 / 50.0 against arm A's 100 / 92.5), it costs the symbol-label ICL suite 14 points against the base, it halves the model's ability to read the same backward fact from context (51.9 against 92.5), and inside the section 8 mixture at 43 passes it learns less than the plain text. The recipe that gives everything from the weights is still the paraphrases; masking is the cheaper route to the one direction paraphrases written forward do not cover, and the two should be tried together (masked paraphrases) before either replaces the other. Open: whether the in-context loss is a property of masked training or of any arm that holds a backward answer in its weights (arm A, which holds the easy direction, keeps 91.2 with context on the hard level). EVAL-7: the merchant `reverse` construction is category-level (section 4.3's caveat): its distractors differ in the category, so the easy level here reproduces it and the hard level is the entity-level test. Masked fine-tuning moves both, and the hard level is the one that matters.

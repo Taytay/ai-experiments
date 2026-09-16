@@ -244,6 +244,7 @@ Distractors come from other categories (`merchants.py:136,147,157`), so "Which s
 goods and frozen vegetables?" is answered by knowing which option is a grocer. The reversal-curse
 conclusion rests on this task.
 *Experiment:* hard-negative variants with same-category distractors; report easy and hard.
+**Status (2026-09-15):** answered, PLAN step 8. `universe.reverse_items` builds both levels: L8_reverse_easy has distractors of another type (the merchant `reverse` construction; any arm that knows each option's type answers it, arm A 87.5), L8_reverse_hard has same-type distractors differing in diet or region (arm A 28.8, masked fine-tuning 48.1). The merchant `reverse` was the category-level test; the entity-level test is the hard level and is now in the frozen set `reverse_v1.json`.
 
 ### DATA — dataset design and confounds
 
@@ -459,6 +460,7 @@ backward; a random-token control collapses, so it is not generic augmentation. N
 *Experiment:* Qwen2.5-3B-Instruct, LoRA r=64, one template per entity, masked-FT objective on
 the K stream with episodes and replay unchanged; score bare L1, `L1_recall_fmt`, the merchant
 `reverse` task and the ICL suite against arm C. About 2x arm C in tokens.
+**Status (2026-09-15):** partly, PLAN step 8. REPORT.md 22. On Qwen2.5-3B-Instruct with one rendering per species, masked fine-tuning gives 60.6 / 48.1 backward recall (easy / hard; plain text 21.2 / 20.0, chance 25) and 87.5 forward (plain 65.6), so it replaces paraphrases for the backward direction. It leaves manipulation at the base (arm A's 20 paraphrases: 100 / 92.5), costs the symbol-label ICL suite 14 points, and the model reads the hard backward fact from context at 51.9 where the base reads it at 92.5. Inside the mixture at 43 passes the masked text learns less than the plain one (36.2 against 54.4). Next: masked paraphrases; whether the context loss follows any backward knowledge in the weights.
 
 **TRAIN-6 (O) Is the knowledge stream overhead-bound, and would sequence packing change the results as well as the speed?**
 Knowledge texts average 25 tokens and are trained unpacked in micro-batches of 8, so a step is
