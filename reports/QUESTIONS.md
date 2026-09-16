@@ -346,6 +346,7 @@ The closest thing run is episodes with oracle field-guide entries at `ctx_frac=0
 (`universe.py:318-321`), no distractors, no actual retriever.
 *Experiment:* arm C-RAFT with top-3 entries retrieved by the fine-tuned MiniLM over noisy
 renderings (some wrong), answer-only loss; evaluate with retrieved context and with none.
+**Status (2026-09-16):** run, PLAN step 14, REPORT.md 25.1. Arm C (oracle-only context in training) does not fall below its no-context numbers with retrieved context; it gains, because the fine-tuned MiniLM's top-3 per name are the species' paraphrased training texts (Timmy 78.1 retrieved vs 70.6 oracle vs 61.9 bare). Arm Cr (episodes with gold p 0.8 + 2 retrieved distractors) trains to arm C's from-the-weights numbers and reads retrieved context 3 to 7 points better (85.6 / 77.5 / 81.2 on Timmy / k=4 / weakness); single seed. The distilled arm P2 reads context worse than the base model.
 
 **BASE-2 (R) How do dedicated knowledge-editing methods compare on this ladder?**
 120 merchant relations and ~680 species relations are in the range where ROME/MEMIT/AlphaEdit
@@ -418,6 +419,7 @@ The "RAG ceiling" inserts the exact fact verbatim; the 70.8% embedding number is
 measured.
 *Experiment:* index the 120 (then 10k) records with the fine-tuned MiniLM; recall@1/5 from bank
 strings; feed top-1 (right or wrong) to the LLM; end-to-end category accuracy.
+**Status (2026-09-16):** measured at 120 records, PLAN step 14, REPORT.md 25.4. Recall@1 of the bank string to its own record: zero-shot MiniLM 78.1 (train) / 87.5 (held-out), the section 4 category-tuned encoder 55.2 / 29.2, a record-tuned encoder (same anchors, own record as the positive) 100 / 100, held-out bank strings included. End to end on untrained Qwen2.5-3B with the top-1 record: 81.2 / 75.0 on bank strings and 89.6 / 91.7 on clean names, identical to the oracle; top-3 records halve it; Qwen2.5-0.5B cannot use the record from a bank string (8.3). The 10k-record test is PLAN row 22.
 
 **REAL-3 (R) Does 100% recall survive 1k to 10k entities in one adapter?**
 Section 7.3 extrapolates 10k-merchant training time linearly from 136 species; rank-64 capacity and
@@ -554,4 +556,5 @@ vector fixed to the member mean. Merchant categories have meaningful names; univ
 **GRAPH-7 (R) Does the model use E-A-E structure without the attribute vocabulary?**
 *Experiment:* Timmy with context given as co-typed species lists per demo and no attribute names (a KAPING-style
 neighbour list); expected below the field-guide oracle. After PLAN row 14.
+**Status (2026-09-16):** answered yes, PLAN step 14, REPORT.md 25.3. Three co-typed species per name and no attribute words is the best context for the episode-trained arms (Timmy 87.5 for C, 93.1 for Cr; the field-guide oracle gives 70.6 / 69.4) and chance for the base model (36.9): the trained model uses the entity-entity structure. Habitat, which the list does not encode, stays at chance.
 

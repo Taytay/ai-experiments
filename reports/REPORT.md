@@ -1367,3 +1367,95 @@ Table 24.5 is the text-initialised inductive KGE. The encoder embeds merchants, 
 - BASE-4: the frozen encoders are at chance on the universe (the names are strings), the trained centroid is matched by logistic regression and not improved by SetFit, and every number in section 6.3 reproduces on identical items with the LLM.
 - GRAPH-5: no; the text-initialised encoder bridges products to category on its own.
 - What does not transfer to the encoder: recall in words, manipulation, and reading a card it was never trained on (held-out species at chance everywhere but the LLM with the guide).
+
+## 25. Retrieval: retrieved context beats the oracle, RAFT training adds a little, a neighbour list beats both, and the merchant record is found at 100% (BASE-1, REAL-2, GRAPH-7)
+
+Date: 2026-09-16. Code: `ai_experiments.retrieval` (new: a fine-tuned MiniLM index over the field guide and over the merchant records, with the context builders), `RET=1 PERIODIC=200 uv run python scripts/exp_curriculum.py Cr` (arm C-RAFT), `RET=1 RUN_TAG=ret EVAL_ONLY=1 ADAPTER_NAME=... uv run python scripts/exp_curriculum.py {C,P2}` and `RET=1 RUN_TAG=ret ... base` (the retrieved and neighbour-list conditions on the existing adapters), `uv run python scripts/exp_retrieval_merchants.py` (REAL-2). Data `results/curriculum_Qwen2.5-3B_{Cr_p200,base_ret,C_ret,P2_ret}.json` with per-item files, `results/retrieval_merchants.json`, `results/retrieval_universe.json` (the universe retriever's recall).
+
+Every with-context number so far was an oracle: the exact field-guide entry of every species in the item, or the merchant's own record, placed in the prompt (section 8's `ctx_frac = 0.5` episodes, the "+ field guide" columns, section 4's `incontext`). BASE-1 noted that RAFT was recommended twice and never run, and that oracle-only context is RAFT's worst configuration: a model trained on gold-only context can score below its no-context number when fed retrieved context with distractors. REAL-2 noted that recall@k of a bank string to its merchant record was never measured, so "retrieval" had never been tested end to end. GRAPH-7 asked whether the LLM uses entity-attribute-entity structure when the context is a neighbour list with no attribute words.
+
+The retriever is all-MiniLM-L6-v2 fine-tuned as in section 24 (name to attribute text on the seen species, 8 epochs, 20 seconds), indexing every species' field-guide entry, held-out species included, plus the 2,752 training texts. Three context conditions on the frozen ladder: `oracle` (as before), `retrieved` (the top-3 documents per name in the item, right or wrong), `neighbours` (per name, three co-typed seen species and nothing else). Four models: the base model, arm C, the distilled arm P2, and the new arm Cr, which is arm C with its context episodes carrying RAFT context instead of the oracle entries: per name, the gold entry with probability 0.8 plus the two nearest non-gold documents, shuffled. On the merchant side, the fine-tuned MiniLM indexes the 120 canonical records; recall@1 and @5 from the bank string and from the bare name, then the untrained Qwen2.5-0.5B and -3B score the 12-way category with the top-1 record in the prompt, right or wrong, against the oracle record and no context.
+
+**Table 25.1: the ladder under four contexts, accuracy % (none / oracle field guide / retrieved top-3 per name / neighbour list)**
+
+| level | base | C | P2 | Cr |
+|---|---|---|---|---|
+| recall, trained fmt | 13.1 / 100 / 100 / - | 100 / 100 / 100 / - | 94.4 / 100 / 100 / - | 100 / 100 / 100 / - |
+| yes/no | 42.5 / 100 / 100 / - | 77.5 / 98.8 / 100 / - | 58.8 / 100 / 100 / - | 96.2 / 98.8 / 100 / - |
+| pair | 51.2 / 82.5 / 77.5 / - | 81.2 / 76.2 / 80 / - | 48.8 / 56.2 / 65 / - | 87.5 / 82.5 / 85 / - |
+| Timmy k=3 | 35.6 / 49.4 / 41.9 / 36.9 | 61.9 / 70.6 / 78.1 / 87.5 | 33.1 / 46.9 / 44.4 / 40 | 68.8 / 69.4 / 85.6 / 93.1 |
+| k=4 | 27.5 / 40.6 / 39.4 / 29.4 | 51.9 / 60.6 / 74.4 / 86.2 | 25.6 / 30.6 / 36.2 / 26.2 | 61.9 / 56.9 / 77.5 / 90.6 |
+| weakness | 35 / 46.9 / 53.1 / 37.5 | 60 / 67.5 / 76.9 / 79.4 | 34.4 / 42.5 / 45 / 34.4 | 64.4 / 58.1 / 81.2 / 91.2 |
+| habitat | 31.2 / 38.1 / 40.6 / 29.4 | 29.4 / 65.6 / 61.9 / 25 | 28.1 / 35 / 35 / 32.5 | 28.1 / 60.6 / 65.6 / 29.4 |
+| held-out species | 39.6 / 43.8 / 38.5 / 40.6 | 29.2 / 72.9 / 64.6 / 81.2 | 36.5 / 40.6 / 51 / 37.5 | 31.2 / 69.8 / 62.5 / 81.2 |
+| reverse easy | 23.1 / 95.6 / - / - | 30.6 / 80.6 / - / - | 20.6 / 93.1 / - / - | 34.4 / 81.2 / - / - |
+| reverse hard | 20 / 88.1 / - / - | 19.4 / 74.4 / - / - | 18.1 / 86.2 / - / - | 21.9 / 81.9 / - / - |
+
+**Table 25.2: arm Cr against arm C (seed 0, no context unless stated)**
+
+| measure | C | Cr |
+|---|---|---|
+| recall, trained fmt | 100 | 100 |
+| yes/no | 77.5 | 96.2 |
+| pair | 81.2 | 87.5 |
+| Timmy k=3 | 61.9 | 68.8 |
+| weakness | 60 | 64.4 |
+| ICL symbol | 78.6 | 78.2 |
+| ICL natural | 87 | 87 |
+| ARC-Easy | 58.5 | 60 |
+| WikiText ppl | 22.787 | 22.777 |
+| training minutes | 50.3 | 10.4 |
+| loss tokens E | - | - |
+| loss tokens Er | - | 19637 |
+
+Cr periodic recall_fmt / Timmy: 0: 12.5 / 40.0, 200: 25.0 / 37.5, 400: 100.0 / 47.5, 600: 97.5 / 50.0
+
+**Table 25.3: merchant record retrieval, recall@1 / @5 of the merchant's own record (120 records)**
+
+| retriever | bank string, train | bank string, held-out | name, train | name, held-out |
+|---|---|---|---|---|
+| zero_shot | 78.1 / 96.9 | 87.5 / 95.8 | 99.0 / 100.0 | 95.8 / 100.0 |
+| category_tuned | 55.2 / 74.0 | 29.2 / 41.7 | 89.6 / 100.0 | 29.2 / 54.2 |
+| record_tuned | 100.0 / 100.0 | 100.0 / 100.0 | 100.0 / 100.0 | 100.0 / 100.0 |
+
+ret1 gold hits over all items: 100.0
+
+**Table 25.4: end-to-end category (12-way, chance 8.3), untrained base models, record-tuned retriever**
+
+| model | context | bank string, train | bank string, held-out | clean name, train | clean name, held-out |
+|---|---|---|---|---|---|
+| Qwen2.5-0.5B | none | 8.3 | 8.3 | 9.4 | 8.3 |
+| Qwen2.5-0.5B | oracle | 8.3 | 12.5 | 67.7 | 62.5 |
+| Qwen2.5-0.5B | ret1 | 8.3 | 12.5 | 67.7 | 62.5 |
+| Qwen2.5-0.5B | ret3 | 8.3 | 8.3 | 24.0 | 25.0 |
+| Qwen2.5-3B | none | 7.3 | 8.3 | 8.3 | 8.3 |
+| Qwen2.5-3B | oracle | 81.2 | 75.0 | 89.6 | 91.7 |
+| Qwen2.5-3B | ret1 | 81.2 | 75.0 | 89.6 | 91.7 |
+| Qwen2.5-3B | ret3 | 46.9 | 41.7 | 70.8 | 62.5 |
+
+### 25.1 Retrieved context beats the oracle entry, and no arm scores below its no-context number with distractors
+
+Table 25.1's third figure in each cell is the ladder with the retriever's top-3 documents per name in the prompt, right or wrong. RAFT's warning was that a model trained on gold-only context can fall below its no-context score when the context is retrieved. Arm C, trained on gold-only context (section 8's `ctx_frac = 0.5` with the exact entries), does not: with retrieved context it is above its no-context number on every level and above its oracle number on induction (Timmy 78.1 against 70.6 oracle and 61.9 bare; k=4 74.4 against 60.6; weakness 76.9 against 67.5). The base model reads retrieved context about as well as the oracle (41.9 against 49.4 on Timmy, 53.1 against 46.9 on weakness). The retrieved context is not a degraded oracle here; it is a richer one. The top-3 for a seen species is three of its own paraphrased training texts (`results/retrieval_universe.json`: every top-3 document of every seen species is about it, and the compact entry itself ranks below the longer texts, top-1 for 0% of them), so the prompt states each fact three times in different words, and the trained model reads that better than the single entry it was trained on. The distractors RAFT worried about arrive mainly for the held-out species, whose names the retriever never saw: their entries are top-1 for 87.5% of them (the name appears verbatim in the entry, and nothing else in the index mentions it) and the other 12.5% get three documents about other species, and the held-out level with retrieved context is 64.6 for arm C against 72.9 with the oracle, the one place retrieval costs anything.
+
+Arm Cr, arm C with RAFT context in its training episodes (per name the gold entry with probability 0.8 plus the two nearest non-gold documents, shuffled), trains in 10 minutes to the same from-the-weights numbers as C (recall 100, ICL 78.2 / 87.0 against 78.6 / 87.0, WikiText 22.78 against 22.79) with manipulation and induction a few points higher (96.2 / 87.5 / 68.8 against 77.5 / 81.2 / 61.9; single seeds, inside arm C's seed band of section 20). With retrieved context it is the best reader of the four: Timmy 85.6, k=4 77.5, weakness 81.2, against C's 78.1 / 74.4 / 76.9. That is the RAFT effect, 3 to 7 points on top of an arm that was not hurt by distractors in the first place. Its oracle numbers are C's (69.4 / 56.9 / 58.1 against 70.6 / 60.6 / 67.5), so training on distractors did not cost the clean case. Recommendation for BASE-1: train the context episodes on retrieved context when retrieval is what the deployed model will see; the gain is modest and the cost is none.
+
+### 25.2 The distilled adapter cannot read context
+
+P2 (section 18: the with-context ranking distilled into the bare format, 91.9 trained-format recall) is the arm that loses with context. With the oracle field guide in the prompt it answers Timmy at 46.9 and k=4 at 30.6 where the base model answers 49.4 and 40.6, and the pair manipulation at 56.2 against the base's 82.5; retrieved context does not repair it (44.4 / 36.2 / 65.0). Only recall and the yes/no question, the forms it was distilled on, are at 100 with context. Distilling the with-context answers into the bare prompt taught the model to answer without looking, and it keeps not looking when the answer is in front of it. Section 18 reported that the distilled arm stays inside its five question forms; this adds that it also stops using the context those forms came from. For any deployment where retrieval is available, P2 is the wrong arm.
+
+### 25.3 A neighbour list with no attribute words is the best context for the trained model (GRAPH-7)
+
+The fourth figure is GRAPH-7's probe: for each name in a Timmy item, three co-typed seen species and nothing else, no type, no weakness, no habitat word. The expectation was a number below the field-guide oracle, since the list only says "these belong together" and never what they are. For the base model the list is worth nothing (36.9 on Timmy, 29.4 on k=4, chance). For the episode-trained arms it is the best context of the four: C 87.5 on Timmy, 86.2 on k=4, 79.4 on weakness (its oracle numbers are 70.6 / 60.6 / 67.5) and 81.2 on held-out species (oracle 72.9); Cr 93.1 / 90.6 / 91.2 / 81.2. The trained model knows the species that share a type, so two demos whose lists overlap are the same type and the query's list places it: it is using the entity-attribute-entity structure the memo asked about, and doing so more reliably than it reads the attribute word off an entry. Habitat, the partition the lists do not encode, stays at chance under the list (25.0 / 29.4) where the oracle gives 65.6 / 60.6. So the answer to GRAPH-7 is yes, for the arms that learned the graph, and the practical reading is that a retriever returning *related entities* is worth more to this model than one returning the entities' descriptions, provided the model has been trained on the entities.
+
+### 25.4 Merchant records: a retriever tuned for records is perfect at 120, and the oracle number is then the end-to-end number (REAL-2)
+
+Table 25.3 is the number REAL-2 said was never measured. Over the 120 canonical merchant records, the zero-shot MiniLM already finds a bank string's own record at recall@1 78.1 (training merchants) and 87.5 (held-out), because the record states the merchant's name and the uncased tokenizer maps ELRHOLM and Elrholm to the same subwords (section 24.4). The encoder fine-tuned as in section 4, sentences and names toward the *category* text, is a worse record retriever (55.2 / 29.2): it was trained to make merchants of one category alike, which is the opposite of what record retrieval needs. Fine-tuned toward the *record* (the same anchors, the merchant's own fact as the positive), recall@1 is 100 on every split and every query form, held-out bank strings included, whose merchants the retriever never saw in training. With 120 records this is a solved problem for an uncased 22M encoder; the 10k-record version with Zipf frequencies and real-style truncations is PLAN row 22.
+
+Table 25.4 is retrieval end to end. Because the record-tuned retriever's top-1 is the gold record for every item, `ret1` equals the oracle exactly: Qwen2.5-3B, untrained, reads the category off the retrieved record at 81.2 / 75.0 from the bank string (train / held-out) and 89.6 / 91.7 from the clean name, against 7 to 8 with no context. Two things in the table are not free. Qwen2.5-0.5B cannot use the record when the query is a bank string (8.3 with the oracle record in the prompt; section 4 had 14 with a different prompt), while it can from the clean name (67.7): the small model does not connect the upper-case string to the record even when the record is right there. And giving the 3B model the top-3 records instead of the top-1 halves its accuracy (46.9 / 41.7 on bank strings, 70.8 / 62.5 on names): two irrelevant records beside the right one are distractors it cannot ignore, which is the RAFT failure mode in its pure form, on an untrained model. The deployment reading is: retrieve one record, and make the retriever earn it.
+
+### 25.5 What the step says
+
+- BASE-1: run. Arm C, trained on oracle context only, does not fall below its no-context numbers with retrieved context; it gains (retrieved top-3 beats the oracle entry on induction, 78 against 71 on Timmy), because retrieval returns the paraphrased texts. Training on RAFT context (arm Cr) adds 3 to 7 points on the retrieved condition at no cost elsewhere; a second seed would make it a claim.
+- REAL-2: measured. Record-tuned MiniLM: recall@1 100 from bank strings at 120 records (zero-shot 78 to 88, category-tuned 29 to 55); end to end equals the oracle on Qwen2.5-3B (81 / 75 on bank strings), top-3 halves it, the 0.5B model cannot read the record from a bank string.
+- GRAPH-7: yes. A list of co-typed species per name, with no attribute words, is the best context for the episode-trained arms (Timmy 87.5 for C, 93.1 for Cr; oracle 70.6 / 69.4) and worthless for the base model (36.9): the trained model uses the entity-entity structure. It does nothing for the partition the list does not encode (habitat at chance).
+- The distilled arm P2 reads context worse than the base model on every induction and manipulation level; do not deploy it with retrieval.
