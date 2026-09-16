@@ -350,7 +350,7 @@ def episodes(species, n=6000, seed=3, ctx_frac=0.5, attrs=EPISODE_ATTRS):
             rng.shuffle(names)
             prompt = "Field guide:\n" + "\n".join(entry(by_name[x]) for x in names) + "\n\n" + prompt
         out.append(dict(prompt=prompt, answer=" " + labels[vals.index(qv)], attr=attr, k=k, labels=labels,
-                        demos=[(d["name"], l) for d, l in demos]))
+                        demos=[(d["name"], l) for d, l in demos], query=q["name"]))
     return out
 
 

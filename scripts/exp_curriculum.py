@@ -13,6 +13,13 @@ Cn      knowledge .50 + episodes .50 (no replay)               plain
 D       phase 1: knowledge .85 + replay .15;                   plain
         phase 2: episodes .85 + replay .15   (sequential)
 E       same as C                                              morphology
+Cr      C-RAFT (PLAN step 14, BASE-1): arm C with stream Er in place of E: the same episodes, but the half that carry
+        context carry RETRIEVED context (ai_experiments.retrieval): per species named, its field-guide entry with
+        probability 0.8 plus the 2 nearest non-gold documents from a fine-tuned MiniLM index over every entry (held-out
+        species included) and the training texts, shuffled (RAFT 2403.10131). RET=1 adds two evaluation conditions
+        to any arm: `ret` = every ladder item with the top-3 retrieved documents per name prepended (right or wrong),
+        `neigh` = GRAPH-7, the induction items with a list of co-typed species per name and no attribute words.
+        ADAPTER_NAME=<dir under models/adapters> with EVAL_ONLY=1 re-scores that adapter under any ARM label.
 Dr/Dc/Dk  arm D controls (PLAN step 12, TRAIN-2): Dr restarts the learning-rate schedule (30-step warmup,
         linear decay to zero) at the phase boundary instead of one schedule over both phases; Dc holds the
         peak rate after the warmup; Dk replays 10% knowledge texts in phase 2 (episodes .75 + knowledge .10
@@ -111,6 +118,7 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "Dr": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],           # D, learning-rate schedule restarted per phase (PLAN step 12)
     "Dc": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],           # D, constant learning rate after warmup
     "Dk": [dict(K=0.85, R=0.15), dict(E=0.75, K=0.10, R=0.15)],   # D, 10% knowledge replay in phase 2
+    "Cr": [dict(K=0.45, Er=0.40, R=0.15)],                        # C-RAFT: episodes with retrieved context, gold + distractors (PLAN step 14)
     "E": [dict(K=0.45, E=0.40, R=0.15)],
     "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
     "A1": [dict(K1=1.0)],
@@ -126,6 +134,18 @@ MASK_TOKEN = "<|fim_pad|>"  # a reserved single token of the Qwen2.5 vocabulary,
 MASK_INSTRUCTION = "Recover the original passage from the masked version.\nMasked:"
 MASK_RNG = random.Random(1000 + int(os.environ.get("SEED", "0")))
 BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
+RET = bool(os.environ.get("RET"))      # retrieved-context and neighbour-list evaluation conditions (PLAN step 14)
+_RETRIEVER = None
+
+
+def retriever():
+    """The fine-tuned MiniLM index over the field guide (built once per process, ~20 s)."""
+    global _RETRIEVER
+    if _RETRIEVER is None:
+        from ai_experiments.retrieval import UniverseRetriever
+        _RETRIEVER = UniverseRetriever(species)
+        print(f"    retriever index: {len(_RETRIEVER.docs)} documents ({_RETRIEVER.n_entries} entries + training texts)", flush=True)
+    return _RETRIEVER
 SCHEDULE = {"Dr": "restart", "Dc": "constant"}.get(ARM, "shared")  # one warmup + linear decay over all phases (default),
 # restarted at each phase boundary, or held at the peak after the warmup (PLAN step 12, TRAIN-2)
 ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
@@ -182,6 +202,10 @@ def evaluate(model, tok):
     sc = Scorer(model, tok, maxlen=MAXLEN, extras=EXTRAS)
     recs = {"noctx": sc.score(ladder, label="ladder") + sc.score(probes, label="probe") + sc.score(suite, label="ICL suite"),
             "ctx": sc.score(ladder, ctx=True, label="ladder+ctx")}
+    if RET:
+        R = retriever(); nr = random.Random(7)
+        recs["ret"] = sc.score([R.with_retrieved(it, k=3) for it in ladder], label="ladder+retrieved")
+        recs["neigh"] = sc.score([R.with_neighbours(it, nr) for it in ladder if it.get("demos")], label="ladder+neighbours")
     if known:
         recs["noctx"] += sc.score(known, label="known facts")
     if FROZEN.reverse:
@@ -197,7 +221,10 @@ def evaluate(model, tok):
     ctx = aggregate(recs["ctx"])
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
     torch.cuda.empty_cache()
-    return {"noctx": noctx, "ctx": ctx}, recs
+    out = {"noctx": noctx, "ctx": ctx}
+    if RET:
+        out["ret"], out["neigh"] = aggregate(recs["ret"]), aggregate(recs["neigh"])
+    return out, recs
 
 
 def periodic_eval(model, tok):
@@ -305,6 +332,13 @@ def train(model, tok, phases, run):
     need = {k for ph in phases for k in ph}
     if "E" in need:
         streams["E"] = Stream(U.episodes(species, n=6000, seed=3), rng)
+    if "Er" in need:  # C-RAFT: the same episodes, the context half carrying retrieved gold + distractors instead of the oracle entries
+        eps, R = U.episodes(species, n=6000, seed=3, ctx_frac=0.0), retriever(); rr = random.Random(14)
+        for e in eps:
+            if rr.random() < 0.5:
+                names = [d for d, _ in e["demos"]] + [e["query"]]; rr.shuffle(names)
+                e["prompt"] = R.raft_context(names, rr) + e["prompt"]
+        streams["Er"] = Stream(eps, rng)
     if "R" in need:
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
     if "G" in need:
@@ -424,7 +458,9 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH))
         for key, cond in conds.items():
             run.artifact(write_records(per_item_path(OUT, cond), recs[key]))
 
-    eval_only = bool(phases) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
+    if os.environ.get("ADAPTER_NAME"):
+        ADAPTER = ROOT / "models" / "adapters" / os.environ["ADAPTER_NAME"]
+    eval_only = (bool(phases) or bool(os.environ.get("ADAPTER_NAME"))) and bool(os.environ.get("EVAL_ONLY")) and ADAPTER.exists()
     if eval_only:
         # re-score a previously trained adapter (e.g. after an eval-time crash) without retraining
         run.set_config(eval_only=True, adapter=str(ADAPTER.relative_to(ROOT)))
@@ -432,16 +468,20 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH))
         tok.padding_side = "right"
         r, recs = evaluate(model, tok)
         results["trained"], results["trained_ctx"] = r["noctx"], r["ctx"]
+        if RET:
+            results["trained_ret"], results["trained_neigh"] = r["ret"], r["neigh"]
         if OUT.exists():  # keep the training-time stats recorded by the original run
             prev = json.loads(OUT.read_text()).get("trained", {})
             keep = ("train_minutes", "train_tokens", "tokens_per_s", "peak_alloc_GiB", "train_stats_note")
             results["trained"].update({k: v for k, v in prev.items() if k in keep or k.startswith("n_")})
-        conds = {"noctx": "trained", "ctx": "trained_ctx"}
+        conds = {"noctx": "trained", "ctx": "trained_ctx"} | ({"ret": "trained_ret", "neigh": "trained_neigh"} if RET else {})
     elif not phases:
         tok, model = load()
         r, recs = evaluate(model, tok)
         results["base"], results["base_ctx"] = r["noctx"], r["ctx"]
-        conds = {"noctx": "base", "ctx": "base_ctx"}
+        if RET:
+            results["base_ret"], results["base_neigh"] = r["ret"], r["neigh"]
+        conds = {"noctx": "base", "ctx": "base_ctx"} | ({"ret": "base_ret", "neigh": "base_neigh"} if RET else {})
     elif BENCH:
         tok, model = load()
         model, stats, periodic = train(model, tok, phases, run)
@@ -453,9 +493,11 @@ with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH))
         model.save_pretrained(ADAPTER); print(f"   saved adapter -> {ADAPTER}", flush=True)
         r, recs = evaluate(model, tok)
         results["trained"] = {**r["noctx"], **stats}; results["trained_ctx"] = r["ctx"]
+        if RET:
+            results["trained_ret"], results["trained_neigh"] = r["ret"], r["neigh"]
         if periodic:
             results["periodic"] = {str(k): v for k, v in periodic.items()}  # curves; scripts/curves.py reads the tracker
-        conds = {"noctx": "trained", "ctx": "trained_ctx"}
+        conds = {"noctx": "trained", "ctx": "trained_ctx"} | ({"ret": "trained_ret", "neigh": "trained_neigh"} if RET else {})
     save(recs, conds)
 
 print(f"\n=== {tag} arm {ARM} ===")
