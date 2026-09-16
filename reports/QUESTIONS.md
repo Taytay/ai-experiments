@@ -356,6 +356,8 @@ prompts without context (KL or hard labels), scored on the ladder.
 
 **Status (2026-09-15):** PLAN step 7, REPORT.md section 14. Arm P (`scripts/exp_distill.py`: KL at T=2 to the base model reading the field-guide entries, arm C's mixture and budget) injected nothing: trained-format recall 13.8 (base 11.9), every induction level inside its null band, ppl 8.64 (base 8.54); the ICL suite gained 16 points, from the 15% hard-label replay. Diagnosis (`scripts/diag_distill_teacher.py`, Table 14.2): even with the entry in context the teacher puts 6% of its next-token mass on the type token in the training sentence (0.3% at T=2), so the 98.8 with-context recall is a ranking among eight options, not a distribution worth imitating; the student matched the teacher (KL 2.17 to 0.28) and learned no facts. Open: PLAN row 27 tries option-renormalised targets at T=1; if that fails too, the answer is no.
 
+**Status (2026-09-15, step 27):** REPORT.md section 18. Closed. With the target renormalised over the option set (arm P2, `scripts/exp_distill_v2.py`) the ranking does distil: trained-format recall 91.9 from a teacher at 100, general-text cost 0.03 nats (arm C: 0.84), ARC-Easy and ICL unhurt, the teacher's errors inherited (diet form 58% for both). But the knowledge is bound to the five question forms it was distilled in: yes/no 58.8, pairwise 50, induction inside the null band. The with-context ceiling is a ranking; the ranking can be written into the weights; what is written is the ranking.
+
 **BASE-4 (R) Are the embedding results compared against trivial baselines and against the LLM on identical items?**
 No linear probe, SetFit or kNN baseline exists; the 85% prototype result (300 random trials) and the
 59% LLM Timmy result (160 ladder items) are on different item sets.
@@ -492,3 +494,55 @@ a lower learning rate on the knowledge stream, since the loss is paid while the 
 **Status (2026-09-15):** PLAN step 26, REPORT.md section 19. Yes, overhead-bound, and packing changed the speed and not the results: sequence packing through unsloth's packed_seq_lengths (xformers block-diagonal attention, verified directly) with one 16-sequence micro-batch gives arm C 2.5x and arm A 2x at identical sequences per step; the batched scorer gives evaluation 3x (10x without the section 10 extras). A fast-path retrain of arm C lies inside the same-seed run-to-run spread of the two old-path runs (17.9% flips between them, 19.8% against the new one).
 
 **Status (2026-09-15):** PLAN step 25, REPORT.md section 17. Yes: arm Cg (arm C with 5% of sequences, 27% of the loss, as WikiText-2 train paragraphs) keeps the WikiText perplexity at +0.09 nats over the base (C: +0.84) at every checkpoint and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), with recall at 100 and the ICL suite at 81.2. Induction from the weights fell 10 to 21 points on three levels, confounded with the episode share the general text displaced; step 9 runs the 5% out of the knowledge stream instead. The lower-learning-rate variant was not run: the replay alone removes the perplexity cost.
+
+### Added by the graph-methods memo, 2026-09-15
+
+The owner observed that the universe is a bipartite graph (entities on one side, attribute values or labels on the
+other) and asked what graph algorithms, GNNs or graph embeddings could add. `references/graph_methods.md` is the
+literature pass; its conclusion is that message passing has nothing to propagate here (no entity-entity edges, every
+relation functional, the only node feature a name string) and that what survives is probes of how the graph is stored
+in the weights, graph-walk data augmentation, and label propagation on the embedding side where repeated noisy
+strings supply real structure. The seven IDs below are that residue.
+
+**GRAPH-1 (O) Did LoRA write a relation or 136 facts?**
+Hernandez et al. (2308.09124) find that for about half of relations the subject-to-object map inside an LM is one
+linear transform on the subject representation (a linear relational embedding, LRE). Nothing here measures whether
+arm C's adapter stores `type` as a relation or as per-entity memorisation.
+*Experiment:* fit an LRE from the species-name hidden state to the type token on arm C's merged adapter, layer sweep;
+faithfulness on the 136 trained species; apply it to the 24 held-out species with and without context; repeat for
+weakness and test whether LRE_weakness factors through LRE_type (the DATA-1 confound as a shared subspace). PLAN row 28.
+
+**GRAPH-2 (R) Does transductive label propagation beat prototypes on Zipf-distributed merchants?**
+Correct & Smooth (2010.13993) and TPN (1805.10002) show label propagation over a kNN graph beats prototype
+classifiers when labels are few (miniImageNet 1-shot 53.8 vs 49.4) and the gain vanishes by k = 5. Repeated noisy
+renderings of one merchant are the one real graph structure in the transaction data.
+*Experiment:* kNN graph over embeddings of all transaction strings, labelled and not; LP vs prototypes at k in
+{1, 3, 10}, by merchant-frequency bucket and known vs unknown merchant. Inside PLAN row 22.
+
+**GRAPH-3 (R) Do texts generated from two-hop walks teach the pairwise and yes/no levels?**
+EntiGraph (2409.07431) generates text about pairs and triples of entities (random walks on the entity graph) and
+lifts closed-book QA from 39.5 to 56.2; the K stream's comparative sentences are a one-hop version.
+*Experiment:* replace part of the knowledge stream with E-A-E walk texts at a fixed token budget; score pair, yes/no
+and Timmy from the weights against arm C. PLAN row 29.
+
+**GRAPH-4 (R) Is weakness stored as f(type) or per entity?**
+The weakness = f(type) map (DATA-1) is an attribute-attribute edge the training text never states.
+*Experiment:* bare items "creatures of type T are weak to ?" and the two-hop path form, per adapter; above chance
+means the weights completed the graph through type. Eight facts, so a yes/no answer, not a percentage. PLAN row 30.
+
+**GRAPH-5 (R) Does a text-initialised inductive KGE baseline add anything over prototypes?**
+BLP (2010.03496) and SimKGC (2203.02167) score unseen entities from text descriptions; SimKGC beats RotatE only on
+the sparse, description-rich graph (WN18RR MRR 0.67 vs 0.48), which is this repo's regime.
+*Experiment:* MiniLM entity encoder plus a per-relation scorer trained jointly on all merchant relations; unseen-
+merchant category and the products-to-category bridge against prototypes and logistic regression on the same items.
+With PLAN row 13, rerun after 21.
+
+**GRAPH-6 (R) Can a category with zero examples be classified from its name?**
+StarSpace (1709.03856) and ZestXML co-embed labels and inputs; the section 6.3 centroid is StarSpace with the label
+vector fixed to the member mean. Merchant categories have meaningful names; universe labels do not.
+*Experiment:* category vector from its name vs k-example centroid vs their mix, on the merchant set. Inside PLAN row 22.
+
+**GRAPH-7 (R) Does the model use E-A-E structure without the attribute vocabulary?**
+*Experiment:* Timmy with context given as co-typed species lists per demo and no attribute names (a KAPING-style
+neighbour list); expected below the field-guide oracle. After PLAN row 14.
+
