@@ -9,7 +9,8 @@ usage: uv run python scripts/exp_encoder.py ARM [model] [steps] [lr]
   model   google/flan-t5-large (default; WikiDYK's model), google/t5gemma-l-l-ul2 (the modern encoder-decoder follow-on)
   steps   800 (16 sequences per step, as the decoder arms); lr 1e-4 (full fine-tuning, bitsandbytes 8-bit AdamW, fp32 weights,
           bf16 autocast; 30-step warmup and linear decay as exp_curriculum)
-  env     UNIVERSE_N=125|625 (the 1,000 / 5,000-species universes), RUN_TAG, SEED, SMOKE=1, EVAL_ONLY=1 (re-score the saved weights)
+  env     UNIVERSE_N=125|625 (the 1,000 / 5,000-species universes), RUN_TAG, SEED, SMOKE=1, EVAL_ONLY=1 (re-score the saved weights),
+          LORA=64 (rank-64 adapter on all projections over a bf16 base instead of full fine-tuning; T5Gemma at 1e-4 full FT was damaged)
 
 Scoring. Every ladder, held-out, probe, ICL-suite, known-facts (ARC-Easy) and reverse item is scored as the decoder-side log-probability
 of each option given the prompt as encoder input (sum over the option's tokens, the same `sum_lp` record as ai_experiments.scoring,
@@ -48,10 +49,11 @@ RUN_TAG = os.environ.get("RUN_TAG", "")
 UNIVERSE_N = int(os.environ.get("UNIVERSE_N", "20"))
 SMOKE = bool(os.environ.get("SMOKE"))
 EVAL_ONLY = bool(os.environ.get("EVAL_ONLY"))
+LORA = int(os.environ.get("LORA", "0"))  # LORA=r: a rank-r adapter (alpha 2r) on every attention and MLP projection instead of full fine-tuning
 tag = MODEL.split("/")[-1]
 SFX = (f"_s{SEED}" if SEED else "") + (f"_{RUN_TAG}" if RUN_TAG else "")
 OUT = ROOT / "results" / f"encoder_{tag}_{ARM}{SFX}{'_smoke' if SMOKE else ''}.json"
-WEIGHTS = ROOT / ("models/smoke" if SMOKE else "models/adapters") / f"encoder_{tag}_{ARM}{SFX}_full"
+WEIGHTS = ROOT / ("models/smoke" if SMOKE else "models/adapters") / f"encoder_{tag}_{ARM}{SFX}_{'lora' if LORA else 'full'}"
 torch.manual_seed(SEED)
 rng = random.Random(SEED)
 
@@ -67,7 +69,17 @@ GEN_LEVELS = ("L1_recall", "L1_recall_fmt", "L8_reverse_easy", "L8_reverse_hard"
 ATTR_VALUES = sorted({str(s[a]) for s in species for a in ("type", "weakness", "habitat", "diet", "region")} | {f"stage-{k}" for k in (1, 2, 3)}, key=len, reverse=True)
 
 tok = AutoTokenizer.from_pretrained(MODEL)
-model = AutoModelForSeq2SeqLM.from_pretrained(str(WEIGHTS) if EVAL_ONLY and WEIGHTS.exists() else MODEL, dtype=torch.float32).cuda()
+if LORA:
+    from peft import LoraConfig, PeftModel, get_peft_model
+    model = AutoModelForSeq2SeqLM.from_pretrained(MODEL, dtype=torch.bfloat16).cuda()  # bf16 base, adapter in fp32 (peft default)
+    if EVAL_ONLY and WEIGHTS.exists():
+        model = PeftModel.from_pretrained(model, str(WEIGHTS))
+    else:
+        targets = ["q", "k", "v", "o", "wi_0", "wi_1", "wo"] if "t5" in MODEL.lower() and "gemma" not in MODEL.lower() else ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+        model = get_peft_model(model, LoraConfig(r=LORA, lora_alpha=2 * LORA, lora_dropout=0.0, target_modules=targets, task_type="SEQ_2_SEQ_LM"))
+        model.print_trainable_parameters()
+else:
+    model = AutoModelForSeq2SeqLM.from_pretrained(str(WEIGHTS) if EVAL_ONLY and WEIGHTS.exists() else MODEL, dtype=torch.float32).cuda()
 SENTINELS = [tok.convert_tokens_to_ids(f"<extra_id_{i}>") for i in range(100)]
 HAS_SENTINELS = SENTINELS[0] is not None and SENTINELS[0] != tok.unk_token_id
 # without T5 sentinels (T5Gemma's Gemma tokenizer), a masked span is the literal word "___" in the input and the target is the
@@ -140,8 +152,8 @@ def train():
     if "R" in need:
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
     model.gradient_checkpointing_enable()  # the Flan-T5-large smoke peaked at 21.8 GiB without it; T5Gemma-large would not fit
-    params = [p for p in model.parameters()]
-    opt = bnb.optim.AdamW8bit(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
+    params = [p for p in model.parameters() if p.requires_grad]
+    opt = (torch.optim.AdamW if LORA else bnb.optim.AdamW8bit)(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
     model.train(); torch.cuda.reset_peak_memory_stats(); t0 = time.time(); counts, tokens = {}, 0
     for step in range(STEPS):
@@ -246,14 +258,17 @@ def evaluate():
 
 
 # ------------------------------------------------------------------ main
-cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, lr=LR, seed=SEED, maxlen=MAXLEN, max_target=MAX_TGT, method="full_ft_adamw8bit_seq2seq", run_tag=RUN_TAG,
+cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, lr=LR, seed=SEED, maxlen=MAXLEN, max_target=MAX_TGT, method=f"lora{LORA}_seq2seq" if LORA else "full_ft_adamw8bit_seq2seq", lora_r=LORA, run_tag=RUN_TAG,
            universe_n=UNIVERSE_N, mixture=json.dumps(phases), n_species=len(species), n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), eval_only=EVAL_ONLY, **FROZEN.config())
 results = {}
 with Run("encoder_v1", model=MODEL, config=cfg, enabled=not SMOKE) as run:
     if phases and not EVAL_ONLY:
         stats = train()
         WEIGHTS.parent.mkdir(parents=True, exist_ok=True)
-        model.to(torch.bfloat16).save_pretrained(WEIGHTS); tok.save_pretrained(WEIGHTS); model.float()
+        if LORA:
+            model.save_pretrained(WEIGHTS); tok.save_pretrained(WEIGHTS)
+        else:
+            model.to(torch.bfloat16).save_pretrained(WEIGHTS); tok.save_pretrained(WEIGHTS); model.float()
         print(f"   saved weights -> {WEIGHTS}", flush=True)
     else:
         stats = {}
