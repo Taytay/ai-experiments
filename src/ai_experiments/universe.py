@@ -125,6 +125,48 @@ def training_texts(species, rng=None, n_cmp_per_species=4):
     return out
 
 
+# ------------------------------------------------------------------ augmentation variants (PLAN step 16, DATA-5)
+_ATTR_SENTS = ["{N} is a {T}-type creature.", "{N} lives in {H} habitats.", "{N} eats as an {D}.", "{N} is found in {R}.",
+               "{N} is weak to {W}-type attacks.", "{N} is a stage-{S} creature."]
+_REV = [  # reverse-direction statements: the attributes first, the name last (never the L8 question form)
+    "The {T}-type creature that lives in {H} habitats and is found in {R} is {N}.",
+    "A {T}-type with an {D} diet, native to {R}: that is {N}.",
+    "Weak to {W}-type attacks, {H}-dwelling, found in {R}: the creature is {N}.",
+    "Among the {T}-types of {R}, the one with an {D} diet and a {H} habitat is called {N}.",
+]
+
+
+def knowledge_texts(species, spec, llm_texts=None, seed=16):
+    """The knowledge stream under the augmentation variants of PLAN step 16 (trained species only; no type lore, no
+    negatives, no comparatives, so the count of distinct texts per species is the variable):
+      descK        the first K of the 14 descriptive / QA templates (_DESC), K in 1..14
+      desc14perm   desc14 plus 5 texts per species made of the six attribute sentences in a random order (sentence-order permutation)
+      desc14rev    desc14 plus the 4 reverse-direction statements (attributes first, name last)
+      desc14llm    desc14 plus the LLM-written texts for the species (llm_texts: name -> list[str], data/processed/llm_texts_v1.json)
+    training_texts() is the section 8 stream (14 templates + negatives + comparatives + type lore, about 20 per species)."""
+    rng = random.Random(seed)
+    tr = [s for s in species if not s["heldout"]]
+    base, extra = spec, ""
+    for suffix in ("perm", "rev", "llm"):
+        if spec.endswith(suffix):
+            base, extra = spec[: -len(suffix)], suffix
+    assert base.startswith("desc") and base[4:].isdigit(), spec
+    k = int(base[4:]); assert 1 <= k <= len(_DESC), spec
+    out = []
+    for s in tr:
+        f = dict(N=s["name"], T=s["type"], W=s["weakness"], H=s["habitat"], D=s["diet"], R=s["region"], S=s["stage"])
+        out += [t.format(**f) for t in _DESC[:k]]
+        if extra == "perm":
+            for _ in range(5):
+                order = list(_ATTR_SENTS); rng.shuffle(order)
+                out.append(" ".join(t.format(**f) for t in order))
+        elif extra == "rev":
+            out += [t.format(**f) for t in _REV]
+        elif extra == "llm":
+            out += list(llm_texts[s["name"]])
+    return out
+
+
 def single_texts(species):
     """One rendering per trained species carrying every attribute (PLAN step 8, TRAIN-5): the paraphrase-free
     knowledge stream. 136 texts of about 47 tokens; training_texts() has 20 per species."""
