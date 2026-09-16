@@ -125,6 +125,36 @@ def training_texts(species, rng=None, n_cmp_per_species=4):
     return out
 
 
+def single_texts(species):
+    """One rendering per trained species carrying every attribute (PLAN step 8, TRAIN-5): the paraphrase-free
+    knowledge stream. 136 texts of about 47 tokens; training_texts() has 20 per species."""
+    return [f"{s['name']} is a {s['type']}-type creature, weak to {s['weakness']}-type attacks. It lives in {s['habitat']} "
+            f"habitats, eats as an {s['diet']}, and is found in {s['region']}. It is a stage-{s['stage']} creature."
+            for s in species if not s["heldout"]]
+
+
+def reverse_items(species, seed=8, n_per_level=160):
+    """Backward questions, attributes -> species name, four options (the reversal-curse probe, TRAIN-5 / EVAL-7).
+    L8_reverse_easy: the distractors have another type, so knowing the type answers it (the merchant `reverse`
+    task's construction). L8_reverse_hard: the distractors share the type and differ in diet or region, so the
+    conjunction is needed. Every knowledge text states the attributes in the forward direction only."""
+    rng = random.Random(seed)
+    seen = [s for s in species if not s["heldout"]]
+    items = []
+    for level, hard in (("L8_reverse_easy", False), ("L8_reverse_hard", True)):
+        for _ in range(n_per_level):
+            s = rng.choice(seen)
+            pool = ([o for o in seen if o["type"] == s["type"] and (o["diet"] != s["diet"] or o["region"] != s["region"])]
+                    if hard else [o for o in seen if o["type"] != s["type"]])
+            ds = rng.sample(pool, 3)
+            opts = [" " + o["name"] for o in ds] + [" " + s["name"]]
+            rng.shuffle(opts)
+            items.append(dict(level=level, prompt=f"Question: Which creature is a {s['type']}-type with an {s['diet']} diet, "
+                                                  f"found in {s['region']}?\nAnswer:",
+                              options=opts, answer=opts.index(" " + s["name"]), query=s["name"], demos=[o.strip() for o in opts]))
+    return items
+
+
 def entry(s):
     """Compact field-guide entry for the oracle-context controls (exact entry in the prompt)."""
     return f"{s['name']}: {s['type']}-type, weak to {s['weakness']}, {s['habitat']} habitat, {s['diet']}, {s['region']}."
