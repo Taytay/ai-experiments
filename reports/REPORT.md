@@ -942,3 +942,73 @@ Every fast-path value lies between the two old-path values or within one half-wi
 The remaining evaluation time is the with-context ladder (1,744 items whose prompts carry field-guide entries) and the ICL suite (prompts up to 650 tokens); both are now compute-bound at 64 rows per forward. The remaining training time for short-text arms is launch overhead per step, which only a larger batch or fewer steps would remove, and section 15 says the runs are already 200 steps too long for recall. Everything queued behind this section (steps 8, 9, 10) runs on the new defaults; runs before it are marked in the tracker by `micro=8, accum=2, grad_ckpt=unsloth, pack=0`.
 
 **What the report should say.** Batching option rows across items cuts the evaluation from 26 to 9 minutes (5 without the scorer-study extras) with 1.9% of predictions flipping, the same-weights noise floor of section 9. One 16-sequence micro-batch packed into 2,048-token block-diagonal rows trains arm A 2x and arm C 2.5x faster at identical sequences per step (3.3x without activation checkpointing, which fits a bench and not a full run); the block-diagonal attention was verified directly. An arm C run with periodic points goes from about an hour to about twenty minutes.
+
+## 20. Three seeds: the induction gain and the ICL cost are real, the manipulation and "sequential loses" gaps are not (STAT-1)
+
+Date: 2026-09-15. Code: `SEED={1,2} PERIODIC=200 uv run python scripts/exp_curriculum.py {A,C,D}` (seed 0 is the section 15 rerun), `scripts/seeds_table.py` writes `reports/seeds_Qwen2.5-3B.md` (every metric, every gap). Data `results/curriculum_Qwen2.5-3B_{A,C,D}_s{1,2}_p200.json`; adapters `_s{1,2}_p200_lora`. The seed sets the LoRA initialisation, the sampler and the stream shuffles; the data, the item sets and the schedule are fixed. Seeds 1 and 2 ran on the section 19 fast path (D under plain torch checkpointing, see 20.4), seed 0 on the padded path; section 19.3 put those within the same-seed floor.
+
+STAT-1 asked what the seed-to-seed noise is and which of section 8's gaps clear it. Section 8 compared one run per arm, and its headlines were: knowledge-only (A) gives recall and manipulation, the mixture (C) trades some manipulation for induction from the weights and keeps the ICL suite, and the sequential arm (D) loses 4 / 25 / 8 / 12 points against C on recall, yes/no, pair and real-name induction (section 11's paired table). Section 15 added ARC-Easy and the perplexity cost. With three seeds the rule is the one STAT-1 set: a gap counts if it exceeds twice the sd of the difference (the two arms' variances added, n = 3 each).
+
+**Table 20.1: mean +- sd over seeds 0, 1, 2 (accuracy %; ppl is the section 16 slice; seed 0 re-scored with the section 19 scorer); base model, re-scored with the section 19 scorer, in the last column**
+
+| measure | A | C | D | base |
+|---|---|---|---|---|
+| recall, trained fmt | 100.0 +- 0.0 | 100.0 +- 0.0 | 91.5 +- 3.5 | 13.1 |
+| recall, bare | 21.2 +- 1.6 | 18.4 +- 1.3 | 44.2 +- 20.6 | 18.1 |
+| yes/no (is-a) | 98.3 +- 2.9 | 80.0 +- 12.7 | 70.9 +- 8.3 | 42.5 |
+| pair | 90.8 +- 1.9 | 78.7 +- 12.7 | 68.7 +- 16.0 | 51.2 |
+| Timmy k=3 | 35.9 +- 3.6 | 63.8 +- 9.2 | 59.2 +- 7.0 | 35.6 |
+| k=4 | 35.2 +- 6.9 | 57.9 +- 11.0 | 54.6 +- 7.0 | 27.5 |
+| weakness | 41.5 +- 4.1 | 59.6 +- 11.9 | 55.8 +- 6.7 | 35.0 |
+| held-out species | 26.0 +- 2.8 | 31.9 +- 3.2 | 36.1 +- 2.6 | 39.6 |
+| ICL suite, symbol | 50.3 +- 2.9 | 79.0 +- 1.1 | 79.2 +- 1.8 | 60.4 |
+| ICL suite, natural | 81.1 +- 1.1 | 87.5 +- 0.9 | 88.4 +- 1.1 | 84.9 |
+| ARC-Easy (K) | 63.7 +- 2.1 | 64.0 +- 4.8 | 63.7 +- 2.4 | 73.5 |
+| WikiText ppl | 39.1 +- 5.2 | 22.6 +- 0.2 | 21.9 +- 0.9 | 10.61 |
+
+**Table 20.2: section 8's headline gaps against 2 sd of the difference**
+
+| gap | measure | section 8 (one seed) | mean diff over 3 seeds | 2 sd | clears? |
+|---|---|---|---|---|---|
+| C - A | Timmy k=3 | +18.7 | +27.9 | 19.8 | **yes** |
+| C - A | k=4 | +17.4 | +22.7 | 26.0 | no |
+| C - A | weakness | +6.9 | +18.1 | 25.1 | no |
+| C - A | ICL suite, symbol | +27.0 | +28.6 | 6.1 | **yes** |
+| C - A | WikiText ppl | . | -16.5 | 10.4 | **yes** |
+| C - A | yes/no | -10.0 | -18.3 | 26.0 | no |
+| C - A | pair | -17.4 | -12.1 | 25.6 | no |
+| D - C | recall, trained fmt | -3.8 | -8.5 | 6.9 | **yes** |
+| D - C | Timmy k=3 | +1.9 | -4.6 | 23.2 | no |
+| D - C | yes/no | -25.0 | -9.2 | 30.3 | no |
+| D - C | pair | -7.6 | -10.0 | 40.8 | no |
+| D - C | ICL suite, symbol | +3.1 | +0.2 | 4.2 | no |
+| C - base | ARC-Easy | -14.5 | -9.5 | 9.6 | no |
+| C - base | Timmy k=3 | +21.2 | +28.2 | 18.5 | yes |
+
+### 20.1 How big the noise is
+
+It depends on the arm and the level. Arm A is a stable recipe: sd 2 to 4 points on every level but k=4 (6.9). Arm C is not: its manipulation levels have sd 12.7 (yes/no 77.5 / 68.8 / 93.8; pair 81.2 / 65.0 / 90.0), and its three induction levels sd 9 to 12 (Timmy 61.9 / 55.6 / 73.8). Arm D sits between, with one level out of control: bare recall 58.8 / 20.6 / 53.1. The ICL suite, ARC-Easy and the perplexity slice have sd 1 to 4.5 across all three arms, so the general-ability measures are the reliable ones, and the 160-item ladder levels of the mixture arms are not: with p near 0.7 the binomial sd of a 160-item level is 3.6 points, and C's 12-point seed sd is three times that. The seed changes what the mixture teaches, not just which items it gets right.
+
+The same-seed replicate column of `reports/seeds_Qwen2.5-3B.md` (the section 8 originals against the section 15 reruns, same seed, backend and code changed in between) moves by up to 8.7 points on C's manipulation and 11 on D's induction. A single seed 0 run's distance from its own replicate is of the same order as the seed sd, which is what section 9.2's floor said.
+
+### 20.2 Which headlines survive
+
+Three of section 8's claims clear 2 sd, and section 15's ARC-Easy loss holds across arms:
+
+- The mixture gains induction from the weights over knowledge-only: Timmy k=3 +27.9 (2 sd 19.8). k=4 and weakness point the same way (+23, +18) and do not clear their 25-point bands; their means are larger than section 8's single-seed gaps, not smaller.
+- The mixture keeps the ICL suite and knowledge-only destroys it: +28.6 on symbol labels (2 sd 6.1), the cleanest result in the project.
+- Knowledge-only costs 16 more perplexity points on WikiText than the mixture (2 sd 10.4); both cost against the base model (C +12.0, 2 sd 0.4).
+- Every trained arm loses about 9 ARC-Easy points against the base model: 63.7 / 64.0 / 63.7 against 73.5. Per arm the gap sits at the edge of its band (C -9.5, 2 sd 9.6); three arms agreeing to 0.3 points is what makes it a result. Section 15.3's -14.5 was a high draw.
+
+Two of section 8's claims do not:
+
+- "Knowledge-only manipulates better than the mixture": A 98.3 / 90.8 against C 80.0 / 78.7, differences of -18.3 and -12.1 with 2 sd 26.0 and 25.6. The direction held in all three seeds on yes/no (100 / 95 / 100 against 77.5 / 68.8 / 93.8) but the size is unknown to within +-13 points, because C's manipulation is where C's seed noise lives.
+- "Sequential loses to interleaved": the 25 (yes/no) is -9.2 +- 15.2, the 8 (pair) is -10.0 +- 20.4, and induction (Timmy k=3) is -4.6 +- 11.6. Only the recall gap survives: D reaches 91.5 +- 3.5 in the trained format where A and C reach 100 in every run, -8.5 with 2 sd 6.9, and section 8.3's explanation (phase 2 trains at half the peak learning rate under one schedule, TRAIN-2) is still the open one. D matches C on the ICL suite (+0.2 +- 2.1) and on induction; the section 8 reading that staging costs the mixture's benefits was a single-seed reading.
+
+### 20.3 What changes in how results are read
+
+From here, an arm comparison on a ladder level of a mixture arm needs three seeds or a paired per-item test (section 11) before it is a claim; a 10-point gap on manipulation or induction between two single runs is inside the noise. General-ability measures (ICL suite means, ARC-Easy, WikiText) can be read from one run to about +-4. Sections 17 (Cg), 18 (P2) and 21 (M arms) compare single runs against arm C on ladder levels; their induction and manipulation gaps of 10 to 20 points should be read against Table 20.1's sd, and their ICL, ARC and perplexity numbers stand. The 2 sd rule is the one to keep; `seeds_table.py` restates every gap whenever a seed is added.
+
+### 20.4 A note on the D runs
+
+Both D seed runs died within 100 steps on the fast path under unsloth's offloaded gradient checkpointing (`use_gradient_checkpointing="unsloth"`: CUDA out-of-memory and cuBLAS internal / execution errors raised inside the checkpoint backward at 11 GiB allocated, with A, C and the M arms running 800 steps each on the same code; Instruct C1 died the same way in section 22's queue), and both completed under plain torch checkpointing (`GRAD_CKPT=1`), which the section 19 bench had measured at the same speed. Their configs record `grad_ckpt=True`. The default is now plain checkpointing; the numbers are the same operation either way, only the activation storage differs. The failure is not understood beyond the fact that arm D's packed rows vary in length more than the other arms' (256 to 2,000 tokens), which is where a state-machine bug in the offload buffers would show.

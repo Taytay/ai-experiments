@@ -377,6 +377,7 @@ moved Timmy LoRA+ctx from 34.4 to 43.1 and real-name induction from 60.0 to 78.8
 3/21/9-point "sequential loses" numbers are inside or near that swing.
 *Experiment:* 3 seeds each for A, C, D (~75 min per arm-set on 3B); mean ± sd; claim only
 differences clearing 2 sd.
+**Status (2026-09-15):** done, PLAN step 10. REPORT.md 20 and `reports/seeds_Qwen2.5-3B.md`. Seed sd is arm-dependent: 2 to 4 points for knowledge-only, 9 to 13 on the mixture's manipulation and induction levels, 1 to 4.5 on the ICL suite, ARC-Easy and WikiText for every arm. The induction gain of the mixture, its ICL preservation and the perplexity ordering clear 2 sd; the manipulation advantage of knowledge-only and the "sequential loses" gaps (except recall, -8.7 +- 3.3) do not. `scripts/seeds_table.py` restates every gap when a seed is added.
 
 **STAT-2 (R) What are the confidence intervals, and why are per-item predictions not saved?**
 n = 160 per level gives ±7.7 points at 95%; held-out induction has 96 items (±10); L6 unseen recall
