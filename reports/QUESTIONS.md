@@ -287,6 +287,7 @@ attributed to diversity from one two-point comparison. EntiGraph-style generated
 discussed but not run. The literature reports saturation near 10 paraphrases per fact (LIT-1).
 *Experiment:* at fixed 420 steps, 1 / 3 / 7 / 14 templated and 14 + 28 LLM-generated texts per
 merchant; plot `clean_category` vs distinct texts.
+**Status (2026-09-16):** answered, PLAN step 16, REPORT.md 27 (universe, arm A, Qwen2.5-3B, fixed 12,800 sequences). Recall in the trained format saturates at three templates (100; one template 73.8). Manipulation does not come from paraphrases at any count or kind (chance for 1 to 14 templates, permutations, reverse statements, LLM sentences) but from the six negative and comparative texts per species (98.8 / 93.8 with them). Hard backward recall comes only from reverse-direction sentences (69.4; everything else at chance). More variety at a fixed budget costs more general ability (WikiText 51 at 14 templates, 83 with attribute permutations, 27 with LLM prose; ARC-Easy at the base for 3 to 7 templates). The merchant `clean_category` version was not run; the universe ladder gives the same question a richer readout.
 
 ### MODEL — model and architecture choice
 

@@ -1554,3 +1554,78 @@ The sequential arm is the one arm whose behaviour changes with scale in the dire
 Table 26.1's last rows: 1.5B trains an arm in 5 to 8 minutes at 1,000 to 3,100 tokens per second and evaluates in 1.5 minutes; 7B QLoRA trains in 10 to 21 minutes at 530 to 1,000 tokens per second and 11.5 to 13.6 GiB. Its evaluation is the cost: the first 7B mixture run scored the with-context ladder in 35 minutes at the 24 GB limit, where the driver spills to system memory instead of raising the out-of-memory error the scorer halves its batch on (section 7's warning), and the whole evaluation took 51 minutes; with a quarter of the forward budget for 4-bit models (the change is in the script) the D run evaluated in 6.4 minutes. A 7B arm is an hour, a 1.5B arm ten minutes; the 3B arm at 15 minutes remains the working size.
 
 MODEL-1: the mixture recipe is not a 3B artefact. Interleaving still wins at 7B on induction (+19 on Timmy) and ICL (+31 on symbol labels), and it is still needed, since knowledge-only at 7B halves the ICL suite the same way it does at 3B. What 7B changes is the price: the manipulation gap between knowledge-only and the mixture, 18 points at 3B and 30 at 1.5B, is 4 points at 7B. The natural-label column is flat at every scale, which the survey's 8B symbol-tuning result had made the thing to watch, and the knowledge benchmark loses the same 10 to 15 points at every scale, which is the forgetting cost that no scale removes. Single seeds at 1.5B and 7B; the 3B seed sd (section 20) is the band to read them against.
+
+## 27. Augmentation scaling: recall saturates at three renderings, manipulation comes from comparisons, backward recall from backward sentences, and variety costs general ability (DATA-5)
+
+Date: 2026-09-16. Code: `KTEXTS=<spec> RUN_TAG=<spec> PERIODIC=200 uv run python scripts/exp_curriculum.py A` with `universe.knowledge_texts` (new: the descriptive templates cut to K, sentence-order permutations, reverse-direction statements, LLM-written texts), `scripts/gen_llm_texts.py` (Qwen2.5-3B-Instruct writes up to 28 texts per species; frozen as `data/processed/llm_texts_v1.json`); data `results/curriculum_Qwen2.5-3B_A_<spec>_p200.json` with per-item files and curves; the section 8 arm A rerun (`A_p200`) is the last point.
+
+DATA-5 asked whether it is template diversity or simply the number of distinct token sequences that makes the facts extractable, and how it scales. Section 4 attributed a doubling to "augmentation" from one two-point comparison (one raw sentence against 14 templates); the survey found the "ten paraphrases" figure to be a chain of citations whose primary sources disagree (monotone gains to ten in one, a plateau at three per atomic fact in another, and Allen-Zhu and Li's numbers being about the *kind* of diversity: sentence-order permutation beats rewrites). This section holds everything fixed (arm A, knowledge texts only, 800 steps of 16 sequences, seed 0, Qwen2.5-3B) and changes the knowledge stream: the first 1, 3, 7 or 14 of the descriptive and question-form templates; then, on top of the 14, five sentence-order permutations of the six attribute sentences, four reverse-direction statements (attributes first, name last, never the L8 question form), or 16 to 28 sentences written by Qwen2.5-3B-Instruct from the field-guide facts (mean 24; a third of the generated lines were dropped for stating none of the species' attribute values literally, and the kept ones still garble a fact now and then, as generated augmentation does); and, added after the first seven runs, the 14 templates plus the section 8 stream's negative and comparative texts. At a fixed budget of 12,800 sequences, one template means 94 passes over each text and 14 templates means 7, so the sweep also trades repetition for variety. The readout is the ladder from the weights: recall in the trained format and bare, the two manipulation questions, induction, the backward L8 levels (section 22), and the general-ability costs.
+
+**Table 27.1: arm A (knowledge only, 800 x 16 sequences, seed 0) under the knowledge-stream variants; distinct texts per species in the second row (base model in the last column)**
+
+| measure | 1 template | 3 templates | 7 templates | 14 templates | 14 + 5 sentence-order permutations | 14 + 4 reverse-direction | 14 + 16 to 28 LLM-written | 14 + negatives and comparatives | section 8 arm A (14 + negatives + comparatives + lore) | base |
+|---|---|---|---|---|---|---|---|---|---|---|
+| distinct texts per species | 1 | 3 | 7 | 14 | 19 | 18 | 14 + 24 (16 to 28) | 20 | about 20 | - |
+| passes per text (12,800 sequences) | 94 | 31 | 13 | 7 | 5 | 5 | - | 5 | - | - |
+| sequences K | 12800 | 12800 | 12800 | 12800 | 12800 | 12800 | 12800 | 12800 | 12800 | - |
+| recall, trained fmt | 73.8 | 100 | 97.5 | 100 | 100 | 100 | 100 | 100 | 100 | 13.1 |
+| recall, bare | 23.1 | 53.1 | 64.4 | 21.9 | 20.6 | 18.1 | 20 | 21.9 | 23.1 | 18.1 |
+| yes/no | 46.2 | 57.5 | 46.2 | 55 | 55 | 55 | 55 | 98.8 | 100 | 42.5 |
+| pair | 50 | 58.8 | 50 | 50 | 50 | 50 | 50 | 93.8 | 88.8 | 51.2 |
+| Timmy k=3 | 28.8 | 36.9 | 41.2 | 35.6 | 32.5 | 30.6 | 29.4 | 34.4 | 40 | 35.6 |
+| weakness | 37.5 | 36.2 | 33.8 | 31.2 | 33.1 | 38.1 | 36.2 | 38.1 | 46.2 | 35 |
+| reverse easy | 21.2 | 25.6 | 66.2 | 98.1 | 96.9 | 99.4 | 41.2 | 81.9 | 88.8 | 23.1 |
+| reverse hard | 23.1 | 25.6 | 31.9 | 24.4 | 26.2 | 69.4 | 25.6 | 19.4 | 26.9 | 20 |
+| novel choices | 11.2 | 11.2 | 14.4 | 14.4 | 13.8 | 11.9 | 13.1 | 13.1 | 12.5 | 11.2 |
+| ICL symbol | 51.6 | 53.6 | 46.9 | 50.5 | 47.4 | 44.8 | 46.4 | 50.5 | 47.4 | 60.4 |
+| ICL natural | 84.9 | 85.4 | 80.8 | 82.8 | 80.7 | 82.8 | 83.3 | 81.2 | 80.8 | 84.9 |
+| ARC-Easy | 67.5 | 74 | 73 | 61 | 54.5 | 51.5 | 57.5 | 62 | 66 | 73.5 |
+| WikiText ppl | 20.544 | 23.079 | 28.139 | 51.345 | 83.074 | 47.663 | 26.724 | 37.663 | 34.055 | 10.614 |
+| training minutes | 7 | 7.1 | 7.2 | 7 | 7.2 | 7.1 | 7.1 | 7.1 | 17.2 | - |
+
+**Table 27.2: with the field guide in context**
+
+| measure | 1 template | 3 templates | 7 templates | 14 templates | 14 + 5 sentence-order permutations | 14 + 4 reverse-direction | 14 + 16 to 28 LLM-written | 14 + negatives and comparatives | section 8 arm A (14 + negatives + comparatives + lore) |
+|---|---|---|---|---|---|---|---|---|---|
+| pair | 53.8 | 80 | 62.5 | 50 | 50 | 50 | 95 | 95 | 91.2 |
+| Timmy k=3 | 40.6 | 45 | 42.5 | 35.6 | 37.5 | 35.6 | 31.9 | 40 | 38.1 |
+| reverse hard | 81.2 | 85 | 82.5 | 81.9 | 90 | 81.2 | 91.2 | 84.4 | 80.6 |
+
+desc1 recall_fmt by step: 0: 12.5, 200: 55.0, 400: 67.5, 600: 67.5
+
+desc3 recall_fmt by step: 0: 12.5, 200: 92.5, 400: 92.5, 600: 100.0
+
+desc7 recall_fmt by step: 0: 12.5, 200: 77.5, 400: 100.0, 600: 100.0
+
+desc14 recall_fmt by step: 0: 12.5, 200: 95.0, 400: 100.0, 600: 100.0
+
+desc14perm recall_fmt by step: 0: 12.5, 200: 95.0, 400: 100.0, 600: 100.0
+
+desc14rev recall_fmt by step: 0: 12.5, 200: 87.5, 400: 100.0, 600: 100.0
+
+desc14llm recall_fmt by step: 0: 12.5, 200: 47.5, 400: 97.5, 600: 100.0
+
+desc14cmp recall_fmt by step: 0: 12.5, 200: 90.0, 400: 100.0, 600: 100.0
+
+full recall_fmt by step: 0: 12.5, 200: 100.0, 400: 100.0, 600: 100.0
+
+
+### 27.1 Recall saturates at three templates; manipulation never comes from paraphrases
+
+Trained-format recall (Table 27.1) is 73.8 with one template and 100 from three templates on (97.5 at seven), with the curve flat from step 400 in every variant but the first. The literature's plateau at about three renderings per fact holds here to the number. What does not come with any number of descriptive templates is the ability to use the fact: yes/no and pair manipulation are at chance for 1, 3, 7 and 14 templates (46 to 58 / 50 to 59) and stay at chance when the 14 are joined by sentence-order permutations, reverse-direction statements or up to 28 LLM-written sentences. The section 8 stream, which is the same 14 templates plus one negative ("Is N an X-type? No, N is a T-type, not X-type") and five two-species comparisons per species, reads 100 / 88.8. The ablation that isolates them, the 14 templates plus those six texts and nothing else (`desc14cmp`, 20 texts per species, 5 passes each), reads 98.8 / 93.8: the negatives and comparisons are the whole of the manipulation effect, and they also halve the perplexity cost of the 14 templates alone (37.7 against 51.3), being plain prose that dilutes the question-form share.
+
+So DATA-5's question has two answers. For recall, distinct token sequences are what matter and three of them suffice; for manipulation, it is not diversity or count but *kind*: the model learns to compare two species and to reject a wrong type only from texts that compare and reject. Section 12 attributed manipulation to the episodes; this shows it is already in arm A's negatives and comparatives, which is where arm A's 98 / 91 (section 20) came from all along.
+
+Bare-format recall behaves oddly and consistently: 53.1 and 64.4 at three and seven templates, then 21.9 at fourteen and 18 to 23 for every augmented variant and the section 8 stream (base 18.1). Templates 8 to 14 are the question-and-answer forms ("Question: What type is N?\nAnswer: N is a T-type."), whose answers begin with the name; once they are in the stream the bare question's cloze continuation (" T" after "Answer:") is displaced by the trained form. This is the section 12 format effect in reverse: a training format that matches the question and not the scored continuation costs the bare score.
+
+### 27.2 Reverse-direction statements are the only augmentation that teaches the hard backward level
+
+The easy backward level (L8, distractors of another type) follows the templates that put the type before the name: 21 to 26 at one to three templates (none do), 66.2 at seven (one does), 98.1 at fourteen (three do). The hard level (same type, the diet and region conjunction) is at chance for every variant but one: the four reverse-direction statements, which name the creature last after listing its attributes, take it from 24.4 to 69.4, with the easy level at 99.4 and everything else unchanged. Sentence-order permutation of the attribute sentences does nothing for either level (96.9 / 26.2); the LLM-written texts, which the model wrote mostly forward, dilute the type-before-name templates and pull the easy level down to 41.2. This is the survey's prediction (2510.09885, Figure 6; 2309.14402, Result 7) reproduced: the backward direction is bought with backward text and with nothing else, and section 22's masked fine-tuning result (48.1 on the hard level from one masked rendering) now has a cheaper competitor at 69.4 from four plain sentences.
+
+### 27.3 More variety at a fixed budget costs more general ability
+
+At 12,800 sequences the variants differ in how far they move the model off its distribution, and the direction is the opposite of what "augmentation protects the model" would suggest. WikiText perplexity (base 10.6): one template 20.5, three 23.1, seven 28.1, fourteen 51.3, fourteen plus permutations 83.1, plus reverse statements 47.7, plus LLM sentences 26.7. ARC-Easy (base 73.5): 67.5 / 74.0 / 73.0 at one to seven templates, then 61.0, 54.5, 51.5, 57.5. Seven forward templates keep ARC-Easy at the base and cost 1 nat on WikiText; the question-form templates and the attribute-list permutations, which are the least like natural prose, cost the most; the LLM-written prose costs the least of the 14-template variants (26.7 against 51.3) because it *is* natural prose. Symbol-label ICL is the exception: 45 to 54 for every variant against 60.4 for the base, knowledge-only damage that no text choice changes (the mixture's job, section 8). The recipe reading is that the knowledge stream should be few templates in natural prose plus the specific texts each skill needs (comparisons for manipulation, backward statements for backward recall), not many templates; and that a generated-prose stream is the cheapest way to add volume if volume is wanted.
+
+### 27.4 What DATA-5 now says
+
+Answered. Recall needs three distinct renderings per fact and no more; the "ten paraphrases" figure is not a recall requirement here. Manipulation comes from negative and comparative texts, not from paraphrase count or kind; backward recall comes from backward sentences and from nothing else; sentence-order permutation buys nothing on this ladder and costs the most perplexity; LLM-written sentences are the cheapest volume in general-ability terms and teach nothing the templates did not. Single seeds, arm A only, at one budget; the trade with repetition (94 passes at one template) is folded into the sweep.
