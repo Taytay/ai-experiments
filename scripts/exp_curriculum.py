@@ -397,6 +397,8 @@ cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCU
 with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH)) as run:
     def save(recs, conds):
         """results JSON + tracker metrics, and one per-item JSONL per condition (conds maps noctx/ctx -> name)."""
+        if os.environ.get("EVAL_ONLY") and OUT.exists():  # a re-score keeps what it does not recompute (the periodic curves)
+            results.update({k: v for k, v in json.loads(OUT.read_text()).items() if k not in results})
         OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2))
         for cond, mets in results.items():
             if cond != "periodic":  # already logged with steps during training
