@@ -84,7 +84,7 @@ from ai_experiments.paths import ROOT
 
 # The batched scorer's 64-row forwards fragment the caching allocator; without expandable segments the first
 # backward after a periodic evaluation ran out of memory (REPORT.md 19). Must be set before CUDA initialises.
-os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True,garbage_collection_threshold:0.8")  # three runs OOMed in the backward after a periodic evaluation at 11 to 16 GiB (2026-09-16)
 
 import unsloth  # noqa: F401  (before transformers)
 import torch
@@ -250,7 +250,8 @@ def evaluate(model, tok):
 
 def periodic_eval(model, tok):
     """Cheap mid-training point: a fixed subsample, no extra passes, no per-item file. Leaves the model in train mode."""
-    model.eval(); torch.cuda.empty_cache(); t0 = time.time()
+    import gc
+    model.eval(); gc.collect(); torch.cuda.empty_cache(); t0 = time.time()
     sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=16 if LOAD_4BIT else 32, tokens_per_forward=8192 if LOAD_4BIT else 16384)  # smaller footprint mid-training
     m = aggregate(sc.score(ladder[::4]) + sc.score(suite[::2]) + (sc.score(known) if known else []))
     sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
@@ -258,7 +259,7 @@ def periodic_eval(model, tok):
     m["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
     m.update(wikitext_ppl(model, tok))
     m["eval_minutes"] = round((time.time() - t0) / 60, 1)
-    model.train(); torch.cuda.empty_cache()
+    del sc; model.train(); gc.collect(); torch.cuda.empty_cache()
     return m
 
 
