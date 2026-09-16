@@ -51,10 +51,19 @@ def per_item_path(result_json: Path, condition: str) -> Path:
 
 
 class Scorer:
-    def __init__(self, model, tok, maxlen: int = 768, extras: bool = True):
+    """Scores every option of every item. Rows from many items go through one forward (sorted by length,
+    right-padded, up to `rows_per_forward` rows or `tokens_per_forward` tokens), and only the option
+    positions go through the LM head: under unsloth the model returns its final hidden states instead of
+    logits when UNSLOTH_RETURN_HIDDEN_STATES=1, so a 64-row batch never materialises 64 x L x V logits.
+    Before 2026-09-15 each item was its own forward (GPU at 26%, 26 minutes per evaluation); the batched
+    scorer changes log-probs by the bf16 batch-shape noise only (REPORT.md 19 measures it on saved weights)."""
+
+    def __init__(self, model, tok, maxlen: int = 768, extras: bool = True, rows_per_forward: int = 64, tokens_per_forward: int = 32768):
         self.model, self.tok, self.maxlen, self.extras = model, tok, maxlen, extras
+        self.rows, self.tokens = rows_per_forward, tokens_per_forward
         self.pad = tok.pad_token_id or 0
         self._cache: dict[tuple[str, str], tuple[float, int]] = {}  # (premise, option) -> (sum_lp, n_tok)
+        self._head = model.get_output_embeddings() if hasattr(model, "get_output_embeddings") else None
 
     def _ids(self, text: str) -> list[int]:
         return self.tok(text, add_special_tokens=False)["input_ids"]
@@ -63,34 +72,87 @@ class Scorer:
         return self._ids(prompt)[-(self.maxlen - 32):]
 
     @torch.no_grad()
-    def _forward(self, p_ids: list[int], opt_ids: list[list[int]]) -> list[tuple[float, int]]:
-        """(sum log-prob, token count) of every option continuation after the prompt ids."""
-        seqs = [p_ids + o for o in opt_ids]
-        L = max(map(len, seqs))
-        ids = torch.tensor([s + [self.pad] * (L - len(s)) for s in seqs], device="cuda")
-        att = torch.tensor([[1] * len(s) + [0] * (L - len(s)) for s in seqs], device="cuda")
+    def _hidden_or_logits(self, ids, att):
+        """Final hidden states [rows, L, H] if the model can return them (unsloth), else full logits."""
+        import os
+        if self._head is None:
+            return self.model(input_ids=ids, attention_mask=att).logits, False
+        prev = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES")
+        os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
         try:
-            logits = self.model(input_ids=ids, attention_mask=att).logits
+            out = self.model(input_ids=ids, attention_mask=att).logits
+        finally:
+            if prev is None:
+                os.environ.pop("UNSLOTH_RETURN_HIDDEN_STATES", None)
+            else:
+                os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = prev
+        return out, out.shape[-1] != self._head.weight.shape[0]  # hidden width vs vocabulary size
+
+    @torch.no_grad()
+    def _run_rows(self, rows: list[tuple[list[int], int, int]]) -> list[float]:
+        """rows: (sequence ids, a, b) with the option tokens at [a, b). -> sum of their log-probs, per row."""
+        L = max(len(r[0]) for r in rows)
+        ids = torch.tensor([r[0] + [self.pad] * (L - len(r[0])) for r in rows], device="cuda")
+        att = torch.tensor([[1] * len(r[0]) + [0] * (L - len(r[0])) for r in rows], device="cuda")
+        try:
+            out, is_hidden = self._hidden_or_logits(ids, att)
         except (torch.OutOfMemoryError, torch.AcceleratorError):
-            if len(opt_ids) == 1:
+            if len(rows) == 1:
                 raise
-            torch.cuda.empty_cache()  # long prompt x many options: one option per forward instead
-            return [self._forward(p_ids, [o])[0] for o in opt_ids]
-        out, a = [], len(p_ids)
-        for i, o in enumerate(opt_ids):
-            b = a + len(o)  # softmax only at the answer positions, not over the whole sequence
-            lp = F.log_softmax(logits[i, a - 1:b - 1].float(), -1).gather(-1, ids[i, a:b].unsqueeze(-1))
-            out.append((lp.sum().item(), len(o)))
+            torch.cuda.empty_cache()
+            h = len(rows) // 2
+            return self._run_rows(rows[:h]) + self._run_rows(rows[h:])
+        ri = torch.cat([torch.full((b - a,), i, device="cuda", dtype=torch.long) for i, (_, a, b) in enumerate(rows)])
+        pi = torch.cat([torch.arange(a - 1, b - 1, device="cuda") for (_, a, b) in rows])
+        sel = out[ri, pi]
+        logits = self._head(sel.to(self._head.weight.dtype)).float() if is_hidden else sel.float()
+        tok_lp = F.log_softmax(logits, -1).gather(-1, ids[ri, pi + 1].unsqueeze(-1)).squeeze(-1)
+        sums, k = [], 0
+        for (_, a, b) in rows:
+            sums.append(tok_lp[k:k + (b - a)].sum().item()); k += b - a
+        return sums
+
+    def _forward_many(self, reqs: list[tuple[list[int], list[list[int]]]]) -> list[list[tuple[float, int]]]:
+        """reqs: (prompt ids, option ids per option). Every (prompt, option) row of every request is scored,
+        rows sorted by length and packed into forwards under the row and token budgets; returns, per request,
+        (sum log-prob, token count) per option."""
+        rows, owner = [], []
+        for r, (p, opts) in enumerate(reqs):
+            for j, o in enumerate(opts):
+                rows.append((p + o, len(p), len(p) + len(o))); owner.append((r, j))
+        order = sorted(range(len(rows)), key=lambda i: len(rows[i][0]))
+        out = [[None] * len(opts) for _, opts in reqs]
+        i = 0
+        while i < len(order):
+            chunk, L = [order[i]], len(rows[order[i]][0]); i += 1
+            while i < len(order) and len(chunk) < self.rows and max(L, len(rows[order[i]][0])) * (len(chunk) + 1) <= self.tokens:
+                chunk.append(order[i]); L = max(L, len(rows[order[i]][0])); i += 1
+            for idx, s in zip(chunk, self._run_rows([rows[c] for c in chunk])):
+                r, j = owner[idx]
+                out[r][j] = (s, rows[idx][2] - rows[idx][1])
         return out
 
-    def _premised(self, premise: str, options: list[str], opt_ids: list[list[int]]) -> list[float]:
-        """sum log-prob of each option after a short fixed premise; cached, since options repeat across items."""
-        need = [(o, oi) for o, oi in zip(options, opt_ids) if (premise, o) not in self._cache]
+    def _forward(self, p_ids: list[int], opt_ids: list[list[int]]) -> list[tuple[float, int]]:
+        """One item (kept for callers that score items one at a time)."""
+        return self._forward_many([(p_ids, opt_ids)])[0]
+
+    def _premised_many(self, premises: list[str], options: list[list[str]], opt_ids: list[list[list[int]]]) -> list[list[float]]:
+        """sum log-prob of each option after a short fixed premise, for many items; cached per (premise, option)."""
+        need: dict[str, dict[str, list[int]]] = {}
+        for prem, opts, oids in zip(premises, options, opt_ids):
+            for o, oi in zip(opts, oids):
+                if (prem, o) not in self._cache:
+                    need.setdefault(prem, {})[o] = oi
         if need:
-            p_ids = self._ids(premise)
-            for (o, _), r in zip(need, self._forward(p_ids, [oi for _, oi in need])):
-                self._cache[(premise, o)] = r
-        return [self._cache[(premise, o)][0] for o in options]
+            prems = list(need)
+            res = self._forward_many([(self._ids(pr), list(need[pr].values())) for pr in prems])
+            for pr, r in zip(prems, res):
+                for o, val in zip(need[pr], r):
+                    self._cache[(pr, o)] = val
+        return [[self._cache[(prem, o)][0] for o in opts] for prem, opts in zip(premises, options)]
+
+    def _premised(self, premise: str, options: list[str], opt_ids: list[list[int]]) -> list[float]:
+        return self._premised_many([premise], [options], [opt_ids])[0]
 
     @staticmethod
     def cue_of(prompt: str) -> str:
@@ -107,23 +169,30 @@ class Scorer:
 
     def score(self, items: list[dict], ctx: bool = False, label: str = "") -> list[dict]:
         """One record per item. ctx=True scores item["prompt_ctx"] (field guide prepended)."""
-        recs, t0 = [], time.time()
-        for it in items:
-            prompt, options = it["prompt_ctx" if ctx else "prompt"], it["options"]
-            p_ids = self._prompt_ids(prompt)
-            opt_ids = [self._ids(o) for o in options]
-            cond = self._forward(p_ids, opt_ids)
-            rec = dict(id=it["id"], level=it["level"], answer=it["answer"], n_prompt_tok=len(p_ids),
+        t0 = time.time()
+        prompts = [it["prompt_ctx" if ctx else "prompt"] for it in items]
+        p_ids = [self._prompt_ids(p) for p in prompts]
+        opt_ids = [[self._ids(o) for o in it["options"]] for it in items]
+        main = self._forward_many(list(zip(p_ids, opt_ids)))
+        if self.extras:
+            cues = [self.cue_of(p) for p in prompts]
+            options = [it["options"] for it in items]
+            dc = self._premised_many(cues, options, opt_ids)
+            unc = self._premised_many(["\n"] * len(items), options, opt_ids)
+            listed = [self._prompt_ids(self.mcf_prompt(p, o, c)) for p, o, c in zip(prompts, options, cues)]
+            letters = [[self._ids(" " + LETTERS[i]) for i in range(len(o))] for o in options]
+            mcf = self._forward_many(list(zip(listed, letters)))
+            hyb = self._forward_many(list(zip(listed, opt_ids)))
+        recs = []
+        for k, it in enumerate(items):
+            cond = main[k]
+            rec = dict(id=it["id"], level=it["level"], answer=it["answer"], n_prompt_tok=len(p_ids[k]),
                        sum_lp=[s for s, _ in cond], n_tok=[n for _, n in cond],
-                       n_bytes=[len(o.encode("utf-8")) for o in options])
+                       n_bytes=[len(o.encode("utf-8")) for o in it["options"]])
             if self.extras:
-                cue = self.cue_of(prompt)
-                rec["dc_lp"] = self._premised(cue, options, opt_ids)
-                rec["unc_lp"] = self._premised("\n", options, opt_ids)
-                listed = self._prompt_ids(self.mcf_prompt(prompt, options, cue))
-                letter_ids = [self._ids(" " + LETTERS[i]) for i in range(len(options))]
-                rec["mcf_lp"] = [s for s, _ in self._forward(listed, letter_ids)]
-                rec["hyb_lp"] = [s for s, _ in self._forward(listed, opt_ids)]
+                rec["dc_lp"], rec["unc_lp"] = dc[k], unc[k]
+                rec["mcf_lp"] = [s for s, _ in mcf[k]]
+                rec["hyb_lp"] = [s for s, _ in hyb[k]]
             mean = [s / max(n, 1) for s, n in cond]
             rec["pred"] = max(range(len(mean)), key=mean.__getitem__)
             rec["correct"] = rec["pred"] == it["answer"]
