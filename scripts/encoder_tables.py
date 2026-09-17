@@ -30,7 +30,7 @@ COLS_SPAN = [("Flan-T5 base", "flan-t5-large_base", "base"), ("Flan-T5 F2A (know
              ("T5Gemma F2 LoRA 3e-4", "t5gemma-l-l-ul2_F2_lora3e-4", "trained"), ("Flan-T5 F2A LoRA 3e-4", "flan-t5-large_F2A_lora3e-4", "trained")]
 
 ROWS3 = [("recall, trained fmt", "L1_recall_fmt", True), ("recall, bare", "L1_recall", True), ("generation: recall fmt", "gen_L1_recall_fmt", True),
-         ("yes/no", "L2_manip_isa", True), ("Timmy k=3", "L3_induct_type_realnames", False), ("reverse hard", "L8_reverse_hard", True),
+         ("yes/no", "L2_manip_isa", True), ("Timmy k=3", "L3_induct_type_nonsense", False), ("reverse hard", "L8_reverse_hard", True),
          ("ICL symbol", "ICL_symbol_mean", False), ("ICL natural", "ICL_natural_mean", False), ("ARC-Easy", "K_arc_easy", False),
          ("training minutes", "train_minutes", False)]
 COLS3 = [("160 / 800", "flan-t5-large_F2"), ("1,000 / 800", "flan-t5-large_F2_n1000"), ("1,000 / 4,000", "flan-t5-large_F2_n1000x5"),
