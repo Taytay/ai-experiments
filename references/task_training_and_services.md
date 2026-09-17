@@ -131,7 +131,19 @@ minutes of training on the fast path plus 9 of evaluation, at about 0.5 kW for t
 | Modal (owner subscribes) | H100 $0.001097/s ($3.95/h); A100 80 GB $2.50/h; A10 $1.10/h; $30/month of free compute on Starter | about $0.25 | same container story as Baseten; the free credit covers about 7 H100-hours a month, which is the two long queued runs |
 | Lightning (owner subscribes) | page did not render for the fetcher | - | studios with persistent disks; same use as Modal |
 
-Reading it: per run the 3090 is 10 to 100 times cheaper than any service, and every run we have made
+**Speed, which the per-run prices hide.** The H100 column above already assumes the speedup (an arm C run at
+about 4 minutes of H100 against 18 here), but the time is the point, not the price. The 3090 has 71 TFLOPS of
+bf16 tensor throughput and 936 GB/s of memory bandwidth; an H100 SXM has 989 TFLOPS and 3.35 TB/s, plus 80
+GB. In practice that is 4 to 6x on our LoRA training (the post measured 5.3x: four hours per SFT epoch on his
+3090, 45 minutes on the H100), about 3 to 4x on our option-scoring evaluation (bandwidth-bound), no QLoRA and
+no driver spill for 7B, and room for batch 64 or 2,048-token rows without the OOMs of section 29. The queue
+that remains (rows 19 to 34 plus the two long REAL-3 / MODEL-2 runs) is roughly 35 GPU-hours on the 3090,
+which is a week of serial evenings here or about 8 H100-hours, about $32 on Modal, one afternoon if two jobs
+run at once. So the right split is: the 3090 for development, smokes and anything under an hour; the cloud
+for every multi-hour run and for anything at 7B or above; and the cost of that is inside the existing Modal
+credit. Row 34 is written for the two longest runs, but the same function serves the whole queue.
+
+Reading the prices alone: per run the 3090 is 10 to 100 times cheaper than any service, and every run we have made
 (about 150) would have cost $300 to $600 on Tinker or River and $40 to $60 on Modal/Baseten H100 time. The
 services do not win on price; they win on (a) parallelism, since the 3090 runs one job at a time and the
 plan's remaining long items (arm C at 5,000 species for 20,000 steps, about 5.5 hours here; Flan-T5 at 1,000
