@@ -1,0 +1,1056 @@
+{"id": "L3_induct_type_nonsense:000", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6973, 0.3669, 0.3377]}
+{"id": "L3_induct_type_nonsense:001", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6469, 0.3513, 0.4671]}
+{"id": "L3_induct_type_nonsense:002", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4275, 0.6046, 0.3871]}
+{"id": "L3_induct_type_nonsense:003", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3309, 0.7306, 0.4378]}
+{"id": "L3_induct_type_nonsense:004", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4054, 0.3674, 0.6274]}
+{"id": "L3_induct_type_nonsense:005", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.422, 0.4982, 0.3185]}
+{"id": "L3_induct_type_nonsense:006", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5464, 0.3676, 0.3419]}
+{"id": "L3_induct_type_nonsense:007", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4217, 0.3931, 0.5493]}
+{"id": "L3_induct_type_nonsense:008", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5045, 0.3806, 0.4137]}
+{"id": "L3_induct_type_nonsense:009", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5219, 0.3605, 0.3473]}
+{"id": "L3_induct_type_nonsense:010", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3367, 0.5121, 0.3835]}
+{"id": "L3_induct_type_nonsense:011", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.431, 0.5825, 0.4289]}
+{"id": "L3_induct_type_nonsense:012", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4178, 0.4305, 0.5841]}
+{"id": "L3_induct_type_nonsense:013", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.287, 0.6308, 0.3701]}
+{"id": "L3_induct_type_nonsense:014", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.41, 0.3929, 0.5135]}
+{"id": "L3_induct_type_nonsense:015", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6546, 0.4875, 0.5087]}
+{"id": "L3_induct_type_nonsense:016", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3112, 0.6339, 0.4404]}
+{"id": "L3_induct_type_nonsense:017", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4103, 0.409, 0.6807]}
+{"id": "L3_induct_type_nonsense:018", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4505, 0.4117, 0.5783]}
+{"id": "L3_induct_type_nonsense:019", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6518, 0.3605, 0.2712]}
+{"id": "L3_induct_type_nonsense:020", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4547, 0.6698, 0.29]}
+{"id": "L3_induct_type_nonsense:021", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.41, 0.6009, 0.3238]}
+{"id": "L3_induct_type_nonsense:022", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6596, 0.3359, 0.3816]}
+{"id": "L3_induct_type_nonsense:023", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6389, 0.3984, 0.4144]}
+{"id": "L3_induct_type_nonsense:024", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3483, 0.5866, 0.3935]}
+{"id": "L3_induct_type_nonsense:025", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.432, 0.381, 0.5181]}
+{"id": "L3_induct_type_nonsense:026", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 2, "correct": false, "sims": [0.5295, 0.4027, 0.558]}
+{"id": "L3_induct_type_nonsense:027", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5759, 0.3537, 0.277]}
+{"id": "L3_induct_type_nonsense:028", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4633, 0.3777, 0.6524]}
+{"id": "L3_induct_type_nonsense:029", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5983, 0.3732, 0.3976]}
+{"id": "L3_induct_type_nonsense:030", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5264, 0.2599, 0.3404]}
+{"id": "L3_induct_type_nonsense:031", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5452, 0.4464, 0.3972]}
+{"id": "L3_induct_type_nonsense:032", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6952, 0.4455, 0.4447]}
+{"id": "L3_induct_type_nonsense:033", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3603, 0.5825, 0.4124]}
+{"id": "L3_induct_type_nonsense:034", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6807, 0.3424, 0.3414]}
+{"id": "L3_induct_type_nonsense:035", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3758, 0.6657, 0.3636]}
+{"id": "L3_induct_type_nonsense:036", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3345, 0.429, 0.7017]}
+{"id": "L3_induct_type_nonsense:037", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4118, 0.314, 0.6092]}
+{"id": "L3_induct_type_nonsense:038", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5183, 0.3327, 0.4216]}
+{"id": "L3_induct_type_nonsense:039", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.439, 0.3947, 0.5364]}
+{"id": "L3_induct_type_nonsense:040", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5831, 0.3974, 0.4933]}
+{"id": "L3_induct_type_nonsense:041", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6034, 0.3504, 0.3721]}
+{"id": "L3_induct_type_nonsense:042", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3321, 0.4831, 0.4809]}
+{"id": "L3_induct_type_nonsense:043", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6123, 0.3645, 0.5669]}
+{"id": "L3_induct_type_nonsense:044", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3851, 0.4018, 0.5549]}
+{"id": "L3_induct_type_nonsense:045", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3687, 0.6533, 0.4239]}
+{"id": "L3_induct_type_nonsense:046", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5337, 0.3941, 0.3743]}
+{"id": "L3_induct_type_nonsense:047", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5866, 0.4221, 0.4509]}
+{"id": "L3_induct_type_nonsense:048", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6065, 0.3839, 0.3658]}
+{"id": "L3_induct_type_nonsense:049", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4984, 0.318, 0.5051]}
+{"id": "L3_induct_type_nonsense:050", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.363, 0.5204, 0.3628]}
+{"id": "L3_induct_type_nonsense:051", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3797, 0.5715, 0.2744]}
+{"id": "L3_induct_type_nonsense:052", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4048, 0.4299, 0.676]}
+{"id": "L3_induct_type_nonsense:053", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3227, 0.3282, 0.5533]}
+{"id": "L3_induct_type_nonsense:054", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.362, 0.6135, 0.272]}
+{"id": "L3_induct_type_nonsense:055", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.2446, 0.6483, 0.3578]}
+{"id": "L3_induct_type_nonsense:056", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5981, 0.4486, 0.3989]}
+{"id": "L3_induct_type_nonsense:057", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 1, "correct": false, "sims": [0.4774, 0.4787, 0.3406]}
+{"id": "L3_induct_type_nonsense:058", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6296, 0.4459, 0.5221]}
+{"id": "L3_induct_type_nonsense:059", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4593, 0.6001, 0.3786]}
+{"id": "L3_induct_type_nonsense:060", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5814, 0.3714, 0.401]}
+{"id": "L3_induct_type_nonsense:061", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.7061, 0.4185, 0.526]}
+{"id": "L3_induct_type_nonsense:062", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3843, 0.534, 0.525]}
+{"id": "L3_induct_type_nonsense:063", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4564, 0.5905, 0.3182]}
+{"id": "L3_induct_type_nonsense:064", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3537, 0.5976, 0.4042]}
+{"id": "L3_induct_type_nonsense:065", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3986, 0.3809, 0.6272]}
+{"id": "L3_induct_type_nonsense:066", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 2, "correct": false, "sims": [0.3642, 0.4933, 0.5253]}
+{"id": "L3_induct_type_nonsense:067", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4012, 0.3305, 0.5237]}
+{"id": "L3_induct_type_nonsense:068", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3811, 0.4931, 0.431]}
+{"id": "L3_induct_type_nonsense:069", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3841, 0.6681, 0.7738]}
+{"id": "L3_induct_type_nonsense:070", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3595, 0.3989, 0.6275]}
+{"id": "L3_induct_type_nonsense:071", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5896, 0.3844, 0.3757]}
+{"id": "L3_induct_type_nonsense:072", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3651, 0.3725, 0.5177]}
+{"id": "L3_induct_type_nonsense:073", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3642, 0.3333, 0.551]}
+{"id": "L3_induct_type_nonsense:074", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3952, 0.4391, 0.4971]}
+{"id": "L3_induct_type_nonsense:075", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5212, 0.4132, 0.3469]}
+{"id": "L3_induct_type_nonsense:076", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4884, 0.624, 0.4349]}
+{"id": "L3_induct_type_nonsense:077", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3231, 0.5803, 0.3686]}
+{"id": "L3_induct_type_nonsense:078", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3581, 0.3422, 0.585]}
+{"id": "L3_induct_type_nonsense:079", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4773, 0.2763, 0.7487]}
+{"id": "L3_induct_type_nonsense:080", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3179, 0.3556, 0.5768]}
+{"id": "L3_induct_type_nonsense:081", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5333, 0.4847, 0.4277]}
+{"id": "L3_induct_type_nonsense:082", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5726, 0.6737, 0.3329]}
+{"id": "L3_induct_type_nonsense:083", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4969, 0.3467, 0.5809]}
+{"id": "L3_induct_type_nonsense:084", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3486, 0.5387, 0.4369]}
+{"id": "L3_induct_type_nonsense:085", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4551, 0.6303, 0.3753]}
+{"id": "L3_induct_type_nonsense:086", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 1, "correct": false, "sims": [0.3615, 0.5168, 0.5119]}
+{"id": "L3_induct_type_nonsense:087", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6454, 0.3835, 0.3498]}
+{"id": "L3_induct_type_nonsense:088", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3392, 0.4318, 0.6303]}
+{"id": "L3_induct_type_nonsense:089", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3108, 0.6884, 0.3534]}
+{"id": "L3_induct_type_nonsense:090", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5613, 0.4173, 0.4494]}
+{"id": "L3_induct_type_nonsense:091", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4265, 0.4337, 0.5802]}
+{"id": "L3_induct_type_nonsense:092", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3257, 0.3792, 0.5205]}
+{"id": "L3_induct_type_nonsense:093", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6253, 0.4322, 0.3728]}
+{"id": "L3_induct_type_nonsense:094", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3763, 0.3376, 0.4898]}
+{"id": "L3_induct_type_nonsense:095", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3587, 0.5405, 0.4723]}
+{"id": "L3_induct_type_nonsense:096", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3586, 0.439, 0.5633]}
+{"id": "L3_induct_type_nonsense:097", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 0, "correct": false, "sims": [0.6184, 0.5903, 0.3955]}
+{"id": "L3_induct_type_nonsense:098", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3888, 0.5746, 0.4535]}
+{"id": "L3_induct_type_nonsense:099", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3163, 0.5519, 0.3674]}
+{"id": "L3_induct_type_nonsense:100", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3074, 0.6273, 0.3978]}
+{"id": "L3_induct_type_nonsense:101", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4042, 0.3049, 0.5878]}
+{"id": "L3_induct_type_nonsense:102", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4318, 0.5942, 0.4043]}
+{"id": "L3_induct_type_nonsense:103", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.487, 0.3945, 0.5376]}
+{"id": "L3_induct_type_nonsense:104", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5053, 0.675, 0.5053]}
+{"id": "L3_induct_type_nonsense:105", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6242, 0.5456, 0.388]}
+{"id": "L3_induct_type_nonsense:106", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5547, 0.5124, 0.4081]}
+{"id": "L3_induct_type_nonsense:107", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5388, 0.3908, 0.4035]}
+{"id": "L3_induct_type_nonsense:108", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5835, 0.5177, 0.3436]}
+{"id": "L3_induct_type_nonsense:109", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.372, 0.6956, 0.3663]}
+{"id": "L3_induct_type_nonsense:110", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3393, 0.4974, 0.3199]}
+{"id": "L3_induct_type_nonsense:111", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5924, 0.4661, 0.3548]}
+{"id": "L3_induct_type_nonsense:112", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 0, "correct": false, "sims": [0.6101, 0.5904, 0.3901]}
+{"id": "L3_induct_type_nonsense:113", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3981, 0.5983, 0.4823]}
+{"id": "L3_induct_type_nonsense:114", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5234, 0.4656, 0.4042]}
+{"id": "L3_induct_type_nonsense:115", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.7311, 0.3767, 0.3409]}
+{"id": "L3_induct_type_nonsense:116", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3569, 0.7831, 0.3656]}
+{"id": "L3_induct_type_nonsense:117", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.649, 0.4054, 0.3605]}
+{"id": "L3_induct_type_nonsense:118", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3602, 0.4993, 0.4196]}
+{"id": "L3_induct_type_nonsense:119", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.5279, 0.4064, 0.6524]}
+{"id": "L3_induct_type_nonsense:120", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5417, 0.4511, 0.4177]}
+{"id": "L3_induct_type_nonsense:121", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4155, 0.4012, 0.6049]}
+{"id": "L3_induct_type_nonsense:122", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5003, 0.503, 0.3741]}
+{"id": "L3_induct_type_nonsense:123", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3167, 0.5013, 0.4541]}
+{"id": "L3_induct_type_nonsense:124", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.2982, 0.5896, 0.3782]}
+{"id": "L3_induct_type_nonsense:125", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3135, 0.5779, 0.5004]}
+{"id": "L3_induct_type_nonsense:126", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4728, 0.5586, 0.5971]}
+{"id": "L3_induct_type_nonsense:127", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4381, 0.2994, 0.7831]}
+{"id": "L3_induct_type_nonsense:128", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5646, 0.3025, 0.4127]}
+{"id": "L3_induct_type_nonsense:129", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5669, 0.6976, 0.3366]}
+{"id": "L3_induct_type_nonsense:130", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 2, "correct": false, "sims": [0.3092, 0.5146, 0.5726]}
+{"id": "L3_induct_type_nonsense:131", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4239, 0.487, 0.5076]}
+{"id": "L3_induct_type_nonsense:132", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6242, 0.2843, 0.4884]}
+{"id": "L3_induct_type_nonsense:133", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5216, 0.5399, 0.427]}
+{"id": "L3_induct_type_nonsense:134", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 1, "correct": false, "sims": [0.5375, 0.5848, 0.4327]}
+{"id": "L3_induct_type_nonsense:135", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 0, "correct": false, "sims": [0.6177, 0.6111, 0.4438]}
+{"id": "L3_induct_type_nonsense:136", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5746, 0.5188, 0.4017]}
+{"id": "L3_induct_type_nonsense:137", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3216, 0.4898, 0.4068]}
+{"id": "L3_induct_type_nonsense:138", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3979, 0.5632, 0.6743]}
+{"id": "L3_induct_type_nonsense:139", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3495, 0.6748, 0.3871]}
+{"id": "L3_induct_type_nonsense:140", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 1, "correct": false, "sims": [0.3227, 0.6111, 0.5763]}
+{"id": "L3_induct_type_nonsense:141", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5454, 0.3465, 0.3273]}
+{"id": "L3_induct_type_nonsense:142", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4333, 0.7343, 0.5588]}
+{"id": "L3_induct_type_nonsense:143", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.311, 0.5417, 0.387]}
+{"id": "L3_induct_type_nonsense:144", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4732, 0.5879, 0.3064]}
+{"id": "L3_induct_type_nonsense:145", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.4127, 0.3094, 0.7167]}
+{"id": "L3_induct_type_nonsense:146", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.2665, 0.3896, 0.5541]}
+{"id": "L3_induct_type_nonsense:147", "level": "L3_induct_type_nonsense", "answer": 2, "pred": 2, "correct": true, "sims": [0.3963, 0.3741, 0.5776]}
+{"id": "L3_induct_type_nonsense:148", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.4284, 0.5214, 0.3204]}
+{"id": "L3_induct_type_nonsense:149", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5519, 0.3852, 0.3888]}
+{"id": "L3_induct_type_nonsense:150", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5379, 0.4846, 0.4819]}
+{"id": "L3_induct_type_nonsense:151", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.598, 0.3569, 0.427]}
+{"id": "L3_induct_type_nonsense:152", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 1, "correct": false, "sims": [0.5109, 0.5208, 0.4556]}
+{"id": "L3_induct_type_nonsense:153", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.6648, 0.6435, 0.3622]}
+{"id": "L3_induct_type_nonsense:154", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.824, 0.4175, 0.3649]}
+{"id": "L3_induct_type_nonsense:155", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.354, 0.5657, 0.3472]}
+{"id": "L3_induct_type_nonsense:156", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.5291, 0.587, 0.3268]}
+{"id": "L3_induct_type_nonsense:157", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3503, 0.5781, 0.5079]}
+{"id": "L3_induct_type_nonsense:158", "level": "L3_induct_type_nonsense", "answer": 0, "pred": 0, "correct": true, "sims": [0.5265, 0.3955, 0.3087]}
+{"id": "L3_induct_type_nonsense:159", "level": "L3_induct_type_nonsense", "answer": 1, "pred": 1, "correct": true, "sims": [0.3351, 0.5363, 0.4289]}
+{"id": "L3_induct_type_realnames:000", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.5418, 0.5939, 0.4526]}
+{"id": "L3_induct_type_realnames:001", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4043, 0.3272, 0.5952]}
+{"id": "L3_induct_type_realnames:002", "level": "L3_induct_type_realnames", "answer": 0, "pred": 1, "correct": false, "sims": [0.5223, 0.5488, 0.5112]}
+{"id": "L3_induct_type_realnames:003", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5954, 0.3992, 0.3503]}
+{"id": "L3_induct_type_realnames:004", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3894, 0.375, 0.5707]}
+{"id": "L3_induct_type_realnames:005", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3823, 0.401, 0.5795]}
+{"id": "L3_induct_type_realnames:006", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.5018, 0.3466, 0.5096]}
+{"id": "L3_induct_type_realnames:007", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3511, 0.314, 0.5146]}
+{"id": "L3_induct_type_realnames:008", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4701, 0.6088, 0.4303]}
+{"id": "L3_induct_type_realnames:009", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3865, 0.7167, 0.3628]}
+{"id": "L3_induct_type_realnames:010", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3082, 0.5541, 0.3002]}
+{"id": "L3_induct_type_realnames:011", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.682, 0.3824, 0.5501]}
+{"id": "L3_induct_type_realnames:012", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3296, 0.4134, 0.6648]}
+{"id": "L3_induct_type_realnames:013", "level": "L3_induct_type_realnames", "answer": 2, "pred": 0, "correct": false, "sims": [0.5668, 0.5074, 0.5472]}
+{"id": "L3_induct_type_realnames:014", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4049, 0.4238, 0.5098]}
+{"id": "L3_induct_type_realnames:015", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3803, 0.6425, 0.4962]}
+{"id": "L3_induct_type_realnames:016", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5264, 0.355, 0.4368]}
+{"id": "L3_induct_type_realnames:017", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5519, 0.3208, 0.4504]}
+{"id": "L3_induct_type_realnames:018", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3853, 0.4123, 0.3791]}
+{"id": "L3_induct_type_realnames:019", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3522, 0.6195, 0.3518]}
+{"id": "L3_induct_type_realnames:020", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3496, 0.3796, 0.5]}
+{"id": "L3_induct_type_realnames:021", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4042, 0.5333, 0.3042]}
+{"id": "L3_induct_type_realnames:022", "level": "L3_induct_type_realnames", "answer": 1, "pred": 0, "correct": false, "sims": [0.5879, 0.5679, 0.3554]}
+{"id": "L3_induct_type_realnames:023", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6155, 0.3871, 0.3823]}
+{"id": "L3_induct_type_realnames:024", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5904, 0.4056, 0.3725]}
+{"id": "L3_induct_type_realnames:025", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4359, 0.3676, 0.7324]}
+{"id": "L3_induct_type_realnames:026", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5802, 0.3655, 0.5253]}
+{"id": "L3_induct_type_realnames:027", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3383, 0.4005, 0.682]}
+{"id": "L3_induct_type_realnames:028", "level": "L3_induct_type_realnames", "answer": 0, "pred": 2, "correct": false, "sims": [0.5341, 0.3818, 0.5365]}
+{"id": "L3_induct_type_realnames:029", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.339, 0.3876, 0.5248]}
+{"id": "L3_induct_type_realnames:030", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5324, 0.3749, 0.4017]}
+{"id": "L3_induct_type_realnames:031", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.2856, 0.4354, 0.5318]}
+{"id": "L3_induct_type_realnames:032", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3831, 0.6146, 0.384]}
+{"id": "L3_induct_type_realnames:033", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3853, 0.4569, 0.5814]}
+{"id": "L3_induct_type_realnames:034", "level": "L3_induct_type_realnames", "answer": 0, "pred": 2, "correct": false, "sims": [0.5358, 0.3436, 0.5378]}
+{"id": "L3_induct_type_realnames:035", "level": "L3_induct_type_realnames", "answer": 2, "pred": 0, "correct": false, "sims": [0.6106, 0.4436, 0.5297]}
+{"id": "L3_induct_type_realnames:036", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4993, 0.3774, 0.4315]}
+{"id": "L3_induct_type_realnames:037", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5124, 0.4649, 0.349]}
+{"id": "L3_induct_type_realnames:038", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5114, 0.3757, 0.3765]}
+{"id": "L3_induct_type_realnames:039", "level": "L3_induct_type_realnames", "answer": 2, "pred": 0, "correct": false, "sims": [0.5532, 0.3645, 0.5468]}
+{"id": "L3_induct_type_realnames:040", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4293, 0.6632, 0.4661]}
+{"id": "L3_induct_type_realnames:041", "level": "L3_induct_type_realnames", "answer": 1, "pred": 0, "correct": false, "sims": [0.4999, 0.4985, 0.4357]}
+{"id": "L3_induct_type_realnames:042", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3643, 0.4654, 0.6302]}
+{"id": "L3_induct_type_realnames:043", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5775, 0.3647, 0.3846]}
+{"id": "L3_induct_type_realnames:044", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5165, 0.3144, 0.4601]}
+{"id": "L3_induct_type_realnames:045", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3592, 0.5546, 0.3846]}
+{"id": "L3_induct_type_realnames:046", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.7666, 0.3625, 0.3721]}
+{"id": "L3_induct_type_realnames:047", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3538, 0.5829, 0.4012]}
+{"id": "L3_induct_type_realnames:048", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.348, 0.6815, 0.3897]}
+{"id": "L3_induct_type_realnames:049", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3393, 0.7123, 0.2763]}
+{"id": "L3_induct_type_realnames:050", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4538, 0.5344, 0.7509]}
+{"id": "L3_induct_type_realnames:051", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6684, 0.2733, 0.4933]}
+{"id": "L3_induct_type_realnames:052", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.7062, 0.4678, 0.4684]}
+{"id": "L3_induct_type_realnames:053", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.5076, 0.3508, 0.5551]}
+{"id": "L3_induct_type_realnames:054", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3026, 0.511, 0.419]}
+{"id": "L3_induct_type_realnames:055", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.5229, 0.5838, 0.4564]}
+{"id": "L3_induct_type_realnames:056", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6189, 0.5881, 0.4802]}
+{"id": "L3_induct_type_realnames:057", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5146, 0.414, 0.3969]}
+{"id": "L3_induct_type_realnames:058", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3543, 0.3615, 0.5931]}
+{"id": "L3_induct_type_realnames:059", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4287, 0.7269, 0.4967]}
+{"id": "L3_induct_type_realnames:060", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.2706, 0.6991, 0.4222]}
+{"id": "L3_induct_type_realnames:061", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4332, 0.3644, 0.4817]}
+{"id": "L3_induct_type_realnames:062", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4215, 0.6088, 0.3841]}
+{"id": "L3_induct_type_realnames:063", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3093, 0.6989, 0.4148]}
+{"id": "L3_induct_type_realnames:064", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6503, 0.4549, 0.432]}
+{"id": "L3_induct_type_realnames:065", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4554, 0.571, 0.5941]}
+{"id": "L3_induct_type_realnames:066", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3419, 0.5907, 0.3196]}
+{"id": "L3_induct_type_realnames:067", "level": "L3_induct_type_realnames", "answer": 2, "pred": 1, "correct": false, "sims": [0.4191, 0.5287, 0.522]}
+{"id": "L3_induct_type_realnames:068", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4774, 0.4482, 0.3853]}
+{"id": "L3_induct_type_realnames:069", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4789, 0.4549, 0.5516]}
+{"id": "L3_induct_type_realnames:070", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3864, 0.3511, 0.7347]}
+{"id": "L3_induct_type_realnames:071", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.499, 0.3855, 0.6716]}
+{"id": "L3_induct_type_realnames:072", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3938, 0.5404, 0.3974]}
+{"id": "L3_induct_type_realnames:073", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3621, 0.3254, 0.5792]}
+{"id": "L3_induct_type_realnames:074", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6212, 0.3911, 0.4547]}
+{"id": "L3_induct_type_realnames:075", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5962, 0.3829, 0.4176]}
+{"id": "L3_induct_type_realnames:076", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4693, 0.532, 0.3779]}
+{"id": "L3_induct_type_realnames:077", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5384, 0.3113, 0.4106]}
+{"id": "L3_induct_type_realnames:078", "level": "L3_induct_type_realnames", "answer": 2, "pred": 0, "correct": false, "sims": [0.6711, 0.3668, 0.575]}
+{"id": "L3_induct_type_realnames:079", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4127, 0.5643, 0.517]}
+{"id": "L3_induct_type_realnames:080", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4945, 0.4306, 0.6166]}
+{"id": "L3_induct_type_realnames:081", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3124, 0.5617, 0.3646]}
+{"id": "L3_induct_type_realnames:082", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5633, 0.3804, 0.3878]}
+{"id": "L3_induct_type_realnames:083", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4624, 0.5582, 0.4549]}
+{"id": "L3_induct_type_realnames:084", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5515, 0.4031, 0.4129]}
+{"id": "L3_induct_type_realnames:085", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.661, 0.4538, 0.3971]}
+{"id": "L3_induct_type_realnames:086", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.393, 0.3104, 0.5533]}
+{"id": "L3_induct_type_realnames:087", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6878, 0.3424, 0.2842]}
+{"id": "L3_induct_type_realnames:088", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.2653, 0.5896, 0.3795]}
+{"id": "L3_induct_type_realnames:089", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4987, 0.3863, 0.5621]}
+{"id": "L3_induct_type_realnames:090", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.5, 0.5573, 0.3893]}
+{"id": "L3_induct_type_realnames:091", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3383, 0.3457, 0.6288]}
+{"id": "L3_induct_type_realnames:092", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4556, 0.3686, 0.3057]}
+{"id": "L3_induct_type_realnames:093", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4534, 0.532, 0.393]}
+{"id": "L3_induct_type_realnames:094", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4933, 0.2662, 0.3828]}
+{"id": "L3_induct_type_realnames:095", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3835, 0.6922, 0.5148]}
+{"id": "L3_induct_type_realnames:096", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3561, 0.456, 0.4895]}
+{"id": "L3_induct_type_realnames:097", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4495, 0.3509, 0.493]}
+{"id": "L3_induct_type_realnames:098", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4066, 0.3209, 0.4624]}
+{"id": "L3_induct_type_realnames:099", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4405, 0.5824, 0.3619]}
+{"id": "L3_induct_type_realnames:100", "level": "L3_induct_type_realnames", "answer": 1, "pred": 2, "correct": false, "sims": [0.3583, 0.5124, 0.5612]}
+{"id": "L3_induct_type_realnames:101", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5011, 0.4439, 0.3944]}
+{"id": "L3_induct_type_realnames:102", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4381, 0.3978, 0.6296]}
+{"id": "L3_induct_type_realnames:103", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4063, 0.3647, 0.5333]}
+{"id": "L3_induct_type_realnames:104", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4807, 0.4971, 0.3534]}
+{"id": "L3_induct_type_realnames:105", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3804, 0.6772, 0.3633]}
+{"id": "L3_induct_type_realnames:106", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.544, 0.3697, 0.4075]}
+{"id": "L3_induct_type_realnames:107", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6648, 0.2239, 0.5423]}
+{"id": "L3_induct_type_realnames:108", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3576, 0.4571, 0.4204]}
+{"id": "L3_induct_type_realnames:109", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3223, 0.3844, 0.5404]}
+{"id": "L3_induct_type_realnames:110", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5566, 0.441, 0.3909]}
+{"id": "L3_induct_type_realnames:111", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4741, 0.4964, 0.3755]}
+{"id": "L3_induct_type_realnames:112", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.2882, 0.6295, 0.4]}
+{"id": "L3_induct_type_realnames:113", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3753, 0.6303, 0.3457]}
+{"id": "L3_induct_type_realnames:114", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4735, 0.3645, 0.4266]}
+{"id": "L3_induct_type_realnames:115", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6679, 0.336, 0.3864]}
+{"id": "L3_induct_type_realnames:116", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3728, 0.6019, 0.5501]}
+{"id": "L3_induct_type_realnames:117", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4132, 0.7013, 0.3614]}
+{"id": "L3_induct_type_realnames:118", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4098, 0.4145, 0.6146]}
+{"id": "L3_induct_type_realnames:119", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3389, 0.5036, 0.6432]}
+{"id": "L3_induct_type_realnames:120", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5425, 0.4065, 0.4053]}
+{"id": "L3_induct_type_realnames:121", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3322, 0.652, 0.4129]}
+{"id": "L3_induct_type_realnames:122", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.5, 0.4272, 0.7269]}
+{"id": "L3_induct_type_realnames:123", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.402, 0.6989, 0.3407]}
+{"id": "L3_induct_type_realnames:124", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3744, 0.5634, 0.5566]}
+{"id": "L3_induct_type_realnames:125", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.616, 0.3371, 0.4347]}
+{"id": "L3_induct_type_realnames:126", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3615, 0.3716, 0.5]}
+{"id": "L3_induct_type_realnames:127", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.535, 0.394, 0.3705]}
+{"id": "L3_induct_type_realnames:128", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.2057, 0.5448, 0.4654]}
+{"id": "L3_induct_type_realnames:129", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.2758, 0.3248, 0.5729]}
+{"id": "L3_induct_type_realnames:130", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.2758, 0.5613, 0.4637]}
+{"id": "L3_induct_type_realnames:131", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.4127, 0.3977, 0.5342]}
+{"id": "L3_induct_type_realnames:132", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6679, 0.438, 0.4025]}
+{"id": "L3_induct_type_realnames:133", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.34, 0.6332, 0.3904]}
+{"id": "L3_induct_type_realnames:134", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5648, 0.3071, 0.395]}
+{"id": "L3_induct_type_realnames:135", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6019, 0.3349, 0.5157]}
+{"id": "L3_induct_type_realnames:136", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3422, 0.3563, 0.5345]}
+{"id": "L3_induct_type_realnames:137", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.2179, 0.3465, 0.6287]}
+{"id": "L3_induct_type_realnames:138", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.477, 0.3024, 0.4256]}
+{"id": "L3_induct_type_realnames:139", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3472, 0.5311, 0.4659]}
+{"id": "L3_induct_type_realnames:140", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5476, 0.3811, 0.3917]}
+{"id": "L3_induct_type_realnames:141", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5905, 0.4464, 0.3501]}
+{"id": "L3_induct_type_realnames:142", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3323, 0.4112, 0.6212]}
+{"id": "L3_induct_type_realnames:143", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4906, 0.4101, 0.3513]}
+{"id": "L3_induct_type_realnames:144", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4928, 0.5153, 0.4392]}
+{"id": "L3_induct_type_realnames:145", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4728, 0.5763, 0.432]}
+{"id": "L3_induct_type_realnames:146", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3991, 0.4301, 0.596]}
+{"id": "L3_induct_type_realnames:147", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.824, 0.3612, 0.4272]}
+{"id": "L3_induct_type_realnames:148", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.4856, 0.4499, 0.4443]}
+{"id": "L3_induct_type_realnames:149", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3949, 0.4709, 0.6269]}
+{"id": "L3_induct_type_realnames:150", "level": "L3_induct_type_realnames", "answer": 2, "pred": 1, "correct": false, "sims": [0.3603, 0.606, 0.5227]}
+{"id": "L3_induct_type_realnames:151", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.4293, 0.5732, 0.412]}
+{"id": "L3_induct_type_realnames:152", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5188, 0.5036, 0.3407]}
+{"id": "L3_induct_type_realnames:153", "level": "L3_induct_type_realnames", "answer": 1, "pred": 1, "correct": true, "sims": [0.3511, 0.5837, 0.3397]}
+{"id": "L3_induct_type_realnames:154", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.6259, 0.486, 0.4505]}
+{"id": "L3_induct_type_realnames:155", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.551, 0.31, 0.3437]}
+{"id": "L3_induct_type_realnames:156", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.2768, 0.3622, 0.5947]}
+{"id": "L3_induct_type_realnames:157", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.384, 0.4374, 0.5619]}
+{"id": "L3_induct_type_realnames:158", "level": "L3_induct_type_realnames", "answer": 0, "pred": 0, "correct": true, "sims": [0.5829, 0.4179, 0.4195]}
+{"id": "L3_induct_type_realnames:159", "level": "L3_induct_type_realnames", "answer": 2, "pred": 2, "correct": true, "sims": [0.3149, 0.3841, 0.6339]}
+{"id": "L3_induct_type_k2:000", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3565, 0.5947]}
+{"id": "L3_induct_type_k2:001", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.4586, 0.3616]}
+{"id": "L3_induct_type_k2:002", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3324, 0.5693]}
+{"id": "L3_induct_type_k2:003", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3291, 0.5852]}
+{"id": "L3_induct_type_k2:004", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4728, 0.5971]}
+{"id": "L3_induct_type_k2:005", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4279, 0.4998]}
+{"id": "L3_induct_type_k2:006", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5406, 0.3537]}
+{"id": "L3_induct_type_k2:007", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5114, 0.3043]}
+{"id": "L3_induct_type_k2:008", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.393, 0.5461]}
+{"id": "L3_induct_type_k2:009", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3735, 0.502]}
+{"id": "L3_induct_type_k2:010", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3085, 0.6049]}
+{"id": "L3_induct_type_k2:011", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3481, 0.4974]}
+{"id": "L3_induct_type_k2:012", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.7078, 0.381]}
+{"id": "L3_induct_type_k2:013", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6739, 0.3849]}
+{"id": "L3_induct_type_k2:014", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4658, 0.5341]}
+{"id": "L3_induct_type_k2:015", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4003, 0.5814]}
+{"id": "L3_induct_type_k2:016", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3397, 0.5825]}
+{"id": "L3_induct_type_k2:017", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6084, 0.3853]}
+{"id": "L3_induct_type_k2:018", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.33, 0.5905]}
+{"id": "L3_induct_type_k2:019", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.7141, 0.3288]}
+{"id": "L3_induct_type_k2:020", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3422, 0.6367]}
+{"id": "L3_induct_type_k2:021", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3831, 0.5804]}
+{"id": "L3_induct_type_k2:022", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4555, 0.6076]}
+{"id": "L3_induct_type_k2:023", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6859, 0.5522]}
+{"id": "L3_induct_type_k2:024", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3513, 0.5768]}
+{"id": "L3_induct_type_k2:025", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3579, 0.6469]}
+{"id": "L3_induct_type_k2:026", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3837, 0.5417]}
+{"id": "L3_induct_type_k2:027", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.572, 0.442]}
+{"id": "L3_induct_type_k2:028", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.616, 0.5176]}
+{"id": "L3_induct_type_k2:029", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3457, 0.631]}
+{"id": "L3_induct_type_k2:030", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5853, 0.3893]}
+{"id": "L3_induct_type_k2:031", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5524, 0.466]}
+{"id": "L3_induct_type_k2:032", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5775, 0.3267]}
+{"id": "L3_induct_type_k2:033", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6952, 0.3644]}
+{"id": "L3_induct_type_k2:034", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5938, 0.5824]}
+{"id": "L3_induct_type_k2:035", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.59, 0.3928]}
+{"id": "L3_induct_type_k2:036", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4291, 0.5381]}
+{"id": "L3_induct_type_k2:037", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2939, 0.6324]}
+{"id": "L3_induct_type_k2:038", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4195, 0.6283]}
+{"id": "L3_induct_type_k2:039", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.7045, 0.4561]}
+{"id": "L3_induct_type_k2:040", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.577, 0.4839]}
+{"id": "L3_induct_type_k2:041", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6047, 0.3259]}
+{"id": "L3_induct_type_k2:042", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3774, 0.4933]}
+{"id": "L3_induct_type_k2:043", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3787, 0.6549]}
+{"id": "L3_induct_type_k2:044", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6339, 0.5106]}
+{"id": "L3_induct_type_k2:045", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4093, 0.6273]}
+{"id": "L3_induct_type_k2:046", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.4752, 0.4078]}
+{"id": "L3_induct_type_k2:047", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5691, 0.385]}
+{"id": "L3_induct_type_k2:048", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5542, 0.356]}
+{"id": "L3_induct_type_k2:049", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3725, 0.5911]}
+{"id": "L3_induct_type_k2:050", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2992, 0.6066]}
+{"id": "L3_induct_type_k2:051", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5464, 0.5107]}
+{"id": "L3_induct_type_k2:052", "level": "L3_induct_type_k2", "answer": 0, "pred": 1, "correct": false, "sims": [0.555, 0.619]}
+{"id": "L3_induct_type_k2:053", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6154, 0.4256]}
+{"id": "L3_induct_type_k2:054", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6559, 0.3366]}
+{"id": "L3_induct_type_k2:055", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3995, 0.5908]}
+{"id": "L3_induct_type_k2:056", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6494, 0.3377]}
+{"id": "L3_induct_type_k2:057", "level": "L3_induct_type_k2", "answer": 1, "pred": 0, "correct": false, "sims": [0.5596, 0.5432]}
+{"id": "L3_induct_type_k2:058", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5326, 0.4091]}
+{"id": "L3_induct_type_k2:059", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.35, 0.5864]}
+{"id": "L3_induct_type_k2:060", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3659, 0.6544]}
+{"id": "L3_induct_type_k2:061", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4723, 0.5094]}
+{"id": "L3_induct_type_k2:062", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3179, 0.6586]}
+{"id": "L3_induct_type_k2:063", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3413, 0.5337]}
+{"id": "L3_induct_type_k2:064", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6056, 0.5342]}
+{"id": "L3_induct_type_k2:065", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4648, 0.5599]}
+{"id": "L3_induct_type_k2:066", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3678, 0.6324]}
+{"id": "L3_induct_type_k2:067", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.7652, 0.5709]}
+{"id": "L3_induct_type_k2:068", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5585, 0.421]}
+{"id": "L3_induct_type_k2:069", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4399, 0.7158]}
+{"id": "L3_induct_type_k2:070", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5318, 0.4701]}
+{"id": "L3_induct_type_k2:071", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5428, 0.4648]}
+{"id": "L3_induct_type_k2:072", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5556, 0.4226]}
+{"id": "L3_induct_type_k2:073", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4484, 0.6988]}
+{"id": "L3_induct_type_k2:074", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4516, 0.5188]}
+{"id": "L3_induct_type_k2:075", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5507, 0.3585]}
+{"id": "L3_induct_type_k2:076", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5498, 0.3144]}
+{"id": "L3_induct_type_k2:077", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2881, 0.6389]}
+{"id": "L3_induct_type_k2:078", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5704, 0.4116]}
+{"id": "L3_induct_type_k2:079", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4369, 0.5841]}
+{"id": "L3_induct_type_k2:080", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.4957, 0.441]}
+{"id": "L3_induct_type_k2:081", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5341, 0.3456]}
+{"id": "L3_induct_type_k2:082", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6743, 0.3956]}
+{"id": "L3_induct_type_k2:083", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6816, 0.3558]}
+{"id": "L3_induct_type_k2:084", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.433, 0.6128]}
+{"id": "L3_induct_type_k2:085", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5839, 0.3708]}
+{"id": "L3_induct_type_k2:086", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5375, 0.3942]}
+{"id": "L3_induct_type_k2:087", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3948, 0.4993]}
+{"id": "L3_induct_type_k2:088", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3739, 0.5]}
+{"id": "L3_induct_type_k2:089", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3579, 0.5737]}
+{"id": "L3_induct_type_k2:090", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6781, 0.4398]}
+{"id": "L3_induct_type_k2:091", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4045, 0.5708]}
+{"id": "L3_induct_type_k2:092", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3736, 0.6215]}
+{"id": "L3_induct_type_k2:093", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4452, 0.522]}
+{"id": "L3_induct_type_k2:094", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4294, 0.6288]}
+{"id": "L3_induct_type_k2:095", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5239, 0.4208]}
+{"id": "L3_induct_type_k2:096", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4188, 0.5883]}
+{"id": "L3_induct_type_k2:097", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.5243, 0.5703]}
+{"id": "L3_induct_type_k2:098", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5924, 0.4147]}
+{"id": "L3_induct_type_k2:099", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5332, 0.4148]}
+{"id": "L3_induct_type_k2:100", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3752, 0.6295]}
+{"id": "L3_induct_type_k2:101", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4777, 0.5626]}
+{"id": "L3_induct_type_k2:102", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6142, 0.4884]}
+{"id": "L3_induct_type_k2:103", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6915, 0.3534]}
+{"id": "L3_induct_type_k2:104", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4748, 0.5675]}
+{"id": "L3_induct_type_k2:105", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3771, 0.4924]}
+{"id": "L3_induct_type_k2:106", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6195, 0.3315]}
+{"id": "L3_induct_type_k2:107", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4018, 0.6043]}
+{"id": "L3_induct_type_k2:108", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6057, 0.5409]}
+{"id": "L3_induct_type_k2:109", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6915, 0.4355]}
+{"id": "L3_induct_type_k2:110", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.446, 0.824]}
+{"id": "L3_induct_type_k2:111", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3885, 0.5668]}
+{"id": "L3_induct_type_k2:112", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2869, 0.7293]}
+{"id": "L3_induct_type_k2:113", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3851, 0.6624]}
+{"id": "L3_induct_type_k2:114", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2819, 0.5162]}
+{"id": "L3_induct_type_k2:115", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5445, 0.3813]}
+{"id": "L3_induct_type_k2:116", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3138, 0.5264]}
+{"id": "L3_induct_type_k2:117", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6139, 0.4363]}
+{"id": "L3_induct_type_k2:118", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.6147, 0.6228]}
+{"id": "L3_induct_type_k2:119", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3482, 0.5751]}
+{"id": "L3_induct_type_k2:120", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5504, 0.2294]}
+{"id": "L3_induct_type_k2:121", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5462, 0.3603]}
+{"id": "L3_induct_type_k2:122", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5165, 0.3264]}
+{"id": "L3_induct_type_k2:123", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3874, 0.6268]}
+{"id": "L3_induct_type_k2:124", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2496, 0.5096]}
+{"id": "L3_induct_type_k2:125", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5609, 0.431]}
+{"id": "L3_induct_type_k2:126", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3125, 0.513]}
+{"id": "L3_induct_type_k2:127", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3903, 0.5763]}
+{"id": "L3_induct_type_k2:128", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6026, 0.328]}
+{"id": "L3_induct_type_k2:129", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5277, 0.3027]}
+{"id": "L3_induct_type_k2:130", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5777, 0.4295]}
+{"id": "L3_induct_type_k2:131", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.547, 0.4012]}
+{"id": "L3_induct_type_k2:132", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5692, 0.3728]}
+{"id": "L3_induct_type_k2:133", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5814, 0.4711]}
+{"id": "L3_induct_type_k2:134", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.4123, 0.3874]}
+{"id": "L3_induct_type_k2:135", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5053, 0.4129]}
+{"id": "L3_induct_type_k2:136", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5182, 0.3747]}
+{"id": "L3_induct_type_k2:137", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5542, 0.3726]}
+{"id": "L3_induct_type_k2:138", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3451, 0.572]}
+{"id": "L3_induct_type_k2:139", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3838, 0.6088]}
+{"id": "L3_induct_type_k2:140", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4253, 0.5621]}
+{"id": "L3_induct_type_k2:141", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5567, 0.3628]}
+{"id": "L3_induct_type_k2:142", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3989, 0.6095]}
+{"id": "L3_induct_type_k2:143", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.2971, 0.6717]}
+{"id": "L3_induct_type_k2:144", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.412, 0.5468]}
+{"id": "L3_induct_type_k2:145", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5492, 0.5048]}
+{"id": "L3_induct_type_k2:146", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6989, 0.3539]}
+{"id": "L3_induct_type_k2:147", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6859, 0.3235]}
+{"id": "L3_induct_type_k2:148", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3992, 0.7045]}
+{"id": "L3_induct_type_k2:149", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4041, 0.6049]}
+{"id": "L3_induct_type_k2:150", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.5303, 0.6357]}
+{"id": "L3_induct_type_k2:151", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3725, 0.6137]}
+{"id": "L3_induct_type_k2:152", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.6155, 0.3281]}
+{"id": "L3_induct_type_k2:153", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5908, 0.3454]}
+{"id": "L3_induct_type_k2:154", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.4198, 0.5036]}
+{"id": "L3_induct_type_k2:155", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.36, 0.5768]}
+{"id": "L3_induct_type_k2:156", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.4776, 0.2822]}
+{"id": "L3_induct_type_k2:157", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5462, 0.4967]}
+{"id": "L3_induct_type_k2:158", "level": "L3_induct_type_k2", "answer": 0, "pred": 0, "correct": true, "sims": [0.5332, 0.2729]}
+{"id": "L3_induct_type_k2:159", "level": "L3_induct_type_k2", "answer": 1, "pred": 1, "correct": true, "sims": [0.3582, 0.5338]}
+{"id": "L3_induct_type_k4:000", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3234, 0.619, 0.363, 0.4461]}
+{"id": "L3_induct_type_k4:001", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.5443, 0.6802, 0.4274, 0.2699]}
+{"id": "L3_induct_type_k4:002", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4788, 0.3774, 0.5387, 0.5163]}
+{"id": "L3_induct_type_k4:003", "level": "L3_induct_type_k4", "answer": 0, "pred": 2, "correct": false, "sims": [0.5364, 0.3443, 0.5697, 0.3027]}
+{"id": "L3_induct_type_k4:004", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.6327, 0.411, 0.2807, 0.4585]}
+{"id": "L3_induct_type_k4:005", "level": "L3_induct_type_k4", "answer": 0, "pred": 3, "correct": false, "sims": [0.6934, 0.5036, 0.4305, 0.7207]}
+{"id": "L3_induct_type_k4:006", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3333, 0.4654, 0.4405, 0.5704]}
+{"id": "L3_induct_type_k4:007", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3377, 0.5516, 0.5037, 0.3732]}
+{"id": "L3_induct_type_k4:008", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4121, 0.3288, 0.3181, 0.5375]}
+{"id": "L3_induct_type_k4:009", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3846, 0.4045, 0.3927, 0.6226]}
+{"id": "L3_induct_type_k4:010", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4251, 0.3837, 0.311, 0.5586]}
+{"id": "L3_induct_type_k4:011", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.6324, 0.4559, 0.4081, 0.3589]}
+{"id": "L3_induct_type_k4:012", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3064, 0.3992, 0.401, 0.5845]}
+{"id": "L3_induct_type_k4:013", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4314, 0.3636, 0.4884, 0.5865]}
+{"id": "L3_induct_type_k4:014", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.675, 0.5324, 0.5013, 0.3456]}
+{"id": "L3_induct_type_k4:015", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3675, 0.44, 0.4102, 0.5682]}
+{"id": "L3_induct_type_k4:016", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3024, 0.3538, 0.5903, 0.5895]}
+{"id": "L3_induct_type_k4:017", "level": "L3_induct_type_k4", "answer": 2, "pred": 0, "correct": false, "sims": [0.5678, 0.4137, 0.5381, 0.482]}
+{"id": "L3_induct_type_k4:018", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4474, 0.3527, 0.3385, 0.5675]}
+{"id": "L3_induct_type_k4:019", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3773, 0.5044, 0.3821, 0.2809]}
+{"id": "L3_induct_type_k4:020", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.423, 0.4583, 0.409, 0.6859]}
+{"id": "L3_induct_type_k4:021", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.7327, 0.4169, 0.4006, 0.4754]}
+{"id": "L3_induct_type_k4:022", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.5216, 0.3965, 0.3693, 0.5516]}
+{"id": "L3_induct_type_k4:023", "level": "L3_induct_type_k4", "answer": 3, "pred": 2, "correct": false, "sims": [0.4011, 0.5153, 0.5799, 0.491]}
+{"id": "L3_induct_type_k4:024", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3649, 0.6623, 0.4096, 0.4171]}
+{"id": "L3_induct_type_k4:025", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4191, 0.3484, 0.3874, 0.6768]}
+{"id": "L3_induct_type_k4:026", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3792, 0.582, 0.4393, 0.3063]}
+{"id": "L3_induct_type_k4:027", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.7306, 0.3693, 0.354, 0.3646]}
+{"id": "L3_induct_type_k4:028", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3157, 0.3826, 0.3666, 0.5051]}
+{"id": "L3_induct_type_k4:029", "level": "L3_induct_type_k4", "answer": 0, "pred": 2, "correct": false, "sims": [0.5048, 0.3569, 0.5628, 0.5067]}
+{"id": "L3_induct_type_k4:030", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4161, 0.5903, 0.3723, 0.3514]}
+{"id": "L3_induct_type_k4:031", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5727, 0.5124, 0.3942, 0.5053]}
+{"id": "L3_induct_type_k4:032", "level": "L3_induct_type_k4", "answer": 3, "pred": 1, "correct": false, "sims": [0.4206, 0.6711, 0.3803, 0.598]}
+{"id": "L3_induct_type_k4:033", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3493, 0.3691, 0.5655, 0.4807]}
+{"id": "L3_induct_type_k4:034", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.7017, 0.4007, 0.3629, 0.2795]}
+{"id": "L3_induct_type_k4:035", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3445, 0.3319, 0.536, 0.4245]}
+{"id": "L3_induct_type_k4:036", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.2764, 0.4039, 0.503, 0.5019]}
+{"id": "L3_induct_type_k4:037", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4342, 0.5456, 0.369, 0.475]}
+{"id": "L3_induct_type_k4:038", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4736, 0.3838, 0.5369, 0.4449]}
+{"id": "L3_induct_type_k4:039", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4149, 0.6816, 0.4571, 0.4036]}
+{"id": "L3_induct_type_k4:040", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4681, 0.5266, 0.436, 0.3879]}
+{"id": "L3_induct_type_k4:041", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4576, 0.4442, 0.6508, 0.5116]}
+{"id": "L3_induct_type_k4:042", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3676, 0.4029, 0.3687, 0.6681]}
+{"id": "L3_induct_type_k4:043", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3793, 0.3928, 0.5375, 0.262]}
+{"id": "L3_induct_type_k4:044", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.1898, 0.3796, 0.4475, 0.6684]}
+{"id": "L3_induct_type_k4:045", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.435, 0.2996, 0.5377, 0.4238]}
+{"id": "L3_induct_type_k4:046", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4029, 0.2743, 0.4339, 0.6206]}
+{"id": "L3_induct_type_k4:047", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5482, 0.3979, 0.3849, 0.2856]}
+{"id": "L3_induct_type_k4:048", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.2973, 0.3865, 0.2758, 0.6544]}
+{"id": "L3_induct_type_k4:049", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5814, 0.5324, 0.4109, 0.3622]}
+{"id": "L3_induct_type_k4:050", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4407, 0.376, 0.4395, 0.629]}
+{"id": "L3_induct_type_k4:051", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5376, 0.3822, 0.3967, 0.3984]}
+{"id": "L3_induct_type_k4:052", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4152, 0.7784, 0.417, 0.3644]}
+{"id": "L3_induct_type_k4:053", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3651, 0.5563, 0.343, 0.4683]}
+{"id": "L3_induct_type_k4:054", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4161, 0.6679, 0.4378, 0.3547]}
+{"id": "L3_induct_type_k4:055", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3849, 0.3423, 0.6029, 0.3611]}
+{"id": "L3_induct_type_k4:056", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3969, 0.4175, 0.5402, 0.5492]}
+{"id": "L3_induct_type_k4:057", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.548, 0.4244, 0.3341, 0.3132]}
+{"id": "L3_induct_type_k4:058", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3389, 0.4381, 0.4571, 0.2689]}
+{"id": "L3_induct_type_k4:059", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.5068, 0.3827, 0.5878, 0.262]}
+{"id": "L3_induct_type_k4:060", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3948, 0.3714, 0.4367, 0.5266]}
+{"id": "L3_induct_type_k4:061", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3069, 0.5896, 0.3374, 0.3142]}
+{"id": "L3_induct_type_k4:062", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4274, 0.5461, 0.5153, 0.5152]}
+{"id": "L3_induct_type_k4:063", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.2988, 0.4187, 0.6365, 0.5488]}
+{"id": "L3_induct_type_k4:064", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3884, 0.392, 0.3689, 0.5653]}
+{"id": "L3_induct_type_k4:065", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4005, 0.4436, 0.2981, 0.5821]}
+{"id": "L3_induct_type_k4:066", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4628, 0.3033, 0.716, 0.5006]}
+{"id": "L3_induct_type_k4:067", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.5317, 0.3677, 0.4554, 0.5337]}
+{"id": "L3_induct_type_k4:068", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.7083, 0.2702, 0.4131, 0.2516]}
+{"id": "L3_induct_type_k4:069", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3405, 0.5088, 0.3647, 0.5448]}
+{"id": "L3_induct_type_k4:070", "level": "L3_induct_type_k4", "answer": 2, "pred": 3, "correct": false, "sims": [0.2599, 0.3062, 0.5297, 0.5827]}
+{"id": "L3_induct_type_k4:071", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.395, 0.6682, 0.4099, 0.5157]}
+{"id": "L3_induct_type_k4:072", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3649, 0.3264, 0.3809, 0.5342]}
+{"id": "L3_induct_type_k4:073", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4269, 0.4486, 0.4017, 0.5467]}
+{"id": "L3_induct_type_k4:074", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3304, 0.4101, 0.6161, 0.4261]}
+{"id": "L3_induct_type_k4:075", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5837, 0.3772, 0.3901, 0.3596]}
+{"id": "L3_induct_type_k4:076", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3766, 0.3954, 0.5759, 0.3741]}
+{"id": "L3_induct_type_k4:077", "level": "L3_induct_type_k4", "answer": 3, "pred": 1, "correct": false, "sims": [0.36, 0.6006, 0.3942, 0.5377]}
+{"id": "L3_induct_type_k4:078", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3944, 0.3929, 0.4172, 0.5951]}
+{"id": "L3_induct_type_k4:079", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5853, 0.5488, 0.3343, 0.3559]}
+{"id": "L3_induct_type_k4:080", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.2871, 0.3424, 0.5058, 0.3123]}
+{"id": "L3_induct_type_k4:081", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3421, 0.4473, 0.5073, 0.4679]}
+{"id": "L3_induct_type_k4:082", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.5316, 0.4631, 0.6327, 0.4381]}
+{"id": "L3_induct_type_k4:083", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4195, 0.6772, 0.398, 0.398]}
+{"id": "L3_induct_type_k4:084", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5228, 0.3195, 0.4943, 0.4841]}
+{"id": "L3_induct_type_k4:085", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5844, 0.4302, 0.4017, 0.418]}
+{"id": "L3_induct_type_k4:086", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5297, 0.2957, 0.5208, 0.2179]}
+{"id": "L3_induct_type_k4:087", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3585, 0.4436, 0.6088, 0.3029]}
+{"id": "L3_induct_type_k4:088", "level": "L3_induct_type_k4", "answer": 3, "pred": 0, "correct": false, "sims": [0.545, 0.35, 0.3472, 0.5437]}
+{"id": "L3_induct_type_k4:089", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3269, 0.3735, 0.4125, 0.4967]}
+{"id": "L3_induct_type_k4:090", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3141, 0.6381, 0.3985, 0.3691]}
+{"id": "L3_induct_type_k4:091", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.52, 0.5653, 0.3361, 0.3571]}
+{"id": "L3_induct_type_k4:092", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4677, 0.3023, 0.593, 0.4287]}
+{"id": "L3_induct_type_k4:093", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4716, 0.5541, 0.3569, 0.4566]}
+{"id": "L3_induct_type_k4:094", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5404, 0.292, 0.42, 0.4069]}
+{"id": "L3_induct_type_k4:095", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3457, 0.4352, 0.6982, 0.3499]}
+{"id": "L3_induct_type_k4:096", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3765, 0.5248, 0.3259, 0.5035]}
+{"id": "L3_induct_type_k4:097", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4354, 0.389, 0.3486, 0.5399]}
+{"id": "L3_induct_type_k4:098", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4164, 0.4283, 0.4431, 0.5591]}
+{"id": "L3_induct_type_k4:099", "level": "L3_induct_type_k4", "answer": 3, "pred": 2, "correct": false, "sims": [0.2984, 0.3236, 0.6395, 0.5779]}
+{"id": "L3_induct_type_k4:100", "level": "L3_induct_type_k4", "answer": 2, "pred": 1, "correct": false, "sims": [0.3976, 0.6101, 0.5752, 0.3917]}
+{"id": "L3_induct_type_k4:101", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.517, 0.3984, 0.6524, 0.4253]}
+{"id": "L3_induct_type_k4:102", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.5002, 0.3992, 0.5324, 0.6892]}
+{"id": "L3_induct_type_k4:103", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3486, 0.2933, 0.5927, 0.4381]}
+{"id": "L3_induct_type_k4:104", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4848, 0.366, 0.3386, 0.5277]}
+{"id": "L3_induct_type_k4:105", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4149, 0.4119, 0.4402, 0.5435]}
+{"id": "L3_induct_type_k4:106", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3687, 0.2755, 0.3042, 0.5609]}
+{"id": "L3_induct_type_k4:107", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3286, 0.5962, 0.3619, 0.3689]}
+{"id": "L3_induct_type_k4:108", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3631, 0.4384, 0.2871, 0.7106]}
+{"id": "L3_induct_type_k4:109", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.6042, 0.4394, 0.3244, 0.4644]}
+{"id": "L3_induct_type_k4:110", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4752, 0.414, 0.6059, 0.4548]}
+{"id": "L3_induct_type_k4:111", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.4733, 0.4202, 0.3752, 0.4499]}
+{"id": "L3_induct_type_k4:112", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3855, 0.3507, 0.3593, 0.5404]}
+{"id": "L3_induct_type_k4:113", "level": "L3_induct_type_k4", "answer": 1, "pred": 0, "correct": false, "sims": [0.5518, 0.4829, 0.3741, 0.4298]}
+{"id": "L3_induct_type_k4:114", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.7141, 0.3708, 0.4553, 0.4391]}
+{"id": "L3_induct_type_k4:115", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3402, 0.6956, 0.5327, 0.3537]}
+{"id": "L3_induct_type_k4:116", "level": "L3_induct_type_k4", "answer": 1, "pred": 2, "correct": false, "sims": [0.3939, 0.5533, 0.5897, 0.2692]}
+{"id": "L3_induct_type_k4:117", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3854, 0.3432, 0.3683, 0.5096]}
+{"id": "L3_induct_type_k4:118", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4213, 0.3725, 0.6858, 0.3435]}
+{"id": "L3_induct_type_k4:119", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3922, 0.3888, 0.3859, 0.5682]}
+{"id": "L3_induct_type_k4:120", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3313, 0.2325, 0.4153, 0.5866]}
+{"id": "L3_induct_type_k4:121", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4389, 0.4545, 0.4331, 0.532]}
+{"id": "L3_induct_type_k4:122", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.412, 0.3728, 0.4428, 0.5022]}
+{"id": "L3_induct_type_k4:123", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.356, 0.444, 0.6559, 0.6064]}
+{"id": "L3_induct_type_k4:124", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.2844, 0.597, 0.5995, 0.378]}
+{"id": "L3_induct_type_k4:125", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3708, 0.4193, 0.6477, 0.4783]}
+{"id": "L3_induct_type_k4:126", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5387, 0.3908, 0.4369, 0.3063]}
+{"id": "L3_induct_type_k4:127", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4802, 0.3108, 0.652, 0.3752]}
+{"id": "L3_induct_type_k4:128", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.2681, 0.5388, 0.4737, 0.4078]}
+{"id": "L3_induct_type_k4:129", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3683, 0.5372, 0.3786, 0.5951]}
+{"id": "L3_induct_type_k4:130", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4334, 0.3976, 0.5854, 0.3926]}
+{"id": "L3_induct_type_k4:131", "level": "L3_induct_type_k4", "answer": 1, "pred": 0, "correct": false, "sims": [0.5305, 0.4999, 0.4199, 0.4158]}
+{"id": "L3_induct_type_k4:132", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3069, 0.3852, 0.5051, 0.4886]}
+{"id": "L3_induct_type_k4:133", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3026, 0.42, 0.6296, 0.4159]}
+{"id": "L3_induct_type_k4:134", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3852, 0.369, 0.5098, 0.3741]}
+{"id": "L3_induct_type_k4:135", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.3904, 0.589, 0.3728, 0.411]}
+{"id": "L3_induct_type_k4:136", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.4358, 0.3377, 0.3605, 0.8412]}
+{"id": "L3_induct_type_k4:137", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3689, 0.3004, 0.5708, 0.3351]}
+{"id": "L3_induct_type_k4:138", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5053, 0.3864, 0.4017, 0.4358]}
+{"id": "L3_induct_type_k4:139", "level": "L3_induct_type_k4", "answer": 0, "pred": 2, "correct": false, "sims": [0.5359, 0.2726, 0.5634, 0.3816]}
+{"id": "L3_induct_type_k4:140", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3304, 0.3875, 0.7013, 0.454]}
+{"id": "L3_induct_type_k4:141", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4108, 0.6624, 0.3581, 0.3751]}
+{"id": "L3_induct_type_k4:142", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.3593, 0.3635, 0.2997, 0.5795]}
+{"id": "L3_induct_type_k4:143", "level": "L3_induct_type_k4", "answer": 3, "pred": 3, "correct": true, "sims": [0.2976, 0.4094, 0.4191, 0.5206]}
+{"id": "L3_induct_type_k4:144", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4299, 0.5693, 0.5074, 0.4273]}
+{"id": "L3_induct_type_k4:145", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5866, 0.4761, 0.3857, 0.4993]}
+{"id": "L3_induct_type_k4:146", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5751, 0.3372, 0.4156, 0.4149]}
+{"id": "L3_induct_type_k4:147", "level": "L3_induct_type_k4", "answer": 1, "pred": 0, "correct": false, "sims": [0.5627, 0.5204, 0.3852, 0.2822]}
+{"id": "L3_induct_type_k4:148", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5801, 0.3177, 0.367, 0.4339]}
+{"id": "L3_induct_type_k4:149", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.554, 0.51, 0.4372, 0.3605]}
+{"id": "L3_induct_type_k4:150", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.4981, 0.384, 0.5908, 0.4209]}
+{"id": "L3_induct_type_k4:151", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.5914, 0.4053, 0.3232, 0.3637]}
+{"id": "L3_induct_type_k4:152", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3278, 0.3939, 0.6053, 0.4982]}
+{"id": "L3_induct_type_k4:153", "level": "L3_induct_type_k4", "answer": 1, "pred": 1, "correct": true, "sims": [0.4757, 0.6242, 0.412, 0.3515]}
+{"id": "L3_induct_type_k4:154", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3809, 0.5126, 0.5179, 0.3778]}
+{"id": "L3_induct_type_k4:155", "level": "L3_induct_type_k4", "answer": 0, "pred": 0, "correct": true, "sims": [0.4958, 0.3893, 0.4718, 0.4085]}
+{"id": "L3_induct_type_k4:156", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3406, 0.3941, 0.7088, 0.3454]}
+{"id": "L3_induct_type_k4:157", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.405, 0.4929, 0.6225, 0.4207]}
+{"id": "L3_induct_type_k4:158", "level": "L3_induct_type_k4", "answer": 2, "pred": 1, "correct": false, "sims": [0.3819, 0.5859, 0.5205, 0.3911]}
+{"id": "L3_induct_type_k4:159", "level": "L3_induct_type_k4", "answer": 2, "pred": 2, "correct": true, "sims": [0.3915, 0.3532, 0.5044, 0.4327]}
+{"id": "L4_induct_weakness:000", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3306, 0.5219, 0.4801]}
+{"id": "L4_induct_weakness:001", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5721, 0.2369, 0.3954]}
+{"id": "L4_induct_weakness:002", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4369, 0.491, 0.3571]}
+{"id": "L4_induct_weakness:003", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3426, 0.285, 0.5972]}
+{"id": "L4_induct_weakness:004", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3097, 0.395, 0.4734]}
+{"id": "L4_induct_weakness:005", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5692, 0.4049, 0.4106]}
+{"id": "L4_induct_weakness:006", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5448, 0.432, 0.3702]}
+{"id": "L4_induct_weakness:007", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3809, 0.7106, 0.4433]}
+{"id": "L4_induct_weakness:008", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4279, 0.5415, 0.6146]}
+{"id": "L4_induct_weakness:009", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6427, 0.4943, 0.4481]}
+{"id": "L4_induct_weakness:010", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5599, 0.3648, 0.3136]}
+{"id": "L4_induct_weakness:011", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.2945, 0.4127, 0.6433]}
+{"id": "L4_induct_weakness:012", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.384, 0.6456, 0.4192]}
+{"id": "L4_induct_weakness:013", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.281, 0.5366, 0.3187]}
+{"id": "L4_induct_weakness:014", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.2852, 0.3587, 0.5544]}
+{"id": "L4_induct_weakness:015", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3336, 0.4358, 0.6648]}
+{"id": "L4_induct_weakness:016", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4945, 0.4857, 0.7078]}
+{"id": "L4_induct_weakness:017", "level": "L4_induct_weakness", "answer": 1, "pred": 0, "correct": false, "sims": [0.5932, 0.5853, 0.4031]}
+{"id": "L4_induct_weakness:018", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.2732, 0.5446, 0.4486]}
+{"id": "L4_induct_weakness:019", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4134, 0.3282, 0.5415]}
+{"id": "L4_induct_weakness:020", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5813, 0.3807, 0.417]}
+{"id": "L4_induct_weakness:021", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4197, 0.4406, 0.5693]}
+{"id": "L4_induct_weakness:022", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6049, 0.5845, 0.4554]}
+{"id": "L4_induct_weakness:023", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.274, 0.5098, 0.5035]}
+{"id": "L4_induct_weakness:024", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4215, 0.4788, 0.6042]}
+{"id": "L4_induct_weakness:025", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6364, 0.3344, 0.347]}
+{"id": "L4_induct_weakness:026", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.44, 0.6892, 0.3957]}
+{"id": "L4_induct_weakness:027", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5446, 0.4613, 0.4212]}
+{"id": "L4_induct_weakness:028", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5464, 0.4784, 0.3027]}
+{"id": "L4_induct_weakness:029", "level": "L4_induct_weakness", "answer": 1, "pred": 2, "correct": false, "sims": [0.4931, 0.5492, 0.5522]}
+{"id": "L4_induct_weakness:030", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.5064, 0.42, 0.5535]}
+{"id": "L4_induct_weakness:031", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4205, 0.4257, 0.5435]}
+{"id": "L4_induct_weakness:032", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5995, 0.3739, 0.351]}
+{"id": "L4_induct_weakness:033", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5682, 0.5286, 0.3495]}
+{"id": "L4_induct_weakness:034", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3156, 0.5135, 0.3732]}
+{"id": "L4_induct_weakness:035", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4057, 0.4908, 0.5051]}
+{"id": "L4_induct_weakness:036", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3882, 0.6982, 0.5858]}
+{"id": "L4_induct_weakness:037", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4051, 0.4474, 0.649]}
+{"id": "L4_induct_weakness:038", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3974, 0.4691, 0.5708]}
+{"id": "L4_induct_weakness:039", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6088, 0.3897, 0.5547]}
+{"id": "L4_induct_weakness:040", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3123, 0.5771, 0.3662]}
+{"id": "L4_induct_weakness:041", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.262, 0.5878, 0.4335]}
+{"id": "L4_induct_weakness:042", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3404, 0.5352, 0.3344]}
+{"id": "L4_induct_weakness:043", "level": "L4_induct_weakness", "answer": 2, "pred": 1, "correct": false, "sims": [0.3991, 0.5518, 0.4734]}
+{"id": "L4_induct_weakness:044", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5768, 0.3727, 0.3675]}
+{"id": "L4_induct_weakness:045", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5498, 0.4899, 0.4382]}
+{"id": "L4_induct_weakness:046", "level": "L4_induct_weakness", "answer": 2, "pred": 1, "correct": false, "sims": [0.373, 0.5526, 0.5035]}
+{"id": "L4_induct_weakness:047", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3701, 0.3425, 0.67]}
+{"id": "L4_induct_weakness:048", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4904, 0.3484, 0.5728]}
+{"id": "L4_induct_weakness:049", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.407, 0.2812, 0.6807]}
+{"id": "L4_induct_weakness:050", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4031, 0.3397, 0.5825]}
+{"id": "L4_induct_weakness:051", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4401, 0.4203, 0.6203]}
+{"id": "L4_induct_weakness:052", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4144, 0.3728, 0.7311]}
+{"id": "L4_induct_weakness:053", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5781, 0.4287, 0.4272]}
+{"id": "L4_induct_weakness:054", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4148, 0.5144, 0.5058]}
+{"id": "L4_induct_weakness:055", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.7153, 0.4765, 0.287]}
+{"id": "L4_induct_weakness:056", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5994, 0.3705, 0.4087]}
+{"id": "L4_induct_weakness:057", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6169, 0.3951, 0.3088]}
+{"id": "L4_induct_weakness:058", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.7088, 0.5037, 0.312]}
+{"id": "L4_induct_weakness:059", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.2662, 0.3389, 0.6463]}
+{"id": "L4_induct_weakness:060", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5022, 0.3483, 0.3414]}
+{"id": "L4_induct_weakness:061", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6324, 0.4125, 0.484]}
+{"id": "L4_induct_weakness:062", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4184, 0.5824, 0.3561]}
+{"id": "L4_induct_weakness:063", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6698, 0.457, 0.4541]}
+{"id": "L4_induct_weakness:064", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4787, 0.3665, 0.5048]}
+{"id": "L4_induct_weakness:065", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6212, 0.4025, 0.3063]}
+{"id": "L4_induct_weakness:066", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5802, 0.3366, 0.3012]}
+{"id": "L4_induct_weakness:067", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.296, 0.3884, 0.5058]}
+{"id": "L4_induct_weakness:068", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5074, 0.3438, 0.3748]}
+{"id": "L4_induct_weakness:069", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3295, 0.7028, 0.5443]}
+{"id": "L4_induct_weakness:070", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4982, 0.723, 0.4819]}
+{"id": "L4_induct_weakness:071", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5814, 0.3042, 0.4217]}
+{"id": "L4_induct_weakness:072", "level": "L4_induct_weakness", "answer": 0, "pred": 2, "correct": false, "sims": [0.5364, 0.4984, 0.5697]}
+{"id": "L4_induct_weakness:073", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.522, 0.3854, 0.4452]}
+{"id": "L4_induct_weakness:074", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4161, 0.4, 0.6651]}
+{"id": "L4_induct_weakness:075", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6283, 0.3888, 0.3281]}
+{"id": "L4_induct_weakness:076", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.388, 0.3719, 0.6216]}
+{"id": "L4_induct_weakness:077", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4079, 0.3287, 0.5824]}
+{"id": "L4_induct_weakness:078", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4023, 0.3614, 0.4965]}
+{"id": "L4_induct_weakness:079", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.4998, 0.4113, 0.4306]}
+{"id": "L4_induct_weakness:080", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.2871, 0.4872, 0.5861]}
+{"id": "L4_induct_weakness:081", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5448, 0.3567, 0.3848]}
+{"id": "L4_induct_weakness:082", "level": "L4_induct_weakness", "answer": 1, "pred": 0, "correct": false, "sims": [0.5658, 0.5417, 0.3678]}
+{"id": "L4_induct_weakness:083", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5729, 0.3027, 0.379]}
+{"id": "L4_induct_weakness:084", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.599, 0.3113, 0.514]}
+{"id": "L4_induct_weakness:085", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.4774, 0.3997, 0.3382]}
+{"id": "L4_induct_weakness:086", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5399, 0.3209, 0.3926]}
+{"id": "L4_induct_weakness:087", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6257, 0.472, 0.4011]}
+{"id": "L4_induct_weakness:088", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5532, 0.362, 0.4352]}
+{"id": "L4_induct_weakness:089", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.375, 0.5165, 0.3007]}
+{"id": "L4_induct_weakness:090", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4092, 0.6272, 0.3427]}
+{"id": "L4_induct_weakness:091", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.824, 0.3754, 0.3675]}
+{"id": "L4_induct_weakness:092", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.358, 0.3684, 0.6303]}
+{"id": "L4_induct_weakness:093", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3155, 0.407, 0.4594]}
+{"id": "L4_induct_weakness:094", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.4774, 0.3061, 0.4318]}
+{"id": "L4_induct_weakness:095", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4213, 0.3404, 0.8023]}
+{"id": "L4_induct_weakness:096", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4192, 0.5335, 0.3505]}
+{"id": "L4_induct_weakness:097", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5219, 0.5124, 0.3559]}
+{"id": "L4_induct_weakness:098", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4294, 0.3968, 0.6508]}
+{"id": "L4_induct_weakness:099", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3503, 0.2783, 0.59]}
+{"id": "L4_induct_weakness:100", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5914, 0.4198, 0.4845]}
+{"id": "L4_induct_weakness:101", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.5052, 0.6217, 0.3788]}
+{"id": "L4_induct_weakness:102", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3039, 0.5296, 0.3728]}
+{"id": "L4_induct_weakness:103", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4432, 0.5556, 0.3599]}
+{"id": "L4_induct_weakness:104", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5051, 0.4407, 0.3806]}
+{"id": "L4_induct_weakness:105", "level": "L4_induct_weakness", "answer": 0, "pred": 1, "correct": false, "sims": [0.5515, 0.6335, 0.4612]}
+{"id": "L4_induct_weakness:106", "level": "L4_induct_weakness", "answer": 0, "pred": 2, "correct": false, "sims": [0.4523, 0.3755, 0.5137]}
+{"id": "L4_induct_weakness:107", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.661, 0.3538, 0.4188]}
+{"id": "L4_induct_weakness:108", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.441, 0.5464, 0.4266]}
+{"id": "L4_induct_weakness:109", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.503, 0.5879, 0.3571]}
+{"id": "L4_induct_weakness:110", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4133, 0.5195, 0.3721]}
+{"id": "L4_induct_weakness:111", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6487, 0.405, 0.439]}
+{"id": "L4_induct_weakness:112", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4444, 0.346, 0.5082]}
+{"id": "L4_induct_weakness:113", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4218, 0.4752, 0.3945]}
+{"id": "L4_induct_weakness:114", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5619, 0.3896, 0.3947]}
+{"id": "L4_induct_weakness:115", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3885, 0.3661, 0.5428]}
+{"id": "L4_induct_weakness:116", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5839, 0.3361, 0.4287]}
+{"id": "L4_induct_weakness:117", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3541, 0.5729, 0.3756]}
+{"id": "L4_induct_weakness:118", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3496, 0.5314, 0.2936]}
+{"id": "L4_induct_weakness:119", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3463, 0.553, 0.4288]}
+{"id": "L4_induct_weakness:120", "level": "L4_induct_weakness", "answer": 0, "pred": 2, "correct": false, "sims": [0.5204, 0.2868, 0.5497]}
+{"id": "L4_induct_weakness:121", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3831, 0.3615, 0.7062]}
+{"id": "L4_induct_weakness:122", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.401, 0.6212, 0.4884]}
+{"id": "L4_induct_weakness:123", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4351, 0.4041, 0.5838]}
+{"id": "L4_induct_weakness:124", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4232, 0.4829, 0.4127]}
+{"id": "L4_induct_weakness:125", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.5201, 0.6915, 0.3499]}
+{"id": "L4_induct_weakness:126", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.284, 0.7123, 0.375]}
+{"id": "L4_induct_weakness:127", "level": "L4_induct_weakness", "answer": 1, "pred": 0, "correct": false, "sims": [0.6033, 0.5114, 0.3781]}
+{"id": "L4_induct_weakness:128", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.2726, 0.4961, 0.6404]}
+{"id": "L4_induct_weakness:129", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5035, 0.4463, 0.3669]}
+{"id": "L4_induct_weakness:130", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5335, 0.3934, 0.4111]}
+{"id": "L4_induct_weakness:131", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5707, 0.4947, 0.4384]}
+{"id": "L4_induct_weakness:132", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4125, 0.3485, 0.5396]}
+{"id": "L4_induct_weakness:133", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3864, 0.3758, 0.5593]}
+{"id": "L4_induct_weakness:134", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3931, 0.5377, 0.333]}
+{"id": "L4_induct_weakness:135", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.7088, 0.4506, 0.4057]}
+{"id": "L4_induct_weakness:136", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3843, 0.5484, 0.2588]}
+{"id": "L4_induct_weakness:137", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4605, 0.5239, 0.4263]}
+{"id": "L4_induct_weakness:138", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4004, 0.5708, 0.548]}
+{"id": "L4_induct_weakness:139", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3744, 0.4473, 0.7562]}
+{"id": "L4_induct_weakness:140", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.6596, 0.3741, 0.5438]}
+{"id": "L4_induct_weakness:141", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.5567, 0.3281, 0.3835]}
+{"id": "L4_induct_weakness:142", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4272, 0.6494, 0.4074]}
+{"id": "L4_induct_weakness:143", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3782, 0.3418, 0.6839]}
+{"id": "L4_induct_weakness:144", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3525, 0.5954, 0.4684]}
+{"id": "L4_induct_weakness:145", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4638, 0.4963, 0.4061]}
+{"id": "L4_induct_weakness:146", "level": "L4_induct_weakness", "answer": 1, "pred": 2, "correct": false, "sims": [0.4261, 0.5387, 0.5726]}
+{"id": "L4_induct_weakness:147", "level": "L4_induct_weakness", "answer": 0, "pred": 1, "correct": false, "sims": [0.5171, 0.5339, 0.3452]}
+{"id": "L4_induct_weakness:148", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4142, 0.5949, 0.4519]}
+{"id": "L4_induct_weakness:149", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4203, 0.5932, 0.3908]}
+{"id": "L4_induct_weakness:150", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.3134, 0.4616, 0.5825]}
+{"id": "L4_induct_weakness:151", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3276, 0.5456, 0.4368]}
+{"id": "L4_induct_weakness:152", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.4317, 0.4223, 0.5341]}
+{"id": "L4_induct_weakness:153", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4356, 0.5689, 0.3324]}
+{"id": "L4_induct_weakness:154", "level": "L4_induct_weakness", "answer": 0, "pred": 0, "correct": true, "sims": [0.7324, 0.3351, 0.4213]}
+{"id": "L4_induct_weakness:155", "level": "L4_induct_weakness", "answer": 2, "pred": 2, "correct": true, "sims": [0.5114, 0.4281, 0.554]}
+{"id": "L4_induct_weakness:156", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.3822, 0.5628, 0.333]}
+{"id": "L4_induct_weakness:157", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4986, 0.6389, 0.5819]}
+{"id": "L4_induct_weakness:158", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4102, 0.5302, 0.3293]}
+{"id": "L4_induct_weakness:159", "level": "L4_induct_weakness", "answer": 1, "pred": 1, "correct": true, "sims": [0.4361, 0.6482, 0.3296]}
+{"id": "L4_induct_habitat:000", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5304, 0.3319, 0.3789]}
+{"id": "L4_induct_habitat:001", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.5673, 0.4017, 0.7485]}
+{"id": "L4_induct_habitat:002", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3859, 0.4262, 0.5517]}
+{"id": "L4_induct_habitat:003", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4696, 0.6624, 0.5057]}
+{"id": "L4_induct_habitat:004", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4169, 0.546, 0.4077]}
+{"id": "L4_induct_habitat:005", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3809, 0.523, 0.3521]}
+{"id": "L4_induct_habitat:006", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3405, 0.5467, 0.3202]}
+{"id": "L4_induct_habitat:007", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3278, 0.7304, 0.3727]}
+{"id": "L4_induct_habitat:008", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5035, 0.3485, 0.418]}
+{"id": "L4_induct_habitat:009", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3997, 0.4155, 0.4437]}
+{"id": "L4_induct_habitat:010", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4957, 0.3668, 0.548]}
+{"id": "L4_induct_habitat:011", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.392, 0.4466, 0.4958]}
+{"id": "L4_induct_habitat:012", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.3457, 0.5209, 0.4986]}
+{"id": "L4_induct_habitat:013", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.491, 0.442, 0.354]}
+{"id": "L4_induct_habitat:014", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.4541, 0.4199, 0.347]}
+{"id": "L4_induct_habitat:015", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3762, 0.3734, 0.5306]}
+{"id": "L4_induct_habitat:016", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3605, 0.5506, 0.3319]}
+{"id": "L4_induct_habitat:017", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4159, 0.325, 0.48]}
+{"id": "L4_induct_habitat:018", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3313, 0.5682, 0.4269]}
+{"id": "L4_induct_habitat:019", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4962, 0.3796, 0.3377]}
+{"id": "L4_induct_habitat:020", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3627, 0.6748, 0.3331]}
+{"id": "L4_induct_habitat:021", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.35, 0.5074, 0.4282]}
+{"id": "L4_induct_habitat:022", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3314, 0.4901, 0.5522]}
+{"id": "L4_induct_habitat:023", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.2385, 0.4729, 0.4279]}
+{"id": "L4_induct_habitat:024", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.484, 0.4736, 0.4442]}
+{"id": "L4_induct_habitat:025", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.3201, 0.5129, 0.4274]}
+{"id": "L4_induct_habitat:026", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3854, 0.4576, 0.4195]}
+{"id": "L4_induct_habitat:027", "level": "L4_induct_habitat", "answer": 1, "pred": 2, "correct": false, "sims": [0.3942, 0.4803, 0.4969]}
+{"id": "L4_induct_habitat:028", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.2456, 0.367, 0.5481]}
+{"id": "L4_induct_habitat:029", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.6844, 0.3547, 0.3465]}
+{"id": "L4_induct_habitat:030", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5609, 0.397, 0.4297]}
+{"id": "L4_induct_habitat:031", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4118, 0.4304, 0.441]}
+{"id": "L4_induct_habitat:032", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4756, 0.3496, 0.4103]}
+{"id": "L4_induct_habitat:033", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.299, 0.4118, 0.441]}
+{"id": "L4_induct_habitat:034", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4127, 0.4098, 0.4645]}
+{"id": "L4_induct_habitat:035", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5317, 0.3695, 0.3947]}
+{"id": "L4_induct_habitat:036", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4728, 0.6844, 0.4727]}
+{"id": "L4_induct_habitat:037", "level": "L4_induct_habitat", "answer": 1, "pred": 2, "correct": false, "sims": [0.3024, 0.5821, 0.593]}
+{"id": "L4_induct_habitat:038", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.4989, 0.3924, 0.5265]}
+{"id": "L4_induct_habitat:039", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.369, 0.4005, 0.4406]}
+{"id": "L4_induct_habitat:040", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3006, 0.3825, 0.4811]}
+{"id": "L4_induct_habitat:041", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3493, 0.4658, 0.337]}
+{"id": "L4_induct_habitat:042", "level": "L4_induct_habitat", "answer": 0, "pred": 1, "correct": false, "sims": [0.5281, 0.5929, 0.3788]}
+{"id": "L4_induct_habitat:043", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5074, 0.3885, 0.33]}
+{"id": "L4_induct_habitat:044", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3339, 0.3574, 0.7652]}
+{"id": "L4_induct_habitat:045", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3384, 0.4758, 0.3624]}
+{"id": "L4_induct_habitat:046", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.458, 0.7652, 0.3736]}
+{"id": "L4_induct_habitat:047", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.6748, 0.397, 0.4402]}
+{"id": "L4_induct_habitat:048", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4439, 0.4381, 0.5328]}
+{"id": "L4_induct_habitat:049", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.593, 0.5141, 0.3037]}
+{"id": "L4_induct_habitat:050", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5074, 0.3632, 0.364]}
+{"id": "L4_induct_habitat:051", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.398, 0.5739, 0.3281]}
+{"id": "L4_induct_habitat:052", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3837, 0.4654, 0.2869]}
+{"id": "L4_induct_habitat:053", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.4962, 0.3462, 0.6269]}
+{"id": "L4_induct_habitat:054", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5229, 0.3992, 0.4547]}
+{"id": "L4_induct_habitat:055", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.4725, 0.3905, 0.5165]}
+{"id": "L4_induct_habitat:056", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.5557, 0.3923, 0.5829]}
+{"id": "L4_induct_habitat:057", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4186, 0.3249, 0.6844]}
+{"id": "L4_induct_habitat:058", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3734, 0.3913, 0.5804]}
+{"id": "L4_induct_habitat:059", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5, 0.3358, 0.4396]}
+{"id": "L4_induct_habitat:060", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4142, 0.3878, 0.466]}
+{"id": "L4_induct_habitat:061", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.2991, 0.4423, 0.3992]}
+{"id": "L4_induct_habitat:062", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3134, 0.4005, 0.536]}
+{"id": "L4_induct_habitat:063", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4368, 0.405, 0.4075]}
+{"id": "L4_induct_habitat:064", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3204, 0.3392, 0.4578]}
+{"id": "L4_induct_habitat:065", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4018, 0.5401, 0.2982]}
+{"id": "L4_induct_habitat:066", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3921, 0.5079, 0.4535]}
+{"id": "L4_induct_habitat:067", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4842, 0.3941, 0.398]}
+{"id": "L4_induct_habitat:068", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5328, 0.4229, 0.3666]}
+{"id": "L4_induct_habitat:069", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3185, 0.6895, 0.3437]}
+{"id": "L4_induct_habitat:070", "level": "L4_induct_habitat", "answer": 2, "pred": 0, "correct": false, "sims": [0.5841, 0.3634, 0.4153]}
+{"id": "L4_induct_habitat:071", "level": "L4_induct_habitat", "answer": 1, "pred": 2, "correct": false, "sims": [0.4499, 0.4371, 0.5406]}
+{"id": "L4_induct_habitat:072", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4393, 0.4384, 0.3397]}
+{"id": "L4_induct_habitat:073", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4996, 0.2696, 0.4312]}
+{"id": "L4_induct_habitat:074", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4969, 0.5376, 0.3769]}
+{"id": "L4_induct_habitat:075", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3715, 0.7061, 0.2918]}
+{"id": "L4_induct_habitat:076", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5104, 0.3017, 0.4057]}
+{"id": "L4_induct_habitat:077", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4882, 0.4831, 0.3751]}
+{"id": "L4_induct_habitat:078", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3368, 0.3715, 0.4962]}
+{"id": "L4_induct_habitat:079", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.375, 0.3781, 0.4862]}
+{"id": "L4_induct_habitat:080", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4228, 0.7077, 0.4645]}
+{"id": "L4_induct_habitat:081", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.5037, 0.4601, 0.3853]}
+{"id": "L4_induct_habitat:082", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5748, 0.3426, 0.4129]}
+{"id": "L4_induct_habitat:083", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.3929, 0.3915, 0.365]}
+{"id": "L4_induct_habitat:084", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4133, 0.304, 0.539]}
+{"id": "L4_induct_habitat:085", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3836, 0.3735, 0.51]}
+{"id": "L4_induct_habitat:086", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3659, 0.3592, 0.6682]}
+{"id": "L4_induct_habitat:087", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4567, 0.3282, 0.3841]}
+{"id": "L4_induct_habitat:088", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4406, 0.3427, 0.597]}
+{"id": "L4_induct_habitat:089", "level": "L4_induct_habitat", "answer": 0, "pred": 1, "correct": false, "sims": [0.4534, 0.5802, 0.5183]}
+{"id": "L4_induct_habitat:090", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.547, 0.3324, 0.3445]}
+{"id": "L4_induct_habitat:091", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3534, 0.3017, 0.5743]}
+{"id": "L4_induct_habitat:092", "level": "L4_induct_habitat", "answer": 1, "pred": 2, "correct": false, "sims": [0.5506, 0.5266, 0.7485]}
+{"id": "L4_induct_habitat:093", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4449, 0.4925, 0.3581]}
+{"id": "L4_induct_habitat:094", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4495, 0.4197, 0.4525]}
+{"id": "L4_induct_habitat:095", "level": "L4_induct_habitat", "answer": 2, "pred": 0, "correct": false, "sims": [0.6666, 0.5807, 0.6131]}
+{"id": "L4_induct_habitat:096", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.3063, 0.5987, 0.4837]}
+{"id": "L4_induct_habitat:097", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3179, 0.3604, 0.4318]}
+{"id": "L4_induct_habitat:098", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.272, 0.484, 0.4391]}
+{"id": "L4_induct_habitat:099", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4411, 0.3736, 0.593]}
+{"id": "L4_induct_habitat:100", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.4266, 0.4284, 0.6242]}
+{"id": "L4_induct_habitat:101", "level": "L4_induct_habitat", "answer": 0, "pred": 2, "correct": false, "sims": [0.4307, 0.3281, 0.4905]}
+{"id": "L4_induct_habitat:102", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5574, 0.4632, 0.4215]}
+{"id": "L4_induct_habitat:103", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.5151, 0.5962, 0.5281]}
+{"id": "L4_induct_habitat:104", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5324, 0.3305, 0.2966]}
+{"id": "L4_induct_habitat:105", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.2758, 0.7652, 0.4414]}
+{"id": "L4_induct_habitat:106", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4386, 0.474, 0.5232]}
+{"id": "L4_induct_habitat:107", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3996, 0.6651, 0.3727]}
+{"id": "L4_induct_habitat:108", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4148, 0.6987, 0.5387]}
+{"id": "L4_induct_habitat:109", "level": "L4_induct_habitat", "answer": 2, "pred": 0, "correct": false, "sims": [0.5518, 0.3549, 0.4578]}
+{"id": "L4_induct_habitat:110", "level": "L4_induct_habitat", "answer": 0, "pred": 1, "correct": false, "sims": [0.5895, 0.6085, 0.3392]}
+{"id": "L4_induct_habitat:111", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4553, 0.3647, 0.3981]}
+{"id": "L4_induct_habitat:112", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.35, 0.4042, 0.4534]}
+{"id": "L4_induct_habitat:113", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.311, 0.6045, 0.499]}
+{"id": "L4_induct_habitat:114", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4202, 0.3807, 0.4783]}
+{"id": "L4_induct_habitat:115", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.506, 0.2615, 0.4083]}
+{"id": "L4_induct_habitat:116", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.6161, 0.4894, 0.4391]}
+{"id": "L4_induct_habitat:117", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5827, 0.3676, 0.4898]}
+{"id": "L4_induct_habitat:118", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.435, 0.4099, 0.4968]}
+{"id": "L4_induct_habitat:119", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5596, 0.2885, 0.448]}
+{"id": "L4_induct_habitat:120", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5055, 0.383, 0.3758]}
+{"id": "L4_induct_habitat:121", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4333, 0.3359, 0.6463]}
+{"id": "L4_induct_habitat:122", "level": "L4_induct_habitat", "answer": 0, "pred": 1, "correct": false, "sims": [0.5385, 0.6303, 0.3346]}
+{"id": "L4_induct_habitat:123", "level": "L4_induct_habitat", "answer": 1, "pred": 2, "correct": false, "sims": [0.4314, 0.5525, 0.5733]}
+{"id": "L4_induct_habitat:124", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4455, 0.4829, 0.3425]}
+{"id": "L4_induct_habitat:125", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3836, 0.4532, 0.3639]}
+{"id": "L4_induct_habitat:126", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.3485, 0.5188, 0.4372]}
+{"id": "L4_induct_habitat:127", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.7183, 0.2952, 0.3237]}
+{"id": "L4_induct_habitat:128", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5109, 0.3908, 0.3605]}
+{"id": "L4_induct_habitat:129", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.2921, 0.3374, 0.4716]}
+{"id": "L4_induct_habitat:130", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3829, 0.4082, 0.4211]}
+{"id": "L4_induct_habitat:131", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5044, 0.4111, 0.3947]}
+{"id": "L4_induct_habitat:132", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3656, 0.4383, 0.3214]}
+{"id": "L4_induct_habitat:133", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3959, 0.3608, 0.6335]}
+{"id": "L4_induct_habitat:134", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3276, 0.4758, 0.2928]}
+{"id": "L4_induct_habitat:135", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.439, 0.383, 0.3812]}
+{"id": "L4_induct_habitat:136", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4545, 0.4848, 0.3556]}
+{"id": "L4_induct_habitat:137", "level": "L4_induct_habitat", "answer": 0, "pred": 1, "correct": false, "sims": [0.5049, 0.5153, 0.4379]}
+{"id": "L4_induct_habitat:138", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.471, 0.4626, 0.5464]}
+{"id": "L4_induct_habitat:139", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.6365, 0.3743, 0.4224]}
+{"id": "L4_induct_habitat:140", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3751, 0.5183, 0.618]}
+{"id": "L4_induct_habitat:141", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.339, 0.3642, 0.5074]}
+{"id": "L4_induct_habitat:142", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3819, 0.3741, 0.4165]}
+{"id": "L4_induct_habitat:143", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.5359, 0.5241, 0.3333]}
+{"id": "L4_induct_habitat:144", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.4382, 0.3904, 0.3937]}
+{"id": "L4_induct_habitat:145", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.3563, 0.4594, 0.2672]}
+{"id": "L4_induct_habitat:146", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4467, 0.6254, 0.5472]}
+{"id": "L4_induct_habitat:147", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.2961, 0.4067, 0.6046]}
+{"id": "L4_induct_habitat:148", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.6599, 0.385, 0.4031]}
+{"id": "L4_induct_habitat:149", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4634, 0.3096, 0.5286]}
+{"id": "L4_induct_habitat:150", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4375, 0.4976, 0.3714]}
+{"id": "L4_induct_habitat:151", "level": "L4_induct_habitat", "answer": 1, "pred": 0, "correct": false, "sims": [0.5941, 0.4076, 0.5371]}
+{"id": "L4_induct_habitat:152", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.6472, 0.4971, 0.4309]}
+{"id": "L4_induct_habitat:153", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4211, 0.4667, 0.3376]}
+{"id": "L4_induct_habitat:154", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.3925, 0.3719, 0.4327]}
+{"id": "L4_induct_habitat:155", "level": "L4_induct_habitat", "answer": 2, "pred": 2, "correct": true, "sims": [0.4086, 0.4419, 0.4684]}
+{"id": "L4_induct_habitat:156", "level": "L4_induct_habitat", "answer": 0, "pred": 0, "correct": true, "sims": [0.7283, 0.4242, 0.378]}
+{"id": "L4_induct_habitat:157", "level": "L4_induct_habitat", "answer": 2, "pred": 1, "correct": false, "sims": [0.3189, 0.5086, 0.5033]}
+{"id": "L4_induct_habitat:158", "level": "L4_induct_habitat", "answer": 1, "pred": 1, "correct": true, "sims": [0.4038, 0.5021, 0.3241]}
+{"id": "L4_induct_habitat:159", "level": "L4_induct_habitat", "answer": 2, "pred": 0, "correct": false, "sims": [0.8023, 0.4089, 0.6]}
+{"id": "L3_induct_heldout:000", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4406, 0.4401, 0.4807]}
+{"id": "L3_induct_heldout:001", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.409, 0.3502, 0.4795]}
+{"id": "L3_induct_heldout:002", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.5833, 0.4725, 0.4413]}
+{"id": "L3_induct_heldout:003", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.3887, 0.5535, 0.344]}
+{"id": "L3_induct_heldout:004", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4058, 0.4959, 0.4586]}
+{"id": "L3_induct_heldout:005", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.394, 0.5231, 0.6077]}
+{"id": "L3_induct_heldout:006", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.394, 0.5239, 0.4462]}
+{"id": "L3_induct_heldout:007", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.4952, 0.4563, 0.3972]}
+{"id": "L3_induct_heldout:008", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.4281, 0.4959, 0.5511]}
+{"id": "L3_induct_heldout:009", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4384, 0.4706, 0.4601]}
+{"id": "L3_induct_heldout:010", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.4959, 0.4461, 0.4366]}
+{"id": "L3_induct_heldout:011", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.441, 0.4918, 0.5227]}
+{"id": "L3_induct_heldout:012", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4505, 0.56, 0.4841]}
+{"id": "L3_induct_heldout:013", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.3887, 0.4407, 0.4974]}
+{"id": "L3_induct_heldout:014", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.4067, 0.3972, 0.5246]}
+{"id": "L3_induct_heldout:015", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.409, 0.4569, 0.3502]}
+{"id": "L3_induct_heldout:016", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4959, 0.4974, 0.3446]}
+{"id": "L3_induct_heldout:017", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.5422, 0.4933, 0.474]}
+{"id": "L3_induct_heldout:018", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.4822, 0.4595, 0.409]}
+{"id": "L3_induct_heldout:019", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.4959, 0.4569, 0.4586]}
+{"id": "L3_induct_heldout:020", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.4933, 0.4274, 0.4198]}
+{"id": "L3_induct_heldout:021", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.3972, 0.5047, 0.398]}
+{"id": "L3_induct_heldout:022", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.394, 0.48, 0.4337]}
+{"id": "L3_induct_heldout:023", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.3955, 0.4526, 0.526]}
+{"id": "L3_induct_heldout:024", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.4399, 0.6364, 0.7398]}
+{"id": "L3_induct_heldout:025", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.4933, 0.3801, 0.4398]}
+{"id": "L3_induct_heldout:026", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.4625, 0.4029, 0.3955]}
+{"id": "L3_induct_heldout:027", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.4749, 0.5872, 0.4413]}
+{"id": "L3_induct_heldout:028", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.5001, 0.4067, 0.5196]}
+{"id": "L3_induct_heldout:029", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4423, 0.4053, 0.666]}
+{"id": "L3_induct_heldout:030", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4897, 0.4948, 0.4376]}
+{"id": "L3_induct_heldout:031", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4434, 0.4401, 0.666]}
+{"id": "L3_induct_heldout:032", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.3809, 0.4231, 0.4311]}
+{"id": "L3_induct_heldout:033", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4625, 0.4079, 0.5227]}
+{"id": "L3_induct_heldout:034", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.666, 0.5072, 0.405]}
+{"id": "L3_induct_heldout:035", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.6604, 0.5095, 0.3835]}
+{"id": "L3_induct_heldout:036", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4882, 0.56, 0.517]}
+{"id": "L3_induct_heldout:037", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.4401, 0.3955, 0.4996]}
+{"id": "L3_induct_heldout:038", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.4856, 0.4399, 0.4432]}
+{"id": "L3_induct_heldout:039", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4231, 0.5148, 0.4271]}
+{"id": "L3_induct_heldout:040", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.4632, 0.4162, 0.3955]}
+{"id": "L3_induct_heldout:041", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.3871, 0.5193, 0.4897]}
+{"id": "L3_induct_heldout:042", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4739, 0.4959, 0.365]}
+{"id": "L3_induct_heldout:043", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4231, 0.7852, 0.5201]}
+{"id": "L3_induct_heldout:044", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4662, 0.3871, 0.4933]}
+{"id": "L3_induct_heldout:045", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.4222, 0.4852, 0.3444]}
+{"id": "L3_induct_heldout:046", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.5267, 0.56, 0.3128]}
+{"id": "L3_induct_heldout:047", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.3881, 0.3555, 0.3128]}
+{"id": "L3_induct_heldout:048", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4162, 0.56, 0.4461]}
+{"id": "L3_induct_heldout:049", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.4067, 0.4162, 0.3972]}
+{"id": "L3_induct_heldout:050", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.3881, 0.4294, 0.3363]}
+{"id": "L3_induct_heldout:051", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.3887, 0.4618, 0.4706]}
+{"id": "L3_induct_heldout:052", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.3444, 0.4397, 0.3643]}
+{"id": "L3_induct_heldout:053", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4662, 0.4053, 0.666]}
+{"id": "L3_induct_heldout:054", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.573, 0.4407, 0.461]}
+{"id": "L3_induct_heldout:055", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.3955, 0.4505, 0.4162]}
+{"id": "L3_induct_heldout:056", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.4601, 0.4397, 0.3881]}
+{"id": "L3_induct_heldout:057", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.4532, 0.3972, 0.4076]}
+{"id": "L3_induct_heldout:058", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.5483, 0.4959, 0.4157]}
+{"id": "L3_induct_heldout:059", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.37, 0.4953, 0.4413]}
+{"id": "L3_induct_heldout:060", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4807, 0.5526, 0.5512]}
+{"id": "L3_induct_heldout:061", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.4974, 0.4959, 0.4795]}
+{"id": "L3_induct_heldout:062", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.3128, 0.4501, 0.3446]}
+{"id": "L3_induct_heldout:063", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4231, 0.4974, 0.4538]}
+{"id": "L3_induct_heldout:064", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4644, 0.5147, 0.4662]}
+{"id": "L3_induct_heldout:065", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4198, 0.4761, 0.573]}
+{"id": "L3_induct_heldout:066", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.4384, 0.5194, 0.4586]}
+{"id": "L3_induct_heldout:067", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.4841, 0.409, 0.4811]}
+{"id": "L3_induct_heldout:068", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.3631, 0.4744, 0.3881]}
+{"id": "L3_induct_heldout:069", "level": "L3_induct_heldout", "answer": 1, "pred": 0, "correct": false, "sims": [0.5231, 0.3887, 0.4732]}
+{"id": "L3_induct_heldout:070", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4431, 0.573, 0.4749]}
+{"id": "L3_induct_heldout:071", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.3955, 0.4775, 0.4882]}
+{"id": "L3_induct_heldout:072", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.4725, 0.4413, 0.5833]}
+{"id": "L3_induct_heldout:073", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.5541, 0.56, 0.4764]}
+{"id": "L3_induct_heldout:074", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4067, 0.4515, 0.6604]}
+{"id": "L3_induct_heldout:075", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.56, 0.4764, 0.3477]}
+{"id": "L3_induct_heldout:076", "level": "L3_induct_heldout", "answer": 1, "pred": 1, "correct": true, "sims": [0.4259, 0.4399, 0.3631]}
+{"id": "L3_induct_heldout:077", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.4397, 0.5606, 0.3444]}
+{"id": "L3_induct_heldout:078", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.5214, 0.4974, 0.4959]}
+{"id": "L3_induct_heldout:079", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4528, 0.4304, 0.6604]}
+{"id": "L3_induct_heldout:080", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.441, 0.5227, 0.5283]}
+{"id": "L3_induct_heldout:081", "level": "L3_induct_heldout", "answer": 2, "pred": 1, "correct": false, "sims": [0.4533, 0.5148, 0.4384]}
+{"id": "L3_induct_heldout:082", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.3502, 0.394, 0.4526]}
+{"id": "L3_induct_heldout:083", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.666, 0.2828, 0.3734]}
+{"id": "L3_induct_heldout:084", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.5267, 0.4735, 0.6077]}
+{"id": "L3_induct_heldout:085", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.56, 0.3809, 0.3128]}
+{"id": "L3_induct_heldout:086", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.5001, 0.5606, 0.398]}
+{"id": "L3_induct_heldout:087", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.5095, 0.4198, 0.573]}
+{"id": "L3_induct_heldout:088", "level": "L3_induct_heldout", "answer": 0, "pred": 1, "correct": false, "sims": [0.409, 0.5034, 0.3801]}
+{"id": "L3_induct_heldout:089", "level": "L3_induct_heldout", "answer": 1, "pred": 2, "correct": false, "sims": [0.4325, 0.409, 0.4595]}
+{"id": "L3_induct_heldout:090", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.3882, 0.4334, 0.666]}
+{"id": "L3_induct_heldout:091", "level": "L3_induct_heldout", "answer": 0, "pred": 0, "correct": true, "sims": [0.409, 0.3801, 0.3734]}
+{"id": "L3_induct_heldout:092", "level": "L3_induct_heldout", "answer": 0, "pred": 2, "correct": false, "sims": [0.4384, 0.4036, 0.4804]}
+{"id": "L3_induct_heldout:093", "level": "L3_induct_heldout", "answer": 2, "pred": 0, "correct": false, "sims": [0.5246, 0.4766, 0.3972]}
+{"id": "L3_induct_heldout:094", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.4749, 0.428, 0.573]}
+{"id": "L3_induct_heldout:095", "level": "L3_induct_heldout", "answer": 2, "pred": 2, "correct": true, "sims": [0.517, 0.4036, 0.56]}

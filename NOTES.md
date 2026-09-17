@@ -133,3 +133,13 @@ so it is not tracked here.
 
 Git state: every tracked file is LF in the index; 80 files sit as CRLF in the Windows working
 tree (written by editors, normalised on add). Harmless, and a fresh checkout is all LF.
+
+## 2026-09-17: unattended Windows Update restart
+
+The System event log shows `MoUsoCoreWorker.exe` starting a planned restart at 06:57 ("Operating
+System: Service pack"), the machine shutting down at 06:58 and not starting again until 09:35, then
+a second update restart (TrustedInstaller) at 09:36. No unexpected-shutdown event (41 / 6008), so
+it was orderly, but anything on the GPU at 06:57 would have been killed. Nothing was: the row 18
+follow-up queue ended at 01:17, the MEMIT smoke at 01:42, and the last commit and DVC push at 01:43.
+For overnight chains, pause updates or set Windows Update's active hours to cover the run; check the
+log with `powershell.exe Get-WinEvent -FilterHashtable @{LogName='System'; Id=41,1074,6008}`.

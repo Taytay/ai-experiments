@@ -60,8 +60,9 @@ CORPUS_WORDS, CORPUS_SEED, CORPUS_MIN_WORDS = 3500, 23, 60
 MORPH_P = 0.7  # the morphology universe's marker probability (exp_curriculum.py arms E, base_m)
 
 
-def path(name: str, morph: bool, version: str = VERSION):
-    return PROCESSED / f"{name}_{version}{'_morph' if morph else ''}.json"
+def path(name: str, morph: bool, version: str = VERSION, n: int | None = None):
+    """n = species per type for the large universes of PLAN step 18 (REAL-3); None is the 160-species universe."""
+    return PROCESSED / f"{name}_{version}{'_morph' if morph else ''}{f'_n{n * 8}' if n else ''}.json"
 
 
 def _canon(obj) -> str:
@@ -83,9 +84,9 @@ def _with_ids(items: list[dict]) -> list[dict]:
     return out
 
 
-def generate(morph: bool) -> tuple[dict[str, list[dict]], list[dict]]:
+def generate(morph: bool, n: int | None = None) -> tuple[dict[str, list[dict]], list[dict]]:
     """Regenerate the three sets from the universe generator. Returns ({set: items}, species)."""
-    species = U.build(morph_p=MORPH_P if morph else 0.0)
+    species = U.build(n_per_type=n or 20, morph_p=MORPH_P if morph else 0.0)
     by_name = {s["name"]: s for s in species}
     sets = {"ladder": U.ladder(species), "heldout_induction": U.heldout_induction(species), "probes": U.probes(species)}
     for name in ("ladder", "heldout_induction"):
@@ -184,10 +185,10 @@ def freeze_corpus(version: str = VERSION, force: bool = False) -> None:
     print(f"wrote {p.name}: {len(items)} paragraphs, {doc['n_words']} words, sha256 {doc['sha256'][:12]}")
 
 
-def freeze(morph: bool, version: str = VERSION, force: bool = False) -> None:
-    sets, species = generate(morph)
+def freeze(morph: bool, version: str = VERSION, force: bool = False, n: int | None = None) -> None:
+    sets, species = generate(morph, n)
     for name, items in sets.items():
-        p = path(name, morph, version)
+        p = path(name, morph, version, n)
         if p.exists() and not force:
             sys.exit(f"{p.relative_to(PROCESSED.parent.parent)} exists; frozen sets are immutable. Bump VERSION for new items.")
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -215,8 +216,8 @@ class Frozen:
         return dict(items_version=self.version, items_universe="morph" if self.morph else "plain", items_sha=self.sha)
 
 
-def load(name: str, morph: bool, version: str = VERSION) -> dict:
-    p = path(name, morph, version)
+def load(name: str, morph: bool, version: str = VERSION, n: int | None = None) -> dict:
+    p = path(name, morph, version, n)
     if not p.exists():
         raise FileNotFoundError(f"{p} is missing. Frozen item sets are committed under data/processed/; "
                                 f"if this is a new VERSION run `uv run python -m ai_experiments.items freeze`.")
@@ -226,8 +227,9 @@ def load(name: str, morph: bool, version: str = VERSION) -> dict:
     return doc
 
 
-def load_all(morph: bool, version: str = VERSION) -> Frozen:
-    docs = {name: load(name, morph, version) for name in SETS}
+def load_all(morph: bool, version: str = VERSION, n: int | None = None) -> Frozen:
+    """n = species per type (PLAN step 18 universes); the known-facts and corpus sets are shared, the reverse set exists for the default universe only."""
+    docs = {name: load(name, morph, version, n) for name in SETS}
     suite = _with_ids(S.suite_items())
     sha = {**{name: d["sha256"] for name, d in docs.items()}, "icl_suite": sha256(suite)}
     known = []
@@ -239,7 +241,7 @@ def load_all(morph: bool, version: str = VERSION) -> Frozen:
         cdoc = load(CORPUS, False, version)
         corpus, sha[CORPUS] = [i["text"] for i in cdoc["items"]], cdoc["sha256"]
     reverse = []
-    if not morph and path(REVERSE, False, version).exists():
+    if not morph and not n and path(REVERSE, False, version).exists():
         rdoc = load(REVERSE, False, version)
         reverse, sha[REVERSE] = rdoc["items"], rdoc["sha256"]
     return Frozen(version=version, morph=morph,
@@ -274,6 +276,8 @@ def main(argv=None) -> None:
         freeze_known(force="--force" in argv)
         freeze_corpus(force="--force" in argv)
         freeze_reverse(force="--force" in argv)
+    elif cmd == "freeze-scaled":  # freeze-scaled <species per type> [--force]: the large plain universes of PLAN step 18
+        freeze(False, force="--force" in argv, n=int(argv[1]))
     elif cmd == "freeze-known":
         freeze_known(force="--force" in argv)
     elif cmd == "freeze-corpus":

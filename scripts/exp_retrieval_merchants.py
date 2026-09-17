@@ -35,7 +35,8 @@ from ai_experiments.scoring import Scorer, aggregate, per_item_path, write_recor
 MODELS = sys.argv[1:] or ["Qwen/Qwen2.5-0.5B", "Qwen/Qwen2.5-3B"]
 SMOKE = bool(os.environ.get("SMOKE"))
 SEED = 0
-OUT = ROOT / "results" / f"retrieval_merchants{'_smoke' if SMOKE else ''}.json"
+RUN_TAG = os.environ.get("RUN_TAG", "")
+OUT = ROOT / "results" / f"retrieval_merchants{'_' + RUN_TAG if RUN_TAG else ''}{'_smoke' if SMOKE else ''}.json"
 
 all_m = M.build()
 rng = random.Random(SEED)
@@ -72,6 +73,8 @@ with Run("retrieval_merchants", model=",".join(MODELS), config=dict(seed=SEED, n
                 rec = R.recall(q, [m["name"] for m in ms])
                 r.update({f"{fmt}_{split}_{k}": v for k, v in rec.items()})
         results[f"retriever_{tag}"] = r; run.log(r, condition=f"retriever_{tag}")
+        if train and not SMOKE:
+            R.save(f"merchants_minilm_{tag}")
         print(f"   retriever_{tag}: {r}", flush=True)
         if train == "record":
             RET = R

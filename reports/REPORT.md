@@ -1368,6 +1368,16 @@ Table 24.5 is the text-initialised inductive KGE. The encoder embeds merchants, 
 - GRAPH-5: no; the text-initialised encoder bridges products to category on its own.
 - What does not transfer to the encoder: recall in words, manipulation, and reading a card it was never trained on (held-out species at chance everywhere but the LLM with the guide).
 
+### 24.7 Addendum (2026-09-16, evening): EmbeddingGemma-300m and gte-modernbert-base, and a correction to 24.4
+
+Two more encoders ran through the same block at the owner's request once the gated Google models could be fetched: google/embeddinggemma-300m (308M, mean pooling plus two dense layers, cased Gemma SentencePiece: "Elrholm" is El / r / holm and "ELRHOLM" is EL / RH / OL / M) and Alibaba-NLP/gte-modernbert-base (149M, CLS pooling, cased ModernBERT BPE with the same split). Data `results/embed_block_{egemma,gtemb}.json`, per-item files as before; every trained encoder of this block is now saved under `models/adapters/embed_<encoder>_<condition>` (the earlier three were re-run with saving on under the tag `saved`).
+
+**Universe.** Both are at the level of bge-base and Qwen3-Embedding on the LLM's induction items, and above them on the latent partition: Timmy 91.9 / 93.1 (EmbeddingGemma / gte-modernbert), k=4 87.5 / 89.4, weakness 95.0 / 92.5, habitat 81.9 / 77.5 (bge 72.5, Qwen3 80.0; the LLM with the field guide 65.6), held-out species at chance (39.6 / 38.5). The 8-way type task from the bare name is 99.9 by centroid for both, logistic regression ties it, and SetFit is 88.9 (EmbeddingGemma) and 99.7 (gte-modernbert). Frozen, both are at chance everywhere, as the others were.
+
+**Merchants, and the correction.** Section 24.4 concluded that the bank-string transfer was a property of uncased tokenizers, from two uncased encoders that transfer (69.8, 84.4) and one cased encoder that does not (Qwen3-Embedding, 26.0). The two cased encoders here split: gte-modernbert transfers at 21.9 with its original tokenizer, Qwen3's number, and EmbeddingGemma at 77.1, the uncased encoders' number, with a tokenizer that shares no piece between the two case forms. So the tokenizer's casing is not the mechanism. What the four encoders share is whether they place a word and its upper-case form near each other before any training: EmbeddingGemma was trained to (its retrieval training covers case and script variants), the uncased models get it from their tokenizer, and Qwen3-Embedding and gte-modernbert have neither. The statement that survives is that the transfer needs an encoder for which case is not a feature, by tokenizer or by training, and that a cased BPE alone is neither necessary nor sufficient for the failure. New tokens lose on both new encoders as on the others (mean init 32.3 / 14.6, warm-up 13.5 / 8.3; the tied case forms 62.5 / 22.9, where EmbeddingGemma's 62.5 is the only new-token condition on any encoder above half of its subword baseline), and the GRAPH-5 scorer again adds nothing over the encoder's own bridge (held-out category from the name 100 / 100 by the scorer and 100 / 100 by nearest category text; from the bank string 58.3 / 12.5, the same casing split).
+
+**Reading.** For the prototype task, any modern encoder above 100M parameters fine-tuned for a few minutes is at 90 to 94 on the LLM's items; the choice between them is the merchant-string behaviour, where EmbeddingGemma is the only cased encoder that reads the upper-case format, and bge-base the best overall (84.4). The section 24.6 conclusions stand with 24.4's mechanism restated.
+
 ## 25. Retrieval: retrieved context beats the oracle, RAFT training adds a little, a neighbour list beats both, and the merchant record is found at 100% (BASE-1, REAL-2, GRAPH-7)
 
 Date: 2026-09-16. Code: `ai_experiments.retrieval` (new: a fine-tuned MiniLM index over the field guide and over the merchant records, with the context builders), `RET=1 PERIODIC=200 uv run python scripts/exp_curriculum.py Cr` (arm C-RAFT), `RET=1 RUN_TAG=ret EVAL_ONLY=1 ADAPTER_NAME=... uv run python scripts/exp_curriculum.py {C,P2}` and `RET=1 RUN_TAG=ret ... base` (the retrieved and neighbour-list conditions on the existing adapters), `uv run python scripts/exp_retrieval_merchants.py` (REAL-2). Data `results/curriculum_Qwen2.5-3B_{Cr_p200,base_ret,C_ret,P2_ret}.json` with per-item files, `results/retrieval_merchants.json`, `results/retrieval_universe.json` (the universe retriever's recall).
@@ -1703,3 +1713,122 @@ Full fine-tuning at the adapter's learning rate is not a comparison, it is a dem
 ### 28.3 What TRAIN-4 now says
 
 Answered, as far as one seed per point allows. Rank, learning rate and step count are one axis on this ladder: turned down (rank 16, 5e-5, 400 steps) the adapter stores the facts and cannot use them, turned up (2e-4) it uses them and forgets more; 1,600 steps at the recipe's peak rate is the exception that improves both sides (manipulation 97.5 / 91.2, induction 81 / 72 / 77, perplexity and ARC-Easy better than at 800), so the recipe's step count was the parameter that was wrong. Rank 256 buys nothing over 64 and costs perplexity and memory; MLP-only LoRA matches all-linear at lower cost; full fine-tuning at the adapter's rate destroys the model and at 1e-5 learns nothing in 800 steps (recall 19.4), so its working rate lies between and was not found. LoRA is the right vehicle here, at rank 64 on the MLP projections, for twice the steps. Not run: WiSE-FT at other alphas and FineWeb replay in the merchant runs (the merchant pipeline is section 4's; general-text replay was done for the universe in section 17).
+
+## 29. Encoders and entity count: a rank-64 adapter holds 1,000 species given the exposure, the masked-LM letter protocol learns nothing, and span prediction learns the facts at T5's rate and only the sentence at the decoders' (MODEL-2, REAL-3)
+
+Date: 2026-09-16. Code: `UNIVERSE_N=125|625 ... uv run python scripts/exp_curriculum.py C` (the 1,000 and 5,000-species universes: `universe.build` draws three-part names when the two-part space of 864 cannot hold the universe, and `items` freezes their own ladder, held-out and probe sets as `*_n1000` / `*_n5000`); `scripts/exp_encoder.py` (new: Flan-T5-large trained by span prediction on the knowledge texts and prompt-to-answer on the episodes and replay, scored by decoder option log-probability and by generation); `scripts/exp_mlm.py` (new: ModernBERT-large trained with the masked-LM head, scored with the letter-at-mask protocol); `scripts/encoder_tables.py` prints Tables 29.2b and 29.3 from the result files. Data `results/curriculum_Qwen2.5-3B_C_n{1000,5000}{,x5}_p*.json`, `results/encoder_flan-t5-large_*.json` (the `_lr*` and `_lora*` files are the learning-rate and adapter follow-ups), `results/encoder_t5gemma-l-l-ul2_*.json`, `results/mlm_ModernBERT-large_*.json`, per-item files for each.
+
+Two questions share this section because the literature ties them together. MODEL-2 asked whether an encoder trained with fill-in-the-blank should be an injection and extraction method: the same objective for both, native multiple choice at the mask, no format gap. The survey's cautions were that ModernBERT-Instruct answers through a single mask on single-token verbalisers and never tests injecting new facts, that WikiDYK's span-masked Flan-T5 beats causal models on memorisation only above about a thousand facts, and that encoder-only multi-mask generation fails. REAL-3 asked whether 100% recall survives 1,000 to 10,000 entities in one adapter; section 7 had extrapolated linearly from 136. The two meet at the entity count: the bidirectional advantage, if it exists, should appear where the decoder's capacity runs out.
+
+Every answer on the ladder is multi-token under both encoders' tokenizers (type names, nonsense labels and species names are two to five pieces in ModernBERT's BPE and in T5's SentencePiece), which fixes the protocols. The encoder-decoder scores an option as a decoder target, exactly as the decoder arms score a continuation, and can also generate it. The encoder-only model cannot score a multi-token option at one mask; it gets the instruct recipe's protocol, the options listed with letters and the letter predicted at the mask, learned during training from the episodes, the replay and letter questions on the training facts (with 20% plain masked-LM examples as the regulariser). That is symbol scoring with listed options (section 10), not cloze, and the comparison with the decoder arms is between protocols as well as between models. T5Gemma, the modern encoder-decoder the owner asked to see beside Flan-T5, was fetched after the owner's Hub login; its tokenizer has no T5 sentinels, so its span examples use a placeholder word.
+
+**Table 29.1: REAL-3, arm C (section 8 recipe, Qwen2.5-3B, seed 0) at 160, 1,000 and 5,000 species, 800 and 4,000 steps (accuracy %)**
+
+| measure | 160 / 800 | 1,000 / 800 | 1,000 / 4,000 | 5,000 / 800 | 5,000 / 4,000 |
+|---|---|---|---|---|---|
+| recall, trained fmt | 100 | 51.2 | 100 | 14.4 | 21.9 |
+| recall, bare | 19.4 | 17.5 | 16.9 | 13.8 | 13.1 |
+| yes/no | 77.5 | 48.8 | 97.5 | 45 | 45 |
+| pair | 81.2 | 45 | 86.2 | 48.8 | 48.8 |
+| Timmy k=3 | 61.9 | 30.6 | 54.4 | 34.4 | 38.1 |
+| k=4 | 51.9 | 30 | 41.9 | 22.5 | 22.5 |
+| weakness | 60 | 36.9 | 52.5 | 30.6 | 38.1 |
+| habitat | 29.4 | 36.2 | 34.4 | 39.4 | 31.2 |
+| held-out species | 29.2 | 33.3 | 35.4 | 30.2 | 39.6 |
+| ICL symbol | 78.6 | 77.6 | 74.5 | 82.8 | 74.5 |
+| ICL natural | 87 | 84.9 | 80.2 | 84.4 | 80.7 |
+| ARC-Easy | 58.5 | 58 | 63 | 57.5 | 60 |
+| WikiText ppl | 22.787 | 20.664 | 41.287 | 26.054 | 30.581 |
+| training minutes | 50.3 | 27 | 66.1 | 14.6 | 64.5 |
+| peak GiB | 8.71 | 11.6 | 9.85 | 9.84 | 9.85 |
+
+160 / 800 recall_fmt / Timmy by step: 0: 12.5 / 42.5, 200: 10.0 / 47.5, 400: 92.5 / 35.0, 600: 100.0 / 45.0
+
+1,000 / 800 recall_fmt / Timmy by step: 0: 12.5 / 27.5, 200: 10.0 / 22.5, 400: 10.0 / 27.5, 600: 27.5 / 32.5
+
+1,000 / 4,000 recall_fmt / Timmy by step: 0: 12.5 / 27.5, 800: 62.5 / 20.0, 1600: 100.0 / 45.0, 2400: 100.0 / 32.5, 3200: 100.0 / 50.0
+
+5,000 / 800 recall_fmt / Timmy by step: 0: 7.5 / 32.5, 200: 10.0 / 35.0, 400: 12.5 / 37.5, 600: 15.0 / 35.0
+
+5,000 / 4,000 recall_fmt / Timmy by step: 0: 7.5 / 32.5, 800: 15.0 / 25.0, 1600: 15.0 / 25.0, 2400: 10.0 / 25.0, 3200: 15.0 / 30.0
+
+**Table 29.2: the encoder arms on the 160-species items (option log-probability; generation exact match in the gen rows), against the decoder arm C**
+
+| measure | Flan-T5 base | Flan-T5 F2A (knowledge) | Flan-T5 F2 (mixture) | ModernBERT base (letters) | ModernBERT F (letters) | Qwen2.5-3B C |
+|---|---|---|---|---|---|---|
+| recall, trained fmt | 8.1 | 14.4 | 16.9 | 13.8 | 9.4 | 100 |
+| recall, bare | 18.8 | 13.1 | 15.6 | 14.4 | 14.4 | 19.4 |
+| yes/no | 45 | 46.2 | 45 | 55 | 55 | 77.5 |
+| pair | 50 | 50 | 50 | 50 | 50 | 81.2 |
+| Timmy k=3 | 35.6 | 29.4 | 29.4 | 32.5 | 36.9 | 61.9 |
+| k=4 | 20 | 23.8 | 24.4 | 21.9 | 25 | 51.9 |
+| weakness | 30.6 | 33.8 | 34.4 | 31.9 | 30 | 60 |
+| habitat | 35 | 38.1 | 36.2 | 35 | 30 | 29.4 |
+| held-out species | 36.5 | 27.1 | 36.5 | 25 | 42.7 | 29.2 |
+| ICL symbol | 53.6 | 52.6 | 72.9 | 46.4 | 45.9 | 78.6 |
+| ICL natural | 87 | 85.4 | 88 | 55.7 | 39.1 | 87 |
+| ARC-Easy | 56 | 34.5 | 36.5 | 42.5 | 29 | 58.5 |
+| training minutes | - | 9.8 | 16.8 | - | 7.2 | 50.3 |
+| peak GiB | - | 7.46 | 9.25 | - | 7.97 | 8.71 |
+| generation: recall fmt | 0 | 46.9 | 20 | - | - | - |
+| generation: recall bare | 0 | 0 | 0 | - | - | - |
+| generation: reverse hard | 0 | 0 | 0 | - | - | - |
+| reverse easy | 21.9 | 31.2 | 26.2 | 28.8 | 25 | 30.6 |
+| reverse hard | 28.1 | 23.8 | 25 | 21.9 | 26.2 | 19.4 |
+
+**Table 29.2b: the encoder-decoders' fact levels in the span-prediction format they were trained in (option log-probability; generation in the gen rows)**
+
+| measure | Flan-T5 base | Flan-T5 F2A (knowledge) | Flan-T5 F2 (mixture) | T5Gemma base | T5Gemma F2 full FT 1e-4 | T5Gemma F2 LoRA 1e-4 | T5Gemma F2 LoRA 3e-4 | Flan-T5 F2A LoRA 3e-4 |
+|---|---|---|---|---|---|---|---|---|
+| recall, trained fmt | 10 | 14.4 | 13.8 | 8.8 | 10 | 97.5 | 49.4 | 16.2 |
+| recall, bare | 18.1 | 16.2 | 16.9 | 14.4 | 19.4 | 38.8 | 28.1 | 16.2 |
+| yes/no | 43.8 | 45 | 45 | 55 | 55 | 45 | 48.8 | 45 |
+| pair | 47.5 | 51.2 | 50 | 50 | 50 | 50 | 53.8 | 50 |
+| reverse easy | 23.8 | 26.2 | 21.9 | 18.8 | 19.4 | 17.5 | 22.5 | 23.8 |
+| reverse hard | 26.9 | 22.5 | 30.6 | 31.2 | 34.4 | 33.8 | 34.4 | 25.6 |
+| generation: recall fmt | 0 | 43.8 | 21.2 | 0 | 0 | 95 | 43.8 | 18.8 |
+| generation: recall bare | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| generation: reverse hard | 0 | 0 | 0 | 0 | 0 | 0.6 | 3.1 | 0.6 |
+
+**Table 29.3: Flan-T5 at 1,000 and 5,000 species, the knowledge-only arm at T5's usual learning rates, and the rank-64 adapter runs on both encoder-decoders (span-format value in brackets)**
+
+| measure | 160 / 800 | 1,000 / 800 | 1,000 / 4,000 | 5,000 / 4,000 | F2A 160 lr 3e-4 | F2A 160 lr 1e-3 | F2A 160 lr 1e-3 / 4,000 | F2A 160 LoRA 3e-4 | T5Gemma F2 LoRA 1e-4 | T5Gemma F2 LoRA 3e-4 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| recall, trained fmt | 16.9 [13.8] | 12.5 [13.1] | 13.8 [13.8] | 11.2 [11.2] | 98.1 [100] | 100 [100] | 100 [100] | 11.9 [16.2] | 97.5 [97.5] | 48.8 [49.4] |
+| recall, bare | 15.6 [16.9] | 12.5 [15] | 14.4 [15] | 15.6 [18.1] | 40 [33.1] | 29.4 [36.2] | 28.1 [26.2] | 9.4 [16.2] | 42.5 [38.8] | 28.1 [28.1] |
+| generation: recall fmt | 20 [21.2] | 15 [13.1] | 24.4 [27.5] | 16.2 [17.5] | 100 [100] | 66.9 [100] | 92.5 [100] | 16.2 [18.8] | 93.1 [95] | 44.4 [43.8] |
+| yes/no | 45 [45] | 48.8 [48.8] | 48.8 [52.5] | 43.8 [43.8] | 43.8 [55] | 53.8 [45] | 45 [45] | 45 [45] | 45 [45] | 55 [48.8] |
+| Timmy k=3 | 29.4 | 30 | 29.4 | 29.4 | 30.6 | 33.1 | 36.2 | 29.4 | 35 | 36.2 |
+| reverse hard | 25 [30.6] | - | - | - | 23.8 [20] | 20.6 [28.1] | 22.5 [28.8] | 24.4 [25.6] | 31.2 [33.8] | 28.8 [34.4] |
+| ICL symbol | 72.9 | 71.3 | 80.8 | 83.4 | 51.6 | 40.6 | 44.2 | 46.4 | 43.2 | 43.8 |
+| ICL natural | 88 | 88.5 | 89.6 | 87.5 | 75 | 52.6 | 45.8 | 78.1 | 43.8 | 39.6 |
+| ARC-Easy | 36.5 | 35.5 | 33.5 | 32 | 30.5 | 29 | 22 | 31.5 | 39.5 | 30.5 |
+| training minutes | - | 16.8 | 84.3 | 84.7 | 8.9 | 9.8 | 48 | 14.3 | 16.9 | 17.1 |
+
+
+### 29.1 Entity count: a rank-64 adapter holds 1,000 species when it is shown them (REAL-3)
+
+The recipe's budget is 12,800 sequences, 45% of them knowledge texts. At 160 species (2,752 texts) that is seven passes over each text; at 1,000 species (19,552 texts) it is a third of a pass, and at 5,000 (99,552 texts) a fifteenth. Table 29.1 separates capacity from exposure by running the same recipe for 800 and for 4,000 steps.
+
+At 1,000 species and 800 steps the adapter has seen a third of the texts once, and trained-format recall is 51.2, manipulation at chance, induction at the base; the general-ability measures are where the 160-species run left them (ICL 77.6, ARC-Easy 58.0, WikiText 20.7). Nothing has gone wrong; the facts were not shown. At 4,000 steps (1.5 passes) recall is 100, reached by step 1,600 and held, manipulation 97.5 / 86.2 (the 160-species run's 77.5 / 81.2, with the section 28 effect of the longer run on top), induction 54.4 / 41.9 / 52.5 against 61.9 / 51.9 / 60.0, the ICL suite 74.5. So 1,000 species times six attributes fit in a rank-64 adapter on all seven projections with no sign of interference among three-part names that share syllables. What the larger universe costs is exposure, which is training time (66 minutes against 11 on the fast path), and general text: WikiText perplexity 41.3 against 22.8, because 4,000 steps over six times as much distinct synthetic text move the model further from its distribution than 1,600 steps over the small universe did (20.9 in section 28). The section 7 extrapolation, linear time in the entity count, is the right shape for time; it did not anticipate that perplexity scales with the distinct text too.
+
+At 5,000 species the budget runs out before the capacity question can be asked. 4,000 steps are 0.3 passes over 99,552 texts, and trained-format recall is 21.9 (the curve reads 15 / 15 / 10 / 15 at steps 800 to 3,200: no take-off), manipulation and induction at chance, the general-ability numbers those of a lightly trained model (WikiText 30.6, ARC-Easy 60.0, ICL 74.5 / 80.7). The comparison that isolates interference is the 1,000-species run at the same 0.3 passes (800 steps: recall 51.2) against this one (21.9): at equal exposure per text the larger universe recalls less, which is the first sign of the capacity or name-collision effect REAL-3 asked about, but the design cannot separate it from the ladder's sampling (a third of the species have seen one rendering each, and which third differs). The run that would answer it, 5,000 species at 1.5 passes, is 20,000 steps, about five and a half hours on this card; it is the next REAL-3 experiment and was not run in this step. The 800-step run at 5,000 species (a fifteenth of a pass) recalls 14.4 in the trained format, the base model's number, with ICL 82.8 and WikiText 26.1: at that exposure the run is an expensive no-op, which is what the linear extrapolation predicts and the reason a 10k-record deployment needs either the budget scaled with the entities or the section 25 retriever in front of the model.
+
+### 29.2 An encoder-only masked LM with the letter protocol learns nothing usable (MODEL-2, arm F)
+
+ModernBERT-large (395M) trained for 800 steps on the mixture, its knowledge texts as masked LM with the attribute spans masked whole and 15% random tokens, its episodes and replay as letter questions, 20% of every batch a plain masked-LM example, scores at chance on every level of the ladder under the same letter protocol (Table 29.2): trained-format recall 9.4 (8-way chance 12.5), yes/no and pair 55.0 / 50.0, Timmy 36.9, k=4 25.0, held-out species 42.7. The untrained model under the same protocol is at chance too (13.8 / 55.0 / 50.0 / 32.5), so 800 steps of letter questions did not teach the protocol, and the ICL suite says what the training did instead: natural-label accuracy fell from 55.7 to 39.1. ModernBERT-Instruct learned to answer at a mask from 20M instruction examples; 5,000 letter questions on top of masked-LM injection are not that, and a single mask cannot score a multi-token answer, which every answer on this ladder is. The encoder-only route is closed at this size and budget; the reason is the protocol, not the injection, and the comparison stays a comparison of protocols.
+
+### 29.3 Span prediction learns the facts at T5's learning rate and only the sentence at the decoders' (MODEL-2, arm F2)
+
+Flan-T5-large (783M), trained by span prediction on the same knowledge texts (every attribute value masked with probability 0.5, 15% random spans, T5 sentinels) with the episodes and replay as prompt-to-answer, at the decoders' rate of 1e-4, recovers the symbol-label ICL suite the way the decoder mixture does (72.9 from a base of 53.6; the knowledge-only arm 52.6) and learns nothing the fact levels can see: trained-format recall 16.9 by option scoring and 20.0 by generation, bare recall 15.6, manipulation at chance, the backward levels at chance, and ARC-Easy down from 56.0 to 36.5 (Table 29.2). Scoring the fact levels in the span-prediction format the knowledge stream was trained in (the question with the sentinel where the answer goes, Table 29.2b) does not change it, and a direct look at the generations says what happened: asked for a species' type the model produces the trained sentence shape with the wrong type ("Syaott is a Voltrix-type." for a Verdane species), and its option scores are a fixed preference for two type names within two nats of each other across all eight options, the same ranking for every species. At 1,000 species (Table 29.3) the 1e-4 runs read the same at every budget (12.5 / 13.8 recall at 800 and 4,000 steps, generation 15 and 24 to 27) and at 5,000 species and 4,000 steps recall is 11.2.
+
+The learning rate is the whole difference. The knowledge-only arm at T5's own fine-tuning rates (Table 29.3; full fine-tuning with 8-bit AdamW, 800 steps, 4.6 passes over the 2,752 texts) recalls the facts: at 3e-4 trained-format recall is 98.1 by option scoring and 100 by generation, against 14.4 / 46.9 at 1e-4, and the trained span format agrees (100). The same run reads 40.0 on bare recall, twice the decoder arm C's 19.4 on the question the training never showed, and nothing on label induction: Timmy k=3 30.6 against the base's 35.6 and the decoder mixture's 61.9 (with real type names as labels it reads 61.2 against the decoder's 77.5, the type vocabulary it learned rather than the induction skill). What it costs is the general-ability measures the knowledge-only decoder arm also loses: natural-label ICL 85.4 to 75.0, symbol ICL 51.6, ARC-Easy 30.5 (the 1e-4 run 34.5, the base 56.0). At 1e-3 recall is 100 as well, with generation in the trained format down to 66.9 (the model over-produces the sentence), natural ICL 52.6 and Timmy 33.1; 4,000 steps at 1e-3 keep recall at 100 and take natural ICL to 45.8 and ARC-Easy to 22.0. So 3e-4 for 800 steps is the Flan-T5 setting; the decoders' 1e-4 is an order of magnitude below the rate the T5 recipe fine-tunes at, and every 1e-4 Flan-T5 run in Tables 29.2 and 29.3 is an under-trained model, not evidence about the encoder-decoder's capacity. The 1,000 and 5,000-species Flan-T5 runs at 3e-4 (17, 84 and 85 minutes at 1e-4) are the runs that would put WikiDYK's claim, span-masked Flan-T5 memorising real facts better than 1B to 8B causal models above about a thousand facts, against the decoder's 100 at 1,000 species; they were not run in this step.
+
+**T5Gemma** (large-large, UL2; 1.2B parameters, no T5 sentinels, so masked spans are a placeholder word and the target the spans in order) needs the opposite correction. Full fine-tuning of all its weights at 1e-4 with 8-bit AdamW damaged it (natural-label ICL 74.5 to 47.4, ARC-Easy 54.0 to 20.5) and taught it no fact (recall 12.5, generation 0), the failure the 3B decoder showed under full fine-tuning at that rate in section 28. The decoders' own recipe, a rank-64 adapter on every projection over a bf16 base (`LORA=64`), at 1e-4 on the mixture recalls 97.5 in the trained format by option scoring and 93.1 by generation (97.5 / 95.0 in the span format), bare recall 42.5, trained in 17 minutes at 4.8 GiB against the full fine-tune's 14 minutes at 11.7 GiB. It does not protect the rest of the model: natural-label ICL is 43.8 and symbol ICL 43.2 (base 74.5 / 50.0), ARC-Easy 39.5, Timmy 35.0 against the base's 33.8; the mixture's episodes, which hold the decoder's ICL suite at 78.6 and lift its induction to 61.9, do neither for T5Gemma under an adapter. At 3e-4 the adapter learns half the facts (recall 48.8, generation 44.4) and loses more (natural ICL 39.6). The adapter on Flan-T5 at 3e-4 learns nothing (recall 11.9, generation 16.2; natural ICL kept at 78.1): a rank-64 adapter at the rate that works for full fine-tuning of the same model is too small a step, and the adapter run at 1e-3 or above is the unrun follow-up. The two encoder-decoders therefore need different recipes (Flan-T5: full fine-tuning at 3e-4; T5Gemma: the adapter at 1e-4), and neither recipe keeps the general-ability measures where the decoder mixture keeps them.
+
+### 29.4 What the step says
+
+- REAL-3: capacity is not the limit at 1,000 species; exposure is. The section 8 recipe at 4,000 steps (1.5 passes over 19,552 texts) recalls 1,000 species at 100 with manipulation at 97.5 / 86.2, at the cost of an hour and a 41 WikiText perplexity; at 800 steps (0.3 passes) it recalls 51. At 5,000 species the budget runs out (22 at 0.3 passes, 14 at 0.07), and the same-exposure comparison (51 at 1,000 against 22 at 5,000) is the first sign of interference; 5,000 species at 1.5 passes (20,000 steps) is the run that decides it.
+- MODEL-2, encoder-only: no. ModernBERT-large under the letter-at-mask protocol is at chance on every level after training and loses natural-label ICL; every answer on the ladder is multi-token, and the protocol that would fix that needs an instruction-tuning stage this budget does not contain.
+- MODEL-2, encoder-decoder: yes for injection at the right rate, and the rate is the model's, not the decoders'. Flan-T5-large under full fine-tuning at 3e-4 recalls the 160 species at 98.1 / 100 (option scoring / generation) where 1e-4 learned the template only, with no label induction (Timmy at the base) and bare recall twice the decoder's; T5Gemma under a rank-64 adapter at 1e-4 recalls 97.5 / 93.1 where full fine-tuning at that rate destroyed it. Both lose the natural-label ICL suite and ARC-Easy in a way the decoder mixture does not (Flan-T5 75.0 / 30.5, T5Gemma 43.8 / 39.5), and the 1,000 and 5,000-species Flan-T5 runs at the working rate, the ones that would test WikiDYK's capacity claim against the decoder's 100 at 1,000 species, are unrun. On this ladder the encoder-decoder is a working injection vehicle and a worse general model after it; it is not a substitute for the decoder until that cost is understood.
+- Everything trained here is saved under `models/adapters/` (the Flan-T5 checkpoints at each rate, the T5Gemma checkpoints and adapters, the Flan-T5 adapter, the ModernBERT weights, the EmbeddingGemma, gte-modernbert, MiniLM, bge and Qwen3-Embedding encoders of sections 24 and 24.7, and the merchant retrievers of section 25) and pushed to the DVC remote.

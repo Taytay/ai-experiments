@@ -60,6 +60,7 @@ Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ..
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
 LOAD_4BIT=1 loads the base weights in 4-bit NF4 (QLoRA; PLAN step 15 runs Qwen2.5-7B this way on the 24 GB card).
+UNIVERSE_N=125 | 625 trains and scores the 1,000 / 5,000-species universes (frozen sets *_n1000 / *_n5000; pair with RUN_TAG; PLAN step 18, REAL-3).
 LORA_R=<r> (alpha 2r), LORA_TARGETS=all|mlp|attn, FULL_FT=1 (every weight in bf16, bitsandbytes 8-bit AdamW): the PLAN step 17 sweep (TRAIN-4);
 steps and learning rate are argv 3 and 4 as before. Pair with RUN_TAG.
 KTEXTS=descK | desc14perm | desc14rev | desc14llm swaps the knowledge stream for an augmentation variant (universe.knowledge_texts,
@@ -108,7 +109,7 @@ GRAD_CKPT = os.environ.get("GRAD_CKPT", "1")  # "1" (default: plain torch checkp
 GRAD_CKPT = {"0": False, "1": True}.get(GRAD_CKPT, GRAD_CKPT)
 BENCH = int(os.environ.get("BENCH", "0"))  # BENCH=N: train N steps, print throughput, no eval / save / tracker
 EXTRAS = bool(int(os.environ.get("EXTRAS", "0")))  # EXTRAS=1: also record dc/unc/mcf/hyb log-probs (the section 10 scorer study); doubles ladder time
-PACK = int(os.environ.get("PACK", "2048"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,
+PACK = int(os.environ.get("PACK", "1024"))  # PACK=T: pack each micro-batch's sequences into rows of at most T tokens (padding-free,  # 1,024 since 2026-09-16: five 2,048-row runs OOMed in the backward after a periodic evaluation; no 1,024-row run has
 # block-diagonal attention through unsloth's packed_seq_lengths path; PLAN step 26, TRAIN-6). PACK=0 = one sequence per row (padded).
 # Before 2026-09-15 every run used MICRO=8 ACCUM=2 PACK=0 (REPORT.md 19 measures the change: 2 to 2.5x faster, same numbers).
 RUN_TAG = os.environ.get("RUN_TAG", "")  # optional suffix on the results and adapter names (validation runs, ablations)
@@ -155,6 +156,8 @@ def retriever():
         from ai_experiments.retrieval import UniverseRetriever
         _RETRIEVER = UniverseRetriever(species)
         print(f"    retriever index: {len(_RETRIEVER.docs)} documents ({_RETRIEVER.n_entries} entries + training texts)", flush=True)
+        if not SMOKE and not (ROOT / "models" / "adapters" / f"retriever_universe_minilm_n{len(species)}").exists():
+            _RETRIEVER.save(f"universe_minilm_n{len(species)}")
     return _RETRIEVER
 SCHEDULE = {"Dr": "restart", "Dc": "constant"}.get(ARM, "shared")  # one warmup + linear decay over all phases (default),
 # restarted at each phase boundary, or held at the peak after the warmup (PLAN step 12, TRAIN-2)
@@ -166,7 +169,8 @@ OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}{SFX}.json"
 ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}{SFX}_lora"
 torch.manual_seed(SEED)
 
-species = U.build(morph_p=MORPH_P)
+UNIVERSE_N = int(os.environ.get("UNIVERSE_N", "20"))  # species per type; 125 and 625 are the 1,000 and 5,000-species universes (PLAN step 18, REAL-3)
+species = U.build(n_per_type=UNIVERSE_N, morph_p=MORPH_P)
 KTEXTS = os.environ.get("KTEXTS", "full")  # knowledge-stream variant (PLAN step 16, DATA-5): full (section 8), descK, desc14perm, desc14rev, desc14llm
 LLM_TEXTS_SHA = None
 if KTEXTS == "full":
@@ -177,7 +181,7 @@ else:
         doc = json.loads((ROOT / "data" / "processed" / "llm_texts_v1.json").read_text(encoding="utf-8"))
         llm_texts, LLM_TEXTS_SHA = {d["name"]: d["texts"] for d in doc["items"]}, doc["sha256"]
     K_texts = U.knowledge_texts(species, KTEXTS, llm_texts=llm_texts)
-FROZEN = I.load_all(morph=MORPH_P > 0)  # never regenerated: the same items for every arm and commit
+FROZEN = I.load_all(morph=MORPH_P > 0, n=UNIVERSE_N if UNIVERSE_N != 20 else None)  # never regenerated: the same items for every arm and commit
 ladder, probes, suite = FROZEN.ladder, FROZEN.probes, FROZEN.suite
 SMOKE = bool(os.environ.get("SMOKE"))
 if SMOKE:
@@ -475,7 +479,7 @@ phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
            method="full_ft_adamw8bit" if FULL_FT else ("unsloth_qlora" if LOAD_4BIT else "unsloth_lora"), load_4bit=LOAD_4BIT, full_ft=FULL_FT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=LORA_R, lora_alpha=2 * LORA_R, lora_targets=os.environ.get("LORA_TARGETS", "all"), morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
-           n_knowledge_texts=len(K_texts), ktexts=KTEXTS, llm_texts_sha=LLM_TEXTS_SHA, n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
+           n_knowledge_texts=len(K_texts), ktexts=KTEXTS, universe_n=UNIVERSE_N, llm_texts_sha=LLM_TEXTS_SHA, n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
 with Run("curriculum_v2", model=MODEL, config=cfg, enabled=not (SMOKE or BENCH)) as run:
     def save(recs, conds):
