@@ -150,7 +150,7 @@ def save(run, cond, r):
 
 
 def write_per_item(cond, recs):
-    p = PER_ITEM / f"embed_block_{ENC}{'_smoke' if SMOKE else ''}.{cond}.jsonl"
+    p = PER_ITEM / f"embed_block_{ENC}{'_' + RUN_TAG if RUN_TAG else ''}{'_smoke' if SMOKE else ''}.{cond}.jsonl"  # the tag, so a re-run does not overwrite section 24's records
     p.parent.mkdir(exist_ok=True)
     with p.open("w", encoding="utf-8") as f:
         for r in recs:
