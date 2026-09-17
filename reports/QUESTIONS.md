@@ -567,3 +567,49 @@ vector fixed to the member mean. Merchant categories have meaningful names; univ
 neighbour list); expected below the field-guide oracle. After PLAN row 14.
 **Status (2026-09-16):** answered yes, PLAN step 14, REPORT.md 25.3. Three co-typed species per name and no attribute words is the best context for the episode-trained arms (Timmy 87.5 for C, 93.1 for Cr; the field-guide oracle gives 70.6 / 69.4) and chance for the base model (36.9): the trained model uses the entity-entity structure. Habitat, which the list does not encode, stays at chance.
 
+
+## Owner reading, 2026-09-17: the qorl post and the training services
+
+Source: `references/task_training_and_services.md` (analysis) and `references/blog/qorl_4b_query_optimizer.md`
+(the post). The owner asked whether off-policy distillation, RL and task-direct training as used there should
+enter the plan, and how rented training compares with the 3090.
+
+**TRAIN-8 (O) Can on-policy distillation from the pre-injection model repair the general-ability loss of injection?**
+Arm C loses WikiText perplexity 10.6 to 22.8 and ARC-Easy 73.5 to 58.5 (sections 8, 28); every working
+encoder-decoder recipe loses natural ICL and ARC (section 29). Thinking Machines report the same loss from
+midtraining on documents (IF-eval 85 to 45) and its repair by on-policy distillation with the original model
+as teacher (83, knowledge kept: 43 to 41), where replay mixing (79) and LoRA did not suffice.
+*Experiment:* after arm C (rank-64 adapter), sample from the student on general prompts that are not eval
+items (Tulu-3 SFT prompts or similar), score each token by the base model with the adapter disabled
+(reverse KL as the per-token advantage), importance-sampling policy-gradient steps on the adapter, about
+100 to 150 steps of 64 prompts x 4 samples. Full ladder before and after: recall should hold near 100 while
+perplexity, ARC-Easy and the ICL suite move toward the base. Compare with TRAIN-7's replay.
+
+**TRAIN-9 (O) Are the adapter results rate artefacts? LoRA at ten times the full fine-tuning rate.**
+Tinker's LoRA primer: LoRA needs about 10x the full-FT learning rate, independent of rank; their SFT recipes
+use 1e-3 for LoRA and 1e-4 for full FT. Our decoder adapters run at 1e-4 (section 28 stopped at 2e-4, which
+was better on manipulation and induction) and the Flan-T5 adapter at 3e-4 learned nothing (section 29).
+*Experiment:* arm C at 5e-4 and 1e-3 (rank 64, 800 steps); Flan-T5 F2A adapter at 1e-3 and 3e-3; T5Gemma
+adapter already at its best (1e-4 > 3e-4, so it is the exception to check against). Full ladder each.
+
+**REAL-5 (O) For the merchant problem, is training on the task directly better than injecting the merchants' facts?**
+Section 4 withheld the category label from training by design, so the LLM has never been trained on the
+task; the encoders have (category-tuned contrastive, 68 to 93). The post's recipe is SFT on a strong
+teacher's traces, loss-masked and unrolled, then RL on a verifiable reward, inside a tool harness.
+*Experiment, three arms on Qwen2.5-3B:* (a) label SFT on (bank string, category) pairs, the classifier
+baseline; (b) teacher-trace distillation: a strong model (Qwen2.5-7B-Instruct locally, or a frontier model by
+API) with the merchant records available as a lookup tool or in context writes short reasoning traces from
+bank string to category for the 96 training merchants; the student is fine-tuned on the traces (loss on
+assistant tokens, one row per assistant turn); (c) a GRPO stage on (b) with exact-category reward through
+unsloth's colocated-vLLM path. Score on the section 25 conditions (no context, oracle record, retrieved
+record) for trained and held-out merchants, and record whether the tool-using student handles the 24
+held-out merchants without retraining, which is the property the injection arms lack.
+
+**INFRA-1 (O) Move the long queued runs off the 3090.**
+The 3090 runs one job at a time; arm C at 5,000 species for 20,000 steps (about 5.5 hours) and the Flan-T5
+1,000 / 5,000-species runs at 3e-4 (about 3 hours) block the queue. Per run the 3090 is 10 to 100x cheaper
+than any service, but Modal's Starter credit ($30/month, H100 at $3.95/h) covers both runs. *Task:* a Modal
+function that builds the image from `uv.lock`, mounts `hf_cache` and the frozen item sets, runs
+`exp_curriculum.py` / `exp_encoder.py`, and syncs results and adapters back (DVC). Tinker ($20 to $40) is
+worth trying once TRAIN-8 has a local number: its shipped on-policy distillation recipe is the independent
+check, and frontier-size trace generation for REAL-5 costs a few dollars there.
