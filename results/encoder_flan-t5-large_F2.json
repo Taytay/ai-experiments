@@ -37,14 +37,7 @@
     "gen_L1_recall_fmt": 20.0,
     "gen_L8_reverse_easy": 0.0,
     "gen_L8_reverse_hard": 0.0,
-    "eval_minutes": 2.0,
-    "train_minutes": 16.8,
-    "train_tokens": 1461609,
-    "tokens_per_s": 1451,
-    "peak_alloc_GiB": 9.25,
-    "n_E": 5051,
-    "n_K": 5818,
-    "n_R": 1931
+    "eval_minutes": 2.8
   },
   "trained_ctx": {
     "L1_recall": 99.4,
@@ -65,9 +58,43 @@
     "L8_reverse_hard": 92.5,
     "L6_unseen_recall_margin": 0.55,
     "L6_seen_recall_ctrl_margin": 0.523,
-    "gen_L1_recall": 28.1,
+    "gen_L1_recall": 83.8,
     "gen_L1_recall_fmt": 0.0,
     "gen_L8_reverse_easy": 98.1,
     "gen_L8_reverse_hard": 90.6
+  },
+  "trained_span": {
+    "L1_recall": 16.9,
+    "L1_recall_fmt": 13.8,
+    "L2_manip_isa": 45.0,
+    "L2_manip_pair": 50.0,
+    "L5_novel_choices": 9.4,
+    "L6_unseen_recall": 16.7,
+    "L6_seen_recall_ctrl": 12.5,
+    "L8_reverse_easy": 21.9,
+    "L8_reverse_hard": 30.6,
+    "L6_unseen_recall_margin": 0.076,
+    "L6_seen_recall_ctrl_margin": 0.078,
+    "gen_L1_recall": 0.0,
+    "gen_L1_recall_fmt": 21.2,
+    "gen_L8_reverse_easy": 0.0,
+    "gen_L8_reverse_hard": 0.0
+  },
+  "trained_span_ctx": {
+    "L1_recall": 100.0,
+    "L1_recall_fmt": 100.0,
+    "L2_manip_isa": 86.2,
+    "L2_manip_pair": 50.0,
+    "L5_novel_choices": 12.5,
+    "L6_unseen_recall": 100.0,
+    "L6_seen_recall_ctrl": 100.0,
+    "L8_reverse_easy": 97.5,
+    "L8_reverse_hard": 89.4,
+    "L6_unseen_recall_margin": 0.471,
+    "L6_seen_recall_ctrl_margin": 0.44,
+    "gen_L1_recall": 77.5,
+    "gen_L1_recall_fmt": 0.0,
+    "gen_L8_reverse_easy": 96.9,
+    "gen_L8_reverse_hard": 83.8
   }
 }
