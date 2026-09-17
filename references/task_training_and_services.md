@@ -47,6 +47,21 @@ His own "next steps" are on-policy distillation and trace inversion, which is wh
 | LoRA at ten times the full fine-tuning rate (Tinker's LoRA primer) | No. Our decoder LoRA runs use 1e-4, which is the full-FT rate the primer says LoRA should exceed tenfold; section 28 found 2e-4 better than 1e-4 on manipulation and induction and stopped there. The Flan-T5 adapter at 3e-4 learned nothing (section 29) | REPORT 28, 29 |
 | Renting GPUs for the slow part | No; every run has been on the 3090, serially | NOTES.md |
 
+## 2b. The owner's final goals (stated 2026-09-17, after the first draft of this note)
+
+1. A fine-tuned "one trick pony" that auto-categorises bank transactions the way a particular user
+   categorised similar ones before, on seen and unseen category names and on seen and unseen-but-related
+   inputs (new merchants, new locations of known chains).
+2. A way to inject external fact databases (retailer, POI; the owner's internal dataset in production,
+   purchasable datasets as extras) so the model knows those merchants and categorises them better even
+   when they never appear in the user's labelled history.
+
+The species ladder is the abstraction of both: recall is knowing the merchant, Timmy is an unseen category
+name learned from a few examples, held-out species are unseen related inputs; the fact-DB injection is what
+sections 4, 8, 25 and 30 measure. What is missing is the joint measurement, the categoriser with and without
+the injected DB on the merchants the user never labelled, on a per-user scheme. That is now REAL-6 (the
+evaluation set, row 35) and REAL-5 (the experiment, row 33).
+
 ## 3. Should we "just train on the task"?
 
 Two different tasks are hiding in the repo, and the answer differs.

@@ -592,18 +592,31 @@ was better on manipulation and induction) and the Flan-T5 adapter at 3e-4 learne
 *Experiment:* arm C at 5e-4 and 1e-3 (rank 64, 800 steps); Flan-T5 F2A adapter at 1e-3 and 3e-3; T5Gemma
 adapter already at its best (1e-4 > 3e-4, so it is the exception to check against). Full ladder each.
 
-**REAL-5 (O) For the merchant problem, is training on the task directly better than injecting the merchants' facts?**
-Section 4 withheld the category label from training by design, so the LLM has never been trained on the
-task; the encoders have (category-tuned contrastive, 68 to 93). The post's recipe is SFT on a strong
-teacher's traces, loss-masked and unrolled, then RL on a verifiable reward, inside a tool harness.
-*Experiment, three arms on Qwen2.5-3B:* (a) label SFT on (bank string, category) pairs, the classifier
-baseline; (b) teacher-trace distillation: a strong model (Qwen2.5-7B-Instruct locally, or a frontier model by
-API) with the merchant records available as a lookup tool or in context writes short reasoning traces from
-bank string to category for the 96 training merchants; the student is fine-tuned on the traces (loss on
-assistant tokens, one row per assistant turn); (c) a GRPO stage on (b) with exact-category reward through
-unsloth's colocated-vLLM path. Score on the section 25 conditions (no context, oracle record, retrieved
-record) for trained and held-out merchants, and record whether the tool-using student handles the 24
-held-out merchants without retraining, which is the property the injection arms lack.
+**REAL-5 (O) The production categoriser: does an injected fact database improve it on merchants the user never labelled?**
+The owner's end goal (2026-09-17): a fine-tuned "one trick pony" that categorises bank transactions the
+way a given user categorised similar ones before, on seen and unseen category names and on seen and
+unseen-but-related merchants; and a way to inject external retailer / POI fact databases so the model knows
+those merchants and categorises them better even though they never appear in the user's labelled history.
+The ladder abstracts this (recall = knowing the merchant, Timmy = unseen category names, held-out species =
+unseen related inputs); the merchant set is the concrete case; nothing yet measures the two together.
+*Experiment*, on the REAL-6 evaluation, Qwen2.5-3B and the section 24.7 encoders: train the categoriser
+three ways (label SFT on the user's history; the prototype / contrastive encoder; teacher-trace
+distillation with the fact records as a tool, loss-masked and unrolled, optionally a GRPO stage with
+exact-category reward through unsloth's colocated vLLM) and cross it with three ways of giving it the fact
+DB (none; parametric injection of the DB texts first, section 8's recipe or an editor; retrieval of the
+record at inference, section 25). The number that matters is the gain on merchants present in the DB but
+absent from the user's history, split by seen and unseen category names, and whether the gain survives
+unseen scheme names. Everything else (recall of the DB, general-ability cost) is reported as before.
+
+**REAL-6 (O) An evaluation set shaped like the production task: users, schemes, histories.**
+No eval has per-user category schemes. *Task:* synthetic users over the merchant set (then REAL-1's
+realistic set): each user has 8 to 20 categories with their own names (some standard, some renamed, some
+new words), an imbalanced labelled history of transactions (bank strings with amount and weekday), and a
+test set in four cells: seen merchant / seen name, seen merchant / new name (label induction from the
+history), unseen merchant in the fact DB / seen name, unseen merchant in the fact DB / new name. Frozen
+like the ladder (`items.py` versioning), scored by option log-probability for the LLM and by prototype
+distance for encoders, per cell, with the null bands of section 12. This is the yardstick for REAL-5, REAL-4
+and row 22, and the merchant-side counterpart of the ladder.
 
 **INFRA-1 (O) Move the long queued runs off the 3090.**
 The 3090 runs one job at a time; arm C at 5,000 species for 20,000 steps (about 5.5 hours) and the Flan-T5
