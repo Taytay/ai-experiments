@@ -4,7 +4,7 @@ edits (`batch_edit`, a single chunk; `edit` would apply and undo them one at a t
 Runs from the EasyEdit checkout with its own environment (the ai_experiments package is installed there without its deps):
   cd /home/taytay/projects/Taytay/EasyEdit && .venv/bin/python ai_exp_edit.py ALG FACTS [--n N]
     ALG    MEMIT | AlphaEdit        (hparams/<ALG>/qwen2.5-3b.yaml, derived from the 7B settings: layers 4-8, v_loss_layer 35, WikiText covariance)
-    FACTS  type | all               one edit per trained species (its type) or five (type, weakness, habitat, diet, region)
+    FACTS  type | all | allpre      one edit per trained species (its type) or five (type, weakness, habitat, diet, region); allpre = the five with the relation named before the subject; allyaml / allyamllast = properties-style records, relation-first or subject-first with the key at the last token
     --n    edit only the first N species (smoke)
 Edit requests are (prompt with the subject, subject, target): "{N} is a" -> "{T}-type creature", "{N} is weak to" -> "{W}-type attacks",
 "{N} lives in" -> "{H} habitats", "{N} eats as an" -> "{D}", "{N} is found in" -> "{R}". Output: the edited model under
@@ -35,6 +35,19 @@ if N:
     species = species[:N]
 TEMPLATES = {"type": ("{N} is a", "{T}-type creature"), "weakness": ("{N} is weak to", "{W}-type attacks"), "habitat": ("{N} lives in", "{H} habitats"),
              "diet": ("{N} eats as an", "{D}"), "region": ("{N} is found in", "{R}")}
+TEMPLATES_PRE = {a: (f"As a {a}, " + pr, tg) for a, (pr, tg) in TEMPLATES.items()}
+# "allpre": the relation named before the subject ("As a weakness, {N} is weak to"), so the key at the subject's last token differs per
+# fact; with subject-first prompts the five facts of a species share one key and the closed-form update averages their targets (2210.07229 Eqn 19)
+if FACTS == "allpre":
+    TEMPLATES = TEMPLATES_PRE
+# structured records (owner's suggestion, 2026-09-17): properties syntax rather than JSON because EasyEdit passes prompts through str.format,
+# where literal braces break. "allyaml" names the relation before the subject (key at the subject's last token, as usual);
+# "allyamllast" is the natural subject-first record with the key taken at the prompt's last token (fact_token = last), i.e. the
+# relation field's colon, so the five facts of a species get five keys without reordering the record.
+elif FACTS == "allyaml":
+    TEMPLATES = {a: (f"relation: {a}\nspecies: {{N}}\nvalue:", tg) for a, (pr, tg) in TEMPLATES.items()}
+elif FACTS == "allyamllast":
+    TEMPLATES = {a: (f"species: {{N}}\n{a}:", tg) for a, (pr, tg) in TEMPLATES.items()}
 attrs = ["type"] if FACTS == "type" else list(TEMPLATES)
 prompts, targets, subjects = [], [], []
 for s in species:
@@ -46,6 +59,8 @@ print(f"{ALG} on Qwen2.5-3B: {len(prompts)} edits ({len(species)} species x {len
 
 HP = {"MEMIT": MEMITHyperParams, "AlphaEdit": AlphaEditHyperParams}[ALG]
 hparams = HP.from_hparams(f"./hparams/{ALG}/qwen2.5-3b")
+if FACTS == "allyamllast":
+    hparams.fact_token = "last"
 if os.environ.get("COV_RIDGE"):  # MEMIT: ridge on the closed-form solve (see memit_main.py); the run's names carry it
     hparams.cov_ridge = float(os.environ["COV_RIDGE"])
 hparams.batch_size = len(prompts)  # one chunk: every edit in a single MEMIT / AlphaEdit batch (the plan's protocol); sequential_edit=True keeps the edited weights

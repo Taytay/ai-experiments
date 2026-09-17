@@ -17,8 +17,9 @@ ROWS = [("recall, trained fmt", "L1_recall_fmt"), ("recall, bare", "L1_recall"),
         ("ARC-Easy", "K_arc_easy"), ("WikiText ppl", "L7_ppl_wikitext")]
 COLS = [("base", "curriculum_Qwen2.5-3B_base", "base"), ("A (knowledge)", "curriculum_Qwen2.5-3B_A_p200", "trained"), ("C (mixture)", "curriculum_Qwen2.5-3B_C_p200", "trained"),
         ("MEMIT type", "curriculum_edit_memit_type_qwen2.5-3b_base", "base"), ("MEMIT type, ridge 150", "curriculum_edit_memit_type_ridge150_qwen2.5-3b_base", "base"), ("MEMIT type, ridge 15", "curriculum_edit_memit_type_ridge15_qwen2.5-3b_base", "base"), ("AlphaEdit type", "curriculum_edit_alphaedit_type_qwen2.5-3b_base", "base"),
-        ("MEMIT all relation-first, ridge 15", "curriculum_edit_memit_allpre_ridge15_qwen2.5-3b_base", "base"), ("AlphaEdit all", "curriculum_edit_alphaedit_all_qwen2.5-3b_base", "base")]
-EDITS = {"MEMIT type": "edit_memit_type", "MEMIT type, ridge 150": "edit_memit_type_ridge150", "MEMIT type, ridge 15": "edit_memit_type_ridge15", "AlphaEdit type": "edit_alphaedit_type", "MEMIT all relation-first, ridge 15": "edit_memit_allpre_ridge15", "AlphaEdit all": "edit_alphaedit_all"}
+        ("MEMIT all relation-first, ridge 15", "curriculum_edit_memit_allpre_ridge15_qwen2.5-3b_base", "base"), ("AlphaEdit all", "curriculum_edit_alphaedit_all_qwen2.5-3b_base", "base"),
+        ("MEMIT all record relation-first, ridge 15", "curriculum_edit_memit_allyaml_ridge15_qwen2.5-3b_base", "base"), ("MEMIT all record last-token key, ridge 15", "curriculum_edit_memit_allyamllast_ridge15_qwen2.5-3b_base", "base")]
+EDITS = {"MEMIT type": "edit_memit_type", "MEMIT type, ridge 150": "edit_memit_type_ridge150", "MEMIT type, ridge 15": "edit_memit_type_ridge15", "AlphaEdit type": "edit_alphaedit_type", "MEMIT all relation-first, ridge 15": "edit_memit_allpre_ridge15", "AlphaEdit all": "edit_alphaedit_all", "MEMIT all record relation-first, ridge 15": "edit_memit_allyaml_ridge15", "MEMIT all record last-token key, ridge 15": "edit_memit_allyamllast_ridge15"}
 
 
 def load(name):
