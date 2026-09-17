@@ -37,6 +37,20 @@ def main():
     print("|---|" + "---|" * len(COLS))
     for label, key in ROWS:
         print(f"| {label} | " + " | ".join(fmt(load(f).get(c, {}).get(key)) for _, f, c in COLS) + " |")
+    # bare recall split by the asked attribute (the ladder mixes type, weakness and habitat questions; the type-only edits answer
+    # the type question and mis-fire on the weakness one, which the pooled number hides)
+    import collections
+    lad = json.load(open(ROOT / "data" / "processed" / "ladder_v1.json"))["items"]
+    attr = {it["id"]: it["attr"] for it in lad if it["level"] == "L1_recall"}
+    for a in ("type", "weakness", "habitat"):
+        cells = []
+        for _, f, c in COLS:
+            pf = R / "per_item" / f"{f}.{c}.jsonl"
+            if not pf.exists():
+                cells.append("-"); continue
+            acc = [json.loads(l)["correct"] for l in open(pf) if (r := json.loads(l))["level"] == "L1_recall" and attr.get(r["id"]) == a]
+            cells.append(f"{100 * sum(acc) / len(acc):.1f}" if acc else "-")
+        print(f"| recall, bare: {a} questions | " + " | ".join(cells) + " |")
     for label, key in (("edits", "n_edits"), ("edit minutes", "edit_minutes"), ("EasyEdit rewrite acc", "rewrite_acc"), ("EasyEdit rephrase acc", "rephrase_acc")):
         cells = []
         for name, _, _ in COLS:
