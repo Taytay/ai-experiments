@@ -16,9 +16,9 @@ ROWS = [("recall, trained fmt", "L1_recall_fmt"), ("recall, bare", "L1_recall"),
         ("reverse easy", "L8_reverse_easy"), ("reverse hard", "L8_reverse_hard"), ("ICL symbol", "ICL_symbol_mean"), ("ICL natural", "ICL_natural_mean"),
         ("ARC-Easy", "K_arc_easy"), ("WikiText ppl", "L7_ppl_wikitext")]
 COLS = [("base", "curriculum_Qwen2.5-3B_base", "base"), ("A (knowledge)", "curriculum_Qwen2.5-3B_A_p200", "trained"), ("C (mixture)", "curriculum_Qwen2.5-3B_C_p200", "trained"),
-        ("MEMIT type", "curriculum_edit_memit_type_qwen2.5-3b_base", "base"), ("AlphaEdit type", "curriculum_edit_alphaedit_type_qwen2.5-3b_base", "base"),
+        ("MEMIT type", "curriculum_edit_memit_type_qwen2.5-3b_base", "base"), ("MEMIT type, ridge 150", "curriculum_edit_memit_type_ridge150_qwen2.5-3b_base", "base"), ("MEMIT type, ridge 15", "curriculum_edit_memit_type_ridge15_qwen2.5-3b_base", "base"), ("AlphaEdit type", "curriculum_edit_alphaedit_type_qwen2.5-3b_base", "base"),
         ("MEMIT all", "curriculum_edit_memit_all_qwen2.5-3b_base", "base"), ("AlphaEdit all", "curriculum_edit_alphaedit_all_qwen2.5-3b_base", "base")]
-EDITS = {"MEMIT type": "edit_memit_type", "AlphaEdit type": "edit_alphaedit_type", "MEMIT all": "edit_memit_all", "AlphaEdit all": "edit_alphaedit_all"}
+EDITS = {"MEMIT type": "edit_memit_type", "MEMIT type, ridge 150": "edit_memit_type_ridge150", "MEMIT type, ridge 15": "edit_memit_type_ridge15", "AlphaEdit type": "edit_alphaedit_type", "MEMIT all": "edit_memit_all", "AlphaEdit all": "edit_alphaedit_all"}
 
 
 def load(name):
@@ -31,7 +31,7 @@ def fmt(v):
 
 
 def main():
-    print("**Table 30.1: knowledge editing on Qwen2.5-3B (EasyEdit MEMIT and AlphaEdit, layers 4-8, one batch) against the untrained base and the fine-tuned arms A and C on the 160-species items (accuracy %)**\n")
+    print("**Table 30.1: knowledge editing on Qwen2.5-3B (EasyEdit MEMIT, MEMIT with a ridge on the solve, and AlphaEdit; layers 4-8, one batch) against the untrained base and the fine-tuned arms A and C on the 160-species items (accuracy %)**\n")
     print("| measure | " + " | ".join(c[0] for c in COLS) + " |")
     print("|---|" + "---|" * len(COLS))
     for label, key in ROWS:
