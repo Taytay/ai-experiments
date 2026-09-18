@@ -292,6 +292,8 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
         tg = time.time()
         rows = sample([p for p in prompts for _ in range(N_SAMPLES)])
         gen_s += time.time() - tg
+        torch.cuda.empty_cache()  # the generate phase (256 KV caches) and the training phase (8 x L x V logits) fragment each other's reserve;
+        # without this the reserve reached the 24 GB ceiling at step 55 of the replay run and the driver spilled to system RAM (5+ min per step)
         rows.sort(key=lambda r: len(r[0]) + len(r[1]))
         n_tok = sum(len(c) for _, c in rows)
         tot_loss, tot_rkl, tot_kl, n_done = 0.0, 0.0, 0.0, 0
@@ -306,13 +308,15 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
             # plain cross-entropy from the logits, one row at a time in float32: unsloth's fused loss (the `labels=` path) sizes its
             # chunks from the free GPU memory and raised "No or negligible GPU memory available" after the KL micro-batches had
             # filled the caching allocator's reserve (two runs died at step 1 on 2026-09-18)
-            r_logits = model(input_ids=r_ids, attention_mask=r_att).logits[:, :-1]
-            r_tgt = r_lab[:, 1:]; n_lab = int((r_tgt != -100).sum())
-            rep_loss = sum(F.cross_entropy(r_logits[i].float(), r_tgt[i], ignore_index=-100, reduction="sum") for i in range(r_logits.shape[0])) / max(n_lab, 1)
-            (REPLAY_W * rep_loss).backward(); rep_loss = rep_loss.item(); del r_logits
+            r_tgt = r_lab[:, 1:]; n_lab = max(int((r_tgt != -100).sum()), 1); rep_loss = 0.0
+            for j in range(0, r_ids.shape[0], MICRO):  # MICRO rows per forward: 16 rows x 700 tokens x the vocabulary is 3.4 GB of logits at once
+                r_logits = model(input_ids=r_ids[j:j + MICRO], attention_mask=r_att[j:j + MICRO]).logits[:, :-1]
+                l = sum(F.cross_entropy(r_logits[i].float(), r_tgt[j + i], ignore_index=-100, reduction="sum") for i in range(r_logits.shape[0])) / n_lab
+                (REPLAY_W * l).backward(); rep_loss += l.item(); del r_logits, l
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         tokens += n_tok
+        torch.cuda.empty_cache()
         rec = dict(step=step + 1, loss=round(tot_loss / n_done, 4), rkl_sampled=round(tot_rkl / n_done, 4), n_rows=len(rows), n_tokens=n_tok,
                    mean_len=round(n_tok / len(rows), 1), ended=sum(c[-1] == eos for _, c in rows), lr=sched.get_last_lr()[0])
         if KL == "full":
@@ -329,6 +333,7 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
         if PERIODIC and (step + 1) % PERIODIC == 0 and step + 1 < STEPS:
             periodic[step + 1] = periodic_eval(); run.log(periodic[step + 1], condition="periodic", step=step + 1)
             print(f"    step {step + 1} periodic: {periodic[step + 1]}", flush=True)
+            model.save_pretrained(OUT_ADAPTER)  # the latest weights survive a kill (no optimizer state: a checkpoint, not a resume point)
     el = time.time() - t0
     stats = dict(train_minutes=round(el / 60, 1), sampling_minutes=round(gen_s / 60, 1), train_tokens=tokens, peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2**30, 2),
                  rkl_sampled_first=curve[0]["rkl_sampled"], rkl_sampled_last=round(sum(c["rkl_sampled"] for c in curve[-5:]) / len(curve[-5:]), 4))
