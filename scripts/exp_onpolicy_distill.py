@@ -22,7 +22,7 @@ env:
               prefixes (both distributions are on this machine, so no sampled-token estimator is needed); sample:
               the blog's estimator, advantage = log p_teacher - log p_student at the sampled token, loss
               -advantage * log p_student (with one optimizer step per sampled batch the importance ratio is 1).
-    N_PROMPTS=64 N_SAMPLES=4 MAX_NEW=96 TEMP=1.0 PROMPT_WORDS=40 MICRO=8 (rows per forward / backward)
+    N_PROMPTS=64 N_SAMPLES=4 MAX_NEW=96 TEMP=1.0 PROMPT_WORDS=40 MICRO=8 (rows per forward / backward) GEN_CHUNK=64 (rows per generate call)
     PERIODIC=30  subsample evaluation every N steps (ladder[::4], ICL suite[::2], ARC-Easy, WikiText perplexity)
     RUN_TAG      suffix for the adapter and results (default <PROMPTS>_<KL>)
     SMOKE=1      3 steps, 8 x 2 samples, 32 new tokens, adapter under models/smoke/, no tracker
@@ -66,6 +66,7 @@ N_PROMPTS, N_SAMPLES = int(os.environ.get("N_PROMPTS", "64")), int(os.environ.ge
 MAX_NEW, TEMP = int(os.environ.get("MAX_NEW", "96")), float(os.environ.get("TEMP", "1.0"))
 PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "40"))
 MICRO = int(os.environ.get("MICRO", "8"))
+GEN_CHUNK = int(os.environ.get("GEN_CHUNK", "64"))  # rows per generate call: 256 rows in one call took 104 s per step against 4 x 17 s in chunks of 64
 PERIODIC = int(os.environ.get("PERIODIC", "30"))
 SEED = int(os.environ.get("SEED", "0"))
 SMOKE = bool(os.environ.get("SMOKE"))
@@ -184,10 +185,13 @@ def sample(prompts):
     att = (ids != pad).long()
     for i, e in enumerate(enc):  # a real pad token inside a prompt would be masked out; there are none, but keep the mask honest
         att[i, L - len(e):] = 1
-    gen = model.generate(input_ids=ids, attention_mask=att, max_new_tokens=MAX_NEW, do_sample=True, temperature=TEMP, top_p=1.0, top_k=0,
-                         pad_token_id=pad, eos_token_id=eos)
+    gens = []
+    for i in range(0, len(enc), GEN_CHUNK):
+        g = model.generate(input_ids=ids[i:i + GEN_CHUNK], attention_mask=att[i:i + GEN_CHUNK], max_new_tokens=MAX_NEW, do_sample=True, temperature=TEMP,
+                           top_p=1.0, top_k=0, pad_token_id=pad, eos_token_id=eos)
+        gens += g[:, L:].tolist()
     rows = []
-    for e, g in zip(enc, gen[:, L:].tolist()):
+    for e, g in zip(enc, gens):
         comp = []
         for t in g:
             if t == pad and eos != pad:
