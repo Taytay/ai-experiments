@@ -1,0 +1,57 @@
+diff --git a/easyeditor/models/memit/compute_z.py b/easyeditor/models/memit/compute_z.py
+index 3433b7a..233f919 100644
+--- a/easyeditor/models/memit/compute_z.py
++++ b/easyeditor/models/memit/compute_z.py
+@@ -240,20 +240,14 @@ def get_module_input_output_at_words(
+             track="both", subtoken=subtoken, **context_info, **word_repr_args
+         )
+     elif fact_token_strategy == "last":
+-        raise Exception("This is definitely bugged, fix it.")
+-        context_info = dict(
+-            contexts=[
+-                tmp[i].format(words[i]) for i, tmp in enumerate(context_templates)
+-            ],
+-            idxs=[000000],
+-        )
++        # ai-experiments: key at the last token of each formatted context (the upstream branch raised). Contexts are the
++        # templates with the subject substituted; the index is the last real token (right padding, no BOS for Qwen).
++        contexts = [tmp.format(words[i]) for i, tmp in enumerate(context_templates)]
++        idxs = [[len(tok(c)["input_ids"]) - 1] for c in contexts]
++        context_info = dict(contexts=contexts, idxs=idxs)
+         if track == 'out' or track == 'in':
+-            return repr_tools.get_reprs_at_word_tokens(
+-                track=track, subtoken=subtoken, **context_info, **word_repr_args
+-            )
+-        l_input, l_output = repr_tools.get_reprs_at_idxs(
+-            track="both", **context_info, **word_repr_args
+-        )
++            return repr_tools.get_reprs_at_idxs(track=track, **context_info, **word_repr_args)
++        l_input, l_output = repr_tools.get_reprs_at_idxs(track="both", **context_info, **word_repr_args)
+     else:
+         raise ValueError(f"fact_token={fact_token_strategy} not recognized")
+ 
+diff --git a/easyeditor/models/memit/memit_hparams.py b/easyeditor/models/memit/memit_hparams.py
+index a4cfde1..d3127ac 100644
+--- a/easyeditor/models/memit/memit_hparams.py
++++ b/easyeditor/models/memit/memit_hparams.py
+@@ -42,6 +42,7 @@ class MEMITHyperParams(HyperParams):
+     max_length: int = 40
+     batch_size: int = 1
+     model_parallel: bool = False
++    cov_ridge: float = 0.0  # ai-experiments: ridge added to (lambda*C0 + K K^T) in the solve; Qwen2.5-3B's C0 is near-singular (half its eigenvalues < 1e-6)
+ 
+     @classmethod
+     def from_hparams(cls, hparams_name_or_path: str):
+diff --git a/easyeditor/models/memit/memit_main.py b/easyeditor/models/memit/memit_main.py
+index bc0602a..b73e824 100644
+--- a/easyeditor/models/memit/memit_main.py
++++ b/easyeditor/models/memit/memit_main.py
+@@ -210,7 +210,7 @@ def execute_memit(
+         )
+ 
+         adj_k = torch.linalg.solve(
+-            hparams.mom2_update_weight * cov.double() + layer_ks @ layer_ks.T,
++            hparams.mom2_update_weight * cov.double() + layer_ks @ layer_ks.T + getattr(hparams, "cov_ridge", 0.0) * torch.eye(layer_ks.shape[0], dtype=torch.float64, device=layer_ks.device),
+             layer_ks,
+         )
+         resid = targets / (len(hparams.layers) - i)  # Distribute residual across layers
