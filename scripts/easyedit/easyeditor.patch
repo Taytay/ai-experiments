@@ -1,3 +1,35 @@
+diff --git a/easyeditor/models/memit/compute_z.py b/easyeditor/models/memit/compute_z.py
+index 3433b7a..233f919 100644
+--- a/easyeditor/models/memit/compute_z.py
++++ b/easyeditor/models/memit/compute_z.py
+@@ -240,20 +240,14 @@ def get_module_input_output_at_words(
+             track="both", subtoken=subtoken, **context_info, **word_repr_args
+         )
+     elif fact_token_strategy == "last":
+-        raise Exception("This is definitely bugged, fix it.")
+-        context_info = dict(
+-            contexts=[
+-                tmp[i].format(words[i]) for i, tmp in enumerate(context_templates)
+-            ],
+-            idxs=[000000],
+-        )
++        # ai-experiments: key at the last token of each formatted context (the upstream branch raised). Contexts are the
++        # templates with the subject substituted; the index is the last real token (right padding, no BOS for Qwen).
++        contexts = [tmp.format(words[i]) for i, tmp in enumerate(context_templates)]
++        idxs = [[len(tok(c)["input_ids"]) - 1] for c in contexts]
++        context_info = dict(contexts=contexts, idxs=idxs)
+         if track == 'out' or track == 'in':
+-            return repr_tools.get_reprs_at_word_tokens(
+-                track=track, subtoken=subtoken, **context_info, **word_repr_args
+-            )
+-        l_input, l_output = repr_tools.get_reprs_at_idxs(
+-            track="both", **context_info, **word_repr_args
+-        )
++            return repr_tools.get_reprs_at_idxs(track=track, **context_info, **word_repr_args)
++        l_input, l_output = repr_tools.get_reprs_at_idxs(track="both", **context_info, **word_repr_args)
+     else:
+         raise ValueError(f"fact_token={fact_token_strategy} not recognized")
+ 
 diff --git a/easyeditor/models/memit/memit_hparams.py b/easyeditor/models/memit/memit_hparams.py
 index a4cfde1..d3127ac 100644
 --- a/easyeditor/models/memit/memit_hparams.py

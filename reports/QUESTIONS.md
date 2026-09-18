@@ -360,6 +360,7 @@ renderings (some wrong), answer-only loss; evaluate with retrieved context and w
 operate on 3B models, and they claim locality, which is precisely arm A's failure.
 *Experiment:* MEMIT via EasyEdit on Qwen2.5-3B for all species; full ladder plus ICL suite, side by
 side with arms A and C.
+**Status (2026-09-17):** done, PLAN step 19, REPORT.md 30. AlphaEdit and MEMIT (after a ridge on its solve; the shipped update destroys Qwen2.5-3B because the WikiText covariance is near-singular) write one type edit per species with trained-format recall 100 and plain-question recall 100, where every fine-tune reads about 20, at no cost to perplexity, ARC-Easy or the ICL suite (arm C costs 12 perplexity points and 15 ARC points); they give no manipulation, induction or reverse, and the edit mis-fires on the weakness question. Five facts per species collide on the subject key (16 to 25 per fact); relation-first clauses recover 46 / 36 / 69, records less, field-token keys collide across subjects. Complements, not competitors: the editor is a phrasing-independent store of one association per entity; the fine-tune's augmentation or retrieval supplies the record and anything derived. Untried: a joint target vector per subject; AlphaEdit with relation-first prompts.
 
 **BASE-3 (R) Can the with-context ceiling be distilled into the weights directly?**
 With-context numbers are the ceiling everywhere (98.8 recall, 48.8 Timmy for base 3B). Context
