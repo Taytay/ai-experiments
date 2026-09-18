@@ -22,7 +22,10 @@ env:
               prefixes (both distributions are on this machine, so no sampled-token estimator is needed); sample:
               the blog's estimator, advantage = log p_teacher - log p_student at the sampled token, loss
               -advantage * log p_student (with one optimizer step per sampled batch the importance ratio is 1).
-    N_PROMPTS=64 N_SAMPLES=4 MAX_NEW=96 TEMP=1.0 PROMPT_WORDS=40 MICRO=8 (rows per forward / backward) GEN_CHUNK=64 (rows per generate call)
+    N_PROMPTS=64 N_SAMPLES=4 MAX_NEW=96 TEMP=1.0 PROMPT_WORDS=40 MICRO=8 (rows per forward / backward) GEN_CHUNK=256 (rows per generate call)
+    REPLAY=C     add one SFT micro-batch per step (REPLAY_N=16 sequences) from arm C's own mixture (knowledge .45, episodes .40, ICL replay .15)
+              with weight REPLAY_W=1.0 on its mean token loss: the injection kept in the loop while the KL term repairs (runs 1 and 2 showed
+              the plain KL erases the facts along with the damage)
     PERIODIC=30  subsample evaluation every N steps (ladder[::4], ICL suite[::2], ARC-Easy, WikiText perplexity)
     RUN_TAG      suffix for the adapter and results (default <PROMPTS>_<KL>)
     SMOKE=1      3 steps, 8 x 2 samples, 32 new tokens, adapter under models/smoke/, no tracker
@@ -66,12 +69,17 @@ N_PROMPTS, N_SAMPLES = int(os.environ.get("N_PROMPTS", "64")), int(os.environ.ge
 MAX_NEW, TEMP = int(os.environ.get("MAX_NEW", "96")), float(os.environ.get("TEMP", "1.0"))
 PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "40"))
 MICRO = int(os.environ.get("MICRO", "8"))
-GEN_CHUNK = int(os.environ.get("GEN_CHUNK", "64"))  # rows per generate call: 256 rows in one call took 104 s per step against 4 x 17 s in chunks of 64
+GEN_CHUNK = int(os.environ.get("GEN_CHUNK", "256"))  # rows per generate call. All 256 rows in one call: 104 s per step; four calls of 64: about 190 s
+# (runs 2 and 3 of 2026-09-18), although a standalone timing of one 64-row call read 17 s. Keep one call.
+REPLAY = os.environ.get("REPLAY", "")  # "C": every step also takes one 16-sequence SFT micro-batch from arm C's training mixture (knowledge
+# texts .45 full-sequence loss, episodes .40 answer-only, ICL replay .15), weighted REPLAY_W, so the facts are rewritten while the KL term repairs
+REPLAY_W = float(os.environ.get("REPLAY_W", "1.0"))
+REPLAY_N = int(os.environ.get("REPLAY_N", "16"))
 PERIODIC = int(os.environ.get("PERIODIC", "30"))
 SEED = int(os.environ.get("SEED", "0"))
 SMOKE = bool(os.environ.get("SMOKE"))
 MAXLEN = 768
-TAG = os.environ.get("RUN_TAG") or f"{PROMPTS}_{KL}"
+TAG = os.environ.get("RUN_TAG") or f"{PROMPTS}_{KL}" + (f"_replay{REPLAY}" if REPLAY else "")
 assert KL in ("full", "sample") and PROMPTS in ("fineweb", "tulu", "wikitext")
 
 
@@ -238,12 +246,38 @@ def step_loss(rows):
     return loss, n, rkl_tok, None
 
 
-cfg = dict(adapter=ADAPTER_NAME, steps=STEPS, lr=LR, prompts=PROMPTS, kl=KL, n_prompts=N_PROMPTS, n_samples=N_SAMPLES, max_new=MAX_NEW, temp=TEMP,
+def replay_batch(tok, stream_of, rng):
+    """One right-padded SFT micro-batch from arm C's mixture -> (ids, attention, labels)."""
+    eos = [tok.eos_token_id]
+    seqs = []
+    for _ in range(REPLAY_N):
+        src = rng.choices(["K", "E", "R"], [0.45, 0.40, 0.15])[0]
+        smp = stream_of[src].next()
+        if isinstance(smp, str):
+            ids = tok(smp, add_special_tokens=False)["input_ids"][:MAXLEN - 1] + eos; seqs.append((ids, list(ids)))
+        else:
+            a = tok(smp["answer"], add_special_tokens=False)["input_ids"] + eos
+            p = tok(smp["prompt"], add_special_tokens=False)["input_ids"][-(MAXLEN - len(a)):]
+            seqs.append((p + a, [-100] * len(p) + a))
+    L = max(len(i) for i, _ in seqs)
+    ids = torch.tensor([i + [pad] * (L - len(i)) for i, _ in seqs], device="cuda")
+    lab = torch.tensor([l + [-100] * (L - len(l)) for _, l in seqs], device="cuda")
+    att = (torch.arange(L, device="cuda")[None] < torch.tensor([len(i) for i, _ in seqs], device="cuda")[:, None]).long()
+    return ids, att, lab
+
+
+cfg = dict(adapter=ADAPTER_NAME, steps=STEPS, lr=LR, prompts=PROMPTS, kl=KL, replay=REPLAY, replay_w=REPLAY_W, replay_n=REPLAY_N, n_prompts=N_PROMPTS, n_samples=N_SAMPLES, max_new=MAX_NEW, temp=TEMP,
            prompt_words=PROMPT_WORDS, micro=MICRO, periodic=PERIODIC, seed=SEED, run_tag=TAG, method="onpolicy_distill_lora", **FROZEN.config())
 with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not SMOKE) as run:
     prompt_pool = json.loads(PROMPT_FILE.read_text(encoding="utf-8"))["sources"][PROMPTS]
     rng = random.Random(SEED); torch.manual_seed(SEED)
     stream = Stream(prompt_pool, rng)
+    if REPLAY:
+        from ai_experiments import universe as U
+        from ai_experiments import icl_suite as S
+        rrng = random.Random(SEED + 100); species = U.build(n_per_type=20, morph_p=0.0)
+        replay_streams = {"K": Stream(U.training_texts(species), rrng), "E": Stream(U.episodes(species, n=6000, seed=3), rrng), "R": Stream(S.replay_episodes(n=4000, seed=11), rrng)}
+        print(f"    replay {REPLAY}: {len(replay_streams['K'].items)} knowledge texts, {len(replay_streams['E'].items)} episodes, {len(replay_streams['R'].items)} ICL replay episodes; {REPLAY_N} per step, weight {REPLAY_W}", flush=True)
     t_ppl, s_ppl = teacher_check()
     run.log(dict(teacher_ppl=t_ppl, student_ppl=s_ppl), condition="check")
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
@@ -266,6 +300,11 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
             loss, n, rkl, kl = step_loss(mb)
             (loss * n / n_tok).backward()  # every completion token weighs the same across micro-batches
             tot_loss += loss.item() * n; tot_rkl += rkl.item(); tot_kl += kl.item() if kl is not None else 0.0; n_done += n
+        rep_loss = None
+        if REPLAY:
+            r_ids, r_att, r_lab = replay_batch(tok, replay_streams, rrng)
+            rep_loss = model(input_ids=r_ids, attention_mask=r_att, labels=r_lab).loss
+            (REPLAY_W * rep_loss).backward(); rep_loss = rep_loss.item()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         tokens += n_tok
@@ -273,12 +312,14 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
                    mean_len=round(n_tok / len(rows), 1), ended=sum(c[-1] == eos for _, c in rows), lr=sched.get_last_lr()[0])
         if KL == "full":
             rec["rkl_full"] = round(tot_kl / n_done, 4)
+        if rep_loss is not None:
+            rec["replay_loss"] = round(rep_loss, 4)
         curve.append(rec)
         run.log({k: v for k, v in rec.items() if k != "step"}, condition="train", step=step + 1)
         if (step + 1) % 5 == 0 or step == 0 or step + 1 == STEPS:
             el = time.time() - t0
             print(f"    step {step + 1}/{STEPS} loss {rec['loss']:.4f} rkl {rec['rkl_sampled']:.4f}" + (f" kl {rec['rkl_full']:.4f}" if KL == "full" else "")
-                  + f" | {len(rows)} rows, mean {rec['mean_len']} tok, {rec['ended']} ended | {el:.0f}s ({gen_s:.0f}s sampling) "
+                  + (f" replay {rec['replay_loss']:.3f}" if rep_loss is not None else "") + f" | {len(rows)} rows, mean {rec['mean_len']} tok, {rec['ended']} ended | {el:.0f}s ({gen_s:.0f}s sampling) "
                   f"{torch.cuda.max_memory_allocated() / 2**30:.1f} GiB", flush=True)
         if PERIODIC and (step + 1) % PERIODIC == 0 and step + 1 < STEPS:
             periodic[step + 1] = periodic_eval(); run.log(periodic[step + 1], condition="periodic", step=step + 1)
