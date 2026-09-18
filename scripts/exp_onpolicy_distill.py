@@ -303,8 +303,13 @@ with Run("onpolicy_distill", model=f"Qwen/{model_name}", config=cfg, enabled=not
         rep_loss = None
         if REPLAY:
             r_ids, r_att, r_lab = replay_batch(tok, replay_streams, rrng)
-            rep_loss = model(input_ids=r_ids, attention_mask=r_att, labels=r_lab).loss
-            (REPLAY_W * rep_loss).backward(); rep_loss = rep_loss.item()
+            # plain cross-entropy from the logits, one row at a time in float32: unsloth's fused loss (the `labels=` path) sizes its
+            # chunks from the free GPU memory and raised "No or negligible GPU memory available" after the KL micro-batches had
+            # filled the caching allocator's reserve (two runs died at step 1 on 2026-09-18)
+            r_logits = model(input_ids=r_ids, attention_mask=r_att).logits[:, :-1]
+            r_tgt = r_lab[:, 1:]; n_lab = int((r_tgt != -100).sum())
+            rep_loss = sum(F.cross_entropy(r_logits[i].float(), r_tgt[i], ignore_index=-100, reduction="sum") for i in range(r_logits.shape[0])) / max(n_lab, 1)
+            (REPLAY_W * rep_loss).backward(); rep_loss = rep_loss.item(); del r_logits
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         tokens += n_tok
