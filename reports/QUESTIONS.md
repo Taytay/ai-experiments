@@ -274,6 +274,8 @@ The 12 product pools are disjoint and every product is diagnostic (`merchants.py
 merchants sell across categories.
 *Experiment:* (a) P(category correct | products recalled) on the same merchants; (b) a v2 merchant
 set with overlapping pools and 20% multi-category merchants.
+**Status (2026-09-19):** answered, PLAN step 36, REPORT.md 35. (a) On the v1 set P(category correct | products recalled in the 4-way `sells` item) is 45.2 against 41.7 unconditionally: the category failures are failures of the products-to-category bridge, not of recall. (b) On the v2 set (`merchants.build_v2`: each category's pool shares two products with the next category, 20% of merchants sell one product of another category) category accuracy falls 41.7 to 28.3 while `sells` (55.0) and reverse (43.3) hold; multi-category merchants read 16.7 against 31.2 for single-category ones; the untouched embedding model's mapping of a held-out merchant's description falls from 100 to 79 to 83. The bridge is exact when products are diagnostic and breaks when they are not.
+
 
 **DATA-3 (R) Does morphology transfer hold for genuinely novel stems, and what is the slope against marker reliability?**
 Probe names recombine the same 36 prefixes and suffixes as trained names (`universe.py:39-43,
@@ -289,6 +291,8 @@ Each merchant has one bank rendering, used only at test time (`merchants.py:51-5
 are always intact. Real strings truncate (`SQ *THE COFF`, `AMZN Mktp US*2K3`).
 *Experiment:* add renderings to training text (LLM and embedding), add truncation/abbreviation
 templates, write the regex normalizer, report `bank_category` through it for every condition.
+**Status (2026-09-19):** answered, PLAN step 36, REPORT.md 35. Tested on section 4's two recipes with replicated baselines (embedding 70.8, 0.5B 12.5 on the bank string). Embedding route: six card-statement renderings per merchant in training (`merchants.rendering_texts`) take the never-seen bank string from 70.8 to 100; the regex normaliser (`merchants.normalize`) alone also gives 100, and 92.7 on a new truncated string (`bank_hard_string`, name cut to 8 characters) against 44.8 raw. 0.5B decoder: the normaliser lifts the bank string from 12.5 to 44.2, its own clean-name level (41.7), and the truncated string from 10.8 to 36.7; renderings in training add 6 points raw and nothing normalised, and cost 12 points of reverse lookup. Held-out merchants stay at chance in every cell. Not run: renderings for the 3B decoder or the section 24.7 encoders; a learned normaliser.
+
 
 **DATA-5 (R) Is it template diversity or simply distinct token sequences that makes knowledge extractable, and how does it scale?**
 "Augmented" is 14 fixed templates (`merchants.py:95-112`), ~20 for the universe; the doubling is

@@ -2155,3 +2155,63 @@ The third doubt was that real stems are often word-initial (the INN stems `-vir`
 ### 34.3 What the step says
 
 DATA-3's three doubts, answered: the morphology transfer of section 8 is not a recombination effect (unseen-part probes read the same as recombined-part probes at every coverage), it is a monotone function of marker coverage (60 at 0.3, 79 at 0.5, 96 at 0.7, 98 to 100 above), and it does not depend on the stem being a suffix (prefix markers 100 / 97.9). The one correction is to the reviewer's word: `morph_p` is coverage, and a reliability sweep, where a marker sometimes points to the wrong class, has not been run; nor has the INN-stem-to-ATC-class replicate on real drug names, which needs a real name list and is the natural first item for row 36's realism work if the owner wants the pharmaceutical case as well as the merchant one. For the categoriser the reading is direct: a merchant family that shares a visible token (`AMZN`, `SQ *`, a franchise prefix) will be placed with its family by a fine-tuned model even when the rest of the string is new, and how reliably depends on how consistently the family's members carry the token in the training data, with about 60% of a perfect score at 30% coverage and the ceiling from 90%. Six runs, 87 minutes of training.
+
+## 35. Merchant realism: a regex normaliser or six renderings per merchant close the bank-string gap for the embedding route, the normaliser alone lifts the 0.5B model from chance to its clean-name level, and the products-to-category bridge, not recall, is what product ambiguity breaks (DATA-4, DATA-2)
+
+*PLAN step 36. Code: `merchants.renderings` / `rendering_texts` / `normalize` / `bank_hard_string` / `build_v2`, `scripts/exp_merchant_realism.py` (both routes, both sets, both conditions; per-item records under `results/per_item/merchant_realism.*.jsonl`), `scripts/merchant_realism_tables.py` (the tables). Results `results/merchant_realism.json`; tracker experiment `merchant_realism`.*
+
+Section 4 left the merchant problem at a known place: contrastive fine-tuning of a small embedding model learns every trained merchant and carries 70.8% of them to the bank-statement string it never saw, while the 0.5B language model, under every training condition and even with the fact in the prompt, sits at chance on that string. The reviewer's DATA-4 asked why the obvious fix, training on noisy renderings and normalising the string at test time, was never tried; DATA-2 asked how much of the category result is recall of the products against the products-to-category bridge, and whether the bridge survives products that do not name their category. Both are answered here with section 4's two recipes unchanged (the embedding route: all-MiniLM-L6-v2, six contrastive epochs, 96 trained and 24 held-out merchants; the language-model route: Qwen2.5-0.5B, full fine-tuning at 1e-5 for 420 steps, all 120 merchants) on two merchant sets and two training conditions. The renderings (`merchants.rendering_texts`) are six card-statement strings per merchant drawn from twelve templates disjoint from the test template: processor prefixes (`TST*`, `PAYPAL *`, `PP*`, `CKCD`), the name cut to 8 or 10 characters, a vowel-dropped abbreviation (`ELRHLM`), store numbers, cities and dates, each tied to the merchant's name and products in a sentence. The normaliser (`merchants.normalize`) is fourteen prefix rules, four regexes for numbers, dates and store tokens, a city and state list, and title-casing; it removes noise and does not restore a truncated name. Two test strings per merchant: the held-out `bank_string` of section 4 (an intact name inside noise) and a new `bank_hard_string` with the name cut to eight characters (`CHKCARD FALVARRO 1032 OMAHA NE`), each scored raw and normalised. The v2 set (`merchants.build_v2`) keeps the 120 names and gives each category's product pool two products of the next category, so a product no longer names its category, and makes 20% of the merchants sell one product of another category.
+
+**Table 35.1: the embedding route (all-MiniLM-L6-v2, contrastive, 96 trained and 24 held-out merchants): 12-way category by nearest category text (accuracy %; chance 8.3)**
+
+| test string | v1 clean | v1 + renderings | v2 clean | v2 + renderings |
+|---|---|---|---|---|
+| name (trained) | 100 | 100 | 100 | 100 |
+| bank string (trained) | 70.8 | 100 | 81.2 | 100 |
+| bank string, normalised (trained) | 100 | 100 | 100 | 100 |
+| truncated string (trained) | 44.8 | 61.5 | 42.7 | 57.3 |
+| truncated, normalised (trained) | 92.7 | 91.7 | 95.8 | 96.9 |
+| description (trained) | 100 | 100 | 100 | 100 |
+| name (held out) | 12.5 | 8.3 | 0 | 0 |
+| bank string (held out) | 4.2 | 8.3 | 8.3 | 0 |
+| bank string, normalised (held out) | 12.5 | 8.3 | 0 | 0 |
+| truncated, normalised (held out) | 12.5 | 8.3 | 8.3 | 4.2 |
+| description (held out) | 100 | 100 | 83.3 | 79.2 |
+| training minutes | 0.35 | 0.42 | 0.33 | 0.41 |
+
+**Table 35.2: the language-model route (Qwen2.5-0.5B, full fine-tuning at 1e-5, 420 steps, all 120 merchants trained): section 4's formats plus the normalised and truncated bank strings, and the products-to-category bridge (accuracy %; chance 8.3 on 12-way, 25 on 4-way)**
+
+| measure | v1 clean | v1 + renderings | v2 clean | v2 + renderings |
+|---|---|---|---|---|
+| clean_category (12-way) | 41.7 | 40.8 | 28.3 | 27.5 |
+| bank_category | 12.5 | 18.3 | 9.2 | 9.2 |
+| bank, normalised | 44.2 | 45 | 25.8 | 31.7 |
+| truncated bank | 10.8 | 12.5 | 8.3 | 10 |
+| truncated, normalised | 36.7 | 36.7 | 26.7 | 24.2 |
+| sells (4-way) | 51.7 | 60.8 | 55 | 46.7 |
+| reverse (4-way) | 42.5 | 30 | 43.3 | 29.2 |
+| P(clean_category | sells correct) | 45.2 | 43.8 | 28.8 | 32.1 |
+| merchants with sells correct | 62 | 73 | 66 | 56 |
+| clean_category, single-category merchants | - | - | 31.2 | 30.2 |
+| clean_category, multi-category merchants | - | - | 16.7 | 16.7 |
+| sells, single / multi | - | - | 56.2 | 50 |
+| sells, multi | - | - | 50 | 33.3 |
+| perplexity, neutral English | 26.01 | 25.69 | 26.34 | 25.62 |
+| training texts | 1680 | 2400 | 1680 | 2400 |
+| training minutes | 2.4 | 2.5 | 2.4 | 2.4 |
+
+### 35.1 The embedding route: renderings in training or a normaliser at test time each close the bank-string gap, and the truncated name needs both
+
+The clean v1 column reproduces section 4.3.1 to the decimal (bank string 70.8 on the 96 trained merchants, name 100, held-out merchants at chance), so the two additions are read against a replicated baseline. Six card-statement renderings per merchant in the contrastive pairs take the never-seen bank string from 70.8 to 100. The normaliser alone, applied to the test string of the clean model, also takes it to 100: on section 4's test template the name is intact inside the noise, and once the prefix, store number, city and date are stripped the string *is* the name, which the clean model already maps at 100. The truncated string is where the two differ. Raw, the clean model reads 44.8 and the renderings model 61.5; normalised, 92.7 and 91.7. The normaliser does most of the work on that string too (it strips everything but the eight-character stem, and the WordPiece pieces of `FALVARRO` are the pieces of `Falvarro Llc`), and training on renderings adds 17 points to the raw number but nothing to the normalised one. The held-out merchants stay at chance in every cell (0 to 12.5 on 24 merchants), as in section 4: nothing about a name says what the store sells, and neither renderings nor normalisation changes that. On the v2 set the same pattern holds (81.2 to 100 with renderings, 100 normalised, truncated 42.7 / 57.3 raw and 95.8 / 96.9 normalised), with one difference that belongs to DATA-2: the *description* of a held-out merchant, which the untouched model and every v1 model map at 95.8 to 100, maps at 83.3 and 79.2 on v2, because two of a category's ten products now also belong to its neighbour and a fifth of the merchants sell one product of another category. The bridge from products to category is exact when the products are diagnostic and loses 17 to 21 points when they are not, on a model that never trained on those merchants at all.
+
+### 35.2 The language-model route: the normaliser does what training could not, renderings add little, and ambiguity breaks the bridge
+
+The clean v1 column reproduces section 4.3.2's best row to the decimal (clean category 41.7, bank string 12.5, sells 51.7, reverse 42.5, perplexity 26.0 at 1e-5), so again the additions are read against a replicated baseline. Section 4 found that no training condition, and not even the fact in the prompt, lifted the 0.5B model off chance on the bank string; the normaliser does: 12.5 to 44.2, which is the model's own clean-name number (41.7), and 36.7 on the truncated string against 10.8 raw. The knowledge was there and the string was the problem, exactly as the embedding route said in section 4.3.1 with its 70.8, and a hundred lines of regex fix it for a 0.5B decoder as they do for a 22M encoder. Training on the renderings is a different story for this route: bank string 12.5 to 18.3, normalised 44.2 to 45.0, truncated 10.8 to 12.5, so six noisy renderings per merchant in 2,400 training sentences teach a 0.5B model almost nothing about reading its own bank strings, where the same renderings took the embedding model from 70.8 to 100. The renderings are not free either: reverse lookup falls from 42.5 to 30.0 in both sets, because the added sentences run name-to-products only and dilute the backward statements (section 27's lesson about backward recall coming from backward sentences), while `sells` rises 51.7 to 60.8 on v1. General perplexity is unchanged (25.6 to 26.3).
+
+DATA-2's question was how much of the category result is recall of the products and how much the bridge from products to category. On v1, P(category correct | the merchant's products were recalled in the 4-way `sells` item) is 45.2 against 41.7 unconditionally, on 62 merchants: knowing what the store sells raises the odds of naming its category by three points, so the failures are mostly failures of the bridge, not of recall. On v2, where two of every category's ten products belong to the neighbouring category too and a fifth of the merchants sell one product from elsewhere, the category numbers fall while recall holds: clean category 41.7 to 28.3 (renderings 27.5), P(category | sells) 45.2 to 28.8, while `sells` stays at 55.0 and reverse at 43.3. Inside v2 the multi-category merchants are the casualties: category 16.7 against 31.2 for the single-category ones, `sells` 50.0 against 56.2. The embedding route's held-out description number told the same story from the other side (100 to 79 to 83 on merchants it never trained on). A model that has recalled "sushi rolls, frozen vegetables and packaged snacks" has no more idea than chance which of two categories that is, and no amount of merchant training fixes it, because the ambiguity is in the world, not in the weights.
+
+### 35.3 What the step says
+
+DATA-4: the fix the reviewer asked about works, and which half of it matters depends on the model. For the embedding route, renderings in training and a normaliser at test time are each sufficient on section 4's bank strings (70.8 to 100 either way) and the normaliser carries the truncated strings too (44.8 to 92.7); for the 0.5B decoder only the normaliser works (12.5 to 44.2, its clean-name level), and renderings in training barely move it while costing backward recall. The string-alignment failure that section 4 reported for the decoder was real and is solved outside the model. DATA-2: the category result is mostly bridge, not recall (recalling the products lifts category accuracy by three points), and the bridge is what product ambiguity breaks: the v2 set costs 13 points of category on a model whose product recall is unchanged, and multi-category merchants read at half the single-category rate. For the owner's categoriser both halves point the same way: normalise the statement string before anything else (it is the cheapest and largest gain in this report), train the encoder route on renderings if the strings truncate, and expect the products-to-category step, not merchant recall, to be the residual error on real merchants, whose products are ambiguous by nature; a category-level signal (the user's own labels, row 35) rather than a product description is what closes that gap. Cost: eight training runs, 12 minutes in all.
+
+Not run: renderings for the 3B decoder or the section 24.7 encoders (the recipe here is section 4's, chosen so the baselines replicate), a learned normaliser, and the v2 set with the user-labelled evaluation of row 35, where the ambiguity will matter most.
