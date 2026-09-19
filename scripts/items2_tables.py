@@ -50,7 +50,7 @@ def main():
                 v = load(v1file).get(v1cond, {}).get(key)
             else:
                 d = load(f"items2_{tag}")
-                cond = ("base" if tag == "base" or tag.startswith("edit_") else "trained") + ("_ctx" if src == "v2ctx" else "")
+                cond = ("base" if tag == "base" else "trained") + ("_ctx" if src == "v2ctx" else "")  # exp_items_v2 files a full checkpoint under "trained"
                 v = d.get(cond, {}).get(key)
             cells.append(fmt(v))
         print(f"| {label} | " + " | ".join(cells) + " |")
