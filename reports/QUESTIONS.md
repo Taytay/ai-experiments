@@ -655,3 +655,30 @@ function that builds the image from `uv.lock`, mounts `hf_cache` and the frozen 
 `exp_curriculum.py` / `exp_encoder.py`, and syncs results and adapters back (DVC). Tinker ($20 to $40) is
 worth trying once TRAIN-8 has a local number: its shipped on-policy distillation recipe is the independent
 check, and frontier-size trace generation for REAL-5 costs a few dollars there.
+
+## Added 2026-09-19: hardening the REAL-5 result before the cloud runs
+
+Section 38's headline (the categoriser with the merchant's fact-DB record in the prompt: 90 overall, 98 on merchants no
+user labelled) rests on three conveniences. These rows remove them on the 3090; row 34 (Modal) stays for the long runs.
+
+**REAL-7 (O) Does the record-in-prompt number survive ambiguous records, a learned retriever and a second seed?**
+(1) The REAL-6 records use section 4's disjoint product pools, so a record names its category almost by construction;
+section 35 measured a 13-point loss for the products-to-category bridge when pools overlap. (2) The record is found by the
+merchant's name (an oracle); production has only the statement string, and section 25.4's retriever was measured on clean
+strings and 120 records. (3) Every REAL-6 number is one seed. *Experiment:* an ambiguous fact DB for the same 240 merchants
+(each category's pool gains two products of the next one; a fifth of the merchants sell two of their own products and one of
+another category), frozen beside `real6_v1`; the record-in-prompt and parametric categorisers retrained and rescored on it.
+A MiniLM retriever over the 240 records tuned on templated statement renderings of the DB's own names (no user labels),
+recall@1 / @5 from the 1,179 test strings by known / opaque and full / truncated name, and the categoriser scored end to end
+with the retrieved top-1 record, wrong ones included. Three seeds of SFT no-DB, SFT + record and the 400-step parametric arm.
+
+**INFRA-2 (O) A categoriser trainer that does not depend on unsloth.**
+Sections 31 and 38 hit unsloth's fused loss and allocator behaviour (`labels=` chunking from free memory, the "unsloth"
+checkpointing assertion, `merge_and_unload` breaking the fast forward); the owner asked whether it is more trouble than it
+is worth. *Task:* a `TRAINER=hf` path in `exp_categoriser.py` (transformers + peft, same LoRA, schedule, batches and seed),
+the same-seed comparison on REAL-6 and the wall-clock and memory cost, so production can depend on either.
+
+**REAL-8 (O) The parametric exposure curve and the chat template.**
+Section 38: one pass over the records injected nothing, three passes gave +21 on DB-only merchants at a nine-point ARC cost.
+*Experiment:* six and twelve passes (800 and 1,600 steps at 50%) on the same axis; and the REAL-6 prompt through the instruct
+model's chat template, since production will use it.
