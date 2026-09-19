@@ -567,6 +567,7 @@ and Timmy from the weights against arm C. PLAN row 29.
 The weakness = f(type) map (DATA-1) is an attribute-attribute edge the training text never states.
 *Experiment:* bare items "creatures of type T are weak to ?" and the two-hop path form, per adapter; above chance
 means the weights completed the graph through type. Eight facts, so a yes/no answer, not a percentage. PLAN row 30.
+**Status (2026-09-19):** answered, PLAN step 30, REPORT.md 42, with a corrected premise: two knowledge templates state the rule as a clause ("like all {T}-types it is weak to {W}"), 136 times. Bare rule question (`universe.graph4_items`, eight items): 0 to 4 of 8 for every adapter (chance 1): the clause never becomes a queryable rule. Path form (type stated, weakness asked, 136 items): base and arm D copy the stated type (0 / 5); arm C 64 to 69 (six or seven of eight types), which on this universe is both the rotation and the species' fact. On the independent-weakness universe arm C answers 39.7, and 39.7% of its answers are the species' own weakness against 19.9% the type's plurality: weakness is stored per species, anchored to the type-first sentence frame, not as f(type). Frozen as `graph4_v1{,_wind}.json`, scored in every run from now on.
 
 **GRAPH-5 (R) Does a text-initialised inductive KGE baseline add anything over prototypes?**
 BLP (2010.03496) and SimKGC (2203.02167) score unseen entities from text descriptions; SimKGC beats RotatE only on
