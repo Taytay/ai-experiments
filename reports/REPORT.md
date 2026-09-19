@@ -1897,3 +1897,83 @@ The owner's suggestion was to write the facts as structured records, which is wh
 - Several facts per subject are the open problem. With subject-first prompts the five edits of a species share a key and average (per-fact plain recall 16 to 25); relation-first clauses separate them partly (46 / 36 / 69); relation-first records less (25 / 14 / 81); keys at the field token collide across subjects instead. The joint target vector per subject is the untried fix.
 - For the owner's fact-DB goal (REAL-5): an editor is a fast store of one association per entity that answers in any phrasing at zero cost to the model, and it is not a store of a record and not a source of anything computed from it. The record and the hop to a category come from retrieval or from the fine-tune's augmentation and training on the hop itself (row 33).
 - Saved under `models/adapters/`: `edit_memit_type_qwen2.5-3b` (the destroyed model, kept as evidence), `edit_memit_type_ridge{150,15}_qwen2.5-3b`, `edit_alphaedit_{type,all}_qwen2.5-3b`, `edit_memit_allpre_ridge15_qwen2.5-3b`, `edit_memit_allyaml_ridge15_qwen2.5-3b`; pushed to DVC.
+
+## 31. On-policy distillation from the pre-injection model returns every general measure to the base and erases the facts with them, unless the injection mixture stays in the loop: then it keeps the facts at arm C's level and beats general-text replay on every number (TRAIN-8)
+
+*PLAN step 31. Code: `scripts/exp_onpolicy_distill.py` (the loop), `scripts/opd_tables.py` (the tables), `data/processed/opd_prompts_v1.json` (the frozen prompt pools). Results: `results/opd_<tag>.json` (curves), `results/curriculum_Qwen2.5-3B_C_opd_<tag>.json` and `results/curriculum_Qwen2.5-3B_{base,C}_rescore0917.json` (full ladder), adapters `models/adapters/curriculum_Qwen2.5-3B_C_opd_<tag>_lora`. Tracker experiment `onpolicy_distill`; the full-ladder scores are `curriculum_v2` runs with `EVAL_ONLY`.*
+
+Thinking Machines' personalization experiment (`references/task_training_and_services.md` section 4) is our forgetting problem with a fix attached: midtraining Qwen3-8B on documents took IF-eval from 85 to 45, and on-policy distillation afterwards, with the original model as teacher on Tulu-3 prompts, brought it to 83 while the injected knowledge stayed (43 to 41). Arm C loses the same things (section 16: WikiText perplexity 10.6 to 22.8; section 15: ARC-Easy 73.5 to 58.5), and with a LoRA student the teacher costs nothing: it is the same weights with the adapter disabled, which reproduces the untrained base's perplexity to three decimals. The loop samples the student at temperature 1 on 64 prompts x 4 samples of up to 96 new tokens per step, scores every sampled prefix under both models, and takes one AdamW step on the adapter (lr 1e-4, 10-step warmup, linear decay over 120 steps, the injection recipe's shape) on the reverse KL. Both distributions are on this machine, so the loss is the exact per-position KL(student || teacher) over the whole vocabulary rather than the blog's sampled-token estimator (`KL=sample` implements that too; not run). The prompts are the first 40 words of FineWeb-Edu documents (run 1) or Tulu-3 user turns as "Question: ... Answer:" (run 2, the blog's setting); neither pool touches the species, the ladder, the ICL suite or the WikiText slice. A third pool (WikiText-2 train prefixes, TRAIN-7's replay source) was stopped at step 15 for time once the first two agreed. A subsample point (ladder[::4], ICL suite[::2], the 200 ARC-Easy items, the WikiText slice) is taken every 30 steps; the full ladder is scored on the saved adapter through `exp_curriculum.py` as for every other arm.
+
+**Table 31.1: on-policy distillation (OPD) of arm C toward the adapter-off base on 120 steps of 64 prompts x 4 samples, full ladder (accuracy %; the base and arm C re-scored on 2026-09-18 reproduce their section 8 and 15 numbers exactly)**
+
+| measure | base (sec. 8) | C (sec. 15) | Cg replay (sec. 17) | C + OPD FineWeb, exact KL | C + OPD Tulu, exact KL | C + OPD FineWeb + C replay |
+|---|---|---|---|---|---|---|
+| recall, trained fmt | 13.1 | 100 | 100 | 37.5 | 33.8 | 96.9 |
+| recall, bare | 18.1 | 19.4 | 18.8 | 21.9 | 20.6 | 21.2 |
+| yes/no | 42.5 | 77.5 | 73.8 | 46.2 | 45 | 77.5 |
+| pair | 51.2 | 81.2 | 58.8 | 50 | 48.8 | 68.8 |
+| Timmy k=3 | 35.6 | 61.9 | 47.5 | 38.1 | 36.2 | 61.9 |
+| k=4 | 27.5 | 51.9 | 46.9 | 30.6 | 34.4 | 50.6 |
+| weakness | 35 | 60 | 50 | 34.4 | 32.5 | 57.5 |
+| habitat | 31.2 | 29.4 | 31.9 | 30.6 | 35 | 31.9 |
+| held-out species | 39.6 | 29.2 | 30.2 | 35.4 | 32.3 | 27.1 |
+| unseen recall | 16.7 | 12.5 | 12.5 | 12.5 | 12.5 | 12.5 |
+| seen recall control | 16.7 | 20.8 | 20.8 | 20.8 | 25 | 20.8 |
+| reverse hard | 20 | 19.4 | - | 20.6 | 25 | 26.2 |
+| ICL symbol | 60.4 | 78.6 | 81.2 | 75 | 72.9 | 82.3 |
+| ICL natural | 84.9 | 87 | 89.1 | 89.1 | 88.5 | 90.1 |
+| ARC-Easy | 73.5 | 58.5 | 71 | 73 | 75.5 | 73.5 |
+| WikiText ppl | 10.614 | 22.787 | 11.599 | 10.579 | 10.598 | 11.076 |
+| repair minutes | - | - | - | 271.0 (199.7 sampling) | 478.4 (322.9 sampling) | 317.8 (218.0 sampling) |
+
+**Table 31.2: the repairs' curves: exact or sampled-token reverse KL per completion token (mean over the step's samples), mean sample length, and the subsample points (ladder[::4], ICL suite[::2], the 200 ARC-Easy items, the WikiText slice)**
+
+| run | step | KL | replay loss | mean len | recall fmt | yes/no | Timmy k=3 | ICL sym | ICL nat | ARC-Easy | WikiText ppl |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| FineWeb, exact KL | 0 | 1.5651 | - | 11.1 | 100 | 80 | 60 | 71.9 | 89.6 | 58 | 25.663 |
+| FineWeb, exact KL | 30 | 0.0255 | - | 96 | 30 | 55 | 27.5 | 72.9 | 85.4 | 72 | 11.192 |
+| FineWeb, exact KL | 60 | 0.0207 | - | 93.6 | 22.5 | 55 | 25 | 78.1 | 90.6 | 73 | 11.124 |
+| FineWeb, exact KL | 90 | 0.0087 | - | 93.4 | 22.5 | 55 | 30 | 78.1 | 90.6 | 73 | 11.087 |
+| FineWeb, exact KL | 120 | 0.007 | - | 94.1 | 22.5 | 55 | 30 | 78.1 | 90.6 | 73.5 | 11.088 |
+| Tulu, exact KL | 0 | 1.427 | - | 15.6 | 100 | 80 | 60 | 71.9 | 89.6 | 58 | 25.663 |
+| Tulu, exact KL | 30 | 0.0368 | - | 77.5 | 30 | 50 | 32.5 | 78.1 | 87.5 | 70.5 | 11.15 |
+| Tulu, exact KL | 60 | 0.0145 | - | 75.9 | 25 | 50 | 35 | 75 | 87.5 | 72 | 11.084 |
+| Tulu, exact KL | 90 | 0.0101 | - | 78.7 | 25 | 45 | 32.5 | 70.8 | 88.5 | 73 | 11.097 |
+| Tulu, exact KL | 120 | 0.0105 | - | 82.6 | 25 | 45 | 35 | 74 | 88.5 | 72.5 | 11.105 |
+| FineWeb + C replay | 0 | 1.5651 | 0.259 | 11.1 | 100 | 80 | 60 | 71.9 | 89.6 | 58 | 25.663 |
+| FineWeb + C replay | 10 | 0.1578 | 0.5355 | 93.7 | 97.5 | 80 | 60 | 74 | 89.6 | 69.5 | 12.206 |
+| FineWeb + C replay | 20 | 0.0668 | 0.3761 | 95.8 | 92.5 | 75 | 60 | 78.2 | 86.5 | 70 | 11.623 |
+| FineWeb + C replay | 30 | 0.0498 | 0.3335 | 95.5 | 90 | 80 | 62.5 | 77.1 | 89.6 | 69.5 | 11.568 |
+| FineWeb + C replay | 40 | 0.035 | 0.3846 | 94.7 | 100 | 85 | 60 | 76 | 86.5 | 66 | 11.604 |
+| FineWeb + C replay | 50 | 0.0403 | 0.381 | 94.5 | 100 | 80 | 67.5 | 80.2 | 87.5 | 69.5 | 11.72 |
+| FineWeb + C replay | 60 | 0.0338 | 0.3852 | 93.4 | 92.5 | 75 | 65 | 76 | 86.5 | 70 | 11.753 |
+| FineWeb + C replay | 70 | 0.0367 | 0.3741 | 93.5 | 92.5 | 90 | 67.5 | 76 | 86.5 | 70.5 | 11.729 |
+| FineWeb + C replay | 80 | 0.025 | 0.3547 | 91.8 | 97.5 | 75 | 62.5 | 74 | 83.3 | 72 | 11.651 |
+| FineWeb + C replay | 90 | 0.0269 | 0.2908 | 93.9 | 97.5 | 75 | 57.5 | 74 | 85.4 | 71.5 | 11.577 |
+| FineWeb + C replay | 100 | 0.0251 | 0.2897 | 93.8 | 100 | 70 | 52.5 | 82.3 | 85.4 | 70.5 | 11.561 |
+| FineWeb + C replay | 110 | 0.0209 | 0.2916 | 94 | 100 | 75 | 60 | 81.2 | 87.5 | 72.5 | 11.565 |
+| FineWeb + C replay | 120 | 0.0195 | 0.3637 | 93.7 | 100 | 70 | 60 | 84.4 | 85.4 | 72.5 | 11.553 |
+
+### 31.1 The general measures come back to the base, completely, in thirty steps
+
+Arm C's own samples are the first surprise: on FineWeb prefixes every one of the 256 samples ends within 96 tokens and the mean completion is 11 tokens, because the knowledge stream taught it 24-token sentences that end in end-of-text, and the teacher charges 1.57 nats per token for that on average. By step 10 the KL is 0.13 and the mean sample 95 tokens; by step 30 it is 0.026 and the subsample perplexity is already the teacher's (11.19 against 11.12 on the script's own forward path, which reads 0.05 nats above `exp_curriculum.py`'s 10.61 for the same weights and the same function, an unresolved path difference, so those numbers are only compared with each other; the full-ladder numbers below all come from `exp_curriculum.py`, whose re-score of the base and arm C on 2026-09-18 reproduced sections 8 and 15 to the last decimal); by step 120 the KL is 0.007 nats per token, the student is the teacher on its own samples. On the full ladder the repaired adapters read WikiText perplexity 10.58 and 10.60 against the base's 10.61 (arm C 22.8, arm Cg's replay 11.6), ARC-Easy 73.0 and 75.5 against 73.5 (C 58.5, Cg 71.0), natural-label ICL 89 (base 84.9, C 87.0). Item by item the repaired model agrees with the base on 92 to 97% of the ARC items and 96 to 99% of the yes/no and pair items: not "as good as the base" but the base's answers. The two prompt pools give the same result (16% of items flip between them, under the 17.9% between two same-seed runs of arm C in section 19); Tulu prompts leave more variance in sample length (68 of 256 still end early at step 120) and cost more time.
+
+One general skill survives partly: symbol-label ICL, which the episodes raised from 60.4 to 78.6, reads 75.0 and 72.9 after the repair. The sampled prompts never exercise that format, so the KL never sees it; the same is true of the fact prompts, and those did not survive.
+
+### 31.2 The facts go with it
+
+Recall in the trained sentence falls from 100 to 37.5 (FineWeb prompts) and 33.8 (Tulu) on eight options, and the subsample curve shows it at 30 by step 30, the same step at which the perplexity arrives at the teacher's: the repair and the erasure are one process. Every from-the-weights gain of arm C returns to the base: yes/no 77.5 to 46.2 and 45.0 (base 42.5), pair 81.2 to 50.0 and 48.8 (51.2), Timmy k=3 61.9 to 38.1 and 36.2 (35.6), weakness 60 to 34.4 and 32.5 (35). What is left of the facts is a residue above chance: 37.5 on eight options where the base reads 13.1, and on those items the repaired model agrees with the base on fewer than 1% of its answers, so it is neither arm C nor the base there but a scrambled remnant.
+
+### 31.3 The adapter is not erased, it is re-purposed
+
+The obvious mechanism, that the KL to the adapter-off teacher drives the adapter to zero, is wrong. The repaired adapters' weight deltas (B A per module, summed over the 252 LoRA layers) have 1.007 and 0.983 times arm C's Frobenius norm, and a cosine of 0.82 with arm C's delta (per module type 0.76 for down_proj to 0.89 for q_proj). The repair rotated about a third of the adapter's mass into directions that cancel its effect on general prose, and the directions that held the facts went with it. The adapter is rank 64 across every linear layer and the facts are 160 associations written into it by 12,800 short sequences; nothing localises them, so a low-rank update that cancels the adapter's output distribution on ordinary text is not orthogonal to them. This is the same lesson as section 30 from the other side: the editors write one association into one layer's weights and the general measures do not move; the fine-tune spreads the facts over the whole adapter, and any general-purpose correction to that adapter moves them.
+
+### 31.4 Keeping arm C's mixture in the loop keeps the facts, and the pair beats replay alone on every measure
+
+The third run adds one 16-sequence micro-batch from arm C's own training mixture to every step (knowledge texts, episodes and ICL replay at .45 / .40 / .15, the ordinary token loss with weight 1, one sixteenth of the step's rows next to the 256 sampled ones), so the facts are rewritten while the KL term repairs. That is the whole difference, and it changes the result: recall in the trained sentence 96.9 (the plain repair 37.5), yes/no 77.5 (arm C's own 77.5), Timmy k=3 61.9 (C 61.9, arm Cg 47.5), weakness 57.5 (C 60, Cg 50), k=4 50.6 (C 51.9); the one from-the-weights loss is the pair level, 81.2 to 68.8, still ten points over Cg's 58.8. The general measures stay where the plain repair put them: WikiText perplexity 11.08, 0.043 nats over the base where Cg's replay left 0.088 and arm C 0.76; ARC-Easy 73.5, the base's number exactly (Cg 71.0, C 58.5); symbol-label ICL 82.3 and natural-label 90.1, the best of any arm in the report (base 60.4 and 84.9). Item by item the repaired adapter gives arm C's answer on 96.9% of the trained-sentence recall items and the base's answer on 89.5% of the ARC items. The curve (Table 31.2) shows the two terms settling against each other: the KL flattens at 0.02 to 0.035 nats per token instead of running to 0.007, the replay loss holds at 0.29 to 0.39 (arm C's own loss on that mixture is 0.26 at step 0), recall dips to 90 on the subsample at step 30 and is back at 100 from step 40, and ARC-Easy reaches 70 by step 20 and 72.5 by the end. The adapter geometry is the same story as 31.3 with a smaller angle: the delta has 1.07 times arm C's norm and a cosine of 0.91 with it (the plain repair 0.82); the KL still rotates the adapter, and the replay batch keeps re-writing the fact directions it rotates away.
+
+### 31.5 What the step says
+
+On-policy distillation from the pre-injection model does what the blog reports for the general measures, and better than replay did: perplexity, ARC-Easy and natural ICL return to the base exactly, where arm Cg's 5% general-text replay left perplexity at +0.09 nats and ARC at 71. It does not do what the blog reports for the knowledge. Thinking Machines kept 41 of 43 points of document knowledge through the repair; here 100 points of recall became 35. Three differences are candidates and this step cannot separate them: their knowledge sat in the full weights of an 8B model after midtraining, ours in a rank-64 adapter; their internal-QA measure is a reading-comprehension-style recall of documents, ours the exact sentence the injection trained; and their distillation stopped where the chat behaviour was recovered, while ours ran the KL to 0.007 nats, which is the student reproducing the teacher everywhere the samples reach. With the injection mixture kept in the loop the repair keeps what the blog kept and more: the facts at arm C's level, the general measures at the base, at the cost of one pair-level drop (81 to 69). Against the owner's goals (a categoriser that keeps the injected merchant facts and its general ability) this is the best injected adapter in the report, and it beats TRAIN-7's replay on every measure: perplexity +0.04 against +0.09 nats, ARC 73.5 against 71.0, Timmy 61.9 against 47.5, yes/no 77.5 against 73.8, pair 68.8 against 58.8. The price is time: arm Cg took 29 minutes of training, the plain repairs 271 and 478 minutes (200 and 323 of them sampling), the repair with replay 318 (218 sampling), and each run on top of the 50-minute injection it repairs. Whether 0.05 nats, 2.5 ARC points and 14 induction points over Cg are worth eleven times the compute is the owner's call; the arithmetic changes if the sampler does. The cost is the other honest number: on-policy distillation on a 3B model with Hugging Face generation is 4.5 to 8 hours per 2.8 million sampled tokens on this GPU, five to nine times the injection run it repairs, and a vLLM sampler or a rented H100 would be the first thing to change before running it again.
+
+Not run: the WikiText-train prompt pool (stopped at step 15), the sampled-token estimator (`KL=sample`), a lower learning rate or an early stop at the step where perplexity first reaches the teacher (step 30 in the plain runs, where recall had already fallen to 30), a sweep of the replay weight, and the repair on the 1,000 and 5,000-species adapters of section 29, where the general-ability loss was largest. Two engineering notes for whoever runs it next: the loop alternates a generate phase (256 KV caches) with a training phase (8 x L x V logits), and on this 24 GB card the two fragment each other's allocator reserve until the driver spills to system RAM (one attempt stalled at step 55 at five minutes per step); `torch.cuda.empty_cache()` between the phases fixed it. And unsloth's fused cross-entropy on the `labels=` path sizes its chunks from free GPU memory and raised "No or negligible GPU memory available" after the KL micro-batches; the replay loss is computed from the logits instead.
