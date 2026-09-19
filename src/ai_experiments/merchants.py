@@ -179,3 +179,105 @@ Roasting drives chemical reactions that produce hundreds of aromatic compounds, 
 roast tastes bright and acidic while a dark roast turns bitter and smoky. Whether brewed in a stovetop
 pot, pulled as espresso, or steeped cold overnight, the beverage remains one of the most widely traded
 agricultural commodities on the planet, second only to crude oil in the value of some years' exports."""
+
+
+# --- realism (PLAN step 36, DATA-4 / DATA-2) ------------------------------------
+import re as _re
+
+# Training-time renderings of a merchant as it appears on a card statement: processor prefixes, truncations to 8 or 10
+# characters, vowel-dropped abbreviations, store numbers, cities, dates. Disjoint from _BANK_TMPL, whose one rendering per
+# merchant stays the held-out test string, so no evaluation string is ever trained on.
+_REND_TMPL = ["{U} {city}", "{U8}* {n:04d}", "TST* {U} {city}", "PAYPAL *{U10}", "{U} #{n:03d}", "{ABBR} {city} {d}",
+              "PP*{U8} {n:02d}", "{U10} {cityshort}", "POS {ABBR} {n:04d}", "CKCD {d} {U}", "{U8} {n:05d} {cityshort}", "{ABBR}*{n:03d}"]
+_PREFIXES = ["POS DEBIT", "CARD PURCHASE", "CHECKCARD", "CHKCARD", "DEBIT CARD PURCHASE", "CKCD", "POS", "TST*", "TST", "SQ *", "SQ", "PAYPAL *", "PAYPAL", "PP*", "PP"]
+_CITY_WORDS = sorted({w for c in _CITIES for w in c.split()} | {"WA", "HOUSTON", "SEATTLE", "MINNEAPOLIS", "MN"}, key=len, reverse=True)
+
+
+def _upper(m):
+    return m["name"].upper().replace("&", "AND")
+
+
+def _abbr(u):
+    """Drop the vowels after the first letter of each word (KELVARRO -> KLVRR), as processors do to fit a field."""
+    return " ".join(w[0] + _re.sub(r"[AEIOU]", "", w[1:]) if len(w) > 3 else w for w in u.split())
+
+
+def renderings(m, rng, k=6):
+    """k distinct card-statement renderings of merchant m for the training text (never its held-out bank_string)."""
+    u = _upper(m)
+    fill = dict(U=u, U8=u[:8], U10=u[:10], ABBR=_abbr(u), city=m["city"], cityshort=m["city"].split()[0], n=m["n"], d=m["d"])
+    out, tmpls = [], list(range(len(_REND_TMPL)))
+    rng.shuffle(tmpls)
+    for i in tmpls:
+        r = _REND_TMPL[i].format(**fill)
+        if r != bank_string(m) and r not in out:
+            out.append(r)
+        if len(out) == k:
+            break
+    return out
+
+
+def rendering_texts(m, rng, k=6):
+    """Training sentences that tie the renderings to the merchant and to what it sells (DATA-4: 'train on noisy renderings')."""
+    rs = renderings(m, rng, k)
+    tm = ["Card statement line: {R}\nMerchant: {N}", "The transaction '{R}' was a purchase at {N}, which sells {P}.",
+          "'{R}' on a bank statement is {N}."]
+    return [tm[i % len(tm)].format(R=r, N=m["name"], P=prods(m)) for i, r in enumerate(rs)]
+
+
+def normalize(s):
+    """Regex normaliser for card-statement strings: strip processor prefixes, store numbers, dates, cities and state codes,
+    collapse spaces and title-case what is left (SQ *KELVARRO AUSTIN TX 03/14 -> Kelvarro). A truncated or abbreviated name
+    stays truncated (KELVARR, KLVRR): the normaliser removes noise, it does not restore the name."""
+    s = s.strip()
+    changed = True
+    while changed:
+        changed = False
+        for p in _PREFIXES:
+            if s.upper().startswith(p):
+                s = s[len(p):].lstrip(" *"); changed = True
+    s = _re.sub(r"\b\d{2}/\d{2}\b", " ", s)
+    s = _re.sub(r"\bSTORE\s+\d+\b", " ", s, flags=_re.I)
+    s = _re.sub(r"[#*]\s*\d+", " ", s)
+    s = _re.sub(r"\b\d+\b", " ", s)
+    s = _re.sub(r"\b(" + "|".join(_re.escape(w) for w in _CITY_WORDS) + r")\b", " ", s)
+    s = _re.sub(r"[*#]", " ", s)
+    s = _re.sub(r"\s+", " ", s).strip()
+    return s.title()
+
+
+def build_v2(n_per_cat=10, seed=0, overlap=2, multi_frac=0.2):
+    """DATA-2: the same 120 merchants with product ambiguity. Each category's pool gains `overlap` products of the next
+    category (so a product no longer names its category), and a `multi_frac` share of merchants sell two products of their
+    category and one of another (multi-category merchants; the label is the category of two of the three products)."""
+    rng = random.Random(seed)
+    pools = {}
+    for i, c in enumerate(CATEGORY_LIST):
+        nxt = CATEGORY_LIST[(i + 1) % len(CATEGORY_LIST)]
+        pools[c] = list(CATEGORIES[c]) + CATEGORIES[nxt][:overlap]
+    names, merchants = set(), []
+    for cat in CATEGORY_LIST:
+        for j in range(n_per_cat):
+            while True:
+                name = rng.choice(_PREFIX) + rng.choice(_SUFFIX) + rng.choice(_TAG)
+                if name not in names:
+                    names.add(name); break
+            multi = j < round(n_per_cat * multi_frac)
+            if multi:
+                other = rng.choice([c for c in CATEGORY_LIST if c != cat])
+                prods_ = rng.sample(CATEGORIES[cat], 2) + [rng.choice(CATEGORIES[other])]
+                rng.shuffle(prods_)
+            else:
+                other = None
+                prods_ = rng.sample(pools[cat], 3)
+            merchants.append({"name": name, "category": cat, "products": prods_, "multi": multi, "secondary": other,
+                              "city": rng.choice(_CITIES), "n": rng.randint(1, 9999),
+                              "d": f"{rng.randint(1,12):02d}/{rng.randint(1,28):02d}",
+                              "bank_tmpl": rng.randrange(len(_BANK_TMPL))})
+    return merchants
+
+
+def bank_hard_string(m):
+    """A second held-out test rendering with the name cut to 8 characters (CHKCARD ELRHOLM 4970 TUCSON AZ, CHKCARD FALVARRO 0123 ...):
+    the truncation case, which the normaliser cannot undo and only training on truncated renderings can teach."""
+    return f"CHKCARD {_upper(m)[:8]} {m['n']:04d} {m['city']}"
