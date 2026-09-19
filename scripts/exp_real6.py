@@ -148,7 +148,9 @@ cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, r
            n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
 with Run("real6", model=cfg["model"], config=cfg, enabled=not SMOKE) as run:
     results = run_llm(run) if ROUTE == "llm" else run_encoder(run)
-    OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2)); run.artifact(OUT)
+    OUT.parent.mkdir(exist_ok=True)
+    merged = json.loads(OUT.read_text()) if OUT.exists() and not SMOKE else {}  # a later run of other conditions (CONDS=ret1) keeps the earlier ones
+    merged.update(results); OUT.write_text(json.dumps(merged, indent=2)); run.artifact(OUT)
 print(f"=== real6 {tag}")
 for cond, r in results.items():
     print(f"-- {cond}: " + " ".join(f"{lv}={r[lv]}" for lv in CELLS + ["R6_seen_all", "R6_unseen_all", "R6_all"] if lv in r) + f" | chance {r.get('R6_all_chance')} null {r.get('R6_all_null')}")
