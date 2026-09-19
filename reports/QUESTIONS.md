@@ -227,7 +227,7 @@ type 25% of the time (`universe.py:246`), so that prior is taught. The observed 
 59.4 type vs 35.0 habitat) matches a model that simply assumes type.
 *Experiment:* two demos per group sharing exactly one attribute; stratify existing items by
 identifiability; report only on identifiable items, per generating attribute.
-**Status (2026-09-18):** answered, PLAN step 20, REPORT.md 33. Two findings before any model: weakness is a bijection of type in the universe, so the L4 weakness level was a second type level and the "transfer to weakness" of sections 8 and 15 was not a transfer; and three quarters of the v1 items are silent on the competing rule. Stratified (`scripts/induct_strata.py`), arm C answers habitat items by type (12.5 where the rules conflict, 47.1 where they coincide). New identifiable items (`universe.induction_v2`: two demos per group sharing only the generating attribute, `induction2_v1.json`, scored in every run from now on): the type induction from the weights is real and identifiable (C 66.2, D 66.9, 1,600 steps 82.5, base 41.2), habitat / diet / region from the weights are at chance for every arm but D (45 to 46), and no arm ever picks the unseen label (0.0 for all, base included): the rule is copied from a shown group, never applied to an unshown one. With the entries in context every attribute reads 60 to 86.
+**Status (2026-09-18):** answered, PLAN step 20, REPORT.md 33. Two findings before any model: weakness is a bijection of type in the universe (DATA-1's point, row 23), so the L4 weakness level was a second type level and the "transfer to weakness" of sections 8 and 15 was not a transfer; and three quarters of the v1 items are silent on the competing rule. Stratified (`scripts/induct_strata.py`), arm C answers habitat items by type (12.5 where the rules conflict, 47.1 where they coincide). New identifiable items (`universe.induction_v2`: two demos per group sharing only the generating attribute, `induction2_v1.json`, scored in every run from now on): the type induction from the weights is real and identifiable (C 66.2, D 66.9, 1,600 steps 82.5, base 41.2), habitat / diet / region from the weights are at chance for every arm but D (45 to 46), and no arm ever picks the unseen label (0.0 for all, base included): the rule is copied from a shown group, never applied to an unshown one. With the entries in context every attribute reads 60 to 86.
 
 
 **EVAL-5 (R) Is the ICL regression suite really out-of-distribution for the trained arms?**
@@ -267,12 +267,15 @@ bioS-couple result (2309.14316, Figure 6) shows correlated attributes get chaine
 rather than to the name, so weakness-as-rotation-of-type is stored as a function of type.
 *Experiment:* make weakness non-bijective or independent per species, or hold out habitat/region
 from episodes instead; re-run arm C.
+**Status (2026-09-19, partial):** the stratification of PLAN step 20 (REPORT.md 33.1) confirms the point from the saved per-item files: the weakness level replicates the type level within noise for every arm, and arm C answers habitat items by the type rule. The re-run with an independent weakness (row 23) is still to do.
 
 **DATA-2 (R) How much of the category result is recall vs the products-to-category bridge, and does the bridge survive product ambiguity?**
 The 12 product pools are disjoint and every product is diagnostic (`merchants.py:10-35`). Real
 merchants sell across categories.
 *Experiment:* (a) P(category correct | products recalled) on the same merchants; (b) a v2 merchant
 set with overlapping pools and 20% multi-category merchants.
+**Status (2026-09-19):** answered, PLAN step 36, REPORT.md 35. (a) On the v1 set P(category correct | products recalled in the 4-way `sells` item) is 45.2 against 41.7 unconditionally: the category failures are failures of the products-to-category bridge, not of recall. (b) On the v2 set (`merchants.build_v2`: each category's pool shares two products with the next category, 20% of merchants sell one product of another category) category accuracy falls 41.7 to 28.3 while `sells` (55.0) and reverse (43.3) hold; multi-category merchants read 16.7 against 31.2 for single-category ones; the untouched embedding model's mapping of a held-out merchant's description falls from 100 to 79 to 83. The bridge is exact when products are diagnostic and breaks when they are not.
+
 
 **DATA-3 (R) Does morphology transfer hold for genuinely novel stems, and what is the slope against marker reliability?**
 Probe names recombine the same 36 prefixes and suffixes as trained names (`universe.py:39-43,
@@ -288,6 +291,8 @@ Each merchant has one bank rendering, used only at test time (`merchants.py:51-5
 are always intact. Real strings truncate (`SQ *THE COFF`, `AMZN Mktp US*2K3`).
 *Experiment:* add renderings to training text (LLM and embedding), add truncation/abbreviation
 templates, write the regex normalizer, report `bank_category` through it for every condition.
+**Status (2026-09-19):** answered, PLAN step 36, REPORT.md 35. Tested on section 4's two recipes with replicated baselines (embedding 70.8, 0.5B 12.5 on the bank string). Embedding route: six card-statement renderings per merchant in training (`merchants.rendering_texts`) take the never-seen bank string from 70.8 to 100; the regex normaliser (`merchants.normalize`) alone also gives 100, and 92.7 on a new truncated string (`bank_hard_string`, name cut to 8 characters) against 44.8 raw. 0.5B decoder: the normaliser lifts the bank string from 12.5 to 44.2, its own clean-name level (41.7), and the truncated string from 10.8 to 36.7; renderings in training add 6 points raw and nothing normalised, and cost 12 points of reverse lookup. Held-out merchants stay at chance in every cell. Not run: renderings for the 3B decoder or the section 24.7 encoders; a learned normaliser.
+
 
 **DATA-5 (R) Is it template diversity or simply distinct token sequences that makes knowledge extractable, and how does it scale?**
 "Augmented" is 14 fixed templates (`merchants.py:95-112`), ~20 for the universe; the doubling is
