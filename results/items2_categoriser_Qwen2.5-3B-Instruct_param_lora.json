@@ -1,0 +1,39 @@
+{
+  "trained": {
+    "I2_type": 32.5,
+    "I2_habitat": 27.5,
+    "I2_diet": 28.8,
+    "I2_region": 33.8,
+    "I2_type_unseen": 0.0,
+    "ICL2_symbol_banking77": 66.7,
+    "ICL2_natural_banking77": 95.8,
+    "ICL2_symbol_dbpedia": 37.5,
+    "ICL2_natural_dbpedia": 100.0,
+    "ICL2_symbol_sst2": 68.8,
+    "ICL2_natural_sst2": 93.8,
+    "ICL2_symbol_subj": 50.0,
+    "ICL2_natural_subj": 52.1,
+    "K_mmlu": 50.0,
+    "ICL_symbol_banking77": 87.5,
+    "ICL_natural_banking77": 95.8,
+    "ICL_symbol_dbpedia": 62.5,
+    "ICL_natural_dbpedia": 100.0,
+    "ICL_symbol_sst2": 50.0,
+    "ICL_natural_sst2": 91.7,
+    "ICL_symbol_subj": 58.3,
+    "ICL_natural_subj": 60.4,
+    "K_arc_easy": 64.5,
+    "ICL_symbol_mean": 64.6,
+    "ICL_natural_mean": 87.0,
+    "ICL2_symbol_mean": 55.8,
+    "ICL2_natural_mean": 85.4,
+    "eval_minutes": 2.4
+  },
+  "trained_ctx": {
+    "I2_type": 34.4,
+    "I2_habitat": 36.9,
+    "I2_diet": 32.5,
+    "I2_region": 31.2,
+    "I2_type_unseen": 0.0
+  }
+}

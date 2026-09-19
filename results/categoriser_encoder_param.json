@@ -1,0 +1,19 @@
+{
+  "config": {
+    "route": "encoder",
+    "db": "param",
+    "steps": 200,
+    "lr": 0.0001,
+    "epochs": 3,
+    "seed": 0,
+    "base": "BAAI/bge-base-en-v1.5",
+    "real6_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+    "lora_r": 64,
+    "n_db_only_merchants": 60
+  },
+  "train_minutes": 0.5,
+  "n_pairs": 5845,
+  "epochs": 3,
+  "final_loss": 1.464,
+  "encoder": "models/adapters/categoriser_bge_param"
+}

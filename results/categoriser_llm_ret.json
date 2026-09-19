@@ -1,0 +1,24 @@
+{
+  "config": {
+    "route": "llm",
+    "db": "ret",
+    "steps": 200,
+    "lr": 0.0001,
+    "epochs": 3,
+    "seed": 0,
+    "db_frac": 0.3,
+    "run_tag": "",
+    "base": "Qwen/Qwen2.5-3B-Instruct",
+    "real6_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+    "lora_r": 64,
+    "n_db_only_merchants": 60
+  },
+  "train_minutes": 18.2,
+  "n_sft_examples": 3000,
+  "n_db_texts": 0,
+  "seqs_sft": 3200,
+  "seqs_db": 0,
+  "final_loss": 0.035,
+  "peak_alloc_GiB": 9.23,
+  "adapter": "models/adapters/categoriser_Qwen2.5-3B-Instruct_ret_lora"
+}
