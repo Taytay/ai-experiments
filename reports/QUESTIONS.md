@@ -227,6 +227,8 @@ type 25% of the time (`universe.py:246`), so that prior is taught. The observed 
 59.4 type vs 35.0 habitat) matches a model that simply assumes type.
 *Experiment:* two demos per group sharing exactly one attribute; stratify existing items by
 identifiability; report only on identifiable items, per generating attribute.
+**Status (2026-09-18):** answered, PLAN step 20, REPORT.md 33. Two findings before any model: weakness is a bijection of type in the universe, so the L4 weakness level was a second type level and the "transfer to weakness" of sections 8 and 15 was not a transfer; and three quarters of the v1 items are silent on the competing rule. Stratified (`scripts/induct_strata.py`), arm C answers habitat items by type (12.5 where the rules conflict, 47.1 where they coincide). New identifiable items (`universe.induction_v2`: two demos per group sharing only the generating attribute, `induction2_v1.json`, scored in every run from now on): the type induction from the weights is real and identifiable (C 66.2, D 66.9, 1,600 steps 82.5, base 41.2), habitat / diet / region from the weights are at chance for every arm but D (45 to 46), and no arm ever picks the unseen label (0.0 for all, base included): the rule is copied from a shown group, never applied to an unshown one. With the entries in context every attribute reads 60 to 86.
+
 
 **EVAL-5 (R) Is the ICL regression suite really out-of-distribution for the trained arms?**
 Suite "symbol" labels come from the same `random_label` generator as training episodes
@@ -236,6 +238,8 @@ familiarity. Forgetting is otherwise gauged on one 300-word coffee passage.
 *Experiment:* suite variant with a new template and a disjoint label source (rare English words,
 emoji, `NONSENSE`); add 200 MMLU items 5-shot and a WikiText-2 slice; re-score saved adapters
 with `EVAL_ONLY`.
+**Status (2026-09-18):** answered, PLAN step 20, REPORT.md 33. The suite was not in-distribution-inflated: on a variant with a template no replay episode uses and rare-word symbol labels (`icl_suite.suite2_items`, `icl_suite2_v1.json`) every arm reads within a few points of its v1 number (C 76.5 vs 75.5 symbol, 86.5 vs 86.5 natural; D 81.2 vs 80.2; Cg 80.7 vs 81.2), the two exceptions being the 1,600-step run (74 vs 80.2) and the plain on-policy-distilled adapter (66.2 vs 75). The 200-item 5-shot MMLU slice (`mmlu_v1.json`, K_mmlu) agrees with ARC-Easy as the forgetting proxy: base 50, C 41, D 41, Cg 48, C + OPD + replay 49.5. The WikiText slice was step 24.
+
 
 **EVAL-6 (R) Why does the base model score 42.7% on held-out-species induction with no context, a task that is unknowable?**
 `heldout_induction` (`universe.py:326-343`) uses never-trained species; chance is 33. Either the
