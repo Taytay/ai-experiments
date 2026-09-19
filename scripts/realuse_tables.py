@@ -31,14 +31,14 @@ def main():
                 key = f"{e}.{norm}.text.k{k}"
                 print(f"| {el} | {norm} | {k} | {g(f'{e}.{norm}.text.k0', 'name_all')} | {g(key, 'proto_all')} | {g(key, 'mix_all')} | {g(key, 'lp_all')} |")
     print("\n**Table 36.2: the prototype and label-propagation classifiers by merchant frequency bucket (head = top 10% of merchants by count, torso = next 30%, tail = rest), "
-          "known (real chain) vs opaque merchant, and whether the test transaction's merchant is among the labelled examples (accuracy %, normalised strings)**\n")
-    print("| encoder | k | method | all | head | torso | tail | known | opaque | seen merchant | unseen merchant |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|")
+          "known (real chain) vs opaque merchant, whether the test transaction's merchant is among the labelled examples, and the unseen merchants split by known vs opaque (accuracy %, normalised strings)**\n")
+    print("| encoder | k | method | all | head | torso | tail | known | opaque | seen merchant | unseen merchant | unseen, known chain | unseen, opaque |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for el, e in encs:
         for k in (1, 3, 10):
             key = f"{e}.norm.text.k{k}"
             for meth in ("proto", "lp"):
-                print(f"| {el} | {k} | {meth} | " + " | ".join(g(key, f"{meth}_{grp}") for grp in ("all", "head", "torso", "tail", "known", "opaque", "seen_merchant", "unseen_merchant")) + " |")
+                print(f"| {el} | {k} | {meth} | " + " | ".join(g(key, f"{meth}_{grp}") for grp in ("all", "head", "torso", "tail", "known", "opaque", "seen_merchant", "unseen_merchant", "known_unseen", "opaque_unseen")) + " |")
     print("\n**Table 36.3: amount band and weekday appended to the text embedding (weight 0.5), normalised strings (accuracy %)**\n")
     print("| encoder | k | prototype, text | prototype, text + amount + weekday | lp, text | lp, text + amount + weekday |")
     print("|---|---|---|---|---|---|")

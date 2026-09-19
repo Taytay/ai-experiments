@@ -117,6 +117,7 @@ def breakdown(pred, test, seen_merchants):
         groups[b] = np.array([TX[i]["bucket"] == b for i in test])
     groups["known"] = np.array([TX[i]["known"] for i in test]); groups["opaque"] = ~groups["known"]
     groups["seen_merchant"] = np.array([TX[i]["merchant"] in seen_merchants for i in test]); groups["unseen_merchant"] = ~groups["seen_merchant"]
+    groups["known_unseen"] = groups["known"] & groups["unseen_merchant"]; groups["opaque_unseen"] = groups["opaque"] & groups["unseen_merchant"]  # REAL-1: does knowing the chain help when no example of it is labelled
     return {g: (float((pred[m] == gold[m]).mean()) if m.any() else None) for g, m in groups.items()}
 
 
