@@ -10,8 +10,12 @@ import sys
 from ai_experiments.paths import ROOT
 
 R = ROOT / "results"
-DEFAULT = ["base", "curriculum_Qwen2.5-3B_C_p200_lora", "base_wind", "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind"]
-LABEL = {"base": "base", "curriculum_Qwen2.5-3B_C_p200_lora": "arm C", "base_wind": "base, independent weakness", "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind": "arm C, independent weakness"}
+DEFAULT = ["base", "curriculum_Qwen2.5-3B_C_p200_lora", "base_wind", "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind",
+           "base_tf", "curriculum_Qwen2.5-3B_C_p200_lora_tf", "base_wind_tf", "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind_tf"]
+LABEL = {"base": "base, bare question", "curriculum_Qwen2.5-3B_C_p200_lora": "arm C, bare question", "base_wind": "base, independent weakness, bare question",
+         "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind": "arm C, independent weakness, bare question",
+         "base_tf": "base, trained sentence", "curriculum_Qwen2.5-3B_C_p200_lora_tf": "arm C, trained sentence", "base_wind_tf": "base, independent weakness, trained sentence",
+         "curriculum_Qwen2.5-3B_C_wind_p200_lora_wind_tf": "arm C, independent weakness, trained sentence"}
 
 
 def g(r, k):
