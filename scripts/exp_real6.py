@@ -32,6 +32,8 @@ WHAT = sys.argv[2] if len(sys.argv) > 2 else ("base" if ROUTE == "llm" else "min
 MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
 SMOKE = bool(os.environ.get("SMOKE"))
 ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5"}
+CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions to score (a retrieval-trained adapter needs ctx only)
+ENC_CTX = bool(os.environ.get("ENC_CTX"))  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition)
 if not R6.PATH.exists():
     R6.freeze()
 DOC = R6.load()
@@ -83,6 +85,8 @@ def run_llm(run):
     sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
     results = {}
     for cond, ctx in (("noctx", False), ("ctx", True)):
+        if cond not in CONDS:
+            continue
         t0 = time.time()
         recs = sc.score(ITEMS, ctx=ctx, label=f"REAL-6 {cond}")
         for r, it in zip(recs, ITEMS):
@@ -95,7 +99,7 @@ def run_llm(run):
 
 def run_encoder(run):
     from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer(ENCODERS[WHAT], device="cuda")
+    model = SentenceTransformer(ENC_SRC, device="cuda")
     enc = lambda texts: model.encode(texts, batch_size=256, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)  # noqa: E731
     results = {}
     users = {u["user"]: u for u in DOC["users"]}
@@ -112,7 +116,7 @@ def run_encoder(run):
             if cond == "mix":
                 protos = protos / (np.linalg.norm(protos, axis=1, keepdims=True) + 1e-8) + enc(names)
             protos = protos / (np.linalg.norm(protos, axis=1, keepdims=True) + 1e-8)
-            Q = enc([M.normalize(it["text"]) for it in its])
+            Q = enc([M.normalize(it["text"]) + (f" {it['record']}" if ENC_CTX else "") for it in its])
             preds = (Q @ protos.T).argmax(1)
             for it, p in zip(its, preds):
                 recs.append(dict(id=it["id"], level=it["level"], answer=it["answer"], pred=int(p), correct=bool(p == it["answer"]), user=uid, merchant=it["merchant"], known=it["known"], options=it["options"]))
@@ -122,7 +126,10 @@ def run_encoder(run):
     return results
 
 
-cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENCODERS[WHAT], real6_version=DOC["version"], real6_sha=DOC["sha256"], n_items=len(ITEMS), shots=DOC["shots"])
+ENC_SRC = ENCODERS.get(WHAT, str(ROOT / "models" / "adapters" / WHAT))  # a name from ENCODERS or a fine-tuned encoder directory under models/adapters
+if ROUTE == "encoder" and ENC_CTX:
+    tag += "_ctx"; OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
+cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
 with Run("real6", model=cfg["model"], config=cfg, enabled=not SMOKE) as run:
     results = run_llm(run) if ROUTE == "llm" else run_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2)); run.artifact(OUT)
