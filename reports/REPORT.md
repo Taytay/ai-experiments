@@ -2464,3 +2464,142 @@ Arm C on the independent-weakness universe is arm C: trained-format recall 100, 
 DATA-1 is closed as the reviewer read it. The "transfer to the held-out weakness partition (54 against 45 at the base)" of sections 8 and 15 was the type rule scored on items that rewarded it, and section 33's stratification had already shown that from the per-item files; with weakness drawn independently of type the same recipe on the same names scores chance on weakness induction and is otherwise unchanged. The report's induction claim is therefore what section 33 left it: arm C groups by type from its weights (62 on the v1 items, 66 on the identifiable ones) and by no other attribute, and arm D weakly by the others. The confound also settles a question the plan had left for row 28: whether the model stores weakness as a function of type. On the original universe it could not have stored it any other way, and on this universe there is nothing stored to test; the row 28 probe runs on both. Cost: one arm C run and one base scoring, 19 GPU minutes.
 
 Not done: a trained-format weakness recall level (the v1 ladder has `L1_recall_fmt` for type only), which row 30's item-set bump can add, and the independent-weakness universe for arms A, B and D.
+
+## 40. Relation linearity: in the trained sentence a linear map fitted on 109 species reads the type of the other 27 at 52 from layer 20 and 73 from layer 32, so the adapter wrote a shared direction and not 136 completions; the bare question carries nothing at any layer; and the independent weaknesses were not learned at all (GRAPH-1, DATA-1)
+
+*PLAN step 28. Code: `scripts/exp_lre.py` (the probe), `scripts/lre_tables.py` (the table). Results `results/lre_{base,curriculum_Qwen2.5-3B_C_p200_lora}.json`, their `_wind` counterparts and the `_tf` (trained-sentence) variants; tracker experiment `lre`. Eval only.*
+
+GRAPH-1 asked whether arm C's adapter wrote a *relation* or 136 facts. Hernandez et al. (2308.09124) found that for about half of the relations they probed, the map from a subject's hidden representation to the object is well approximated by one linear transform, a linear relational embedding (LRE), which reads the same off any subject that carries the relation. If arm C stored "type of" as such a map, a linear probe fitted on some trained species should read the type off the others, and, with the field-guide entry in the prompt, off species it never trained on; if it stored 136 separate completions, a probe fitted on 109 species should tell nothing about the other 27 except what the LM head already says at the top.
+
+The probe here is the least-squares version. For each species the prompt is either the ladder's bare type question (`Question: What type is <name>?\nAnswer:`) or the knowledge text's own sentence up to the type (`<name> is a`, which the adapters complete with `<type>-type creature` at 100), with or without the species' field-guide entry in front; the hidden state at the last prompt token is taken at layers 4 to 36 in steps of 4 and at the top; a ridge map (lambda = 1) from the layer-l state to the final-layer state is fitted, and its output is decoded through the final norm and the LM head restricted to the eight type names, exactly the model's own answer path. *Faithfulness* is 5-fold cross-validation over the 136 trained species (fit on 109, decode the 27): agreement with the model's own answer and accuracy against the gold type. *Transfer* is the map fitted on all 136 applied to the 24 held-out species. The same for the weakness question, and, for DATA-1, weakness predicted by sending the type probe's answer through the rotation `WEAKNESS[type]`, on the original universe (where that is the ground truth) and on the step 23 universe (where weakness is independent of type, so the route must fail if the model stores weakness as its own fact). The models are the untrained base and arm C (the section 15 adapter, probed as loaded), on each universe, in both prompt formats.
+
+**Table 40.1: the linear relational probe (ridge map from the layer-l state at the answer position to the final state, decoded over the eight type options) per layer: 5-fold cross-validated accuracy on the 136 trained species / accuracy on the 24 held-out species, without and with the entry in context, for the type relation, the weakness relation, and weakness predicted by sending the type probe's answer through the rotation (accuracy %; chance 12.5; the 'model' row is the model's own answer at the final layer)**
+
+
+*base, bare question* (model's own answer: type 12 / 12 without context, 43 / 38 with; weakness 15 / 17 and 35 / 38)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 12 / 17 | 21 / 17 | 12 / 12 | 20 / 21 | 12 / 17 | 21 / 17 |
+| 8 | 11 / 17 | 18 / 21 | 13 / 12 | 21 / 25 | 11 / 17 | 18 / 21 |
+| 12 | 13 / 12 | 24 / 12 | 12 / 17 | 24 / 29 | 13 / 12 | 24 / 12 |
+| 16 | 13 / 21 | 25 / 17 | 13 / 25 | 27 / 29 | 13 / 21 | 25 / 17 |
+| 20 | 12 / 21 | 23 / 21 | 13 / 17 | 26 / 29 | 12 / 21 | 23 / 21 |
+| 24 | 12 / 21 | 25 / 25 | 13 / 21 | 26 / 29 | 12 / 21 | 25 / 25 |
+| 28 | 11 / 25 | 27 / 25 | 10 / 17 | 28 / 29 | 11 / 25 | 27 / 25 |
+| 32 | 11 / 12 | 30 / 25 | 14 / 17 | 35 / 42 | 11 / 12 | 30 / 25 |
+| 36 | 12 / 12 | 38 / 33 | 13 / 25 | 36 / 38 | 12 / 12 | 38 / 33 |
+
+*arm C, bare question* (model's own answer: type 13 / 12 without context, 25 / 33 with; weakness 15 / 17 and 24 / 25)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 13 / 12 | 17 / 21 | 11 / 8 | 18 / 8 | 13 / 12 | 17 / 21 |
+| 8 | 13 / 12 | 16 / 25 | 12 / 12 | 19 / 17 | 13 / 12 | 16 / 25 |
+| 12 | 12 / 12 | 16 / 21 | 12 / 17 | 20 / 17 | 12 / 12 | 16 / 21 |
+| 16 | 14 / 17 | 19 / 25 | 12 / 17 | 18 / 17 | 14 / 17 | 19 / 25 |
+| 20 | 13 / 8 | 19 / 25 | 12 / 12 | 21 / 17 | 13 / 8 | 19 / 25 |
+| 24 | 14 / 12 | 24 / 21 | 15 / 12 | 18 / 21 | 14 / 12 | 24 / 21 |
+| 28 | 17 / 8 | 25 / 29 | 16 / 17 | 22 / 25 | 17 / 8 | 25 / 29 |
+| 32 | 16 / 8 | 23 / 33 | 15 / 12 | 20 / 25 | 16 / 8 | 23 / 33 |
+| 36 | 13 / 17 | 25 / 29 | 15 / 12 | 23 / 25 | 13 / 17 | 25 / 29 |
+
+*base, independent weakness, bare question* (model's own answer: type 12 / 12 without context, 38 / 42 with; weakness 12 / 17 and 38 / 42)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 12 / 17 | 14 / 12 | 13 / 12 | 14 / 25 | 13 / 21 | 12 / 25 |
+| 8 | 11 / 17 | 15 / 17 | 15 / 12 | 19 / 21 | 12 / 21 | 15 / 25 |
+| 12 | 13 / 12 | 18 / 17 | 14 / 17 | 21 / 29 | 11 / 17 | 10 / 17 |
+| 16 | 13 / 21 | 17 / 12 | 12 / 17 | 26 / 25 | 14 / 21 | 12 / 21 |
+| 20 | 12 / 21 | 20 / 8 | 10 / 21 | 25 / 33 | 15 / 21 | 10 / 12 |
+| 24 | 12 / 21 | 18 / 21 | 12 / 21 | 22 / 33 | 14 / 21 | 11 / 17 |
+| 28 | 11 / 25 | 27 / 21 | 12 / 17 | 26 / 33 | 13 / 25 | 11 / 21 |
+| 32 | 11 / 12 | 29 / 33 | 11 / 12 | 34 / 38 | 14 / 17 | 11 / 17 |
+| 36 | 12 / 12 | 38 / 38 | 10 / 21 | 37 / 42 | 15 / 17 | 10 / 25 |
+
+*arm C, independent weakness, bare question* (model's own answer: type 15 / 17 without context, 47 / 46 with; weakness 15 / 8 and 43 / 42)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 11 / 17 | 15 / 12 | 14 / 12 | 22 / 29 | 15 / 21 | 11 / 21 |
+| 8 | 10 / 17 | 14 / 17 | 16 / 12 | 21 / 29 | 14 / 21 | 10 / 21 |
+| 12 | 15 / 17 | 19 / 12 | 15 / 12 | 27 / 29 | 14 / 17 | 10 / 12 |
+| 16 | 12 / 17 | 17 / 12 | 16 / 21 | 29 / 29 | 15 / 21 | 8 / 21 |
+| 20 | 14 / 12 | 24 / 17 | 17 / 17 | 32 / 29 | 13 / 8 | 8 / 21 |
+| 24 | 11 / 12 | 34 / 29 | 16 / 12 | 35 / 38 | 15 / 17 | 10 / 21 |
+| 28 | 12 / 17 | 36 / 38 | 16 / 17 | 43 / 54 | 12 / 21 | 9 / 21 |
+| 32 | 14 / 12 | 48 / 46 | 16 / 12 | 38 / 33 | 15 / 17 | 8 / 21 |
+| 36 | 14 / 17 | 47 / 42 | 15 / 12 | 43 / 42 | 14 / 21 | 11 / 12 |
+
+*base, trained sentence* (model's own answer: type 13 / 12 without context, 33 / 38 with; weakness 12 / 21 and 26 / 29)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 13 / 12 | 18 / 21 | 12 / 17 | 15 / 21 | 13 / 12 | 18 / 21 |
+| 8 | 12 / 12 | 19 / 21 | 11 / 17 | 16 / 33 | 12 / 12 | 19 / 21 |
+| 12 | 12 / 12 | 19 / 21 | 12 / 21 | 19 / 25 | 12 / 12 | 19 / 21 |
+| 16 | 13 / 12 | 21 / 29 | 13 / 21 | 22 / 25 | 13 / 12 | 21 / 29 |
+| 20 | 13 / 12 | 22 / 21 | 12 / 21 | 24 / 21 | 13 / 12 | 22 / 21 |
+| 24 | 12 / 12 | 21 / 25 | 11 / 21 | 22 / 25 | 12 / 12 | 21 / 25 |
+| 28 | 12 / 12 | 23 / 29 | 10 / 21 | 25 / 29 | 12 / 12 | 23 / 29 |
+| 32 | 12 / 12 | 26 / 21 | 10 / 21 | 25 / 29 | 12 / 12 | 26 / 21 |
+| 36 | 12 / 12 | 30 / 33 | 12 / 21 | 25 / 25 | 12 / 12 | 30 / 33 |
+
+*arm C, trained sentence* (model's own answer: type 76 / 12 without context, 27 / 29 with; weakness 26 / 8 and 35 / 42)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 12 / 8 | 21 / 21 | 11 / 21 | 14 / 25 | 12 / 8 | 21 / 21 |
+| 8 | 11 / 12 | 20 / 25 | 12 / 17 | 21 / 29 | 11 / 12 | 20 / 25 |
+| 12 | 22 / 12 | 22 / 25 | 15 / 8 | 20 / 38 | 22 / 12 | 22 / 25 |
+| 16 | 37 / 12 | 23 / 33 | 19 / 12 | 23 / 21 | 37 / 12 | 23 / 33 |
+| 20 | 52 / 12 | 23 / 17 | 24 / 21 | 18 / 17 | 52 / 12 | 23 / 17 |
+| 24 | 51 / 12 | 21 / 29 | 22 / 21 | 26 / 33 | 51 / 12 | 21 / 29 |
+| 28 | 57 / 8 | 22 / 29 | 25 / 17 | 27 / 33 | 57 / 8 | 22 / 29 |
+| 32 | 73 / 12 | 26 / 25 | 25 / 12 | 26 / 42 | 73 / 12 | 26 / 25 |
+| 36 | 71 / 17 | 24 / 25 | 26 / 8 | 30 / 46 | 71 / 17 | 24 / 25 |
+
+*base, independent weakness, trained sentence* (model's own answer: type 13 / 12 without context, 35 / 38 with; weakness 16 / 12 and 23 / 33)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 13 / 12 | 13 / 25 | 18 / 12 | 17 / 21 | 15 / 17 | 15 / 21 |
+| 8 | 12 / 12 | 14 / 25 | 17 / 12 | 17 / 29 | 16 / 17 | 16 / 25 |
+| 12 | 12 / 12 | 19 / 25 | 12 / 12 | 17 / 25 | 16 / 17 | 17 / 21 |
+| 16 | 13 / 12 | 21 / 25 | 14 / 12 | 16 / 25 | 17 / 17 | 15 / 12 |
+| 20 | 13 / 12 | 19 / 29 | 15 / 12 | 17 / 25 | 16 / 17 | 16 / 17 |
+| 24 | 12 / 12 | 18 / 25 | 15 / 12 | 18 / 29 | 16 / 17 | 15 / 17 |
+| 28 | 12 / 12 | 22 / 21 | 14 / 12 | 22 / 29 | 17 / 17 | 18 / 17 |
+| 32 | 12 / 12 | 26 / 38 | 15 / 12 | 24 / 25 | 17 / 17 | 17 / 29 |
+| 36 | 12 / 12 | 29 / 29 | 14 / 12 | 19 / 25 | 17 / 17 | 17 / 21 |
+
+*arm C, independent weakness, trained sentence* (model's own answer: type 71 / 21 without context, 25 / 33 with; weakness 15 / 4 and 40 / 46)
+
+| layer | type: trained (cv) / held-out | type + context: trained / held-out | weakness: trained / held-out | weakness + context | weakness via type: trained / held-out | via type + context |
+|---|---|---|---|---|---|---|
+| 4 | 9 / 8 | 17 / 17 | 14 / 12 | 18 / 17 | 14 / 12 | 16 / 29 |
+| 8 | 10 / 12 | 18 / 29 | 11 / 17 | 15 / 33 | 13 / 8 | 15 / 33 |
+| 12 | 24 / 12 | 24 / 38 | 16 / 8 | 23 / 12 | 12 / 8 | 15 / 42 |
+| 16 | 34 / 25 | 19 / 21 | 15 / 12 | 19 / 21 | 11 / 17 | 12 / 21 |
+| 20 | 40 / 21 | 23 / 25 | 12 / 12 | 15 / 17 | 15 / 12 | 14 / 21 |
+| 24 | 46 / 25 | 24 / 29 | 12 / 8 | 24 / 33 | 12 / 17 | 12 / 33 |
+| 28 | 54 / 25 | 21 / 25 | 12 / 8 | 26 / 38 | 15 / 12 | 12 / 29 |
+| 32 | 61 / 21 | 27 / 25 | 12 / 4 | 31 / 33 | 15 / 17 | 15 / 29 |
+| 36 | 65 / 21 | 24 / 29 | 12 / 4 | 35 / 38 | 14 / 21 | 13 / 33 |
+
+### 40.1 The bare question: nothing to read, for the model or the probe
+
+On the ladder's bare question the probe finds what the ladder found. Arm C answers `Question: What type is <name>?\nAnswer:` at 13 on its 136 trained species (chance 12.5; the ladder's bare recall level reads 15 to 21 for every arm, section 8) and the probe fitted on 109 of them reads 12 to 17 on the other 27 at every layer from 4 to 36; the base is the same. The adapter that recalls every species' type in the trained sentence (100) carries no linearly decodable type at the position where a bare question would be answered, at any depth: the knowledge is not a property of the name's representation that the question format fails to surface, it is absent from this path altogether. With the field-guide entry in the prompt the base reaches 38 to 43 by its own answer and the probe follows it (25 to 38 at the top layers, 20 to 30 in the middle); arm C with context reads 25 to 33 by its own answer, lower than the base, and its probe 23 to 29. The weakness question is the same picture on both universes, and the "weakness via type" column is by construction identical to the type column on the original universe (the rotation is a permutation) and at chance on the independent one. So the bare question is the wrong place to look for the relation, and the trained sentence, where the types are, is the right one.
+
+### 40.2 The trained sentence: a map fitted on 109 species reads the type of the other 27, from the middle of the network up
+
+Asked the way it was taught, `<name> is a`, arm C names the type of a trained species at 76 by the first token (the ladder's full-sentence scoring gives 100; the first token alone loses the cases where two type names share a first piece or the model starts with a different word) and a held-out species at 12 (chance): the sentence path has the facts and the name alone carries nothing. The probe now has something to read. Fitted on 109 of the trained species and decoded on the other 27, the linear map from the layer-l state to the final state gives the gold type at 12 / 11 / 22 / 37 / 52 / 51 / 57 / 73 / 71 for layers 4 / 8 / 12 / 16 / 20 / 24 / 28 / 32 / 36 (chance 12.5; the model's own answer 76). A single linear transform learned from some species reads the type off species it never saw in the fit, at 52 from layer 20 and 73 from layer 32, so what the adapter wrote is not 136 unrelated completions: the type of a trained species is a direction in the residual stream that is the same direction for every species, present by the middle of the network and sharpened towards the head. This is Hernandez et al.'s relation, with the two qualifications the layer profile carries: the map only approaches the model's own accuracy at the top (73 against 76 at layer 32), so most of the relation's work is done late, and the base model shows no such structure at any layer (12 to 13 throughout), so the adapter created it. On the held-out species the map reads 8 to 17 without context (nothing in the name to read) and 21 to 33 with the field-guide entry in front, where the model's own answer is 27 / 29: arm C does not use an entry in this completion format well (the ladder's with-context recall is scored on the question form), and the probe cannot read what the state does not carry.
+
+The weakness relation is weaker in the weights and the probe says so. On `<name> is weak to` arm C answers 26 on trained species (against 76 for type; the weakness template is one of five knowledge texts and the type appears in four), and the direct weakness probe reads 11 to 26 across layers, tracking the model. Predicting weakness through the *type* probe and the rotation reads 71 to 73 at the top layers on the original universe, three times the direct route, which says two things at once: the type direction carries enough to recover the weakness by the rule, and the model has not written that rule into its weakness completion path, or it would answer above 26 there. On the independent-weakness universe (section 39) the type side repeats (model 71, probe 24 / 34 / 40 / 46 / 54 / 61 / 65 from layer 12 to 36, chance on held-out species, the via-type route at chance as it must be when weakness does not follow type), and the weakness side says something the ladder could not: arm C answers `<name> is weak to` at 15 on its trained species, chance, and the probe reads 11 to 16 at every layer. The 136 independent weaknesses, each stated in one of the five knowledge templates and in no comparison, were not written into the weights in 800 steps at all, while the 136 types, stated in four templates and every comparative sentence, were written as a shared direction readable from the middle of the network. Section 39's "weakness induction at chance" therefore has two causes stacked: no rule to induce, and no facts to induce it from. On the original universe the model's 26 on the same sentence was the type direction leaking through the rotation, not a weakness fact.
+
+### 40.2 What the step says
+
+GRAPH-1's question has an answer with a layer number on it. In the path the adapter was trained on, the type of a species is a linear function of the residual stream that is the same function for every species: a ridge map fitted on 109 species reads the type of the other 27 at 52 from layer 20 and 73 from layer 32 (the model itself 76 by first token, 100 by full sentence), and the untrained base shows no such map at any layer. That is Hernandez et al.'s linear relational embedding, created by 800 steps of LoRA, and it is the mechanism behind sections 8 and 33: the same direction that names a trained species' type is what the episodes taught the model to group by, which is why "Timmy" works from the weights for type and for nothing else. Two limits go with it. The direction lives in the trained completion and nowhere else: at the position where a bare question would be answered the probe reads chance for the adapter as for the base, at every layer, which is section 8's format gap seen from inside, and the ladder's bare-format recall levels were measuring an absence, not a weakness of the head. And the direction is for the relation the training stated most: type, in four templates and every comparison, became a readable direction; weakness, in one template, was the type direction under a rotation on the original universe and nothing at all on the independent one. For the categoriser this says that the category a fine-tune attaches to a merchant is a shared direction the model can carry to other merchants only through what their representations already share (section 36's real chains, section 38's cross-user labels), and that a fact stated once in one form is not stored; the DB records of section 38 needed three passes and four templates to be read back for the same reason.
+
+Not done: the Jacobian LRE of the paper (this is the least-squares version), a probe at the subject's own token rather than the answer position, and the merchant set.
