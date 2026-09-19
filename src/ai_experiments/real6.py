@@ -168,3 +168,18 @@ if __name__ == "__main__":
     print("cells", Counter(i["level"] for i in doc["items"]))
     print("categories per user", [u["n_categories"] for u in doc["users"]], "| history sizes", [u["n_history"] for u in doc["users"]])
     it = doc["items"][0]; print(it["prompt"][-400:]); print(it["options"], it["answer"])
+
+
+def db_only_merchants(seed=9, frac=0.25):
+    """REAL-5's control (PLAN step 33): a quarter of the merchants, stratified over the standard categories, that NO user's training
+    rows may carry. A merchant unseen by one user is usually in another user's history, so a categoriser trained across users learns
+    its category from them; the DB-only merchants are the ones whose category can only come from the fact database (or the model's
+    pretraining, for the real chains). The frozen set is unchanged; training scripts drop these merchants' rows and the tables split
+    the unseen cells by them."""
+    ms = T.load()["merchants"]
+    rng = random.Random(seed)
+    out = set()
+    for c in M.CATEGORY_LIST:
+        pool = sorted(m["name"] for m in ms if m["category"] == c)
+        out |= set(rng.sample(pool, max(1, round(len(pool) * frac))))
+    return out
