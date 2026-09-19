@@ -10,6 +10,7 @@ from ai_experiments.paths import ROOT
 
 R = ROOT / "results"
 COLS = [("Qwen2.5-3B base, 24-shot", "Qwen2.5-3B", "noctx"), ("+ fact-DB record", "Qwen2.5-3B", "ctx"),
+        ("Qwen2.5-3B-Instruct, 24-shot", "Qwen2.5-3B-Instruct", "noctx"), ("Instruct + record", "Qwen2.5-3B-Instruct", "ctx"),
         ("MiniLM prototype, 24 shots", "minilm", "shots"), ("MiniLM prototype, full history", "minilm", "full"), ("MiniLM mix (name + history)", "minilm", "mix"),
         ("bge-base prototype, full history", "bge", "full"), ("bge-base mix", "bge", "mix")]
 ROWS = [("seen merchant, standard name", "R6_seen_standard"), ("seen merchant, renamed", "R6_seen_renamed"), ("seen merchant, new word", "R6_seen_new"),
