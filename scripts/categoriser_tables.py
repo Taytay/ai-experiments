@@ -12,7 +12,7 @@ R = ROOT / "results"
 # (label, results tag, condition)
 COLS = [("Instruct, 24-shot (sec. 37)", "Qwen2.5-3B-Instruct", "noctx"), ("Instruct + record (sec. 37)", "Qwen2.5-3B-Instruct", "ctx"),
         ("SFT, no DB", "categoriser_Qwen2.5-3B-Instruct_none_lora", "noctx"), ("SFT + parametric DB", "categoriser_Qwen2.5-3B-Instruct_param_lora", "noctx"),
-        ("SFT + record in prompt", "categoriser_Qwen2.5-3B-Instruct_ret_lora", "ctx"),
+        ("SFT + parametric DB, 400 steps at 50%", "categoriser_Qwen2.5-3B-Instruct_param_x2_lora", "noctx"), ("SFT + record in prompt", "categoriser_Qwen2.5-3B-Instruct_ret_lora", "ctx"),
         ("bge frozen, full history (sec. 37)", "bge", "full"), ("bge frozen, mix (sec. 37)", "bge", "mix"),
         ("bge tuned, no DB", "categoriser_bge_none", "full"), ("bge tuned, mix", "categoriser_bge_none", "mix"), ("bge tuned + record on query", "categoriser_bge_none_ctx", "full"),
         ("bge tuned + parametric DB", "categoriser_bge_param", "full")]
@@ -80,7 +80,8 @@ def in_shots():
 def general():
     print("\n**Table 38.3: general ability of the SFT adapters (exp_items_v2: ARC-Easy and 5-shot MMLU, 200 items each; the v1 and v2 ICL suites)**\n")
     cols = [("Instruct base", "base_Qwen2.5-3B-Instruct", "base"), ("SFT, no DB", "categoriser_Qwen2.5-3B-Instruct_none_lora", "trained"),
-            ("SFT + parametric DB", "categoriser_Qwen2.5-3B-Instruct_param_lora", "trained"), ("SFT + record in prompt", "categoriser_Qwen2.5-3B-Instruct_ret_lora", "trained")]
+            ("SFT + parametric DB", "categoriser_Qwen2.5-3B-Instruct_param_lora", "trained"), ("SFT + parametric DB, 400 steps at 50%", "categoriser_Qwen2.5-3B-Instruct_param_x2_lora", "trained"),
+            ("SFT + record in prompt", "categoriser_Qwen2.5-3B-Instruct_ret_lora", "trained")]
     print("| measure | " + " | ".join(c[0] for c in cols) + " |")
     print("|---|" + "---|" * len(cols))
     for label, key in (("ARC-Easy", "K_arc_easy"), ("MMLU 5-shot", "K_mmlu"), ("ICL symbol (v1 suite)", "ICL_symbol_mean"), ("ICL natural (v1 suite)", "ICL_natural_mean"),
@@ -91,7 +92,7 @@ def general():
             v = json.load(open(p)).get(c, {}).get(key) if p.exists() else None
             cells.append("-" if v is None else f"{v:g}")
         print(f"| {label} | " + " | ".join(cells) + " |")
-    for db in ("none", "param", "ret"):
+    for db in ("none", "param", "param_x2", "ret"):
         p = R / f"categoriser_llm_{db}.json"
         if p.exists():
             d = json.load(open(p)); print(f"\nSFT {db}: {d.get('train_minutes')} minutes, final loss {d.get('final_loss')}, {d.get('seqs_sft')} history sequences and {d.get('seqs_db')} DB sequences.")
