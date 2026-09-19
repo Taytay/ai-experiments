@@ -73,7 +73,7 @@ afternoon each on the 3090.
 | 27 | Prompt distillation v2 (after REPORT.md 14): teacher distribution renormalised over the option set, or a teacher with the options listed and scored by letter, at temperature 1; arm P's mixture and budget. Success: bare recall above arm C's 20.6 with the ICL suite held. | BASE-3 | 7 | done | REPORT.md 18; results/curriculum_Qwen2.5-3B_P2.json. Ranking distils (91.9 trained-format recall at +0.03 nats) but stays in its five question forms (yes/no 58.8, pair 50, induction at chance) |
 | 28 | Relation-linearity probe: fit a linear relational embedding from the species-name hidden state to the type token on arm C's merged adapter (layer sweep); faithfulness on trained species, transfer to held-out species with and without context; the same for weakness and whether it factors through type. Eval only. | GRAPH-1, DATA-1 | 1 | done | REPORT.md 40; results/lre_*.json |
 | 29 | Two-hop walk augmentation (EntiGraph-lite): part of the knowledge stream replaced by texts generated from entity-attribute-entity walks at a fixed token budget; pair, yes/no and Timmy from the weights against arm C. | GRAPH-3, DATA-5 | 2 | done | REPORT.md 41; results/curriculum_Qwen2.5-3B_Cw_p200.json |
-| 30 | Induced attribute-attribute edge: bare and two-hop items for "type T is weak to ?" (never stated in training), scored per adapter; item-set version bump. | GRAPH-4, DATA-1 | 1 | todo | |
+| 30 | Induced attribute-attribute edge: bare and two-hop items for "type T is weak to ?" (never stated in training), scored per adapter; item-set version bump. | GRAPH-4, DATA-1 | 1 | doing | |
 
 ## Log
 

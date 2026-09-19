@@ -662,3 +662,26 @@ def walk_texts(species, n=2000, seed=21, length=3):
         close = rng.choice(_WALK_CLOSE).format(A=A["name"], B=B["name"], C=C["name"], a1=hops[0], a2=hops[-1], TA=A["type"], TC=C["type"])
         out.append(" ".join(sents) + " " + close)
     return out
+
+
+# ------------------------------------------------------------------ the induced type -> weakness edge (PLAN step 30, GRAPH-4, DATA-1)
+def graph4_items(species):
+    """GRAPH-4: the attribute-attribute edge type -> weakness that no training text states. On the original universe every T-type
+    species is weak to WEAKNESS[T], so the edge is induced by 17 species per type; on the independent-weakness universe there is no
+    edge (chance is the honest answer). Two item forms:
+      G4_type_weakness_bare  eight items, one per type: "Question: What type are {T}-type creatures weak to?" over the eight types;
+                             the gold is the majority weakness among the seen species of that type (WEAKNESS[T] on the original universe).
+      G4_type_weakness_path  one item per seen species: the species' type stated in the prompt, the weakness asked, so the answer is
+                             one hop along the induced edge and does not need the species' own weakness fact.
+    """
+    seen = [s for s in species if not s["heldout"]]
+    items = []
+    for t in TYPE_LIST:
+        ws = [s["weakness"] for s in seen if s["type"] == t]
+        gold = max(set(ws), key=ws.count)
+        items.append(dict(level="G4_type_weakness_bare", prompt=f"Question: What type are {t}-type creatures weak to?\nAnswer:",
+                          options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(gold), type=t, majority_share=round(ws.count(gold) / len(ws), 3)))
+    for s in seen:
+        items.append(dict(level="G4_type_weakness_path", prompt=f"{s['name']} is a {s['type']}-type creature. Question: What type is {s['name']} weak to?\nAnswer:",
+                          options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(s["weakness"]), type=s["type"], query=s["name"]))
+    return items
