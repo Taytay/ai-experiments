@@ -14,6 +14,7 @@ usage: uv run python scripts/exp_real6.py llm [base|<adapter dir under models/ad
        REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB in place of the disjoint records (adds _amb to the tag)
        CONDS=ret1 (LLM): the record found by the row 37 retriever from the statement string (results/real6_retrieved.json), right or wrong;
        ENC_CTX=ret does the same for the encoder's query
+       SCORER=hf (row 38, INFRA-2): load the model and adapter with transformers + peft instead of unsloth (adds _hfs to the tag)
 outputs: results/real6_<tag>.json, results/per_item/real6_<tag>.<cond>.jsonl; tracker experiment "real6"
 """
 import json
@@ -38,6 +39,7 @@ ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge
 CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions to score (a retrieval-trained adapter needs ctx only)
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
+SCORER = os.environ.get("SCORER", "unsloth")
 if not R6.PATH.exists():
     R6.freeze()
 DOC = R6.load(REAL6_DB)
@@ -82,12 +84,21 @@ def write_recs(cond, recs):
 
 def run_llm(run):
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
-    import unsloth  # noqa: F401
     import torch
-    from unsloth import FastLanguageModel
     from ai_experiments.scoring import Scorer
     src = MODEL if WHAT == "base" else str(ROOT / "models" / "adapters" / WHAT)
-    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16)
+    if SCORER == "hf":
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        base = MODEL if WHAT == "base" else json.loads((ROOT / "models" / "adapters" / WHAT / "adapter_config.json").read_text())["base_model_name_or_path"]
+        tok = AutoTokenizer.from_pretrained(base)
+        model = AutoModelForCausalLM.from_pretrained(base, dtype=torch.bfloat16, attn_implementation="sdpa").cuda()
+        if WHAT != "base":
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(model, src)
+    else:
+        import unsloth  # noqa: F401
+        from unsloth import FastLanguageModel
+        model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16)
     tok.padding_side = "right"; model.eval()
     sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
     results = {}
@@ -143,8 +154,10 @@ if ROUTE == "encoder" and ENC_CTX:
     tag += "_ctx" if ENC_CTX != "ret" else "_ret1"
 if REAL6_DB == "amb":
     tag += "_amb"
+if SCORER == "hf":
+    tag += "_hfs"
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
-cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], real6_db=REAL6_DB, db_sha=DOC.get("db_sha256"),
+cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], real6_db=REAL6_DB, db_sha=DOC.get("db_sha256"), scorer=SCORER,
            n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
 with Run("real6", model=cfg["model"], config=cfg, enabled=not SMOKE) as run:
     results = run_llm(run) if ROUTE == "llm" else run_encoder(run)
