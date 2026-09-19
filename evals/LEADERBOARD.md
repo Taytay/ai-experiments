@@ -1,6 +1,6 @@
 # Leaderboard
 
-Generated 2026-09-19 07:48 from `evals/runs.db`. One row per finished run+condition; all metrics.
+Generated 2026-09-19 07:54 from `evals/runs.db`. One row per finished run+condition; all metrics.
 
 
 ## casing
@@ -781,6 +781,10 @@ Configs:
 | 20260919-074737 | Qwen2.5-3B | d10d6b5* | trained   | 0.0                  | 6.0                      | 0.0                   | 64.0                  | 0.1          |
 | 20260919-074805 | Qwen2.5-3B | d10d6b5* | trained   | 4.0                  | 7.0                      | 50.0                  | 69.1                  | 0.1          |
 | 20260919-074832 | Qwen2.5-3B | d10d6b5* | trained   | 2.0                  | 0.0                      | 25.0                  | 5.1                   | 0.1          |
+| 20260919-074901 | Qwen2.5-3B | d10d6b5* | trained   | 1.0                  | 6.0                      | 12.5                  | 68.4                  | 0.1          |
+| 20260919-074929 | Qwen2.5-3B | f8ae3d3* | trained   | 0.0                  | 1.0                      | 0.0                   | 14.0                  | 0.1          |
+| 20260919-074955 | Qwen2.5-3B | f8ae3d3* | base      | 0.0                  | 0.0                      | 0.0                   | 0.0                   | 0.1          |
+| 20260919-075019 | Qwen2.5-3B | f8ae3d3* | trained   | 0.0                  | 1.0                      | 0.0                   | 39.7                  | 0.1          |
 
 Configs:
 - `20260919-074646`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "base"}`
@@ -788,6 +792,10 @@ Configs:
 - `20260919-074737`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "curriculum_Qwen2.5-3B_C_p200_lora"}`
 - `20260919-074805`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "curriculum_Qwen2.5-3B_C_fast_p200_lora"}`
 - `20260919-074832`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "curriculum_Qwen2.5-3B_D_p200_lora"}`
+- `20260919-074901`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "curriculum_Qwen2.5-3B_C_s1600_p400_lora"}`
+- `20260919-074929`: `{"graph4_sha": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14", "n_items": 144, "weakness": "type", "what": "curriculum_Qwen2.5-3B_C_opd_fineweb_full_replayC_lora"}`
+- `20260919-074955`: `{"graph4_sha": "3ef199caa6902ceff55c1d0567ea7a69dd12f5bc8c6945f1cb57c640087ac087", "n_items": 144, "weakness": "independent", "what": "base"}`
+- `20260919-075019`: `{"graph4_sha": "3ef199caa6902ceff55c1d0567ea7a69dd12f5bc8c6945f1cb57c640087ac087", "n_items": 144, "weakness": "independent", "what": "curriculum_Qwen2.5-3B_C_wind_p200_lora"}`
 
 ## items_v2
 
