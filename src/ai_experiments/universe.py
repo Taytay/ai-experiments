@@ -84,17 +84,21 @@ def _name3(rng, names):
             names.add(n); return n, False
 
 
-def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0, morph_pos="suffix"):
+def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0, morph_pos="suffix", weakness="type"):
     """n_per_type=20 is the 160-species universe of every section; larger universes (REAL-3: 125 and 625 per type) use
     three-part names because the two-part name space is 864, and are otherwise drawn the same way. morph_p > 0 marks that
-    share of names with their type's stem, as a suffix (sections 8 and 15) or a prefix (PLAN step 21)."""
+    share of names with their type's stem, as a suffix (sections 8 and 15) or a prefix (PLAN step 21). weakness="type" is
+    the original rotation (WEAKNESS[type], so weakness groups are type groups, DATA-1); "independent" draws each species'
+    weakness from the other seven types with its own generator, so names, habitats, diets and regions are unchanged and
+    weakness is a genuinely held-out partition (PLAN step 23)."""
     rng = random.Random(seed)
     names, species = set(), []
     three = n_per_type * len(TYPE_LIST) > 600
     for t in TYPE_LIST:
         for i in range(n_per_type):
             n, _ = _name3(rng, names) if three else _name(rng, names, t, morph_p, pos=morph_pos)
-            species.append(dict(name=n, type=t, weakness=WEAKNESS[t], habitat=rng.choice(HABITATS),
+            w = WEAKNESS[t] if weakness == "type" else random.Random(f"{seed}:{t}:{i}:weakness").choice([x for x in TYPE_LIST if x != t])
+            species.append(dict(name=n, type=t, weakness=w, habitat=rng.choice(HABITATS),
                                 diet=rng.choice(DIETS), region=rng.choice(REGIONS), stage=rng.randint(1, 3),
                                 heldout=(i < holdout_per_type)))
     rng.shuffle(species)

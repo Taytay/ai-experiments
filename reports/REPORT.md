@@ -2424,3 +2424,43 @@ The record in the prompt does connect them. Trained and scored with the merchant
 REAL-5's question was whether an injected fact database improves the categoriser on merchants the user never labelled, and whether the gain survives the user's own category names. Measured on the DB-only merchants, which no user's training rows carry: injecting the records into the weights does nothing at one pass over them (encoder 38 to 39; SFT 51 to 54) and 21 points at three passes (SFT 51 to 72, opaque merchants 25 to 54, coined names 32 to 68), at a general-ability cost of nine ARC-Easy points; giving the record at inference does more for less, 33 points for the tuned encoder (38 to 71) and 46 for the SFT model (51 to 98), with no general-ability cost, and the gain is largest, not smallest, on the coined names (encoder 27 to 77, SFT 32 to 96) because the record supplies what the name withholds. So the report's verdict on parametric injection gets its one qualification here: with section 8's exposure and a task-shaped SFT half in the same mixture, records in the weights do transfer to a noisy string and a user's own word, at two thirds of what the same record in the prompt gives and at the forgetting cost the ladder always showed; retrieval remains the better engineering, and the two are not exclusive. The other half of the owner's goal, categorising the way the user did before, is served by SFT across users' histories (57 without any record, 96 when the merchant is among the shots) and by the tuned encoder (76 to 80 on the user's own and on other users' merchants), with the collaborative signal, other users' labels, doing as much for an unseen merchant as the user's own history does for a seen one. For production: fine-tune across users in the prompt format, retrieve the merchant's record into the prompt, keep the encoder route as the cheap fallback, and expect the products-to-category step to be the residual error on real merchants with ambiguous products.
 
 Not run: teacher-trace distillation with the records as a tool and a GRPO stage (the third route of the question; sampling cost, section 31); a learned retriever on this set (oracle used); the crossing with section 35's ambiguous v2 products; more than one seed. Cost: about 2.5 GPU hours of training and scoring.
+
+## 39. The held-out partition without the confound: with weakness independent of type, arm C's weakness induction falls from 60 to 34 (chance 33) and nothing else moves (DATA-1)
+
+*PLAN step 23. Code: `universe.build(weakness="independent")`, `items.freeze-wind` (frozen sets `*_v1_wind.json`), `WEAKNESS=independent` in `scripts/exp_curriculum.py`, `scripts/weakness_tables.py`. Results `results/curriculum_Qwen2.5-3B_C_wind_p200.json`, `results/curriculum_Qwen2.5-3B_base_wind.json`; adapter `models/adapters/curriculum_Qwen2.5-3B_C_wind_p200_lora`.*
+
+The reviewer's DATA-1 pointed at `WEAKNESS = dict(zip(TYPE_LIST, TYPE_LIST[3:] + TYPE_LIST[:3]))`: every species' weakness is a rotation of its type, so two species share a weakness exactly when they share a type, the weakness partition is the type partition, and "transfer to the held-out weakness partition" (sections 8 and 15) measured the type rule a second time. Section 33.1 confirmed it from the saved per-item files. This step removes the confound and re-runs the recipe: `universe.build(weakness="independent")` draws each species' weakness from the seven other types with a generator of its own, so the 160 names, habitats, diets and regions are the section 8 universe's to the byte and only the weakness column changes (128 of 160 species get a different one; within each type the eight species' weaknesses spread over six or seven values). The knowledge texts state the new weaknesses, the episodes still group by type, habitat, region and diet and never by weakness, and the ladder, held-out induction, probes and the step 20 and 21 sets are frozen anew for this universe (`_wind`). Arm C (the section 15 recipe on the fast path, seed 0, 800 steps) and the untrained base are scored on them.
+
+**Table 39.1: arm C with weakness as a rotation of type (every earlier section) and with weakness independent of type (PLAN step 23), same names and other attributes (accuracy %)**
+
+| measure | base, original universe (sec. 8) | C, original (sec. 15) | C, original, fast path (sec. 19) | base, independent weakness | C, independent weakness |
+|---|---|---|---|---|---|
+| recall, trained fmt | 13.1 | 100 | 100 | 13.1 | 100 |
+| recall, bare (pooled) | 18.1 | 19.4 | 15 | 18.1 | 19.4 |
+| yes/no | 42.5 | 77.5 | 87.5 | 42.5 | 75 |
+| pair | 51.2 | 81.2 | 73.8 | 51.2 | 73.8 |
+| Timmy k=3 (type) | 35.6 | 61.9 | 56.9 | 35.6 | 61.9 |
+| k=4 | 27.5 | 51.9 | 43.8 | 27.5 | 49.4 |
+| weakness induction | 35 | 60 | 52.5 | 35 | 33.8 |
+| habitat induction | 31.2 | 29.4 | 31.2 | 32.5 | 34.4 |
+| held-out species | 39.6 | 29.2 | 28.1 | 40.6 | 34.4 |
+| v2 type (identifiable) | - | - | - | - | - |
+| v2 habitat | - | - | - | - | - |
+| ICL symbol | 60.4 | 78.6 | 79.7 | 60.4 | 78.1 |
+| ICL natural | 84.9 | 87 | 89.1 | 84.9 | 86.5 |
+| ARC-Easy | 73.5 | 58.5 | 64 | 73.5 | 61.5 |
+| WikiText ppl | 10.614 | 22.787 | 22.087 | 10.614 | 21.581 |
+| training minutes | - | 50.3 | 11.2 | - | 14.4 |
+| recall, bare: type questions | 17.9 | 19.6 | 21.4 | 17.9 | 21.4 |
+| recall, bare: weakness questions | 17.9 | 17.9 | 3.6 | 17.9 | 17.9 |
+| recall, bare: habitat questions | 18.8 | 20.8 | 20.8 | 18.8 | 18.8 |
+
+### 39.1 One column changes and one number follows it
+
+Arm C on the independent-weakness universe is arm C: trained-format recall 100, yes/no 75.0 (the section 15 run 77.5, the fast-path rerun 87.5), pair 73.8 (81.2 / 73.8), Timmy k=3 61.9 (61.9 / 56.9), k=4 49.4 (51.9 / 43.8), habitat induction 34.4 (29.4 / 31.2), held-out species 34.4 (29.2 / 28.1), ICL 78.1 / 86.5 (78.6 / 87.0), ARC-Easy 61.5 (58.5 / 64.0), WikiText perplexity 21.6 (22.8 / 22.1), all inside the same-seed spread of section 20. The weakness induction level reads 33.8, chance for three options, against 60.0 and 52.5 on the original universe. Nothing else in the recipe changed: the same 2,752 knowledge-text templates, now stating the independent weaknesses, the same episodes (which never group by weakness), the same 800 steps; the model still recalls its species' types at 100 and groups by type from its weights at 62; it has no weakness rule, because the only thing that ever made "group by weakness" work was that it was "group by type" under another name. The bare weakness recall question reads 17.9 on both universes (chance 12.5 to 17 for the six-to-eight-option bare levels), as it did for every arm in section 8: the facts about weakness are in the adapter in the trained sentence (`{N} is weak to {W}-type attacks` is one of the five templates), and a bare question cannot elicit them, so the item that would show whether the independent weaknesses were *learned* is the section 30 style trained-format recall, which the ladder has only for type. What the ladder can say is that recall of type and the type rule are intact and the weakness rule is gone.
+
+### 39.2 What the step says
+
+DATA-1 is closed as the reviewer read it. The "transfer to the held-out weakness partition (54 against 45 at the base)" of sections 8 and 15 was the type rule scored on items that rewarded it, and section 33's stratification had already shown that from the per-item files; with weakness drawn independently of type the same recipe on the same names scores chance on weakness induction and is otherwise unchanged. The report's induction claim is therefore what section 33 left it: arm C groups by type from its weights (62 on the v1 items, 66 on the identifiable ones) and by no other attribute, and arm D weakly by the others. The confound also settles a question the plan had left for row 28: whether the model stores weakness as a function of type. On the original universe it could not have stored it any other way, and on this universe there is nothing stored to test; the row 28 probe runs on both. Cost: one arm C run and one base scoring, 19 GPU minutes.
+
+Not done: a trained-format weakness recall level (the v1 ladder has `L1_recall_fmt` for type only), which row 30's item-set bump can add, and the independent-weakness universe for arms A, B and D.

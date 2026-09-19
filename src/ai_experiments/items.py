@@ -74,9 +74,10 @@ def morph_tag(morph_p: float = MORPH_P, morph_pos: str = "suffix") -> str:
     return f"{int(round(morph_p * 100))}{'p' if morph_pos == 'prefix' else ''}"
 
 
-def path(name: str, morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix"):
-    """n = species per type for the large universes of PLAN step 18 (REAL-3); None is the 160-species universe."""
-    tag = f"_morph{morph_tag(morph_p, morph_pos)}" if morph else ""
+def path(name: str, morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix", weakness: str = "type"):
+    """n = species per type for the large universes of PLAN step 18 (REAL-3); None is the 160-species universe; weakness="independent"
+    is the PLAN step 23 universe (DATA-1), files tagged _wind."""
+    tag = (f"_morph{morph_tag(morph_p, morph_pos)}" if morph else "") + ("_wind" if weakness == "independent" else "")
     return PROCESSED / f"{name}_{version}{tag}{f'_n{n * 8}' if n else ''}.json"
 
 
@@ -102,9 +103,9 @@ def _with_ids(items: list[dict]) -> list[dict]:
 PROBES2 = "probes2"  # PLAN step 21 (DATA-3): probes with never-trained name parts (M2_*); optional set, plain and every morph universe
 
 
-def generate(morph: bool, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix") -> tuple[dict[str, list[dict]], list[dict]]:
+def generate(morph: bool, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix", weakness: str = "type") -> tuple[dict[str, list[dict]], list[dict]]:
     """Regenerate the three sets (and probes2) from the universe generator. Returns ({set: items}, species)."""
-    species = U.build(n_per_type=n or 20, morph_p=morph_p if morph else 0.0, morph_pos=morph_pos)
+    species = U.build(n_per_type=n or 20, morph_p=morph_p if morph else 0.0, morph_pos=morph_pos, weakness=weakness)
     by_name = {s["name"]: s for s in species}
     sets = {"ladder": U.ladder(species), "heldout_induction": U.heldout_induction(species), "probes": U.probes(species, pos=morph_pos),
             PROBES2: U.probes_v2(species, pos=morph_pos)}
@@ -245,12 +246,12 @@ def freeze_corpus(version: str = VERSION, force: bool = False) -> None:
 
 
 def freeze(morph: bool, version: str = VERSION, force: bool = False, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix",
-           only: tuple | None = None) -> None:
-    sets, species = generate(morph, n, morph_p, morph_pos)
+           only: tuple | None = None, weakness: str = "type") -> None:
+    sets, species = generate(morph, n, morph_p, morph_pos, weakness)
     for name, items in sets.items():
         if only and name not in only:
             continue
-        p = path(name, morph, version, n, morph_p, morph_pos)
+        p = path(name, morph, version, n, morph_p, morph_pos, weakness)
         if p.exists() and not force:
             sys.exit(f"{p.relative_to(PROCESSED.parent.parent)} exists; frozen sets are immutable. Bump VERSION for new items.")
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -282,8 +283,8 @@ class Frozen:
         return dict(items_version=self.version, items_universe="morph" if self.morph else "plain", items_sha=self.sha)
 
 
-def load(name: str, morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix") -> dict:
-    p = path(name, morph, version, n, morph_p, morph_pos)
+def load(name: str, morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix", weakness: str = "type") -> dict:
+    p = path(name, morph, version, n, morph_p, morph_pos, weakness)
     if not p.exists():
         raise FileNotFoundError(f"{p} is missing. Frozen item sets are committed under data/processed/; "
                                 f"if this is a new VERSION run `uv run python -m ai_experiments.items freeze`.")
@@ -293,10 +294,11 @@ def load(name: str, morph: bool, version: str = VERSION, n: int | None = None, m
     return doc
 
 
-def load_all(morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix") -> Frozen:
+def load_all(morph: bool, version: str = VERSION, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix", weakness: str = "type") -> Frozen:
     """n = species per type (PLAN step 18 universes); the known-facts and corpus sets are shared, the reverse set exists for the default universe only.
-    morph_p / morph_pos pick a morphology universe other than the 0.7-suffix one (PLAN step 21)."""
-    docs = {name: load(name, morph, version, n, morph_p, morph_pos) for name in SETS}
+    morph_p / morph_pos pick a morphology universe other than the 0.7-suffix one (PLAN step 21); weakness="independent" the DATA-1 universe (step 23)."""
+    docs = {name: load(name, morph, version, n, morph_p, morph_pos, weakness) for name in SETS}
+    wind = weakness == "independent"
     suite = _with_ids(S.suite_items())
     sha = {**{name: d["sha256"] for name, d in docs.items()}, "icl_suite": sha256(suite)}
     known = []
@@ -308,14 +310,14 @@ def load_all(morph: bool, version: str = VERSION, n: int | None = None, morph_p:
         cdoc = load(CORPUS, False, version)
         corpus, sha[CORPUS] = [i["text"] for i in cdoc["items"]], cdoc["sha256"]
     reverse = []
-    if not morph and not n and path(REVERSE, False, version).exists():
+    if not morph and not n and not wind and path(REVERSE, False, version).exists():
         rdoc = load(REVERSE, False, version)
         reverse, sha[REVERSE] = rdoc["items"], rdoc["sha256"]
     extra = {}
-    if not n and path(PROBES2, morph, version, n, morph_p, morph_pos).exists():
-        d = load(PROBES2, morph, version, n, morph_p, morph_pos)
+    if not n and path(PROBES2, morph, version, n, morph_p, morph_pos, weakness).exists():
+        d = load(PROBES2, morph, version, n, morph_p, morph_pos, weakness)
         extra["probes2"], sha[PROBES2] = d["items"], d["sha256"]
-    for name in ((INDUCT2,) if not morph and not n else ()) + (SUITE2, MMLU):
+    for name in ((INDUCT2,) if not morph and not n and not wind else ()) + (SUITE2, MMLU):
         if path(name, False, version).exists():
             d = load(name, False, version)
             extra[{INDUCT2: "induction2", SUITE2: "suite2", MMLU: "mmlu"}[name]], sha[name] = d["items"], d["sha256"]
@@ -368,6 +370,8 @@ def main(argv=None) -> None:
             freeze(morph, force="--force" in argv, only=(PROBES2,))
     elif cmd == "freeze-morph":  # freeze-morph <morph_p> [prefix] [--force]: every set of another morphology universe (PLAN step 21)
         freeze(True, force="--force" in argv, morph_p=float(argv[1]), morph_pos="prefix" if "prefix" in argv else "suffix")
+    elif cmd == "freeze-wind":  # PLAN step 23 (DATA-1): the plain universe with weakness independent of type
+        freeze(False, force="--force" in argv, weakness="independent")
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":

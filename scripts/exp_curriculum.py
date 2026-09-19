@@ -164,6 +164,7 @@ SCHEDULE = {"Dr": "restart", "Dc": "constant"}.get(ARM, "shared")  # one warmup 
 ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
 MORPH_P = float(os.environ.get("MORPH_P", "0.7" if ARM in ("E", "base_m") else "0.0"))  # marker share (PLAN step 21 sweeps it on arm E)
 MORPH_POS = os.environ.get("MORPH_POS", "suffix")  # "prefix": the prefix-marker universe (PLAN step 21, DATA-3)
+WEAKNESS = os.environ.get("WEAKNESS", "type")  # "independent": weakness drawn independently of type (PLAN step 23, DATA-1); items tagged _wind
 tag = MODEL.split("/")[-1]
 SFX = (f"_s{SEED}" if SEED else "") + (f"_{RUN_TAG}" if RUN_TAG else "")  # seed 0, no tag keeps the original names
 OUT = ROOT / "results" / f"curriculum_{tag}_{ARM}{SFX}.json"
@@ -171,7 +172,7 @@ ADAPTER = ROOT / "models" / "adapters" / f"curriculum_{tag}_{ARM}{SFX}_lora"
 torch.manual_seed(SEED)
 
 UNIVERSE_N = int(os.environ.get("UNIVERSE_N", "20"))  # species per type; 125 and 625 are the 1,000 and 5,000-species universes (PLAN step 18, REAL-3)
-species = U.build(n_per_type=UNIVERSE_N, morph_p=MORPH_P, morph_pos=MORPH_POS)
+species = U.build(n_per_type=UNIVERSE_N, morph_p=MORPH_P, morph_pos=MORPH_POS, weakness=WEAKNESS)
 KTEXTS = os.environ.get("KTEXTS", "full")  # knowledge-stream variant (PLAN step 16, DATA-5): full (section 8), descK, desc14perm, desc14rev, desc14llm
 LLM_TEXTS_SHA = None
 if KTEXTS == "full":
@@ -182,7 +183,7 @@ else:
         doc = json.loads((ROOT / "data" / "processed" / "llm_texts_v1.json").read_text(encoding="utf-8"))
         llm_texts, LLM_TEXTS_SHA = {d["name"]: d["texts"] for d in doc["items"]}, doc["sha256"]
     K_texts = U.knowledge_texts(species, KTEXTS, llm_texts=llm_texts)
-FROZEN = I.load_all(morph=MORPH_P > 0, n=UNIVERSE_N if UNIVERSE_N != 20 else None, morph_p=MORPH_P if MORPH_P > 0 else I.MORPH_P, morph_pos=MORPH_POS)  # never regenerated: the same items for every arm and commit
+FROZEN = I.load_all(morph=MORPH_P > 0, n=UNIVERSE_N if UNIVERSE_N != 20 else None, morph_p=MORPH_P if MORPH_P > 0 else I.MORPH_P, morph_pos=MORPH_POS, weakness=WEAKNESS)  # never regenerated: the same items for every arm and commit
 ladder, probes, suite = FROZEN.ladder, FROZEN.probes, FROZEN.suite
 SMOKE = bool(os.environ.get("SMOKE"))
 if SMOKE:
@@ -491,7 +492,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="full_ft_adamw8bit" if FULL_FT else ("unsloth_qlora" if LOAD_4BIT else "unsloth_lora"), load_4bit=LOAD_4BIT, full_ft=FULL_FT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=LORA_R, lora_alpha=2 * LORA_R, lora_targets=os.environ.get("LORA_TARGETS", "all"), morph_p=MORPH_P, morph_pos=MORPH_POS,
+           method="full_ft_adamw8bit" if FULL_FT else ("unsloth_qlora" if LOAD_4BIT else "unsloth_lora"), load_4bit=LOAD_4BIT, full_ft=FULL_FT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=LORA_R, lora_alpha=2 * LORA_R, lora_targets=os.environ.get("LORA_TARGETS", "all"), morph_p=MORPH_P, morph_pos=MORPH_POS, weakness=WEAKNESS,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), ktexts=KTEXTS, universe_n=UNIVERSE_N, llm_texts_sha=LLM_TEXTS_SHA, n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
