@@ -545,6 +545,8 @@ arm C's adapter stores `type` as a relation or as per-entity memorisation.
 *Experiment:* fit an LRE from the species-name hidden state to the type token on arm C's merged adapter, layer sweep;
 faithfulness on the 136 trained species; apply it to the 24 held-out species with and without context; repeat for
 weakness and test whether LRE_weakness factors through LRE_type (the DATA-1 confound as a shared subspace). PLAN row 28.
+**Status (2026-09-19):** answered, PLAN step 28, REPORT.md 40 (least-squares LRE, `scripts/exp_lre.py`). In the trained sentence (`<name> is a`) a ridge map from the layer-l state at the answer position to the final state, fitted on 109 trained species, reads the type of the other 27 at 22 / 37 / 52 / 51 / 57 / 73 / 71 for layers 12 to 36 (chance 12.5; the model 76 by first token); the base has no such map at any layer. A relation, not 136 facts, readable from the middle of the network. It does not transfer to held-out species (the name carries nothing; with the entry in context the map reads 21 to 33 where the model reads 27). On the bare question the probe reads chance for the adapter at every layer, as the model does: section 8's format gap is an absence in the residual stream, not a head effect. Weakness: on the original universe the direct probe reads 25 while the type probe through the rotation reads 73 (the type direction carries it; the weakness path does not); on the independent-weakness universe the model answers 15 and the probe 11 to 16, the 136 weaknesses (one template each) were not written at all. Not done: the Jacobian LRE; a probe at the subject token; the merchant set.
+
 
 **GRAPH-2 (R) Does transductive label propagation beat prototypes on Zipf-distributed merchants?**
 Correct & Smooth (2010.13993) and TPN (1805.10002) show label propagation over a kNN graph beats prototype
@@ -559,6 +561,7 @@ EntiGraph (2409.07431) generates text about pairs and triples of entities (rando
 lifts closed-book QA from 39.5 to 56.2; the K stream's comparative sentences are a one-hop version.
 *Experiment:* replace part of the knowledge stream with E-A-E walk texts at a fixed token budget; score pair, yes/no
 and Timmy from the weights against arm C. PLAN row 29.
+**Status (2026-09-19):** answered, PLAN step 29, REPORT.md 41. Arm Cw (a ninth of the knowledge sequences as templated three-entity walks, `universe.walk_texts`, 1.22x arm C's knowledge-side tokens) reads yes/no 88.8, pair 77.5, Timmy 59.4 against the same-path arm C's 87.5 / 73.8 / 56.9, inside the section 20 same-seed spread; recall 100, general measures unchanged. Two-hop walks are read as more comparative sentences; the lever on those levels remains the step count (section 28). Not run: walks at a larger share, LLM-written walks.
 
 **GRAPH-4 (R) Is weakness stored as f(type) or per entity?**
 The weakness = f(type) map (DATA-1) is an attribute-attribute edge the training text never states.

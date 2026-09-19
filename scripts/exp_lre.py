@@ -16,7 +16,8 @@ ridge map to the FINAL-layer hidden state at the same position, whose logits ove
                  (WEAKNESS=independent, PLAN step 23) they can only agree if the model stores weakness as a function of type.
 Eval only; minutes.
 
-usage: uv run python scripts/exp_lre.py [base|<adapter dir under models/adapters>]      WEAKNESS=independent for the _wind universe
+usage: uv run python scripts/exp_lre.py [base|<adapter dir under models/adapters>]      WEAKNESS=independent for the _wind universe; FORMAT=trained for the
+       knowledge-text sentence prompt ("<name> is a"), where the adapters recall the type at 100 (the bare question reads about chance for every arm, section 8)
 outputs: results/lre_<tag>.json; tracker experiment "lre"
 """
 import json
@@ -39,12 +40,14 @@ MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
 WEAKNESS = os.environ.get("WEAKNESS", "type")
 LAYERS = [int(x) for x in os.environ.get("LAYERS", "4,8,12,16,20,24,28,32,36").split(",")]
 RIDGE = float(os.environ.get("RIDGE", "1.0"))
-tag = ("base" if WHAT == "base" else WHAT) + ("_wind" if WEAKNESS == "independent" else "")
+FORMAT = os.environ.get("FORMAT", "bare")  # bare: the ladder's question; trained: the knowledge-text sentence up to the type ("<name> is a" -> " <type>-type ...")
+tag = ("base" if WHAT == "base" else WHAT) + ("_wind" if WEAKNESS == "independent" else "") + ("_tf" if FORMAT == "trained" else "")
 OUT = ROOT / "results" / f"lre_{tag}.json"
 species = U.build(n_per_type=20, weakness=WEAKNESS)
 by_name = {s["name"]: s for s in species}
 seen = [s for s in species if not s["heldout"]]; held = [s for s in species if s["heldout"]]
-Q = {"type": "Question: What type is {n}?\nAnswer:", "weakness": "Question: What type is {n} weak to?\nAnswer:"}
+Q = {"type": "Question: What type is {n}?\nAnswer:", "weakness": "Question: What type is {n} weak to?\nAnswer:"} if FORMAT == "bare" else \
+    {"type": "{n} is a", "weakness": "{n} is weak to"}  # the trained sentences: "{N} is a {T}-type creature.", "{N} is weak to {W}-type attacks."
 
 
 def load():
@@ -131,7 +134,7 @@ def probe(model, tok, rel, ctx):
     return r
 
 
-cfg = dict(what=WHAT, model=MODEL, weakness=WEAKNESS, layers=LAYERS, ridge=RIDGE, n_seen=len(seen), n_held=len(held))
+cfg = dict(what=WHAT, model=MODEL, weakness=WEAKNESS, layers=LAYERS, ridge=RIDGE, n_seen=len(seen), n_held=len(held), format=FORMAT)
 with Run("lre", model=MODEL, config=cfg, enabled=True) as run:
     t0 = time.time()
     model, tok = load()
