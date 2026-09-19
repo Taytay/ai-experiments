@@ -625,3 +625,40 @@ def probes_v2(species, seed=33, n_per_type=6, pos="suffix"):
                 items.append(dict(level=level + "_fmt", prompt=f"Question: What type is {n}?\nAnswer:",
                                   options=[f" {n} is a {o}-type." for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
     return items
+
+
+# ------------------------------------------------------------------ two-hop walk texts (PLAN step 29, GRAPH-3, EntiGraph-lite)
+_WALK_ATTRS = {"type": ("{A} and {B} are both {V}-type creatures", "T"), "habitat": ("{A} and {B} both live in {V} habitats", "H"),
+               "diet": ("{A} and {B} both eat as {V}s", "D"), "region": ("{A} and {B} are both found in {V}", "R")}
+_WALK_CLOSE = ["So {A} and {C} are linked through {B}: {A} shares its {a1} with {B}, and {B} its {a2} with {C}.",
+               "{A} is a {TA}-type creature and {C} a {TC}-type one; {B} connects them, being {a1}-mates of {A} and {a2}-mates of {C}.",
+               "Question: How are {A} and {C} related?\nAnswer: Through {B}. {A} and {B} share a {a1}, {B} and {C} share a {a2}."]
+
+
+def walk_texts(species, n=2000, seed=21, length=3):
+    """EntiGraph-lite (2409.07431): texts generated from random walks on the entity-attribute-entity graph of the seen species.
+    A walk of `length` entities takes one hop per step (an attribute both share: type, habitat, diet or region, never weakness),
+    renders each hop as a sentence and closes with a sentence that names the path, so a text relates two or three entities
+    through attributes the knowledge texts state separately; the K stream's comparative sentences are the one-hop case."""
+    rng = random.Random(seed)
+    tr = [s for s in species if not s["heldout"]]
+    out = []
+    while len(out) < n:
+        walk, hops = [rng.choice(tr)], []
+        ok = True
+        for _ in range(length - 1):
+            a = rng.choice(list(_WALK_ATTRS))
+            cands = [o for o in tr if o[a] == walk[-1][a] and o not in walk]
+            if not cands:
+                ok = False; break
+            walk.append(rng.choice(cands)); hops.append(a)
+        if not ok:
+            continue
+        sents = []
+        for (x, y), a in zip(zip(walk, walk[1:]), hops):
+            tmpl, _ = _WALK_ATTRS[a]
+            sents.append(tmpl.format(A=x["name"], B=y["name"], V=x[a]) + (f", though {y['name']} is a {y['type']}-type creature" if a != "type" and x["type"] != y["type"] else "") + ".")
+        A, B, C = walk[0], walk[1], walk[-1]
+        close = rng.choice(_WALK_CLOSE).format(A=A["name"], B=B["name"], C=C["name"], a1=hops[0], a2=hops[-1], TA=A["type"], TC=C["type"])
+        out.append(" ".join(sents) + " " + close)
+    return out
