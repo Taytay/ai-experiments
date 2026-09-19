@@ -51,15 +51,23 @@ def load():
     src = MODEL if WHAT == "base" else str(ROOT / "models" / "adapters" / WHAT)
     model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=1024, dtype=torch.bfloat16)
     if WHAT != "base":
-        model = model.merge_and_unload()  # the probe reads the merged weights
+        FastLanguageModel.for_inference(model)  # the adapter stays a PeftModel (merge_and_unload broke unsloth's fast forward); the hidden states are the same
     model.eval()
     return model, tok
+
+
+def inner(model):
+    """The decoder stack that owns .layers and .norm, through the Peft wrapper if there is one."""
+    m = model
+    while not hasattr(m, "layers"):
+        m = m.model if hasattr(m, "model") else m.base_model
+    return m
 
 
 @torch.no_grad()
 def states(model, tok, prompts):
     """Hidden states at the last prompt token for every layer: {layer: [n, d]} (layer 0 = embeddings), plus the final-layer state."""
-    out = {l: [] for l in range(len(model.model.layers) + 1)}
+    out = {l: [] for l in range(len(inner(model).layers) + 1)}
     for i in range(0, len(prompts), 16):
         enc = tok(prompts[i:i + 16], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
         hs = model(**enc, output_hidden_states=True).hidden_states
@@ -76,7 +84,7 @@ def option_ids(tok):
 def decode(model, tok, H):
     """Argmax over the eight type options of the LM head applied to final-layer states H [n, d] (after the final norm)."""
     W = model.get_output_embeddings().weight[option_ids(tok)].float()  # [8, d]
-    h = model.model.norm(torch.tensor(H, device="cuda", dtype=torch.bfloat16)).float() if hasattr(model.model, "norm") else torch.tensor(H, device="cuda").float()
+    h = inner(model).norm(torch.tensor(H, device="cuda", dtype=torch.bfloat16)).float()
     return (h @ W.T).argmax(1).cpu().numpy()
 
 
