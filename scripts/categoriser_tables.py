@@ -43,13 +43,22 @@ def in_shots():
         t2m = {h["text"]: h["merchant"] for h in u["history"]}
         shot_m[u["user"]] = {t2m[t] for t in u["shots"] if t in t2m}
     item = {it["id"]: it for it in doc["items"]}
-    groups = ("in the 24 shots", "in the history, not the shots", "not in the history", "known chain, not in the history", "opaque, not in the history")
+    db_only = R6.db_only_merchants()
+    groups = ("in the 24 shots", "in the history, not the shots", "not in the history", "not in the history, labelled by other users in training",
+              "not in the history, DB-only (no user labelled it in training)", "DB-only, known chain", "DB-only, opaque", "DB-only, standard name", "DB-only, renamed", "DB-only, new word")
     def grp(r):
         it = item[r["id"]]
         if not it["seen"]:
-            return ["not in the history", ("known chain" if it["known"] else "opaque") + ", not in the history"]
+            g = ["not in the history"]
+            if it["merchant"] in db_only:
+                g += ["not in the history, DB-only (no user labelled it in training)", "DB-only, known chain" if it["known"] else "DB-only, opaque",
+                      {"standard": "DB-only, standard name", "renamed": "DB-only, renamed", "new": "DB-only, new word"}[it["name_type"]]]
+            else:
+                g.append("not in the history, labelled by other users in training")
+            return g
         return ["in the 24 shots" if it["merchant"] in shot_m[it["user"]] else "in the history, not the shots"]
-    print("\n**Table 38.2: by whether the merchant is among the 24 prompt shots, elsewhere in the 300-row history, or absent from it (accuracy %)**\n")
+    print("\n**Table 38.2: by whether the merchant is among the 24 prompt shots, elsewhere in the 300-row history, or absent from it, and for the absent ones whether "
+          "another user's training rows carried it or only the fact DB knows it (accuracy %; the untrained section 37 columns did not train, so their split is a merchant subset only)**\n")
     print("| group | " + " | ".join(c[0] for c in COLS) + " |")
     print("|---|" + "---|" * len(COLS))
     cells = {}

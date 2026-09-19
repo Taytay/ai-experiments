@@ -11,6 +11,8 @@ Two ways of training, three ways of giving it the fact DB:
             sequences at 30% (LLM, full-sequence loss) or as (record -> standard category name) pairs (encoder)
   DB=ret    retrieval: the merchant's record is in the prompt before the query at training and at test (the LLM item's prompt_ctx);
             for the encoder the record is appended to the query string at test (ENC_CTX=1 in exp_real6.py)
+A quarter of the merchants (real6.db_only_merchants, stratified over categories) never appear in any training row, as query or shot,
+so that the unseen cells split into merchants other users labelled and merchants only the DB knows (the REAL-5 number).
 
 usage: uv run python scripts/exp_categoriser.py llm|encoder [none|param|ret]
 env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), EPOCHS=3 (encoder), SMOKE=1, SEED=0
@@ -42,6 +44,7 @@ MICRO, MAXLEN = 4, 1536  # 4 x 4 = 16 sequences per step
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 DOC = R6.load()
 DBREC = DOC["fact_db"]
+DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{DB}_lora" if ROUTE == "llm" else f"categoriser_bge_{DB}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{DB}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -60,7 +63,7 @@ def sft_examples(per_user=150):
     the seen cells), but the test transactions themselves are not history rows."""
     ex = []
     for u in DOC["users"]:
-        hist = u["history"]
+        hist = [h for h in u["history"] if h["merchant"] not in DB_ONLY]
         header = "Categories: " + ", ".join(c["name"] for c in u["categories"]) + "\n\n"
         rows = list(range(len(hist))); rng.shuffle(rows)
         for i in rows[:per_user]:
@@ -130,7 +133,8 @@ def train_encoder(run):
     pairs = []
     for u in DOC["users"]:
         for h in u["history"]:
-            pairs.append((M.normalize(h["text"]), h["label"]))
+            if h["merchant"] not in DB_ONLY:
+                pairs.append((M.normalize(h["text"]), h["label"]))
     if DB == "param":
         for m in json.loads((ROOT / "data" / "processed" / "transactions_v1.json").read_text())["merchants"]:
             pairs += [(DBREC[m["name"]], m["category"])] * 2
@@ -156,7 +160,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
