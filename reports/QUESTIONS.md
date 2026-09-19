@@ -594,6 +594,8 @@ use 1e-3 for LoRA and 1e-4 for full FT. Our decoder adapters run at 1e-4 (sectio
 was better on manipulation and induction) and the Flan-T5 adapter at 3e-4 learned nothing (section 29).
 *Experiment:* arm C at 5e-4 and 1e-3 (rank 64, 800 steps); Flan-T5 F2A adapter at 1e-3 and 3e-3; T5Gemma
 adapter already at its best (1e-4 > 3e-4, so it is the exception to check against). Full ladder each.
+**Status (2026-09-18):** answered, PLAN step 32, REPORT.md 32. Not rate artefacts. Arm C at 5e-4 stores the facts (recall 100) and returns every manipulation, induction and general measure to the base or below it (yes/no 45, Timmy 39, natural ICL 75.5, ARC 50.5, ppl 55); at 1e-3 the model is destroyed in 200 steps (ppl 1.5 million). The primer's ten-times rule is stated for alpha 32 with 1/r scaling (update scale 0.5 at rank 64); our alpha = 2r scales by 2, so the recipe's 1e-4 already moves the weights like their 4e-4 and section 28's 2e-4 like their 8e-4: the runs agree with the post once translated, and section 28's window (1e-4 to 2e-4, step count as the lever) stands. Flan-T5's rank-64 adapter at 1e-3 learns a third of the facts (recall 34.4) at the cost of natural ICL (87 to 52.6) and ARC (26.5), the same damage as full fine-tuning at 1e-3 for a third of its recall; at 3e-3 it learns nothing and destroys the model. Full fine-tuning at 3e-4 remains Flan-T5's recipe. Four runs, 59 minutes of training.
+
 
 **REAL-5 (O) The production categoriser: does an injected fact database improve it on merchants the user never labelled?**
 The owner's end goal (2026-09-17): a fine-tuned "one trick pony" that categorises bank transactions the
