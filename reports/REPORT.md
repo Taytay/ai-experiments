@@ -2603,3 +2603,45 @@ The weakness relation is weaker in the weights and the probe says so. On `<name>
 GRAPH-1's question has an answer with a layer number on it. In the path the adapter was trained on, the type of a species is a linear function of the residual stream that is the same function for every species: a ridge map fitted on 109 species reads the type of the other 27 at 52 from layer 20 and 73 from layer 32 (the model itself 76 by first token, 100 by full sentence), and the untrained base shows no such map at any layer. That is Hernandez et al.'s linear relational embedding, created by 800 steps of LoRA, and it is the mechanism behind sections 8 and 33: the same direction that names a trained species' type is what the episodes taught the model to group by, which is why "Timmy" works from the weights for type and for nothing else. Two limits go with it. The direction lives in the trained completion and nowhere else: at the position where a bare question would be answered the probe reads chance for the adapter as for the base, at every layer, which is section 8's format gap seen from inside, and the ladder's bare-format recall levels were measuring an absence, not a weakness of the head. And the direction is for the relation the training stated most: type, in four templates and every comparison, became a readable direction; weakness, in one template, was the type direction under a rotation on the original universe and nothing at all on the independent one. For the categoriser this says that the category a fine-tune attaches to a merchant is a shared direction the model can carry to other merchants only through what their representations already share (section 36's real chains, section 38's cross-user labels), and that a fact stated once in one form is not stored; the DB records of section 38 needed three passes and four templates to be read back for the same reason.
 
 Not done: the Jacobian LRE of the paper (this is the least-squares version), a probe at the subject's own token rather than the answer position, and the merchant set.
+
+## 41. Two-hop walk texts in the knowledge stream: a ninth of the knowledge sequences as three-entity walks changes nothing the same-seed noise does not cover (GRAPH-3, DATA-5)
+
+*PLAN step 29. Code: `universe.walk_texts`, arm `Cw` in `scripts/exp_curriculum.py`, `scripts/walk_tables.py`. Results `results/curriculum_Qwen2.5-3B_Cw_p200.json`; adapter `models/adapters/curriculum_Qwen2.5-3B_Cw_p200_lora`.*
+
+EntiGraph (2409.07431) generates text about pairs and triples of entities by walking the entity graph and asking a model to write about the relations along the walk, and lifts closed-book QA on a small corpus from 39.5 to 56.2. The knowledge stream's comparative sentences (section 8: "X and Y are both T-type creatures", "X is T-type while Y is U-type") are the one-hop case, and section 27 found that manipulation (yes/no, pair) comes from exactly those six negative and comparative texts per species and from nothing else in the augmentation. GRAPH-3 asked whether two-hop walks add more. `universe.walk_texts` writes them without a model: a walk of three seen species, each hop an attribute the two share (type, habitat, diet or region, never weakness), one sentence per hop with the type of the newcomer when it differs, and a closing sentence that names the path ("So A and C are linked through B: A shares its habitat with B, and B its type with C"; a third of the closings are question form). Arm Cw is arm C with a ninth of the knowledge sequences replaced by walk texts (knowledge .40, walks .05, episodes .40, replay .15, 800 steps on the fast path, seed 0). A walk text is 80 tokens against a knowledge text's 23, so the knowledge-side token budget is about 1.3 times arm C's; the per-stream token counts in the table give the exact figure, and the comparison is read with that in mind.
+
+**Table 41.1: arm Cw (knowledge .40, two-hop walk texts .05, episodes .40, replay .15) against arm C (knowledge .45), 800 steps, seed 0 (accuracy %)**
+
+| measure | base | C (sec. 15) | C, fast path (sec. 19) | C, 1,600 steps (sec. 28) | Cw: walks in the knowledge stream |
+|---|---|---|---|---|---|
+| recall, trained fmt | 13.1 | 100 | 100 | 100 | 100 |
+| recall, bare | 18.1 | 19.4 | 15 | 20 | 15.6 |
+| yes/no | 42.5 | 77.5 | 87.5 | 97.5 | 88.8 |
+| pair | 51.2 | 81.2 | 73.8 | 91.2 | 77.5 |
+| Timmy k=3 | 35.6 | 61.9 | 56.9 | 81.2 | 59.4 |
+| k=4 | 27.5 | 51.9 | 43.8 | 71.9 | 45.6 |
+| habitat induction | 31.2 | 29.4 | 31.2 | 33.8 | 33.8 |
+| held-out species | 39.6 | 29.2 | 28.1 | 34.4 | 34.4 |
+| v2 type (identifiable) | - | - | - | - | 60 |
+| v2 habitat | - | - | - | - | 36.2 |
+| v2 diet | - | - | - | - | 38.1 |
+| v2 region | - | - | - | - | 34.4 |
+| unseen label | - | - | - | - | 0 |
+| reverse hard | 20 | 19.4 | 21.9 | 20 | 23.8 |
+| ICL symbol | 60.4 | 78.6 | 79.7 | 78.1 | 77.6 |
+| ICL natural | 84.9 | 87 | 89.1 | 85.4 | 84.3 |
+| ARC-Easy | 73.5 | 58.5 | 64 | 65.5 | 62.5 |
+| MMLU | - | - | - | - | 48.5 |
+| WikiText ppl | 10.614 | 22.787 | 22.087 | 20.949 | 23.373 |
+| knowledge tokens (K) | - | - | 147,528 | 293,302 | 133,792 |
+| walk tokens (W) | - | - | - | - | 46,639 |
+| episode tokens (E) | - | - | 687,249 | 1,387,907 | 683,056 |
+| training minutes | - | 50.3 | 11.2 | 25.8 | 14.6 |
+
+### 41.1 The walks land where the one-hop comparisons already were
+
+Arm Cw is arm C on every level. Against the fast-path arm C run of section 19 (the same code path and seed) it reads yes/no 88.8 against 87.5, pair 77.5 against 73.8, Timmy k=3 59.4 against 56.9, k=4 45.6 against 43.8, held-out species 34.4 against 28.1, habitat 33.8 against 31.2, recall 100 against 100; the general measures are ICL 77.6 / 84.3 against 79.7 / 89.1, ARC-Easy 62.5 against 64.0, WikiText perplexity 23.4 against 22.1. Every difference is inside the spread section 20 measured between same-seed runs of this recipe (up to 8.7 points on manipulation, 11 on induction, 17.9% of predictions flipping), and the three levels the walks were meant to move (pair, yes/no, Timmy) move by two to four points in the direction that a 1.22 times larger knowledge-side token budget would predict on its own (133,792 knowledge plus 46,639 walk tokens against 147,528). The 1,600-step run of section 28, which doubles every stream, moves the same levels by 10 to 24 points, so the ceiling the recipe has not reached is a matter of steps, not of the texts' graph structure. On the step 20 items the run reads type induction 60.0 (identifiable), the other attributes 34 to 38 (chance), the unseen label 0, as arm C does.
+
+### 41.2 What the step says
+
+GRAPH-3 asked whether texts generated from two-hop walks teach the pairwise and yes/no levels beyond what the one-hop comparative sentences do. At a fixed step count and a knowledge share of .45 (of which a ninth became walks), no: the two-hop texts are read like more comparative sentences, and section 27's finding stands that manipulation comes from the comparative and negative texts and scales with the steps that read them, not with the augmentation's kind. EntiGraph's gain (39.5 to 56.2 on closed-book QA) came from generating a corpus many times larger than the source with an LLM's knowledge of each entity pair; a templated walk over four attributes of 136 species, at 5% of the sequences, is not that experiment, and a faithful replicate would need generated text at a multiple of the knowledge stream, which section 27 also found costs general ability at a fixed budget. Not run: walks at a larger share or longer length, LLM-written walk texts, walks as the whole knowledge stream. Cost: one run, 15 minutes.
