@@ -7,7 +7,8 @@ content, converted to markdown by a small HTML walker (headings, paragraphs, lis
 kept as text); the date comes from the JSON-LD datePublished, the article:published_time meta tag or the RSS pubDate.
 
 usage: uv run python scripts/fetch_blog_posts.py <links.md> <group>      writes references/blog/<group>/YYYY-MM-DD-<slug>.md
-       and references/blog/<group>/INDEX.md (chronological); a line in links.md is "<url> | <title>" or a bare URL.
+       and references/blog/<group>/INDEX.md (chronological, every dated file in the folder); a line in links.md is "<url> | <title>" or a bare URL.
+       uv run python scripts/fetch_blog_posts.py --index <group>          rebuilds INDEX.md only (after filing hand-saved posts)
 Every fetch is sequential with a pause; nothing is retried more than twice. Files that already exist are not refetched.
 """
 import html
@@ -172,6 +173,8 @@ def slug_of(url):
 
 
 def main():
+    if sys.argv[1] == "--index":
+        write_index(ROOT / "references" / "blog" / sys.argv[2], sys.argv[2]); return
     links, group = Path(sys.argv[1]), sys.argv[2]
     dest = ROOT / "references" / "blog" / group
     dest.mkdir(parents=True, exist_ok=True)
@@ -214,11 +217,22 @@ def main():
         (dest / name).write_text(f"# {title}\n\n*Source: {url}  \nPublished: {date}  \nFetched: {time.strftime('%Y-%m-%d')} via {src}*\n\n{body}\n")
         print(f"  -> {name} ({len(body.split())} words)")
         index.append((date, title, url, name)); time.sleep(4)
-    index.sort()
-    lines = [f"# {group}: posts in chronological order", "", "Fetched by `scripts/fetch_blog_posts.py` from the list in `references/blog/`; one file per post, dated by its publication date.", ""]
-    lines += [f"- {d} [{t}]({n}) ({u})" if n else f"- MISSING {t} ({u})" for d, t, u, n in index]
+    write_index(dest, group, [(t, u) for d, t, u, n in index if d == "MISSING"])
+
+
+def write_index(dest, group, missing=()):
+    """INDEX.md from every dated file in the folder (fetched by this script or saved by hand from a browser), chronological."""
+    rows = []
+    for f in sorted(dest.glob("????-??-??-*.md")):
+        head = f.read_text().splitlines()
+        title = head[0].lstrip("# ").strip("* ") if head else f.name
+        src = next((re.sub(r"^[-*]?\s*Source:\s*", "", l).strip(" *") for l in head[1:12] if "Source:" in l), "")
+        rows.append(f"- {f.name[:10]} [{title}]({f.name})" + (f" ({src})" if src else ""))
+    rows += [f"- MISSING {t} ({u})" for t, u in missing]
+    lines = [f"# {group}: posts in chronological order", "", "One file per post, dated by its publication date: fetched by `scripts/fetch_blog_posts.py` (RSS, Wayback Machine, direct) or saved from a browser into "
+             "`references/blog/inbox/` and filed here by hand when no route worked. `summaries.md` summarises each.", ""] + rows
     (dest / "INDEX.md").write_text("\n".join(lines) + "\n")
-    print(f"index: {len(index)} entries, {sum(1 for d, *_ in index if d == 'MISSING')} missing")
+    print(f"index: {len(rows)} entries, {len(missing)} missing")
 
 
 if __name__ == "__main__":

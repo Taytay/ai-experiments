@@ -712,7 +712,10 @@ next-transaction prediction from the history up to that point, (4) relabelling a
 (5) a recency rule as the target: the user's latest labelling of a merchant wins; (6) per shot, how the label arose (typed,
 accepted from a suggestion, corrected) and the elapsed time, after TransAct's action type and Zepto's temporal encoding;
 (7) a slice whose shots are drawn uniformly, so a selection policy can be replayed offline (the Closeup ranker's
-randomised-traffic slice); (8) short-history users (0, 5, 25 rows) for the cold-start curve. Frozen and hashed like REAL-6;
+randomised-traffic slice); (8) short-history users (0, 5, 25 rows) for the cold-start curve; (9) point-in-time correctness as a requirement: every shot,
+record and collaborative record given to the model for a transaction at time T is filtered to what was known at or before T,
+at training and at evaluation (`references/blog/other/`, the temporal-leakage preview); (10) a correction-rate measure after
+auto-applied labels enter the history (the multi-objective post's day-one-gain, week-two-loss). Frozen and hashed like REAL-6;
 the arms of sections 38, 43 and rows 41, 42 and 44 rescored on it; the cells report default vs custom users, seen vs unseen
 merchants, before vs after a relabelling event, and history length.
 

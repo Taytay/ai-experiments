@@ -1,7 +1,7 @@
 # Pinterest engineering posts: summaries, chronological
 
 Each post in this folder summarised (mechanism, evidence, relevance to the transaction categoriser). Written 2026-09-21 from
-the fetched markdown by two subagents and the main session (26 Pinterest posts and the Zepto post, dated by publication); numbers are as the posts state them. The applications to our
+the fetched markdown by two subagents and the main session (the Pinterest posts, the five labs featured-post abstracts the owner saved from a browser, the Zepto post and the temporal-leakage preview, dated by publication); numbers are as the posts state them. The applications to our
 research are drawn together in `../pinterest-applications.md`.
 
 ## 2018-08-15: PinSage: A new graph convolutional neural network for web-scale recommender systems (Ruining He)
@@ -145,6 +145,21 @@ softmax on (transaction, category-name) pairs is the right loss; capping per-ite
 how often "Amazon" or "Groceries" appears so the model does not collapse to head categories. The "only strong engagement"
 filter maps to using only user-confirmed (not auto-suggested) assignments as positives.
 
+## 2022-08-14: Introducing PinnerFormer (Pinterest Labs featured post; abstract only, paper arXiv 2205.04507)
+
+Mechanism: A user representation "trained to predict a user's future long-term engagement using a sequential model of a
+user's recent actions", with a "dense all-action loss, modeling long-term future actions instead of next action
+prediction", so that it runs on batch infrastructure (one embedding per user per day) rather than streaming.
+
+Evidence: the abstract says it "significantly close[s] the gap between batch user embeddings that are generated once a day
+and realtime user embeddings generated whenever a user takes an action", with "substantial improvements in Pinterest's user
+retention and engagement" in A/B tests; deployed since fall 2021.
+
+Relevance: The daily batch user embedding is the recommender's version of a per-user summary computed off the request path;
+the realtime sequence (TransAct) is the in-request part. For us the split is the same: a per-user summary (their scheme,
+their merchant habits, computed offline) plus the latest rows in the prompt. The loss idea, train the summary to predict
+all of the next two weeks' actions rather than the next one, is the objective a per-user categoriser summary should have.
+
 ## 2022-10-26: Query Rewards: Building a Recommendation Feedback Loop During Query Selection
 
 Mechanism: About 30% of Homefeed comes from pin-to-pin retrieval seeded by query pins from the user's history; users may have
@@ -280,6 +295,18 @@ features. For the LLM route that suggests appending "similar merchants and how t
 the encoder route it is a feature recipe (neighbour embeddings, visit counts, degree). Users are not nodes here, so it does
 not address per-user label spaces.
 
+## 2024-05-13: Introducing OmniSearchSage (Pinterest Labs featured post; abstract only, paper arXiv 2404.16260)
+
+Mechanism: One query embedding jointly trained for query-query, query-pin and query-product retrieval and ranking, in the
+same space as existing pin and product embeddings; entity text enriched with "image captions from a generative LLM,
+historical engagement, and user-curated boards"; "300k requests per second".
+
+Evidence: "> 8% relevance, > 7% engagement, and > 5% ads CTR" in production search.
+
+Relevance: Two ideas. Entity text enriched by an LLM-written caption is our fact-DB record for merchants, and by
+"user-curated boards" is the collaborative record (row 44). A single embedding trained for several pairings at once is the
+encoder route trained jointly on (transaction, category name), (transaction, record) and (record, category name) pairs.
+
 ## 2025-06-06: Next-Level Personalization: How 16k+ Lifelong User Actions Supercharge Pinterest's Recommendations (TransAct V2)
 
 Mechanism: TransAct (2023) modelled the last 100 actions in the home feed ranker; V2 models "up to 16,000 user actions: a
@@ -304,6 +331,53 @@ the scheme) as the negatives, which the label SFT already does implicitly and th
 scale of the gain over the last-100 window is the strongest evidence in the set that history selection, not model size, is
 where a per-user recommender's accuracy comes from.
 
+## 2025-07-30: Introducing OmniSage (Pinterest Labs featured post; abstract only, paper arXiv 2504.17811)
+
+Mechanism: "A unified embedding system" that "transforms native content into powerful vector representations, learning
+from authentic human curation behaviors": graph neural networks, content models and user-sequence models trained together
+with several contrastive tasks (entity-entity, entity-feature, user-entity) on a graph of 5.6 billion nodes and 63 billion
+edges (from the paper's abstract).
+
+Evidence: "approximate 2.5% increase in sitewide repins" across five applications (paper abstract).
+
+Relevance: The successor to PinSage and the current form of the graph idea: graph structure, content and user sequences
+as three training signals for one embedding. It confirms the reading in `pinterest-applications.md` that the graph is a
+training signal and a neighbourhood sampler, not a separate system. The paper is the one to read if the encoder route
+is pursued at the real scale.
+
+## 2025-09-22: Introducing PinFM (Pinterest Labs featured post; abstract only, paper arXiv 2507.12704)
+
+Mechanism: "A large, 20B-parameter sequential model pretrained on lifelong user activity sequences" that "plugs into
+downstream ranking systems (e.g., Homefeed) and is fine-tuned per use case"; pretrained with an InfoNCE next-pin objective,
+fine-tuned with the ranking loss.
+
+Evidence: "a step-function improvement in user-sequence understanding"; the paper reports "a 20% increase in engagement
+with new items" and a 600% throughput gain from the deduplicated cross-attention transformer.
+
+Relevance: A pretrain-then-finetune sequence model over user histories is the parametric route to the cross-user signal,
+at a scale we cannot run. What transfers is the shape: a shared model of "what users do", specialised per surface by a
+fine-tune, with the user's own sequence as the input. Our label SFT plus per-user prompt is that pattern at 3B.
+
+## 2026-04-07: Evolution of Multi-Objective Optimization at Pinterest Home feed
+
+Mechanism: The last funnel layer after retrieval, pre-ranking and ranking, deciding feed composition rather than per-item
+scores. V1 (2021) a Determinantal Point Process with relevance on the diagonal and GraphSAGE plus taxonomy similarity off
+it; V2 (2025) Sliding Spectrum Decomposition: within a sliding window, eigendecompose the similarity matrix, track cumulative
+exposure per spectrum, and pick the candidate maximising relevance minus an exposure-weighted redundancy term, on CPU
+serving clusters. "Soft spacing" adds a distance-decayed penalty for repeated sensitive content, replacing hard filtering
+that "leads to less satisfying user experience if there is no backfill". Diversity signals grew from taxonomy plus GraphSage
+to visual, text and graph embeddings, PinCLIP, and Semantic ID prefix-overlap penalties.
+
+Evidence: Removing feed-level diversity raised saves on day 1 "but quickly turn negative by the second week"; the DPP
+ablation "reduced [time spent] by over 2% after the first week"; SSD "improved balance between engagement and
+diversification".
+
+Relevance: Little for the algorithms; two observations transfer. The feedback-loop warning ("when users engage with less
+diverse content, engagement signals will also be affected, reinforcing the system") is the risk of auto-applied categories
+entering the 24-shot history and cementing early errors; the day-1-gain, week-2-loss pattern says to judge auto-apply on
+later correction rates, not immediate acceptance. Soft spacing over hard filtering argues for a graded penalty on
+low-confidence assignments rather than a hard "ask" threshold.
+
 ## 2026-04-13: Scaling Recommendation Systems with Request-Level Deduplication
 
 Mechanism: The Foundation Model has "a 100x increase in transformer dense parameter counts"; request-level data is
@@ -320,6 +394,25 @@ Relevance: Directly applicable to the scorer's cost structure: the 24 shots plus
 names are the "items"; encode the shared prefix once and let each candidate label attend to it (KV-cache reuse), which the
 batched Scorer approximates. The user-level negative masking transfers verbatim to any contrastive training of the encoder
 route: never draw a negative from the same user.
+
+## 2026-04-20: Smarter URL Normalization at Scale: How MIQPS Powers Content Deduplication at Pinterest
+
+Mechanism: MIQPS ("Minimal Important Query Param Set") learns, per domain, which URL query parameters change page content:
+accumulate a per-domain URL corpus; group URLs by "the sorted set of parameter names" and keep the top patterns, because
+the same name can be tracking noise in one pattern and identity in another; for each parameter, sample URLs with distinct
+values, render the page with and without it, and compare a content ID (a hash of the page's visual representation); a
+parameter is non-neutral if the ID changes in at least T% of samples, with early exit and a conservative default (too few
+samples means non-neutral). Runtime normalisation layers static platform allowlists, regex, then MIQPS; anomaly detection
+rejects a refreshed map if too many parameters flip from non-neutral to neutral. Offline, because rendering "takes seconds"
+and conventions change "on the order of weeks or months".
+
+Evidence: no numbers; "hundreds of thousands of domains", "billions of URLs".
+
+Relevance: Moderate, as a design pattern for payee-string canonicalisation. The transferable idea is the test itself: a
+token in a payee string is noise if stripping it leaves the label unchanged, measured against labelled history, decided per
+merchant and per string pattern rather than globally; keep a token when there are too few samples, and never let a refresh
+silently start stripping a token that previously mattered. Static rules for known merchants plus a learned long tail is the
+shape of the fact DB plus the retriever.
 
 ## 2026-05-01: Optimizing ML Workload Network Efficiency (Part I): Feature Trimmer
 
@@ -343,6 +436,18 @@ Evidence: qualitative by policy: cost reductions, faster onboarding, "improved e
 Relevance: A specification for what the 24 shots should be: an enriched, recency-ordered window with a documented freshness
 profile, built by the same code at training and scoring time so the two never drift. The training/serving split-brain
 warning applies when REAL-9 builds retrieved and recent shots by one path and the eval harness by another.
+
+## 2026-05-29: Introducing UniPinRec (Pinterest Labs featured post; abstract only, paper arXiv 2606.00422)
+
+Mechanism: "One input format, one model, one training stage" for retrieval and ranking: a shared transformer encodes the
+user action sequence into candidate-independent representations, with a retrieval head (ANN dot product) and a ranking
+head (cross-attention).
+
+Evidence: about +1% online engagement, serving latency -11.1%, QPS +63.6% (from the search result; not in the abstract
+captured).
+
+Relevance: Little beyond the cascade design already noted: a cheap candidate-independent head (the centroid route) and a
+cross-attention head (the LLM prompt) sharing one encoding of the user's history.
 
 ## 2026-06-22 (other): Real-Time Personalisation at Scale: How Zepto Understands What You Want, Right Now
 
@@ -375,6 +480,28 @@ engagement gains", enabling teacher-student distillation.
 
 Relevance: Little. A bigger teacher distilled into a smaller serving model is how Pinterest cashes in scale.
 
+## 2026-07-27: Pinner Progression: Better Use-Case Representation Driving Weekly Active User Growth at Pinterest (Part 1 of 2)
+
+Mechanism: User Interest Clusters (UICs): for each user, take the last 500 actions, embed them in OmniSage space, and run
+complete-linkage agglomerative clustering (merge while the minimum pairwise cosine exceeds a threshold, up to a cluster
+cap). Three changes over PinnerSage: clustering "over only the Pins a user has engaged with", so "the exact same Pin ... may
+end up in very different clusters for different users"; a dynamic cluster count (two for a new user, fifteen for a power
+user); per-cluster lifecycle metadata (recency, frequency). Each cluster has a medoid plus landmark Pins. Uses: UIC-conditioned
+retrieval ("sampling 5 of a user's 10 clusters") with "frontier sampling" of boundary landmarks for exploration and
+retrieval only for currently active clusters; a utility discount for higher-scoring candidates in the same cluster;
+state-dependent ranking weights (curiosity signals for nascent interests, saves for mature ones); candidates assigned to the
+medoid of highest cosine above 0.85, "unmatched Pins fall into a default group".
+
+Evidence: Retention benefit of use-case adoption "accelerates sharply at the top decile"; UIC-aware diversification gave
+"meaningful engagement gains", "increases in longer sessions"; active-only retrieval "meaningful infrastructure cost
+savings". No percentages.
+
+Relevance: High, for the encoder route and for shot selection. A user's categories are use cases: cluster the user's own
+labelled transactions in their own space, keep a medoid plus landmarks per category, and attach recency and frequency so
+recent categories weigh more. Choose the 24 shots by cluster coverage with a same-cluster discount rather than top-k
+similarity, and try frontier sampling for ambiguous merchants. The 0.85 assignment threshold with a default group for
+unmatched items is a ready-made abstain rule: no category prototype above threshold means ask the user.
+
 ## 2026-08-26: Scaling Conditional Learned Retrieval for Pinterest Home Feed
 
 Mechanism: CLR conditions the user tower on an explicit context, producing several condition-aware user embeddings per
@@ -394,6 +521,21 @@ is how to score all of a user's category names in one forward pass on either rou
 merchants: hierarchical codes from the merchant record let an unseen merchant share rows with similar ones. Random-walk Board
 conditions map to "categories that this user's neighbours in the merchant graph tend to use", a candidate source for coined
 names.
+
+## 2026-09-06 (other, preview only): Feature Stores Spent a Decade Killing Temporal Leakage in ML. AI Agent Memory Just Brought It Back (Amina Okanovic)
+
+Mechanism: Only the public preview was captured (member-only story). Its opening example is a payments company running a
+fraud model through a point-in-time-correct feature store next to an LLM "fraud review copilot" over a vector index of
+analyst notes: the copilot retrieves a five-month-old "customer verified, low risk" note by similarity, the fraud model
+scores the last ten minutes of velocity as high risk, and "only one of them was ever built to ask 'as of when.'" The
+rule it states: "a training row built for an event at time T must reflect only what was knowable at or before T."
+
+Evidence: none in the preview.
+
+Relevance: High for row 43 (REAL-11) even from the preview. Every retrieved shot, record and collaborative record must be
+filtered by the transaction's timestamp, at training and at evaluation; a shot from the future is leakage, and a similarity
+retriever with no time filter will produce it. The fraud-copilot example is our record-in-prompt route with the wrong index.
+The rest of the article needs a Medium login to capture.
 
 ## 2026-09-11: Evolving Pinterest's Embedding Retrieval Platform
 

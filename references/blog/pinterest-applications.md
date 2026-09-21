@@ -2,9 +2,9 @@
 
 Sources: the 26 Pinterest engineering posts and the Zepto post in `pinterest/` and `other/` (fetched by
 `scripts/fetch_blog_posts.py`, summarised in `pinterest/summaries.md`), the labs topic pages and the publication list in
-`pinterest/publications.md`. Three posts in the owner's list could not be fetched by any route (Medium blocks scripts and the
-Wayback Machine has no capture): MIQPS URL normalisation, the multi-objective optimisation post, and the feature-store
-temporal-leakage post. The owner's questions: is this a graph problem like Pinterest's, could a random walk over transaction
+`pinterest/publications.md`. Three posts that no script route could fetch, the five labs featured posts (abstracts that link to
+their papers) and one more (Pinner Progression) were saved by the owner from a browser on 2026-09-21 and filed beside the
+rest; the temporal-leakage post is a preview only (member-only story). Section 9 covers what they added. The owner's questions: is this a graph problem like Pinterest's, could a random walk over transaction
 nodes discover that user A's "Fluffy" is other users' "Pets", and is all of that achievable by a well-tuned embedding model
 and a well-crafted prompt without the graph.
 
@@ -162,3 +162,28 @@ not a longer context, is the transfer.
    uniformly-drawn-shots slice for replaying selection policies.
 4. **The encoder route (row 40 or later)** with the SearchSage recipe and a PinSage-style merchant embedding from record plus
    walk neighbours.
+
+## 9. Addendum from the hand-saved posts (2026-09-21, later the same day)
+
+- **Point-in-time correctness (the temporal-leakage preview).** The rule as stated: "a training row built for an event at
+  time T must reflect only what was knowable at or before T", and the opening example is our record-in-prompt route with
+  the wrong index: a copilot retrieving a five-month-old "low risk" note by similarity while the point-in-time fraud model
+  reads the last ten minutes. Row 43's set must filter every retrieved shot, record and collaborative record by the
+  transaction's timestamp, at training and at evaluation. Added to REAL-11 as a requirement rather than a note.
+- **Per-user clusters as the shot-selection unit (Pinner Progression).** Cluster the user's own labelled transactions in
+  their own space, medoid plus landmarks per category, recency and frequency per cluster, a dynamic cluster count (two for a
+  new user, fifteen for a heavy one), and shots chosen by cluster coverage with a same-cluster discount and frontier
+  sampling at the boundaries. This is a fourth shot rule for row 41 beside similarity, recency and TransAct V2's
+  combination, and the 0.85-cosine assignment threshold with a default group is an abstain rule for the encoder route.
+- **Auto-apply feedback loops (multi-objective optimisation).** A gain on day one that turns negative by week two is
+  Pinterest's experience of letting the system's own choices feed its signals. Auto-applied categories entering the shot
+  history are the same loop; judge auto-apply on later correction rates, and prefer a graded confidence penalty to a hard
+  ask threshold. Belongs in row 43's evaluation (a correction-rate measure after auto-applied labels enter the history).
+- **Payee-string canonicalisation (MIQPS).** A token is noise if removing it leaves the label unchanged, decided per merchant
+  and per string pattern with conservative defaults and a guard against refreshes that silently drop a token. A design
+  note for the retriever's normaliser, not a row.
+- **The labs abstracts (PinnerFormer, OmniSearchSage, OmniSage, PinFM, UniPinRec)** confirm the reading above: one
+  embedding trained from graph, content and sequence signals together (OmniSage); a daily batch user summary trained to
+  predict the next two weeks of actions, closing most of the gap to realtime embeddings (PinnerFormer); entity text enriched
+  by an LLM and by "user-curated boards" (OmniSearchSage), which is the content record plus the collaborative record. The
+  papers are the next reading if the encoder route is pursued at scale.
