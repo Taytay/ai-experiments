@@ -689,7 +689,9 @@ centroid. REAL-6 is its setting (per-user schemes of 8 to 12 similar categories,
 label's text, which the centroid ignores: a gain on standard and renamed names, and nothing on coined ones, is the
 expectation. *Experiment:* FastFit per user from the 24 shots and from the full history, plain and with the merchant's
 record appended to the query (`ENC_CTX`), scored per cell like the encoders of section 38; compare with the bge centroid,
-logistic regression and SetFit; report the renamed / new-word cells and the DB-only merchants separately.
+logistic regression and SetFit; report the renamed / new-word cells and the DB-only merchants separately. The package's
+`max_text_length` defaults to 32 tokens, below a statement plus record; raise it. The scan of 2026-09-21
+(`references/fewshot_scan_2026-09-21.md`) names GLiClass (arXiv 2508.07662) as the nearest relative to run beside it.
 
 **REAL-8 (O) The parametric exposure curve and the chat template.**
 Section 38: one pass over the records injected nothing, three passes gave +21 on DB-only merchants at a nine-point ARC cost.
