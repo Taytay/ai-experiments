@@ -44,6 +44,7 @@ LAYERS = [int(x) for x in os.environ.get("LAYERS", "4,8,12,16,20,24,28,32,36").s
 RIDGE = float(os.environ.get("RIDGE", "1.0"))
 FORMAT = os.environ.get("FORMAT", "bare")  # bare: the ladder's question; trained: the knowledge-text sentence up to the type ("<name> is a" -> " <type>-type ...")
 tag = ("base" if WHAT == "base" else WHAT) + ("_wind" if WEAKNESS == "independent" else "") + ("_tf" if FORMAT == "trained" else "")
+tag += ("_" + os.environ["RUN_TAG"]) if os.environ.get("RUN_TAG") else ""  # e.g. RUN_TAG=bf16 for the section 44 re-reads beside the 4-bit files
 OUT = ROOT / "results" / f"lre_{tag}.json"
 species = U.build(n_per_type=20, weakness=WEAKNESS)
 by_name = {s["name"]: s for s in species}

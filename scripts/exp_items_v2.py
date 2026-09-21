@@ -38,6 +38,7 @@ elif what == "full":
     src, tag, kind = sys.argv[2], os.path.basename(sys.argv[2].rstrip("/")), "full"
 else:
     src, tag, kind = str(ROOT / "models" / "adapters" / what), what, "adapter"
+tag += ("_" + os.environ["RUN_TAG"]) if os.environ.get("RUN_TAG") else ""  # e.g. RUN_TAG=bf16 for the section 44 re-reads beside the 4-bit files
 OUT = ROOT / "results" / f"items2_{tag}{'_smoke' if SMOKE else ''}.json"
 
 F = I.load_all(morph=False)

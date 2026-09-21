@@ -27,6 +27,7 @@ LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "0")))  # unsloth's loader defa
 # never set it, so its saved results were read on the 4-bit base (REPORT.md section 44). Default now bf16, like exp_curriculum; LOAD_4BIT=1 reproduces the old reads.
 WEAKNESS = os.environ.get("WEAKNESS", "type")
 tag = ("base" if WHAT == "base" else WHAT) + ("_wind" if WEAKNESS == "independent" else "")
+tag += ("_" + os.environ["RUN_TAG"]) if os.environ.get("RUN_TAG") else ""  # e.g. RUN_TAG=bf16 for the section 44 re-reads beside the 4-bit files
 OUT = ROOT / "results" / f"graph4_{tag}.json"
 doc = I.load(I.GRAPH4, False, weakness=WEAKNESS)
 items = doc["items"]
