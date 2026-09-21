@@ -686,7 +686,8 @@ merchant is in the prompt by chance only, and real histories run to thousands of
 task is a recommendation problem, predicting the label this user would give from their own history and label set,
 hyper-personalised on their most recent inputs, so the choice of shots is the retrieval step of a recommender, not a
 convenience. *Experiment:* shots chosen per query by (a) similarity, the nearest 24 history rows under the row 37 MiniLM
-retriever, and (b) recency, the 24 most recent rows, at train and at test; the untrained base, the no-DB SFT and the
+retriever, (b) recency, the 24 most recent rows, and (c) TransAct V2's rule (references/blog/pinterest/summaries.md, 2025-06-06:
+the most recent r actions plus the K history rows nearest to the candidate, selected per candidate, concatenated), at train and at test; the untrained base, the no-DB SFT and the
 record-in-prompt SFT; paired per item with the fixed-shot adapters of sections 38 and 43; the seen-merchant cell (where the
 merchant's own rows can now be in the prompt) reported separately from the unseen ones.
 
@@ -708,9 +709,28 @@ every user deviates from the default, and the history has no order. *Experiment:
 default-scheme majority and a custom-label minority, (2) idiosyncratic assignments: the same merchant under different
 categories for different users, drawn per user and not derivable from the standard category, (3) timestamps and
 next-transaction prediction from the history up to that point, (4) relabelling and new-category events mid-stream, and
-(5) a recency rule as the target: the user's latest labelling of a merchant wins. Frozen and hashed like REAL-6; the
-arms of sections 38, 43 and rows 41 and 42 rescored on it; the cells report default vs custom users, seen vs unseen
-merchants, before vs after a relabelling event.
+(5) a recency rule as the target: the user's latest labelling of a merchant wins; (6) per shot, how the label arose (typed,
+accepted from a suggestion, corrected) and the elapsed time, after TransAct's action type and Zepto's temporal encoding;
+(7) a slice whose shots are drawn uniformly, so a selection policy can be replayed offline (the Closeup ranker's
+randomised-traffic slice); (8) short-history users (0, 5, 25 rows) for the cold-start curve. Frozen and hashed like REAL-6;
+the arms of sections 38, 43 and rows 41, 42 and 44 rescored on it; the cells report default vs custom users, seen vs unseen
+merchants, before vs after a relabelling event, and history length.
+
+**REAL-12 (O) The collaborative record: what other users call the category this merchant goes into.**
+The owner's Pinterest reading (2026-09-21, `references/blog/pinterest-applications.md`): Pixie walks the Pin-board graph,
+"created from how people describe and organize Pins", and the merchant-category graph is the same object, created from
+how users file transactions. One hop from a merchant gives the distribution of category names other users filed it under;
+two hops give the categories that share merchants (synonyms: "Fluffy" beside "Pets"). The prompt holds the user's own
+history and the merchant's content record but not this cross-user signal, which so far reaches the model only through the
+label SFT's weights. Section 43 found the content record worth +10 +- 12 in the weights and +42 in the prompt; the
+collaborative record has not been put in the prompt at all. *Experiment:* for each merchant, the histogram of the
+training users' category names for it, mapped to standard names (one hop), and the categories reached by a random walk
+with restart over the bipartite merchant-category graph (two hops; Pixie's rules: visit counts as relevance, restart 0.5,
+catch-all categories and hub merchants pruned), rendered as a second note line ("Other users file this merchant under:
+Pets 61%, Shopping 20%"); arms no record, content record, collaborative record, both, on the untrained base and the SFT
+categoriser, with the DB-only merchants (no other user's label exists) as the cell the collaborative record cannot help
+and the unseen-by-this-user merchants as the cell it should; then on row 43's set with idiosyncratic assignments, where
+the graph is the only source of a shared personal reason.
 
 **BASE-6 (O) Does FastFit beat the prototype classifier on the per-user categories?**
 The owner asked about IBM's FastFit (Yehudai and Bendel, NAACL 2024 demo, arXiv 2404.12365, `pip install fast-fit`): a
