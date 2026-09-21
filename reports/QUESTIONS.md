@@ -680,6 +680,17 @@ is worth. *Task:* a `TRAINER=hf` path in `exp_categoriser.py` (transformers + pe
 the same-seed comparison on REAL-6 and the wall-clock and memory cost, so production can depend on either.
 **Status (2026-09-21):** answered, PLAN step 38, REPORT.md 44. `TRAINER=hf` (transformers + peft) trains the same adapter on the same batches: no DB 59.5 (unsloth 57.1), record in prompt 88.5 (90.2), DB-only 92.7 (97.6), inside section 43's seed spread; 27 minutes against 18, peak 12.6 GiB against 9.1, scoring 37 minutes against 24; peft's format either way. The comparison exposed unsloth's `load_in_4bit=True` default: sections 37, 38 and 43 are QLoRA on the NF4 base throughout (comparisons stand), and the back-fill scripts of sections 33, 40 and 42 and the OPD teacher of section 31 used the 4-bit base under bf16 adapters. Measured (Table 44.4): a bf16 adapter on the 4-bit base changes 19.3% of the no-DB predictions (2.2 points), the instruct base reads 3 to 4 points higher at bf16, the section 33 means move 0 to 6 points, the LRE probe 4 to 9 (layer 32: 72.8 to 81.6), all upward, no conclusion changes. Recommendation: the transformers path at bf16 for production, precision matched between training and scoring.
 
+**BASE-6 (O) Does FastFit beat the prototype classifier on the per-user categories?**
+The owner asked about IBM's FastFit (Yehudai and Bendel, NAACL 2024 demo, arXiv 2404.12365, `pip install fast-fit`): a
+few-shot text classifier for many semantically similar classes that trains a sentence encoder with batch contrastive
+learning between examples and class names plus a token-level similarity score between the query and the label text, in
+seconds. The survey did not cover it; its nearest relative here is SetFit, which section 24 found no better than the
+centroid. REAL-6 is its setting (per-user schemes of 8 to 12 similar categories, 24 shots), and it scores against the
+label's text, which the centroid ignores: a gain on standard and renamed names, and nothing on coined ones, is the
+expectation. *Experiment:* FastFit per user from the 24 shots and from the full history, plain and with the merchant's
+record appended to the query (`ENC_CTX`), scored per cell like the encoders of section 38; compare with the bge centroid,
+logistic regression and SetFit; report the renamed / new-word cells and the DB-only merchants separately.
+
 **REAL-8 (O) The parametric exposure curve and the chat template.**
 Section 38: one pass over the records injected nothing, three passes gave +21 on DB-only merchants at a nine-point ARC cost.
 *Experiment:* six and twelve passes (800 and 1,600 steps at 50%) on the same axis; and the REAL-6 prompt through the instruct
