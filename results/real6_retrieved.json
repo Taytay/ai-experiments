@@ -1,0 +1,12975 @@
+{
+"retriever": "retriever_real6_minilm",
+"query": "raw statement string",
+"items": {
+"R6_seen_new:000": {
+"top": [
+"Gold's Gym",
+"Planet Fitness",
+"24 Hour Fitness",
+"LA Fitness",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:001": {
+"top": [
+"Menards",
+"Halbury",
+"Nevnard Bros",
+"Micro Center",
+"Tractor Supply"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:002": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halhurst Co",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:003": {
+"top": [
+"Polby",
+"Polsley",
+"Polstead LLC",
+"Polford Ltd",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:004": {
+"top": [
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Halwen & Sons",
+"Wexhurst & Sons",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:005": {
+"top": [
+"Istmoor Group",
+"Istmere Group",
+"Istwick Group",
+"Istlock",
+"Istbury"
+],
+"hit1": false,
+"rank_gold": 2
+},
+"R6_seen_new:006": {
+"top": [
+"Orangetheory",
+"Olive Garden",
+"Enterprise",
+"Oskhurst",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:007": {
+"top": [
+"Ace Hardware",
+"Aldi",
+"IKEA",
+"Dell",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:008": {
+"top": [
+"Sabstead Bros",
+"Sabby Co",
+"Bramby & Sons",
+"Holden Bros",
+"Oskhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:009": {
+"top": [
+"Falvarro Ltd",
+"Falvarro Bros",
+"Falvarro LLC",
+"Falholm Inc",
+"Fennard"
+],
+"hit1": false,
+"rank_gold": 2
+},
+"R6_seen_new:010": {
+"top": [
+"Halmere Group",
+"Istmere Group",
+"Halwen Group",
+"Halvarro",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:011": {
+"top": [
+"Expedia",
+"Exxon",
+"Enterprise",
+"Equinox",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:000": {
+"top": [
+"Torhurst Co",
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Quilhurst",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:001": {
+"top": [
+"Bexlock & Sons",
+"Pexlock",
+"Istlock",
+"Bexwen & Sons",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:002": {
+"top": [
+"Pep Boys",
+"BP",
+"Menards",
+"Kelford Bros",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:003": {
+"top": [
+"H-E-B",
+"B&H Photo",
+"Equinox",
+"Chick-fil-A",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:004": {
+"top": [
+"Rinlock",
+"Rinham",
+"Rinford",
+"Rinton Ltd",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:005": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:006": {
+"top": [
+"AutoZone",
+"Hertz",
+"AT&T",
+"Verizon",
+"Zara"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:007": {
+"top": [
+"Nike",
+"Sony",
+"Marathon",
+"Starbucks",
+"Rover"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:008": {
+"top": [
+"Costco",
+"Petco",
+"Taco Bell",
+"Sunoco",
+"Dell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:009": {
+"top": [
+"Grinard Inc",
+"Tornard Group",
+"Gridale",
+"Fenford Group",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:010": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Wegmans",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:011": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:000": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"BarkBox",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:001": {
+"top": [
+"Duane Reade",
+"REI",
+"Con Edison",
+"Harbor Freight",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:002": {
+"top": [
+"Gridale",
+"Griden Group",
+"Lundale Inc",
+"PG&E",
+"Holdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:003": {
+"top": [
+"Garden Group",
+"Griden Group",
+"Olive Garden",
+"Fenley Group",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:004": {
+"top": [
+"AMC Theatres",
+"Regal Cinemas",
+"United Airlines",
+"Amtrak",
+"Ace Hardware"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:005": {
+"top": [
+"Vitamin Shoppe",
+"CorePower Yoga",
+"Spectrum",
+"Apple Store",
+"Kaiser Permanente"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:006": {
+"top": [
+"Spotify",
+"Chewy",
+"Spectrum",
+"Dunkin",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:007": {
+"top": [
+"Regal Cinemas",
+"AMC Theatres",
+"Cinemark",
+"Spectrum",
+"Best Buy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:008": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Quest Diagnostics",
+"Whole Foods",
+"Pet Supplies Plus"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:009": {
+"top": [
+"Wexley Inc",
+"Wexden Inc",
+"Wexham Inc",
+"Wexdale Bros",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:010": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Costco",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:011": {
+"top": [
+"Fennard",
+"Fenley Group",
+"Falvarro Bros",
+"Falvarro LLC",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:000": {
+"top": [
+"United Airlines",
+"AT&T",
+"Southwest",
+"REI",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:001": {
+"top": [
+"United Airlines",
+"Aldi",
+"AMC Theatres",
+"Ace Hardware",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:002": {
+"top": [
+"PG&E",
+"GameStop",
+"Gridale",
+"Topgolf",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:003": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:004": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"Southwest",
+"Aldi",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:005": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:006": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"Menards"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:007": {
+"top": [
+"United Airlines",
+"Ace Hardware",
+"AMC Theatres",
+"Aldi",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:008": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"Menards"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:009": {
+"top": [
+"United Airlines",
+"Ace Hardware",
+"AMC Theatres",
+"Aldi",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:010": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:011": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"Southwest",
+"Delta Air Lines",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:000": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Southwest",
+"United Airlines",
+"24 Hour Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:001": {
+"top": [
+"Old Navy",
+"Nevden Bros",
+"Istnard LLC",
+"Istbury",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:002": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"24 Hour Fitness",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:003": {
+"top": [
+"Aldi",
+"Apple Store",
+"Albertsons",
+"Oskhurst",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:004": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"United Airlines",
+"Amtrak",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:005": {
+"top": [
+"Halwen Bros",
+"Halwen & Sons",
+"Halwen Group",
+"Griwen Bros",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:006": {
+"top": [
+"Best Buy",
+"Apple Store",
+"Whole Foods",
+"Bose",
+"Dell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:007": {
+"top": [
+"Ulmmoor Inc",
+"Ulmden Inc",
+"Lundale Inc",
+"Ulmwick Ltd",
+"Ulmdale & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:008": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Halsley Ltd",
+"Rinton Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:009": {
+"top": [
+"Wexhurst & Sons",
+"Wexham Bros",
+"Wexham Inc",
+"Bexwen & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:010": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:011": {
+"top": [
+"Marbury Inc",
+"Jorden Inc",
+"Lundale Inc",
+"Falham Inc",
+"Torton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:000": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Cinemark",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:001": {
+"top": [
+"Holdale",
+"True Value",
+"Lundale Inc",
+"Gridale",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:002": {
+"top": [
+"Morton LLC",
+"Oskbury LLC",
+"Polstead LLC",
+"Brammere LLC",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:003": {
+"top": [
+"Halwen Group",
+"Halwen Bros",
+"Dunwen Group",
+"Halmere Group",
+"Halwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:004": {
+"top": [
+"Holdale",
+"Con Edison",
+"Halhurst Co",
+"Torhurst Co",
+"Regal Cinemas"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:005": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Oskbury LLC",
+"Halsley Ltd",
+"Brammere LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:006": {
+"top": [
+"GNC",
+"Garwick Co",
+"Griden Group",
+"GameStop",
+"Garholm Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:007": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Cinemark",
+"Tornard Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:008": {
+"top": [
+"Nevden Bros",
+"Nevnard Bros",
+"Nevwick",
+"Nevwick Group",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:009": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Publix",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:010": {
+"top": [
+"Jorden Inc",
+"Marbury Inc",
+"Lundale Inc",
+"Falham Inc",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:011": {
+"top": [
+"Morton LLC",
+"Oskbury LLC",
+"Brammere LLC",
+"Polstead LLC",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:012": {
+"top": [
+"Wexhurst & Sons",
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Wexham Bros",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:013": {
+"top": [
+"Istwick Group",
+"Istmoor Group",
+"Nevwick Group",
+"Istmere Group",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:014": {
+"top": [
+"Wexdale Bros",
+"Wexham Bros",
+"Istdale Bros",
+"Wexhurst & Sons",
+"Wexham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:015": {
+"top": [
+"Grinard Inc",
+"Lundale Inc",
+"Torton Inc",
+"Ardton Inc",
+"Wexley Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:012": {
+"top": [
+"Netflix",
+"Dunwick",
+"AMC Theatres",
+"Cox",
+"Dunkin"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:013": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"PetSmart",
+"Orangetheory"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:014": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Falholm Inc",
+"Holden Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:015": {
+"top": [
+"Oskhurst",
+"Oskhurst Bros",
+"Oskbury LLC",
+"Elrhurst Co",
+"Orangetheory"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:016": {
+"top": [
+"B&H Photo",
+"H-E-B",
+"Bose",
+"Sabstead Bros",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:017": {
+"top": [
+"Istmoor Group",
+"Istwick Group",
+"Istmere Group",
+"Istbury",
+"Istlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:018": {
+"top": [
+"Istnard LLC",
+"Istlock",
+"Istmere & Sons",
+"Enterprise",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:019": {
+"top": [
+"Dunnard Ltd",
+"Menards",
+"Tornard Group",
+"Istlock",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:020": {
+"top": [
+"Dovvarro & Sons",
+"Fenvarro & Sons",
+"Orlnard & Sons",
+"Halvarro",
+"Halholm & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:021": {
+"top": [
+"Nordstrom",
+"Apple Store",
+"Spectrum",
+"Newegg",
+"Best Buy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:022": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Peloton",
+"Bexlock & Sons",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:023": {
+"top": [
+"Halley",
+"Hilton",
+"Chewy",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:012": {
+"top": [
+"Pexnard",
+"Pexlock",
+"Pexley",
+"Peloton",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:013": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:014": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Sunoco",
+"True Value"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:015": {
+"top": [
+"Pep Boys",
+"Kelford Bros",
+"BP",
+"Menards",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:012": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"PetSmart",
+"Pet Supplies Plus",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:013": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:014": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:015": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:016": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmmoor Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:017": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:018": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:019": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:012": {
+"top": [
+"Aldi",
+"Albertsons",
+"Apple Store",
+"Oskhurst",
+"Elrmoor"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:013": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:014": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:015": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Halhurst Co",
+"Torhurst Co",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:016": {
+"top": [
+"CVS",
+"Macy's",
+"Dovvarro & Sons",
+"Quest Diagnostics",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:017": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:018": {
+"top": [
+"Garden Group",
+"Griden Group",
+"Olive Garden",
+"Fenley Group",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:019": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Bramwen Group",
+"Halwen & Sons",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:020": {
+"top": [
+"Best Buy",
+"Whole Foods",
+"Apple Store",
+"Costco",
+"AT&T"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:021": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Bramwen Group",
+"Halwen Group",
+"Halwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:022": {
+"top": [
+"Fennard",
+"Fenvarro & Sons",
+"Fenley Group",
+"Fenford Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:023": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:012": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:013": {
+"top": [
+"Chevron",
+"Peloton",
+"Halvarro",
+"Walgreens",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:014": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Istwick Group",
+"Fennard",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:015": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:016": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Istwick Group",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:017": {
+"top": [
+"Rinham",
+"Rinton Ltd",
+"Rinford",
+"Rinlock",
+"Dunwick"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:018": {
+"top": [
+"Rinham",
+"Rinlock",
+"Rinton Ltd",
+"Rinford",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:019": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:020": {
+"top": [
+"Chevron",
+"Cox",
+"Petco",
+"Exxon",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:021": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:022": {
+"top": [
+"Chevron",
+"Cox",
+"Pexnard",
+"Safeway",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:023": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Griby Co",
+"Fenvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:016": {
+"top": [
+"Torhurst Co",
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Quilhurst",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:017": {
+"top": [
+"Duane Reade",
+"REI",
+"Con Edison",
+"Harbor Freight",
+"Ace Hardware"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:018": {
+"top": [
+"Wag",
+"Samsung",
+"Newegg",
+"Wexley Group",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:019": {
+"top": [
+"Grinard Inc",
+"Tornard Group",
+"Gridale",
+"Fenford Group",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:020": {
+"top": [
+"Nordstrom",
+"Valero",
+"Halvarro",
+"Sunoco",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:021": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:022": {
+"top": [
+"Rover",
+"Valero",
+"Nike",
+"Torden Ltd",
+"Sunoco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:023": {
+"top": [
+"AT&T",
+"Orlcott Inc",
+"Ardton Inc",
+"AutoZone",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:024": {
+"top": [
+"Dovvarro & Sons",
+"Fenvarro & Sons",
+"Orlnard & Sons",
+"Halvarro",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:025": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:026": {
+"top": [
+"Cox",
+"Netflix",
+"Chevron",
+"Polsley",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:027": {
+"top": [
+"Hertz",
+"Apple Store",
+"Best Buy",
+"Sherwin-Williams",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:024": {
+"top": [
+"Oskhurst",
+"Oskhurst Bros",
+"Oskbury LLC",
+"Elrhurst Co",
+"Orangetheory"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:025": {
+"top": [
+"Rinlock",
+"Rinham",
+"Rinford",
+"Rinton Ltd",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:026": {
+"top": [
+"Istdale Bros",
+"Wexdale Bros",
+"Istmere & Sons",
+"Istmere Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:027": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Cinemark",
+"Tornard Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:028": {
+"top": [
+"Wexley Inc",
+"Wexley Group",
+"Wegmans",
+"Wexden Inc",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:029": {
+"top": [
+"Panera Bread",
+"Tornard Group",
+"Pexley",
+"Polstead LLC",
+"B&H Photo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:030": {
+"top": [
+"Dunkin",
+"Dunwick",
+"BarkBox",
+"Dunhurst Bros",
+"Halley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:031": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Kelby Co",
+"Fenley Group",
+"Halley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:032": {
+"top": [
+"Regal Cinemas",
+"AMC Theatres",
+"Cinemark",
+"Sony",
+"Macy's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:033": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Amtrak",
+"Southwest",
+"Regal Cinemas"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:016": {
+"top": [
+"Halhurst Co",
+"Torhurst Co",
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:017": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:018": {
+"top": [
+"Pexnard",
+"Pexlock",
+"Pexley",
+"Peloton",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:019": {
+"top": [
+"Samsung",
+"Best Buy",
+"Vitamin Shoppe",
+"T-Mobile",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:020": {
+"top": [
+"Dunnard Ltd",
+"Menards",
+"Tornard Group",
+"Istlock",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:021": {
+"top": [
+"Peloton",
+"Pexley",
+"Griton",
+"Pexlock",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:022": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Istwick Group",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:023": {
+"top": [
+"Sabby Co",
+"Sabstead Bros",
+"Griby Co",
+"Halley",
+"Bramby & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:024": {
+"top": [
+"Rinham",
+"Rinlock",
+"Rinton Ltd",
+"Rinford",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:025": {
+"top": [
+"Floor & Decor",
+"Fenvarro & Sons",
+"Yarden & Sons",
+"Holton & Sons",
+"Fennard"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:026": {
+"top": [
+"Orangetheory",
+"Oskhurst",
+"Olive Garden",
+"Enterprise",
+"Oskbury LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:027": {
+"top": [
+"Orlcott Inc",
+"Vorcott",
+"Orlwick Co",
+"Orangetheory",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:020": {
+"top": [
+"Con Edison",
+"Holdale",
+"Enterprise",
+"United Airlines",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:021": {
+"top": [
+"Fennard",
+"Fenvarro & Sons",
+"Fenley Group",
+"Fenford Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:022": {
+"top": [
+"Vitamin Shoppe",
+"Kaiser Permanente",
+"CorePower Yoga",
+"Spectrum",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:023": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:024": {
+"top": [
+"Marbury Inc",
+"Jorden Inc",
+"Lundale Inc",
+"Falham Inc",
+"Torton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:025": {
+"top": [
+"Vitamin Shoppe",
+"Shell",
+"Sunoco",
+"CVS",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:026": {
+"top": [
+"Con Edison",
+"Amtrak",
+"Enterprise",
+"REI",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:027": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Torden Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:028": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Dunnard Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:029": {
+"top": [
+"Fennard",
+"Fenvarro & Sons",
+"Fenley Group",
+"Fenford Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:030": {
+"top": [
+"Vitamin Shoppe",
+"CorePower Yoga",
+"Spectrum",
+"Apple Store",
+"Kaiser Permanente"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:031": {
+"top": [
+"Fennard",
+"Fenvarro & Sons",
+"Fenley Group",
+"Fenford Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:024": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Oskhurst",
+"Elrdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:025": {
+"top": [
+"AMC Theatres",
+"Regal Cinemas",
+"Ace Hardware",
+"United Airlines",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:026": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Oskbury LLC",
+"Halsley Ltd",
+"Brammere LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:027": {
+"top": [
+"Netflix",
+"Dunwick",
+"AMC Theatres",
+"Cox",
+"Dunkin"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:028": {
+"top": [
+"Elrhurst Co",
+"Elrholm",
+"Elrmoor",
+"Elrdale",
+"Vorstead Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:029": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Oskhurst",
+"Oskhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:030": {
+"top": [
+"Oskhurst Bros",
+"Oskhurst",
+"Oskbury LLC",
+"Elrhurst Co",
+"Sabstead Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:031": {
+"top": [
+"Morton LLC",
+"Sabby Co",
+"Rover",
+"Sony",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:032": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Elrdale",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:033": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Oskbury LLC",
+"Brammere LLC",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:034": {
+"top": [
+"AMC Theatres",
+"Regal Cinemas",
+"United Airlines",
+"Amtrak",
+"Netflix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:035": {
+"top": [
+"Morton LLC",
+"Oskbury LLC",
+"Polstead LLC",
+"Brammere LLC",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:024": {
+"top": [
+"Menards",
+"Halbury",
+"Wegmans",
+"Pep Boys",
+"Nevnard Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:025": {
+"top": [
+"Menards",
+"Pep Boys",
+"Wegmans",
+"Halbury",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:026": {
+"top": [
+"Menards",
+"Wegmans",
+"Halbury",
+"Pep Boys",
+"Macy's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:027": {
+"top": [
+"Menards",
+"Pep Boys",
+"Nevnard Bros",
+"Halbury",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:028": {
+"top": [
+"Menards",
+"Apple Store",
+"Tornard Group",
+"Halhurst Co",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:029": {
+"top": [
+"Halmere Group",
+"Istmere Group",
+"Halwen Group",
+"Halvarro",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:030": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:031": {
+"top": [
+"Menards",
+"Nevnard Bros",
+"Halbury",
+"Halhurst Co",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:032": {
+"top": [
+"Menards",
+"Halbury",
+"Pep Boys",
+"Wegmans",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:033": {
+"top": [
+"Menards",
+"Pep Boys",
+"Halbury",
+"Wegmans",
+"Halmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:034": {
+"top": [
+"Menards",
+"Halbury",
+"Pep Boys",
+"Chewy",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:035": {
+"top": [
+"Gold's Gym",
+"Planet Fitness",
+"24 Hour Fitness",
+"LA Fitness",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:034": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Banfield Pet Hospital",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:035": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:036": {
+"top": [
+"Chick-fil-A",
+"H-E-B",
+"Publix",
+"Starbucks",
+"Taco Bell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:037": {
+"top": [
+"Ace Hardware",
+"Apple Store",
+"Best Buy",
+"IKEA",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:038": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Fenley Group",
+"Halley",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:039": {
+"top": [
+"Bowlero",
+"Dunwick",
+"Bose",
+"Cinemark",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:040": {
+"top": [
+"Halton",
+"Griton",
+"Ardton Inc",
+"Holton & Sons",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:041": {
+"top": [
+"Dunwick",
+"Orlwick Co",
+"Dunkin",
+"Nevwick",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:042": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Falvarro LLC",
+"Brammere LLC",
+"Oskbury LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:043": {
+"top": [
+"Torden Ltd",
+"Torhurst Co",
+"Torvarro",
+"Torton Inc",
+"Rover"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:044": {
+"top": [
+"AutoZone",
+"Hertz",
+"AT&T",
+"Verizon",
+"Zara"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:045": {
+"top": [
+"Cinemark",
+"Istlock",
+"Southwest",
+"Amtrak",
+"Sabby Co"
+],
+"hit1": false,
+"rank_gold": 4
+},
+"R6_seen_standard:028": {
+"top": [
+"Ulmmoor Inc",
+"Ulmden Inc",
+"Lundale Inc",
+"Falham Inc",
+"Ulmdale & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:029": {
+"top": [
+"Marbury Inc",
+"Jorden Inc",
+"Falham Inc",
+"Lundale Inc",
+"Torton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:030": {
+"top": [
+"Grinard Inc",
+"Lundale Inc",
+"Torton Inc",
+"Ardton Inc",
+"Orlcott Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:031": {
+"top": [
+"Wexdale Bros",
+"Wexham Bros",
+"Istdale Bros",
+"Wexhurst & Sons",
+"Wexham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:032": {
+"top": [
+"Nevnard Bros",
+"Nevden Bros",
+"Nevham Group",
+"Nevwick",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:033": {
+"top": [
+"Lundale Inc",
+"Gridale",
+"Holdale",
+"Ulmdale & Sons",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:034": {
+"top": [
+"PetSmart",
+"Petco",
+"Pet Supplies Plus",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:035": {
+"top": [
+"Chewy",
+"Shell",
+"Halley",
+"Crunch Fitness",
+"Jiffy Lube"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:036": {
+"top": [
+"Istwick Group",
+"Istmoor Group",
+"Nevwick Group",
+"Istmere Group",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:037": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:036": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:037": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Wegmans",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:038": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Whole Foods",
+"Quest Diagnostics"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:039": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Whole Foods",
+"Quest Diagnostics",
+"Pet Supplies Plus"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:040": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:041": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:042": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Istmere & Sons",
+"Brammere LLC",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:043": {
+"top": [
+"Polstead LLC",
+"Polford Ltd",
+"Morton LLC",
+"Polsley",
+"Falvarro LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:044": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Wexdale Bros",
+"Wag",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:045": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Quest Diagnostics",
+"Whole Foods",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:046": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Whole Foods",
+"Quest Diagnostics"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:047": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Wegmans",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:036": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:037": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Rinton Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:038": {
+"top": [
+"Wag",
+"Newegg",
+"Samsung",
+"Wexley Group",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:039": {
+"top": [
+"Ulmbury Ltd",
+"Ulmdale & Sons",
+"Istbury",
+"Ulmmoor Inc",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:040": {
+"top": [
+"Wag",
+"Samsung",
+"Newegg",
+"Wexley Group",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:041": {
+"top": [
+"Petland",
+"Polford Ltd",
+"Petco",
+"PetSmart",
+"Chevron"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:042": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Halsley Ltd",
+"Rinton Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:043": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:044": {
+"top": [
+"Ulmbury Ltd",
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmmoor Inc",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:045": {
+"top": [
+"Wag",
+"Newegg",
+"Samsung",
+"Whole Foods",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:046": {
+"top": [
+"Orangetheory",
+"Oskhurst",
+"Olive Garden",
+"Enterprise",
+"Oskbury LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:047": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:028": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polby",
+"Polford Ltd",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:029": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Istwick Group",
+"Fennard",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:030": {
+"top": [
+"Expedia",
+"Exxon",
+"Equinox",
+"Pexlock",
+"Pexnard"
+],
+"hit1": false,
+"rank_gold": 2
+},
+"R6_seen_new:031": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Dovvarro & Sons",
+"True Value"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:046": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Holdale",
+"Con Edison",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:047": {
+"top": [
+"Panera Bread",
+"Dunhurst Bros",
+"Bramstead & Sons",
+"Quilhurst",
+"Comcast"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:048": {
+"top": [
+"Garden Group",
+"Griden Group",
+"Olive Garden",
+"Fenford Group",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:049": {
+"top": [
+"Halmere Group",
+"Istmere Group",
+"Halwen Group",
+"Halvarro",
+"Brammere LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:050": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:051": {
+"top": [
+"Dunnard Ltd",
+"Orlnard & Sons",
+"Comcast",
+"Tornard Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:052": {
+"top": [
+"Kaiser Permanente",
+"Vitamin Shoppe",
+"Petland",
+"Polstead LLC",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:053": {
+"top": [
+"Wexley Inc",
+"Wexley Group",
+"Wexden Inc",
+"Wexham Inc",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:054": {
+"top": [
+"Istbury",
+"Istlock",
+"Istmere Group",
+"Istdale Bros",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:055": {
+"top": [
+"AMC Theatres",
+"Ace Hardware",
+"United Airlines",
+"Aldi",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:056": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Istmere & Sons",
+"Brammere LLC",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:057": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:038": {
+"top": [
+"Fenford Group",
+"Fenley Group",
+"Istwick Group",
+"Tornard Group",
+"Istmoor Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:039": {
+"top": [
+"Ardton Inc",
+"Ulmden Inc",
+"Torton Inc",
+"Lundale Inc",
+"Orlcott Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:040": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Garden Group",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:041": {
+"top": [
+"Peloton",
+"Pexley",
+"Griton",
+"Pexlock",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:042": {
+"top": [
+"Orangetheory",
+"Olive Garden",
+"Enterprise",
+"Oskhurst",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:043": {
+"top": [
+"Zedden",
+"Zedbury",
+"Zara",
+"Quildale Group",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:044": {
+"top": [
+"Istmere Group",
+"Istmoor Group",
+"Halmere Group",
+"Istmere & Sons",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:045": {
+"top": [
+"Wag",
+"Newegg",
+"Samsung",
+"Whole Foods",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:046": {
+"top": [
+"Amtrak",
+"Con Edison",
+"Harbor Freight",
+"Marathon",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:047": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Holden Bros",
+"Falholm Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:048": {
+"top": [
+"Hilton",
+"Halley",
+"Dell",
+"Morton LLC",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:049": {
+"top": [
+"Orlnard & Sons",
+"Yarden & Sons",
+"Dovvarro & Sons",
+"Istmere & Sons",
+"Halholm & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:032": {
+"top": [
+"Wexham Bros",
+"Wexdale Bros",
+"Wexham Inc",
+"Wexhurst & Sons",
+"Bexwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:033": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:034": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexhurst & Sons",
+"Wexdale Bros",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:035": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:036": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:037": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:038": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:039": {
+"top": [
+"Garwick Co",
+"Garholm Co",
+"Orlwick Co",
+"Nevwick Group",
+"Nevwick"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:040": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:041": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:042": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:043": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:048": {
+"top": [
+"Gridale",
+"Griden Group",
+"Lundale Inc",
+"PG&E",
+"Holdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:049": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"PetSmart",
+"Orangetheory"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:050": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"United Airlines",
+"Amtrak",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:051": {
+"top": [
+"Old Navy",
+"Nevden Bros",
+"Istnard LLC",
+"Istbury",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:052": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"PetSmart",
+"Hertz",
+"Wag"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:053": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"Wag",
+"PetSmart",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:054": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Morwen",
+"Rinham",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:055": {
+"top": [
+"Topgolf",
+"Starbucks",
+"GameStop",
+"PG&E",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:056": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"PetSmart",
+"Wag",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:057": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"H-E-B",
+"Wegmans",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:058": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:059": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:048": {
+"top": [
+"Rover",
+"Nike",
+"Torden Ltd",
+"Sony",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:049": {
+"top": [
+"Spectrum",
+"CorePower Yoga",
+"Vitamin Shoppe",
+"Best Buy",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:050": {
+"top": [
+"Bose",
+"Best Buy",
+"BP",
+"B&H Photo",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:051": {
+"top": [
+"Rover",
+"Valero",
+"Nike",
+"Sunoco",
+"Planet Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:052": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"Samsung",
+"TJ Maxx"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:053": {
+"top": [
+"Torden Ltd",
+"Dunnard Ltd",
+"Dunhurst Ltd",
+"Rinton Ltd",
+"Falvarro Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:054": {
+"top": [
+"Torden Ltd",
+"Torhurst Co",
+"Dunnard Ltd",
+"Dunhurst Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:055": {
+"top": [
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Halwen & Sons",
+"Wexhurst & Sons",
+"Griwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:056": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"Samsung",
+"TJ Maxx"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:057": {
+"top": [
+"Rover",
+"Nike",
+"Torden Ltd",
+"Sony",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:058": {
+"top": [
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Halwen & Sons",
+"Wexhurst & Sons",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:059": {
+"top": [
+"Torden Ltd",
+"Torhurst Co",
+"Dunhurst Ltd",
+"Dunnard Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:032": {
+"top": [
+"Dunkin",
+"Dunwick",
+"Griton",
+"Duane Reade",
+"Halton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:033": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Wexham Bros",
+"Sabstead Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:034": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:035": {
+"top": [
+"Macy's",
+"Dell",
+"Domino's",
+"Regal Cinemas",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:036": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quilmere",
+"Quildale Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:037": {
+"top": [
+"Quildale Group",
+"Quilmere",
+"Quilhurst",
+"Quilden Group",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:038": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Oskhurst",
+"Elrdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:039": {
+"top": [
+"Ulmwick Ltd",
+"Istwick Group",
+"Ulmbury Ltd",
+"Nevwick Group",
+"Dunwick"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:040": {
+"top": [
+"Istdale Bros",
+"Istmere & Sons",
+"Wexdale Bros",
+"Istmere Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:041": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:058": {
+"top": [
+"Garholm Co",
+"Garwick Co",
+"Elrholm",
+"Jorholm Bros",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:059": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Halsley Ltd",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:060": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmmoor Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:061": {
+"top": [
+"Quilhurst",
+"Dunhurst Bros",
+"Quilmere",
+"Wexhurst & Sons",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:062": {
+"top": [
+"PetSmart",
+"Pet Supplies Plus",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:063": {
+"top": [
+"Bramby & Sons",
+"Bramwen Group",
+"Bramstead & Sons",
+"Brammere LLC",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:064": {
+"top": [
+"Jiffy Lube",
+"Morwen",
+"Dunkin",
+"Rinham",
+"Zedden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:065": {
+"top": [
+"BarkBox",
+"Starbucks",
+"Dunkin",
+"Publix",
+"Bose"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:066": {
+"top": [
+"Quilden Group",
+"Quildale Group",
+"Tornard Group",
+"Griden Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:067": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"Walgreens",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:068": {
+"top": [
+"Halholm & Sons",
+"Talholm & Sons",
+"Halwen & Sons",
+"Halhurst Co",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:069": {
+"top": [
+"Hilton",
+"Halley",
+"Dell",
+"Chewy",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:050": {
+"top": [
+"Samsung",
+"Best Buy",
+"Vitamin Shoppe",
+"T-Mobile",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:051": {
+"top": [
+"Halhurst Co",
+"Torhurst Co",
+"Holdale",
+"Vorstead Co",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:044": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:045": {
+"top": [
+"Halsley Ltd",
+"Torden Ltd",
+"Rinton Ltd",
+"Dunhurst Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:046": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:047": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Southwest",
+"Amtrak",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:048": {
+"top": [
+"Old Navy",
+"Nevden Bros",
+"Istnard LLC",
+"Istbury",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:049": {
+"top": [
+"Starbucks",
+"Subway",
+"McDonald's",
+"Marriott",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:050": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:051": {
+"top": [
+"Starbucks",
+"Subway",
+"Publix",
+"BarkBox",
+"Marriott"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:052": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"United Airlines",
+"Amtrak",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:053": {
+"top": [
+"Halsley Ltd",
+"Halbury",
+"Polsley",
+"Halvarro",
+"Halwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:054": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Istmere & Sons",
+"Brammere LLC",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:055": {
+"top": [
+"Halsley Ltd",
+"Halbury",
+"Halhurst Co",
+"Halwen & Sons",
+"Halwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:060": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Quest Diagnostics",
+"Whole Foods"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:061": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Quest Diagnostics",
+"Whole Foods"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:062": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:063": {
+"top": [
+"Zedden",
+"Zedbury",
+"Zara",
+"Quildale Group",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:064": {
+"top": [
+"Garden Group",
+"Griden Group",
+"Olive Garden",
+"Fenley Group",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:065": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Ross",
+"Whole Foods",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:066": {
+"top": [
+"Pet Supplies Plus",
+"Banfield Pet Hospital",
+"PetSmart",
+"Petco",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:067": {
+"top": [
+"Ace Hardware",
+"Dunwick",
+"Aldi",
+"Ulmwick Ltd",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:068": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Holden Bros",
+"Falholm Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:069": {
+"top": [
+"Ace Hardware",
+"Aldi",
+"AMC Theatres",
+"United Airlines",
+"AT&T"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:070": {
+"top": [
+"H-E-B",
+"B&H Photo",
+"Equinox",
+"Olive Garden",
+"Chick-fil-A"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:071": {
+"top": [
+"Wexley Inc",
+"Wexden Inc",
+"Wexham Inc",
+"Wexdale Bros",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:060": {
+"top": [
+"Oskbury LLC",
+"Oskhurst",
+"Oskhurst Bros",
+"Morton LLC",
+"Marbury Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:061": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:062": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:063": {
+"top": [
+"Oskbury LLC",
+"Oskhurst",
+"Morton LLC",
+"Oskhurst Bros",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:064": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:065": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Ticketmaster"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:066": {
+"top": [
+"GameStop",
+"Steam",
+"PG&E",
+"Newegg",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:067": {
+"top": [
+"GameStop",
+"PG&E",
+"Apple Store",
+"Steam",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:068": {
+"top": [
+"GameStop",
+"PG&E",
+"Nike",
+"Steam",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:069": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:070": {
+"top": [
+"GameStop",
+"PG&E",
+"GNC",
+"Spotify",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:071": {
+"top": [
+"GameStop",
+"GNC",
+"PG&E",
+"Garden Group",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:042": {
+"top": [
+"Nevwick",
+"Nevwick Group",
+"Dunwick",
+"Istwick Group",
+"Orlwick Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:043": {
+"top": [
+"Best Buy",
+"Apple Store",
+"Whole Foods",
+"Dell",
+"Regal Cinemas"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:044": {
+"top": [
+"Grinard Inc",
+"Lundale Inc",
+"Ardton Inc",
+"Torton Inc",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:045": {
+"top": [
+"Ulmmoor Inc",
+"Ulmden Inc",
+"Ulmdale & Sons",
+"Lundale Inc",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:046": {
+"top": [
+"Halhurst Co",
+"Torhurst Co",
+"Holdale",
+"Vorstead Co",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:047": {
+"top": [
+"Samsung",
+"Best Buy",
+"Vitamin Shoppe",
+"T-Mobile",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:048": {
+"top": [
+"Pet Supplies Plus",
+"Banfield Pet Hospital",
+"PetSmart",
+"Petco",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:070": {
+"top": [
+"Fennard",
+"Fenley Group",
+"Falvarro Bros",
+"Falvarro LLC",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:071": {
+"top": [
+"CVS",
+"Vitamin Shoppe",
+"Costco",
+"Dovvarro & Sons",
+"Vorcott"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:072": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Kelby Co",
+"Fenley Group",
+"Halley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:073": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Sunoco",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:074": {
+"top": [
+"Istmere Group",
+"Istmoor Group",
+"Istmere & Sons",
+"Halmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:075": {
+"top": [
+"Airbnb",
+"Delta Air Lines",
+"Albertsons",
+"AutoZone",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:076": {
+"top": [
+"Uniqlo",
+"United Airlines",
+"Ulmmoor Inc",
+"Ulmden Inc",
+"AutoZone"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:077": {
+"top": [
+"Delta Air Lines",
+"United Airlines",
+"Airbnb",
+"Ace Hardware",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:078": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Griby Co",
+"Fenvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:079": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:080": {
+"top": [
+"Quilhurst",
+"Quilmere",
+"Quilden Group",
+"Dunhurst Bros",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:081": {
+"top": [
+"Oskhurst",
+"Oskhurst Bros",
+"Oskbury LLC",
+"Elrhurst Co",
+"Orangetheory"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:052": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halhurst Co",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:053": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Garden Group",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:054": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:055": {
+"top": [
+"Nevnard Bros",
+"Nevwick",
+"Nevham Group",
+"Nevden Bros",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:056": {
+"top": [
+"Verizon",
+"T-Mobile",
+"AT&T",
+"Con Edison",
+"Taco Bell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:057": {
+"top": [
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Halwen & Sons",
+"Wexhurst & Sons",
+"Griwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:058": {
+"top": [
+"Home Depot",
+"Ace Hardware",
+"Hilton",
+"Floor & Decor",
+"Dave & Buster's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:059": {
+"top": [
+"Orangetheory",
+"Oskhurst",
+"Olive Garden",
+"Enterprise",
+"Oskbury LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:060": {
+"top": [
+"Fenford Group",
+"Fenley Group",
+"Fennard",
+"Istwick Group",
+"Istmoor Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:061": {
+"top": [
+"Menards",
+"Tornard Group",
+"Halhurst Co",
+"Halbury",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:056": {
+"top": [
+"PetSmart",
+"Petco",
+"Pet Supplies Plus",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:057": {
+"top": [
+"GameStop",
+"GNC",
+"PG&E",
+"Garden Group",
+"Fenford Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:058": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:059": {
+"top": [
+"GameStop",
+"PG&E",
+"GNC",
+"Spotify",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:060": {
+"top": [
+"Aldi",
+"Apple Store",
+"Albertsons",
+"Oskhurst",
+"Elrhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:061": {
+"top": [
+"Istwick Group",
+"Istmoor Group",
+"Nevwick Group",
+"Istmere Group",
+"Nevwick"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:062": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Newegg",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:063": {
+"top": [
+"Aldi",
+"Apple Store",
+"Albertsons",
+"Oskhurst",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:064": {
+"top": [
+"Wexhurst & Sons",
+"Wexham Bros",
+"Wexham Inc",
+"Bexwen & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:065": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"PetSmart",
+"Pet Supplies Plus",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:066": {
+"top": [
+"GameStop",
+"PG&E",
+"Spotify",
+"Garden Group",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:067": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:072": {
+"top": [
+"Rinford",
+"Rinham",
+"Rinton Ltd",
+"Polford Ltd",
+"Rinlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:073": {
+"top": [
+"Southwest",
+"Sabstead Bros",
+"Sabby Co",
+"Oskhurst Bros",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:074": {
+"top": [
+"Southwest",
+"Newegg",
+"United Airlines",
+"Harbor Freight",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:075": {
+"top": [
+"Southwest",
+"Sabstead Bros",
+"Sabby Co",
+"Oskhurst Bros",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:076": {
+"top": [
+"Griwen Bros",
+"Bramwen Group",
+"Morwen",
+"Dunwen Group",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:077": {
+"top": [
+"Southwest",
+"LA Fitness",
+"AMC Theatres",
+"Starbucks",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:078": {
+"top": [
+"Southwest",
+"Harbor Freight",
+"United Airlines",
+"AMC Theatres",
+"Starbucks"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:079": {
+"top": [
+"Griwen Bros",
+"Morwen",
+"Bramwen Group",
+"Dunwen Group",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:080": {
+"top": [
+"Gridale",
+"Griden Group",
+"Lundale Inc",
+"PG&E",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:081": {
+"top": [
+"Halsley Ltd",
+"Rinton Ltd",
+"Dunhurst Ltd",
+"Torden Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:082": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Halwen & Sons",
+"Bramwen Group",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:083": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Halwen & Sons",
+"Bramwen Group",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:072": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Home Depot",
+"Sabby Co",
+"Duane Reade"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:073": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Sabby Co",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:074": {
+"top": [
+"Ace Hardware",
+"Aldi",
+"IKEA",
+"Dell",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:075": {
+"top": [
+"Lowe's",
+"Macy's",
+"Trader Joe's",
+"Domino's",
+"Gold's Gym"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:076": {
+"top": [
+"Ace Hardware",
+"AMC Theatres",
+"Aldi",
+"United Airlines",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:077": {
+"top": [
+"Ace Hardware",
+"Dunwick",
+"Aldi",
+"Ulmwick Ltd",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:078": {
+"top": [
+"Ace Hardware",
+"Apple Store",
+"IKEA",
+"Best Buy",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:079": {
+"top": [
+"Ace Hardware",
+"Apple Store",
+"IKEA",
+"Best Buy",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:080": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Sabby Co",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:081": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Sabby Co",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:082": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Gridale",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:083": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Home Depot",
+"Duane Reade",
+"Sabby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:082": {
+"top": [
+"Delta Air Lines",
+"United Airlines",
+"Airbnb",
+"Ace Hardware",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:083": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:084": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Istmere & Sons",
+"Brammere LLC",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:085": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Oskhurst",
+"Oskhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:086": {
+"top": [
+"Dunwick",
+"Orlwick Co",
+"Dunhurst Bros",
+"Nevwick",
+"Dunhurst Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:087": {
+"top": [
+"GameStop",
+"PG&E",
+"Nike",
+"Steam",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:088": {
+"top": [
+"Istdale Bros",
+"Istbury",
+"Istmere & Sons",
+"Istlock",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:089": {
+"top": [
+"Talholm & Sons",
+"Halholm & Sons",
+"Holton & Sons",
+"Fenvarro & Sons",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:090": {
+"top": [
+"Garholm Co",
+"Garwick Co",
+"Elrholm",
+"Jorholm Bros",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:091": {
+"top": [
+"Panera Bread",
+"Tornard Group",
+"Pexley",
+"Polstead LLC",
+"B&H Photo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:092": {
+"top": [
+"Rinton Ltd",
+"Rinham",
+"Rinford",
+"Dunnard Ltd",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:093": {
+"top": [
+"Best Buy",
+"Bose",
+"AT&T",
+"BarkBox",
+"B&H Photo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:062": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:063": {
+"top": [
+"Harbor Freight",
+"Apple Store",
+"Wag",
+"Wegmans",
+"Whole Foods"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:064": {
+"top": [
+"Istmere & Sons",
+"Istdale Bros",
+"Yarden & Sons",
+"Istmoor Group",
+"Ulmdale & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:065": {
+"top": [
+"Costco",
+"Petco",
+"Taco Bell",
+"Sunoco",
+"Dell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:066": {
+"top": [
+"BP",
+"Bose",
+"Dell",
+"Samsung",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:067": {
+"top": [
+"Ulmbury Ltd",
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmmoor Inc",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:068": {
+"top": [
+"Jiffy Lube",
+"Dunkin",
+"Chewy",
+"Morwen",
+"Sabstead Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:069": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:070": {
+"top": [
+"Menards",
+"Halhurst Co",
+"Halbury",
+"Pep Boys",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:071": {
+"top": [
+"Quildale Group",
+"Quilmere",
+"Quilhurst",
+"Quilden Group",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:072": {
+"top": [
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Costco",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:073": {
+"top": [
+"Dunwen Group",
+"Bramwen Group",
+"Halwen Group",
+"Morwen",
+"Griwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:084": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:085": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:086": {
+"top": [
+"CorePower Yoga",
+"Crunch Fitness",
+"Spectrum",
+"Apple Store",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:087": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:088": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Elrdale",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:089": {
+"top": [
+"Garden Group",
+"Olive Garden",
+"Griden Group",
+"Bowlero",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:090": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:091": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:092": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:093": {
+"top": [
+"Garden Group",
+"Griden Group",
+"Olive Garden",
+"Fenford Group",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:094": {
+"top": [
+"Zedbury",
+"Zara",
+"Zedden",
+"Elrdale",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:095": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Oskbury LLC",
+"Elrdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:084": {
+"top": [
+"Tractor Supply",
+"Harbor Freight",
+"Rover",
+"Amtrak",
+"Trader Joe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:085": {
+"top": [
+"Valero",
+"Sunoco",
+"Halvarro",
+"Torvarro",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:086": {
+"top": [
+"Pexley",
+"Pexnard",
+"Peloton",
+"Pexlock",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:087": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Sabby Co",
+"Wexley Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:088": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Polby",
+"Garwick Co",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:089": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Subway",
+"Southwest",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:090": {
+"top": [
+"Quilhurst",
+"Quilmere",
+"Quilden Group",
+"Dunhurst Bros",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:091": {
+"top": [
+"Quilhurst",
+"Dunhurst Bros",
+"Quilmere",
+"Wexhurst & Sons",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:092": {
+"top": [
+"Valero",
+"Halvarro",
+"Tornard Group",
+"Vitamin Shoppe",
+"Grinard Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:093": {
+"top": [
+"Tractor Supply",
+"Harbor Freight",
+"Jiffy Lube",
+"Trader Joe's",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:094": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Yarden & Sons",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:095": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:094": {
+"top": [
+"GNC",
+"Garwick Co",
+"Garholm Co",
+"Griden Group",
+"GameStop"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:095": {
+"top": [
+"Aldi",
+"Albertsons",
+"United Airlines",
+"Apple Store",
+"Ace Hardware"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:096": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:097": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Whole Foods",
+"Quest Diagnostics",
+"Pet Supplies Plus"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:098": {
+"top": [
+"Wexham Inc",
+"Wexham Bros",
+"Wexden Inc",
+"Wexhurst & Sons",
+"Wexley Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:099": {
+"top": [
+"Polford Ltd",
+"Dunhurst Ltd",
+"Torden Ltd",
+"Polstead LLC",
+"Rinford"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:100": {
+"top": [
+"Starbucks",
+"Subway",
+"McDonald's",
+"Marriott",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:101": {
+"top": [
+"Dunnard Ltd",
+"Orlnard & Sons",
+"Tornard Group",
+"Torhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:102": {
+"top": [
+"BarkBox",
+"Starbucks",
+"Dunkin",
+"Bose",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:103": {
+"top": [
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Istdale Bros",
+"Wexham Inc",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:104": {
+"top": [
+"Delta Air Lines",
+"Airbnb",
+"United Airlines",
+"Ace Hardware",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:105": {
+"top": [
+"Tornard Group",
+"Garden Group",
+"Griden Group",
+"Quilden Group",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:074": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Falvarro LLC",
+"Brammere LLC",
+"Oskbury LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:075": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:076": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:077": {
+"top": [
+"AMC Theatres",
+"Ace Hardware",
+"United Airlines",
+"Aldi",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:078": {
+"top": [
+"Menards",
+"Tornard Group",
+"Wegmans",
+"Pep Boys",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:079": {
+"top": [
+"Regal Cinemas",
+"Con Edison",
+"Spectrum",
+"Panera Bread",
+"Holdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:080": {
+"top": [
+"Netflix",
+"Cox",
+"AMC Theatres",
+"Best Buy",
+"Dunkin"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:081": {
+"top": [
+"Jorden Inc",
+"Lundale Inc",
+"Grinard Inc",
+"Marbury Inc",
+"Wexley Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:082": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Amtrak",
+"Southwest",
+"Domino's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:083": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:084": {
+"top": [
+"Sherwin-Williams",
+"H&M",
+"Wegmans",
+"Shell",
+"Wag"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:085": {
+"top": [
+"Halvarro",
+"Torvarro",
+"Halmere Group",
+"Dovvarro & Sons",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:096": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:097": {
+"top": [
+"Orlnard & Sons",
+"Orangetheory",
+"Orlwick Co",
+"Rinford",
+"Halvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:098": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Sony",
+"IKEA",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:099": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Sony",
+"IKEA",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:100": {
+"top": [
+"Nevnard Bros",
+"Nevden Bros",
+"Nevwick",
+"Istdale Bros",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:101": {
+"top": [
+"Sabstead Bros",
+"Sabby Co",
+"Bramby & Sons",
+"Holden Bros",
+"Oskhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:102": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:103": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:104": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:105": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:106": {
+"top": [
+"Sabstead Bros",
+"Sabby Co",
+"Yarstead Bros",
+"Bramby & Sons",
+"Yarton Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:107": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Wexdale Bros",
+"Wag",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:096": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Bramwen Group",
+"Halwen Group",
+"Halwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:097": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Halwen Group",
+"Bramwen Group",
+"Halwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:098": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Home Depot",
+"Duane Reade",
+"Sabby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:099": {
+"top": [
+"Pep Boys",
+"Kelford Bros",
+"BP",
+"Ross",
+"Gold's Gym"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:100": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Halwen & Sons",
+"Bramwen Group",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:101": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Sabby Co",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:102": {
+"top": [
+"Floor & Decor",
+"Elrmoor",
+"Home Depot",
+"True Value",
+"Cinemark"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:103": {
+"top": [
+"Pep Boys",
+"BP",
+"Menards",
+"Kelford Bros",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:104": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Istwick Group",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:105": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Bramwen Group",
+"Halwen & Sons",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:106": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Home Depot",
+"Duane Reade"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:107": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Home Depot",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:049": {
+"top": [
+"Rinton Ltd",
+"Rinham",
+"Rinford",
+"Dunnard Ltd",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:050": {
+"top": [
+"Trader Joe's",
+"Domino's",
+"Lowe's",
+"Gold's Gym",
+"Tractor Supply"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:051": {
+"top": [
+"Orlcott Inc",
+"Grinard Inc",
+"Wexley Inc",
+"Torton Inc",
+"Ardton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:052": {
+"top": [
+"BarkBox",
+"Starbucks",
+"Dunkin",
+"Publix",
+"Bose"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:053": {
+"top": [
+"Planet Fitness",
+"LA Fitness",
+"24 Hour Fitness",
+"Crunch Fitness",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:054": {
+"top": [
+"Sabby Co",
+"Sabstead Bros",
+"Griby Co",
+"Bramby & Sons",
+"Ace Hardware"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:055": {
+"top": [
+"Kroger",
+"Apple Store",
+"PetSmart",
+"Nike",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:056": {
+"top": [
+"Orangetheory",
+"Orlnard & Sons",
+"Orlwick Co",
+"Orlcott Inc",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:057": {
+"top": [
+"Wexdale Bros",
+"Wexham Bros",
+"Istdale Bros",
+"Wexhurst & Sons",
+"Wexham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:058": {
+"top": [
+"Dunnard Ltd",
+"Orlnard & Sons",
+"Tornard Group",
+"Torhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:059": {
+"top": [
+"Nevnard Bros",
+"Nevwick",
+"Nevham Group",
+"Nevden Bros",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:060": {
+"top": [
+"Chewy",
+"Shell",
+"Halley",
+"Crunch Fitness",
+"Jiffy Lube"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:106": {
+"top": [
+"Nevden Bros",
+"Nevnard Bros",
+"Nevwick",
+"CVS",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:107": {
+"top": [
+"Airbnb",
+"Delta Air Lines",
+"AutoZone",
+"Albertsons",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:108": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Wexhurst & Sons",
+"Pexlock",
+"Bexlock & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:109": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Cinemark",
+"Tornard Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:110": {
+"top": [
+"CVS",
+"Vitamin Shoppe",
+"Dovvarro & Sons",
+"Planet Fitness",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:111": {
+"top": [
+"Fenvarro & Sons",
+"Dovvarro & Sons",
+"Fennard",
+"Yarden & Sons",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:112": {
+"top": [
+"Gridale",
+"Griden Group",
+"Fenford Group",
+"Tornard Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:113": {
+"top": [
+"Topgolf",
+"GameStop",
+"Starbucks",
+"Zedbury",
+"PG&E"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:114": {
+"top": [
+"Spotify",
+"Bose",
+"GameStop",
+"Starbucks",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:115": {
+"top": [
+"GNC",
+"Garwick Co",
+"Griden Group",
+"GameStop",
+"Garholm Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:116": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Yarden & Sons",
+"Istmere & Sons",
+"Holton & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:117": {
+"top": [
+"Istnard LLC",
+"Istlock",
+"Istmere & Sons",
+"Enterprise",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:086": {
+"top": [
+"Menards",
+"Halbury",
+"Halhurst Co",
+"Southwest",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:087": {
+"top": [
+"Tractor Supply",
+"Harbor Freight",
+"Trader Joe's",
+"Fenford Group",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:088": {
+"top": [
+"Valero",
+"Halvarro",
+"Vitamin Shoppe",
+"Tornard Group",
+"Sunoco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:089": {
+"top": [
+"Quilden Group",
+"Quildale Group",
+"Tornard Group",
+"Quilhurst",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:090": {
+"top": [
+"Bose",
+"Best Buy",
+"BP",
+"B&H Photo",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:091": {
+"top": [
+"Rinham",
+"Rinton Ltd",
+"Rinford",
+"Rinlock",
+"Dunwick"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:092": {
+"top": [
+"Home Depot",
+"Ace Hardware",
+"Floor & Decor",
+"IKEA",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:093": {
+"top": [
+"Griden Group",
+"Gridale",
+"Garden Group",
+"Tornard Group",
+"Bramwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:094": {
+"top": [
+"Bramwen Group",
+"Dunwen Group",
+"Halwen Group",
+"Griwen Bros",
+"Bramby & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:095": {
+"top": [
+"Oskbury LLC",
+"Oskhurst",
+"Oskhurst Bros",
+"Halbury",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:096": {
+"top": [
+"Nevwick",
+"Nevwick Group",
+"Dunwick",
+"Istwick Group",
+"Orlwick Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:097": {
+"top": [
+"Uniqlo",
+"United Airlines",
+"Ulmmoor Inc",
+"Ulmden Inc",
+"AutoZone"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:068": {
+"top": [
+"PetSmart",
+"Petco",
+"Pet Supplies Plus",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:069": {
+"top": [
+"Whole Foods",
+"Best Buy",
+"Safeway",
+"Amtrak",
+"Bose"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:070": {
+"top": [
+"Petland",
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:071": {
+"top": [
+"Petland",
+"Polford Ltd",
+"Petco",
+"PetSmart",
+"Chevron"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:072": {
+"top": [
+"Equinox",
+"Exxon",
+"H-E-B",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:073": {
+"top": [
+"Equinox",
+"H-E-B",
+"Exxon",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:074": {
+"top": [
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Halsley Ltd",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:075": {
+"top": [
+"Whole Foods",
+"Lowe's",
+"Wegmans",
+"Harbor Freight",
+"Comcast"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:076": {
+"top": [
+"Halholm & Sons",
+"Halwen & Sons",
+"Talholm & Sons",
+"Orlnard & Sons",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:077": {
+"top": [
+"Equinox",
+"H-E-B",
+"Exxon",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:078": {
+"top": [
+"Halholm & Sons",
+"Halwen & Sons",
+"Talholm & Sons",
+"Bramstead & Sons",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:079": {
+"top": [
+"Lundale Inc",
+"Grinard Inc",
+"Marbury Inc",
+"Wexley Inc",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:108": {
+"top": [
+"Kaiser Permanente",
+"Vitamin Shoppe",
+"Apple Store",
+"Nike",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:109": {
+"top": [
+"Kaiser Permanente",
+"Vitamin Shoppe",
+"Petland",
+"Polstead LLC",
+"Chevron"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:110": {
+"top": [
+"Duke Energy",
+"CorePower Yoga",
+"Planet Fitness",
+"Amtrak",
+"Steam"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:111": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Sony",
+"Kroger",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:112": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Con Edison",
+"IKEA",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:113": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:114": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Vitamin Shoppe",
+"Sony",
+"B&H Photo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:115": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Morton LLC",
+"Con Edison",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:116": {
+"top": [
+"Kaiser Permanente",
+"Vitamin Shoppe",
+"Apple Store",
+"Nordstrom",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:117": {
+"top": [
+"Duke Energy",
+"Planet Fitness",
+"CorePower Yoga",
+"Steam",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:118": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Vitamin Shoppe",
+"REI",
+"Marathon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:119": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"Vitamin Shoppe",
+"Marathon",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:108": {
+"top": [
+"Nordstrom",
+"Bose",
+"Albertsons",
+"Spectrum",
+"Nevnard Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:109": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:110": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:111": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:112": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"United Airlines",
+"Southwest",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:113": {
+"top": [
+"Falholm Inc",
+"Falvarro LLC",
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:114": {
+"top": [
+"GameStop",
+"Steam",
+"PG&E",
+"Newegg",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:115": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Home Depot",
+"Duane Reade"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:116": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:117": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:118": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Home Depot",
+"Sabby Co",
+"Duane Reade"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:119": {
+"top": [
+"IKEA",
+"Ace Hardware",
+"Olive Garden",
+"Home Depot",
+"Sabby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:061": {
+"top": [
+"Starbucks",
+"Subway",
+"Southwest",
+"Marriott",
+"Publix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:062": {
+"top": [
+"Elrhurst Co",
+"Elrmoor",
+"Elrholm",
+"Oskhurst",
+"Elrdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:063": {
+"top": [
+"Chick-fil-A",
+"H-E-B",
+"Chevron",
+"T-Mobile",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:064": {
+"top": [
+"Domino's",
+"Macy's",
+"Trader Joe's",
+"Lowe's",
+"Dave & Buster's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:118": {
+"top": [
+"Pep Boys",
+"Kelford Bros",
+"BP",
+"Ross",
+"Gold's Gym"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:119": {
+"top": [
+"Peloton",
+"Pexley",
+"Griton",
+"Pexlock",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:120": {
+"top": [
+"Jorholm Bros",
+"Elrholm",
+"Jorden Inc",
+"Trader Joe's",
+"Garholm Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:121": {
+"top": [
+"Delta Air Lines",
+"United Airlines",
+"Airbnb",
+"Ace Hardware",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:122": {
+"top": [
+"Uniqlo",
+"United Airlines",
+"Ulmmoor Inc",
+"Ulmden Inc",
+"AutoZone"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:123": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:124": {
+"top": [
+"Planet Fitness",
+"LA Fitness",
+"24 Hour Fitness",
+"Crunch Fitness",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:125": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"H-E-B",
+"Wegmans",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:126": {
+"top": [
+"Ross",
+"United Airlines",
+"Enterprise",
+"Chewy",
+"Bose"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:127": {
+"top": [
+"Safeway",
+"Whole Foods",
+"Subway",
+"Pexley",
+"Cox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:128": {
+"top": [
+"Samsung",
+"T-Mobile",
+"Bose",
+"Best Buy",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:129": {
+"top": [
+"Halmere Group",
+"Istmere Group",
+"Halwen Group",
+"Halvarro",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:098": {
+"top": [
+"Sabstead Bros",
+"Sabby Co",
+"Bramby & Sons",
+"Holden Bros",
+"Oskhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:099": {
+"top": [
+"Dovvarro & Sons",
+"Fenvarro & Sons",
+"Orlnard & Sons",
+"Halvarro",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:100": {
+"top": [
+"Regal Cinemas",
+"AMC Theatres",
+"Garholm Co",
+"Nordstrom",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:101": {
+"top": [
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Costco",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:102": {
+"top": [
+"Polsley",
+"Polby",
+"Polstead LLC",
+"Polford Ltd",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:103": {
+"top": [
+"GNC",
+"Garwick Co",
+"Garholm Co",
+"Griden Group",
+"GameStop"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:104": {
+"top": [
+"Wexley Inc",
+"Wexden Inc",
+"Wexham Inc",
+"Wexdale Bros",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:105": {
+"top": [
+"BarkBox",
+"Bartell Drugs",
+"Elrdale",
+"Publix",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:106": {
+"top": [
+"Petland",
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:107": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Halhurst Co",
+"Holden Bros",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:108": {
+"top": [
+"Wexham Inc",
+"Wexham Bros",
+"Wexden Inc",
+"Wexhurst & Sons",
+"Wexley Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:109": {
+"top": [
+"Duke Energy",
+"Planet Fitness",
+"CorePower Yoga",
+"Amtrak",
+"Dunkin"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:080": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:081": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:082": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:083": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:084": {
+"top": [
+"Istdale Bros",
+"Istmere & Sons",
+"Wexdale Bros",
+"Istmere Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:085": {
+"top": [
+"Istdale Bros",
+"Istbury",
+"Istlock",
+"Istmere & Sons",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:086": {
+"top": [
+"Istdale Bros",
+"Istbury",
+"Istmere Group",
+"Istnard LLC",
+"Istlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:087": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:088": {
+"top": [
+"Istdale Bros",
+"Wexdale Bros",
+"Istmere & Sons",
+"Istmere Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:089": {
+"top": [
+"Bramstead & Sons",
+"Bramby & Sons",
+"Istmere & Sons",
+"Brammere LLC",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:090": {
+"top": [
+"Panera Bread",
+"Tornard Group",
+"Pexley",
+"B&H Photo",
+"Polstead LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:091": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:120": {
+"top": [
+"Floor & Decor",
+"Home Depot",
+"Regal Cinemas",
+"Con Edison",
+"Yarden & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:121": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Sunoco",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:122": {
+"top": [
+"Equinox",
+"H-E-B",
+"Exxon",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:123": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Verizon",
+"Micro Center"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:124": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:125": {
+"top": [
+"Floor & Decor",
+"Home Depot",
+"Pet Supplies Plus",
+"Ace Hardware",
+"Rite Aid"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:126": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Micro Center",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:127": {
+"top": [
+"Bexlock & Sons",
+"Pexlock",
+"Bexwen & Sons",
+"Istlock",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:128": {
+"top": [
+"Aldi",
+"Albertsons",
+"United Airlines",
+"Apple Store",
+"Ace Hardware"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:129": {
+"top": [
+"Equinox",
+"H-E-B",
+"Exxon",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:130": {
+"top": [
+"Hilton",
+"Halley",
+"Dell",
+"Chewy",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:131": {
+"top": [
+"Polford Ltd",
+"Dunhurst Ltd",
+"Torden Ltd",
+"Polstead LLC",
+"Rinford"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:120": {
+"top": [
+"Duane Reade",
+"REI",
+"Con Edison",
+"Harbor Freight",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:121": {
+"top": [
+"Duane Reade",
+"Dunkin",
+"Dunwick",
+"REI",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:122": {
+"top": [
+"Bartell Drugs",
+"LabCorp",
+"Publix",
+"Chewy",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:123": {
+"top": [
+"Verizon",
+"T-Mobile",
+"AT&T",
+"Con Edison",
+"Samsung"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:124": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:125": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Banfield Pet Hospital",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:126": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Fenley Group",
+"Halley",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:127": {
+"top": [
+"Pet Supplies Plus",
+"Banfield Pet Hospital",
+"PetSmart",
+"Petco",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:128": {
+"top": [
+"Jorden Inc",
+"Marbury Inc",
+"Lundale Inc",
+"Falham Inc",
+"Wexley Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:129": {
+"top": [
+"Quilhurst",
+"Quilmere",
+"Quilden Group",
+"Dunhurst Bros",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:130": {
+"top": [
+"Verizon",
+"T-Mobile",
+"AT&T",
+"Con Edison",
+"Taco Bell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:131": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Fenley Group",
+"Halley",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:065": {
+"top": [
+"Nevwick",
+"Nevwick Group",
+"Orlwick Co",
+"Dunwick",
+"Nevham Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:066": {
+"top": [
+"Hertz",
+"Sherwin-Williams",
+"AutoZone",
+"Verizon",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:067": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:068": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Halley",
+"Chewy",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:069": {
+"top": [
+"Netflix",
+"AMC Theatres",
+"TJ Maxx",
+"Comcast",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:070": {
+"top": [
+"Regal Cinemas",
+"AMC Theatres",
+"Cinemark",
+"Macy's",
+"Best Buy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:071": {
+"top": [
+"Morton LLC",
+"Oskbury LLC",
+"Brammere LLC",
+"Polstead LLC",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:072": {
+"top": [
+"T-Mobile",
+"Topgolf",
+"Torvarro",
+"Fenford Group",
+"PG&E"
+],
+"hit1": false,
+"rank_gold": 2
+},
+"R6_seen_new:073": {
+"top": [
+"Micro Center",
+"Dell",
+"Whole Foods",
+"Griton",
+"H&M"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:074": {
+"top": [
+"Halhurst Co",
+"Dunhurst Bros",
+"Torhurst Co",
+"Quilhurst",
+"Dunhurst Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:075": {
+"top": [
+"B&H Photo",
+"H-E-B",
+"Spotify",
+"Bose",
+"Cinemark"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:076": {
+"top": [
+"Marbury Inc",
+"Jorden Inc",
+"Lundale Inc",
+"Falham Inc",
+"Torton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:130": {
+"top": [
+"Fenvarro & Sons",
+"Dovvarro & Sons",
+"Fennard",
+"Yarden & Sons",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:131": {
+"top": [
+"Griden Group",
+"Garden Group",
+"Gridale",
+"Tornard Group",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:132": {
+"top": [
+"Bexwen & Sons",
+"Bexlock & Sons",
+"Halwen & Sons",
+"Morwen",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:133": {
+"top": [
+"CorePower Yoga",
+"Crunch Fitness",
+"Spectrum",
+"Apple Store",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:134": {
+"top": [
+"Trader Joe's",
+"Harbor Freight",
+"Tractor Supply",
+"Vitamin Shoppe",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:135": {
+"top": [
+"Equinox",
+"Exxon",
+"H-E-B",
+"Expedia",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:136": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"Samsung",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:137": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Vitamin Shoppe",
+"Costco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:138": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:139": {
+"top": [
+"Con Edison",
+"Holdale",
+"Enterprise",
+"United Airlines",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:140": {
+"top": [
+"Aldi",
+"Albertsons",
+"Apple Store",
+"Oskhurst",
+"Elrmoor"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:141": {
+"top": [
+"AT&T",
+"Orlcott Inc",
+"Ardton Inc",
+"AutoZone",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:110": {
+"top": [
+"AutoZone",
+"Hertz",
+"AT&T",
+"Verizon",
+"Zara"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:111": {
+"top": [
+"BP",
+"Bose",
+"Dell",
+"Samsung",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:112": {
+"top": [
+"Uniqlo",
+"United Airlines",
+"Ulmmoor Inc",
+"Ulmden Inc",
+"AutoZone"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:113": {
+"top": [
+"Nike",
+"Sony",
+"Marathon",
+"Starbucks",
+"Rover"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:114": {
+"top": [
+"Macy's",
+"Domino's",
+"Lowe's",
+"Dell",
+"McDonald's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:115": {
+"top": [
+"Pep Boys",
+"BP",
+"Kelford Bros",
+"Menards",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:116": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polby",
+"Polford Ltd",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:117": {
+"top": [
+"Rinham",
+"Rinlock",
+"Rinton Ltd",
+"Rinford",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:118": {
+"top": [
+"Chick-fil-A",
+"Starbucks",
+"LA Fitness",
+"Crunch Fitness",
+"H-E-B"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:119": {
+"top": [
+"Wexham Bros",
+"Wexham Inc",
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:120": {
+"top": [
+"Istdale Bros",
+"Wexdale Bros",
+"Istmere & Sons",
+"Istmere Group",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:121": {
+"top": [
+"Valero",
+"Halvarro",
+"Vitamin Shoppe",
+"Tornard Group",
+"Sunoco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:092": {
+"top": [
+"GameStop",
+"PG&E",
+"GNC",
+"Spotify",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:093": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:094": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:095": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Newegg",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:096": {
+"top": [
+"Southwest",
+"LA Fitness",
+"AMC Theatres",
+"Starbucks",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:097": {
+"top": [
+"Southwest",
+"Harbor Freight",
+"United Airlines",
+"AMC Theatres",
+"Starbucks"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:098": {
+"top": [
+"Southwest",
+"LA Fitness",
+"Marathon",
+"Safeway",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:099": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:100": {
+"top": [
+"GameStop",
+"PG&E",
+"Nike",
+"Steam",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:101": {
+"top": [
+"Southwest",
+"Newegg",
+"United Airlines",
+"Harbor Freight",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:102": {
+"top": [
+"GameStop",
+"Steam",
+"PG&E",
+"Newegg",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:103": {
+"top": [
+"Rover",
+"Valero",
+"Torvarro",
+"Zara",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:132": {
+"top": [
+"Menards",
+"Halbury",
+"Nevnard Bros",
+"H&M",
+"Rinford"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:133": {
+"top": [
+"Menards",
+"H&M",
+"Wegmans",
+"Halbury",
+"Micro Center"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:134": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Ross",
+"Whole Foods",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:135": {
+"top": [
+"Menards",
+"Nevnard Bros",
+"Halbury",
+"Topgolf",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:136": {
+"top": [
+"Menards",
+"Tornard Group",
+"Chewy",
+"Halwen Bros",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:137": {
+"top": [
+"Menards",
+"Pep Boys",
+"Wegmans",
+"Halbury",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:138": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Ross",
+"Gridale",
+"Quest Diagnostics"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:139": {
+"top": [
+"Menards",
+"Pep Boys",
+"Halbury",
+"Wegmans",
+"Tornard Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:140": {
+"top": [
+"Menards",
+"Halbury",
+"Wegmans",
+"Pep Boys",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:141": {
+"top": [
+"Menards",
+"Halbury",
+"Pep Boys",
+"Wegmans",
+"Nevnard Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:142": {
+"top": [
+"Menards",
+"Pep Boys",
+"Nevnard Bros",
+"Halbury",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:143": {
+"top": [
+"Rite Aid",
+"Wexley Inc",
+"Duane Reade",
+"24 Hour Fitness",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:132": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Yarden & Sons",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:133": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Istdale Bros",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:134": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"United Airlines",
+"Amtrak",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:135": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Istdale Bros",
+"Sabstead Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:136": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:137": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Amtrak",
+"Southwest",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:138": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Southwest",
+"United Airlines",
+"24 Hour Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:139": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Sabstead Bros",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:140": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:141": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:142": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Sabby Co",
+"Wexley Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:143": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Holden Bros",
+"Yarden & Sons",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:077": {
+"top": [
+"Oskhurst",
+"Oskhurst Bros",
+"Oskbury LLC",
+"Elrhurst Co",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:078": {
+"top": [
+"Kaiser Permanente",
+"Nike",
+"REI",
+"IKEA",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:079": {
+"top": [
+"Panera Bread",
+"Tornard Group",
+"Pexley",
+"Polstead LLC",
+"B&H Photo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:080": {
+"top": [
+"Istdale Bros",
+"Istbury",
+"Istmere & Sons",
+"Istlock",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:081": {
+"top": [
+"Starbucks",
+"Subway",
+"McDonald's",
+"Marriott",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:082": {
+"top": [
+"Chick-fil-A",
+"Starbucks",
+"LA Fitness",
+"Crunch Fitness",
+"H-E-B"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:083": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:084": {
+"top": [
+"Vitamin Shoppe",
+"Shell",
+"Sunoco",
+"CVS",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:085": {
+"top": [
+"Nevden Bros",
+"Nevnard Bros",
+"Nevwick",
+"CVS",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:086": {
+"top": [
+"Dunkin",
+"Dunwick",
+"Griton",
+"Duane Reade",
+"Halton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:087": {
+"top": [
+"Bartell Drugs",
+"LabCorp",
+"Publix",
+"Chewy",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:088": {
+"top": [
+"Taco Bell",
+"Costco",
+"T-Mobile",
+"Petco",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:142": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:143": {
+"top": [
+"Ross",
+"United Airlines",
+"Enterprise",
+"Chewy",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:144": {
+"top": [
+"Istnard LLC",
+"Istlock",
+"Istmere & Sons",
+"Enterprise",
+"Istbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:145": {
+"top": [
+"Bowlero",
+"Bose",
+"Dunwick",
+"Cinemark",
+"Tornard Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:146": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Morton LLC",
+"Polby",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:147": {
+"top": [
+"Marathon",
+"Amtrak",
+"Nike",
+"Kaiser Permanente",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:148": {
+"top": [
+"Yarton Bros",
+"Yarstead Bros",
+"Sabby Co",
+"Sabstead Bros",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:149": {
+"top": [
+"Ulmbury Ltd",
+"Ulmdale & Sons",
+"Istbury",
+"Ulmmoor Inc",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:150": {
+"top": [
+"Hilton",
+"Dell",
+"Halley",
+"BP",
+"Whole Foods"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:151": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Falholm Inc",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:152": {
+"top": [
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Istdale Bros",
+"Wexham Inc",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:153": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Amtrak",
+"Southwest",
+"Regal Cinemas"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:122": {
+"top": [
+"Fenford Group",
+"Fenley Group",
+"Istwick Group",
+"Tornard Group",
+"Istmoor Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:123": {
+"top": [
+"Micro Center",
+"Dell",
+"Whole Foods",
+"Griton",
+"H&M"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:124": {
+"top": [
+"Menards",
+"Pep Boys",
+"Wegmans",
+"Halbury",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:125": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:126": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:127": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Halhurst Co",
+"Holden Bros",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:128": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:129": {
+"top": [
+"Wexham Inc",
+"Wexham Bros",
+"Wexden Inc",
+"Wexley Inc",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:130": {
+"top": [
+"Kroger",
+"Apple Store",
+"Vitamin Shoppe",
+"PetSmart",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:131": {
+"top": [
+"Gold's Gym",
+"Planet Fitness",
+"24 Hour Fitness",
+"LA Fitness",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:132": {
+"top": [
+"AT&T",
+"Enterprise",
+"Orlcott Inc",
+"Best Buy",
+"Ardton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:133": {
+"top": [
+"REI",
+"Kaiser Permanente",
+"United Airlines",
+"Rinford",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:104": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:105": {
+"top": [
+"CVS",
+"Macy's",
+"Dovvarro & Sons",
+"Quest Diagnostics",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:106": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istdale Bros",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:107": {
+"top": [
+"Domino's",
+"Macy's",
+"Trader Joe's",
+"Lowe's",
+"Dave & Buster's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:108": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:109": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:110": {
+"top": [
+"GNC",
+"Garwick Co",
+"Griden Group",
+"Garholm Co",
+"GameStop"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:111": {
+"top": [
+"Polsley",
+"Polby",
+"Polstead LLC",
+"Polford Ltd",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:112": {
+"top": [
+"Polsley",
+"Polby",
+"Polstead LLC",
+"Polford Ltd",
+"Halsley Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:113": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:114": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:115": {
+"top": [
+"Gridale",
+"Griden Group",
+"Fenford Group",
+"Tornard Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:144": {
+"top": [
+"Halholm & Sons",
+"Halwen & Sons",
+"Talholm & Sons",
+"Bramstead & Sons",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:145": {
+"top": [
+"Wexhurst & Sons",
+"Wexham Bros",
+"Wexham Inc",
+"Bexwen & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:146": {
+"top": [
+"Wexhurst & Sons",
+"Wexham Bros",
+"Bexwen & Sons",
+"Wexham Inc",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:147": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:148": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"PetSmart",
+"Pet Supplies Plus",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:149": {
+"top": [
+"Istbury",
+"Istlock",
+"Istmere Group",
+"Istdale Bros",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:150": {
+"top": [
+"Istmere Group",
+"Istmoor Group",
+"Istmere & Sons",
+"Halmere Group",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:151": {
+"top": [
+"Istmere Group",
+"Istmere & Sons",
+"Istbury",
+"Istlock",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:152": {
+"top": [
+"Garholm Co",
+"Griby Co",
+"Garwick Co",
+"Lomholm",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:153": {
+"top": [
+"Morton LLC",
+"Polstead LLC",
+"Oskbury LLC",
+"Halsley Ltd",
+"Brammere LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:154": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:155": {
+"top": [
+"Wexley Inc",
+"Wexden Inc",
+"Wexham Inc",
+"Wexdale Bros",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:144": {
+"top": [
+"Istmoor Group",
+"Istwick Group",
+"Istmere Group",
+"Istbury",
+"Istlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:145": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:146": {
+"top": [
+"Whole Foods",
+"Crunch Fitness",
+"Best Buy",
+"Safeway",
+"Trader Joe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:147": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"Hertz",
+"Wag",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:148": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"Hertz",
+"Wag",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:149": {
+"top": [
+"Sherwin-Williams",
+"H&M",
+"Morwen",
+"Shell",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:150": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"Wegmans",
+"Orangetheory",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:151": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"PetSmart",
+"Wag",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:152": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"Hertz",
+"Wag",
+"PetSmart"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:153": {
+"top": [
+"Sherwin-Williams",
+"Hertz",
+"H-E-B",
+"PetSmart",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:154": {
+"top": [
+"Istmoor Group",
+"Istwick Group",
+"Istmere Group",
+"Istbury",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:155": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"PetSmart",
+"Wag",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:089": {
+"top": [
+"Quilmere",
+"Quilhurst",
+"Quildale Group",
+"Quilden Group",
+"Falholm Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:090": {
+"top": [
+"Bramwen Group",
+"Dunwen Group",
+"Halwen Group",
+"Griwen Bros",
+"Bramby & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:091": {
+"top": [
+"Bramby & Sons",
+"Bramstead & Sons",
+"Yarden & Sons",
+"Holton & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:154": {
+"top": [
+"GNC",
+"Garwick Co",
+"Griden Group",
+"Garholm Co",
+"GameStop"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:155": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:156": {
+"top": [
+"Kroger",
+"Apple Store",
+"Vitamin Shoppe",
+"PetSmart",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:157": {
+"top": [
+"Halley",
+"Chewy",
+"Hilton",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:158": {
+"top": [
+"Dunkin",
+"Dunwick",
+"Griton",
+"Duane Reade",
+"Halton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:159": {
+"top": [
+"Dunnard Ltd",
+"Menards",
+"Tornard Group",
+"Istlock",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:160": {
+"top": [
+"Old Navy",
+"Harbor Freight",
+"Southwest",
+"United Airlines",
+"24 Hour Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:161": {
+"top": [
+"Lundale Inc",
+"Grinard Inc",
+"Marbury Inc",
+"Wexley Inc",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:162": {
+"top": [
+"Gridale",
+"Griden Group",
+"Fenford Group",
+"Tornard Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:163": {
+"top": [
+"Wexdale Bros",
+"Wexham Bros",
+"Istdale Bros",
+"Wexhurst & Sons",
+"Wexham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:164": {
+"top": [
+"PetSmart",
+"Pet Supplies Plus",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:165": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Vitamin Shoppe",
+"Costco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:134": {
+"top": [
+"Con Edison",
+"Holdale",
+"Enterprise",
+"United Airlines",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:135": {
+"top": [
+"Exxon",
+"Expedia",
+"Enterprise",
+"Pexley",
+"Chevron"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:136": {
+"top": [
+"Hertz",
+"Sherwin-Williams",
+"AutoZone",
+"Verizon",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:137": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Peloton",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:138": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Bexlock & Sons",
+"Pexlock",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:139": {
+"top": [
+"Cox",
+"Chevron",
+"Polsley",
+"Netflix",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:140": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Falholm Inc",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:141": {
+"top": [
+"Expedia",
+"Exxon",
+"Enterprise",
+"Orangetheory",
+"Equinox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:142": {
+"top": [
+"Torden Ltd",
+"Torhurst Co",
+"Dunnard Ltd",
+"Dunhurst Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:143": {
+"top": [
+"Spectrum",
+"Regal Cinemas",
+"CorePower Yoga",
+"Con Edison",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:144": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halhurst Co",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:145": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Istwick Group",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:156": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Ross",
+"Whole Foods",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:157": {
+"top": [
+"Holden Bros",
+"Dunhurst Bros",
+"Yarton Bros",
+"Yarstead Bros",
+"Griwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:158": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Wegmans"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:159": {
+"top": [
+"Jorholm Bros",
+"Elrholm",
+"Lomholm",
+"Garholm Co",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:160": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Whole Foods",
+"Quest Diagnostics"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:161": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Ross",
+"Whole Foods",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:162": {
+"top": [
+"Bowlero",
+"Cinemark",
+"Dunwick",
+"Bose",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:163": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Whole Foods",
+"Quest Diagnostics",
+"Pet Supplies Plus"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:164": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"Bramwen Group",
+"Brammere LLC",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:165": {
+"top": [
+"Wexley Inc",
+"Wexley Group",
+"Wexden Inc",
+"Wexham Inc",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:166": {
+"top": [
+"Rite Aid",
+"Duane Reade",
+"Pet Supplies Plus",
+"Quest Diagnostics",
+"Whole Foods"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:167": {
+"top": [
+"Whole Foods",
+"Best Buy",
+"Newegg",
+"Crunch Fitness",
+"Rite Aid"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:156": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:157": {
+"top": [
+"United Airlines",
+"Delta Air Lines",
+"Aldi",
+"Airbnb",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:158": {
+"top": [
+"United Airlines",
+"Delta Air Lines",
+"AMC Theatres",
+"Airbnb",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:159": {
+"top": [
+"United Airlines",
+"Delta Air Lines",
+"Aldi",
+"Airbnb",
+"AMC Theatres"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:160": {
+"top": [
+"United Airlines",
+"REI",
+"Sony",
+"Aldi",
+"Menards"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:161": {
+"top": [
+"United Airlines",
+"Uniqlo",
+"REI",
+"Ulmden Inc",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:162": {
+"top": [
+"United Airlines",
+"REI",
+"Ardton Inc",
+"Nordstrom",
+"Uniqlo"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:163": {
+"top": [
+"United Airlines",
+"Aldi",
+"Ace Hardware",
+"AMC Theatres",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:164": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"Southwest",
+"REI",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:165": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"REI",
+"Southwest",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:166": {
+"top": [
+"United Airlines",
+"Ace Hardware",
+"AMC Theatres",
+"Aldi",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:167": {
+"top": [
+"United Airlines",
+"Ardton Inc",
+"REI",
+"Uniqlo",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:166": {
+"top": [
+"Whole Foods",
+"Lowe's",
+"Wegmans",
+"Harbor Freight",
+"Comcast"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:167": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Holden Bros",
+"Falholm Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:168": {
+"top": [
+"Orlwick Co",
+"Dunwick",
+"Nevwick",
+"Garwick Co",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:169": {
+"top": [
+"Torhurst Co",
+"Halhurst Co",
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:170": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Istwick Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:171": {
+"top": [
+"Equinox",
+"Exxon",
+"H-E-B",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:172": {
+"top": [
+"Gold's Gym",
+"Planet Fitness",
+"24 Hour Fitness",
+"LA Fitness",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:173": {
+"top": [
+"Starbucks",
+"Subway",
+"Southwest",
+"Marriott",
+"Publix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:174": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"Elrdale",
+"Walgreens"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:175": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:176": {
+"top": [
+"Rover",
+"Valero",
+"Morton LLC",
+"Sony",
+"Cinemark"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:177": {
+"top": [
+"Panera Bread",
+"Dunhurst Bros",
+"Bramstead & Sons",
+"Quilhurst",
+"Comcast"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:146": {
+"top": [
+"Topgolf",
+"Best Buy",
+"PG&E",
+"GameStop",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:147": {
+"top": [
+"Halmere Group",
+"Halvarro",
+"Halwen Group",
+"Tornard Group",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:148": {
+"top": [
+"Rinham",
+"Rinlock",
+"Rinton Ltd",
+"Rinford",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:149": {
+"top": [
+"Marathon",
+"Amtrak",
+"Nike",
+"Kaiser Permanente",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:150": {
+"top": [
+"Pep Boys",
+"BP",
+"Menards",
+"Kelford Bros",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:151": {
+"top": [
+"Halvarro",
+"Torvarro",
+"Halmere Group",
+"Dovvarro & Sons",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:152": {
+"top": [
+"AMC Theatres",
+"Regal Cinemas",
+"United Airlines",
+"Amtrak",
+"Netflix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:153": {
+"top": [
+"BP",
+"Bose",
+"Whole Foods",
+"Chewy",
+"Hilton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:154": {
+"top": [
+"Bramby & Sons",
+"Bramstead & Sons",
+"Yarden & Sons",
+"Holton & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:155": {
+"top": [
+"Griby Co",
+"Sabby Co",
+"Polby",
+"Garwick Co",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:156": {
+"top": [
+"Griden Group",
+"Garden Group",
+"Gridale",
+"Tornard Group",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:157": {
+"top": [
+"Regal Cinemas",
+"Spectrum",
+"Con Edison",
+"Grinard Inc",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:168": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:169": {
+"top": [
+"Fenford Group",
+"Fenley Group",
+"Istwick Group",
+"Tornard Group",
+"Istmoor Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:170": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:171": {
+"top": [
+"H-E-B",
+"B&H Photo",
+"Equinox",
+"Olive Garden",
+"Chick-fil-A"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:172": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:173": {
+"top": [
+"Duane Reade",
+"REI",
+"Con Edison",
+"Morton LLC",
+"Harbor Freight"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:174": {
+"top": [
+"Taco Bell",
+"Bowlero",
+"BP",
+"Bose",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:175": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:176": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Ulmwick Ltd",
+"Ulmmoor Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:177": {
+"top": [
+"Planet Fitness",
+"LA Fitness",
+"24 Hour Fitness",
+"Crunch Fitness",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:178": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:179": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:168": {
+"top": [
+"Ace Hardware",
+"Aldi",
+"IKEA",
+"Dell",
+"United Airlines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:169": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Sunoco",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:170": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Amtrak",
+"AT&T",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:171": {
+"top": [
+"Valero",
+"Halvarro",
+"Sunoco",
+"Torvarro",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:172": {
+"top": [
+"Ace Hardware",
+"IKEA",
+"Delta Air Lines",
+"Sabby Co",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:173": {
+"top": [
+"Spotify",
+"Bose",
+"GameStop",
+"Starbucks",
+"Crunch Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:174": {
+"top": [
+"Ace Hardware",
+"IKEA",
+"Home Depot",
+"AT&T",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:175": {
+"top": [
+"Spotify",
+"Chewy",
+"Dunkin",
+"Spectrum",
+"Tractor Supply"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:176": {
+"top": [
+"Ticketmaster",
+"AMC Theatres",
+"Amtrak",
+"Southwest",
+"Domino's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:177": {
+"top": [
+"Valero",
+"Halvarro",
+"Torvarro",
+"Sunoco",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:178": {
+"top": [
+"Ace Hardware",
+"Aldi",
+"AMC Theatres",
+"United Airlines",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:179": {
+"top": [
+"Spotify",
+"Chewy",
+"Spectrum",
+"Dunkin",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:178": {
+"top": [
+"Topgolf",
+"Starbucks",
+"GameStop",
+"Zedbury",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:179": {
+"top": [
+"Fennard",
+"Fenvarro & Sons",
+"Fenley Group",
+"Fenford Group",
+"Istnard LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:180": {
+"top": [
+"Holdale",
+"Halhurst Co",
+"Gridale",
+"Torhurst Co",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:181": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"BarkBox",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:182": {
+"top": [
+"Halley",
+"Hilton",
+"Chewy",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:183": {
+"top": [
+"Dunwick",
+"Orlwick Co",
+"Dunkin",
+"Nevwick",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:184": {
+"top": [
+"Nevden Bros",
+"Nevnard Bros",
+"Nevwick",
+"CVS",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:185": {
+"top": [
+"Quilden Group",
+"Quildale Group",
+"Tornard Group",
+"Griden Group",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:186": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Apple Store"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:187": {
+"top": [
+"Talholm & Sons",
+"Halholm & Sons",
+"Holton & Sons",
+"Dovvarro & Sons",
+"TJ Maxx"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:188": {
+"top": [
+"Regal Cinemas",
+"AMC Theatres",
+"Garholm Co",
+"Nordstrom",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:189": {
+"top": [
+"GNC",
+"Garwick Co",
+"Griden Group",
+"GameStop",
+"Garholm Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:158": {
+"top": [
+"Fenley Group",
+"Fenford Group",
+"Fennard",
+"Istwick Group",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:159": {
+"top": [
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Costco",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:160": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Dunnard Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:161": {
+"top": [
+"Duke Energy",
+"CorePower Yoga",
+"Planet Fitness",
+"Amtrak",
+"Steam"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:162": {
+"top": [
+"Ulmmoor Inc",
+"Ulmden Inc",
+"Ulmdale & Sons",
+"Lundale Inc",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:163": {
+"top": [
+"Orangetheory",
+"Olive Garden",
+"Enterprise",
+"Oskhurst",
+"IKEA"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:164": {
+"top": [
+"Chevron",
+"Cox",
+"Pexnard",
+"Safeway",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:165": {
+"top": [
+"CorePower Yoga",
+"Crunch Fitness",
+"Spectrum",
+"Apple Store",
+"Vitamin Shoppe"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:166": {
+"top": [
+"Spectrum",
+"CorePower Yoga",
+"Quest Diagnostics",
+"Vitamin Shoppe",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:167": {
+"top": [
+"BarkBox",
+"Dunkin",
+"Starbucks",
+"Bose",
+"Publix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:168": {
+"top": [
+"AutoZone",
+"Hertz",
+"Verizon",
+"Airbnb",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:169": {
+"top": [
+"Domino's",
+"Macy's",
+"Lowe's",
+"Trader Joe's",
+"Dave & Buster's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:180": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:181": {
+"top": [
+"Griden Group",
+"Garden Group",
+"Gridale",
+"Tornard Group",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:182": {
+"top": [
+"Aldi",
+"Albertsons",
+"Apple Store",
+"Oskhurst",
+"Elrmoor"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:183": {
+"top": [
+"Brammere LLC",
+"Bramstead & Sons",
+"Bramby & Sons",
+"Bramwen Group",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:184": {
+"top": [
+"Quilhurst",
+"Quilden Group",
+"Pexlock",
+"Quilmere",
+"Quildale Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:185": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:186": {
+"top": [
+"Orlcott Inc",
+"Vorcott",
+"Orlwick Co",
+"Orangetheory",
+"Orlnard & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:187": {
+"top": [
+"Halvarro",
+"Dovvarro & Sons",
+"Halbury",
+"Halmere Group",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:188": {
+"top": [
+"Gridale",
+"Griden Group",
+"Lundale Inc",
+"PG&E",
+"Holdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:189": {
+"top": [
+"Delta Air Lines",
+"Airbnb",
+"United Airlines",
+"Ace Hardware",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:190": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Falholm Inc",
+"Holden Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:191": {
+"top": [
+"Quilhurst",
+"Quilmere",
+"Quilden Group",
+"Dunhurst Bros",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:180": {
+"top": [
+"Rover",
+"Nike",
+"Sony",
+"Torden Ltd",
+"Sunoco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:181": {
+"top": [
+"Rover",
+"Valero",
+"Nike",
+"Sunoco",
+"Planet Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:182": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:183": {
+"top": [
+"Rover",
+"Nike",
+"Valero",
+"Torden Ltd",
+"Sunoco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:184": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:185": {
+"top": [
+"Wexden Inc",
+"Wexham Inc",
+"Wexley Inc",
+"Wexhurst & Sons",
+"Wexdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:186": {
+"top": [
+"Nevnard Bros",
+"Nevden Bros",
+"Nevwick",
+"Nevham Group",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:187": {
+"top": [
+"Nevnard Bros",
+"Nevden Bros",
+"Nevham Group",
+"Nevwick",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:188": {
+"top": [
+"Pet Supplies Plus",
+"Banfield Pet Hospital",
+"PetSmart",
+"Petco",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:189": {
+"top": [
+"Starbucks",
+"Subway",
+"Southwest",
+"Marriott",
+"Publix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:190": {
+"top": [
+"Pexnard",
+"Pexlock",
+"Pexley",
+"Peloton",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:191": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:190": {
+"top": [
+"H-E-B",
+"B&H Photo",
+"Equinox",
+"Chick-fil-A",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:191": {
+"top": [
+"Quilden Group",
+"Quildale Group",
+"Tornard Group",
+"Quilhurst",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:192": {
+"top": [
+"Kroger",
+"Apple Store",
+"PetSmart",
+"Nike",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:193": {
+"top": [
+"Pexley",
+"Pexnard",
+"Peloton",
+"Pexlock",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:194": {
+"top": [
+"Chewy",
+"Halley",
+"Shell",
+"Safeway",
+"Jiffy Lube"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:195": {
+"top": [
+"Rinham",
+"Rinlock",
+"Rinton Ltd",
+"Rinford",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:196": {
+"top": [
+"Equinox",
+"H-E-B",
+"Exxon",
+"Expedia",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:197": {
+"top": [
+"Cinemark",
+"Istlock",
+"Southwest",
+"Amtrak",
+"Sabby Co"
+],
+"hit1": false,
+"rank_gold": 4
+},
+"R6_seen_renamed:198": {
+"top": [
+"Delta Air Lines",
+"Airbnb",
+"United Airlines",
+"Ace Hardware",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:199": {
+"top": [
+"REI",
+"Vitamin Shoppe",
+"United Airlines",
+"Kaiser Permanente",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:200": {
+"top": [
+"Panera Bread",
+"Tornard Group",
+"Pexley",
+"B&H Photo",
+"Polstead LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:201": {
+"top": [
+"Bose",
+"BP",
+"BarkBox",
+"Amtrak",
+"Sabstead Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:170": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Morwen",
+"Griwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:171": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:172": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:173": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Halhurst Co",
+"Holden Bros",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:174": {
+"top": [
+"Con Edison",
+"Amtrak",
+"Enterprise",
+"REI",
+"Spectrum"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:175": {
+"top": [
+"Comcast",
+"AT&T",
+"Panera Bread",
+"Subway",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:192": {
+"top": [
+"Duane Reade",
+"REI",
+"Con Edison",
+"Harbor Freight",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:193": {
+"top": [
+"Southwest",
+"Sabstead Bros",
+"Sabby Co",
+"Oskhurst Bros",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:194": {
+"top": [
+"Halvarro",
+"Halmere Group",
+"Torvarro",
+"Dovvarro & Sons",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:195": {
+"top": [
+"Southwest",
+"Sabstead Bros",
+"Sabby Co",
+"Oskhurst Bros",
+"Oskhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:196": {
+"top": [
+"Nordstrom",
+"Orangetheory",
+"Ticketmaster",
+"Rinford",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:197": {
+"top": [
+"Nordstrom",
+"Bose",
+"Albertsons",
+"Spectrum",
+"Nevnard Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:198": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Con Edison",
+"Chewy",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:199": {
+"top": [
+"Nordstrom",
+"Spectrum",
+"Newegg",
+"Nevnard Bros",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:200": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Con Edison",
+"IKEA",
+"Safeway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:201": {
+"top": [
+"Nordstrom",
+"Apple Store",
+"Spectrum",
+"Best Buy",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:202": {
+"top": [
+"Lundale Inc",
+"Grinard Inc",
+"Marbury Inc",
+"Wexley Inc",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:203": {
+"top": [
+"Home Depot",
+"Ace Hardware",
+"IKEA",
+"Floor & Decor",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:192": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Pexlock",
+"Bexlock & Sons",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:193": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Pexlock",
+"Bexlock & Sons",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:194": {
+"top": [
+"Halwen & Sons",
+"Halwen Bros",
+"Halwen Group",
+"Halholm & Sons",
+"Bexwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:195": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Bexlock & Sons",
+"Pexlock",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:196": {
+"top": [
+"Xfinity",
+"Pexlock",
+"Pexnard",
+"Wexhurst & Sons",
+"Topgolf"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:197": {
+"top": [
+"Halton",
+"Griton",
+"Holton & Sons",
+"Ardton Inc",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:198": {
+"top": [
+"Xfinity",
+"Bexlock & Sons",
+"Pexnard",
+"Pexlock",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:199": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Pexlock",
+"Bexlock & Sons",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:200": {
+"top": [
+"Falvarro Ltd",
+"Falvarro Bros",
+"Falvarro LLC",
+"Falholm Inc",
+"Fennard"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:201": {
+"top": [
+"Halton",
+"Griton",
+"Ardton Inc",
+"Holton & Sons",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:202": {
+"top": [
+"Xfinity",
+"Wexhurst & Sons",
+"Pexlock",
+"Pexnard",
+"Topgolf"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:203": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Wexhurst & Sons",
+"Pexlock",
+"Bexlock & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:092": {
+"top": [
+"Comcast",
+"Panera Bread",
+"AT&T",
+"Whole Foods",
+"Xfinity"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:093": {
+"top": [
+"AT&T",
+"Orlcott Inc",
+"Ardton Inc",
+"AutoZone",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:094": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Garden Group",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:095": {
+"top": [
+"Xfinity",
+"Pexnard",
+"Pexlock",
+"Bexlock & Sons",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:096": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Holden Bros",
+"Halhurst Co",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:202": {
+"top": [
+"Falvarro Bros",
+"Falvarro Ltd",
+"Falvarro LLC",
+"Falholm Inc",
+"Holden Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:203": {
+"top": [
+"Kroger",
+"Apple Store",
+"Vitamin Shoppe",
+"PetSmart",
+"Nike"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:204": {
+"top": [
+"Orlwick Co",
+"Dunwick",
+"Nevwick",
+"Garwick Co",
+"Nevwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:205": {
+"top": [
+"Orlcott Inc",
+"Orlwick Co",
+"Torton Inc",
+"Grinard Inc",
+"Ardton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:206": {
+"top": [
+"McDonald's",
+"Macy's",
+"Starbucks",
+"Subway",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:207": {
+"top": [
+"Griwen Bros",
+"Halwen Bros",
+"Bramwen Group",
+"Halwen & Sons",
+"Halwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:208": {
+"top": [
+"Fenford Group",
+"Fenley Group",
+"Fennard",
+"Istwick Group",
+"Istmoor Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:209": {
+"top": [
+"Halvarro",
+"Torvarro",
+"Halmere Group",
+"Dovvarro & Sons",
+"Valero"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:210": {
+"top": [
+"Ardton Inc",
+"Ulmden Inc",
+"Lundale Inc",
+"Torton Inc",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:211": {
+"top": [
+"Planet Fitness",
+"LA Fitness",
+"24 Hour Fitness",
+"Crunch Fitness",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:212": {
+"top": [
+"Quilmere",
+"Quildale Group",
+"Quilhurst",
+"Quilden Group",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:213": {
+"top": [
+"Lundale Inc",
+"Grinard Inc",
+"Gridale",
+"Wexley Inc",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:176": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Newegg"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:177": {
+"top": [
+"Duane Reade",
+"Rite Aid",
+"Con Edison",
+"IKEA",
+"Safeway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:178": {
+"top": [
+"Marbury Inc",
+"Jorden Inc",
+"Lundale Inc",
+"Falham Inc",
+"Torton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:179": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Istmoor Group",
+"Pexley",
+"Istwick Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:180": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:181": {
+"top": [
+"Ulmdale & Sons",
+"Ulmden Inc",
+"Ulmbury Ltd",
+"Halwen & Sons",
+"Istmere & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:182": {
+"top": [
+"Ulmmoor Inc",
+"Ulmden Inc",
+"Ulmwick Ltd",
+"Ulmdale & Sons",
+"Ulmbury Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:183": {
+"top": [
+"LabCorp",
+"Bartell Drugs",
+"VCA Animal Hospital",
+"Costco",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:184": {
+"top": [
+"Istwick Group",
+"Istmoor Group",
+"Nevwick Group",
+"Istmere Group",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:185": {
+"top": [
+"Nevden Bros",
+"Nevnard Bros",
+"Nevwick",
+"Istdale Bros",
+"Nevham Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:186": {
+"top": [
+"Oskbury LLC",
+"Oskhurst",
+"Oskhurst Bros",
+"Morton LLC",
+"Halbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:187": {
+"top": [
+"BarkBox",
+"Bartell Drugs",
+"Elrdale",
+"Publix",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:116": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"TJ Maxx",
+"Chick-fil-A"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:117": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Dunnard Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:118": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Torden Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:119": {
+"top": [
+"Dunhurst Ltd",
+"Dunnard Ltd",
+"Polford Ltd",
+"Torden Ltd",
+"Dunhurst Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:120": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"Samsung",
+"TJ Maxx"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:121": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:122": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:123": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Torden Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:124": {
+"top": [
+"T-Mobile",
+"AT&T",
+"Taco Bell",
+"Samsung",
+"TJ Maxx"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:125": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Peloton",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:126": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Peloton",
+"Bexlock & Sons",
+"Pexley"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:127": {
+"top": [
+"Duke Energy",
+"CorePower Yoga",
+"Planet Fitness",
+"Amtrak",
+"Steam"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:204": {
+"top": [
+"Nordstrom",
+"Apple Store",
+"Spectrum",
+"Newegg",
+"Best Buy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:205": {
+"top": [
+"Taco Bell",
+"Costco",
+"T-Mobile",
+"Petco",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:206": {
+"top": [
+"Ace Hardware",
+"Apple Store",
+"IKEA",
+"Best Buy",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:207": {
+"top": [
+"Taco Bell",
+"Costco",
+"T-Mobile",
+"Petco",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:208": {
+"top": [
+"Expedia",
+"Exxon",
+"Enterprise",
+"Equinox",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:209": {
+"top": [
+"Sherwin-Williams",
+"Wegmans",
+"PetSmart",
+"Wag",
+"Hertz"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:210": {
+"top": [
+"Taco Bell",
+"Costco",
+"Petco",
+"T-Mobile",
+"Subway"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:211": {
+"top": [
+"Taco Bell",
+"Costco",
+"T-Mobile",
+"Petco",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:212": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:213": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:214": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:215": {
+"top": [
+"Nordstrom",
+"Ticketmaster",
+"Orangetheory",
+"Rinford",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:204": {
+"top": [
+"Pep Boys",
+"Menards",
+"BP",
+"Ross",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:205": {
+"top": [
+"Petland",
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:206": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:207": {
+"top": [
+"Pep Boys",
+"Kelford Bros",
+"BP",
+"Menards",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:208": {
+"top": [
+"Pep Boys",
+"Kelford Bros",
+"BP",
+"Ross",
+"Gold's Gym"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:209": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:210": {
+"top": [
+"BP",
+"Bose",
+"Dell",
+"Samsung",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:211": {
+"top": [
+"Griton",
+"Halton",
+"Peloton",
+"Holton & Sons",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:212": {
+"top": [
+"Pep Boys",
+"Menards",
+"BP",
+"Ross",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:213": {
+"top": [
+"Pep Boys",
+"BP",
+"Menards",
+"Kelford Bros",
+"Albertsons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:214": {
+"top": [
+"Micro Center",
+"Dell",
+"Whole Foods",
+"Griton",
+"H&M"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:215": {
+"top": [
+"Pep Boys",
+"BP",
+"Menards",
+"Kelford Bros",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:214": {
+"top": [
+"Nordstrom",
+"Bose",
+"Spectrum",
+"Albertsons",
+"Nevnard Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:215": {
+"top": [
+"Istmoor Group",
+"Istwick Group",
+"Istmere Group",
+"Istbury",
+"Istlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:216": {
+"top": [
+"Kroger",
+"Apple Store",
+"PetSmart",
+"Nike",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:217": {
+"top": [
+"Polstead LLC",
+"Polsley",
+"Polford Ltd",
+"Polby",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:218": {
+"top": [
+"Uniqlo",
+"United Airlines",
+"Ulmmoor Inc",
+"Ulmden Inc",
+"AutoZone"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:219": {
+"top": [
+"Quildale Group",
+"Quilden Group",
+"Quilmere",
+"Quilhurst",
+"Zedbury"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:220": {
+"top": [
+"REI",
+"Vitamin Shoppe",
+"United Airlines",
+"Kaiser Permanente",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:221": {
+"top": [
+"Bexlock & Sons",
+"Bexwen & Sons",
+"Bramby & Sons",
+"Pexlock",
+"Fenvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:222": {
+"top": [
+"Fenvarro & Sons",
+"Dovvarro & Sons",
+"Fennard",
+"Yarden & Sons",
+"Fenley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:223": {
+"top": [
+"CVS",
+"Vitamin Shoppe",
+"Dovvarro & Sons",
+"Planet Fitness",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:224": {
+"top": [
+"BP",
+"Bose",
+"Dell",
+"Samsung",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:225": {
+"top": [
+"Safeway",
+"Subway",
+"Chewy",
+"Whole Foods",
+"LA Fitness"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:188": {
+"top": [
+"Vorcott",
+"Vorstead Co",
+"Orlcott Inc",
+"Verizon",
+"Costco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:189": {
+"top": [
+"Halton",
+"Griton",
+"Holton & Sons",
+"Ardton Inc",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:190": {
+"top": [
+"Petland",
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:191": {
+"top": [
+"GameStop",
+"PG&E",
+"Steam",
+"Nike",
+"Ticketmaster"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:192": {
+"top": [
+"Bramwen Group",
+"Bramby & Sons",
+"Griwen Bros",
+"Halwen Bros",
+"Bramstead & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:193": {
+"top": [
+"Chewy",
+"Halley",
+"Shell",
+"Safeway",
+"Jiffy Lube"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:194": {
+"top": [
+"Comcast",
+"AT&T",
+"Panera Bread",
+"Subway",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:195": {
+"top": [
+"Grinard Inc",
+"Lundale Inc",
+"Torton Inc",
+"Ardton Inc",
+"Orlcott Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:196": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Garden Group",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:197": {
+"top": [
+"Samsung",
+"T-Mobile",
+"Bose",
+"Best Buy",
+"Sony"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:198": {
+"top": [
+"Wexdale Bros",
+"Wexhurst & Sons",
+"Istdale Bros",
+"Wexham Inc",
+"Wexden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:199": {
+"top": [
+"Halmere Group",
+"Halvarro",
+"Halbury",
+"Halsley Ltd",
+"Istmere Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:216": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"Elrdale",
+"Chewy"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:217": {
+"top": [
+"Bartell Drugs",
+"LabCorp",
+"Publix",
+"Chewy",
+"BarkBox"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:218": {
+"top": [
+"Pep Boys",
+"BP",
+"Kelford Bros",
+"Albertsons",
+"Menards"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:219": {
+"top": [
+"AutoZone",
+"Hertz",
+"AT&T",
+"Verizon",
+"Zara"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:220": {
+"top": [
+"Macy's",
+"Dell",
+"Domino's",
+"McDonald's",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:221": {
+"top": [
+"Valero",
+"Halvarro",
+"Tornard Group",
+"Grinard Inc",
+"Torvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:222": {
+"top": [
+"Valero",
+"Halvarro",
+"Vitamin Shoppe",
+"Tornard Group",
+"Grinard Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:223": {
+"top": [
+"Whole Foods",
+"Vitamin Shoppe",
+"Safeway",
+"Crunch Fitness",
+"Pet Supplies Plus"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:224": {
+"top": [
+"Valero",
+"Halvarro",
+"Sunoco",
+"Torvarro",
+"Dovvarro & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:225": {
+"top": [
+"Pep Boys",
+"BP",
+"Kelford Bros",
+"Menards",
+"Ross"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:226": {
+"top": [
+"Bartell Drugs",
+"LabCorp",
+"Publix",
+"Duane Reade",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:227": {
+"top": [
+"Bartell Drugs",
+"Publix",
+"LabCorp",
+"Elrdale",
+"Walgreens"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:216": {
+"top": [
+"Holdale",
+"Halhurst Co",
+"Best Buy",
+"Apple Store",
+"Gridale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:217": {
+"top": [
+"Halton",
+"Hilton",
+"Griton",
+"Holton & Sons",
+"Halley"
+],
+"hit1": false,
+"rank_gold": 2
+},
+"R6_unseen_standard:218": {
+"top": [
+"Banfield Pet Hospital",
+"VCA Animal Hospital",
+"Pet Supplies Plus",
+"PetSmart",
+"Petco"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:219": {
+"top": [
+"B&H Photo",
+"H-E-B",
+"Bose",
+"Sabstead Bros",
+"Home Depot"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:220": {
+"top": [
+"Apple Store",
+"Best Buy",
+"GameStop",
+"Vitamin Shoppe",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:221": {
+"top": [
+"Griden Group",
+"Garden Group",
+"Gridale",
+"Tornard Group",
+"Bramwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:222": {
+"top": [
+"B&H Photo",
+"H-E-B",
+"Home Depot",
+"Bose",
+"BP"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:223": {
+"top": [
+"Spectrum",
+"Apple Store",
+"Vitamin Shoppe",
+"Best Buy",
+"CorePower Yoga"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:224": {
+"top": [
+"Spectrum",
+"CorePower Yoga",
+"Regal Cinemas",
+"Nordstrom",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:225": {
+"top": [
+"Pexlock",
+"Pexnard",
+"Bexlock & Sons",
+"Pexley",
+"Peloton"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:226": {
+"top": [
+"Pet Supplies Plus",
+"Banfield Pet Hospital",
+"PetSmart",
+"Petco",
+"VCA Animal Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:227": {
+"top": [
+"Griden Group",
+"Garden Group",
+"Gridale",
+"Tornard Group",
+"Bramwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:097": {
+"top": [
+"Wexdale Bros",
+"Wexham Bros",
+"Istdale Bros",
+"Wexhurst & Sons",
+"Wexham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:098": {
+"top": [
+"Istwick Group",
+"Istmoor Group",
+"Nevwick Group",
+"Istmere Group",
+"Ulmwick Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:099": {
+"top": [
+"BarkBox",
+"Dunkin",
+"Starbucks",
+"Bose",
+"Publix"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:100": {
+"top": [
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Costco",
+"Petland"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:101": {
+"top": [
+"Macy's",
+"Dell",
+"Domino's",
+"Regal Cinemas",
+"Lowe's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:102": {
+"top": [
+"Grinard Inc",
+"Lundale Inc",
+"Torton Inc",
+"Ardton Inc",
+"Orlcott Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:103": {
+"top": [
+"Marbury Inc",
+"Lundale Inc",
+"Wexley Inc",
+"Jorden Inc",
+"Falham Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:104": {
+"top": [
+"Petland",
+"Petco",
+"PetSmart",
+"Pet Supplies Plus",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:105": {
+"top": [
+"Chewy",
+"Halley",
+"Shell",
+"Whole Foods",
+"Chipotle"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:106": {
+"top": [
+"Ulmbury Ltd",
+"Ulmdale & Sons",
+"Istbury",
+"Ulmmoor Inc",
+"Ulmden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:107": {
+"top": [
+"Pet Supplies Plus",
+"PetSmart",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_new:108": {
+"top": [
+"Wag",
+"Newegg",
+"Samsung",
+"Whole Foods",
+"Wexley Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:226": {
+"top": [
+"Hilton",
+"Halley",
+"Dell",
+"B&H Photo",
+"Morton LLC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:227": {
+"top": [
+"Regal Cinemas",
+"Con Edison",
+"Spectrum",
+"Panera Bread",
+"Holdale"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:228": {
+"top": [
+"CVS",
+"Vitamin Shoppe",
+"Costco",
+"Dovvarro & Sons",
+"Vorcott"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:229": {
+"top": [
+"Airbnb",
+"Delta Air Lines",
+"Albertsons",
+"AutoZone",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:230": {
+"top": [
+"Bramby & Sons",
+"Bramwen Group",
+"Bramstead & Sons",
+"Brammere LLC",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:231": {
+"top": [
+"Griton",
+"Halton",
+"Holton & Sons",
+"Peloton",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:232": {
+"top": [
+"Istmere Group",
+"Istmere & Sons",
+"Istbury",
+"Istlock",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:233": {
+"top": [
+"Garholm Co",
+"Griby Co",
+"Garwick Co",
+"Lomholm",
+"GNC"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:234": {
+"top": [
+"Tornard Group",
+"Quilden Group",
+"Fenford Group",
+"Griden Group",
+"Quildale Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:235": {
+"top": [
+"Kroger",
+"Apple Store",
+"PetSmart",
+"Nike",
+"Kelford Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:236": {
+"top": [
+"Best Buy",
+"Apple Store",
+"Dell",
+"Whole Foods",
+"Bose"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_renamed:237": {
+"top": [
+"Quilden Group",
+"Quildale Group",
+"Tornard Group",
+"Quilhurst",
+"Dunwen Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:200": {
+"top": [
+"Equinox",
+"Expedia",
+"Exxon",
+"H-E-B",
+"Olive Garden"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:201": {
+"top": [
+"Dunwen Group",
+"Halwen Group",
+"Bramwen Group",
+"Garden Group",
+"Morwen"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:202": {
+"top": [
+"Kelford Bros",
+"Kelby Co",
+"Istdale Bros",
+"Kelvarro Inc",
+"Kroger"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:203": {
+"top": [
+"Xfinity",
+"Bexlock & Sons",
+"Pexnard",
+"Pexlock",
+"Wexhurst & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:204": {
+"top": [
+"Zedbury",
+"Zedden",
+"Zara",
+"Quildale Group",
+"Quilmere"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:205": {
+"top": [
+"Istdale Bros",
+"Istbury",
+"Istnard LLC",
+"Istmere Group",
+"Istlock"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:206": {
+"top": [
+"Domino's",
+"Macy's",
+"Lowe's",
+"Trader Joe's",
+"Dave & Buster's"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:207": {
+"top": [
+"Kelby Co",
+"Kelford Bros",
+"Kelvarro Inc",
+"Halbury",
+"Griby Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:208": {
+"top": [
+"Istlock",
+"Istbury",
+"Istmoor Group",
+"Istmere Group",
+"Istdale Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:209": {
+"top": [
+"Verizon",
+"T-Mobile",
+"AT&T",
+"Con Edison",
+"Taco Bell"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:210": {
+"top": [
+"Rinton Ltd",
+"Rinham",
+"Rinford",
+"Dunnard Ltd",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_seen_standard:211": {
+"top": [
+"Lundale Inc",
+"Grinard Inc",
+"Gridale",
+"Wexley Inc",
+"Jorden Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:128": {
+"top": [
+"Halsley Ltd",
+"Halbury",
+"Halhurst Co",
+"Halvarro",
+"Halwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:129": {
+"top": [
+"Halsley Ltd",
+"Halhurst Co",
+"Halbury",
+"Halwen & Sons",
+"Halvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:130": {
+"top": [
+"Halsley Ltd",
+"Halhurst Co",
+"Halbury",
+"Halwen & Sons",
+"Halwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:131": {
+"top": [
+"PetSmart",
+"Pet Supplies Plus",
+"Petco",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:132": {
+"top": [
+"Halsley Ltd",
+"Halhurst Co",
+"Halbury",
+"Halwen Bros",
+"Halwen & Sons"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:133": {
+"top": [
+"Halsley Ltd",
+"Polsley",
+"Halbury",
+"Halwen Bros",
+"Halvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:134": {
+"top": [
+"Nike",
+"Sony",
+"Marathon",
+"Kaiser Permanente",
+"Gold's Gym"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:135": {
+"top": [
+"Halsley Ltd",
+"Halwen Bros",
+"Halwen & Sons",
+"Halbury",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:136": {
+"top": [
+"PetSmart",
+"Petco",
+"Pet Supplies Plus",
+"Petland",
+"Banfield Pet Hospital"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:137": {
+"top": [
+"Halsley Ltd",
+"Halbury",
+"Halwen Bros",
+"Polsley",
+"Halvarro"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:138": {
+"top": [
+"Halsley Ltd",
+"Halbury",
+"Halhurst Co",
+"Halvarro",
+"Halwen Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_new:139": {
+"top": [
+"Halsley Ltd",
+"Rinton Ltd",
+"Dunhurst Ltd",
+"Torden Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:228": {
+"top": [
+"Wexley Group",
+"Wexley Inc",
+"Wag",
+"Wexdale Bros",
+"Wexham Bros"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:229": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"AT&T"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:230": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"AT&T"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:231": {
+"top": [
+"United Airlines",
+"Uniqlo",
+"REI",
+"Ulmden Inc",
+"Nordstrom"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:232": {
+"top": [
+"United Airlines",
+"Uniqlo",
+"REI",
+"Nordstrom",
+"Ardton Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:233": {
+"top": [
+"United Airlines",
+"REI",
+"AMC Theatres",
+"Delta Air Lines",
+"Southwest"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:234": {
+"top": [
+"United Airlines",
+"REI",
+"Aldi",
+"Sony",
+"Lundale Inc"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:235": {
+"top": [
+"Torden Ltd",
+"Torhurst Co",
+"Dunhurst Ltd",
+"Dunnard Ltd",
+"Polford Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:236": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"Southwest",
+"REI",
+"Aldi"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:237": {
+"top": [
+"United Airlines",
+"Southwest",
+"AMC Theatres",
+"Aldi",
+"Delta Air Lines"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:238": {
+"top": [
+"United Airlines",
+"AMC Theatres",
+"Southwest",
+"Delta Air Lines",
+"REI"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_renamed:239": {
+"top": [
+"United Airlines",
+"REI",
+"Sony",
+"Aldi",
+"Enterprise"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:228": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Halhurst Co",
+"Torhurst Co",
+"Quilhurst"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:229": {
+"top": [
+"Dunhurst Bros",
+"Dunhurst Ltd",
+"Holden Bros",
+"Halhurst Co",
+"Torhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:230": {
+"top": [
+"Spectrum",
+"CorePower Yoga",
+"Regal Cinemas",
+"Vitamin Shoppe",
+"Con Edison"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:231": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Torden Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:232": {
+"top": [
+"Duke Energy",
+"Planet Fitness",
+"CorePower Yoga",
+"Steam",
+"Amtrak"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:233": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Dunnard Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:234": {
+"top": [
+"Peloton",
+"Pexley",
+"Griton",
+"Pexlock",
+"Verizon"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:235": {
+"top": [
+"Duke Energy",
+"CorePower Yoga",
+"Planet Fitness",
+"Amtrak",
+"Steam"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:236": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Torden Ltd",
+"Halhurst Co"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:237": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:238": {
+"top": [
+"CorePower Yoga",
+"Crunch Fitness",
+"Planet Fitness",
+"LA Fitness",
+"Garden Group"
+],
+"hit1": true,
+"rank_gold": 1
+},
+"R6_unseen_standard:239": {
+"top": [
+"Dunhurst Ltd",
+"Dunhurst Bros",
+"Torhurst Co",
+"Halhurst Co",
+"Torden Ltd"
+],
+"hit1": true,
+"rank_gold": 1
+}
+}
+}

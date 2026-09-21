@@ -1,0 +1,2650 @@
+{
+"name": "real6_ambdb",
+"version": "v1",
+"n_merchants": 240,
+"fact_db": {
+"Elrholm": "Elrholm is a store that sells frozen vegetables, treadmills and fresh produce.",
+"Istmoor Group": "Istmoor Group is a store that sells wool sweaters, milk and eggs and rice and pasta.",
+"H-E-B": "H-E-B is a store that sells fresh produce, denim jeans and bread and cereal.",
+"Falvarro LLC": "Falvarro LLC is a store that sells packaged snacks, leather belts and bread and cereal.",
+"Sabby Co": "Sabby Co is a store that sells bread and cereal, frozen vegetables and rice and pasta.",
+"Ulmden Inc": "Ulmden Inc is a store that sells canned goods, fresh produce and deli meats.",
+"Wegmans": "Wegmans is a store that sells rice and pasta, bread and cereal and burgers and fries.",
+"Aldi": "Aldi is a store that sells canned goods, milk and eggs and deli meats.",
+"Costco": "Costco is a store that sells canned goods, fresh produce and deli meats.",
+"Safeway": "Safeway is a store that sells milk and eggs, canned goods and deli meats.",
+"Kroger": "Kroger is a store that sells canned goods, packaged snacks and deli meats.",
+"Dunnard Ltd": "Dunnard Ltd is a store that sells bread and cereal, packaged snacks and burgers and fries.",
+"Pexley": "Pexley is a store that sells bread and cereal, fresh produce and canned goods.",
+"Halley": "Halley is a store that sells fresh produce, deli meats and rice and pasta.",
+"Publix": "Publix is a store that sells fresh produce, burgers and fries and rice and pasta.",
+"Albertsons": "Albertsons is a store that sells deli meats, rice and pasta and fresh produce.",
+"Trader Joe's": "Trader Joe's is a store that sells packaged snacks, fresh produce and bread and cereal.",
+"Orlcott Inc": "Orlcott Inc is a store that sells sushi rolls, frozen vegetables and milk and eggs.",
+"Holton & Sons": "Holton & Sons is a store that sells frozen vegetables, packaged snacks and deli meats.",
+"Whole Foods": "Whole Foods is a store that sells burgers and fries, deli meats and canned goods.",
+"Panera Bread": "Panera Bread is a store that sells ramen bowls, wood-fired pizza and power drills.",
+"Olive Garden": "Olive Garden is a store that sells lumber, sushi rolls and grilled steaks.",
+"Rinford": "Rinford is a store that sells tacos and burritos, deli meats and espresso and pastries.",
+"Bramstead & Sons": "Bramstead & Sons is a store that sells sushi rolls, ramen bowls and mobile phone plans.",
+"Dunkin": "Dunkin is a store that sells grilled steaks, espresso and pastries and tacos and burritos.",
+"Zedbury": "Zedbury is a store that sells wood-fired pizza, diesel fuel and ramen bowls.",
+"Istlock": "Istlock is a store that sells sushi rolls, wood-fired pizza and ramen bowls.",
+"Chipotle": "Chipotle is a store that sells espresso and pastries, wood-fired pizza and burgers and fries.",
+"Taco Bell": "Taco Bell is a store that sells ramen bowls, pad thai and wood-fired pizza.",
+"Subway": "Subway is a store that sells grilled steaks, wood-fired pizza and diesel fuel.",
+"McDonald's": "McDonald's is a store that sells grilled steaks, espresso and pastries and diesel fuel.",
+"Elrhurst Co": "Elrhurst Co is a store that sells pad thai, diesel fuel and grilled steaks.",
+"Vorstead Co": "Vorstead Co is a store that sells ramen bowls, wood-fired pizza and sushi rolls.",
+"Starbucks": "Starbucks is a store that sells ramen bowls, unleaded gasoline and wood-fired pizza.",
+"Istdale Bros": "Istdale Bros is a store that sells grilled steaks, espresso and pastries and wood-fired pizza.",
+"Chick-fil-A": "Chick-fil-A is a store that sells sushi rolls, grilled steaks and pad thai.",
+"Morwen": "Morwen is a store that sells unleaded gasoline, diesel fuel and espresso and pastries.",
+"Oskhurst": "Oskhurst is a store that sells sushi rolls, espresso and pastries and burgers and fries.",
+"Domino's": "Domino's is a store that sells pad thai, espresso and pastries and diesel fuel.",
+"Rinlock": "Rinlock is a store that sells grilled steaks, pad thai and unleaded gasoline.",
+"Rinham": "Rinham is a store that sells motor oil, tire rotations and rental cars.",
+"Wexden Inc": "Wexden Inc is a store that sells computer monitors, tire rotations and brake pads.",
+"BP": "BP is a store that sells brake pads, landline service and diesel fuel.",
+"Chevron": "Chevron is a store that sells diesel fuel, windshield wipers and packaged snacks.",
+"Garwick Co": "Garwick Co is a store that sells windshield wipers, motor oil and unleaded gasoline.",
+"Pexnard": "Pexnard is a store that sells engine coolant, windshield wipers and motor oil.",
+"Bexlock & Sons": "Bexlock & Sons is a store that sells unleaded gasoline, motor oil and diesel fuel.",
+"Marathon": "Marathon is a store that sells tire rotations, motor oil and engine coolant.",
+"Shell": "Shell is a store that sells windshield wipers, denim jeans and unleaded gasoline.",
+"Valero": "Valero is a store that sells brake pads, engine coolant and tire rotations.",
+"Polstead LLC": "Polstead LLC is a store that sells brake pads, diesel fuel and windshield wipers.",
+"Jiffy Lube": "Jiffy Lube is a store that sells windshield wipers, tire rotations and unleaded gasoline.",
+"Exxon": "Exxon is a store that sells tire rotations, brake pads and car batteries.",
+"Yarden & Sons": "Yarden & Sons is a store that sells brake pads, diesel fuel and tire rotations.",
+"Wexham Bros": "Wexham Bros is a store that sells unleaded gasoline, denim jeans and car batteries.",
+"Kelvarro Inc": "Kelvarro Inc is a store that sells diesel fuel, car batteries and tire rotations.",
+"Sunoco": "Sunoco is a store that sells wool sweaters, car batteries and tire rotations.",
+"AutoZone": "AutoZone is a store that sells motor oil, brake pads and denim jeans.",
+"Fenley Group": "Fenley Group is a store that sells wool sweaters, denim jeans and tire rotations.",
+"Pep Boys": "Pep Boys is a store that sells engine coolant, motor oil and denim jeans.",
+"Old Navy": "Old Navy is a store that sells cotton socks, escape room bookings and wool sweaters.",
+"Gap": "Gap is a store that sells cotton socks, rain jackets and bowling lanes.",
+"H&M": "H&M is a store that sells light fixtures, running shoes and rain jackets.",
+"Macy's": "Macy's is a store that sells interior paint, rain jackets and running shoes.",
+"Lomholm": "Lomholm is a store that sells wool sweaters, rain jackets and winter coats.",
+"TJ Maxx": "TJ Maxx is a store that sells dress shirts, denim jeans and running shoes.",
+"Uniqlo": "Uniqlo is a store that sells cotton socks, denim jeans and rain jackets.",
+"Yarton Bros": "Yarton Bros is a store that sells laptops, smartphones and dress shirts.",
+"Ross": "Ross is a store that sells winter coats, rain jackets and denim jeans.",
+"Ulmwick Ltd": "Ulmwick Ltd is a store that sells winter coats, rain jackets and dress shirts.",
+"Elrmoor": "Elrmoor is a store that sells running shoes, dress shirts and laptops.",
+"Nordstrom": "Nordstrom is a store that sells rain jackets, smartphones and wool sweaters.",
+"Istbury": "Istbury is a store that sells denim jeans, running shoes and dress shirts.",
+"Falham Inc": "Falham Inc is a store that sells dress shirts, laptops and leather belts.",
+"Nike": "Nike is a store that sells smartphones, dress shirts and denim jeans.",
+"Halsley Ltd": "Halsley Ltd is a store that sells rain jackets, leather belts and laptops.",
+"Jorholm Bros": "Jorholm Bros is a store that sells smartphones, running shoes and denim jeans.",
+"Torhurst Co": "Torhurst Co is a store that sells denim jeans, dress shirts and rain jackets.",
+"Quildale Group": "Quildale Group is a store that sells wool sweaters, laptops and winter coats.",
+"Zara": "Zara is a store that sells denim jeans, cotton socks and laptops.",
+"Falholm Inc": "Falholm Inc is a store that sells wireless headphones, smartphones and plywood sheets.",
+"Halhurst Co": "Halhurst Co is a store that sells 4K televisions, prescription medications and wireless headphones.",
+"Halwen Bros": "Halwen Bros is a store that sells tablets, smartphones and power drills.",
+"Best Buy": "Best Buy is a store that sells tablets, laptops and contact lens solution.",
+"Sony": "Sony is a store that sells laptops, smartphones and lumber.",
+"Apple Store": "Apple Store is a store that sells 4K televisions, smartphones and wireless headphones.",
+"Oskbury LLC": "Oskbury LLC is a store that sells gaming consoles, computer monitors and wireless headphones.",
+"Orlnard & Sons": "Orlnard & Sons is a store that sells wireless headphones, power drills and tablets.",
+"B&H Photo": "B&H Photo is a store that sells wireless headphones, smartphones and 4K televisions.",
+"Griton": "Griton is a store that sells laptops, lumber and smartphones.",
+"Dell": "Dell is a store that sells tablets, smartphones and gaming consoles.",
+"Bose": "Bose is a store that sells laptops, smartphones and tablets.",
+"Nevwick": "Nevwick is a store that sells power drills, wireless headphones and laptops.",
+"Micro Center": "Micro Center is a store that sells tablets, smartphones and USB cables.",
+"GameStop": "GameStop is a store that sells power drills, computer monitors and lumber.",
+"Talholm & Sons": "Talholm & Sons is a store that sells USB cables, power drills and laptops.",
+"Newegg": "Newegg is a store that sells wireless headphones, gaming consoles and power drills.",
+"Samsung": "Samsung is a store that sells power drills, lumber and gaming consoles.",
+"Torvarro": "Torvarro is a store that sells lumber, power drills and 4K televisions.",
+"Wexley Group": "Wexley Group is a store that sells gaming consoles, smartphones and 4K televisions.",
+"Bramby & Sons": "Bramby & Sons is a store that sells plywood sheets, flea treatments and power drills.",
+"Home Depot": "Home Depot is a store that sells power drills, light fixtures and prescription medications.",
+"Elrdale": "Elrdale is a store that sells kitchen faucets, interior paint and frozen vegetables.",
+"Sherwin-Williams": "Sherwin-Williams is a store that sells tacos and burritos, light fixtures and plywood sheets.",
+"Istmere & Sons": "Istmere & Sons is a store that sells garden hoses, kitchen faucets and ceramic tile.",
+"True Value": "True Value is a store that sells garden hoses, vitamins and light fixtures.",
+"Menards": "Menards is a store that sells light fixtures, interior paint and garden hoses.",
+"Ace Hardware": "Ace Hardware is a store that sells ceramic tile, light fixtures and garden hoses.",
+"Tractor Supply": "Tractor Supply is a store that sells prescription medications, lumber and kitchen faucets.",
+"Bramwen Group": "Bramwen Group is a store that sells interior paint, light fixtures and power drills.",
+"Halbury": "Halbury is a store that sells power drills, lumber and prescription medications.",
+"IKEA": "IKEA is a store that sells interior paint, kitchen faucets and prescription medications.",
+"Quilden Group": "Quilden Group is a store that sells lumber, plywood sheets and prescription medications.",
+"Griden Group": "Griden Group is a store that sells garden hoses, lumber and light fixtures.",
+"Lowe's": "Lowe's is a store that sells plywood sheets, ceramic tile and light fixtures.",
+"Halmere Group": "Halmere Group is a store that sells garden hoses, plywood sheets and prescription medications.",
+"Floor & Decor": "Floor & Decor is a store that sells power drills, kitchen faucets and interior paint.",
+"Quilmere": "Quilmere is a store that sells interior paint, power drills and garden hoses.",
+"Harbor Freight": "Harbor Freight is a store that sells light fixtures, plywood sheets and interior paint.",
+"Halvarro": "Halvarro is a store that sells prescription medications, ceramic tile and power drills.",
+"Fennard": "Fennard is a store that sells blood pressure monitors, electricity bills and cold medicine.",
+"GNC": "GNC is a store that sells cold medicine, blood pressure monitors and milk and eggs.",
+"Kaiser Permanente": "Kaiser Permanente is a store that sells allergy pills, plywood sheets and vitamins.",
+"Dovvarro & Sons": "Dovvarro & Sons is a store that sells vitamins, tacos and burritos and sunscreen.",
+"Walgreens": "Walgreens is a store that sells prescription medications, contact lens solution and allergy pills.",
+"Quest Diagnostics": "Quest Diagnostics is a store that sells prescription medications, sunscreen and concert tickets.",
+"Duane Reade": "Duane Reade is a store that sells sunscreen, contact lens solution and bandages.",
+"Polsley": "Polsley is a store that sells prescription medications, concert tickets and blood pressure monitors.",
+"Torton Inc": "Torton Inc is a store that sells vitamins, concert tickets and cold medicine.",
+"Nevwick Group": "Nevwick Group is a store that sells sunscreen, vitamins and concert tickets.",
+"LabCorp": "LabCorp is a store that sells prescription medications, cold medicine and concert tickets.",
+"Nevden Bros": "Nevden Bros is a store that sells sunscreen, contact lens solution and prescription medications.",
+"Vitamin Shoppe": "Vitamin Shoppe is a store that sells prescription medications, allergy pills and contact lens solution.",
+"Bartell Drugs": "Bartell Drugs is a store that sells sunscreen, allergy pills and prescription medications.",
+"Rite Aid": "Rite Aid is a store that sells prescription medications, cold medicine and bandages.",
+"CVS": "CVS is a store that sells movie tickets, contact lens solution and cold medicine.",
+"Garden Group": "Garden Group is a store that sells movie tickets, cold medicine and vitamins.",
+"Halwen Group": "Halwen Group is a store that sells blood pressure monitors, vitamins and movie tickets.",
+"Fenvarro & Sons": "Fenvarro & Sons is a store that sells movie tickets, bandages and vitamins.",
+"Gridale": "Gridale is a store that sells cold medicine, prescription medications and sunscreen.",
+"Regal Cinemas": "Regal Cinemas is a store that sells bowling lanes, wireless headphones and theater seats.",
+"Griby Co": "Griby Co is a store that sells hotel rooms, arcade tokens and mini golf rounds.",
+"Griwen Bros": "Griwen Bros is a store that sells arcade tokens, 4K televisions and movie tickets.",
+"Wexley Inc": "Wexley Inc is a store that sells mini golf rounds, smartphones and movie tickets.",
+"Bowlero": "Bowlero is a store that sells theater seats, airline tickets and movie tickets.",
+"Steam": "Steam is a store that sells video game rentals, bowling lanes and movie tickets.",
+"Jorden Inc": "Jorden Inc is a store that sells escape room bookings, bowling lanes and movie tickets.",
+"Cinemark": "Cinemark is a store that sells movie tickets, theater seats and video game rentals.",
+"Holdale": "Holdale is a store that sells concert tickets, theater seats and bowling lanes.",
+"Dave & Buster's": "Dave & Buster's is a store that sells mini golf rounds, concert tickets and video game rentals.",
+"AMC Theatres": "AMC Theatres is a store that sells bowling lanes, hotel rooms and video game rentals.",
+"Topgolf": "Topgolf is a store that sells escape room bookings, mini golf rounds and video game rentals.",
+"Brammere LLC": "Brammere LLC is a store that sells movie tickets, concert tickets and hotel rooms.",
+"Morton LLC": "Morton LLC is a store that sells movie tickets, concert tickets and hotel rooms.",
+"Istnard LLC": "Istnard LLC is a store that sells bowling lanes, mini golf rounds and theater seats.",
+"Oskhurst Bros": "Oskhurst Bros is a store that sells video game rentals, movie tickets and arcade tokens.",
+"Quilhurst": "Quilhurst is a store that sells airline tickets, theater seats and bowling lanes.",
+"Spotify": "Spotify is a store that sells mini golf rounds, arcade tokens and hotel rooms.",
+"Netflix": "Netflix is a store that sells mini golf rounds, movie tickets and bowling lanes.",
+"Ticketmaster": "Ticketmaster is a store that sells hotel rooms, bowling lanes and concert tickets.",
+"Ardton Inc": "Ardton Inc is a store that sells packaged snacks, rental cars and train tickets.",
+"Istmere Group": "Istmere Group is a store that sells airport lounge passes, rental cars and ramen bowls.",
+"Airbnb": "Airbnb is a store that sells airline tickets, winter coats and travel insurance.",
+"Vorcott": "Vorcott is a store that sells cold medicine, travel insurance and hotel rooms.",
+"United Airlines": "United Airlines is a store that sells train tickets, dog food and vacation packages.",
+"Delta Air Lines": "Delta Air Lines is a store that sells cruise cabins, vacation packages and dog food.",
+"Hilton": "Hilton is a store that sells cruise cabins, airline tickets and travel insurance.",
+"Falvarro Bros": "Falvarro Bros is a store that sells airport lounge passes, vacation packages and rental cars.",
+"Hertz": "Hertz is a store that sells rental cars, cruise cabins and travel insurance.",
+"Tornard Group": "Tornard Group is a store that sells airport lounge passes, airline tickets and hotel rooms.",
+"Amtrak": "Amtrak is a store that sells rental cars, airport lounge passes and hotel rooms.",
+"Nevham Group": "Nevham Group is a store that sells train tickets, cruise cabins and vacation packages.",
+"Southwest": "Southwest is a store that sells travel insurance, cat litter and hotel rooms.",
+"Expedia": "Expedia is a store that sells cruise cabins, airport lounge passes and airline tickets.",
+"Marriott": "Marriott is a store that sells hotel rooms, dog food and rental cars.",
+"Polford Ltd": "Polford Ltd is a store that sells airport lounge passes, airline tickets and vacation packages.",
+"Dunwick": "Dunwick is a store that sells airline tickets, train tickets and airport lounge passes.",
+"Enterprise": "Enterprise is a store that sells dog food, travel insurance and airport lounge passes.",
+"Torden Ltd": "Torden Ltd is a store that sells travel insurance, dog food and airline tickets.",
+"Garholm Co": "Garholm Co is a store that sells dog food, rental cars and airport lounge passes.",
+"Pet Supplies Plus": "Pet Supplies Plus is a store that sells natural gas service, chew toys and aquarium filters.",
+"Petco": "Petco is a store that sells ramen bowls, pet grooming and aquarium filters.",
+"Grinard Inc": "Grinard Inc is a store that sells pet grooming, flea treatments and electricity bills.",
+"PetSmart": "PetSmart is a store that sells water bills, pet grooming and bird seed.",
+"Petland": "Petland is a store that sells pet grooming, cat litter and yoga classes.",
+"Chewy": "Chewy is a store that sells chew toys, yoga classes and gym memberships.",
+"Yarstead Bros": "Yarstead Bros is a store that sells yoga classes, cat litter and aquarium filters.",
+"Ulmdale & Sons": "Ulmdale & Sons is a store that sells cat litter, flea treatments and aquarium filters.",
+"VCA Animal Hospital": "VCA Animal Hospital is a store that sells pet grooming, cat litter and flea treatments.",
+"Istwick Group": "Istwick Group is a store that sells flea treatments, pet grooming and yoga classes.",
+"Ulmbury Ltd": "Ulmbury Ltd is a store that sells hamster cages, gym memberships and pet grooming.",
+"Wexdale Bros": "Wexdale Bros is a store that sells chew toys, flea treatments and yoga classes.",
+"BarkBox": "BarkBox is a store that sells cat litter, bird seed and aquarium filters.",
+"Ulmmoor Inc": "Ulmmoor Inc is a store that sells flea treatments, dog food and aquarium filters.",
+"Halholm & Sons": "Halholm & Sons is a store that sells cat litter, chew toys and aquarium filters.",
+"Marbury Inc": "Marbury Inc is a store that sells flea treatments, pet grooming and bird seed.",
+"Wag": "Wag is a store that sells yoga classes, cat litter and bird seed.",
+"Banfield Pet Hospital": "Banfield Pet Hospital is a store that sells cat litter, dog food and hamster cages.",
+"Wexhurst & Sons": "Wexhurst & Sons is a store that sells aquarium filters, gym memberships and cat litter.",
+"Rover": "Rover is a store that sells bird seed, pet grooming and hamster cages.",
+"Rinton Ltd": "Rinton Ltd is a store that sells dumbbells, diesel fuel and yoga classes.",
+"Orlwick Co": "Orlwick Co is a store that sells running shoes, personal training sessions and dumbbells.",
+"Kelford Bros": "Kelford Bros is a store that sells rain jackets, spin classes and protein powder.",
+"Peloton": "Peloton is a store that sells personal training sessions, burgers and fries and yoga classes.",
+"Gold's Gym": "Gold's Gym is a store that sells personal training sessions, yoga classes and resistance bands.",
+"REI": "REI is a store that sells protein powder, gym memberships and yoga classes.",
+"Equinox": "Equinox is a store that sells resistance bands, personal training sessions and treadmills.",
+"LA Fitness": "LA Fitness is a store that sells personal training sessions, spin classes and dumbbells.",
+"Zedden": "Zedden is a store that sells protein powder, resistance bands and yoga classes.",
+"Fenford Group": "Fenford Group is a store that sells home internet service, yoga classes and protein powder.",
+"Nevnard Bros": "Nevnard Bros is a store that sells spin classes, personal training sessions and yoga classes.",
+"Bexwen & Sons": "Bexwen & Sons is a store that sells mobile phone plans, spin classes and gym memberships.",
+"CorePower Yoga": "CorePower Yoga is a store that sells treadmills, spin classes and home internet service.",
+"Lundale Inc": "Lundale Inc is a store that sells protein powder, yoga classes and dumbbells.",
+"Polby": "Polby is a store that sells protein powder, yoga classes and resistance bands.",
+"24 Hour Fitness": "24 Hour Fitness is a store that sells spin classes, dumbbells and home internet service.",
+"Crunch Fitness": "Crunch Fitness is a store that sells treadmills, yoga classes and resistance bands.",
+"Planet Fitness": "Planet Fitness is a store that sells personal training sessions, dumbbells and yoga classes.",
+"Holden Bros": "Holden Bros is a store that sells gym memberships, dumbbells and personal training sessions.",
+"Orangetheory": "Orangetheory is a store that sells gym memberships, home internet service and protein powder.",
+"Halton": "Halton is a store that sells fiber broadband, prescription medications and landline service.",
+"Dunhurst Ltd": "Dunhurst Ltd is a store that sells contact lens solution, landline service and fiber broadband.",
+"Dunhurst Bros": "Dunhurst Bros is a store that sells car batteries, home internet service and water bills.",
+"Halwen & Sons": "Halwen & Sons is a store that sells ramen bowls, water bills and home internet service.",
+"Xfinity": "Xfinity is a store that sells cable TV packages, electricity bills and fiber broadband.",
+"Duke Energy": "Duke Energy is a store that sells water bills, cable TV packages and mobile phone plans.",
+"Spectrum": "Spectrum is a store that sells home internet service, electricity bills and fiber broadband.",
+"Comcast": "Comcast is a store that sells home internet service, milk and eggs and landline service.",
+"Falvarro Ltd": "Falvarro Ltd is a store that sells mobile phone plans, landline service and electricity bills.",
+"Kelby Co": "Kelby Co is a store that sells natural gas service, mobile phone plans and fiber broadband.",
+"Wexham Inc": "Wexham Inc is a store that sells water bills, fiber broadband and electricity bills.",
+"Dunwen Group": "Dunwen Group is a store that sells fiber broadband, natural gas service and home internet service.",
+"Pexlock": "Pexlock is a store that sells water bills, mobile phone plans and fresh produce.",
+"Cox": "Cox is a store that sells electricity bills, landline service and home internet service.",
+"AT&T": "AT&T is a store that sells cable TV packages, electricity bills and water bills.",
+"Con Edison": "Con Edison is a store that sells water bills, natural gas service and electricity bills.",
+"T-Mobile": "T-Mobile is a store that sells cable TV packages, fresh produce and home internet service.",
+"PG&E": "PG&E is a store that sells cable TV packages, home internet service and fresh produce.",
+"Sabstead Bros": "Sabstead Bros is a store that sells landline service, water bills and cable TV packages.",
+"Verizon": "Verizon is a store that sells water bills, fiber broadband and fresh produce."
+},
+"meta": {
+"Elrholm": {
+"multi": true,
+"secondary": "Fitness",
+"products": [
+"frozen vegetables",
+"treadmills",
+"fresh produce"
+],
+"off_pool": 1
+},
+"Istmoor Group": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"wool sweaters",
+"milk and eggs",
+"rice and pasta"
+],
+"off_pool": 1
+},
+"H-E-B": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"fresh produce",
+"denim jeans",
+"bread and cereal"
+],
+"off_pool": 1
+},
+"Falvarro LLC": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"packaged snacks",
+"leather belts",
+"bread and cereal"
+],
+"off_pool": 1
+},
+"Sabby Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"bread and cereal",
+"frozen vegetables",
+"rice and pasta"
+],
+"off_pool": 0
+},
+"Ulmden Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"canned goods",
+"fresh produce",
+"deli meats"
+],
+"off_pool": 0
+},
+"Wegmans": {
+"multi": false,
+"secondary": null,
+"products": [
+"rice and pasta",
+"bread and cereal",
+"burgers and fries"
+],
+"off_pool": 1
+},
+"Aldi": {
+"multi": false,
+"secondary": null,
+"products": [
+"canned goods",
+"milk and eggs",
+"deli meats"
+],
+"off_pool": 0
+},
+"Costco": {
+"multi": false,
+"secondary": null,
+"products": [
+"canned goods",
+"fresh produce",
+"deli meats"
+],
+"off_pool": 0
+},
+"Safeway": {
+"multi": false,
+"secondary": null,
+"products": [
+"milk and eggs",
+"canned goods",
+"deli meats"
+],
+"off_pool": 0
+},
+"Kroger": {
+"multi": false,
+"secondary": null,
+"products": [
+"canned goods",
+"packaged snacks",
+"deli meats"
+],
+"off_pool": 0
+},
+"Dunnard Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"bread and cereal",
+"packaged snacks",
+"burgers and fries"
+],
+"off_pool": 1
+},
+"Pexley": {
+"multi": false,
+"secondary": null,
+"products": [
+"bread and cereal",
+"fresh produce",
+"canned goods"
+],
+"off_pool": 0
+},
+"Halley": {
+"multi": false,
+"secondary": null,
+"products": [
+"fresh produce",
+"deli meats",
+"rice and pasta"
+],
+"off_pool": 0
+},
+"Publix": {
+"multi": false,
+"secondary": null,
+"products": [
+"fresh produce",
+"burgers and fries",
+"rice and pasta"
+],
+"off_pool": 1
+},
+"Albertsons": {
+"multi": false,
+"secondary": null,
+"products": [
+"deli meats",
+"rice and pasta",
+"fresh produce"
+],
+"off_pool": 0
+},
+"Trader Joe's": {
+"multi": false,
+"secondary": null,
+"products": [
+"packaged snacks",
+"fresh produce",
+"bread and cereal"
+],
+"off_pool": 0
+},
+"Orlcott Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"sushi rolls",
+"frozen vegetables",
+"milk and eggs"
+],
+"off_pool": 1
+},
+"Holton & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"frozen vegetables",
+"packaged snacks",
+"deli meats"
+],
+"off_pool": 0
+},
+"Whole Foods": {
+"multi": false,
+"secondary": null,
+"products": [
+"burgers and fries",
+"deli meats",
+"canned goods"
+],
+"off_pool": 1
+},
+"Panera Bread": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"ramen bowls",
+"wood-fired pizza",
+"power drills"
+],
+"off_pool": 1
+},
+"Olive Garden": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"lumber",
+"sushi rolls",
+"grilled steaks"
+],
+"off_pool": 1
+},
+"Rinford": {
+"multi": true,
+"secondary": "Groceries",
+"products": [
+"tacos and burritos",
+"deli meats",
+"espresso and pastries"
+],
+"off_pool": 1
+},
+"Bramstead & Sons": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"sushi rolls",
+"ramen bowls",
+"mobile phone plans"
+],
+"off_pool": 1
+},
+"Dunkin": {
+"multi": false,
+"secondary": null,
+"products": [
+"grilled steaks",
+"espresso and pastries",
+"tacos and burritos"
+],
+"off_pool": 0
+},
+"Zedbury": {
+"multi": false,
+"secondary": null,
+"products": [
+"wood-fired pizza",
+"diesel fuel",
+"ramen bowls"
+],
+"off_pool": 1
+},
+"Istlock": {
+"multi": false,
+"secondary": null,
+"products": [
+"sushi rolls",
+"wood-fired pizza",
+"ramen bowls"
+],
+"off_pool": 0
+},
+"Chipotle": {
+"multi": false,
+"secondary": null,
+"products": [
+"espresso and pastries",
+"wood-fired pizza",
+"burgers and fries"
+],
+"off_pool": 0
+},
+"Taco Bell": {
+"multi": false,
+"secondary": null,
+"products": [
+"ramen bowls",
+"pad thai",
+"wood-fired pizza"
+],
+"off_pool": 0
+},
+"Subway": {
+"multi": false,
+"secondary": null,
+"products": [
+"grilled steaks",
+"wood-fired pizza",
+"diesel fuel"
+],
+"off_pool": 1
+},
+"McDonald's": {
+"multi": false,
+"secondary": null,
+"products": [
+"grilled steaks",
+"espresso and pastries",
+"diesel fuel"
+],
+"off_pool": 1
+},
+"Elrhurst Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"pad thai",
+"diesel fuel",
+"grilled steaks"
+],
+"off_pool": 1
+},
+"Vorstead Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"ramen bowls",
+"wood-fired pizza",
+"sushi rolls"
+],
+"off_pool": 0
+},
+"Starbucks": {
+"multi": false,
+"secondary": null,
+"products": [
+"ramen bowls",
+"unleaded gasoline",
+"wood-fired pizza"
+],
+"off_pool": 1
+},
+"Istdale Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"grilled steaks",
+"espresso and pastries",
+"wood-fired pizza"
+],
+"off_pool": 0
+},
+"Chick-fil-A": {
+"multi": false,
+"secondary": null,
+"products": [
+"sushi rolls",
+"grilled steaks",
+"pad thai"
+],
+"off_pool": 0
+},
+"Morwen": {
+"multi": false,
+"secondary": null,
+"products": [
+"unleaded gasoline",
+"diesel fuel",
+"espresso and pastries"
+],
+"off_pool": 2
+},
+"Oskhurst": {
+"multi": false,
+"secondary": null,
+"products": [
+"sushi rolls",
+"espresso and pastries",
+"burgers and fries"
+],
+"off_pool": 0
+},
+"Domino's": {
+"multi": false,
+"secondary": null,
+"products": [
+"pad thai",
+"espresso and pastries",
+"diesel fuel"
+],
+"off_pool": 1
+},
+"Rinlock": {
+"multi": false,
+"secondary": null,
+"products": [
+"grilled steaks",
+"pad thai",
+"unleaded gasoline"
+],
+"off_pool": 1
+},
+"Rinham": {
+"multi": true,
+"secondary": "Travel",
+"products": [
+"motor oil",
+"tire rotations",
+"rental cars"
+],
+"off_pool": 1
+},
+"Wexden Inc": {
+"multi": true,
+"secondary": "Electronics",
+"products": [
+"computer monitors",
+"tire rotations",
+"brake pads"
+],
+"off_pool": 1
+},
+"BP": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"brake pads",
+"landline service",
+"diesel fuel"
+],
+"off_pool": 1
+},
+"Chevron": {
+"multi": true,
+"secondary": "Groceries",
+"products": [
+"diesel fuel",
+"windshield wipers",
+"packaged snacks"
+],
+"off_pool": 1
+},
+"Garwick Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"windshield wipers",
+"motor oil",
+"unleaded gasoline"
+],
+"off_pool": 0
+},
+"Pexnard": {
+"multi": false,
+"secondary": null,
+"products": [
+"engine coolant",
+"windshield wipers",
+"motor oil"
+],
+"off_pool": 0
+},
+"Bexlock & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"unleaded gasoline",
+"motor oil",
+"diesel fuel"
+],
+"off_pool": 0
+},
+"Marathon": {
+"multi": false,
+"secondary": null,
+"products": [
+"tire rotations",
+"motor oil",
+"engine coolant"
+],
+"off_pool": 0
+},
+"Shell": {
+"multi": false,
+"secondary": null,
+"products": [
+"windshield wipers",
+"denim jeans",
+"unleaded gasoline"
+],
+"off_pool": 1
+},
+"Valero": {
+"multi": false,
+"secondary": null,
+"products": [
+"brake pads",
+"engine coolant",
+"tire rotations"
+],
+"off_pool": 0
+},
+"Polstead LLC": {
+"multi": false,
+"secondary": null,
+"products": [
+"brake pads",
+"diesel fuel",
+"windshield wipers"
+],
+"off_pool": 0
+},
+"Jiffy Lube": {
+"multi": false,
+"secondary": null,
+"products": [
+"windshield wipers",
+"tire rotations",
+"unleaded gasoline"
+],
+"off_pool": 0
+},
+"Exxon": {
+"multi": false,
+"secondary": null,
+"products": [
+"tire rotations",
+"brake pads",
+"car batteries"
+],
+"off_pool": 0
+},
+"Yarden & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"brake pads",
+"diesel fuel",
+"tire rotations"
+],
+"off_pool": 0
+},
+"Wexham Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"unleaded gasoline",
+"denim jeans",
+"car batteries"
+],
+"off_pool": 1
+},
+"Kelvarro Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"diesel fuel",
+"car batteries",
+"tire rotations"
+],
+"off_pool": 0
+},
+"Sunoco": {
+"multi": false,
+"secondary": null,
+"products": [
+"wool sweaters",
+"car batteries",
+"tire rotations"
+],
+"off_pool": 1
+},
+"AutoZone": {
+"multi": false,
+"secondary": null,
+"products": [
+"motor oil",
+"brake pads",
+"denim jeans"
+],
+"off_pool": 1
+},
+"Fenley Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"wool sweaters",
+"denim jeans",
+"tire rotations"
+],
+"off_pool": 2
+},
+"Pep Boys": {
+"multi": false,
+"secondary": null,
+"products": [
+"engine coolant",
+"motor oil",
+"denim jeans"
+],
+"off_pool": 1
+},
+"Old Navy": {
+"multi": true,
+"secondary": "Entertainment",
+"products": [
+"cotton socks",
+"escape room bookings",
+"wool sweaters"
+],
+"off_pool": 1
+},
+"Gap": {
+"multi": true,
+"secondary": "Entertainment",
+"products": [
+"cotton socks",
+"rain jackets",
+"bowling lanes"
+],
+"off_pool": 1
+},
+"H&M": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"light fixtures",
+"running shoes",
+"rain jackets"
+],
+"off_pool": 1
+},
+"Macy's": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"interior paint",
+"rain jackets",
+"running shoes"
+],
+"off_pool": 1
+},
+"Lomholm": {
+"multi": false,
+"secondary": null,
+"products": [
+"wool sweaters",
+"rain jackets",
+"winter coats"
+],
+"off_pool": 0
+},
+"TJ Maxx": {
+"multi": false,
+"secondary": null,
+"products": [
+"dress shirts",
+"denim jeans",
+"running shoes"
+],
+"off_pool": 0
+},
+"Uniqlo": {
+"multi": false,
+"secondary": null,
+"products": [
+"cotton socks",
+"denim jeans",
+"rain jackets"
+],
+"off_pool": 0
+},
+"Yarton Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"laptops",
+"smartphones",
+"dress shirts"
+],
+"off_pool": 2
+},
+"Ross": {
+"multi": false,
+"secondary": null,
+"products": [
+"winter coats",
+"rain jackets",
+"denim jeans"
+],
+"off_pool": 0
+},
+"Ulmwick Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"winter coats",
+"rain jackets",
+"dress shirts"
+],
+"off_pool": 0
+},
+"Elrmoor": {
+"multi": false,
+"secondary": null,
+"products": [
+"running shoes",
+"dress shirts",
+"laptops"
+],
+"off_pool": 1
+},
+"Nordstrom": {
+"multi": false,
+"secondary": null,
+"products": [
+"rain jackets",
+"smartphones",
+"wool sweaters"
+],
+"off_pool": 1
+},
+"Istbury": {
+"multi": false,
+"secondary": null,
+"products": [
+"denim jeans",
+"running shoes",
+"dress shirts"
+],
+"off_pool": 0
+},
+"Falham Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"dress shirts",
+"laptops",
+"leather belts"
+],
+"off_pool": 1
+},
+"Nike": {
+"multi": false,
+"secondary": null,
+"products": [
+"smartphones",
+"dress shirts",
+"denim jeans"
+],
+"off_pool": 1
+},
+"Halsley Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"rain jackets",
+"leather belts",
+"laptops"
+],
+"off_pool": 1
+},
+"Jorholm Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"smartphones",
+"running shoes",
+"denim jeans"
+],
+"off_pool": 1
+},
+"Torhurst Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"denim jeans",
+"dress shirts",
+"rain jackets"
+],
+"off_pool": 0
+},
+"Quildale Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"wool sweaters",
+"laptops",
+"winter coats"
+],
+"off_pool": 1
+},
+"Zara": {
+"multi": false,
+"secondary": null,
+"products": [
+"denim jeans",
+"cotton socks",
+"laptops"
+],
+"off_pool": 1
+},
+"Falholm Inc": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"wireless headphones",
+"smartphones",
+"plywood sheets"
+],
+"off_pool": 1
+},
+"Halhurst Co": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"4K televisions",
+"prescription medications",
+"wireless headphones"
+],
+"off_pool": 1
+},
+"Halwen Bros": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"tablets",
+"smartphones",
+"power drills"
+],
+"off_pool": 1
+},
+"Best Buy": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"tablets",
+"laptops",
+"contact lens solution"
+],
+"off_pool": 1
+},
+"Sony": {
+"multi": false,
+"secondary": null,
+"products": [
+"laptops",
+"smartphones",
+"lumber"
+],
+"off_pool": 1
+},
+"Apple Store": {
+"multi": false,
+"secondary": null,
+"products": [
+"4K televisions",
+"smartphones",
+"wireless headphones"
+],
+"off_pool": 0
+},
+"Oskbury LLC": {
+"multi": false,
+"secondary": null,
+"products": [
+"gaming consoles",
+"computer monitors",
+"wireless headphones"
+],
+"off_pool": 0
+},
+"Orlnard & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"wireless headphones",
+"power drills",
+"tablets"
+],
+"off_pool": 1
+},
+"B&H Photo": {
+"multi": false,
+"secondary": null,
+"products": [
+"wireless headphones",
+"smartphones",
+"4K televisions"
+],
+"off_pool": 0
+},
+"Griton": {
+"multi": false,
+"secondary": null,
+"products": [
+"laptops",
+"lumber",
+"smartphones"
+],
+"off_pool": 1
+},
+"Dell": {
+"multi": false,
+"secondary": null,
+"products": [
+"tablets",
+"smartphones",
+"gaming consoles"
+],
+"off_pool": 0
+},
+"Bose": {
+"multi": false,
+"secondary": null,
+"products": [
+"laptops",
+"smartphones",
+"tablets"
+],
+"off_pool": 0
+},
+"Nevwick": {
+"multi": false,
+"secondary": null,
+"products": [
+"power drills",
+"wireless headphones",
+"laptops"
+],
+"off_pool": 1
+},
+"Micro Center": {
+"multi": false,
+"secondary": null,
+"products": [
+"tablets",
+"smartphones",
+"USB cables"
+],
+"off_pool": 0
+},
+"GameStop": {
+"multi": false,
+"secondary": null,
+"products": [
+"power drills",
+"computer monitors",
+"lumber"
+],
+"off_pool": 2
+},
+"Talholm & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"USB cables",
+"power drills",
+"laptops"
+],
+"off_pool": 1
+},
+"Newegg": {
+"multi": false,
+"secondary": null,
+"products": [
+"wireless headphones",
+"gaming consoles",
+"power drills"
+],
+"off_pool": 1
+},
+"Samsung": {
+"multi": false,
+"secondary": null,
+"products": [
+"power drills",
+"lumber",
+"gaming consoles"
+],
+"off_pool": 2
+},
+"Torvarro": {
+"multi": false,
+"secondary": null,
+"products": [
+"lumber",
+"power drills",
+"4K televisions"
+],
+"off_pool": 2
+},
+"Wexley Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"gaming consoles",
+"smartphones",
+"4K televisions"
+],
+"off_pool": 0
+},
+"Bramby & Sons": {
+"multi": true,
+"secondary": "Pets",
+"products": [
+"plywood sheets",
+"flea treatments",
+"power drills"
+],
+"off_pool": 1
+},
+"Home Depot": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"power drills",
+"light fixtures",
+"prescription medications"
+],
+"off_pool": 1
+},
+"Elrdale": {
+"multi": true,
+"secondary": "Groceries",
+"products": [
+"kitchen faucets",
+"interior paint",
+"frozen vegetables"
+],
+"off_pool": 1
+},
+"Sherwin-Williams": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"tacos and burritos",
+"light fixtures",
+"plywood sheets"
+],
+"off_pool": 1
+},
+"Istmere & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"garden hoses",
+"kitchen faucets",
+"ceramic tile"
+],
+"off_pool": 0
+},
+"True Value": {
+"multi": false,
+"secondary": null,
+"products": [
+"garden hoses",
+"vitamins",
+"light fixtures"
+],
+"off_pool": 1
+},
+"Menards": {
+"multi": false,
+"secondary": null,
+"products": [
+"light fixtures",
+"interior paint",
+"garden hoses"
+],
+"off_pool": 0
+},
+"Ace Hardware": {
+"multi": false,
+"secondary": null,
+"products": [
+"ceramic tile",
+"light fixtures",
+"garden hoses"
+],
+"off_pool": 0
+},
+"Tractor Supply": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"lumber",
+"kitchen faucets"
+],
+"off_pool": 1
+},
+"Bramwen Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"interior paint",
+"light fixtures",
+"power drills"
+],
+"off_pool": 0
+},
+"Halbury": {
+"multi": false,
+"secondary": null,
+"products": [
+"power drills",
+"lumber",
+"prescription medications"
+],
+"off_pool": 1
+},
+"IKEA": {
+"multi": false,
+"secondary": null,
+"products": [
+"interior paint",
+"kitchen faucets",
+"prescription medications"
+],
+"off_pool": 1
+},
+"Quilden Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"lumber",
+"plywood sheets",
+"prescription medications"
+],
+"off_pool": 1
+},
+"Griden Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"garden hoses",
+"lumber",
+"light fixtures"
+],
+"off_pool": 0
+},
+"Lowe's": {
+"multi": false,
+"secondary": null,
+"products": [
+"plywood sheets",
+"ceramic tile",
+"light fixtures"
+],
+"off_pool": 0
+},
+"Halmere Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"garden hoses",
+"plywood sheets",
+"prescription medications"
+],
+"off_pool": 1
+},
+"Floor & Decor": {
+"multi": false,
+"secondary": null,
+"products": [
+"power drills",
+"kitchen faucets",
+"interior paint"
+],
+"off_pool": 0
+},
+"Quilmere": {
+"multi": false,
+"secondary": null,
+"products": [
+"interior paint",
+"power drills",
+"garden hoses"
+],
+"off_pool": 0
+},
+"Harbor Freight": {
+"multi": false,
+"secondary": null,
+"products": [
+"light fixtures",
+"plywood sheets",
+"interior paint"
+],
+"off_pool": 0
+},
+"Halvarro": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"ceramic tile",
+"power drills"
+],
+"off_pool": 1
+},
+"Fennard": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"blood pressure monitors",
+"electricity bills",
+"cold medicine"
+],
+"off_pool": 1
+},
+"GNC": {
+"multi": true,
+"secondary": "Groceries",
+"products": [
+"cold medicine",
+"blood pressure monitors",
+"milk and eggs"
+],
+"off_pool": 1
+},
+"Kaiser Permanente": {
+"multi": true,
+"secondary": "Home Improvement",
+"products": [
+"allergy pills",
+"plywood sheets",
+"vitamins"
+],
+"off_pool": 1
+},
+"Dovvarro & Sons": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"vitamins",
+"tacos and burritos",
+"sunscreen"
+],
+"off_pool": 1
+},
+"Walgreens": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"contact lens solution",
+"allergy pills"
+],
+"off_pool": 0
+},
+"Quest Diagnostics": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"sunscreen",
+"concert tickets"
+],
+"off_pool": 1
+},
+"Duane Reade": {
+"multi": false,
+"secondary": null,
+"products": [
+"sunscreen",
+"contact lens solution",
+"bandages"
+],
+"off_pool": 0
+},
+"Polsley": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"concert tickets",
+"blood pressure monitors"
+],
+"off_pool": 1
+},
+"Torton Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"vitamins",
+"concert tickets",
+"cold medicine"
+],
+"off_pool": 1
+},
+"Nevwick Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"sunscreen",
+"vitamins",
+"concert tickets"
+],
+"off_pool": 1
+},
+"LabCorp": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"cold medicine",
+"concert tickets"
+],
+"off_pool": 1
+},
+"Nevden Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"sunscreen",
+"contact lens solution",
+"prescription medications"
+],
+"off_pool": 0
+},
+"Vitamin Shoppe": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"allergy pills",
+"contact lens solution"
+],
+"off_pool": 0
+},
+"Bartell Drugs": {
+"multi": false,
+"secondary": null,
+"products": [
+"sunscreen",
+"allergy pills",
+"prescription medications"
+],
+"off_pool": 0
+},
+"Rite Aid": {
+"multi": false,
+"secondary": null,
+"products": [
+"prescription medications",
+"cold medicine",
+"bandages"
+],
+"off_pool": 0
+},
+"CVS": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"contact lens solution",
+"cold medicine"
+],
+"off_pool": 1
+},
+"Garden Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"cold medicine",
+"vitamins"
+],
+"off_pool": 1
+},
+"Halwen Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"blood pressure monitors",
+"vitamins",
+"movie tickets"
+],
+"off_pool": 1
+},
+"Fenvarro & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"bandages",
+"vitamins"
+],
+"off_pool": 1
+},
+"Gridale": {
+"multi": false,
+"secondary": null,
+"products": [
+"cold medicine",
+"prescription medications",
+"sunscreen"
+],
+"off_pool": 0
+},
+"Regal Cinemas": {
+"multi": true,
+"secondary": "Electronics",
+"products": [
+"bowling lanes",
+"wireless headphones",
+"theater seats"
+],
+"off_pool": 1
+},
+"Griby Co": {
+"multi": true,
+"secondary": "Travel",
+"products": [
+"hotel rooms",
+"arcade tokens",
+"mini golf rounds"
+],
+"off_pool": 1
+},
+"Griwen Bros": {
+"multi": true,
+"secondary": "Electronics",
+"products": [
+"arcade tokens",
+"4K televisions",
+"movie tickets"
+],
+"off_pool": 1
+},
+"Wexley Inc": {
+"multi": true,
+"secondary": "Electronics",
+"products": [
+"mini golf rounds",
+"smartphones",
+"movie tickets"
+],
+"off_pool": 1
+},
+"Bowlero": {
+"multi": false,
+"secondary": null,
+"products": [
+"theater seats",
+"airline tickets",
+"movie tickets"
+],
+"off_pool": 1
+},
+"Steam": {
+"multi": false,
+"secondary": null,
+"products": [
+"video game rentals",
+"bowling lanes",
+"movie tickets"
+],
+"off_pool": 0
+},
+"Jorden Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"escape room bookings",
+"bowling lanes",
+"movie tickets"
+],
+"off_pool": 0
+},
+"Cinemark": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"theater seats",
+"video game rentals"
+],
+"off_pool": 0
+},
+"Holdale": {
+"multi": false,
+"secondary": null,
+"products": [
+"concert tickets",
+"theater seats",
+"bowling lanes"
+],
+"off_pool": 0
+},
+"Dave & Buster's": {
+"multi": false,
+"secondary": null,
+"products": [
+"mini golf rounds",
+"concert tickets",
+"video game rentals"
+],
+"off_pool": 0
+},
+"AMC Theatres": {
+"multi": false,
+"secondary": null,
+"products": [
+"bowling lanes",
+"hotel rooms",
+"video game rentals"
+],
+"off_pool": 1
+},
+"Topgolf": {
+"multi": false,
+"secondary": null,
+"products": [
+"escape room bookings",
+"mini golf rounds",
+"video game rentals"
+],
+"off_pool": 0
+},
+"Brammere LLC": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"concert tickets",
+"hotel rooms"
+],
+"off_pool": 1
+},
+"Morton LLC": {
+"multi": false,
+"secondary": null,
+"products": [
+"movie tickets",
+"concert tickets",
+"hotel rooms"
+],
+"off_pool": 1
+},
+"Istnard LLC": {
+"multi": false,
+"secondary": null,
+"products": [
+"bowling lanes",
+"mini golf rounds",
+"theater seats"
+],
+"off_pool": 0
+},
+"Oskhurst Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"video game rentals",
+"movie tickets",
+"arcade tokens"
+],
+"off_pool": 0
+},
+"Quilhurst": {
+"multi": false,
+"secondary": null,
+"products": [
+"airline tickets",
+"theater seats",
+"bowling lanes"
+],
+"off_pool": 1
+},
+"Spotify": {
+"multi": false,
+"secondary": null,
+"products": [
+"mini golf rounds",
+"arcade tokens",
+"hotel rooms"
+],
+"off_pool": 1
+},
+"Netflix": {
+"multi": false,
+"secondary": null,
+"products": [
+"mini golf rounds",
+"movie tickets",
+"bowling lanes"
+],
+"off_pool": 0
+},
+"Ticketmaster": {
+"multi": false,
+"secondary": null,
+"products": [
+"hotel rooms",
+"bowling lanes",
+"concert tickets"
+],
+"off_pool": 1
+},
+"Ardton Inc": {
+"multi": true,
+"secondary": "Groceries",
+"products": [
+"packaged snacks",
+"rental cars",
+"train tickets"
+],
+"off_pool": 1
+},
+"Istmere Group": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"airport lounge passes",
+"rental cars",
+"ramen bowls"
+],
+"off_pool": 1
+},
+"Airbnb": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"airline tickets",
+"winter coats",
+"travel insurance"
+],
+"off_pool": 1
+},
+"Vorcott": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"cold medicine",
+"travel insurance",
+"hotel rooms"
+],
+"off_pool": 1
+},
+"United Airlines": {
+"multi": false,
+"secondary": null,
+"products": [
+"train tickets",
+"dog food",
+"vacation packages"
+],
+"off_pool": 1
+},
+"Delta Air Lines": {
+"multi": false,
+"secondary": null,
+"products": [
+"cruise cabins",
+"vacation packages",
+"dog food"
+],
+"off_pool": 1
+},
+"Hilton": {
+"multi": false,
+"secondary": null,
+"products": [
+"cruise cabins",
+"airline tickets",
+"travel insurance"
+],
+"off_pool": 0
+},
+"Falvarro Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"airport lounge passes",
+"vacation packages",
+"rental cars"
+],
+"off_pool": 0
+},
+"Hertz": {
+"multi": false,
+"secondary": null,
+"products": [
+"rental cars",
+"cruise cabins",
+"travel insurance"
+],
+"off_pool": 0
+},
+"Tornard Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"airport lounge passes",
+"airline tickets",
+"hotel rooms"
+],
+"off_pool": 0
+},
+"Amtrak": {
+"multi": false,
+"secondary": null,
+"products": [
+"rental cars",
+"airport lounge passes",
+"hotel rooms"
+],
+"off_pool": 0
+},
+"Nevham Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"train tickets",
+"cruise cabins",
+"vacation packages"
+],
+"off_pool": 0
+},
+"Southwest": {
+"multi": false,
+"secondary": null,
+"products": [
+"travel insurance",
+"cat litter",
+"hotel rooms"
+],
+"off_pool": 1
+},
+"Expedia": {
+"multi": false,
+"secondary": null,
+"products": [
+"cruise cabins",
+"airport lounge passes",
+"airline tickets"
+],
+"off_pool": 0
+},
+"Marriott": {
+"multi": false,
+"secondary": null,
+"products": [
+"hotel rooms",
+"dog food",
+"rental cars"
+],
+"off_pool": 1
+},
+"Polford Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"airport lounge passes",
+"airline tickets",
+"vacation packages"
+],
+"off_pool": 0
+},
+"Dunwick": {
+"multi": false,
+"secondary": null,
+"products": [
+"airline tickets",
+"train tickets",
+"airport lounge passes"
+],
+"off_pool": 0
+},
+"Enterprise": {
+"multi": false,
+"secondary": null,
+"products": [
+"dog food",
+"travel insurance",
+"airport lounge passes"
+],
+"off_pool": 1
+},
+"Torden Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"travel insurance",
+"dog food",
+"airline tickets"
+],
+"off_pool": 1
+},
+"Garholm Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"dog food",
+"rental cars",
+"airport lounge passes"
+],
+"off_pool": 1
+},
+"Pet Supplies Plus": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"natural gas service",
+"chew toys",
+"aquarium filters"
+],
+"off_pool": 1
+},
+"Petco": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"ramen bowls",
+"pet grooming",
+"aquarium filters"
+],
+"off_pool": 1
+},
+"Grinard Inc": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"pet grooming",
+"flea treatments",
+"electricity bills"
+],
+"off_pool": 1
+},
+"PetSmart": {
+"multi": true,
+"secondary": "Telecom & Utilities",
+"products": [
+"water bills",
+"pet grooming",
+"bird seed"
+],
+"off_pool": 1
+},
+"Petland": {
+"multi": false,
+"secondary": null,
+"products": [
+"pet grooming",
+"cat litter",
+"yoga classes"
+],
+"off_pool": 1
+},
+"Chewy": {
+"multi": false,
+"secondary": null,
+"products": [
+"chew toys",
+"yoga classes",
+"gym memberships"
+],
+"off_pool": 2
+},
+"Yarstead Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"yoga classes",
+"cat litter",
+"aquarium filters"
+],
+"off_pool": 1
+},
+"Ulmdale & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"cat litter",
+"flea treatments",
+"aquarium filters"
+],
+"off_pool": 0
+},
+"VCA Animal Hospital": {
+"multi": false,
+"secondary": null,
+"products": [
+"pet grooming",
+"cat litter",
+"flea treatments"
+],
+"off_pool": 0
+},
+"Istwick Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"flea treatments",
+"pet grooming",
+"yoga classes"
+],
+"off_pool": 1
+},
+"Ulmbury Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"hamster cages",
+"gym memberships",
+"pet grooming"
+],
+"off_pool": 1
+},
+"Wexdale Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"chew toys",
+"flea treatments",
+"yoga classes"
+],
+"off_pool": 1
+},
+"BarkBox": {
+"multi": false,
+"secondary": null,
+"products": [
+"cat litter",
+"bird seed",
+"aquarium filters"
+],
+"off_pool": 0
+},
+"Ulmmoor Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"flea treatments",
+"dog food",
+"aquarium filters"
+],
+"off_pool": 0
+},
+"Halholm & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"cat litter",
+"chew toys",
+"aquarium filters"
+],
+"off_pool": 0
+},
+"Marbury Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"flea treatments",
+"pet grooming",
+"bird seed"
+],
+"off_pool": 0
+},
+"Wag": {
+"multi": false,
+"secondary": null,
+"products": [
+"yoga classes",
+"cat litter",
+"bird seed"
+],
+"off_pool": 1
+},
+"Banfield Pet Hospital": {
+"multi": false,
+"secondary": null,
+"products": [
+"cat litter",
+"dog food",
+"hamster cages"
+],
+"off_pool": 0
+},
+"Wexhurst & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"aquarium filters",
+"gym memberships",
+"cat litter"
+],
+"off_pool": 1
+},
+"Rover": {
+"multi": false,
+"secondary": null,
+"products": [
+"bird seed",
+"pet grooming",
+"hamster cages"
+],
+"off_pool": 0
+},
+"Rinton Ltd": {
+"multi": true,
+"secondary": "Gas & Auto",
+"products": [
+"dumbbells",
+"diesel fuel",
+"yoga classes"
+],
+"off_pool": 1
+},
+"Orlwick Co": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"running shoes",
+"personal training sessions",
+"dumbbells"
+],
+"off_pool": 1
+},
+"Kelford Bros": {
+"multi": true,
+"secondary": "Clothing",
+"products": [
+"rain jackets",
+"spin classes",
+"protein powder"
+],
+"off_pool": 1
+},
+"Peloton": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"personal training sessions",
+"burgers and fries",
+"yoga classes"
+],
+"off_pool": 1
+},
+"Gold's Gym": {
+"multi": false,
+"secondary": null,
+"products": [
+"personal training sessions",
+"yoga classes",
+"resistance bands"
+],
+"off_pool": 0
+},
+"REI": {
+"multi": false,
+"secondary": null,
+"products": [
+"protein powder",
+"gym memberships",
+"yoga classes"
+],
+"off_pool": 0
+},
+"Equinox": {
+"multi": false,
+"secondary": null,
+"products": [
+"resistance bands",
+"personal training sessions",
+"treadmills"
+],
+"off_pool": 0
+},
+"LA Fitness": {
+"multi": false,
+"secondary": null,
+"products": [
+"personal training sessions",
+"spin classes",
+"dumbbells"
+],
+"off_pool": 0
+},
+"Zedden": {
+"multi": false,
+"secondary": null,
+"products": [
+"protein powder",
+"resistance bands",
+"yoga classes"
+],
+"off_pool": 0
+},
+"Fenford Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"home internet service",
+"yoga classes",
+"protein powder"
+],
+"off_pool": 1
+},
+"Nevnard Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"spin classes",
+"personal training sessions",
+"yoga classes"
+],
+"off_pool": 0
+},
+"Bexwen & Sons": {
+"multi": false,
+"secondary": null,
+"products": [
+"mobile phone plans",
+"spin classes",
+"gym memberships"
+],
+"off_pool": 1
+},
+"CorePower Yoga": {
+"multi": false,
+"secondary": null,
+"products": [
+"treadmills",
+"spin classes",
+"home internet service"
+],
+"off_pool": 1
+},
+"Lundale Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"protein powder",
+"yoga classes",
+"dumbbells"
+],
+"off_pool": 0
+},
+"Polby": {
+"multi": false,
+"secondary": null,
+"products": [
+"protein powder",
+"yoga classes",
+"resistance bands"
+],
+"off_pool": 0
+},
+"24 Hour Fitness": {
+"multi": false,
+"secondary": null,
+"products": [
+"spin classes",
+"dumbbells",
+"home internet service"
+],
+"off_pool": 1
+},
+"Crunch Fitness": {
+"multi": false,
+"secondary": null,
+"products": [
+"treadmills",
+"yoga classes",
+"resistance bands"
+],
+"off_pool": 0
+},
+"Planet Fitness": {
+"multi": false,
+"secondary": null,
+"products": [
+"personal training sessions",
+"dumbbells",
+"yoga classes"
+],
+"off_pool": 0
+},
+"Holden Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"gym memberships",
+"dumbbells",
+"personal training sessions"
+],
+"off_pool": 0
+},
+"Orangetheory": {
+"multi": false,
+"secondary": null,
+"products": [
+"gym memberships",
+"home internet service",
+"protein powder"
+],
+"off_pool": 1
+},
+"Halton": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"fiber broadband",
+"prescription medications",
+"landline service"
+],
+"off_pool": 1
+},
+"Dunhurst Ltd": {
+"multi": true,
+"secondary": "Pharmacy & Health",
+"products": [
+"contact lens solution",
+"landline service",
+"fiber broadband"
+],
+"off_pool": 1
+},
+"Dunhurst Bros": {
+"multi": true,
+"secondary": "Gas & Auto",
+"products": [
+"car batteries",
+"home internet service",
+"water bills"
+],
+"off_pool": 1
+},
+"Halwen & Sons": {
+"multi": true,
+"secondary": "Restaurants",
+"products": [
+"ramen bowls",
+"water bills",
+"home internet service"
+],
+"off_pool": 1
+},
+"Xfinity": {
+"multi": false,
+"secondary": null,
+"products": [
+"cable TV packages",
+"electricity bills",
+"fiber broadband"
+],
+"off_pool": 0
+},
+"Duke Energy": {
+"multi": false,
+"secondary": null,
+"products": [
+"water bills",
+"cable TV packages",
+"mobile phone plans"
+],
+"off_pool": 0
+},
+"Spectrum": {
+"multi": false,
+"secondary": null,
+"products": [
+"home internet service",
+"electricity bills",
+"fiber broadband"
+],
+"off_pool": 0
+},
+"Comcast": {
+"multi": false,
+"secondary": null,
+"products": [
+"home internet service",
+"milk and eggs",
+"landline service"
+],
+"off_pool": 1
+},
+"Falvarro Ltd": {
+"multi": false,
+"secondary": null,
+"products": [
+"mobile phone plans",
+"landline service",
+"electricity bills"
+],
+"off_pool": 0
+},
+"Kelby Co": {
+"multi": false,
+"secondary": null,
+"products": [
+"natural gas service",
+"mobile phone plans",
+"fiber broadband"
+],
+"off_pool": 0
+},
+"Wexham Inc": {
+"multi": false,
+"secondary": null,
+"products": [
+"water bills",
+"fiber broadband",
+"electricity bills"
+],
+"off_pool": 0
+},
+"Dunwen Group": {
+"multi": false,
+"secondary": null,
+"products": [
+"fiber broadband",
+"natural gas service",
+"home internet service"
+],
+"off_pool": 0
+},
+"Pexlock": {
+"multi": false,
+"secondary": null,
+"products": [
+"water bills",
+"mobile phone plans",
+"fresh produce"
+],
+"off_pool": 1
+},
+"Cox": {
+"multi": false,
+"secondary": null,
+"products": [
+"electricity bills",
+"landline service",
+"home internet service"
+],
+"off_pool": 0
+},
+"AT&T": {
+"multi": false,
+"secondary": null,
+"products": [
+"cable TV packages",
+"electricity bills",
+"water bills"
+],
+"off_pool": 0
+},
+"Con Edison": {
+"multi": false,
+"secondary": null,
+"products": [
+"water bills",
+"natural gas service",
+"electricity bills"
+],
+"off_pool": 0
+},
+"T-Mobile": {
+"multi": false,
+"secondary": null,
+"products": [
+"cable TV packages",
+"fresh produce",
+"home internet service"
+],
+"off_pool": 1
+},
+"PG&E": {
+"multi": false,
+"secondary": null,
+"products": [
+"cable TV packages",
+"home internet service",
+"fresh produce"
+],
+"off_pool": 1
+},
+"Sabstead Bros": {
+"multi": false,
+"secondary": null,
+"products": [
+"landline service",
+"water bills",
+"cable TV packages"
+],
+"off_pool": 0
+},
+"Verizon": {
+"multi": false,
+"secondary": null,
+"products": [
+"water bills",
+"fiber broadband",
+"fresh produce"
+],
+"off_pool": 1
+}
+},
+"sha256": "54e5e85444798664a6faf33248f222344136f61f6540b350a75582bfb855a458"
+}

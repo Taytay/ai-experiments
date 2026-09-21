@@ -655,3 +655,31 @@ function that builds the image from `uv.lock`, mounts `hf_cache` and the frozen 
 `exp_curriculum.py` / `exp_encoder.py`, and syncs results and adapters back (DVC). Tinker ($20 to $40) is
 worth trying once TRAIN-8 has a local number: its shipped on-policy distillation recipe is the independent
 check, and frontier-size trace generation for REAL-5 costs a few dollars there.
+
+## Added 2026-09-19: hardening the REAL-5 result before the cloud runs
+
+Section 38's headline (the categoriser with the merchant's fact-DB record in the prompt: 90 overall, 98 on merchants no
+user labelled) rests on three conveniences. These rows remove them on the 3090; row 34 (Modal) stays for the long runs.
+
+**REAL-7 (O) Does the record-in-prompt number survive ambiguous records, a learned retriever and a second seed?**
+(1) The REAL-6 records use section 4's disjoint product pools, so a record names its category almost by construction;
+section 35 measured a 13-point loss for the products-to-category bridge when pools overlap. (2) The record is found by the
+merchant's name (an oracle); production has only the statement string, and section 25.4's retriever was measured on clean
+strings and 120 records. (3) Every REAL-6 number is one seed. *Experiment:* an ambiguous fact DB for the same 240 merchants
+(each category's pool gains two products of the next one; a fifth of the merchants sell two of their own products and one of
+another category), frozen beside `real6_v1`; the record-in-prompt and parametric categorisers retrained and rescored on it.
+A MiniLM retriever over the 240 records tuned on templated statement renderings of the DB's own names (no user labels),
+recall@1 / @5 from the 1,179 test strings by known / opaque and full / truncated name, and the categoriser scored end to end
+with the retrieved top-1 record, wrong ones included. Three seeds of SFT no-DB, SFT + record and the 400-step parametric arm.
+**Status (2026-09-21):** answered, PLAN step 37, REPORT.md 43. Ambiguous records (`real6_v1_ambdb.json`: 133 of 240 with an off-pool product, 48 multi-category): the record-in-prompt categoriser retrained on them reads 87.4 overall (90.2 disjoint), 84.8 unseen (88.5) and 88.6 on the DB-only merchants (97.6), the loss on the opaque ones (94.2 to 78.8) and none on coined names; trained on clean records and handed ambiguous ones it reads 82.6 / DB-only 78.0; the instruct base 48.7 (58.0), the tuned bge encoder 77.9 (83.7); the 400-step parametric arm 64.0 / DB-only 65.0 (66.3 / 72.4). Retriever: MiniLM tuned on templated renderings of the DB's names (no user labels) finds the record from the raw statement string at recall@1 99.4 / @5 100 over 240 records (97.7 on truncated names; zero-shot 79.1 / 44.3), 92.9 / 98.6 with 5,000 decoy records (73.2 truncated); the categoriser with the retrieved top-1 record equals the oracle within 0.3 on every cell (89.9 vs 90.2). Seeds: no-DB 60.5 +- 3.0, record in prompt 89.3 +- 0.9 (DB-only 91.3 +- 5.6), parametric 63.8 +- 2.3 overall but DB-only 59.4 +- 12.3 and opaque 30.7 +- 21.4 (section 38's 72.4 / 53.8 was the best seed), so the parametric gain on DB-only merchants (+10 +- 12) is inside the noise and the prompt gain (+42) is not.
+
+**INFRA-2 (O) A categoriser trainer that does not depend on unsloth.**
+Sections 31 and 38 hit unsloth's fused loss and allocator behaviour (`labels=` chunking from free memory, the "unsloth"
+checkpointing assertion, `merge_and_unload` breaking the fast forward); the owner asked whether it is more trouble than it
+is worth. *Task:* a `TRAINER=hf` path in `exp_categoriser.py` (transformers + peft, same LoRA, schedule, batches and seed),
+the same-seed comparison on REAL-6 and the wall-clock and memory cost, so production can depend on either.
+
+**REAL-8 (O) The parametric exposure curve and the chat template.**
+Section 38: one pass over the records injected nothing, three passes gave +21 on DB-only merchants at a nine-point ARC cost.
+*Experiment:* six and twelve passes (800 and 1,600 steps at 50%) on the same axis; and the REAL-6 prompt through the instruct
+model's chat template, since production will use it.
