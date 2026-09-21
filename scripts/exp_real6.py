@@ -9,6 +9,7 @@
 Every cell gets a 95% bootstrap interval over its items and the section 11 null band (gold permuted within the cell, predictions fixed).
 
 usage: uv run python scripts/exp_real6.py llm [base|<adapter dir under models/adapters>]      MODEL=Qwen/Qwen2.5-3B
+       CHAT=1: the prompts through the instruct model's chat template (real6.chat_item; on by default for an adapter whose name has _chat; adds _chat to a base's tag)
        uv run python scripts/exp_real6.py encoder [minilm|bge]
        SMOKE=1 scores every 10th item, no tracker
        REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB in place of the disjoint records (adds _amb to the tag)
@@ -40,6 +41,7 @@ CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions 
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 SCORER = os.environ.get("SCORER", "unsloth")
+CHAT = bool(int(os.environ.get("CHAT", "1" if "_chat" in WHAT else "0")))  # row 39 (REAL-8): the prompt as the user turn, the option as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
 if not R6.PATH.exists():
@@ -49,6 +51,8 @@ RETRIEVED = None
 if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/exp_real6_retriever.py; its record comes from the DB in use
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
+if CHAT and ROUTE == "llm":
+    ITEMS = [R6.chat_item(it) for it in ITEMS]
 tag = (MODEL.split("/")[-1] if WHAT == "base" else WHAT) if ROUTE == "llm" else WHAT
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
 CELLS = sorted({it["level"] for it in DOC["items"]})
@@ -102,6 +106,8 @@ def run_llm(run):
         from unsloth import FastLanguageModel
         model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     tok.padding_side = "right"; model.eval()
+    if CHAT:
+        assert R6.chat_wrap("x") == tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True), "chat template drift"
     sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
     results = {}
     for cond, ctx in (("noctx", False), ("ctx", True), ("ret1", True)):
@@ -158,8 +164,10 @@ if REAL6_DB == "amb":
     tag += "_amb"
 if SCORER == "hf":
     tag += "_hfs"
+if CHAT and ROUTE == "llm" and "_chat" not in tag:
+    tag += "_chat"
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
-cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], real6_db=REAL6_DB, db_sha=DOC.get("db_sha256"), scorer=SCORER,
+cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], real6_db=REAL6_DB, db_sha=DOC.get("db_sha256"), scorer=SCORER, chat=CHAT,
            n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
 with Run("real6", model=cfg["model"], config=cfg, enabled=not SMOKE) as run:
     results = run_llm(run) if ROUTE == "llm" else run_encoder(run)
