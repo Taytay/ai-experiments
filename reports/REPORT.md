@@ -2,6 +2,8 @@
 
 Date: 2026-09-12 to 2026-09-14. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
 Sections 4 and 6 ran with transformers + torch only (Smart App Control blocked triton at the time; see NOTES.md); sections 7 and 8 use unsloth.
+**Correction (2026-09-21, section 44).** unsloth's `FastLanguageModel.from_pretrained` defaults to `load_in_4bit=True`, and six scripts never overrode it: `exp_categoriser.py` and `exp_real6.py` (sections 37, 38, 43: every categoriser is QLoRA on the NF4 4-bit base and every number in those sections, the instruct base's included, is read on that base, consistently), `exp_items_v2.py` (the ARC / MMLU / induction re-reads of section 33 and Table 38.3), `exp_lre.py` (section 40), `exp_graph4.py` (section 42) and `exp_onpolicy_distill.py` (section 31: the teacher is the 4-bit base, perplexity 11.12 against the bf16 base's 10.61, and the student was trained on it). `exp_curriculum.py` always set the flag, so the arms of sections 8 to 34 are bf16 LoRA on the bf16 base as stated; the four back-fill and OPD scripts read those bf16 adapters on the 4-bit base, a mismatch whose size section 44 measures. Every script now sets the precision explicitly (`LOAD_4BIT`).
+
 Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../scripts/`. Raw numbers: `../results/`. Every run is tracked with config + git commit in `../evals/` (see `../evals/LEADERBOARD.md`).
 
 ## 1. Executive summary
