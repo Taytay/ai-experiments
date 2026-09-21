@@ -23,6 +23,8 @@ from ai_experiments.scoring import Scorer, aggregate, per_item_path, write_recor
 
 WHAT = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
+LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "0")))  # unsloth's loader defaults to the NF4 4-bit base (load_in_4bit=True); until 2026-09-21 this script
+# never set it, so its saved results were read on the 4-bit base (REPORT.md section 44). Default now bf16, like exp_curriculum; LOAD_4BIT=1 reproduces the old reads.
 WEAKNESS = os.environ.get("WEAKNESS", "type")
 tag = ("base" if WHAT == "base" else WHAT) + ("_wind" if WEAKNESS == "independent" else "")
 OUT = ROOT / "results" / f"graph4_{tag}.json"
@@ -32,7 +34,7 @@ src = MODEL if WHAT == "base" else str(ROOT / "models" / "adapters" / WHAT)
 cond = "base" if WHAT == "base" else "trained"
 
 with Run("graph4", model=MODEL, config=dict(what=WHAT, weakness=WEAKNESS, graph4_sha=doc["sha256"], n_items=len(items))) as run:
-    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=768, dtype=torch.bfloat16)
+    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=768, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     tok.padding_side = "right"; model.eval(); t0 = time.time()
     sc = Scorer(model, tok, maxlen=768, extras=False)
     recs = sc.score(items, label="graph4")

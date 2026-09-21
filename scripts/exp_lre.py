@@ -37,6 +37,8 @@ from ai_experiments.paths import ROOT
 
 WHAT = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
+LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "0")))  # unsloth's loader defaults to the NF4 4-bit base (load_in_4bit=True); until 2026-09-21 this script
+# never set it, so its saved results were read on the 4-bit base (REPORT.md section 44). Default now bf16, like exp_curriculum; LOAD_4BIT=1 reproduces the old reads.
 WEAKNESS = os.environ.get("WEAKNESS", "type")
 LAYERS = [int(x) for x in os.environ.get("LAYERS", "4,8,12,16,20,24,28,32,36").split(",")]
 RIDGE = float(os.environ.get("RIDGE", "1.0"))
@@ -52,7 +54,7 @@ Q = {"type": "Question: What type is {n}?\nAnswer:", "weakness": "Question: What
 
 def load():
     src = MODEL if WHAT == "base" else str(ROOT / "models" / "adapters" / WHAT)
-    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=1024, dtype=torch.bfloat16)
+    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=1024, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     if WHAT != "base":
         FastLanguageModel.for_inference(model)  # the adapter stays a PeftModel (merge_and_unload broke unsloth's fast forward); the hidden states are the same
     model.eval()
