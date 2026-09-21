@@ -64,6 +64,8 @@ ADAPTER_NAME = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("
 STEPS = int(sys.argv[2]) if len(sys.argv) > 2 else 120
 LR = float(sys.argv[3]) if len(sys.argv) > 3 else 1e-4
 PROMPTS = os.environ.get("PROMPTS", "fineweb")
+LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "0")))  # unsloth's loader defaults to the NF4 4-bit base (load_in_4bit=True); until 2026-09-21 this script
+# never set it, so its saved results were read on the 4-bit base (REPORT.md section 44). Default now bf16, like exp_curriculum; LOAD_4BIT=1 reproduces the old reads.
 KL = os.environ.get("KL", "full")
 N_PROMPTS, N_SAMPLES = int(os.environ.get("N_PROMPTS", "64")), int(os.environ.get("N_SAMPLES", "4"))
 MAX_NEW, TEMP = int(os.environ.get("MAX_NEW", "96")), float(os.environ.get("TEMP", "1.0"))
@@ -140,7 +142,7 @@ OUT = ROOT / "results" / f"opd_{TAG}{'_smoke' if SMOKE else ''}.json"
 if SMOKE:
     STEPS, N_PROMPTS, N_SAMPLES, MAX_NEW, PERIODIC = 3, 8, 2, 32, 2
 
-model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16)
+model, tok = FastLanguageModel.from_pretrained(str(ADAPTER), max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
 tok.padding_side = "right"
 params = [p for p in model.parameters() if p.requires_grad]
 pad, eos = tok.pad_token_id, tok.eos_token_id

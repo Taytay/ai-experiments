@@ -53,6 +53,9 @@ Both sides:
   line endings, DVC remote, GPU, torchvision build matching torch so unsloth imports); `just doctor --gpu` also tests whether the driver spills VRAM
   to system RAM. Run it when something looks off, and after changing a machine setting.
 - Run Python with `uv run python ...`, never a bare `python`.
+- unsloth's `FastLanguageModel.from_pretrained` defaults to `load_in_4bit=True` (the NF4 4-bit base). Always pass
+  `load_in_4bit=` explicitly (the scripts read `LOAD_4BIT`), and score an adapter on the precision it was trained on:
+  a bf16 adapter on the 4-bit base (or the reverse) changes a fifth of the predictions (REPORT.md section 44).
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
   side; if not, `just pull` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.

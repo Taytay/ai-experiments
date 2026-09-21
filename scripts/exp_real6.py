@@ -40,6 +40,8 @@ CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions 
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 SCORER = os.environ.get("SCORER", "unsloth")
+LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
+# unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
 if not R6.PATH.exists():
     R6.freeze()
 DOC = R6.load(REAL6_DB)
@@ -98,7 +100,7 @@ def run_llm(run):
     else:
         import unsloth  # noqa: F401
         from unsloth import FastLanguageModel
-        model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16)
+        model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     tok.padding_side = "right"; model.eval()
     sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
     results = {}

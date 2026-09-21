@@ -2,6 +2,8 @@
 
 Date: 2026-09-12 to 2026-09-14. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
 Sections 4 and 6 ran with transformers + torch only (Smart App Control blocked triton at the time; see NOTES.md); sections 7 and 8 use unsloth.
+**Correction (2026-09-21, section 44).** unsloth's `FastLanguageModel.from_pretrained` defaults to `load_in_4bit=True`, and six scripts never overrode it: `exp_categoriser.py` and `exp_real6.py` (sections 37, 38, 43: every categoriser is QLoRA on the NF4 4-bit base and every number in those sections, the instruct base's included, is read on that base, consistently), `exp_items_v2.py` (the ARC / MMLU / induction re-reads of section 33 and Table 38.3), `exp_lre.py` (section 40), `exp_graph4.py` (section 42) and `exp_onpolicy_distill.py` (section 31: the teacher is the 4-bit base, perplexity 11.12 against the bf16 base's 10.61, and the student was trained on it). `exp_curriculum.py` always set the flag, so the arms of sections 8 to 34 are bf16 LoRA on the bf16 base as stated; the four back-fill and OPD scripts read those bf16 adapters on the 4-bit base, a mismatch whose size section 44 measures. Every script now sets the precision explicitly (`LOAD_4BIT`).
+
 Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../scripts/`. Raw numbers: `../results/`. Every run is tracked with config + git commit in `../evals/` (see `../evals/LEADERBOARD.md`).
 
 ## 1. Executive summary
@@ -2809,3 +2811,96 @@ Table 43.4. Over three seeds of LoRA initialisation and data order, the SFT arm 
 ### 43.5 What the step says
 
 REAL-7 asked whether section 38's record-in-prompt number survives ambiguous records, a learned retriever and more seeds. It does, at a discount that is now measured. Ambiguous records (133 of 240 with a product from outside the category's pool, 48 multi-category merchants) cost the categoriser trained on them 3 points overall (87.4) and 9 on the merchants only the DB knows (88.6), the loss on the opaque merchants (94 to 79) and none on the coined-name cells; a categoriser trained on clean records and handed ambiguous ones loses twice that, and an untrained reader loses in proportion to the ambiguity. The name oracle costs nothing to remove: a MiniLM retriever tuned on templated renderings of the DB's own names, with no user label, finds the record from the raw statement string at 99.4 over 240 records and the categoriser reads the same numbers with the retrieved record as with the oracle; against 5,000 decoy records the same retriever reads 92.9 (73 on truncated names), so the retrieval side of a production DB is a hard-negative problem on truncated twins, not a categorisation problem. Three seeds leave the record-in-prompt result where it was (89.3 +- 0.9; DB-only 91 +- 6) and remove section 38's parametric claim: the +21 on DB-only merchants was the best of three seeds whose mean gain is +10 +- 12, and on the opaque merchants +5 +- 21, so at this exposure the injected records are not reliably usable from the prompt, which section 38 already flagged as exposure-limited and row 39's exposure curve should now read at three seeds. For the owner's goal the ranking is unchanged and better founded: record in the prompt through a tuned retriever (89 to 90 overall, 87 to 89 with ambiguous records), then other users' labels (84 to 86), then the records in the weights (59 +- 12 on the merchants that need them). Not run: the categoriser fed the decoy-index retrieval (the per-hit numbers put it at about 6 points below the oracle); seeds of the ambiguous-DB runs; a retriever tuned with the twins as hard negatives or on bge; the exposure curve at three seeds (row 39). Cost: about 10 GPU hours over two nights (the chain was stopped once by the owner between steps and resumed from `scripts/chains/chain_r37.sh`).
+
+## 44. An unsloth-free categoriser trainer, and what it exposed: unsloth's loader defaults to the 4-bit base, six scripts never overrode it, a bf16 adapter read on the 4-bit base changes a fifth of the predictions, and the mismatched re-reads of sections 33, 40 and 42 move by 0 to 9 points without changing a conclusion (INFRA-2)
+
+*PLAN step 38. Code: `TRAINER=hf` in `scripts/exp_categoriser.py` (transformers + peft, no unsloth), `SCORER=hf` in `scripts/exp_real6.py`, `scripts/check_unsloth_base.py` (what a load returns), `LOAD_4BIT` in the six scripts that had relied on the default, `RUN_TAG` on the back-fill scripts, `scripts/hf_trainer_tables.py`, chains `scripts/chains/chain_r38{,b,c}.sh`. Results `results/categoriser_llm_{none,ret}_hf.json`, `results/real6_*_hf_lora*.json`, `results/real6_Qwen2.5-3B-Instruct_hfs.json`, `results/{items2,graph4,lre}_*_bf16*.json`; adapters `categoriser_Qwen2.5-3B-Instruct_{none,ret}_hf_lora`.*
+
+The owner asked whether unsloth is more trouble than it is worth after the fused-loss and allocator problems of sections 31 and 38. INFRA-2's task was the smaller, concrete answer: a second implementation of the section 38 categoriser trainer with transformers and peft alone, the same rank-64 LoRA on every linear layer, the same schedule, the same batches in the same order from the same seed (the LoRA initialisation is each library's own), so that production can depend on either and the two can be checked against each other. The check found more than a trainer difference.
+
+**The trainer.** `load_llm()` in `exp_categoriser.py` builds the model either way; the loop, loss (per-row cross-entropy on the label tokens), optimiser and schedule are shared. The transformers path loads `Qwen/Qwen2.5-3B-Instruct` in bf16 with SDPA attention and non-reentrant gradient checkpointing and wraps it with peft's `LoraConfig(r=64, alpha=128)`; the adapter is saved in peft's format, as unsloth's is. `SCORER=hf` in `exp_real6.py` loads the base named in the adapter's own config through transformers and the adapter through `PeftModel`, and scores with the same option log-probability rule.
+
+**What the loader returns.** Scoring the peft-trained no-DB adapter through unsloth's loader (the section 38 scorer) agreed with scoring it through transformers on only 80.7% of the items, while the unsloth-trained adapter scored both ways agreed on 98.6%. The adapters' configs explained it: the unsloth-trained one records its base as `unsloth/qwen2.5-3b-instruct-unsloth-bnb-4bit`. `check_unsloth_base.py` confirms that `FastLanguageModel.from_pretrained(name, dtype=torch.bfloat16)` returns the NF4 4-bit model (bitsandbytes `Linear4bit` layers, 2.25 GiB allocated against 5.85 in bf16) because `load_in_4bit` defaults to True; `dtype` sets the compute type only. `exp_curriculum.py` and the scripts of sections 4 to 30 passed the flag (`LOAD_4BIT`, default off), so the arms of sections 8 to 34 are bf16 LoRA on the bf16 base as the report says. Six scripts written from 2026-09-18 on did not: `exp_categoriser.py` and `exp_real6.py` (sections 37, 38, 43), `exp_items_v2.py` (section 33's re-reads and Table 38.3), `exp_lre.py` (section 40), `exp_graph4.py` (section 42) and `exp_onpolicy_distill.py` (section 31). For the first two the consequence is a relabelling: every categoriser is QLoRA on the 4-bit base and every REAL-6 number, the instruct base's included, is read on that base, consistently, so the comparisons stand. For the other four it is a mismatch: bf16-trained adapters were read on the 4-bit base, and in section 31 the teacher was the 4-bit base (perplexity 11.12 on the WikiText slice against the bf16 base's 10.61; `exp_onpolicy_distill.py` had flagged the gap as unexplained) and the student was trained on it, then scored on bf16 by `exp_curriculum.py` (its step-0 perplexity reads 25.66 inside the OPD script and 22.79 in `exp_curriculum.py` for the same weights). Every script now sets the precision explicitly, the top of this report carries the correction, and the second and third chains of this step measured the sizes (Table 44.4).
+
+**Table 44.1: the same categoriser recipe (rank-64 LoRA on every linear layer, 200 steps x 16 sequences, lr 1e-4, seed 0, identical batches) trained through unsloth (section 38: QLoRA on the NF4 4-bit base, scored on it) and through transformers + peft alone (TRAINER=hf: bf16 base, scored on it with SCORER=hf); accuracy %, DB-only groups from the per-item files**
+
+| measure | no DB: unsloth | no DB: transformers + peft | record in prompt: unsloth | record in prompt: transformers + peft |
+|---|---|---|---|---|
+| all items | 57.1 [54.3, 59.9] | 59.5 [57, 62.3] | 90.2 [88.4, 91.7] | 88.5 [86.6, 90.2] |
+| seen merchant | 60.3 [56.2, 64.4] | 61.2 [57.2, 65.1] | 91.9 [89.6, 94.1] | 92.1 [89.8, 94.3] |
+| unseen merchant | 54.2 [50.3, 58.1] | 58.1 [54, 62.1] | 88.5 [86, 91.1] | 85.2 [82.4, 88.1] |
+| unseen, new word | 42.9 [35, 51.4] | 51.4 [42.9, 60] | 92.1 [87.9, 96.4] | 88.6 [83.6, 93.6] |
+| DB-only merchants | 51.2 | 56.9 | 97.6 | 92.7 |
+| DB-only, opaque | 25.0 | 26.9 | 94.2 | 86.5 |
+| training minutes | 17.7 | 27.1 | 18.2 | 27.6 |
+| peak allocated GiB | 9.13 | 12.63 | 9.23 | 12.73 |
+| peak reserved GiB | - | 13.68 | - | 13.79 |
+| final loss (last 10 steps) | 0.141 | 0.127 | 0.035 | 0.029 |
+| trainable parameters | - | 119,734,272 | - | 119,734,272 |
+
+**Table 44.2: training loss (label tokens, mean over the step's 16 sequences) at every 25 steps, both trainers, same batches**
+
+| arm, trainer | 25 | 50 | 75 | 100 | 125 | 150 | 175 | 200 |
+|---|---|---|---|---|---|---|---|---|
+| no DB, unsloth | 0.183 | 0.306 | 0.102 | 0.025 | 0.245 | 0.111 | 0.060 | 0.165 |
+| no DB, transformers + peft | 0.211 | 0.262 | 0.108 | 0.124 | 0.234 | 0.169 | 0.054 | 0.123 |
+| record in prompt, unsloth | 0.038 | 0.008 | 0.019 | 0.002 | 0.004 | 0.104 | 0.018 | 0.000 |
+| record in prompt, transformers + peft | 0.129 | 0.003 | 0.007 | 0.010 | 0.011 | 0.072 | 0.034 | 0.000 |
+
+**Table 44.3: the two scorers on each adapter (the same option log-probability rule): unsloth's loader puts every adapter on the 4-bit base it defaults to; transformers + peft loads the base named in the adapter's config, the 4-bit one for unsloth's adapters and bf16 for its own. Accuracy and the share of items with the same prediction**
+
+| adapter | unsloth scorer | transformers + peft scorer | same prediction |
+|---|---|---|---|
+| no DB, unsloth adapter (4-bit) | 57.1 | 56.6 | 98.6% |
+| no DB, transformers + peft adapter (bf16) | 57.3 | 59.5 | 80.7% |
+| record in prompt, transformers + peft adapter (bf16) | 88.0 | 88.5 | 94.7% |
+
+**Table 44.4: the size of the 4-bit default. The same items and scorers read on the NF4 4-bit base (the numbers the report carried) and on the bf16 base (RUN_TAG=bf16 re-reads; SCORER=hf for REAL-6). The section 33 items are 160 per attribute, the ICL suites 48 per task, ARC and MMLU 200; the LRE probe is the type relation in the trained sentence, cross-validated accuracy of the linear map (section 40)**
+
+| model, measure (section) | 4-bit read | bf16 read | same prediction |
+|---|---|---|---|
+| Instruct base, REAL-6 no record, all (38) | 31.2 | 35.1 | 59.7% |
+| Instruct base, REAL-6 no record, unseen merchant | 26.8 | 30.3 |  |
+| Instruct base, REAL-6 record in prompt, all (38) | 58 | 61.1 | 71.9% |
+| Instruct base, REAL-6 record in prompt, unseen merchant | 54.7 | 55.2 |  |
+| Qwen2.5-3B base, v2 type induction (33) | 41.2 | 40.6 | 73.8% |
+| Qwen2.5-3B base, v2 habitat / diet / region mean (33) | 31.7 | 30.6 | 76.9% |
+| Qwen2.5-3B base, ICL symbol, v1 suite (33) | 54.7 | 60.4 | 85.9% |
+| Qwen2.5-3B base, ICL natural, v1 suite | 84.4 | 84.9 | 94.3% |
+| Qwen2.5-3B base, ICL symbol, v2 suite | 56.8 | 56.8 | 83.3% |
+| Qwen2.5-3B base, ICL natural, v2 suite | 83.4 | 86.0 | 92.2% |
+| Qwen2.5-3B base, ARC-Easy | 71.5 | 73.5 | 89.0% |
+| Qwen2.5-3B base, MMLU 5-shot | 50.0 | 51.5 | 91.0% |
+| arm C, v2 type induction (33) | 66.2 | 67.5 | 85.6% |
+| arm C, v2 habitat / diet / region mean (33) | 35.4 | 34.2 | 81.7% |
+| arm C, ICL symbol, v1 suite (33) | 75.5 | 78.6 | 93.8% |
+| arm C, ICL natural, v1 suite | 86.5 | 87.0 | 96.4% |
+| arm C, ICL symbol, v2 suite | 76.5 | 77.6 | 92.7% |
+| arm C, ICL natural, v2 suite | 86.5 | 86.5 | 94.8% |
+| arm C, ARC-Easy | 57.5 | 58.5 | 87.5% |
+| arm C, MMLU 5-shot | 41.0 | 43.5 | 89.0% |
+| arm C, type -> weakness, path form (42) | 64.0 | 64.0 | 83.1% |
+| arm C, LRE type probe, layer 20 (40) | 52.2 | 55.9 |  |
+| arm C, LRE type probe, layer 32 (40) | 72.8 | 81.6 |  |
+| arm C, LRE type probe, layer 36 (40) | 70.6 | 74.3 |  |
+| arm C, LRE probe, the model's own answer on the 136 species | 75.7 | 75.7 |  |
+
+### 44.1 The two trainers agree on the categoriser; transformers + peft at bf16 costs 1.5 times the minutes and 3.5 GiB more
+
+Table 44.1 reads each adapter on the base it was trained against. Trained on the same batches from seed 0, the no-DB categoriser reads 57.1 through unsloth (QLoRA on the 4-bit base, scored on it) and 59.5 through transformers + peft (bf16 base, scored on it), the record-in-prompt categoriser 90.2 and 88.5; both differences are inside the three-seed spread of section 43 (60.5 +- 3.0 and 89.3 +- 0.9), and the DB-only cells (97.6 against 92.7, opaque 94.2 against 86.5) inside its three-seed range (DB-only 91.3 +- 5.6, whose seed 0 is the 97.6). The loss curves (Table 44.2) track each other at every 25 steps and end within 0.015 of each other. The transformers path takes 27 minutes against 18 and peaks at 12.6 GiB allocated (13.7 reserved) against 9.1; scoring takes 37 minutes against 24. The adapter is the same object either way (119.7 M trainable parameters, peft's format). Two things the table does not separate: how much of unsloth's advantage is its kernels and how much the 4-bit base it silently used (unsloth at bf16 was not run), and whether the 2.4-point no-DB difference is the base precision or the seed (one seed each).
+
+Table 44.3 is the scorer check, and it is where the default surfaced. Each adapter read on its own base agrees with itself across the two loaders on 98.6% of the items (the unsloth adapter, whose config names the 4-bit base, so both loaders build the same model). The bf16 adapter dropped onto the 4-bit base by unsloth's loader changes 19.3% of the no-DB predictions and 2.2 points of accuracy (59.5 to 57.3), with a median shift of 0.31 nats per option against 0.03 for the matched pair; the record-in-prompt adapter, whose decisions are less marginal, changes 5.3% of its predictions and 0.5 points (88.5 to 88.0). The rule that follows is in `CLAUDE.md`: pass `load_in_4bit=` explicitly, and score an adapter on the precision it was trained on.
+
+### 44.2 The 4-bit default measured: the instruct base gains 3 to 4 points at bf16, the section 33 reads move 0 to 6 points on the means and up to 40% on individual items, the LRE probe reads 9 points higher, and no conclusion changes
+
+Table 44.4 puts the numbers the report carried (read on the 4-bit base) beside the same items and scorers on the bf16 base.
+
+- **The instruct base on REAL-6 (section 38).** 31.2 without a record and 58.0 with one at 4-bit; 35.1 and 61.1 at bf16. Only 59.7% and 71.9% of the individual predictions are the same: a base near chance on eight options decides most items by small margins, and quantisation noise moves them. Section 38's comparisons were all read on the 4-bit base, so the SFT gains stand as stated; against the bf16 base they are 3 to 4 points smaller (the no-DB adapter's +26 over the base becomes +24 at like-for-like bf16 precision with the transformers-trained adapter of Table 44.1, 59.5 against 35.1).
+- **The Qwen2.5-3B base and arm C on the section 33 items.** The type induction is unchanged (base 41.2 to 40.6, arm C 66.2 to 67.5) and the other three attributes stay at chance both ways, so section 33's finding (the type rule is real and identifiable, the rest is not) is unaffected. The general-ability reads move up at bf16: the base's symbol-label ICL from 54.7 to 60.4 (the largest shift), ARC-Easy 71.5 to 73.5, MMLU 50.0 to 51.5; arm C's symbol ICL 75.5 to 78.6, ARC 57.5 to 58.5, MMLU 41.0 to 43.5. These bf16 re-reads reproduce to the decimal the numbers section 30 had already quoted for the same models from `exp_curriculum.py` (base ARC 73.5, symbol ICL 60.4, natural 84.9; arm C 58.5 and 78.6), which is the cross-check that the two bf16 scorers agree and that the section 33 tables, not the section 30 text, carried the 4-bit reads. Between 74% and 96% of the individual predictions are the same; the ARC and MMLU differences of 1 to 2.5 points are within the +- 3 that 200 items resolve. Table 38.3 (the instruct base and the SFT adapters on these items) is consistently 4-bit and was not re-read.
+- **The type -> weakness path (section 42).** 64.0 at both precisions, 6 of 8 types above half either way, with 83% of the item-level predictions the same: the retrieval of the trained sentence is not marginal.
+- **The LRE probe (section 40).** The linear map fitted on the bf16 activations reads the held-out species' type at 55.9 from layer 20 (52.2 at 4-bit), 81.6 from layer 32 (72.8) and 74.3 from layer 36 (70.6), while the model's own answer on the 136 species is 75.7 either way. Section 40's headline ("52 from layer 20 and 73 from layer 32") understated the linearity by 4 to 9 points: the 4-bit base adds noise to the residual stream that a 136-sample linear fit cannot average out. The conclusion (a shared direction, not 136 completions) is stronger at bf16, not weaker.
+- **On-policy distillation (section 31)** is the one case where the default changed what was trained, not only what was read: the teacher was the 4-bit base. It was not re-run (a retrain, not a re-read, and the OPD result's shape, general measures return to the base and the facts go with them, is unlikely to depend on a 0.5-perplexity teacher handicap); the section 31 perplexity table was read by `exp_curriculum.py` at bf16 and stands as a read of the weights that were trained.
+
+### 44.3 What the step says
+
+INFRA-2 asked for a categoriser trainer that does not depend on unsloth, and whether it agrees. It exists (`TRAINER=hf`, `SCORER=hf`), it produces the same adapter format, and on the same batches it lands within the seed spread of the unsloth run on every cell; the price is 1.5 times the training minutes, 1.5 times the scoring minutes and 3.5 GiB of peak memory, all of it the bf16 base against unsloth's 4-bit one. Production can depend on either. The recommendation is the transformers path at bf16 (or unsloth with `LOAD_4BIT=0`, untested at this recipe) unless memory forces 4-bit, because the base precision must be the same at training and at scoring, and the transformers path makes it explicit in the adapter's config. What the step found on the way is that unsloth's loader had been returning the 4-bit base to six scripts since 2026-09-18. Inside sections 37, 38 and 43 that is a relabelling (QLoRA throughout, base and adapters alike), and the ranking of the arms is unchanged; in sections 33, 40 and 42 it is a mismatch that Table 44.4 sizes at 0 to 6 points on the means and 4 to 40% of the individual predictions, in one direction (bf16 higher), leaving every conclusion where it was and making section 40's linearity claim 9 points stronger. **Not run:** unsloth at bf16 for the categoriser (the like-for-like speed comparison), the transformers path with a bitsandbytes 4-bit base (the like-for-like memory comparison), seeds of the transformers trainer, a bf16 re-read of Table 38.3, and the OPD teacher at bf16.
