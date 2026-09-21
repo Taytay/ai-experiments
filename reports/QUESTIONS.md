@@ -680,6 +680,38 @@ is worth. *Task:* a `TRAINER=hf` path in `exp_categoriser.py` (transformers + pe
 the same-seed comparison on REAL-6 and the wall-clock and memory cost, so production can depend on either.
 **Status (2026-09-21):** answered, PLAN step 38, REPORT.md 44. `TRAINER=hf` (transformers + peft) trains the same adapter on the same batches: no DB 59.5 (unsloth 57.1), record in prompt 88.5 (90.2), DB-only 92.7 (97.6), inside section 43's seed spread; 27 minutes against 18, peak 12.6 GiB against 9.1, scoring 37 minutes against 24; peft's format either way. The comparison exposed unsloth's `load_in_4bit=True` default: sections 37, 38 and 43 are QLoRA on the NF4 base throughout (comparisons stand), and the back-fill scripts of sections 33, 40 and 42 and the OPD teacher of section 31 used the 4-bit base under bf16 adapters. Measured (Table 44.4): a bf16 adapter on the 4-bit base changes 19.3% of the no-DB predictions (2.2 points), the instruct base reads 3 to 4 points higher at bf16, the section 33 means move 0 to 6 points, the LRE probe 4 to 9 (layer 32: 72.8 to 81.6), all upward, no conclusion changes. Recommendation: the transformers path at bf16 for production, precision matched between training and scoring.
 
+**REAL-9 (O) Are the fixed 24 shots leaving accuracy on the table, and which shots should a real history supply?**
+Every REAL-6 prompt carries 24 shots stratified over the user's categories and then filled at random, so a row of the same
+merchant is in the prompt by chance only, and real histories run to thousands of rows. The owner's framing (2026-09-21): the
+task is a recommendation problem, predicting the label this user would give from their own history and label set,
+hyper-personalised on their most recent inputs, so the choice of shots is the retrieval step of a recommender, not a
+convenience. *Experiment:* shots chosen per query by (a) similarity, the nearest 24 history rows under the row 37 MiniLM
+retriever, and (b) recency, the 24 most recent rows, at train and at test; the untrained base, the no-DB SFT and the
+record-in-prompt SFT; paired per item with the fixed-shot adapters of sections 38 and 43; the seen-merchant cell (where the
+merchant's own rows can now be in the prompt) reported separately from the unseen ones.
+
+**REAL-10 (O) Does the categoriser hold for users whose schemes were never trained on?**
+Every REAL-6 number is on the 20 training users' own schemes: unseen merchants, never unseen users. The real application
+has over a million users, so the production number is the held-out-user one. Symbol tuning (arXiv 2305.08298) and the
+small-model ICL papers (arXiv 2511.21038, 2605.08295) say the model copies labels from the demonstrated set and rarely
+overrides a label's meaning, which is why coined names work and renamed-but-colliding names are the risk. *Experiment:*
+train the no-DB and record-in-prompt SFT on 15 users and score the other 5, plain and with rename augmentation (per
+episode, a random subset of the user's category names replaced by fresh coined words, consistently across the shots and
+the target), three seeds; compare with the all-20 adapters on the same 5 users; the cost of the augmentation on standard
+names is the other number.
+
+**REAL-11 (O) An evaluation set shaped like the real population, with a time axis.**
+The owner (2026-09-21): over a million users, most on the default category set, some with custom labels, each filing
+merchants under labels for their own reasons; predictions must follow extremely recent inputs, as a recommender does.
+REAL-6 merges, splits and renames the 12 standard categories, so a merchant's category always follows its standard one,
+every user deviates from the default, and the history has no order. *Experiment:* a successor set (`real7`) with (1) a
+default-scheme majority and a custom-label minority, (2) idiosyncratic assignments: the same merchant under different
+categories for different users, drawn per user and not derivable from the standard category, (3) timestamps and
+next-transaction prediction from the history up to that point, (4) relabelling and new-category events mid-stream, and
+(5) a recency rule as the target: the user's latest labelling of a merchant wins. Frozen and hashed like REAL-6; the
+arms of sections 38, 43 and rows 41 and 42 rescored on it; the cells report default vs custom users, seen vs unseen
+merchants, before vs after a relabelling event.
+
 **BASE-6 (O) Does FastFit beat the prototype classifier on the per-user categories?**
 The owner asked about IBM's FastFit (Yehudai and Bendel, NAACL 2024 demo, arXiv 2404.12365, `pip install fast-fit`): a
 few-shot text classifier for many semantically similar classes that trains a sentence encoder with batch contrastive
