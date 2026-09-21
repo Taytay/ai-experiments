@@ -151,6 +151,17 @@ few-shot classification other than FastFit itself. Verdict: skip; FastFit is the
 - 2 belongs with row 40 as a second encoder baseline; 6 is a one-line swap in the encoder script. 5 is a cost row.
 - Skipped with reasons in the list: per-user adapters, document-to-LoRA, distillation, constrained decoding, late interaction
   beyond FastFit.
+- Scale, added by the owner on 2026-09-21: the real application has over a million users, each labelling their own
+  transactions in a personal way; most use the default category set, some create their own labels, and the reasons for
+  putting a merchant under a label are the user's own. (The per-user-adapter papers in 11 were skipped because *they* have no
+  user-defined label sets, not because we lack them.) At that scale: one LoRA per user is a storage and serving problem
+  (a million adapters), so the shared model with the user's scheme and shots in the prompt, or a hypernetwork from the user's
+  history to a small adapter (Profile-to-PEFT, which needs many users to meta-train and a million supplies), are the two
+  designs; the held-out-user evaluation (4) becomes the production metric rather than a check; retrieved shots (1) stop being
+  optional, because real histories run to thousands of rows and the prompt holds 24; and the cost rows (5, the encoder route)
+  matter, because scoring is per transaction per user. One gap in REAL-6 itself: its schemes merge, split and rename the 12
+  standard categories, so a merchant's category follows its standard one; a user who files a gym under "Health" and another
+  under "Treats" (personal reasons, not renames) is not modelled, and a REAL-7 set should add idiosyncratic assignments.
 
 ## URLs fetched by the subagent
 
