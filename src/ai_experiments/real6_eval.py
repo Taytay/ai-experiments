@@ -13,7 +13,7 @@ from .paths import ROOT
 
 
 def summarize(recs, n_boot=1000):
-    """Per cell: accuracy, 95% bootstrap interval, null band; plus aggregates over seen/unseen and name types."""
+    """Per cell: accuracy, 95% bootstrap interval over items (_ci) and over users (_uci), null band; plus aggregates over seen/unseen and name types."""
     by = defaultdict(list)
     for r in recs:
         by[r["level"]].append(r)
@@ -35,6 +35,10 @@ def summarize(recs, n_boot=1000):
         out[lv] = round(float(acc), 1); out[lv + "_n"] = n
         out[lv + "_ci"] = [round(float(ci[0]), 1), round(float(ci[1]), 1)]
         out[lv + "_null"] = [round(float(nb[0]), 1), round(float(nb[1]), 1)]
+        if n > 1 and all("user" in r for r in rs):  # the set samples 20 users: resample users, items staying with their user (REAL-13)
+            us = sorted({r["user"] for r in rs}); by_u = [c[[r["user"] == u for r in rs]] for u in us]; g3 = np.random.default_rng(3)
+            ub = sorted(100 * np.concatenate([by_u[k] for k in g3.integers(0, len(us), len(us))]).mean() for _ in range(n_boot))
+            out[lv + "_uci"] = [round(float(ub[int(0.025 * n_boot)]), 1), round(float(ub[int(0.975 * n_boot) - 1]), 1)]
         out[lv + "_chance"] = round(float(np.mean([100 / len(r["options"]) for r in rs])), 1)
     return out
 
