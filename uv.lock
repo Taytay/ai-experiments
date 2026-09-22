@@ -31,7 +31,10 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
+    { name = "fast-fit" },
+    { name = "gliclass" },
     { name = "numpy" },
+    { name = "scikit-learn" },
     { name = "sentence-transformers" },
     { name = "torch" },
     { name = "torchvision" },
@@ -46,7 +49,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "datasets", specifier = ">=4.3.0" },
+    { name = "fast-fit", specifier = ">=1.2.1" },
+    { name = "gliclass", specifier = ">=0.1.20" },
     { name = "numpy", specifier = ">=2.5.3" },
+    { name = "scikit-learn", specifier = ">=1.9.1" },
     { name = "sentence-transformers", specifier = ">=6.0.1" },
     { name = "torch", specifier = ">=2.11.0", index = "https://download.pytorch.org/whl/cu128" },
     { name = "torchvision", specifier = ">=0.26.0", index = "https://download.pytorch.org/whl/cu128" },
@@ -785,6 +791,21 @@ wheels = [
 ]
 
 [[package]]
+name = "fast-fit"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "datasets" },
+    { name = "scikit-learn" },
+    { name = "torch" },
+    { name = "transformers", extra = ["torch"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/62/54e5dc96dc0ce0fc416601ed5e76e2597ff5378cbbb5eb77b2b2708bf64a/fast_fit-1.2.1.tar.gz", hash = "sha256:e28a6e8d38c2dbaddb1b7eee651060533e7192113e799c346091518107c2ba58", size = 27997, upload-time = "2024-05-08T20:55:00.458Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/e8/44cc642a402d1bc00ff5e08db470a04baaa697214e786d878aa4cd85b756/fast_fit-1.2.1-py3-none-any.whl", hash = "sha256:25a3cf4e05b0ea3ce0dc7293c5739db1459eb206074d3cbc9934e4ec55d21009", size = 27201, upload-time = "2024-05-08T20:54:54.324Z" },
+]
+
+[[package]]
 name = "fastapi"
 version = "0.141.1"
 source = { registry = "https://pypi.org/simple" }
@@ -904,6 +925,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e0/db/3ca813cbacb23ab6fe46ff38a9b5ef8e73e970c8051f2ce903aacafe0446/gitpython-3.1.62.tar.gz", hash = "sha256:1791de66309bc0c7cfca40bf8d2e3de7ca091cbf94e6051be1ad0722c61062af", size = 231728, upload-time = "2026-09-07T02:57:21.155Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d6/0b/29d7965215f8ef830a7ca1f42997fe13e5693d85e9edb18f938d063ef5f2/gitpython-3.1.62-py3-none-any.whl", hash = "sha256:7002251225e10e29d2e1f49e6532613fe5d5d9f0b6f1f02997a52b38fe56899e", size = 222753, upload-time = "2026-09-07T02:57:19.762Z" },
+]
+
+[[package]]
+name = "gliclass"
+version = "0.1.20"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/7e/50ec9ff331823078a2fcb6fce2c41e0cea7988b67ad9fa96e3446aade94f/gliclass-0.1.20.tar.gz", hash = "sha256:749fcf6e4323f475ead281b9d2ec3f5ab2ec2e7c246e541840f36685bafc05dc", size = 88771, upload-time = "2026-07-21T17:26:52.297Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4e/ab/b37dd1e5365dd738e3398ca5c73a49b229dc03b1f187260b5933c6877a95/gliclass-0.1.20-py3-none-any.whl", hash = "sha256:554005810fc18155bd4dd506f08785196005d1414ba5beddd2533121b6dd98ba", size = 80276, upload-time = "2026-07-21T17:26:50.931Z" },
 ]
 
 [[package]]
@@ -2378,6 +2414,12 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ff/9d/fb46e729b461985f41a5740167688b924a4019141e5c164bea77548d3d9e/transformers-5.5.0.tar.gz", hash = "sha256:c8db656cf51c600cd8c75f06b20ef85c72e8b8ff9abc880c5d3e8bc70e0ddcbd", size = 8237745, upload-time = "2026-04-02T16:13:08.113Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/28/35f7411ff80a3640c1f4fc907dcbb6a65061ebb82f66950e38bfc9f7f740/transformers-5.5.0-py3-none-any.whl", hash = "sha256:821a9ff0961abbb29eb1eb686d78df1c85929fdf213a3fe49dc6bd94f9efa944", size = 10245591, upload-time = "2026-04-02T16:13:03.462Z" },
+]
+
+[package.optional-dependencies]
+torch = [
+    { name = "accelerate" },
+    { name = "torch" },
 ]
 
 [[package]]

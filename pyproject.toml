@@ -10,6 +10,9 @@ dependencies = [
     "torch>=2.11.0",
     "torchvision>=0.26.0",  # direct dep so tool.uv.sources can pin it to the cu128 index (unsloth needs a matching build)
     "unsloth>=2026.9.4",
+    "fast-fit>=1.2.1",  # row 40 (BASE-6): FastFit; only fastfit.modeling is imported (its trainer needs datasets.load_metric)
+    "gliclass>=0.1.20",  # row 40: GLiClass zero-shot classifier
+    "scikit-learn>=1.9.1",  # row 40: logistic-regression baseline
 ]
 
 [project.scripts]
