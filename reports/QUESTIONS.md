@@ -680,7 +680,76 @@ is worth. *Task:* a `TRAINER=hf` path in `exp_categoriser.py` (transformers + pe
 the same-seed comparison on REAL-6 and the wall-clock and memory cost, so production can depend on either.
 **Status (2026-09-21):** answered, PLAN step 38, REPORT.md 44. `TRAINER=hf` (transformers + peft) trains the same adapter on the same batches: no DB 59.5 (unsloth 57.1), record in prompt 88.5 (90.2), DB-only 92.7 (97.6), inside section 43's seed spread; 27 minutes against 18, peak 12.6 GiB against 9.1, scoring 37 minutes against 24; peft's format either way. The comparison exposed unsloth's `load_in_4bit=True` default: sections 37, 38 and 43 are QLoRA on the NF4 base throughout (comparisons stand), and the back-fill scripts of sections 33, 40 and 42 and the OPD teacher of section 31 used the 4-bit base under bf16 adapters. Measured (Table 44.4): a bf16 adapter on the 4-bit base changes 19.3% of the no-DB predictions (2.2 points), the instruct base reads 3 to 4 points higher at bf16, the section 33 means move 0 to 6 points, the LRE probe 4 to 9 (layer 32: 72.8 to 81.6), all upward, no conclusion changes. Recommendation: the transformers path at bf16 for production, precision matched between training and scoring.
 
+**REAL-9 (O) Are the fixed 24 shots leaving accuracy on the table, and which shots should a real history supply?**
+Every REAL-6 prompt carries 24 shots stratified over the user's categories and then filled at random, so a row of the same
+merchant is in the prompt by chance only, and real histories run to thousands of rows. The owner's framing (2026-09-21): the
+task is a recommendation problem, predicting the label this user would give from their own history and label set,
+hyper-personalised on their most recent inputs, so the choice of shots is the retrieval step of a recommender, not a
+convenience. *Experiment:* shots chosen per query by (a) similarity, the nearest 24 history rows under the row 37 MiniLM
+retriever, (b) recency, the 24 most recent rows, and (c) TransAct V2's rule (references/blog/pinterest/summaries.md, 2025-06-06:
+the most recent r actions plus the K history rows nearest to the candidate, selected per candidate, concatenated), at train and at test; the untrained base, the no-DB SFT and the
+record-in-prompt SFT; paired per item with the fixed-shot adapters of sections 38 and 43; the seen-merchant cell (where the
+merchant's own rows can now be in the prompt) reported separately from the unseen ones.
+
+**REAL-10 (O) Does the categoriser hold for users whose schemes were never trained on?**
+Every REAL-6 number is on the 20 training users' own schemes: unseen merchants, never unseen users. The real application
+has over a million users, so the production number is the held-out-user one. Symbol tuning (arXiv 2305.08298) and the
+small-model ICL papers (arXiv 2511.21038, 2605.08295) say the model copies labels from the demonstrated set and rarely
+overrides a label's meaning, which is why coined names work and renamed-but-colliding names are the risk. *Experiment:*
+train the no-DB and record-in-prompt SFT on 15 users and score the other 5, plain and with rename augmentation (per
+episode, a random subset of the user's category names replaced by fresh coined words, consistently across the shots and
+the target), three seeds; compare with the all-20 adapters on the same 5 users; the cost of the augmentation on standard
+names is the other number.
+
+**REAL-11 (O) An evaluation set shaped like the real population, with a time axis.**
+The owner (2026-09-21): over a million users, most on the default category set, some with custom labels, each filing
+merchants under labels for their own reasons; predictions must follow extremely recent inputs, as a recommender does.
+REAL-6 merges, splits and renames the 12 standard categories, so a merchant's category always follows its standard one,
+every user deviates from the default, and the history has no order. *Experiment:* a successor set (`real7`) with (1) a
+default-scheme majority and a custom-label minority, (2) idiosyncratic assignments: the same merchant under different
+categories for different users, drawn per user and not derivable from the standard category, (3) timestamps and
+next-transaction prediction from the history up to that point, (4) relabelling and new-category events mid-stream, and
+(5) a recency rule as the target: the user's latest labelling of a merchant wins; (6) per shot, how the label arose (typed,
+accepted from a suggestion, corrected) and the elapsed time, after TransAct's action type and Zepto's temporal encoding;
+(7) a slice whose shots are drawn uniformly, so a selection policy can be replayed offline (the Closeup ranker's
+randomised-traffic slice); (8) short-history users (0, 5, 25 rows) for the cold-start curve; (9) point-in-time correctness as a requirement: every shot,
+record and collaborative record given to the model for a transaction at time T is filtered to what was known at or before T,
+at training and at evaluation (`references/blog/other/`, the temporal-leakage preview); (10) a correction-rate measure after
+auto-applied labels enter the history (the multi-objective post's day-one-gain, week-two-loss). Frozen and hashed like REAL-6;
+the arms of sections 38, 43 and rows 41, 42 and 44 rescored on it; the cells report default vs custom users, seen vs unseen
+merchants, before vs after a relabelling event, and history length.
+
+**REAL-12 (O) The collaborative record: what other users call the category this merchant goes into.**
+The owner's Pinterest reading (2026-09-21, `references/blog/pinterest-applications.md`): Pixie walks the Pin-board graph,
+"created from how people describe and organize Pins", and the merchant-category graph is the same object, created from
+how users file transactions. One hop from a merchant gives the distribution of category names other users filed it under;
+two hops give the categories that share merchants (synonyms: "Fluffy" beside "Pets"). The prompt holds the user's own
+history and the merchant's content record but not this cross-user signal, which so far reaches the model only through the
+label SFT's weights. Section 43 found the content record worth +10 +- 12 in the weights and +42 in the prompt; the
+collaborative record has not been put in the prompt at all. *Experiment:* for each merchant, the histogram of the
+training users' category names for it, mapped to standard names (one hop), and the categories reached by a random walk
+with restart over the bipartite merchant-category graph (two hops; Pixie's rules: visit counts as relevance, restart 0.5,
+catch-all categories and hub merchants pruned), rendered as a second note line ("Other users file this merchant under:
+Pets 61%, Shopping 20%"); arms no record, content record, collaborative record, both, on the untrained base and the SFT
+categoriser, with the DB-only merchants (no other user's label exists) as the cell the collaborative record cannot help
+and the unseen-by-this-user merchants as the cell it should; then on row 43's set with idiosyncratic assignments, where
+the graph is the only source of a shared personal reason.
+
+**BASE-6 (O) Does FastFit beat the prototype classifier on the per-user categories?**
+The owner asked about IBM's FastFit (Yehudai and Bendel, NAACL 2024 demo, arXiv 2404.12365, `pip install fast-fit`): a
+few-shot text classifier for many semantically similar classes that trains a sentence encoder with batch contrastive
+learning between examples and class names plus a token-level similarity score between the query and the label text, in
+seconds. The survey did not cover it; its nearest relative here is SetFit, which section 24 found no better than the
+centroid. REAL-6 is its setting (per-user schemes of 8 to 12 similar categories, 24 shots), and it scores against the
+label's text, which the centroid ignores: a gain on standard and renamed names, and nothing on coined ones, is the
+expectation. *Experiment:* FastFit per user from the 24 shots and from the full history, plain and with the merchant's
+record appended to the query (`ENC_CTX`), scored per cell like the encoders of section 38; compare with the bge centroid,
+logistic regression and SetFit; report the renamed / new-word cells and the DB-only merchants separately. The package's
+`max_text_length` defaults to 32 tokens, below a statement plus record; raise it. The scan of 2026-09-21
+(`references/fewshot_scan_2026-09-21.md`) names GLiClass (arXiv 2508.07662) as the nearest relative to run beside it.
+
 **REAL-8 (O) The parametric exposure curve and the chat template.**
 Section 38: one pass over the records injected nothing, three passes gave +21 on DB-only merchants at a nine-point ARC cost.
 *Experiment:* six and twelve passes (800 and 1,600 steps at 50%) on the same axis; and the REAL-6 prompt through the instruct
 model's chat template, since production will use it.
+**Status (2026-09-22):** answered, PLAN step 39, REPORT.md 45. Three seeds per point, QLoRA on the 4-bit base: DB-only merchants 49.1 +- 3.8 without the DB, 53.7 at one pass, 59.3 +- 12.3 at 3.3 passes, 68.8 +- 5.8 at 6.7 passes (800 steps at 50%), 64.2 +- 5.7 at 13.3 passes (1,600 steps); opaque DB-only merchants 26 / 14 / 31 +- 21 / 44 +- 10 / 34 +- 10 against 94 to 96 with the record in the prompt; real chains plateau at 87. ARC-Easy 73.2 +- 2.3 at 6.7 passes (the base's level; section 38's nine-point cost was one seed) and 65.7 +- 8.3 at 13.3 (one seed at 57); MMLU 51 to 52 throughout; ICL 3 to 4 points under the no-DB adapter at both exposures. The whole set goes 63.8 +- 2.3 to 76.8 +- 2.2 to 78.2 +- 0.3, but the history exposure doubles with the DB exposure (6,400 and 12,800 history sequences against 3,200) and no no-DB arm at those step counts was run. Chat template (`real6.chat_prompt`, the cue as an assistant prefill): the no-DB and record-in-prompt categorisers trained and scored in it read 58.9 and 90.0 (plain 57.1, 90.2; 73% and 92% of the predictions the same); the instruct base with the record 63.2 (58.0), without it 10.0 (31.2), its predictions piling on two option positions. Recommendation: retrieve; if parametric, 800 steps at 50% and a same-step no-DB control; the template is free for a trained model.

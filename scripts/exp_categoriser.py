@@ -17,6 +17,8 @@ so that the unseen cells split into merchants other users labelled and merchants
 usage: uv run python scripts/exp_categoriser.py llm|encoder [none|param|ret]
 env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of the LLM sequences under param), RUN_TAG (name suffix), EPOCHS=3 (encoder), SMOKE=1, SEED=0
      REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB of real6_v1_ambdb.json in place of the disjoint records, for param and ret; adds _amb to the names
+     CHAT=1 (row 39, REAL-8): the SFT pairs through the instruct model's chat template (real6.chat_prompt: the prompt up to the query line as
+       the user turn, "Category:" opening the assistant turn, the label after it); adds _chat to the names. Score such an adapter with exp_real6.py, which reads CHAT from the name.
      TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
        LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
@@ -49,13 +51,14 @@ MICRO, MAXLEN = 4, 1536  # 4 x 4 = 16 sequences per step
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
+CHAT = bool(int(os.environ.get("CHAT", "0")))  # row 39: the prompt as the user turn of the chat template, the label as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
 assert TRAINER in ("unsloth", "hf")
 DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -82,7 +85,8 @@ def sft_examples(per_user=150):
             others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
             demo = "".join(f"Transaction: {o['text']} | ${o['amount']:.2f} | {o['weekday']}\nCategory: {o['label']}\n\n" for o in others)
             note = f"Note: {DBREC[h['merchant']]}\n" if DB == "ret" else ""
-            ex.append((header + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory:", " " + h["label"]))
+            prompt = header + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory:"
+            ex.append((R6.chat_prompt(prompt) if CHAT else prompt, " " + h["label"]))
     return ex
 
 
@@ -107,6 +111,9 @@ def load_llm():
         model, tok = FastLanguageModel.from_pretrained(LLM_BASE, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
         model = FastLanguageModel.get_peft_model(model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none", use_gradient_checkpointing=True, random_state=SEED, target_modules=TARGETS)
     tok.padding_side = "right"
+    if CHAT:  # the hand-written wrapper must be the tokenizer's own template, and the label must end the assistant turn (eos is <|im_end|>)
+        assert R6.chat_wrap("x") == tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True), "chat template drift"
+        assert tok.eos_token == "<|im_end|>", tok.eos_token
     return model, tok
 
 
@@ -191,7 +198,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
