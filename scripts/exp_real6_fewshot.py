@@ -96,6 +96,8 @@ def fastfit_user(u, rows, tok, out_dir):
     texts = [qtext(h["text"], h["merchant"]) for h in rows]; y = torch.tensor([names.index(h["label"]) for h in rows])
     cfg = FastFitConfig.from_encoder_config(AutoConfig.from_pretrained(ENCODERS[ENC]), clf_dim=len(names), num_repeats=REPEATS, clf_factor=0.1, sim_factor=1.0,
                                             mask_prob=0.0, mlm_factor=0.0, rep_tokens="all", inference_type="sim", inference_direction="doc", clf_level="cls")
+    from transformers import MPNetConfig
+    MPNetConfig.is_decoder = MPNetConfig.add_cross_attention = False  # fastfit reads both; MPNetConfig under transformers 5 defines neither
     type(cfg).has_no_defaults_at_init = True  # transformers 5 instantiates the config class bare on save; FastFitConfig() asserts
     torch.manual_seed(SEED)
     model = FastFitTrainable.from_encoder_pretrained(ENCODERS[ENC], config=cfg).cuda()
