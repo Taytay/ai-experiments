@@ -25,12 +25,16 @@ def summarize(recs, n_boot=1000):
         c = np.array([r["correct"] for r in rs], float); n = len(c)
         acc = 100 * c.mean()
         g1, g2 = np.random.default_rng(1), np.random.default_rng(2)
-        boot = sorted(100 * c[g1.integers(0, n, n)].mean() for _ in range(n_boot)) if n > 1 else [acc, acc]
         preds = np.array([r["pred"] for r in rs]); golds = np.array([r["answer"] for r in rs])
-        null = sorted(100 * (preds == g2.permutation(golds)).mean() for _ in range(n_boot)) if n > 1 else [acc, acc]
+        if n > 1:
+            boot = sorted(100 * c[g1.integers(0, n, n)].mean() for _ in range(n_boot))
+            null = sorted(100 * (preds == g2.permutation(golds)).mean() for _ in range(n_boot))
+            ci = [boot[int(0.025 * n_boot)], boot[int(0.975 * n_boot) - 1]]; nb = [null[int(0.025 * n_boot)], null[int(0.975 * n_boot) - 1]]
+        else:  # a one-item cell (smoke runs): no interval to bootstrap
+            ci = nb = [acc, acc]
         out[lv] = round(float(acc), 1); out[lv + "_n"] = n
-        out[lv + "_ci"] = [round(float(boot[int(0.025 * n_boot)]), 1), round(float(boot[int(0.975 * n_boot) - 1]), 1)]
-        out[lv + "_null"] = [round(float(null[int(0.025 * n_boot)]), 1), round(float(null[int(0.975 * n_boot) - 1]), 1)]
+        out[lv + "_ci"] = [round(float(ci[0]), 1), round(float(ci[1]), 1)]
+        out[lv + "_null"] = [round(float(nb[0]), 1), round(float(nb[1]), 1)]
         out[lv + "_chance"] = round(float(np.mean([100 / len(r["options"]) for r in rs])), 1)
     return out
 

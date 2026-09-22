@@ -57,7 +57,8 @@ DB_ONLY = R6.db_only_merchants()
 USERS = DOC["users"][:2] if SMOKE else DOC["users"]
 ITEMS = [it for it in (DOC["items"][::10] if SMOKE else DOC["items"]) if it["user"] in {u["user"] for u in USERS}]
 MODELS = ROOT / "models" / ("smoke" if SMOKE else "adapters")
-tag = {"fastfit": f"fastfit_{ENC}", "logreg": "logreg_bge", "gliclass": "gliclass" if WHAT in ("base", "train") else WHAT}[ROUTE] + ("_ctx" if CTX else "")
+tag = {"fastfit": f"fastfit_{ENC}", "logreg": "logreg_bge", "gliclass": "gliclass" if WHAT in ("base", "train") else WHAT}[ROUTE]
+tag += "_ctx" if CTX and not tag.endswith("_ctx") else ""  # a fine-tuned model dir already carries _ctx
 random.seed(SEED); np.random.seed(SEED)
 
 
@@ -95,6 +96,7 @@ def fastfit_user(u, rows, tok, out_dir):
     texts = [qtext(h["text"], h["merchant"]) for h in rows]; y = torch.tensor([names.index(h["label"]) for h in rows])
     cfg = FastFitConfig.from_encoder_config(AutoConfig.from_pretrained(ENCODERS[ENC]), clf_dim=len(names), num_repeats=REPEATS, clf_factor=0.1, sim_factor=1.0,
                                             mask_prob=0.0, mlm_factor=0.0, rep_tokens="all", inference_type="sim", inference_direction="doc", clf_level="cls")
+    type(cfg).has_no_defaults_at_init = True  # transformers 5 instantiates the config class bare on save; FastFitConfig() asserts
     torch.manual_seed(SEED)
     model = FastFitTrainable.from_encoder_pretrained(ENCODERS[ENC], config=cfg).cuda()
     q = tok(texts, padding=True, truncation=True, max_length=MAXLEN, return_tensors="pt")
@@ -137,7 +139,7 @@ def run_fastfit(run):
     for cond in CONDS:
         t0 = time.time(); recs = []; minutes = []; losses = []
         for u in USERS:
-            out_dir = MODELS / f"fastfit_{ENC}_{cond}{'_ctx' if CTX else ''}" / u["user"]
+            out_dir = MODELS / f"fastfit_{ENC}_{cond}{'_ctx' if CTX else ''}" / str(u["user"])
             its, S, m, loss = fastfit_user(u, rows_of(u, cond), tok, out_dir)
             minutes.append(m); losses.append(loss)
             for it, s in zip(its, S):
@@ -191,6 +193,29 @@ def train_gliclass(run):
     new = [t for t in ("<<LABEL>>", "<<SEP>>", "<<EXAMPLE>>") if tokz.convert_tokens_to_ids(t) in (None, tokz.unk_token_id)]
     if new:
         tokz.add_tokens(new, special_tokens=True); model.resize_token_embeddings(len(tokz)); print(f"    added tokens {new}")
+    # gliclass 0.1.20 cannot train a single-label checkpoint as shipped: its collator drops 0-d label tensors (the batch gets an empty
+    # list) and its single-label loss reshapes the logits with self.num_labels = -1 ("only one dimension can be inferred"; the Trainer
+    # swallows the error and skips every step). Two shims: stack the labels, and a masked cross-entropy over each row's real classes.
+    from gliclass import model as GM
+    import torch.nn.functional as F
+
+    def ce_loss(self, logits, labels, classes_embedding=None, classes_embedding_mask=None):
+        if classes_embedding_mask is not None:
+            logits = logits.masked_fill(classes_embedding_mask == 0, -1e4)
+        loss = F.cross_entropy(logits.float(), labels.view(-1).long())
+        if self.config.contrastive_loss_coef > 0 and classes_embedding is not None:
+            loss = loss + GM.sequence_contrastive_loss(classes_embedding, classes_embedding_mask) * self.config.contrastive_loss_coef
+        return loss
+
+    class Collator(DataCollatorWithPadding):
+        def __call__(self, batch):
+            out = super().__call__(batch)
+            if isinstance(out.get("labels"), list) and isinstance(batch[0]["labels"], torch.Tensor) and batch[0]["labels"].dim() == 0:
+                out["labels"] = torch.stack([b["labels"] for b in batch])
+            return out
+
+    assert model.config.problem_type == "single_label_classification", model.config.problem_type
+    GM.GLiClassBaseModel.get_loss = ce_loss
     rng = random.Random(SEED); data = []
     for u in USERS:
         names = [c["name"] for c in u["categories"]]
@@ -208,7 +233,7 @@ def train_gliclass(run):
     args = TrainingArguments(output_dir=str(ROOT / "models" / "smoke" / "gliclass_tmp"), learning_rate=1e-5, weight_decay=0.01, others_lr=3e-5, others_weight_decay=0.01,
                              lr_scheduler_type="linear", warmup_ratio=0.05, per_device_train_batch_size=8, num_train_epochs=EPOCHS, save_strategy="no", logging_steps=100,
                              dataloader_num_workers=0, report_to="none", bf16=True, seed=SEED, remove_unused_columns=False, use_cpu=False)
-    trainer = Trainer(model=model, args=args, train_dataset=ds, data_collator=DataCollatorWithPadding(device="cuda:0"), processing_class=tokz)
+    trainer = Trainer(model=model, args=args, train_dataset=ds, data_collator=Collator(device="cuda:0"), processing_class=tokz)
     t0 = time.time(); res = trainer.train()
     model.save_pretrained(out_dir); tokz.save_pretrained(out_dir)
     stats = dict(train_minutes=round((time.time() - t0) / 60, 1), n_rows=len(data), epochs=EPOCHS, final_loss=round(float(res.training_loss), 4), model=str(out_dir.relative_to(ROOT)))
@@ -240,17 +265,18 @@ def run_logreg(run):
     return results
 
 
-OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
-cfg = dict(route=ROUTE, what=WHAT, ctx=CTX, enc=ENCODERS[ENC] if ROUTE != "gliclass" else GLICLASS, conds=CONDS, epochs=EPOCHS, seed=SEED, bs=BS, num_repeats=REPEATS, lr=LR,
-           maxlen=MAXLEN, real6_version=DOC["version"], real6_sha=DOC["sha256"], n_items=len(ITEMS), n_users=len(USERS), shots=DOC["shots"])
-with Run("real6", model=cfg["enc"], config=cfg, enabled=not SMOKE) as run:
-    if ROUTE == "gliclass" and WHAT == "train":
-        results = train_gliclass(run)
-    else:
-        results = {"fastfit": run_fastfit, "gliclass": run_gliclass, "logreg": run_logreg}[ROUTE](run)
-    OUT.parent.mkdir(exist_ok=True)
-    merged = json.loads(OUT.read_text()) if OUT.exists() and not SMOKE else {}
-    merged.update(results); OUT.write_text(json.dumps(merged, indent=2)); run.artifact(OUT)
-print(f"=== real6 {tag}")
-for cond, r in results.items():
-    print(f"-- {cond}: " + " ".join(f"{k}={r[k]}" for k in sorted(r) if isinstance(r[k], (int, float)) and (k.startswith("R6_") and not k.endswith("_n") or k in ("minutes", "train_minutes", "final_loss"))))
+if __name__ == "__main__":
+    OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
+    cfg = dict(route=ROUTE, what=WHAT, ctx=CTX, enc=ENCODERS[ENC] if ROUTE != "gliclass" else GLICLASS, conds=CONDS, epochs=EPOCHS, seed=SEED, bs=BS, num_repeats=REPEATS, lr=LR,
+               maxlen=MAXLEN, real6_version=DOC["version"], real6_sha=DOC["sha256"], n_items=len(ITEMS), n_users=len(USERS), shots=DOC["shots"])
+    with Run("real6", model=cfg["enc"], config=cfg, enabled=not SMOKE) as run:
+        if ROUTE == "gliclass" and WHAT == "train":
+            results = train_gliclass(run)
+        else:
+            results = {"fastfit": run_fastfit, "gliclass": run_gliclass, "logreg": run_logreg}[ROUTE](run)
+        OUT.parent.mkdir(exist_ok=True)
+        merged = json.loads(OUT.read_text()) if OUT.exists() and not SMOKE else {}
+        merged.update(results); OUT.write_text(json.dumps(merged, indent=2)); run.artifact(OUT)
+    print(f"=== real6 {tag}")
+    for cond, r in results.items():
+        print(f"-- {cond}: " + " ".join(f"{k}={r[k]}" for k in sorted(r) if isinstance(r[k], (int, float)) and (k.startswith("R6_") and not k.endswith("_n") or k in ("minutes", "train_minutes", "final_loss"))))
