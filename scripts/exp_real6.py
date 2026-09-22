@@ -40,6 +40,7 @@ CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions 
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 SCORER = os.environ.get("SCORER", "unsloth")
+SHOTS = os.environ.get("SHOTS", next((r for r in ("recent", "nearest", "transact", "cluster") if f"_shots{r}" in WHAT), "fixed"))  # row 41: shots per query
 CHAT = bool(int(os.environ.get("CHAT", "1" if "_chat" in WHAT else "0")))  # row 39 (REAL-8): the prompt as the user turn, the option as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
@@ -50,9 +51,19 @@ RETRIEVED = None
 if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/exp_real6_retriever.py; its record comes from the DB in use
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
+if ROUTE == "llm":
+    from ai_experiments import real6_shots as RS
+    USERS_BY_ID = {u["user"]: u for u in DOC["users"]}
+    if SHOTS != "fixed":  # the prompts rebuilt from the rule's shots; the query is never in the pool
+        _shots = RS.Shots(SHOTS)
+        ITEMS = [_shots.apply(it, USERS_BY_ID[it["user"]]) for it in ITEMS]
+    else:
+        ITEMS = [RS.frozen_flags(it, USERS_BY_ID[it["user"]]) for it in ITEMS]
 if CHAT and ROUTE == "llm":
     ITEMS = [R6.chat_item(it) for it in ITEMS]
 tag = (MODEL.split("/")[-1] if WHAT == "base" else WHAT) if ROUTE == "llm" else WHAT
+if ROUTE == "llm" and SHOTS != "fixed" and f"_shots{SHOTS}" not in WHAT:
+    tag += f"_shots{SHOTS}"  # a fixed-shot model read with the rule's shots at test only
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
 CELLS = sorted({it["level"] for it in DOC["items"]})
 
@@ -93,7 +104,7 @@ def run_llm(run):
             for r, it in zip(recs, ITEMS):
                 r["hit1"] = RETRIEVED[it["id"]]["hit1"]
         for r, it in zip(recs, ITEMS):
-            r.update(user=it["user"], merchant=it["merchant"], known=it["known"], options=it["options"])
+            r.update(user=it["user"], merchant=it["merchant"], known=it["known"], options=it["options"], merchant_in_shots=it.get("merchant_in_shots"), gold_in_shots=it.get("gold_in_shots"))
         results[cond] = summarize(recs); results[cond]["minutes"] = round((time.time() - t0) / 60, 1)
         run.log({k: v for k, v in results[cond].items() if isinstance(v, (int, float))}, condition=cond)
         run.artifact(write_recs(cond, recs))
