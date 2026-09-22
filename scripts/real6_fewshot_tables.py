@@ -21,14 +21,14 @@ import categoriser_tables as CT  # noqa: E402
 
 R = ROOT / "results"
 PLAIN = [("bge frozen centroid, history (sec. 37)", "bge", "full"), ("bge tuned centroid, history (sec. 38)", "categoriser_bge_none", "full"),
-         ("logreg on bge, 24 shots", "logreg_bge", "shots"), ("logreg on bge, history", "logreg_bge", "full"),
+         ("logreg on bge (C=100), 24 shots", "logreg_bge_c100", "shots"), ("logreg on bge (C=100), history", "logreg_bge_c100", "full"),
          ("FastFit bge, 24 shots", "fastfit_bge", "shots"), ("FastFit bge, history", "fastfit_bge", "full"),
          ("FastFit mpnet, 24 shots", "fastfit_mpnet", "shots"), ("FastFit mpnet, history", "fastfit_mpnet", "full"),
          ("GLiClass, names only", "gliclass", "zs"), ("GLiClass + 24 shots", "gliclass", "ex"),
          ("GLiClass tuned, names only", "gliclass_ft", "zs"), ("GLiClass tuned + 24 shots", "gliclass_ft", "ex"),
          ("SFT, no DB (sec. 38)", "categoriser_Qwen2.5-3B-Instruct_none_lora", "noctx")]
 CTX = [("bge tuned centroid + record at test (sec. 38)", "categoriser_bge_none_ctx", "full"),
-       ("logreg on bge + record, 24 shots", "logreg_bge_ctx", "shots"), ("logreg on bge + record, history", "logreg_bge_ctx", "full"),
+       ("logreg on bge (C=100) + record, 24 shots", "logreg_bge_c100_ctx", "shots"), ("logreg on bge (C=100) + record, history", "logreg_bge_c100_ctx", "full"),
        ("FastFit bge + record, 24 shots", "fastfit_bge_ctx", "shots"), ("FastFit bge + record, history", "fastfit_bge_ctx", "full"),
        ("GLiClass + record, names only", "gliclass_ctx", "zs"), ("GLiClass + record + 24 shots", "gliclass_ctx", "ex"),
        ("GLiClass tuned + record, names only", "gliclass_ft_ctx", "zs"), ("GLiClass tuned + record + 24 shots", "gliclass_ft_ctx", "ex"),
@@ -52,7 +52,7 @@ def cost():
                                    ("FastFit mpnet, 24 shots", "fastfit_mpnet", "shots", 24), ("FastFit mpnet, history", "fastfit_mpnet", "full", 300)):
         d = CT.load(tag).get(cond, {})
         print(f"| {label} | {rows} | {d.get('train_minutes_per_user', '-')} | {d.get('final_loss_mean', '-')} |")
-    for label, tag in (("GLiClass fine-tune, all users", "gliclass_ft"), ("GLiClass fine-tune + record, all users", "gliclass_ft_ctx")):
+    for label, tag in (("GLiClass fine-tune, all users", "gliclass"), ("GLiClass fine-tune + record, all users", "gliclass_ctx")):  # the train stats sit in the base run's file
         d = CT.load(tag).get("train", {})
         print(f"| {label} | {d.get('n_rows', '-')} (total) | {d.get('train_minutes', '-')} (total) | {d.get('final_loss', '-')} |")
     for label, tag, cond in (("logreg on bge, history", "logreg_bge", "full"), ("GLiClass, names only", "gliclass", "zs"), ("GLiClass + 24 shots", "gliclass", "ex")):

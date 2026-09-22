@@ -58,6 +58,9 @@ USERS = DOC["users"][:2] if SMOKE else DOC["users"]
 ITEMS = [it for it in (DOC["items"][::10] if SMOKE else DOC["items"]) if it["user"] in {u["user"] for u in USERS}]
 MODELS = ROOT / "models" / ("smoke" if SMOKE else "adapters")
 tag = {"fastfit": f"fastfit_{ENC}", "logreg": "logreg_bge", "gliclass": "gliclass" if WHAT in ("base", "train") else WHAT}[ROUTE]
+LOGREG_C = float(os.environ.get("LOGREG_C", "1"))  # sklearn's default C=1 underfits unit-norm embeddings; the chain also runs 10 and 100
+if ROUTE == "logreg" and LOGREG_C != 1:
+    tag += f"_c{LOGREG_C:g}"
 tag += "_ctx" if CTX and not tag.endswith("_ctx") else ""  # a fine-tuned model dir already carries _ctx
 random.seed(SEED); np.random.seed(SEED)
 
@@ -260,7 +263,7 @@ def run_logreg(run):
             if len(set(y)) < 2:
                 preds = [y[0]] * len(its)
             else:
-                preds = LogisticRegression(max_iter=3000, C=1.0).fit(X, y).predict(Q)
+                preds = LogisticRegression(max_iter=3000, C=LOGREG_C).fit(X, y).predict(Q)
             for it, p in zip(its, preds):
                 recs.append(record(it, int(p), u["user"]))
         finish(run, results, cond, recs, t0)
