@@ -6,6 +6,9 @@ the frozen stratified block, on the LLM arms.
   47.2  paired with the fixed block per item: share of the same predictions, both right, either right, net gain
   47.3  the seen items by whether the query's merchant is among the shots, and all items by whether the gold label is among the shot labels
   47.4  training minutes and final loss of the rule-trained adapters
+  47.5  the corrected cells (ai_experiments.real6_cells, QUESTIONS.md REAL-13): in the history / labelled seen but not in it /
+        determined by the merchant's standard category / split category; the model with the nearest-row lookup in front
+        (hybrid); all items with a user-resampled interval
 usage: uv run python scripts/retrieved_shots_tables.py            prints markdown; '-' where a run is missing
 """
 import json
@@ -125,5 +128,29 @@ def t4():
         print(f"| SFT {db} | " + " | ".join(cells) + " |")
 
 
+def t5():
+    from ai_experiments import real6_cells as RC
+    ks = RC.KINDS[:4]
+    print("\n**Table 47.5: the corrected cells (accuracy %; groups from `real6_cells`: 444 items whose merchant is in the user's history, 115 labelled seen "
+          "whose merchant the 300-row cut removed, 509 determined by the merchant's standard category, 103 in a category the user split; 'hybrid' = the label of "
+          "the nearest history row when its retriever cosine is at least 0.8, else the model; interval = users resampled)**\n")
+    print("| arm | rule | " + " | ".join(ks) + " | all [user interval] | hybrid, all |")
+    print("|---|---|" + "---|" * (len(ks) + 2))
+    nn = RC.nn1()
+    print("| nearest-row lookup alone | - | " + " | ".join(f"{100 * sum(nn[i][1] for i in nn if RC.kind(i) == k) / sum(RC.kind(i) == k for i in nn):.1f}" for k in ks)
+          + f" | {100 * sum(v[1] for v in nn.values()) / len(nn):.1f} | - |")
+    for arm in ARMS:
+        for rule in RULES:
+            rs = recs(tag_of(arm, rule), arm[2])
+            if not rs:
+                continue
+            cells = []
+            for k in ks:
+                x = [r["correct"] for i, r in rs.items() if RC.kind(i) == k]
+                cells.append(f"{100 * sum(x) / len(x):.1f}" if x else "-")
+            c = {i: r["correct"] for i, r in rs.items()}; lo, hi = RC.user_ci(c); h = RC.hybrid(rs)
+            print(f"| {arm[0]} | {rule} | " + " | ".join(cells) + f" | {100 * sum(c.values()) / len(c):.1f} [{lo}, {hi}] | {100 * sum(h.values()) / len(h):.1f} |")
+
+
 if __name__ == "__main__":
-    t1(); t2(); t3(); t4()
+    t1(); t2(); t3(); t4(); t5()
