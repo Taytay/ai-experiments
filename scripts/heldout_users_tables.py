@@ -5,18 +5,20 @@ on its five held-out users, merged into one held-out reading of all 1,179 items 
   R.1  by arm: the all-20 adapter, held out, held out with rename augmentation; all items with the user interval, by name type
        (standard / renamed / coined), and by REPORT.md 48's corrected groups
   R.2  paired: held out against all-20 on the same items (same prediction, net change), per name type
-usage: uv run python scripts/heldout_users_tables.py [ST]      ST = training steps of the fold adapters (default 200, the section 38 recipe)
+usage: uv run python scripts/heldout_users_tables.py            the no-DB arm at 800 steps (REPORT.md 49), the record arm at 200
 """
 import json
-import sys
 
 from ai_experiments import real6_cells as RC
 from ai_experiments.paths import ROOT
 
 P = ROOT / "results" / "per_item"
 CAT = "categoriser_Qwen2.5-3B-Instruct"
-ST = sys.argv[1] if len(sys.argv) > 1 else "200"
-TAG = "" if ST == "200" else f"_st{ST}"
+ST = {"none": "800", "ret": "200"}
+
+
+def tag(db):
+    return "" if ST[db] == "200" else f"_st{ST[db]}"
 NAMES = (("standard", "standard"), ("renamed", "renamed"), ("coined", "new"))
 GROUPS = RC.KINDS[:4]
 
@@ -30,7 +32,7 @@ def folds(db, sfx, cond):
     """The four fold adapters' held-out records merged; empty unless all four exist."""
     out = {}
     for f in range(4):
-        rs = load(f"{CAT}_{db}{TAG}_f{f}{sfx}_lora.{cond}")
+        rs = load(f"{CAT}_{db}{tag(db)}_f{f}{sfx}_lora.{cond}")
         if not rs:
             return {}
         out.update(rs)
@@ -38,8 +40,8 @@ def folds(db, sfx, cond):
 
 
 def all20(db, cond):
-    """The all-20 adapter at the same step count (row 47's `_st<ST>_s0` runs), else the 200-step section 38 adapter."""
-    return load(f"{CAT}_{db}{TAG}_s0_lora.{cond}") or load(f"{CAT}_{db}_lora.{cond}") if TAG else load(f"{CAT}_{db}_lora.{cond}")
+    """The all-20 adapter at the same step count (row 47's `_st800_s0` for no DB; section 38's for the record arm)."""
+    return load(f"{CAT}_{db}{tag(db)}_s0_lora.{cond}") if tag(db) else load(f"{CAT}_{db}_lora.{cond}")
 
 
 def pct(x):
@@ -53,7 +55,7 @@ ARMS = [(db, cond, label, rs) for db, cond in (("none", "noctx"), ("ret", "ctx")
 
 
 def t1():
-    print(f"**Table R.1: the categoriser on held-out users ({ST} training steps; accuracy %; the held-out rows merge four fold adapters, each scoring the "
+    print("**Table R.1: the categoriser on held-out users (no DB at 800 steps, record at 200; accuracy %; the held-out rows merge four fold adapters, each scoring the "
           "five users it never trained on; interval = users resampled; groups as REPORT.md 48)**\n")
     print("| arm | all [user interval] | " + " | ".join(n for n, _ in NAMES) + " | " + " | ".join(GROUPS) + " |")
     print("|---|---|" + "---|" * (len(NAMES) + len(GROUPS)))
