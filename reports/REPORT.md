@@ -3314,3 +3314,57 @@ The option rule: the untrained bases read 1 to 8 points higher when the options 
 ### 48.5 What the step says
 
 REAL-6 measured three things well: whether a categoriser reads the user's scheme at all (the coined names), whether a fact-DB record reaches merchants no user labelled (the DB-only merchants), and whether training across users carries a merchant's category to another user's scheme. It cannot measure the rest of the owner's task. The seen cells are a lookup, so the in-context route's advantage over a lookup table (following a user's relabelling, filing one merchant two ways, reasons the history shows but the merchant does not) is untested; and the unseen cells reduce to knowing the merchant's standard category, which the record gives, so the record-in-prompt arms are at the set's ceiling and further variants of them are ties. The queue follows from that: held-out users (row 42) still has something to measure on REAL-6 (the schemes are new even if the categories are not); row 43's set has to be built so that neither a lookup nor the standard category decides an item; the collaborative record (row 44) waits for that set; and the no-DB recipe question of 48.3 (row 47) goes first, because it may change every no-record number and costs a few GPU hours.
+
+## 49. The no-DB categoriser was under-trained: four times the steps takes it from 60.5 to 73.3 (eight times: 76.7) with ARC-Easy and MMLU no lower, the gain on the merchants users labelled and none on the merchants only the DB knows; at matched history exposure the records in the weights still add 5 to 9 points overall and 12 to 20 on the DB-only merchants (REAL-8, REAL-13)
+
+*PLAN step 47. Code: `scripts/chains/chain_r47.sh` (log `logs/gpu47.log`, 15 steps, 9.2 hours), `scripts/nodb_steps_tables.py`; no code change to the trainer (`STEPS`, `SEED`, `RUN_TAG`). Adapters `categoriser_Qwen2.5-3B-Instruct_none_st{400,800,1600}_s<k>_lora`, results `results/real6_*_none_st*_lora.json`, `results/items2_*_none_st*_lora.json`. QLoRA on the 4-bit base, scored on it, as sections 37 to 48.*
+
+Section 48.3 found that the records-in-the-weights arms of section 45 gained 13 to 22 points on items the records cannot explain (merchants the user labelled, merchants other users labelled), and that those arms had trained for four and eight times the no-DB arm's 200 steps. This step trains the no-DB categoriser, unchanged otherwise, for 400 steps (one seed; the history exposure of section 45's 800-step arm, whose sequences were half records), 800 steps (three seeds; the exposure of the 1,600-step arm) and 1,600 steps (one seed), and reads them in section 48's groups and on the step 20 general measures.
+
+**Table 49.1: the no-DB categoriser by training steps (16 sequences per step; accuracy %, mean +- sd where three seeds; groups as REPORT.md 48; DB-only = category-determined or split items whose merchant no user labelled in training; interval = users resampled, seed 0)**
+
+| steps | passes over the 3,000 history episodes (150 per user) | in history | labelled seen, not in history | determined by category | split category | DB-only | all | seed 0 all [user interval] |
+|---|---|---|---|---|---|---|---|---|
+| 200 (3 seeds) | 1.1 | 68.5 +- 2.8 | 44.6 +- 3.9 | 62.7 +- 3.1 | 35.6 +- 7.4 | 49.5 +- 3.8 | 60.5 +- 3.0 | 57.1 [53.6, 60.3] |
+| 400 (1 seed) | 2.1 | 75.0 | 58.3 | 71.5 | 27.2 | 49.2 | 67.4 | 67.4 [63.7, 70.9] |
+| 800 (3 seeds) | 4.3 | 80.9 +- 0.8 | 58.0 +- 1.3 | 78.5 +- 3.8 | 33.7 +- 5.9 | 52.7 +- 2.1 | 73.3 +- 2.3 | 71.7 [67.5, 75.5] |
+| 1,600 (1 seed) | 8.5 | 83.1 | 70.4 | 82.9 | 27.2 | 55.7 | 76.7 | 76.7 [72.6, 80.9] |
+
+**Table 49.2: the records' own contribution, at matched history exposure (accuracy %, mean +- sd over seeds)**
+
+| history exposure | arm | in history | labelled seen, not in history | determined by category | split category | DB-only | all |
+|---|---|---|---|---|---|---|---|
+| 6,400 history sequences | no DB, 400 steps | 75.0 | 58.3 | 71.5 | 27.2 | 49.2 | 67.4 |
+| 6,400 history sequences | records at 50%, 800 steps (6.7 passes) | 81.9 +- 0.9 | 62.6 +- 4.8 | 82.0 +- 3.5 | 44.0 +- 12.8 | 68.9 +- 5.4 | 76.8 +- 2.1 |
+| 12,800 history sequences | no DB, 800 steps | 80.9 +- 0.8 | 58.0 +- 1.3 | 78.5 +- 3.8 | 33.7 +- 5.9 | 52.7 +- 2.1 | 73.3 +- 2.3 |
+| 12,800 history sequences | records at 50%, 1,600 steps (13.3 passes) | 84.1 +- 0.6 | 68.4 +- 2.7 | 85.1 +- 2.4 | 30.7 +- 5.9 | 64.5 +- 5.5 | 78.3 +- 0.3 |
+
+**Table 49.3: general measures by training steps (exp_items_v2 on the same adapters; % ; mean over seeds where three)**
+
+| steps | ARC-Easy | MMLU | ICL natural | ICL symbol | ICL v2 natural | ICL v2 symbol |
+|---|---|---|---|---|---|---|
+| 200 (1) | 76.0 | 51.0 | 86.5 | 76.6 | 88.5 | 64.5 |
+| 400 (1) | 77.0 | 53.5 | 88.0 | 70.8 | 89.6 | 61.5 |
+| 800 (3) | 78.2 | 52.8 | 86.3 | 72.9 | 88.2 | 66.1 |
+| 1,600 (1) | 80.5 | 53.5 | 87.0 | 74.5 | 87.0 | 69.8 |
+
+**Table 49.4: training cost (minutes, final loss; seed 0)**
+
+| steps | minutes | final loss |
+|---|---|---|
+| 200 | 17.7 | 0.141 |
+| 400 | 36.6 | 0.047 |
+| 800 | 77.6 | 0.028 |
+| 1,600 | 146.8 | 0.0 |
+
+### 49.1 More steps teach the users' labels and other users' labels, not the merchants nobody labelled
+
+The whole set goes 60.5 +- 3.0 (200 steps, three seeds) to 67.4 (400), 73.3 +- 2.3 (800, three seeds) and 76.7 (1,600), with the seed spread at 800 steps no wider than at 200 and the user intervals of 200 and 800 steps not overlapping ([53.6, 60.3] against [67.5, 75.5] for seed 0). The gain sits where the training data has the answer: on merchants in the user's history 68.5 to 80.9 and 83.1, on the category-determined merchants (three quarters of them labelled by other users in training) 62.7 to 78.5 and 82.9, and on the 115 truncated items, whose merchants other users labelled too, 44.6 to 58.0 and 70.4. The DB-only merchants, which no training row carries, move from 49.5 +- 3.8 to 52.7 +- 2.1 and 55.7, inside the seed spread: what the model knows about a merchant nobody labelled does not grow with more passes over other merchants. The split items stay at a coin flip or below. The curve is flattening (+6.9, +5.9, +3.4 per doubling on the whole set) and not yet flat at 8.5 passes over the history episodes. The general measures do not pay for it: ARC-Easy 76.0 at 200 steps and 78.2 (three seeds) at 800, 80.5 at 1,600 (instruct base 72.5, Table 38.3), MMLU 51 to 54, the ICL suite within its seed noise; training loss reaches 0.028 at 800 steps and rounds to zero at 1,600. So the 200-step recipe used for every categoriser in sections 38 to 48 stopped at about a quarter of what the no-DB arm can use, and the lookup-group number it was compared with (98.6) is partly a comparison with an under-trained model: at 1,600 steps the model alone reads 83.1 on merchants the user labelled.
+
+### 49.2 The records' own share of section 45
+
+At the same number of history sequences, the records in the weights still add to the whole set: 76.8 +- 2.1 against 67.4 at 6,400 history sequences, 78.3 +- 0.3 against 73.3 +- 2.3 at 12,800; and on the DB-only merchants, which only the records can reach, 68.9 +- 5.4 against 49.2 and 64.5 +- 5.5 against 52.7 +- 2.1. So about half of section 45's whole-set gain over the 200-step no-DB arm (60.5 to 76.8 and 78.3) was history exposure and half the records, and the DB-only gain (+12 to +20) is the records'. The parametric arm's DB-only number is still far under the record in the prompt (97.5, section 48), and section 45's recommendation stands.
+
+### 49.3 What the step says
+
+The no-DB categoriser was under-trained by a factor of four to eight: 800 steps (77 minutes) is worth 13 points on REAL-6 and 1,600 steps (147 minutes) 16, all of it on merchants some user labelled, with no general-ability cost. The record-in-prompt arm was not retrained here (it sits at the set's ceiling, section 48), and the DB-only merchants do not gain from steps, so the record in the prompt remains the route for them. Consequences for the queue: row 42's held-out-user adapters train at 800 steps (the three-seed point; 1,600 is four hours per adapter), and whether the extra steps are learning the users' schemes or memorising the twenty users' merchant labels is exactly what the held-out users will show, since a held-out user's labelled merchants were never in training. Not run: the record arm at 800 steps, a second and third seed at 400 and 1,600, and steps beyond 1,600.
