@@ -859,3 +859,40 @@ and record SFT arms with the decider augmentation (a "needs review" option in on
 arm, uniform targets over the user's categories on evidence-free episodes; measured with row 49's metrics: the share of
 evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
 that do have evidence.
+
+**MODEL-6 Can a small encoder with one scored `[MASK]` marker per category do the categoriser's job?**
+Laya (`laya_analysis.md`) and Verdict 2.0 (`openjev_verdict_analysis.md`) put the options first, each behind its own
+`[MASK]`, then the state, and score each marker's hidden state with a small trained head; one forward pass, options defined
+at request time. Both collapse off their training domain on general decision benchmarks, which does not matter for a
+categoriser that only ever sees transactions. Section 46's GLiClass, the nearest thing we ran, reads 85.8 fine-tuned with
+the record (SFT 90.2), but the 24 shots hurt it in every arm, "not investigated further"; section 29's ModernBERT failed
+with a letter at a single mask because our answers are several tokens, which a scored marker per option avoids. At a
+million users a 400M encoder at milliseconds per item is the production argument. *Task:* Laya's `DecisionModel` (code in
+`~/projects/Taytay/laya-hf/rl_common.py`) on REAL-6, fine-tuned across users: the user's categories as marked options, then
+the query statement, the record, and the shots tagged "statement -> category"; soft-target cross-entropy (no Gaussian RL,
+section 3.2 of the memo), options shuffled per episode; from the Laya checkpoint and from plain ModernBERT-large, with a
+longer context than Laya's 512 if the shots need it; no-record and record arms; against GLiClass tuned and the SFT
+categoriser on row 45's groups and row 42's held-out folds; milliseconds per item beside the 3B's. The question is whether
+this layout lets an encoder read the shots where GLiClass could not.
+
+**MODEL-7 Does a bidirectional slot read (a diffusion LM) categorise better than a causal readout, and does it hold at scale?**
+djev-dev and razorback16/openjev (`diffusiongemma_djev_analysis.md`) read every answer from one decoder pass of
+DiffusionGemma 26B-A4B: a fixed answer template, one single-token label slot per question, one denoising step, the exact
+log-probabilities of the allowed labels at each slot. Untrained it is #3 on JevBench, and with a thinking pass first one of
+the only open systems above Jev on hard items. It does not fit a 3090 (52 GB BF16; the 18 GB NVFP4 build targets
+Blackwell). Smaller open diffusion LMs do, and the same read works on them in plain transformers (the letter slot as the
+mask token, one forward, softmax over the allowed letters; 8 to 20 categories fit single-token letters), found 2026-09-23:
+nvidia/Nemotron-Labs-Diffusion-3B and -8B (one set of weights that decodes causally or by diffusion by switching the
+attention pattern, so the two readouts are compared on identical weights), Dream-org/Dream-v0-Instruct-7B (converted from
+Qwen2.5-7B, paired with Qwen2.5-7B-Instruct as the model card of DiffusionGemma pairs it with Gemma 4),
+GSAI-ML/LLaDA-8B-Instruct (trained from scratch as a diffusion LM), and LiquidAI/LFM2.5-Encoder-350M-Diffusion (an encoder
+made a diffusion chat model, the bridge to MODEL-6). *Task, local (row 54):* zero-shot on REAL-6 with the 24 shots, with and
+without the record: Nemotron 8B causal letter readout against its one-step slot read, Dream-7B against Qwen2.5-7B-Instruct,
+LLaDA-8B, LFM2.5-Encoder; row 50's order permutations on each (djev and openjev publish no rotation test, and the commit-order
+paper suggests the slot read leans less on left context); temperature and ECE by row 49's code; if one beats its causal twin
+by more than the seed spread, a LoRA fine-tune of the slot read with the SFT categoriser's data as a follow-up. Remote code
+may need its own transformers pin (Dream's was written for 4.x; Nemotron needs 5.x); use a separate venv rather than move
+the project's. *Task, large GPU (row 55):* DiffusionGemma 26B-A4B in BF16 through djev-dev's pinned runtime on one 80 GB
+GPU (Modal H100, row 34), zero-shot on REAL-6 and on row 43's set when it exists, one-step read with and without the record,
+and with a thinking pass first as a second arm: the reference for how much a much larger backbone reads with no training,
+and a candidate teacher for soft labels.
