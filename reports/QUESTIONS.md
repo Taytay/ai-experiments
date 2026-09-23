@@ -799,3 +799,63 @@ tokenizer (withdrawn in 24.7), 33.2's window explanation (it was the 4-bit misma
 49), and several single-seed gaps inside section 20's spread (28's "best on every number", 26's "vanishes at 7B", 31 against
 Cg, 17's heading). The summary also never states the result the project now rests on: the record in the prompt (90) over
 the record in the weights (59 +- 12). *Task:* rewrite section 1 and add the pointers; no runs.
+
+## Added by the Jev review, 2026-09-23
+
+The owner asked what the Jev series in `references/` (thirteen memos on open rebuilds of TypeSafe's Jev decision model,
+synthesis in `references/jev_meta_analysis.md`, claim check in `references/jev_credibility_and_unknowns.md`) should add to
+the plan. The categoriser already has the shape those projects converged on (the evidence in the prompt, the model reads
+it, one distribution over a runtime-defined option list), and the field agrees with section 43's record-in-prompt result.
+What the field measured and we have not: calibration and order sensitivity. What it trained that transferred: minimal pairs
+and trained abstention. Rows 49 to 52.
+
+**STAT-4 Are the categoriser's probabilities calibrated, and at what confidence can a label be applied without review?**
+Every Jev rebuild that measured its raw option distribution found it over-confident, and one temperature fitted on the
+serving population fixes most of it (`jqv_analysis.md` 2.4, `reflex_analysis.md` 2.3, `kev_analysis.md` 3). The temperature
+depends on the task type, not the model: at 1.7B jqv needed about 12 on knowledge questions and about 3 on questions
+answerable from the prompt, and a temperature fitted on one population hurt every foreign one in reflex. Our arms split the
+same way (no record: the category comes from the weights and the shots; record in the prompt: it is read), and REAL-11's
+correction-rate requirement needs an operating point, not an accuracy. *Task (CPU only):* from the saved per-option scores in
+`results/per_item/real6_*`, per arm (untrained base, no-DB SFT, record-in-prompt SFT, retrieved record), the softmax over the
+user's categories under the mean-per-token and the sum rule; one temperature per arm fitted by NLL on held-out users
+(leave-users-out folds, so no user's items fit its own temperature), and the cross-arm transfer (the no-record temperature on
+the record arm and the reverse); raw and tempered ECE (10 bins), Brier, NLL; coverage at 90% and 95% precision and the
+risk-coverage curve (AURC); on row 45's corrected groups with user-resampled intervals. Prediction from the series: the
+record arm near calibrated (T about 1 to 3), the no-record arm far off, and the transfer hurting. Code to reuse:
+`kev/kev/metrics.py`, `jqv/jqv/calibration.py` (bounded 1-D search; LBFGS diverged on near-separable sets there).
+
+**EVAL-8 How much does the order of the category list change the categoriser's answer?**
+Letter and position priors move argmaxes on weak-evidence items: SemIf lost 10 of 36 decisions to reversing the option
+order, jqv 52% of argmaxes at 1.7B under rotation, Jev itself 13% (`jev_meta_analysis.md` 2.5), and averaging two orders
+is worth about 3 points at 4 to 14B for no training. Every REAL-6 number uses one fixed category order in the prompt, and
+our scorer reads category names, not letters, so the size of the effect here is unknown. *Task (eval only):* re-score the
+untrained instruct model and the no-DB and record-in-prompt SFT adapters with the prompt's category list permuted under two
+further seeds (shots and query unchanged); argmax flip rate per corrected group and per name type, the accuracy of each
+order, and of the two- and three-order averaged distributions; the same with a lettered list and letter readout on the
+untrained model only (the adapters were trained on names). Precision matched to training (CLAUDE.md, section 44).
+
+**TRAIN-10 Do counterfactual minimal pairs teach the categoriser to read its evidence rather than its prior?**
+Across the series, training on decision data raised in-distribution accuracy and lost on held-out items (reflex, Open-Jev,
+decider, Laya), with one clear exception: Nimble's 2,676 rows of base/counterfactual pairs, whose contexts differ in one
+fact that flips the label, moved a 9B 24 points on its own distribution and held within 1.2 points of Jev on 13
+human-labelled sets (`nimble_analysis.md` 5). kev's executable-rule pairs point the same way. The property that matters is
+that the only way to fit both rows of a pair is to read the fact. Our labels come from the generator's rules, so pairs need
+no LLM verifier. *Task:* from the REAL-6 generator, for each training episode a sibling that changes one piece of evidence
+and recomputes the label: (a) the user's history files the query's merchant under another of the user's categories (the
+shots carrying it relabelled consistently), so the label follows the history; (b) the merchant's record names products of
+another standard category, so the label follows the record through the user's scheme; keep pairs whose labels differ.
+No-DB and record arms, pairs against an equal count of unpaired episodes at the same token budget, one epoch, same seed;
+three seeds if the first differs by more than the seed spread. Scored on row 42's held-out-user folds and row 45's
+corrected groups, with a paired-sibling accuracy (both rows right) beside plain accuracy; re-scored on row 43's set when it
+exists. The split-category items stay a coin flip by construction and are reported apart.
+
+**REAL-14 Can the categoriser say "needs review" when it has no evidence, and is its confidence lower there?**
+A listed abstain option without training gets confident wrong answers (SemIf's `insufficient`; `2405.05904`). decider trains
+it: 10% of questions with three or more options get an abstain option, and in a quarter of those the true categories are
+swapped for another user's so abstain is correct (`decider_analysis.md` 4.3). kev's uniform targets on evidence-free items
+cut the share answered at 0.9 confidence or more from 0.19 to 0.00 (`kev_analysis.md` 3). Our evidence-free items are the
+opaque merchants with no record and not in the history, where the no-DB categoriser reads 6 (Table 37.2). *Task:* the no-DB
+and record SFT arms with the decider augmentation (a "needs review" option in one of several wordings) and, in a second
+arm, uniform targets over the user's categories on evidence-free episodes; measured with row 49's metrics: the share of
+evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
+that do have evidence.
