@@ -902,3 +902,18 @@ the project's. *Task, large GPU (row 55):* DiffusionGemma 26B-A4B in BF16 throug
 GPU (Modal H100, row 34), zero-shot on REAL-6 and on row 43's set when it exists, one-step read with and without the record,
 and with a thinking pass first as a second arm: the reference for how much a much larger backbone reads with no training,
 and a candidate teacher for soft labels.
+
+## Added 2026-09-23: training efficiency
+
+**TRAIN-11 (O) Where do the categoriser's GPU hours go, and can the same accuracy come cheaper?**
+Row 47 put the no-DB categoriser at 800 steps (77 minutes, 73.3) to 1,600 (147 minutes, 76.7), which made row 42's chain
+14 hours. One step is 16 sequences of about 850 tokens (the category list, 24 labelled shots, the query) through a 3B model on
+the NF4 4-bit base, at about 2,500 tokens a second (section 7's 3B figure is 2,700): the card is busy, and the loss falls on the
+answer's 1 to 5 tokens, so each 850-token pass teaches one label. The owner asked for two tests. (1) The loss on every shot's
+label as well (each predicted from the category list and the shots before it, the section 21 all-answer idea on this prompt):
+about 25 supervised answers per pass, at the risk that early shots, with few demonstrations before them, teach a different
+task. (2) A small run on the bf16 base instead of 4-bit: QLoRA dequantises every weight on every pass, and a 3B bf16 base fits
+in 24 GB. *Experiment:* the no-DB arm, seed 0: all-label loss at 100, 200 and 400 steps on the 4-bit base; the plain recipe at
+200 steps on the bf16 base; the all-label loss at 200 steps on bf16; each scored on REAL-6 (bf16 adapters on the bf16 base) and
+the ARC / MMLU / ICL items, against row 47's 4-bit curve (200 / 400 / 800 / 1,600 steps); report minutes, tokens per second,
+peak memory and minutes to reach the 800-step accuracy.
