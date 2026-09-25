@@ -804,3 +804,100 @@ tokenizer (withdrawn in 24.7), 33.2's window explanation (it was the 4-bit misma
 Cg, 17's heading). The summary also never states the result the project now rests on: the record in the prompt (90) over
 the record in the weights (59 +- 12). *Task:* rewrite section 1 and add the pointers; no runs.
 **Status (2026-09-22):** done, PLAN step 48. Section 1 opens with a paragraph on where the project stands and fourteen earlier claims carry forward pointers (sections 1, 5, 6.5.1, 8.3, 8.6, 11, 17, 24, 26, 28.3, 31.5, 33.2, 34.3; PLAN row 13). Not taken: the 6.2 confidence claim (section 10.5's constant predictors are the yes/no levels, not the margins) and a 33.4 sentence that is not in the report.
+
+## Added by the Jev review, 2026-09-23
+
+The owner asked what the Jev series in `references/` (thirteen memos on open rebuilds of TypeSafe's Jev decision model,
+synthesis in `references/jev_meta_analysis.md`, claim check in `references/jev_credibility_and_unknowns.md`) should add to
+the plan. The categoriser already has the shape those projects converged on (the evidence in the prompt, the model reads
+it, one distribution over a runtime-defined option list), and the field agrees with section 43's record-in-prompt result.
+What the field measured and we have not: calibration and order sensitivity. What it trained that transferred: minimal pairs
+and trained abstention. Rows 49 to 52.
+
+**STAT-4 Are the categoriser's probabilities calibrated, and at what confidence can a label be applied without review?**
+Every Jev rebuild that measured its raw option distribution found it over-confident, and one temperature fitted on the
+serving population fixes most of it (`jqv_analysis.md` 2.4, `reflex_analysis.md` 2.3, `kev_analysis.md` 3). The temperature
+depends on the task type, not the model: at 1.7B jqv needed about 12 on knowledge questions and about 3 on questions
+answerable from the prompt, and a temperature fitted on one population hurt every foreign one in reflex. Our arms split the
+same way (no record: the category comes from the weights and the shots; record in the prompt: it is read), and REAL-11's
+correction-rate requirement needs an operating point, not an accuracy. *Task (CPU only):* from the saved per-option scores in
+`results/per_item/real6_*`, per arm (untrained base, no-DB SFT, record-in-prompt SFT, retrieved record), the softmax over the
+user's categories under the mean-per-token and the sum rule; one temperature per arm fitted by NLL on held-out users
+(leave-users-out folds, so no user's items fit its own temperature), and the cross-arm transfer (the no-record temperature on
+the record arm and the reverse); raw and tempered ECE (10 bins), Brier, NLL; coverage at 90% and 95% precision and the
+risk-coverage curve (AURC); on row 45's corrected groups with user-resampled intervals. Prediction from the series: the
+record arm near calibrated (T about 1 to 3), the no-record arm far off, and the transfer hurting. Code to reuse:
+`kev/kev/metrics.py`, `jqv/jqv/calibration.py` (bounded 1-D search; LBFGS diverged on near-separable sets there).
+
+**EVAL-8 How much does the order of the category list change the categoriser's answer?**
+Letter and position priors move argmaxes on weak-evidence items: SemIf lost 10 of 36 decisions to reversing the option
+order, jqv 52% of argmaxes at 1.7B under rotation, Jev itself 13% (`jev_meta_analysis.md` 2.5), and averaging two orders
+is worth about 3 points at 4 to 14B for no training. Every REAL-6 number uses one fixed category order in the prompt, and
+our scorer reads category names, not letters, so the size of the effect here is unknown. *Task (eval only):* re-score the
+untrained instruct model and the no-DB and record-in-prompt SFT adapters with the prompt's category list permuted under two
+further seeds (shots and query unchanged); argmax flip rate per corrected group and per name type, the accuracy of each
+order, and of the two- and three-order averaged distributions; the same with a lettered list and letter readout on the
+untrained model only (the adapters were trained on names). Precision matched to training (CLAUDE.md, section 44).
+
+**TRAIN-10 Do counterfactual minimal pairs teach the categoriser to read its evidence rather than its prior?**
+Across the series, training on decision data raised in-distribution accuracy and lost on held-out items (reflex, Open-Jev,
+decider, Laya), with one clear exception: Nimble's 2,676 rows of base/counterfactual pairs, whose contexts differ in one
+fact that flips the label, moved a 9B 24 points on its own distribution and held within 1.2 points of Jev on 13
+human-labelled sets (`nimble_analysis.md` 5). kev's executable-rule pairs point the same way. The property that matters is
+that the only way to fit both rows of a pair is to read the fact. Our labels come from the generator's rules, so pairs need
+no LLM verifier. *Task:* from the REAL-6 generator, for each training episode a sibling that changes one piece of evidence
+and recomputes the label: (a) the user's history files the query's merchant under another of the user's categories (the
+shots carrying it relabelled consistently), so the label follows the history; (b) the merchant's record names products of
+another standard category, so the label follows the record through the user's scheme; keep pairs whose labels differ.
+No-DB and record arms, pairs against an equal count of unpaired episodes at the same token budget, one epoch, same seed;
+three seeds if the first differs by more than the seed spread. Scored on row 42's held-out-user folds and row 45's
+corrected groups, with a paired-sibling accuracy (both rows right) beside plain accuracy; re-scored on row 43's set when it
+exists. The split-category items stay a coin flip by construction and are reported apart.
+
+**REAL-14 Can the categoriser say "needs review" when it has no evidence, and is its confidence lower there?**
+A listed abstain option without training gets confident wrong answers (SemIf's `insufficient`; `2405.05904`). decider trains
+it: 10% of questions with three or more options get an abstain option, and in a quarter of those the true categories are
+swapped for another user's so abstain is correct (`decider_analysis.md` 4.3). kev's uniform targets on evidence-free items
+cut the share answered at 0.9 confidence or more from 0.19 to 0.00 (`kev_analysis.md` 3). Our evidence-free items are the
+opaque merchants with no record and not in the history, where the no-DB categoriser reads 6 (Table 37.2). *Task:* the no-DB
+and record SFT arms with the decider augmentation (a "needs review" option in one of several wordings) and, in a second
+arm, uniform targets over the user's categories on evidence-free episodes; measured with row 49's metrics: the share of
+evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
+that do have evidence.
+
+**MODEL-6 Can a small encoder with one scored `[MASK]` marker per category do the categoriser's job?**
+Laya (`laya_analysis.md`) and Verdict 2.0 (`openjev_verdict_analysis.md`) put the options first, each behind its own
+`[MASK]`, then the state, and score each marker's hidden state with a small trained head; one forward pass, options defined
+at request time. Both collapse off their training domain on general decision benchmarks, which does not matter for a
+categoriser that only ever sees transactions. Section 46's GLiClass, the nearest thing we ran, reads 85.8 fine-tuned with
+the record (SFT 90.2), but the 24 shots hurt it in every arm, "not investigated further"; section 29's ModernBERT failed
+with a letter at a single mask because our answers are several tokens, which a scored marker per option avoids. At a
+million users a 400M encoder at milliseconds per item is the production argument. *Task:* Laya's `DecisionModel` (code in
+`~/projects/Taytay/laya-hf/rl_common.py`) on REAL-6, fine-tuned across users: the user's categories as marked options, then
+the query statement, the record, and the shots tagged "statement -> category"; soft-target cross-entropy (no Gaussian RL,
+section 3.2 of the memo), options shuffled per episode; from the Laya checkpoint and from plain ModernBERT-large, with a
+longer context than Laya's 512 if the shots need it; no-record and record arms; against GLiClass tuned and the SFT
+categoriser on row 45's groups and row 42's held-out folds; milliseconds per item beside the 3B's. The question is whether
+this layout lets an encoder read the shots where GLiClass could not.
+
+**MODEL-7 Does a bidirectional slot read (a diffusion LM) categorise better than a causal readout, and does it hold at scale?**
+djev-dev and razorback16/openjev (`diffusiongemma_djev_analysis.md`) read every answer from one decoder pass of
+DiffusionGemma 26B-A4B: a fixed answer template, one single-token label slot per question, one denoising step, the exact
+log-probabilities of the allowed labels at each slot. Untrained it is #3 on JevBench, and with a thinking pass first one of
+the only open systems above Jev on hard items. It does not fit a 3090 (52 GB BF16; the 18 GB NVFP4 build targets
+Blackwell). Smaller open diffusion LMs do, and the same read works on them in plain transformers (the letter slot as the
+mask token, one forward, softmax over the allowed letters; 8 to 20 categories fit single-token letters), found 2026-09-23:
+nvidia/Nemotron-Labs-Diffusion-3B and -8B (one set of weights that decodes causally or by diffusion by switching the
+attention pattern, so the two readouts are compared on identical weights), Dream-org/Dream-v0-Instruct-7B (converted from
+Qwen2.5-7B, paired with Qwen2.5-7B-Instruct as the model card of DiffusionGemma pairs it with Gemma 4),
+GSAI-ML/LLaDA-8B-Instruct (trained from scratch as a diffusion LM), and LiquidAI/LFM2.5-Encoder-350M-Diffusion (an encoder
+made a diffusion chat model, the bridge to MODEL-6). *Task, local (row 54):* zero-shot on REAL-6 with the 24 shots, with and
+without the record: Nemotron 8B causal letter readout against its one-step slot read, Dream-7B against Qwen2.5-7B-Instruct,
+LLaDA-8B, LFM2.5-Encoder; row 50's order permutations on each (djev and openjev publish no rotation test, and the commit-order
+paper suggests the slot read leans less on left context); temperature and ECE by row 49's code; if one beats its causal twin
+by more than the seed spread, a LoRA fine-tune of the slot read with the SFT categoriser's data as a follow-up. Remote code
+may need its own transformers pin (Dream's was written for 4.x; Nemotron needs 5.x); use a separate venv rather than move
+the project's. *Task, large GPU (row 55):* DiffusionGemma 26B-A4B in BF16 through djev-dev's pinned runtime on one 80 GB
+GPU (Modal H100, row 34), zero-shot on REAL-6 and on row 43's set when it exists, one-step read with and without the record,
+and with a thinking pass first as a second arm: the reference for how much a much larger backbone reads with no training,
+and a candidate teacher for soft labels.

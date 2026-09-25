@@ -13,6 +13,7 @@ usage: uv run python scripts/exp_real6.py llm [base|<adapter dir under models/ad
        uv run python scripts/exp_real6.py encoder [minilm|bge]
        SMOKE=1 scores every 10th item, no tracker
        REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB in place of the disjoint records (adds _amb to the tag)
+       USERS=<ids>|all: score only these users' items; a fold adapter of row 42 (name with _f<k>) defaults to its five held-out users
        CONDS=ret1 (LLM): the record found by the row 37 retriever from the statement string (results/real6_retrieved.json), right or wrong;
        ENC_CTX=ret does the same for the encoder's query
        SCORER=hf (row 38, INFRA-2): load the model and adapter with transformers + peft instead of unsloth (adds _hfs to the tag)
@@ -20,6 +21,7 @@ outputs: results/real6_<tag>.json, results/per_item/real6_<tag>.<cond>.jsonl; tr
 """
 import json
 import os
+import re
 import sys
 import time
 
@@ -51,6 +53,10 @@ RETRIEVED = None
 if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/exp_real6_retriever.py; its record comes from the DB in use
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
+_fold = re.search(r"_f(\d)(?:_|$)", WHAT)  # row 42: a fold adapter (exp_categoriser.py FOLD=k) is scored on its held-out users unless USERS says otherwise
+USERS = os.environ.get("USERS", "all" if _fold is None else ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == int(_fold.group(1))))
+if USERS != "all":
+    ITEMS = [it for it in ITEMS if str(it["user"]) in USERS.split(",")]
 if ROUTE == "llm":
     from ai_experiments import real6_shots as RS
     USERS_BY_ID = {u["user"]: u for u in DOC["users"]}

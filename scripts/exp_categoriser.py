@@ -19,6 +19,10 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
      REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB of real6_v1_ambdb.json in place of the disjoint records, for param and ret; adds _amb to the names
      CHAT=1 (row 39, REAL-8): the SFT pairs through the instruct model's chat template (real6.chat_prompt: the prompt up to the query line as
        the user turn, "Category:" opening the assistant turn, the label after it); adds _chat to the names. Score such an adapter with exp_real6.py, which reads CHAT from the name.
+     FOLD=k (row 42, REAL-10): train on the users outside fold k of four (fold = user id mod 4, five users each), so the fold's users are
+       held out; adds _f<k>. Score with `USERS=<the fold's ids> exp_real6.py llm <adapter>`.
+     RENAME=p (row 42): rename augmentation, per training episode each of the user's category names replaced with probability p by a
+       fresh coined word, consistently in the category list, the shots and the target; adds _ren<p*100>.
      TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
        LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
@@ -52,6 +56,8 @@ LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
 SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
+FOLD = os.environ.get("FOLD")  # row 42: hold out the users with user % 4 == FOLD
+RENAME = float(os.environ.get("RENAME", "0"))  # row 42: per-episode probability of replacing each category name by a coined word
 CHAT = bool(int(os.environ.get("CHAT", "0")))  # row 39: the prompt as the user turn of the chat template, the label as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
@@ -59,7 +65,7 @@ assert TRAINER in ("unsloth", "hf")
 DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -73,6 +79,22 @@ def db_texts():
     return out
 
 
+SYLL = [c + v for c in "bdfgklmnprstvz" for v in "aeiou"]
+
+
+def coined(r, taken):
+    """A fresh pronounceable word ("Tavoli", "Mekru") not among `taken` (row 42's rename augmentation)."""
+    while True:
+        w = "".join(r.choice(SYLL) for _ in range(r.randint(2, 3)))
+        w = (w + r.choice(["", "", "n", "r", "x"])).capitalize()
+        if w not in taken:
+            return w
+
+
+def training_users():
+    return [u for u in DOC["users"] if FOLD is None or u["user"] % 4 != int(FOLD)]
+
+
 def sft_examples(per_user=150):
     """(prompt, answer) pairs in the REAL-6 format from the users' histories; the test items' merchants are not excluded (they are
     the seen cells), but the test transactions themselves are not history rows."""
@@ -81,7 +103,7 @@ def sft_examples(per_user=150):
     if SHOTS != "fixed":
         from ai_experiments.real6_shots import Shots
         shots = Shots(SHOTS, seed=SEED, exclude=DB_ONLY)
-    for u in DOC["users"]:
+    for u in training_users():
         hist = [h for h in u["history"] if h["merchant"] not in DB_ONLY]
         header = "Categories: " + ", ".join(c["name"] for c in u["categories"]) + "\n\n"
         rows = list(range(len(hist))); rng.shuffle(rows)
@@ -91,10 +113,19 @@ def sft_examples(per_user=150):
                 others = shots.select(u, h["text"], train=True, query_index=i)
             else:
                 others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
-            demo = "".join(f"Transaction: {o['text']} | ${o['amount']:.2f} | {o['weekday']}\nCategory: {o['label']}\n\n" for o in others)
+            names = {c["name"]: c["name"] for c in u["categories"]}
+            if RENAME:  # the same fresh word for a category everywhere in this episode
+                taken = set(names)
+                for n in names:
+                    if rng.random() < RENAME:
+                        names[n] = coined(rng, taken); taken.add(names[n])
+                hdr = "Categories: " + ", ".join(names[c["name"]] for c in u["categories"]) + "\n\n"
+            else:
+                hdr = header
+            demo = "".join(f"Transaction: {o['text']} | ${o['amount']:.2f} | {o['weekday']}\nCategory: {names[o['label']]}\n\n" for o in others)
             note = f"Note: {DBREC[h['merchant']]}\n" if DB == "ret" else ""
-            prompt = header + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory:"
-            ex.append((R6.chat_prompt(prompt) if CHAT else prompt, " " + h["label"]))
+            prompt = hdr + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory:"
+            ex.append((R6.chat_prompt(prompt) if CHAT else prompt, " " + names[h["label"]]))
     return ex
 
 
@@ -177,7 +208,7 @@ def train_encoder(run):
     from sentence_transformers import SentenceTransformer
     model = SentenceTransformer(ENC_BASE, device="cuda")
     pairs = []
-    for u in DOC["users"]:
+    for u in training_users():
         for h in u["history"]:
             if h["merchant"] not in DB_ONLY:
                 pairs.append((M.normalize(h["text"]), h["label"]))
@@ -206,7 +237,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()))
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
