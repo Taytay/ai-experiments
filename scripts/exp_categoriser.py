@@ -27,6 +27,8 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
        from the category list and the shots before it), so one 850-token sequence carries about 25 supervised answers instead of 1; the
        label tokens are found through the tokenizer's offset mapping on the whole prompt, so training sees the scorer's tokenisation;
        adds _alllab. No-DB arm only (the shots carry no record, so the record arm would learn its skill from 1 label in 25).
+     ANS_WEIGHT=w (row 56, with ALL_LABELS): each sequence's loss is w x the final answer's mean token loss + (1 - w) x the shot
+       labels' mean token loss, instead of one mean over all labelled tokens (where the answer is ~3 tokens in ~85); adds _aw<w*100>.
      TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
        LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
@@ -62,16 +64,18 @@ TRAINER = os.environ.get("TRAINER", "unsloth")
 SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
 FOLD = os.environ.get("FOLD")  # row 42: hold out the users with user % 4 == FOLD
 RENAME = float(os.environ.get("RENAME", "0"))
-ALL_LABELS = bool(int(os.environ.get("ALL_LABELS", "0")))  # row 56: loss on every shot label in the prompt too  # row 42: per-episode probability of replacing each category name by a coined word
+ALL_LABELS = bool(int(os.environ.get("ALL_LABELS", "0")))  # row 56: loss on every shot label in the prompt too
+ANS_WEIGHT = float(os.environ.get("ANS_WEIGHT", "0"))  # row 56: the final answer's share of each sequence's loss under ALL_LABELS (0 = token mean)  # row 42: per-episode probability of replacing each category name by a coined word
 CHAT = bool(int(os.environ.get("CHAT", "0")))  # row 39: the prompt as the user turn of the chat template, the label as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
 assert TRAINER in ("unsloth", "hf")
 assert not (ALL_LABELS and (CHAT or DB != "none")), "ALL_LABELS is built for the plain no-DB prompt"
+assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs ALL_LABELS and 0 < w < 1"
 DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -175,15 +179,15 @@ def train_llm(run):
 
     def enc(pair):
         if isinstance(pair, str):
-            ids = tok(pair, add_special_tokens=False)["input_ids"][:MAXLEN - 1] + [eos]; return ids, list(ids)
+            ids = tok(pair, add_special_tokens=False)["input_ids"][:MAXLEN - 1] + [eos]; return ids, list(ids), 0
         a = tok(pair[1], add_special_tokens=False)["input_ids"] + [eos]
         if len(pair) == 3:  # ALL_LABELS: the shot labels' tokens carry the loss too
             e = tok(pair[0], add_special_tokens=False, return_offsets_mapping=True)
             lab = [t if any(s0 < b and a0 < s1 for s0, s1 in pair[2]) else -100 for t, (a0, b) in zip(e["input_ids"], e["offset_mapping"])]
             keep = MAXLEN - len(a)
-            return e["input_ids"][-keep:] + a, lab[-keep:] + a
+            return e["input_ids"][-keep:] + a, lab[-keep:] + a, len(a)
         p = tok(pair[0], add_special_tokens=False)["input_ids"][-(MAXLEN - len(a)):]
-        return p + a, [-100] * len(p) + a
+        return p + a, [-100] * len(p) + a, len(a)  # third: the answer's token count (it ends the sequence), for ANS_WEIGHT
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
     model.train(); t0 = time.time(); n_sft = n_db = 0; losses = []; n_tok = n_lab_tok = n_pad = 0
@@ -197,14 +201,24 @@ def train_llm(run):
                     batch.append(enc(rng.choice(kt))); n_db += 1
                 else:
                     batch.append(enc(rng.choice(ex))); n_sft += 1
-            L = max(len(i) for i, _ in batch)
-            n_tok += sum(len(i) for i, _ in batch); n_pad += sum(L - len(i) for i, _ in batch); n_lab_tok += sum(sum(x != -100 for x in lb[1:]) for _, lb in batch)
-            ids = torch.tensor([i + [pad] * (L - len(i)) for i, _ in batch], device="cuda")
-            lab = torch.tensor([l + [-100] * (L - len(l)) for _, l in batch], device="cuda")
-            att = (torch.arange(L, device="cuda")[None] < torch.tensor([len(i) for i, _ in batch], device="cuda")[:, None]).long()
+            L = max(len(i) for i, *_ in batch)
+            n_tok += sum(len(i) for i, *_ in batch); n_pad += sum(L - len(i) for i, *_ in batch); n_lab_tok += sum(sum(x != -100 for x in lb[1:]) for _, lb, _ in batch)
+            ids = torch.tensor([i + [pad] * (L - len(i)) for i, *_ in batch], device="cuda")
+            lab = torch.tensor([l + [-100] * (L - len(l)) for _, l, _ in batch], device="cuda")
+            att = (torch.arange(L, device="cuda")[None] < torch.tensor([len(i) for i, *_ in batch], device="cuda")[:, None]).long()
             logits = model(input_ids=ids, attention_mask=att).logits[:, :-1]
             tgt = lab[:, 1:]; n_lab = max(int((tgt != -100).sum()), 1)
-            loss = sum(torch.nn.functional.cross_entropy(logits[i].float(), tgt[i], ignore_index=-100, reduction="sum") for i in range(len(batch))) / n_lab / 4
+            if ANS_WEIGHT:  # per sequence: w x the answer's mean token loss + (1 - w) x the shot labels' mean token loss
+                loss = 0.0
+                for i, (seq, _, nf) in enumerate(batch):
+                    ce = torch.nn.functional.cross_entropy(logits[i].float(), tgt[i], ignore_index=-100, reduction="none")
+                    valid = tgt[i] != -100; fin = torch.zeros_like(valid); fin[len(seq) - nf - 1:len(seq) - 1] = True
+                    shot = valid & ~fin
+                    li = ce[fin & valid].mean()
+                    loss = loss + (ANS_WEIGHT * li + (1 - ANS_WEIGHT) * ce[shot].mean() if shot.any() else li)
+                loss = loss / len(batch) / 4
+            else:
+                loss = sum(torch.nn.functional.cross_entropy(logits[i].float(), tgt[i], ignore_index=-100, reduction="sum") for i in range(len(batch))) / n_lab / 4
             loss.backward(); loss_acc += loss.item(); del logits
         torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss_acc)
@@ -254,7 +268,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, load_in_4bit=LOAD_4BIT)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
