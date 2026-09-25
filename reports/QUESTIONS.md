@@ -917,3 +917,16 @@ in 24 GB. *Experiment:* the no-DB arm, seed 0: all-label loss at 100, 200 and 40
 200 steps on the bf16 base; the all-label loss at 200 steps on bf16; each scored on REAL-6 (bf16 adapters on the bf16 base) and
 the ARC / MMLU / ICL items, against row 47's 4-bit curve (200 / 400 / 800 / 1,600 steps); report minutes, tokens per second,
 peak memory and minutes to reach the 800-step accuracy.
+
+**REAL-15 (O) Does the fact DB go into the weights better as supervised categorisation decisions than as prose?**
+The owner (2026-09-25), after the all-label result: measuring loss on more tokens may be the better way to impart a database.
+Every records-in-the-weights arm so far (sections 38, 43, 45) trained the record sentences as full-sequence text, which is loss on
+every token already, and reached the DB-only merchants at 59 +- 12 (3.3 passes) to 69 +- 6 (6.7), opaque ones never above 44,
+against 97.5 with the record in the prompt; the species sections (8, 27, 29) found knowledge trained as prose stays in the trained
+form. The all-label loss (REPORT.md 52, row 56) instead supervised the decisions the task makes. *Experiment:* database episodes
+(`DBEP`): synthetic statement rows of every DB merchant, DB-only ones included, labelled with a training user's own name for the
+merchant's DB category (a category field, as real POI databases carry; split categories skipped), as shots and targets inside
+all-label episodes, against the prose records given the same category (`DB_CAT`), both, and neither; on row 42's held-out-user
+folds so that no (user, merchant) answer is supervised for a scored user; the DB-only merchants without the record (known chains
+and opaque ones) are the cell that measures it, plus the other groups of REPORT.md 48 and ARC / MMLU. Frame: this improves the
+no-record route (retrieval missing or unavailable at serving time); with the record in the prompt the DB-only merchants are at 97.5.
