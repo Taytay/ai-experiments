@@ -3368,3 +3368,92 @@ At the same number of history sequences, the records in the weights still add to
 ### 49.3 What the step says
 
 The no-DB categoriser was under-trained by a factor of four to eight: 800 steps (77 minutes) is worth 13 points on REAL-6 and 1,600 steps (147 minutes) 16, all of it on merchants some user labelled, with no general-ability cost. The record-in-prompt arm was not retrained here (it sits at the set's ceiling, section 48), and the DB-only merchants do not gain from steps, so the record in the prompt remains the route for them. Consequences for the queue: row 42's held-out-user adapters train at 800 steps (the three-seed point; 1,600 is four hours per adapter), and whether the extra steps are learning the users' schemes or memorising the twenty users' merchant labels is exactly what the held-out users will show, since a held-out user's labelled merchants were never in training. Not run: the record arm at 800 steps, a second and third seed at 400 and 1,600, and steps beyond 1,600.
+
+## 50. Calibration and the auto-apply operating point: under the sum rule one temperature per arm calibrates every categoriser (ECE 3 to 4), the record arm is nearly calibrated as trained (T 1.4) and the no-record arm over-confident (T 2.8); at 95% precision the record categoriser can auto-apply 82% of a trained user's transactions and 60% of a new user's, the no-record one 56% and 48%; a foreign temperature ruins the probabilities and leaves the operating point intact; and the split categories are where confident errors concentrate (STAT-4)
+
+*PLAN step 49. Code: `ai_experiments.calibration` (softmax over the user's categories, a bounded 1-D temperature fit after `../jqv/jqv/calibration.py`, ECE, Brier, the risk-coverage curve, AURC and threshold selection after `../kev/kev/metrics.py`), `scripts/calibration_tables.py`. CPU only, from the saved per-option log-probabilities of the per-item records; nothing rescored. Row 42's fold adapters enter as their plain folds; the rename-augmented folds are added to the same tables when row 42's chain finishes (section 51).*
+
+REAL-11 asks for a correction rate, and a production categoriser needs a rule for when a label is applied without asking the user. That needs probabilities that mean what they say, or at least a confidence whose ranking holds across users. The Jev rebuilds the owner collected (`references/jqv_analysis.md` 2.4, `reflex_analysis.md` 2.3, `kev_analysis.md` 3) all found raw option distributions over-confident, one temperature fitted on the serving population fixing most of it, and the temperature depending on the task type (knowledge in the weights against evidence in the prompt), not the model. This step measures that on the categoriser arms. Protocol: per item the softmax over the user's categories of the option scores under the mean-per-token rule (what every REAL-6 table reports) and the sum rule; users in four folds (id mod 4, row 42's split); each fold's items are tempered with the temperature fitted by NLL on the other three folds and auto-applied against a threshold chosen on the other three folds' tempered confidences for 95% (and 90%) precision. No user's items fit their own temperature or threshold, and for row 42's fold adapters no user's items trained the adapter either. Intervals resample users.
+
+
+**Table C.1 (mean rule): calibration and the auto-apply operating point, seed 0 or the merged folds (T = mean of the four leave-users-out fits; ECE in points over 10 bins; AURC in % risk; coverage = share of items auto-applied; oracle = threshold chosen on the same items, out-of-fold = threshold chosen on the other users, with the precision it realised; intervals resample users)**
+
+| arm | T | accuracy | NLL raw / tempered | Brier raw / tempered | ECE raw | ECE tempered | AURC | coverage at 95%, oracle | at 95%, out-of-fold [interval] (precision) | at 90%, oracle | at 90%, out-of-fold (precision) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| instruct base, no record | 1.76 | 31.2 | 2.46 / 2.37 | 0.815 / 0.847 | 8.1 | 11.9 [9.7, 15.2] | 45.4 | 0.3 | 1.7 [0.7, 3.1] (80.0) | 5.5 | 5.9 (90.0) |
+| instruct base + record | 0.83 | 58.0 | 1.49 / 1.48 | 0.605 / 0.586 | 15.0 | 8.9 [6.6, 13.1] | 22.9 | 1.8 | 2.2 [0.9, 3.7] (80.8) | 21.5 | 17.0 (89.0) |
+| SFT no DB, 200 steps | 1.10 | 57.1 | 1.64 / 1.63 | 0.551 / 0.560 | 7.7 | 10.1 [8.1, 13.7] | 16.8 | 22.9 | 22.6 [18.1, 27.1] (94.8) | 44.5 | 43.6 (90.1) |
+| SFT no DB, 800 steps | 1.43 | 71.7 | 1.24 / 1.15 | 0.387 / 0.392 | 4.8 | 8.3 [5.8, 12.2] | 8.2 | 51.4 | 51.3 [44.4, 56.7] (95.0) | 66.3 | 65.9 (90.0) |
+| SFT + record | 0.62 | 90.2 | 0.39 / 0.32 | 0.177 / 0.160 | 10.9 | 3.2 [2.1, 7.2] | 2.7 | 74.9 | 79.3 [73.9, 84.9] (94.2) | 100.0 | 99.0 (90.7) |
+| SFT + retrieved record | 0.66 | 89.9 | 0.41 / 0.35 | 0.181 / 0.164 | 10.8 | 3.1 [2.3, 6.7] | 2.8 | 75.8 | 79.6 [74.3, 84.9] (94.1) | 99.8 | 98.9 (90.5) |
+| SFT no DB, 800 steps, user held out (row 42) | 1.45 | 70.1 | 1.21 / 1.14 | 0.408 / 0.410 | 5.2 | 6.0 [4.1, 9.5] | 9.2 | 43.3 | 45.2 [40.5, 51.0] (94.4) | 61.6 | 61.6 (89.8) |
+| SFT + record, user held out (row 42) | 1.02 | 81.6 | 0.71 / 0.73 | 0.278 / 0.282 | 3.6 | 3.5 [2.6, 9.1] | 6.7 | 52.7 | 61.3 [53.9, 68.4] (92.8) | 78.5 | 73.6 (90.7) |
+
+**Table C.1 (sum rule): calibration and the auto-apply operating point, seed 0 or the merged folds (T = mean of the four leave-users-out fits; ECE in points over 10 bins; AURC in % risk; coverage = share of items auto-applied; oracle = threshold chosen on the same items, out-of-fold = threshold chosen on the other users, with the precision it realised; intervals resample users)**
+
+| arm | T | accuracy | NLL raw / tempered | Brier raw / tempered | ECE raw | ECE tempered | AURC | coverage at 95%, oracle | at 95%, out-of-fold [interval] (precision) | at 90%, oracle | at 90%, out-of-fold (precision) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| instruct base, no record | 2.38 | 32.1 | 2.67 / 2.24 | 0.843 / 0.805 | 19.8 | 9.5 [7.0, 12.2] | 43.8 | 5.3 | 4.7 [3.0, 6.5] (89.1) | 8.8 | 8.3 (90.8) |
+| instruct base + record | 1.50 | 60.7 | 1.40 / 1.29 | 0.548 / 0.538 | 10.0 | 3.9 [2.7, 7.4] | 20.0 | 3.6 | 8.3 [4.2, 13.3] (89.8) | 25.3 | 24.3 (90.2) |
+| SFT no DB, 200 steps | 1.80 | 57.3 | 1.57 / 1.38 | 0.555 / 0.522 | 14.3 | 3.0 [2.6, 7.2] | 15.9 | 30.8 | 31.6 [27.7, 35.8] (94.6) | 47.2 | 46.6 (89.8) |
+| SFT no DB, 800 steps | 2.79 | 72.1 | 1.69 / 0.99 | 0.451 / 0.373 | 18.6 | 3.9 [3.2, 6.7] | 7.6 | 55.0 | 55.8 [51.2, 59.4] (95.0) | 66.4 | 66.8 (90.0) |
+| SFT + record | 1.44 | 90.3 | 0.34 / 0.32 | 0.158 / 0.155 | 5.0 | 3.2 [1.9, 7.2] | 2.8 | 84.3 | 82.3 [77.0, 86.7] (95.4) | 100.0 | 99.9 (90.4) |
+| SFT + retrieved record | 1.50 | 90.1 | 0.37 / 0.34 | 0.163 / 0.159 | 5.1 | 2.5 [1.9, 6.8] | 2.9 | 81.9 | 81.8 [76.5, 86.3] (95.2) | 100.0 | 99.8 (90.2) |
+| SFT no DB, 800 steps, user held out (row 42) | 2.88 | 69.6 | 1.70 / 1.03 | 0.475 / 0.398 | 19.2 | 1.9 [1.9, 5.2] | 9.0 | 47.8 | 47.8 [43.0, 52.9] (94.5) | 62.9 | 63.7 (89.5) |
+| SFT + record, user held out (row 42) | 2.20 | 81.3 | 0.92 / 0.62 | 0.310 / 0.279 | 12.6 | 4.7 [3.3, 9.3] | 6.2 | 57.5 | 60.4 [54.4, 67.7] (93.3) | 75.8 | 74.3 (90.3) |
+
+**Table C.2: the seeded arms, mean +- sd over seeds 0 to 2 (mean rule)**
+
+| arm | T | accuracy | ECE raw | ECE tempered | AURC | coverage at 95%, out-of-fold | its precision |
+|---|---|---|---|---|---|---|---|
+| SFT no DB, 200 steps | 0.98 +- 0.10 | 60.5 +- 3.0 | 10.9 +- 3.0 | 10.1 +- 1.6 | 14.7 +- 1.9 | 31.0 +- 8.0 | 94.7 +- 0.7 |
+| SFT no DB, 800 steps | 1.34 +- 0.10 | 73.3 +- 2.3 | 4.3 +- 0.9 | 7.3 +- 1.2 | 7.3 +- 0.9 | 55.6 +- 3.7 | 94.8 +- 0.2 |
+| SFT + record | 0.69 +- 0.07 | 89.3 +- 0.8 | 9.1 +- 1.6 | 2.6 +- 0.6 | 2.9 +- 0.2 | 80.9 +- 2.1 | 94.4 +- 0.4 |
+
+**Table C.3: cross-arm transfer, seed 0, mean rule (each arm tempered by its own leave-users-out temperatures and by the other arm's, fitted on the same users; NLL and ECE tempered; out-of-fold coverage at 95% with its realised precision)**
+
+| arm | temperature from | T | NLL | ECE | coverage at 95% (precision) |
+|---|---|---|---|---|---|
+| SFT no DB, 800 steps | SFT no DB, 800 steps (own) | 1.43 | 1.15 | 8.3 | 51.3 (95.0) |
+| SFT no DB, 800 steps | SFT + record | 0.62 | 1.65 | 14.3 | 46.6 (95.5) |
+| SFT + record | SFT + record (own) | 0.62 | 0.32 | 3.2 | 79.3 (94.2) |
+| SFT + record | SFT no DB, 800 steps | 1.43 | 0.56 | 24.9 | 80.8 (94.8) |
+| instruct base, no record | instruct base, no record (own) | 1.76 | 2.37 | 11.9 | 1.7 (80.0) |
+| instruct base, no record | instruct base + record | 0.83 | 2.56 | 7.6 | 1.8 (81.0) |
+| instruct base + record | instruct base + record (own) | 0.83 | 1.48 | 8.9 | 2.2 (80.8) |
+| instruct base + record | instruct base, no record | 1.76 | 1.68 | 30.6 | 1.6 (78.9) |
+
+**Table C.4: the 95% out-of-fold operating point by corrected group, seed 0 or merged folds, mean rule (accuracy; mean tempered confidence; share auto-applied; precision of the auto-applied)**
+
+| arm | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|
+| instruct base, no record | 38 / 20 / 2 / 91 | 30 / 20 / 4 / 60 | 28 / 19 / 1 / 75 | 20 / 15 / 0 / - |
+| instruct base + record | 62 / 51 / 2 / 100 | 60 / 49 / 3 / 67 | 60 / 50 / 2 / 100 | 31 / 45 / 5 / 20 |
+| SFT no DB, 200 steps | 65 / 52 / 31 / 99 | 41 / 38 / 15 / 100 | 59 / 47 / 20 / 94 | 27 / 39 / 7 / 14 |
+| SFT no DB, 800 steps | 80 / 72 / 65 / 97 | 58 / 56 / 37 / 93 | 75 / 64 / 50 / 97 | 33 / 50 / 14 / 21 |
+| SFT + record | 94 / 93 / 86 / 97 | 83 / 88 / 71 / 96 | 97 / 92 / 83 / 100 | 50 / 79 / 48 / 16 |
+| SFT + retrieved record | 94 / 92 / 86 / 97 | 83 / 86 / 71 / 98 | 97 / 91 / 83 / 100 | 50 / 77 / 49 / 16 |
+| SFT no DB, 800 steps, user held out (row 42) | 73 / 70 / 57 / 95 | 61 / 57 / 36 / 95 | 75 / 64 / 45 / 95 | 39 / 50 / 6 / 50 |
+| SFT + record, user held out (row 42) | 89 / 83 / 68 / 96 | 75 / 76 / 50 / 90 | 87 / 78 / 61 / 98 | 30 / 69 / 41 / 31 |
+
+### 50.1 The sum rule is the one to calibrate, and the record arm needs almost no temperature
+
+Under the mean rule a fitted temperature often makes ECE worse (the no-DB SFT at 800 steps 4.8 to 8.3, the untrained base 8.1 to 11.9) while lowering NLL, because the softmax of per-token averages is not a likelihood: a two-token and a six-token category name are put on one scale by the division, and no single temperature undoes that per item. Under the sum rule the softmax is the model's own probability of each name, and one temperature per arm brings every categoriser to ECE 2 to 4 (Table C.1, sum rule). The accuracies are the same under both rules (section 48.4), and the sum rule's auto-apply coverage at 95% is the same or higher at the same realised precision (+3 to +9 on the trained-user arms; -0.9 and +2.6 on the held-out folds), so the sum rule is the one to serve confidences from. The Jev series' prediction holds in direction: the record-in-prompt categoriser, which reads the category off evidence in the prompt, is nearly calibrated as trained (T 1.44, raw ECE 5.0, tempered 3.2), and the no-record one, which answers from its weights and the shots, is over-confident and more so the longer it trains (T 1.80 at 200 steps and 2.79 at 800; raw ECE 14.3 and 18.6, tempered 3.0 and 3.9). The untrained instruct base is over-confident without the record (T 2.38) and nearer calibrated with it (1.50).
+
+### 50.2 The operating point: 82% of a trained user's transactions at 95% precision, 60% of a new user's
+
+With the threshold chosen on other users (out-of-fold), the record categoriser auto-applies 82.3% of the items [77.0, 86.7] at a realised precision of 95.4% (sum rule; 80.9 +- 2.1 over three seeds under the mean rule), and at 90% precision it applies everything (99.9%, since its accuracy is 90). The retrieved record gives the same (81.8 at 95.2). The no-DB categoriser at 800 steps applies 55.8% at 95.0%, against 31.6% at 200 steps: row 47's longer training nearly doubles the share that needs no review. For users whose schemes the adapter never saw (row 42's folds) the shares fall to 60.4% (record, realised precision 93.3%, a little under target: the threshold chosen on other users' items transfers imperfectly when those items came from other fold adapters) and 47.8% (no DB, 94.5%). So the production number for a new user with the record in the prompt is about 60% auto-applied at 93 to 95% precision, and 40% sent for review. The untrained base cannot be operated this way at all (2 to 8% coverage), which is one more measure of what the label SFT buys.
+
+### 50.3 A foreign temperature ruins the probabilities and leaves the operating point intact
+
+The temperature is task-dependent, as the series found: the record arm tempered with the no-record arm's T (1.43 under the mean rule, against its own 0.62) goes from ECE 3.2 to 24.9 and NLL 0.32 to 0.56, and the no-record arm with the record arm's T from 8.3 to 14.3; the untrained base with and without the record behaves the same way (8.9 to 30.6). The auto-apply coverage at 95% precision barely moves (79.3 to 80.8, 51.3 to 46.6) because the threshold is chosen on the tempered confidences of the same arm and one scalar temperature preserves most of the confidence ranking. The practical rule: fit the auto-apply threshold per arm (per prompt layout) on held-out users, which is robust; fit a temperature per arm only where the probability itself is shown or consumed downstream, and never carry one across arms.
+
+### 50.4 Where the confident errors are: the split categories
+
+Table C.4 splits the 95% operating point by section 48's groups. On the category-determined items the record arm auto-applies 83% at 100% precision and on the merchants in the history 86% at 97%; on the 103 items in categories the user split with nothing to say which side, its accuracy is 50 (a coin flip, as section 48 found), its mean confidence 79, and it auto-applies 48% of them at 16% precision. The no-record arms do the same on a smaller scale (14% applied at 21%). So nearly all of the auto-apply errors on REAL-6 come from the items that have no answer in the evidence, and the model does not know that it does not know. A trained abstention option (row 52, REAL-14) is aimed at exactly these, and they are the cleanest test set for it: the uniform-target arm should put those items below the threshold without moving the others.
+
+### 50.5 What the step says
+
+STAT-4 asked whether the categoriser's probabilities are calibrated and at what confidence a label can be applied without review. Serve confidences from the sum rule; fit one temperature per arm on held-out users (record arm about 1.4, no-record arm about 2.8, bounded search); choose the auto-apply threshold per arm on held-out users, which transfers where the temperature does not. At 95% precision the record-in-prompt categoriser applies about 82% of a trained user's transactions and about 60% of a new user's, the 800-step no-record categoriser 56% and 48%. The residual errors at that operating point are concentrated in the categories the user split arbitrarily, where the model is confident and wrong; row 52 targets them, and row 43's set, with relabelling and per-user assignments, will be the harder test of the whole operating point.
+
+Not done: per-user or per-category temperatures, a Brier or calibration term in the training loss (the Jev series' alternative to post-hoc scaling), the encoder arms (they save no per-option scores), and the rename-augmented folds (row 42, section 51).
