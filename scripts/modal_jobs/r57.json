@@ -1,0 +1,282 @@
+[
+ {
+  "tag": "r57-N-f0",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "0",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r57-N-f1",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "1",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r57-N-f2",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "2",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f2_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r57-N-f3",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "3",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f3_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r57-E-f0",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "0",
+   "CONDS": "noctx",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f0_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r57-E-f1",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "1",
+   "CONDS": "noctx",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f1_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r57-E-f2",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "2",
+   "CONDS": "noctx",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f2_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r57-E-f3",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "3",
+   "CONDS": "noctx",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f3_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r57-P-f0",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "0",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f0_alllab_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-P-f1",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "1",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f1_alllab_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-P-f2",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "2",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f2_alllab_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-P-f3",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "3",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f3_alllab_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-PE-f0",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "0",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.25",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f0_alllab_dbep50_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-PE-f1",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "1",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.25",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f1_alllab_dbep50_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-PE-f2",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "2",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.25",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f2_alllab_dbep50_dbcat_lora"
+  ]
+ },
+ {
+  "tag": "r57-PE-f3",
+  "env": {
+   "LOAD_4BIT": "1",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100",
+   "FOLD": "3",
+   "CONDS": "noctx",
+   "DB_CAT": "1",
+   "DB_FRAC": "0.25",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm param",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_param_h100_f3_alllab_dbep50_dbcat_lora"
+  ]
+ }
+]
