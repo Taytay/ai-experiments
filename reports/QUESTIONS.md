@@ -585,6 +585,8 @@ items (Tulu-3 SFT prompts or similar), score each token by the base model with t
 (reverse KL as the per-token advantage), importance-sampling policy-gradient steps on the adapter, about
 100 to 150 steps of 64 prompts x 4 samples. Full ladder before and after: recall should hold near 100 while
 perplexity, ARC-Easy and the ICL suite move toward the base. Compare with TRAIN-7's replay.
+**Status (2026-09-18):** answered, PLAN step 31, REPORT.md 31. Yes with a condition. Reverse-KL on-policy distillation of arm C toward the adapter-off base (`scripts/exp_onpolicy_distill.py`, exact KL over the vocabulary, 120 steps of 64 prompts x 4 samples, FineWeb-Edu or Tulu-3 prompts) returns WikiText perplexity (10.58 vs base 10.61), ARC-Easy (73-75.5 vs 73.5) and natural ICL to the base exactly, and erases the injected facts with them (recall in the trained sentence 100 to 35, every manipulation and induction gain back to the base) by step 30; the adapter keeps its norm and rotates (cosine 0.82 with arm C's delta). With one micro-batch of arm C's own mixture per step the same loop keeps recall at 96.9, yes/no and Timmy at arm C's level, and lands perplexity +0.04 nats over the base, ARC-Easy 73.5, ICL 82.3 / 90.1: the best injected adapter so far, better than TRAIN-7's replay (Cg) on every measure, at eleven times Cg's training time (318 min, 218 of them Hugging Face sampling). Not run: WikiText-train prompts, the sampled-token estimator, a replay-weight sweep, the 1,000 / 5,000-species adapters.
+
 
 **TRAIN-9 (O) Are the adapter results rate artefacts? LoRA at ten times the full fine-tuning rate.**
 Tinker's LoRA primer: LoRA needs about 10x the full-FT learning rate, independent of rank; their SFT recipes
