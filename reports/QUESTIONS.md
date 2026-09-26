@@ -412,15 +412,23 @@ weekday features; implement the cluster-tightness attribute selector on habitat-
 **REPORT-1 (R)** The executive summary states "transfer to the held-out partition (54%)" without
 the weakness-equals-type caveat (DATA-1). Drop it or state "the weakness attribute, a type
 replicate in this universe".
+**Status (2026-09-14):** done, PLAN step 6. The summary bullet and 8.3 point 2 now say "the weakness
+attribute ... a type replicate in this universe and not evidence of latent-partition transfer".
 
 **REPORT-2 (R)** Every table should carry a 95% CI column and section 8 a one-line noise-floor
 statement; the 18-point backend-replicate swing is never mentioned in section 8 (STAT-1).
 
 **REPORT-3 (R)** Base at 42.7% on unknowable held-out induction is unexplained (EVAL-6); "RAG
 ceiling" should be renamed "oracle context" and "RAG" reserved for REAL-2.
+**Status (2026-09-14):** rename done, PLAN step 6: REPORT.md 4.3.2 and 6.2 say "oracle context" and
+point at REAL-2; the code docstrings match. The unexplained 42.7% base score on held-out induction is
+EVAL-6 and waits for the empirical null band (PLAN step 4).
 
 **REPORT-4 (R)** Recipe fractions are given in sequences while the loss averages over tokens
 (TRAIN-1); the arm D schedule confound (TRAIN-2) is not disclosed in the design table.
+**Status (2026-09-14):** done, PLAN step 6. REPORT.md 8.1 has a table of sequence, token and
+loss-bearing-token fractions per arm (arm C is 84% knowledge text by loss-bearing tokens) and a
+paragraph on the single learning-rate schedule spanning arm D's two phases; 8.3 point 3 points at it.
 
 ### Added by the literature survey, 2026-09-14
 
