@@ -1,0 +1,206 @@
+[
+ {
+  "tag": "r62v-N-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-N-f0"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r62v-N-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-N-f1"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f1_alllab_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r62v-N-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-N-f2"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f2_alllab_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f2_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r62v-N-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-N-f3"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f3_alllab_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f3_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r62v-E-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-E-f0"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_dbep50_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r62v-E-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-E-f1"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f1_alllab_dbep50_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f1_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r62v-E-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-E-f2"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f2_alllab_dbep50_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f2_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r62v-E-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r58-E-f3"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f3_alllab_dbep50_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f3_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r62v-R-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-R-f0"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f0_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f0_lora"
+  ]
+ },
+ {
+  "tag": "r62v-R-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-R-f1"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f1_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f1_lora"
+  ]
+ },
+ {
+  "tag": "r62v-R-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-R-f2"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f2_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f2_lora"
+  ]
+ },
+ {
+  "tag": "r62v-R-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-R-f3"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f3_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f3_lora"
+  ]
+ },
+ {
+  "tag": "r62v-RC-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-RC-f0"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f0_reccat_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f0_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r62v-RC-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-RC-f1"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f1_reccat_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f1_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r62v-RC-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-RC-f2"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f2_reccat_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f2_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r62v-RC-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "ADAPTERS_FROM": "r58-RC-f3"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f3_reccat_lora",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_ret_h100bf16_f3_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r62v-base",
+  "env": {
+   "LOAD_4BIT": "0",
+   "CONDS": "noctx,ctx",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct"
+  },
+  "cmds": [
+   "ITEMS_SET=novel_merchants_v1_full uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=novel_merchants_v1_clean uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ }
+]
