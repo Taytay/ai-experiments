@@ -82,7 +82,9 @@ class DecisionModel(nn.Module):
 def load_model():
     from transformers import AutoModel, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(BASE)
-    model = DecisionModel(AutoModel.from_pretrained(BASE, attn_implementation="sdpa"))
+    enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa")
+    enc.config.reference_compile = False  # as Laya's inference: no torch.compile, whose recompiles per shape would swamp the latency read
+    model = DecisionModel(enc)
     if INIT == "laya":
         from huggingface_hub import hf_hub_download
         from safetensors.torch import load_file
@@ -167,7 +169,10 @@ def score(tok, model):
         with torch.autocast("cuda", dtype=torch.bfloat16):
             out += [torch.log_softmax(x[x > -1e3], -1).tolist() for x in model(*collate(tok, seqs[k:k + 32]))]
     torch.cuda.synchronize(); ms_batched = 1000 * (time.time() - t0) / len(seqs)
-    t0 = time.time()
+    for s in seqs[:5]:  # warm-up before the latency read
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            model(*collate(tok, [s]))
+    torch.cuda.synchronize(); t0 = time.time()
     for s in seqs[:50]:  # latency one request at a time
         with torch.autocast("cuda", dtype=torch.bfloat16):
             model(*collate(tok, [s]))
