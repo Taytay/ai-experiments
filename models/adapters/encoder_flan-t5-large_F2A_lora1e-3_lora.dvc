@@ -1,0 +1,6 @@
+outs:
+- md5: 8401a5e7b748351fe1eabd5caa414627.dir
+  size: 295111278
+  nfiles: 5
+  hash: md5
+  path: encoder_flan-t5-large_F2A_lora1e-3_lora

@@ -1,0 +1,6 @@
+outs:
+- md5: c04509ee84f73904820f9b43e0fbc503.dir
+  size: 438759996
+  nfiles: 10
+  hash: md5
+  path: categoriser_bge_none

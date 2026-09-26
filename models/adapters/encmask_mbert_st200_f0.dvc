@@ -1,0 +1,6 @@
+outs:
+- md5: 158e1395ba16e1f66c8babb24ddfb52d.dir
+  size: 1684141327
+  nfiles: 2
+  hash: md5
+  path: encmask_mbert_st200_f0

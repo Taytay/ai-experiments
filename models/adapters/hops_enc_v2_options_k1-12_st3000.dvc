@@ -1,0 +1,6 @@
+outs:
+- md5: 80b089eb12eda29a10b1910afba692a5.dir
+  size: 1686258227
+  nfiles: 2
+  hash: md5
+  path: hops_enc_v2_options_k1-12_st3000
