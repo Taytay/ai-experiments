@@ -1,0 +1,112 @@
+[
+ {
+  "tag": "r70-E-7b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-7B-Instruct",
+   "STEPS": "200",
+   "ALL_LABELS": "1",
+   "DBEP": "0.5",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-7B-Instruct_none_h100bf16_f0_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r70-RC-7b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-7B-Instruct",
+   "STEPS": "200",
+   "REC_CAT": "1",
+   "CONDS": "ctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm ret",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-7B-Instruct_ret_h100bf16_f0_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r70-PREN-7b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-7B-Instruct",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "RENAME": "0.5",
+   "POI": "poi1_v1",
+   "ITEMS_SET": "poi1_v1",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS= uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-7B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r70-E-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "8",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-14B-Instruct",
+   "STEPS": "200",
+   "ALL_LABELS": "1",
+   "DBEP": "0.5",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-14B-Instruct_none_h100bf16_f0_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r70-RC-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "8",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-14B-Instruct",
+   "STEPS": "200",
+   "REC_CAT": "1",
+   "CONDS": "ctx"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm ret",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-14B-Instruct_ret_h100bf16_f0_reccat_lora"
+  ]
+ },
+ {
+  "tag": "r70-PREN-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MICRO": "8",
+   "RUN_TAG": "h100bf16",
+   "FOLD": "0",
+   "LLM_BASE": "Qwen/Qwen2.5-14B-Instruct",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "RENAME": "0.5",
+   "POI": "poi1_v1",
+   "ITEMS_SET": "poi1_v1",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS= uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-14B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ }
+]

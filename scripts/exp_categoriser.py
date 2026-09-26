@@ -75,7 +75,7 @@ MICRO = int(os.environ.get("MICRO", "4"))  # sequences per forward/backward (row
 EFF_BATCH = int(os.environ.get("EFF_BATCH", "16"))  # sequences per optimizer step (row 60, TRAIN-12: the batch-size ablation); 16 in every run before it
 assert EFF_BATCH % MICRO == 0
 ACCUM, MAXLEN = EFF_BATCH // MICRO, 1536
-LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
+LLM_BASE, ENC_BASE = os.environ.get("LLM_BASE", "Qwen/Qwen2.5-3B-Instruct"), "BAAI/bge-base-en-v1.5"  # row 70: LLM_BASE=Qwen/Qwen2.5-7B-Instruct / 14B
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
 SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
@@ -101,7 +101,7 @@ DOC = json.loads((ROOT / "data" / "processed" / f"{POI}.json").read_text()) if P
 DBREC = DOC.get("fact_db", {})
 DB_ONLY = set() if POI else R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
 SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
-OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
+OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
 
