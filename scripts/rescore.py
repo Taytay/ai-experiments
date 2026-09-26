@@ -40,7 +40,7 @@ from unsloth import FastLanguageModel
 from ai_experiments import items as I
 from ai_experiments.evals.tracker import Run
 from ai_experiments.merchants import GENERAL_TEXT
-from ai_experiments.scoring import Scorer, aggregate, per_item_path, perplexity, write_records
+from ai_experiments.scoring import Scorer, aggregate, corpus_perplexity, per_item_path, perplexity, write_records
 
 MAXLEN = 768  # same as exp_curriculum.py
 
@@ -110,6 +110,9 @@ with Run("rescore", model=base, config=cfg, note=a.note, enabled=not SMOKE) as r
     nat = [v for k, v in m.items() if k.startswith("ICL_natural")]
     m["ICL_symbol_mean"], m["ICL_natural_mean"] = round(sum(sym) / len(sym), 1), round(sum(nat) / len(nat), 1)
     m["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
+    if FROZEN.corpus:
+        cp = corpus_perplexity(model, tok, FROZEN.corpus, maxlen=MAXLEN)
+        m["L7_ppl_wikitext"], m["L7_nll_wikitext_se"] = cp["ppl"], cp["nll_se"]
     m["eval_minutes"] = round((time.time() - t0) / 60, 1)
     OUT.write_text(json.dumps(results, indent=2))
     run.artifact(OUT)

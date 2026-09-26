@@ -43,7 +43,7 @@ from ai_experiments import items as I
 from ai_experiments import universe as U
 from ai_experiments.evals.tracker import Run
 from ai_experiments.merchants import GENERAL_TEXT
-from ai_experiments.scoring import Scorer, aggregate, per_item_path, perplexity, write_records
+from ai_experiments.scoring import Scorer, aggregate, corpus_perplexity, per_item_path, perplexity, write_records
 
 ARM = "P"
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-3B"
@@ -92,6 +92,9 @@ def evaluate(model, tok):
     noctx["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
     noctx["ICL_natural_mean"] = round(sum(nat) / len(nat), 1)
     noctx["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
+    if FROZEN.corpus:
+        cp = corpus_perplexity(model, tok, FROZEN.corpus, maxlen=MAXLEN)
+        noctx["L7_ppl_wikitext"], noctx["L7_nll_wikitext_se"] = cp["ppl"], cp["nll_se"]
     ctx = aggregate(recs["ctx"])
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
     return {"noctx": noctx, "ctx": ctx}, recs

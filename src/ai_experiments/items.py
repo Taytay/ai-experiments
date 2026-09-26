@@ -25,6 +25,11 @@ was already frozen by `icl_suite.py` (one file, both universes); it gets ids and
 11, TRAIN-3): 200 four-option ARC-Easy test questions (allenai/ai2_arc) in the ladder's cloze
 format, level K_arc_easy. Facts the base model knows that no arm trains on; a drop means damage.
 
+`corpus_ppl` (one file, both universes) is the general-text perplexity slice (PLAN step 24, TRAIN-3):
+WikiText-2 raw test paragraphs, detokenised, shuffled with a seed and taken until 3,500 words (about
+4,500 Qwen tokens). Replaces the one 249-word paragraph of `merchants.GENERAL_TEXT`, whose perplexity
+swung 2x between checkpoints of one run (REPORT.md 15.5). Text only; the model never trains on it.
+
   uv run python -m ai_experiments.items freeze     # write the files for VERSION (refuses to overwrite)
   uv run python -m ai_experiments.items check      # regenerate and compare with the files on disk
   uv run python -m ai_experiments.items show       # counts and hashes of what is on disk
@@ -45,6 +50,8 @@ VERSION = "v1"
 SETS = ("ladder", "heldout_induction", "probes")
 KNOWN = "known_facts"
 KNOWN_N, KNOWN_SEED = 200, 17
+CORPUS = "corpus_ppl"
+CORPUS_WORDS, CORPUS_SEED, CORPUS_MIN_WORDS = 3500, 23, 60
 MORPH_P = 0.7  # the morphology universe's marker probability (exp_curriculum.py arms E, base_m)
 
 
@@ -104,6 +111,54 @@ def freeze_known(version: str = VERSION, force: bool = False) -> None:
     print(f"wrote {p.name}: {len(items)} items, sha256 {doc['sha256'][:12]}")
 
 
+def _detokenize_wikitext(t: str) -> str:
+    """Undo WikiText's tokenisation (the usual GPT-2 evaluation rules): ' @-@ ' hyphens, spaced punctuation, quotes."""
+    import re
+    t = t.replace("s '", "s'")
+    t = re.sub(r"/' [0-9]/", r"/'[0-9]/", t)
+    t = t.replace(" @-@ ", "-").replace(" @,@ ", ",").replace(" @.@ ", ".")
+    for a, b in ((" : ", ": "), (" ; ", "; "), (" . ", ". "), (" ! ", "! "), (" ? ", "? "), (" , ", ", ")):
+        t = t.replace(a, b)
+    t = re.sub(r"\(\s*([^\)]*?)\s*\)", r"(\1)", t)
+    t = re.sub(r"\[\s*([^\]]*?)\s*\]", r"[\1]", t)
+    t = re.sub(r"{\s*([^}]*?)\s*}", r"{\1}", t)
+    t = re.sub(r"\"\s*([^\"]*?)\s*\"", r'"\1"', t)
+    t = re.sub(r"'\s*([^']*?)\s*'", r"'\1'", t)
+    t = t.replace(" " + chr(176) + " ", chr(176)).replace(" 's", "'s").replace(" n't", "n't")
+    t = re.sub(r" ([.,;:!?)])", r"\1", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def generate_corpus(words: int = CORPUS_WORDS, seed: int = CORPUS_SEED) -> list[dict]:
+    """WikiText-2 raw test body paragraphs (no headings, at least CORPUS_MIN_WORDS words), detokenised,
+    shuffled with a seed, taken in order until `words` words."""
+    import random
+    from datasets import load_dataset
+    d = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="test")
+    paras = [x["text"] for x in d if not x["text"].lstrip().startswith("=") and len(x["text"].split()) >= CORPUS_MIN_WORDS]
+    random.Random(seed).shuffle(paras)
+    out, n = [], 0
+    for raw in paras:
+        if n >= words:
+            break
+        text = _detokenize_wikitext(raw)
+        out.append(dict(id=f"{CORPUS}:{len(out):03d}", text=text, n_words=len(text.split())))
+        n += out[-1]["n_words"]
+    return out
+
+
+def freeze_corpus(version: str = VERSION, force: bool = False) -> None:
+    p = path(CORPUS, False, version)
+    if p.exists() and not force:
+        sys.exit(f"{p.name} exists; frozen sets are immutable. Bump VERSION for new items.")
+    items = generate_corpus()
+    doc = dict(name=CORPUS, version=version, n_items=len(items), n_words=sum(i["n_words"] for i in items),
+               source="Salesforce/wikitext wikitext-2-raw-v1 test, body paragraphs of %d+ words, detokenised, seed %d, first %d words"
+                      % (CORPUS_MIN_WORDS, CORPUS_SEED, CORPUS_WORDS), sha256=sha256(items), items=items)
+    p.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"wrote {p.name}: {len(items)} paragraphs, {doc['n_words']} words, sha256 {doc['sha256'][:12]}")
+
+
 def freeze(morph: bool, version: str = VERSION, force: bool = False) -> None:
     sets, species = generate(morph)
     for name, items in sets.items():
@@ -126,6 +181,7 @@ class Frozen:
     probes: list[dict]
     suite: list[dict]
     known: list[dict] = field(default_factory=list)   # K_arc_easy forgetting proxy; [] if not frozen yet
+    corpus: list[str] = field(default_factory=list)   # general-text perplexity paragraphs; [] if not frozen yet
     sha: dict[str, str] = field(default_factory=dict)  # set name -> sha256 of its items
 
     def config(self) -> dict:
@@ -152,9 +208,13 @@ def load_all(morph: bool, version: str = VERSION) -> Frozen:
     if path(KNOWN, False, version).exists():
         kdoc = load(KNOWN, False, version)
         known, sha[KNOWN] = kdoc["items"], kdoc["sha256"]
+    corpus = []
+    if path(CORPUS, False, version).exists():
+        cdoc = load(CORPUS, False, version)
+        corpus, sha[CORPUS] = [i["text"] for i in cdoc["items"]], cdoc["sha256"]
     return Frozen(version=version, morph=morph,
                   ladder=docs["ladder"]["items"] + docs["heldout_induction"]["items"],
-                  probes=docs["probes"]["items"], suite=suite, known=known, sha=sha)
+                  probes=docs["probes"]["items"], suite=suite, known=known, corpus=corpus, sha=sha)
 
 
 def check(version: str = VERSION) -> bool:
@@ -182,15 +242,19 @@ def main(argv=None) -> None:
         for morph in (False, True):
             freeze(morph, force="--force" in argv)
         freeze_known(force="--force" in argv)
+        freeze_corpus(force="--force" in argv)
     elif cmd == "freeze-known":
         freeze_known(force="--force" in argv)
+    elif cmd == "freeze-corpus":
+        freeze_corpus(force="--force" in argv)
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":
         for morph in (False, True):
             f = load_all(morph)
             print(f"{'morph' if morph else 'plain'} {f.version}: {len(f.ladder)} ladder(+heldout) items, "
-                  f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items")
+                  f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items, "
+                  f"{len(f.corpus)} perplexity paragraphs")
             for k, v in f.sha.items():
                 print(f"   {k:18s} {v}")
     else:

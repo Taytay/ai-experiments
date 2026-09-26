@@ -31,7 +31,9 @@ PERIODIC=N evaluates a fixed subsample (every 4th ladder item, every 2nd ICL sui
 ARC-Easy known-facts items as the forgetting proxy) before training and every N steps, logged to the
 tracker under condition "periodic" with the step; results and adapter get a "_pN" suffix so the
 original arm stays (PLAN step 11). The final evaluation also scores the known-facts set (K_arc_easy)
-whenever data/processed/known_facts_v1.json exists.
+whenever data/processed/known_facts_v1.json exists, and every evaluation reports L7_ppl_wikitext, the
+perplexity on the frozen WikiText-2 slice (data/processed/corpus_ppl_v1.json, PLAN step 24), beside the
+one-paragraph L7_ppl_general.
 """
 import json
 import os
@@ -50,7 +52,7 @@ from ai_experiments import icl_suite as S
 from ai_experiments import items as I
 from ai_experiments.evals.tracker import Run
 from ai_experiments.merchants import GENERAL_TEXT
-from ai_experiments.scoring import Scorer, aggregate, per_item_path, perplexity, write_records
+from ai_experiments.scoring import Scorer, aggregate, corpus_perplexity, per_item_path, perplexity, write_records
 
 ARM = sys.argv[1] if len(sys.argv) > 1 else "base"
 MODEL = sys.argv[2] if len(sys.argv) > 2 else "Qwen/Qwen2.5-3B"
@@ -101,6 +103,14 @@ def load():
 
 
 # ------------------------------------------------------------------ evaluation
+def wikitext_ppl(model, tok):
+    """L7_ppl_wikitext (+ the standard error of its mean NLL) on the frozen corpus slice; {} if not frozen."""
+    if not FROZEN.corpus:
+        return {}
+    cp = corpus_perplexity(model, tok, FROZEN.corpus, maxlen=MAXLEN)
+    return {"L7_ppl_wikitext": cp["ppl"], "L7_nll_wikitext_se": cp["nll_se"]}
+
+
 def evaluate(model, tok):
     """Returns ({"noctx": metrics, "ctx": metrics}, {"noctx": records, "ctx": records}).
     Probes, ICL suite and perplexity live under noctx; records are per item (ai_experiments.scoring)."""
@@ -116,6 +126,7 @@ def evaluate(model, tok):
     noctx["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
     noctx["ICL_natural_mean"] = round(sum(nat) / len(nat), 1)
     noctx["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
+    noctx.update(wikitext_ppl(model, tok))
     ctx = aggregate(recs["ctx"])
     noctx["eval_minutes"] = round((time.time() - t0) / 60, 1)
     return {"noctx": noctx, "ctx": ctx}, recs
@@ -129,6 +140,7 @@ def periodic_eval(model, tok):
     sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
     m["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
     m["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
+    m.update(wikitext_ppl(model, tok))
     m["eval_minutes"] = round((time.time() - t0) / 60, 1)
     model.train()
     return m
