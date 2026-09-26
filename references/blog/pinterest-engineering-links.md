@@ -1,0 +1,36 @@
+
+The following links were found by Taylor on 9/21/26 and might be of relevance to our recommendation engine/graph embeddings for our transaction classification:
+
+All publications: 
+https://labs.pinterest.com/publications
+
+Recommender systems: https://labs.pinterest.com/research-and-innovation/recommender-systems
+Generative models: https://labs.pinterest.com/research-and-innovation/generative-models
+Representation learning: https://labs.pinterest.com/research-and-innovation/representation-learning
+
+https://medium.com/pinterest-engineering/an-update-on-pixie-pinterests-recommendation-system-6f273f737e1b | An update on Pixie, Pinterest’s recommendation system | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/linksage-gnn-based-pinterest-off-site-content-understanding-fca14b0d1141 | LinkSage: GNN-based Pinterest Off-site Content Understanding | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/training-foundation-improvements-for-closeup-recommendation-ranker-67d90603426e | Training Foundation Improvements for Closeup Recommendation Ranker | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/last-mile-data-processing-with-ray-629affbf34ff | Last Mile Data Processing with Ray | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/mlenv-standardizing-ml-at-pinterest-under-one-ml-engine-to-accelerate-innovation-e2b30b2f6768 | MLEnv: Standardizing ML at Pinterest Under One ML Engine to Accelerate Innovation | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/deep-multi-task-learning-and-real-time-personalization-for-closeup-recommendations-1030edfe445f | Deep Multi-task Learning and Real-time Personalization for Closeup Recommendations | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/large-scale-user-sequences-at-pinterest-78a5075a3fe9 | Large-scale User Sequences at Pinterest | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/an-ml-based-approach-to-proactive-advertiser-churn-prevention-3a7c0c335016 | An ML based approach to proactive advertiser churn prevention | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/how-pinterest-leverages-realtime-user-actions-in-recommendation-to-boost-homefeed-engagement-volume-165ae2e8cde8 | How Pinterest Leverages Realtime User Actions in Recommendation to Boost Homefeed Engagement Volume | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/query-rewards-building-a-recommendation-feedback-loop-during-query-selection-70b4d20e5ea0 | Query Rewards: Building a Recommendation Feedback Loop During Query Selection | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/searchsage-learning-search-query-representations-at-pinterest-654f2bb887fc | SearchSage: Learning Search Query Representations at Pinterest | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/pinterest-home-feed-unified-lightweight-scoring-a-two-tower-approach-b3143ac70b55 | Pinterest Home Feed Unified Lightweight Scoring: A Two-tower Approach | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/advertiser-recommendation-systems-at-pinterest-ccb255fbde20 | Advertiser Recommendation Systems at Pinterest | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/the-evolution-of-search-at-pinterest-c69e78ff2698 | The Evolution of Search at Pinterest | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/how-pinterest-fights-misinformation-hate-speech-and-self-harm-content-with-machine-learning-1806b73b40ef | How Pinterest fights misinformation, hate speech, and self-harm content with machine learning | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/detecting-image-similarity-in-near-real-time-using-apache-flink-723ce072b7d2 | Detecting Image Similarity in (Near) Real-time Using Apache Flink | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426 | Scaling Conditional Learned Retrieval for Pinterest Home Feed | by Pinterest Engineering | Pinterest Engineering Blog | Aug, 2026 | Medium
+https://medium.com/pinterest-engineering/achieving-near-linear-training-scalability-for-pinterests-foundation-models-14d4f59fe6f6 | Achieving Near-Linear Training Scalability for Pinterest’s Foundation Models | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/making-user-sequence-data-more-cost-efficient-faster-and-easier-to-use-2a56a928cae1 | Making User-Sequence Data More Cost-Efficient, Faster, and Easier to Use | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/optimizing-ml-workload-network-efficiency-part-i-feature-trimmer-ae20beb08d69 | Optimizing ML Workload Network Efficiency (Part I): Feature Trimmer | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/smarter-url-normalization-at-scale-how-miqps-powers-content-deduplication-at-pinterest-4aa42e807d7d | Smarter URL Normalization at Scale: How MIQPS Powers Content Deduplication at Pinterest | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/scaling-recommendation-systems-with-request-level-deduplication-93bd514142d9 | Scaling Recommendation Systems with Request-Level Deduplication | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/evolution-of-multi-objective-optimization-at-pinterest-home-feed-06657e33cd10 | Evolution of Multi-Objective Optimization at Pinterest Home feed | by Pinterest Engineering | Pinterest Engineering Blog | Medium
+https://medium.com/pinterest-engineering/evolving-pinterests-embedding-retrieval-platform-aede4e831e01 | Evolving Pinterest’s Embedding Retrieval Platform | by Pinterest Engineering | Pinterest Engineering Blog | Sep, 2026 | Medium
+https://blog.zepto.com/real-time-personalisation-at-scale-how-zepto-understands-what-you-want-right-now-d743b13367c8 | Real-Time Personalisation at Scale: How Zepto Understands What You Want, Right Now | by Zepto Tech | Zepto TechXPress
+https://medium.com/@kabirbakovic/feature-stores-spent-a-decade-killing-temporal-leakage-in-ml-ai-agent-memory-just-brought-it-back-bf903bce4a0b | Feature Stores Spent a Decade Killing Temporal Leakage in ML. AI Agent Memory Just Brought It Back. | by Amina Okanovic | Sep, 2026 | Medium

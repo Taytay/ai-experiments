@@ -75,6 +75,32 @@ def fact_db_ambiguous(merchants, seed=5, overlap=2, multi_frac=0.2):
     return db, meta
 
 
+CHAT_SYSTEM = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."  # what Qwen2.5-Instruct's template inserts when no system turn is given
+
+
+CUE = "\nCategory:"
+
+
+def chat_wrap(prompt, system=CHAT_SYSTEM):
+    """The prompt as the user turn of Qwen2.5-Instruct's chat template (the string tok.apply_chat_template gives for one user message
+    with add_generation_prompt=True; the scripts assert that equality) (row 39, REAL-8)."""
+    return f"<|im_start|>system\n{system}<|im_end|>\n<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
+
+
+def chat_prompt(prompt):
+    """The REAL-6 prompt through the chat template: everything up to the query line is the user turn, and the "Category:" cue opens the
+    assistant turn (a prefill), so the option follows the cue exactly as in the plain format. With the cue left in the user turn the
+    instruct base opens a sentence ("Based on the transactions provided, ...") and bare-name scoring is off its distribution."""
+    head, sep, tail = prompt.rpartition(CUE)
+    assert sep and tail == "", prompt[-60:]
+    return chat_wrap(head) + CUE.lstrip("\n")
+
+
+def chat_item(item):
+    """The item with both prompts through chat_prompt; the options keep their leading space (they follow the cue as before)."""
+    return dict(item, prompt=chat_prompt(item["prompt"]), prompt_ctx=chat_prompt(item["prompt_ctx"]))
+
+
 def set_record(item, record):
     """The item with another merchant record in its context prompt (the ambiguous DB, or a retrieved record, right or wrong)."""
     head, sep, q = item["prompt_ctx"].rpartition("\nTransaction: ")
