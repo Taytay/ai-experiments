@@ -962,3 +962,19 @@ H100: effective batch 32 and 64 at equal samples (100 and 50 steps; the rate at 
 ratio) and at equal steps (200, the scaled rate), against the three batch-16 seeds of section 52.4; passes of 8, 16 and 32
 sequences for the throughput curve; REAL-6 by group and the ARC / MMLU / ICL items. The 20-step warmup is fixed, so the 50-step
 runs warm up for 40% of their training.
+
+**REAL-18 (O) Can a merchant known from the database be filed under a label the model has never seen?**
+The owner (2026-09-26). REAL-6's coined category names come from a list of 24 words shared by all users: 13 of the 25 coined names
+the held-out users carry are also some training user's (often for another category), so the coined cell measures familiar words.
+On it (held-out users, section 55) database episodes read 63.6 and the record with the category 77.3 on DB-only merchants, n = 22.
+*Experiment (scoring only):* every item re-scored with each user's category names replaced by freshly generated words, consistently
+in the category list, the shots and the options (a new word per user and category, fixed seed), for the no-DB, episode, record and
+record-with-category arms; by original name type and REPORT.md 48's groups.
+
+**REAL-19 (O) Can the categoriser infer what kind of store an unknown merchant is from its name and the user's examples, and does
+baking a database in cost that?**
+The owner (2026-09-26). Every REAL-6 merchant has a record and its opaque names carry no meaning, so this is untested. *Experiment:*
+a small item set of merchants in no database and no history: descriptive names ("Harbor Pet Supply", "Oak Street Dental") whose
+kind the name and the user's shots should give, and opaque ones as the floor; statement strings in the generator's renderings,
+labels in each user's scheme; scored for the no-DB, episode and record arms (the record arms with no record for these merchants).
+
