@@ -635,3 +635,31 @@ For the section 4 model with the fact in context, generation is better than cloz
 The two section 6 adapters saved by plain peft (loaded with the 9.4 fix) behave like the other knowledge-only models: bare recall 85.6 (3B) and 84.4 (0.5B) by generation against 20 to 24 by cloze, 100 in the trained format, and no induction labels at all (94 to 100% unanswered, with and without context). The 0.5B figure is the one to note: section 6.4 read its 20.0 cloze recall as the small model failing to learn the facts, and it knew 84% of them. Merchant items for fine-tuned models need the section 4 recipes re-run with saved adapters, which is its own step.
 
 **What the report should say.** Bare-format recall is about 85% by generation for every knowledge arm and the 20% cloze figure should be read as a scoring artifact, not a knowledge gap; the induction claims of section 8 hold by generation for the episode arms; base and A cannot produce labels, only prefer them. Generation joins `mean` and `hybrid` as the third line for every table that reports a level a user would see as text.
+## 13. Tokenizer casing check: the bank-string failure is not the tokens (MODEL-4)
+
+Date: 2026-09-14. Code: `scripts/exp_casing.py`; data `results/casing.json`, per-item records `results/per_item/casing_Qwen2.5-0.5B.*.jsonl`; tracker experiment `casing`; PLAN.md step 5.
+
+QUESTIONS.md MODEL-4 proposed that the merchant bank-string failure in section 4 (14.2% with the fact in context, chance 8.3) is a tokenizer artifact: the training text carries `Kelvarro Co`, the statement carries `KELVARRO CO`, and a cased BPE tokenizer splits the two into different pieces, so nothing learned about one can reach the other. The test: render every bank string three ways and score the same items.
+
+**Token survival.** Share of a clean merchant name's tokens that also appear in the rendered name, over the 120 merchants:
+
+| tokenizer | clean | upper (bank string) | title-cased | name restored |
+|---|---|---|---|---|
+| Qwen2.5 (0.5B and 3B) | 100 (3.6 tokens/name) | **10.6** (4.5 tokens/name) | 95.2 | 100 |
+| all-MiniLM-L6-v2, uncased WordPiece | 100 (3.3) | 96.2 | 96.2 | 100 |
+
+The 10.6% confirms the mechanism the reviewer measured (12.6% with a slightly different count): for a cased tokenizer the uppercase name is a different string. Title-casing the whole statement brings 95.2% of the tokens back; restoring only the name brings all of them.
+
+**Table 13.1: bank_category (12-way, chance 8.3) under the three renderings**
+
+| model, condition | upper | title | name restored |
+|---|---|---|---|
+| Qwen2.5-0.5B, bare (section 4 "base") | 8.3 | 8.3 | 8.3 |
+| Qwen2.5-0.5B, fact in context (section 4 "incontext") | 14.2 | 15.8 | 15.0 |
+| MiniLM zero-shot, 96 trained merchants | 7.3 | 7.3 | 7.3 |
+| MiniLM ft_subword (section 4.3.1 recipe, retrained), 96 trained merchants | 67.7 | 67.7 | 68.8 |
+| MiniLM ft_subword, 24 held-out merchants | 4.2 | 4.2 | 4.2 |
+
+**What it says.** The hypothesis is wrong for the LLM. Giving the 0.5B model the merchant name in exactly its trained tokens, inside the bank string, moves the with-context score from 14.2 to 15.0, one item; title-casing the whole line gives 15.8. The 120-item half-width at 15% is about 6 points, so these are the same number. The model has the fact in the prompt and the name in its trained form and still cannot map `POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14` to a spending category, while the same model with the same note answers `Merchant: Kelvarro Co` at 69.2 (4.3.2). What defeats it is the transaction format itself: the few-shot prefix of bank lines, the store number, city and date around the name, and the "Spending category:" cue, at a model size that does not read past that noise. The embedding side is the control the hypothesis predicted: an uncased tokenizer is indifferent to the rendering (67.7 / 67.7 / 68.8), and its 70.8% transfer in 4.3.1 owes nothing to casing either way.
+
+So section 1's recommendation stands with a different reason: normalise bank strings before the model sees them because the *format* is noise for small models, not because of the tokenizer. Case-normalisation alone will not recover the bank format; stripping the string down to the merchant name (or training on realistic renderings, PLAN step 21) is what the numbers point at. The second half of MODEL-4, whether the 70.8% transfer survives on a cased encoder (bge-base, Qwen3-Embedding), stays with step 13.
