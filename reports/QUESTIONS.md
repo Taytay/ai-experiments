@@ -456,6 +456,27 @@ backward; a random-token control collapses, so it is not generic augmentation. N
 the K stream with episodes and replay unchanged; score bare L1, `L1_recall_fmt`, the merchant
 `reverse` task and the ICL suite against arm C. About 2x arm C in tokens.
 
+**TRAIN-6 (O) Is the knowledge stream overhead-bound, and would sequence packing change the results as well as the speed?**
+Knowledge texts average 25 tokens and are trained unpacked in micro-batches of 8, so a step is
+mostly launch overhead and padding: arm A retrains at about 280 tokens/s with the 3090 at 35 to
+60% utilisation, 12 to 26% memory bandwidth and 240 of 350 W (measured 2026-09-15 during the
+step 11 periodic run), against 850 tokens/s for arm C's long episodes and 69% MFU on long
+sequences in section 7.1. The training loop in `exp_curriculum.py` is hand-written (samples per
+stream, pad to the longest, call the model), so unsloth only speeds up the kernels; its packing
+comes with TRL's `SFTTrainer` (`packing=True`, and the padding-free variant that keeps packed
+examples' attention separate). Packing is not a free speed-up here: without per-sequence masking
+and position ids, facts about one species leak into the loss of the next; and averaging the loss
+over a 768-token pack of about 30 facts instead of 8 padded ones changes the effective mixture
+weights that section 8.1 measured (84% knowledge by loss-bearing tokens), so a packed run is a
+recipe change, not a drop-in.
+*Experiment:* PLAN row 26, two parts. (1) Move the K stream (or the whole loop) to unsloth's `SFTTrainer`
+with `packing=True` so the mixture, masking and position handling are the trainer's, keeping the
+per-step mixture draw by tokens as step 9 defines it; confirm on one packed micro-batch that
+attention is block-diagonal (attention weights across pack boundaries are zero) and that
+positions restart at each boundary. (2) Retrain arm A packed and unpacked at the same token
+budget and seed; both must score within the section 9.2 noise floor on the frozen ladder, and the
+packed run should report tokens/s, MFU and the loss-bearing-token fractions per stream. Only
+then use packing for the sweeps (steps 10, 15, 17) where the time saving matters.
 **TRAIN-7 (R) Does general-text replay protect the knowledge the model already had?**
 Section 15: every arm loses 11 to 16 ARC-Easy points in the first 200 steps and never recovers them; 15% replay of
 ICL-suite episodes protects the ICL suite completely but does nothing for ARC-Easy (arm D, replay from step 0, drops
