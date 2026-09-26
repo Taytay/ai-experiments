@@ -1,0 +1,82 @@
+[
+ {
+  "tag": "r76-plain-real6",
+  "env": {
+   "INIT": "hops",
+   "HOPS_FROM": "v2_options_k1-3_st3000",
+   "FOLD": "0",
+   "ADAPTERS_FROM": "r71v2-enc-plain-k3"
+  },
+  "cmds": [
+   " STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   " STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   " STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r76-plain-poi",
+  "env": {
+   "INIT": "hops",
+   "HOPS_FROM": "v2_options_k1-3_st3000",
+   "FOLD": "0",
+   "ADAPTERS_FROM": "r71v2-enc-plain-k3"
+  },
+  "cmds": [
+   " POI=poi1_v1 STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   " POI=poi1_v1 STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   " POI=poi1_v1 STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r76-labaux-real6",
+  "env": {
+   "INIT": "hops",
+   "HOPS_FROM": "v2_options_lab_aux1_k1-3_st3000",
+   "FOLD": "0",
+   "ADAPTERS_FROM": "r71v2-enc-labaux-k3"
+  },
+  "cmds": [
+   " STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   " STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   " STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r76-labaux-poi",
+  "env": {
+   "INIT": "hops",
+   "HOPS_FROM": "v2_options_lab_aux1_k1-3_st3000",
+   "FOLD": "0",
+   "ADAPTERS_FROM": "r71v2-enc-labaux-k3"
+  },
+  "cmds": [
+   " POI=poi1_v1 STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   " POI=poi1_v1 STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   " POI=poi1_v1 STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r76-mbert-st200",
+  "env": {
+   "INIT": "mbert",
+   "FOLD": "0",
+   "STEPS": "200"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r76-laya-st200",
+  "env": {
+   "INIT": "laya",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   "POI=poi1_v1 STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py",
+   "POI=poi1_v1 STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
