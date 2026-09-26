@@ -1080,4 +1080,4 @@ degrades with hops; latent two-hop over facts stored in weights mostly fails wit
 Yang et al. 2024), though in-context hops are easier. For encoders the analogues of thinking are extra computation positions
 (pause tokens, Goyal et al. ICLR 2024), looping the network (looped transformers, Saunshi et al. ICLR 2025), and iterative unmasking
 (masked diffusion LMs, MODEL-7). Our categoriser decisions are short hops (query -> similar example -> its label -> option), and
-section 63's single-mask failure may be a hop limit. *Experiment (row 71).*
+section 63's single-mask failure may be a hop limit. *Experiment (row 71):* decoders 0.5B to 14B with and without CoT; the encoder layout trained on short chains; the encoder with scratch rounds; a looped encoder (a tied block repeated r times, trained at r <= 4, tested to 12) and Huginn-0125's test-time recurrence; diffusion LMs (Dream-7B paired with Qwen2.5-7B, LLaDA-8B, LFM2.5-Encoder-350M-Diffusion) with 1 to k denoising steps. The owner asked for the looping encoder and a diffusion model explicitly.
