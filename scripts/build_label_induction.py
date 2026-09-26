@@ -17,8 +17,13 @@ factors varied one at a time, each on the same 300 queries (25 per standard cate
 
 The other categories' examples are descriptive businesses of their own category (at least one each, 24 in all); amounts from the
 category's distribution. Every item keeps the Overture ids and source licences of its query (sources) and examples (example_ids).
-Frozen as data/processed/label_induction_v1.json in REAL-6's item format (score with ITEMS_SET=label_induction_v1 USERS=all).
-usage: uv run --with duckdb python scripts/build_label_induction.py [--force]
+Frozen as data/processed/label_induction_<version>.json in REAL-6's item format (score with ITEMS_SET=label_induction_<version> USERS=all).
+
+v1 turned out to be solvable by elimination (a blind Opus reader: 100% with no gold examples): the scheme lacks exactly one standard
+category and has exactly one coined word left unexplained by the examples. v2 (--empty 3) adds three more coined categories with no
+examples to every scheme, as users have categories with no recent transactions, so elimination leaves a guess among four words and
+only the gold examples can decide; everything else is v1's, item for item.
+usage: uv run --with duckdb python scripts/build_label_induction.py [--version v2 --empty 3] [--force]
 """
 import json
 import random
@@ -33,7 +38,9 @@ from ai_experiments.paths import PROCESSED
 sys.path.insert(0, str(Path(__file__).parent))
 import build_novel_merchants as NM  # noqa: E402
 
-OUT = PROCESSED / "label_induction_v1.json"
+VERSION = sys.argv[sys.argv.index("--version") + 1] if "--version" in sys.argv else "v1"
+EMPTY = int(sys.argv[sys.argv.index("--empty") + 1]) if "--empty" in sys.argv else 0  # coined categories with no examples (v2: 3)
+OUT = PROCESSED / f"label_induction_{VERSION}.json"
 SEED, N_QUERY, N_SHOTS = 64, 25, 24
 BASE = dict(n_gold=2, kind="other_kind", n_coined=3, decoy=False)
 CONDITIONS = [("base", {}), ("n_gold=0", dict(n_gold=0)), ("n_gold=1", dict(n_gold=1)), ("n_gold=4", dict(n_gold=4)), ("n_gold=8", dict(n_gold=8)),
@@ -85,6 +92,8 @@ def build():
         others = [c for c in M.CATEGORY_LIST if c != q["std"]]
         coined_order = qrng.sample(others, 5)  # the other categories to coin, in a fixed order per query
         words = {c: fresh_word(qrng, taken_words) for c in [q["std"]] + coined_order}
+        empties = [f"__empty{k}" for k in range(EMPTY)]  # after the query's other draws, so v1's items are unchanged when EMPTY = 0
+        words.update({e: fresh_word(random.Random(SEED * 7919 + qn * 31 + k), taken_words) for k, e in enumerate(empties)})
         same_kind = [p for p in by_kind[(q["std"], q["tprimary"])] if p["id"] != q["id"]]
         other_kind = [p for p in by_cat[q["std"]] if p["tprimary"] != q["tprimary"]]
         gold_pool = {"same_kind": qrng.sample(same_kind, min(8, len(same_kind))), "other_kind": qrng.sample(other_kind, min(8, len(other_kind)))}
@@ -97,6 +106,7 @@ def build():
             c = {**BASE, "coined_gold": True, **change}
             coined = ([q["std"]] if c["coined_gold"] else []) + coined_order[:c["n_coined"] - 1]  # the control keeps the same other coined categories
             names = {k: (words[k] if k in coined else k) for k in M.CATEGORY_LIST}
+            names.update({e: words[e] for e in empties})
             gold = [row(p, q["std"], random.Random(qn * 7 + j)) for j, p in enumerate(gold_pool.get(c["kind"], [])[:c["n_gold"]])] if c["kind"] != "opaque" else opaque_pool[:c["n_gold"]]
             shots = [(r, q["std"]) for r in gold]
             slots = N_SHOTS - len(shots) - (1 if c["decoy"] else 0)
@@ -109,6 +119,8 @@ def build():
                 shots.append((decoy_row, decoy_cat))
             random.Random(SEED + qn).shuffle(shots)
             opts = M.CATEGORY_LIST[:]; random.Random(qn).shuffle(opts)
+            for k, e in enumerate(empties):  # the empty coined categories at fixed positions per query
+                opts.insert(random.Random(qn * 13 + k).randrange(len(opts) + 1), e)
             header = "Categories: " + ", ".join(names[k] for k in opts) + "\n\n"
             demo = "".join(f"Transaction: {r['text']} | ${r['amount']:.2f} | {r['weekday']}\nCategory: {names[k]}\n\n" for r, k in shots)
             query = f"Transaction: {qrow['text']} | ${qrow['amount']:.2f} | {qrow['weekday']}\nCategory:"
@@ -125,7 +137,7 @@ if __name__ == "__main__":
     if OUT.exists() and "--force" not in sys.argv:
         sys.exit(f"{OUT} exists (frozen); pass --force to rebuild")
     items = build()
-    doc = dict(name="label_induction", version="v1", n_items=len(items), conditions=[c for c, _ in CONDITIONS], base=BASE, seed=SEED,
+    doc = dict(name="label_induction", version=VERSION, empty_coined_categories=EMPTY, n_items=len(items), conditions=[c for c, _ in CONDITIONS], base=BASE, seed=SEED,
                source="Overture Maps places 2026-09-23.1 (per-row licences in `sources`; provenance in data/external/overture_places_2026-09-23.1/)", items=items, sha256=R6.sha256(items))
     OUT.write_text(json.dumps(doc, indent=0, ensure_ascii=False))
     from collections import Counter
