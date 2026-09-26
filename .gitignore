@@ -21,3 +21,6 @@ references/papers/*/paper_flat.tex
 # smoke-run outputs (`just smoke`): plumbing checks, not results
 results/*_smoke*.json
 results/per_item/*_smoke*.jsonl
+
+# GPU chain logs (scripts/chains/)
+logs/

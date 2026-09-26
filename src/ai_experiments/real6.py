@@ -48,6 +48,50 @@ def fact_db(merchants, seed=5):
     return db
 
 
+AMB_PATH = PROCESSED / f"real6_{VERSION}_ambdb.json"
+
+
+def fact_db_ambiguous(merchants, seed=5, overlap=2, multi_frac=0.2):
+    """REAL-7: the same 240 merchants with section 35's product ambiguity (merchants.build_v2), so a record no longer names its
+    category by construction. Each category's pool gains `overlap` products of the next category; a `multi_frac` share of every
+    category's merchants (real chains and opaque alike) sell two products of their own category and one of another; the rest draw
+    three from the overlapping pool. Returns (name -> record, name -> {multi, secondary, products})."""
+    rng = random.Random(seed)
+    pools = {}
+    for i, c in enumerate(M.CATEGORY_LIST):
+        pools[c] = list(M.CATEGORIES[c]) + M.CATEGORIES[M.CATEGORY_LIST[(i + 1) % len(M.CATEGORY_LIST)]][:overlap]
+    db, meta = {}, {}
+    for c in M.CATEGORY_LIST:
+        ms = sorted((m["name"] for m in merchants if m["category"] == c)); rng.shuffle(ms)
+        n_multi = round(len(ms) * multi_frac)
+        for j, name in enumerate(ms):
+            if j < n_multi:
+                other = rng.choice([x for x in M.CATEGORY_LIST if x != c])
+                prods = rng.sample(M.CATEGORIES[c], 2) + [rng.choice(M.CATEGORIES[other])]; rng.shuffle(prods)
+            else:
+                other, prods = None, rng.sample(pools[c], 3)
+            db[name] = f"{name} is a store that sells {prods[0]}, {prods[1]} and {prods[2]}."
+            meta[name] = dict(multi=j < n_multi, secondary=other, products=prods, off_pool=sum(p not in M.CATEGORIES[c] for p in prods))
+    return db, meta
+
+
+def set_record(item, record):
+    """The item with another merchant record in its context prompt (the ambiguous DB, or a retrieved record, right or wrong)."""
+    head, sep, q = item["prompt_ctx"].rpartition("\nTransaction: ")
+    assert head.endswith(f"Note: {item['record']}"), item["id"]
+    head = head[:-len(item["record"])] + record
+    return dict(item, record=record, prompt_ctx=head + sep + q)
+
+
+def freeze_amb(force=False):
+    if AMB_PATH.exists() and not force:
+        raise SystemExit(f"{AMB_PATH.name} exists; frozen sets are immutable.")
+    db, meta = fact_db_ambiguous(T.load()["merchants"])
+    doc = dict(name="real6_ambdb", version=VERSION, n_merchants=len(db), fact_db=db, meta=meta, sha256=sha256(db))
+    AMB_PATH.write_text(json.dumps(doc, indent=0, ensure_ascii=False) + "\n", encoding="utf-8")
+    return doc
+
+
 def make_scheme(rng, merchants):
     """A user's categories: the 12 standard ones merged (fewer) or split (more), each with a name type; returns
     (categories: [{name, name_type, standard: [..]}], merchant -> category index)."""
@@ -155,14 +199,29 @@ def freeze(force=False):
     return doc
 
 
-def load():
+def load(db="v1"):
+    """The frozen set; db="amb" swaps every record (item["record"], item["prompt_ctx"], doc["fact_db"]) for the ambiguous DB of
+    `real6_v1_ambdb.json` and records its sha as doc["db_sha256"]; the items' own sha is unchanged (same ids, strings, options, gold)."""
     doc = json.loads(PATH.read_text(encoding="utf-8"))
     assert sha256(doc["items"]) == doc["sha256"], f"{PATH.name}: items do not match the recorded sha256"
+    doc["db"] = db
+    if db == "amb":
+        amb = json.loads(AMB_PATH.read_text(encoding="utf-8"))
+        assert sha256(amb["fact_db"]) == amb["sha256"], f"{AMB_PATH.name}: records do not match the recorded sha256"
+        doc["items"] = [set_record(it, amb["fact_db"][it["merchant"]]) for it in doc["items"]]
+        doc["fact_db"], doc["db_meta"], doc["db_sha256"] = amb["fact_db"], amb["meta"], amb["sha256"]
+    elif db != "v1":
+        raise ValueError(db)
     return doc
 
 
 if __name__ == "__main__":
     import sys
+    if "--amb" in sys.argv:  # uv run python -m ai_experiments.real6 --amb   freezes the ambiguous DB beside the set
+        amb = freeze_amb(force="--force" in sys.argv) if not AMB_PATH.exists() or "--force" in sys.argv else json.loads(AMB_PATH.read_text())
+        print(f"ambiguous DB: {amb['n_merchants']} records, sha {amb['sha256'][:12]}, multi {sum(v['multi'] for v in amb['meta'].values())}, "
+              f"records with an off-pool product {sum(v['off_pool'] > 0 for v in amb['meta'].values())}")
+        raise SystemExit
     doc = freeze(force="--force" in sys.argv) if not PATH.exists() or "--force" in sys.argv else load()
     print(f"{doc['n_users']} users, {doc['n_items']} items, sha {doc['sha256'][:12]}")
     print("cells", Counter(i["level"] for i in doc["items"]))

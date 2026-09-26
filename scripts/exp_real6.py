@@ -11,6 +11,10 @@ Every cell gets a 95% bootstrap interval over its items and the section 11 null 
 usage: uv run python scripts/exp_real6.py llm [base|<adapter dir under models/adapters>]      MODEL=Qwen/Qwen2.5-3B
        uv run python scripts/exp_real6.py encoder [minilm|bge]
        SMOKE=1 scores every 10th item, no tracker
+       REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB in place of the disjoint records (adds _amb to the tag)
+       CONDS=ret1 (LLM): the record found by the row 37 retriever from the statement string (results/real6_retrieved.json), right or wrong;
+       ENC_CTX=ret does the same for the encoder's query
+       SCORER=hf (row 38, INFRA-2): load the model and adapter with transformers + peft instead of unsloth (adds _hfs to the tag)
 outputs: results/real6_<tag>.json, results/per_item/real6_<tag>.<cond>.jsonl; tracker experiment "real6"
 """
 import json
@@ -33,10 +37,15 @@ MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
 SMOKE = bool(os.environ.get("SMOKE"))
 ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5"}
 CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions to score (a retrieval-trained adapter needs ctx only)
-ENC_CTX = bool(os.environ.get("ENC_CTX"))  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition)
+ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
+REAL6_DB = os.environ.get("REAL6_DB", "v1")
+SCORER = os.environ.get("SCORER", "unsloth")
 if not R6.PATH.exists():
     R6.freeze()
-DOC = R6.load()
+DOC = R6.load(REAL6_DB)
+RETRIEVED = None
+if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/exp_real6_retriever.py; its record comes from the DB in use
+    RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
 tag = (MODEL.split("/")[-1] if WHAT == "base" else WHAT) if ROUTE == "llm" else WHAT
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
@@ -75,20 +84,33 @@ def write_recs(cond, recs):
 
 def run_llm(run):
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
-    import unsloth  # noqa: F401
     import torch
-    from unsloth import FastLanguageModel
     from ai_experiments.scoring import Scorer
     src = MODEL if WHAT == "base" else str(ROOT / "models" / "adapters" / WHAT)
-    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16)
+    if SCORER == "hf":
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        base = MODEL if WHAT == "base" else json.loads((ROOT / "models" / "adapters" / WHAT / "adapter_config.json").read_text())["base_model_name_or_path"]
+        tok = AutoTokenizer.from_pretrained(base)
+        model = AutoModelForCausalLM.from_pretrained(base, dtype=torch.bfloat16, attn_implementation="sdpa").cuda()
+        if WHAT != "base":
+            from peft import PeftModel
+            model = PeftModel.from_pretrained(model, src)
+    else:
+        import unsloth  # noqa: F401
+        from unsloth import FastLanguageModel
+        model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16)
     tok.padding_side = "right"; model.eval()
     sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
     results = {}
-    for cond, ctx in (("noctx", False), ("ctx", True)):
+    for cond, ctx in (("noctx", False), ("ctx", True), ("ret1", True)):
         if cond not in CONDS:
             continue
         t0 = time.time()
-        recs = sc.score(ITEMS, ctx=ctx, label=f"REAL-6 {cond}")
+        its = [R6.set_record(it, DOC["fact_db"][RETRIEVED[it["id"]]["top"][0]]) for it in ITEMS] if cond == "ret1" else ITEMS
+        recs = sc.score(its, ctx=ctx, label=f"REAL-6 {cond}")
+        if cond == "ret1":
+            for r, it in zip(recs, ITEMS):
+                r["hit1"] = RETRIEVED[it["id"]]["hit1"]
         for r, it in zip(recs, ITEMS):
             r.update(user=it["user"], merchant=it["merchant"], known=it["known"], options=it["options"])
         results[cond] = summarize(recs); results[cond]["minutes"] = round((time.time() - t0) / 60, 1)
@@ -116,7 +138,8 @@ def run_encoder(run):
             if cond == "mix":
                 protos = protos / (np.linalg.norm(protos, axis=1, keepdims=True) + 1e-8) + enc(names)
             protos = protos / (np.linalg.norm(protos, axis=1, keepdims=True) + 1e-8)
-            Q = enc([M.normalize(it["text"]) + (f" {it['record']}" if ENC_CTX else "") for it in its])
+            rec_of = (lambda it: DOC["fact_db"][RETRIEVED[it["id"]]["top"][0]]) if ENC_CTX == "ret" else (lambda it: it["record"])  # noqa: E731
+            Q = enc([M.normalize(it["text"]) + (f" {rec_of(it)}" if ENC_CTX else "") for it in its])
             preds = (Q @ protos.T).argmax(1)
             for it, p in zip(its, preds):
                 recs.append(dict(id=it["id"], level=it["level"], answer=it["answer"], pred=int(p), correct=bool(p == it["answer"]), user=uid, merchant=it["merchant"], known=it["known"], options=it["options"]))
@@ -128,11 +151,19 @@ def run_encoder(run):
 
 ENC_SRC = ENCODERS.get(WHAT, str(ROOT / "models" / "adapters" / WHAT))  # a name from ENCODERS or a fine-tuned encoder directory under models/adapters
 if ROUTE == "encoder" and ENC_CTX:
-    tag += "_ctx"; OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
-cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
+    tag += "_ctx" if ENC_CTX != "ret" else "_ret1"
+if REAL6_DB == "amb":
+    tag += "_amb"
+if SCORER == "hf":
+    tag += "_hfs"
+OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"
+cfg = dict(route=ROUTE, what=WHAT, model=MODEL if ROUTE == "llm" else ENC_SRC, real6_version=DOC["version"], real6_sha=DOC["sha256"], real6_db=REAL6_DB, db_sha=DOC.get("db_sha256"), scorer=SCORER,
+           n_items=len(ITEMS), shots=DOC["shots"], conds=CONDS, enc_ctx=ENC_CTX)
 with Run("real6", model=cfg["model"], config=cfg, enabled=not SMOKE) as run:
     results = run_llm(run) if ROUTE == "llm" else run_encoder(run)
-    OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(results, indent=2)); run.artifact(OUT)
+    OUT.parent.mkdir(exist_ok=True)
+    merged = json.loads(OUT.read_text()) if OUT.exists() and not SMOKE else {}  # a later run of other conditions (CONDS=ret1) keeps the earlier ones
+    merged.update(results); OUT.write_text(json.dumps(merged, indent=2)); run.artifact(OUT)
 print(f"=== real6 {tag}")
 for cond, r in results.items():
     print(f"-- {cond}: " + " ".join(f"{lv}={r[lv]}" for lv in CELLS + ["R6_seen_all", "R6_unseen_all", "R6_all"] if lv in r) + f" | chance {r.get('R6_all_chance')} null {r.get('R6_all_null')}")

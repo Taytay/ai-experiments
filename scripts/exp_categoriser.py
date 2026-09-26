@@ -16,6 +16,9 @@ so that the unseen cells split into merchants other users labelled and merchants
 
 usage: uv run python scripts/exp_categoriser.py llm|encoder [none|param|ret]
 env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of the LLM sequences under param), RUN_TAG (name suffix), EPOCHS=3 (encoder), SMOKE=1, SEED=0
+     REAL6_DB=amb (row 37, REAL-7): the ambiguous fact DB of real6_v1_ambdb.json in place of the disjoint records, for param and ret; adds _amb to the names
+     TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
+       LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
   (training stats); the REAL-6 scores come from `scripts/exp_real6.py llm <adapter>` / `encoder <dir>` afterwards. Tracker "categoriser".
 """
@@ -44,10 +47,13 @@ RUN_TAG = os.environ.get("RUN_TAG", "")  # suffix on the adapter and results nam
 EPOCHS = 1 if SMOKE else int(os.environ.get("EPOCHS", "3"))
 MICRO, MAXLEN = 4, 1536  # 4 x 4 = 16 sequences per step
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
-DOC = R6.load()
+REAL6_DB = os.environ.get("REAL6_DB", "v1")
+TRAINER = os.environ.get("TRAINER", "unsloth")
+assert TRAINER in ("unsloth", "hf")
+DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -78,14 +84,33 @@ def sft_examples(per_user=150):
     return ex
 
 
+TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+
+def load_llm():
+    """The base model with a fresh rank-64 LoRA on every linear layer: through unsloth (the recipe of every adapter so far) or through
+    transformers + peft alone (TRAINER=hf), with gradient checkpointing in both."""
+    import torch
+    if TRAINER == "hf":
+        from peft import LoraConfig, get_peft_model
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(LLM_BASE)
+        model = AutoModelForCausalLM.from_pretrained(LLM_BASE, dtype=torch.bfloat16, attn_implementation="sdpa").cuda()
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False}); model.enable_input_require_grads()
+        torch.manual_seed(SEED)
+        model = get_peft_model(model, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=TARGETS))
+    else:
+        import unsloth  # noqa: F401
+        from unsloth import FastLanguageModel
+        model, tok = FastLanguageModel.from_pretrained(LLM_BASE, max_seq_length=MAXLEN, dtype=torch.bfloat16)
+        model = FastLanguageModel.get_peft_model(model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none", use_gradient_checkpointing=True, random_state=SEED, target_modules=TARGETS)
+    tok.padding_side = "right"
+    return model, tok
+
+
 def train_llm(run):
     import torch
-    import unsloth  # noqa: F401
-    from unsloth import FastLanguageModel
-    model, tok = FastLanguageModel.from_pretrained(LLM_BASE, max_seq_length=MAXLEN, dtype=torch.bfloat16)
-    tok.padding_side = "right"
-    model = FastLanguageModel.get_peft_model(model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none", use_gradient_checkpointing=True, random_state=SEED,
-                                             target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"])
+    model, tok = load_llm()
     params = [p for p in model.parameters() if p.requires_grad]
     ex = sft_examples()
     kt = db_texts() if DB == "param" else []
@@ -125,7 +150,8 @@ def train_llm(run):
             run.log(dict(train_loss=loss_acc), condition="train", step=step + 1)
     model.save_pretrained(OUT_DIR); tok.save_pretrained(OUT_DIR)
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_sft_examples=len(ex), n_db_texts=len(kt), seqs_sft=n_sft, seqs_db=n_db, final_loss=round(sum(losses[-10:]) / len(losses[-10:]), 3),
-                peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2**30, 2), adapter=str(OUT_DIR.relative_to(ROOT)))
+                peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2**30, 2), peak_reserved_GiB=round(torch.cuda.max_memory_reserved() / 2**30, 2), trainer=TRAINER,
+                n_trainable=sum(p.numel() for p in params), losses=[round(x, 4) for x in losses], adapter=str(OUT_DIR.relative_to(ROOT)))
 
 
 def train_encoder(run):
@@ -163,9 +189,10 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY))
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
-    run.log({k: v for k, v in stats.items() if isinstance(v, (int, float))}, condition="trained")
+    run.log({k: v for k, v in stats.items() if isinstance(v, (int, float)) and not isinstance(v, bool)}, condition="trained")
+stats.pop("losses", None)
 print(f"=== categoriser {ROUTE} {DB}: {stats}")

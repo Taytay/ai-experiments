@@ -2669,3 +2669,143 @@ The bare rule question fails for every model. Asked `What type are {T}-type crea
 GRAPH-4's question, whether weakness is stored as f(type) or per entity, has an answer once the premise is fixed. The training text states the type-to-weakness rule 136 times as a clause inside per-species sentences, and the weights do not turn it into a rule a question can reach (0 to 4 of 8 on the bare form); with the type stated in the trained sentence's own frame, the weakness comes out at 64 to 69 on the original universe and at 40 on the independent one, and on the independent one it is the species' own weakness that comes out, not the type's plurality. The graph was not completed through type; the sentence was completed through its own beginning. For DATA-1 this closes the last door: the weakness partition never was a held-out partition (section 39), the weakness fact is anchored to the type-mentioning template rather than to the name (here and section 40), and neither the probe nor the items find a type-to-weakness rule in the weights. For the categoriser: a "rule" written into training sentences as a clause ("like all grocery stores, X sells food") does not become an answerable generalisation; what the model can do afterwards is complete the sentence it was shown, from the frame it was shown in.
 
 Not done: the same items on the merchant categorisers (row 33's adapters have no type-like attribute chain); a template set that states the rule as its own sentence, to test whether a rule stated on its own becomes queryable. Cost: nine scorings, 4 GPU minutes.
+
+## 43. The record-in-prompt categoriser without its conveniences: ambiguous records cost it 3 points overall and 9 on the merchants only the DB knows, a retriever tuned on the DB's own renderings replaces the name oracle at no cost (recall@1 99.4; 93 against 5,000 decoys), and over three seeds the prompt gain stands (DB-only 91 +- 6) while the parametric gain dissolves (59 +- 12, opaque 31 +- 21) (REAL-7)
+
+*PLAN step 37. Code: `real6.fact_db_ambiguous` (frozen as `data/processed/real6_v1_ambdb.json`; `real6.load("amb")` swaps every record of the frozen set, items unchanged), `REAL6_DB=amb` in `scripts/exp_categoriser.py` and `scripts/exp_real6.py`, `scripts/exp_real6_retriever.py` (the retriever; `results/real6_retrieval.json`, its top-5 per item in `results/real6_retrieved.json`, the encoders under `models/adapters/retriever_real6_minilm{,_decoys}`), the `ret1` condition and `ENC_CTX=ret` of `exp_real6.py`, `SEED` / `RUN_TAG` of `exp_categoriser.py`, `scripts/real5_hardening_tables.py`, `scripts/chains/chain_r37.sh`. Results `results/real6_*_amb.json`, the `ret1` conditions and `_s1` / `_s2` adapters in `results/real6_*.json`, `results/categoriser_llm_*.json`.*
+
+Section 38's headline is the categoriser with the merchant's fact-DB record in the prompt: 90.2 over the REAL-6 items and 97.6 on the merchants no user had labelled, coined category names included. The owner asked what else the 3090 could do before the long runs move to the cloud, and the answer was to take that number apart, because it rests on three conveniences. The records use section 4's disjoint product pools, so "sells fresh produce, deli meats and canned goods" names its category by construction, and section 35 measured the products-to-category bridge losing 13 points when the pools overlap. The record is found by the merchant's name, an oracle: production has the statement string, and section 25.4's retriever was read on clean strings and 120 records. And every REAL-6 number is one seed. This step removes the three in turn on the same frozen items and users, so every cell pairs with sections 37 and 38.
+
+**The ambiguous DB.** `real6.fact_db_ambiguous` rewrites the 240 records with section 35's construction (`merchants.build_v2`): each category's pool gains two products of the next category, and a fifth of every category's merchants, real chains and opaque alike, sell two products of their own category and one of another. 133 of the 240 records carry at least one product from outside their category's pool (126 one, 7 two) and 48 are multi-category merchants. It is frozen beside the set with its own hash; the items, prompts, shots, options and gold are those of `real6_v1`. The record-in-prompt categoriser is retrained on it (`REAL6_DB=amb`, 200 steps, the section 38 recipe) and scored on it, the section 38 adapter trained on the disjoint records is scored on it, and so are the instruct base and the tuned bge encoder with the record on the query; the 400-step parametric arm is retrained with the ambiguous records mixed in at 50%.
+
+**The retriever.** The index is the 240 records. The encoder is all-MiniLM-L6-v2 through `ai_experiments.retrieval.Retriever`, zero-shot and tuned for six epochs on 3,139 pairs the DB alone supplies: for every merchant, eight templated card-statement renderings of its name (`merchants.renderings`, the section 36 templates: truncations to 8 or 10 characters, vowel-stripped abbreviations, processor prefixes, store numbers, cities), its section 4 bank string, the bare and upper-cased name, and the normalised form of each, all mapped to the merchant's record. No user label and no test string is used. The queries are the 1,179 REAL-6 item strings, whose renderings drew fresh templates, store numbers and dates, raw and through the section 36 normaliser. A second index adds 5,000 opaque decoy merchants (fresh names from the same generator, records from the same pools, renderings in the tuning pairs) so that recall is also read against a DB of production size, where a truncated ISTMR or a vowel-stripped KLVRR has many near neighbours. The tuned 240-record retriever's top-1 record then replaces the oracle record in the prompt (`CONDS=ret1`) for the instruct base, the section 38 record-in-prompt adapter and the ambiguous-DB adapter, and on the tuned encoder's query.
+
+**Seeds.** Seeds 1 and 2 (LoRA initialisation and data order) of the SFT arms without a DB, with the record in the prompt, and with the parametric DB at 400 steps, scored as in section 38.
+
+**Table 43.1: the disjoint fact DB of sections 37 and 38 against the ambiguous one (each category's pool gains two products of the next category; a fifth of the merchants sell one product of another category), same items, same users (accuracy % [95% bootstrap interval], * = inside the null band; chance about 7; the unseen split follows Table 38.2)**
+
+| | Instruct + record, disjoint DB (sec. 37) | Instruct + record, ambiguous DB | SFT + record: trained and scored disjoint (sec. 38) | SFT + record: trained disjoint, scored ambiguous | SFT + record: trained and scored ambiguous | bge tuned + record on query, disjoint (sec. 38) | bge tuned + record on query, ambiguous | SFT + parametric DB, 400 steps at 50%, disjoint (sec. 38) | SFT + parametric DB, 400 steps at 50%, ambiguous |
+|---|---|---|---|---|---|---|---|---|---|
+| seen merchant, all | 61.7 [57.6, 65.8] | 53.1 [49, 57.4] | 91.9 [89.6, 94.1] | 86 [83.4, 88.7] | 90.3 [87.8, 92.8] | 87.5 [84.8, 90.5] | 84.4 [81.8, 87.5] | 66.7 [62.6, 70.7] | 67.6 [63.5, 71.7] |
+| unseen merchant, all | 54.7 [50.8, 58.5] | 44.7 [40.5, 48.5] | 88.5 [86, 91.1] | 79.5 [76.5, 82.6] | 84.8 [82.1, 87.7] | 80.3 [77.3, 83.4] | 71.9 [68.5, 75.2] | 66 [62.3, 70] | 60.6 [56.6, 64.2] |
+| unseen, standard name | 70.4 [64.2, 76.7] | 55 [48.8, 60.8] | 100 [100, 100] | 90.4 [86.2, 93.8] | 97.5 [95.4, 99.2] | 89.6 [85.4, 93.3] | 81.7 [76.7, 86.7] | 75.8 [70, 81.2] | 71.7 [65.4, 77.1] |
+| unseen, renamed | 51.2 [44.6, 57.5] | 42.9 [36.2, 49.2] | 75 [69.6, 80.4] | 71.2 [65.4, 77.1] | 72.1 [66.2, 77.5] | 66.7 [60.8, 72.5] | 59.2 [52.5, 65.4] | 59.6 [53.3, 65.4] | 57.1 [50.4, 63.3] |
+| unseen, new word | 33.6 [25.7, 41.4] | 30 [22.1, 37.1] | 92.1 [87.9, 96.4] | 75 [67.9, 81.4] | 85 [79.3, 90.7] | 87.9 [82.1, 92.9] | 77.1 [70, 83.6] | 60 [52.1, 68.6] | 47.9 [39.3, 57.1] |
+| all items | 58 [55.1, 60.8] | 48.7 [45.9, 51.6] | 90.2 [88.4, 91.7] | 82.6 [80.4, 84.6] | 87.4 [85.7, 89.2] | 83.7 [81.6, 85.8] | 77.9 [75.6, 80.2] | 66.3 [63.9, 69] | 64 [61.3, 66.6] |
+| not in the history, labelled by other users in training | 56.1 | 45.1 | 86.3 | 79.9 | 83.9 | 82.7 | 77.3 | 64.4 | 59.6 |
+| DB-only (no user labelled it in training) | 48.8 | 43.1 | 97.6 | 78.0 | 88.6 | 70.7 | 50.4 | 72.4 | 65.0 |
+| DB-only, known chain | 52.1 | 63.4 | 100.0 | 90.1 | 95.8 | 85.9 | 66.2 | 85.9 | 87.3 |
+| DB-only, opaque | 44.2 | 15.4 | 94.2 | 61.5 | 78.8 | 50.0 | 28.8 | 53.8 | 34.6 |
+| DB-only, standard name | 63.3 | 46.7 | 100.0 | 81.7 | 90.0 | 73.3 | 66.7 | 85.0 | 66.7 |
+| DB-only, renamed | 46.3 | 48.8 | 95.1 | 73.2 | 82.9 | 63.4 | 39.0 | 56.1 | 56.1 |
+| DB-only, new word | 13.6 | 22.7 | 95.5 | 77.3 | 95.5 | 77.3 | 27.3 | 68.2 | 77.3 |
+
+**Table 43.1b: accuracy on the ambiguous DB by the record's ambiguity (unseen merchants only): products off the category's own pool 0 / 1 / 2, and the multi-category merchants (two own products and one of another category), against the same merchants under the disjoint DB where the columns exist**
+
+| record stratum (n unseen items) | Instruct + record, ambiguous DB | SFT + record: trained disjoint, scored ambiguous | SFT + record: trained and scored ambiguous | bge tuned + record on query, ambiguous |
+|---|---|---|---|---|
+| 0 off-pool products (219) | 53.9 | 84.5 | 85.4 | 73.1 |
+| 1 off-pool product, not multi (232) | 42.7 | 73.7 | 81.0 | 73.3 |
+| 2 off-pool products (37) | 16.2 | 83.8 | 97.3 | 67.6 |
+| multi-category merchant (132) | 40.9 | 80.3 | 87.1 | 68.9 |
+
+**Table 43.2: the record retriever (all-MiniLM-L6-v2 over the merchant records; tuned on 3139 (templated rendering -> record) pairs from the DB's own names, no user labels): recall@1 / recall@5 of the merchant's own record from the 1179 test strings, raw and through the normaliser, at 240 records and with 5,000 opaque decoy records added**
+
+
+*raw statement string as the query*
+
+| strings (n) | zero-shot, 240 records | tuned, 240 records | zero-shot, +5,000 decoys | tuned, +5,000 decoys |
+|---|---|---|---|---|
+| all strings (1179) | 79.1 / 87.3 | 99.4 / 100.0 | 49.4 / 68.4 | 92.9 / 98.6 |
+| known chain (645) | 82.8 / 86.7 | 99.2 / 100.0 | 71.2 / 78.4 | 95.7 / 98.9 |
+| opaque merchant (534) | 74.7 / 88.0 | 99.6 / 100.0 | 23.0 / 56.2 | 89.5 / 98.1 |
+| full name in the string (881) | 90.9 / 97.4 | 100.0 / 100.0 | 60.6 / 80.7 | 99.5 / 100.0 |
+| name truncated or vowel-stripped (298) | 44.3 / 57.4 | 97.7 / 100.0 | 16.1 / 31.9 | 73.2 / 94.3 |
+| DB-only merchants (258) | 77.1 / 86.8 | 99.2 / 100.0 | 49.2 / 63.2 | 93.4 / 98.1 |
+
+*normalised string as the query*
+
+| strings (n) | zero-shot, 240 records | tuned, 240 records | zero-shot, +5,000 decoys | tuned, +5,000 decoys |
+|---|---|---|---|---|
+| all strings (1179) | 86.8 / 90.8 | 99.4 / 99.8 | 68.9 / 82.8 | 90.9 / 97.5 |
+| known chain (645) | 88.4 / 90.2 | 99.2 / 99.7 | 85.0 / 86.0 | 97.4 / 98.8 |
+| opaque merchant (534) | 84.8 / 91.4 | 99.6 / 100.0 | 49.4 / 78.8 | 83.1 / 96.1 |
+| full name in the string (881) | 99.7 / 99.9 | 100.0 / 100.0 | 85.6 / 99.3 | 97.2 / 100.0 |
+| name truncated or vowel-stripped (298) | 48.7 / 63.8 | 97.7 / 99.3 | 19.5 / 33.9 | 72.5 / 90.3 |
+| DB-only merchants (258) | 86.4 / 92.2 | 99.2 / 99.2 | 64.3 / 80.6 | 95.3 / 98.1 |
+
+**Table 43.3: the oracle record (found by the merchant's name) against the retrieved top-1 record (found from the statement string, right or wrong) in the prompt, and the accuracy on the items whose retrieval hit and missed (accuracy %; the bge column appends the record to the query)**
+
+
+| | Instruct base: oracle | Instruct base: retrieved | SFT + record (trained on the oracle record): oracle | SFT + record (trained on the oracle record): retrieved | SFT + record, ambiguous DB: oracle | SFT + record, ambiguous DB: retrieved | bge tuned: oracle on query | bge tuned: retrieved on query |
+|---|---|---|---|---|---|---|---|---|
+| seen merchant, all | 61.7 [57.6, 65.8] | 61.4 [57.2, 65.5] | 91.9 [89.6, 94.1] | 91.6 [89.3, 93.7] | 90.3 [87.8, 92.8] | 89.8 [87.3, 92.3] | 87.5 [84.8, 90.5] | 87.3 [84.6, 90.2] |
+| unseen merchant, all | 54.7 [50.8, 58.5] | 54.7 [50.8, 58.5] | 88.5 [86, 91.1] | 88.4 [85.8, 91] | 84.8 [82.1, 87.7] | 84.7 [81.9, 87.6] | 80.3 [77.3, 83.4] | 80.2 [76.9, 83.2] |
+| unseen, standard name | 70.4 [64.2, 76.7] | 70.4 [64.2, 76.7] | 100 [100, 100] | 99.6 [98.8, 100] | 97.5 [95.4, 99.2] | 97.1 [94.6, 98.8] | 89.6 [85.4, 93.3] | 89.2 [85, 92.9] |
+| unseen, renamed | 51.2 [44.6, 57.5] | 51.2 [44.6, 57.5] | 75 [69.6, 80.4] | 75 [69.6, 80.4] | 72.1 [66.2, 77.5] | 72.1 [66.2, 77.5] | 66.7 [60.8, 72.5] | 66.7 [60.8, 72.5] |
+| unseen, new word | 33.6 [25.7, 41.4] | 33.6 [25.7, 41.4] | 92.1 [87.9, 96.4] | 92.1 [87.9, 96.4] | 85 [79.3, 90.7] | 85 [79.3, 90.7] | 87.9 [82.1, 92.9] | 87.9 [82.1, 92.9] |
+| all items | 58 [55.1, 60.8] | 57.8 [55, 60.6] | 90.2 [88.4, 91.7] | 89.9 [88, 91.5] | 87.4 [85.7, 89.2] | 87.1 [85.2, 89] | 83.7 [81.6, 85.8] | 83.5 [81.4, 85.6] |
+| not in the history, labelled by other users in training | 56.1 | 56.1 | 86.3 | 86.1 | 83.9 | 83.7 | 82.7 | 82.5 |
+| DB-only (no user labelled it in training) | 48.8 | 48.8 | 97.6 | 97.6 | 88.6 | 88.6 | 70.7 | 70.7 |
+| DB-only, known chain | 52.1 | 52.1 | 100.0 | 100.0 | 95.8 | 95.8 | 85.9 | 85.9 |
+| DB-only, opaque | 44.2 | 44.2 | 94.2 | 94.2 | 78.8 | 78.8 | 50.0 | 50.0 |
+| DB-only, standard name | 63.3 | 63.3 | 100.0 | 100.0 | 90.0 | 90.0 | 73.3 | 73.3 |
+| DB-only, renamed | 46.3 | 46.3 | 95.1 | 95.1 | 82.9 | 82.9 | 63.4 | 63.4 |
+| DB-only, new word | 13.6 | 13.6 | 95.5 | 95.5 | 95.5 | 95.5 | 77.3 | 77.3 |
+
+| retrieval outcome (n) | Instruct base: retrieved | SFT + record (trained on the oracle record): retrieved | SFT + record, ambiguous DB: retrieved |
+|---|---|---|---|
+| retriever hit (1172) | 58.2 | 90.3 | 87.5 |
+| retriever missed (7) | 0.0 | 28.6 | 14.3 |
+
+**Table 43.4: three seeds (LoRA init and data order) of the section 38 SFT arms: per-seed accuracy and mean +- sd (accuracy %; the DB-only groups from the per-item files)**
+
+| arm | measure | seed 0 | seed 1 | seed 2 | mean +- sd |
+|---|---|---|---|---|---|
+| SFT, no DB | all items | 57.1 | 61.7 | 62.8 | 60.5 +- 3.0 |
+| SFT, no DB | seen merchant | 60.3 | 64.6 | 66 | 63.6 +- 3.0 |
+| SFT, no DB | unseen merchant | 54.2 | 59 | 60 | 57.7 +- 3.1 |
+| SFT, no DB | unseen, new word | 42.9 | 42.9 | 45.7 | 43.8 +- 1.6 |
+| SFT, no DB | DB-only (no user labelled it in training) | 51.2 | 44.7 | 51.2 | 49.0 +- 3.8 |
+| SFT, no DB | DB-only, opaque | 25.0 | 19.2 | 32.7 | 25.6 +- 6.8 |
+| SFT, no DB | not in the history, labelled by other users in training | 54.9 | 62.6 | 62.2 | 59.9 +- 4.3 |
+| SFT + record in prompt | all items | 90.2 | 89.3 | 88.5 | 89.3 +- 0.9 |
+| SFT + record in prompt | seen merchant | 91.9 | 92.5 | 91.8 | 92.1 +- 0.4 |
+| SFT + record in prompt | unseen merchant | 88.5 | 86.5 | 85.5 | 86.8 +- 1.5 |
+| SFT + record in prompt | unseen, new word | 92.1 | 83.6 | 89.3 | 88.3 +- 4.3 |
+| SFT + record in prompt | DB-only (no user labelled it in training) | 97.6 | 87.0 | 89.4 | 91.3 +- 5.6 |
+| SFT + record in prompt | DB-only, opaque | 94.2 | 94.2 | 88.5 | 92.3 +- 3.3 |
+| SFT + record in prompt | not in the history, labelled by other users in training | 86.3 | 86.3 | 84.5 | 85.7 +- 1.0 |
+| SFT + parametric DB, 400 steps at 50% | all items | 66.3 | 63.5 | 61.7 | 63.8 +- 2.3 |
+| SFT + parametric DB, 400 steps at 50% | seen merchant | 66.7 | 65.8 | 67.3 | 66.6 +- 0.8 |
+| SFT + parametric DB, 400 steps at 50% | unseen merchant | 66 | 61.5 | 56.6 | 61.4 +- 4.7 |
+| SFT + parametric DB, 400 steps at 50% | unseen, new word | 60 | 51.4 | 30.7 | 47.4 +- 15.1 |
+| SFT + parametric DB, 400 steps at 50% | DB-only (no user labelled it in training) | 72.4 | 57.7 | 48.0 | 59.4 +- 12.3 |
+| SFT + parametric DB, 400 steps at 50% | DB-only, opaque | 53.8 | 26.9 | 11.5 | 30.7 +- 21.4 |
+| SFT + parametric DB, 400 steps at 50% | not in the history, labelled by other users in training | 64.4 | 62.4 | 58.8 | 61.9 +- 2.8 |
+
+none: training minutes per seed 17.7, 18.0, 17.9
+
+ret: training minutes per seed 18.2, 18.4, 18.4
+
+param_x2: training minutes per seed 33.3, 33.7, 33.7
+
+### 43.1 Ambiguous records cost the record-in-prompt categoriser 3 points overall and 9 on the merchants only the DB knows, once it is trained on them; the untrained readers lose 6 to 9
+
+Table 43.1. With the ambiguous DB in place of the disjoint one, the same users and items, the record-in-prompt categoriser trained on the ambiguous records reads 87.4 overall against 90.2, 84.8 on unseen merchants against 88.5, and 88.6 on the DB-only merchants against 97.6: 95.8 on the DB-only known chains (100 before) and 78.8 on the DB-only opaque merchants (94.2 before), where the record is the only source. The coined-name cells hold (unseen new word 85.0 against 92.1; DB-only new word 95.5 in both). The section 38 adapter, trained on the disjoint records and handed the ambiguous ones, reads 82.6 / 79.5 / 78.0 (DB-only opaque 61.5): a model that learned "the products name the category" loses 17 points on the opaque DB-only merchants when they no longer do, and retraining on the ambiguous records recovers 11 of them. The untrained readers lose more: the instruct base with the ambiguous record 48.7 against 58.0 (DB-only opaque 15.4 against 44.2, below its no-record 31.2 on the whole set), the tuned bge encoder with the record on the query 77.9 against 83.7 (DB-only 50.4 against 70.7, opaque 28.8 against 50.0). Table 43.1b reads the ambiguous records by stratum on the unseen merchants: for the retrained categoriser 85.4 on records with no off-pool product, 81.0 with one, 97.3 with two (37 items) and 87.1 on the multi-category merchants, so the loss is not concentrated on the most ambiguous records but spread, as a weaker prior over every record; for the instruct base the strata read 53.9 / 42.7 / 16.2 / 40.9, the loss in proportion to the ambiguity, which is the section 35 pattern (the untrained model reads the products literally). The parametric arm follows the same pattern at its own level: the 400-step run with the ambiguous records mixed in at 50% reads 64.0 overall against 66.3, 60.6 on unseen merchants against 66.0 and 65.0 on the DB-only merchants against 72.4, the loss again on the opaque ones (34.6 against 53.8; known chains 87.3 against 85.9), at the same general-ability cost (ARC-Easy 65.5 against 67.0 and the instruct base's 72.5; MMLU 49.0 against 52.0 and 50.0). Over the untrained base's DB-only reading (43.1 with the ambiguous record, 48.8 with the disjoint one), the records injected into the weights buy about half of what the same records buy in the prompt (22 against 46 points ambiguous, 24 against 49 disjoint), the ratio of section 38.
+
+### 43.2 The retriever: 99 from the raw statement string at 240 records, 93 against 5,000 decoys, the misses are truncated names with a near twin
+
+Table 43.2. Zero-shot MiniLM finds the merchant's own record from the raw statement string at recall@1 79.1 (87.3 at 5): 90.9 when the full name survives in the string and 44.3 when the string carries a truncated or vowel-stripped name (298 of the 1,179 strings), and the normaliser adds 8 points (86.8) by removing the processor prefix and the city. Tuned on the DB's own renderings it reads 99.4 at 1 and 100 at 5, 97.7 on the truncated and abbreviated strings, the same on the known chains and the opaque names (99.2 / 99.6) and on the DB-only merchants (99.2). The seven misses are all collisions the string cannot resolve: `FALVARRO* 2843` against Falvarro Ltd, Falvarro Bros and Falvarro LLC (the gold at rank 2), `POS ISTMR GRP 5750` against Istmoor and Istmere Group, `EXXN*8169` against Expedia, `HLTN*9382` against Halton, `TPGLF*9463` against T-Mobile; `POS AMTRK 2807` is the one string whose gold is outside the top 3. With 5,000 decoys in the index the tuned retriever reads 92.9 at 1 and 98.6 at 5: 99.5 when the full name is in the string, 73.2 when it is truncated or abbreviated (94.3 at 5), 95.7 on the known chains against 89.5 on the opaque names, whose truncations now have opaque twins in the decoy set; the zero-shot encoder falls to 49.4 (16.1 on truncated names). The normaliser helps the zero-shot encoder at both sizes and no longer helps the tuned one (90.9 against 92.9 with decoys): the tuned encoder learned the prefixes and cities itself, and normalising a truncated name discards the digits that separated the twins.
+
+### 43.3 End to end: the retrieved record equals the oracle record within 0.3 points on every cell
+
+Table 43.3. With the tuned retriever's top-1 record in the prompt instead of the record found by the merchant's name, the instruct base reads 57.8 against 58.0, the section 38 record-in-prompt categoriser 89.9 against 90.2 (unseen 88.4 against 88.5, DB-only 97.6 in both), the ambiguous-DB categoriser 87.1 against 87.4, and the tuned encoder with the record on its query 83.5 against 83.7; the DB-only rows are identical because the retriever missed none of those merchants' strings. The seven items whose retrieval missed read 0 / 28.6 / 14.3 (base / the two categorisers) against 58.2 / 90.3 / 87.5 on the 1,172 hits: a wrong record is a wrong answer, and a retriever at 99.4 makes that the smaller correction of this step. At the 5,000-decoy size the same retriever would miss about 7% of the strings (27% of the truncated ones), which by the per-hit numbers would cost the categoriser about 6 points overall; that condition (the categoriser fed the decoy-index retrieval) was not scored.
+
+### 43.4 Seeds: the record-in-prompt arm is stable, the no-DB arm varies by 3, and the parametric arm's DB-only gain was one seed
+
+Table 43.4. Over three seeds of LoRA initialisation and data order, the SFT arm without a DB reads 57.1 / 61.7 / 62.8 (60.5 +- 3.0; section 38's seed 0 was the lowest), the record-in-prompt arm 90.2 / 89.3 / 88.5 (89.3 +- 0.9) with 91.3 +- 5.6 on the DB-only merchants and 92.3 +- 3.3 on the opaque ones among them, and the 400-step parametric arm 66.3 / 63.5 / 61.7 (63.8 +- 2.3) overall but 72.4 / 57.7 / 48.0 on the DB-only merchants (59.4 +- 12.3) and 53.8 / 26.9 / 11.5 on the opaque DB-only merchants (30.7 +- 21.4), with the unseen coined-name cell at 60.0 / 51.4 / 30.7. Section 38 read the parametric injection's gain on the merchants only the DB knows as +21 over the no-DB arm (51.2 to 72.4) and +29 on the opaque ones (25.0 to 53.8); on the seed means the gains are +10 (49.0 to 59.4) and +5 (25.6 to 30.7), inside one standard deviation of the parametric arm on both, while the record in the prompt adds +42 and +67 at a spread of 3 to 6. The three parametric seeds were trained on the same 3,239 DB sequences at the same loss (0.25 to 0.27 at the end), so what varies is not how well the records were fitted but whether the fitted records are reachable from the categorisation prompt, which is the section 8 and 14 finding again (stored is not usable) at the seed level. The overall gap between the parametric and the no-DB arm (63.8 against 60.5) is within their spreads as well. On the seen merchants and on the merchants other users labelled every arm is stable to 1 to 4 points.
+
+### 43.5 What the step says
+
+REAL-7 asked whether section 38's record-in-prompt number survives ambiguous records, a learned retriever and more seeds. It does, at a discount that is now measured. Ambiguous records (133 of 240 with a product from outside the category's pool, 48 multi-category merchants) cost the categoriser trained on them 3 points overall (87.4) and 9 on the merchants only the DB knows (88.6), the loss on the opaque merchants (94 to 79) and none on the coined-name cells; a categoriser trained on clean records and handed ambiguous ones loses twice that, and an untrained reader loses in proportion to the ambiguity. The name oracle costs nothing to remove: a MiniLM retriever tuned on templated renderings of the DB's own names, with no user label, finds the record from the raw statement string at 99.4 over 240 records and the categoriser reads the same numbers with the retrieved record as with the oracle; against 5,000 decoy records the same retriever reads 92.9 (73 on truncated names), so the retrieval side of a production DB is a hard-negative problem on truncated twins, not a categorisation problem. Three seeds leave the record-in-prompt result where it was (89.3 +- 0.9; DB-only 91 +- 6) and remove section 38's parametric claim: the +21 on DB-only merchants was the best of three seeds whose mean gain is +10 +- 12, and on the opaque merchants +5 +- 21, so at this exposure the injected records are not reliably usable from the prompt, which section 38 already flagged as exposure-limited and row 39's exposure curve should now read at three seeds. For the owner's goal the ranking is unchanged and better founded: record in the prompt through a tuned retriever (89 to 90 overall, 87 to 89 with ambiguous records), then other users' labels (84 to 86), then the records in the weights (59 +- 12 on the merchants that need them). Not run: the categoriser fed the decoy-index retrieval (the per-hit numbers put it at about 6 points below the oracle); seeds of the ambiguous-DB runs; a retriever tuned with the twins as hard negatives or on bge; the exposure curve at three seeds (row 39). Cost: about 10 GPU hours over two nights (the chain was stopped once by the owner between steps and resumed from `scripts/chains/chain_r37.sh`).
