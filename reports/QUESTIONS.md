@@ -978,3 +978,59 @@ a small item set of merchants in no database and no history: descriptive names (
 kind the name and the user's shots should give, and opaque ones as the floor; statement strings in the generator's renderings,
 labels in each user's scheme; scored for the no-DB, episode and record arms (the record arms with no record for these merchants).
 
+
+## Research agenda, 2026-09-26 (the owner's framing)
+
+The owner: the aim is to understand the science and mechanics, not to tune a product metric. Three questions lead, and every
+row from here states which it serves. Product use only weights the metrics: auto-file extremely confident predictions (typically a
+merchant the user has filed consistently before), suggest options for the rest. Every run reports one scorecard (EVAL-9): top-1,
+top-3, MRR, calibrated uncertainty in bits, coverage at 98% precision; against a baseline ladder (uniform, the user's usage prior,
+the user's merchant lookup, other users' labels) and a strong-reader ceiling (a blind Opus pass on a sample); held-out users,
+user-resampled intervals, paired one-factor variants.
+
+- **Q1, LLMs and encoders as multiple-choice categorisers.** Answered so far: the option rule (48.4), calibration (50), per-user
+  encoders (46). Open: option order (EVAL-8, row 50), the readout (names, letters, generation), the encoder option scorer
+  (MODEL-6, row 53), diffusion slot reads (MODEL-7, rows 54, 55), where in the network the decision forms (MODEL-8, row 67),
+  many-way behaviour on real labels (POI-1, row 65).
+- **Q2, the best way to inject knowledge.** Answered so far: prose records weak, the record in the prompt strong (38, 43, 45),
+  the database as supervised decisions strong and equal to the record at equal information (53, 55), and it helps on merchants
+  outside it (row 62). Open: capacity (REAL-17, row 59), real-database episodes with held-out places (REAL-21, row 66),
+  what the weights store (MODEL-8, row 67), combining episodes and retrieval, the collaborative record (REAL-12, row 44).
+- **Q3, inferring meaningless category names.** Answered so far: from training examples the models memorise users' coined names
+  and rename augmentation fixes most of it (51); from prompt examples the information is there (blind Opus 88% on coined names,
+  clean strings) and the 3B model reaches 42 to 55 (row 62). Open: the controlled label-induction set (REAL-20, row 64), novel
+  words at test (REAL-18, row 61), model size, example selection (REAL-9 follow-up, row 46), schemes over real categories (POI-1).
+
+**EVAL-9 One scorecard for every run.** Top-1 accuracy undersells a suggestion interface and uniform chance is the wrong
+baseline: on the novel merchants the episode model's top-1 is 57 but its top-3 74 (usage prior 28, uniform 24), and its raw
+probabilities leave as much uncertainty as uniform guessing (3.76 bits against 3.72) because it is confidently wrong often.
+*Task (CPU):* `ai_experiments.scorecard` over the saved per-option scores: top-1 / top-3 / MRR; log-loss and Brier in bits after
+the leave-users-out temperature of section 50; coverage at 95% and 98% precision with the threshold from other users; each
+against uniform, the user's usage prior, the user's merchant lookup and other users' labels, with skill = the share of the headroom
+over the best of those the model captures; per-item chance normalisation for the number of categories. Re-read every REAL-6 and
+novel-merchant run with it.
+
+**REAL-20 Label induction: when can a model infer what a meaningless category name means from the user's examples?**
+Blind Opus solves the novel merchants' coined names at 88% from clean strings; the 3B categorisers at 42 to 55. *Experiment
+(scoring only):* a controlled item set on clean renderings, each factor varied with the others fixed and paired items: examples of
+the gold coined category in the prompt (0, 1, 2, 4, 8); the examples' kind (same kind of business as the query, same standard
+category but another kind, only opaque merchants); the number of coined categories in the scheme; decoys (a same-kind business filed
+under another name); scored for the untrained and trained models, model sizes (3B, 7B; 14B on Modal) and a blind Opus sample.
+Says whether the models copy the nearest example's label or induce the word's meaning.
+
+**POI-1 Categorisation of real places at scale.** Overture places (81.5M, 288 basic categories and a finer taxonomy, per-row
+licences) as a labelled benchmark: many-way multiple choice on real labels (Q1), synthetic users whose schemes merge, rename and
+coin Overture's categories over real places (Q3), and a knowledge-injection testbed at real scale with places held out (Q2).
+*Experiment:* frozen sets from a sampled, category-stratified slice (US first): the plain task at 10 / 50 / all basic categories;
+user schemes built as REAL-6's are (merge, split, rename, coin) but over Overture's categories; held-out places and held-out users;
+renderings obscure / full / clean; the scorecard of EVAL-9.
+
+**REAL-21 Does a database taught as decisions teach facts or a skill?** Database episodes built from real places (Overture),
+scored on places in the injected database and on places held out of it, same categories: the first measures stored facts, the
+second the general "this kind of business goes in this kind of category" skill that row 62's +5 on merchants outside the database
+suggests; capacity against the held-out gain.
+
+**MODEL-8 Where the categoriser's decision forms, and what the weights store.** Linear probes on the query's and the merchant
+name's hidden states across layers (section 40's method): whether the standard category, the user's label and the business kind are
+linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its
+name's representation after injection.
