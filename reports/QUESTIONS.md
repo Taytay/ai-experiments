@@ -1068,3 +1068,16 @@ multiple-choice symbol binding). The question is whether the family matters once
 **MODEL-11 Does a larger fine-tuned decoder close the gap to each set's ceiling?** Every trained categoriser so far is the 3B. REAL-6's
 ceiling is about 94 (section 48; the split categories are a coin flip); POI-1's is bracketed by blind Opus (56) and the kind-lookup
 hybrid (80). *Experiment (row 70):* the three best 3B recipes at 7B and 14B, fold 0 first.
+
+**MODEL-12 How many associative hops can a model follow in one pass, and do thinking steps raise the limit for an encoder?** The
+owner (2026-09-26): given "foo = bar", "bar = baz", "baz = flibbert", ... in the prompt, how far along the chain can a model answer
+what foo equals, for single-token and multi-token names, encoders against decoders? Theory: one forward pass of a fixed-depth
+transformer does a bounded number of serial steps; k-hop lookup ("k-hop induction heads") can be done in about log k layers by
+pointer doubling and needs depth growing with k (Sanford, Hsu and Telgarsky 2024); a chain of thought adds one serial step per
+generated token, so constant-depth decoders with CoT solve serial problems they cannot without it (Li, Liu, Zhou and Ma, ICLR 2024;
+Merrill and Sabharwal, ICLR 2024). Empirically RULER's variable-tracking task (Hsieh et al. 2024) is this chain in long context and
+degrades with hops; latent two-hop over facts stored in weights mostly fails without CoT (the "two-hop curse", Balesni et al. 2024;
+Yang et al. 2024), though in-context hops are easier. For encoders the analogues of thinking are extra computation positions
+(pause tokens, Goyal et al. ICLR 2024), looping the network (looped transformers, Saunshi et al. ICLR 2025), and iterative unmasking
+(masked diffusion LMs, MODEL-7). Our categoriser decisions are short hops (query -> similar example -> its label -> option), and
+section 63's single-mask failure may be a hop limit. *Experiment (row 71).*
