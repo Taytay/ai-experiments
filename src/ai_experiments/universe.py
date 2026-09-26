@@ -59,12 +59,27 @@ def _name(rng, names, t=None, morph_p=0.0, marked=None):
             names.add(n); return n, m
 
 
+_MID = ["a", "e", "i", "o", "u", "ar", "el", "in", "or", "ul", "an", "es", "ir", "ol", "um", "ax", "en", "iv", "os", "ur"]
+
+
+def _name3(rng, names):
+    """Three-part names (A + middle + B, 17,280 combinations) for the large universes of PLAN step 18 (REAL-3); the two-part
+    space has 864 combinations and cannot hold 1,000 species."""
+    while True:
+        n = rng.choice(_A) + rng.choice(_MID) + rng.choice(_B)
+        if n not in names:
+            names.add(n); return n, False
+
+
 def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0):
+    """n_per_type=20 is the 160-species universe of every section; larger universes (REAL-3: 125 and 625 per type) use
+    three-part names because the two-part name space is 864, and are otherwise drawn the same way."""
     rng = random.Random(seed)
     names, species = set(), []
+    three = n_per_type * len(TYPE_LIST) > 600
     for t in TYPE_LIST:
         for i in range(n_per_type):
-            n, _ = _name(rng, names, t, morph_p)
+            n, _ = _name3(rng, names) if three else _name(rng, names, t, morph_p)
             species.append(dict(name=n, type=t, weakness=WEAKNESS[t], habitat=rng.choice(HABITATS),
                                 diet=rng.choice(DIETS), region=rng.choice(REGIONS), stage=rng.randint(1, 3),
                                 heldout=(i < holdout_per_type)))

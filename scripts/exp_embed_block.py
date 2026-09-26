@@ -8,6 +8,8 @@ Encoders (all through sentence-transformers, so each one's own pooling and norma
   minilm   sentence-transformers/all-MiniLM-L6-v2   22M, 384-d, mean pooling, UNCASED WordPiece (the section 4/6 encoder)
   bge      BAAI/bge-base-en-v1.5                     109M, 768-d, CLS pooling, UNCASED WordPiece (the survey called it cased; it lower-cases)
   qwen3    Qwen/Qwen3-Embedding-0.6B                 596M, 1024-d, last-token pooling, CASED Qwen BPE ("Elrholm" and "ELRHOLM" share no token)
+  egemma   google/embeddinggemma-300m                308M, 768-d, mean pooling + dense layers, CASED Gemma SentencePiece (added later, gated)
+  gtemb    Alibaba-NLP/gte-modernbert-base           149M, 768-d, CLS pooling, ModernBERT BPE (cased), 8k context (added later)
 
 PART universe (MODEL-3, BASE-4): contrastive name -> attribute-text training exactly as exp_universe_embed.py
   (8 epochs, in-batch negatives, same-positive masking), frozen and trained encoder each scored on
@@ -52,16 +54,26 @@ from ai_experiments import universe as U
 from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import ROOT
 
-ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5", "qwen3": "Qwen/Qwen3-Embedding-0.6B"}
+ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-base-en-v1.5", "qwen3": "Qwen/Qwen3-Embedding-0.6B",
+            "egemma": "google/embeddinggemma-300m", "gtemb": "Alibaba-NLP/gte-modernbert-base"}  # both added after section 24 (owner's request; MODEL-3's list)
 ENC = sys.argv[1] if len(sys.argv) > 1 else "minilm"
 PART = sys.argv[2] if len(sys.argv) > 2 else "all"
 MODEL = ENCODERS[ENC]
 SMOKE = bool(os.environ.get("SMOKE"))
-LR = {"minilm": 3e-5, "bge": 3e-5, "qwen3": 1e-5}[ENC]
+RUN_TAG = os.environ.get("RUN_TAG", "")
+LR = {"minilm": 3e-5, "bge": 3e-5, "qwen3": 1e-5, "egemma": 2e-5, "gtemb": 3e-5}[ENC]
 BS, SEED = 32, 0
 EPOCHS_U, EPOCHS_M, EPOCHS_K = (2, 2, 2) if SMOKE else (8, 6, 6)
 TRIALS, SPLITS = (20, 2) if SMOKE else (300, 10)
-OUT = ROOT / "results" / f"embed_block_{ENC}{'_smoke' if SMOKE else ''}.json"
+OUT = ROOT / "results" / f"embed_block_{ENC}{'_' + RUN_TAG if RUN_TAG else ''}{'_smoke' if SMOKE else ''}.json"
+SAVE_DIR = ROOT / ("models/smoke" if SMOKE else "models/adapters")
+
+
+def save_encoder(model, name):
+    """Every trained encoder is kept (owner's rule), in bf16, under models/adapters/embed_<enc>_<name> (DVC)."""
+    d = SAVE_DIR / f"embed_{ENC}_{name}"
+    model[0].auto_model.to(torch.bfloat16); model.save(str(d)); model[0].auto_model.to(torch.float32)
+    print(f"    saved {d.relative_to(ROOT)}", flush=True)
 PER_ITEM = ROOT / "results" / "per_item"
 torch.manual_seed(SEED)
 rng = random.Random(SEED)
@@ -138,7 +150,7 @@ def save(run, cond, r):
 
 
 def write_per_item(cond, recs):
-    p = PER_ITEM / f"embed_block_{ENC}{'_smoke' if SMOKE else ''}.{cond}.jsonl"
+    p = PER_ITEM / f"embed_block_{ENC}{'_' + RUN_TAG if RUN_TAG else ''}{'_smoke' if SMOKE else ''}.{cond}.jsonl"  # the tag, so a re-run does not overwrite section 24's records
     p.parent.mkdir(exist_ok=True)
     with p.open("w", encoding="utf-8") as f:
         for r in recs:
@@ -255,6 +267,7 @@ def part_universe(run):
     for cond in ("frozen", "trained"):
         if cond == "trained":
             train_pairs(model, universe_pairs(), EPOCHS_U, log="universe: ")
+            save_encoder(model, "universe_trained")
         r = {}
         r.update({f"ladder_{k}": v for k, v in score_ladder(model, f"universe_{cond}").items()})
         r.update(score_universe_protocol(model))
@@ -348,7 +361,7 @@ def mosaic_mlm(model, new_ids, alpha=0.3, p_mask=0.15, mask_id=None):
 
 def part_merchant(run):
     names = [m["name"] for m in all_m]
-    conds = ["zero_shot", "ft_subword", "ft_newtok_mean", "ft_newtok_gauss", "ft_newtok_warm"] + (["ft_newtok_mosaic"] if ENC != "qwen3" else ["ft_newtok_tied"])
+    conds = ["zero_shot", "ft_subword", "ft_newtok_mean", "ft_newtok_gauss", "ft_newtok_warm"] + (["ft_newtok_mosaic"] if ENC in ("minilm", "bge") else ["ft_newtok_tied"])
     for cond in conds:
         model = load_encoder()
         if cond != "zero_shot":
@@ -379,6 +392,8 @@ def part_merchant(run):
                 w = model[0].auto_model.get_input_embeddings().weight
                 with torch.no_grad(): w[upper] = w[ids]
         r = score_merchant(model)
+        if cond != "zero_shot":
+            save_encoder(model, f"merchant_{cond}")
         if cond.startswith("ft_newtok"):
             tok = model.tokenizer
             r["bank_hits_new_token"] = round(100 * sum(any(i in ids + (upper if cond == "ft_newtok_tied" else []) for i in tok(M.bank_string(m), add_special_tokens=False)["input_ids"]) for m in all_m) / len(all_m), 1)
@@ -447,16 +462,18 @@ def part_kge(run):
     model.eval()
     print(f"    kge: trained {EPOCHS_K} epochs in {time.time() - t0:.0f}s, final loss {float(loss):.3f}", flush=True)
     save(run, "kge_distmult", score_after(model, {k: v.detach() for k, v in rel.items()}))
+    save_encoder(model, "kge_distmult"); torch.save({k: v.detach().cpu() for k, v in rel.items()}, SAVE_DIR / f"embed_{ENC}_kge_distmult" / "relations.pt")
     del model; torch.cuda.empty_cache()
     # (b) relation-free control: the same triples as (head text, tail text) contrastive pairs
     model = load_encoder()
     train_pairs(model, [(h, t) for h, _, t in triples], EPOCHS_K, log="kge control (pairs): ")
     save(run, "kge_pairs_control", score_after(model))
+    save_encoder(model, "kge_pairs_control")
     del model; torch.cuda.empty_cache()
 
 
 # ================================================================== main
-cfg = dict(encoder=ENC, part=PART, lr=LR, bs=BS, seed=SEED, epochs_universe=EPOCHS_U, epochs_merchant=EPOCHS_M, epochs_kge=EPOCHS_K,
+cfg = dict(encoder=ENC, part=PART, run_tag=RUN_TAG, lr=LR, bs=BS, seed=SEED, epochs_universe=EPOCHS_U, epochs_merchant=EPOCHS_M, epochs_kge=EPOCHS_K,
            trials=TRIALS, splits=SPLITS, smoke=SMOKE, n_species=len(species), n_heldout_species=len(held), n_merchants=len(all_m),
            n_heldout_merchants=len(held_m), **FROZEN.config())
 with Run("embed_block", model=MODEL, config=cfg, enabled=not SMOKE) as run:

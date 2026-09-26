@@ -1,0 +1,1739 @@
+{
+ "name": "heldout_induction",
+ "version": "v1",
+ "morph_p": 0.0,
+ "n_items": 96,
+ "n_species": 1000,
+ "species_sha256": "fc6827b085f8d43a85487d232c686ada66216db08922cb8ac2b39b751c2a0fe5",
+ "sha256": "84420c151d865e23e2d2e386a9cc77a1c41b1f433e5911ed0542273810949789",
+ "items": [
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gribesarn 'FooFoo' and his Radoent 'blammo' and his Falulott 'grix'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " blammo",
+    " grix"
+   ],
+   "answer": 2,
+   "query": "Gorurrock",
+   "demos": [
+    "Gribesarn",
+    "Radoent",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gribesarn 'FooFoo' and his Radoent 'blammo' and his Falulott 'grix'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "id": "L3_induct_heldout:000"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'plib' and his Ulkanash 'blammo' and his Gorurrock 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " plib",
+    " blammo",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Ulkuble",
+   "demos": [
+    "Wexaxump",
+    "Ulkanash",
+    "Gorurrock"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'plib' and his Ulkanash 'blammo' and his Gorurrock 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:001"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falulott 'tandle' and his Gorinarn 'FooFoo' and his Pexeble 'plib'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "options": [
+    " tandle",
+    " FooFoo",
+    " plib"
+   ],
+   "answer": 2,
+   "query": "Ulkarrock",
+   "demos": [
+    "Falulott",
+    "Gorinarn",
+    "Pexeble"
+   ],
+   "prompt_ctx": "Field guide:\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falulott 'tandle' and his Gorinarn 'FooFoo' and his Pexeble 'plib'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "id": "L3_induct_heldout:002"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'grix' and his Lumolath 'blammo' and his Nixuath 'dabble'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "options": [
+    " grix",
+    " blammo",
+    " dabble"
+   ],
+   "answer": 0,
+   "query": "Velenome",
+   "demos": [
+    "Radaxash",
+    "Lumolath",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'grix' and his Lumolath 'blammo' and his Nixuath 'dabble'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "id": "L3_induct_heldout:003"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gribesarn 'blammo' and his Dololrock 'FooFoo' and his Radaxash 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " blammo",
+    " FooFoo",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Ulkuble",
+   "demos": [
+    "Gribesarn",
+    "Dololrock",
+    "Radaxash"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gribesarn 'blammo' and his Dololrock 'FooFoo' and his Radaxash 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:004"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Morarump 'snerk' and his Radaxash 'dabble' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "options": [
+    " snerk",
+    " dabble",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Ulkanash",
+   "demos": [
+    "Morarump",
+    "Radaxash",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Morarump 'snerk' and his Radaxash 'dabble' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "id": "L3_induct_heldout:005"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Morarump 'wumbo' and his Skaloent 'dabble' and his Gribesarn 'blammo'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "options": [
+    " wumbo",
+    " dabble",
+    " blammo"
+   ],
+   "answer": 0,
+   "query": "Ulkanash",
+   "demos": [
+    "Morarump",
+    "Skaloent",
+    "Gribesarn"
+   ],
+   "prompt_ctx": "Field guide:\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Morarump 'wumbo' and his Skaloent 'dabble' and his Gribesarn 'blammo'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "id": "L3_induct_heldout:006"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'FooFoo' and his Lumolath 'blammo' and his Ulkarrock 'snerk'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " blammo",
+    " snerk"
+   ],
+   "answer": 2,
+   "query": "Falorott",
+   "demos": [
+    "Ekkumsup",
+    "Lumolath",
+    "Ulkarrock"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'FooFoo' and his Lumolath 'blammo' and his Ulkarrock 'snerk'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:007"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Morarump 'dabble' and his Dololrock 'wumbo' and his Falorott 'blammo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " dabble",
+    " wumbo",
+    " blammo"
+   ],
+   "answer": 1,
+   "query": "Ulkuble",
+   "demos": [
+    "Morarump",
+    "Dololrock",
+    "Falorott"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Morarump 'dabble' and his Dololrock 'wumbo' and his Falorott 'blammo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:008"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'snerk' and his Gorinarn 'FooFoo' and his Lumolath 'wumbo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "options": [
+    " snerk",
+    " FooFoo",
+    " wumbo"
+   ],
+   "answer": 0,
+   "query": "Radaxash",
+   "demos": [
+    "Draosish",
+    "Gorinarn",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'snerk' and his Gorinarn 'FooFoo' and his Lumolath 'wumbo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "id": "L3_induct_heldout:009"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'zorp' and his Ithanine 'quix' and his Radolurn 'plib'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "options": [
+    " zorp",
+    " quix",
+    " plib"
+   ],
+   "answer": 0,
+   "query": "Dololrock",
+   "demos": [
+    "Ulkuble",
+    "Ithanine",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'zorp' and his Ithanine 'quix' and his Radolurn 'plib'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "id": "L3_induct_heldout:010"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falorott 'zorp' and his Draosish 'plib' and his Ekkumsup 'dabble'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " zorp",
+    " plib",
+    " dabble"
+   ],
+   "answer": 2,
+   "query": "Skaloent",
+   "demos": [
+    "Falorott",
+    "Draosish",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falorott 'zorp' and his Draosish 'plib' and his Ekkumsup 'dabble'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:011"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'zorp' and his Nixuath 'tandle' and his Wexaxump 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " zorp",
+    " tandle",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Ithanine",
+   "demos": [
+    "Lumolath",
+    "Nixuath",
+    "Wexaxump"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'zorp' and his Nixuath 'tandle' and his Wexaxump 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:012"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'zorp' and his Skaloent 'plib' and his Ulkuble 'snerk'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "options": [
+    " zorp",
+    " plib",
+    " snerk"
+   ],
+   "answer": 0,
+   "query": "Velenome",
+   "demos": [
+    "Radaxash",
+    "Skaloent",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'zorp' and his Skaloent 'plib' and his Ulkuble 'snerk'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "id": "L3_induct_heldout:013"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Krooent 'grix' and his Ulkarrock 'plib' and his Gorinarn 'tandle'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " grix",
+    " plib",
+    " tandle"
+   ],
+   "answer": 1,
+   "query": "Falorott",
+   "demos": [
+    "Krooent",
+    "Ulkarrock",
+    "Gorinarn"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Krooent 'grix' and his Ulkarrock 'plib' and his Gorinarn 'tandle'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:014"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'quix' and his Ithanine 'wumbo' and his Ulkanash 'zorp'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " quix",
+    " wumbo",
+    " zorp"
+   ],
+   "answer": 0,
+   "query": "Ulkuble",
+   "demos": [
+    "Wexaxump",
+    "Ithanine",
+    "Ulkanash"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'quix' and his Ithanine 'wumbo' and his Ulkanash 'zorp'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:015"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Dololrock 'grix' and his Velenome 'blammo' and his Nixuath 'snerk'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " grix",
+    " blammo",
+    " snerk"
+   ],
+   "answer": 0,
+   "query": "Ulkuble",
+   "demos": [
+    "Dololrock",
+    "Velenome",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Dololrock 'grix' and his Velenome 'blammo' and his Nixuath 'snerk'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:016"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'snerk' and his Gorinarn 'tandle' and his Krooent 'wumbo'. Following the same rule, how is he likely to label his Ekkanish?\nAnswer:",
+   "options": [
+    " snerk",
+    " tandle",
+    " wumbo"
+   ],
+   "answer": 1,
+   "query": "Ekkanish",
+   "demos": [
+    "Radolurn",
+    "Gorinarn",
+    "Krooent"
+   ],
+   "prompt_ctx": "Field guide:\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'snerk' and his Gorinarn 'tandle' and his Krooent 'wumbo'. Following the same rule, how is he likely to label his Ekkanish?\nAnswer:",
+   "id": "L3_induct_heldout:017"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'zorp' and his Ekkumsup 'blammo' and his Ulkuble 'snerk'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " zorp",
+    " blammo",
+    " snerk"
+   ],
+   "answer": 2,
+   "query": "Wexaxump",
+   "demos": [
+    "Ulkanash",
+    "Ekkumsup",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'zorp' and his Ekkumsup 'blammo' and his Ulkuble 'snerk'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:018"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Dololrock 'snerk' and his Ithanine 'zorp' and his Radaxash 'FooFoo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " snerk",
+    " zorp",
+    " FooFoo"
+   ],
+   "answer": 0,
+   "query": "Ulkuble",
+   "demos": [
+    "Dololrock",
+    "Ithanine",
+    "Radaxash"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Dololrock 'snerk' and his Ithanine 'zorp' and his Radaxash 'FooFoo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:019"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'quix' and his Nixuath 'grix' and his Skaloent 'snerk'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "options": [
+    " quix",
+    " grix",
+    " snerk"
+   ],
+   "answer": 0,
+   "query": "Gorinarn",
+   "demos": [
+    "Ekkanish",
+    "Nixuath",
+    "Skaloent"
+   ],
+   "prompt_ctx": "Field guide:\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'quix' and his Nixuath 'grix' and his Skaloent 'snerk'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "id": "L3_induct_heldout:020"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkarrock 'quix' and his Ekkanish 'grix' and his Nixuath 'wumbo'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " quix",
+    " grix",
+    " wumbo"
+   ],
+   "answer": 0,
+   "query": "Falorott",
+   "demos": [
+    "Ulkarrock",
+    "Ekkanish",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkarrock 'quix' and his Ekkanish 'grix' and his Nixuath 'wumbo'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:021"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'tandle' and his Ekkumsup 'snerk' and his Ithanine 'wumbo'. Following the same rule, how is he likely to label his Morarump?\nAnswer:",
+   "options": [
+    " tandle",
+    " snerk",
+    " wumbo"
+   ],
+   "answer": 0,
+   "query": "Morarump",
+   "demos": [
+    "Ulkanash",
+    "Ekkumsup",
+    "Ithanine"
+   ],
+   "prompt_ctx": "Field guide:\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'tandle' and his Ekkumsup 'snerk' and his Ithanine 'wumbo'. Following the same rule, how is he likely to label his Morarump?\nAnswer:",
+   "id": "L3_induct_heldout:022"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'quix' and his Ulkanash 'snerk' and his Lumolath 'tandle'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "options": [
+    " quix",
+    " snerk",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Radoent",
+   "demos": [
+    "Ithanine",
+    "Ulkanash",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'quix' and his Ulkanash 'snerk' and his Lumolath 'tandle'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "id": "L3_induct_heldout:023"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'blammo' and his Pexeble 'tandle' and his Krooent 'plib'. Following the same rule, how is he likely to label his Gribesarn?\nAnswer:",
+   "options": [
+    " blammo",
+    " tandle",
+    " plib"
+   ],
+   "answer": 0,
+   "query": "Gribesarn",
+   "demos": [
+    "Ekkanish",
+    "Pexeble",
+    "Krooent"
+   ],
+   "prompt_ctx": "Field guide:\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'blammo' and his Pexeble 'tandle' and his Krooent 'plib'. Following the same rule, how is he likely to label his Gribesarn?\nAnswer:",
+   "id": "L3_induct_heldout:024"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'plib' and his Wexaxump 'wumbo' and his Ulkanash 'tandle'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "options": [
+    " plib",
+    " wumbo",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Gorinarn",
+   "demos": [
+    "Ekkanish",
+    "Wexaxump",
+    "Ulkanash"
+   ],
+   "prompt_ctx": "Field guide:\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'plib' and his Wexaxump 'wumbo' and his Ulkanash 'tandle'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "id": "L3_induct_heldout:025"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Skaloent 'tandle' and his Dololrock 'wumbo' and his Ithanine 'zorp'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "options": [
+    " tandle",
+    " wumbo",
+    " zorp"
+   ],
+   "answer": 2,
+   "query": "Radoent",
+   "demos": [
+    "Skaloent",
+    "Dololrock",
+    "Ithanine"
+   ],
+   "prompt_ctx": "Field guide:\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Skaloent 'tandle' and his Dololrock 'wumbo' and his Ithanine 'zorp'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "id": "L3_induct_heldout:026"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Skaloent 'zorp' and his Radaxash 'FooFoo' and his Pexeble 'grix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "options": [
+    " zorp",
+    " FooFoo",
+    " grix"
+   ],
+   "answer": 2,
+   "query": "Ulkarrock",
+   "demos": [
+    "Skaloent",
+    "Radaxash",
+    "Pexeble"
+   ],
+   "prompt_ctx": "Field guide:\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Skaloent 'zorp' and his Radaxash 'FooFoo' and his Pexeble 'grix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "id": "L3_induct_heldout:027"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'quix' and his Krooent 'FooFoo' and his Radoent 'dabble'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " quix",
+    " FooFoo",
+    " dabble"
+   ],
+   "answer": 0,
+   "query": "Falorott",
+   "demos": [
+    "Pexeble",
+    "Krooent",
+    "Radoent"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'quix' and his Krooent 'FooFoo' and his Radoent 'dabble'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:028"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'zorp' and his Ulkanash 'FooFoo' and his Lumolath 'snerk'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "options": [
+    " zorp",
+    " FooFoo",
+    " snerk"
+   ],
+   "answer": 2,
+   "query": "Gorurrock",
+   "demos": [
+    "Draosish",
+    "Ulkanash",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'zorp' and his Ulkanash 'FooFoo' and his Lumolath 'snerk'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "id": "L3_induct_heldout:029"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'grix' and his Velenome 'tandle' and his Radoent 'FooFoo'. Following the same rule, how is he likely to label his Radolurn?\nAnswer:",
+   "options": [
+    " grix",
+    " tandle",
+    " FooFoo"
+   ],
+   "answer": 0,
+   "query": "Radolurn",
+   "demos": [
+    "Ekkumsup",
+    "Velenome",
+    "Radoent"
+   ],
+   "prompt_ctx": "Field guide:\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'grix' and his Velenome 'tandle' and his Radoent 'FooFoo'. Following the same rule, how is he likely to label his Radolurn?\nAnswer:",
+   "id": "L3_induct_heldout:030"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'tandle' and his Radoent 'blammo' and his Lumolath 'FooFoo'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "options": [
+    " tandle",
+    " blammo",
+    " FooFoo"
+   ],
+   "answer": 2,
+   "query": "Gorurrock",
+   "demos": [
+    "Ekkumsup",
+    "Radoent",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'tandle' and his Radoent 'blammo' and his Lumolath 'FooFoo'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "id": "L3_induct_heldout:031"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Nixuath 'quix' and his Velenome 'tandle' and his Dololrock 'dabble'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "options": [
+    " quix",
+    " tandle",
+    " dabble"
+   ],
+   "answer": 1,
+   "query": "Draosish",
+   "demos": [
+    "Nixuath",
+    "Velenome",
+    "Dololrock"
+   ],
+   "prompt_ctx": "Field guide:\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Nixuath 'quix' and his Velenome 'tandle' and his Dololrock 'dabble'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "id": "L3_induct_heldout:032"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radoent 'tandle' and his Gorurrock 'grix' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " tandle",
+    " grix",
+    " quix"
+   ],
+   "answer": 2,
+   "query": "Skaloent",
+   "demos": [
+    "Radoent",
+    "Gorurrock",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radoent 'tandle' and his Gorurrock 'grix' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:033"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Gorinarn 'grix' and his Draosish 'quix'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " dabble",
+    " grix",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Lumolath",
+   "demos": [
+    "Gorurrock",
+    "Gorinarn",
+    "Draosish"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Gorinarn 'grix' and his Draosish 'quix'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:034"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Morarump 'quix' and his Skaloent 'plib' and his Ulkuble 'blammo'. Following the same rule, how is he likely to label his Krooent?\nAnswer:",
+   "options": [
+    " quix",
+    " plib",
+    " blammo"
+   ],
+   "answer": 0,
+   "query": "Krooent",
+   "demos": [
+    "Morarump",
+    "Skaloent",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Morarump 'quix' and his Skaloent 'plib' and his Ulkuble 'blammo'. Following the same rule, how is he likely to label his Krooent?\nAnswer:",
+   "id": "L3_induct_heldout:035"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'zorp' and his Nixuath 'wumbo' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " zorp",
+    " wumbo",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Ithanine",
+   "demos": [
+    "Ekkanish",
+    "Nixuath",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'zorp' and his Nixuath 'wumbo' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:036"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'plib' and his Ithanine 'grix' and his Gorinarn 'tandle'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "options": [
+    " plib",
+    " grix",
+    " tandle"
+   ],
+   "answer": 1,
+   "query": "Radoent",
+   "demos": [
+    "Gorurrock",
+    "Ithanine",
+    "Gorinarn"
+   ],
+   "prompt_ctx": "Field guide:\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'plib' and his Ithanine 'grix' and his Gorinarn 'tandle'. Following the same rule, how is he likely to label his Radoent?\nAnswer:",
+   "id": "L3_induct_heldout:037"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'FooFoo' and his Ekkanish 'snerk' and his Radolurn 'wumbo'. Following the same rule, how is he likely to label his Gribesarn?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " snerk",
+    " wumbo"
+   ],
+   "answer": 1,
+   "query": "Gribesarn",
+   "demos": [
+    "Ithanine",
+    "Ekkanish",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'FooFoo' and his Ekkanish 'snerk' and his Radolurn 'wumbo'. Following the same rule, how is he likely to label his Gribesarn?\nAnswer:",
+   "id": "L3_induct_heldout:038"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'blammo' and his Krooent 'quix' and his Ulkuble 'tandle'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "options": [
+    " blammo",
+    " quix",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Draosish",
+   "demos": [
+    "Velenome",
+    "Krooent",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'blammo' and his Krooent 'quix' and his Ulkuble 'tandle'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "id": "L3_induct_heldout:039"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'plib' and his Falorott 'dabble' and his Radoent 'tandle'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " plib",
+    " dabble",
+    " tandle"
+   ],
+   "answer": 2,
+   "query": "Ithanine",
+   "demos": [
+    "Velenome",
+    "Falorott",
+    "Radoent"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'plib' and his Falorott 'dabble' and his Radoent 'tandle'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:040"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'FooFoo' and his Ulkuble 'zorp' and his Radolurn 'plib'. Following the same rule, how is he likely to label his Ekkumsup?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " zorp",
+    " plib"
+   ],
+   "answer": 2,
+   "query": "Ekkumsup",
+   "demos": [
+    "Gorinarn",
+    "Ulkuble",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'FooFoo' and his Ulkuble 'zorp' and his Radolurn 'plib'. Following the same rule, how is he likely to label his Ekkumsup?\nAnswer:",
+   "id": "L3_induct_heldout:041"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'quix' and his Ulkuble 'blammo' and his Morarump 'dabble'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "options": [
+    " quix",
+    " blammo",
+    " dabble"
+   ],
+   "answer": 1,
+   "query": "Dololrock",
+   "demos": [
+    "Velenome",
+    "Ulkuble",
+    "Morarump"
+   ],
+   "prompt_ctx": "Field guide:\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'quix' and his Ulkuble 'blammo' and his Morarump 'dabble'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "id": "L3_induct_heldout:042"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'FooFoo' and his Morarump 'grix' and his Ithanine 'quix'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " grix",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Draosish",
+   "demos": [
+    "Velenome",
+    "Morarump",
+    "Ithanine"
+   ],
+   "prompt_ctx": "Field guide:\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'FooFoo' and his Morarump 'grix' and his Ithanine 'quix'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "id": "L3_induct_heldout:043"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Ekkumsup 'grix' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "options": [
+    " dabble",
+    " grix",
+    " quix"
+   ],
+   "answer": 2,
+   "query": "Gorinarn",
+   "demos": [
+    "Gorurrock",
+    "Ekkumsup",
+    "Ekkanish"
+   ],
+   "prompt_ctx": "Field guide:\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Ekkumsup 'grix' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "id": "L3_induct_heldout:044"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'dabble' and his Skaloent 'FooFoo' and his Dololrock 'grix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " dabble",
+    " FooFoo",
+    " grix"
+   ],
+   "answer": 2,
+   "query": "Wexaxump",
+   "demos": [
+    "Velenome",
+    "Skaloent",
+    "Dololrock"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'dabble' and his Skaloent 'FooFoo' and his Dololrock 'grix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:045"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'blammo' and his Ithanine 'plib' and his Lumolath 'wumbo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "options": [
+    " blammo",
+    " plib",
+    " wumbo"
+   ],
+   "answer": 1,
+   "query": "Nixuath",
+   "demos": [
+    "Ulkanash",
+    "Ithanine",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'blammo' and his Ithanine 'plib' and his Lumolath 'wumbo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "id": "L3_induct_heldout:046"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falulott 'zorp' and his Radolurn 'plib' and his Nixuath 'snerk'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " zorp",
+    " plib",
+    " snerk"
+   ],
+   "answer": 0,
+   "query": "Lumolath",
+   "demos": [
+    "Falulott",
+    "Radolurn",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falulott 'zorp' and his Radolurn 'plib' and his Nixuath 'snerk'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:047"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falorott 'blammo' and his Nixuath 'plib' and his Dololrock 'dabble'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " blammo",
+    " plib",
+    " dabble"
+   ],
+   "answer": 1,
+   "query": "Ithanine",
+   "demos": [
+    "Falorott",
+    "Nixuath",
+    "Dololrock"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falorott 'blammo' and his Nixuath 'plib' and his Dololrock 'dabble'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:048"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Krooent 'dabble' and his Ithanine 'wumbo' and his Ulkarrock 'FooFoo'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " dabble",
+    " wumbo",
+    " FooFoo"
+   ],
+   "answer": 2,
+   "query": "Falorott",
+   "demos": [
+    "Krooent",
+    "Ithanine",
+    "Ulkarrock"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Krooent 'dabble' and his Ithanine 'wumbo' and his Ulkarrock 'FooFoo'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:049"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falulott 'quix' and his Ulkuble 'snerk' and his Ekkumsup 'zorp'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " quix",
+    " snerk",
+    " zorp"
+   ],
+   "answer": 0,
+   "query": "Lumolath",
+   "demos": [
+    "Falulott",
+    "Ulkuble",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falulott 'quix' and his Ulkuble 'snerk' and his Ekkumsup 'zorp'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:050"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'quix' and his Krooent 'tandle' and his Gorinarn 'FooFoo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "options": [
+    " quix",
+    " tandle",
+    " FooFoo"
+   ],
+   "answer": 0,
+   "query": "Radaxash",
+   "demos": [
+    "Velenome",
+    "Krooent",
+    "Gorinarn"
+   ],
+   "prompt_ctx": "Field guide:\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'quix' and his Krooent 'tandle' and his Gorinarn 'FooFoo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "id": "L3_induct_heldout:051"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'dabble' and his Lumolath 'tandle' and his Ulkanash 'quix'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "options": [
+    " dabble",
+    " tandle",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Dololrock",
+   "demos": [
+    "Wexaxump",
+    "Lumolath",
+    "Ulkanash"
+   ],
+   "prompt_ctx": "Field guide:\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'dabble' and his Lumolath 'tandle' and his Ulkanash 'quix'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "id": "L3_induct_heldout:052"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'zorp' and his Ulkanash 'dabble' and his Lumolath 'tandle'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "options": [
+    " zorp",
+    " dabble",
+    " tandle"
+   ],
+   "answer": 2,
+   "query": "Gorurrock",
+   "demos": [
+    "Gorinarn",
+    "Ulkanash",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'zorp' and his Ulkanash 'dabble' and his Lumolath 'tandle'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "id": "L3_induct_heldout:053"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'tandle' and his Velenome 'FooFoo' and his Pexeble 'quix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " tandle",
+    " FooFoo",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Skaloent",
+   "demos": [
+    "Radolurn",
+    "Velenome",
+    "Pexeble"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'tandle' and his Velenome 'FooFoo' and his Pexeble 'quix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:054"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radoent 'grix' and his Lumolath 'FooFoo' and his Falorott 'tandle'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " grix",
+    " FooFoo",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Ithanine",
+   "demos": [
+    "Radoent",
+    "Lumolath",
+    "Falorott"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radoent 'grix' and his Lumolath 'FooFoo' and his Falorott 'tandle'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:055"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'blammo' and his Dololrock 'grix' and his Falulott 'tandle'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " blammo",
+    " grix",
+    " tandle"
+   ],
+   "answer": 2,
+   "query": "Lumolath",
+   "demos": [
+    "Radaxash",
+    "Dololrock",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radaxash 'blammo' and his Dololrock 'grix' and his Falulott 'tandle'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:056"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'dabble' and his Falorott 'quix' and his Dololrock 'grix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "options": [
+    " dabble",
+    " quix",
+    " grix"
+   ],
+   "answer": 1,
+   "query": "Ulkarrock",
+   "demos": [
+    "Velenome",
+    "Falorott",
+    "Dololrock"
+   ],
+   "prompt_ctx": "Field guide:\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'dabble' and his Falorott 'quix' and his Dololrock 'grix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "id": "L3_induct_heldout:057"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'dabble' and his Dololrock 'FooFoo' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " dabble",
+    " FooFoo",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Ulkuble",
+   "demos": [
+    "Pexeble",
+    "Dololrock",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'dabble' and his Dololrock 'FooFoo' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:058"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'zorp' and his Krooent 'FooFoo' and his Ulkarrock 'wumbo'. Following the same rule, how is he likely to label his Pexeble?\nAnswer:",
+   "options": [
+    " zorp",
+    " FooFoo",
+    " wumbo"
+   ],
+   "answer": 2,
+   "query": "Pexeble",
+   "demos": [
+    "Velenome",
+    "Krooent",
+    "Ulkarrock"
+   ],
+   "prompt_ctx": "Field guide:\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'zorp' and his Krooent 'FooFoo' and his Ulkarrock 'wumbo'. Following the same rule, how is he likely to label his Pexeble?\nAnswer:",
+   "id": "L3_induct_heldout:059"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Gribesarn 'grix' and his Krooent 'tandle'. Following the same rule, how is he likely to label his Falulott?\nAnswer:",
+   "options": [
+    " dabble",
+    " grix",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Falulott",
+   "demos": [
+    "Gorurrock",
+    "Gribesarn",
+    "Krooent"
+   ],
+   "prompt_ctx": "Field guide:\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorurrock 'dabble' and his Gribesarn 'grix' and his Krooent 'tandle'. Following the same rule, how is he likely to label his Falulott?\nAnswer:",
+   "id": "L3_induct_heldout:060"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Velenome 'FooFoo' and his Dololrock 'dabble' and his Gorurrock 'wumbo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " dabble",
+    " wumbo"
+   ],
+   "answer": 1,
+   "query": "Ulkuble",
+   "demos": [
+    "Velenome",
+    "Dololrock",
+    "Gorurrock"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Velenome 'FooFoo' and his Dololrock 'dabble' and his Gorurrock 'wumbo'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:061"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'tandle' and his Radoent 'blammo' and his Ulkuble 'zorp'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "options": [
+    " tandle",
+    " blammo",
+    " zorp"
+   ],
+   "answer": 1,
+   "query": "Nixuath",
+   "demos": [
+    "Lumolath",
+    "Radoent",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'tandle' and his Radoent 'blammo' and his Ulkuble 'zorp'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "id": "L3_induct_heldout:062"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'snerk' and his Ulkuble 'quix' and his Gorinarn 'wumbo'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "options": [
+    " snerk",
+    " quix",
+    " wumbo"
+   ],
+   "answer": 0,
+   "query": "Velenome",
+   "demos": [
+    "Draosish",
+    "Ulkuble",
+    "Gorinarn"
+   ],
+   "prompt_ctx": "Field guide:\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'snerk' and his Ulkuble 'quix' and his Gorinarn 'wumbo'. Following the same rule, how is he likely to label his Velenome?\nAnswer:",
+   "id": "L3_induct_heldout:063"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Krooent 'plib' and his Gribesarn 'dabble' and his Gorurrock 'zorp'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "options": [
+    " plib",
+    " dabble",
+    " zorp"
+   ],
+   "answer": 1,
+   "query": "Gorinarn",
+   "demos": [
+    "Krooent",
+    "Gribesarn",
+    "Gorurrock"
+   ],
+   "prompt_ctx": "Field guide:\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Krooent 'plib' and his Gribesarn 'dabble' and his Gorurrock 'zorp'. Following the same rule, how is he likely to label his Gorinarn?\nAnswer:",
+   "id": "L3_induct_heldout:064"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'snerk' and his Dololrock 'plib' and his Radolurn 'blammo'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " snerk",
+    " plib",
+    " blammo"
+   ],
+   "answer": 2,
+   "query": "Skaloent",
+   "demos": [
+    "Gorinarn",
+    "Dololrock",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'snerk' and his Dololrock 'plib' and his Radolurn 'blammo'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:065"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'plib' and his Ekkumsup 'tandle' and his Ulkuble 'blammo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "options": [
+    " plib",
+    " tandle",
+    " blammo"
+   ],
+   "answer": 0,
+   "query": "Radaxash",
+   "demos": [
+    "Draosish",
+    "Ekkumsup",
+    "Ulkuble"
+   ],
+   "prompt_ctx": "Field guide:\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'plib' and his Ekkumsup 'tandle' and his Ulkuble 'blammo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "id": "L3_induct_heldout:066"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'dabble' and his Ulkuble 'zorp' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " dabble",
+    " zorp",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Wexaxump",
+   "demos": [
+    "Ithanine",
+    "Ulkuble",
+    "Ekkanish"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'dabble' and his Ulkuble 'zorp' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:067"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'FooFoo' and his Pexeble 'plib' and his Falulott 'quix'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " plib",
+    " quix"
+   ],
+   "answer": 2,
+   "query": "Lumolath",
+   "demos": [
+    "Ekkanish",
+    "Pexeble",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'FooFoo' and his Pexeble 'plib' and his Falulott 'quix'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:068"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'dabble' and his Velenome 'wumbo' and his Nixuath 'FooFoo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "options": [
+    " dabble",
+    " wumbo",
+    " FooFoo"
+   ],
+   "answer": 1,
+   "query": "Radaxash",
+   "demos": [
+    "Ulkanash",
+    "Velenome",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkanash 'dabble' and his Velenome 'wumbo' and his Nixuath 'FooFoo'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "id": "L3_induct_heldout:069"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'dabble' and his Radolurn 'tandle' and his Ulkarrock 'plib'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " dabble",
+    " tandle",
+    " plib"
+   ],
+   "answer": 1,
+   "query": "Skaloent",
+   "demos": [
+    "Ekkanish",
+    "Radolurn",
+    "Ulkarrock"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'dabble' and his Radolurn 'tandle' and his Ulkarrock 'plib'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:070"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radoent 'zorp' and his Krooent 'blammo' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " zorp",
+    " blammo",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Ithanine",
+   "demos": [
+    "Radoent",
+    "Krooent",
+    "Ekkanish"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radoent 'zorp' and his Krooent 'blammo' and his Ekkanish 'quix'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:071"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'plib' and his Pexeble 'zorp' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "options": [
+    " plib",
+    " zorp",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Ulkarrock",
+   "demos": [
+    "Gorinarn",
+    "Pexeble",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'plib' and his Pexeble 'zorp' and his Falulott 'quix'. Following the same rule, how is he likely to label his Ulkarrock?\nAnswer:",
+   "id": "L3_induct_heldout:072"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'dabble' and his Ithanine 'quix' and his Ekkumsup 'FooFoo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "options": [
+    " dabble",
+    " quix",
+    " FooFoo"
+   ],
+   "answer": 1,
+   "query": "Nixuath",
+   "demos": [
+    "Ekkanish",
+    "Ithanine",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkanish 'dabble' and his Ithanine 'quix' and his Ekkumsup 'FooFoo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "id": "L3_induct_heldout:073"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falorott 'FooFoo' and his Ekkumsup 'wumbo' and his Morarump 'dabble'. Following the same rule, how is he likely to label his Krooent?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " wumbo",
+    " dabble"
+   ],
+   "answer": 2,
+   "query": "Krooent",
+   "demos": [
+    "Falorott",
+    "Ekkumsup",
+    "Morarump"
+   ],
+   "prompt_ctx": "Field guide:\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falorott 'FooFoo' and his Ekkumsup 'wumbo' and his Morarump 'dabble'. Following the same rule, how is he likely to label his Krooent?\nAnswer:",
+   "id": "L3_induct_heldout:074"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'plib' and his Ekkumsup 'tandle' and his Morarump 'wumbo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "options": [
+    " plib",
+    " tandle",
+    " wumbo"
+   ],
+   "answer": 0,
+   "query": "Nixuath",
+   "demos": [
+    "Ithanine",
+    "Ekkumsup",
+    "Morarump"
+   ],
+   "prompt_ctx": "Field guide:\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'plib' and his Ekkumsup 'tandle' and his Morarump 'wumbo'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "id": "L3_induct_heldout:075"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'tandle' and his Gribesarn 'wumbo' and his Lumolath 'FooFoo'. Following the same rule, how is he likely to label his Ekkanish?\nAnswer:",
+   "options": [
+    " tandle",
+    " wumbo",
+    " FooFoo"
+   ],
+   "answer": 1,
+   "query": "Ekkanish",
+   "demos": [
+    "Pexeble",
+    "Gribesarn",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'tandle' and his Gribesarn 'wumbo' and his Lumolath 'FooFoo'. Following the same rule, how is he likely to label his Ekkanish?\nAnswer:",
+   "id": "L3_induct_heldout:076"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'quix' and his Falorott 'zorp' and his Wexaxump 'grix'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "options": [
+    " quix",
+    " zorp",
+    " grix"
+   ],
+   "answer": 2,
+   "query": "Dololrock",
+   "demos": [
+    "Lumolath",
+    "Falorott",
+    "Wexaxump"
+   ],
+   "prompt_ctx": "Field guide:\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'quix' and his Falorott 'zorp' and his Wexaxump 'grix'. Following the same rule, how is he likely to label his Dololrock?\nAnswer:",
+   "id": "L3_induct_heldout:077"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radoent 'FooFoo' and his Velenome 'zorp' and his Dololrock 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " zorp",
+    " quix"
+   ],
+   "answer": 2,
+   "query": "Ulkuble",
+   "demos": [
+    "Radoent",
+    "Velenome",
+    "Dololrock"
+   ],
+   "prompt_ctx": "Field guide:\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\nVelenome: Verdane-type, weak to Frostel, reef habitat, nectarivore, Thulen.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radoent 'FooFoo' and his Velenome 'zorp' and his Dololrock 'quix'. Following the same rule, how is he likely to label his Ulkuble?\nAnswer:",
+   "id": "L3_induct_heldout:078"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'grix' and his Gorinarn 'plib' and his Krooent 'blammo'. Following the same rule, how is he likely to label his Morarump?\nAnswer:",
+   "options": [
+    " grix",
+    " plib",
+    " blammo"
+   ],
+   "answer": 2,
+   "query": "Morarump",
+   "demos": [
+    "Radolurn",
+    "Gorinarn",
+    "Krooent"
+   ],
+   "prompt_ctx": "Field guide:\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Radolurn 'grix' and his Gorinarn 'plib' and his Krooent 'blammo'. Following the same rule, how is he likely to label his Morarump?\nAnswer:",
+   "id": "L3_induct_heldout:079"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falorott 'tandle' and his Ekkumsup 'FooFoo' and his Ithanine 'grix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " tandle",
+    " FooFoo",
+    " grix"
+   ],
+   "answer": 1,
+   "query": "Skaloent",
+   "demos": [
+    "Falorott",
+    "Ekkumsup",
+    "Ithanine"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falorott 'tandle' and his Ekkumsup 'FooFoo' and his Ithanine 'grix'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:080"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Falulott 'quix' and his Krooent 'grix' and his Radaxash 'tandle'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "options": [
+    " quix",
+    " grix",
+    " tandle"
+   ],
+   "answer": 2,
+   "query": "Draosish",
+   "demos": [
+    "Falulott",
+    "Krooent",
+    "Radaxash"
+   ],
+   "prompt_ctx": "Field guide:\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Falulott 'quix' and his Krooent 'grix' and his Radaxash 'tandle'. Following the same rule, how is he likely to label his Draosish?\nAnswer:",
+   "id": "L3_induct_heldout:081"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'wumbo' and his Morarump 'plib' and his Radoent 'blammo'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "options": [
+    " wumbo",
+    " plib",
+    " blammo"
+   ],
+   "answer": 1,
+   "query": "Ulkanash",
+   "demos": [
+    "Ulkuble",
+    "Morarump",
+    "Radoent"
+   ],
+   "prompt_ctx": "Field guide:\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nRadoent: Pyrrhan-type, weak to Verdane, cave habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'wumbo' and his Morarump 'plib' and his Radoent 'blammo'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "id": "L3_induct_heldout:082"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'snerk' and his Krooent 'plib' and his Wexaxump 'tandle'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "options": [
+    " snerk",
+    " plib",
+    " tandle"
+   ],
+   "answer": 0,
+   "query": "Gorurrock",
+   "demos": [
+    "Lumolath",
+    "Krooent",
+    "Wexaxump"
+   ],
+   "prompt_ctx": "Field guide:\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Lumolath 'snerk' and his Krooent 'plib' and his Wexaxump 'tandle'. Following the same rule, how is he likely to label his Gorurrock?\nAnswer:",
+   "id": "L3_induct_heldout:083"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Nixuath 'quix' and his Krooent 'dabble' and his Falulott 'tandle'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "options": [
+    " quix",
+    " dabble",
+    " tandle"
+   ],
+   "answer": 1,
+   "query": "Ulkanash",
+   "demos": [
+    "Nixuath",
+    "Krooent",
+    "Falulott"
+   ],
+   "prompt_ctx": "Field guide:\nUlkanash: Frostel-type, weak to Tidewell, reef habitat, herbivore, Thulen.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nFalulott: Lithor-type, weak to Gustral, reef habitat, nectarivore, Velmire.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Nixuath 'quix' and his Krooent 'dabble' and his Falulott 'tandle'. Following the same rule, how is he likely to label his Ulkanash?\nAnswer:",
+   "id": "L3_induct_heldout:084"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'tandle' and his Draosish 'zorp' and his Lumolath 'quix'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "options": [
+    " tandle",
+    " zorp",
+    " quix"
+   ],
+   "answer": 0,
+   "query": "Nixuath",
+   "demos": [
+    "Ithanine",
+    "Draosish",
+    "Lumolath"
+   ],
+   "prompt_ctx": "Field guide:\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ithanine 'tandle' and his Draosish 'zorp' and his Lumolath 'quix'. Following the same rule, how is he likely to label his Nixuath?\nAnswer:",
+   "id": "L3_induct_heldout:085"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'FooFoo' and his Dololrock 'zorp' and his Nixuath 'plib'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " zorp",
+    " plib"
+   ],
+   "answer": 0,
+   "query": "Falorott",
+   "demos": [
+    "Pexeble",
+    "Dololrock",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nPexeble: Gustral-type, weak to Pyrrhan, marsh habitat, mineralivore, Brakka.\nDololrock: Voltrix-type, weak to Lithor, canopy habitat, nectarivore, Thulen.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Pexeble 'FooFoo' and his Dololrock 'zorp' and his Nixuath 'plib'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:086"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Krooent 'blammo' and his Gorinarn 'tandle' and his Radolurn 'zorp'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " blammo",
+    " tandle",
+    " zorp"
+   ],
+   "answer": 2,
+   "query": "Skaloent",
+   "demos": [
+    "Krooent",
+    "Gorinarn",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nKrooent: Frostel-type, weak to Tidewell, dune habitat, nectarivore, Korrath.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Krooent 'blammo' and his Gorinarn 'tandle' and his Radolurn 'zorp'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:087"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'plib' and his Radolurn 'snerk' and his Gorinarn 'grix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " plib",
+    " snerk",
+    " grix"
+   ],
+   "answer": 0,
+   "query": "Wexaxump",
+   "demos": [
+    "Ulkuble",
+    "Radolurn",
+    "Gorinarn"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'plib' and his Radolurn 'snerk' and his Gorinarn 'grix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:088"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'plib' and his Ulkuble 'blammo' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " plib",
+    " blammo",
+    " quix"
+   ],
+   "answer": 1,
+   "query": "Wexaxump",
+   "demos": [
+    "Draosish",
+    "Ulkuble",
+    "Ekkumsup"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'plib' and his Ulkuble 'blammo' and his Ekkumsup 'quix'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:089"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'quix' and his Gribesarn 'snerk' and his Gorurrock 'wumbo'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "options": [
+    " quix",
+    " snerk",
+    " wumbo"
+   ],
+   "answer": 2,
+   "query": "Lumolath",
+   "demos": [
+    "Wexaxump",
+    "Gribesarn",
+    "Gorurrock"
+   ],
+   "prompt_ctx": "Field guide:\nLumolath: Lithor-type, weak to Gustral, reef habitat, herbivore, Korrath.\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nGribesarn: Umbrine-type, weak to Voltrix, tundra habitat, herbivore, Ostrand.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Wexaxump 'quix' and his Gribesarn 'snerk' and his Gorurrock 'wumbo'. Following the same rule, how is he likely to label his Lumolath?\nAnswer:",
+   "id": "L3_induct_heldout:090"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'quix' and his Gorinarn 'plib' and his Gorurrock 'FooFoo'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "options": [
+    " quix",
+    " plib",
+    " FooFoo"
+   ],
+   "answer": 0,
+   "query": "Wexaxump",
+   "demos": [
+    "Ulkuble",
+    "Gorinarn",
+    "Gorurrock"
+   ],
+   "prompt_ctx": "Field guide:\nWexaxump: Voltrix-type, weak to Lithor, dune habitat, herbivore, Brakka.\nUlkuble: Voltrix-type, weak to Lithor, dune habitat, mineralivore, Brakka.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nGorurrock: Lithor-type, weak to Gustral, reef habitat, herbivore, Brakka.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkuble 'quix' and his Gorinarn 'plib' and his Gorurrock 'FooFoo'. Following the same rule, how is he likely to label his Wexaxump?\nAnswer:",
+   "id": "L3_induct_heldout:091"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Draosish 'blammo' and his Ithanine 'snerk' and his Ekkanish 'grix'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "options": [
+    " blammo",
+    " snerk",
+    " grix"
+   ],
+   "answer": 0,
+   "query": "Radaxash",
+   "demos": [
+    "Draosish",
+    "Ithanine",
+    "Ekkanish"
+   ],
+   "prompt_ctx": "Field guide:\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nDraosish: Verdane-type, weak to Frostel, cave habitat, piscivore, Velmire.\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkanish: Umbrine-type, weak to Voltrix, dune habitat, mineralivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Draosish 'blammo' and his Ithanine 'snerk' and his Ekkanish 'grix'. Following the same rule, how is he likely to label his Radaxash?\nAnswer:",
+   "id": "L3_induct_heldout:092"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'FooFoo' and his Radolurn 'blammo' and his Ulkarrock 'tandle'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "options": [
+    " FooFoo",
+    " blammo",
+    " tandle"
+   ],
+   "answer": 2,
+   "query": "Falorott",
+   "demos": [
+    "Gorinarn",
+    "Radolurn",
+    "Ulkarrock"
+   ],
+   "prompt_ctx": "Field guide:\nFalorott: Gustral-type, weak to Pyrrhan, reef habitat, nectarivore, Brakka.\nGorinarn: Umbrine-type, weak to Voltrix, reef habitat, piscivore, Korrath.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Gorinarn 'FooFoo' and his Radolurn 'blammo' and his Ulkarrock 'tandle'. Following the same rule, how is he likely to label his Falorott?\nAnswer:",
+   "id": "L3_induct_heldout:093"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ulkarrock 'plib' and his Morarump 'wumbo' and his Radolurn 'zorp'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "options": [
+    " plib",
+    " wumbo",
+    " zorp"
+   ],
+   "answer": 2,
+   "query": "Skaloent",
+   "demos": [
+    "Ulkarrock",
+    "Morarump",
+    "Radolurn"
+   ],
+   "prompt_ctx": "Field guide:\nSkaloent: Tidewell-type, weak to Umbrine, canopy habitat, herbivore, Korrath.\nUlkarrock: Gustral-type, weak to Pyrrhan, canopy habitat, nectarivore, Ostrand.\nMorarump: Frostel-type, weak to Tidewell, tundra habitat, piscivore, Ostrand.\nRadolurn: Tidewell-type, weak to Umbrine, tundra habitat, herbivore, Ostrand.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ulkarrock 'plib' and his Morarump 'wumbo' and his Radolurn 'zorp'. Following the same rule, how is he likely to label his Skaloent?\nAnswer:",
+   "id": "L3_induct_heldout:094"
+  },
+  {
+   "level": "L3_induct_heldout",
+   "prompt": "Timmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'snerk' and his Radaxash 'tandle' and his Nixuath 'wumbo'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "options": [
+    " snerk",
+    " tandle",
+    " wumbo"
+   ],
+   "answer": 2,
+   "query": "Ithanine",
+   "demos": [
+    "Ekkumsup",
+    "Radaxash",
+    "Nixuath"
+   ],
+   "prompt_ctx": "Field guide:\nIthanine: Pyrrhan-type, weak to Verdane, marsh habitat, mineralivore, Thulen.\nEkkumsup: Tidewell-type, weak to Umbrine, reef habitat, insectivore, Thulen.\nRadaxash: Verdane-type, weak to Frostel, tundra habitat, piscivore, Ostrand.\nNixuath: Pyrrhan-type, weak to Verdane, canopy habitat, herbivore, Korrath.\n\nTimmy labels his creature cards with his own made-up tags. He labeled his Ekkumsup 'snerk' and his Radaxash 'tandle' and his Nixuath 'wumbo'. Following the same rule, how is he likely to label his Ithanine?\nAnswer:",
+   "id": "L3_induct_heldout:095"
+  }
+ ]
+}

@@ -70,6 +70,15 @@ class Retriever:
                 loss.backward(); opt.step(); opt.zero_grad()
         print(f"    retriever{(' ' + log) if log else ''}: trained {epochs} epochs x {len(pairs)} pairs in {time.time() - t0:.0f}s, final loss {loss.item():.3f}", flush=True)
 
+    def save(self, name: str):
+        """Keep the trained encoder (owner's rule): bf16 under models/adapters/retriever_<name>, with the documents and keys."""
+        import json
+        from ai_experiments.paths import ROOT
+        d = ROOT / "models" / "adapters" / f"retriever_{name}"
+        self.model[0].auto_model.to(torch.bfloat16); self.model.save(str(d)); self.model[0].auto_model.to(torch.float32)
+        (d / "index.json").write_text(json.dumps(dict(docs=self.docs, keys=[sorted(k) for k in self.keys], trained=self.trained)), encoding="utf-8")
+        print(f"    saved {d.relative_to(ROOT)}", flush=True)
+
     def topk(self, queries: list[str], k: int) -> list[list[int]]:
         """Indices of the k nearest documents per query."""
         Q = self.embed(queries)

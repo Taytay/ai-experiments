@@ -1,0 +1,63 @@
+{
+  "retriever_zero_shot": {
+    "bank_train_recall@1": 78.1,
+    "bank_train_recall@5": 96.9,
+    "name_train_recall@1": 99.0,
+    "name_train_recall@5": 100.0,
+    "bank_heldout_recall@1": 87.5,
+    "bank_heldout_recall@5": 95.8,
+    "name_heldout_recall@1": 95.8,
+    "name_heldout_recall@5": 100.0
+  },
+  "retriever_category_tuned": {
+    "bank_train_recall@1": 55.2,
+    "bank_train_recall@5": 74.0,
+    "name_train_recall@1": 89.6,
+    "name_train_recall@5": 100.0,
+    "bank_heldout_recall@1": 29.2,
+    "bank_heldout_recall@5": 41.7,
+    "name_heldout_recall@1": 29.2,
+    "name_heldout_recall@5": 54.2
+  },
+  "retriever_record_tuned": {
+    "bank_train_recall@1": 100.0,
+    "bank_train_recall@5": 100.0,
+    "name_train_recall@1": 100.0,
+    "name_train_recall@5": 100.0,
+    "bank_heldout_recall@1": 100.0,
+    "bank_heldout_recall@5": 100.0,
+    "name_heldout_recall@1": 100.0,
+    "name_heldout_recall@5": 100.0
+  },
+  "retrieval_hits": {
+    "ret1_gold": 100.0
+  },
+  "Qwen2.5-3B_none": {
+    "clean_category_train": 8.3,
+    "bank_category_train": 7.3,
+    "clean_category_heldout": 8.3,
+    "bank_category_heldout": 8.3,
+    "eval_minutes": 0.42
+  },
+  "Qwen2.5-3B_oracle": {
+    "clean_category_train": 89.6,
+    "bank_category_train": 81.2,
+    "clean_category_heldout": 91.7,
+    "bank_category_heldout": 75.0,
+    "eval_minutes": 0.52
+  },
+  "Qwen2.5-3B_ret1": {
+    "clean_category_train": 89.6,
+    "bank_category_train": 81.2,
+    "clean_category_heldout": 91.7,
+    "bank_category_heldout": 75.0,
+    "eval_minutes": 0.52
+  },
+  "Qwen2.5-3B_ret3": {
+    "clean_category_train": 70.8,
+    "bank_category_train": 46.9,
+    "clean_category_heldout": 62.5,
+    "bank_category_heldout": 41.7,
+    "eval_minutes": 0.73
+  }
+}

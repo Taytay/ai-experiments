@@ -164,6 +164,8 @@ continued-pretraining stage on the augmented corpus before contrastive alignment
 probe (`Elrholm sells [MASK]`). Run an MLM stage on ModernBERT-base, then the same contrastive
 step; compare bank and held-out transfer plus a cloze recall probe against contrastive-only.
 
+**Status (2026-09-16):** answered for this budget, PLAN step 18, REPORT.md 29. Encoder-only: ModernBERT-large trained with the MLM head and scored with the letter-at-mask protocol (every ladder answer is multi-token) is at chance on every level and loses natural-label ICL; not a vehicle at 395M and 800 steps. Encoder-decoder: Flan-T5-large span prediction at the decoders' rate learns the sentence template and not the facts at 160, 1,000 and 5,000 species (recall 11 to 17, generation 16 to 27), in both the plain and the trained span scoring format; T5Gemma under full FT at 1e-4 is damaged. The follow-ups reverse the encoder-decoder verdict: the rate was the whole difference. Flan-T5-large under full FT at 3e-4 recalls the 160 species at 98.1 / 100 (option scoring / generation), with no label induction (Timmy at the base) and bare recall twice the decoder's; T5Gemma under a rank-64 adapter at 1e-4 recalls 97.5 / 93.1. Both lose natural-label ICL and ARC-Easy in a way the decoder mixture does not, so the encoder-decoder is an injection vehicle and a worse general model after it. Unrun: Flan-T5 at 1,000 and 5,000 species at 3e-4 (the WikiDYK capacity test), the Flan-T5 adapter at 1e-3 or above.
+
 ### MODEL-3 (O) Are we using the right LLM and the right embedding model?
 
 **Answer.** The choices were pragmatic, not the result of a comparison.
@@ -431,6 +433,7 @@ Section 7.3 extrapolates 10k-merchant training time linearly from 136 species; r
 interference between thousands of similar names are untested.
 *Experiment:* `U.build(n_per_type=125)` and 625 (1k and 5k species), same recipe, 1x and 5x steps;
 trained-format recall and Timmy vs entity count.
+**Status (2026-09-16):** measured to 5,000 species, PLAN step 18, REPORT.md 29.1. With the section 8 recipe a rank-64 adapter on Qwen2.5-3B holds 1,000 species at 100 trained-format recall once each text has been seen about 1.5 times (4,000 steps; 51 at 800 steps = 0.3 passes), with manipulation 97.5 / 86.2 and a 41 WikiText perplexity; at 5,000 species 4,000 steps are 0.3 passes and recall is 22, against 51 for 1,000 species at the same exposure, the first sign of interference. 5,000 species at 1.5 passes (20,000 steps, about 5.5 hours) is the run that separates capacity from exposure; 10k was not attempted.
 
 **REAL-4 (R) Is the prototype classifier tested under the conditions personal categories actually have?**
 Prototype eval is 3-way, balanced, names-only, 300 trials (`exp_universe_embed.py:72-87`); real
