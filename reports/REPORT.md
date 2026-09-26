@@ -9,13 +9,39 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 
 ## 1. Executive summary
 
-**Where the project stands (2026-09-26, sections 37 to 59).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
+**Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
 - **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
 - **Q1.** Score options by summed log-probability and fit one temperature per model on other users; raw confidences are miscalibrated and a temperature does not transfer between models (section 50). Training time goes into re-reading the prompt, not precision: bf16 and the 4-bit base give the same model (52), 16 sequences per step at 1e-4 is the efficient batch (56), and putting the loss on every example label in the prompt (the "all-label" loss) trains in 100 steps what 1,600 plain steps did (52). The same run on the 3090 and on Modal's H100 agrees within run-to-run noise, six times faster there (54).
 - **Q2.** A database written into the weights as prose sentences reaches the merchants only it knows at 59 to 69% (sections 43, 45); the same database taught as supervised decisions ("database episodes": synthetic statement rows of its merchants labelled in a training user's scheme) reaches 94%, opaque names included, with no record in the prompt (53), ties the record in the prompt at equal information (55), holds 20,000 merchants as well as 240 when each gets about 30 training rows (58), and helps on real businesses outside the database (+4 to 5, section 57). The record in the prompt remains the robust route: 85% on real Overture businesses from a one-line category record, whatever the statement string looks like (57).
 - **Q3.** Categorisers memorise training users' coined names (10 to 25 points that do not transfer to new users) and rename augmentation fixes most of it (+12 to 14, section 51); on held-out users the record-in-prompt categoriser then reads 87%. From examples in the prompt, a blind Opus 5.5 reader resolves real businesses' coined categories at 88% (clean names) where the 3B model manages 55 to 65 (57): the information is there and the small model under-uses it; row 64's label-induction set, whose first version turned out to be solvable by elimination, is taking that apart.
-- **Real data.** Overture's places (81.5M POIs, per-row licences) are downloaded with provenance (`data/external/`); the novel-merchant set (57) is built from them, and POI-1 (PLAN row 65) will make them a benchmark at scale. Truncated bank-statement strings cost every model without a record about 15 points (57).
+- **Real data.** Overture's places (81.5M POIs, per-row licences) are downloaded with provenance (`data/external/`). Two sets are
+  built from them. The novel-merchant set (57): truncated bank-statement strings cost every model without a record about 15 points.
+  POI-1 (61): 200 synthetic users over real places, 12 to 20 categories each. POI-1 is hard for every reader: blind Opus 5.5 56%,
+  the best 3B 59, 14B 60 (64). A lookup by the place's kind answers the kinds a user has filed (exact), and lookup-then-model reads
+  80. Choosing the prompt's examples by kind lifts every model 8 to 18 points without training (68.6 for the 3B, 81% of the
+  seen-kind ceiling).
+- **Q3 in the prompt (60).** One or two examples of other businesses filed under a coined word teach every model what it means.
+  On v2, where elimination cannot solve it, the 14B goes from 12 to 66% with one example, and a fine-tuned 3B reads like an
+  untrained 14B. Opaque example names teach nothing. The models copy the nearest example: one same-kind business filed elsewhere
+  costs 15 to 19 points, where Opus keeps 97.
+- **Encoders (62, 63).** Trained across users with one scored position per category (Laya's `[MASK]` layout or GLiClass-large; the
+  family does not matter once training matches), a 400M encoder:
+  - matches the 3B on POI-1 (57 to 58 against 55 to 59) at 6 to 10 ms per item batched, about 40 times faster;
+  - trails it on REAL-6 by 15 points without the record and 8 with it, for want of merchant knowledge;
+  - with the record, GLiClass has the steadiest confidence of the encoders (AURC 0.062).
+
+  Untrained, every encoder is at chance. ModernBERT-Instruct's single `[MASK]` over letter IDs works with the record (73.5) but
+  learns slowly without it (42 at 5,000 steps), and letter IDs show position bias.
+- **Best approach and ceilings (64).** Results are read as a share of each set's maximum achievable score (`ai_experiments.ceiling`):
+  - REAL-6's ceiling is 94.0 (the split categories are a coin flip); the best decoders sit at 95 to 96% of it at 3B, 7B and 14B
+    alike;
+  - on POI-1, scale adds a point where retrieval adds nine;
+  - the leading approach is a lookup (merchant, then kind) in front of a fine-tuned 3B with database episodes and kind-retrieved
+    examples.
+
+  Open limits and their hypotheses are in 64.2. Hop limits of encoders and decoders, with looped encoders and diffusion LMs, are
+  PLAN row 71.
 
 - **Frameworks.** For one 24 GB GPU, Unsloth is the consensus choice (fastest, lowest VRAM, native Windows, now covers embedding models via `FastSentenceTransformer`). Axolotl is the pick for multi-GPU nodes with YAML-driven reproducibility. TRL is the substrate both wrap and the right layer if you need a custom loss. torchtune is unmaintained since July 2025; do not start on it. For RL at scale, verl. For embedding models specifically, the trainer is sentence-transformers' `SentenceTransformerTrainer` whether or not Unsloth is wrapping it.
 - **New vocabulary.** Almost never worth it for merchant names. Subword tokenization already handles them; expansion requires continued pretraining and can hurt at small token budgets. If you must add tokens, initialize inside the existing embedding distribution (mean-of-subwords or Hewitt's N(mu, Sigma) sampling), never random, and train afterwards. Our experiments went further: added merchant tokens actively **hurt** both models. For the embedding model they collapsed transfer to unseen bank-statement strings from 70.8% to 23-26% (section 4.3.1); for the LLM they cut knowledge extraction from 46.7% to 31.7% at identical data and steps. Post-hoc aliasing of an uppercase token onto the trained mixed-case embedding did not rescue the bank format either. Fix the strings with normalization, not the tokenizer.
