@@ -1,0 +1,6 @@
+outs:
+- md5: 0caa94eb440ccf0fd543301e90520040.dir
+  size: 220002295
+  nfiles: 10
+  hash: md5
+  path: embed_bge_merchant_ft_newtok_gauss

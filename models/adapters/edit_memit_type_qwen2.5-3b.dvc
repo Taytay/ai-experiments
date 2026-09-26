@@ -1,0 +1,6 @@
+outs:
+- md5: 1809562ec3b718856de93a959bc2f57d.dir
+  size: 6183354083
+  nfiles: 6
+  hash: md5
+  path: edit_memit_type_qwen2.5-3b

@@ -1,0 +1,6 @@
+outs:
+- md5: 7e63f40fd3e0235b1378250bb325508d.dir
+  size: 8768232957
+  nfiles: 40
+  hash: md5
+  path: fastfit_bge_shots

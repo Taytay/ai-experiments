@@ -1,0 +1,6 @@
+outs:
+- md5: 68a2e95c14ce441bcb0bd6d403b5205f.dir
+  size: 1203049099
+  nfiles: 12
+  hash: md5
+  path: embed_qwen3_kge_distmult

@@ -1,0 +1,6 @@
+outs:
+- md5: 6ea68840efd4ef4e1b8a6aa4c54f684c.dir
+  size: 1203302972
+  nfiles: 11
+  hash: md5
+  path: embed_qwen3_merchant_ft_newtok_gauss

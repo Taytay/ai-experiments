@@ -1,0 +1,6 @@
+outs:
+- md5: 807e3e9f44cd2ed846c7a874e8e9cdd9.dir
+  size: 609120752
+  nfiles: 4
+  hash: md5
+  path: gliclass_ft

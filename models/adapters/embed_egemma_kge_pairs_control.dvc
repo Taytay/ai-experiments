@@ -1,0 +1,6 @@
+outs:
+- md5: 142b92f4637d668e40454d9897badaee.dir
+  size: 658043179
+  nfiles: 14
+  hash: md5
+  path: embed_egemma_kge_pairs_control

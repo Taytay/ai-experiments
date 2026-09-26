@@ -1,0 +1,6 @@
+outs:
+- md5: c22ba714e801b55c2325ae71b0ce5542.dir
+  size: 894937337
+  nfiles: 2
+  hash: md5
+  path: encmbi_instruct_st1500_f0_ctx

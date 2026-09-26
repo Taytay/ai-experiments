@@ -1,0 +1,6 @@
+outs:
+- md5: fc828cadd26fd1d97fd4b7086c2d06fe.dir
+  size: 490440687
+  nfiles: 6
+  hash: md5
+  path: categoriser_Qwen2.5-3B-Instruct_ret_shotscluster_lora

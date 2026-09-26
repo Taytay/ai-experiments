@@ -1,0 +1,6 @@
+outs:
+- md5: a059864d4ca4350128e8b59e52eb215c.dir
+  size: 490438139
+  nfiles: 5
+  hash: md5
+  path: curriculum_Qwen2.5-3B_C_opd_fineweb_full_lora

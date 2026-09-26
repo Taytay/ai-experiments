@@ -1,0 +1,6 @@
+outs:
+- md5: 748245bf4b2f452bd9cd636251441ae2.dir
+  size: 479011605
+  nfiles: 3
+  hash: md5
+  path: universe_Qwen2.5-3B_lr0.0001_unsloth_lora

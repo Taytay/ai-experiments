@@ -1,0 +1,6 @@
+outs:
+- md5: 5f13ce0ee7ac1483d176e7ffad8cdf6d.dir
+  size: 46162431
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_merchant_ft_subword
