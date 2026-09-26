@@ -18,6 +18,11 @@ METRICS = ["L1_recall_fmt", "L3_induct_type_nonsense", "L4_induct_weakness", "IC
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq", "base_m": "base(m)",
          "E": "E morph", "P": "P distill", "Cg": "Cg inter+R+G", "P2": "P2 distill-opt"}
 
+def label(arm):
+    base, _, seed = arm.partition(" ")
+    return LABEL.get(base, base) + (f" {seed}" if seed else "")
+
+
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 ap.add_argument("tag", nargs="?", default="Qwen2.5-3B")
 ap.add_argument("--metrics", nargs="*", default=METRICS)
@@ -28,7 +33,8 @@ runs = []
 for rid, model, cfg in con.execute("SELECT run_id, model, config FROM runs WHERE experiment='curriculum_v2' AND status='finished' ORDER BY started_at"):
     c = json.loads(cfg)
     if c.get("periodic", 0) and (model or "").split("/")[-1] == a.tag:
-        runs.append((rid, c["arm"], c["periodic"], c.get("steps")))
+        arm = c["arm"] + (f" s{c['seed']}" if c.get("seed") else "")  # one curve per arm and seed (PLAN step 10)
+        runs.append((rid, arm, c["periodic"], c.get("steps")))
 if not runs:
     raise SystemExit("no finished curriculum_v2 runs with periodic evaluation in the tracker")
 latest = {}
@@ -53,7 +59,7 @@ md = [f"# Learning curves: {a.tag}", "",
       "(every 4th ladder item, every 2nd ICL suite item, all 200 ARC-Easy known-facts items), so they carry more noise "
       "than the final row.", ""]
 for m in a.metrics:
-    md += [f"## {m}", "", "| step | " + " | ".join(LABEL.get(x, x) for x in arms) + " |", "|---|" + "---|" * len(arms)]
+    md += [f"## {m}", "", "| step | " + " | ".join(label(x) for x in arms) + " |", "|---|" + "---|" * len(arms)]
     for s in steps_all:
         row = [curves[x].get(s, {}).get(m) for x in arms]
         if any(v is not None for v in row):
@@ -69,4 +75,4 @@ for arm in arms:
         if final is None:
             continue
         reached = next((s for s in sorted(curves[arm]) if curves[arm][s].get(m) is not None and abs(curves[arm][s][m] - final) <= 2), final_step)
-        print(f"  {LABEL.get(arm, arm):10s} {m:26s} final {final:7.2f} at step {final_step}; within 2 points from step {reached}")
+        print(f"  {label(arm):10s} {m:26s} final {final:7.2f} at step {final_step}; within 2 points from step {reached}")
