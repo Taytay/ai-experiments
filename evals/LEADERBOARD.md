@@ -1,6 +1,6 @@
 # Leaderboard
 
-Generated 2026-09-15 22:37 from `evals/runs.db`. One row per finished run+condition; all metrics.
+Generated 2026-09-15 22:38 from `evals/runs.db`. One row per finished run+condition; all metrics.
 
 
 ## casing
