@@ -317,6 +317,7 @@ Arm D runs both phases under one warmup + linear decay (`exp_curriculum.py:195, 
 (episodes) trains at half the peak LR or less.
 *Experiment:* D with a restarted schedule per phase; D with constant LR; D with 10% knowledge
 replay in phase 2. If any matches C, the recommendation becomes "interleave or replay".
+**Status (2026-09-16):** closed, PLAN step 12. REPORT.md 23. Three seeds each: with the schedule restarted per phase (Dr) or held constant (Dc), the episode phase erases the facts (formatted recall 28.1 +- 16.4 and 41.0 +- 18.8 against arm D's 91.5; induction from the weights back to arm A's level), so arm D's decaying schedule was protecting phase 1, not holding phase 2 back. With 10% knowledge replay in phase 2 (Dk) recall is 99.8 +- 0.3 and every level matches arm C within the seed noise, with lower WikiText perplexity (19.6 vs 22.6, clear). The recommendation is "interleave or replay"; the staging itself costs nothing once the earlier phase is replayed.
 
 **TRAIN-3 (R) When during training is knowledge acquired and when is ICL damaged?**
 Every arm is evaluated once at 800 steps; only train loss is logged (`exp_curriculum.py:218-222`).

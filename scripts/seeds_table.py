@@ -21,12 +21,14 @@ METRICS = [("L1_recall_fmt", "recall, trained fmt"), ("L1_recall", "recall, bare
            ("L4_induct_weakness", "weakness"), ("L4_induct_habitat", "habitat"), ("L3_induct_heldout", "held-out species"),
            ("ICL_symbol_mean", "ICL symbol"), ("ICL_natural_mean", "ICL natural"), ("K_arc_easy", "ARC-Easy"),
            ("L7_ppl_wikitext", "WikiText ppl")]
-GAPS = [("C", "A"), ("D", "A"), ("D", "C"), ("C", "base"), ("A", "base"), ("D", "base")]
+GAPS = [("C", "A"), ("D", "A"), ("D", "C"), ("C", "base"), ("A", "base"), ("D", "base"),
+        ("Dr", "D"), ("Dc", "D"), ("Dk", "D"), ("Dr", "C"), ("Dc", "C"), ("Dk", "C")]  # arm D controls (PLAN step 12); skipped when absent
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 ap.add_argument("tag", nargs="?", default="Qwen2.5-3B")
 ap.add_argument("--seeds", nargs="*", type=int, default=[0, 1, 2])
 ap.add_argument("--arms", nargs="*", default=["A", "C", "D"])
+ap.add_argument("--out", default=None, help="output file under reports/ (default seeds_<tag>.md)")
 a = ap.parse_args()
 R = ROOT / "results"
 
@@ -92,6 +94,6 @@ for key, name in METRICS:
         clear = "yes" if abs(d) > 2 * sd and sd > 0 else ("n/a" if sd == 0 else "no")
         md.append(f"| {name} | {x} - {y} | {d:+.1f} | {sd:.1f} | {2 * sd:.1f} | {clear} |")
         print(f"{name:22s} {x + ' - ' + y:10s} {d:+7.1f} {sd:6.1f}  {clear}")
-out = ROOT / "reports" / f"seeds_{a.tag}.md"
+out = ROOT / "reports" / (a.out or f"seeds_{a.tag}.md")
 out.write_text("\n".join(md) + "\n", encoding="utf-8")
 print(f"wrote {out.relative_to(ROOT)}")
