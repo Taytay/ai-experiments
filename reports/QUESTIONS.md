@@ -637,6 +637,8 @@ history), unseen merchant in the fact DB / seen name, unseen merchant in the fac
 like the ladder (`items.py` versioning), scored by option log-probability for the LLM and by prototype
 distance for encoders, per cell, with the null bands of section 12. This is the yardstick for REAL-5, REAL-4
 and row 22, and the merchant-side counterpart of the ladder.
+**Status (2026-09-19):** built and first-read, PLAN step 35, REPORT.md 37. `ai_experiments.real6` freezes 20 synthetic users over the section 36 history (8 to 20 categories each: the 12 standard ones merged or split, names standard / renamed / coined; 300-row labelled histories; 1,179 test items in seen / unseen merchant x name-type cells; a fact-DB record per merchant; 24-shot prompts and a record-in-prompt variant), `scripts/exp_real6.py` scores an LLM (option log-probability) or an encoder (prototypes) per cell with bootstrap intervals and null bands. Untrained: Qwen2.5-3B at 24 shots 25.4 (seen 31.1, unseen 20.2), Instruct 31.2; with the record 48.6 and 58.0 (Instruct: unseen 54.7, opaque unseen 52.0, coined names 38.6); encoder prototypes over the full history 55.6 (MiniLM) / 59.7 (bge-base) on seen merchants and 12 to 20 on unseen; the name mix helps standard-name categories only. These are row 33's targets. Real exports not used; the set has a stable interface for them.
+
 
 **INFRA-1 (O) Move the long queued runs off the 3090.**
 The 3090 runs one job at a time; arm C at 5,000 species for 20,000 steps (about 5.5 hours) and the Flan-T5
