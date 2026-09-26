@@ -3616,3 +3616,51 @@ Three things stand between this and a production claim. The synthetic statement 
 REAL-15 asked whether the fact DB goes into the weights better as supervised decisions than as prose. It does, by a wide margin: 94 against 65 on the merchants only the database knows, 96 against 35 on the opaque ones, with no record in the prompt at test and on users the model never saw. For merchants in a fact DB, database episodes are the parametric route to use, and the no-record categoriser with them (89.9 overall) is above the record-in-prompt categoriser on held-out users without rename augmentation (81.6, section 51) and close to it with (86.8).
 
 Not done: episodes with rename augmentation, other episode shares, the record in the prompt together with episodes, and the scale and rendering tests above.
+
+## 54. Experiments on Modal: the repository's scripts run unchanged on an H100, one 16-sequence pass per step trains six times faster than the 3090, the numbers agree within run-to-run noise, and a train-and-score job costs under a dollar (INFRA-1)
+
+*PLAN step 34, started 2026-09-25 when the owner provided Modal access (workspace `ynab`, shared; app `ai-experiments-training`, volumes `ai-exp-hf-cache` and `ai-exp-results`, names approved by the owner). Code: `scripts/modal_app.py`, job lists in `scripts/modal_jobs/`, `MICRO` in `scripts/exp_categoriser.py`, `scripts/modal_repro_tables.py`; Modal's agent skill in `.claude/skills/modal` (its bundled docs carry Modal's sample Docker Hub token, which GitHub push protection flags; replaced by an obvious placeholder).*
+
+The image is the project's own environment: Python 3.12 and `uv sync --frozen` from `pyproject.toml` and `uv.lock` (torch 2.11 + cu128, unsloth 2026.9.4, the versions on the 3090), built once and cached. The code, the frozen item sets and the tracker's `runs.jsonl` are mounted at container start and copied into a writable tree, so a code change does not rebuild the image; model downloads persist in a volume. Each job runs any list of the repository's commands with any environment (the chain scripts' conventions unchanged), streams their output, and writes every file they created or changed (results, adapters, tracker rows) to its own directory in the results volume, from which `modal volume get` brings them back to a checkout, `just push-models` and a union of `runs.jsonl` by run id. A job list runs in parallel, at most eight containers at a time (the volume's commits contend beyond about five).
+
+**Table 54.1: one run on two GPUs (row 56's all-label no-DB run, 200 steps, seed 0, 4-bit; interval = users resampled; paired with the 3090 run)**
+
+| GPU, micro-batches | train minutes | tokens/s | peak GiB | final loss | REAL-6 all [interval] | same predictions as the 3090 | minus the 3090 [interval] |
+|---|---|---|---|---|---|---|---|
+| 3090, 4 x 4 | 18.1 | 2369 | 9.13 | 0.002 | 80.4 [76.3, 84.1] | 100.0 | - |
+| H100, 4 x 4 | 4.9 | 8736 | 9.18 | 0.002 | 78.5 [73.9, 82.6] | 87.3 | -1.9 [-3.9, -0.1] |
+| H100, 1 x 16 | 3.0 | 14091 | 25.18 | 0.002 | 80.1 [75.6, 83.8] | 86.8 | -0.3 [-2.5, +1.7] |
+
+The three runs are the same code, data order and seed. The H100 with the 3090's four micro-batches of four trains in 4.9 minutes instead of 18.1 (3.7 times the tokens per second); one pass of 16 sequences per step, which fits in 25 GiB of the H100's 80, takes 3.0 minutes (5.9 times). The REAL-6 accuracies are within two points and the predictions agree on 87%, which is the same-seed run-to-run agreement the 3090 shows between separate runs (section 20); three seeds of the same recipe on the H100 later put its spread at 1.0 to 1.4 points (section 52.4). A job that trains and scores costs about $0.60 to $0.80 of H100 time; scoring, still batched for a 24 GB card, is now the larger half of it. Rows 57 and 58 ran as sixteen parallel jobs each in about twenty minutes, which would have been five hours each on the 3090.
+
+INFRA-1 is answered for the categoriser line, and from 2026-09-25 all GPU work runs there (the owner's decision). The long runs the row was first written for (arm C at 5,000 species, Flan-T5 at 1,000 and 5,000 species) were not run: the species-universe questions they served have been overtaken by the categoriser's, and row 59 asks the capacity question on the merchant database instead.
+
+## 55. Database episodes against the record in the prompt, with the same information: a tie (87.8 against 86.6 overall, 93.4 against 91.8 on the DB-only merchants); the category field is worth little to the record, and a database taught as decisions is as good as the database looked up at test (REAL-16)
+
+*PLAN step 58. Code: `REC_CAT` in `scripts/exp_categoriser.py` and `scripts/exp_real6.py` (the record in the prompt, in training and at test, states the merchant's category: `real6.category_record`), `scripts/modal_jobs/r58.json`, `scripts/fair_record_tables.py`. Every arm on Modal on one setting: H100, bf16 (the default from 2026-09-26), one 16-sequence pass per step, 200 steps, row 42's four held-out folds.*
+
+Section 53 found database episodes put the DB-only merchants at 94 on held-out users with no record at test, above the record-in-prompt categoriser's 87 (section 51), but the episodes were built from a category field the record in the prompt never carried, and the arms ran on different hardware and precision. This step gives the record the category ("Halvarro is a Home Improvement store that sells interior paint, garden hoses and plywood sheets") and runs all four arms alike.
+
+**Table 55.1: database episodes against the record in the prompt at equal information (held-out users; accuracy %; interval = users resampled)**
+
+| arm | all | standard | renamed | coined | in history | determined by category | split category | DB-only | DB-only known | DB-only opaque | interval (all) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| no DB (all-label) | 76.8 | 87.2 | 66.5 | 77.9 | 80.0 | 83.5 | 43.7 | 56.6 | 83.1 | 19.6 | [73.3, 80.0] |
+| database episodes (all-label), no record at test | 87.8 | 99.8 | 77.0 | 86.7 | 90.5 | 94.3 | 44.7 | 93.4 | 93.0 | 94.1 | [84.1, 91.0] |
+| record in the prompt, products | 85.0 | 98.9 | 78.2 | 72.7 | 90.1 | 88.6 | 49.5 | 88.5 | 88.7 | 88.2 | [80.7, 88.6] |
+| record in the prompt, with the category | 86.6 | 100.0 | 78.7 | 77.5 | 90.8 | 91.9 | 46.6 | 91.8 | 91.5 | 92.2 | [82.5, 90.4] |
+
+**Table 55.2: paired differences on the same items, points [user-resampled 95% interval]**
+
+| comparison | all | coined | determined by category | DB-only | DB-only opaque |
+|---|---|---|---|---|---|
+| database episodes (all-label), no record at test minus no DB (all-label) | +10.9 [+7.9, +13.8] | +8.8 [+2.2, +14.5] | +10.8 [+7.0, +14.7] | +36.9 [+28.1, +44.3] | +74.5 [+60.0, +91.5] |
+| record in the prompt, with the category minus no DB (all-label) | +9.8 [+6.0, +13.1] | -0.4 [-15.0, +13.1] | +8.4 [+2.9, +14.3] | +35.2 [+26.5, +44.1] | +72.5 [+55.4, +93.9] |
+| record in the prompt, with the category minus record in the prompt, products | +1.6 [-1.3, +4.4] | +4.8 [-9.4, +18.8] | +3.3 [-2.5, +9.4] | +3.3 [+0.7, +6.2] | +3.9 [+0.0, +9.8] |
+| database episodes (all-label), no record at test minus record in the prompt, with the category | +1.2 [-2.7, +5.0] | +9.2 [-2.4, +20.7] | +2.4 [-1.5, +6.4] | +1.6 [-3.5, +6.5] | +2.0 [-7.5, +8.5] |
+
+With the same information the two routes tie: database episodes, with nothing in the prompt about the merchant, read 87.8 [84.1, 91.0] on held-out users and 93.4 on the DB-only merchants; the record in the prompt with the category reads 86.6 [82.5, 90.4] and 91.8 (paired +1.2 [-2.7, 5.0] and +1.6 [-3.5, 6.5]). The category field adds little to the record (+1.6 overall, +3.3 on the DB-only merchants): the product sentence already names the category for these disjoint pools, and section 43's ambiguous records are where it would matter more. The episodes' clearer edge is on coined names (+9.2 [-2.4, 20.7]), which comes from the all-label loss the record arms do not use, not from the database. On bf16 the no-DB all-label arm reads 76.8 against 73.4 on the 4-bit base in section 53, inside the spread of the cross-precision runs of section 52.
+
+REAL-16 asked whether database episodes beat the record in the prompt at equal information. They match it. So a merchant database can be served from the weights at no loss against retrieval, at this size: no lookup at serving time, and it still works when retrieval cannot find the record, at the cost of retraining when the database changes. Which to prefer then turns on the database's size and churn: row 59 measures how many merchants the weights can hold, and the combination (episodes in training, the record in the prompt when it is found) is the obvious next arm.
+
+Not done: episodes with the record also in the prompt, the record arms with the all-label loss and rename augmentation, and the ambiguous database of section 43.
