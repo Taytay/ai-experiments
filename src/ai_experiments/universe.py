@@ -47,13 +47,26 @@ _B = ["orc", "rock", "sup", "ble", "van", "dor", "ish", "ax", "urn", "eel", "ott
 # then t-type with probability morph_p (the "drug stem" / "retailer variant" mechanism).
 MARKER = dict(zip(TYPE_LIST, ["orc", "ash", "eel", "ath", "ilk", "ome", "urn", "ent"]))
 _B_PLAIN = [b for b in _B if b not in MARKER.values()]
+# PLAN step 21 (DATA-3): a prefix-marker universe (the stem at the front of the name, as in drug INN stems), and never-trained
+# name parts for the unseen-part probes: prefixes outside _A, suffixes outside _B
+PREFIX_MARKER = dict(zip(TYPE_LIST, ["Zev", "Quor", "Mib", "Tesk", "Ral", "Ombu", "Vik", "Naz"]))
+_A2 = ["Vru", "Kesh", "Olm", "Tyx", "Bran", "Ceph", "Dwin", "Fyr", "Glos", "Hux", "Jem", "Plax"]  # unseen prefixes
+_B2 = ["ulth", "ymm", "osk", "ave", "irk", "ondo", "eft", "ock"]  # unseen suffixes
+assert not (set(_A2) & set(_A)) and not (set(PREFIX_MARKER.values()) & (set(_A) | set(_A2))) and not (set(_B2) & set(_B))
 
 
-def _name(rng, names, t=None, morph_p=0.0, marked=None):
+def _name(rng, names, t=None, morph_p=0.0, marked=None, pos="suffix", prefixes=None, suffixes=None):
+    """pos="suffix": the marker is the type's MARKER suffix; "prefix": the type's PREFIX_MARKER at the front. prefixes / suffixes
+    override the plain pools (the unseen-part probes)."""
     while True:
-        a = rng.choice(_A)  # draw order kept identical to the original build() when morph_p == 0
-        m = marked if marked is not None else (morph_p > 0 and t is not None and rng.random() < morph_p)
-        suf = MARKER[t] if m else rng.choice(_B_PLAIN if morph_p > 0 else _B)
+        if pos == "prefix":
+            m = marked if marked is not None else (morph_p > 0 and t is not None and rng.random() < morph_p)
+            a = PREFIX_MARKER[t] if m else rng.choice(prefixes or _A)
+            suf = rng.choice(suffixes or _B)
+        else:
+            a = rng.choice(prefixes or _A)  # draw order kept identical to the original build() when morph_p == 0
+            m = marked if marked is not None else (morph_p > 0 and t is not None and rng.random() < morph_p)
+            suf = MARKER[t] if m else rng.choice(suffixes or (_B_PLAIN if morph_p > 0 else _B))
         n = a + suf
         if n not in names:
             names.add(n); return n, m
@@ -71,15 +84,16 @@ def _name3(rng, names):
             names.add(n); return n, False
 
 
-def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0):
+def build(n_per_type=20, seed=0, holdout_per_type=3, morph_p=0.0, morph_pos="suffix"):
     """n_per_type=20 is the 160-species universe of every section; larger universes (REAL-3: 125 and 625 per type) use
-    three-part names because the two-part name space is 864, and are otherwise drawn the same way."""
+    three-part names because the two-part name space is 864, and are otherwise drawn the same way. morph_p > 0 marks that
+    share of names with their type's stem, as a suffix (sections 8 and 15) or a prefix (PLAN step 21)."""
     rng = random.Random(seed)
     names, species = set(), []
     three = n_per_type * len(TYPE_LIST) > 600
     for t in TYPE_LIST:
         for i in range(n_per_type):
-            n, _ = _name3(rng, names) if three else _name(rng, names, t, morph_p)
+            n, _ = _name3(rng, names) if three else _name(rng, names, t, morph_p, pos=morph_pos)
             species.append(dict(name=n, type=t, weakness=WEAKNESS[t], habitat=rng.choice(HABITATS),
                                 diet=rng.choice(DIETS), region=rng.choice(REGIONS), stage=rng.randint(1, 3),
                                 heldout=(i < holdout_per_type)))
@@ -325,16 +339,16 @@ GENERAL_TEXT = None  # reuse merchants.GENERAL_TEXT
 
 
 # ------------------------------------------------------------------ morphology probes
-def probes(species, seed=5, n_per_type=6):
-    """Never-trained names. 'marked' probes end in their type's MARKER suffix, 'plain' ones
-    do not. Type recall above chance on marked probes = morphology transfer; plain = control."""
+def probes(species, seed=5, n_per_type=6, pos="suffix"):
+    """Never-trained names. 'marked' probes carry their type's marker (the MARKER suffix, or the PREFIX_MARKER in a prefix
+    universe), 'plain' ones do not. Type recall above chance on marked probes = morphology transfer; plain = control."""
     rng = random.Random(seed)
     names = {s["name"] for s in species}
     items = []
     for t in TYPE_LIST:
         for _ in range(n_per_type):
             for level, marked in (("M_probe_marked", True), ("M_probe_plain", False)):
-                n, _m = _name(rng, names, t, 1.0, marked=marked)
+                n, _m = _name(rng, names, t, 1.0, marked=marked, pos=pos)
                 items.append(dict(level=level, prompt=f"Question: What type is {n}?\nAnswer:",
                                   options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
                 # same probe in the trained answer format (bare type names score ~20% even for
@@ -586,3 +600,24 @@ def rule_agreement(item, species_by_name, attrs=("type", "habitat", "diet", "reg
             out[a] = None; continue
         out[a] = vals.index(q[a]) if q[a] in vals else None
     return out
+
+
+def probes_v2(species, seed=33, n_per_type=6, pos="suffix"):
+    """DATA-3: probes whose non-marker part is a name part NO trained name has (an unseen prefix with the marker suffix, or an
+    unseen suffix with the marker prefix), so the only familiar thing in the name is the stem. 'marked' carries the type's
+    marker, 'plain' a never-trained neutral part in its place. Levels M2_probe_marked / M2_probe_plain (+ _fmt)."""
+    rng = random.Random(seed)
+    names = {s["name"] for s in species}
+    items = []
+    for t in TYPE_LIST:
+        for _ in range(n_per_type):
+            for level, marked in (("M2_probe_marked", True), ("M2_probe_plain", False)):
+                if pos == "prefix":
+                    n, _m = _name(rng, names, t, 1.0, marked=marked, pos="prefix", prefixes=_A2, suffixes=_B2)
+                else:
+                    n, _m = _name(rng, names, t, 1.0, marked=marked, pos="suffix", prefixes=_A2, suffixes=_B2)
+                items.append(dict(level=level, prompt=f"Question: What type is {n}?\nAnswer:",
+                                  options=[" " + o for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
+                items.append(dict(level=level + "_fmt", prompt=f"Question: What type is {n}?\nAnswer:",
+                                  options=[f" {n} is a {o}-type." for o in TYPE_LIST], answer=TYPE_LIST.index(t), query=n))
+    return items

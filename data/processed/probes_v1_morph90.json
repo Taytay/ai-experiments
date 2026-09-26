@@ -1,0 +1,3275 @@
+{
+ "name": "probes",
+ "version": "v1",
+ "morph_p": 0.7,
+ "n_items": 192,
+ "n_species": 160,
+ "species_sha256": "726e9e93e92cb202a2090d9c60bc14bedb01924798a71591804c26cb898a6843",
+ "sha256": "22714d577d32067e05161fe09aa7cfcb95deb02df112d2e386817ea9ade60625",
+ "items": [
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Syaorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Syaorc",
+   "id": "M_probe_marked:000"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Syaorc?\nAnswer:",
+   "options": [
+    " Syaorc is a Voltrix-type.",
+    " Syaorc is a Pyrrhan-type.",
+    " Syaorc is a Tidewell-type.",
+    " Syaorc is a Lithor-type.",
+    " Syaorc is a Verdane-type.",
+    " Syaorc is a Umbrine-type.",
+    " Syaorc is a Gustral-type.",
+    " Syaorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Syaorc",
+   "id": "M_probe_marked_fmt:000"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Brirock?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Brirock",
+   "id": "M_probe_plain:000"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Brirock?\nAnswer:",
+   "options": [
+    " Brirock is a Voltrix-type.",
+    " Brirock is a Pyrrhan-type.",
+    " Brirock is a Tidewell-type.",
+    " Brirock is a Lithor-type.",
+    " Brirock is a Verdane-type.",
+    " Brirock is a Umbrine-type.",
+    " Brirock is a Gustral-type.",
+    " Brirock is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Brirock",
+   "id": "M_probe_plain_fmt:000"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Ithorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Ithorc",
+   "id": "M_probe_marked:001"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Ithorc?\nAnswer:",
+   "options": [
+    " Ithorc is a Voltrix-type.",
+    " Ithorc is a Pyrrhan-type.",
+    " Ithorc is a Tidewell-type.",
+    " Ithorc is a Lithor-type.",
+    " Ithorc is a Verdane-type.",
+    " Ithorc is a Umbrine-type.",
+    " Ithorc is a Gustral-type.",
+    " Ithorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Ithorc",
+   "id": "M_probe_marked_fmt:001"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Orvsup?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Orvsup",
+   "id": "M_probe_plain:001"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Orvsup?\nAnswer:",
+   "options": [
+    " Orvsup is a Voltrix-type.",
+    " Orvsup is a Pyrrhan-type.",
+    " Orvsup is a Tidewell-type.",
+    " Orvsup is a Lithor-type.",
+    " Orvsup is a Verdane-type.",
+    " Orvsup is a Umbrine-type.",
+    " Orvsup is a Gustral-type.",
+    " Orvsup is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Orvsup",
+   "id": "M_probe_plain_fmt:001"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Pexorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Pexorc",
+   "id": "M_probe_marked:002"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Pexorc?\nAnswer:",
+   "options": [
+    " Pexorc is a Voltrix-type.",
+    " Pexorc is a Pyrrhan-type.",
+    " Pexorc is a Tidewell-type.",
+    " Pexorc is a Lithor-type.",
+    " Pexorc is a Verdane-type.",
+    " Pexorc is a Umbrine-type.",
+    " Pexorc is a Gustral-type.",
+    " Pexorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Pexorc",
+   "id": "M_probe_marked_fmt:002"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Gribell?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Gribell",
+   "id": "M_probe_plain:002"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Gribell?\nAnswer:",
+   "options": [
+    " Gribell is a Voltrix-type.",
+    " Gribell is a Pyrrhan-type.",
+    " Gribell is a Tidewell-type.",
+    " Gribell is a Lithor-type.",
+    " Gribell is a Verdane-type.",
+    " Gribell is a Umbrine-type.",
+    " Gribell is a Gustral-type.",
+    " Gribell is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Gribell",
+   "id": "M_probe_plain_fmt:002"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Javorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Javorc",
+   "id": "M_probe_marked:003"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Javorc?\nAnswer:",
+   "options": [
+    " Javorc is a Voltrix-type.",
+    " Javorc is a Pyrrhan-type.",
+    " Javorc is a Tidewell-type.",
+    " Javorc is a Lithor-type.",
+    " Javorc is a Verdane-type.",
+    " Javorc is a Umbrine-type.",
+    " Javorc is a Gustral-type.",
+    " Javorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Javorc",
+   "id": "M_probe_marked_fmt:003"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Orvig?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Orvig",
+   "id": "M_probe_plain:003"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Orvig?\nAnswer:",
+   "options": [
+    " Orvig is a Voltrix-type.",
+    " Orvig is a Pyrrhan-type.",
+    " Orvig is a Tidewell-type.",
+    " Orvig is a Lithor-type.",
+    " Orvig is a Verdane-type.",
+    " Orvig is a Umbrine-type.",
+    " Orvig is a Gustral-type.",
+    " Orvig is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Orvig",
+   "id": "M_probe_plain_fmt:003"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Tunorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Tunorc",
+   "id": "M_probe_marked:004"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Tunorc?\nAnswer:",
+   "options": [
+    " Tunorc is a Voltrix-type.",
+    " Tunorc is a Pyrrhan-type.",
+    " Tunorc is a Tidewell-type.",
+    " Tunorc is a Lithor-type.",
+    " Tunorc is a Verdane-type.",
+    " Tunorc is a Umbrine-type.",
+    " Tunorc is a Gustral-type.",
+    " Tunorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Tunorc",
+   "id": "M_probe_marked_fmt:004"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Orvrock?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Orvrock",
+   "id": "M_probe_plain:004"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Orvrock?\nAnswer:",
+   "options": [
+    " Orvrock is a Voltrix-type.",
+    " Orvrock is a Pyrrhan-type.",
+    " Orvrock is a Tidewell-type.",
+    " Orvrock is a Lithor-type.",
+    " Orvrock is a Verdane-type.",
+    " Orvrock is a Umbrine-type.",
+    " Orvrock is a Gustral-type.",
+    " Orvrock is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Orvrock",
+   "id": "M_probe_plain_fmt:004"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Quonorc?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Quonorc",
+   "id": "M_probe_marked:005"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Quonorc?\nAnswer:",
+   "options": [
+    " Quonorc is a Voltrix-type.",
+    " Quonorc is a Pyrrhan-type.",
+    " Quonorc is a Tidewell-type.",
+    " Quonorc is a Lithor-type.",
+    " Quonorc is a Verdane-type.",
+    " Quonorc is a Umbrine-type.",
+    " Quonorc is a Gustral-type.",
+    " Quonorc is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Quonorc",
+   "id": "M_probe_marked_fmt:005"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Dolish?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "query": "Dolish",
+   "id": "M_probe_plain:005"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Dolish?\nAnswer:",
+   "options": [
+    " Dolish is a Voltrix-type.",
+    " Dolish is a Pyrrhan-type.",
+    " Dolish is a Tidewell-type.",
+    " Dolish is a Lithor-type.",
+    " Dolish is a Verdane-type.",
+    " Dolish is a Umbrine-type.",
+    " Dolish is a Gustral-type.",
+    " Dolish is a Frostel-type."
+   ],
+   "answer": 0,
+   "query": "Dolish",
+   "id": "M_probe_plain_fmt:005"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Pexash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Pexash",
+   "id": "M_probe_marked:006"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Pexash?\nAnswer:",
+   "options": [
+    " Pexash is a Voltrix-type.",
+    " Pexash is a Pyrrhan-type.",
+    " Pexash is a Tidewell-type.",
+    " Pexash is a Lithor-type.",
+    " Pexash is a Verdane-type.",
+    " Pexash is a Umbrine-type.",
+    " Pexash is a Gustral-type.",
+    " Pexash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Pexash",
+   "id": "M_probe_marked_fmt:006"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Pexine?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Pexine",
+   "id": "M_probe_plain:006"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Pexine?\nAnswer:",
+   "options": [
+    " Pexine is a Voltrix-type.",
+    " Pexine is a Pyrrhan-type.",
+    " Pexine is a Tidewell-type.",
+    " Pexine is a Lithor-type.",
+    " Pexine is a Verdane-type.",
+    " Pexine is a Umbrine-type.",
+    " Pexine is a Gustral-type.",
+    " Pexine is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Pexine",
+   "id": "M_probe_plain_fmt:006"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Yorash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Yorash",
+   "id": "M_probe_marked:007"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Yorash?\nAnswer:",
+   "options": [
+    " Yorash is a Voltrix-type.",
+    " Yorash is a Pyrrhan-type.",
+    " Yorash is a Tidewell-type.",
+    " Yorash is a Lithor-type.",
+    " Yorash is a Verdane-type.",
+    " Yorash is a Umbrine-type.",
+    " Yorash is a Gustral-type.",
+    " Yorash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Yorash",
+   "id": "M_probe_marked_fmt:007"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Draax?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Draax",
+   "id": "M_probe_plain:007"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Draax?\nAnswer:",
+   "options": [
+    " Draax is a Voltrix-type.",
+    " Draax is a Pyrrhan-type.",
+    " Draax is a Tidewell-type.",
+    " Draax is a Lithor-type.",
+    " Draax is a Verdane-type.",
+    " Draax is a Umbrine-type.",
+    " Draax is a Gustral-type.",
+    " Draax is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Draax",
+   "id": "M_probe_plain_fmt:007"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Dolash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Dolash",
+   "id": "M_probe_marked:008"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Dolash?\nAnswer:",
+   "options": [
+    " Dolash is a Voltrix-type.",
+    " Dolash is a Pyrrhan-type.",
+    " Dolash is a Tidewell-type.",
+    " Dolash is a Lithor-type.",
+    " Dolash is a Verdane-type.",
+    " Dolash is a Umbrine-type.",
+    " Dolash is a Gustral-type.",
+    " Dolash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Dolash",
+   "id": "M_probe_marked_fmt:008"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Wexrock?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Wexrock",
+   "id": "M_probe_plain:008"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Wexrock?\nAnswer:",
+   "options": [
+    " Wexrock is a Voltrix-type.",
+    " Wexrock is a Pyrrhan-type.",
+    " Wexrock is a Tidewell-type.",
+    " Wexrock is a Lithor-type.",
+    " Wexrock is a Verdane-type.",
+    " Wexrock is a Umbrine-type.",
+    " Wexrock is a Gustral-type.",
+    " Wexrock is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Wexrock",
+   "id": "M_probe_plain_fmt:008"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Cynash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Cynash",
+   "id": "M_probe_marked:009"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Cynash?\nAnswer:",
+   "options": [
+    " Cynash is a Voltrix-type.",
+    " Cynash is a Pyrrhan-type.",
+    " Cynash is a Tidewell-type.",
+    " Cynash is a Lithor-type.",
+    " Cynash is a Verdane-type.",
+    " Cynash is a Umbrine-type.",
+    " Cynash is a Gustral-type.",
+    " Cynash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Cynash",
+   "id": "M_probe_marked_fmt:009"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Falish?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Falish",
+   "id": "M_probe_plain:009"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Falish?\nAnswer:",
+   "options": [
+    " Falish is a Voltrix-type.",
+    " Falish is a Pyrrhan-type.",
+    " Falish is a Tidewell-type.",
+    " Falish is a Lithor-type.",
+    " Falish is a Verdane-type.",
+    " Falish is a Umbrine-type.",
+    " Falish is a Gustral-type.",
+    " Falish is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Falish",
+   "id": "M_probe_plain_fmt:009"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Morash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Morash",
+   "id": "M_probe_marked:010"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Morash?\nAnswer:",
+   "options": [
+    " Morash is a Voltrix-type.",
+    " Morash is a Pyrrhan-type.",
+    " Morash is a Tidewell-type.",
+    " Morash is a Lithor-type.",
+    " Morash is a Verdane-type.",
+    " Morash is a Umbrine-type.",
+    " Morash is a Gustral-type.",
+    " Morash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Morash",
+   "id": "M_probe_marked_fmt:010"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Syable?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Syable",
+   "id": "M_probe_plain:010"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Syable?\nAnswer:",
+   "options": [
+    " Syable is a Voltrix-type.",
+    " Syable is a Pyrrhan-type.",
+    " Syable is a Tidewell-type.",
+    " Syable is a Lithor-type.",
+    " Syable is a Verdane-type.",
+    " Syable is a Umbrine-type.",
+    " Syable is a Gustral-type.",
+    " Syable is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Syable",
+   "id": "M_probe_plain_fmt:010"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Zarash?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Zarash",
+   "id": "M_probe_marked:011"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Zarash?\nAnswer:",
+   "options": [
+    " Zarash is a Voltrix-type.",
+    " Zarash is a Pyrrhan-type.",
+    " Zarash is a Tidewell-type.",
+    " Zarash is a Lithor-type.",
+    " Zarash is a Verdane-type.",
+    " Zarash is a Umbrine-type.",
+    " Zarash is a Gustral-type.",
+    " Zarash is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Zarash",
+   "id": "M_probe_marked_fmt:011"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Zarble?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "query": "Zarble",
+   "id": "M_probe_plain:011"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Zarble?\nAnswer:",
+   "options": [
+    " Zarble is a Voltrix-type.",
+    " Zarble is a Pyrrhan-type.",
+    " Zarble is a Tidewell-type.",
+    " Zarble is a Lithor-type.",
+    " Zarble is a Verdane-type.",
+    " Zarble is a Umbrine-type.",
+    " Zarble is a Gustral-type.",
+    " Zarble is a Frostel-type."
+   ],
+   "answer": 1,
+   "query": "Zarble",
+   "id": "M_probe_plain_fmt:011"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Brieel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Brieel",
+   "id": "M_probe_marked:012"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Brieel?\nAnswer:",
+   "options": [
+    " Brieel is a Voltrix-type.",
+    " Brieel is a Pyrrhan-type.",
+    " Brieel is a Tidewell-type.",
+    " Brieel is a Lithor-type.",
+    " Brieel is a Verdane-type.",
+    " Brieel is a Umbrine-type.",
+    " Brieel is a Gustral-type.",
+    " Brieel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Brieel",
+   "id": "M_probe_marked_fmt:012"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Wexarn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Wexarn",
+   "id": "M_probe_plain:012"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Wexarn?\nAnswer:",
+   "options": [
+    " Wexarn is a Voltrix-type.",
+    " Wexarn is a Pyrrhan-type.",
+    " Wexarn is a Tidewell-type.",
+    " Wexarn is a Lithor-type.",
+    " Wexarn is a Verdane-type.",
+    " Wexarn is a Umbrine-type.",
+    " Wexarn is a Gustral-type.",
+    " Wexarn is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Wexarn",
+   "id": "M_probe_plain_fmt:012"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Yoreel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Yoreel",
+   "id": "M_probe_marked:013"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Yoreel?\nAnswer:",
+   "options": [
+    " Yoreel is a Voltrix-type.",
+    " Yoreel is a Pyrrhan-type.",
+    " Yoreel is a Tidewell-type.",
+    " Yoreel is a Lithor-type.",
+    " Yoreel is a Verdane-type.",
+    " Yoreel is a Umbrine-type.",
+    " Yoreel is a Gustral-type.",
+    " Yoreel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Yoreel",
+   "id": "M_probe_marked_fmt:013"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Quonarn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Quonarn",
+   "id": "M_probe_plain:013"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Quonarn?\nAnswer:",
+   "options": [
+    " Quonarn is a Voltrix-type.",
+    " Quonarn is a Pyrrhan-type.",
+    " Quonarn is a Tidewell-type.",
+    " Quonarn is a Lithor-type.",
+    " Quonarn is a Verdane-type.",
+    " Quonarn is a Umbrine-type.",
+    " Quonarn is a Gustral-type.",
+    " Quonarn is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Quonarn",
+   "id": "M_probe_plain_fmt:013"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Zimeel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Zimeel",
+   "id": "M_probe_marked:014"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Zimeel?\nAnswer:",
+   "options": [
+    " Zimeel is a Voltrix-type.",
+    " Zimeel is a Pyrrhan-type.",
+    " Zimeel is a Tidewell-type.",
+    " Zimeel is a Lithor-type.",
+    " Zimeel is a Verdane-type.",
+    " Zimeel is a Umbrine-type.",
+    " Zimeel is a Gustral-type.",
+    " Zimeel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Zimeel",
+   "id": "M_probe_marked_fmt:014"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Syarock?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Syarock",
+   "id": "M_probe_plain:014"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Syarock?\nAnswer:",
+   "options": [
+    " Syarock is a Voltrix-type.",
+    " Syarock is a Pyrrhan-type.",
+    " Syarock is a Tidewell-type.",
+    " Syarock is a Lithor-type.",
+    " Syarock is a Verdane-type.",
+    " Syarock is a Umbrine-type.",
+    " Syarock is a Gustral-type.",
+    " Syarock is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Syarock",
+   "id": "M_probe_plain_fmt:014"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Frodeel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Frodeel",
+   "id": "M_probe_marked:015"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Frodeel?\nAnswer:",
+   "options": [
+    " Frodeel is a Voltrix-type.",
+    " Frodeel is a Pyrrhan-type.",
+    " Frodeel is a Tidewell-type.",
+    " Frodeel is a Lithor-type.",
+    " Frodeel is a Verdane-type.",
+    " Frodeel is a Umbrine-type.",
+    " Frodeel is a Gustral-type.",
+    " Frodeel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Frodeel",
+   "id": "M_probe_marked_fmt:015"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Oxxoz?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Oxxoz",
+   "id": "M_probe_plain:015"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Oxxoz?\nAnswer:",
+   "options": [
+    " Oxxoz is a Voltrix-type.",
+    " Oxxoz is a Pyrrhan-type.",
+    " Oxxoz is a Tidewell-type.",
+    " Oxxoz is a Lithor-type.",
+    " Oxxoz is a Verdane-type.",
+    " Oxxoz is a Umbrine-type.",
+    " Oxxoz is a Gustral-type.",
+    " Oxxoz is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Oxxoz",
+   "id": "M_probe_plain_fmt:015"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Blaxeel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Blaxeel",
+   "id": "M_probe_marked:016"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Blaxeel?\nAnswer:",
+   "options": [
+    " Blaxeel is a Voltrix-type.",
+    " Blaxeel is a Pyrrhan-type.",
+    " Blaxeel is a Tidewell-type.",
+    " Blaxeel is a Lithor-type.",
+    " Blaxeel is a Verdane-type.",
+    " Blaxeel is a Umbrine-type.",
+    " Blaxeel is a Gustral-type.",
+    " Blaxeel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Blaxeel",
+   "id": "M_probe_marked_fmt:016"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Hyssup?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Hyssup",
+   "id": "M_probe_plain:016"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Hyssup?\nAnswer:",
+   "options": [
+    " Hyssup is a Voltrix-type.",
+    " Hyssup is a Pyrrhan-type.",
+    " Hyssup is a Tidewell-type.",
+    " Hyssup is a Lithor-type.",
+    " Hyssup is a Verdane-type.",
+    " Hyssup is a Umbrine-type.",
+    " Hyssup is a Gustral-type.",
+    " Hyssup is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Hyssup",
+   "id": "M_probe_plain_fmt:016"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Orveel?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Orveel",
+   "id": "M_probe_marked:017"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Orveel?\nAnswer:",
+   "options": [
+    " Orveel is a Voltrix-type.",
+    " Orveel is a Pyrrhan-type.",
+    " Orveel is a Tidewell-type.",
+    " Orveel is a Lithor-type.",
+    " Orveel is a Verdane-type.",
+    " Orveel is a Umbrine-type.",
+    " Orveel is a Gustral-type.",
+    " Orveel is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Orveel",
+   "id": "M_probe_marked_fmt:017"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Ithell?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "query": "Ithell",
+   "id": "M_probe_plain:017"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Ithell?\nAnswer:",
+   "options": [
+    " Ithell is a Voltrix-type.",
+    " Ithell is a Pyrrhan-type.",
+    " Ithell is a Tidewell-type.",
+    " Ithell is a Lithor-type.",
+    " Ithell is a Verdane-type.",
+    " Ithell is a Umbrine-type.",
+    " Ithell is a Gustral-type.",
+    " Ithell is a Frostel-type."
+   ],
+   "answer": 2,
+   "query": "Ithell",
+   "id": "M_probe_plain_fmt:017"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Briath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Briath",
+   "id": "M_probe_marked:018"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Briath?\nAnswer:",
+   "options": [
+    " Briath is a Voltrix-type.",
+    " Briath is a Pyrrhan-type.",
+    " Briath is a Tidewell-type.",
+    " Briath is a Lithor-type.",
+    " Briath is a Verdane-type.",
+    " Briath is a Umbrine-type.",
+    " Briath is a Gustral-type.",
+    " Briath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Briath",
+   "id": "M_probe_marked_fmt:018"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Myrump?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Myrump",
+   "id": "M_probe_plain:018"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Myrump?\nAnswer:",
+   "options": [
+    " Myrump is a Voltrix-type.",
+    " Myrump is a Pyrrhan-type.",
+    " Myrump is a Tidewell-type.",
+    " Myrump is a Lithor-type.",
+    " Myrump is a Verdane-type.",
+    " Myrump is a Umbrine-type.",
+    " Myrump is a Gustral-type.",
+    " Myrump is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Myrump",
+   "id": "M_probe_plain_fmt:018"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Tunath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Tunath",
+   "id": "M_probe_marked:019"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Tunath?\nAnswer:",
+   "options": [
+    " Tunath is a Voltrix-type.",
+    " Tunath is a Pyrrhan-type.",
+    " Tunath is a Tidewell-type.",
+    " Tunath is a Lithor-type.",
+    " Tunath is a Verdane-type.",
+    " Tunath is a Umbrine-type.",
+    " Tunath is a Gustral-type.",
+    " Tunath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Tunath",
+   "id": "M_probe_marked_fmt:019"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Cynine?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Cynine",
+   "id": "M_probe_plain:019"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Cynine?\nAnswer:",
+   "options": [
+    " Cynine is a Voltrix-type.",
+    " Cynine is a Pyrrhan-type.",
+    " Cynine is a Tidewell-type.",
+    " Cynine is a Lithor-type.",
+    " Cynine is a Verdane-type.",
+    " Cynine is a Umbrine-type.",
+    " Cynine is a Gustral-type.",
+    " Cynine is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Cynine",
+   "id": "M_probe_plain_fmt:019"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Gorath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Gorath",
+   "id": "M_probe_marked:020"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Gorath?\nAnswer:",
+   "options": [
+    " Gorath is a Voltrix-type.",
+    " Gorath is a Pyrrhan-type.",
+    " Gorath is a Tidewell-type.",
+    " Gorath is a Lithor-type.",
+    " Gorath is a Verdane-type.",
+    " Gorath is a Umbrine-type.",
+    " Gorath is a Gustral-type.",
+    " Gorath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Gorath",
+   "id": "M_probe_marked_fmt:020"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Velax?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Velax",
+   "id": "M_probe_plain:020"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Velax?\nAnswer:",
+   "options": [
+    " Velax is a Voltrix-type.",
+    " Velax is a Pyrrhan-type.",
+    " Velax is a Tidewell-type.",
+    " Velax is a Lithor-type.",
+    " Velax is a Verdane-type.",
+    " Velax is a Umbrine-type.",
+    " Velax is a Gustral-type.",
+    " Velax is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Velax",
+   "id": "M_probe_plain_fmt:020"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Cynath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Cynath",
+   "id": "M_probe_marked:021"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Cynath?\nAnswer:",
+   "options": [
+    " Cynath is a Voltrix-type.",
+    " Cynath is a Pyrrhan-type.",
+    " Cynath is a Tidewell-type.",
+    " Cynath is a Lithor-type.",
+    " Cynath is a Verdane-type.",
+    " Cynath is a Umbrine-type.",
+    " Cynath is a Gustral-type.",
+    " Cynath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Cynath",
+   "id": "M_probe_marked_fmt:021"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Morook?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Morook",
+   "id": "M_probe_plain:021"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Morook?\nAnswer:",
+   "options": [
+    " Morook is a Voltrix-type.",
+    " Morook is a Pyrrhan-type.",
+    " Morook is a Tidewell-type.",
+    " Morook is a Lithor-type.",
+    " Morook is a Verdane-type.",
+    " Morook is a Umbrine-type.",
+    " Morook is a Gustral-type.",
+    " Morook is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Morook",
+   "id": "M_probe_plain_fmt:021"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Tavath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Tavath",
+   "id": "M_probe_marked:022"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Tavath?\nAnswer:",
+   "options": [
+    " Tavath is a Voltrix-type.",
+    " Tavath is a Pyrrhan-type.",
+    " Tavath is a Tidewell-type.",
+    " Tavath is a Lithor-type.",
+    " Tavath is a Verdane-type.",
+    " Tavath is a Umbrine-type.",
+    " Tavath is a Gustral-type.",
+    " Tavath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Tavath",
+   "id": "M_probe_marked_fmt:022"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Nolble?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Nolble",
+   "id": "M_probe_plain:022"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Nolble?\nAnswer:",
+   "options": [
+    " Nolble is a Voltrix-type.",
+    " Nolble is a Pyrrhan-type.",
+    " Nolble is a Tidewell-type.",
+    " Nolble is a Lithor-type.",
+    " Nolble is a Verdane-type.",
+    " Nolble is a Umbrine-type.",
+    " Nolble is a Gustral-type.",
+    " Nolble is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Nolble",
+   "id": "M_probe_plain_fmt:022"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Wexath?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Wexath",
+   "id": "M_probe_marked:023"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Wexath?\nAnswer:",
+   "options": [
+    " Wexath is a Voltrix-type.",
+    " Wexath is a Pyrrhan-type.",
+    " Wexath is a Tidewell-type.",
+    " Wexath is a Lithor-type.",
+    " Wexath is a Verdane-type.",
+    " Wexath is a Umbrine-type.",
+    " Wexath is a Gustral-type.",
+    " Wexath is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Wexath",
+   "id": "M_probe_marked_fmt:023"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Yorine?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "query": "Yorine",
+   "id": "M_probe_plain:023"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Yorine?\nAnswer:",
+   "options": [
+    " Yorine is a Voltrix-type.",
+    " Yorine is a Pyrrhan-type.",
+    " Yorine is a Tidewell-type.",
+    " Yorine is a Lithor-type.",
+    " Yorine is a Verdane-type.",
+    " Yorine is a Umbrine-type.",
+    " Yorine is a Gustral-type.",
+    " Yorine is a Frostel-type."
+   ],
+   "answer": 3,
+   "query": "Yorine",
+   "id": "M_probe_plain_fmt:023"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Javilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Javilk",
+   "id": "M_probe_marked:024"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Javilk?\nAnswer:",
+   "options": [
+    " Javilk is a Voltrix-type.",
+    " Javilk is a Pyrrhan-type.",
+    " Javilk is a Tidewell-type.",
+    " Javilk is a Lithor-type.",
+    " Javilk is a Verdane-type.",
+    " Javilk is a Umbrine-type.",
+    " Javilk is a Gustral-type.",
+    " Javilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Javilk",
+   "id": "M_probe_marked_fmt:024"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Pexsup?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Pexsup",
+   "id": "M_probe_plain:024"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Pexsup?\nAnswer:",
+   "options": [
+    " Pexsup is a Voltrix-type.",
+    " Pexsup is a Pyrrhan-type.",
+    " Pexsup is a Tidewell-type.",
+    " Pexsup is a Lithor-type.",
+    " Pexsup is a Verdane-type.",
+    " Pexsup is a Umbrine-type.",
+    " Pexsup is a Gustral-type.",
+    " Pexsup is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Pexsup",
+   "id": "M_probe_plain_fmt:024"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Nolilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Nolilk",
+   "id": "M_probe_marked:025"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Nolilk?\nAnswer:",
+   "options": [
+    " Nolilk is a Voltrix-type.",
+    " Nolilk is a Pyrrhan-type.",
+    " Nolilk is a Tidewell-type.",
+    " Nolilk is a Lithor-type.",
+    " Nolilk is a Verdane-type.",
+    " Nolilk is a Umbrine-type.",
+    " Nolilk is a Gustral-type.",
+    " Nolilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Nolilk",
+   "id": "M_probe_marked_fmt:025"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Ekksup?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Ekksup",
+   "id": "M_probe_plain:025"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Ekksup?\nAnswer:",
+   "options": [
+    " Ekksup is a Voltrix-type.",
+    " Ekksup is a Pyrrhan-type.",
+    " Ekksup is a Tidewell-type.",
+    " Ekksup is a Lithor-type.",
+    " Ekksup is a Verdane-type.",
+    " Ekksup is a Umbrine-type.",
+    " Ekksup is a Gustral-type.",
+    " Ekksup is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Ekksup",
+   "id": "M_probe_plain_fmt:025"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Orvilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Orvilk",
+   "id": "M_probe_marked:026"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Orvilk?\nAnswer:",
+   "options": [
+    " Orvilk is a Voltrix-type.",
+    " Orvilk is a Pyrrhan-type.",
+    " Orvilk is a Tidewell-type.",
+    " Orvilk is a Lithor-type.",
+    " Orvilk is a Verdane-type.",
+    " Orvilk is a Umbrine-type.",
+    " Orvilk is a Gustral-type.",
+    " Orvilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Orvilk",
+   "id": "M_probe_marked_fmt:026"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Briump?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Briump",
+   "id": "M_probe_plain:026"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Briump?\nAnswer:",
+   "options": [
+    " Briump is a Voltrix-type.",
+    " Briump is a Pyrrhan-type.",
+    " Briump is a Tidewell-type.",
+    " Briump is a Lithor-type.",
+    " Briump is a Verdane-type.",
+    " Briump is a Umbrine-type.",
+    " Briump is a Gustral-type.",
+    " Briump is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Briump",
+   "id": "M_probe_plain_fmt:026"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Zimilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Zimilk",
+   "id": "M_probe_marked:027"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Zimilk?\nAnswer:",
+   "options": [
+    " Zimilk is a Voltrix-type.",
+    " Zimilk is a Pyrrhan-type.",
+    " Zimilk is a Tidewell-type.",
+    " Zimilk is a Lithor-type.",
+    " Zimilk is a Verdane-type.",
+    " Zimilk is a Umbrine-type.",
+    " Zimilk is a Gustral-type.",
+    " Zimilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Zimilk",
+   "id": "M_probe_marked_fmt:027"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Radarn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Radarn",
+   "id": "M_probe_plain:027"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Radarn?\nAnswer:",
+   "options": [
+    " Radarn is a Voltrix-type.",
+    " Radarn is a Pyrrhan-type.",
+    " Radarn is a Tidewell-type.",
+    " Radarn is a Lithor-type.",
+    " Radarn is a Verdane-type.",
+    " Radarn is a Umbrine-type.",
+    " Radarn is a Gustral-type.",
+    " Radarn is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Radarn",
+   "id": "M_probe_plain_fmt:027"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Zarilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Zarilk",
+   "id": "M_probe_marked:028"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Zarilk?\nAnswer:",
+   "options": [
+    " Zarilk is a Voltrix-type.",
+    " Zarilk is a Pyrrhan-type.",
+    " Zarilk is a Tidewell-type.",
+    " Zarilk is a Lithor-type.",
+    " Zarilk is a Verdane-type.",
+    " Zarilk is a Umbrine-type.",
+    " Zarilk is a Gustral-type.",
+    " Zarilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Zarilk",
+   "id": "M_probe_marked_fmt:028"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Huldor?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Huldor",
+   "id": "M_probe_plain:028"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Huldor?\nAnswer:",
+   "options": [
+    " Huldor is a Voltrix-type.",
+    " Huldor is a Pyrrhan-type.",
+    " Huldor is a Tidewell-type.",
+    " Huldor is a Lithor-type.",
+    " Huldor is a Verdane-type.",
+    " Huldor is a Umbrine-type.",
+    " Huldor is a Gustral-type.",
+    " Huldor is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Huldor",
+   "id": "M_probe_plain_fmt:028"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Tunilk?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Tunilk",
+   "id": "M_probe_marked:029"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Tunilk?\nAnswer:",
+   "options": [
+    " Tunilk is a Voltrix-type.",
+    " Tunilk is a Pyrrhan-type.",
+    " Tunilk is a Tidewell-type.",
+    " Tunilk is a Lithor-type.",
+    " Tunilk is a Verdane-type.",
+    " Tunilk is a Umbrine-type.",
+    " Tunilk is a Gustral-type.",
+    " Tunilk is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Tunilk",
+   "id": "M_probe_marked_fmt:029"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Pexoz?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "query": "Pexoz",
+   "id": "M_probe_plain:029"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Pexoz?\nAnswer:",
+   "options": [
+    " Pexoz is a Voltrix-type.",
+    " Pexoz is a Pyrrhan-type.",
+    " Pexoz is a Tidewell-type.",
+    " Pexoz is a Lithor-type.",
+    " Pexoz is a Verdane-type.",
+    " Pexoz is a Umbrine-type.",
+    " Pexoz is a Gustral-type.",
+    " Pexoz is a Frostel-type."
+   ],
+   "answer": 4,
+   "query": "Pexoz",
+   "id": "M_probe_plain_fmt:029"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Cynome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Cynome",
+   "id": "M_probe_marked:030"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Cynome?\nAnswer:",
+   "options": [
+    " Cynome is a Voltrix-type.",
+    " Cynome is a Pyrrhan-type.",
+    " Cynome is a Tidewell-type.",
+    " Cynome is a Lithor-type.",
+    " Cynome is a Verdane-type.",
+    " Cynome is a Umbrine-type.",
+    " Cynome is a Gustral-type.",
+    " Cynome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Cynome",
+   "id": "M_probe_marked_fmt:030"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Morsup?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Morsup",
+   "id": "M_probe_plain:030"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Morsup?\nAnswer:",
+   "options": [
+    " Morsup is a Voltrix-type.",
+    " Morsup is a Pyrrhan-type.",
+    " Morsup is a Tidewell-type.",
+    " Morsup is a Lithor-type.",
+    " Morsup is a Verdane-type.",
+    " Morsup is a Umbrine-type.",
+    " Morsup is a Gustral-type.",
+    " Morsup is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Morsup",
+   "id": "M_probe_plain_fmt:030"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Ithome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Ithome",
+   "id": "M_probe_marked:031"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Ithome?\nAnswer:",
+   "options": [
+    " Ithome is a Voltrix-type.",
+    " Ithome is a Pyrrhan-type.",
+    " Ithome is a Tidewell-type.",
+    " Ithome is a Lithor-type.",
+    " Ithome is a Verdane-type.",
+    " Ithome is a Umbrine-type.",
+    " Ithome is a Gustral-type.",
+    " Ithome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Ithome",
+   "id": "M_probe_marked_fmt:031"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Pexux?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Pexux",
+   "id": "M_probe_plain:031"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Pexux?\nAnswer:",
+   "options": [
+    " Pexux is a Voltrix-type.",
+    " Pexux is a Pyrrhan-type.",
+    " Pexux is a Tidewell-type.",
+    " Pexux is a Lithor-type.",
+    " Pexux is a Verdane-type.",
+    " Pexux is a Umbrine-type.",
+    " Pexux is a Gustral-type.",
+    " Pexux is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Pexux",
+   "id": "M_probe_plain_fmt:031"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Kelome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Kelome",
+   "id": "M_probe_marked:032"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Kelome?\nAnswer:",
+   "options": [
+    " Kelome is a Voltrix-type.",
+    " Kelome is a Pyrrhan-type.",
+    " Kelome is a Tidewell-type.",
+    " Kelome is a Lithor-type.",
+    " Kelome is a Verdane-type.",
+    " Kelome is a Umbrine-type.",
+    " Kelome is a Gustral-type.",
+    " Kelome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Kelome",
+   "id": "M_probe_marked_fmt:032"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Yorarn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Yorarn",
+   "id": "M_probe_plain:032"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Yorarn?\nAnswer:",
+   "options": [
+    " Yorarn is a Voltrix-type.",
+    " Yorarn is a Pyrrhan-type.",
+    " Yorarn is a Tidewell-type.",
+    " Yorarn is a Lithor-type.",
+    " Yorarn is a Verdane-type.",
+    " Yorarn is a Umbrine-type.",
+    " Yorarn is a Gustral-type.",
+    " Yorarn is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Yorarn",
+   "id": "M_probe_plain_fmt:032"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Javome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Javome",
+   "id": "M_probe_marked:033"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Javome?\nAnswer:",
+   "options": [
+    " Javome is a Voltrix-type.",
+    " Javome is a Pyrrhan-type.",
+    " Javome is a Tidewell-type.",
+    " Javome is a Lithor-type.",
+    " Javome is a Verdane-type.",
+    " Javome is a Umbrine-type.",
+    " Javome is a Gustral-type.",
+    " Javome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Javome",
+   "id": "M_probe_marked_fmt:033"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Ekkdor?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Ekkdor",
+   "id": "M_probe_plain:033"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Ekkdor?\nAnswer:",
+   "options": [
+    " Ekkdor is a Voltrix-type.",
+    " Ekkdor is a Pyrrhan-type.",
+    " Ekkdor is a Tidewell-type.",
+    " Ekkdor is a Lithor-type.",
+    " Ekkdor is a Verdane-type.",
+    " Ekkdor is a Umbrine-type.",
+    " Ekkdor is a Gustral-type.",
+    " Ekkdor is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Ekkdor",
+   "id": "M_probe_plain_fmt:033"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Dolome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Dolome",
+   "id": "M_probe_marked:034"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Dolome?\nAnswer:",
+   "options": [
+    " Dolome is a Voltrix-type.",
+    " Dolome is a Pyrrhan-type.",
+    " Dolome is a Tidewell-type.",
+    " Dolome is a Lithor-type.",
+    " Dolome is a Verdane-type.",
+    " Dolome is a Umbrine-type.",
+    " Dolome is a Gustral-type.",
+    " Dolome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Dolome",
+   "id": "M_probe_marked_fmt:034"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Nolish?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Nolish",
+   "id": "M_probe_plain:034"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Nolish?\nAnswer:",
+   "options": [
+    " Nolish is a Voltrix-type.",
+    " Nolish is a Pyrrhan-type.",
+    " Nolish is a Tidewell-type.",
+    " Nolish is a Lithor-type.",
+    " Nolish is a Verdane-type.",
+    " Nolish is a Umbrine-type.",
+    " Nolish is a Gustral-type.",
+    " Nolish is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Nolish",
+   "id": "M_probe_plain_fmt:034"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Zarome?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Zarome",
+   "id": "M_probe_marked:035"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Zarome?\nAnswer:",
+   "options": [
+    " Zarome is a Voltrix-type.",
+    " Zarome is a Pyrrhan-type.",
+    " Zarome is a Tidewell-type.",
+    " Zarome is a Lithor-type.",
+    " Zarome is a Verdane-type.",
+    " Zarome is a Umbrine-type.",
+    " Zarome is a Gustral-type.",
+    " Zarome is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Zarome",
+   "id": "M_probe_marked_fmt:035"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Quonble?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "query": "Quonble",
+   "id": "M_probe_plain:035"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Quonble?\nAnswer:",
+   "options": [
+    " Quonble is a Voltrix-type.",
+    " Quonble is a Pyrrhan-type.",
+    " Quonble is a Tidewell-type.",
+    " Quonble is a Lithor-type.",
+    " Quonble is a Verdane-type.",
+    " Quonble is a Umbrine-type.",
+    " Quonble is a Gustral-type.",
+    " Quonble is a Frostel-type."
+   ],
+   "answer": 5,
+   "query": "Quonble",
+   "id": "M_probe_plain_fmt:035"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Kelurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Kelurn",
+   "id": "M_probe_marked:036"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Kelurn?\nAnswer:",
+   "options": [
+    " Kelurn is a Voltrix-type.",
+    " Kelurn is a Pyrrhan-type.",
+    " Kelurn is a Tidewell-type.",
+    " Kelurn is a Lithor-type.",
+    " Kelurn is a Verdane-type.",
+    " Kelurn is a Umbrine-type.",
+    " Kelurn is a Gustral-type.",
+    " Kelurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Kelurn",
+   "id": "M_probe_marked_fmt:036"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Tavell?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Tavell",
+   "id": "M_probe_plain:036"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Tavell?\nAnswer:",
+   "options": [
+    " Tavell is a Voltrix-type.",
+    " Tavell is a Pyrrhan-type.",
+    " Tavell is a Tidewell-type.",
+    " Tavell is a Lithor-type.",
+    " Tavell is a Verdane-type.",
+    " Tavell is a Umbrine-type.",
+    " Tavell is a Gustral-type.",
+    " Tavell is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Tavell",
+   "id": "M_probe_plain_fmt:036"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Briurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Briurn",
+   "id": "M_probe_marked:037"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Briurn?\nAnswer:",
+   "options": [
+    " Briurn is a Voltrix-type.",
+    " Briurn is a Pyrrhan-type.",
+    " Briurn is a Tidewell-type.",
+    " Briurn is a Lithor-type.",
+    " Briurn is a Verdane-type.",
+    " Briurn is a Umbrine-type.",
+    " Briurn is a Gustral-type.",
+    " Briurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Briurn",
+   "id": "M_probe_marked_fmt:037"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Radine?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Radine",
+   "id": "M_probe_plain:037"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Radine?\nAnswer:",
+   "options": [
+    " Radine is a Voltrix-type.",
+    " Radine is a Pyrrhan-type.",
+    " Radine is a Tidewell-type.",
+    " Radine is a Lithor-type.",
+    " Radine is a Verdane-type.",
+    " Radine is a Umbrine-type.",
+    " Radine is a Gustral-type.",
+    " Radine is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Radine",
+   "id": "M_probe_plain_fmt:037"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Cynurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Cynurn",
+   "id": "M_probe_marked:038"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Cynurn?\nAnswer:",
+   "options": [
+    " Cynurn is a Voltrix-type.",
+    " Cynurn is a Pyrrhan-type.",
+    " Cynurn is a Tidewell-type.",
+    " Cynurn is a Lithor-type.",
+    " Cynurn is a Verdane-type.",
+    " Cynurn is a Umbrine-type.",
+    " Cynurn is a Gustral-type.",
+    " Cynurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Cynurn",
+   "id": "M_probe_marked_fmt:038"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Oxxump?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Oxxump",
+   "id": "M_probe_plain:038"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Oxxump?\nAnswer:",
+   "options": [
+    " Oxxump is a Voltrix-type.",
+    " Oxxump is a Pyrrhan-type.",
+    " Oxxump is a Tidewell-type.",
+    " Oxxump is a Lithor-type.",
+    " Oxxump is a Verdane-type.",
+    " Oxxump is a Umbrine-type.",
+    " Oxxump is a Gustral-type.",
+    " Oxxump is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Oxxump",
+   "id": "M_probe_plain_fmt:038"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Quonurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Quonurn",
+   "id": "M_probe_marked:039"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Quonurn?\nAnswer:",
+   "options": [
+    " Quonurn is a Voltrix-type.",
+    " Quonurn is a Pyrrhan-type.",
+    " Quonurn is a Tidewell-type.",
+    " Quonurn is a Lithor-type.",
+    " Quonurn is a Verdane-type.",
+    " Quonurn is a Umbrine-type.",
+    " Quonurn is a Gustral-type.",
+    " Quonurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Quonurn",
+   "id": "M_probe_marked_fmt:039"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Blaxarn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Blaxarn",
+   "id": "M_probe_plain:039"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Blaxarn?\nAnswer:",
+   "options": [
+    " Blaxarn is a Voltrix-type.",
+    " Blaxarn is a Pyrrhan-type.",
+    " Blaxarn is a Tidewell-type.",
+    " Blaxarn is a Lithor-type.",
+    " Blaxarn is a Verdane-type.",
+    " Blaxarn is a Umbrine-type.",
+    " Blaxarn is a Gustral-type.",
+    " Blaxarn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Blaxarn",
+   "id": "M_probe_plain_fmt:039"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Yorurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Yorurn",
+   "id": "M_probe_marked:040"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Yorurn?\nAnswer:",
+   "options": [
+    " Yorurn is a Voltrix-type.",
+    " Yorurn is a Pyrrhan-type.",
+    " Yorurn is a Tidewell-type.",
+    " Yorurn is a Lithor-type.",
+    " Yorurn is a Verdane-type.",
+    " Yorurn is a Umbrine-type.",
+    " Yorurn is a Gustral-type.",
+    " Yorurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Yorurn",
+   "id": "M_probe_marked_fmt:040"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Tavux?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Tavux",
+   "id": "M_probe_plain:040"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Tavux?\nAnswer:",
+   "options": [
+    " Tavux is a Voltrix-type.",
+    " Tavux is a Pyrrhan-type.",
+    " Tavux is a Tidewell-type.",
+    " Tavux is a Lithor-type.",
+    " Tavux is a Verdane-type.",
+    " Tavux is a Umbrine-type.",
+    " Tavux is a Gustral-type.",
+    " Tavux is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Tavux",
+   "id": "M_probe_plain_fmt:040"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Lumurn?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Lumurn",
+   "id": "M_probe_marked:041"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Lumurn?\nAnswer:",
+   "options": [
+    " Lumurn is a Voltrix-type.",
+    " Lumurn is a Pyrrhan-type.",
+    " Lumurn is a Tidewell-type.",
+    " Lumurn is a Lithor-type.",
+    " Lumurn is a Verdane-type.",
+    " Lumurn is a Umbrine-type.",
+    " Lumurn is a Gustral-type.",
+    " Lumurn is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Lumurn",
+   "id": "M_probe_marked_fmt:041"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Briell?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "query": "Briell",
+   "id": "M_probe_plain:041"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Briell?\nAnswer:",
+   "options": [
+    " Briell is a Voltrix-type.",
+    " Briell is a Pyrrhan-type.",
+    " Briell is a Tidewell-type.",
+    " Briell is a Lithor-type.",
+    " Briell is a Verdane-type.",
+    " Briell is a Umbrine-type.",
+    " Briell is a Gustral-type.",
+    " Briell is a Frostel-type."
+   ],
+   "answer": 6,
+   "query": "Briell",
+   "id": "M_probe_plain_fmt:041"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Tavent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Tavent",
+   "id": "M_probe_marked:042"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Tavent?\nAnswer:",
+   "options": [
+    " Tavent is a Voltrix-type.",
+    " Tavent is a Pyrrhan-type.",
+    " Tavent is a Tidewell-type.",
+    " Tavent is a Lithor-type.",
+    " Tavent is a Verdane-type.",
+    " Tavent is a Umbrine-type.",
+    " Tavent is a Gustral-type.",
+    " Tavent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Tavent",
+   "id": "M_probe_marked_fmt:042"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Briish?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Briish",
+   "id": "M_probe_plain:042"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Briish?\nAnswer:",
+   "options": [
+    " Briish is a Voltrix-type.",
+    " Briish is a Pyrrhan-type.",
+    " Briish is a Tidewell-type.",
+    " Briish is a Lithor-type.",
+    " Briish is a Verdane-type.",
+    " Briish is a Umbrine-type.",
+    " Briish is a Gustral-type.",
+    " Briish is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Briish",
+   "id": "M_probe_plain_fmt:042"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Cynent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Cynent",
+   "id": "M_probe_marked:043"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Cynent?\nAnswer:",
+   "options": [
+    " Cynent is a Voltrix-type.",
+    " Cynent is a Pyrrhan-type.",
+    " Cynent is a Tidewell-type.",
+    " Cynent is a Lithor-type.",
+    " Cynent is a Verdane-type.",
+    " Cynent is a Umbrine-type.",
+    " Cynent is a Gustral-type.",
+    " Cynent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Cynent",
+   "id": "M_probe_marked_fmt:043"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Zardor?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Zardor",
+   "id": "M_probe_plain:043"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Zardor?\nAnswer:",
+   "options": [
+    " Zardor is a Voltrix-type.",
+    " Zardor is a Pyrrhan-type.",
+    " Zardor is a Tidewell-type.",
+    " Zardor is a Lithor-type.",
+    " Zardor is a Verdane-type.",
+    " Zardor is a Umbrine-type.",
+    " Zardor is a Gustral-type.",
+    " Zardor is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Zardor",
+   "id": "M_probe_plain_fmt:043"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Myrent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Myrent",
+   "id": "M_probe_marked:044"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Myrent?\nAnswer:",
+   "options": [
+    " Myrent is a Voltrix-type.",
+    " Myrent is a Pyrrhan-type.",
+    " Myrent is a Tidewell-type.",
+    " Myrent is a Lithor-type.",
+    " Myrent is a Verdane-type.",
+    " Myrent is a Umbrine-type.",
+    " Myrent is a Gustral-type.",
+    " Myrent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Myrent",
+   "id": "M_probe_marked_fmt:044"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Pexax?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Pexax",
+   "id": "M_probe_plain:044"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Pexax?\nAnswer:",
+   "options": [
+    " Pexax is a Voltrix-type.",
+    " Pexax is a Pyrrhan-type.",
+    " Pexax is a Tidewell-type.",
+    " Pexax is a Lithor-type.",
+    " Pexax is a Verdane-type.",
+    " Pexax is a Umbrine-type.",
+    " Pexax is a Gustral-type.",
+    " Pexax is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Pexax",
+   "id": "M_probe_plain_fmt:044"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Oxxent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Oxxent",
+   "id": "M_probe_marked:045"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Oxxent?\nAnswer:",
+   "options": [
+    " Oxxent is a Voltrix-type.",
+    " Oxxent is a Pyrrhan-type.",
+    " Oxxent is a Tidewell-type.",
+    " Oxxent is a Lithor-type.",
+    " Oxxent is a Verdane-type.",
+    " Oxxent is a Umbrine-type.",
+    " Oxxent is a Gustral-type.",
+    " Oxxent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Oxxent",
+   "id": "M_probe_marked_fmt:045"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Tavrock?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Tavrock",
+   "id": "M_probe_plain:045"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Tavrock?\nAnswer:",
+   "options": [
+    " Tavrock is a Voltrix-type.",
+    " Tavrock is a Pyrrhan-type.",
+    " Tavrock is a Tidewell-type.",
+    " Tavrock is a Lithor-type.",
+    " Tavrock is a Verdane-type.",
+    " Tavrock is a Umbrine-type.",
+    " Tavrock is a Gustral-type.",
+    " Tavrock is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Tavrock",
+   "id": "M_probe_plain_fmt:045"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Draent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Draent",
+   "id": "M_probe_marked:046"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Draent?\nAnswer:",
+   "options": [
+    " Draent is a Voltrix-type.",
+    " Draent is a Pyrrhan-type.",
+    " Draent is a Tidewell-type.",
+    " Draent is a Lithor-type.",
+    " Draent is a Verdane-type.",
+    " Draent is a Umbrine-type.",
+    " Draent is a Gustral-type.",
+    " Draent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Draent",
+   "id": "M_probe_marked_fmt:046"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Quonott?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Quonott",
+   "id": "M_probe_plain:046"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Quonott?\nAnswer:",
+   "options": [
+    " Quonott is a Voltrix-type.",
+    " Quonott is a Pyrrhan-type.",
+    " Quonott is a Tidewell-type.",
+    " Quonott is a Lithor-type.",
+    " Quonott is a Verdane-type.",
+    " Quonott is a Umbrine-type.",
+    " Quonott is a Gustral-type.",
+    " Quonott is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Quonott",
+   "id": "M_probe_plain_fmt:046"
+  },
+  {
+   "level": "M_probe_marked",
+   "prompt": "Question: What type is Nixent?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Nixent",
+   "id": "M_probe_marked:047"
+  },
+  {
+   "level": "M_probe_marked_fmt",
+   "prompt": "Question: What type is Nixent?\nAnswer:",
+   "options": [
+    " Nixent is a Voltrix-type.",
+    " Nixent is a Pyrrhan-type.",
+    " Nixent is a Tidewell-type.",
+    " Nixent is a Lithor-type.",
+    " Nixent is a Verdane-type.",
+    " Nixent is a Umbrine-type.",
+    " Nixent is a Gustral-type.",
+    " Nixent is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Nixent",
+   "id": "M_probe_marked_fmt:047"
+  },
+  {
+   "level": "M_probe_plain",
+   "prompt": "Question: What type is Skalvan?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "query": "Skalvan",
+   "id": "M_probe_plain:047"
+  },
+  {
+   "level": "M_probe_plain_fmt",
+   "prompt": "Question: What type is Skalvan?\nAnswer:",
+   "options": [
+    " Skalvan is a Voltrix-type.",
+    " Skalvan is a Pyrrhan-type.",
+    " Skalvan is a Tidewell-type.",
+    " Skalvan is a Lithor-type.",
+    " Skalvan is a Verdane-type.",
+    " Skalvan is a Umbrine-type.",
+    " Skalvan is a Gustral-type.",
+    " Skalvan is a Frostel-type."
+   ],
+   "answer": 7,
+   "query": "Skalvan",
+   "id": "M_probe_plain_fmt:047"
+  }
+ ]
+}

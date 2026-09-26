@@ -280,6 +280,8 @@ Probe names recombine the same 36 prefixes and suffixes as trained names (`unive
 often word-initial or multi-token.
 *Experiment:* probes with unseen prefixes; sweep morph_p in {0.3, 0.5, 0.7, 0.9, 1.0}; a
 prefix-marker universe; then the INN-stem to ATC-class replicate.
+**Status (2026-09-19):** answered, PLAN step 21, REPORT.md 34. The transfer holds for genuinely novel names: probes whose only trained part is the marker (`universe.probes_v2`, an unseen prefix beside the suffix marker) read 95.8 on the 0.7 universe, the same as the recombined-part probes (95.8; the section 8 adapter re-scored 93.8 / 95.8), plain controls 14.6 to 16.7, chance 12.5. The slope is against marker *coverage* (a present marker never lies in this universe, so `morph_p` is coverage, not reliability): 60.4 / 79.2 / 95.8 / 97.9 / 100 at 0.3 / 0.5 / 0.7 / 0.9 / 1.0, and induction over held-out species without context 38.5 / 31.2 / 50.0 / 74.0 / 85.4. A prefix-marker universe (`PREFIX_MARKER`, stems at the front of the name) gives 100 / 97.9 with the rest of the ladder unchanged. Not run: a reliability sweep (markers that sometimes lie) and the INN-stem to ATC-class replicate on real drug names.
+
 
 **DATA-4 (R) Why is the recommended fix (train on noisy renderings, normalize strings) never tested?**
 Each merchant has one bank rendering, used only at test time (`merchants.py:51-56, 79-81`); names
