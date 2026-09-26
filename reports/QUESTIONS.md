@@ -268,6 +268,7 @@ rather than to the name, so weakness-as-rotation-of-type is stored as a function
 *Experiment:* make weakness non-bijective or independent per species, or hold out habitat/region
 from episodes instead; re-run arm C.
 **Status (2026-09-19, partial):** the stratification of PLAN step 20 (REPORT.md 33.1) confirms the point from the saved per-item files: the weakness level replicates the type level within noise for every arm, and arm C answers habitat items by the type rule. The re-run with an independent weakness (row 23) is still to do.
+**Status (2026-09-19):** answered, PLAN step 23, REPORT.md 39. With every species' weakness drawn independently of its type (`universe.build(weakness="independent")`, names and the other attributes unchanged, items `_wind`), arm C's weakness induction reads 33.8 (chance 33.3) against 60.0 / 52.5 on the original universe, and every other measure is unchanged (recall 100, yes/no 75, Timmy 61.9, k=4 49.4, ICL 78 / 87, ARC 61.5, ppl 21.6). The held-out-partition transfer was the type rule; there is none. Not done: the same universe for arms A, B, D; a trained-format weakness recall level.
 
 **DATA-2 (R) How much of the category result is recall vs the products-to-category bridge, and does the bridge survive product ambiguity?**
 The 12 product pools are disjoint and every product is diagnostic (`merchants.py:10-35`). Real
