@@ -20,11 +20,11 @@ from ai_experiments.paths import ROOT
 from ai_experiments import scorers as SC
 from ai_experiments import stats as ST
 
-ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E"]
+ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E", "P"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
-         "base_m": "base(m)", "E": "E morph"}
+         "base_m": "base(m)", "E": "E morph", "P": "P distill"}
 PAIRS = [("base", "A"), ("base", "B"), ("base", "C"), ("base", "Cn"), ("base", "D"), ("A", "C"), ("Cn", "C"), ("D", "C"),
-         ("base_m", "E")]
+         ("base_m", "E"), ("base", "P"), ("C", "P")]
 LEVELS = ["L1_recall", "L1_recall_fmt", "L2_manip_isa", "L2_manip_pair", "L3_induct_type_nonsense",
           "L3_induct_type_realnames", "L3_induct_type_k2", "L3_induct_type_k4", "L4_induct_weakness",
           "L4_induct_habitat", "L5_novel_choices", "L6_unseen_recall", "L6_seen_recall_ctrl", "L3_induct_heldout",

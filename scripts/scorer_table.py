@@ -20,9 +20,9 @@ from collections import defaultdict
 from ai_experiments.paths import ROOT
 from ai_experiments import scorers as SC
 
-ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E"]
+ARMS = ["base", "A", "B", "C", "Cn", "D", "base_m", "E", "P"]
 LABEL = {"base": "base", "A": "A know", "B": "B epis", "C": "C inter+R", "Cn": "Cn inter", "D": "D seq",
-         "base_m": "base(m)", "E": "E morph",
+         "base_m": "base(m)", "E": "E morph", "P": "P distill",
          "universe_Qwen2.5-0.5B_lr0.0001": "U-0.5B (sec 6)", "universe_Qwen2.5-3B_lr0.0001": "U-3B (sec 6)",
          "universe_Qwen2.5-3B_lr0.0001_unsloth": "U-3B unsloth (sec 6)"}
 LEVELS = ["L1_recall", "L1_recall_fmt", "L2_manip_isa", "L2_manip_pair", "L3_induct_type_nonsense",

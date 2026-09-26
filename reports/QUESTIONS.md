@@ -349,6 +349,8 @@ distillation is the most direct method and is absent.
 *Experiment:* teacher distributions with field guide in context, student trained on the same
 prompts without context (KL or hard labels), scored on the ladder.
 
+**Status (2026-09-15):** PLAN step 7, REPORT.md section 14. Arm P (`scripts/exp_distill.py`: KL at T=2 to the base model reading the field-guide entries, arm C's mixture and budget) injected nothing: trained-format recall 13.8 (base 11.9), every induction level inside its null band, ppl 8.64 (base 8.54); the ICL suite gained 16 points, from the 15% hard-label replay. Diagnosis (`scripts/diag_distill_teacher.py`, Table 14.2): even with the entry in context the teacher puts 6% of its next-token mass on the type token in the training sentence (0.3% at T=2), so the 98.8 with-context recall is a ranking among eight options, not a distribution worth imitating; the student matched the teacher (KL 2.17 to 0.28) and learned no facts. Open: PLAN row 27 tries option-renormalised targets at T=1; if that fails too, the answer is no.
+
 **BASE-4 (R) Are the embedding results compared against trivial baselines and against the LLM on identical items?**
 No linear probe, SetFit or kNN baseline exists; the 85% prototype result (300 random trials) and the
 59% LLM Timmy result (160 ladder items) are on different item sets.
