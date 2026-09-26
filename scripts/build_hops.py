@@ -17,7 +17,7 @@ another option" is the gold for k >= 3, and a trained encoder learned it (the cu
 (--version v2) makes the options symmetric: the end and the one-hop-short name of each of three chains (at k = 1 the start), so
 every end sits one link from another option; the statements are v1's generator with the same seed.
 Frozen as data/processed/hops_v1.json: {"items": [{id, k, names, prompt, question, options, answer, chain, statements}], "pools": ...}.
-usage: uv run --with wordfreq python scripts/build_hops.py [--force]; uv run python scripts/build_hops.py --version v2 [--cut]
+usage: uv run --with wordfreq python scripts/build_hops.py [--force]; uv run python scripts/build_hops.py --version v2 [--cut | --cutlast]
 """
 import json
 import random
@@ -124,6 +124,26 @@ def build():
             **({"pools": p} if VERSION == "v1" else {})}
 
 
+def cut_last():
+    """v2's control, hops_<version>_cutlast.json: every item with k >= 2 minus the target chain's last link, so the start's chain now
+    ends one hop short, a name that v2 always offers; the answer is re-pointed to it (old_answer keeps the removed end). A reader
+    that follows links moves its pick from the old end to the new one; one that recognises the old end by some other cue does not.
+    (The middle cut leaves the new stop out of v2's options, a forced guess.)"""
+    doc = json.loads(OUT.read_text())
+    items = []
+    for it in doc["items"]:
+        if it["k"] < 2:
+            continue
+        drop = (it["chain"][-2], it["chain"][-1])
+        st = [s for s in it["statements"] if tuple(s) != drop]
+        lines = "\n".join(f"- {a} = {b}" for a, b in st)
+        items.append({**it, "id": it["id"] + "_cutlast", "statements": st, "cut": list(drop), "old_answer": it["answer"],
+                      "answer": it["options"].index(it["chain"][-2]), "chain": it["chain"][:-1], "k": it["k"] - 1, "k_orig": it["k"],
+                      "prompt": f"{INSTR}\n\n{lines}\n\n{it['question']}"})
+    (PROCESSED / f"hops_{VERSION}_cutlast.json").write_text(json.dumps({"version": f"{VERSION}_cutlast", "source": f"hops_{VERSION}", "items": items}, indent=1))
+    print(len(items), "cut-last items")
+
+
 def cut():
     """The shortcut control, hops_<version>_cut.json: every item with k >= 2 minus the target chain's middle link (chain[k // 2] = chain[k // 2 + 1]),
     so the start no longer reaches the old end. The answer field still names the old end: a reader that follows links picks it at
@@ -145,6 +165,8 @@ def cut():
 if __name__ == "__main__":
     if "--cut" in sys.argv:
         sys.exit(cut())
+    if "--cutlast" in sys.argv:
+        sys.exit(cut_last())
     if OUT.exists() and "--force" not in sys.argv:
         sys.exit(f"{OUT} exists (frozen); --force to rebuild")
     doc = build()
