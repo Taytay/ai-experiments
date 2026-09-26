@@ -1,0 +1,72 @@
+[
+ {
+  "tag": "r71v2-dec-0.5b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-0.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-1.5b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-1.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-3b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-7b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-7B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-14b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct",
+   "BATCH": "16",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ }
+]
