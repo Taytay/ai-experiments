@@ -1,0 +1,6 @@
+outs:
+- md5: bb3158e13d6174a3b432ee13cb11c1eb.dir
+  size: 220002295
+  nfiles: 10
+  hash: md5
+  path: embed_bge_merchant_ft_newtok_mean

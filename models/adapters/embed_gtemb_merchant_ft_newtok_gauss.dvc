@@ -1,0 +1,6 @@
+outs:
+- md5: 54c60b4cd8725c9fea169dc94eda1036.dir
+  size: 301849000
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_merchant_ft_newtok_gauss

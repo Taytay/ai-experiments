@@ -1,0 +1,6 @@
+outs:
+- md5: 9607e0f78acd003f28a6a0dcaf8100df.dir
+  size: 219795595
+  nfiles: 10
+  hash: md5
+  path: embed_bge_merchant_ft_subword

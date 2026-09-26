@@ -1,0 +1,6 @@
+outs:
+- md5: 1d7e708f6fcbfeda34e8237f763dfbee.dir
+  size: 301849000
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_merchant_ft_newtok_warm

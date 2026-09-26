@@ -1,0 +1,6 @@
+outs:
+- md5: 47c46a0a6c04b6d4a0e26caec32914e4.dir
+  size: 1203034712
+  nfiles: 11
+  hash: md5
+  path: embed_qwen3_universe_trained

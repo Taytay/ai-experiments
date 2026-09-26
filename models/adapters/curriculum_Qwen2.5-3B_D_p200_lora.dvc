@@ -1,0 +1,6 @@
+outs:
+- md5: 3686b01e347ed164e4584b09144104de.dir
+  size: 479011552
+  nfiles: 3
+  hash: md5
+  path: curriculum_Qwen2.5-3B_D_p200_lora

@@ -1,0 +1,6 @@
+outs:
+- md5: 66f803016758edeba8eaa640992b28d0.dir
+  size: 327045558
+  nfiles: 5
+  hash: md5
+  path: encoder_t5gemma-l-l-ul2_F2_lora_lora
