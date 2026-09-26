@@ -66,9 +66,10 @@ LR = float(os.environ.get("LR", "1e-4"))
 DB_FRAC = float(os.environ.get("DB_FRAC", "0.3"))  # share of the LLM's training sequences that are DB texts under DB=param
 RUN_TAG = os.environ.get("RUN_TAG", "")  # suffix on the adapter and results names (variants such as the longer parametric run)
 EPOCHS = 1 if SMOKE else int(os.environ.get("EPOCHS", "3"))
-MICRO = int(os.environ.get("MICRO", "4"))  # sequences per forward/backward; 16 per step always (row 34: MICRO=16 = one pass per step on an 80 GB GPU)
-assert 16 % MICRO == 0
-ACCUM, MAXLEN = 16 // MICRO, 1536
+MICRO = int(os.environ.get("MICRO", "4"))  # sequences per forward/backward (row 34: MICRO=16 = one pass per step on an 80 GB GPU)
+EFF_BATCH = int(os.environ.get("EFF_BATCH", "16"))  # sequences per optimizer step (row 60, TRAIN-12: the batch-size ablation); 16 in every run before it
+assert EFF_BATCH % MICRO == 0
+ACCUM, MAXLEN = EFF_BATCH // MICRO, 1536
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
@@ -241,7 +242,7 @@ def train_llm(run):
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
     model.train(); t0 = time.time(); n_sft = n_db = 0; losses = []; n_tok = n_lab_tok = n_pad = 0
-    print(f"   {len(ex)} SFT examples, {len(kt)} DB texts, {STEPS} steps x 16 sequences, lr {LR}", flush=True)
+    print(f"   {len(ex)} SFT examples, {len(kt)} DB texts, {STEPS} steps x {EFF_BATCH} sequences, lr {LR}", flush=True)
     for step in range(STEPS):
         loss_acc = 0.0
         for _ in range(ACCUM):
@@ -318,7 +319,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
