@@ -702,6 +702,7 @@ episode, a random subset of the user's category names replaced by fresh coined w
 the target), three seeds; compare with the all-20 adapters on the same 5 users; the cost of the augmentation on standard
 names is the other number.
 **Amended (2026-09-22, REAL-13):** four folds of five users in place of one 15/5 split at three seeds (every user held out once, the same number of trainings), user-resampled intervals, the corrected cells of row 45; on REAL-6 the record arm sits at the set's ceiling for the training users, so the no-record arm and the renamed and coined cells carry the answer.
+**Status (2026-09-26):** answered, PLAN step 42, REPORT.md 51. On held-out users standard names transfer (no DB 82.1, record 99.6) and the users' coined names fall 10.0 [0.4, 19.0] (no DB) and 24.9 [11.4, 39.0] points (record): the categorisers had memorised the training users' private vocabularies. Rename augmentation (0.5 per name per episode) recovers +12.0 [5.1, 20.0] on coined names for the all-label no-DB recipe and +13.7 for the record arm, nothing lost on standard names; the record-in-prompt categoriser on a new user reads 86.8 [82.6, 90.4] with it (81.6 without), the no-DB all-label one 77.6. From here every categoriser trains with rename augmentation and is scored on held-out users.
 
 **REAL-11 (O) An evaluation set shaped like the real population, with a time axis.**
 The owner (2026-09-21): over a million users, most on the default category set, some with custom labels, each filing
@@ -917,6 +918,7 @@ in 24 GB. *Experiment:* the no-DB arm, seed 0: all-label loss at 100, 200 and 40
 200 steps on the bf16 base; the all-label loss at 200 steps on bf16; each scored on REAL-6 (bf16 adapters on the bf16 base) and
 the ARC / MMLU / ICL items, against row 47's 4-bit curve (200 / 400 / 800 / 1,600 steps); report minutes, tokens per second,
 peak memory and minutes to reach the 800-step accuracy.
+**Status (2026-09-26):** answered, PLAN step 56, REPORT.md 52. The hours went into re-reading 24 shots to learn one label, not into precision. The loss on every shot label reaches in 100 steps (9 min, 79.4) what 1,600 plain steps (147 min, 76.7) reached; on held-out users 200 steps read 74.5 against the 800-step recipe's 70.1 (+4.4 [0.9, 7.8]), half the trained-user gain having been memorisation, and the model stops consulting its own chain knowledge (known DB-only chains 87 to 70), which weighting the answer to half the loss does not restore. bf16 and the 4-bit base: same speed, same accuracy (H100, three seeds: 80.0 +- 1.4 against 80.5 +- 1.0); bf16 is the default from 2026-09-26.
 
 **REAL-15 (O) Does the fact DB go into the weights better as supervised categorisation decisions than as prose?**
 The owner (2026-09-25), after the all-label result: measuring loss on more tokens may be the better way to impart a database.
@@ -930,3 +932,4 @@ all-label episodes, against the prose records given the same category (`DB_CAT`)
 folds so that no (user, merchant) answer is supervised for a scored user; the DB-only merchants without the record (known chains
 and opaque ones) are the cell that measures it, plus the other groups of REPORT.md 48 and ARC / MMLU. Frame: this improves the
 no-record route (retrieval missing or unavailable at serving time); with the record in the prompt the DB-only merchants are at 97.5.
+**Status (2026-09-26):** answered, PLAN step 57, REPORT.md 53. Yes, by a wide margin. On held-out users with no record in the prompt, database episodes put the DB-only merchants at 94.3 (+50.0 [35.2, 64.4] over no DB), opaque ones at 96.1 (from 11.8), in every fold; prose records with the same category reach 64.8 (opaque 35.3); both together 91.8. Every other cell gains too (all +16.5, coined +20.9). Untested: real bank renderings (row 43), a database larger than 240 merchants (row 59), and the record in the prompt given the same category field (row 58).

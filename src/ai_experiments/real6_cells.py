@@ -93,3 +93,60 @@ def user_ci(correct_by_id, n_boot=1000, seed=0):
         x = np.concatenate([by[users[k]] for k in pick]); b.append(100 * x.mean())
     lo, hi = np.percentile(b, [2.5, 97.5])
     return round(float(lo), 1), round(float(hi), 1)
+
+
+# ---- shared by the table scripts of REPORT.md 51 to 55 (rows 42, 56, 57, 34, 58) ----
+
+def load_recs(*patterns):
+    """Per-item records merged from one or more globs under results/per_item (fold files merge into one held-out reading)."""
+    import glob
+    out = {}
+    for pat in patterns:
+        for f in sorted(glob.glob(str(ROOT / "results" / "per_item" / pat))):
+            out.update({r["id"]: r for r in map(json.loads, open(f))})
+    return out
+
+
+def is_db_only(item_id):
+    doc, _ = _doc()
+    items = {it["id"]: it for it in doc["items"]}
+    return kind(item_id) in KINDS[2:4] and items[item_id]["merchant"] in R6.db_only_merchants()
+
+
+@lru_cache(maxsize=1)
+def _items():
+    doc, _ = _doc()
+    return {it["id"]: it for it in doc["items"]}
+
+
+def selectors():
+    """(label, item filter) for the report columns: all, name types, corrected groups, DB-only (known / opaque)."""
+    it = _items(); db = R6.db_only_merchants()
+    dbo = lambda i: kind(i) in KINDS[2:4] and it[i]["merchant"] in db  # noqa: E731
+    return [("all", lambda i: True), ("standard", lambda i: it[i]["level"].endswith("standard")), ("renamed", lambda i: it[i]["level"].endswith("renamed")),
+            ("coined", lambda i: it[i]["level"].endswith("new")), ("in history", lambda i: kind(i) == KINDS[0]),
+            ("labelled seen, not in history", lambda i: kind(i) == KINDS[1]), ("determined by category", lambda i: kind(i) == KINDS[2]),
+            ("split category", lambda i: kind(i) == KINDS[3]), ("DB-only", dbo), ("DB-only known", lambda i: dbo(i) and it[i]["known"]),
+            ("DB-only opaque", lambda i: dbo(i) and not it[i]["known"])]
+
+
+def row_cells(recs, cols):
+    sel = dict(selectors())
+    out = []
+    for c in cols:
+        x = [r["correct"] for i, r in recs.items() if sel[c](i)]
+        out.append(f"{100 * sum(x) / len(x):.1f}" if x else "-")
+    return out
+
+
+def paired(base, other, col="all", n_boot=2000, seed=0):
+    """Mean of (other - base) correctness over the items both scored in a column, with a user-resampled 95% interval."""
+    sel = dict(selectors())[col]; iu = item_user()
+    ids = [i for i in base if i in other and sel(i)]
+    d = {}
+    for i in ids:
+        d.setdefault(iu[i], []).append(float(other[i]["correct"]) - float(base[i]["correct"]))
+    us = sorted(d); rng = np.random.default_rng(seed)
+    b = [100 * np.mean(np.concatenate([d[u] for u in rng.choice(us, len(us))])) for _ in range(n_boot)]
+    lo, hi = np.percentile(b, [2.5, 97.5])
+    return f"{100 * np.mean([float(other[i]['correct']) - float(base[i]['correct']) for i in ids]):+.1f} [{lo:+.1f}, {hi:+.1f}]"
