@@ -49,6 +49,7 @@ Both sides:
   gitignored `.dvc/config.local`, then `dvc pull`). Without `just`, the three commands are in
   `README.md`. If any `dvc` command fails with `expected 'url' for dictionary value`, the
   remote step has not been done on this checkout.
+- If `dvc pull` of the whole `models/adapters` fails (the full set is hundreds of GB and filled the C: drive once), pull only the adapter you need: `uv run dvc pull models/adapters/<name>`.
 - `just doctor` checks the machine and checkout (venv, package, UTF-8, Store alias, poppler,
   line endings, DVC remote, GPU, torchvision build matching torch so unsloth imports); `just doctor --gpu` also tests whether the driver spills VRAM
   to system RAM. Run it when something looks off, and after changing a machine setting.
