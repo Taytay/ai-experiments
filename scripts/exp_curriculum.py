@@ -14,6 +14,15 @@ D       phase 1: knowledge .85 + replay .15;                   plain
         phase 2: episodes .85 + replay .15   (sequential)
 E       same as C                                              morphology
 Cg      knowledge .45 + episodes .35 + replay .15 + general .05  plain   (PLAN step 25, TRAIN-7)
+M0      arm C's mixture, but the fractions are LOSS WEIGHTS: the loss is the weighted sum of each
+        stream's own mean token loss, so a stream's share of the gradient is its fraction whatever
+        its token count (PLAN step 9, TRAIN-1). No other change: the ablation for M20/M40/M60.
+M20/M40/M60  loss-weighted mixture with E = .20 / .40 / .60, R = .15, the rest split 2:1 between
+        knowledge texts (K) and the self-teaching stream S (universe.self_teaching: completion,
+        true/false and in-document multiple choice derived from the same facts, answer-only loss);
+        episodes carry the loss on every INFERABLE demo label as well as the answer (all-answer
+        loss after 2512.19879 B.1, restricted to labels whose group already appeared, since the
+        labels are random strings): about 1.9x the label tokens of answer-only episodes.
 
 Streams: knowledge = universe.training_texts (full-sequence LM loss); episodes = universe.episodes
 (loss on the answer only; random labels, varied templates, weakness attribute held out, half with
@@ -75,7 +84,13 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "D": [dict(K=0.85, R=0.15), dict(E=0.85, R=0.15)],
     "E": [dict(K=0.45, E=0.40, R=0.15)],
     "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
+    "M0": [dict(K=0.45, E=0.40, R=0.15)],
+    "M20": [dict(K=0.43, S=0.22, E=0.20, R=0.15)],
+    "M40": [dict(K=0.30, S=0.15, E=0.40, R=0.15)],
+    "M60": [dict(K=0.17, S=0.08, E=0.60, R=0.15)],
 }
+BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
+ALL_ANSWER = BY_LOSS and ARM != "M0"   # episodes: loss on every demo label too
 MORPH_P = 0.7 if ARM in ("E", "base_m") else 0.0
 tag = MODEL.split("/")[-1]
 SFX = f"_s{SEED}" if SEED else ""  # seed 0 keeps the original names (every arm before PLAN step 10)
@@ -167,13 +182,40 @@ class Stream:
         return self.items[self.order.pop()]
 
 
+def demo_label_spans(prompt, demos, window=12):
+    """Character spans of the INFERABLE demo labels in an episode prompt: a demo's label counts only if the
+    same label already appeared on an earlier demo (labels are random strings, so a group's first label
+    is unpredictable and would only teach the label distribution). The occurrence used is the one that
+    starts within `window` characters after the demo name ("X = l", "X 'l'", "X -> l", "Input: X\nOutput: l")."""
+    import re
+    spans, seen, hits = [], set(), []
+    for name, label in demos:
+        for m in re.finditer(re.escape(name), prompt):
+            hit = re.compile(r"(?<![A-Za-z0-9])" + re.escape(label) + r"(?![A-Za-z0-9])").search(prompt, m.end(), m.end() + window + len(label))
+            if hit and hit.start() - m.end() <= window:
+                hits.append((hit.start(), hit.end(), label)); break
+    for a, b, label in sorted(hits):
+        if label in seen:
+            spans.append((a, b))
+        seen.add(label)
+    return spans
+
+
 def encode(tok, sample):
-    """sample: str (full-sequence loss) or dict(prompt, answer) (answer-only loss). -> (ids, labels)"""
+    """sample: str (full-sequence loss) or dict(prompt, answer) (answer-only loss; with ALL_ANSWER and
+    sample["demos"], the demo labels inside the prompt carry the loss too). -> (ids, labels)"""
     eos = [tok.eos_token_id]
     if isinstance(sample, str):
         ids = tok(sample, add_special_tokens=False)["input_ids"][: MAXLEN - 1] + eos
         return ids, list(ids)
     a = tok(sample["answer"], add_special_tokens=False)["input_ids"] + eos
+    if ALL_ANSWER and sample.get("demos"):
+        enc = tok(sample["prompt"], add_special_tokens=False, return_offsets_mapping=True)
+        p, offs = enc["input_ids"], enc["offset_mapping"]
+        spans = demo_label_spans(sample["prompt"], sample["demos"])
+        lab = [t if any(o[0] < e and o[1] > s_ for s_, e in spans) else -100 for t, o in zip(p, offs)]
+        cut = MAXLEN - len(a)
+        return p[-cut:] + a, lab[-cut:] + a
     p = tok(sample["prompt"], add_special_tokens=False)["input_ids"][-(MAXLEN - len(a)):]
     return p + a, [-100] * len(p) + a
 
@@ -194,6 +236,8 @@ def train(model, tok, phases, run):
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
     if "G" in need:
         streams["G"] = Stream(S.general_replay_texts(n=4000, seed=19), rng)
+    if "S" in need:
+        streams["S"] = Stream(U.self_teaching(species, n=4000, seed=5), rng)
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 30) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
@@ -210,9 +254,9 @@ def train(model, tok, phases, run):
         srcs, ws = zip(*mix.items())
         loss_acc = 0.0
         for _ in range(ACCUM):
-            batch = []
+            batch, batch_src = [], []
             for _ in range(MICRO):
-                src = rng.choices(srcs, ws)[0]; counts[src] += 1
+                src = rng.choices(srcs, ws)[0]; counts[src] += 1; batch_src.append(src)
                 batch.append(encode(tok, streams[src].next()))
                 tok_by[src] += len(batch[-1][0]); lb_by[src] += sum(l != -100 for l in batch[-1][1][1:])
             L = max(len(i) for i, _ in batch)
@@ -220,7 +264,18 @@ def train(model, tok, phases, run):
             lab = torch.tensor([l + [-100] * (L - len(l)) for _, l in batch], device="cuda")
             att = (torch.arange(L, device="cuda")[None] < torch.tensor([len(i) for i, _ in batch], device="cuda")[:, None]).long()
             tokens += int(att.sum())
-            loss = model(input_ids=ids, attention_mask=att, labels=lab).loss / ACCUM
+            if BY_LOSS:
+                # each stream's mean token loss, weighted by its mixture fraction (renormalised over the streams present)
+                logits = model(input_ids=ids, attention_mask=att).logits
+                tl = torch.nn.functional.cross_entropy(logits[:, :-1].float().reshape(-1, logits.shape[-1]), lab[:, 1:].reshape(-1),
+                                                       ignore_index=-100, reduction="none").view(len(batch), L - 1)
+                valid = (lab[:, 1:] != -100).float()
+                present = {s_: [i for i, b in enumerate(batch_src) if b == s_] for s_ in set(batch_src)}
+                present = {s_: rows for s_, rows in present.items() if valid[rows].sum() > 0}
+                wsum = sum(mix[s_] for s_ in present)
+                loss = sum(mix[s_] / wsum * (tl[rows] * valid[rows]).sum() / valid[rows].sum() for s_, rows in present.items()) / ACCUM
+            else:
+                loss = model(input_ids=ids, attention_mask=att, labels=lab).loss / ACCUM
             loss.backward(); loss_acc += loss.item()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
@@ -228,7 +283,7 @@ def train(model, tok, phases, run):
             el = time.time() - t0
             print(f"    step {step + 1}/{STEPS} loss {loss_acc:.3f} mix={mix} {el:.0f}s {tokens / el:.0f} tok/s "
                   f"{torch.cuda.max_memory_allocated() / 2**30:.1f} GiB", flush=True)
-            run.log(dict(train_loss=loss_acc), condition="train", step=step + 1)
+            run.log(dict(train_loss=loss_acc, **{f"lb_{k}": v for k, v in lb_by.items()}), condition="train", step=step + 1)
         if PERIODIC and (step + 1) % PERIODIC == 0 and step + 1 < STEPS:
             periodic[step + 1] = periodic_eval(model, tok); run.log(periodic[step + 1], condition="periodic", step=step + 1)
             print(f"    step {step + 1} periodic: {periodic[step + 1]}", flush=True)
@@ -243,7 +298,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_lora", lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="unsloth_lora", loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())
