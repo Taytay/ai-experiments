@@ -1,0 +1,6 @@
+outs:
+- md5: 5c087bef1eba4f30fddb1613a2c166ef.dir
+  size: 490438139
+  nfiles: 5
+  hash: md5
+  path: curriculum_Qwen2.5-3B_C_opd_tulu_full_lora

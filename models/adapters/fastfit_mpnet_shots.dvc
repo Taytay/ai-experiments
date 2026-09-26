@@ -1,0 +1,6 @@
+outs:
+- md5: 23db882dd70931e82f5db6fc3b0eb635.dir
+  size: 8768556349
+  nfiles: 40
+  hash: md5
+  path: fastfit_mpnet_shots

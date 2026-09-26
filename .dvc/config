@@ -2,6 +2,9 @@
     analytics = false
     remote = dstore
     autostage = true
+[cache]
+    # Hardlink cache blobs into models/ so each adapter's bytes are stored once on disk.
+    type = "hardlink,copy"
 
 # The remote "dstore" is a plain folder on this machine's D: drive. Its path differs by OS,
 # so it is NOT set here on purpose. Every clone must set it once, locally (gitignored);

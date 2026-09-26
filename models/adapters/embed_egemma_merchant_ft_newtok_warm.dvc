@@ -1,0 +1,6 @@
+outs:
+- md5: 988294d5e8790b3c29580f36e7a272cd.dir
+  size: 658251535
+  nfiles: 14
+  hash: md5
+  path: embed_egemma_merchant_ft_newtok_warm

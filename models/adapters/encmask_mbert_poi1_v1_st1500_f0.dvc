@@ -1,0 +1,6 @@
+outs:
+- md5: 8d195d5da7ff81c8a6b3a3b3e2d37745.dir
+  size: 1684141261
+  nfiles: 2
+  hash: md5
+  path: encmask_mbert_poi1_v1_st1500_f0
