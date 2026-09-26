@@ -10,8 +10,9 @@ dvc_wsl := '/mnt/d/repos/dvc/ai-experiments'
 default:
     @just --list --unsorted
 
-# Once per checkout: venv + editable package, DVC remote path for this OS, then the adapters.
-setup: sync dvc-remote pull
+# Once per checkout: venv + editable package, DVC remote path for this OS. Adapters are pulled
+# on demand with `just pull NAME`.
+setup: sync dvc-remote
 
 # Create or refresh .venv and install ai_experiments editable.
 sync:
@@ -28,14 +29,39 @@ dvc-remote:
 dvc-remote:
     if [ -d '{{dvc_wsl}}' ]; then uv run dvc remote modify --local dstore url '{{dvc_wsl}}' && echo "dvc remote dstore = {{dvc_wsl}}"; else echo "{{dvc_wsl}} does not exist; set it by hand: uv run dvc remote modify --local dstore url <folder>"; fi
 
-# Fetch the adapters this commit expects (3.8 GB the first time).
-pull:
+# Fetch named adapters from D:, e.g. `just pull curriculum_Qwen2.5-3B_C_lora`.
+pull +NAMES:
+    cd models/adapters; uv run dvc pull {{NAMES}}
+
+# Fetch every adapter this commit tracks (hundreds of GB; usually you want `just pull NAME`).
+pull-all:
     uv run dvc pull
 
-# After training: re-hash models/adapters, push new blobs, stage the updated .dvc pointer.
+# After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files.
+[windows]
+[doc("After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files")]
 push-models:
-    uv run dvc add models/adapters
+    uv run dvc add (Get-ChildItem models/adapters -Directory | ForEach-Object { "models/adapters/$($_.Name)" }); uv run dvc push
+
+[unix]
+[doc("After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files")]
+push-models:
+    uv run dvc add $(find models/adapters -mindepth 1 -maxdepth 1 -type d | sort)
     uv run dvc push
+
+# Free local disk: push, then delete every local adapter dir and the DVC cache. The .dvc files
+# stay, so `just pull NAME` brings any adapter back from D:.
+[windows]
+[doc("Free local disk: push, then delete local adapter dirs and the DVC cache (.dvc files stay)")]
+drop-all:
+    uv run dvc push; if ($LASTEXITCODE -ne 0) { exit 1 }; Get-ChildItem models/adapters -Directory | Remove-Item -Recurse -Force; if (Test-Path .dvc/cache) { Remove-Item .dvc/cache -Recurse -Force }
+
+[unix]
+[doc("Free local disk: push, then delete local adapter dirs and the DVC cache (.dvc files stay)")]
+drop-all:
+    uv run dvc push
+    find models/adapters -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+    rm -rf .dvc/cache
 
 # Check machine and checkout against CLAUDE.md; `--gpu` also tests the VRAM-to-RAM spill.
 doctor *ARGS:

@@ -1,0 +1,6 @@
+outs:
+- md5: a57a3f07c2c7da84a81426e865e791a2.dir
+  size: 1684141378
+  nfiles: 2
+  hash: md5
+  path: encmask_hops-v2-options-k1-3_poi1_v1_st1500_f0

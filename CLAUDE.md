@@ -30,7 +30,7 @@ we collected, `src/` is library code, `scripts/` is entry points.
 | `justfile` | Task runner: `just setup`, `just doctor`, `just push-models`, `just smoke`; `just` lists them | a routine changes |
 | `data/processed/` | Frozen item sets (`ladder_v1.json` etc., plain and `_morph` universes), versioned and immutable; hashes go into the tracker config; `uv run python -m ai_experiments.items check` says whether the generators still reproduce them | a new item-set version is frozen |
 | `results/` | Raw JSON and logs, one file per run and arm; `per_item/` has one JSONL per run and condition with every option's log-probs (`ai_experiments.scoring`) | every run |
-| `models/` | Adapters and fine-tuned weights, tracked by DVC (`adapters.dvc` in git, bytes at `D:\repos\dvc\ai-experiments`) | every training run |
+| `models/` | Adapters and fine-tuned weights, tracked by DVC (one `adapters/<name>.dvc` per adapter in git, bytes at `D:\repos\dvc\ai-experiments`; pulled on demand) | every training run |
 | `evals/` | Tracker data: `runs.jsonl` (the record), `LEADERBOARD.md`; CLI is `uv run evals` | every run |
 | `NOTES.md` | Machine and environment history | the environment changes |
 
@@ -68,8 +68,8 @@ They share the GPU, the driver, everything in git, and the DVC remote on D:. The
 Both sides:
 
 - Once per checkout: `just setup` (runs `uv sync`, writes this OS's DVC remote path to the
-  gitignored `.dvc/config.local`, then `dvc pull`). Without `just`, the three commands are in
-  `README.md`. If any `dvc` command fails with `expected 'url' for dictionary value`, the
+  gitignored `.dvc/config.local`). Adapters are not pulled; fetch the ones a run needs with
+  `just pull NAME`. Without `just`, the two commands are in `README.md`. If any `dvc` command fails with `expected 'url' for dictionary value`, the
   remote step has not been done on this checkout.
 - `just doctor` checks the machine and checkout (venv, package, UTF-8, Store alias, poppler,
   line endings, DVC remote, GPU, torchvision build matching torch so unsloth imports); `just doctor --gpu` also tests whether the driver spills VRAM
@@ -79,7 +79,7 @@ Both sides:
   `load_in_4bit=` explicitly (the scripts read `LOAD_4BIT`), and score an adapter on the precision it was trained on:
   a bf16 adapter on the 4-bit base (or the reverse) changes a fifth of the predictions (REPORT.md section 44).
 - Before an `EVAL_ONLY=1` re-score, check the adapter exists under `models/adapters/` on this
-  side; if not, `just pull` (see `models/README.md`).
+  side; if not, `just pull NAME` (see `models/README.md`).
 - Subagents cannot write report files; have them return text and write it from the main session.
 - The Read tool cannot open PDFs. Extract first: `pdftotext -layout x.pdf paper.txt`. That
   needs poppler, which is optional and per machine: `just pdf-tools` installs it, `just doctor`
@@ -89,8 +89,9 @@ Both sides:
   so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
-- After a training run: `just push-models` (`dvc add models/adapters` then `dvc push`), then
-  commit the updated `models/adapters.dvc` with the results.
+- After a training run: `just push-models` (`dvc add` on each adapter dir present, then
+  `dvc push`), then commit the new or changed `models/adapters/*.dvc` with the results.
+  `just drop-all` frees the disk afterwards (the C: drive filled up once from local adapters).
 - The driver can spill VRAM to system memory and turn an OOM into a 3x slowdown
   (`reports/REPORT.md` section 7). `just doctor --gpu` tests it; unless that check is OK on
   this side, watch step times, not just whether the run finishes.

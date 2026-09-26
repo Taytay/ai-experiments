@@ -1,0 +1,6 @@
+outs:
+- md5: 1897d0bd693a1a2e1b4964404c508f1e.dir
+  size: 1203302972
+  nfiles: 11
+  hash: md5
+  path: embed_qwen3_merchant_ft_newtok_warm

@@ -1,0 +1,6 @@
+outs:
+- md5: bef50b850d58fed0487950645b0e275c.dir
+  size: 658251535
+  nfiles: 14
+  hash: md5
+  path: embed_egemma_merchant_ft_newtok_mean

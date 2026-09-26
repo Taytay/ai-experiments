@@ -1,0 +1,6 @@
+outs:
+- md5: 59ce7f21c707c3bd6f9b8b0c0043a25a.dir
+  size: 609120752
+  nfiles: 4
+  hash: md5
+  path: gliclass_ft_ctx

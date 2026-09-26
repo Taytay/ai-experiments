@@ -1,0 +1,6 @@
+outs:
+- md5: 4cd5b4391dc8febd24eabfdd1596657d.dir
+  size: 46169138
+  nfiles: 11
+  hash: md5
+  path: embed_minilm_kge_distmult

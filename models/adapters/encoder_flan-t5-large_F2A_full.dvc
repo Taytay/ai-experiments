@@ -1,0 +1,6 @@
+outs:
+- md5: 7a6ab90884c67e41e221fed36e0c9d93.dir
+  size: 1568796405
+  nfiles: 5
+  hash: md5
+  path: encoder_flan-t5-large_F2A_full

@@ -1,0 +1,6 @@
+outs:
+- md5: 26378069e5894a800c2f7876c5ef3b68.dir
+  size: 8768232957
+  nfiles: 40
+  hash: md5
+  path: fastfit_bge_shots_ctx

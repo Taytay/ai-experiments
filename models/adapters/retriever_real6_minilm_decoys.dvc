@@ -1,0 +1,6 @@
+outs:
+- md5: 036f2ca377d2ec13a27744d03011dc76.dir
+  size: 46707550
+  nfiles: 11
+  hash: md5
+  path: retriever_real6_minilm_decoys

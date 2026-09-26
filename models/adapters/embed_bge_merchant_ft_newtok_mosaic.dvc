@@ -1,0 +1,6 @@
+outs:
+- md5: 9cabaf0b6e53545661c5f9f0f87df0ba.dir
+  size: 220002295
+  nfiles: 10
+  hash: md5
+  path: embed_bge_merchant_ft_newtok_mosaic
