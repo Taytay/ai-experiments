@@ -27,6 +27,8 @@ from ai_experiments.paths import ROOT
 from ai_experiments.scoring import Scorer, aggregate, per_item_path, write_records
 
 MODEL = os.environ.get("MODEL", "Qwen/Qwen2.5-3B")
+LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "0")))  # unsloth's loader defaults to the NF4 4-bit base (load_in_4bit=True); until 2026-09-21 this script
+# never set it, so its saved results were read on the 4-bit base (REPORT.md section 44). Default now bf16, like exp_curriculum; LOAD_4BIT=1 reproduces the old reads.
 SMOKE = bool(os.environ.get("SMOKE"))
 MAXLEN = 1536  # MMLU 5-shot prompts run to about 900 tokens; the scorer cuts prompts to MAXLEN - 32 and options must fit in the rest
 what = sys.argv[1] if len(sys.argv) > 1 else "base"
@@ -36,6 +38,7 @@ elif what == "full":
     src, tag, kind = sys.argv[2], os.path.basename(sys.argv[2].rstrip("/")), "full"
 else:
     src, tag, kind = str(ROOT / "models" / "adapters" / what), what, "adapter"
+tag += ("_" + os.environ["RUN_TAG"]) if os.environ.get("RUN_TAG") else ""  # e.g. RUN_TAG=bf16 for the section 44 re-reads beside the 4-bit files
 OUT = ROOT / "results" / f"items2_{tag}{'_smoke' if SMOKE else ''}.json"
 
 F = I.load_all(morph=False)
@@ -46,7 +49,7 @@ if SMOKE:
 
 cfg = dict(source=src, kind=kind, tag=tag, maxlen=MAXLEN, **F.config())
 with Run("items_v2", model=MODEL, config=cfg, enabled=not SMOKE) as run:
-    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=MAXLEN, dtype=torch.bfloat16)
+    model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
     tok.padding_side = "right"
     model.eval(); t0 = time.time()
     sc = Scorer(model, tok, maxlen=MAXLEN, extras=False)
