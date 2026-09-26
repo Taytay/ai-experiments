@@ -1,0 +1,15 @@
+[
+ {
+  "tag": "r71-cut-plain-k3",
+  "env": {
+   "MODE": "options",
+   "TRAIN_KS": "1-3",
+   "EVAL_ONLY": "1",
+   "ITEMS": "hops_v1_cut",
+   "ADAPTERS_FROM": "r71-enc-plain-k3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ }
+]
