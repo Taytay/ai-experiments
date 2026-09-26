@@ -3828,3 +3828,145 @@ The owner's research framing (QUESTIONS.md, research agenda) asks for metrics th
 | no DB, all-label + rename augmentation (3090, 4-bit) | 41% of auto (38% of all) | 8% of auto (10% of all) | 49% of auto (43% of all) | 1% of auto (9% of all) |
 
 On REAL-6's held-out users the no-model cascade reads 87.0 top-1: the user's own past label for the merchant covers the merchants in their history, other users' labels cover almost every other merchant (each REAL-6 merchant is in someone's history, the DB-only ones included, since they are held out of training rows only), and the users label consistently. The best categorisers sit on it (database episodes 87.4, record with the category 86.0; skill 3 and -8), so REAL-6's top-1 mostly measures how well a model re-derives what a lookup gives free, as section 48 found for the seen cells. Their value is in the ranking (top-3 97 to 98 against 26 for the usage prior; skill 97) and in what a lookup cannot reach: on the novel merchants, where no lookup or other-user label exists, the cascade is the usage prior (7.8) and the categorisers read 53 to 85 (Table 57.1). Calibrated, the models leave 0.6 to 1.5 bits of uncertainty on REAL-6 (usage prior 4.3) and 0.8 to 2.9 on the novel merchants. Auto-filing at a 98% threshold chosen on other users realises 92 to 98% precision on new users, not 98: confidence thresholds drift between users, which supports the owner's rule of auto-filing a merchant the user has filed consistently before (the lookup is exact on those) and suggesting everything else. Every table from here reports this scorecard, skill over the cascade included; REAL-6's successor (row 43) and POI-1 (row 65) are where the lookup and collaborative signals stop answering.
+
+
+## 60. Label induction: one or two examples of other businesses filed under a coined word teach every model what the word means (14B untrained 21 to 80% on v1, Opus 25 to 100% on v2), the fine-tuned 3B reads it like an untrained 14B, and the models copy the nearest example where a strong reader reasons from the category (REAL-20)
+
+PLAN step 64. REAL-20 asks when a model infers what a meaningless category name means from the user's examples in the prompt. The
+item set (`scripts/build_label_induction.py`, `data/processed/label_induction_v1.json`) holds 300 queries: real US businesses with
+descriptive names from Overture, 25 for each of the twelve standard categories, rendered clean ("Name, City ST"). Each query is shown
+under 12 conditions, which pair item by item. Every scheme holds the twelve standard categories. The query's category (gold) is
+renamed to a fresh coined word ("Kofa"), and two other categories are coined too. The 24 labelled examples are other real businesses.
+
+The base condition gives 2 gold examples, businesses of another kind in the gold category (the query is a pizzeria, the examples a
+taqueria and a cafe). The other conditions vary one factor at a time:
+
+- the number of gold examples: 0, 1, 4, 8;
+- the examples' kind: the same kind as the query, or opaque generated names ("Oskpobury Group");
+- the number of coined categories: 1 or 6;
+- a decoy: one example of the query's own kind filed under another category, with and without the gold examples;
+- a control that keeps the standard name.
+
+The readers are:
+
+- untrained Qwen2.5-Instruct at 3B, 7B and 14B;
+- three 3B categorisers trained on REAL-6 users of fold 0 (all-label loss; with database episodes; with rename augmentation, the last
+  trained for this step: `categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_ren50_alllab_lora`);
+- blind Opus 5.5 subagents in a Latin square: 60 queries, six conditions, six agents, and no agent sees a query twice
+  (`results/blind_opus/`).
+
+All models ran on Modal in bf16 (`scripts/modal_jobs/r64*.json`) and were scored by the sum rule; tables from
+`scripts/label_induction_tables.py`.
+
+**v1 is solvable by elimination.** Blind Opus scored 98 to 100% in every condition, including zero gold examples. Its reasons
+say how: "No Groceries category; Kuvir is the unused coined label". The scheme leaves out exactly one standard category and puts one
+coined word with no other examples in its place. v2 (`--empty 3`, `label_induction_v2.json`) is v1 item for item plus three coined
+categories with no examples anywhere, as users have categories with no recent transactions. In v2 elimination leaves four words and
+only the gold examples can decide. Blind Opus confirms this: 25% with no gold examples, chance among four.
+
+**Table 60.1: v1 (12 options; solvable by elimination): top-1 % by condition, 300 queries per condition (blind Opus: its 60)**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 50 | 73 | 87 | 73 | 81 | 85 | 100 |
+| n_gold=0 | 7 | 11 | 21 | 22 | 11 | 26 | 100 |
+| n_gold=1 | 44 | 69 | 80 | 65 | 73 | 78 | 100 |
+| n_gold=4 | 62 | 77 | 88 | 80 | 86 | 87 | - |
+| n_gold=8 | 72 | 83 | 89 | 84 | 89 | 90 | - |
+| kind=same_kind | 83 | 93 | 96 | 90 | 93 | 95 | - |
+| kind=opaque | 6 | 10 | 16 | 24 | 20 | 25 | 98 |
+| n_coined=1 | 54 | 76 | 88 | 82 | 84 | 87 | - |
+| n_coined=6 | 48 | 68 | 84 | 67 | 78 | 83 | - |
+| decoy | 36 | 49 | 62 | 57 | 62 | 61 | 98 |
+| decoy, n_gold=0 | 2 | 2 | 6 | 10 | 4 | 5 | - |
+| control: standard name | 93 | 93 | 97 | 95 | 96 | 94 | 100 |
+
+
+**Table 60.2: v2 (15 options: three empty coined categories): top-1 % by condition, 300 queries per condition (blind Opus: its 60)**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 46 | 60 | 77 | 68 | 78 | 77 | 100 |
+| n_gold=0 | 5 | 14 | 12 | 15 | 11 | 12 | 25 |
+| n_gold=1 | 34 | 56 | 66 | 55 | 69 | 71 | 100 |
+| n_gold=4 | 55 | 69 | 83 | 76 | 84 | 84 | - |
+| n_gold=8 | 66 | 78 | 87 | 81 | 90 | 90 | - |
+| kind=same_kind | 79 | 89 | 93 | 89 | 92 | 94 | - |
+| kind=opaque | 4 | 7 | 5 | 15 | 15 | 10 | 3 |
+| n_coined=1 | 47 | 62 | 78 | 69 | 80 | 78 | - |
+| n_coined=6 | 40 | 59 | 74 | 63 | 75 | 79 | - |
+| decoy | 30 | 45 | 58 | 51 | 60 | 60 | 97 |
+| decoy, n_gold=0 | 1 | 2 | 3 | 7 | 5 | 4 | - |
+| control: standard name | 92 | 93 | 96 | 94 | 94 | 94 | 100 |
+
+
+**Table 60.3: v2 (15 options: three empty coined categories): the same on the blind reader's 60 queries only**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 45 | 70 | 83 | 72 | 82 | 85 | 100 |
+| n_gold=0 | 7 | 18 | 17 | 10 | 12 | 12 | 25 |
+| n_gold=1 | 28 | 60 | 75 | 52 | 68 | 75 | 100 |
+| n_gold=4 | 57 | 72 | 85 | 78 | 85 | 88 | - |
+| n_gold=8 | 70 | 82 | 88 | 90 | 93 | 98 | - |
+| kind=same_kind | 88 | 92 | 97 | 90 | 97 | 98 | - |
+| kind=opaque | 2 | 8 | 7 | 12 | 15 | 8 | 3 |
+| n_coined=1 | 48 | 73 | 83 | 72 | 82 | 80 | - |
+| n_coined=6 | 43 | 70 | 82 | 72 | 82 | 82 | - |
+| decoy | 33 | 53 | 63 | 62 | 72 | 68 | 97 |
+| decoy, n_gold=0 | 2 | 3 | 5 | 8 | 5 | 2 | - |
+| control: standard name | 95 | 92 | 95 | 97 | 93 | 97 | 100 |
+
+
+**Table 60.4: the decoy condition, how often a wrong answer is the decoy's category (the one example of the query's own kind was filed there)**
+
+| reader | v1 wrong | of which the decoy's category | v2 wrong | of which the decoy's category |
+|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 192 / 300 | 96 (50%) | 211 / 300 | 100 (47%) |
+| Qwen2.5-14B-Instruct, untrained | 115 / 300 | 81 (70%) | 126 / 300 | 75 (60%) |
+| 3B all-label + rename augmentation (fold 0) | 117 / 300 | 87 (74%) | 120 / 300 | 87 (73%) |
+
+### 60.1 What the models do with a coined word
+
+**The gold examples do the work.** On v2 the untrained 14B goes from 12% with no gold examples to 66 with one and 87 with eight; the
+3B categorisers go from 11 to 15 with none to 55 to 71 with one and 81 to 90 with eight. Examples of the query's own kind give
+89 to 94, close to the control that keeps the standard name (92 to 96).
+
+**The meaning comes from the examples' names.** With opaque example names every reader stays near its no-example level (v2: 4 to
+15% for the models, 3% for Opus). The models infer the word from what kind of businesses the examples are, not from the count of examples.
+
+**Elimination is Opus's shortcut, not the models'.** On v1 with no gold examples the models read 7 to 26% where Opus reads 100.
+Adding three empty coined categories (v2) costs the models 3 to 13 points at base (14B 87 to 77, the rename-trained 3B 85 to 77),
+because each empty word is another plausible home for a business the examples do not explain. The number of coined categories
+matters little otherwise (n_coined 1 against 6: 14B 78 against 74 on v2).
+
+**Scale and training.** Untrained, 3B reads 46 at v2's base, 7B 60 and 14B 77. Fine-tuning the 3B on REAL-6 user episodes brings
+it to 68 (all-label loss). Database episodes and rename augmentation bring it to 77 to 78, level with the untrained 14B in almost
+every row. Rename augmentation was built for this: episodes where category names are replaced by coined words. Database episodes
+help as much here, probably because they also teach the model to file a merchant it has never seen by its kind.
+
+### 60.2 The decoy: copying the nearest example
+
+One example of the query's own kind filed under another category drops every model by 15 to 19 points on v2 (base 77 to 58 for the
+14B, 77 to 60 for the rename-trained 3B). Of the wrong answers, 60 to 74% are exactly the decoy's category (Table 60.4). Opus keeps
+97%. The models weight the single most similar example over the two examples that define the category, where Opus reads the
+category. With no gold examples and a decoy, all models fall to 1 to 7%.
+
+This is how a similarity-driven reader behaves, and it matches section 48: the models are strong at "this merchant, or one like it,
+went there". It is not always wrong for the product. A user who filed one pizzeria under "Date night" may want the next pizzeria
+there too; gold here is the query's standard category, which is one reading of the user. What the item set settles is the
+mechanism: the models copy the nearest example; they do not weigh it against the category the other examples define.
+
+### 60.3 What the step says
+
+For Q3 (inferring meaningless category names), a coined word is learned from one or two labelled examples of other businesses of
+the same kind, by every model from 3B up. Training on user episodes, above all with coined names or database rows, moves a 3B to
+where a 14B starts. The remaining gap to a strong reader (77 against 100 at two examples) is a gap in weighing the evidence. The
+models follow the most similar example and are drawn to categories with no examples; Opus uses both examples and ignores a single
+odd one. Two follow-ups:
+
+- Train with decoys, and with empty categories, in the episodes (the rename-augmentation recipe plus deliberate inconsistencies).
+- Test whether the 3B separates "same kind" from "same category" in its hidden states (row 67, probes).
+
+POI-1 (row 65) now asks the same of real places at scale: schemes of 12 to 20 categories over Overture's 288 basic categories, with
+places no user has filed.
