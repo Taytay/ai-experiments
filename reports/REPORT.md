@@ -3970,3 +3970,156 @@ odd one. Two follow-ups:
 
 POI-1 (row 65) now asks the same of real places at scale: schemes of 12 to 20 categories over Overture's 288 basic categories, with
 places no user has filed.
+
+
+## 61. POI-1: real places at 12 to 20 categories per user are hard for every reader (blind Opus 56%, the best 3B 59); a lookup by the place's kind answers most of what is answerable, the model adds 15 points on top (80%), and examples chosen by kind lift every model by 8 to 18 points (POI-1)
+
+PLAN step 65. POI-1 moves the categoriser off REAL-6's synthetic merchants onto real places, and makes the categories harder. The
+set is `scripts/build_poi1.py`, frozen as `data/processed/poi1_v1.json`, built from Overture places 2026-09-23.1 (every place keeps
+its Overture id and per-row source licence).
+
+- **Users.** 200 synthetic users over real US places.
+- **Categories.** Each user groups 20 to 45 of Overture's basic categories into 12 to 20 of their own. Groups follow Overture's
+  top-level taxonomy, split and merged at random, so some cross top levels. Each is named one of three ways: readable ("Health
+  care"), merged from two members ("Surgery & primary care or general clinic"), or a coined word ("Gavir").
+- **Histories.** Each user has 150 places, weighted Zipf over their categories, and no place is shared between users. The prompt
+  shows a frozen block of 24 of them as labelled examples.
+- **Test items.** 2,053 places that are in nobody's history, so no merchant lookup answers them. Half are of a basic category
+  already in the user's history ("seen kind"); half are of a basic category in the scheme but not in the history ("unseen kind").
+- **Users are consistent by construction:** every basic category maps to exactly one of the user's categories. So the **kind
+  lookup** is exact whenever it applies. It is the user's label for other places of the same Overture basic category, and it is
+  what a places database plus the user's history gives without any model.
+
+**Readers:**
+
+- untrained Qwen2.5-Instruct 3B, 7B and 14B;
+- two REAL-6 categorisers as transfer;
+- three 3B categorisers trained on POI-1's users with fold 0 held out (`POI=poi1_v1` in `exp_categoriser.py`; all-label loss, 200 or
+  800 steps, one with rename augmentation);
+- blind Opus 5.5 on 120 items (20 per level, `results/blind_opus/poi1_v1/`).
+
+All model runs were on Modal in bf16 (`scripts/modal_jobs/r65*.json`); tables from `scripts/poi1_tables.py`, with the scorecard
+extended to a set's own users (`ai_experiments.scorecard`, `users=`, `fold_of=`).
+
+**Table 61.1: POI-1, fold 0's held-out users (50 users): the scorecard (temperature and auto-file thresholds fitted leave-users-out within the fold's users, grouped by (id // 4) mod 4; kind lookup = the user's label for another place of the same Overture basic category)**
+
+| reader | n | top-1 [interval] | top-3 | MRR | bits left | auto-file at 98%: coverage (precision) | usage prior top-1 / top-3 | kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 | kind lookup, else the model: top-1 (the model's top-1 where the lookup has nothing) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 507 | 44.6 [39.5, 49.5] | 65.3 | 0.58 | 2.93 | 5.3 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -60 / 55 | 74.6 (37.7) |
+| Qwen2.5-7B-Instruct, untrained | 507 | 47.7 [42.2, 53.3] | 68.0 | 0.61 | 2.61 | 6.7 (94.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -51 / 58 | 74.2 (36.7) |
+| Qwen2.5-14B-Instruct, untrained | 507 | 52.9 [47.8, 58.0] | 71.6 | 0.66 | 2.39 | 3.7 (94.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -36 / 63 | 77.9 (45.9) |
+| 3B trained on REAL-6 (all-label), transfer | 507 | 46.5 [41.4, 51.2] | 64.5 | 0.59 | 2.79 | 1.6 (87.5) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -54 / 54 | 74.6 (37.7) |
+| 3B trained on REAL-6 (all-label + rename), transfer | 507 | 37.9 [32.8, 42.9] | 60.9 | 0.53 | 3.00 | 4.7 (95.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -79 / 49 | 69.4 (25.1) |
+| 3B trained on POI-1, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 0.70 | 2.12 | 10.7 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -22 / 69 | 80.3 (51.7) |
+| 3B trained on POI-1, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 0.68 | 2.27 | 4.7 (95.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -28 / 66 | 78.9 (48.3) |
+| 3B trained on POI-1, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 0.71 | 1.94 | 16.4 (92.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -18 / 72 | 79.7 (50.2) |
+
+**Table 61.2: top-1 % by level, fold 0 (seen / unseen = the place's Overture basic category is / is not in the user's history; standard / renamed / new = readable / merged / coined category name); blind Opus on its own sample (all users, 20 per level)**
+
+| reader | R6_seen_new | R6_seen_renamed | R6_seen_standard | R6_unseen_new | R6_unseen_renamed | R6_unseen_standard |
+|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 24 | 54 | 60 | 6 | 38 | 53 |
+| Qwen2.5-7B-Instruct, untrained | 37 | 51 | 66 | 13 | 34 | 49 |
+| Qwen2.5-14B-Instruct, untrained | 37 | 52 | 70 | 19 | 49 | 57 |
+| 3B trained on REAL-6 (all-label), transfer | 37 | 55 | 59 | 12 | 45 | 47 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 42 | 52 | 46 | 15 | 32 | 27 |
+| 3B trained on POI-1, 200 steps | 45 | 66 | 69 | 21 | 45 | 69 |
+| 3B trained on POI-1, 800 steps | 32 | 68 | 71 | 12 | 47 | 67 |
+| 3B trained on POI-1, 800 steps + rename | 56 | 60 | 72 | 35 | 53 | 56 |
+| blind Opus 5.5 (sample) | 45 (20) | 65 (20) | 90 (20) | 25 (20) | 40 (20) | 70 (20) |
+
+**Table 61.3: top-1 % by what the prompt's 24 shots show x the category name type (fold 0; blind Opus on its sample, n in brackets)**
+
+| reader | kind in shots, standard | kind in shots, renamed | kind in shots, new | other kinds under gold, standard | other kinds under gold, renamed | other kinds under gold, new | gold not in shots, standard | gold not in shots, renamed | gold not in shots, new |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 61 | 67 | 33 | 56 | 34 | 7 | 47 | 50 | 0 |
+| Qwen2.5-7B-Instruct, untrained | 72 | 64 | 47 | 52 | 28 | 18 | 47 | 58 | 0 |
+| Qwen2.5-14B-Instruct, untrained | 73 | 64 | 47 | 61 | 38 | 21 | 55 | 75 | 5 |
+| 3B trained on REAL-6 (all-label), transfer | 64 | 67 | 47 | 48 | 38 | 14 | 47 | 67 | 5 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 51 | 64 | 51 | 31 | 28 | 23 | 26 | 58 | 0 |
+| 3B trained on POI-1, 200 steps | 68 | 82 | 55 | 69 | 44 | 27 | 71 | 42 | 5 |
+| 3B trained on POI-1, 800 steps | 66 | 82 | 35 | 74 | 44 | 21 | 66 | 58 | 0 |
+| 3B trained on POI-1, 800 steps + rename | 72 | 69 | 56 | 66 | 48 | 48 | 47 | 67 | 21 |
+| blind Opus 5.5 (sample) | 91 (11) | 92 (12) | 57 (14) | 77 (26) | 29 (24) | 25 (20) | 67 (3) | 75 (4) | 17 (6) |
+
+(fold 0 items per cell: kind in shots, standard: 106, kind in shots, renamed: 39, kind in shots, new: 55, other kinds under gold, standard: 121, other kinds under gold, renamed: 61, other kinds under gold, new: 56, gold not in shots, standard: 38, gold not in shots, renamed: 12, gold not in shots, new: 19)
+
+**Table 61.4: kind-retrieved shots, top-1 % on fold 0's items whose Overture basic category is in the user's history (frozen 24 shots → up to six of them replaced by history places of the query's kind), by category name type**
+
+| reader | standard (n=157) | renamed (n=65) | new (n=78) | all |
+|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 60 → 75 | 54 → 69 | 24 → 50 | 49 → 67 |
+| Qwen2.5-14B-Instruct, untrained | 70 → 79 | 52 → 77 | 37 → 67 | 58 → 75 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 46 → 66 | 52 → 69 | 42 → 62 | 47 → 66 |
+| 3B trained on POI-1, 800 steps | 71 → 77 | 68 → 74 | 32 → 45 | 60 → 68 |
+| 3B trained on POI-1, 800 steps + rename | 72 → 83 | 60 → 82 | 56 → 76 | 65 → 81 |
+
+On all 200 users the untrained and transfer readers read as on fold 0 (3B 43.9, 7B 47.9, 14B 51.9, REAL-6 all-label 45.1, REAL-6
+rename 38.5).
+
+### 61.1 How hard the task is, and what decides it
+
+POI-1 is far harder than REAL-6. The best reader, the POI-trained 3B with rename augmentation, reaches 59% top-1, and blind Opus
+reaches 56% on its sample. Opus gets 90% on seen kinds with readable names but 25% on unseen kinds with coined names. Much of the
+set is underdetermined from the prompt. A coined or merged group whose members the 24 examples do not show cannot be decoded: when
+the gold category's name is coined and only other kinds are filed under it, Opus reads 25%. When the query's kind is among the
+examples, Opus reads 91 to 92% for readable and merged names.
+
+The prompt's 24 examples, not the history, are what the model sees. The query's kind is among them in only 39% of items (66% of
+seen-kind items).
+
+### 61.2 Lookup first, model for the rest
+
+The no-model cascade (kind lookup, then other users, then the usage prior) reads 65% on fold 0. The kind lookup answers 59% of
+items, all correctly, and the usage prior handles the rest. Every model alone is below the cascade (skill -18 to -79). Combined,
+with the kind lookup where it answers and the model elsewhere, the result is 69 to 80% (the POI-trained 3Bs 79 to 80, the untrained
+14B 78). Where the lookup has nothing, the model is worth 25 to 52% against the prior's 7.5 (the POI-trained 3Bs 48 to 52).
+
+This is the same division of labour section 59 found on REAL-6 with the merchant lookup. Here it is one level up, by the kind of
+place, which needs a places database (Overture's category for the query). Real users are less consistent than POI-1's, so a real
+kind lookup would be imperfect. The finding is the division of labour, not the 100%.
+
+### 61.3 Scale, transfer and training
+
+- **Scale.** Untrained, 3B, 7B and 14B read 44.6, 47.7 and 52.9.
+- **Transfer.** The REAL-6 categorisers do not transfer: all-label 46.5, about the untrained 3B. The rename-augmented one does worse
+  (37.9), losing most on readable names (unseen kind, standard: 27 against 53). Training on REAL-6's twelve-category schemes with
+  coined words seems to teach it to distrust readable names.
+- **Training on POI-1's own users.** This gives 55 to 59: fold 0's users are unseen, but their kinds of places and naming habits are
+  not. 200 steps (57.8) do as well as 800 (55.4, intervals overlap). Rename augmentation helps most where it should, on coined
+  names: seen kind 32 to 56, unseen kind 12 to 35, the latter above blind Opus's 25 on its sample. Its auto-file coverage at 98% is
+  the highest (16.4%), but its realised precision is 92.8.
+
+### 61.4 Examples chosen by kind
+
+`scripts/build_poi1_variants.py kshots` (`poi1_v1_kshots.json`) swaps up to six of the 24 examples for history places of the
+query's Overture basic category. This is retrieval by kind, which needs the places database. No training was redone. On fold 0's
+items whose kind is in the history, it lifts every reader:
+
+- untrained 3B, 49 to 67;
+- untrained 14B, 58 to 75;
+- POI-trained 3B with rename augmentation, 65 to 81, and on coined names 56 to 76.
+
+Even so the models do not simply copy. With six examples of the query's kind in the prompt, all under the gold label, the 14B picks
+it 88% of the time and the best 3B 92%. A lookup is exact there. So the order is: lookup by merchant, then lookup by kind, then the
+model with kind-retrieved examples for kinds the user has never filed.
+
+### 61.5 What the step says
+
+On real places with realistic scheme sizes the models' value is where lookups stop: kinds of place the user has never filed, and
+categories whose meaning must be read from a few examples.
+
+- For Q1 (multiple-choice mechanics), the choice among 12 to 20 user categories is limited mostly by what the prompt shows, not by
+  model size (3B to 14B: +8 points).
+- For Q2 (knowledge injection), a places database helps twice without any training: as a lookup by kind, and as a way to choose
+  examples.
+- For Q3 (coined names), training with coined words on the right distribution of places is what moves coined names (24 to 56 on
+  seen kinds for the 3B; 76 with kind-retrieved examples).
+
+Open:
+
+- all four folds for the POI-trained arms (fold 0 only here);
+- the obscure rendering;
+- inconsistent users (a kind filed under two categories), so the lookup is no longer exact;
+- training with kind-retrieved examples;
+- row 66 (facts or skill) uses POI-1's places as the injected database.

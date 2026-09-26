@@ -8,6 +8,8 @@
   P.3  the untrained and transfer readers on all 200 users
   P.4  top-1 by what the prompt's 24 shots show (a place of the query's own basic category; only other kinds under the gold label;
        not the gold label) x the name type, fold 0, with blind Opus on its sample
+  P.5  kind-retrieved shots (poi1_v1_kshots): top-1 on the items whose kind is in the user's history, frozen shots against up to six
+       history places of the query's Overture basic category in the prompt, by name type, fold 0
 usage: uv run python scripts/poi1_tables.py
 """
 import json
@@ -114,3 +116,20 @@ if __name__ == "__main__":
     n0 = [i for i in items if items[i]["user"] % 4 == 0]
     print("\n(fold 0 items per cell: " + ", ".join(f"{g}, {nt}: {sum(sel(i, g, nt) for i in n0)}" for g, nt in cells) + ")\n")
     table("**Table P.3: POI-1, all 200 users (the untrained and transfer readers only)**", items, users, False)
+
+    print("\n**Table P.5: kind-retrieved shots, top-1 % on fold 0's items whose Overture basic category is in the user's history (frozen 24 "
+          "shots → up to six of them replaced by history places of the query's kind), by category name type**\n")
+    kitems = {i["id"]: i for i in json.loads((PROCESSED / f"{SET}_kshots.json").read_text())["items"]}
+    sel = [i for i in kitems if kitems[i]["n_kind_shots"] > 0 and kitems[i]["user"] % 4 == 0]
+    print("| reader | " + " | ".join(f"{nt} (n={sum(items[i]['name_type'] == nt for i in sel)})" for nt in ("standard", "renamed", "new")) + " | all |")
+    print("|---|---|---|---|---|")
+    for label, pat in READERS:
+        a, b = RC.load_recs(pat), RC.load_recs(pat.replace(f"_{SET}.noctx", f"_{SET}_kshots.noctx"))
+        if not b:
+            continue
+        ok = lambda r, i: int(np.argmax(r[i]["sum_lp"])) == r[i]["answer"]  # noqa: E731
+        cells = []
+        for nt in ("standard", "renamed", "new", None):
+            ids = [i for i in sel if (nt is None or items[i]["name_type"] == nt) and i in a and i in b]
+            cells.append(f"{100 * np.mean([ok(a, i) for i in ids]):.0f} → {100 * np.mean([ok(b, i) for i in ids]):.0f}")
+        print(f"| {label} | " + " | ".join(cells) + " |")
