@@ -29,6 +29,13 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
        adds _alllab. No-DB arm only (the shots carry no record, so the record arm would learn its skill from 1 label in 25).
      ANS_WEIGHT=w (row 56, with ALL_LABELS): each sequence's loss is w x the final answer's mean token loss + (1 - w) x the shot
        labels' mean token loss, instead of one mean over all labelled tokens (where the answer is ~3 tokens in ~85); adds _aw<w*100>.
+     DBEP=p (row 57, REAL-15): database episodes. With probability p a training episode has 8 of its shots and its target replaced by
+       synthetic statement rows of fact-DB merchants (rendered by the generator, amounts from the category's log-normal, any string
+       that is a REAL-6 test string refused), each labelled with the training user's own name for the merchant's DB category (merchants
+       whose category the user split are skipped: the DB cannot say which half). DB-only merchants included: their labels come from the
+       DB, never from a user. Adds _dbep<p*100>. With ALL_LABELS every such label carries the loss.
+     DB_CAT=1 (row 57): the DB texts of DB=param also state the merchant's category ("X is a Groceries store that sells ..."), so the
+       prose arm has the same information as the episodes; adds _dbcat.
      TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
        LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
@@ -65,17 +72,20 @@ SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training sho
 FOLD = os.environ.get("FOLD")  # row 42: hold out the users with user % 4 == FOLD
 RENAME = float(os.environ.get("RENAME", "0"))
 ALL_LABELS = bool(int(os.environ.get("ALL_LABELS", "0")))  # row 56: loss on every shot label in the prompt too
+DBEP = float(os.environ.get("DBEP", "0"))  # row 57: share of training episodes rebuilt around synthetic fact-DB rows
+DB_CAT = bool(int(os.environ.get("DB_CAT", "0")))  # row 57: the prose DB texts state the category too
 ANS_WEIGHT = float(os.environ.get("ANS_WEIGHT", "0"))  # row 56: the final answer's share of each sequence's loss under ALL_LABELS (0 = token mean)  # row 42: per-episode probability of replacing each category name by a coined word
 CHAT = bool(int(os.environ.get("CHAT", "0")))  # row 39: the prompt as the user turn of the chat template, the label as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
 assert TRAINER in ("unsloth", "hf")
-assert not (ALL_LABELS and (CHAT or DB != "none")), "ALL_LABELS is built for the plain no-DB prompt"
+assert not (ALL_LABELS and (CHAT or DB == "ret")), "ALL_LABELS is built for the plain prompt (no record in it)"
+assert not (DBEP and (CHAT or DB == "ret")), "DBEP builds plain episodes without a record"
 assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs ALL_LABELS and 0 < w < 1"
 DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -85,8 +95,34 @@ def db_texts():
     out = []
     for name, rec in DBREC.items():
         prods = rec.split(" sells ", 1)[1].rstrip(".")
-        out += [rec, f"Question: What does {name} sell?\nAnswer: {name} sells {prods}.", f"Shoppers go to {name} for {prods}.", f"Store directory entry: {name} - {prods}."]
+        if DB_CAT:  # row 57: the same information the database episodes get
+            cat = MERCHANT[name]["category"]
+            out += [f"{name} is a {cat} store that sells {prods}.", f"Question: What category is {name}?\nAnswer: {name} is {cat}; it sells {prods}.",
+                    f"Shoppers go to {name} for {prods}.", f"Store directory entry: {name} ({cat}) - {prods}."]
+        else:
+            out += [rec, f"Question: What does {name} sell?\nAnswer: {name} sells {prods}.", f"Shoppers go to {name} for {prods}.", f"Store directory entry: {name} - {prods}."]
     return out
+
+
+from ai_experiments import transactions as T  # noqa: E402
+MERCHANT = {m["name"]: m for m in T.load()["merchants"]}
+ITEM_TEXTS = {it["text"] for it in DOC["items"]}
+
+
+def db_row(u, rng, names_ok):
+    """A synthetic statement row of a fact-DB merchant, labelled with user u's name for its DB category (row 57); None if none maps."""
+    import math
+    std_to_name = {std: c["name"] for c in u["categories"] if "split" not in c for std in c["standard"]}
+    for _ in range(20):
+        m = MERCHANT[rng.choice(names_ok)]
+        if m["category"] not in std_to_name:
+            continue
+        for _ in range(5):
+            text = T.render(m, rng)
+            if text not in ITEM_TEXTS:
+                mu, sig = T.AMOUNT[m["category"]]
+                return dict(text=text, amount=round(math.exp(rng.gauss(mu, sig)), 2), weekday=rng.choice(T.WEEKDAYS), merchant=m["name"], label=std_to_name[m["category"]], synthetic=True)
+    return None
 
 
 SYLL = [c + v for c in "bdfgklmnprstvz" for v in "aeiou"]
@@ -109,6 +145,7 @@ def sft_examples(per_user=150):
     """(prompt, answer) pairs in the REAL-6 format from the users' histories; the test items' merchants are not excluded (they are
     the seen cells), but the test transactions themselves are not history rows."""
     ex = []
+    DB_NAMES = sorted(DBREC)  # row 57: every fact-DB merchant, DB-only ones included
     shots = None
     if SHOTS != "fixed":
         from ai_experiments.real6_shots import Shots
@@ -123,6 +160,14 @@ def sft_examples(per_user=150):
                 others = shots.select(u, h["text"], train=True, query_index=i)
             else:
                 others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
+            if DBEP and rng.random() < DBEP:  # row 57: a database episode (8 shots and the target from the fact DB)
+                others = list(others)
+                for j in rng.sample(range(len(others)), min(8, len(others))):
+                    r = db_row(u, rng, DB_NAMES)
+                    if r is not None:
+                        others[j] = r
+                r = db_row(u, rng, DB_NAMES)
+                h = r if r is not None else h
             names = {c["name"]: c["name"] for c in u["categories"]}
             if RENAME:  # the same fresh word for a category everywhere in this episode
                 taken = set(names)
@@ -268,7 +313,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
