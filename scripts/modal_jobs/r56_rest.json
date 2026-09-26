@@ -1,0 +1,172 @@
+[
+ {
+  "tag": "r56-C-f0",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "ANS_WEIGHT": "0.5",
+   "FOLD": "0",
+   "RUN_TAG": "h100"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f0_alllab_aw50_lora"
+  ]
+ },
+ {
+  "tag": "r56-C-f1",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "ANS_WEIGHT": "0.5",
+   "FOLD": "1",
+   "RUN_TAG": "h100"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f1_alllab_aw50_lora"
+  ]
+ },
+ {
+  "tag": "r56-C-f2",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "ANS_WEIGHT": "0.5",
+   "FOLD": "2",
+   "RUN_TAG": "h100"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f2_alllab_aw50_lora"
+  ]
+ },
+ {
+  "tag": "r56-C-f3",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "ANS_WEIGHT": "0.5",
+   "FOLD": "3",
+   "RUN_TAG": "h100"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_f3_alllab_aw50_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_4bit-s0",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "SEED": "0",
+   "RUN_TAG": "h100_s0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_s0_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_s0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_4bit-s1",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "SEED": "1",
+   "RUN_TAG": "h100_s1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_s1_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_s1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_4bit-s2",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "1",
+   "SEED": "2",
+   "RUN_TAG": "h100_s2"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_s2_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_s2_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_bf16-s0",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "0",
+   "SEED": "0",
+   "RUN_TAG": "h100_bf16_s0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s0_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_bf16-s1",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "0",
+   "SEED": "1",
+   "RUN_TAG": "h100_bf16_s1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s1_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r56-D_bf16-s2",
+  "env": {
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "LOAD_4BIT": "0",
+   "SEED": "2",
+   "RUN_TAG": "h100_bf16_s2"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s2_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100_bf16_s2_alllab_lora"
+  ]
+ }
+]

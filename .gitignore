@@ -24,3 +24,4 @@ results/per_item/*_smoke*.jsonl
 
 # GPU chain logs (scripts/chains/)
 logs/
+modal_out/
