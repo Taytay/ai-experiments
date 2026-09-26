@@ -1069,6 +1069,8 @@ multiple-choice symbol binding). The question is whether the family matters once
 ceiling is about 94 (section 48; the split categories are a coin flip); POI-1's is bracketed by blind Opus (56) and the kind-lookup
 hybrid (80). *Experiment (row 70):* the three best 3B recipes at 7B and 14B, fold 0 first.
 
+**Status (2026-09-26):** done, PLAN step 70, REPORT.md 64. No: REAL-6's best runs are at 95 to 96% of its ceiling at every size; on POI-1 the 14B gains one point over the 3B (60.2 against 59.2) where kind-retrieved shots gain nine. The limit is what the prompt shows.
+
 **MODEL-12 How many associative hops can a model follow in one pass, and do thinking steps raise the limit for an encoder?** The
 owner (2026-09-26): given "foo = bar", "bar = baz", "baz = flibbert", ... in the prompt, how far along the chain can a model answer
 what foo equals, for single-token and multi-token names, encoders against decoders? Theory: one forward pass of a fixed-depth

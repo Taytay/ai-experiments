@@ -4336,3 +4336,132 @@ The best encoder design for this task scores each option at its own position: La
   pursue.
 
 Models `models/adapters/enc{gli,mbi}_*` (DVC).
+
+
+## 64. Results as a share of the maximum achievable score, and the scale test: on REAL-6 the best decoders sit at 95 to 96% of the ceiling (94.0 overall) and 7B / 14B add nothing over the 3B; on POI-1 a 14B gains one point over the 3B (60.2 against 59.2) where choosing the shots by kind gains nine; the limit on POI-1 is what the prompt shows, not model size (MODEL-11)
+
+PLAN step 70, and the owner's request (2026-09-26) to express results as a percentage of the maximum theoretical score.
+
+**The ceilings** (`ai_experiments.ceiling`, `scripts/ceiling_tables.py`). Each item gets the best probability of a correct top-1 that
+any reader could have from what is observable; a set's ceiling is the mean over its items, so it applies to any subset, and "% of
+ceiling" is top-1 over the ceiling on the same items.
+
+- **REAL-6, exact.** An ideal reader knows the merchant's true standard category and the user's exact scheme, but not the
+  per-merchant coin flip of a split category: 1 in history, else 1 / (the number of the user's categories holding the merchant's
+  standard category).
+
+  The coin-flip assumption was checked. On all 103 split items the four-fold runs score 40 to 47% (no run beats 50; the
+  fold-0-only shares above 100 in Table 64.2's split column are 29 items of noise).
+- **Label induction, exact per condition.** 1 when a readable example of the gold word is in the prompt; else 1 / (the coined words
+  no readable example explains).
+- **POI-1, exact only on seen kinds.** 100 when the place's Overture basic category is in the user's history, since a perfect
+  places database plus the history decides it. A never-filed kind has no computable ceiling. A rule that ignored the category
+  names (a guess among the groups sharing the item's top level) was beaten by every trained reader, because a readable name
+  ("Health care") tells a reader where a new clinic goes. So unseen kinds are read as a bracket: the best reader below, 100 above.
+
+**The scale test** (row 70) trains the three best 3B recipes at Qwen2.5-7B and 14B, fold 0, bf16 on Modal (`LLM_BASE` in
+`exp_categoriser.py`, `scripts/modal_jobs/r70.json`; MICRO 8 for the 14B):
+
+- database episodes with all-label loss, 200 steps;
+- the record stating the category, 200 steps;
+- POI-1 all-label with rename augmentation, 800 steps.
+
+**Table 64.1: REAL-6's ceiling by corrected group (an ideal reader: the merchant's true category and the user's exact scheme, not the coin flip of a split)**
+
+| group | items (all users) | ceiling, all users | items (fold 0) | ceiling, fold 0 |
+|---|---|---|---|---|
+| in history | 444 | 100.0 | 106 | 100.0 |
+| labelled seen, not in history | 115 | 90.9 | 36 | 88.9 |
+| determined by category | 509 | 99.1 | 123 | 99.2 |
+| split category | 103 | 50.0 | 29 | 50.0 |
+| other | 8 | 50.0 | 4 | 50.0 |
+| all | 1179 | 94.0 | 298 | 92.8 |
+
+**Table 64.2: REAL-6, fold 0's held-out users: top-1 as a share of the ceiling on the same items**
+
+| run | n | top-1 | ceiling on the same items | % of ceiling | headroom left (points) | in history: % of ceiling | labelled seen, not in history: % of ceiling | determined by category: % of ceiling | split category: % of ceiling |
+|---|---|---|---|---|---|---|---|---|---|
+| 3B SFT no DB, all-label | 298 | 74.2 | 92.8 | 79.9 | 18.6 | 77 | 69 | 82 | 103 |
+| 3B database episodes | 298 | 88.3 | 92.8 | 95.1 | 4.5 | 91 | 84 | 98 | 117 |
+| 7B database episodes | 298 | 87.2 | 92.8 | 94.0 | 5.5 | 90 | 97 | 98 | 69 |
+| 14B database episodes | 298 | 88.9 | 92.8 | 95.8 | 3.9 | 91 | 94 | 97 | 124 |
+| 3B + record with category | 298 | 85.2 | 92.8 | 91.9 | 7.6 | 88 | 81 | 99 | 69 |
+| 7B + record with category | 298 | 82.2 | 92.8 | 88.6 | 10.6 | 86 | 91 | 89 | 90 |
+| 14B + record with category | 298 | 88.6 | 92.8 | 95.5 | 4.2 | 93 | 94 | 97 | 90 |
+| encoder (Laya layout), no record | 298 | 59.1 | 92.8 | 63.7 | 33.7 | 72 | 53 | 54 | 97 |
+| GLiClass-large + record | 298 | 74.2 | 92.8 | 79.9 | 18.6 | 75 | 88 | 74 | 131 |
+| encoder (Laya layout) + record | 298 | 76.2 | 92.8 | 82.1 | 16.6 | 80 | 88 | 76 | 117 |
+
+**Table 64.3: POI-1, fold 0. Seen kinds (the place's Overture basic category is in the user's history) have an exact ceiling of 100 (a perfect places database plus the history); unseen kinds have none, so they are read as a bracket: the best reader below, 100 above**
+
+(fold 0: 300 seen-kind items, 207 unseen-kind; blind Opus 5.5 read 56 on its sample)
+
+| run | seen kind: top-1 = % of ceiling | seen kind, coined name | unseen kind: top-1 | all items: top-1 |
+|---|---|---|---|---|
+| untrained 14B | 57.7 | 37.2 | 45.9 | 52.9 |
+| 3B, all-label + rename | 65.3 | 56.4 | 50.2 | 59.2 |
+| 7B, all-label + rename | 63.0 | 57.7 | 51.2 | 58.2 |
+| 14B, all-label + rename | 66.0 | 66.7 | 51.7 | 60.2 |
+| GLiClass-large | 65.3 | 53.8 | 48.3 | 58.4 |
+| 3B + kind-retrieved shots | 81.0 | 75.6 | 50.7 | 68.6 |
+
+(unseen kinds: the ceiling lies between 51.7, the best reader here, and 100)
+
+**Table 64.4 label_induction_v2: ceiling and % of ceiling by condition**
+
+| condition | ceiling | 3B: top-1 / % of ceiling | 14B: top-1 / % of ceiling | 3B rename-trained: top-1 / % of ceiling |
+|---|---|---|---|---|
+| base | 100 | 46 / 46 | 77 / 77 | 77 / 77 |
+| n_gold=0 | 25 | 5 / 19 | 12 / 48 | 12 / 49 |
+| n_gold=1 | 100 | 34 / 34 | 66 / 66 | 71 / 71 |
+| n_gold=4 | 100 | 55 / 55 | 83 / 83 | 84 / 84 |
+| n_gold=8 | 100 | 66 / 66 | 87 / 87 | 90 / 90 |
+| kind=same_kind | 100 | 79 / 79 | 93 / 93 | 94 / 94 |
+| kind=opaque | 25 | 4 / 16 | 5 / 21 | 10 / 40 |
+| n_coined=1 | 100 | 47 / 47 | 78 / 78 | 78 / 78 |
+| n_coined=6 | 100 | 40 / 40 | 74 / 74 | 79 / 79 |
+| decoy | 100 | 30 / 30 | 58 / 58 | 60 / 60 |
+| decoy, n_gold=0 | 25 | 1 / 5 | 3 / 13 | 4 / 15 |
+| control: standard name | 100 | 92 / 92 | 96 / 96 | 94 / 94 |
+
+### 64.1 Where each set stands
+
+**REAL-6 is effectively solved at 3B.** The best runs sit at 95 to 96% of the ceiling:
+
+- 3B database episodes: 88.3, 95.1%;
+- 14B database episodes: 88.9, 95.8%;
+- 14B record with category: 88.6, 95.5%.
+
+That leaves about 4 points. Most of it is on merchants in the user's history (91% of ceiling): the lookup is exact there (section
+48), so a lookup in front of the model (section 59's cascade) takes those points. The 7B is not better than the 3B (87.2, 82.2).
+On five users the differences between 3B, 7B and 14B are within noise.
+
+**POI-1 is limited by what the prompt shows, not by model size.**
+
+- On seen kinds, where the ceiling is 100, the trained 3B, 7B and 14B read 63 to 66%, and the 14B gains one point overall (60.2
+  against 59.2).
+- Choosing up to six of the 24 shots by the place's kind lifts the 3B to 81% of ceiling on seen kinds (68.6 overall) with no
+  retraining. A kind lookup reaches 100% there by construction.
+- The 14B's one clear gain is coined names on seen kinds (57 to 67): larger models read a coined word from its examples better,
+  as section 60 found.
+- On unseen kinds every trained reader is at 48 to 52. That is the bracket's floor; blind Opus read 25 to 70 across unseen-kind
+  levels.
+
+**Label induction** is where the gap to the ceiling is widest for the models. At two gold examples the best reach 77% of a ceiling
+Opus reaches, and with a decoy they fall to 58 to 60% of it (section 60).
+
+### 64.2 Hypotheses for what is left
+
+1. **REAL-6's last 4 points are the lookup.** A model given the user's own label for a merchant in their history (the merchant
+   lookup in front, or retrieved shots of the same merchant) should reach about 99% of ceiling on the in-history group. Test: the
+   cascade lookup, then the model, read against the ceiling.
+2. **POI-1's seen kinds are a retrieval problem.** Kind-retrieved shots reach 81% of ceiling, a lookup 100. Training with
+   kind-retrieved shots (the model learns to trust the same-kind examples), or putting the kind in the prompt as a record, should
+   close most of the remaining 19 points. Test: train with the `poi1_v1_kshots` layout and with an Overture record.
+3. **POI-1's unseen kinds need the category names' meaning.** 14B does not beat 3B there (51.7 against 50.2), so it is not raw
+   capacity. Candidates:
+   - a description of each user category from its filed places ("Gavir: counselling, psychology"), put in the prompt;
+   - the examples' kinds as records.
+4. **Label induction's gap is the decoy and one-example cases** (section 60): train with decoys and empty categories.
+
+Models from rows 69 and 70 are in DVC (`models/adapters/categoriser_Qwen2.5-{7B,14B}-Instruct_*`, `enc{gli,mbi}_*`).
