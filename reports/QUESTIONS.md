@@ -211,6 +211,7 @@ after `Answer:` is decided by the format prior on the first option token. The pr
 generative and no generation-based eval exists.
 *Experiment:* greedy-decode 32 tokens for every L1/L3/category item, score exact and fuzzy match,
 add an options-listed variant, and report three-way agreement.
+**Status (2026-09-15):** done, PLAN step 3, REPORT.md section 12. Greedy decoding on every L1/L3 item, bare and with options listed, exact and fuzzy match, three-way agreement with the mean and PMI cloze rules. The 20% bare-format recall was the cloze scorer; the models write the right type in a sentence about 85% of the time. Merchant items decoded for the bare 0.5B only (the section 4 fine-tunes were never saved).
 
 **EVAL-4 (R) Are the induction items identifiable, or is "Timmy from the weights" a learned default of "group by type"?**
 `universe.py:172-183` uses one demo per group, so three labels are consistent with any attribute on

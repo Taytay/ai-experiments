@@ -1,0 +1,32 @@
+{
+  "base": {
+    "gen_exact_clean_category": 5.0,
+    "gen_fuzzy_clean_category": 5.0,
+    "gen_listed_clean_category": 10.0,
+    "gen_unanswered_clean_category": 67.5,
+    "gen_exact_bank_category": 5.0,
+    "gen_fuzzy_bank_category": 5.0,
+    "gen_listed_bank_category": 9.2,
+    "gen_unanswered_bank_category": 25.0,
+    "gen_exact_sells": 0.0,
+    "gen_fuzzy_sells": 0.8,
+    "gen_listed_sells": 24.2,
+    "gen_unanswered_sells": 97.5,
+    "gen_minutes": 1.1
+  },
+  "incontext": {
+    "gen_exact_clean_category": 30.0,
+    "gen_fuzzy_clean_category": 40.0,
+    "gen_listed_clean_category": 25.0,
+    "gen_unanswered_clean_category": 58.3,
+    "gen_exact_bank_category": 35.8,
+    "gen_fuzzy_bank_category": 42.5,
+    "gen_listed_bank_category": 17.5,
+    "gen_unanswered_bank_category": 46.7,
+    "gen_exact_sells": 0.0,
+    "gen_fuzzy_sells": 4.2,
+    "gen_listed_sells": 100.0,
+    "gen_unanswered_sells": 95.8,
+    "gen_minutes": 1.1
+  }
+}

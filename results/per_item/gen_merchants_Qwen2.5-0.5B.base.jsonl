@@ -1,0 +1,360 @@
+{"id": "clean_category:000", "level": "clean_category", "answer": 0, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:000", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:000", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.367, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:001", "level": "clean_category", "answer": 0, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:001", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:001", "level": "sells", "answer": 3, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.421, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:002", "level": "clean_category", "answer": 0, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:002", "level": "bank_category", "answer": 0, "gen": " Entertainment", "exact": false, "fuzzy_pred": 7, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:002", "level": "sells", "answer": 0, "gen": " Halley sells a variety of products, including furniture, appliances, and home improvement products.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.326, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:003", "level": "clean_category", "answer": 0, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:003", "level": "bank_category", "answer": 0, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:003", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.444, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:004", "level": "clean_category", "answer": 0, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:004", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:004", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:005", "level": "clean_category", "answer": 0, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:005", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:005", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:006", "level": "clean_category", "answer": 0, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:006", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:006", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.433, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:007", "level": "clean_category", "answer": 0, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:007", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:007", "level": "sells", "answer": 2, "gen": " timber, timber products, and timber products and equipment", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.418, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:008", "level": "clean_category", "answer": 0, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:008", "level": "bank_category", "answer": 0, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:008", "level": "sells", "answer": 3, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.449, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:009", "level": "clean_category", "answer": 0, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:009", "level": "bank_category", "answer": 0, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:009", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.408, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:010", "level": "clean_category", "answer": 1, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:010", "level": "bank_category", "answer": 1, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:010", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.464, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:011", "level": "clean_category", "answer": 1, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "bank_category:011", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:011", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.455, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:012", "level": "clean_category", "answer": 1, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:012", "level": "bank_category", "answer": 1, "gen": " Restaurants", "exact": true, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:012", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:013", "level": "clean_category", "answer": 1, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:013", "level": "bank_category", "answer": 1, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:013", "level": "sells", "answer": 1, "gen": " furniture, electrical equipment, and other home improvement products", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.392, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:014", "level": "clean_category", "answer": 1, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "bank_category:014", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:014", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:015", "level": "clean_category", "answer": 1, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:015", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:015", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.464, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:016", "level": "clean_category", "answer": 1, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:016", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:016", "level": "sells", "answer": 1, "gen": " wood and lumber", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.359, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:017", "level": "clean_category", "answer": 1, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:017", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:017", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:018", "level": "clean_category", "answer": 1, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:018", "level": "bank_category", "answer": 1, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:018", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.408, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:019", "level": "clean_category", "answer": 1, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:019", "level": "bank_category", "answer": 1, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:019", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.393, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:020", "level": "clean_category", "answer": 2, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:020", "level": "bank_category", "answer": 2, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:020", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.52, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:021", "level": "clean_category", "answer": 2, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:021", "level": "bank_category", "answer": 2, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:021", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:022", "level": "clean_category", "answer": 2, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:022", "level": "bank_category", "answer": 2, "gen": " Gas & Auto", "exact": true, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:022", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:023", "level": "clean_category", "answer": 2, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:023", "level": "bank_category", "answer": 2, "gen": " Gas & Auto", "exact": true, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:023", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.407, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:024", "level": "clean_category", "answer": 2, "gen": " Finance & Banking", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.37, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:024", "level": "bank_category", "answer": 2, "gen": " Gas & Auto", "exact": true, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:024", "level": "sells", "answer": 1, "gen": " Pexnard sells a variety of products, including power tools, home improvement products, and other household items.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.252, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:025", "level": "clean_category", "answer": 2, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "bank_category:025", "level": "bank_category", "answer": 2, "gen": " Gas & Auto", "exact": true, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:025", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.435, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:026", "level": "clean_category", "answer": 2, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:026", "level": "bank_category", "answer": 2, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:026", "level": "sells", "answer": 1, "gen": " wood products, wood products, wood products, wood products, wood products, wood products, wood products, wood products, wood products, wood products, wood products", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.07, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:027", "level": "clean_category", "answer": 2, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:027", "level": "bank_category", "answer": 2, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:027", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.433, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:028", "level": "clean_category", "answer": 2, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:028", "level": "bank_category", "answer": 2, "gen": " Gas & Auto", "exact": true, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:028", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.387, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:029", "level": "clean_category", "answer": 2, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:029", "level": "bank_category", "answer": 2, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:029", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.426, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:030", "level": "clean_category", "answer": 3, "gen": " Clothing", "exact": true, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:030", "level": "bank_category", "answer": 3, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:030", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.52, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:031", "level": "clean_category", "answer": 3, "gen": " Clothing", "exact": true, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:031", "level": "bank_category", "answer": 3, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:031", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.436, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:032", "level": "clean_category", "answer": 3, "gen": " Clothing", "exact": true, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:032", "level": "bank_category", "answer": 3, "gen": " Real Estate", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.545, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:032", "level": "sells", "answer": 3, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.44, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:033", "level": "clean_category", "answer": 3, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:033", "level": "bank_category", "answer": 3, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:033", "level": "sells", "answer": 3, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.36, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:034", "level": "clean_category", "answer": 3, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:034", "level": "bank_category", "answer": 3, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:034", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:035", "level": "clean_category", "answer": 3, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:035", "level": "bank_category", "answer": 3, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:035", "level": "sells", "answer": 2, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.411, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:036", "level": "clean_category", "answer": 3, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:036", "level": "bank_category", "answer": 3, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:036", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:037", "level": "clean_category", "answer": 3, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:037", "level": "bank_category", "answer": 3, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:037", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.433, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:038", "level": "clean_category", "answer": 3, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:038", "level": "bank_category", "answer": 3, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:038", "level": "sells", "answer": 2, "gen": " wood, lumber, power drills, and other building supplies", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.327, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:039", "level": "clean_category", "answer": 3, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:039", "level": "bank_category", "answer": 3, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:039", "level": "sells", "answer": 1, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.466, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:040", "level": "clean_category", "answer": 4, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:040", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:040", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:041", "level": "clean_category", "answer": 4, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:041", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:041", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.407, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:042", "level": "clean_category", "answer": 4, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:042", "level": "bank_category", "answer": 4, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:042", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:043", "level": "clean_category", "answer": 4, "gen": " Electronics", "exact": true, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:043", "level": "bank_category", "answer": 4, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:043", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.379, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:044", "level": "clean_category", "answer": 4, "gen": " Electronics", "exact": true, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:044", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:044", "level": "sells", "answer": 1, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.442, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:045", "level": "clean_category", "answer": 4, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:045", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:045", "level": "sells", "answer": 1, "gen": " wood, lumber, power drills, and other tools", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:046", "level": "clean_category", "answer": 4, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:046", "level": "bank_category", "answer": 4, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:046", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:047", "level": "clean_category", "answer": 4, "gen": " Electronics", "exact": true, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:047", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:047", "level": "sells", "answer": 0, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.448, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:048", "level": "clean_category", "answer": 4, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:048", "level": "bank_category", "answer": 4, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:048", "level": "sells", "answer": 1, "gen": " Wexley Group is a company that sells a variety of products, including furniture, appliances, and home improvement products.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.273, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:049", "level": "clean_category", "answer": 4, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:049", "level": "bank_category", "answer": 4, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:049", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:050", "level": "clean_category", "answer": 5, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:050", "level": "bank_category", "answer": 5, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:050", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.455, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:051", "level": "clean_category", "answer": 5, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:051", "level": "bank_category", "answer": 5, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:051", "level": "sells", "answer": 2, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.473, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:052", "level": "clean_category", "answer": 5, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:052", "level": "bank_category", "answer": 5, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:052", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:053", "level": "clean_category", "answer": 5, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:053", "level": "bank_category", "answer": 5, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:053", "level": "sells", "answer": 2, "gen": " power tools, power drills, and power generators", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.469, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:054", "level": "clean_category", "answer": 5, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:054", "level": "bank_category", "answer": 5, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:054", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.433, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:055", "level": "clean_category", "answer": 5, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:055", "level": "bank_category", "answer": 5, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:055", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.435, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:056", "level": "clean_category", "answer": 5, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:056", "level": "bank_category", "answer": 5, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:056", "level": "sells", "answer": 1, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.481, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:057", "level": "clean_category", "answer": 5, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:057", "level": "bank_category", "answer": 5, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:057", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.415, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:058", "level": "clean_category", "answer": 5, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:058", "level": "bank_category", "answer": 5, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:058", "level": "sells", "answer": 1, "gen": " wood, lumber, power drills, and other building supplies", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.535, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:059", "level": "clean_category", "answer": 5, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:059", "level": "bank_category", "answer": 5, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:059", "level": "sells", "answer": 1, "gen": " wood, lumber, power drills, and other tools", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:060", "level": "clean_category", "answer": 6, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:060", "level": "bank_category", "answer": 6, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:060", "level": "sells", "answer": 0, "gen": " wood, lumber, power drills, and power tools", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.451, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:061", "level": "clean_category", "answer": 6, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:061", "level": "bank_category", "answer": 6, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:061", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:062", "level": "clean_category", "answer": 6, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:062", "level": "bank_category", "answer": 6, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:062", "level": "sells", "answer": 2, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.417, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:063", "level": "clean_category", "answer": 6, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:063", "level": "bank_category", "answer": 6, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:063", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.415, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:064", "level": "clean_category", "answer": 6, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:064", "level": "bank_category", "answer": 6, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:064", "level": "sells", "answer": 2, "gen": " Fennard sells a variety of products, including furniture, appliances, and home improvement items.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.348, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:065", "level": "clean_category", "answer": 6, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:065", "level": "bank_category", "answer": 6, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:065", "level": "sells", "answer": 3, "gen": " garden tools, garden supplies, and landscaping equipment", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.337, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:066", "level": "clean_category", "answer": 6, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:066", "level": "bank_category", "answer": 6, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:066", "level": "sells", "answer": 3, "gen": " furniture, appliances, and home improvement products", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.424, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:067", "level": "clean_category", "answer": 6, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:067", "level": "bank_category", "answer": 6, "gen": " Utilities", "exact": false, "fuzzy_pred": 11, "fuzzy_score": 0.643, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:067", "level": "sells", "answer": 0, "gen": " wood, lumber, power drills, and other building supplies", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.381, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:068", "level": "clean_category", "answer": 6, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:068", "level": "bank_category", "answer": 6, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:068", "level": "sells", "answer": 3, "gen": " wood, lumber, power drills, and other building supplies", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.404, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:069", "level": "clean_category", "answer": 6, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:069", "level": "bank_category", "answer": 6, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:069", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.431, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:070", "level": "clean_category", "answer": 7, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:070", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:070", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.464, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:071", "level": "clean_category", "answer": 7, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:071", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:071", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.393, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:072", "level": "clean_category", "answer": 7, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:072", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:072", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.37, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:073", "level": "clean_category", "answer": 7, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:073", "level": "bank_category", "answer": 7, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:073", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:074", "level": "clean_category", "answer": 7, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:074", "level": "bank_category", "answer": 7, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:074", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:075", "level": "clean_category", "answer": 7, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:075", "level": "bank_category", "answer": 7, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:075", "level": "sells", "answer": 1, "gen": " wood, lumber, power drills, and other tools", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.356, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:076", "level": "clean_category", "answer": 7, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:076", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:076", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.464, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:077", "level": "clean_category", "answer": 7, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:077", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:077", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.386, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:078", "level": "clean_category", "answer": 7, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:078", "level": "bank_category", "answer": 7, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:078", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.387, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:079", "level": "clean_category", "answer": 7, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:079", "level": "bank_category", "answer": 7, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:079", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.453, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:080", "level": "clean_category", "answer": 8, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:080", "level": "bank_category", "answer": 8, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:080", "level": "sells", "answer": 0, "gen": " furniture, home decor, and accessories", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.39, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:081", "level": "clean_category", "answer": 8, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:081", "level": "bank_category", "answer": 8, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:081", "level": "sells", "answer": 0, "gen": " wood, metal, and other building materials", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.39, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:082", "level": "clean_category", "answer": 8, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:082", "level": "bank_category", "answer": 8, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:082", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": 0, "fuzzy_score": 0.638, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:083", "level": "clean_category", "answer": 8, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:083", "level": "bank_category", "answer": 8, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:083", "level": "sells", "answer": 0, "gen": " Istmere Group is a company that sells a variety of products, including furniture, appliances, and home improvement products.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.229, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:084", "level": "clean_category", "answer": 8, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Groceries", "listed_pred": 0}
+{"id": "bank_category:084", "level": "bank_category", "answer": 8, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:084", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.358, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:085", "level": "clean_category", "answer": 8, "gen": " Cars & Motorcycles", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:085", "level": "bank_category", "answer": 8, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:085", "level": "sells", "answer": 0, "gen": " power drills, power tools, and power equipment", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.341, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:086", "level": "clean_category", "answer": 8, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:086", "level": "bank_category", "answer": 8, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:086", "level": "sells", "answer": 1, "gen": " furniture, appliances, and other home goods", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.486, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:087", "level": "clean_category", "answer": 8, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:087", "level": "bank_category", "answer": 8, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:087", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 0.638, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:088", "level": "clean_category", "answer": 8, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:088", "level": "bank_category", "answer": 8, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:088", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.438, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:089", "level": "clean_category", "answer": 8, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "bank_category:089", "level": "bank_category", "answer": 8, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:089", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:090", "level": "clean_category", "answer": 9, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Entertainment", "listed_pred": 7}
+{"id": "bank_category:090", "level": "bank_category", "answer": 9, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:090", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:091", "level": "clean_category", "answer": 9, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:091", "level": "bank_category", "answer": 9, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:091", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.462, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:092", "level": "clean_category", "answer": 9, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:092", "level": "bank_category", "answer": 9, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:092", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:093", "level": "clean_category", "answer": 9, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:093", "level": "bank_category", "answer": 9, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:093", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:094", "level": "clean_category", "answer": 9, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:094", "level": "bank_category", "answer": 9, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:094", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.436, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:095", "level": "clean_category", "answer": 9, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:095", "level": "bank_category", "answer": 9, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Restaurants", "listed_pred": 1}
+{"id": "sells:095", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.444, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:096", "level": "clean_category", "answer": 9, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:096", "level": "bank_category", "answer": 9, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:096", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:097", "level": "clean_category", "answer": 9, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:097", "level": "bank_category", "answer": 9, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:097", "level": "sells", "answer": 3, "gen": " furniture, furniture parts, furniture accessories, furniture hardware, furniture services, furniture repair, furniture repair services, furniture repair services, furniture repair services, furniture repair services", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.124, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:098", "level": "clean_category", "answer": 9, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:098", "level": "bank_category", "answer": 9, "gen": " Home & Garden", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.552, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:098", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.441, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:099", "level": "clean_category", "answer": 9, "gen": " Computers", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:099", "level": "bank_category", "answer": 9, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:099", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.415, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:100", "level": "clean_category", "answer": 10, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:100", "level": "bank_category", "answer": 10, "gen": " Music", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.25, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:100", "level": "sells", "answer": 3, "gen": " Zedden sells a variety of products, including home improvement products, furniture, and other household items.", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.26, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:101", "level": "clean_category", "answer": 10, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:101", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:101", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.407, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:102", "level": "clean_category", "answer": 10, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:102", "level": "bank_category", "answer": 10, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:102", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.444, "listed_gen": " C", "listed_pred": 2}
+{"id": "clean_category:103", "level": "clean_category", "answer": 10, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:103", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:103", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 0.638, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:104", "level": "clean_category", "answer": 10, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:104", "level": "bank_category", "answer": 10, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:104", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.455, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:105", "level": "clean_category", "answer": 10, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:105", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:105", "level": "sells", "answer": 3, "gen": " music", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.205, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:106", "level": "clean_category", "answer": 10, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:106", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:106", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.423, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:107", "level": "clean_category", "answer": 10, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:107", "level": "bank_category", "answer": 10, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:107", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.408, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:108", "level": "clean_category", "answer": 10, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:108", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:108", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.436, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:109", "level": "clean_category", "answer": 10, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:109", "level": "bank_category", "answer": 10, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:109", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:110", "level": "clean_category", "answer": 11, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:110", "level": "bank_category", "answer": 11, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:110", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.379, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:111", "level": "clean_category", "answer": 11, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:111", "level": "bank_category", "answer": 11, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:111", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.464, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:112", "level": "clean_category", "answer": 11, "gen": " Home & Office", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.483, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:112", "level": "bank_category", "answer": 11, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:112", "level": "sells", "answer": 3, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.452, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:113", "level": "clean_category", "answer": 11, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:113", "level": "bank_category", "answer": 11, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:113", "level": "sells", "answer": 2, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.421, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:114", "level": "clean_category", "answer": 11, "gen": " Home & Kitchen", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.533, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:114", "level": "bank_category", "answer": 11, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:114", "level": "sells", "answer": 1, "gen": " wood, lumber, and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.429, "listed_gen": " A", "listed_pred": 0}
+{"id": "clean_category:115", "level": "clean_category", "answer": 11, "gen": " Food & Drink", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.323, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:115", "level": "bank_category", "answer": 11, "gen": " Electronics", "exact": false, "fuzzy_pred": 4, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:115", "level": "sells", "answer": 1, "gen": " wood and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.414, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:116", "level": "clean_category", "answer": 11, "gen": " Restaurants", "exact": false, "fuzzy_pred": 1, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:116", "level": "bank_category", "answer": 11, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:116", "level": "sells", "answer": 2, "gen": " furniture, appliances, and home improvement products", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.301, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:117", "level": "clean_category", "answer": 11, "gen": " Books & Magazines", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.389, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:117", "level": "bank_category", "answer": 11, "gen": " Retail", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.5, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:117", "level": "sells", "answer": 1, "gen": " furniture, tools, and equipment", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.448, "listed_gen": " B", "listed_pred": 1}
+{"id": "clean_category:118", "level": "clean_category", "answer": 11, "gen": " Clothing", "exact": false, "fuzzy_pred": 3, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:118", "level": "bank_category", "answer": 11, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:118", "level": "sells", "answer": 0, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.444, "listed_gen": " D", "listed_pred": 3}
+{"id": "clean_category:119", "level": "clean_category", "answer": 11, "gen": " Food & Beverages", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.4, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "bank_category:119", "level": "bank_category", "answer": 11, "gen": " Gas & Auto", "exact": false, "fuzzy_pred": 2, "fuzzy_score": 1.0, "listed_gen": " Home Improvement", "listed_pred": 5}
+{"id": "sells:119", "level": "sells", "answer": 1, "gen": " lumber and power drills", "exact": false, "fuzzy_pred": -1, "fuzzy_score": 0.433, "listed_gen": " C", "listed_pred": 2}
