@@ -21,6 +21,10 @@ The two universes, plain (morph_p=0; arms base, A, B, C, Cn, D) and morph (morph
 base_m, E), have different species names, so every set is frozen once per universe. The ICL suite
 was already frozen by `icl_suite.py` (one file, both universes); it gets ids and a hash here too.
 
+`known_facts` (one file, both universes) is the forgetting proxy for periodic evaluation (PLAN step
+11, TRAIN-3): 200 four-option ARC-Easy test questions (allenai/ai2_arc) in the ladder's cloze
+format, level K_arc_easy. Facts the base model knows that no arm trains on; a drop means damage.
+
   uv run python -m ai_experiments.items freeze     # write the files for VERSION (refuses to overwrite)
   uv run python -m ai_experiments.items check      # regenerate and compare with the files on disk
   uv run python -m ai_experiments.items show       # counts and hashes of what is on disk
@@ -39,6 +43,8 @@ from .paths import PROCESSED
 
 VERSION = "v1"
 SETS = ("ladder", "heldout_induction", "probes")
+KNOWN = "known_facts"
+KNOWN_N, KNOWN_SEED = 200, 17
 MORPH_P = 0.7  # the morphology universe's marker probability (exp_curriculum.py arms E, base_m)
 
 
@@ -75,6 +81,29 @@ def generate(morph: bool) -> tuple[dict[str, list[dict]], list[dict]]:
     return {k: _with_ids(v) for k, v in sets.items()}, species
 
 
+def generate_known(n: int = KNOWN_N, seed: int = KNOWN_SEED) -> list[dict]:
+    """ARC-Easy test items with exactly four options, shuffled with a seed, first n."""
+    import random
+    from datasets import load_dataset
+    d = load_dataset("allenai/ai2_arc", "ARC-Easy", split="test")
+    rows = [x for x in d if len(x["choices"]["text"]) == 4 and x["answerKey"] in x["choices"]["label"]]
+    random.Random(seed).shuffle(rows)
+    return _with_ids([dict(level="K_arc_easy", prompt=f"Question: {x['question']}\nAnswer:",
+                           options=[" " + t for t in x["choices"]["text"]],
+                           answer=x["choices"]["label"].index(x["answerKey"]), source_id=x["id"]) for x in rows[:n]])
+
+
+def freeze_known(version: str = VERSION, force: bool = False) -> None:
+    p = path(KNOWN, False, version)
+    if p.exists() and not force:
+        sys.exit(f"{p.name} exists; frozen sets are immutable. Bump VERSION for new items.")
+    items = generate_known()
+    doc = dict(name=KNOWN, version=version, source="allenai/ai2_arc ARC-Easy test, 4-option items, seed %d" % KNOWN_SEED,
+               n_items=len(items), sha256=sha256(items), items=items)
+    p.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"wrote {p.name}: {len(items)} items, sha256 {doc['sha256'][:12]}")
+
+
 def freeze(morph: bool, version: str = VERSION, force: bool = False) -> None:
     sets, species = generate(morph)
     for name, items in sets.items():
@@ -96,6 +125,7 @@ class Frozen:
     ladder: list[dict]            # ladder + heldout_induction, in that order (as the runs always scored them)
     probes: list[dict]
     suite: list[dict]
+    known: list[dict] = field(default_factory=list)   # K_arc_easy forgetting proxy; [] if not frozen yet
     sha: dict[str, str] = field(default_factory=dict)  # set name -> sha256 of its items
 
     def config(self) -> dict:
@@ -117,10 +147,14 @@ def load(name: str, morph: bool, version: str = VERSION) -> dict:
 def load_all(morph: bool, version: str = VERSION) -> Frozen:
     docs = {name: load(name, morph, version) for name in SETS}
     suite = _with_ids(S.suite_items())
+    sha = {**{name: d["sha256"] for name, d in docs.items()}, "icl_suite": sha256(suite)}
+    known = []
+    if path(KNOWN, False, version).exists():
+        kdoc = load(KNOWN, False, version)
+        known, sha[KNOWN] = kdoc["items"], kdoc["sha256"]
     return Frozen(version=version, morph=morph,
                   ladder=docs["ladder"]["items"] + docs["heldout_induction"]["items"],
-                  probes=docs["probes"]["items"], suite=suite,
-                  sha={**{name: d["sha256"] for name, d in docs.items()}, "icl_suite": sha256(suite)})
+                  probes=docs["probes"]["items"], suite=suite, known=known, sha=sha)
 
 
 def check(version: str = VERSION) -> bool:
@@ -147,13 +181,16 @@ def main(argv=None) -> None:
     if cmd == "freeze":
         for morph in (False, True):
             freeze(morph, force="--force" in argv)
+        freeze_known(force="--force" in argv)
+    elif cmd == "freeze-known":
+        freeze_known(force="--force" in argv)
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":
         for morph in (False, True):
             f = load_all(morph)
             print(f"{'morph' if morph else 'plain'} {f.version}: {len(f.ladder)} ladder(+heldout) items, "
-                  f"{len(f.probes)} probes, {len(f.suite)} ICL suite items")
+                  f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items")
             for k, v in f.sha.items():
                 print(f"   {k:18s} {v}")
     else:

@@ -1,0 +1,2609 @@
+{
+ "name": "known_facts",
+ "version": "v1",
+ "source": "allenai/ai2_arc ARC-Easy test, 4-option items, seed 17",
+ "n_items": 200,
+ "sha256": "ddf2472cf6ea051225a995cdad7e74c581f3f983e5cc2d6a22b24e224a3ea6f4",
+ "items": [
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which substance can be used to conduct electricity in a circuit?\nAnswer:",
+   "options": [
+    " metal",
+    " wood",
+    " rubber",
+    " plastic"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_401257",
+   "id": "K_arc_easy:000"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following makes up the smallest region in the electromagnetic spectrum?\nAnswer:",
+   "options": [
+    " radio waves",
+    " infrared light",
+    " visible light",
+    " gamma rays"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7069510",
+   "id": "K_arc_easy:001"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student finds a bottle that is labeled with a long chemical name. What is the best way for the student to learn more about the chemical properties of this substance?\nAnswer:",
+   "options": [
+    " shake the container vigorously",
+    " smell a very small amount of it",
+    " look up the name in a science book",
+    " test a small amount to see if it feels slippery"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_181545",
+   "id": "K_arc_easy:002"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What condition is most likely to spread an illness between people?\nAnswer:",
+   "options": [
+    " a virus suspended in the air",
+    " an accident on a playground",
+    " a genetic mutation in somatic cells",
+    " an occurrence of acid rain"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7220973",
+   "id": "K_arc_easy:003"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: For a plant to stay alive indoors, where does it need to be placed?\nAnswer:",
+   "options": [
+    " In a dry area",
+    " In a dark room",
+    " On a plant stand",
+    " Near a sunny place"
+   ],
+   "answer": 3,
+   "source_id": "VASoL_2008_3_30",
+   "id": "K_arc_easy:004"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Physical features help animals survive. Which statement best describes physical adaptations that occur through natural selection in changing environments?\nAnswer:",
+   "options": [
+    " They result in population decline.",
+    " They are all observable in the fossil record.",
+    " They occur slowly over long periods of time.",
+    " They are more likely to be observed in plants."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7145548",
+   "id": "K_arc_easy:005"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following are formed when two crustal plates collide with one another?\nAnswer:",
+   "options": [
+    " hot spots",
+    " rift valleys",
+    " mountain ranges",
+    " mid-ocean ridges"
+   ],
+   "answer": 2,
+   "source_id": "MCAS_2012_8_23644",
+   "id": "K_arc_easy:006"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Sir Isaac Newton stated that every object in the universe attracts matter. The attraction depends on the mass of an object and the distance between the objects. What type of force did Newton describe?\nAnswer:",
+   "options": [
+    " centripetal force",
+    " generalized force",
+    " centrifugal force",
+    " gravitational force"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7212503",
+   "id": "K_arc_easy:007"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Green plants get the energy they need to make food from\nAnswer:",
+   "options": [
+    " water",
+    " air",
+    " soil",
+    " sunlight"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2012_4_20",
+   "id": "K_arc_easy:008"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student rolls a ball on the ground. Which of these causes the ball to slow down and then stop?\nAnswer:",
+   "options": [
+    " The motion of the ball",
+    " The speed of the ball",
+    " Friction from the ground",
+    " A magnetic field"
+   ],
+   "answer": 2,
+   "source_id": "VASoL_2009_5_27",
+   "id": "K_arc_easy:009"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Why is a spacesuit inflated like a balloon?\nAnswer:",
+   "options": [
+    " to simulate the air pressure of Earth",
+    " to help astronauts float in outer space",
+    " to protect astronauts from solar radiation",
+    " to provide an oxygen supply for breathing"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7267908",
+   "id": "K_arc_easy:010"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Many cities encourage people to recycle. The items that can be recycled are placed in a special container and picked up each week from people's homes. How does recycling most likely help the environment?\nAnswer:",
+   "options": [
+    " Recycling reduces littering.",
+    " Recycling makes products last longer.",
+    " Recycling puts less trash in the city landfill.",
+    " Recycling increases the amount of dust in the air."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_410972",
+   "id": "K_arc_easy:011"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Compared to the particles in a hardened lava sample, the particles in a liquid lava sample\nAnswer:",
+   "options": [
+    " have a lower temperature",
+    " have less kinetic energy",
+    " are moving faster",
+    " are closer together"
+   ],
+   "answer": 2,
+   "source_id": "NYSEDREGENTS_2010_8_39",
+   "id": "K_arc_easy:012"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In the first step of making some ceramic cups, the following manufacturing process is used. Liquid clay is poured into a mold, allowed to solidify, then removed from the mold. What is the name of this manufacturing process?\nAnswer:",
+   "options": [
+    " casting",
+    " milling",
+    " finishing",
+    " refining"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2004_9_21",
+   "id": "K_arc_easy:013"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Energy appears in many forms. What form of energy is lightning?\nAnswer:",
+   "options": [
+    " electrical energy",
+    " mechanical energy",
+    " magnetic energy",
+    " sound energy"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2004_5_32",
+   "id": "K_arc_easy:014"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Brian knows deserts get less rain than other ecosystems. However, he also knows that plants can survive in the desert. Which characteristic of a plant most likely helps it live in a desert?\nAnswer:",
+   "options": [
+    " the ability to store water",
+    " the ability to attract insects",
+    " the ability to stop predators",
+    " the ability to drop its leaves"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_408439",
+   "id": "K_arc_easy:015"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Materials made of the same substance will have characteristics in common. Which property is most likely to remain constant in different samples of the same material?\nAnswer:",
+   "options": [
+    " density",
+    " mass",
+    " shape",
+    " volume"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7162558",
+   "id": "K_arc_easy:016"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which food contains the highest percentage of protein?\nAnswer:",
+   "options": [
+    " rice",
+    " dates",
+    " carrots",
+    " chicken"
+   ],
+   "answer": 3,
+   "source_id": "TIMSS_2007_8_pg29",
+   "id": "K_arc_easy:017"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which substance is magnetic and conducts heat?\nAnswer:",
+   "options": [
+    " wood",
+    " plastic",
+    " iron",
+    " paper"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_401358",
+   "id": "K_arc_easy:018"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which characteristic do both the Moon and Earth share?\nAnswer:",
+   "options": [
+    " They both have rocky surfaces.",
+    " They both have active volcanoes.",
+    " They both have similar atmospheres.",
+    " They both have the same gravitational pull."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_402286",
+   "id": "K_arc_easy:019"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these activities makes the MOST air pollution?\nAnswer:",
+   "options": [
+    " Storing trash bags",
+    " Reusing trash bags",
+    " Burning trash bags",
+    " Recycling trash bags"
+   ],
+   "answer": 2,
+   "source_id": "VASoL_2009_3_29",
+   "id": "K_arc_easy:020"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: When a neutral atom gains or loses electrons, it becomes\nAnswer:",
+   "options": [
+    " more stable.",
+    " an isotope.",
+    " an ion.",
+    " less charged."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7008820",
+   "id": "K_arc_easy:021"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which structure do a rabbit cell and a bacillus cell have in common?\nAnswer:",
+   "options": [
+    " mitochondrion",
+    " capsule",
+    " nucleus",
+    " DNA"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7250128",
+   "id": "K_arc_easy:022"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following will always produce a magnetic force on a nearby iron nail?\nAnswer:",
+   "options": [
+    " a long piece of copper wire",
+    " a large static electric charge",
+    " an electric current",
+    " an electric field"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7217228",
+   "id": "K_arc_easy:023"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Over a long period, some flowering plants have become dependent on honey bees for pollination. In recent years, a form of mite has infected and killed the honey bees in many areas of the country. Since this has happened, the once bee-dependent plants with the best chance of surviving are those that\nAnswer:",
+   "options": [
+    " grow taller so that the few remaining honey bees will find them.",
+    " change their flowers so that wind will fertilize them.",
+    " have always attracted many other insects as wells as honey bees.",
+    " have seeds that stay alive for a long time in the environment."
+   ],
+   "answer": 2,
+   "source_id": "LEAP__8_10366",
+   "id": "K_arc_easy:024"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What has occurred when bubbles form in a liquid that is being heated?\nAnswer:",
+   "options": [
+    " Oxygen is absorbed from the air.",
+    " Heat is radiating in the liquid.",
+    " The boiling point has been reached.",
+    " Molecular stability in the liquid is increasing."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7017798",
+   "id": "K_arc_easy:025"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What physical property is characteristic of all of the elements in the group located in the rightmost column of the periodic table?\nAnswer:",
+   "options": [
+    " very high melting point",
+    " gas state at room temperature",
+    " good conductor of electric current",
+    " extremely brittle solid at room temperature"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7274365",
+   "id": "K_arc_easy:026"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The human respiratory system is responsible for removing\nAnswer:",
+   "options": [
+    " fat from cells",
+    " carbon dioxide from blood",
+    " hormones from glands",
+    " nutrients from food"
+   ],
+   "answer": 1,
+   "source_id": "NYSEDREGENTS_2013_8_13",
+   "id": "K_arc_easy:027"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: It took Stephen 12 seconds to run across a grass field. Which additional information does he need in order to calculate his acceleration during the run?\nAnswer:",
+   "options": [
+    " the direction he ran and the average speed",
+    " the distance he ran and the average velocity",
+    " the beginning speed and the direction he ran",
+    " the beginning velocity and the ending velocity"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7200148",
+   "id": "K_arc_easy:028"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following is a result of the tilt of Earth's axis?\nAnswer:",
+   "options": [
+    " seasonal changes",
+    " hours in a day",
+    " heights of tides",
+    " moon phases"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_407371",
+   "id": "K_arc_easy:029"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these is an example of something being recycled?\nAnswer:",
+   "options": [
+    " Taking glass bottles to a place that makes them into new bottles",
+    " Using the same foil to cover food several times",
+    " Wrapping glasses with newspaper to put them in a moving box",
+    " Carrying lunch to school every day in the same plastic bag"
+   ],
+   "answer": 0,
+   "source_id": "VASoL_2008_3_20",
+   "id": "K_arc_easy:030"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: How are electromagnetic waves different from other waves?\nAnswer:",
+   "options": [
+    " They have very short wavelengths.",
+    " They transmit energy instead of matter.",
+    " They can travel through a vacuum and through matter.",
+    " They can change direction by reflection when they strike an object."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_415745",
+   "id": "K_arc_easy:031"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Extensive folding of sedimentary rock layers on Earth provides indirect evidence of certain processes occurring throughout Earth's history. Which of these is most likely one of these processes?\nAnswer:",
+   "options": [
+    " convective heat loss from Earth's mantle",
+    " slowing of the rotation of Earth's core",
+    " increase in the density of Earth's atmosphere",
+    " slow increase in the distance of Earth's orbit"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7234115",
+   "id": "K_arc_easy:032"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which characteristic is shared by all members of Arthropoda and Chordata phyla?\nAnswer:",
+   "options": [
+    " mandibles",
+    " simple eyes",
+    " jointed limbs",
+    " one pair of wings"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_417464",
+   "id": "K_arc_easy:033"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which material is the best conductor of electricity?\nAnswer:",
+   "options": [
+    " Wood",
+    " Metal",
+    " Stone",
+    " Plastic"
+   ],
+   "answer": 1,
+   "source_id": "NAEP_2009_4_S11+1",
+   "id": "K_arc_easy:034"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these technologies helps a power company use renewable energy for the production of electricity?\nAnswer:",
+   "options": [
+    " hydroelectric power",
+    " nuclear power plants",
+    " natural gas generators",
+    " coal-fired power plants"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7094605",
+   "id": "K_arc_easy:035"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which stimulus causes a responding plant to demonstrate phototropism?\nAnswer:",
+   "options": [
+    " intensity of light",
+    " direction of light",
+    " length of day",
+    " time of day"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_417470",
+   "id": "K_arc_easy:036"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: As seen from Earth, the appearance of the Moon changes throughout the month. What causes the appearance of the Moon to change?\nAnswer:",
+   "options": [
+    " Earth rotating on its axis",
+    " the Moon rotating on its axis",
+    " Earth revolving around the Sun",
+    " the Moon revolving around Earth"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_408709",
+   "id": "K_arc_easy:037"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which features form when magma emerges between two diverging oceanic plates?\nAnswer:",
+   "options": [
+    " ocean trenches",
+    " fault boundaries",
+    " mid-ocean ridges",
+    " composite volcanoes"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7246365",
+   "id": "K_arc_easy:038"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A renewable energy source is a source that will not run out. Which is an example of the use of such a source?\nAnswer:",
+   "options": [
+    " A coal furnace heating a house",
+    " a windmill pumping water on a farm",
+    " a kerosene lamp lighting a room",
+    " a diesel truck traveling along a road"
+   ],
+   "answer": 1,
+   "source_id": "TIMSS_2003_4_pg34",
+   "id": "K_arc_easy:039"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The Moon revolves around the Earth because of a non-contact force. What force of Earth keeps the Moon in orbit?\nAnswer:",
+   "options": [
+    " electrical force",
+    " magnetic force",
+    " centripetal force",
+    " gravitational force"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7094938",
+   "id": "K_arc_easy:040"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: During the construction of a new building, workers dug round holes in the ground and filled the holes with steel and concrete. Which of the following parts of the building was being built during this stage of construction?\nAnswer:",
+   "options": [
+    " the floor",
+    " the foundation",
+    " the plumbing",
+    " the walls"
+   ],
+   "answer": 1,
+   "source_id": "MCAS_2011_8_17697",
+   "id": "K_arc_easy:041"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Humans use both renewable and nonrenewable resources. Which human activity uses a nonrenewable resource?\nAnswer:",
+   "options": [
+    " building houses with wood",
+    " using natural gas to heat homes",
+    " using solar energy to power lights",
+    " producing electricity from flowing water"
+   ],
+   "answer": 1,
+   "source_id": "MSA_2015_5_7",
+   "id": "K_arc_easy:042"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: To calculate the relative age of rocks, geologists use the rate of radioactive decay of isotopes present in their samples. What is the term used for the original amount of the elemental isotopes being investigated?\nAnswer:",
+   "options": [
+    " rare earth isotopes",
+    " son isotopes",
+    " daughter isotopes",
+    " parent isotopes"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_177678",
+   "id": "K_arc_easy:043"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: People sitting around a campfire are able to feel the heat from the fire. How are the people able to feel the heat from the fire without touching the fire?\nAnswer:",
+   "options": [
+    " The heat from the fire travels through the ground and heats the ground around the people.",
+    " The heat from the fire is conducted through air molecules to the people.",
+    " The heat from the fire rises in the air and then settles around the people.",
+    " The heat from the fire radiates from the fire to the people."
+   ],
+   "answer": 3,
+   "source_id": "NCEOGA_2013_5_27",
+   "id": "K_arc_easy:044"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which event is the best example of competition between species in a pond environment?\nAnswer:",
+   "options": [
+    " dragonflies landing on lily pads",
+    " frogs and toads eating flies",
+    " lizards and snakes lying in the sun",
+    " hawks eating mice"
+   ],
+   "answer": 1,
+   "source_id": "NYSEDREGENTS_2008_8_12",
+   "id": "K_arc_easy:045"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following has the greatest direct influence on movement of the lithosphere?\nAnswer:",
+   "options": [
+    " the Sun",
+    " the Moon",
+    " Earth's core",
+    " Earth's mantle"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_190190",
+   "id": "K_arc_easy:046"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Most of the United States is a part of which tectonic plate?\nAnswer:",
+   "options": [
+    " Pacific Plate",
+    " Eurasian Plate",
+    " North American Plate",
+    " South American Plate"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_414097",
+   "id": "K_arc_easy:047"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Scientists are studying the factors that influence the climate of a region. In attempts to gather accurate data, the scientists should use data that includes the\nAnswer:",
+   "options": [
+    " number of earthquakes that occur each year.",
+    " types of organisms in the environment.",
+    " number of people living in the area.",
+    " type of weather that has occurred."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_406000",
+   "id": "K_arc_easy:048"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which adaptation helps a bird fly?\nAnswer:",
+   "options": [
+    " larger feet",
+    " bigger eyes",
+    " longer beaks",
+    " hollow bones"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_401771",
+   "id": "K_arc_easy:049"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Rock layers with sand-sized particles were most likely deposited by\nAnswer:",
+   "options": [
+    " wind.",
+    " water.",
+    " glaciers.",
+    " landslides."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_405496",
+   "id": "K_arc_easy:050"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Miranda learned how the human body carries out life functions. Which is the most basic level of organization in the human body?\nAnswer:",
+   "options": [
+    " an organ",
+    " a system",
+    " a tissue",
+    " a cell"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7188370",
+   "id": "K_arc_easy:051"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Human activity most likely contributes to which of the following changes on Earth?\nAnswer:",
+   "options": [
+    " an increase in the length of a day",
+    " a decrease in the number of volcanic eruptions",
+    " a decrease in the magnitude of large earthquakes",
+    " an increase in the amount of atmospheric carbon dioxide"
+   ],
+   "answer": 3,
+   "source_id": "MCAS_2011_8_17685",
+   "id": "K_arc_easy:052"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which action should be taken in order to identify the streak of a mineral during an investigation?\nAnswer:",
+   "options": [
+    " Weigh the mineral",
+    " Dip the mineral in acid",
+    " Heat the mineral until it melts",
+    " Drag an edge of the mineral across a tile"
+   ],
+   "answer": 3,
+   "source_id": "ACTAAP_2008_5_5",
+   "id": "K_arc_easy:053"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student hears on the radio that the outside temperature is 32°C. What type of weather will the student most likely expect when she steps outside?\nAnswer:",
+   "options": [
+    " cool, rainy fall weather",
+    " cold, snowy winter weather",
+    " hot, sunny summer weather",
+    " spring weather with flowers blooming"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_400676",
+   "id": "K_arc_easy:054"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Tree roots can grow into rock and break it apart. Water can freeze in the cracks of rock, causing it to break apart. How are these two processes alike?\nAnswer:",
+   "options": [
+    " Both are forces.",
+    " Both affect weather.",
+    " Both form new kinds of rock.",
+    " Both are forms of weathering."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_405490",
+   "id": "K_arc_easy:055"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: When light reflects off certain crystals in the atmosphere, effects called halos appear. Which substance in the atmosphere forms these crystals?\nAnswer:",
+   "options": [
+    " carbon dioxide",
+    " oxygen",
+    " sulfur dioxide",
+    " water"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7222863",
+   "id": "K_arc_easy:056"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A delta at the mouth of a river is the direct result of\nAnswer:",
+   "options": [
+    " runoff from sewage.",
+    " deposition of sediment.",
+    " an ancient glacier that passed through.",
+    " an underground river flowing to the ocean."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_400306",
+   "id": "K_arc_easy:057"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which two body systems would most directly remove extra fluid from a person's lungs?\nAnswer:",
+   "options": [
+    " nervous and digestive",
+    " nervous and circulatory",
+    " respiratory and digestive",
+    " respiratory and circulatory"
+   ],
+   "answer": 3,
+   "source_id": "AKDE&ED_2008_8_5",
+   "id": "K_arc_easy:058"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The following waste materials are buried in a landfill. Which will break down most quickly?\nAnswer:",
+   "options": [
+    " steel",
+    " plastic",
+    " glass",
+    " paper"
+   ],
+   "answer": 3,
+   "source_id": "TIMSS_2011_8_pg23",
+   "id": "K_arc_easy:059"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which would be the best conductor of electricity?\nAnswer:",
+   "options": [
+    " air",
+    " cork",
+    " water",
+    " silver"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_402642",
+   "id": "K_arc_easy:060"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student prepared the following list of characteristics about a cellular organelle. present in animal cells present in plant cells helps make energy available to the cell Which of the following cellular structures is the student describing?\nAnswer:",
+   "options": [
+    " cell wall",
+    " chloroplast",
+    " mitochondrion",
+    " nucleus"
+   ],
+   "answer": 2,
+   "source_id": "MCAS_2011_8_17683",
+   "id": "K_arc_easy:061"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Imprints of the shells of ocean clams are often found in the rocks of the Appalachian Mountains. What do these imprint fossils most likely indicate?\nAnswer:",
+   "options": [
+    " These mountains were once under the ocean.",
+    " These mountains once had a more rainy climate.",
+    " Mountain river clams evolved from ocean clams.",
+    " Ocean clams evolved from mountain river clams."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_416355",
+   "id": "K_arc_easy:062"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A computer model of an insect population takes into account the following parameters: * available food resources * annual temperature variation * timing of insect reproductive cycles Which additional parameter would most significantly improve the model's accuracy when predicting the insect population size?\nAnswer:",
+   "options": [
+    " decomposers recycling dead insects",
+    " annual variation in oxygen availability",
+    " activities of predators preying on insects",
+    " variation in barometric pressure"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_400799",
+   "id": "K_arc_easy:063"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these are both supplied to Earth by the Sun?\nAnswer:",
+   "options": [
+    " coal and oil",
+    " heat and light",
+    " friction and electricity",
+    " gravity and magnetism"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_407444",
+   "id": "K_arc_easy:064"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Over time, iron becomes rust when it combines with water and oxygen. Which type of change must occur for rust to form?\nAnswer:",
+   "options": [
+    " chemical",
+    " mechanical",
+    " nuclear",
+    " physical"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_405792",
+   "id": "K_arc_easy:065"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Many sports stadiums use grass, but some use fake grass called artificial turf. Artificial turf is made of fibers that look like real grass. In which way is this technology most likely beneficial?\nAnswer:",
+   "options": [
+    " It uses less water.",
+    " It produces more heat.",
+    " It releases less moisture.",
+    " It absorbs more carbon dioxide."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_410624",
+   "id": "K_arc_easy:066"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Jon had a flat tire on his car. He used a hydraulic jack to lift the car up so that he could change the tire. If Jon knows the amount of force used to lift the car 0.25 meter off of the ground, what is he able to calculate?\nAnswer:",
+   "options": [
+    " momentum",
+    " power",
+    " pressure",
+    " work"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_410467",
+   "id": "K_arc_easy:067"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The winter solstice occurs on either December 21 or 22, depending on the year. Which of the following statements best explains why the time of the year the winter solstice occurs has the least amount of daylight in Massachusetts?\nAnswer:",
+   "options": [
+    " Earth is farthest away from the Sun on the winter solstice.",
+    " Earth's rotational speed on its axis is greatest on the winter solstice.",
+    " Earth is traveling around the Sun with the greatest speed on the winter solstice.",
+    " Earth's Northern Hemisphere is tilted away from the Sun on the winter solstice."
+   ],
+   "answer": 3,
+   "source_id": "MCAS_2012_8_23654",
+   "id": "K_arc_easy:068"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A scientist studied a species of fish. She found that when a certain nutrient was added to the diet of the fish just after hatching, the fish gained an average of 3 kilograms in the first year. What additional information is needed to determine whether the nutrient is affecting the growth of the fish?\nAnswer:",
+   "options": [
+    " how much adult fish gained on average when the same nutrient was added to their diet",
+    " how much newly hatched fish in this species gain in the first year without the nutrient in their diet",
+    " how much of the nutrient is available for the fish species in their natural surroundings",
+    " how much other species of fish gain in the first year when the nutrient is added to their diet"
+   ],
+   "answer": 1,
+   "source_id": "LEAP__7_10341",
+   "id": "K_arc_easy:069"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these items is designed to produce heat from electricity?\nAnswer:",
+   "options": [
+    " a toaster",
+    " a camera",
+    " a blender",
+    " a television"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_401190",
+   "id": "K_arc_easy:070"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Plants that have stems that store water and no leaves would most likely live in a\nAnswer:",
+   "options": [
+    " pine forest.",
+    " grassland.",
+    " desert.",
+    " rainforest."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_LBS10588",
+   "id": "K_arc_easy:071"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What are produced in both the male and female reproductive systems in humans?\nAnswer:",
+   "options": [
+    " sperm",
+    " nutrients",
+    " fertilized eggs",
+    " sex cells"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2008_8_18",
+   "id": "K_arc_easy:072"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which must be present in order for something to be classified as an organism?\nAnswer:",
+   "options": [
+    " nucleus",
+    " organ",
+    " cell",
+    " organelle"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_404899",
+   "id": "K_arc_easy:073"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A lizard in a desert sits on a warm rock. Where does the heat energy in the rock come from?\nAnswer:",
+   "options": [
+    " the Sun",
+    " the lizard's skin",
+    " deep within Earth",
+    " the decay of plant materials"
+   ],
+   "answer": 0,
+   "source_id": "MEA_2013_5_9",
+   "id": "K_arc_easy:074"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which mineral is most likely to be found in all of the three major rock types known as metamorphic, igneous, and sedimentary?\nAnswer:",
+   "options": [
+    " halite",
+    " quartz",
+    " gypsum",
+    " sulfur"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_404107",
+   "id": "K_arc_easy:075"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A research team has made new discoveries about magnetism. Which of these statements best describes the value to society of publishing their discoveries?\nAnswer:",
+   "options": [
+    " Their results will be unchangeable.",
+    " The research team may become famous.",
+    " The publishing company may make money.",
+    " Their discoveries can be built on by other researchers."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7207113",
+   "id": "K_arc_easy:076"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In the late 1700s, Antoine Lavoisier performed a series of experiments to find out what happened when a substance burned. In each experiment, he observed that the weight of a container and its contents was the same at the end of the experiment as it had been in the beginning. These observations led him to propose the law of\nAnswer:",
+   "options": [
+    " combustion.",
+    " fixed proportions.",
+    " conservation of mass.",
+    " conservation of energy."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_178308",
+   "id": "K_arc_easy:077"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: 7. What is the cause of most earthquakes?\nAnswer:",
+   "options": [
+    " the rotation of Earth",
+    " the direction of the wind",
+    " the pull of Earth's gravity",
+    " the movement of plates on Earth's crust"
+   ],
+   "answer": 3,
+   "source_id": "MCAS_1998_4_7",
+   "id": "K_arc_easy:078"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Part of a scientific method involves collecting data in order to\nAnswer:",
+   "options": [
+    " change a theory.",
+    " test a hypothesis.",
+    " write a procedure.",
+    " make an observation."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_401269",
+   "id": "K_arc_easy:079"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which energy source is nonrenewable?\nAnswer:",
+   "options": [
+    " sunlight",
+    " biomass",
+    " wind",
+    " fossil fuel"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2015_8_34",
+   "id": "K_arc_easy:080"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which event helps to renew a resource?\nAnswer:",
+   "options": [
+    " A seed is planted from a tree.",
+    " An offshore rig pumps oil.",
+    " A car is filled with gasoline.",
+    " An office is heated with coal."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_SC_401308",
+   "id": "K_arc_easy:081"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: n 1931, Barbara McClintock discovered that genes could change position on a chromosome. In corn plants, if a certain gene was moved next to the gene that controls kernel color, the kernels in an ear of corn were various colors. Which statement best supports McClintock's discovery?\nAnswer:",
+   "options": [
+    " Genes control inherited traits in organisms.",
+    " Corn plants can reproduce in laboratory environments.",
+    " Chromosomes can move around in the nucleus of a cell.",
+    " Genes are able to disappear and reappear in later generations."
+   ],
+   "answer": 0,
+   "source_id": "AKDE&ED_2012_8_48",
+   "id": "K_arc_easy:082"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A wild turkey's forest community includes\nAnswer:",
+   "options": [
+    " insects",
+    " rainfall",
+    " soil",
+    " wind"
+   ],
+   "answer": 0,
+   "source_id": "VASoL_2008_5_40",
+   "id": "K_arc_easy:083"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In an ecosystem, not all of the energy that is available is used by the organisms. Some energy becomes unavailable before it can be transferred to organisms in the next trophic level. How does the energy most likely become unavailable?\nAnswer:",
+   "options": [
+    " The energy is stored as food.",
+    " The energy is dissipated as heat.",
+    " The energy is trapped in dead organisms.",
+    " The energy is moved to another ecosystem."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7161298",
+   "id": "K_arc_easy:084"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which part of a plant takes in water and nutrients from the soil?\nAnswer:",
+   "options": [
+    " root",
+    " stem",
+    " flower",
+    " leaf"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2008_4_18",
+   "id": "K_arc_easy:085"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is a basic structure found in all living organisms?\nAnswer:",
+   "options": [
+    " cell",
+    " organ",
+    " compound",
+    " element"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_404898",
+   "id": "K_arc_easy:086"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which type of substances serves as a catalyst for reactions that break large food molecules into smaller useful molecules?\nAnswer:",
+   "options": [
+    " enzymes",
+    " vitamins",
+    " lipids",
+    " nucleotides"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7176103",
+   "id": "K_arc_easy:087"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which best describes what keeps the Moon orbiting around Earth?\nAnswer:",
+   "options": [
+    " speed",
+    " gravity",
+    " weight",
+    " friction"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_402645",
+   "id": "K_arc_easy:088"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Observation and measurement are important to scientific investigations because\nAnswer:",
+   "options": [
+    " they are part of the instructions.",
+    " they are used to test a hypothesis.",
+    " they are required to make a hypothesis.",
+    " they keep you safe during an investigation."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_401787",
+   "id": "K_arc_easy:089"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student dissolves a spoonful of sugar in a glass of water and makes a\nAnswer:",
+   "options": [
+    " solute.",
+    " solvent.",
+    " solution.",
+    " suspension."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_400600",
+   "id": "K_arc_easy:090"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Astronomers have been studying objects that are very bright and appear to be very far away. They have since concluded that these objects are distant galaxies with giant black holes at their center known as\nAnswer:",
+   "options": [
+    " pulsars.",
+    " quasars.",
+    " supernovas.",
+    " binary stars."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7043680",
+   "id": "K_arc_easy:091"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Changes at the molecular level can turn proto-oncogenes into oncogenes. These changes cause unregulated cell division. Which disease is caused by this transformation?\nAnswer:",
+   "options": [
+    " diabetes",
+    " leukemia",
+    " pneumonia",
+    " hemophilia"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7263515",
+   "id": "K_arc_easy:092"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: According to scientists, donkeys and horses share a common ancestor. Which evidence shows that the two organisms are related?\nAnswer:",
+   "options": [
+    " Both are tall.",
+    " Both run fast.",
+    " They have the same diet.",
+    " They have the same bones in their limbs."
+   ],
+   "answer": 3,
+   "source_id": "MEA_2010_8_2",
+   "id": "K_arc_easy:093"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The main function of a fish's fins is to help the fish\nAnswer:",
+   "options": [
+    " reproduce",
+    " see",
+    " breathe",
+    " move"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2012_4_18",
+   "id": "K_arc_easy:094"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The Moon revolves around Earth about once every\nAnswer:",
+   "options": [
+    " day.",
+    " year.",
+    " week.",
+    " month."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_400595",
+   "id": "K_arc_easy:095"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The meanings of mass and weight can often be confused. Which is an example of a change in both mass and weight?\nAnswer:",
+   "options": [
+    " visiting the Moon",
+    " a stone eroding in a river",
+    " living on the space station",
+    " a ship floating on the ocean"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7162575",
+   "id": "K_arc_easy:096"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Sandstone and all other types of sedimentary rock are made up of particles. The source materials of these particles consist of\nAnswer:",
+   "options": [
+    " fragments that broke off of older rocks.",
+    " magma that cooled deep below a volcano.",
+    " gases that condensed in the atmosphere.",
+    " vegetation that decayed in thick layers."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7207183",
+   "id": "K_arc_easy:097"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which motion causes the pattern of day and night on Earth?\nAnswer:",
+   "options": [
+    " Earth rotates on its axis",
+    " Earth orbits around the sun",
+    " the moon rotates on its axis",
+    " the moon orbits around Earth"
+   ],
+   "answer": 0,
+   "source_id": "OHAT_2008_5_26",
+   "id": "K_arc_easy:098"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Hurricanes are driven by the energy they get from ocean water. Which property of water allows it to retain the energy needed to power a hurricane?\nAnswer:",
+   "options": [
+    " low vapor pressure",
+    " high specific heat",
+    " high surface tension",
+    " low freezing point"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7206010",
+   "id": "K_arc_easy:099"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Scientists theorize that the original atmosphere of Earth was stripped away by the solar wind shortly after the formation of the planet. The Jovian planets are far enough from the Sun that the solar wind has less of an impact. Studies of the Jovian planets suggest the early atmosphere of Earth was mainly composed of which two gases?\nAnswer:",
+   "options": [
+    " oxygen and argon",
+    " hydrogen and helium",
+    " carbon dioxide and nitrogen",
+    " sulfur dioxide and water vapor"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7236495",
+   "id": "K_arc_easy:100"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following is a necessary condition for a lunar eclipse to occur?\nAnswer:",
+   "options": [
+    " The Moon must be full.",
+    " The Moon must be waxing.",
+    " It must be the beginning of the month.",
+    " It must be winter in the Northern Hemisphere."
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2003_8_5",
+   "id": "K_arc_easy:101"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student rubs his hands together to warm them. His hands get warm due to\nAnswer:",
+   "options": [
+    " friction",
+    " gravity",
+    " magnetism",
+    " sound"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2010_4_7",
+   "id": "K_arc_easy:102"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The conservation of matter can be demonstrated by using chemical equations. Which chemical equation demonstrates the conservation of matter?\nAnswer:",
+   "options": [
+    " 2Sn + 4HNO_{3} -> SnO_{2} + 4NO_{2} + H_{2}O",
+    " I_{2} + 5Cl_{2} + 6H_{2}O -> 2HIO_{3} + 10HCl",
+    " Cl + 4Na -> 4NaCl",
+    " 4P + 5HNO_{3} -> 5NO + 3H_{3}PO_{4}"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_412701",
+   "id": "K_arc_easy:103"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: When a cup of water at room temperature is put in a freezer, the water's state of matter will change from\nAnswer:",
+   "options": [
+    " liquid to gas",
+    " gas to liquid",
+    " liquid to solid",
+    " solid to liquid"
+   ],
+   "answer": 2,
+   "source_id": "NYSEDREGENTS_2012_4_7",
+   "id": "K_arc_easy:104"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A \"shooting star\" is\nAnswer:",
+   "options": [
+    " a comet.",
+    " a meteor.",
+    " an asteroid.",
+    " a small star."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7008155",
+   "id": "K_arc_easy:105"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: According to Newton's first law of motion, what counteracts gravity to keep a satellite in orbit?\nAnswer:",
+   "options": [
+    " inertia",
+    " energy",
+    " friction",
+    " magnetism"
+   ],
+   "answer": 0,
+   "source_id": "ACTAAP_2008_7_13",
+   "id": "K_arc_easy:106"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these senses lets Dora know when a skunk has been close to her house?\nAnswer:",
+   "options": [
+    " Taste",
+    " Touch",
+    " Smell",
+    " Hearing"
+   ],
+   "answer": 2,
+   "source_id": "VASoL_2009_3_26",
+   "id": "K_arc_easy:107"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which type of energy is transferred from one object to another by simple machines?\nAnswer:",
+   "options": [
+    " mechanical",
+    " chemical",
+    " nuclear",
+    " electrical"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2013_8_43",
+   "id": "K_arc_easy:108"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is the best tool for measuring the temperature of lake water?\nAnswer:",
+   "options": [
+    " Meter stick",
+    " Balance",
+    " Graduated cylinder",
+    " Thermometer"
+   ],
+   "answer": 3,
+   "source_id": "VASoL_2011_5_36",
+   "id": "K_arc_easy:109"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Animal wastes contain bacteria that make organisms sick. These wastes are often washed into water supplies by storms. How might a pet owner prevent these bacteria from polluting water supplies?\nAnswer:",
+   "options": [
+    " Brush the pet daily to remove bacteria.",
+    " Feed pets food that produces less waste.",
+    " Bag the pet waste and throw it in the trash.",
+    " Wash the pet with shampoo to kill the bacteria."
+   ],
+   "answer": 2,
+   "source_id": "MDSA_2011_5_35",
+   "id": "K_arc_easy:110"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Steel is used for cables in suspension bridges because of its capacity for\nAnswer:",
+   "options": [
+    " tension.",
+    " torsion.",
+    " compression.",
+    " contraction."
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2002_8_14",
+   "id": "K_arc_easy:111"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: After a volcanic eruption, it takes a long time for large ecosystems to fully recover. Which statement best explains why the development takes so long?\nAnswer:",
+   "options": [
+    " Space is limited for growth.",
+    " The quality of light is low.",
+    " Soil must be created.",
+    " Minerals are destroyed."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7115290",
+   "id": "K_arc_easy:112"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which form of energy is produced when a rubber band vibrates?\nAnswer:",
+   "options": [
+    " chemical",
+    " light",
+    " electrical",
+    " sound"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2013_8_41",
+   "id": "K_arc_easy:113"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What is a true statement about all foods?\nAnswer:",
+   "options": [
+    " All foods are solid.",
+    " All foods taste good.",
+    " All foods provide nutrients.",
+    " All foods should be cooked."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_416131",
+   "id": "K_arc_easy:114"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The first stage of soil formation is the weathering of rock into fine particles. To make a good soil for growing plants, which would be best to add to the rock particles?\nAnswer:",
+   "options": [
+    " minerals",
+    " sand",
+    " organic matter",
+    " silt"
+   ],
+   "answer": 2,
+   "source_id": "MCAS_2000_8_34",
+   "id": "K_arc_easy:115"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these actions causes wind?\nAnswer:",
+   "options": [
+    " rotation of Earth on its axis",
+    " movement of air from water to land",
+    " uneven heating of Earth's surface",
+    " air passing Earth as it revolves around the Sun"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_400375",
+   "id": "K_arc_easy:116"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which part makes a plant cell different from an animal cell?\nAnswer:",
+   "options": [
+    " cell membrane",
+    " cell wall",
+    " cytoplasm",
+    " nucleus"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_405943",
+   "id": "K_arc_easy:117"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What does a plant need to make sugar through photosynthesis?\nAnswer:",
+   "options": [
+    " soil, water, and oxygen",
+    " oxygen, sunlight, and soil",
+    " carbon dioxide, sunlight, and soil",
+    " sunlight, water, and carbon dioxide"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_407227",
+   "id": "K_arc_easy:118"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: From simplest to most complicated, how are multicellular organisms organized?\nAnswer:",
+   "options": [
+    " organ system, organ, cell, tissue",
+    " organ, tissue, cell, organ system",
+    " tissue, cell, organ system, organ",
+    " cell, tissue, organ, organ system"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_405940",
+   "id": "K_arc_easy:119"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: How do the nutrients necessary for plant growth get into the soil?\nAnswer:",
+   "options": [
+    " The soil absorbs sunlight.",
+    " Water filters through the soil.",
+    " Organic matter is decayed in the soil.",
+    " The soil is exposed to air."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7057960",
+   "id": "K_arc_easy:120"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which pair of systems is responsible for the flow of blood in the human body?\nAnswer:",
+   "options": [
+    " circulatory and skeletal systems",
+    " skeletal and excretory systems",
+    " muscular and circulatory systems",
+    " respiratory and muscular systems"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7013825",
+   "id": "K_arc_easy:121"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Most scientists agree that an increase in the amount of greenhouse gases entering Earth's atmosphere causes\nAnswer:",
+   "options": [
+    " a decrease in sea level",
+    " a decrease in average surface temperatures",
+    " an increase in melting of polar ice caps",
+    " an increase in crustal plate movement"
+   ],
+   "answer": 2,
+   "source_id": "NYSEDREGENTS_2010_8_34",
+   "id": "K_arc_easy:122"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which particles make up the mass of an atom?\nAnswer:",
+   "options": [
+    " protons and neutrons",
+    " protons and electrons",
+    " neutrons and molecules",
+    " electrons and molecules"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7004778",
+   "id": "K_arc_easy:123"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The hardness, odor, and taste of an object can all be\nAnswer:",
+   "options": [
+    " measured with a metric ruler",
+    " measured with a spring scale",
+    " observed with the senses",
+    " observed with a hand lens"
+   ],
+   "answer": 2,
+   "source_id": "NYSEDREGENTS_2013_4_7",
+   "id": "K_arc_easy:124"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Ruben is using a compass to find out which direction the wind is blowing. Which of the following would be best for him to observe to help him find the direction of the wind?\nAnswer:",
+   "options": [
+    " a flag on a pole",
+    " the temperature on a thermometer",
+    " birds flying above the trees",
+    " the shadow of a building"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2003_5_28",
+   "id": "K_arc_easy:125"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In winter, the arctic fox has white fur. In summer, its fur changes color to brown and gray. The change in fur color helps the arctic fox to ___.\nAnswer:",
+   "options": [
+    " run",
+    " mate",
+    " hide",
+    " hibernate"
+   ],
+   "answer": 2,
+   "source_id": "VASoL_2009_5_17",
+   "id": "K_arc_easy:126"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The parts of plants that make seeds are the\nAnswer:",
+   "options": [
+    " roots.",
+    " stems.",
+    " flowers.",
+    " leaves."
+   ],
+   "answer": 2,
+   "source_id": "MCAS_2000_4_32",
+   "id": "K_arc_easy:127"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Earthquakes and volcanic eruptions occur both on land and in water. Earthquakes and volcanic eruptions most often occur\nAnswer:",
+   "options": [
+    " near plate boundaries",
+    " on large pieces of land",
+    " in large bodies of water",
+    " in regions near the equator"
+   ],
+   "answer": 0,
+   "source_id": "MDSA_2008_8_38",
+   "id": "K_arc_easy:128"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: When a baker bakes bread, he prepares the dough by mixing 2 cups of flour with 1 cup of water. The water needs to be 85°F. Which tools are best for the baker to measure both the volume and temperature of the water?\nAnswer:",
+   "options": [
+    " a balance and a ruler",
+    " a balance and a thermometer",
+    " a measuring cup and a balance",
+    " a measuring cup and a thermometer"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_SC_407441",
+   "id": "K_arc_easy:129"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: MOST of the volcanoes that make up the \"Ring of Fire\" were formed near\nAnswer:",
+   "options": [
+    " hot spots.",
+    " subduction zones.",
+    " divergent boundaries.",
+    " normal faults."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7090580",
+   "id": "K_arc_easy:130"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is most responsible for the uneven heating of the air in the atmosphere?\nAnswer:",
+   "options": [
+    " radiation",
+    " convection",
+    " conduction",
+    " condensation"
+   ],
+   "answer": 1,
+   "source_id": "NCEOGA_2013_5_6",
+   "id": "K_arc_easy:131"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Between 40 and 50 million years ago, the landmass on the Indian plate collided with the landmass on the Eurasian plate. What formed when these landmasses collided?\nAnswer:",
+   "options": [
+    " the Grand Canyon",
+    " the Great Plains",
+    " the Himalayan Mountains",
+    " the Mariana Trench"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7032883",
+   "id": "K_arc_easy:132"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A large plant population may impose selective pressure on a smaller, isolated group of plants, resulting in a change in allele distribution. Which mechanism is responsible for this change in the allele distribution?\nAnswer:",
+   "options": [
+    " mutation",
+    " hybridization",
+    " genetic drift",
+    " trait acquisition"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7239365",
+   "id": "K_arc_easy:133"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is the function of the gallbladder?\nAnswer:",
+   "options": [
+    " store bile",
+    " produce bile",
+    " store digestive enzymes",
+    " produce digestive enzymes"
+   ],
+   "answer": 0,
+   "source_id": "ACTAAP_2007_7_22",
+   "id": "K_arc_easy:134"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which substance is composed of only one type of atom?\nAnswer:",
+   "options": [
+    " water",
+    " gold",
+    " salt",
+    " sugar"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7221393",
+   "id": "K_arc_easy:135"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The cycle of night and day on Earth is a result of\nAnswer:",
+   "options": [
+    " the Moon revolving around Earth.",
+    " Earth revolving around the Sun.",
+    " the Moon rotating on its axis.",
+    " Earth rotating on its axis."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7084595",
+   "id": "K_arc_easy:136"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these includes Earth?\nAnswer:",
+   "options": [
+    " the asteroid belt",
+    " the Andromeda Galaxy",
+    " the solar system",
+    " the Eagle Nebula"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7210630",
+   "id": "K_arc_easy:137"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A scientist observed that the loss of plants near a stream resulted in more soil being washed downstream. How will the excess soil that travels downstream reduce biodiversity?\nAnswer:",
+   "options": [
+    " It will destroy the fish habitat.",
+    " It will provide nutrients to algae.",
+    " It will change the water temperature.",
+    " It will introduce an invasive species."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7245788",
+   "id": "K_arc_easy:138"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Machines are often full of moving parts that rub against each other. In machines, a lubricant such as oil is often applied to these moving parts. Why is this oil necessary?\nAnswer:",
+   "options": [
+    " to enhance the effectiveness of friction",
+    " to increase the efficiency of the machine",
+    " to provide an additional source of energy",
+    " to produce more thermal energy on the machine"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7173653",
+   "id": "K_arc_easy:139"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In which organism can cell walls be found?\nAnswer:",
+   "options": [
+    " moth",
+    " grass",
+    " snake",
+    " hawk"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_405953",
+   "id": "K_arc_easy:140"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which action is a learned characteristic of a newborn horse?\nAnswer:",
+   "options": [
+    " nursing",
+    " walking",
+    " sleeping",
+    " breathing"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_401646",
+   "id": "K_arc_easy:141"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What does a fire take away from a forest that squirrels need to survive?\nAnswer:",
+   "options": [
+    " food and soil",
+    " food and shelter",
+    " water and soil",
+    " water and shelter"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_415469",
+   "id": "K_arc_easy:142"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What is the name of the process in the water cycle shown by label 1?\nAnswer:",
+   "options": [
+    " infiltration",
+    " evaporation",
+    " condensation",
+    " precipitation"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_400203",
+   "id": "K_arc_easy:143"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The driver of a car at a railroad crossing hears a change in pitch of the train whistle as the train passes by. This change in pitch is most likely due to\nAnswer:",
+   "options": [
+    " the Doppler effect.",
+    " the Compton effect.",
+    " a change in medium.",
+    " a change in speed."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7221445",
+   "id": "K_arc_easy:144"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Each year the Earth moves once around\nAnswer:",
+   "options": [
+    " Mars",
+    " the Sun",
+    " the Moon",
+    " all the other planets"
+   ],
+   "answer": 1,
+   "source_id": "TIMSS_2003_4_pg14",
+   "id": "K_arc_easy:145"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is a characteristic Earth and the Moon have in common?\nAnswer:",
+   "options": [
+    " seas",
+    " craters",
+    " thunderstorms",
+    " atmosphere"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_401800",
+   "id": "K_arc_easy:146"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In New England, there are noticeable patterns of seasonal change. Which information could you collect to BEST illustrate this change?\nAnswer:",
+   "options": [
+    " air temperature",
+    " wind speed",
+    " amount of precipitation",
+    " number of cloudy days"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2001_5_15",
+   "id": "K_arc_easy:147"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following is an example of a compound?\nAnswer:",
+   "options": [
+    " copper",
+    " iron",
+    " carbon",
+    " water"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_177345",
+   "id": "K_arc_easy:148"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following characteristics will best prevent a tree from being blown over by high winds during a storm?\nAnswer:",
+   "options": [
+    " deep roots",
+    " long branches",
+    " thick bark",
+    " wide leaves"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2010_5_11988",
+   "id": "K_arc_easy:149"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which four elements make up most of the human body?\nAnswer:",
+   "options": [
+    " oxygen, carbon, hydrogen, nitrogen",
+    " silicon, calcium, oxygen, aluminum",
+    " carbon, sodium, hydrogen, oxygen",
+    " sulfur, phosphorous, calcium, nitrogen"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_414146",
+   "id": "K_arc_easy:150"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which property of an object describes how easily electricity travels through it?\nAnswer:",
+   "options": [
+    " color",
+    " temperature",
+    " reflectivity",
+    " conductivity"
+   ],
+   "answer": 3,
+   "source_id": "NYSEDREGENTS_2012_4_11",
+   "id": "K_arc_easy:151"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Animals get the energy they need for growth and repair by\nAnswer:",
+   "options": [
+    " eating food",
+    " absorbing sunlight",
+    " eliminating waste",
+    " drinking water"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2013_4_19",
+   "id": "K_arc_easy:152"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Use the information to answer the question. Over the last 150 years, the use of fossil fuels has increased, resulting in more carbon dioxide and other greenhouse gases in the atmosphere. Some scientists think that these atmospheric gases will result in global warming. Scientists have recorded data on global temperature changes and have predicted possible changes in sea level that may affect Maryland residents. Using fossil fuels in the United States will most likely contribute to rising sea levels globally by\nAnswer:",
+   "options": [
+    " increasing oxygen levels",
+    " decreasing oxygen levels",
+    " increasing carbon dioxide levels",
+    " decreasing carbon dioxide levels"
+   ],
+   "answer": 2,
+   "source_id": "MDSA_2008_8_25",
+   "id": "K_arc_easy:153"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A main advantage to organisms that reproduce sexually is\nAnswer:",
+   "options": [
+    " being able to conserve energy.",
+    " having large numbers of offspring.",
+    " greater genetic diversity.",
+    " longer life spans."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7107310",
+   "id": "K_arc_easy:154"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A sunspot appears as a dark spot on the sun that is cooler than the surrounding area. On which region of the sun do sunspots occur?\nAnswer:",
+   "options": [
+    " chromosphere",
+    " core",
+    " corona",
+    " photosphere"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_189105",
+   "id": "K_arc_easy:155"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In a deep valley on Earth, a person shouting will hear an echo as the sound is reflected back off the surrounding mountains. In a similar valley on the Moon, no echo will be heard. This is because\nAnswer:",
+   "options": [
+    " the gravitational pull on the Moon is too low",
+    " the temperature on the Moon is too low",
+    " there is no air on the Moon for the sound to travel through",
+    " the mountains on the Moon cannot reflect sound"
+   ],
+   "answer": 2,
+   "source_id": "TIMSS_2007_8_pg57",
+   "id": "K_arc_easy:156"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which type of radiation provides astronomers with the most useful information about high-energy events such as stars colliding?\nAnswer:",
+   "options": [
+    " gamma radiation",
+    " infrared radiation",
+    " radio waves",
+    " visible light"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7264145",
+   "id": "K_arc_easy:157"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Silica sand is a resource used in large volume in Nevada. This resource is used to make which product?\nAnswer:",
+   "options": [
+    " tar",
+    " glass",
+    " plastic",
+    " electricity"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7086765",
+   "id": "K_arc_easy:158"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A company is making prototypes for a new computer system. Which of the following statements best describes an advantage of making several different prototypes?\nAnswer:",
+   "options": [
+    " They can be tested at the same time.",
+    " They can be produced in large numbers.",
+    " They will be bought by many different users.",
+    " They will be sold for more than they cost to build."
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2010_8_12020",
+   "id": "K_arc_easy:159"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A scientist is studying the effect of acid rain on oak trees. Of the numbers below, which would be the number of oak trees the scientist should use to obtain the most reliable data?\nAnswer:",
+   "options": [
+    " 1",
+    " 2",
+    " 20",
+    " 200"
+   ],
+   "answer": 3,
+   "source_id": "MCAS_1999_8_28",
+   "id": "K_arc_easy:160"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What major and potentially catastrophic events can be predicted to occur in the Northern Hemisphere between the months of June and November?\nAnswer:",
+   "options": [
+    " tsunamis",
+    " hurricanes",
+    " asteroid impacts",
+    " volcanic eruptions"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7098543",
+   "id": "K_arc_easy:161"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student finds that an unidentified mineral sample can scratch gypsum but is unable to scratch quartz. The student has made an observation about which property of the sample?\nAnswer:",
+   "options": [
+    " luster",
+    " hardness",
+    " density",
+    " reactivity"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7222758",
+   "id": "K_arc_easy:162"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Humans are protected from some infections by specialized cells which produce chemicals that\nAnswer:",
+   "options": [
+    " destroy microbes",
+    " recycle nutrients",
+    " allow locomotion",
+    " coordinate movement"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2013_8_8",
+   "id": "K_arc_easy:163"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these systems functions to protect and support vital organs?\nAnswer:",
+   "options": [
+    " digestive",
+    " skeletal",
+    " nervous",
+    " excretory"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7056875",
+   "id": "K_arc_easy:164"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The excessive use of nitrogen-based fertilizers causes runoff that increases the nitrogen content of lakes and bays. These nitrogen compounds directly affect the aquatic ecosystems by\nAnswer:",
+   "options": [
+    " interfering with the water cycle.",
+    " decreasing the predator population.",
+    " increasing the rate of algae growth.",
+    " causing aquatic animals to grow larger."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7015733",
+   "id": "K_arc_easy:165"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A bird called a ptarmigan has feathered feet. The feathers on the feet of the ptarmigan are most helpful when this bird ___.\nAnswer:",
+   "options": [
+    " digs up food",
+    " walks in deep snow",
+    " climbs rocky cliffs",
+    " runs under bushes"
+   ],
+   "answer": 1,
+   "source_id": "AKDE&ED_2008_4_8",
+   "id": "K_arc_easy:166"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which is the best source of vitamins and minerals?\nAnswer:",
+   "options": [
+    " fruits and vegetables",
+    " bread, rice, and pasta",
+    " milk and milk products",
+    " meat, fish, and poultry"
+   ],
+   "answer": 0,
+   "source_id": "TIMSS_2007_4_pg64",
+   "id": "K_arc_easy:167"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The sum of protons and neutrons in the nucleus of an atom is called the\nAnswer:",
+   "options": [
+    " valence.",
+    " mass number.",
+    " chemical property.",
+    " electrical charge."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7018078",
+   "id": "K_arc_easy:168"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Two spotted leopards produce a litter of four cubs. Three of the cubs are spotted and one is solid black. The black coat is probably what type of trait?\nAnswer:",
+   "options": [
+    " dominant",
+    " recessive",
+    " polygenic",
+    " sex-linked"
+   ],
+   "answer": 1,
+   "source_id": "MCAS_2006_9_36",
+   "id": "K_arc_easy:169"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which type of organism is made of one cell?\nAnswer:",
+   "options": [
+    " trees",
+    " bacteria",
+    " fern",
+    " fish"
+   ],
+   "answer": 1,
+   "source_id": "MEA_2014_5_15",
+   "id": "K_arc_easy:170"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: The density of a material can be measured by using a\nAnswer:",
+   "options": [
+    " meter stick and test tubes.",
+    " beaker and stopwatch.",
+    " thermometer and computer probes.",
+    " balance and graduated cylinder."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7017955",
+   "id": "K_arc_easy:171"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Respiration is a process during which energy is released from glucose. This energy is used for processes such as growth of the body. Which type of energy does respiration release?\nAnswer:",
+   "options": [
+    " chemical",
+    " kinetic",
+    " potential",
+    " thermal"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7170643",
+   "id": "K_arc_easy:172"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: An earthquake is caused by sudden shifts in which of the following layers of Earth?\nAnswer:",
+   "options": [
+    " outer core",
+    " crust",
+    " inner core",
+    " mesosphere"
+   ],
+   "answer": 1,
+   "source_id": "MCAS_2004_8_5",
+   "id": "K_arc_easy:173"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which difference between land and water contributes most directly to global climate change resulting from tectonic movement?\nAnswer:",
+   "options": [
+    " mean material densities",
+    " magnetic material content",
+    " heat absorption and retention properties",
+    " rate of radioactivity-related heat release"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7234343",
+   "id": "K_arc_easy:174"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Leather basketballs are made for indoor use on smooth surfaces. Rubber basketballs are made for use on many different surfaces. Which of the following properties of rubber makes it better than leather for use on many different surfaces?\nAnswer:",
+   "options": [
+    " Rubber is durable.",
+    " Rubber is lightweight.",
+    " Rubber is dark in color.",
+    " Rubber is quickly produced."
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2012_8_23645",
+   "id": "K_arc_easy:175"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which activity is most likely to add pollutants to the environment?\nAnswer:",
+   "options": [
+    " watering a garden",
+    " pulling weeds from a lawn",
+    " installing a wooden fence",
+    " burning leaves"
+   ],
+   "answer": 3,
+   "source_id": "LEAP_2003_8_10394",
+   "id": "K_arc_easy:176"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: An engineer was given an assignment to build a model rocket. The main requirement was that it had to build it out of a metal that could release the energy that built up when reentering the atmosphere of Earth. What property should the engineer concentrate on the most when designing the rocket?\nAnswer:",
+   "options": [
+    " density",
+    " ductility",
+    " specific heat",
+    " boiling point"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7161035",
+   "id": "K_arc_easy:177"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Why do some animals hibernate in the winter?\nAnswer:",
+   "options": [
+    " to find food for their young",
+    " to adapt to environmental changes",
+    " to attract a mate",
+    " to avoid predators"
+   ],
+   "answer": 1,
+   "source_id": "NYSEDREGENTS_2010_4_22",
+   "id": "K_arc_easy:178"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Students observed that a diamond was able to scratch a piece of talc. What does this observation best support?\nAnswer:",
+   "options": [
+    " Diamonds have sharp edges.",
+    " Talc is softer than diamonds.",
+    " Diamonds are very valuable.",
+    " Talc and diamonds are both minerals."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_SC_402036",
+   "id": "K_arc_easy:179"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What is the source of genetic information of offspring produced by sexual reproduction?\nAnswer:",
+   "options": [
+    " the father only",
+    " the mother only",
+    " the mother and the father",
+    " neither the mother nor the father"
+   ],
+   "answer": 2,
+   "source_id": "MEA_2014_8_18",
+   "id": "K_arc_easy:180"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Sam looks into a fish pond and points at a goldfish. Sam's grandfather looks where Sam is pointing and tells Sam that the fish is actually in a different location. Which property of light explains why Sam's grandfather is correct?\nAnswer:",
+   "options": [
+    " reflection",
+    " refraction",
+    " diffraction",
+    " absorption"
+   ],
+   "answer": 1,
+   "source_id": "ACTAAP_2013_5_5",
+   "id": "K_arc_easy:181"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Plants grow best in soils that are rich in which of the following?\nAnswer:",
+   "options": [
+    " grains of sand",
+    " lumps of clay",
+    " layers of gravel",
+    " decaying plants and animals"
+   ],
+   "answer": 3,
+   "source_id": "TIMSS_2011_4_pg15",
+   "id": "K_arc_easy:182"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these best describes wind energy?\nAnswer:",
+   "options": [
+    " limited",
+    " renewable",
+    " damaging",
+    " inexpensive"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7085418",
+   "id": "K_arc_easy:183"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: When the fuel in a gasoline engine is burned, the energy conversion is from\nAnswer:",
+   "options": [
+    " chemical to thermal.",
+    " potential to nuclear.",
+    " thermal to potential.",
+    " electrical to kinetic."
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7098053",
+   "id": "K_arc_easy:184"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: One method of heat distribution is a baseboard forced hot water system. A baseboard system carries hot water through a pipe that passes through many small, flat plates called fins. What is the purpose of these fins?\nAnswer:",
+   "options": [
+    " to dissipate the heat of the hot water flowing through the pipe",
+    " to prevent the baseboard from coming in contact with hot surfaces",
+    " to replace the heated air leaving the system with cold air",
+    " to prevent dust and other particles from entering the baseboard"
+   ],
+   "answer": 0,
+   "source_id": "MCAS_2005_9_9",
+   "id": "K_arc_easy:185"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Beakers and graduated cylinders are designed to measure\nAnswer:",
+   "options": [
+    " mass.",
+    " density.",
+    " volume.",
+    " viscosity."
+   ],
+   "answer": 2,
+   "source_id": "Mercury_7018498",
+   "id": "K_arc_easy:186"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: In a lab investigation, students had to identify different mineral specimens. Which property is the most reliable for identifying one mineral from another?\nAnswer:",
+   "options": [
+    " texture",
+    " hardness",
+    " crystal shape",
+    " surface color"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_404987",
+   "id": "K_arc_easy:187"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which tool will best help scientists understand relationships between oceans and climate changes?\nAnswer:",
+   "options": [
+    " a computer model",
+    " a weather balloon",
+    " a rain gauge",
+    " radar"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7033600",
+   "id": "K_arc_easy:188"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What keeps stars such as the Sun from collapsing from their own self-gravity?\nAnswer:",
+   "options": [
+    " the centrifugal force created by rapid rotation",
+    " the electrical repulsion of nuclei in the plasma",
+    " the gravitational pull created by orbiting planets",
+    " the outward pressure created by nuclear fusion"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7268993",
+   "id": "K_arc_easy:189"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Sound travels as a\nAnswer:",
+   "options": [
+    " wave without a medium.",
+    " series of compressions only.",
+    " pattern of up and down vibrations.",
+    " pattern of compressions and rarefactions."
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7018393",
+   "id": "K_arc_easy:190"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of the following could help to reduce a home heating bill in winter?\nAnswer:",
+   "options": [
+    " replacing wood doors with aluminum doors",
+    " using more insulation in the walls of the home",
+    " removing thick rugs and heavy curtains in the home",
+    " painting the roof of the home white to reflect light"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_415262",
+   "id": "K_arc_easy:191"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: On Mount Everest the temperature decreases as the altitude increases. The summit of this mountain is in which atmospheric layer?\nAnswer:",
+   "options": [
+    " mesosphere",
+    " stratosphere",
+    " thermosphere",
+    " troposphere"
+   ],
+   "answer": 3,
+   "source_id": "Mercury_7222898",
+   "id": "K_arc_easy:192"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What is the smallest particle of an element that still exhibits all the properties of that element?\nAnswer:",
+   "options": [
+    " an electron",
+    " an atom",
+    " a molecule",
+    " a proton"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7212625",
+   "id": "K_arc_easy:193"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: A student wants to create a drawing of the water cycle. Which image can the student use to represent water cycling through the atmosphere?\nAnswer:",
+   "options": [
+    " a cloud",
+    " a stream",
+    " a frozen lake",
+    " a drop of dew"
+   ],
+   "answer": 0,
+   "source_id": "Mercury_7220343",
+   "id": "K_arc_easy:194"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which of these best describes a fossil?\nAnswer:",
+   "options": [
+    " a geometric pattern formed by a mineral",
+    " a solid element or compound from Earth's crust",
+    " remains of an extinct organism found in a rock layer",
+    " bits of weathered rocks and pieces of dead organisms"
+   ],
+   "answer": 2,
+   "source_id": "Mercury_SC_LBS10611",
+   "id": "K_arc_easy:195"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which property of a mineral is most likely being tested when it is scratched with a nail?\nAnswer:",
+   "options": [
+    " color",
+    " hardness",
+    " cleavage",
+    " luster"
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7068600",
+   "id": "K_arc_easy:196"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: India was once its own continent. According to the theory of continental drift, India has collided with and become part of the continent of Asia. This caused\nAnswer:",
+   "options": [
+    " glaciers in the area to melt.",
+    " large mountain ranges to form.",
+    " deep mid-ocean trenches to develop.",
+    " deserts in the area to become fertile."
+   ],
+   "answer": 1,
+   "source_id": "Mercury_7005093",
+   "id": "K_arc_easy:197"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: Which device is used to determine the volume of a liquid?\nAnswer:",
+   "options": [
+    " anemometer",
+    " graduated cylinder",
+    " test tube",
+    " thermometer"
+   ],
+   "answer": 1,
+   "source_id": "NCEOGA_2013_5_S2",
+   "id": "K_arc_easy:198"
+  },
+  {
+   "level": "K_arc_easy",
+   "prompt": "Question: What model is used to show the pattern of traits that are passed from one generation to the next in a family?\nAnswer:",
+   "options": [
+    " pedigree chart",
+    " dichotomous key",
+    " energy pyramid",
+    " line graph"
+   ],
+   "answer": 0,
+   "source_id": "NYSEDREGENTS_2010_8_9",
+   "id": "K_arc_easy:199"
+  }
+ ]
+}
