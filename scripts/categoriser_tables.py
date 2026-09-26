@@ -35,8 +35,11 @@ def cell(d, cond, key):
     return f"{r[key]:g}{'*' if nlo <= r[key] <= nhi else ''} [{lo:g}, {hi:g}]"
 
 
-def in_shots():
+def in_shots(cols=COLS, title="Table 38.2: by whether the merchant is among the 24 prompt shots, elsewhere in the 300-row history, or absent from it, and for the absent ones whether "
+             "another user's training rows carried it or only the fact DB knows it (accuracy %; the untrained section 37 columns did not train, so their split is a merchant subset only)"):
+    """The merchant-group split for any (label, tag, cond) column list; real6_fewshot_tables.py reuses it for section 46."""
     from ai_experiments import real6 as R6
+    COLS = cols
     doc = R6.load()
     shot_m = {}
     for u in doc["users"]:
@@ -57,8 +60,7 @@ def in_shots():
                 g.append("not in the history, labelled by other users in training")
             return g
         return ["in the 24 shots" if it["merchant"] in shot_m[it["user"]] else "in the history, not the shots"]
-    print("\n**Table 38.2: by whether the merchant is among the 24 prompt shots, elsewhere in the 300-row history, or absent from it, and for the absent ones whether "
-          "another user's training rows carried it or only the fact DB knows it (accuracy %; the untrained section 37 columns did not train, so their split is a merchant subset only)**\n")
+    print(f"\n**{title}**\n")
     print("| group | " + " | ".join(c[0] for c in COLS) + " |")
     print("|---|" + "---|" * len(COLS))
     cells = {}

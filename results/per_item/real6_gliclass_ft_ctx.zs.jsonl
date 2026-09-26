@@ -1,0 +1,1179 @@
+{"id": "R6_seen_new:000", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Gold's Gym", "known": true}
+{"id": "R6_seen_new:001", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Menards", "known": true}
+{"id": "R6_seen_new:002", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Kelby Co", "known": false}
+{"id": "R6_seen_new:003", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Polby", "known": false}
+{"id": "R6_seen_new:004", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Bexwen & Sons", "known": false}
+{"id": "R6_seen_new:005", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "Istmere Group", "known": false}
+{"id": "R6_seen_new:006", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_new:007", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_seen_new:008", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "Sabstead Bros", "known": false}
+{"id": "R6_seen_new:009", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_new:010", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Halmere Group", "known": false}
+{"id": "R6_seen_new:011", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "Expedia", "known": true}
+{"id": "R6_seen_renamed:000", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Torhurst Co", "known": false}
+{"id": "R6_seen_renamed:001", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Bexlock & Sons", "known": false}
+{"id": "R6_seen_renamed:002", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Pep Boys", "known": true}
+{"id": "R6_seen_renamed:003", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "H-E-B", "known": true}
+{"id": "R6_seen_renamed:004", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Rinlock", "known": false}
+{"id": "R6_seen_renamed:005", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_seen_renamed:006", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "AutoZone", "known": true}
+{"id": "R6_seen_renamed:007", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Nike", "known": true}
+{"id": "R6_seen_renamed:008", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "Costco", "known": true}
+{"id": "R6_seen_renamed:009", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 0, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_renamed:010", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "Wexley Group", "known": false}
+{"id": "R6_seen_renamed:011", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "McDonald's", "known": true}
+{"id": "R6_seen_standard:000", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_seen_standard:001", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Duane Reade", "known": true}
+{"id": "R6_seen_standard:002", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Gridale", "known": false}
+{"id": "R6_seen_standard:003", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Garden Group", "known": false}
+{"id": "R6_seen_standard:004", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_seen_standard:005", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Vitamin Shoppe", "known": true}
+{"id": "R6_seen_standard:006", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Spotify", "known": true}
+{"id": "R6_seen_standard:007", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_standard:008", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Rite Aid", "known": true}
+{"id": "R6_seen_standard:009", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_seen_standard:010", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "LabCorp", "known": true}
+{"id": "R6_seen_standard:011", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Fennard", "known": false}
+{"id": "R6_unseen_new:000", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:001", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:002", "level": "R6_unseen_new", "answer": 7, "pred": 7, "correct": true, "user": 0, "merchant": "PG&E", "known": true}
+{"id": "R6_unseen_new:003", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_new:004", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:005", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_new:006", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:007", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:008", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:009", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_new:010", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 0, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_new:011", "level": "R6_unseen_new", "answer": 5, "pred": 5, "correct": true, "user": 0, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:000", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:001", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:002", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:003", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_renamed:004", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:005", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "Halwen Bros", "known": false}
+{"id": "R6_unseen_renamed:006", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 0, "merchant": "Best Buy", "known": true}
+{"id": "R6_unseen_renamed:007", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 0, "merchant": "Ulmmoor Inc", "known": false}
+{"id": "R6_unseen_renamed:008", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 0, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_renamed:009", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 0, "merchant": "Wexhurst & Sons", "known": false}
+{"id": "R6_unseen_renamed:010", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 0, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:011", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 0, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_unseen_standard:000", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Bowlero", "known": true}
+{"id": "R6_unseen_standard:001", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Holdale", "known": false}
+{"id": "R6_unseen_standard:002", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_standard:003", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Halwen Group", "known": false}
+{"id": "R6_unseen_standard:004", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Holdale", "known": false}
+{"id": "R6_unseen_standard:005", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_standard:006", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "GNC", "known": true}
+{"id": "R6_unseen_standard:007", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Bowlero", "known": true}
+{"id": "R6_unseen_standard:008", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 0, "merchant": "Nevden Bros", "known": false}
+{"id": "R6_unseen_standard:009", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Bowlero", "known": true}
+{"id": "R6_unseen_standard:010", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Jorden Inc", "known": false}
+{"id": "R6_unseen_standard:011", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 0, "merchant": "Morton LLC", "known": false}
+{"id": "R6_seen_new:012", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Wexhurst & Sons", "known": false}
+{"id": "R6_seen_new:013", "level": "R6_seen_new", "answer": 9, "pred": 12, "correct": false, "user": 1, "merchant": "Istwick Group", "known": false}
+{"id": "R6_seen_new:014", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_new:015", "level": "R6_seen_new", "answer": 9, "pred": 13, "correct": false, "user": 1, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_renamed:012", "level": "R6_seen_renamed", "answer": 19, "pred": 19, "correct": true, "user": 1, "merchant": "Netflix", "known": true}
+{"id": "R6_seen_renamed:013", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 1, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_seen_renamed:014", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 1, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_renamed:015", "level": "R6_seen_renamed", "answer": 18, "pred": 18, "correct": true, "user": 1, "merchant": "Oskhurst", "known": false}
+{"id": "R6_seen_renamed:016", "level": "R6_seen_renamed", "answer": 14, "pred": 4, "correct": false, "user": 1, "merchant": "B&H Photo", "known": true}
+{"id": "R6_seen_renamed:017", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 1, "merchant": "Istmoor Group", "known": false}
+{"id": "R6_seen_renamed:018", "level": "R6_seen_renamed", "answer": 19, "pred": 11, "correct": false, "user": 1, "merchant": "Istnard LLC", "known": false}
+{"id": "R6_seen_renamed:019", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 1, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_renamed:020", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 1, "merchant": "Dovvarro & Sons", "known": false}
+{"id": "R6_seen_renamed:021", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 1, "merchant": "Nordstrom", "known": true}
+{"id": "R6_seen_renamed:022", "level": "R6_seen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 1, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_renamed:023", "level": "R6_seen_renamed", "answer": 0, "pred": 12, "correct": false, "user": 1, "merchant": "Halley", "known": false}
+{"id": "R6_seen_standard:012", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Pexnard", "known": false}
+{"id": "R6_seen_standard:013", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_seen_standard:014", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Valero", "known": true}
+{"id": "R6_seen_standard:015", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_new:012", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:013", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:014", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_new:015", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:016", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_new:017", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_new:018", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:019", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 1, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_renamed:012", "level": "R6_unseen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 1, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_renamed:013", "level": "R6_unseen_renamed", "answer": 18, "pred": 11, "correct": false, "user": 1, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:014", "level": "R6_unseen_renamed", "answer": 18, "pred": 11, "correct": false, "user": 1, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:015", "level": "R6_unseen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 1, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_unseen_renamed:016", "level": "R6_unseen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 1, "merchant": "CVS", "known": true}
+{"id": "R6_unseen_renamed:017", "level": "R6_unseen_renamed", "answer": 18, "pred": 11, "correct": false, "user": 1, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:018", "level": "R6_unseen_renamed", "answer": 6, "pred": 15, "correct": false, "user": 1, "merchant": "Garden Group", "known": false}
+{"id": "R6_unseen_renamed:019", "level": "R6_unseen_renamed", "answer": 7, "pred": 19, "correct": false, "user": 1, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_renamed:020", "level": "R6_unseen_renamed", "answer": 14, "pred": 4, "correct": false, "user": 1, "merchant": "Best Buy", "known": true}
+{"id": "R6_unseen_renamed:021", "level": "R6_unseen_renamed", "answer": 7, "pred": 19, "correct": false, "user": 1, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_renamed:022", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 1, "merchant": "Fennard", "known": false}
+{"id": "R6_unseen_renamed:023", "level": "R6_unseen_renamed", "answer": 18, "pred": 11, "correct": false, "user": 1, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_standard:012", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:013", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Chevron", "known": true}
+{"id": "R6_unseen_standard:014", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Fenley Group", "known": false}
+{"id": "R6_unseen_standard:015", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:016", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Fenley Group", "known": false}
+{"id": "R6_unseen_standard:017", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Rinham", "known": false}
+{"id": "R6_unseen_standard:018", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Rinham", "known": false}
+{"id": "R6_unseen_standard:019", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:020", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Chevron", "known": true}
+{"id": "R6_unseen_standard:021", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:022", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Chevron", "known": true}
+{"id": "R6_unseen_standard:023", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 1, "merchant": "Fenley Group", "known": false}
+{"id": "R6_seen_new:016", "level": "R6_seen_new", "answer": 3, "pred": 3, "correct": true, "user": 2, "merchant": "Torhurst Co", "known": false}
+{"id": "R6_seen_new:017", "level": "R6_seen_new", "answer": 6, "pred": 6, "correct": true, "user": 2, "merchant": "Duane Reade", "known": true}
+{"id": "R6_seen_new:018", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 2, "merchant": "Wag", "known": true}
+{"id": "R6_seen_new:019", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 2, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_new:020", "level": "R6_seen_new", "answer": 3, "pred": 3, "correct": true, "user": 2, "merchant": "Nordstrom", "known": true}
+{"id": "R6_seen_new:021", "level": "R6_seen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_new:022", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 2, "merchant": "Rover", "known": true}
+{"id": "R6_seen_new:023", "level": "R6_seen_new", "answer": 11, "pred": 2, "correct": false, "user": 2, "merchant": "AT&T", "known": true}
+{"id": "R6_seen_new:024", "level": "R6_seen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Dovvarro & Sons", "known": false}
+{"id": "R6_seen_new:025", "level": "R6_seen_new", "answer": 3, "pred": 3, "correct": true, "user": 2, "merchant": "Old Navy", "known": true}
+{"id": "R6_seen_new:026", "level": "R6_seen_new", "answer": 11, "pred": 11, "correct": true, "user": 2, "merchant": "Cox", "known": true}
+{"id": "R6_seen_new:027", "level": "R6_seen_new", "answer": 8, "pred": 6, "correct": false, "user": 2, "merchant": "Hertz", "known": true}
+{"id": "R6_seen_renamed:024", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Oskhurst", "known": false}
+{"id": "R6_seen_renamed:025", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Rinlock", "known": false}
+{"id": "R6_seen_renamed:026", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_renamed:027", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Bowlero", "known": true}
+{"id": "R6_seen_renamed:028", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_seen_renamed:029", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_renamed:030", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Dunkin", "known": true}
+{"id": "R6_seen_renamed:031", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_renamed:032", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_renamed:033", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_seen_standard:016", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 2, "merchant": "Halhurst Co", "known": false}
+{"id": "R6_seen_standard:017", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 2, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_standard:018", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 2, "merchant": "Pexnard", "known": false}
+{"id": "R6_seen_standard:019", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 2, "merchant": "Samsung", "known": true}
+{"id": "R6_seen_standard:020", "level": "R6_seen_standard", "answer": 0, "pred": 0, "correct": true, "user": 2, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_standard:021", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 2, "merchant": "Peloton", "known": true}
+{"id": "R6_seen_standard:022", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 2, "merchant": "Fenley Group", "known": false}
+{"id": "R6_seen_standard:023", "level": "R6_seen_standard", "answer": 0, "pred": 0, "correct": true, "user": 2, "merchant": "Sabby Co", "known": false}
+{"id": "R6_seen_standard:024", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 2, "merchant": "Rinham", "known": false}
+{"id": "R6_seen_standard:025", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Floor & Decor", "known": true}
+{"id": "R6_seen_standard:026", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 2, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_standard:027", "level": "R6_seen_standard", "answer": 0, "pred": 0, "correct": true, "user": 2, "merchant": "Orlcott Inc", "known": false}
+{"id": "R6_unseen_new:020", "level": "R6_unseen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Con Edison", "known": true}
+{"id": "R6_unseen_new:021", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Fennard", "known": false}
+{"id": "R6_unseen_new:022", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Vitamin Shoppe", "known": true}
+{"id": "R6_unseen_new:023", "level": "R6_unseen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:024", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 2, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_unseen_new:025", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Vitamin Shoppe", "known": true}
+{"id": "R6_unseen_new:026", "level": "R6_unseen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Con Edison", "known": true}
+{"id": "R6_unseen_new:027", "level": "R6_unseen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:028", "level": "R6_unseen_new", "answer": 11, "pred": 6, "correct": false, "user": 2, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:029", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Fennard", "known": false}
+{"id": "R6_unseen_new:030", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Vitamin Shoppe", "known": true}
+{"id": "R6_unseen_new:031", "level": "R6_unseen_new", "answer": 6, "pred": 0, "correct": false, "user": 2, "merchant": "Fennard", "known": false}
+{"id": "R6_unseen_renamed:024", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_unseen_renamed:025", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_unseen_renamed:026", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_renamed:027", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Netflix", "known": true}
+{"id": "R6_unseen_renamed:028", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_unseen_renamed:029", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_unseen_renamed:030", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Oskhurst Bros", "known": false}
+{"id": "R6_unseen_renamed:031", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_renamed:032", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 2, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_unseen_renamed:033", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_renamed:034", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_unseen_renamed:035", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 2, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_standard:024", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:025", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:026", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:027", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:028", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:029", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Halmere Group", "known": false}
+{"id": "R6_unseen_standard:030", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 2, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:031", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:032", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:033", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:034", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 2, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_standard:035", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 2, "merchant": "Gold's Gym", "known": true}
+{"id": "R6_seen_renamed:034", "level": "R6_seen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 3, "merchant": "LabCorp", "known": true}
+{"id": "R6_seen_renamed:035", "level": "R6_seen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 3, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_renamed:036", "level": "R6_seen_renamed", "answer": 19, "pred": 19, "correct": true, "user": 3, "merchant": "Chick-fil-A", "known": true}
+{"id": "R6_seen_renamed:037", "level": "R6_seen_renamed", "answer": 5, "pred": 16, "correct": false, "user": 3, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_seen_renamed:038", "level": "R6_seen_renamed", "answer": 7, "pred": 12, "correct": false, "user": 3, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_renamed:039", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 3, "merchant": "Bowlero", "known": true}
+{"id": "R6_seen_renamed:040", "level": "R6_seen_renamed", "answer": 11, "pred": 12, "correct": false, "user": 3, "merchant": "Halton", "known": false}
+{"id": "R6_seen_renamed:041", "level": "R6_seen_renamed", "answer": 18, "pred": 8, "correct": false, "user": 3, "merchant": "Dunwick", "known": false}
+{"id": "R6_seen_renamed:042", "level": "R6_seen_renamed", "answer": 7, "pred": 12, "correct": false, "user": 3, "merchant": "Morton LLC", "known": false}
+{"id": "R6_seen_renamed:043", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 3, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_seen_renamed:044", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 3, "merchant": "AutoZone", "known": true}
+{"id": "R6_seen_renamed:045", "level": "R6_seen_renamed", "answer": 18, "pred": 8, "correct": false, "user": 3, "merchant": "Amtrak", "known": true}
+{"id": "R6_seen_standard:028", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmmoor Inc", "known": false}
+{"id": "R6_seen_standard:029", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_seen_standard:030", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_standard:031", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_standard:032", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 3, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_seen_standard:033", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 3, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_seen_standard:034", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "PetSmart", "known": true}
+{"id": "R6_seen_standard:035", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Chewy", "known": true}
+{"id": "R6_seen_standard:036", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Istwick Group", "known": false}
+{"id": "R6_seen_standard:037", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_renamed:036", "level": "R6_unseen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:037", "level": "R6_unseen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:038", "level": "R6_unseen_renamed", "answer": 17, "pred": 6, "correct": false, "user": 3, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:039", "level": "R6_unseen_renamed", "answer": 17, "pred": 6, "correct": false, "user": 3, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:040", "level": "R6_unseen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:041", "level": "R6_unseen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:042", "level": "R6_unseen_renamed", "answer": 19, "pred": 19, "correct": true, "user": 3, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_unseen_renamed:043", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 3, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_unseen_renamed:044", "level": "R6_unseen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:045", "level": "R6_unseen_renamed", "answer": 17, "pred": 6, "correct": false, "user": 3, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:046", "level": "R6_unseen_renamed", "answer": 17, "pred": 6, "correct": false, "user": 3, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:047", "level": "R6_unseen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 3, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_standard:036", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_standard:037", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_standard:038", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Wag", "known": true}
+{"id": "R6_unseen_standard:039", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_standard:040", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Wag", "known": true}
+{"id": "R6_unseen_standard:041", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Petland", "known": true}
+{"id": "R6_unseen_standard:042", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_standard:043", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_standard:044", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_standard:045", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Wag", "known": true}
+{"id": "R6_unseen_standard:046", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 3, "merchant": "Orangetheory", "known": true}
+{"id": "R6_unseen_standard:047", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 3, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_new:028", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_new:029", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Fenley Group", "known": false}
+{"id": "R6_seen_new:030", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Exxon", "known": true}
+{"id": "R6_seen_new:031", "level": "R6_seen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Valero", "known": true}
+{"id": "R6_seen_renamed:046", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 4, "merchant": "Duane Reade", "known": true}
+{"id": "R6_seen_renamed:047", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 4, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_renamed:048", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 4, "merchant": "Garden Group", "known": false}
+{"id": "R6_seen_renamed:049", "level": "R6_seen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Halmere Group", "known": false}
+{"id": "R6_seen_renamed:050", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 4, "merchant": "Zedbury", "known": false}
+{"id": "R6_seen_renamed:051", "level": "R6_seen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 4, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_renamed:052", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 4, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_seen_renamed:053", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 4, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_seen_renamed:054", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 4, "merchant": "Istbury", "known": false}
+{"id": "R6_seen_renamed:055", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 4, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_seen_renamed:056", "level": "R6_seen_renamed", "answer": 13, "pred": 1, "correct": false, "user": 4, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_seen_renamed:057", "level": "R6_seen_renamed", "answer": 13, "pred": 1, "correct": false, "user": 4, "merchant": "McDonald's", "known": true}
+{"id": "R6_seen_standard:038", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Fenford Group", "known": false}
+{"id": "R6_seen_standard:039", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Ardton Inc", "known": false}
+{"id": "R6_seen_standard:040", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 4, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_standard:041", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Peloton", "known": true}
+{"id": "R6_seen_standard:042", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_standard:043", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Zedden", "known": false}
+{"id": "R6_seen_standard:044", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Istmere Group", "known": false}
+{"id": "R6_seen_standard:045", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 4, "merchant": "Wag", "known": true}
+{"id": "R6_seen_standard:046", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Amtrak", "known": true}
+{"id": "R6_seen_standard:047", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_standard:048", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Hilton", "known": true}
+{"id": "R6_seen_standard:049", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 4, "merchant": "Orlnard & Sons", "known": false}
+{"id": "R6_unseen_new:032", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:033", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:034", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:035", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:036", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:037", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:038", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:039", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Garwick Co", "known": false}
+{"id": "R6_unseen_new:040", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:041", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:042", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_new:043", "level": "R6_unseen_new", "answer": 2, "pred": 2, "correct": true, "user": 4, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_unseen_renamed:048", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 4, "merchant": "Gridale", "known": false}
+{"id": "R6_unseen_renamed:049", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:050", "level": "R6_unseen_renamed", "answer": 3, "pred": 12, "correct": false, "user": 4, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:051", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 4, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_renamed:052", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:053", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:054", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:055", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 4, "merchant": "Topgolf", "known": true}
+{"id": "R6_unseen_renamed:056", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:057", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:058", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:059", "level": "R6_unseen_renamed", "answer": 16, "pred": 5, "correct": false, "user": 4, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:048", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 4, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:049", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 4, "merchant": "Spectrum", "known": true}
+{"id": "R6_unseen_standard:050", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 4, "merchant": "Bose", "known": true}
+{"id": "R6_unseen_standard:051", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 4, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:052", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 4, "merchant": "T-Mobile", "known": true}
+{"id": "R6_unseen_standard:053", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_unseen_standard:054", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_unseen_standard:055", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Bexwen & Sons", "known": false}
+{"id": "R6_unseen_standard:056", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 4, "merchant": "T-Mobile", "known": true}
+{"id": "R6_unseen_standard:057", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 4, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:058", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 4, "merchant": "Bexwen & Sons", "known": false}
+{"id": "R6_unseen_standard:059", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 4, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_seen_new:032", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Dunkin", "known": true}
+{"id": "R6_seen_new:033", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_seen_new:034", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Taco Bell", "known": true}
+{"id": "R6_seen_new:035", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Macy's", "known": true}
+{"id": "R6_seen_new:036", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Zedbury", "known": false}
+{"id": "R6_seen_new:037", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Quildale Group", "known": false}
+{"id": "R6_seen_new:038", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_seen_new:039", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Ulmwick Ltd", "known": false}
+{"id": "R6_seen_new:040", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_new:041", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Istlock", "known": false}
+{"id": "R6_seen_renamed:058", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 5, "merchant": "Garholm Co", "known": false}
+{"id": "R6_seen_renamed:059", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_seen_renamed:060", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_seen_renamed:061", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 5, "merchant": "Quilhurst", "known": false}
+{"id": "R6_seen_renamed:062", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "PetSmart", "known": true}
+{"id": "R6_seen_renamed:063", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 5, "merchant": "Bramby & Sons", "known": false}
+{"id": "R6_seen_renamed:064", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 5, "merchant": "Jiffy Lube", "known": true}
+{"id": "R6_seen_renamed:065", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_renamed:066", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 5, "merchant": "Quilden Group", "known": false}
+{"id": "R6_seen_renamed:067", "level": "R6_seen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 5, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_seen_renamed:068", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "Halholm & Sons", "known": false}
+{"id": "R6_seen_renamed:069", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 5, "merchant": "Hilton", "known": true}
+{"id": "R6_seen_standard:050", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "Samsung", "known": true}
+{"id": "R6_seen_standard:051", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "Halhurst Co", "known": false}
+{"id": "R6_unseen_new:044", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:045", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:046", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:047", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:048", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:049", "level": "R6_unseen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Starbucks", "known": true}
+{"id": "R6_unseen_new:050", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:051", "level": "R6_unseen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Starbucks", "known": true}
+{"id": "R6_unseen_new:052", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_new:053", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:054", "level": "R6_unseen_new", "answer": 0, "pred": 0, "correct": true, "user": 5, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_unseen_new:055", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 5, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_renamed:060", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 5, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:061", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 5, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:062", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_renamed:063", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 5, "merchant": "Zedden", "known": false}
+{"id": "R6_unseen_renamed:064", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 5, "merchant": "Garden Group", "known": false}
+{"id": "R6_unseen_renamed:065", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 5, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:066", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 5, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_renamed:067", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 5, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_renamed:068", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 5, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_unseen_renamed:069", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 5, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_renamed:070", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 5, "merchant": "H-E-B", "known": true}
+{"id": "R6_unseen_renamed:071", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 5, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_unseen_standard:060", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "Oskbury LLC", "known": false}
+{"id": "R6_unseen_standard:061", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:062", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:063", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "Oskbury LLC", "known": false}
+{"id": "R6_unseen_standard:064", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:065", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:066", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:067", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:068", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:069", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:070", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:071", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 5, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_new:042", "level": "R6_seen_new", "answer": 4, "pred": 10, "correct": false, "user": 6, "merchant": "Nevwick", "known": false}
+{"id": "R6_seen_new:043", "level": "R6_seen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "Best Buy", "known": true}
+{"id": "R6_seen_new:044", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_new:045", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Ulmmoor Inc", "known": false}
+{"id": "R6_seen_new:046", "level": "R6_seen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "Halhurst Co", "known": false}
+{"id": "R6_seen_new:047", "level": "R6_seen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "Samsung", "known": true}
+{"id": "R6_seen_new:048", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_renamed:070", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Fennard", "known": false}
+{"id": "R6_seen_renamed:071", "level": "R6_seen_renamed", "answer": 6, "pred": 3, "correct": false, "user": 6, "merchant": "CVS", "known": true}
+{"id": "R6_seen_renamed:072", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_renamed:073", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 6, "merchant": "Valero", "known": true}
+{"id": "R6_seen_renamed:074", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Istmere Group", "known": false}
+{"id": "R6_seen_renamed:075", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Airbnb", "known": true}
+{"id": "R6_seen_renamed:076", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 6, "merchant": "Uniqlo", "known": true}
+{"id": "R6_seen_renamed:077", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_seen_renamed:078", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 6, "merchant": "Fenley Group", "known": false}
+{"id": "R6_seen_renamed:079", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 6, "merchant": "Taco Bell", "known": true}
+{"id": "R6_seen_renamed:080", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Quilhurst", "known": false}
+{"id": "R6_seen_renamed:081", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 6, "merchant": "Oskhurst", "known": false}
+{"id": "R6_seen_standard:052", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 6, "merchant": "Kelby Co", "known": false}
+{"id": "R6_seen_standard:053", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 6, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_standard:054", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_standard:055", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 6, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_seen_standard:056", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 6, "merchant": "Verizon", "known": true}
+{"id": "R6_seen_standard:057", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 6, "merchant": "Bexwen & Sons", "known": false}
+{"id": "R6_seen_standard:058", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Home Depot", "known": true}
+{"id": "R6_seen_standard:059", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 6, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_standard:060", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 6, "merchant": "Fenford Group", "known": false}
+{"id": "R6_seen_standard:061", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_new:056", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "PetSmart", "known": true}
+{"id": "R6_unseen_new:057", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:058", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:059", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:060", "level": "R6_unseen_new", "answer": 0, "pred": 8, "correct": false, "user": 6, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_new:061", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Istwick Group", "known": false}
+{"id": "R6_unseen_new:062", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:063", "level": "R6_unseen_new", "answer": 0, "pred": 8, "correct": false, "user": 6, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_new:064", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Wexhurst & Sons", "known": false}
+{"id": "R6_unseen_new:065", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 6, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:066", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:067", "level": "R6_unseen_new", "answer": 4, "pred": 0, "correct": false, "user": 6, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_renamed:072", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 6, "merchant": "Rinford", "known": false}
+{"id": "R6_unseen_renamed:073", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:074", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:075", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:076", "level": "R6_unseen_renamed", "answer": 6, "pred": 0, "correct": false, "user": 6, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_renamed:077", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:078", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 6, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:079", "level": "R6_unseen_renamed", "answer": 6, "pred": 0, "correct": false, "user": 6, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_renamed:080", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Gridale", "known": false}
+{"id": "R6_unseen_renamed:081", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 6, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_renamed:082", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_renamed:083", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 6, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_standard:072", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:073", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:074", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:075", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Lowe's", "known": true}
+{"id": "R6_unseen_standard:076", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:077", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:078", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:079", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:080", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:081", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:082", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:083", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 6, "merchant": "IKEA", "known": true}
+{"id": "R6_seen_renamed:082", "level": "R6_seen_renamed", "answer": 14, "pred": 8, "correct": false, "user": 7, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_seen_renamed:083", "level": "R6_seen_renamed", "answer": 13, "pred": 1, "correct": false, "user": 7, "merchant": "McDonald's", "known": true}
+{"id": "R6_seen_renamed:084", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 7, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_seen_renamed:085", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 7, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_seen_renamed:086", "level": "R6_seen_renamed", "answer": 8, "pred": 14, "correct": false, "user": 7, "merchant": "Dunwick", "known": false}
+{"id": "R6_seen_renamed:087", "level": "R6_seen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 7, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_renamed:088", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 7, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_renamed:089", "level": "R6_seen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 7, "merchant": "Talholm & Sons", "known": false}
+{"id": "R6_seen_renamed:090", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 7, "merchant": "Garholm Co", "known": false}
+{"id": "R6_seen_renamed:091", "level": "R6_seen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_renamed:092", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 7, "merchant": "Rinton Ltd", "known": false}
+{"id": "R6_seen_renamed:093", "level": "R6_seen_renamed", "answer": 15, "pred": 4, "correct": false, "user": 7, "merchant": "Best Buy", "known": true}
+{"id": "R6_seen_standard:062", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 7, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_standard:063", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 7, "merchant": "Harbor Freight", "known": true}
+{"id": "R6_seen_standard:064", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 7, "merchant": "Istmere & Sons", "known": false}
+{"id": "R6_seen_standard:065", "level": "R6_seen_standard", "answer": 0, "pred": 0, "correct": true, "user": 7, "merchant": "Costco", "known": true}
+{"id": "R6_seen_standard:066", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 7, "merchant": "BP", "known": true}
+{"id": "R6_seen_standard:067", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 7, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_seen_standard:068", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 7, "merchant": "Jiffy Lube", "known": true}
+{"id": "R6_seen_standard:069", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 7, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_seen_standard:070", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 7, "merchant": "Menards", "known": true}
+{"id": "R6_seen_standard:071", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 7, "merchant": "Quildale Group", "known": false}
+{"id": "R6_seen_standard:072", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 7, "merchant": "Petco", "known": true}
+{"id": "R6_seen_standard:073", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 7, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_unseen_renamed:084", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:085", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:086", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 7, "merchant": "CorePower Yoga", "known": true}
+{"id": "R6_unseen_renamed:087", "level": "R6_unseen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 7, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_renamed:088", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:089", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 7, "merchant": "Garden Group", "known": false}
+{"id": "R6_unseen_renamed:090", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:091", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:092", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:093", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 7, "merchant": "Garden Group", "known": false}
+{"id": "R6_unseen_renamed:094", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:095", "level": "R6_unseen_renamed", "answer": 1, "pred": 13, "correct": false, "user": 7, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_standard:084", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 7, "merchant": "Tractor Supply", "known": true}
+{"id": "R6_unseen_standard:085", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 7, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_standard:086", "level": "R6_unseen_standard", "answer": 0, "pred": 0, "correct": true, "user": 7, "merchant": "Pexley", "known": false}
+{"id": "R6_unseen_standard:087", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 7, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:088", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 7, "merchant": "Griby Co", "known": false}
+{"id": "R6_unseen_standard:089", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 7, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_unseen_standard:090", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 7, "merchant": "Quilhurst", "known": false}
+{"id": "R6_unseen_standard:091", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 7, "merchant": "Quilhurst", "known": false}
+{"id": "R6_unseen_standard:092", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 7, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_standard:093", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 7, "merchant": "Tractor Supply", "known": true}
+{"id": "R6_unseen_standard:094", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 7, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:095", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 7, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_seen_renamed:094", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 8, "merchant": "GNC", "known": true}
+{"id": "R6_seen_renamed:095", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 8, "merchant": "Aldi", "known": true}
+{"id": "R6_seen_renamed:096", "level": "R6_seen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 8, "merchant": "Istlock", "known": false}
+{"id": "R6_seen_renamed:097", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 8, "merchant": "Rite Aid", "known": true}
+{"id": "R6_seen_renamed:098", "level": "R6_seen_renamed", "answer": 11, "pred": 5, "correct": false, "user": 8, "merchant": "Wexham Inc", "known": false}
+{"id": "R6_seen_renamed:099", "level": "R6_seen_renamed", "answer": 8, "pred": 12, "correct": false, "user": 8, "merchant": "Polford Ltd", "known": false}
+{"id": "R6_seen_renamed:100", "level": "R6_seen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 8, "merchant": "Starbucks", "known": true}
+{"id": "R6_seen_renamed:101", "level": "R6_seen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 8, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_renamed:102", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 8, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_renamed:103", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 8, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_renamed:104", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 8, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_seen_renamed:105", "level": "R6_seen_renamed", "answer": 8, "pred": 12, "correct": false, "user": 8, "merchant": "Tornard Group", "known": false}
+{"id": "R6_seen_standard:074", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Morton LLC", "known": false}
+{"id": "R6_seen_standard:075", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_standard:076", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 8, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_standard:077", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_seen_standard:078", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "Menards", "known": true}
+{"id": "R6_seen_standard:079", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_standard:080", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Netflix", "known": true}
+{"id": "R6_seen_standard:081", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Jorden Inc", "known": false}
+{"id": "R6_seen_standard:082", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_seen_standard:083", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 8, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_seen_standard:084", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_seen_standard:085", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "Halvarro", "known": false}
+{"id": "R6_unseen_renamed:096", "level": "R6_unseen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 8, "merchant": "McDonald's", "known": true}
+{"id": "R6_unseen_renamed:097", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 8, "merchant": "Orlnard & Sons", "known": false}
+{"id": "R6_unseen_renamed:098", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 8, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:099", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 8, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:100", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 8, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_unseen_renamed:101", "level": "R6_unseen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 8, "merchant": "Sabstead Bros", "known": false}
+{"id": "R6_unseen_renamed:102", "level": "R6_unseen_renamed", "answer": 4, "pred": 13, "correct": false, "user": 8, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_renamed:103", "level": "R6_unseen_renamed", "answer": 1, "pred": 17, "correct": false, "user": 8, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:104", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 8, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:105", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 8, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:106", "level": "R6_unseen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 8, "merchant": "Sabstead Bros", "known": false}
+{"id": "R6_unseen_renamed:107", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 8, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_standard:096", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_standard:097", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_standard:098", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:099", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 8, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:100", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_standard:101", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:102", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "Floor & Decor", "known": true}
+{"id": "R6_unseen_standard:103", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 8, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:104", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 8, "merchant": "Fenley Group", "known": false}
+{"id": "R6_unseen_standard:105", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 8, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_unseen_standard:106", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:107", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 8, "merchant": "IKEA", "known": true}
+{"id": "R6_seen_new:049", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Rinton Ltd", "known": false}
+{"id": "R6_seen_new:050", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Trader Joe's", "known": true}
+{"id": "R6_seen_new:051", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Orlcott Inc", "known": false}
+{"id": "R6_seen_new:052", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_new:053", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Planet Fitness", "known": true}
+{"id": "R6_seen_new:054", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Sabby Co", "known": false}
+{"id": "R6_seen_new:055", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_new:056", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_new:057", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_new:058", "level": "R6_seen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_new:059", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_seen_new:060", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Chewy", "known": true}
+{"id": "R6_seen_renamed:106", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Nevden Bros", "known": false}
+{"id": "R6_seen_renamed:107", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Airbnb", "known": true}
+{"id": "R6_seen_renamed:108", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 9, "merchant": "Xfinity", "known": true}
+{"id": "R6_seen_renamed:109", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 9, "merchant": "Bowlero", "known": true}
+{"id": "R6_seen_renamed:110", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "CVS", "known": true}
+{"id": "R6_seen_renamed:111", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Fenvarro & Sons", "known": false}
+{"id": "R6_seen_renamed:112", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Gridale", "known": false}
+{"id": "R6_seen_renamed:113", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 9, "merchant": "Topgolf", "known": true}
+{"id": "R6_seen_renamed:114", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 9, "merchant": "Spotify", "known": true}
+{"id": "R6_seen_renamed:115", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "GNC", "known": true}
+{"id": "R6_seen_renamed:116", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 9, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_seen_renamed:117", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 9, "merchant": "Istnard LLC", "known": false}
+{"id": "R6_seen_standard:086", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Menards", "known": true}
+{"id": "R6_seen_standard:087", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Tractor Supply", "known": true}
+{"id": "R6_seen_standard:088", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 9, "merchant": "Valero", "known": true}
+{"id": "R6_seen_standard:089", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Quilden Group", "known": false}
+{"id": "R6_seen_standard:090", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "Bose", "known": true}
+{"id": "R6_seen_standard:091", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 9, "merchant": "Rinham", "known": false}
+{"id": "R6_seen_standard:092", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Home Depot", "known": true}
+{"id": "R6_seen_standard:093", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Griden Group", "known": false}
+{"id": "R6_seen_standard:094", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_standard:095", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "Oskbury LLC", "known": false}
+{"id": "R6_seen_standard:096", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "Nevwick", "known": false}
+{"id": "R6_seen_standard:097", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 9, "merchant": "Uniqlo", "known": true}
+{"id": "R6_unseen_new:068", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "PetSmart", "known": true}
+{"id": "R6_unseen_new:069", "level": "R6_unseen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Whole Foods", "known": true}
+{"id": "R6_unseen_new:070", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Petland", "known": true}
+{"id": "R6_unseen_new:071", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Petland", "known": true}
+{"id": "R6_unseen_new:072", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Equinox", "known": true}
+{"id": "R6_unseen_new:073", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Equinox", "known": true}
+{"id": "R6_unseen_new:074", "level": "R6_unseen_new", "answer": 8, "pred": 0, "correct": false, "user": 9, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_unseen_new:075", "level": "R6_unseen_new", "answer": 0, "pred": 0, "correct": true, "user": 9, "merchant": "Whole Foods", "known": true}
+{"id": "R6_unseen_new:076", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Halholm & Sons", "known": false}
+{"id": "R6_unseen_new:077", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Equinox", "known": true}
+{"id": "R6_unseen_new:078", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 9, "merchant": "Halholm & Sons", "known": false}
+{"id": "R6_unseen_new:079", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 9, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_unseen_renamed:108", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:109", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:110", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 9, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_renamed:111", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:112", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:113", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 9, "merchant": "Pexlock", "known": false}
+{"id": "R6_unseen_renamed:114", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:115", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:116", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:117", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 9, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_renamed:118", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_renamed:119", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 9, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_unseen_standard:108", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 9, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_standard:109", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 9, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_unseen_standard:110", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:111", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:112", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 9, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_standard:113", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "Falholm Inc", "known": false}
+{"id": "R6_unseen_standard:114", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 9, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_standard:115", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:116", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 9, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:117", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 9, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_unseen_standard:118", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "IKEA", "known": true}
+{"id": "R6_unseen_standard:119", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 9, "merchant": "IKEA", "known": true}
+{"id": "R6_seen_new:061", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Starbucks", "known": true}
+{"id": "R6_seen_new:062", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Elrhurst Co", "known": false}
+{"id": "R6_seen_new:063", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Chick-fil-A", "known": true}
+{"id": "R6_seen_new:064", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Domino's", "known": true}
+{"id": "R6_seen_renamed:118", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 10, "merchant": "Pep Boys", "known": true}
+{"id": "R6_seen_renamed:119", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 10, "merchant": "Peloton", "known": true}
+{"id": "R6_seen_renamed:120", "level": "R6_seen_renamed", "answer": 15, "pred": 3, "correct": false, "user": 10, "merchant": "Jorholm Bros", "known": false}
+{"id": "R6_seen_renamed:121", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 10, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_seen_renamed:122", "level": "R6_seen_renamed", "answer": 15, "pred": 3, "correct": false, "user": 10, "merchant": "Uniqlo", "known": true}
+{"id": "R6_seen_renamed:123", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 10, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_renamed:124", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 10, "merchant": "Planet Fitness", "known": true}
+{"id": "R6_seen_renamed:125", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 10, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_seen_renamed:126", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 10, "merchant": "Ross", "known": true}
+{"id": "R6_seen_renamed:127", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 10, "merchant": "Safeway", "known": true}
+{"id": "R6_seen_renamed:128", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 10, "merchant": "Samsung", "known": true}
+{"id": "R6_seen_renamed:129", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 10, "merchant": "Halmere Group", "known": false}
+{"id": "R6_seen_standard:098", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Sabstead Bros", "known": false}
+{"id": "R6_seen_standard:099", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "Dovvarro & Sons", "known": false}
+{"id": "R6_seen_standard:100", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 10, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_standard:101", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 10, "merchant": "Petco", "known": true}
+{"id": "R6_seen_standard:102", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "Polsley", "known": false}
+{"id": "R6_seen_standard:103", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "GNC", "known": true}
+{"id": "R6_seen_standard:104", "level": "R6_seen_standard", "answer": 7, "pred": 1, "correct": false, "user": 10, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_seen_standard:105", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 10, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_standard:106", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 10, "merchant": "Petland", "known": true}
+{"id": "R6_seen_standard:107", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_seen_standard:108", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Wexham Inc", "known": false}
+{"id": "R6_seen_standard:109", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_new:080", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_new:081", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_new:082", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_new:083", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_new:084", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_unseen_new:085", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_unseen_new:086", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_unseen_new:087", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_new:088", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_unseen_new:089", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Bramstead & Sons", "known": false}
+{"id": "R6_unseen_new:090", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Panera Bread", "known": true}
+{"id": "R6_unseen_new:091", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 10, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:120", "level": "R6_unseen_renamed", "answer": 14, "pred": 5, "correct": false, "user": 10, "merchant": "Floor & Decor", "known": true}
+{"id": "R6_unseen_renamed:121", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 10, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_renamed:122", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 10, "merchant": "Equinox", "known": true}
+{"id": "R6_unseen_renamed:123", "level": "R6_unseen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 10, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_renamed:124", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 10, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_unseen_renamed:125", "level": "R6_unseen_renamed", "answer": 14, "pred": 5, "correct": false, "user": 10, "merchant": "Floor & Decor", "known": true}
+{"id": "R6_unseen_renamed:126", "level": "R6_unseen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 10, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_renamed:127", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 10, "merchant": "Bexlock & Sons", "known": false}
+{"id": "R6_unseen_renamed:128", "level": "R6_unseen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 10, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_renamed:129", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 10, "merchant": "Equinox", "known": true}
+{"id": "R6_unseen_renamed:130", "level": "R6_unseen_renamed", "answer": 16, "pred": 8, "correct": false, "user": 10, "merchant": "Hilton", "known": true}
+{"id": "R6_unseen_renamed:131", "level": "R6_unseen_renamed", "answer": 16, "pred": 8, "correct": false, "user": 10, "merchant": "Polford Ltd", "known": false}
+{"id": "R6_unseen_standard:120", "level": "R6_unseen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_standard:121", "level": "R6_unseen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_standard:122", "level": "R6_unseen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_standard:123", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Verizon", "known": true}
+{"id": "R6_unseen_standard:124", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 10, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_standard:125", "level": "R6_unseen_standard", "answer": 6, "pred": 6, "correct": true, "user": 10, "merchant": "LabCorp", "known": true}
+{"id": "R6_unseen_standard:126", "level": "R6_unseen_standard", "answer": 7, "pred": 1, "correct": false, "user": 10, "merchant": "Griby Co", "known": false}
+{"id": "R6_unseen_standard:127", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 10, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_standard:128", "level": "R6_unseen_standard", "answer": 7, "pred": 1, "correct": false, "user": 10, "merchant": "Jorden Inc", "known": false}
+{"id": "R6_unseen_standard:129", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 10, "merchant": "Quilhurst", "known": false}
+{"id": "R6_unseen_standard:130", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 10, "merchant": "Verizon", "known": true}
+{"id": "R6_unseen_standard:131", "level": "R6_unseen_standard", "answer": 7, "pred": 1, "correct": false, "user": 10, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_new:065", "level": "R6_seen_new", "answer": 4, "pred": 11, "correct": false, "user": 11, "merchant": "Nevwick", "known": false}
+{"id": "R6_seen_new:066", "level": "R6_seen_new", "answer": 8, "pred": 8, "correct": true, "user": 11, "merchant": "Hertz", "known": true}
+{"id": "R6_seen_new:067", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 11, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_seen_new:068", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 11, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_new:069", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 11, "merchant": "Netflix", "known": true}
+{"id": "R6_seen_new:070", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 11, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_new:071", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 11, "merchant": "Morton LLC", "known": false}
+{"id": "R6_seen_new:072", "level": "R6_seen_new", "answer": 7, "pred": 7, "correct": true, "user": 11, "merchant": "Topgolf", "known": true}
+{"id": "R6_seen_new:073", "level": "R6_seen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "Micro Center", "known": true}
+{"id": "R6_seen_new:074", "level": "R6_seen_new", "answer": 4, "pred": 6, "correct": false, "user": 11, "merchant": "Halhurst Co", "known": false}
+{"id": "R6_seen_new:075", "level": "R6_seen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "B&H Photo", "known": true}
+{"id": "R6_seen_new:076", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 11, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_seen_renamed:130", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 11, "merchant": "Fenvarro & Sons", "known": false}
+{"id": "R6_seen_renamed:131", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Griden Group", "known": false}
+{"id": "R6_seen_renamed:132", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 11, "merchant": "Bexwen & Sons", "known": false}
+{"id": "R6_seen_renamed:133", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 11, "merchant": "CorePower Yoga", "known": true}
+{"id": "R6_seen_renamed:134", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 11, "merchant": "Trader Joe's", "known": true}
+{"id": "R6_seen_renamed:135", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 11, "merchant": "Equinox", "known": true}
+{"id": "R6_seen_renamed:136", "level": "R6_seen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 11, "merchant": "T-Mobile", "known": true}
+{"id": "R6_seen_renamed:137", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 11, "merchant": "LabCorp", "known": true}
+{"id": "R6_seen_renamed:138", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_renamed:139", "level": "R6_seen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 11, "merchant": "Con Edison", "known": true}
+{"id": "R6_seen_renamed:140", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 11, "merchant": "Aldi", "known": true}
+{"id": "R6_seen_renamed:141", "level": "R6_seen_renamed", "answer": 11, "pred": 11, "correct": true, "user": 11, "merchant": "AT&T", "known": true}
+{"id": "R6_seen_standard:110", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "AutoZone", "known": true}
+{"id": "R6_seen_standard:111", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "BP", "known": true}
+{"id": "R6_seen_standard:112", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Uniqlo", "known": true}
+{"id": "R6_seen_standard:113", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Nike", "known": true}
+{"id": "R6_seen_standard:114", "level": "R6_seen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Macy's", "known": true}
+{"id": "R6_seen_standard:115", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "Pep Boys", "known": true}
+{"id": "R6_seen_standard:116", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_standard:117", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "Rinham", "known": false}
+{"id": "R6_seen_standard:118", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 11, "merchant": "Chick-fil-A", "known": true}
+{"id": "R6_seen_standard:119", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "Wexham Bros", "known": false}
+{"id": "R6_seen_standard:120", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 11, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_standard:121", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 11, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_new:092", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:093", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:094", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:095", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:096", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 11, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_new:097", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 11, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_new:098", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 11, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_new:099", "level": "R6_unseen_new", "answer": 9, "pred": 4, "correct": false, "user": 11, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_new:100", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:101", "level": "R6_unseen_new", "answer": 8, "pred": 8, "correct": true, "user": 11, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_new:102", "level": "R6_unseen_new", "answer": 4, "pred": 4, "correct": true, "user": 11, "merchant": "GameStop", "known": true}
+{"id": "R6_unseen_new:103", "level": "R6_unseen_new", "answer": 9, "pred": 4, "correct": false, "user": 11, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_renamed:132", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:133", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:134", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 11, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:135", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:136", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:137", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:138", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 11, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:139", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:140", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:141", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:142", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 11, "merchant": "Menards", "known": true}
+{"id": "R6_unseen_renamed:143", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 11, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_standard:132", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:133", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:134", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_standard:135", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:136", "level": "R6_unseen_standard", "answer": 1, "pred": 1, "correct": true, "user": 11, "merchant": "McDonald's", "known": true}
+{"id": "R6_unseen_standard:137", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_standard:138", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Old Navy", "known": true}
+{"id": "R6_unseen_standard:139", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:140", "level": "R6_unseen_standard", "answer": 1, "pred": 1, "correct": true, "user": 11, "merchant": "McDonald's", "known": true}
+{"id": "R6_unseen_standard:141", "level": "R6_unseen_standard", "answer": 1, "pred": 1, "correct": true, "user": 11, "merchant": "McDonald's", "known": true}
+{"id": "R6_unseen_standard:142", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_unseen_standard:143", "level": "R6_unseen_standard", "answer": 3, "pred": 3, "correct": true, "user": 11, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_seen_new:077", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Oskhurst", "known": false}
+{"id": "R6_seen_new:078", "level": "R6_seen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Kaiser Permanente", "known": true}
+{"id": "R6_seen_new:079", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_new:080", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_new:081", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Starbucks", "known": true}
+{"id": "R6_seen_new:082", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Chick-fil-A", "known": true}
+{"id": "R6_seen_new:083", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Zedbury", "known": false}
+{"id": "R6_seen_new:084", "level": "R6_seen_new", "answer": 6, "pred": 0, "correct": false, "user": 12, "merchant": "Vitamin Shoppe", "known": true}
+{"id": "R6_seen_new:085", "level": "R6_seen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Nevden Bros", "known": false}
+{"id": "R6_seen_new:086", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Dunkin", "known": true}
+{"id": "R6_seen_new:087", "level": "R6_seen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_seen_new:088", "level": "R6_seen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Taco Bell", "known": true}
+{"id": "R6_seen_renamed:142", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 12, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_seen_renamed:143", "level": "R6_seen_renamed", "answer": 3, "pred": 1, "correct": false, "user": 12, "merchant": "Ross", "known": true}
+{"id": "R6_seen_renamed:144", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 12, "merchant": "Istnard LLC", "known": false}
+{"id": "R6_seen_renamed:145", "level": "R6_seen_renamed", "answer": 7, "pred": 1, "correct": false, "user": 12, "merchant": "Bowlero", "known": true}
+{"id": "R6_seen_renamed:146", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 12, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_renamed:147", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 12, "merchant": "Marathon", "known": true}
+{"id": "R6_seen_renamed:148", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 12, "merchant": "Yarton Bros", "known": false}
+{"id": "R6_seen_renamed:149", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_seen_renamed:150", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 12, "merchant": "Hilton", "known": true}
+{"id": "R6_seen_renamed:151", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 12, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_renamed:152", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_renamed:153", "level": "R6_seen_renamed", "answer": 12, "pred": 1, "correct": false, "user": 12, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_seen_standard:122", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 12, "merchant": "Fenford Group", "known": false}
+{"id": "R6_seen_standard:123", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 12, "merchant": "Micro Center", "known": true}
+{"id": "R6_seen_standard:124", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Menards", "known": true}
+{"id": "R6_seen_standard:125", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 12, "merchant": "Griton", "known": false}
+{"id": "R6_seen_standard:126", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 12, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_standard:127", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 12, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_seen_standard:128", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 12, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_standard:129", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 12, "merchant": "Wexham Inc", "known": false}
+{"id": "R6_seen_standard:130", "level": "R6_seen_standard", "answer": 0, "pred": 0, "correct": true, "user": 12, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_standard:131", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 12, "merchant": "Gold's Gym", "known": true}
+{"id": "R6_seen_standard:132", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 12, "merchant": "AT&T", "known": true}
+{"id": "R6_seen_standard:133", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 12, "merchant": "REI", "known": true}
+{"id": "R6_unseen_new:104", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:105", "level": "R6_unseen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "CVS", "known": true}
+{"id": "R6_unseen_new:106", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:107", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Domino's", "known": true}
+{"id": "R6_unseen_new:108", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:109", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:110", "level": "R6_unseen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "GNC", "known": true}
+{"id": "R6_unseen_new:111", "level": "R6_unseen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Polsley", "known": false}
+{"id": "R6_unseen_new:112", "level": "R6_unseen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Polsley", "known": false}
+{"id": "R6_unseen_new:113", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:114", "level": "R6_unseen_new", "answer": 1, "pred": 1, "correct": true, "user": 12, "merchant": "Istlock", "known": false}
+{"id": "R6_unseen_new:115", "level": "R6_unseen_new", "answer": 6, "pred": 6, "correct": true, "user": 12, "merchant": "Gridale", "known": false}
+{"id": "R6_unseen_renamed:144", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Halholm & Sons", "known": false}
+{"id": "R6_unseen_renamed:145", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Wexhurst & Sons", "known": false}
+{"id": "R6_unseen_renamed:146", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Wexhurst & Sons", "known": false}
+{"id": "R6_unseen_renamed:147", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_renamed:148", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_renamed:149", "level": "R6_unseen_renamed", "answer": 3, "pred": 1, "correct": false, "user": 12, "merchant": "Istbury", "known": false}
+{"id": "R6_unseen_renamed:150", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 12, "merchant": "Istmere Group", "known": false}
+{"id": "R6_unseen_renamed:151", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 12, "merchant": "Istmere Group", "known": false}
+{"id": "R6_unseen_renamed:152", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 12, "merchant": "Garholm Co", "known": false}
+{"id": "R6_unseen_renamed:153", "level": "R6_unseen_renamed", "answer": 7, "pred": 12, "correct": false, "user": 12, "merchant": "Morton LLC", "known": false}
+{"id": "R6_unseen_renamed:154", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 12, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_renamed:155", "level": "R6_unseen_renamed", "answer": 12, "pred": 7, "correct": false, "user": 12, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_unseen_standard:144", "level": "R6_unseen_standard", "answer": 0, "pred": 0, "correct": true, "user": 12, "merchant": "Istmoor Group", "known": false}
+{"id": "R6_unseen_standard:145", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:146", "level": "R6_unseen_standard", "answer": 0, "pred": 0, "correct": true, "user": 12, "merchant": "Whole Foods", "known": true}
+{"id": "R6_unseen_standard:147", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:148", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:149", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:150", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:151", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:152", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:153", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_standard:154", "level": "R6_unseen_standard", "answer": 0, "pred": 0, "correct": true, "user": 12, "merchant": "Istmoor Group", "known": false}
+{"id": "R6_unseen_standard:155", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 12, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_seen_new:089", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 13, "merchant": "Quilmere", "known": false}
+{"id": "R6_seen_new:090", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 13, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_new:091", "level": "R6_seen_new", "answer": 5, "pred": 5, "correct": true, "user": 13, "merchant": "Bramby & Sons", "known": false}
+{"id": "R6_seen_renamed:154", "level": "R6_seen_renamed", "answer": 6, "pred": 15, "correct": false, "user": 13, "merchant": "GNC", "known": true}
+{"id": "R6_seen_renamed:155", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 13, "merchant": "Zedbury", "known": false}
+{"id": "R6_seen_renamed:156", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 13, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_renamed:157", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 13, "merchant": "Halley", "known": false}
+{"id": "R6_seen_renamed:158", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 13, "merchant": "Dunkin", "known": true}
+{"id": "R6_seen_renamed:159", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 13, "merchant": "Dunnard Ltd", "known": false}
+{"id": "R6_seen_renamed:160", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 13, "merchant": "Old Navy", "known": true}
+{"id": "R6_seen_renamed:161", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 13, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_seen_renamed:162", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 13, "merchant": "Gridale", "known": false}
+{"id": "R6_seen_renamed:163", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 13, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_renamed:164", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 13, "merchant": "PetSmart", "known": true}
+{"id": "R6_seen_renamed:165", "level": "R6_seen_renamed", "answer": 6, "pred": 15, "correct": false, "user": 13, "merchant": "LabCorp", "known": true}
+{"id": "R6_seen_standard:134", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Con Edison", "known": true}
+{"id": "R6_seen_standard:135", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 13, "merchant": "Exxon", "known": true}
+{"id": "R6_seen_standard:136", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "Hertz", "known": true}
+{"id": "R6_seen_standard:137", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_standard:138", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Xfinity", "known": true}
+{"id": "R6_seen_standard:139", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Cox", "known": true}
+{"id": "R6_seen_standard:140", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_standard:141", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "Expedia", "known": true}
+{"id": "R6_seen_standard:142", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_seen_standard:143", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Spectrum", "known": true}
+{"id": "R6_seen_standard:144", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 13, "merchant": "Kelby Co", "known": false}
+{"id": "R6_seen_standard:145", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 13, "merchant": "Fenley Group", "known": false}
+{"id": "R6_unseen_renamed:156", "level": "R6_unseen_renamed", "answer": 15, "pred": 6, "correct": false, "user": 13, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:157", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 13, "merchant": "Holden Bros", "known": false}
+{"id": "R6_unseen_renamed:158", "level": "R6_unseen_renamed", "answer": 4, "pred": 14, "correct": false, "user": 13, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:159", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 13, "merchant": "Jorholm Bros", "known": false}
+{"id": "R6_unseen_renamed:160", "level": "R6_unseen_renamed", "answer": 15, "pred": 6, "correct": false, "user": 13, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:161", "level": "R6_unseen_renamed", "answer": 15, "pred": 6, "correct": false, "user": 13, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:162", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 13, "merchant": "Bowlero", "known": true}
+{"id": "R6_unseen_renamed:163", "level": "R6_unseen_renamed", "answer": 15, "pred": 6, "correct": false, "user": 13, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:164", "level": "R6_unseen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 13, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_renamed:165", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 13, "merchant": "Wexley Inc", "known": false}
+{"id": "R6_unseen_renamed:166", "level": "R6_unseen_renamed", "answer": 15, "pred": 6, "correct": false, "user": 13, "merchant": "Rite Aid", "known": true}
+{"id": "R6_unseen_renamed:167", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 13, "merchant": "Whole Foods", "known": true}
+{"id": "R6_unseen_standard:156", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:157", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:158", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:159", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:160", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:161", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:162", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:163", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:164", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:165", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:166", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:167", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 13, "merchant": "United Airlines", "known": true}
+{"id": "R6_seen_renamed:166", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 14, "merchant": "Whole Foods", "known": true}
+{"id": "R6_seen_renamed:167", "level": "R6_seen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 14, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_renamed:168", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 14, "merchant": "Orlwick Co", "known": false}
+{"id": "R6_seen_renamed:169", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 14, "merchant": "Torhurst Co", "known": false}
+{"id": "R6_seen_renamed:170", "level": "R6_seen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 14, "merchant": "Wexley Group", "known": false}
+{"id": "R6_seen_renamed:171", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 14, "merchant": "Equinox", "known": true}
+{"id": "R6_seen_renamed:172", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 14, "merchant": "Gold's Gym", "known": true}
+{"id": "R6_seen_renamed:173", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Starbucks", "known": true}
+{"id": "R6_seen_renamed:174", "level": "R6_seen_renamed", "answer": 12, "pred": 6, "correct": false, "user": 14, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_seen_renamed:175", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 14, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_renamed:176", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 14, "merchant": "Rover", "known": true}
+{"id": "R6_seen_renamed:177", "level": "R6_seen_renamed", "answer": 14, "pred": 0, "correct": false, "user": 14, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_standard:146", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Topgolf", "known": true}
+{"id": "R6_seen_standard:147", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Halmere Group", "known": false}
+{"id": "R6_seen_standard:148", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Rinham", "known": false}
+{"id": "R6_seen_standard:149", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Marathon", "known": true}
+{"id": "R6_seen_standard:150", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Pep Boys", "known": true}
+{"id": "R6_seen_standard:151", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Halvarro", "known": false}
+{"id": "R6_seen_standard:152", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "AMC Theatres", "known": true}
+{"id": "R6_seen_standard:153", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "BP", "known": true}
+{"id": "R6_seen_standard:154", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Bramby & Sons", "known": false}
+{"id": "R6_seen_standard:155", "level": "R6_seen_standard", "answer": 7, "pred": 9, "correct": false, "user": 14, "merchant": "Griby Co", "known": false}
+{"id": "R6_seen_standard:156", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Griden Group", "known": false}
+{"id": "R6_seen_standard:157", "level": "R6_seen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_unseen_renamed:168", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:169", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 14, "merchant": "Fenford Group", "known": false}
+{"id": "R6_unseen_renamed:170", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:171", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 14, "merchant": "H-E-B", "known": true}
+{"id": "R6_unseen_renamed:172", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:173", "level": "R6_unseen_renamed", "answer": 6, "pred": 12, "correct": false, "user": 14, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:174", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:175", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:176", "level": "R6_unseen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 14, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_renamed:177", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 14, "merchant": "Planet Fitness", "known": true}
+{"id": "R6_unseen_renamed:178", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:179", "level": "R6_unseen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 14, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_standard:168", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:169", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_standard:170", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_unseen_standard:171", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_standard:172", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:173", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Spotify", "known": true}
+{"id": "R6_unseen_standard:174", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:175", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Spotify", "known": true}
+{"id": "R6_unseen_standard:176", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Ticketmaster", "known": true}
+{"id": "R6_unseen_standard:177", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 14, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_standard:178", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 14, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_standard:179", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 14, "merchant": "Spotify", "known": true}
+{"id": "R6_seen_renamed:178", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 15, "merchant": "Topgolf", "known": true}
+{"id": "R6_seen_renamed:179", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 15, "merchant": "Fennard", "known": false}
+{"id": "R6_seen_renamed:180", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 15, "merchant": "Holdale", "known": false}
+{"id": "R6_seen_renamed:181", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 15, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_seen_renamed:182", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 15, "merchant": "Halley", "known": false}
+{"id": "R6_seen_renamed:183", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 15, "merchant": "Dunwick", "known": false}
+{"id": "R6_seen_renamed:184", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 15, "merchant": "Nevden Bros", "known": false}
+{"id": "R6_seen_renamed:185", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 15, "merchant": "Quilden Group", "known": false}
+{"id": "R6_seen_renamed:186", "level": "R6_seen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 15, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_renamed:187", "level": "R6_seen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 15, "merchant": "Talholm & Sons", "known": false}
+{"id": "R6_seen_renamed:188", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 15, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_renamed:189", "level": "R6_seen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 15, "merchant": "GNC", "known": true}
+{"id": "R6_seen_standard:158", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "Fenley Group", "known": false}
+{"id": "R6_seen_standard:159", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Petco", "known": true}
+{"id": "R6_seen_standard:160", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 15, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_seen_standard:161", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 15, "merchant": "Duke Energy", "known": true}
+{"id": "R6_seen_standard:162", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Ulmmoor Inc", "known": false}
+{"id": "R6_seen_standard:163", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 15, "merchant": "Orangetheory", "known": true}
+{"id": "R6_seen_standard:164", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "Chevron", "known": true}
+{"id": "R6_seen_standard:165", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 15, "merchant": "CorePower Yoga", "known": true}
+{"id": "R6_seen_standard:166", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 15, "merchant": "Spectrum", "known": true}
+{"id": "R6_seen_standard:167", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_standard:168", "level": "R6_seen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "AutoZone", "known": true}
+{"id": "R6_seen_standard:169", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 15, "merchant": "Domino's", "known": true}
+{"id": "R6_unseen_renamed:180", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 15, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_renamed:181", "level": "R6_unseen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 15, "merchant": "Griden Group", "known": false}
+{"id": "R6_unseen_renamed:182", "level": "R6_unseen_renamed", "answer": 0, "pred": 15, "correct": false, "user": 15, "merchant": "Aldi", "known": true}
+{"id": "R6_unseen_renamed:183", "level": "R6_unseen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 15, "merchant": "Brammere LLC", "known": false}
+{"id": "R6_unseen_renamed:184", "level": "R6_unseen_renamed", "answer": 12, "pred": 7, "correct": false, "user": 15, "merchant": "Quilhurst", "known": false}
+{"id": "R6_unseen_renamed:185", "level": "R6_unseen_renamed", "answer": 4, "pred": 4, "correct": true, "user": 15, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_renamed:186", "level": "R6_unseen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 15, "merchant": "Orlcott Inc", "known": false}
+{"id": "R6_unseen_renamed:187", "level": "R6_unseen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 15, "merchant": "Halvarro", "known": false}
+{"id": "R6_unseen_renamed:188", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 15, "merchant": "Gridale", "known": false}
+{"id": "R6_unseen_renamed:189", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 15, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_unseen_renamed:190", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 15, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_unseen_renamed:191", "level": "R6_unseen_renamed", "answer": 12, "pred": 7, "correct": false, "user": 15, "merchant": "Quilhurst", "known": false}
+{"id": "R6_unseen_standard:180", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:181", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:182", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_unseen_standard:183", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Rover", "known": true}
+{"id": "R6_unseen_standard:184", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_unseen_standard:185", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "Wexden Inc", "known": false}
+{"id": "R6_unseen_standard:186", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 15, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_unseen_standard:187", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 15, "merchant": "Nevnard Bros", "known": false}
+{"id": "R6_unseen_standard:188", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_standard:189", "level": "R6_unseen_standard", "answer": 1, "pred": 1, "correct": true, "user": 15, "merchant": "Starbucks", "known": true}
+{"id": "R6_unseen_standard:190", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 15, "merchant": "Pexnard", "known": false}
+{"id": "R6_unseen_standard:191", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 15, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_renamed:190", "level": "R6_seen_renamed", "answer": 0, "pred": 19, "correct": false, "user": 16, "merchant": "H-E-B", "known": true}
+{"id": "R6_seen_renamed:191", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 16, "merchant": "Quilden Group", "known": false}
+{"id": "R6_seen_renamed:192", "level": "R6_seen_renamed", "answer": 19, "pred": 19, "correct": true, "user": 16, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_renamed:193", "level": "R6_seen_renamed", "answer": 0, "pred": 19, "correct": false, "user": 16, "merchant": "Pexley", "known": false}
+{"id": "R6_seen_renamed:194", "level": "R6_seen_renamed", "answer": 9, "pred": 9, "correct": true, "user": 16, "merchant": "Chewy", "known": true}
+{"id": "R6_seen_renamed:195", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 16, "merchant": "Rinham", "known": false}
+{"id": "R6_seen_renamed:196", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 16, "merchant": "Equinox", "known": true}
+{"id": "R6_seen_renamed:197", "level": "R6_seen_renamed", "answer": 14, "pred": 8, "correct": false, "user": 16, "merchant": "Amtrak", "known": true}
+{"id": "R6_seen_renamed:198", "level": "R6_seen_renamed", "answer": 14, "pred": 8, "correct": false, "user": 16, "merchant": "Delta Air Lines", "known": true}
+{"id": "R6_seen_renamed:199", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 16, "merchant": "REI", "known": true}
+{"id": "R6_seen_renamed:200", "level": "R6_seen_renamed", "answer": 1, "pred": 15, "correct": false, "user": 16, "merchant": "Panera Bread", "known": true}
+{"id": "R6_seen_renamed:201", "level": "R6_seen_renamed", "answer": 17, "pred": 17, "correct": true, "user": 16, "merchant": "Bose", "known": true}
+{"id": "R6_seen_standard:170", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_standard:171", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Kelby Co", "known": false}
+{"id": "R6_seen_standard:172", "level": "R6_seen_standard", "answer": 11, "pred": 9, "correct": false, "user": 16, "merchant": "Pexlock", "known": false}
+{"id": "R6_seen_standard:173", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_seen_standard:174", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Con Edison", "known": true}
+{"id": "R6_seen_standard:175", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Comcast", "known": true}
+{"id": "R6_unseen_renamed:192", "level": "R6_unseen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 16, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:193", "level": "R6_unseen_renamed", "answer": 8, "pred": 14, "correct": false, "user": 16, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:194", "level": "R6_unseen_renamed", "answer": 5, "pred": 12, "correct": false, "user": 16, "merchant": "Halvarro", "known": false}
+{"id": "R6_unseen_renamed:195", "level": "R6_unseen_renamed", "answer": 8, "pred": 14, "correct": false, "user": 16, "merchant": "Southwest", "known": true}
+{"id": "R6_unseen_renamed:196", "level": "R6_unseen_renamed", "answer": 18, "pred": 3, "correct": false, "user": 16, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_renamed:197", "level": "R6_unseen_renamed", "answer": 18, "pred": 3, "correct": false, "user": 16, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_renamed:198", "level": "R6_unseen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 16, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:199", "level": "R6_unseen_renamed", "answer": 18, "pred": 3, "correct": false, "user": 16, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_renamed:200", "level": "R6_unseen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 16, "merchant": "Duane Reade", "known": true}
+{"id": "R6_unseen_renamed:201", "level": "R6_unseen_renamed", "answer": 18, "pred": 3, "correct": false, "user": 16, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_renamed:202", "level": "R6_unseen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 16, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_unseen_renamed:203", "level": "R6_unseen_renamed", "answer": 5, "pred": 12, "correct": false, "user": 16, "merchant": "Home Depot", "known": true}
+{"id": "R6_unseen_standard:192", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:193", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:194", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Halwen & Sons", "known": false}
+{"id": "R6_unseen_standard:195", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:196", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:197", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Halton", "known": false}
+{"id": "R6_unseen_standard:198", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:199", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:200", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Falvarro Ltd", "known": false}
+{"id": "R6_unseen_standard:201", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Halton", "known": false}
+{"id": "R6_unseen_standard:202", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_unseen_standard:203", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 16, "merchant": "Xfinity", "known": true}
+{"id": "R6_seen_new:092", "level": "R6_seen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Comcast", "known": true}
+{"id": "R6_seen_new:093", "level": "R6_seen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "AT&T", "known": true}
+{"id": "R6_seen_new:094", "level": "R6_seen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_new:095", "level": "R6_seen_new", "answer": 11, "pred": 2, "correct": false, "user": 17, "merchant": "Xfinity", "known": true}
+{"id": "R6_seen_new:096", "level": "R6_seen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_seen_renamed:202", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 17, "merchant": "Falvarro Bros", "known": false}
+{"id": "R6_seen_renamed:203", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 17, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_renamed:204", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 17, "merchant": "Orlwick Co", "known": false}
+{"id": "R6_seen_renamed:205", "level": "R6_seen_renamed", "answer": 12, "pred": 1, "correct": false, "user": 17, "merchant": "Orlcott Inc", "known": false}
+{"id": "R6_seen_renamed:206", "level": "R6_seen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "McDonald's", "known": true}
+{"id": "R6_seen_renamed:207", "level": "R6_seen_renamed", "answer": 7, "pred": 7, "correct": true, "user": 17, "merchant": "Griwen Bros", "known": false}
+{"id": "R6_seen_renamed:208", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 17, "merchant": "Fenford Group", "known": false}
+{"id": "R6_seen_renamed:209", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 17, "merchant": "Halvarro", "known": false}
+{"id": "R6_seen_renamed:210", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 17, "merchant": "Ardton Inc", "known": false}
+{"id": "R6_seen_renamed:211", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 17, "merchant": "Planet Fitness", "known": true}
+{"id": "R6_seen_renamed:212", "level": "R6_seen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 17, "merchant": "Quilmere", "known": false}
+{"id": "R6_seen_renamed:213", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 17, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_seen_standard:176", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_standard:177", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 17, "merchant": "Duane Reade", "known": true}
+{"id": "R6_seen_standard:178", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_seen_standard:179", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Wexley Group", "known": false}
+{"id": "R6_seen_standard:180", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_standard:181", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Ulmdale & Sons", "known": false}
+{"id": "R6_seen_standard:182", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Ulmmoor Inc", "known": false}
+{"id": "R6_seen_standard:183", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 17, "merchant": "LabCorp", "known": true}
+{"id": "R6_seen_standard:184", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Istwick Group", "known": false}
+{"id": "R6_seen_standard:185", "level": "R6_seen_standard", "answer": 6, "pred": 6, "correct": true, "user": 17, "merchant": "Nevden Bros", "known": false}
+{"id": "R6_seen_standard:186", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Oskbury LLC", "known": false}
+{"id": "R6_seen_standard:187", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "BarkBox", "known": true}
+{"id": "R6_unseen_new:116", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "T-Mobile", "known": true}
+{"id": "R6_unseen_new:117", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:118", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:119", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:120", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "T-Mobile", "known": true}
+{"id": "R6_unseen_new:121", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Kelby Co", "known": false}
+{"id": "R6_unseen_new:122", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:123", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_new:124", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "T-Mobile", "known": true}
+{"id": "R6_unseen_new:125", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Pexlock", "known": false}
+{"id": "R6_unseen_new:126", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Pexlock", "known": false}
+{"id": "R6_unseen_new:127", "level": "R6_unseen_new", "answer": 11, "pred": 11, "correct": true, "user": 17, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_renamed:204", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 17, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_renamed:205", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:206", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 17, "merchant": "Ace Hardware", "known": true}
+{"id": "R6_unseen_renamed:207", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:208", "level": "R6_unseen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 17, "merchant": "Expedia", "known": true}
+{"id": "R6_unseen_renamed:209", "level": "R6_unseen_renamed", "answer": 5, "pred": 5, "correct": true, "user": 17, "merchant": "Sherwin-Williams", "known": true}
+{"id": "R6_unseen_renamed:210", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:211", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Taco Bell", "known": true}
+{"id": "R6_unseen_renamed:212", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:213", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:214", "level": "R6_unseen_renamed", "answer": 1, "pred": 1, "correct": true, "user": 17, "merchant": "Zedbury", "known": false}
+{"id": "R6_unseen_renamed:215", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 17, "merchant": "Nordstrom", "known": true}
+{"id": "R6_unseen_standard:204", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:205", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 17, "merchant": "Petland", "known": true}
+{"id": "R6_unseen_standard:206", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_standard:207", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:208", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:209", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_standard:210", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "BP", "known": true}
+{"id": "R6_unseen_standard:211", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Griton", "known": false}
+{"id": "R6_unseen_standard:212", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:213", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_standard:214", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 17, "merchant": "Micro Center", "known": true}
+{"id": "R6_unseen_standard:215", "level": "R6_unseen_standard", "answer": 2, "pred": 2, "correct": true, "user": 17, "merchant": "Pep Boys", "known": true}
+{"id": "R6_seen_renamed:214", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 18, "merchant": "Nordstrom", "known": true}
+{"id": "R6_seen_renamed:215", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 18, "merchant": "Istmoor Group", "known": false}
+{"id": "R6_seen_renamed:216", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 18, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_renamed:217", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Polstead LLC", "known": false}
+{"id": "R6_seen_renamed:218", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 18, "merchant": "Uniqlo", "known": true}
+{"id": "R6_seen_renamed:219", "level": "R6_seen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 18, "merchant": "Quildale Group", "known": false}
+{"id": "R6_seen_renamed:220", "level": "R6_seen_renamed", "answer": 10, "pred": 10, "correct": true, "user": 18, "merchant": "REI", "known": true}
+{"id": "R6_seen_renamed:221", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Bexlock & Sons", "known": false}
+{"id": "R6_seen_renamed:222", "level": "R6_seen_renamed", "answer": 6, "pred": 12, "correct": false, "user": 18, "merchant": "Fenvarro & Sons", "known": false}
+{"id": "R6_seen_renamed:223", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 18, "merchant": "CVS", "known": true}
+{"id": "R6_seen_renamed:224", "level": "R6_seen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "BP", "known": true}
+{"id": "R6_seen_renamed:225", "level": "R6_seen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 18, "merchant": "Safeway", "known": true}
+{"id": "R6_seen_standard:188", "level": "R6_seen_standard", "answer": 8, "pred": 8, "correct": true, "user": 18, "merchant": "Vorcott", "known": false}
+{"id": "R6_seen_standard:189", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Halton", "known": false}
+{"id": "R6_seen_standard:190", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Petland", "known": true}
+{"id": "R6_seen_standard:191", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 18, "merchant": "GameStop", "known": true}
+{"id": "R6_seen_standard:192", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 18, "merchant": "Bramwen Group", "known": false}
+{"id": "R6_seen_standard:193", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Chewy", "known": true}
+{"id": "R6_seen_standard:194", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Comcast", "known": true}
+{"id": "R6_seen_standard:195", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_standard:196", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_standard:197", "level": "R6_seen_standard", "answer": 4, "pred": 4, "correct": true, "user": 18, "merchant": "Samsung", "known": true}
+{"id": "R6_seen_standard:198", "level": "R6_seen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_standard:199", "level": "R6_seen_standard", "answer": 5, "pred": 5, "correct": true, "user": 18, "merchant": "Halmere Group", "known": false}
+{"id": "R6_unseen_renamed:216", "level": "R6_unseen_renamed", "answer": 6, "pred": 12, "correct": false, "user": 18, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_renamed:217", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 18, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_renamed:218", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_renamed:219", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "AutoZone", "known": true}
+{"id": "R6_unseen_renamed:220", "level": "R6_unseen_renamed", "answer": 3, "pred": 3, "correct": true, "user": 18, "merchant": "Macy's", "known": true}
+{"id": "R6_unseen_renamed:221", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_renamed:222", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_renamed:223", "level": "R6_unseen_renamed", "answer": 0, "pred": 0, "correct": true, "user": 18, "merchant": "Whole Foods", "known": true}
+{"id": "R6_unseen_renamed:224", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Valero", "known": true}
+{"id": "R6_unseen_renamed:225", "level": "R6_unseen_renamed", "answer": 2, "pred": 2, "correct": true, "user": 18, "merchant": "Pep Boys", "known": true}
+{"id": "R6_unseen_renamed:226", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 18, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_renamed:227", "level": "R6_unseen_renamed", "answer": 6, "pred": 6, "correct": true, "user": 18, "merchant": "Bartell Drugs", "known": true}
+{"id": "R6_unseen_standard:216", "level": "R6_unseen_standard", "answer": 7, "pred": 7, "correct": true, "user": 18, "merchant": "Holdale", "known": false}
+{"id": "R6_unseen_standard:217", "level": "R6_unseen_standard", "answer": 8, "pred": 8, "correct": true, "user": 18, "merchant": "Hilton", "known": true}
+{"id": "R6_unseen_standard:218", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Banfield Pet Hospital", "known": true}
+{"id": "R6_unseen_standard:219", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 18, "merchant": "B&H Photo", "known": true}
+{"id": "R6_unseen_standard:220", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 18, "merchant": "Apple Store", "known": true}
+{"id": "R6_unseen_standard:221", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 18, "merchant": "Griden Group", "known": false}
+{"id": "R6_unseen_standard:222", "level": "R6_unseen_standard", "answer": 4, "pred": 4, "correct": true, "user": 18, "merchant": "B&H Photo", "known": true}
+{"id": "R6_unseen_standard:223", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Spectrum", "known": true}
+{"id": "R6_unseen_standard:224", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Spectrum", "known": true}
+{"id": "R6_unseen_standard:225", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 18, "merchant": "Pexlock", "known": false}
+{"id": "R6_unseen_standard:226", "level": "R6_unseen_standard", "answer": 9, "pred": 9, "correct": true, "user": 18, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_unseen_standard:227", "level": "R6_unseen_standard", "answer": 5, "pred": 5, "correct": true, "user": 18, "merchant": "Griden Group", "known": false}
+{"id": "R6_seen_new:097", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Wexdale Bros", "known": false}
+{"id": "R6_seen_new:098", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Istwick Group", "known": false}
+{"id": "R6_seen_new:099", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "BarkBox", "known": true}
+{"id": "R6_seen_new:100", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Petco", "known": true}
+{"id": "R6_seen_new:101", "level": "R6_seen_new", "answer": 3, "pred": 3, "correct": true, "user": 19, "merchant": "Macy's", "known": true}
+{"id": "R6_seen_new:102", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Grinard Inc", "known": false}
+{"id": "R6_seen_new:103", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Marbury Inc", "known": false}
+{"id": "R6_seen_new:104", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Petland", "known": true}
+{"id": "R6_seen_new:105", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Chewy", "known": true}
+{"id": "R6_seen_new:106", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Ulmbury Ltd", "known": false}
+{"id": "R6_seen_new:107", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Pet Supplies Plus", "known": true}
+{"id": "R6_seen_new:108", "level": "R6_seen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "Wag", "known": true}
+{"id": "R6_seen_renamed:226", "level": "R6_seen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 19, "merchant": "Hilton", "known": true}
+{"id": "R6_seen_renamed:227", "level": "R6_seen_renamed", "answer": 17, "pred": 7, "correct": false, "user": 19, "merchant": "Regal Cinemas", "known": true}
+{"id": "R6_seen_renamed:228", "level": "R6_seen_renamed", "answer": 14, "pred": 14, "correct": true, "user": 19, "merchant": "CVS", "known": true}
+{"id": "R6_seen_renamed:229", "level": "R6_seen_renamed", "answer": 16, "pred": 9, "correct": false, "user": 19, "merchant": "Airbnb", "known": true}
+{"id": "R6_seen_renamed:230", "level": "R6_seen_renamed", "answer": 13, "pred": 5, "correct": false, "user": 19, "merchant": "Bramby & Sons", "known": false}
+{"id": "R6_seen_renamed:231", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 19, "merchant": "Griton", "known": false}
+{"id": "R6_seen_renamed:232", "level": "R6_seen_renamed", "answer": 8, "pred": 8, "correct": true, "user": 19, "merchant": "Istmere Group", "known": false}
+{"id": "R6_seen_renamed:233", "level": "R6_seen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "Garholm Co", "known": false}
+{"id": "R6_seen_renamed:234", "level": "R6_seen_renamed", "answer": 16, "pred": 16, "correct": true, "user": 19, "merchant": "Tornard Group", "known": false}
+{"id": "R6_seen_renamed:235", "level": "R6_seen_renamed", "answer": 15, "pred": 15, "correct": true, "user": 19, "merchant": "Kroger", "known": true}
+{"id": "R6_seen_renamed:236", "level": "R6_seen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 19, "merchant": "Best Buy", "known": true}
+{"id": "R6_seen_renamed:237", "level": "R6_seen_renamed", "answer": 13, "pred": 13, "correct": true, "user": 19, "merchant": "Quilden Group", "known": false}
+{"id": "R6_seen_standard:200", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "Equinox", "known": true}
+{"id": "R6_seen_standard:201", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunwen Group", "known": false}
+{"id": "R6_seen_standard:202", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "Kelford Bros", "known": false}
+{"id": "R6_seen_standard:203", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Xfinity", "known": true}
+{"id": "R6_seen_standard:204", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 19, "merchant": "Zedbury", "known": false}
+{"id": "R6_seen_standard:205", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 19, "merchant": "Istdale Bros", "known": false}
+{"id": "R6_seen_standard:206", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 19, "merchant": "Domino's", "known": true}
+{"id": "R6_seen_standard:207", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Kelby Co", "known": false}
+{"id": "R6_seen_standard:208", "level": "R6_seen_standard", "answer": 1, "pred": 1, "correct": true, "user": 19, "merchant": "Istlock", "known": false}
+{"id": "R6_seen_standard:209", "level": "R6_seen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Verizon", "known": true}
+{"id": "R6_seen_standard:210", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "Rinton Ltd", "known": false}
+{"id": "R6_seen_standard:211", "level": "R6_seen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "Lundale Inc", "known": false}
+{"id": "R6_unseen_new:128", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:129", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:130", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:131", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "PetSmart", "known": true}
+{"id": "R6_unseen_new:132", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:133", "level": "R6_unseen_new", "answer": 3, "pred": 3, "correct": true, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:134", "level": "R6_unseen_new", "answer": 3, "pred": 3, "correct": true, "user": 19, "merchant": "Nike", "known": true}
+{"id": "R6_unseen_new:135", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:136", "level": "R6_unseen_new", "answer": 9, "pred": 9, "correct": true, "user": 19, "merchant": "PetSmart", "known": true}
+{"id": "R6_unseen_new:137", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:138", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_new:139", "level": "R6_unseen_new", "answer": 3, "pred": 9, "correct": false, "user": 19, "merchant": "Halsley Ltd", "known": false}
+{"id": "R6_unseen_renamed:228", "level": "R6_unseen_renamed", "answer": 12, "pred": 12, "correct": true, "user": 19, "merchant": "Wexley Group", "known": false}
+{"id": "R6_unseen_renamed:229", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:230", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:231", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:232", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:233", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:234", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:235", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "Torden Ltd", "known": false}
+{"id": "R6_unseen_renamed:236", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:237", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:238", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_renamed:239", "level": "R6_unseen_renamed", "answer": 8, "pred": 16, "correct": false, "user": 19, "merchant": "United Airlines", "known": true}
+{"id": "R6_unseen_standard:228", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_unseen_standard:229", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Bros", "known": false}
+{"id": "R6_unseen_standard:230", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Spectrum", "known": true}
+{"id": "R6_unseen_standard:231", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_standard:232", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_standard:233", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_standard:234", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "Peloton", "known": true}
+{"id": "R6_unseen_standard:235", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Duke Energy", "known": true}
+{"id": "R6_unseen_standard:236", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_standard:237", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Ltd", "known": false}
+{"id": "R6_unseen_standard:238", "level": "R6_unseen_standard", "answer": 10, "pred": 10, "correct": true, "user": 19, "merchant": "CorePower Yoga", "known": true}
+{"id": "R6_unseen_standard:239", "level": "R6_unseen_standard", "answer": 11, "pred": 11, "correct": true, "user": 19, "merchant": "Dunhurst Ltd", "known": false}
