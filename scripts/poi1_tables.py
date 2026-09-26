@@ -6,6 +6,8 @@
   P.2  top-1 by item level (kind seen or unseen in the user's history x readable / merged / coined category name), fold 0, with blind
        Opus 5.5 on its level-stratified sample (all users)
   P.3  the untrained and transfer readers on all 200 users
+  P.4  top-1 by what the prompt's 24 shots show (a place of the query's own basic category; only other kinds under the gold label;
+       not the gold label) x the name type, fold 0, with blind Opus on its sample
 usage: uv run python scripts/poi1_tables.py
 """
 import json
@@ -78,6 +80,7 @@ if __name__ == "__main__":
         recs = {i: r for i, r in RC.load_recs(pat).items() if items[i]["user"] % 4 == 0}
         if recs:
             print(f"| {label} | " + " | ".join(f"{100 * np.mean([int(np.argmax(r['sum_lp'])) == r['answer'] for i, r in recs.items() if items[i]['level'] == lv]):.0f}" for lv in levels) + " |")
+    got = {}
     try:
         import contextlib
         import io
@@ -87,5 +90,20 @@ if __name__ == "__main__":
             print("| blind Opus 5.5 (sample) | " + " | ".join(f"{100 * np.mean([ok for i, ok in got.items() if items[i]['level'] == lv]):.0f} ({sum(items[i]['level'] == lv for i in got)})" for lv in levels) + " |")
     except FileNotFoundError:
         pass
-    print()
+    print("\n**Table P.4: top-1 % by what the prompt's 24 shots show x the category name type (fold 0; blind Opus on its sample, n in brackets)**\n")
+    shot = {}
+    for i, it in items.items():
+        u = users[it["user"]]; t2 = {h["text"]: (h["basic"], h["label"]) for h in u["history"]}; sh = [t2[t] for t in u["shots"]]
+        shot[i] = ("kind in shots" if it["basic"] in {b for b, _ in sh} else "other kinds under gold" if it["options"][it["answer"]].strip() in {lab for _, lab in sh} else "gold not in shots")
+    cells = [(g, nt) for g in ("kind in shots", "other kinds under gold", "gold not in shots") for nt in ("standard", "renamed", "new")]
+    print("| reader | " + " | ".join(f"{g}, {nt}" for g, nt in cells) + " |"); print("|---|" + "---|" * len(cells))
+    sel = lambda i, g, nt: shot[i] == g and items[i]["name_type"] == nt  # noqa: E731
+    for label, pat in READERS:
+        recs = {i: r for i, r in RC.load_recs(pat).items() if items[i]["user"] % 4 == 0}
+        if recs:
+            print(f"| {label} | " + " | ".join(f"{100 * np.mean([int(np.argmax(r['sum_lp'])) == r['answer'] for i, r in recs.items() if sel(i, g, nt)] or [np.nan]):.0f}" for g, nt in cells) + " |")
+    if got:
+        print("| blind Opus 5.5 (sample) | " + " | ".join(f"{100 * np.mean([ok for i, ok in got.items() if sel(i, g, nt)] or [np.nan]):.0f} ({sum(sel(i, g, nt) for i in got)})" for g, nt in cells) + " |")
+    n0 = [i for i in items if items[i]["user"] % 4 == 0]
+    print("\n(fold 0 items per cell: " + ", ".join(f"{g}, {nt}: {sum(sel(i, g, nt) for i in n0)}" for g, nt in cells) + ")\n")
     table("**Table P.3: POI-1, all 200 users (the untrained and transfer readers only)**", items, users, False)

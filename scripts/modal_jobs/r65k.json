@@ -1,0 +1,65 @@
+[
+ {
+  "tag": "r65k-base-3b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "poi1_v1_kshots",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r65k-base-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "poi1_v1_kshots",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r65k-real6REN",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "poi1_v1_kshots",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "ADAPTERS_FROM": "r64-REN-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r65k-P-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "poi1_v1_kshots",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r65-P-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r65k-PREN-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "poi1_v1_kshots",
+   "CONDS": "noctx",
+   "ADAPTERS_FROM": "r65-PREN-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ }
+]
