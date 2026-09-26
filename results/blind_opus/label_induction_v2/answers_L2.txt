@@ -1,0 +1,60 @@
+item 1 | Fitness | (reason as reported)
+item 2 | Lipin | Electronics store; the camera and electronics shops went to Lipin
+item 3 | Gefux | Computer store; Sager computer purchase was Gefux
+item 4 | Pets | Veterinary clinic; the dog wash and pet resort went to Pets
+item 5 | Kuvir | Food market; the meat and Italian markets went to Kuvir
+item 6 | Fitness | Yoga studio; Pilates and gym went to Fitness
+item 7 | Restaurants | Inn with restaurant; no Travel category, food is closest
+item 8 | Rodirul | Clothing boutique; the shoe store went to Rodirul
+item 9 | Vitor | Dental care; the health-center pharmacy went to Vitor
+item 10 | Doderun | Construction supply; lumber and nursery went to Doderun
+item 11 | Lapimur | No Home Improvement; unseen category, guessed
+item 12 | Lumol | No Electronics; unseen category, guessed
+item 13 | Zukakan | Computer store; computers and audio went to Zukakan
+item 14 | Rela | No Fitness; unseen category, guessed
+item 15 | Entertainment | Movie theater; theaters went to Entertainment
+item 16 | Rozix | Shoes count as apparel; boutiques went to Rozix
+item 17 | Vosupal | No Groceries; unseen category, guessed
+item 18 | Volen | No Restaurants; unseen category, guessed
+item 19 | Ribir | Camera shop; the computer store went to Ribir
+item 20 | Lamuvol | Lawn and garden; hardware stores went to Lamuvol
+item 21 | Debimo | Pizza; the restaurant and cafe went to Debimo
+item 22 | Zatax | No Electronics; unseen category, guessed
+item 23 | Clothing | Boutique; boutiques went to Clothing
+item 24 | Dimezu | Hardware store; building supply went to Dimezu
+item 25 | Sesefar | Restaurant; the cafe and pizza went to Sesefar
+item 26 | Lilibox | Boutique; the apparel store went to Lilibox
+item 27 | Gidebur | Dentist is health; pharmacies went to Gidebur
+item 28 | Miron | No Telecom category; unseen category, guessed
+item 29 | Gas & Auto | Tire shop; auto repair went to Gas & Auto
+item 30 | Mone | Water utility; the electric cooperative went to Mone
+item 31 | Kafen | No Pets; unseen category, guessed
+item 32 | Mekolin | Food market; produce and grocery pickup went to Mekolin
+item 33 | Tevax | Pet care; pet grooming went to Tevax
+item 34 | Vonirol | No Restaurants; unseen category, guessed
+item 35 | Kuruzin | No Electronics; unseen category, guessed
+item 36 | Sobox | Boutique; the other boutiques went to Sobox
+item 37 | Soposox | No Gas & Auto; unseen category, guessed
+item 38 | Travel | Same inn; motels and inns went to Travel
+item 39 | Povor | Restaurant; the cafe and coffee shop went to Povor
+item 40 | Logudur | No Pets; unseen category, guessed
+item 41 | Vunugel | Pricey inn stay; the motel and travel agent went to Vunugel
+item 42 | Seloben | No Electronics; unseen category, guessed
+item 43 | Lapul | Inn stay; the motor inn went to Lapul
+item 44 | Ragil | No Clothing; unseen category, guessed
+item 45 | Entertainment | Cinema; the lanes and arcade went to Entertainment
+item 46 | Zorux | No Pharmacy & Health; unseen category, guessed
+item 47 | Dadaful | Veterinary hospital; grooming and the dog store went to Dadaful
+item 48 | Telecom & Utilities | Communications company; telecom went here
+item 49 | Sifa | Electronics; computer parts stores went to Sifa
+item 50 | Takuvol | No Home Improvement; unseen category, guessed
+item 51 | Pharmacy & Health | Pharmacy; health merchants went here
+item 52 | Bakex | Audio store is electronics; computers went to Bakex
+item 53 | Mitox | Coffee shop; pizza and BBQ went to Mitox
+item 54 | Beguvux | Tire shop; auto repair and garage went to Beguvux
+item 55 | Tama | No Electronics; unseen category, guessed
+item 56 | Bogi | Motor sports is auto; the tire shop went to Bogi
+item 57 | Dadume | Butcher is groceries; markets went to Dadume
+item 58 | Nimo | No Travel; unseen category, guessed
+item 59 | Ninokex | Supermarket; meat and grocery stores went to Ninokex
+item 60 | Disu | No Groceries; unseen category, guessed"}

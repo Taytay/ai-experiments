@@ -1,0 +1,60 @@
+item 1 | Beguvux | (reason as reported)
+item 2 | Dadume | Butcher is grocery-type; the market went to Dadume
+item 3 | Miron | No telecom category; guessed a name with no examples
+item 4 | Ninokex | The natural foods store went to Ninokex, so it is groceries
+item 5 | Zatax | No electronics category; guessed a name with no examples
+item 6 | Mavurel | The yoga studios went to Mavurel, so it is fitness
+item 7 | Electronics | A camera store is electronics
+item 8 | Vunugel | The travel agency went to Vunugel; no Travel category
+item 9 | Fagodil | The pet services went to Fagodil
+item 10 | Dufabal | No travel category; guessed a name with no examples
+item 11 | Lukaral | The clothing stores went to Lukaral; shoes fit there
+item 12 | Travel | An inn is lodging
+item 13 | Luvodur | No electronics category; guessed a name with no examples
+item 14 | Belox | The pilates and fitness went to Belox
+item 15 | Zusar | The cellular and wireless shops went to Zusar
+item 16 | Lapimur | No home improvement category; guessed a name with no examples
+item 17 | Telecom & Utilities | A water utility bill
+item 18 | Clothing | A boutique is clothing
+item 19 | Galakir | No health category; guessed a name with no examples
+item 20 | Refami | Health went to Refami, going by the dental examples
+item 21 | Doderun | No home improvement category; guessed a name with no examples
+item 22 | Guvun | No health category; guessed a name with no examples
+item 23 | Lamuvol | No home improvement category; guessed a name with no examples
+item 24 | Sesefar | The pizza place went to Sesefar, so it is restaurants
+item 25 | Vonirol | No restaurants category; guessed a name with no examples
+item 26 | Zaminix | The theater and fun center went to Zaminix
+item 27 | Bizilil | No electronics category; guessed a name with no examples
+item 28 | Bonin | Hotels went to Bonin, so it is lodging
+item 29 | Kalo | The lanes and arcade went to Kalo, so it is entertainment
+item 30 | Gas & Auto | A motor sports shop is automotive
+item 31 | Home Improvement | A hardware store
+item 32 | Mitox | The pizza place went to Mitox, so it is eating out
+item 33 | Fupe | The inns and motels went to Fupe, so it is lodging
+item 34 | Kerusar | The lumber and roofing supply went to Kerusar
+item 35 | Dadaful | The pet store went to Dadaful, so it is pets
+item 36 | Fofon | The meat and grocery markets went to Fofon
+item 37 | Rifi | The pet grooming went to Rifi, so it is pets
+item 38 | Electronics | An audio store is electronics
+item 39 | Electronics | A computer store is electronics
+item 40 | Pharmacy & Health | A dental clinic is health
+item 41 | Reper | No electronics category; guessed a name with no examples
+item 42 | Tama | No electronics category; guessed a name with no examples
+item 43 | Molugul | No pets category; guessed a name with no examples
+item 44 | Difafar | The electronics stores went to Difafar
+item 45 | Ziror | Restaurants and coffee went to Ziror
+item 46 | Nerul | Looks like groceries, which has no category; guessed a name
+item 47 | Takux | No clothing category; guessed a name with no examples
+item 48 | Zukakan | Electronics went to Zukakan, going by the audio example
+item 49 | Clothing | A boutique is clothing
+item 50 | Pavul | No restaurants category; guessed a name with no examples
+item 51 | Rozix | Clothing went to Rozix, going by the boutique example
+item 52 | Kuvir | Groceries went to Kuvir, going by the meat market example
+item 53 | Melu | Auto went to Melu, going by the tires and auto examples
+item 54 | Gesax | No pets category; guessed a name with no examples
+item 55 | Surovor | The yoga and pilates went to Surovor, so it is fitness
+item 56 | Vosupal | No groceries category; guessed a name with no examples
+item 57 | Vibapon | The boutiques went to Vibapon
+item 58 | Menal | No restaurants category; guessed a name with no examples
+item 59 | Sino | Electronics went to Sino, going by the computer and audio examples
+item 60 | Kofa | Auto went to Kofa, going by the gas station and repair examples"}

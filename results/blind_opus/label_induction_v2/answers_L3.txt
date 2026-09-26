@@ -1,0 +1,60 @@
+item 1 | Sifa | (reason as reported)
+item 2 | Doderun | Nursery went to Doderun, so likely home improvement
+item 3 | Debimo | Family restaurant was filed as Debimo
+item 4 | Navasar | No electronics category; guessed an unused invented label
+item 5 | Restaurants | Italian restaurant
+item 6 | Lamuvol | Hardware store was filed as Lamuvol
+item 7 | Buken | No utilities category; guessed an unused invented label
+item 8 | Mavurel | Yoga studios were filed as Mavurel, so likely fitness
+item 9 | Kalo | Bowling and arcade were filed as Kalo, so entertainment
+item 10 | Surovor | Yoga and pilates were filed as Surovor, so fitness
+item 11 | Ziror | Chinese restaurant and coffee were filed as Ziror
+item 12 | Electronics | Electronics store
+item 13 | Sobox | Boutique was filed as Sobox
+item 14 | Lukaral | Boutique and clothing store were filed as Lukaral
+item 15 | Zaminix | Theatre and games were filed as Zaminix
+item 16 | Bonin | Hotels were filed as Bonin
+item 17 | Kimozel | No clothing category; guessed an unused invented label
+item 18 | Vutamun | Previous car wash was filed as Vutamun
+item 19 | Kofa | Gas station and auto repair were filed as Kofa
+item 20 | Fagodil | Dog wash and pet resort were filed as Fagodil
+item 21 | Ganabex | No restaurant category; guessed an unused invented label
+item 22 | Refami | Dental was filed as Refami, the closest health label
+item 23 | Punar | No clothing category; guessed an unused invented label
+item 24 | Razan | No health category; guessed an unused invented label
+item 25 | Ladu | No travel category; guessed an unused invented label
+item 26 | Difafar | Projectors and TV store were filed as Difafar, so electronics
+item 27 | Telecom & Utilities | Communications company
+item 28 | Electronics | Electronics store
+item 29 | Tigir | No restaurant category; guessed an unused invented label
+item 30 | Home Improvement | Ace home center
+item 31 | Zukakan | No electronics category; guessed an unused invented label
+item 32 | Rifi | Pet groomers were filed as Rifi, so likely pets
+item 33 | Groceries | Grocery store
+item 34 | Restaurants | No groceries category; smokehouse or deli is closest to Restaurants
+item 35 | Vuzur | No groceries category; guessed an unused invented label
+item 36 | Reten | No auto category; guessed an unused invented label
+item 37 | Kerusar | Lumber and roofing supply were filed as Kerusar
+item 38 | Nozon | No home improvement category; guessed an unused invented label
+item 39 | Tevax | Pet grooming was filed as Tevax, so pets
+item 40 | Electronics | Computer store
+item 41 | Rafir | No travel category; guessed an unused invented label
+item 42 | Povor | Cafe was filed as Povor, so restaurants
+item 43 | Gas & Auto | Tire shop
+item 44 | Dadaful | No pets category; guessed an unused invented label
+item 45 | Lipin | Electronics store was filed as Lipin
+item 46 | Fupe | Inns and motels were filed as Fupe
+item 47 | Mekolin | Grocery pickup was filed as Mekolin, so groceries
+item 48 | Kuvir | No groceries category; guessed an unused invented label
+item 49 | Poser | No electronics category; guessed an unused invented label
+item 50 | Vibapon | Boutiques were filed as Vibapon
+item 51 | Zusar | Cellular and wireless were filed as Zusar
+item 52 | Travel | Extended-stay lodge
+item 53 | Belox | Pilates and fitness were filed as Belox; same yoga house
+item 54 | Rukaror | No clothing category; guessed an unused invented label
+item 55 | Kopesir | No electronics category; guessed an unused invented label
+item 56 | Pharmacy & Health | Eye institute is medical
+item 57 | Pets | Veterinary clinic
+item 58 | Gidebur | Pharmacy was filed as Gidebur, so health
+item 59 | Sino | Computers and audio were filed as Sino, so electronics
+item 60 | Fofon | Meat markets were filed as Fofon, so groceries"}
