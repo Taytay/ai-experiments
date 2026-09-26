@@ -3457,3 +3457,162 @@ Table C.4 splits the 95% operating point by section 48's groups. On the category
 STAT-4 asked whether the categoriser's probabilities are calibrated and at what confidence a label can be applied without review. Serve confidences from the sum rule; fit one temperature per arm on held-out users (record arm about 1.4, no-record arm about 2.8, bounded search); choose the auto-apply threshold per arm on held-out users, which transfers where the temperature does not. At 95% precision the record-in-prompt categoriser applies about 82% of a trained user's transactions and about 60% of a new user's, the 800-step no-record categoriser 56% and 48%. The residual errors at that operating point are concentrated in the categories the user split arbitrarily, where the model is confident and wrong; row 52 targets them, and row 43's set, with relabelling and per-user assignments, will be the harder test of the whole operating point.
 
 Not done: per-user or per-category temperatures, a Brier or calibration term in the training loss (the Jev series' alternative to post-hoc scaling), the encoder arms (they save no per-option scores), and the rename-augmented folds (row 42, section 51).
+
+## 51. Held-out users: the categoriser trained on other users' schemes reads standard names as well as ever and loses 10 to 25 points on the user's coined names, which it had been memorising; rename augmentation recovers most of it (coined +12 to +14), and the record-in-prompt categoriser on a new user is 82 without it and 87 with it (REAL-10)
+
+*PLAN step 42. Code: `FOLD` and `RENAME` in `scripts/exp_categoriser.py`, `USERS` and the fold-from-name default in `scripts/exp_real6.py`, `scripts/chains/chain_r42.sh`, `scripts/heldout_users_tables.py`, `ai_experiments.real6_cells` (the shared table helpers). The users fall in four folds (user id mod 4, five users each); each fold adapter trains on the other fifteen users and is scored on its five, so all 1,179 items are read by an adapter that never saw their user. The no-DB arm at 800 steps (REPORT.md 49), the record arm at 200 (at the set's ceiling there, section 48), all on the 3090 (4-bit base). The rename-augmented folds ran under row 56's chain once the all-label loss had become the no-DB recipe (section 52), so the no-DB augmentation is measured on that recipe; the old recipe's rename folds were dropped (PLAN log, 2026-09-25).*
+
+Every REAL-6 number until this step was on the twenty users whose histories trained the adapter. The production categoriser meets users whose schemes it never saw, so this is the number production needs.
+
+**Table 51.1: trained on all 20 users against the user held out (accuracy %; held-out rows merge the four fold adapters, each scoring the five users it never trained on; interval = users resampled)**
+
+| arm | all | standard | renamed | coined | in history | determined by category | split category | DB-only | interval (all) |
+|---|---|---|---|---|---|---|---|---|---|
+| SFT no DB, 800 steps, all 20 users trained | 71.7 | 79.4 | 63.2 | 73.9 | 80.0 | 75.4 | 33.0 | 52.5 | [67.5, 75.5] |
+| SFT no DB, 800 steps, user held out | 70.1 | 82.1 | 61.9 | 63.9 | 73.4 | 75.0 | 38.8 | 59.0 | [66.1, 73.9] |
+| SFT + record, 200 steps, all 20 users trained | 90.2 | 99.8 | 80.3 | 91.6 | 94.1 | 97.4 | 50.5 | 97.5 | [86.0, 93.5] |
+| SFT + record, 200 steps, user held out | 81.6 | 99.6 | 72.4 | 66.7 | 89.2 | 86.6 | 30.1 | 86.9 | [78.6, 84.7] |
+
+**Table 51.2: held out minus all-20 on the same items, points [user-resampled 95% interval]**
+
+| arm | all | standard | renamed | coined | in history |
+|---|---|---|---|---|---|
+| SFT no DB | -1.6 [-5.1, +2.9] | +2.7 [-2.2, +7.6] | -1.3 [-6.7, +4.2] | -10.0 [-19.0, -0.4] | -6.5 [-10.5, -2.7] |
+| SFT + record | -8.6 [-12.3, -4.8] | -0.2 [-1.1, +0.5] | -7.9 [-15.1, -1.7] | -24.9 [-39.0, -11.4] | -5.0 [-8.0, -1.9] |
+
+**Table 51.3: rename augmentation on held-out users (accuracy %, then with minus without on the same items [interval])**
+
+| recipe | augmentation | all | standard | renamed | coined |
+|---|---|---|---|---|---|
+| no DB, all-label 200 steps, held out | without | 74.5 | 85.4 | 64.9 | 73.1 |
+| no DB, all-label 200 steps, held out | with | 77.6 | 86.5 | 65.3 | 85.1 |
+| no DB, all-label 200 steps, held out | with minus without | +3.1 [+0.2, +6.0] | +1.1 [-2.0, +3.9] | +0.4 [-4.6, +5.5] | +12.0 [+5.1, +20.0] |
+| SFT + record, 200 steps, held out | without | 81.6 | 99.6 | 72.4 | 66.7 |
+| SFT + record, 200 steps, held out | with | 86.8 | 99.8 | 77.8 | 80.3 |
+| SFT + record, 200 steps, held out | with minus without | +5.2 [+0.4, +9.8] | +0.2 [-0.5, +1.1] | +5.4 [-3.4, +14.4] | +13.7 [-1.0, +29.3] |
+
+### 51.1 What transfers to a new user and what was memorised
+
+On standard category names a held-out user is read as well as a trained one (no DB 82.1 against 79.4, record 99.6 against 99.8): the model knows what "Groceries" means and the user's shots only confirm it. On the user's own words it is not. The coined names fall 10.0 points without the DB and 24.9 with the record (Table 51.2), and the renamed ones 1 and 8: the categorisers had been learning the twenty users' private vocabularies ("Zorbit" is this user's groceries) from their training rows, not reading them off the shots, and a new user's vocabulary is only in the shots. The record arm loses most because it was the best at the memorised mapping (91.6 on coined names for trained users). Merchants the user labelled fall 5 to 7 points for the same reason: the trained adapter had also memorised which merchant each training user filed where, and for a new user only the 24 shots carry that. On the DB-only merchants, which no user labelled, the no-DB arm does not fall (59.0 against 52.5), and the record arm falls 97.5 to 86.9, the same coined-name loss: the record says what the store sells, and turning that into a new user's coined word is exactly the step that had been memorised. Overall: no DB 70.1 held out against 71.7 trained, the record arm 81.6 against 90.2.
+
+### 51.2 Rename augmentation
+
+Replacing each category name by a fresh coined word with probability 0.5 per training episode (consistently in the category list, the shots and the target) makes memorising a user's vocabulary useless and forces the mapping to be read from the shots. On held-out users it lifts the coined names by 12.0 [5.1, 20.0] points on the no-DB all-label recipe (73.1 to 85.1) and 13.7 [-1.0, 29.3] on the record arm (66.7 to 80.3), with standard names unchanged (+1.1, +0.2) and the whole set up 3.1 and 5.2 points. With it, the record-in-prompt categoriser reads a new user at 86.8 [82.6, 90.4], and the no-DB all-label one at 77.6.
+
+### 51.3 What the step says
+
+REAL-10 asked whether the categoriser holds for users whose schemes were never trained on. For standard names, yes. For a user's own coined and renamed names it held only because it had memorised the training users', and rename augmentation is the fix: it costs nothing on standard names and recovers most of the coined-name loss. Every categoriser from here trains with it and is scored on held-out users. The production numbers are the held-out ones: 86.8 with the record in the prompt, 77.6 without (both with augmentation); section 53's database episodes (without rename augmentation) read 89.9 without any record, and the two have not yet been combined.
+
+Not done: rename augmentation at other rates, and a held-out-user set with more than twenty users (row 43).
+
+## 52. Training efficiency: the categoriser's hours went into re-reading 24 shots to learn one label; putting the loss on every shot label gives in 100 steps (9 minutes) what 1,600 plain steps (147 minutes) gave, and on held-out users 4.4 points more than the 800-step recipe at a quarter of its time, at the cost of leaning less on what the model knew about chains; bf16 and the 4-bit base are the same model for this task (TRAIN-11)
+
+*PLAN step 56 (the owner's request, 2026-09-23). Code: `ALL_LABELS` (the loss on every shot label, found through the tokenizer's offset mapping so training sees the scorer's tokenisation), `ANS_WEIGHT` and the throughput counters in `scripts/exp_categoriser.py`; `scripts/chains/chain_r56*.sh` on the 3090, `scripts/modal_jobs/r56_rest.json` on Modal; `scripts/train_efficiency_tables.py`. Tables 52.1 and 52.2 are the 3090 (4 x 4 sequences per step); 52.3 and 52.4 the H100 on Modal with one 16-sequence pass per step (section 54), where the local chain moved on 2026-09-25.*
+
+One training step of the categoriser is 16 sequences of about 850 tokens (the user's category list, 24 labelled shots, the query) through the 3B model, at about 2,400 tokens a second on the 3090, close to section 7's ceiling for 3B: the card was busy. The loss fell on the answer's one to five tokens, so each 850-token pass taught one label, and row 47 had just shown that the no-DB categoriser needs 800 to 1,600 such steps. Two changes were tested: the loss on every shot's label as well (each predicted from the category list and the shots before it: 83 supervised tokens in 832 instead of about 3), and the bf16 base in place of the 4-bit one, which unsloth had chosen by default (section 44).
+
+**Table 52.1: the no-DB categoriser on all 20 users, seed 0, 3090 (4 x 4 sequences per step; accuracy %; ARC-Easy, MMLU and symbol-label ICL from exp_items_v2)**
+
+| recipe | steps | minutes | tokens/s | peak GiB | final loss | all | in history | determined by category | DB-only | ARC-Easy | MMLU | ICL symbol |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain, 4-bit | 200 | 17.7 | - | 9.13 | 0.141 | 57.1 | 65.3 | 59.3 | 51.6 | 76.0 | 51.0 | 76.6 |
+| plain, 4-bit | 400 | 36.6 | - | 9.13 | 0.047 | 67.4 | 75.0 | 71.5 | 49.2 | 77.0 | 53.5 | 70.8 |
+| plain, 4-bit | 800 | 77.6 | - | 9.13 | 0.028 | 71.7 | 80.0 | 75.4 | 52.5 | 75.0 | 52.5 | 75.0 |
+| plain, 4-bit | 1600 | 146.8 | - | 9.13 | 0.0 | 76.7 | 83.1 | 82.9 | 55.7 | 80.5 | 53.5 | 74.5 |
+| plain, bf16 | 200 | 17.9 | 2391 | 12.64 | 0.099 | 59.1 | 65.8 | 61.5 | 54.9 | 78.5 | 55.0 | 68.2 |
+| plain, bf16 | 800 | 71.6 | 2394 | 12.64 | 0.039 | 73.1 | 78.6 | 79.8 | 57.4 | 81.5 | 54.0 | 68.2 |
+| all-label, 4-bit | 100 | 9.1 | 2355 | 9.12 | 0.019 | 79.4 | 84.0 | 87.4 | 55.7 | 77.5 | 49.5 | 74.5 |
+| all-label, 4-bit | 200 | 18.1 | 2369 | 9.13 | 0.002 | 80.4 | 86.0 | 86.4 | 45.9 | 78.0 | 52.0 | 75.0 |
+| all-label, 4-bit | 400 | 36.3 | 2359 | 9.13 | 0.0 | 82.0 | 87.4 | 90.0 | 63.1 | 78.5 | 52.0 | 74.5 |
+| all-label, bf16 | 200 | 17.7 | 2425 | 12.64 | 0.001 | 80.2 | 86.3 | 88.2 | 54.1 | 76.5 | 55.5 | 74.5 |
+
+**Table 52.2: held-out users (row 42's four folds, 3090): all-label at 200 steps against the plain recipe at 800 steps (accuracy %; last row: all-label minus plain on the same items [user-resampled interval])**
+
+| recipe | all | coined | in history | determined by category | DB-only known | DB-only opaque |
+|---|---|---|---|---|---|---|
+| plain, 800 steps (77 min) | 70.1 | 63.9 | 73.4 | 75.0 | 87.3 | 19.6 |
+| all-label, 200 steps (18 min) | 74.5 | 73.1 | 78.6 | 80.4 | 70.4 | 3.9 |
+| all-label minus plain | +4.4 [+0.9, +7.8] | +9.2 [-3.1, +20.2] | +5.2 [+1.8, +8.5] | +5.3 [-0.8, +11.3] | -16.9 [-32.9, +1.8] | -15.7 [-23.3, -6.2] |
+
+**Table 52.3: held-out users (four folds, H100, one 16-sequence pass per step, 4-bit): the answer's share of the loss**
+
+| loss | all | coined | DB-only known | DB-only opaque |
+|---|---|---|---|---|
+| all-label, token mean (answer ~3 of ~85 labelled tokens) | 73.4 | 70.3 | 67.6 | 11.8 |
+| all-label, answer weighted to half of each sequence | 72.2 | 66.3 | 69.0 | 11.8 |
+| weighted minus token mean | -1.2 [-3.1, +0.8] | -4.0 [-10.6, +2.9] | +1.4 [-7.7, +10.6] | +0.0 [-9.1, +6.8] |
+
+**Table 52.4: 4-bit against bf16, all-label at 200 steps on all 20 users, three seeds each (H100, one 16-sequence pass per step; mean +- sd, then the three seeds)**
+
+| base | REAL-6 | ARC-Easy | MMLU | ICL symbol | training minutes |
+|---|---|---|---|---|---|
+| 4-bit | 80.5 +- 1.0 (80.2, 79.6, 81.7) | 78.3 +- 2.0 (76.0, 79.5, 79.5) | 52.0 +- 0.5 (52.5, 51.5, 52.0) | 71.9 +- 0.6 (72.4, 71.3, 71.9) | 3.1, 3.0, 3.1 |
+| bf16 | 80.0 +- 1.4 (79.6, 78.8, 81.6) | 74.8 +- 2.8 (75.0, 77.5, 72.0) | 55.8 +- 1.4 (55.0, 57.5, 55.0) | 72.6 +- 2.0 (73.5, 70.3, 74.0) | 3.0, 2.9, 2.9 |
+
+### 52.1 The all-label loss: sixteen times less compute for the same trained-user accuracy
+
+On the twenty training users the all-label loss reaches 79.4 in 100 steps (9.1 minutes), above the plain recipe's 76.7 at 1,600 steps (146.8 minutes), and 82.0 at 400; tokens per second are unchanged (the extra supervised tokens cost nothing, since the pass was already made), and ARC-Easy, MMLU and symbol-label ICL stay where the plain recipe put them. Three seeds on the H100 put its spread at 1.0 to 1.4 points (Table 52.4), tighter than the plain recipe's 2.3.
+
+### 52.2 On held-out users the gain halves, and chain knowledge is the price
+
+Scored on users it never trained on (row 42's folds), the all-label adapter at 200 steps reads 74.5 against the plain recipe's 70.1 at 800 steps: +4.4 [0.9, 7.8] at a quarter of the training time, with coined names +9.2 and merchants the user labelled +5.2. Against its trained-user 80.4 it loses 6 points where the plain recipe lost 1.6, so about half of the trained-user gain was faster memorisation of the training users (each sequence now supervises 24 of their merchant labels instead of one). And it gives up what the model knew: on the DB-only merchants that are real chains the plain recipe reads 87.3 and the all-label one 70.4 (-16.9 [-32.9, 1.8]); opaque ones fall from 19.6 to 3.9. With 25 answers per sequence to be read off the shots, the adapter learns to answer from the shots and stops consulting its own knowledge of the merchant. Weighting the final answer to half of each sequence's loss does not bring it back (Table 52.3: known chains 69.0 against 67.6, overall -1.2): the lost knowledge is not a matter of the answer's share of the gradient. Section 53 makes the question moot for merchants in a fact DB, where database episodes put known chains at 93 and opaque ones at 96.
+
+### 52.3 bf16 against the 4-bit base
+
+On the 3090 the bf16 base trains at the same speed (2,391 against about 2,370 tokens a second; unsloth's 4-bit kernels cost almost nothing) with 3.5 GiB more memory, and reads within two points of the 4-bit run at 200 and 800 steps. On the H100 with three seeds each, all-label at 200 steps reads 80.5 +- 1.0 on the 4-bit base and 80.0 +- 1.4 on bf16; the general measures move both ways (ARC-Easy 78.3 against 74.8, MMLU 52.0 against 55.8) and neither by much at three seeds. The categoriser does not care; the owner chose bf16 as the default for new runs (2026-09-26), which removes the quantisation step and the adapter-precision mismatch of section 44 at no cost on an 80 GB GPU.
+
+### 52.4 What the step says
+
+TRAIN-11 asked where the hours go and whether the same accuracy can come cheaper. They went into re-reading the prompt to learn one label per pass, not into precision. The all-label loss is the no-DB recipe from here (with rename augmentation, section 51): a quarter of the training time for +4.4 on held-out users, the ICL and general measures held. Its cost, less use of the model's own merchant knowledge, is the reason to put a fact DB into the weights as episodes (section 53) or in the prompt as a record, not a reason to train longer. The 3090 and the H100 give the same numbers (section 54); the H100 with one 16-sequence pass per step is six times faster.
+
+Not done: the all-label loss for the record-in-prompt arm (its shots carry no record, so it would learn the record's use from one label in 25), the loss on a fraction of the shots, and packing (sequences are padded to the batch's longest).
+
+## 53. The fact DB as supervised decisions: training episodes built from the database's records put the merchants no user labelled at 94 on held-out users with no record in the prompt (opaque ones 96, from 12), where the same records as prose reach 65; knowledge a model must use to decide is best taught as the decisions (REAL-15)
+
+*PLAN step 57, from the owner's remark (2026-09-25) that measuring loss on more tokens might be a better way to impart a database. Code: `DBEP` (database episodes) and `DB_CAT` (category-bearing prose records) in `scripts/exp_categoriser.py`, `scripts/modal_jobs/r57.json`, `scripts/db_episodes_tables.py`. All arms on Modal (H100, 4-bit base, one 16-sequence pass per step), all-label loss, 200 steps, row 42's four held-out folds, scored without the record in the prompt.*
+
+Every records-in-the-weights arm so far trained the record sentences as text: loss on every token of "Elrholm is a store that sells canned goods, packaged snacks and frozen vegetables", and three variants of it. That is the most "loss on more tokens" a record can get, and it reached the DB-only merchants at 59 +- 12 (3.3 passes) to 69 +- 6 (6.7 passes), opaque ones never above 44 (sections 43, 45). Section 52 had just shown that supervising the decisions the task makes (every shot's label) trains the task sixteen times faster. The same idea applied to the database: turn each record into categorisation decisions. A database episode is an ordinary training episode for a training user in which 8 of the 24 shots and the target are replaced by synthetic statement rows of fact-DB merchants (rendered by the generator, amounts from the category's distribution, no string equal to a REAL-6 test string), each labelled with that user's own name for the merchant's DB category; merchants whose category the user split are skipped, since the DB cannot say which half. Every DB merchant is covered, the 60 DB-only ones included, and their labels come from the database, never from a user. Half the episodes are database episodes (`DBEP=0.5`).
+
+Two design choices matter for reading the result. First, the episodes use a category field, which REAL-6's product sentences do not state (real merchant and POI databases usually carry one); to give the prose arm the same information its records state the category too ("Elrholm is a Groceries store that sells ..."). Second, the scores are on held-out users only: on a training user, an episode supervises exactly the answer of the test item for that (user, merchant), which would measure memorisation.
+
+**Table 53.1: the fact DB in the weights, four held-out folds, no record in the prompt at test (accuracy %; interval = users resampled)**
+
+| arm | all | standard | renamed | coined | in history | determined by category | split category | DB-only | DB-only known | DB-only opaque | interval (all) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| no DB | 73.4 | 83.8 | 65.1 | 70.3 | 78.4 | 78.4 | 38.8 | 44.3 | 67.6 | 11.8 | [68.6, 77.7] |
+| database episodes | 89.9 | 99.3 | 80.3 | 91.2 | 92.1 | 95.3 | 59.2 | 94.3 | 93.0 | 96.1 | [86.9, 92.8] |
+| prose records + category | 78.9 | 89.6 | 67.8 | 80.7 | 81.5 | 86.6 | 42.7 | 64.8 | 85.9 | 35.3 | [75.4, 82.1] |
+| both | 88.0 | 99.3 | 76.4 | 89.6 | 90.1 | 95.1 | 48.5 | 91.8 | 95.8 | 86.3 | [84.1, 91.3] |
+
+**Table 53.2: each arm minus no DB on the same items, points [user-resampled 95% interval]**
+
+| arm | all | coined | determined by category | DB-only | DB-only known | DB-only opaque |
+|---|---|---|---|---|---|---|
+| database episodes | +16.5 [+12.6, +21.1] | +20.9 [+13.9, +29.4] | +16.9 [+10.4, +24.6] | +50.0 [+35.2, +64.4] | +25.4 [+11.5, +39.1] | +84.3 [+66.7, +96.6] |
+| prose records + category | +5.5 [+2.6, +8.6] | +10.4 [+5.2, +16.7] | +8.3 [+3.8, +13.7] | +20.5 [+8.0, +33.1] | +18.3 [+5.8, +31.5] | +23.5 [+2.1, +44.2] |
+| both | +14.6 [+10.7, +18.6] | +19.3 [+11.1, +28.1] | +16.7 [+10.1, +24.6] | +47.5 [+29.7, +64.4] | +28.2 [+14.8, +41.4] | +74.5 [+44.1, +96.2] |
+
+**Table 53.3: DB-only merchants per fold (accuracy %, items in the fold)**
+
+| arm | fold 0 | fold 1 | fold 2 | fold 3 |
+|---|---|---|---|---|
+| no DB | 46 (35) | 22 (36) | 62 (32) | 53 (19) |
+| database episodes | 94 (35) | 97 (36) | 100 (32) | 79 (19) |
+| prose records + category | 71 (35) | 58 (36) | 75 (32) | 47 (19) |
+| both | 91 (35) | 94 (36) | 88 (32) | 95 (19) |
+
+### 53.1 Decisions teach what prose does not
+
+With the same information, the database as decisions puts the DB-only merchants at 94.3 on users the model never saw, +50.0 [35.2, 64.4] over no DB, and the opaque ones among them, which nothing but the database names, at 96.1 (+84.3); the prose records with the category reach 64.8 (+20.5) and 35.3 on the opaque ones. The effect holds in every fold (Table 53.3: 94, 97, 100, 79 against 46, 22, 62, 53). It is not only the DB-only merchants: every item gains (all +16.5, coined names +20.9, category-determined +16.9), because every database episode is also practice at mapping a category into a user's own scheme from the shots, with about 14,400 database-derived decisions per run (1,600 database episodes of 8 shots and a target). Prose added to the episodes does not help and costs the opaque merchants ten points (both: 86.3), the prose taking a quarter of the sequences from the episodes. The known chains, which the all-label recipe had taught the model to stop consulting (section 52.2), come back to 93.0.
+
+This is the section 8 lesson (knowledge trained in one form stays in that form) turned to use: the categoriser has to use a merchant's category to decide, so the category is best taught as the decision, in the task's own format, and the prose record is the wrong form for it.
+
+### 53.2 What it does not show yet
+
+Three things stand between this and a production claim. The synthetic statement strings come from the same generator templates as the test strings (only exact matches were refused), so the reading of a real bank string is untested; row 43's held-out rendering family is the test. The database has 240 merchants and a production one millions: section 29 found interference at 5,000 species for this adapter, and how many merchants episodes can hold is row 59 (REAL-17). And the record-in-prompt categoriser has never been given the category field the episodes had, so "episodes against retrieval" is not yet a fair comparison; that is row 58 (REAL-16), with every arm on bf16 on the same GPU.
+
+### 53.3 What the step says
+
+REAL-15 asked whether the fact DB goes into the weights better as supervised decisions than as prose. It does, by a wide margin: 94 against 65 on the merchants only the database knows, 96 against 35 on the opaque ones, with no record in the prompt at test and on users the model never saw. For merchants in a fact DB, database episodes are the parametric route to use, and the no-record categoriser with them (89.9 overall) is above the record-in-prompt categoriser on held-out users without rename augmentation (81.6, section 51) and close to it with (86.8).
+
+Not done: episodes with rename augmentation, other episode shares, the record in the prompt together with episodes, and the scale and rendering tests above.
