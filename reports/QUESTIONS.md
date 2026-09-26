@@ -185,6 +185,8 @@ step; compare bank and held-out transfer plus a cloze recall probe against contr
 gte-modernbert-base and EmbeddingGemma-300M; re-run curriculum arms base/A/C on Qwen2.5-7B and
 Qwen3-8B.
 
+**Status (2026-09-16):** answered for the embedding side, PLAN step 13, REPORT.md 24. On the frozen induction items the LLM arms answer, fine-tuned bge-base-en-v1.5 and Qwen3-Embedding-0.6B score 92 to 94 (Timmy), 86 to 91 (k=4) and 72 to 80 (habitat) from their weights against arm C's 62 / 52 / 29 (71 / 61 / 66 with the field guide); MiniLM's 79 / 63 / 53 already beats the LLM's weights. The section 4 bank-string transfer (70.8) is uncased-tokenizer behaviour: 84.4 on bge-base (uncased, not cased as the survey said), 26.0 on the cased Qwen3 tokenizer. The LLM side (Qwen2.5-7B etc.) is still PLAN row 15.
+
 ---
 
 ## Independent review, 2026-09-14
@@ -192,6 +194,7 @@ Qwen3-8B.
 The reviewer independently raised the 7B gap (folded into MODEL-1), option-length bias of cloze
 scoring (EVAL-2, extends EVAL-1) and the missing masked-LM encoder arm (folded into MODEL-2).
 IDs below continue the numbering started above.
+
 
 ### EVAL — evaluation validity
 
@@ -301,6 +304,7 @@ The diagnosed mechanism is mean-pooling dilution; CLS-pooled or late-interaction
 dilute a single identity token the same way.
 *Experiment:* repeat `ft_subword` vs `ft_newtok_mean` with CLS pooling on bge-small and with a
 ColBERT-style token-max-sim retriever.
+**Status (2026-09-16):** answered, PLAN step 13, REPORT.md 24.4. Not pooling-specific: with new merchant tokens, CLS-pooled bge-base reads the bank strings at 30.2 (84.4 without new tokens) and last-token-pooled Qwen3-Embedding at 12.5 (26.0), the same failure as mean-pooled MiniLM (28.1 vs 69.8). A ColBERT-style retriever was not run.
 
 ### TRAIN — training recipe and hyperparameters
 
@@ -365,6 +369,7 @@ No linear probe, SetFit or kNN baseline exists; the 85% prototype result (300 ra
 59% LLM Timmy result (160 ladder items) are on different item sets.
 *Experiment:* score prototypes and LLM arms on the same 160 L3/L4 items; logistic-regression head on
 frozen and fine-tuned embeddings for the 12-way and 8-way tasks.
+**Status (2026-09-16):** done, PLAN step 13, REPORT.md 24.1 to 24.3. Prototypes and LLM arms are now scored on the same 160-item induction levels with per-item records paired by id (Table 24.1; sign tests in the text). Baselines on the 8-way type task over 10 splits: frozen centroid / logreg / SetFit at chance (the names are strings), trained centroid 83.7 / 99.4 / 99.9 (MiniLM / bge / Qwen3), logistic regression ties the centroid, SetFit is 8 / 0.4 / 7 points below it. The logistic-regression head on the merchant 12-way task matches nearest-category-text within a few points.
 
 **BASE-5 (R) Was the vocabulary-expansion baseline given a fair chance?**
 Runs use random or mean-of-subword init only (`exp_knowledge_injection.py:134-145`,
@@ -372,6 +377,7 @@ Runs use random or mean-of-subword init only (`exp_knowledge_injection.py:134-14
 training tokens (aliasing is post-hoc, `exp_knowledge_injection.py:148-160`).
 *Experiment:* N(mu, Sigma) init; embedding-row-only warm-up before unfreezing; both cased forms as
 tokens; then decide.
+**Status (2026-09-16):** done, PLAN step 13, REPORT.md 24.4. N(mu, Sigma) rows, an embedding-row-only warm-up, MOSAIC's joint MLM stage and (on the cased tokenizer) both case forms as tied tokens were run on three encoders. The warm-up is the only variant that matters (bank strings 55.2 / 76.0 against 69.8 / 84.4 without new tokens on MiniLM / bge); MOSAIC does not help at 14 to 20 texts per token; on Qwen3 the added token cannot reach the upper-case strings (0% hits; tied forms fire on 87.5% and score 13.5). The decision stands: do not add tokens for entities seen a few dozen times.
 
 ### STAT — statistical rigor
 
@@ -539,6 +545,7 @@ the sparse, description-rich graph (WN18RR MRR 0.67 vs 0.48), which is this repo
 *Experiment:* MiniLM entity encoder plus a per-relation scorer trained jointly on all merchant relations; unseen-
 merchant category and the products-to-category bridge against prototypes and logistic regression on the same items.
 With PLAN row 13, rerun after 21.
+**Status (2026-09-16):** answered, PLAN step 13, REPORT.md 24.5. A DistMult scorer per relation over a jointly trained text encoder reads the held-out merchants' category (never stated; reachable by the products-to-category bridge) at 33.3 / 91.7 / 100 (MiniLM / bge / Qwen3) where the same encoder's nearest category text reads 37.5 / 95.8 / 100 and a relation-free contrastive control on the same triples 41.7 / 87.5 / 95.8. The scorer adds nothing over the encoder; the rerun after PLAN row 21 is not needed unless the relations become ones the category text does not paraphrase.
 
 **GRAPH-6 (R) Can a category with zero examples be classified from its name?**
 StarSpace (1709.03856) and ZestXML co-embed labels and inputs; the section 6.3 centroid is StarSpace with the label
