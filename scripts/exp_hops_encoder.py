@@ -43,6 +43,8 @@ STEPS = int(os.environ.get("STEPS", "3000")); BATCH = int(os.environ.get("BATCH"
 LR, HEAD_LR = float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
 MAX_ROUNDS = int(os.environ.get("MAX_ROUNDS", "16"))
 SEED = int(os.environ.get("SEED", "0"))
+ITEMS = os.environ.get("ITEMS", "hops_v1")  # hops_v1_cut: the shortcut control (build_hops.py --cut)
+EVAL_ONLY = bool(int(os.environ.get("EVAL_ONLY", "0")))  # load models/adapters/hops_enc_<NAME>/model.pt instead of training
 BASE = "answerdotai/ModernBERT-large"
 NAME = f"{MODE}{'_loop' + str(LOOP) if LOOP else ''}_k{lo}-{hi}_st{STEPS}" + (f"_s{SEED}" if SEED else "")
 INSTR = {"options": "Question: following the equalities from the start name, where does its chain end? Options:",
@@ -191,13 +193,17 @@ if __name__ == "__main__":
     enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa"); enc.config.reference_compile = False
     model = Scorer(enc).cuda()
     print(NAME, "train ks", TRAIN_KS, "loop", LOOP, flush=True)
-    info = train(tok, model) if STEPS else {}
-    items = json.loads((PROCESSED / "hops_v1.json").read_text())["items"]
+    if EVAL_ONLY:
+        model.load_state_dict(torch.load(ROOT / "models" / "adapters" / f"hops_enc_{NAME}" / "model.pt")); info = {}
+    else:
+        info = train(tok, model) if STEPS else {}
+    items = json.loads((PROCESSED / f"{ITEMS}.json").read_text())["items"]
+    OUT_NAME = NAME + ("" if ITEMS == "hops_v1" else "_" + ITEMS.removeprefix("hops_v1_"))
     t0 = time.time(); conds = test(tok, model, items); info["test_seconds"] = round(time.time() - t0)
     (ROOT / "results" / "per_item").mkdir(parents=True, exist_ok=True)
     acc = {}
     for cond, recs in conds.items():
-        with open(ROOT / "results" / "per_item" / f"hops_enc_{NAME}.{cond}.jsonl", "w") as f:
+        with open(ROOT / "results" / "per_item" / f"hops_enc_{OUT_NAME}.{cond}.jsonl", "w") as f:
             for r in recs:
                 f.write(json.dumps(r) + "\n")
         by = defaultdict(list)
@@ -205,14 +211,14 @@ if __name__ == "__main__":
             by[(r["names"], r["k"])].append(r["pred"] == r["answer"])
         acc[cond] = {f"{n}_k{k:02d}": round(100 * float(np.mean(v)), 1) for (n, k), v in sorted(by.items())}
         print(cond, " ".join(f"{k}:{v:.0f}" for k, v in acc[cond].items()), flush=True)
-    cfg = dict(mode=MODE, loop=LOOP, block=BLOCK, r_test=R_TEST, train_ks=TRAIN_KS, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, seed=SEED, base=BASE)
-    out = ROOT / "results" / f"hops_enc_{NAME}.json"
+    cfg = dict(items=ITEMS, eval_only=EVAL_ONLY, mode=MODE, loop=LOOP, block=BLOCK, r_test=R_TEST, train_ks=TRAIN_KS, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, seed=SEED, base=BASE)
+    out = ROOT / "results" / f"hops_enc_{OUT_NAME}.json"
     out.write_text(json.dumps({"config": cfg, **info, "acc": acc}, indent=1))
     with Run("hops_encoder", model=BASE, config=cfg, enabled=STEPS >= 100) as run:
         for cond, a in acc.items():
             run.log({"acc_mean": sum(a.values()) / len(a), **a}, condition=cond)
         run.artifact(out)
-    if STEPS:
+    if STEPS and not EVAL_ONLY:
         if LOOP:
             model.set_loops(1)
         out = ROOT / "models" / "adapters" / f"hops_enc_{NAME}"; out.mkdir(parents=True, exist_ok=True)

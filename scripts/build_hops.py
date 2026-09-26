@@ -13,7 +13,7 @@ syllable strings of 2 to 4 Qwen2.5 tokens, more than one token in every tokenize
 item fresh). `chains(...)` is exported so the encoder arms can train on fresh chains from disjoint names (split="train").
 
 Frozen as data/processed/hops_v1.json: {"items": [{id, k, names, prompt, question, options, answer, chain, statements}], "pools": ...}.
-usage: uv run --with wordfreq python scripts/build_hops.py [--force]
+usage: uv run --with wordfreq python scripts/build_hops.py [--force]; uv run python scripts/build_hops.py --cut (the control set)
 """
 import json
 import random
@@ -110,7 +110,27 @@ def build():
             "pools": p}
 
 
+def cut():
+    """The shortcut control, hops_v1_cut.json: every item with k >= 2 minus the target chain's middle link (chain[k // 2] = chain[k // 2 + 1]),
+    so the start no longer reaches the old end. The answer field still names the old end: a reader that follows links picks it at
+    most at chance, one that uses a shortcut keeps picking it."""
+    doc = json.loads(OUT.read_text())
+    items = []
+    for it in doc["items"]:
+        if it["k"] < 2:
+            continue
+        j = it["k"] // 2; drop = (it["chain"][j], it["chain"][j + 1])
+        st = [s for s in it["statements"] if tuple(s) != drop]
+        assert len(st) == len(it["statements"]) - 1
+        lines = "\n".join(f"- {a} = {b}" for a, b in st)
+        items.append({**it, "id": it["id"] + "_cut", "statements": st, "cut": list(drop), "prompt": f"{INSTR}\n\n{lines}\n\n{it['question']}"})
+    (PROCESSED / "hops_v1_cut.json").write_text(json.dumps({"version": "v1_cut", "source": "hops_v1", "items": items}, indent=1))
+    print(len(items), "cut items")
+
+
 if __name__ == "__main__":
+    if "--cut" in sys.argv:
+        sys.exit(cut())
     if OUT.exists() and "--force" not in sys.argv:
         sys.exit(f"{OUT} exists (frozen); --force to rebuild")
     doc = build()

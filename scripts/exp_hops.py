@@ -271,6 +271,6 @@ def run_diffusion(items, name):
 
 if __name__ == "__main__":
     items = load_items()
-    name = f"{MODEL.split('/')[-1]}_{MODE if ARM != 'huginn' else 'direct'}" + (f"_pc{PER_CELL}" if PER_CELL else "")
+    name = f"{MODEL.split('/')[-1]}_{MODE if ARM != 'huginn' else 'direct'}" + (f"_pc{PER_CELL}" if PER_CELL else "") + ("" if ITEMS == "hops_v1" else "_" + ITEMS.removeprefix("hops_v1_"))
     print(ARM, MODEL, MODE, len(items), "items ->", name, flush=True)
     {"decoder": run_decoder, "huginn": run_huginn, "diffusion": run_diffusion}[ARM](items, name)
