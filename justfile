@@ -53,10 +53,12 @@ pdf-tools:
 pdf-tools:
     if command -v pdftotext >/dev/null && command -v pdftoppm >/dev/null; then echo "poppler already installed: $(command -v pdftotext)"; else sudo apt-get install -y poppler-utils; fi
 
-# Byte-compile the package and scripts, then import the package.
+# Byte-compile the package and scripts, import the package, and confirm the item generators
+# still reproduce the frozen eval sets in data/processed/.
 check:
     uv run python -m compileall -q src scripts
     uv run python -c "import ai_experiments.icl_suite, ai_experiments.evals.tracker; print('imports ok')"
+    uv run python -m ai_experiments.items check
 
 # Regenerate evals/LEADERBOARD.md from the tracker.
 leaderboard:

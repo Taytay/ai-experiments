@@ -377,6 +377,7 @@ The ladder is regenerated from a seed each run; adding `L1_recall_fmt` shifted e
 6.2 vs 6.4 base rows differ (37.5 vs 35.6). The ICL suite caches items to JSON; the ladder does not.
 *Experiment:* freeze `ladder`, `probes`, `heldout_induction` to `results/*.json` with a version tag
 and record the hash in the tracker config.
+**Status (2026-09-14):** done, PLAN step 1, REPORT.md section 9. `ladder`, `probes`, `heldout_induction` frozen to `data/processed/<set>_v1[_morph].json` with ids and sha256; `items_version` / `items_sha` recorded in every run's tracker config; `uv run python -m ai_experiments.items check` reports generator drift.
 
 ### REAL — transfer to the real use case
 

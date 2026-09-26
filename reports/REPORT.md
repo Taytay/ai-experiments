@@ -437,3 +437,76 @@ Each trained arm took 21 to 25 minutes of training at 837 to 1,171 tokens/s and 
 ### 8.6 Recommendation, revised
 
 Train one run whose batches mix augmented knowledge text (about half), symbol-tuning episodes generated from the same database with random labels and varied grouping attributes (about 40%), and 10 to 20% generic few-shot replay. Do not stage it. Hold out one attribute and a slice of entities from the episodes and use them, plus a public few-shot suite with random labels, as the regression metric instead of perplexity. If the entity names carry any morphology (drug stems, retailer name variants, processor prefixes), make sure the same rendering variety appears in both the knowledge text and the episodes, because that is what turns the shared subword pieces into a feature the model uses without context. Next steps that this sweep did not run: the same arms on 7B, a real-world replicate with drug names and ATC classes, and the merchant database with statement-style noisy renderings in place of the creature universe. Since 2026-09-14 the ordered work queue lives in `PLAN.md` at the repo root; the questions it refers to are defined in `reports/QUESTIONS.md` and grounded in a 34-paper survey in `references/SURVEY.md`. Results of queue steps are appended below this section, one numbered subsection per step with its ID in the heading.
+
+## 9. Frozen item sets and per-item scores (STAT-2, STAT-3)
+
+Date: 2026-09-14, WSL2 side. Code: `src/ai_experiments/items.py`, `src/ai_experiments/scoring.py`, `scripts/rescore.py`, `scripts/compare_records.py`; PLAN.md step 1. Tracker: `curriculum_v2` runs with `eval_only` and `items_version` in the config, and experiment `rescore`.
+
+Until now every accuracy in this report was a single number: `accuracy()` compared the argmax to the gold index and kept the hit rate per level, and the ladder, probes and held-out induction items were regenerated from a seed on every run. Two consequences (QUESTIONS.md STAT-2, STAT-3): no confidence interval, paired test or alternative scoring rule could be computed after the fact, and any change to a generator moved every later item, so tables from different commits were not paired (adding `L1_recall_fmt` shifted the base row from 37.5 to 35.6 on the Timmy task between 6.2 and 6.4).
+
+### 9.1 What was frozen and what is kept
+
+**Frozen sets.** `ladder` (1,648 items), `heldout_induction` (96) and `probes` (192) are written once to `data/processed/<set>_v1.json`, and again as `<set>_v1_morph.json` for the morphology universe of arms base_m and E, whose species names differ. Every item carries an `id` (`<level>:<index>`) and every file a sha256 over its items; runs load the files and record `items_version` and `items_sha` in the tracker config. The ICL suite was already frozen (`icl_suite_items.json`) and gets the same treatment. The v1 files are exactly what the generators produced at this commit, so nothing reported in section 8 moved for that reason; `uv run python -m ai_experiments.items check` (part of `just check`) says whether the generators still reproduce them.
+
+**Per-item records.** For every item and option the scorer keeps the summed log-prob given the prompt, the option's token and byte counts and the argmax under the mean-per-token rule, plus three extra passes the scoring-rule study in section 10 needs: the option's log-prob after the bare cue line (`Answer:` or `Label:`, the PMI premise), after a lone newline (unconditional), and both the letter and the option text after the choices are listed in the prompt (symbol and hybrid scoring). One JSONL per run and condition under `results/per_item/`, logged as tracker artifacts, about 1 MB each. Evaluation time per arm went from 7 to 24 minutes for the extra passes; no adapter has to be loaded again to try a new rule, interval or test.
+
+**Re-score.** Every existing adapter was re-scored on the frozen sets with the new scorer: the six curriculum arms (`EVAL_ONLY=1`), the two base conditions, and the three section 6 adapters through `scripts/rescore.py` (two of them were saved by plain peft and load through transformers + peft, since unsloth refuses them). `minilm-unsloth` is an embedding model and has no option log-probs.
+
+### 9.2 Same weights, different machine: the noise floor under the tables
+
+The section 8 runs were scored on the Windows side right after training; this re-score loaded the saved adapters on WSL2. Same weights, same items, same rule, so every difference is bf16 non-determinism (different kernels, different batch padding) flipping near-tied options. 111 of the 416 numeric cells (8 arms, both conditions) differ from the committed results. Ladder levels (n = 160) move by at most 2.6 points; the largest move is 6.3 points on `ICL_natural_subj`, where n = 48 and one item is 2.1 points (three items flipped). Table 9.1 lists every move of 2 points or more.
+
+**Table 9.1: cells that moved 2 points or more between the Windows run and the WSL re-score (same weights, same items, same rule)**
+
+| arm | condition | level | Windows (section 8) | WSL re-score | move |
+|---|---|---|---|---|---|
+| E | no context | ICL_natural_subj | 68.8 | 62.5 | -6.3 |
+| B | no context | ICL_symbol_sst2 | 77.1 | 72.9 | -4.2 |
+| Cn | no context | ICL_natural_subj | 68.8 | 64.6 | -4.2 |
+| D | no context | L2_manip_isa | 63.8 | 61.2 | -2.6 |
+| D | no context | L3_induct_type_k4 | 52.5 | 55 | +2.5 |
+| base(m) | no context | L3_induct_type_nonsense | 38.1 | 40.6 | +2.5 |
+| base(m) | with context | L3_induct_type_k4 | 42.5 | 40 | -2.5 |
+| base(m) | with context | L4_induct_habitat | 35.6 | 38.1 | +2.5 |
+| base | no context | L3_induct_heldout | 42.7 | 40.6 | -2.1 |
+| base | no context | ICL_natural_banking77 | 91.7 | 93.8 | +2.1 |
+| base | no context | ICL_natural_sst2 | 93.8 | 91.7 | -2.1 |
+| A | no context | ICL_symbol_banking77 | 52.1 | 54.2 | +2.1 |
+| A | no context | ICL_symbol_subj | 52.1 | 54.2 | +2.1 |
+| B | no context | ICL_symbol_banking77 | 91.7 | 89.6 | -2.1 |
+| B | no context | ICL_symbol_subj | 64.6 | 62.5 | -2.1 |
+| C | no context | ICL_symbol_banking77 | 81.2 | 83.3 | +2.1 |
+| C | no context | ICL_symbol_sst2 | 77.1 | 79.2 | +2.1 |
+| Cn | no context | ICL_symbol_subj | 60.4 | 62.5 | +2.1 |
+| D | no context | ICL_natural_sst2 | 87.5 | 85.4 | -2.1 |
+| base(m) | no context | L3_induct_heldout | 35.4 | 33.3 | -2.1 |
+| base(m) | no context | ICL_natural_banking77 | 91.7 | 93.8 | +2.1 |
+| base(m) | no context | ICL_natural_sst2 | 93.8 | 91.7 | -2.1 |
+| B | no context | ICL_symbol_mean | 75.5 | 73.5 | -2 |
+
+This is the floor under any single-seed comparison of the same weights: two cells of the same arm are not different unless they differ by more than this, and section 11 puts the proper intervals on every cell. The tables in 8.2 are left as they were (they are the Windows-side numbers); `results/curriculum_Qwen2.5-3B_<arm>.json` now holds the WSL re-score, and `evals/LEADERBOARD.md` shows both runs.
+
+### 9.3 Merged versus unmerged LoRA
+
+Trained arms score at half the speed of the base model because unsloth applies the adapter unmerged in the forward pass (9.7 versus 5.1 minutes for the ladder). Folding the adapter into the weights (`rescore.py --merge`) would halve every later evaluation, so arm C was scored both ways and compared item by item (`scripts/compare_records.py`):
+
+| condition | items | unmerged acc | merged acc | items whose prediction flips | largest per-option log-prob change |
+|---|---|---|---|---|---|
+| no context (ladder, probes, ICL suite) | 2,320 | 54.2 | 53.8 | 42 (1.8%) | 1.7 |
+| with field-guide context (ladder) | 1,744 | 75.2 | 75.5 | 16 (0.9%) | 1.2 |
+
+Per level the accuracy moves by at most 2.5 points on 160 items (habitat induction 34.4 to 31.9) and 4.2 on 48 (ICL sst2 and subj with symbol labels); trained-format recall, the L6 levels and the probes do not move at all. The merged model scored the whole evaluation in 14.6 minutes against 24.2.
+
+**Verdict.** Merging changes predictions at the same rate as running the same weights on a different machine (9.2), so it is adopted for every evaluation that does not need to reproduce a section 8 number: the constructed-response decoding of step 3 merges before generating, and `rescore.py --merge` is the fast path for new adapters. `EVAL_ONLY` re-scores of the section 8 arms stay unmerged.
+
+### 9.4 Section 6 adapters on the frozen ladder
+
+The three section 6 adapters were trained on the plain universe with knowledge text only (600 steps, lr 1e-4), so they are arm A at a smaller budget, and they scored the ladder as it was regenerated at the time; this is their first score on the frozen v1 items, which also adds the held-out induction level, the probes and the ICL suite they never had. Mean rule, `results/rescore_<adapter>.json`:
+
+| adapter | recall, trained fmt | yes/no | pair | Timmy k=3 | k=4 | weakness | habitat | novel choices | held-out species | ICL symbol | ICL natural | ppl | recall, trained fmt (+ctx) | yes/no (+ctx) | pair (+ctx) | Timmy k=3 (+ctx) | k=4 (+ctx) | weakness (+ctx) | habitat (+ctx) | novel choices (+ctx) | held-out species (+ctx) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0.5B, transformers LoRA (6.4) | 100 | 53.8 | 45 | 30 | 21.2 | 40 | 32.5 | 11.9 | 31.2 | 53.6 | 79.7 | 132.5 | 100 | 55 | 48.8 | 31.9 | 23.8 | 40 | 32.5 | 11.2 | 30.2 |
+| 3B, transformers LoRA (6.4) | 100 | 88.8 | 85 | 33.8 | 31.9 | 40 | 30.6 | 15 | 32.3 | 49.5 | 81.8 | 20.34 | 100 | 100 | 90 | 33.8 | 27.5 | 37.5 | 35.6 | 10.6 | 28.1 |
+| 3B, unsloth LoRA (6.4 replicate) | 100 | 93.8 | 78.8 | 36.9 | 37.5 | 38.1 | 28.1 | 12.5 | 27.1 | 50.5 | 80.8 | 17.11 | 100 | 98.8 | 91.2 | 41.9 | 38.8 | 38.8 | 33.8 | 12.5 | 32.3 |
+
+The 3B adapters land within the section 9.2 floor of their section 6.4 rows on the shared levels, and the 0.5B adapter stays where 6.4 left it: recall in the trained format, chance on everything that needs the fact to be used. The ICL suite columns are new and put the knowledge-only recipe at the base model's level or below, like arm A in 8.2.
