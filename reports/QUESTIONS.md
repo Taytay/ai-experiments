@@ -1053,3 +1053,12 @@ that change what is learned are soft targets, a bounded proper score beside the 
 (row 68):* the row 53 encoder with each objective, and with the layout pre-trained on general multiple-choice data first (UniMC,
 Yang et al. 2022, is the prior art for [MASK]-per-option encoders trained on many MC datasets); read by bits, ECE, AURC and coverage
 at a realised 98% precision on held-out users, which is what auto-filing needs.
+
+**MODEL-10 Can GLiClass-type and instruction-tuned masked-LM encoders be made to work as user categorisers?** Section 46's GLiClass
+(151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the rows) was hurt by the 24 shots;
+section 29's ModernBERT was plain ModernBERT-large taught letters in 800 steps and stayed at chance. Neither had what row 53's
+encoder had: the shots as plain lines on every episode, options shuffled, 24,000 episodes. *Experiment (row 69):* GLiClass
+modern-large v3.0 (its label-token pooling and scorer) and ModernBERT-Large-Instruct (its card's `ANSWER: [unused0] [MASK]` template,
+the MLM head over the options' IDs) through the same data, loop and scorer; for ModernBERT-Instruct, letter IDs against unused
+tokens with no prior meaning, since option IDs carry selection bias (Zheng et al. ICLR 2024; Robinson and Wingate ICLR 2023 on
+multiple-choice symbol binding). The question is whether the family matters once the training matches.
