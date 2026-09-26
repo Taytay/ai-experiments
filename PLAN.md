@@ -6,6 +6,41 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
+## Current state (2026-09-26; overwrite this block when it changes)
+
+A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
+
+- **Goal (owner, 2026-09-26):** understand the science, not tune a product. Q1 how LLMs and encoders work as multiple-choice
+  categorisers; Q2 the best way to inject knowledge (fact databases); Q3 inferring meaningless category names from examples in
+  training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest.
+- **Where the work runs:** all GPU work on Modal (the owner's decision, 2026-09-25), not the local 3090: `scripts/modal_app.py`,
+  job lists in `scripts/modal_jobs/`, how-to in CLAUDE.md ("GPU work: Modal"). bf16 is the default base precision for new runs.
+  Every table reports the scorecard (`ai_experiments.scorecard`, REPORT.md 59) with skill over the no-model cascade; add a blind
+  strong-reader ceiling (`scripts/blind_ceiling.py`) for new item sets.
+- **Branches:** nothing is merged to main; the owner merges. Stack #24 in PR order ends ... #58 plan-49-calibration, #59
+  plan-56-train-efficiency, #60 plan-57-db-episodes, #61 plan-34-modal, #62 plan-58-fair-record, #63 plan-60-batch, #64
+  plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (top). New work branches from the
+  top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
+  merge-forward: resolve as the union of rows by `run_id`, sorted.
+- **Checkouts:** `~/projects/YNAB/ai-experiments` (main checkout, on plan-56; holds every trained adapter under `models/adapters`
+  and runs `just push-models`), `../ai-experiments-wt34` (on the top branch; Modal jobs are launched from here), `../ai-experiments-wt06`
+  (plan-57), `../ai-experiments-wt07` (the owner's, do not touch). Adapters trained on Modal come back in `<checkout>/modal_out/<tag>/`
+  (gitignored): copy them into the main checkout's `models/adapters/`, `just push-models` there, commit `models/adapters.dvc` on the top branch.
+- **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
+  provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
+- **In flight:** row 64 (REAL-20, label induction). Its six Modal scoring jobs (`scripts/modal_jobs/r64.json`, tags `r64-*`; 3B / 7B /
+  14B untrained, the no-DB and episode categorisers, a rename-augmented one) were launched 2026-09-26; pull with
+  `modal volume get ai-exp-results <tag> modal_out/`. The blind Opus Latin square is scored (`results/blind_opus/label_induction_v1/`):
+  98 to 100% in every condition INCLUDING zero gold examples, because the scheme leaves out one standard category and puts exactly one
+  unexplained coined word in its place, so elimination solves it. v1 measures elimination as much as induction; build v2 with two or
+  three extra coined categories that have no examples (users do have unused categories), so elimination leaves a guess among several
+  words and only the examples can decide; then score the same readers and a new Latin square. Write REPORT section 60 from both.
+- **Next:** row 65 (POI-1): 200 synthetic users over real Overture places, schemes grouping 20 to 45 Overture basic categories into 12 to 20
+  of their own (readable, merged, coined names), 150-place histories and 24 frozen shots, test places in no history (half of a kind the
+  user has filed, half an unseen kind of a known group), clean and obscure renderings, REAL-6's item format so every tool works; consumer
+  categories survey done (exclude geographic_entities, cultural_and_historic, community_and_government). Then 66 (facts or skill on
+  Overture), 67 (probes), and the older todo rows as the agenda maps them.
+
 ## Procedure for one step
 
 1. Read the row's IDs in `reports/QUESTIONS.md` (definition, what the reviewer saw, the proposed
