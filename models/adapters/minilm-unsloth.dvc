@@ -1,0 +1,6 @@
+outs:
+- md5: 853e4f0683acbf4aad84d6f7000c53a3.dir
+  size: 46164898
+  nfiles: 10
+  hash: md5
+  path: minilm-unsloth

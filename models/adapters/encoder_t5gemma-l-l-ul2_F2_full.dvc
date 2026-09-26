@@ -1,0 +1,6 @@
+outs:
+- md5: 159f74106db20ceb563a600674d78580.dir
+  size: 2517975205
+  nfiles: 5
+  hash: md5
+  path: encoder_t5gemma-l-l-ul2_F2_full

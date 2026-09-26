@@ -1,0 +1,6 @@
+outs:
+- md5: a6c157ea3d5166f8f88fed60a0bee920.dir
+  size: 1203302972
+  nfiles: 11
+  hash: md5
+  path: embed_qwen3_merchant_ft_newtok_mean

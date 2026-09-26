@@ -1,0 +1,6 @@
+outs:
+- md5: aec04bb2fd0319db3226385fd8b73f8a.dir
+  size: 658054494
+  nfiles: 15
+  hash: md5
+  path: embed_egemma_kge_distmult

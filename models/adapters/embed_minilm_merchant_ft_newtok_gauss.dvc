@@ -1,0 +1,6 @@
+outs:
+- md5: 57410e70396593dcb5c1257d584a213e.dir
+  size: 46276971
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_merchant_ft_newtok_gauss
