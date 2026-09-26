@@ -1,0 +1,840 @@
+{"task": "clean_category", "merchant": "Elrholm", "pred": 2, "answer": 0, "correct": 0, "scores": [-5.553, -8.8391, -3.7003, -9.5579, -10.5579, -6.3871, -6.4998, -11.7766, -9.0891, -10.8391, -8.1516, -7.4491]}
+{"task": "bank_category", "merchant": "Elrholm", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.7947, -8.5083, -1.8488, -4.5708, -4.1333, -5.2259, -7.7706, -6.0083, -3.9458, -7.0395, -7.3208, -6.0157]}
+{"task": "sells", "merchant": "Elrholm", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.2788, -3.6865, -5.3898, -5.0088]}
+{"task": "reverse", "merchant": "Elrholm", "pred": 1, "answer": 3, "correct": 0, "scores": [-2.3287, -1.3594, -2.0926, -3.0167]}
+{"task": "clean_category", "merchant": "Fenstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.5613, -12.478, -4.2538, -9.9155, -11.603, -9.7878, -7.0112, -12.8374, -13.8452, -11.478, -13.7046, -9.0019]}
+{"task": "bank_category", "merchant": "Fenstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.9602, -9.5039, -2.1304, -5.0664, -3.5664, -5.5677, -7.3807, -4.8789, -2.3789, -8.4101, -4.9414, -6.1414]}
+{"task": "sells", "merchant": "Fenstead Ltd", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.9478, -6.2036, -6.7207, -4.1655]}
+{"task": "reverse", "merchant": "Fenstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.004, -4.2071, -1.5294, -1.6748]}
+{"task": "clean_category", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.1073, -7.0794, -2.7238, -10.095, -10.5794, -9.9071, -7.3152, -8.5794, -13.8867, -9.3606, -8.6106, -8.5252]}
+{"task": "bank_category", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.5422, -8.7732, -1.3078, -5.0232, -4.5857, -4.3311, -6.6284, -8.367, -7.4607, -8.8045, -7.2107, -5.5677]}
+{"task": "sells", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.763, -5.7014, -3.4294, -5.4784]}
+{"task": "reverse", "merchant": "Calholm Bros", "pred": 1, "answer": 1, "correct": 1, "scores": [-2.0044, -1.7428, -2.0083, -2.5739]}
+{"task": "clean_category", "merchant": "Kelmoor Group", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.2462, -11.4907, -3.4791, -10.7407, -10.272, -5.299, -6.6794, -9.4907, -10.3657, -12.0845, -7.6782, -6.884]}
+{"task": "bank_category", "merchant": "Kelmoor Group", "pred": 2, "answer": 0, "correct": 0, "scores": [-1.4744, -9.209, -1.2293, -8.1465, -6.1778, -4.9127, -6.6265, -6.9278, -5.6778, -10.6153, -6.4278, -6.4486]}
+{"task": "sells", "merchant": "Kelmoor Group", "pred": 1, "answer": 3, "correct": 0, "scores": [-6.7798, -4.2418, -7.3786, -5.5825]}
+{"task": "reverse", "merchant": "Kelmoor Group", "pred": 0, "answer": 3, "correct": 0, "scores": [-1.0224, -1.9047, -2.9907, -1.4613]}
+{"task": "clean_category", "merchant": "Rinsley & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.5532, -13.1034, -4.7432, -11.3377, -12.5252, -8.1293, -8.5481, -13.7674, -14.1737, -13.9706, -8.9002, -8.1572]}
+{"task": "bank_category", "merchant": "Rinsley & Sons", "pred": 2, "answer": 0, "correct": 0, "scores": [-5.1332, -8.8066, -1.7539, -5.7441, -1.9941, -5.5635, -6.6428, -6.9003, -8.2753, -7.1503, -9.2753, -5.0144]}
+{"task": "sells", "merchant": "Rinsley & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.1699, -6.8908, -3.1941, -7.96]}
+{"task": "reverse", "merchant": "Rinsley & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.7827, -2.2598, -1.2726, -1.6847]}
+{"task": "clean_category", "merchant": "Oskley Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.8678, -13.2666, -3.4017, -12.8995, -6.5401, -8.2152, -7.0758, -4.7276, -14.4268, -12.337, -10.6651, -7.1033]}
+{"task": "bank_category", "merchant": "Oskley Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.4314, -9.7174, -3.1023, -6.6236, -5.5611, -4.1927, -6.6864, -7.3736, -9.2486, -9.6236, -9.9049, -7.1454]}
+{"task": "sells", "merchant": "Oskley Inc", "pred": 3, "answer": 3, "correct": 1, "scores": [-5.1977, -6.9799, -6.3358, -4.5352]}
+{"task": "reverse", "merchant": "Oskley Inc", "pred": 0, "answer": 3, "correct": 0, "scores": [-1.4489, -1.6589, -3.5033, -1.9894]}
+{"task": "clean_category", "merchant": "Griwen", "pred": 1, "answer": 0, "correct": 0, "scores": [-6.6144, -2.7218, -4.1527, -15.3156, -11.7843, -9.4845, -8.5586, -12.3624, -6.5968, -14.6749, -11.8937, -8.8323]}
+{"task": "bank_category", "merchant": "Griwen", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.5881, -5.2291, -1.4024, -2.5416, -4.0416, -6.899, -6.0731, -6.9166, -3.2916, -7.7603, -4.4166, -6.0426]}
+{"task": "sells", "merchant": "Griwen", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.6953, -6.9426, -4.4163, -4.471]}
+{"task": "reverse", "merchant": "Griwen", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.5399, -1.5596, -5.3354, -2.4947]}
+{"task": "clean_category", "merchant": "Polwick Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-5.1564, -7.5417, -2.8549, -11.9636, -11.2917, -9.8713, -7.8219, -9.7605, -11.0573, -10.0417, -11.6823, -7.9715]}
+{"task": "bank_category", "merchant": "Polwick Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.8317, -9.4854, -1.7806, -5.2666, -4.2041, -5.2305, -6.9621, -7.0791, -5.2041, -7.9229, -8.0791, -6.4885]}
+{"task": "sells", "merchant": "Polwick Ltd", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.0813, -5.8708, -2.7082, -5.9076]}
+{"task": "reverse", "merchant": "Polwick Ltd", "pred": 1, "answer": 1, "correct": 1, "scores": [-3.6616, -2.3396, -3.4671, -2.9327]}
+{"task": "clean_category", "merchant": "Orlcott Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.9832, -8.7316, -3.1722, -8.1066, -8.9191, -8.4988, -7.4407, -9.6379, -14.1144, -9.3254, -13.7824, -8.116]}
+{"task": "bank_category", "merchant": "Orlcott Inc", "pred": 8, "answer": 0, "correct": 0, "scores": [-5.633, -9.0018, -2.4221, -7.0955, -3.9393, -6.7851, -6.9195, -5.1268, -1.6893, -9.6268, -8.2518, -6.3247]}
+{"task": "sells", "merchant": "Orlcott Inc", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.8681, -6.8742, -4.7075, -4.0777]}
+{"task": "reverse", "merchant": "Orlcott Inc", "pred": 1, "answer": 2, "correct": 0, "scores": [-1.6911, -1.06, -2.0453, -2.8223]}
+{"task": "clean_category", "merchant": "Istdale Bros", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.7625, -15.8305, -4.8016, -9.9164, -13.6664, -8.5057, -8.2837, -12.5258, -11.6664, -11.8539, -11.9477, -10.2066]}
+{"task": "bank_category", "merchant": "Istdale Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.4176, -10.1824, -2.0452, -5.8699, -4.6824, -4.534, -6.6972, -6.8699, -7.5887, -8.4324, -7.4637, -5.9768]}
+{"task": "sells", "merchant": "Istdale Bros", "pred": 1, "answer": 1, "correct": 1, "scores": [-3.3239, -2.2997, -5.7451, -7.2876]}
+{"task": "reverse", "merchant": "Istdale Bros", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.0533, -0.93, -0.9401, -1.358]}
+{"task": "clean_category", "merchant": "Ulmvarro Ltd", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.0731, -6.4643, -3.3575, -7.0893, -10.9643, -9.8751, -6.9756, -9.058, -9.9955, -9.5893, -10.8393, -8.2111]}
+{"task": "bank_category", "merchant": "Ulmvarro Ltd", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.0235, -7.4669, -2.5869, -3.7482, -4.9357, -5.9098, -6.3379, -7.3419, -5.3732, -6.5294, -7.4669, -7.0734]}
+{"task": "sells", "merchant": "Ulmvarro Ltd", "pred": 1, "answer": 2, "correct": 0, "scores": [-4.7984, -3.63, -5.0566, -5.4961]}
+{"task": "reverse", "merchant": "Ulmvarro Ltd", "pred": 1, "answer": 1, "correct": 1, "scores": [-1.7452, -0.6524, -1.0613, -1.2179]}
+{"task": "clean_category", "merchant": "Torwick Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.9874, -4.2984, -2.7656, -5.9859, -8.7359, -9.014, -7.0528, -8.2671, -14.6187, -8.6109, -9.3609, -8.315]}
+{"task": "bank_category", "merchant": "Torwick Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.3479, -5.0014, -0.7965, -4.0014, -3.7514, -5.6324, -6.7173, -5.7514, -6.7826, -7.7826, -7.4701, -6.9363]}
+{"task": "sells", "merchant": "Torwick Inc", "pred": 2, "answer": 3, "correct": 0, "scores": [-7.0892, -5.5779, -4.2021, -4.3847]}
+{"task": "reverse", "merchant": "Torwick Inc", "pred": 1, "answer": 0, "correct": 0, "scores": [-1.9569, -1.081, -3.5723, -2.5299]}
+{"task": "clean_category", "merchant": "Dovstead", "pred": 2, "answer": 1, "correct": 0, "scores": [-6.8783, -11.1386, -2.0143, -12.748, -12.4355, -8.277, -8.9034, -10.7949, -10.7949, -14.5761, -12.8418, -7.0382]}
+{"task": "bank_category", "merchant": "Dovstead", "pred": 8, "answer": 1, "correct": 0, "scores": [-5.054, -9.7265, -2.3954, -8.1015, -5.539, -8.6008, -7.4655, -6.539, -0.914, -7.914, -6.664, -6.7447]}
+{"task": "sells", "merchant": "Dovstead", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.4803, -3.2557, -5.0262, -5.3262]}
+{"task": "reverse", "merchant": "Dovstead", "pred": 3, "answer": 1, "correct": 0, "scores": [-4.2396, -0.8836, -2.3728, -0.6114]}
+{"task": "clean_category", "merchant": "Vorvarro Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.9456, -8.3463, -3.6174, -7.2213, -8.8776, -11.0805, -7.1801, -8.4401, -10.2838, -8.1588, -9.0026, -7.9396]}
+{"task": "bank_category", "merchant": "Vorvarro Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.4599, -9.401, -2.6729, -3.8385, -5.4635, -5.9845, -6.7511, -8.2135, -7.1198, -5.651, -8.4635, -6.5866]}
+{"task": "sells", "merchant": "Vorvarro Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.3322, -3.64, -3.7109, -4.2694]}
+{"task": "reverse", "merchant": "Vorvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.6893, -7.7554, -1.4214, -1.8146]}
+{"task": "clean_category", "merchant": "Calholm Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.8234, -5.6968, -2.0313, -5.6343, -8.2593, -8.8527, -6.7781, -8.4781, -11.2125, -8.3218, -8.8531, -7.823]}
+{"task": "bank_category", "merchant": "Calholm Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.5105, -7.487, -0.6134, -4.6745, -4.6745, -5.1566, -7.0898, -6.5807, -5.0495, -8.2057, -7.2682, -5.2599]}
+{"task": "sells", "merchant": "Calholm Co", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.9231, -3.2319, -2.9103, -6.0333]}
+{"task": "reverse", "merchant": "Calholm Co", "pred": 1, "answer": 1, "correct": 1, "scores": [-2.3569, -1.6204, -3.3154, -1.8518]}
+{"task": "clean_category", "merchant": "Rinhurst Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.8286, -6.0023, -2.7749, -14.3156, -15.2328, -8.7673, -8.4326, -8.7523, -11.4555, -9.3148, -8.4711, -9.1238]}
+{"task": "bank_category", "merchant": "Rinhurst Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.2077, -7.8032, -1.463, -5.1782, -3.5532, -4.8135, -6.1567, -7.0844, -6.3657, -7.4282, -5.7407, -5.8108]}
+{"task": "sells", "merchant": "Rinhurst Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.2253, -7.0077, -3.1542, -7.5807]}
+{"task": "reverse", "merchant": "Rinhurst Bros", "pred": 0, "answer": 2, "correct": 0, "scores": [-1.5332, -4.3145, -1.6292, -1.7891]}
+{"task": "clean_category", "merchant": "Wexstead LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-5.2936, -8.7484, -3.1156, -12.5218, -12.8343, -9.3917, -8.4235, -8.2171, -9.4046, -8.0921, -9.8109, -7.8751]}
+{"task": "bank_category", "merchant": "Wexstead LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.4345, -6.7142, -1.2586, -4.9954, -3.4329, -6.1276, -6.3132, -4.5579, -3.0579, -7.1204, -4.6204, -6.3054]}
+{"task": "sells", "merchant": "Wexstead LLC", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.8574, -2.6455, -5.1261, -2.9511]}
+{"task": "reverse", "merchant": "Wexstead LLC", "pred": 3, "answer": 1, "correct": 0, "scores": [-3.2565, -1.5094, -2.1102, -0.677]}
+{"task": "clean_category", "merchant": "Lommere Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.3924, -5.87, -2.4062, -10.2137, -9.6825, -12.2463, -6.095, -8.9325, -3.4325, -12.2762, -3.495, -6.349]}
+{"task": "bank_category", "merchant": "Lommere Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-1.5587, -4.3663, -0.8585, -7.8038, -7.085, -6.5949, -6.9129, -7.0538, -3.2413, -9.9913, -5.4288, -5.8536]}
+{"task": "sells", "merchant": "Lommere Group", "pred": 3, "answer": 3, "correct": 1, "scores": [-4.6509, -4.3207, -6.1419, -3.9971]}
+{"task": "reverse", "merchant": "Lommere Group", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.8683, -3.7745, -3.2233, -1.6734]}
+{"task": "clean_category", "merchant": "Orlhurst Co", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.93, -2.4348, -2.7549, -9.1848, -13.9251, -9.8646, -7.7337, -9.0598, -10.3098, -7.1536, -10.2161, -7.9744]}
+{"task": "bank_category", "merchant": "Orlhurst Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.946, -6.509, -0.9329, -4.384, -2.5715, -6.9456, -6.2496, -5.1965, -2.384, -8.009, -6.3215, -5.1379]}
+{"task": "sells", "merchant": "Orlhurst Co", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.116, -5.1224, -3.2993, -6.4965]}
+{"task": "reverse", "merchant": "Orlhurst Co", "pred": 1, "answer": 0, "correct": 0, "scores": [-1.7349, -1.0721, -2.0735, -2.1792]}
+{"task": "clean_category", "merchant": "Fenley Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.5944, -6.1989, -3.874, -16.4177, -13.1286, -8.6028, -8.3716, -11.9177, -10.5427, -10.0739, -10.2614, -8.0229]}
+{"task": "bank_category", "merchant": "Fenley Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.146, -4.1122, -1.1673, -7.6434, -5.6747, -7.5918, -6.932, -4.4872, -3.8622, -7.2997, -5.8622, -6.1071]}
+{"task": "sells", "merchant": "Fenley Group", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.1451, -5.0372, -3.6836, -6.8192]}
+{"task": "reverse", "merchant": "Fenley Group", "pred": 3, "answer": 1, "correct": 0, "scores": [-2.2805, -2.0086, -2.2062, -1.4734]}
+{"task": "clean_category", "merchant": "Ulmford LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.9428, -17.3561, -2.0447, -8.7467, -11.7155, -9.9406, -9.1341, -10.8092, -10.8717, -14.1764, -8.653, -7.7543]}
+{"task": "bank_category", "merchant": "Ulmford LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.9583, -10.2109, -1.5641, -5.1171, -3.5546, -5.002, -6.5131, -7.8671, -6.2421, -7.6796, -7.3359, -6.8283]}
+{"task": "sells", "merchant": "Ulmford LLC", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.5172, -4.0885, -6.3758, -4.3048]}
+{"task": "reverse", "merchant": "Ulmford LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.7795, -1.1574, -0.2764, -1.9141]}
+{"task": "clean_category", "merchant": "Wexlock LLC", "pred": 9, "answer": 2, "correct": 0, "scores": [-7.3023, -12.132, -5.4202, -14.1476, -15.8918, -9.7381, -7.5253, -8.9132, -8.8507, -3.132, -9.8507, -8.9983]}
+{"task": "bank_category", "merchant": "Wexlock LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.1966, -9.6448, -2.3998, -7.801, -7.4573, -5.8421, -6.6685, -7.0198, -5.051, -7.2073, -9.1135, -6.9269]}
+{"task": "sells", "merchant": "Wexlock LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-3.3936, -8.0875, -5.3167, -2.932]}
+{"task": "reverse", "merchant": "Wexlock LLC", "pred": 1, "answer": 3, "correct": 0, "scores": [-3.4575, -1.719, -1.9761, -1.7303]}
+{"task": "clean_category", "merchant": "Rinham", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.8289, -12.7964, -2.015, -13.0777, -11.6402, -8.7896, -9.3514, -10.8589, -11.8902, -12.2027, -12.0777, -7.6956]}
+{"task": "bank_category", "merchant": "Rinham", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.0565, -11.2037, -1.9381, -7.985, -9.11, -3.9679, -8.189, -9.5787, -8.7037, -11.0475, -10.5787, -6.2052]}
+{"task": "sells", "merchant": "Rinham", "pred": 3, "answer": 3, "correct": 1, "scores": [-4.102, -6.2707, -6.9588, -2.4978]}
+{"task": "reverse", "merchant": "Rinham", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.2535, -2.167, -4.5567, -2.6329]}
+{"task": "clean_category", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.6875, -15.1352, -4.679, -4.8383, -12.4008, -9.2446, -9.8882, -16.5238, -10.5883, -9.2133, -16.1703, -7.7506]}
+{"task": "bank_category", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.5454, -9.7491, -2.3203, -3.7178, -4.9678, -5.3933, -7.216, -9.4678, -6.2178, -6.4678, -9.2491, -6.2829]}
+{"task": "sells", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.8291, -8.4591, -4.474, -7.3748]}
+{"task": "reverse", "merchant": "Kelvarro Inc", "pred": 3, "answer": 2, "correct": 0, "scores": [-5.6852, -2.0067, -0.903, -0.5095]}
+{"task": "clean_category", "merchant": "Yarlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.7414, -10.6164, -2.4984, -3.7258, -4.9758, -6.8027, -6.4354, -7.6633, -4.2258, -8.007, -7.007, -6.2412]}
+{"task": "bank_category", "merchant": "Yarlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.0052, -11.1981, -0.8803, -8.12, -5.12, -6.6573, -6.1169, -9.5262, -5.37, -8.7762, -8.745, -7.2897]}
+{"task": "sells", "merchant": "Yarlock", "pred": 3, "answer": 1, "correct": 0, "scores": [-5.8417, -3.189, -3.557, -2.9743]}
+{"task": "reverse", "merchant": "Yarlock", "pred": 0, "answer": 0, "correct": 1, "scores": [-0.8741, -1.2055, -2.7548, -2.2802]}
+{"task": "clean_category", "merchant": "Wexden Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.4909, -14.1024, -3.4075, -13.0516, -14.5595, -9.9177, -8.4695, -11.8876, -8.2782, -17.2626, -13.622, -7.7839]}
+{"task": "bank_category", "merchant": "Wexden Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.7057, -8.945, -1.2388, -5.2575, -3.82, -5.5069, -7.1485, -6.3825, -4.1325, -7.9763, -6.9763, -5.8175]}
+{"task": "sells", "merchant": "Wexden Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.2698, -2.3965, -4.9399, -4.8264]}
+{"task": "reverse", "merchant": "Wexden Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.5818, -1.243, -1.5521, -3.1032]}
+{"task": "clean_category", "merchant": "Wexham Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.2162, -12.1857, -2.5227, -4.756, -5.6935, -6.3789, -6.5436, -6.8498, -6.631, -6.0685, -4.256, -7.3111]}
+{"task": "bank_category", "merchant": "Wexham Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.6294, -11.2535, -1.9001, -6.1754, -4.9254, -5.4957, -7.1461, -7.7379, -7.8316, -6.5504, -6.9566, -6.1807]}
+{"task": "sells", "merchant": "Wexham Bros", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.2387, -3.0522, -4.3934, -3.7203]}
+{"task": "reverse", "merchant": "Wexham Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.2737, -1.1935, -0.6548, -0.9729]}
+{"task": "clean_category", "merchant": "Orllock & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.7509, -19.5032, -4.2941, -14.9563, -13.847, -9.2677, -7.9398, -13.7376, -11.597, -13.597, -13.4251, -9.5163]}
+{"task": "bank_category", "merchant": "Orllock & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.3916, -12.6565, -2.0841, -9.1878, -5.6565, -6.0196, -6.8275, -7.7503, -7.0628, -10.594, -7.219, -7.454]}
+{"task": "sells", "merchant": "Orllock & Sons", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.5544, -5.1194, -6.6626, -3.9207]}
+{"task": "reverse", "merchant": "Orllock & Sons", "pred": 2, "answer": 0, "correct": 0, "scores": [-1.2849, -1.6234, -1.1957, -3.0188]}
+{"task": "clean_category", "merchant": "Dovmoor Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.9035, -10.9122, -3.0785, -4.0372, -8.631, -7.4106, -7.3597, -11.1466, -5.2247, -6.4435, -4.9122, -7.8115]}
+{"task": "bank_category", "merchant": "Dovmoor Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.3834, -11.6216, -2.3183, -8.9341, -7.4341, -4.7205, -8.1365, -8.5278, -7.3716, -9.2778, -8.4028, -6.9605]}
+{"task": "sells", "merchant": "Dovmoor Bros", "pred": 3, "answer": 1, "correct": 0, "scores": [-4.0438, -3.9117, -4.0572, -3.6884]}
+{"task": "reverse", "merchant": "Dovmoor Bros", "pred": 1, "answer": 1, "correct": 1, "scores": [-2.2729, -0.5878, -1.7214, -1.5021]}
+{"task": "clean_category", "merchant": "Dovcott Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-8.2188, -16.1502, -4.7401, -15.033, -10.2049, -9.2023, -11.0968, -13.2987, -10.6737, -13.3299, -16.7029, -9.686]}
+{"task": "bank_category", "merchant": "Dovcott Inc", "pred": 8, "answer": 2, "correct": 0, "scores": [-5.2994, -9.2118, -2.1387, -6.7118, -6.8993, -5.3917, -7.19, -6.7118, -1.5243, -9.5555, -9.2743, -5.6565]}
+{"task": "sells", "merchant": "Dovcott Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.8885, -3.3694, -4.5509, -6.0159]}
+{"task": "reverse", "merchant": "Dovcott Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.0919, -2.2623, -3.8796, -3.1612]}
+{"task": "clean_category", "merchant": "Nevmoor Ltd", "pred": 10, "answer": 3, "correct": 0, "scores": [-4.6982, -12.1959, -3.2141, -6.0866, -8.8053, -8.5772, -7.195, -8.5866, -5.5241, -7.7116, -1.5866, -7.2552]}
+{"task": "bank_category", "merchant": "Nevmoor Ltd", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.1118, -10.5487, -2.2297, -5.7362, -5.6737, -4.9035, -6.8774, -5.7362, -5.6737, -7.955, -4.9237, -6.2646]}
+{"task": "sells", "merchant": "Nevmoor Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-6.8751, -4.2785, -3.0793, -4.4835]}
+{"task": "reverse", "merchant": "Nevmoor Ltd", "pred": 2, "answer": 2, "correct": 1, "scores": [-1.3066, -2.5868, -1.0141, -1.4381]}
+{"task": "clean_category", "merchant": "Quildale", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.5631, -12.8263, -3.8309, -5.717, -10.717, -9.4016, -8.312, -8.3732, -9.1857, -14.0763, -9.1545, -7.4066]}
+{"task": "bank_category", "merchant": "Quildale", "pred": 3, "answer": 3, "correct": 1, "scores": [-3.8566, -11.9541, -2.1955, -2.126, -3.001, -5.7841, -7.0009, -6.9385, -6.4385, -9.501, -5.3135, -5.5648]}
+{"task": "sells", "merchant": "Quildale", "pred": 1, "answer": 2, "correct": 0, "scores": [-10.5088, -3.5323, -3.7661, -5.2734]}
+{"task": "reverse", "merchant": "Quildale", "pred": 1, "answer": 2, "correct": 0, "scores": [-1.7938, -1.2303, -2.872, -2.4417]}
+{"task": "clean_category", "merchant": "Marmoor", "pred": 3, "answer": 3, "correct": 1, "scores": [-7.4106, -15.4866, -6.7799, -3.1584, -13.0022, -8.0506, -9.3736, -15.9319, -11.3147, -10.5959, -12.4084, -8.7701]}
+{"task": "bank_category", "merchant": "Marmoor", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.5153, -9.3506, -2.4456, -12.1319, -10.2256, -7.1521, -7.8723, -7.5069, -2.6319, -10.6006, -10.0381, -7.4258]}
+{"task": "sells", "merchant": "Marmoor", "pred": 0, "answer": 3, "correct": 0, "scores": [-4.8373, -10.3359, -4.9651, -7.5441]}
+{"task": "reverse", "merchant": "Marmoor", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.0394, -1.0282, -2.0246, -2.5288]}
+{"task": "clean_category", "merchant": "Nevley LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.7962, -16.5174, -2.7292, -8.283, -10.1893, -7.7122, -7.7468, -11.5799, -10.0643, -11.0643, -10.8143, -6.6117]}
+{"task": "bank_category", "merchant": "Nevley LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.4511, -7.891, -1.6803, -4.641, -2.516, -6.0119, -5.9258, -6.5473, -5.4535, -6.2035, -5.0785, -5.8608]}
+{"task": "sells", "merchant": "Nevley LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.8192, -6.354, -4.7893, -3.8217]}
+{"task": "reverse", "merchant": "Nevley LLC", "pred": 3, "answer": 2, "correct": 0, "scores": [-2.5732, -2.1137, -2.3475, -1.0058]}
+{"task": "clean_category", "merchant": "Zedholm & Sons", "pred": 2, "answer": 3, "correct": 0, "scores": [-7.2822, -13.743, -4.4148, -6.618, -12.7587, -10.384, -8.6704, -12.0868, -5.8055, -10.493, -12.1649, -8.6594]}
+{"task": "bank_category", "merchant": "Zedholm & Sons", "pred": 8, "answer": 3, "correct": 0, "scores": [-5.7078, -12.203, -4.0688, -4.7343, -4.8593, -4.5296, -6.9229, -8.3593, -3.6718, -9.6718, -6.4218, -6.3393]}
+{"task": "sells", "merchant": "Zedholm & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.7479, -7.0664, -6.1466, -5.7168]}
+{"task": "reverse", "merchant": "Zedholm & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-0.5422, -3.8946, -1.5284, -1.9255]}
+{"task": "clean_category", "merchant": "Rinstead LLC", "pred": 0, "answer": 3, "correct": 0, "scores": [-4.2595, -14.1292, -4.3566, -8.3294, -10.97, -10.6183, -7.452, -11.7044, -7.6731, -9.2356, -8.4544, -7.0721]}
+{"task": "bank_category", "merchant": "Rinstead LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.7007, -7.7422, -1.7626, -2.5235, -2.1485, -5.7367, -6.8025, -5.7735, -4.586, -7.836, -4.961, -5.3153]}
+{"task": "sells", "merchant": "Rinstead LLC", "pred": 3, "answer": 2, "correct": 0, "scores": [-6.0385, -5.1312, -4.2919, -3.7139]}
+{"task": "reverse", "merchant": "Rinstead LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.6122, -1.6374, -1.4706, -3.5774]}
+{"task": "clean_category", "merchant": "Oskbury LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-7.6935, -13.2176, -4.9499, -2.5457, -8.7332, -9.7542, -9.1721, -8.9207, -9.2957, -12.7957, -7.8582, -6.7241]}
+{"task": "bank_category", "merchant": "Oskbury LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.523, -7.517, -2.1174, -4.767, -2.8295, -4.9829, -6.5714, -5.7045, -5.142, -6.642, -5.9545, -6.5521]}
+{"task": "sells", "merchant": "Oskbury LLC", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.408, -4.1776, -6.1651, -5.1571]}
+{"task": "reverse", "merchant": "Oskbury LLC", "pred": 3, "answer": 2, "correct": 0, "scores": [-1.3862, -2.4646, -1.9556, -0.6315]}
+{"task": "clean_category", "merchant": "Falholm Inc", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.3138, -12.2077, -3.2854, -3.0359, -7.4734, -10.2067, -8.415, -10.489, -9.5984, -12.1765, -8.5359, -7.5788]}
+{"task": "bank_category", "merchant": "Falholm Inc", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.2511, -7.9739, -1.7255, -3.6614, -4.2239, -4.9623, -7.4031, -6.7864, -4.2864, -8.7552, -7.1614, -5.917]}
+{"task": "sells", "merchant": "Falholm Inc", "pred": 3, "answer": 1, "correct": 0, "scores": [-5.8874, -5.7524, -5.3999, -5.0229]}
+{"task": "reverse", "merchant": "Falholm Inc", "pred": 3, "answer": 1, "correct": 0, "scores": [-1.5869, -3.8761, -1.9621, -1.397]}
+{"task": "clean_category", "merchant": "Kelton Bros", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.1304, -16.0053, -4.9932, -1.0273, -10.1835, -8.1682, -8.6233, -10.5585, -9.4335, -12.371, -8.1523, -8.3921]}
+{"task": "bank_category", "merchant": "Kelton Bros", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.901, -10.6409, -1.4448, -5.9378, -4.9378, -5.5654, -6.7401, -8.1565, -8.469, -4.7503, -6.8128, -6.438]}
+{"task": "sells", "merchant": "Kelton Bros", "pred": 0, "answer": 2, "correct": 0, "scores": [-2.2049, -5.0898, -4.0246, -4.4634]}
+{"task": "reverse", "merchant": "Kelton Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-1.867, -2.277, -1.5699, -5.1862]}
+{"task": "clean_category", "merchant": "Gridale", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.1529, -14.9342, -6.068, -2.1959, -10.2271, -6.8566, -10.485, -15.3424, -10.6334, -7.8834, -11.0084, -8.0349]}
+{"task": "bank_category", "merchant": "Gridale", "pred": 3, "answer": 3, "correct": 1, "scores": [-5.7547, -14.631, -5.4184, -1.4201, -7.8576, -6.9389, -7.7859, -12.9982, -9.8888, -10.6076, -9.3888, -7.0421]}
+{"task": "sells", "merchant": "Gridale", "pred": 3, "answer": 1, "correct": 0, "scores": [-4.8992, -6.3396, -4.2028, -4.1337]}
+{"task": "reverse", "merchant": "Gridale", "pred": 3, "answer": 0, "correct": 0, "scores": [-2.3349, -1.6613, -3.5068, -1.3801]}
+{"task": "clean_category", "merchant": "Kelwen Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.5424, -12.8493, -2.7893, -5.0133, -3.5133, -10.1949, -7.2381, -7.8258, -5.4508, -9.2633, -4.1383, -4.1268]}
+{"task": "bank_category", "merchant": "Kelwen Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.7901, -10.5597, -2.3165, -5.0597, -5.9347, -5.1904, -6.8868, -8.7159, -8.5597, -7.6222, -7.4347, -6.5196]}
+{"task": "sells", "merchant": "Kelwen Bros", "pred": 1, "answer": 3, "correct": 0, "scores": [-6.2689, -4.7201, -5.0697, -5.0098]}
+{"task": "reverse", "merchant": "Kelwen Bros", "pred": 1, "answer": 3, "correct": 0, "scores": [-2.7321, -1.6342, -3.2629, -3.0811]}
+{"task": "clean_category", "merchant": "Nevnard", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.8873, -10.8349, -2.3419, -11.663, -9.5224, -4.1568, -7.7419, -10.5849, -11.4286, -10.6786, -9.1786, -6.4319]}
+{"task": "bank_category", "merchant": "Nevnard", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.5308, -6.0428, -2.8132, -3.4803, -5.1053, -8.1811, -7.4726, -5.1678, -7.0428, -11.621, -5.1053, -6.3909]}
+{"task": "sells", "merchant": "Nevnard", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.9696, -3.0124, -7.2696, -5.0162]}
+{"task": "reverse", "merchant": "Nevnard", "pred": 0, "answer": 2, "correct": 0, "scores": [-1.5717, -2.2942, -4.2885, -2.2373]}
+{"task": "clean_category", "merchant": "Kellock Ltd", "pred": 2, "answer": 4, "correct": 0, "scores": [-6.3976, -15.3608, -3.6207, -11.3334, -13.3334, -9.1208, -9.7653, -8.9897, -12.3959, -12.2084, -10.5522, -7.078]}
+{"task": "bank_category", "merchant": "Kellock Ltd", "pred": 2, "answer": 4, "correct": 0, "scores": [-6.147, -11.8023, -2.493, -9.0523, -6.9273, -6.3407, -7.3226, -6.6773, -6.3023, -10.896, -6.771, -6.4385]}
+{"task": "sells", "merchant": "Kellock Ltd", "pred": 3, "answer": 1, "correct": 0, "scores": [-5.6012, -6.1735, -7.0482, -3.2352]}
+{"task": "reverse", "merchant": "Kellock Ltd", "pred": 0, "answer": 3, "correct": 0, "scores": [-1.3176, -3.2774, -2.5135, -1.8335]}
+{"task": "clean_category", "merchant": "Garcott Group", "pred": 2, "answer": 4, "correct": 0, "scores": [-6.5181, -14.3488, -4.977, -13.2238, -6.505, -10.8495, -8.9924, -9.63, -7.6925, -14.4425, -11.2238, -6.247]}
+{"task": "bank_category", "merchant": "Garcott Group", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.4046, -9.2302, -1.9127, -5.824, -4.1365, -6.5395, -7.0209, -4.6365, -3.0115, -10.4802, -7.199, -5.1563]}
+{"task": "sells", "merchant": "Garcott Group", "pred": 3, "answer": 1, "correct": 0, "scores": [-6.3579, -6.5076, -5.6507, -4.4344]}
+{"task": "reverse", "merchant": "Garcott Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.2234, -2.8382, -1.6271, -3.7973]}
+{"task": "clean_category", "merchant": "Vorwick LLC", "pred": 2, "answer": 4, "correct": 0, "scores": [-8.0032, -10.5936, -3.6422, -10.3749, -8.6249, -11.5793, -7.6215, -8.4999, -4.5624, -13.5936, -7.4374, -6.6455]}
+{"task": "bank_category", "merchant": "Vorwick LLC", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.4593, -9.0624, -1.3065, -6.3437, -2.6562, -4.9264, -6.8936, -5.5937, -3.5312, -6.9374, -7.0312, -5.8667]}
+{"task": "sells", "merchant": "Vorwick LLC", "pred": 1, "answer": 1, "correct": 1, "scores": [-6.8337, -3.4977, -3.89, -4.7818]}
+{"task": "reverse", "merchant": "Vorwick LLC", "pred": 3, "answer": 2, "correct": 0, "scores": [-1.9478, -5.6735, -3.2498, -0.8567]}
+{"task": "clean_category", "merchant": "Calholm", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.0414, -5.2912, -1.7102, -5.5412, -7.9474, -8.9294, -6.3702, -7.4474, -8.6037, -11.5724, -6.4162, -6.4152]}
+{"task": "bank_category", "merchant": "Calholm", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.6338, -6.7286, -0.6899, -4.5411, -3.9161, -5.4625, -7.0017, -6.8536, -4.9786, -9.9161, -6.6036, -4.8672]}
+{"task": "sells", "merchant": "Calholm", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.1437, -3.4978, -3.6954, -4.0439]}
+{"task": "reverse", "merchant": "Calholm", "pred": 3, "answer": 2, "correct": 0, "scores": [-2.2701, -2.5397, -3.2379, -1.1821]}
+{"task": "clean_category", "merchant": "Bramwick Co", "pred": 2, "answer": 4, "correct": 0, "scores": [-11.6226, -21.4474, -6.0442, -18.6427, -10.0802, -12.9519, -11.6491, -14.1427, -14.549, -20.8927, -14.6427, -8.2202]}
+{"task": "bank_category", "merchant": "Bramwick Co", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.8363, -4.6149, -1.3163, -5.4274, -3.3024, -6.2211, -6.8236, -5.8024, -6.2399, -6.0524, -7.8962, -7.4878]}
+{"task": "sells", "merchant": "Bramwick Co", "pred": 1, "answer": 3, "correct": 0, "scores": [-5.8233, -4.7783, -4.8464, -5.5369]}
+{"task": "reverse", "merchant": "Bramwick Co", "pred": 3, "answer": 3, "correct": 1, "scores": [-1.4121, -4.0805, -2.2761, -1.079]}
+{"task": "clean_category", "merchant": "Jornard Bros", "pred": 3, "answer": 4, "correct": 0, "scores": [-5.5875, -15.7939, -4.0129, -2.2919, -6.7919, -8.5246, -7.9035, -10.6357, -8.6982, -10.0732, -7.4794, -6.9934]}
+{"task": "bank_category", "merchant": "Jornard Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.8905, -9.5402, -1.0427, -3.3527, -1.7902, -5.8672, -6.4067, -5.7277, -6.8214, -7.0714, -5.0402, -5.5178]}
+{"task": "sells", "merchant": "Jornard Bros", "pred": 1, "answer": 0, "correct": 0, "scores": [-4.3458, -4.1172, -5.2634, -7.0228]}
+{"task": "reverse", "merchant": "Jornard Bros", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.7724, -2.0285, -1.7399, -0.5525]}
+{"task": "clean_category", "merchant": "Quilby & Sons", "pred": 2, "answer": 4, "correct": 0, "scores": [-7.9777, -15.3329, -4.5741, -8.6845, -6.122, -8.5787, -8.8748, -9.247, -12.4032, -17.1552, -9.8095, -5.8165]}
+{"task": "bank_category", "merchant": "Quilby & Sons", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.2205, -11.9942, -2.4781, -2.916, -3.541, -7.4294, -6.8793, -6.1035, -5.8535, -9.1973, -6.7285, -5.6859]}
+{"task": "sells", "merchant": "Quilby & Sons", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.5937, -3.1116, -3.168, -4.3219]}
+{"task": "reverse", "merchant": "Quilby & Sons", "pred": 1, "answer": 0, "correct": 0, "scores": [-1.6801, -1.1897, -2.5229, -3.207]}
+{"task": "clean_category", "merchant": "Talwick", "pred": 2, "answer": 4, "correct": 0, "scores": [-9.7337, -19.5372, -6.2236, -15.3416, -11.3104, -12.2246, -9.9882, -13.0604, -12.8416, -19.9315, -18.2948, -7.8808]}
+{"task": "bank_category", "merchant": "Talwick", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.3637, -13.5366, -2.4187, -6.3647, -5.5522, -5.3426, -7.6077, -6.8022, -6.4897, -7.8022, -8.7085, -7.4541]}
+{"task": "sells", "merchant": "Talwick", "pred": 2, "answer": 3, "correct": 0, "scores": [-6.1115, -4.7612, -3.3688, -3.3926]}
+{"task": "reverse", "merchant": "Talwick", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.2688, -4.4342, -3.2335, -5.8627]}
+{"task": "clean_category", "merchant": "Marby Inc", "pred": 3, "answer": 5, "correct": 0, "scores": [-6.8719, -10.2753, -5.2525, -3.3534, -9.5409, -4.2015, -8.084, -6.9784, -11.8847, -10.2441, -6.1034, -7.9745]}
+{"task": "bank_category", "merchant": "Marby Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.9321, -5.318, -1.569, -3.443, -3.2555, -5.9757, -6.976, -5.818, -5.3805, -6.2243, -7.568, -6.305]}
+{"task": "sells", "merchant": "Marby Inc", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.8881, -3.6988, -3.6245, -5.3696]}
+{"task": "reverse", "merchant": "Marby Inc", "pred": 0, "answer": 2, "correct": 0, "scores": [-0.9329, -2.964, -2.2602, -1.4553]}
+{"task": "clean_category", "merchant": "Garden", "pred": 0, "answer": 5, "correct": 0, "scores": [-3.8518, -13.2428, -3.8563, -13.3209, -12.4771, -6.2655, -7.4559, -11.6803, -6.8365, -11.1178, -7.0865, -6.5087]}
+{"task": "bank_category", "merchant": "Garden", "pred": 0, "answer": 5, "correct": 0, "scores": [-2.0319, -6.3886, -3.1047, -11.3261, -9.4824, -5.0964, -6.8304, -7.2011, -5.2011, -9.3261, -5.2636, -6.7523]}
+{"task": "sells", "merchant": "Garden", "pred": 0, "answer": 2, "correct": 0, "scores": [-3.5671, -4.2878, -3.7367, -4.4217]}
+{"task": "reverse", "merchant": "Garden", "pred": 1, "answer": 2, "correct": 0, "scores": [-4.9013, -1.1771, -1.4431, -1.6541]}
+{"task": "clean_category", "merchant": "Quilmere", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.7391, -18.2374, -4.0427, -13.9405, -15.2999, -6.6079, -7.4425, -14.6749, -9.4405, -13.4718, -9.9718, -7.6993]}
+{"task": "bank_category", "merchant": "Quilmere", "pred": 2, "answer": 5, "correct": 0, "scores": [-2.3125, -7.3863, -1.409, -6.9488, -5.3238, -4.5802, -6.6057, -5.1363, -5.1988, -8.7925, -3.8238, -5.443]}
+{"task": "sells", "merchant": "Quilmere", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.6491, -4.1097, -4.9187, -2.8185]}
+{"task": "reverse", "merchant": "Quilmere", "pred": 1, "answer": 2, "correct": 0, "scores": [-1.7568, -1.1379, -2.5028, -2.6616]}
+{"task": "clean_category", "merchant": "Halbury", "pred": 5, "answer": 5, "correct": 1, "scores": [-6.1545, -10.457, -5.861, -6.2382, -11.1757, -4.6747, -8.4975, -12.3945, -12.5195, -12.707, -12.6445, -9.6475]}
+{"task": "bank_category", "merchant": "Halbury", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.1303, -8.7813, -1.8438, -5.1251, -5.5001, -4.046, -7.2374, -6.1876, -3.8751, -8.4063, -6.5626, -7.4449]}
+{"task": "sells", "merchant": "Halbury", "pred": 1, "answer": 2, "correct": 0, "scores": [-5.6315, -2.8316, -9.3062, -5.29]}
+{"task": "reverse", "merchant": "Halbury", "pred": 1, "answer": 2, "correct": 0, "scores": [-1.5283, -1.0108, -4.4316, -3.5489]}
+{"task": "clean_category", "merchant": "Torden Co", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.1364, -9.8218, -3.1177, -7.3218, -9.6656, -6.6311, -8.1202, -12.025, -9.6968, -14.6382, -10.6343, -6.4162]}
+{"task": "bank_category", "merchant": "Torden Co", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.2054, -6.2186, -1.0588, -5.1561, -3.5936, -5.6129, -6.299, -5.7811, -4.4686, -7.3749, -5.9061, -6.3961]}
+{"task": "sells", "merchant": "Torden Co", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.7346, -4.8131, -5.0886, -4.0427]}
+{"task": "reverse", "merchant": "Torden Co", "pred": 3, "answer": 2, "correct": 0, "scores": [-4.7911, -2.0849, -2.1801, -1.2913]}
+{"task": "clean_category", "merchant": "Dovton LLC", "pred": 2, "answer": 5, "correct": 0, "scores": [-6.8105, -16.1889, -3.5461, -10.4702, -7.6577, -9.314, -5.7789, -10.9077, -11.0483, -9.0014, -11.8452, -6.2501]}
+{"task": "bank_category", "merchant": "Dovton LLC", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.2768, -10.5222, -2.7164, -5.616, -4.6785, -4.4076, -6.8849, -8.6472, -5.366, -7.4285, -7.5222, -6.4928]}
+{"task": "sells", "merchant": "Dovton LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.8498, -6.649, -5.625, -6.3026]}
+{"task": "reverse", "merchant": "Dovton LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.8342, -2.16, -2.5419, -1.2655]}
+{"task": "clean_category", "merchant": "Lomlock Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-7.2014, -15.6412, -4.8125, -11.399, -13.7115, -6.0475, -7.8799, -11.7427, -11.3052, -15.0084, -15.1099, -7.6738]}
+{"task": "bank_category", "merchant": "Lomlock Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.8898, -5.9101, -2.078, -6.3476, -5.5976, -6.2719, -6.439, -3.3476, -3.2226, -9.9101, -5.2851, -5.6917]}
+{"task": "sells", "merchant": "Lomlock Group", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.2188, -4.8371, -4.8518, -5.018]}
+{"task": "reverse", "merchant": "Lomlock Group", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.311, -2.4048, -2.5064, -1.4556]}
+{"task": "clean_category", "merchant": "Grimere Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.0229, -14.173, -3.8781, -14.1417, -15.4108, -8.1384, -9.3414, -12.9542, -13.5558, -15.921, -10.4542, -8.1958]}
+{"task": "bank_category", "merchant": "Grimere Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-2.4253, -5.0382, -0.9969, -6.4132, -4.8507, -5.4927, -6.7022, -4.6632, -2.9132, -6.7257, -4.2882, -5.6826]}
+{"task": "sells", "merchant": "Grimere Group", "pred": 3, "answer": 2, "correct": 0, "scores": [-5.6779, -6.5453, -5.6925, -5.5025]}
+{"task": "reverse", "merchant": "Grimere Group", "pred": 0, "answer": 3, "correct": 0, "scores": [-0.9718, -2.8104, -3.2797, -3.2494]}
+{"task": "clean_category", "merchant": "Garley Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.4428, -14.449, -3.5285, -10.1951, -6.1639, -7.334, -9.807, -10.5701, -17.0467, -13.0232, -12.7576, -6.4958]}
+{"task": "bank_category", "merchant": "Garley Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.3219, -10.7526, -1.1741, -7.7526, -4.7214, -4.5855, -6.9828, -7.3464, -9.4401, -8.7526, -8.5339, -6.0989]}
+{"task": "sells", "merchant": "Garley Inc", "pred": 0, "answer": 1, "correct": 0, "scores": [-2.4922, -5.0883, -6.0454, -5.089]}
+{"task": "reverse", "merchant": "Garley Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.9774, -2.0645, -4.8478, -3.0083]}
+{"task": "clean_category", "merchant": "Dovby", "pred": 0, "answer": 5, "correct": 0, "scores": [-4.8438, -15.594, -4.8577, -14.0833, -7.9974, -8.2359, -6.4446, -6.7786, -8.4974, -9.9036, -10.4349, -5.7061]}
+{"task": "bank_category", "merchant": "Dovby", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.3515, -10.5361, -1.9295, -6.5673, -5.8798, -6.5355, -6.8396, -4.8173, -2.1298, -6.4423, -8.1611, -5.894]}
+{"task": "sells", "merchant": "Dovby", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.7642, -6.5329, -3.0413, -3.0453]}
+{"task": "reverse", "merchant": "Dovby", "pred": 3, "answer": 0, "correct": 0, "scores": [-1.3566, -3.7322, -4.2098, -1.3135]}
+{"task": "clean_category", "merchant": "Polstead Ltd", "pred": 10, "answer": 6, "correct": 0, "scores": [-4.3525, -6.0621, -4.2822, -13.5445, -13.4352, -9.1513, -8.3938, -9.6871, -10.6871, -6.4371, -3.4996, -9.7424]}
+{"task": "bank_category", "merchant": "Polstead Ltd", "pred": 2, "answer": 6, "correct": 0, "scores": [-4.1498, -8.378, -1.518, -6.3467, -2.2217, -6.2383, -6.5089, -6.0967, -2.8467, -7.8467, -5.9717, -5.7808]}
+{"task": "sells", "merchant": "Polstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.4007, -5.4827, -3.3386, -4.702]}
+{"task": "reverse", "merchant": "Polstead Ltd", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.1904, -2.5682, -1.5159, -3.5711]}
+{"task": "clean_category", "merchant": "Bexby Co", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.4899, -12.515, -3.6556, -11.7963, -10.515, -7.1533, -9.6552, -10.7338, -12.7963, -17.5346, -8.6088, -6.8387]}
+{"task": "bank_category", "merchant": "Bexby Co", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.1651, -6.3278, -1.6331, -4.8591, -3.9841, -6.1861, -6.3434, -6.0466, -7.5466, -4.4841, -5.2341, -7.0273]}
+{"task": "sells", "merchant": "Bexby Co", "pred": 3, "answer": 3, "correct": 1, "scores": [-3.626, -4.0261, -4.5607, -2.9133]}
+{"task": "reverse", "merchant": "Bexby Co", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.2296, -1.3236, -1.3422, -1.824]}
+{"task": "clean_category", "merchant": "Jorvarro & Sons", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.6447, -15.7442, -5.1146, -13.5489, -17.3926, -9.6454, -5.4822, -12.377, -9.2832, -10.1582, -6.5645, -7.3811]}
+{"task": "bank_category", "merchant": "Jorvarro & Sons", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.9289, -8.0308, -2.2234, -2.2496, -4.4996, -5.4442, -7.1796, -4.8746, -5.9996, -7.7808, -8.1558, -6.7544]}
+{"task": "sells", "merchant": "Jorvarro & Sons", "pred": 0, "answer": 2, "correct": 0, "scores": [-3.2501, -5.2003, -7.5489, -7.9752]}
+{"task": "reverse", "merchant": "Jorvarro & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-0.3939, -1.2344, -2.1264, -2.3852]}
+{"task": "clean_category", "merchant": "Kormoor LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.0032, -12.3051, -1.9496, -8.1801, -11.0707, -8.108, -7.5513, -9.5863, -6.8988, -8.8676, -8.6176, -7.0627]}
+{"task": "bank_category", "merchant": "Kormoor LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.6341, -10.0311, -1.4753, -5.2811, -2.7811, -5.5177, -7.0345, -6.8124, -5.1561, -4.2811, -5.9061, -6.5221]}
+{"task": "sells", "merchant": "Kormoor LLC", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.1119, -3.748, -6.0678, -3.3749]}
+{"task": "reverse", "merchant": "Kormoor LLC", "pred": 1, "answer": 0, "correct": 0, "scores": [-2.2897, -1.7723, -2.8447, -3.2546]}
+{"task": "clean_category", "merchant": "Dunvarro Ltd", "pred": 8, "answer": 6, "correct": 0, "scores": [-8.659, -10.7434, -3.8555, -12.0559, -13.0872, -11.0523, -8.2415, -8.9934, -2.8372, -13.5403, -14.7356, -6.9683]}
+{"task": "bank_category", "merchant": "Dunvarro Ltd", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.8046, -11.2137, -3.2242, -5.3074, -9.0574, -6.219, -6.783, -9.5887, -4.2449, -6.6199, -11.4168, -7.273]}
+{"task": "sells", "merchant": "Dunvarro Ltd", "pred": 3, "answer": 2, "correct": 0, "scores": [-9.0356, -5.2707, -4.6038, -3.59]}
+{"task": "reverse", "merchant": "Dunvarro Ltd", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.1933, -1.4206, -2.4402, -2.6202]}
+{"task": "clean_category", "merchant": "Gribury", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.245, -15.3307, -4.3845, -13.3073, -17.194, -9.0773, -4.6363, -15.2995, -10.2292, -12.6042, -9.9792, -7.7292]}
+{"task": "bank_category", "merchant": "Gribury", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.0265, -9.0178, -2.0388, -5.7053, -7.924, -7.3266, -6.6562, -4.3928, -2.7053, -7.8928, -8.1428, -6.1032]}
+{"task": "sells", "merchant": "Gribury", "pred": 0, "answer": 3, "correct": 0, "scores": [-4.4512, -4.8068, -8.0214, -6.1641]}
+{"task": "reverse", "merchant": "Gribury", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.3476, -2.3487, -1.2134, -2.8688]}
+{"task": "clean_category", "merchant": "Ulmlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.8995, -15.2564, -5.7787, -10.1705, -12.1705, -11.4764, -6.036, -12.0455, -7.4517, -17.647, -9.2955, -8.3449]}
+{"task": "bank_category", "merchant": "Ulmlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-6.1423, -12.8155, -3.6287, -4.2686, -7.7061, -6.1072, -6.7416, -10.4248, -6.8936, -9.1436, -7.8311, -7.0082]}
+{"task": "sells", "merchant": "Ulmlock", "pred": 0, "answer": 3, "correct": 0, "scores": [-2.8779, -5.1818, -5.0767, -6.1299]}
+{"task": "reverse", "merchant": "Ulmlock", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.5535, -3.0985, -4.6944, -3.7618]}
+{"task": "clean_category", "merchant": "Sabham", "pred": 2, "answer": 6, "correct": 0, "scores": [-4.6289, -9.3841, -3.5616, -8.9779, -6.9154, -11.6945, -6.2731, -11.6341, -7.1029, -13.9701, -11.3998, -6.6658]}
+{"task": "bank_category", "merchant": "Sabham", "pred": 3, "answer": 6, "correct": 0, "scores": [-6.5851, -13.3703, -4.3688, -3.089, -9.5578, -6.8986, -7.9337, -12.8547, -8.6203, -8.714, -9.2765, -6.7675]}
+{"task": "sells", "merchant": "Sabham", "pred": 3, "answer": 0, "correct": 0, "scores": [-5.0747, -5.2326, -5.3265, -4.582]}
+{"task": "reverse", "merchant": "Sabham", "pred": 3, "answer": 1, "correct": 0, "scores": [-2.1933, -3.013, -2.9412, -1.158]}
+{"task": "clean_category", "merchant": "Fenlock", "pred": 5, "answer": 6, "correct": 0, "scores": [-5.1275, -13.581, -3.9479, -12.1591, -8.581, -3.882, -5.7352, -12.5185, -7.8935, -13.581, -13.3779, -6.8769]}
+{"task": "bank_category", "merchant": "Fenlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.7042, -12.8562, -2.2479, -9.5906, -8.9344, -6.7057, -6.1864, -5.3406, -2.5281, -12.9109, -6.4031, -6.3884]}
+{"task": "sells", "merchant": "Fenlock", "pred": 3, "answer": 3, "correct": 1, "scores": [-9.6168, -4.6047, -4.9732, -3.0839]}
+{"task": "reverse", "merchant": "Fenlock", "pred": 1, "answer": 2, "correct": 0, "scores": [-3.1587, -0.9574, -4.4252, -2.0688]}
+{"task": "clean_category", "merchant": "Lommere LLC", "pred": 8, "answer": 6, "correct": 0, "scores": [-5.9454, -10.618, -3.0135, -8.8993, -9.118, -12.7243, -7.4008, -10.493, -2.493, -11.9774, -3.868, -7.4975]}
+{"task": "bank_category", "merchant": "Lommere LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.201, -6.7196, -1.8607, -4.5008, -4.0008, -5.9403, -7.1638, -7.8446, -5.3133, -5.5008, -6.0633, -6.0001]}
+{"task": "sells", "merchant": "Lommere LLC", "pred": 1, "answer": 3, "correct": 0, "scores": [-6.3549, -4.523, -6.1739, -4.8772]}
+{"task": "reverse", "merchant": "Lommere LLC", "pred": 3, "answer": 0, "correct": 0, "scores": [-1.5949, -1.6923, -1.6244, -1.2318]}
+{"task": "clean_category", "merchant": "Vorwen Ltd", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.127, -13.7505, -2.4149, -10.313, -7.4693, -8.2665, -7.7751, -8.938, -7.0318, -13.1724, -11.4693, -7.4202]}
+{"task": "bank_category", "merchant": "Vorwen Ltd", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.9231, -8.8851, -1.5946, -4.1976, -3.3851, -4.5743, -6.1761, -6.3226, -3.5726, -8.9476, -6.6351, -5.7285]}
+{"task": "sells", "merchant": "Vorwen Ltd", "pred": 0, "answer": 3, "correct": 0, "scores": [-2.8505, -6.2119, -4.5577, -3.4203]}
+{"task": "reverse", "merchant": "Vorwen Ltd", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.1776, -1.6045, -2.1214, -1.7178]}
+{"task": "clean_category", "merchant": "Talmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.7881, -12.3315, -4.6686, -11.4878, -13.9721, -9.229, -7.9835, -5.1753, -9.519, -15.1479, -13.6753, -8.4954]}
+{"task": "bank_category", "merchant": "Talmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.211, -8.776, -1.637, -8.4635, -8.0572, -6.0217, -6.7299, -4.3385, -2.651, -10.3385, -7.026, -6.6594]}
+{"task": "sells", "merchant": "Talmoor Group", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.0608, -3.3529, -6.1855, -5.6551]}
+{"task": "reverse", "merchant": "Talmoor Group", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.7401, -1.2687, -1.7732, -3.6071]}
+{"task": "clean_category", "merchant": "Holwen Bros", "pred": 3, "answer": 7, "correct": 0, "scores": [-5.9179, -12.6406, -3.8518, -3.1718, -9.9218, -5.9979, -7.6815, -7.3281, -8.8593, -11.0468, -7.2968, -7.6488]}
+{"task": "bank_category", "merchant": "Holwen Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.8595, -10.5478, -1.6359, -4.5791, -3.2666, -5.5419, -6.8184, -7.2041, -5.8291, -6.6728, -6.6416, -5.8742]}
+{"task": "sells", "merchant": "Holwen Bros", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.3811, -5.1722, -3.3956, -3.7577]}
+{"task": "reverse", "merchant": "Holwen Bros", "pred": 1, "answer": 2, "correct": 0, "scores": [-1.8939, -1.534, -2.2799, -2.9919]}
+{"task": "clean_category", "merchant": "Halby Bros", "pred": 7, "answer": 7, "correct": 1, "scores": [-5.4893, -6.5191, -4.2603, -14.0337, -13.2613, -7.2772, -7.9392, -3.8316, -10.9566, -10.5503, -9.2378, -7.8234]}
+{"task": "bank_category", "merchant": "Halby Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.6473, -9.4612, -1.8169, -5.43, -4.93, -5.4054, -7.1293, -6.8362, -7.2425, -6.805, -4.9925, -6.0681]}
+{"task": "sells", "merchant": "Halby Bros", "pred": 3, "answer": 0, "correct": 0, "scores": [-5.1407, -5.5184, -3.6437, -3.558]}
+{"task": "reverse", "merchant": "Halby Bros", "pred": 1, "answer": 0, "correct": 0, "scores": [-2.3371, -1.4675, -1.6256, -3.9905]}
+{"task": "clean_category", "merchant": "Elrford & Sons", "pred": 8, "answer": 7, "correct": 0, "scores": [-7.3197, -9.963, -3.5788, -7.0567, -7.5567, -6.3595, -7.4905, -6.088, -2.2755, -7.1192, -6.838, -8.05]}
+{"task": "bank_category", "merchant": "Elrford & Sons", "pred": 4, "answer": 7, "correct": 0, "scores": [-4.1784, -8.7566, -1.6041, -4.2879, -1.5379, -4.9923, -7.0843, -5.5379, -6.4129, -7.6941, -5.5379, -6.3353]}
+{"task": "sells", "merchant": "Elrford & Sons", "pred": 3, "answer": 3, "correct": 1, "scores": [-8.4805, -4.5769, -5.602, -3.9408]}
+{"task": "reverse", "merchant": "Elrford & Sons", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.2899, -1.7031, -4.5356, -2.9827]}
+{"task": "clean_category", "merchant": "Polmere", "pred": 7, "answer": 7, "correct": 1, "scores": [-6.2985, -14.8309, -4.4249, -10.7567, -7.9129, -7.1918, -10.0206, -3.4129, -12.1317, -12.6942, -8.6942, -8.0676]}
+{"task": "bank_category", "merchant": "Polmere", "pred": 2, "answer": 7, "correct": 0, "scores": [-1.7972, -7.4145, -0.9797, -6.7582, -5.102, -5.6805, -6.0173, -6.5395, -3.727, -6.7582, -2.852, -5.3233]}
+{"task": "sells", "merchant": "Polmere", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.2205, -2.0733, -4.2617, -4.1925]}
+{"task": "reverse", "merchant": "Polmere", "pred": 3, "answer": 1, "correct": 0, "scores": [-2.1204, -5.1835, -1.9819, -1.9646]}
+{"task": "clean_category", "merchant": "Jorwick Inc", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.7054, -9.7695, -3.2451, -9.2695, -9.7382, -10.7931, -9.9324, -6.3632, -3.6757, -8.3945, -12.4882, -7.9195]}
+{"task": "bank_category", "merchant": "Jorwick Inc", "pred": 2, "answer": 7, "correct": 0, "scores": [-2.9434, -6.089, -0.9295, -5.1515, -3.6515, -5.5527, -6.3435, -5.9015, -5.589, -7.2452, -7.5577, -6.4004]}
+{"task": "sells", "merchant": "Jorwick Inc", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.7419, -2.695, -3.48, -4.1603]}
+{"task": "reverse", "merchant": "Jorwick Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.0009, -3.0391, -2.5284, -1.4933]}
+{"task": "clean_category", "merchant": "Bexhurst", "pred": 2, "answer": 7, "correct": 0, "scores": [-7.4649, -9.493, -3.7513, -15.6961, -15.781, -8.5854, -6.0614, -4.0242, -6.3367, -14.032, -9.8992, -8.4311]}
+{"task": "bank_category", "merchant": "Bexhurst", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.2983, -7.4142, -0.8547, -5.3517, -3.9767, -6.7736, -6.7219, -6.1017, -2.1642, -9.2267, -5.7267, -5.5004]}
+{"task": "sells", "merchant": "Bexhurst", "pred": 3, "answer": 2, "correct": 0, "scores": [-4.3555, -3.422, -2.9011, -2.7062]}
+{"task": "reverse", "merchant": "Bexhurst", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.2458, -1.7052, -2.6681, -5.5543]}
+{"task": "clean_category", "merchant": "Fenmoor Group", "pred": 10, "answer": 7, "correct": 0, "scores": [-4.7028, -8.0565, -2.3264, -11.4627, -12.4471, -9.7573, -6.3243, -2.4002, -5.5252, -11.0408, -2.0877, -7.0002]}
+{"task": "bank_category", "merchant": "Fenmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.3814, -5.9782, -0.9575, -8.7907, -7.572, -8.1741, -7.0308, -2.7282, -3.2907, -9.572, -5.4157, -6.2866]}
+{"task": "sells", "merchant": "Fenmoor Group", "pred": 2, "answer": 3, "correct": 0, "scores": [-6.2092, -6.2556, -5.8404, -6.3091]}
+{"task": "reverse", "merchant": "Fenmoor Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-1.3523, -1.7575, -1.1312, -1.6307]}
+{"task": "clean_category", "merchant": "Marton Bros", "pred": 8, "answer": 7, "correct": 0, "scores": [-6.1525, -9.9589, -2.8955, -8.4901, -10.2089, -8.2979, -8.7247, -6.3651, -1.6151, -9.3026, -7.7714, -7.6887]}
+{"task": "bank_category", "merchant": "Marton Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-1.9755, -6.9388, -1.2566, -5.1263, -5.8763, -5.4433, -5.8286, -7.095, -8.2513, -6.1263, -6.0013, -6.0581]}
+{"task": "sells", "merchant": "Marton Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.2104, -4.925, -3.2656, -6.0943]}
+{"task": "reverse", "merchant": "Marton Bros", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.0193, -4.3481, -0.9098, -2.1524]}
+{"task": "clean_category", "merchant": "Dovmoor & Sons", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.977, -12.4986, -3.5576, -11.6548, -15.0064, -6.1941, -8.1881, -8.1236, -3.1861, -10.2173, -10.6548, -7.8327]}
+{"task": "bank_category", "merchant": "Dovmoor & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.5464, -11.6445, -2.4389, -8.8007, -7.8007, -4.1282, -7.8102, -7.832, -5.8632, -9.8007, -9.457, -7.3242]}
+{"task": "sells", "merchant": "Dovmoor & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-4.3859, -4.5691, -4.8026, -6.6558]}
+{"task": "reverse", "merchant": "Dovmoor & Sons", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.0233, -1.5288, -0.9251, -0.7921]}
+{"task": "clean_category", "merchant": "Calford", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.7347, -11.2033, -4.4784, -16.2658, -15.6721, -9.9302, -8.7034, -11.0783, -6.7033, -16.7189, -10.5158, -6.9634]}
+{"task": "bank_category", "merchant": "Calford", "pred": 2, "answer": 8, "correct": 0, "scores": [-2.4308, -7.9742, -1.3757, -6.5679, -6.2242, -5.6495, -6.0172, -5.7242, -5.5367, -6.7554, -6.0367, -6.1973]}
+{"task": "sells", "merchant": "Calford", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.9155, -5.7261, -5.9563, -8.4694]}
+{"task": "reverse", "merchant": "Calford", "pred": 3, "answer": 0, "correct": 0, "scores": [-1.7998, -4.0698, -5.5749, -1.421]}
+{"task": "clean_category", "merchant": "Quilmoor", "pred": 2, "answer": 8, "correct": 0, "scores": [-5.3055, -11.5559, -4.1054, -11.6809, -15.1496, -7.6342, -6.61, -6.7121, -8.9934, -14.1965, -9.0871, -7.5066]}
+{"task": "bank_category", "merchant": "Quilmoor", "pred": 2, "answer": 8, "correct": 0, "scores": [-2.5396, -9.8677, -0.952, -7.5864, -7.0239, -4.8016, -7.2301, -6.0864, -2.5864, -10.4302, -6.2739, -6.4089]}
+{"task": "sells", "merchant": "Quilmoor", "pred": 0, "answer": 2, "correct": 0, "scores": [-3.3069, -4.4691, -3.9772, -6.7234]}
+{"task": "reverse", "merchant": "Quilmoor", "pred": 0, "answer": 0, "correct": 1, "scores": [-0.7962, -2.0522, -1.1371, -2.8997]}
+{"task": "clean_category", "merchant": "Holham Group", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.9042, -12.3104, -3.4106, -8.9823, -12.8416, -11.2836, -9.4901, -10.3885, -1.201, -12.7948, -10.5448, -7.2944]}
+{"task": "bank_category", "merchant": "Holham Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-5.0028, -7.5281, -2.1931, -7.2156, -5.7468, -5.8146, -7.6111, -6.8093, -3.6843, -10.3718, -9.1843, -5.9057]}
+{"task": "sells", "merchant": "Holham Group", "pred": 0, "answer": 0, "correct": 1, "scores": [-4.034, -4.6069, -4.0525, -6.6806]}
+{"task": "reverse", "merchant": "Holham Group", "pred": 3, "answer": 3, "correct": 1, "scores": [-3.4879, -3.5776, -2.1381, -1.428]}
+{"task": "clean_category", "merchant": "Calton Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-8.3704, -9.2321, -3.1446, -14.9274, -13.8259, -9.2384, -9.037, -9.9821, -6.3884, -8.8571, -13.1227, -8.0055]}
+{"task": "bank_category", "merchant": "Calton Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-5.2934, -6.5594, -1.8217, -8.6531, -6.2469, -8.7201, -7.9812, -7.2469, -3.9969, -6.8719, -9.6844, -6.7761]}
+{"task": "sells", "merchant": "Calton Group", "pred": 3, "answer": 3, "correct": 1, "scores": [-5.1913, -5.4607, -3.7205, -3.1192]}
+{"task": "reverse", "merchant": "Calton Group", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.4979, -2.5655, -2.4144, -2.8132]}
+{"task": "clean_category", "merchant": "Istby LLC", "pred": 2, "answer": 8, "correct": 0, "scores": [-5.631, -9.3857, -2.8825, -8.0732, -8.667, -9.756, -7.4446, -9.9482, -3.7607, -5.6357, -7.2607, -8.3157]}
+{"task": "bank_category", "merchant": "Istby LLC", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.6034, -7.8656, -1.8076, -4.4593, -3.6468, -7.6065, -6.849, -6.0843, -3.4593, -5.1468, -4.6468, -7.2472]}
+{"task": "sells", "merchant": "Istby LLC", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.5331, -3.852, -5.2889, -5.2631]}
+{"task": "reverse", "merchant": "Istby LLC", "pred": 3, "answer": 0, "correct": 0, "scores": [-2.8312, -1.5332, -3.1201, -0.8721]}
+{"task": "clean_category", "merchant": "Osklock Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-6.5421, -10.7671, -3.9698, -10.2046, -11.6421, -10.9671, -9.2494, -8.0484, -4.1109, -10.8296, -12.7984, -8.1546]}
+{"task": "bank_category", "merchant": "Osklock Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-2.6549, -9.0515, -1.3398, -4.3015, -1.8015, -6.0299, -6.374, -5.8015, -4.614, -8.3015, -4.9265, -5.8085]}
+{"task": "sells", "merchant": "Osklock Group", "pred": 1, "answer": 1, "correct": 1, "scores": [-9.1218, -4.1024, -6.7052, -7.5705]}
+{"task": "reverse", "merchant": "Osklock Group", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.591, -1.7752, -1.6207, -1.6045]}
+{"task": "clean_category", "merchant": "Holwick", "pred": 8, "answer": 8, "correct": 1, "scores": [-5.5358, -8.3157, -3.4803, -11.6282, -13.0657, -10.2878, -8.2696, -11.8782, -0.5969, -14.1516, -14.0188, -9.8351]}
+{"task": "bank_category", "merchant": "Holwick", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.7108, -12.3197, -1.8855, -5.8822, -3.9447, -5.0061, -7.1184, -6.6947, -8.5697, -6.3822, -7.2259, -6.5644]}
+{"task": "sells", "merchant": "Holwick", "pred": 3, "answer": 0, "correct": 0, "scores": [-4.1793, -6.3078, -7.8445, -4.099]}
+{"task": "reverse", "merchant": "Holwick", "pred": 1, "answer": 3, "correct": 0, "scores": [-4.083, -1.3837, -2.8025, -4.1115]}
+{"task": "clean_category", "merchant": "Orlley & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.9473, -10.9331, -3.3421, -12.8081, -13.9644, -9.1215, -9.92, -8.6519, -5.7144, -13.0425, -12.0894, -8.0925]}
+{"task": "bank_category", "merchant": "Orlley & Sons", "pred": 4, "answer": 8, "correct": 0, "scores": [-5.3163, -12.1347, -3.4444, -4.1035, -2.4785, -4.7114, -6.8218, -8.3847, -7.8535, -10.1035, -6.916, -6.2357]}
+{"task": "sells", "merchant": "Orlley & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.7691, -5.7774, -1.8664, -4.4671]}
+{"task": "reverse", "merchant": "Orlley & Sons", "pred": 1, "answer": 0, "correct": 0, "scores": [-1.132, -0.7574, -2.0671, -2.9491]}
+{"task": "clean_category", "merchant": "Korley Co", "pred": 2, "answer": 8, "correct": 0, "scores": [-6.5986, -6.9608, -3.0346, -6.8358, -12.2421, -10.1549, -7.996, -8.2108, -3.5233, -13.2733, -12.0858, -6.121]}
+{"task": "bank_category", "merchant": "Korley Co", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.1049, -5.9162, -1.3338, -5.1662, -5.8537, -7.1495, -6.5736, -5.7287, -1.4787, -7.0412, -6.0412, -5.4923]}
+{"task": "sells", "merchant": "Korley Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-6.7078, -4.4542, -4.0225, -5.2821]}
+{"task": "reverse", "merchant": "Korley Co", "pred": 3, "answer": 0, "correct": 0, "scores": [-1.4482, -3.5051, -2.0841, -1.1742]}
+{"task": "clean_category", "merchant": "Falden Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-5.8433, -9.3621, -3.6773, -8.9246, -7.3933, -8.4326, -7.9454, -9.5183, -5.4871, -13.2293, -10.8621, -7.2271]}
+{"task": "bank_category", "merchant": "Falden Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.3359, -6.3548, -1.5682, -5.7923, -4.2298, -6.8372, -7.2308, -5.8548, -2.9173, -6.6048, -4.0423, -6.8114]}
+{"task": "sells", "merchant": "Falden Co", "pred": 1, "answer": 0, "correct": 0, "scores": [-5.8403, -5.3358, -9.1285, -5.4699]}
+{"task": "reverse", "merchant": "Falden Co", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.8426, -1.7873, -1.4971, -3.8048]}
+{"task": "clean_category", "merchant": "Calnard Co", "pred": 0, "answer": 9, "correct": 0, "scores": [-2.004, -8.9541, -4.2436, -13.7979, -12.0635, -6.3829, -7.8288, -12.6338, -13.9986, -4.8916, -11.0323, -9.724]}
+{"task": "bank_category", "merchant": "Calnard Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.331, -7.5218, -1.0492, -5.5531, -2.9281, -4.8125, -6.9749, -6.3656, -6.3031, -6.6156, -7.1156, -6.1602]}
+{"task": "sells", "merchant": "Calnard Co", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.8324, -4.021, -5.2272, -5.0129]}
+{"task": "reverse", "merchant": "Calnard Co", "pred": 3, "answer": 0, "correct": 0, "scores": [-2.3443, -1.7867, -1.935, -0.9271]}
+{"task": "clean_category", "merchant": "Pexlock LLC", "pred": 10, "answer": 9, "correct": 0, "scores": [-5.3174, -11.7245, -5.815, -12.037, -13.7635, -10.2555, -7.6902, -10.2557, -11.2088, -6.412, -4.412, -9.9422]}
+{"task": "bank_category", "merchant": "Pexlock LLC", "pred": 3, "answer": 9, "correct": 0, "scores": [-4.4506, -13.5301, -3.4548, -2.5926, -5.8426, -5.3651, -6.6798, -6.6239, -6.5926, -8.9676, -4.5926, -7.3593]}
+{"task": "sells", "merchant": "Pexlock LLC", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.5788, -4.1881, -3.589, -4.2734]}
+{"task": "reverse", "merchant": "Pexlock LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-1.7467, -1.688, -0.4946, -1.816]}
+{"task": "clean_category", "merchant": "Falbury Bros", "pred": 9, "answer": 9, "correct": 1, "scores": [-7.6938, -14.5611, -5.3658, -7.8345, -9.1158, -10.017, -8.0121, -9.9908, -9.5533, -3.5845, -6.647, -9.3742]}
+{"task": "bank_category", "merchant": "Falbury Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.6342, -12.2732, -2.7313, -7.1795, -5.367, -4.1906, -7.9922, -8.0545, -7.742, -10.1795, -7.4295, -7.2076]}
+{"task": "sells", "merchant": "Falbury Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.1195, -6.5781, -1.9709, -3.8676]}
+{"task": "reverse", "merchant": "Falbury Bros", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.6187, -1.6856, -1.4057, -3.5567]}
+{"task": "clean_category", "merchant": "Ulmton LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.9186, -18.7594, -4.9733, -14.65, -13.6656, -9.7683, -7.3843, -11.0563, -10.4, -5.3688, -9.6813, -8.669]}
+{"task": "bank_category", "merchant": "Ulmton LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.7863, -7.9709, -2.0607, -3.7834, -3.2209, -6.8626, -6.2394, -5.5334, -8.2209, -7.5959, -6.6271, -5.8957]}
+{"task": "sells", "merchant": "Ulmton LLC", "pred": 0, "answer": 3, "correct": 0, "scores": [-4.2329, -5.115, -4.9257, -6.2785]}
+{"task": "reverse", "merchant": "Ulmton LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.102, -5.8435, -1.2435, -2.2104]}
+{"task": "clean_category", "merchant": "Orlwick Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-10.0824, -14.2742, -6.3525, -15.4226, -13.4617, -11.0405, -9.6777, -10.6961, -9.1961, -6.6336, -11.8523, -10.3622]}
+{"task": "bank_category", "merchant": "Orlwick Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.9184, -11.7366, -1.5837, -6.096, -4.596, -5.4885, -7.3245, -6.346, -6.6585, -5.721, -9.5647, -7.1299]}
+{"task": "sells", "merchant": "Orlwick Co", "pred": 1, "answer": 2, "correct": 0, "scores": [-5.4241, -4.3732, -4.3944, -6.9962]}
+{"task": "reverse", "merchant": "Orlwick Co", "pred": 3, "answer": 2, "correct": 0, "scores": [-2.8268, -1.8582, -1.1987, -0.8581]}
+{"task": "clean_category", "merchant": "Kelford Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.6588, -10.9827, -3.4104, -13.5452, -10.264, -7.9198, -7.5705, -10.639, -12.9827, -5.1702, -11.1077, -7.7868]}
+{"task": "bank_category", "merchant": "Kelford Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-2.6341, -11.0443, -2.163, -5.1224, -5.1849, -5.159, -6.508, -8.2162, -9.1537, -5.9349, -6.6849, -6.3982]}
+{"task": "sells", "merchant": "Kelford Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.6888, -6.766, -5.6649, -5.8522]}
+{"task": "reverse", "merchant": "Kelford Bros", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.9546, -1.2643, -2.8097, -1.1883]}
+{"task": "clean_category", "merchant": "Holden Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.7789, -15.4711, -3.9477, -4.4086, -6.9711, -9.7374, -7.6381, -5.5961, -7.4399, -8.0649, -6.3461, -7.0813]}
+{"task": "bank_category", "merchant": "Holden Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.7697, -11.0166, -1.5788, -4.5948, -4.2198, -6.6749, -6.5465, -6.2823, -7.0948, -6.5323, -4.7198, -5.9494]}
+{"task": "sells", "merchant": "Holden Bros", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.0927, -4.5855, -4.0927, -5.1634]}
+{"task": "reverse", "merchant": "Holden Bros", "pred": 3, "answer": 2, "correct": 0, "scores": [-2.1736, -2.4682, -4.4125, -1.7319]}
+{"task": "clean_category", "merchant": "Wexham Inc", "pred": 0, "answer": 9, "correct": 0, "scores": [-2.9653, -9.8942, -3.5062, -6.363, -9.0817, -8.558, -7.2271, -7.488, -11.988, -6.2692, -7.8005, -9.0571]}
+{"task": "bank_category", "merchant": "Wexham Inc", "pred": 2, "answer": 9, "correct": 0, "scores": [-2.8659, -6.102, -0.9393, -4.977, -3.602, -4.842, -6.2267, -5.9145, -3.977, -8.5083, -7.1645, -5.9906]}
+{"task": "sells", "merchant": "Wexham Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.7013, -5.6839, -5.7931, -6.0782]}
+{"task": "reverse", "merchant": "Wexham Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-1.3645, -1.9407, -1.1356, -8.0858]}
+{"task": "clean_category", "merchant": "Fennard Inc", "pred": 9, "answer": 9, "correct": 1, "scores": [-9.3868, -15.706, -4.7515, -15.2216, -11.2607, -11.6841, -9.5102, -11.3544, -15.0888, -3.7919, -12.8232, -8.7107]}
+{"task": "bank_category", "merchant": "Fennard Inc", "pred": 4, "answer": 9, "correct": 0, "scores": [-4.9984, -10.4094, -2.0573, -8.3469, -1.9719, -4.9892, -7.5708, -5.8469, -7.2219, -8.0657, -9.3782, -6.0444]}
+{"task": "sells", "merchant": "Fennard Inc", "pred": 0, "answer": 1, "correct": 0, "scores": [-4.5106, -4.7015, -5.311, -6.8203]}
+{"task": "reverse", "merchant": "Fennard Inc", "pred": 3, "answer": 3, "correct": 1, "scores": [-2.1093, -1.8134, -2.7775, -1.6757]}
+{"task": "clean_category", "merchant": "Pexlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.4041, -9.5078, -5.3578, -11.914, -13.1484, -9.7566, -7.3516, -9.4765, -10.6328, -6.8828, -3.4453, -9.8774]}
+{"task": "bank_category", "merchant": "Pexlock", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.7004, -14.7022, -3.7145, -4.1963, -7.5088, -6.1007, -6.8265, -8.0401, -6.4151, -10.0713, -5.1338, -7.2932]}
+{"task": "sells", "merchant": "Pexlock", "pred": 0, "answer": 3, "correct": 0, "scores": [-2.8617, -5.7723, -3.7009, -5.3983]}
+{"task": "reverse", "merchant": "Pexlock", "pred": 3, "answer": 2, "correct": 0, "scores": [-4.4019, -2.8876, -2.3276, -1.5165]}
+{"task": "clean_category", "merchant": "Elrvarro", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.593, -11.1708, -3.8416, -8.9833, -11.4676, -8.6703, -7.6765, -7.0145, -8.702, -11.8739, -2.5458, -8.5718]}
+{"task": "bank_category", "merchant": "Elrvarro", "pred": 0, "answer": 10, "correct": 0, "scores": [-3.448, -7.0631, -3.8289, -9.5319, -10.1256, -6.9311, -6.2548, -6.7506, -8.0631, -6.2819, -7.8444, -7.5255]}
+{"task": "sells", "merchant": "Elrvarro", "pred": 3, "answer": 1, "correct": 0, "scores": [-3.3798, -2.7926, -3.5853, -2.5843]}
+{"task": "reverse", "merchant": "Elrvarro", "pred": 0, "answer": 3, "correct": 0, "scores": [-1.3327, -2.2434, -2.1721, -2.3506]}
+{"task": "clean_category", "merchant": "Falton Ltd", "pred": 10, "answer": 10, "correct": 1, "scores": [-7.2153, -10.6914, -4.1145, -6.9414, -10.1602, -10.053, -8.9326, -8.6602, -7.6914, -10.6602, -2.9414, -7.8861]}
+{"task": "bank_category", "merchant": "Falton Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.1096, -11.4509, -2.0483, -6.7478, -2.6228, -5.3451, -7.5023, -7.8103, -5.2478, -8.8728, -6.8103, -5.9567]}
+{"task": "sells", "merchant": "Falton Ltd", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.1425, -6.9255, -5.9531, -3.497]}
+{"task": "reverse", "merchant": "Falton Ltd", "pred": 1, "answer": 2, "correct": 0, "scores": [-2.3681, -1.9959, -2.9329, -4.6111]}
+{"task": "clean_category", "merchant": "Dunham Inc", "pred": 10, "answer": 10, "correct": 1, "scores": [-4.9787, -11.8938, -5.4072, -11.4563, -13.9407, -9.8687, -7.8313, -11.0188, -7.7376, -14.3782, -3.2376, -9.0797]}
+{"task": "bank_category", "merchant": "Dunham Inc", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.2585, -6.8114, -2.848, -3.8739, -5.3739, -8.049, -6.2477, -10.3895, -4.5614, -9.7176, -4.8739, -6.4309]}
+{"task": "sells", "merchant": "Dunham Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.9588, -6.6116, -2.9216, -5.8503]}
+{"task": "reverse", "merchant": "Dunham Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.408, -2.9789, -1.0798, -2.6412]}
+{"task": "clean_category", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.5738, -9.4381, -3.1235, -7.1881, -9.5006, -10.6113, -6.8653, -8.4069, -6.4069, -9.2819, -7.3756, -7.3889]}
+{"task": "bank_category", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.7577, -11.1923, -2.9309, -3.7704, -6.5829, -5.6379, -7.0436, -8.2704, -6.2704, -7.7704, -8.1454, -6.7064]}
+{"task": "sells", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.8871, -2.7166, -2.708, -4.3639]}
+{"task": "reverse", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 3, "correct": 0, "scores": [-6.6357, -2.1023, -0.9664, -1.8651]}
+{"task": "clean_category", "merchant": "Elrhurst & Sons", "pred": 10, "answer": 10, "correct": 1, "scores": [-7.1122, -10.5097, -4.5143, -8.4784, -15.2206, -7.2481, -5.5501, -8.0409, -11.1972, -10.6972, -1.8534, -8.0638]}
+{"task": "bank_category", "merchant": "Elrhurst & Sons", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.2413, -8.6361, -1.9055, -3.8861, -2.6986, -4.7598, -6.9866, -5.8861, -3.7611, -7.1986, -6.3861, -5.8325]}
+{"task": "sells", "merchant": "Elrhurst & Sons", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.3648, -6.6922, -7.3541, -2.3538]}
+{"task": "reverse", "merchant": "Elrhurst & Sons", "pred": 0, "answer": 2, "correct": 0, "scores": [-1.5045, -3.0623, -1.5794, -4.5379]}
+{"task": "clean_category", "merchant": "Halton", "pred": 5, "answer": 10, "correct": 0, "scores": [-7.7406, -14.9291, -4.2086, -13.1634, -17.2455, -3.8861, -9.0645, -10.6009, -12.1634, -17.1986, -9.8822, -7.4345]}
+{"task": "bank_category", "merchant": "Halton", "pred": 2, "answer": 10, "correct": 0, "scores": [-7.024, -14.9804, -3.4334, -12.6523, -14.1054, -4.0136, -9.9785, -9.3085, -9.3085, -15.3866, -13.121, -7.3664]}
+{"task": "sells", "merchant": "Halton", "pred": 2, "answer": 1, "correct": 0, "scores": [-5.7884, -4.6916, -4.5528, -7.1759]}
+{"task": "reverse", "merchant": "Halton", "pred": 0, "answer": 3, "correct": 0, "scores": [-2.644, -3.3745, -3.388, -4.4146]}
+{"task": "clean_category", "merchant": "Arddale Group", "pred": 2, "answer": 10, "correct": 0, "scores": [-7.4136, -16.8832, -4.7858, -15.5707, -15.2894, -4.8968, -10.1269, -13.1488, -11.6332, -19.2582, -12.9457, -8.625]}
+{"task": "bank_category", "merchant": "Arddale Group", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.2493, -13.6783, -3.3403, -10.694, -8.2252, -4.8828, -7.529, -10.6315, -9.444, -12.4283, -7.444, -6.496]}
+{"task": "sells", "merchant": "Arddale Group", "pred": 0, "answer": 2, "correct": 0, "scores": [-4.1162, -5.2373, -5.1436, -4.2114]}
+{"task": "reverse", "merchant": "Arddale Group", "pred": 1, "answer": 1, "correct": 1, "scores": [-1.8804, -0.583, -1.7724, -1.7087]}
+{"task": "clean_category", "merchant": "Fenton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.5127, -13.14, -2.8461, -9.2962, -10.0775, -5.5049, -6.5459, -11.2025, -5.7025, -11.3119, -6.2025, -8.1055]}
+{"task": "bank_category", "merchant": "Fenton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.8104, -12.2597, -3.4258, -3.8847, -6.3847, -5.6373, -6.8215, -9.3847, -6.8222, -7.7597, -6.7597, -5.9719]}
+{"task": "sells", "merchant": "Fenton", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.026, -6.3097, -4.3502, -3.7845]}
+{"task": "reverse", "merchant": "Fenton", "pred": 1, "answer": 0, "correct": 0, "scores": [-3.4035, -2.7661, -5.2308, -3.349]}
+{"task": "clean_category", "merchant": "Nevlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.6662, -15.231, -4.7961, -13.6373, -10.2779, -4.8417, -8.5295, -7.2779, -12.731, -17.7388, -1.8404, -9.8839]}
+{"task": "bank_category", "merchant": "Nevlock", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.5589, -12.2522, -2.6418, -5.7366, -3.2366, -6.4641, -7.658, -8.2053, -4.7991, -9.7366, -3.4241, -6.0911]}
+{"task": "sells", "merchant": "Nevlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.1604, -4.1603, -3.5116, -5.5814]}
+{"task": "reverse", "merchant": "Nevlock", "pred": 0, "answer": 3, "correct": 0, "scores": [-0.9976, -3.4192, -1.4119, -4.739]}
+{"task": "clean_category", "merchant": "Holhurst Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-8.1849, -15.5454, -4.7957, -10.9907, -11.8657, -10.8836, -9.965, -7.3032, -10.1157, -11.6157, -7.1782, -9.1159]}
+{"task": "bank_category", "merchant": "Holhurst Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.29, -10.2391, -2.2409, -4.0516, -3.4891, -5.4034, -7.3052, -7.7391, -3.8016, -8.1766, -6.2391, -5.9404]}
+{"task": "sells", "merchant": "Holhurst Ltd", "pred": 1, "answer": 2, "correct": 0, "scores": [-5.3236, -3.8319, -5.2855, -5.5657]}
+{"task": "reverse", "merchant": "Holhurst Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-1.0624, -1.5302, -1.0098, -1.1838]}
+{"task": "clean_category", "merchant": "Elrmere LLC", "pred": 2, "answer": 11, "correct": 0, "scores": [-6.4004, -17.0597, -4.0425, -15.3219, -16.3414, -12.1996, -7.7845, -14.1813, -9.9156, -13.7906, -9.4781, -8.0676]}
+{"task": "bank_category", "merchant": "Elrmere LLC", "pred": 2, "answer": 11, "correct": 0, "scores": [-2.5567, -8.6198, -2.4314, -6.2761, -5.4323, -6.5627, -6.4901, -7.2136, -6.4323, -6.1511, -7.0261, -6.6725]}
+{"task": "sells", "merchant": "Elrmere LLC", "pred": 3, "answer": 1, "correct": 0, "scores": [-6.6736, -4.0537, -3.6609, -3.0169]}
+{"task": "reverse", "merchant": "Elrmere LLC", "pred": 1, "answer": 3, "correct": 0, "scores": [-2.6329, -1.348, -2.2788, -1.5708]}
+{"task": "clean_category", "merchant": "Caldale", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.2779, -18.7159, -0.9952, -13.1534, -12.7003, -7.091, -7.4025, -12.5909, -15.0753, -16.3131, -13.3878, -6.1077]}
+{"task": "bank_category", "merchant": "Caldale", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.4139, -12.7303, -3.6826, -3.9647, -7.1522, -3.7672, -7.4263, -7.2147, -9.4647, -10.9647, -7.4647, -6.3823]}
+{"task": "sells", "merchant": "Caldale", "pred": 3, "answer": 3, "correct": 1, "scores": [-5.9505, -2.707, -7.1959, -2.1282]}
+{"task": "reverse", "merchant": "Caldale", "pred": 0, "answer": 1, "correct": 0, "scores": [-1.7727, -2.0949, -3.2356, -1.9491]}
+{"task": "clean_category", "merchant": "Ulmwen Inc", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.3165, -14.6158, -3.2854, -12.108, -11.1705, -6.1653, -9.3146, -13.9049, -13.858, -15.776, -13.4205, -7.5262]}
+{"task": "bank_category", "merchant": "Ulmwen Inc", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.5381, -9.7369, -1.8048, -4.1431, -3.8931, -5.1385, -7.149, -7.2056, -7.0181, -8.1119, -8.3306, -5.9637]}
+{"task": "sells", "merchant": "Ulmwen Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.7738, -5.8602, -3.7333, -4.6455]}
+{"task": "reverse", "merchant": "Ulmwen Inc", "pred": 0, "answer": 2, "correct": 0, "scores": [-1.3833, -3.0468, -1.5577, -4.4252]}
+{"task": "clean_category", "merchant": "Yarhurst Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-6.4855, -18.3664, -5.1801, -14.7277, -20.5402, -11.3118, -9.3806, -12.4152, -12.0402, -12.9152, -12.2902, -7.4184]}
+{"task": "bank_category", "merchant": "Yarhurst Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.3559, -7.686, -1.0327, -5.9985, -4.311, -6.2516, -6.3397, -5.936, -2.9985, -5.936, -6.1235, -5.8046]}
+{"task": "sells", "merchant": "Yarhurst Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.3365, -4.8148, -3.8789, -6.5608]}
+{"task": "reverse", "merchant": "Yarhurst Group", "pred": 3, "answer": 1, "correct": 0, "scores": [-1.406, -1.4219, -0.9078, -0.907]}
+{"task": "clean_category", "merchant": "Rincott Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.0438, -11.7881, -3.063, -8.8662, -12.1162, -8.2408, -6.7176, -13.5772, -10.4912, -14.3975, -10.3662, -6.3991]}
+{"task": "bank_category", "merchant": "Rincott Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.6578, -7.5984, -1.4355, -7.4422, -6.2859, -6.6813, -6.7733, -5.2234, -2.6609, -10.0672, -6.9734, -5.5542]}
+{"task": "sells", "merchant": "Rincott Group", "pred": 1, "answer": 1, "correct": 1, "scores": [-5.3172, -4.5769, -5.8111, -5.3681]}
+{"task": "reverse", "merchant": "Rincott Group", "pred": 0, "answer": 1, "correct": 0, "scores": [-0.9634, -1.0804, -5.2029, -1.3011]}
+{"task": "clean_category", "merchant": "Fensley Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.9608, -11.3324, -2.3754, -10.6449, -9.6761, -9.8233, -7.0338, -10.5199, -8.4574, -6.5824, -11.8636, -6.8003]}
+{"task": "bank_category", "merchant": "Fensley Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.1863, -9.5159, -1.8954, -7.5784, -4.7971, -4.9038, -7.202, -7.4221, -5.2971, -6.6721, -9.6409, -5.8282]}
+{"task": "sells", "merchant": "Fensley Ltd", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.5787, -5.6906, -3.6883, -4.5548]}
+{"task": "reverse", "merchant": "Fensley Ltd", "pred": 2, "answer": 3, "correct": 0, "scores": [-1.7743, -1.5122, -1.2743, -1.7248]}
+{"task": "clean_category", "merchant": "Calmere", "pred": 5, "answer": 11, "correct": 0, "scores": [-6.5413, -15.8788, -4.0952, -17.8241, -11.8475, -2.2437, -9.3166, -12.0975, -14.1288, -18.5194, -12.8788, -7.4302]}
+{"task": "bank_category", "merchant": "Calmere", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.7842, -8.8741, -2.4899, -7.4678, -6.0616, -5.2845, -6.7392, -7.6241, -4.9366, -7.4366, -5.9991, -5.5762]}
+{"task": "sells", "merchant": "Calmere", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.3818, -3.3595, -4.1038, -6.8487]}
+{"task": "reverse", "merchant": "Calmere", "pred": 3, "answer": 1, "correct": 0, "scores": [-3.0502, -4.2722, -3.7647, -1.4232]}
+{"task": "clean_category", "merchant": "Bramton Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-7.6473, -14.1012, -2.0472, -13.4918, -13.9762, -9.3405, -10.0689, -9.3043, -12.0856, -14.8512, -12.8043, -8.1579]}
+{"task": "bank_category", "merchant": "Bramton Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.6741, -10.5048, -1.748, -5.4111, -4.1611, -5.1482, -6.852, -5.7236, -5.1611, -9.8173, -5.9736, -5.5221]}
+{"task": "sells", "merchant": "Bramton Group", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.9227, -4.8452, -7.0983, -5.078]}
+{"task": "reverse", "merchant": "Bramton Group", "pred": 1, "answer": 2, "correct": 0, "scores": [-5.5821, -0.9341, -1.1423, -1.7462]}
+{"task": "clean_category", "merchant": "Lomby", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.8659, -19.2527, -1.5131, -10.4246, -13.2996, -9.8742, -9.3381, -10.2059, -17.2601, -16.1668, -11.5184, -5.6463]}
+{"task": "bank_category", "merchant": "Lomby", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.1633, -7.9725, -1.0428, -5.8475, -7.5037, -6.4597, -6.8881, -5.4725, -5.41, -9.91, -6.535, -4.9797]}
+{"task": "sells", "merchant": "Lomby", "pred": 1, "answer": 1, "correct": 1, "scores": [-7.1216, -2.86, -4.4168, -3.2985]}
+{"task": "reverse", "merchant": "Lomby", "pred": 0, "answer": 0, "correct": 1, "scores": [-1.91, -3.5596, -1.9747, -2.1733]}
+{"task": "bank_norm_category", "merchant": "Elrholm", "pred": 2, "answer": 0, "correct": 0, "scores": [-5.3603, -8.1649, -3.4526, -9.2587, -10.3524, -5.9054, -5.833, -11.2587, -9.1649, -10.3212, -8.3212, -7.1565]}
+{"task": "bank_hard_category", "merchant": "Elrholm", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.1533, -7.5541, -0.8775, -4.3979, -3.8978, -5.7958, -7.2804, -5.5854, -3.5853, -7.5229, -5.8354, -6.0015]}
+{"task": "bank_hard_norm_category", "merchant": "Elrholm", "pred": 2, "answer": 0, "correct": 0, "scores": [-5.3603, -8.1649, -3.4526, -9.2587, -10.3524, -5.9054, -5.833, -11.2587, -9.1649, -10.3212, -8.3212, -7.1565]}
+{"task": "bank_norm_category", "merchant": "Fenstead Ltd", "pred": 0, "answer": 0, "correct": 1, "scores": [-4.158, -11.3816, -4.2832, -10.116, -10.866, -9.1478, -6.3278, -13.1472, -14.4363, -11.491, -13.2879, -8.9634]}
+{"task": "bank_hard_category", "merchant": "Fenstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.4695, -8.0858, -1.6944, -5.5545, -3.617, -6.3429, -7.059, -4.117, -2.6795, -8.3983, -2.5545, -6.0601]}
+{"task": "bank_hard_norm_category", "merchant": "Fenstead Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.2417, -10.6821, -3.6219, -10.9009, -11.4946, -8.5232, -6.1726, -12.7759, -13.5102, -11.979, -12.729, -9.1417]}
+{"task": "bank_norm_category", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.2892, -7.185, -2.8498, -10.81, -11.2787, -9.4828, -6.9805, -8.81, -14.4486, -9.4662, -8.935, -8.188]}
+{"task": "bank_hard_category", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.5353, -7.4848, -0.5501, -4.7348, -4.3598, -5.8397, -7.038, -7.391, -4.9223, -9.2348, -6.2973, -5.1851]}
+{"task": "bank_hard_norm_category", "merchant": "Calholm Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.3119, -4.6768, -1.3436, -4.9268, -8.1455, -8.1251, -5.7387, -7.2705, -7.1143, -10.4268, -5.9268, -6.1646]}
+{"task": "bank_norm_category", "merchant": "Kelmoor Group", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.8733, -11.0255, -3.3524, -10.7755, -10.4787, -4.3682, -6.0268, -9.2912, -9.8849, -11.3068, -7.2599, -7.0116]}
+{"task": "bank_hard_category", "merchant": "Kelmoor Group", "pred": 2, "answer": 0, "correct": 0, "scores": [-1.5635, -8.7155, -0.8907, -6.8717, -5.2155, -5.3646, -6.2521, -5.528, -4.778, -8.278, -3.0905, -6.1601]}
+{"task": "bank_hard_norm_category", "merchant": "Kelmoor Group", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.8877, -10.8868, -3.1461, -10.4493, -10.1368, -3.9727, -6.3131, -9.1993, -9.543, -10.5743, -6.9805, -6.8319]}
+{"task": "bank_norm_category", "merchant": "Rinsley & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.2875, -12.7723, -4.5222, -11.5067, -12.2723, -7.1664, -7.7705, -13.8426, -14.4285, -14.1551, -8.9754, -8.1892]}
+{"task": "bank_hard_category", "merchant": "Rinsley & Sons", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.3466, -6.1931, -0.9102, -5.9431, -2.6931, -7.6616, -6.0431, -4.8806, -6.6931, -6.9431, -6.6931, -4.6137]}
+{"task": "bank_hard_norm_category", "merchant": "Rinsley & Sons", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.434, -11.0309, -4.2198, -10.7184, -11.0934, -7.2354, -8.1087, -12.9527, -13.5621, -14.1949, -8.3746, -7.871]}
+{"task": "bank_norm_category", "merchant": "Oskley Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.2939, -12.9838, -3.2948, -12.4994, -6.5619, -7.8842, -6.6196, -5.4369, -14.7631, -12.5619, -10.9994, -6.9616]}
+{"task": "bank_hard_category", "merchant": "Oskley Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.5367, -10.8137, -3.0477, -7.0012, -5.6887, -5.0351, -6.6017, -6.9387, -8.9387, -9.5012, -9.1574, -6.789]}
+{"task": "bank_hard_norm_category", "merchant": "Oskley Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.5094, -11.9626, -2.9033, -12.7439, -6.0876, -8.4216, -6.8379, -4.7751, -12.947, -12.2908, -9.9001, -6.8021]}
+{"task": "bank_norm_category", "merchant": "Griwen", "pred": 1, "answer": 0, "correct": 0, "scores": [-6.4692, -2.5822, -4.1461, -15.0822, -11.4572, -9.0028, -8.0585, -12.301, -6.3947, -14.4729, -11.801, -8.8045]}
+{"task": "bank_hard_category", "merchant": "Griwen", "pred": 2, "answer": 0, "correct": 0, "scores": [-1.9223, -6.1646, -1.2293, -3.1958, -4.6333, -7.507, -5.8876, -7.1958, -4.1333, -8.6333, -4.3208, -6.4829]}
+{"task": "bank_hard_norm_category", "merchant": "Griwen", "pred": 1, "answer": 0, "correct": 0, "scores": [-6.4692, -2.5822, -4.1461, -15.0822, -11.4572, -9.0028, -8.0585, -12.301, -6.3947, -14.4729, -11.801, -8.8045]}
+{"task": "bank_norm_category", "merchant": "Polwick Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.9176, -6.1331, -3.1417, -11.5706, -11.0081, -8.7319, -7.1547, -10.5706, -11.3362, -9.0081, -10.9456, -7.8494]}
+{"task": "bank_hard_category", "merchant": "Polwick Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-3.5128, -6.1505, -0.8729, -4.5255, -3.588, -7.6092, -6.2981, -5.1505, -4.463, -6.588, -5.463, -5.8074]}
+{"task": "bank_hard_norm_category", "merchant": "Polwick Ltd", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.7563, -5.3443, -2.437, -11.4225, -11.5787, -8.1114, -7.5543, -9.3756, -10.1256, -8.8131, -10.1568, -7.8918]}
+{"task": "bank_norm_category", "merchant": "Orlcott Inc", "pred": 0, "answer": 0, "correct": 1, "scores": [-2.7485, -8.0821, -3.1579, -8.9258, -9.3633, -7.8439, -7.0113, -10.4883, -14.3946, -9.3633, -14.2344, -7.8482]}
+{"task": "bank_hard_category", "merchant": "Orlcott Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.6442, -8.2621, -1.8772, -7.5434, -5.4809, -8.1498, -6.4692, -4.7934, -2.0434, -10.0121, -7.3871, -6.381]}
+{"task": "bank_hard_norm_category", "merchant": "Orlcott Inc", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.782, -6.7933, -2.4176, -8.9808, -8.9808, -7.0753, -6.9833, -8.7621, -12.4183, -9.1058, -12.3871, -7.4314]}
+{"task": "bank_norm_category", "merchant": "Istdale Bros", "pred": 0, "answer": 0, "correct": 1, "scores": [-3.1543, -14.7747, -4.4689, -10.4231, -13.0638, -7.6851, -7.696, -12.5013, -12.0325, -11.1419, -11.6106, -10.0464]}
+{"task": "bank_hard_category", "merchant": "Istdale Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-2.8694, -7.6835, -1.1154, -4.371, -2.6835, -6.5952, -5.7782, -4.9335, -4.6835, -7.9023, -4.621, -5.7712]}
+{"task": "bank_hard_norm_category", "merchant": "Istdale Bros", "pred": 2, "answer": 0, "correct": 0, "scores": [-4.7638, -14.6794, -4.6235, -10.7419, -13.9919, -8.2735, -9.0611, -11.8357, -11.6169, -13.8044, -13.8513, -9.9207]}
+{"task": "bank_norm_category", "merchant": "Ulmvarro Ltd", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.0169, -6.3254, -3.4773, -7.6379, -11.1691, -8.6936, -6.2901, -9.6379, -10.966, -9.7004, -11.1848, -7.9713]}
+{"task": "bank_hard_category", "merchant": "Ulmvarro Ltd", "pred": 0, "answer": 1, "correct": 0, "scores": [-2.0308, -6.882, -2.1472, -5.8195, -7.007, -6.7269, -6.2887, -6.6007, -6.6945, -8.882, -8.4445, -7.2519]}
+{"task": "bank_hard_norm_category", "merchant": "Ulmvarro Ltd", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.7962, -4.8429, -2.4007, -7.4991, -10.1554, -7.4976, -5.8761, -7.5616, -9.0929, -9.1866, -9.3741, -7.335]}
+{"task": "bank_norm_category", "merchant": "Torwick Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.0059, -3.9433, -2.9013, -6.5058, -9.287, -8.0449, -6.7, -8.3495, -14.4667, -8.5058, -9.412, -7.5886]}
+{"task": "bank_hard_category", "merchant": "Torwick Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.702, -8.0266, -0.8677, -4.1203, -3.3703, -7.0939, -6.5541, -3.8703, -5.5578, -7.4641, -5.2453, -5.5245]}
+{"task": "bank_hard_norm_category", "merchant": "Torwick Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.3913, -2.2379, -1.1906, -7.8004, -9.2692, -7.8992, -7.0723, -4.8629, -9.3629, -7.6754, -4.5504, -7.6476]}
+{"task": "bank_norm_category", "merchant": "Dovstead", "pred": 2, "answer": 1, "correct": 0, "scores": [-6.6912, -11.557, -2.1088, -12.7601, -12.1351, -8.0652, -8.474, -11.182, -11.2445, -15.4261, -13.3851, -6.8751]}
+{"task": "bank_hard_category", "merchant": "Dovstead", "pred": 8, "answer": 1, "correct": 0, "scores": [-4.2375, -8.5863, -2.0299, -8.5863, -6.8051, -8.7049, -7.0188, -6.0551, -1.8051, -7.7738, -6.9301, -7.0193]}
+{"task": "bank_hard_norm_category", "merchant": "Dovstead", "pred": 2, "answer": 1, "correct": 0, "scores": [-6.6912, -11.557, -2.1088, -12.7601, -12.1351, -8.0652, -8.474, -11.182, -11.2445, -15.4261, -13.3851, -6.8751]}
+{"task": "bank_norm_category", "merchant": "Vorvarro Inc", "pred": 0, "answer": 1, "correct": 0, "scores": [-3.3105, -7.0503, -3.7059, -7.4566, -8.8003, -9.7809, -7.0158, -9.3003, -11.4722, -8.4878, -10.2066, -7.8948]}
+{"task": "bank_hard_category", "merchant": "Vorvarro Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.5825, -6.7929, -2.1009, -3.6367, -4.8867, -6.291, -6.4666, -6.5429, -4.9492, -6.4804, -4.6992, -6.6408]}
+{"task": "bank_hard_norm_category", "merchant": "Vorvarro Inc", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.1252, -5.9539, -2.5044, -7.5789, -8.6414, -8.1708, -6.4688, -6.8289, -5.2039, -7.9227, -6.0164, -6.8418]}
+{"task": "bank_norm_category", "merchant": "Calholm Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.3119, -4.6768, -1.3436, -4.9268, -8.1455, -8.1251, -5.7387, -7.2705, -7.1143, -10.4268, -5.9268, -6.1646]}
+{"task": "bank_hard_category", "merchant": "Calholm Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.5936, -7.6612, -0.5661, -4.5987, -4.3487, -5.8648, -6.9388, -6.9112, -4.9112, -9.0987, -6.2237, -5.1278]}
+{"task": "bank_hard_norm_category", "merchant": "Calholm Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.3119, -4.6768, -1.3436, -4.9268, -8.1455, -8.1251, -5.7387, -7.2705, -7.1143, -10.4268, -5.9268, -6.1646]}
+{"task": "bank_norm_category", "merchant": "Rinhurst Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.7903, -6.3634, -2.7723, -14.2446, -15.5509, -8.1313, -8.0333, -9.0509, -11.254, -9.0196, -8.5196, -9.1794]}
+{"task": "bank_hard_category", "merchant": "Rinhurst Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.4262, -6.5296, -0.771, -4.9671, -2.7796, -6.7366, -6.3949, -5.1546, -4.3421, -8.3109, -3.5296, -5.1369]}
+{"task": "bank_hard_norm_category", "merchant": "Rinhurst Bros", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.2912, -5.0954, -2.2675, -8.1892, -11.9548, -6.8434, -7.7322, -6.8767, -9.1579, -8.5329, -8.0017, -8.5169]}
+{"task": "bank_norm_category", "merchant": "Wexstead LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-5.2508, -7.527, -1.9344, -12.3942, -12.2301, -8.6429, -8.2261, -8.0583, -9.2458, -7.9333, -10.7145, -7.9016]}
+{"task": "bank_hard_category", "merchant": "Wexstead LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.9205, -6.8638, -0.9147, -5.52, -4.77, -7.6379, -6.7766, -4.145, -3.145, -7.7075, -4.895, -6.1031]}
+{"task": "bank_hard_norm_category", "merchant": "Wexstead LLC", "pred": 2, "answer": 1, "correct": 0, "scores": [-5.1199, -7.0879, -1.9288, -12.5332, -12.1191, -8.1958, -7.6813, -7.6191, -8.5879, -7.8066, -10.1816, -7.3431]}
+{"task": "bank_norm_category", "merchant": "Lommere Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.0734, -4.3867, -2.6319, -9.3867, -9.4492, -11.1472, -5.3252, -8.8242, -4.3867, -11.8398, -3.6992, -6.3711]}
+{"task": "bank_hard_category", "merchant": "Lommere Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-1.8314, -5.658, -0.7081, -6.0955, -5.408, -6.6765, -6.3502, -6.3767, -3.5955, -8.1892, -3.9705, -5.2908]}
+{"task": "bank_hard_norm_category", "merchant": "Lommere Group", "pred": 10, "answer": 1, "correct": 0, "scores": [-4.5648, -5.4004, -2.2837, -7.5254, -8.2441, -10.4538, -5.8946, -9.1191, -2.6504, -11.9941, -1.7129, -6.5154]}
+{"task": "bank_norm_category", "merchant": "Orlhurst Co", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.8004, -2.1046, -2.763, -6.5733, -11.4014, -8.6611, -6.859, -7.3858, -4.8546, -8.5108, -6.5421, -7.4009]}
+{"task": "bank_hard_category", "merchant": "Orlhurst Co", "pred": 2, "answer": 1, "correct": 0, "scores": [-3.2578, -7.8254, -0.8183, -4.6067, -2.7317, -7.9932, -6.4896, -5.1692, -2.9192, -8.1067, -5.1067, -4.9567]}
+{"task": "bank_hard_norm_category", "merchant": "Orlhurst Co", "pred": 1, "answer": 1, "correct": 1, "scores": [-4.8004, -2.1046, -2.763, -6.5733, -11.4014, -8.6611, -6.859, -7.3858, -4.8546, -8.5108, -6.5421, -7.4009]}
+{"task": "bank_norm_category", "merchant": "Fenley Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.5604, -5.5581, -3.7737, -16.1831, -12.5893, -7.8217, -7.7275, -11.3237, -10.3706, -9.8081, -10.4643, -7.9322]}
+{"task": "bank_hard_category", "merchant": "Fenley Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-2.9937, -5.7032, -0.6104, -6.672, -4.7657, -8.1985, -6.8055, -3.9532, -4.0157, -7.3907, -5.0782, -5.4359]}
+{"task": "bank_hard_norm_category", "merchant": "Fenley Group", "pred": 2, "answer": 1, "correct": 0, "scores": [-4.7942, -4.966, -3.6093, -15.3761, -11.6066, -7.2527, -7.477, -11.2629, -9.591, -8.9347, -9.5597, -7.8954]}
+{"task": "bank_norm_category", "merchant": "Ulmford LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.7597, -17.0866, -2.0085, -8.3366, -11.571, -9.5478, -8.1856, -10.8991, -9.8679, -13.532, -7.9304, -7.6698]}
+{"task": "bank_hard_category", "merchant": "Ulmford LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.3532, -9.5451, -0.8175, -4.7326, -3.9826, -5.9631, -5.7223, -5.9826, -5.6076, -8.2326, -5.0451, -6.014]}
+{"task": "bank_hard_norm_category", "merchant": "Ulmford LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.5388, -15.8827, -1.839, -8.0932, -11.2182, -8.2315, -7.5491, -10.7494, -9.0619, -13.2026, -8.6244, -7.1134]}
+{"task": "bank_norm_category", "merchant": "Wexlock LLC", "pred": 9, "answer": 2, "correct": 0, "scores": [-6.9868, -11.1845, -5.3016, -13.747, -15.8153, -9.4783, -7.2685, -8.872, -8.4032, -3.0595, -9.3407, -9.2478]}
+{"task": "bank_hard_category", "merchant": "Wexlock LLC", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.9674, -9.4363, -1.5843, -7.7488, -8.0613, -6.6438, -6.5286, -6.5301, -4.4051, -8.9988, -7.7801, -6.7966]}
+{"task": "bank_hard_norm_category", "merchant": "Wexlock LLC", "pred": 9, "answer": 2, "correct": 0, "scores": [-6.9747, -10.3391, -5.1227, -13.7453, -16.1282, -8.8686, -6.6184, -8.4953, -7.6203, -3.4328, -8.8391, -9.1151]}
+{"task": "bank_norm_category", "merchant": "Rinham", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.2523, -12.0139, -2.1087, -12.2951, -10.7014, -7.5092, -8.5251, -10.5451, -11.0139, -11.7014, -12.2014, -7.2679]}
+{"task": "bank_hard_category", "merchant": "Rinham", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.2028, -12.0659, -2.3075, -7.9878, -9.6753, -4.0489, -7.9905, -8.9253, -8.7065, -10.519, -10.1753, -6.6787]}
+{"task": "bank_hard_norm_category", "merchant": "Rinham", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.2523, -12.0139, -2.1087, -12.2951, -10.7014, -7.5092, -8.5251, -10.5451, -11.0139, -11.7014, -12.2014, -7.2679]}
+{"task": "bank_norm_category", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.5687, -14.9373, -4.5189, -4.9294, -12.4294, -8.0175, -9.3735, -16.3084, -10.7419, -9.0232, -16.4255, -7.5047]}
+{"task": "bank_hard_category", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.2967, -8.8137, -1.923, -3.0325, -4.095, -5.8009, -7.2592, -9.6262, -5.1575, -5.97, -6.22, -6.0824]}
+{"task": "bank_hard_norm_category", "merchant": "Kelvarro Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.0369, -13.6414, -3.9868, -4.2977, -11.5477, -6.4924, -9.2352, -14.9383, -9.4852, -8.3602, -14.8719, -7.5792]}
+{"task": "bank_norm_category", "merchant": "Yarlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.5522, -11.1392, -2.6388, -4.3736, -4.9986, -5.8188, -6.0301, -9.0298, -4.5611, -8.9986, -8.0611, -6.4244]}
+{"task": "bank_hard_category", "merchant": "Yarlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.5117, -11.9064, -1.1942, -6.8283, -5.297, -6.8404, -5.4397, -8.7658, -4.922, -8.047, -7.5158, -6.9951]}
+{"task": "bank_hard_norm_category", "merchant": "Yarlock", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.5522, -11.1392, -2.6388, -4.3736, -4.9986, -5.8188, -6.0301, -9.0298, -4.5611, -8.9986, -8.0611, -6.4244]}
+{"task": "bank_norm_category", "merchant": "Wexden Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.0746, -13.4338, -3.0605, -12.9416, -14.8732, -9.2557, -8.1842, -11.9416, -8.8322, -17.6291, -14.2307, -7.4253]}
+{"task": "bank_hard_category", "merchant": "Wexden Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.4194, -9.4691, -1.1005, -6.0003, -4.5628, -7.1584, -6.9038, -6.3128, -3.5003, -8.1566, -5.6878, -5.9151]}
+{"task": "bank_hard_norm_category", "merchant": "Wexden Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.4292, -12.9802, -3.3091, -13.7536, -14.2809, -9.2507, -8.7334, -12.2614, -8.4177, -18.8864, -15.2448, -7.5965]}
+{"task": "bank_norm_category", "merchant": "Wexham Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.928, -11.5203, -2.656, -5.239, -6.489, -5.8092, -5.8245, -6.864, -7.1765, -5.8328, -4.4265, -7.3968]}
+{"task": "bank_hard_category", "merchant": "Wexham Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-2.7665, -7.6243, -1.0118, -5.1243, -4.4368, -6.9084, -6.514, -4.9368, -4.1243, -7.4368, -3.6243, -5.9603]}
+{"task": "bank_hard_norm_category", "merchant": "Wexham Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.6528, -7.8327, -2.1378, -7.864, -7.9265, -7.7309, -6.0191, -5.3952, -5.6452, -7.9577, -3.6452, -8.2182]}
+{"task": "bank_norm_category", "merchant": "Orllock & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.1962, -17.4355, -4.0617, -12.9511, -12.6386, -7.8814, -6.6598, -12.9511, -11.0449, -11.7324, -11.7636, -9.4122]}
+{"task": "bank_hard_category", "merchant": "Orllock & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.0271, -12.8228, -1.4377, -7.6509, -5.2134, -6.5489, -6.5045, -8.0884, -6.7759, -10.8697, -5.1509, -7.4105]}
+{"task": "bank_hard_norm_category", "merchant": "Orllock & Sons", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.7494, -15.6892, -3.4514, -12.0564, -11.3689, -7.6399, -6.7972, -12.6501, -10.7439, -11.0876, -10.9939, -9.4124]}
+{"task": "bank_norm_category", "merchant": "Dovmoor Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-4.9762, -11.5852, -3.0386, -4.5774, -9.6555, -7.0398, -7.2237, -11.2492, -5.0774, -6.4836, -5.4524, -7.7474]}
+{"task": "bank_hard_category", "merchant": "Dovmoor Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-3.1206, -9.8589, -1.2619, -7.3589, -6.7651, -5.0433, -7.2225, -6.3901, -3.7026, -7.7651, -6.5776, -6.5455]}
+{"task": "bank_hard_norm_category", "merchant": "Dovmoor Bros", "pred": 2, "answer": 2, "correct": 1, "scores": [-6.0959, -10.9773, -2.6829, -10.2898, -13.2429, -6.6118, -7.308, -8.7273, -2.946, -7.9148, -8.7273, -7.608]}
+{"task": "bank_norm_category", "merchant": "Dovcott Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.6416, -15.2267, -4.5132, -14.336, -9.7267, -8.4044, -10.4378, -13.1798, -10.3829, -12.5392, -16.8145, -9.077]}
+{"task": "bank_hard_category", "merchant": "Dovcott Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-5.1057, -9.6195, -1.8542, -6.8382, -7.0257, -6.7655, -7.0045, -5.7132, -2.3382, -8.0257, -8.557, -5.6623]}
+{"task": "bank_hard_norm_category", "merchant": "Dovcott Inc", "pred": 2, "answer": 2, "correct": 1, "scores": [-7.3414, -13.7024, -4.044, -13.7805, -9.3742, -7.1843, -10.9443, -12.6867, -8.843, -13.2961, -16.4153, -8.6734]}
+{"task": "bank_norm_category", "merchant": "Nevmoor Ltd", "pred": 10, "answer": 3, "correct": 0, "scores": [-4.4179, -11.0326, -3.2434, -5.4076, -8.3139, -7.9907, -6.8136, -8.3451, -5.7201, -8.0326, -1.1576, -7.1133]}
+{"task": "bank_hard_category", "merchant": "Nevmoor Ltd", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.4562, -8.5751, -0.9817, -5.0439, -4.2314, -6.0568, -6.3587, -4.1064, -5.5439, -7.4501, -1.6689, -5.8552]}
+{"task": "bank_hard_norm_category", "merchant": "Nevmoor Ltd", "pred": 10, "answer": 3, "correct": 0, "scores": [-4.2252, -8.3795, -2.7998, -7.2545, -9.4732, -6.7486, -6.4167, -8.2857, -5.2232, -7.6607, -0.9107, -7.2869]}
+{"task": "bank_norm_category", "merchant": "Quildale", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.621, -13.5805, -3.9157, -6.1118, -11.518, -8.8126, -8.0386, -8.7993, -8.9555, -14.8852, -10.3305, -7.3707]}
+{"task": "bank_hard_category", "merchant": "Quildale", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.1908, -11.8456, -1.4781, -4.0174, -4.1424, -5.637, -6.3395, -7.5174, -7.0174, -8.7049, -4.7674, -6.069]}
+{"task": "bank_hard_norm_category", "merchant": "Quildale", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.621, -13.5805, -3.9157, -6.1118, -11.518, -8.8126, -8.0386, -8.7993, -8.9555, -14.8852, -10.3305, -7.3707]}
+{"task": "bank_norm_category", "merchant": "Marmoor", "pred": 3, "answer": 3, "correct": 1, "scores": [-7.2328, -15.2599, -6.6392, -2.7521, -11.9709, -7.1006, -8.5541, -15.4709, -11.2521, -10.0334, -12.0021, -8.9648]}
+{"task": "bank_hard_category", "merchant": "Marmoor", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.2467, -9.1114, -2.0755, -12.6895, -10.0176, -7.9893, -7.6807, -7.0801, -3.1426, -10.0801, -8.5176, -7.3186]}
+{"task": "bank_hard_norm_category", "merchant": "Marmoor", "pred": 3, "answer": 3, "correct": 1, "scores": [-7.2328, -15.2599, -6.6392, -2.7521, -11.9709, -7.1006, -8.5541, -15.4709, -11.2521, -10.0334, -12.0021, -8.9648]}
+{"task": "bank_norm_category", "merchant": "Nevley LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.5618, -14.8509, -2.5814, -9.7025, -11.015, -7.3632, -7.945, -11.7337, -10.2962, -11.39, -12.015, -6.9353]}
+{"task": "bank_hard_category", "merchant": "Nevley LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.333, -8.8262, -0.9666, -5.1074, -3.2324, -6.6187, -6.0217, -5.7949, -5.7949, -6.7324, -4.5449, -5.4763]}
+{"task": "bank_hard_norm_category", "merchant": "Nevley LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-4.6715, -13.8743, -1.8662, -8.5539, -10.1164, -6.3496, -7.5806, -10.7414, -9.8039, -10.2102, -10.4914, -6.5526]}
+{"task": "bank_norm_category", "merchant": "Zedholm & Sons", "pred": 2, "answer": 3, "correct": 0, "scores": [-7.1878, -13.7544, -4.3876, -6.0903, -12.1841, -9.2683, -8.3739, -12.0435, -5.0903, -10.7466, -12.3403, -8.8028]}
+{"task": "bank_hard_category", "merchant": "Zedholm & Sons", "pred": 8, "answer": 3, "correct": 0, "scores": [-5.301, -11.4388, -3.8522, -5.8138, -5.1888, -5.1617, -7.2215, -7.5325, -3.4388, -10.1888, -5.8138, -6.4816]}
+{"task": "bank_hard_norm_category", "merchant": "Zedholm & Sons", "pred": 2, "answer": 3, "correct": 0, "scores": [-7.3087, -12.8839, -4.2052, -6.0714, -11.8995, -9.2571, -8.2186, -12.2277, -5.0714, -10.7277, -11.837, -8.6716]}
+{"task": "bank_norm_category", "merchant": "Rinstead LLC", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.6146, -12.1166, -3.8949, -7.3275, -10.39, -9.7271, -7.0303, -10.8431, -7.4525, -8.765, -7.8275, -7.4984]}
+{"task": "bank_hard_category", "merchant": "Rinstead LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.8735, -6.5114, -1.0982, -2.8239, -2.8239, -6.8223, -6.7667, -5.3864, -3.6364, -8.8239, -4.1364, -5.3626]}
+{"task": "bank_hard_norm_category", "merchant": "Rinstead LLC", "pred": 0, "answer": 3, "correct": 0, "scores": [-3.2438, -9.7107, -3.5055, -7.3357, -9.4607, -8.4356, -6.0303, -9.8357, -6.8357, -9.0545, -7.3357, -6.8727]}
+{"task": "bank_norm_category", "merchant": "Oskbury LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-7.8671, -12.2421, -4.8231, -2.3359, -7.6484, -10.6712, -8.6124, -9.3984, -9.8046, -11.2109, -7.9921, -6.5536]}
+{"task": "bank_hard_category", "merchant": "Oskbury LLC", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.999, -7.6934, -1.606, -5.5996, -4.3496, -6.397, -6.4753, -5.6621, -5.4746, -7.0059, -5.5371, -6.6189]}
+{"task": "bank_hard_norm_category", "merchant": "Oskbury LLC", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.1775, -9.7423, -3.9252, -1.836, -6.5235, -8.1381, -7.3311, -6.461, -8.1485, -10.9142, -6.961, -5.521]}
+{"task": "bank_norm_category", "merchant": "Falholm Inc", "pred": 3, "answer": 3, "correct": 1, "scores": [-5.7868, -11.3854, -3.3211, -2.8542, -7.3229, -9.29, -7.7723, -11.2604, -10.0104, -11.5885, -9.1354, -7.5835]}
+{"task": "bank_hard_category", "merchant": "Falholm Inc", "pred": 2, "answer": 3, "correct": 0, "scores": [-3.8814, -8.2576, -1.4515, -4.0701, -4.1951, -6.1012, -7.221, -6.1326, -2.9451, -8.4764, -5.1326, -5.787]}
+{"task": "bank_hard_norm_category", "merchant": "Falholm Inc", "pred": 2, "answer": 3, "correct": 0, "scores": [-5.7564, -9.8457, -2.8232, -3.9082, -7.8145, -9.144, -7.7025, -9.4082, -7.4082, -11.3301, -7.0332, -6.9264]}
+{"task": "bank_norm_category", "merchant": "Kelton Bros", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.1826, -15.7376, -5.0196, -1.1282, -9.6282, -7.2379, -7.8006, -9.6907, -9.6907, -11.1594, -8.2219, -8.2813]}
+{"task": "bank_hard_category", "merchant": "Kelton Bros", "pred": 2, "answer": 3, "correct": 0, "scores": [-2.5915, -8.1303, -0.729, -3.7553, -3.4428, -7.442, -6.7472, -4.7553, -4.8178, -5.5678, -4.6303, -6.0505]}
+{"task": "bank_hard_norm_category", "merchant": "Kelton Bros", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.3491, -13.7537, -4.645, -0.738, -9.0818, -7.373, -7.5777, -9.6443, -7.1755, -10.5505, -7.6443, -8.0382]}
+{"task": "bank_norm_category", "merchant": "Gridale", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.358, -14.963, -6.0657, -2.1818, -10.4318, -6.1098, -9.9217, -15.2482, -10.8068, -8.3068, -11.8068, -8.3414]}
+{"task": "bank_hard_category", "merchant": "Gridale", "pred": 3, "answer": 3, "correct": 1, "scores": [-3.8896, -14.2962, -4.0737, -1.9603, -5.7103, -5.3301, -7.0054, -10.6165, -8.7728, -9.5228, -5.8978, -6.5009]}
+{"task": "bank_hard_norm_category", "merchant": "Gridale", "pred": 3, "answer": 3, "correct": 1, "scores": [-6.358, -14.963, -6.0657, -2.1818, -10.4318, -6.1098, -9.9217, -15.2482, -10.8068, -8.3068, -11.8068, -8.3414]}
+{"task": "bank_norm_category", "merchant": "Kelwen Bros", "pred": 4, "answer": 4, "correct": 1, "scores": [-5.0519, -12.4605, -3.0827, -3.4918, -2.8668, -7.5284, -6.4101, -7.8668, -5.2418, -7.9605, -4.1793, -4.6709]}
+{"task": "bank_hard_category", "merchant": "Kelwen Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.5911, -6.8489, -1.672, -3.4739, -4.7864, -7.2398, -6.2124, -5.1614, -5.0364, -6.4739, -4.0364, -6.1546]}
+{"task": "bank_hard_norm_category", "merchant": "Kelwen Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.8466, -8.5387, -1.8611, -6.0074, -4.0699, -10.0359, -6.5793, -6.5074, -4.5074, -6.6012, -4.4449, -4.5148]}
+{"task": "bank_norm_category", "merchant": "Nevnard", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.2278, -11.3191, -2.8395, -12.116, -11.3504, -3.3721, -7.7979, -11.0066, -11.8504, -11.2566, -10.0691, -6.7063]}
+{"task": "bank_hard_category", "merchant": "Nevnard", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.7797, -7.916, -2.8509, -3.2598, -5.7598, -7.8519, -7.1367, -4.6348, -5.4473, -11.041, -4.7598, -6.0287]}
+{"task": "bank_hard_norm_category", "merchant": "Nevnard", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.2278, -11.3191, -2.8395, -12.116, -11.3504, -3.3721, -7.7979, -11.0066, -11.8504, -11.2566, -10.0691, -6.7063]}
+{"task": "bank_norm_category", "merchant": "Kellock Ltd", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.4093, -13.5116, -2.9147, -10.6053, -12.2616, -7.4142, -8.6303, -7.9491, -10.5741, -9.9803, -10.2928, -6.5185]}
+{"task": "bank_hard_category", "merchant": "Kellock Ltd", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.6724, -9.7359, -1.143, -6.7984, -4.9547, -7.3235, -7.0446, -5.2047, -5.4547, -9.3609, -5.2672, -5.4309]}
+{"task": "bank_hard_norm_category", "merchant": "Kellock Ltd", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.9007, -11.7384, -2.0506, -9.4572, -12.5665, -7.0291, -8.4501, -5.9884, -9.0822, -10.5197, -10.7384, -6.2366]}
+{"task": "bank_norm_category", "merchant": "Garcott Group", "pred": 2, "answer": 4, "correct": 0, "scores": [-6.2399, -13.4629, -4.8623, -13.0879, -6.8379, -9.7366, -8.1511, -9.4004, -7.0879, -14.416, -11.0254, -6.0961]}
+{"task": "bank_hard_category", "merchant": "Garcott Group", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.0763, -9.3116, -1.4104, -6.1554, -4.5304, -7.206, -6.946, -4.4054, -3.4679, -10.5616, -5.8429, -5.2717]}
+{"task": "bank_hard_norm_category", "merchant": "Garcott Group", "pred": 2, "answer": 4, "correct": 0, "scores": [-6.3818, -13.8863, -4.6236, -13.5582, -6.8707, -10.1593, -8.6963, -9.7769, -6.4332, -15.2925, -10.9332, -6.4874]}
+{"task": "bank_norm_category", "merchant": "Vorwick LLC", "pred": 8, "answer": 4, "correct": 0, "scores": [-6.7436, -6.9402, -2.6772, -8.409, -8.409, -10.5818, -7.1117, -7.909, -2.0027, -12.9871, -5.6277, -6.5354]}
+{"task": "bank_hard_category", "merchant": "Vorwick LLC", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.6387, -7.8447, -0.7499, -6.501, -3.9697, -6.6129, -6.8261, -4.7822, -3.7197, -7.1572, -5.5947, -5.6837]}
+{"task": "bank_hard_norm_category", "merchant": "Vorwick LLC", "pred": 2, "answer": 4, "correct": 0, "scores": [-7.4645, -9.6386, -4.1355, -11.3886, -10.1386, -10.1974, -7.3546, -7.7323, -4.5448, -13.6229, -9.6386, -5.7487]}
+{"task": "bank_norm_category", "merchant": "Calholm", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.3119, -4.6768, -1.3436, -4.9268, -8.1455, -8.1251, -5.7387, -7.2705, -7.1143, -10.4268, -5.9268, -6.1646]}
+{"task": "bank_hard_category", "merchant": "Calholm", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.5824, -7.7611, -0.55, -4.6673, -4.6048, -5.8681, -7.0004, -7.4486, -5.0423, -9.3548, -6.2923, -5.2593]}
+{"task": "bank_hard_norm_category", "merchant": "Calholm", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.3119, -4.6768, -1.3436, -4.9268, -8.1455, -8.1251, -5.7387, -7.2705, -7.1143, -10.4268, -5.9268, -6.1646]}
+{"task": "bank_norm_category", "merchant": "Bramwick Co", "pred": 2, "answer": 4, "correct": 0, "scores": [-10.3972, -19.4496, -5.5406, -17.8187, -9.1859, -11.1337, -11.2145, -13.1859, -13.4046, -19.5043, -14.0296, -7.5685]}
+{"task": "bank_hard_category", "merchant": "Bramwick Co", "pred": 2, "answer": 4, "correct": 0, "scores": [-4.7539, -5.8845, -1.7041, -4.7595, -2.322, -7.0404, -6.6317, -3.5095, -6.697, -7.1657, -5.822, -6.9152]}
+{"task": "bank_hard_norm_category", "merchant": "Bramwick Co", "pred": 2, "answer": 4, "correct": 0, "scores": [-10.3972, -19.4496, -5.5406, -17.8187, -9.1859, -11.1337, -11.2145, -13.1859, -13.4046, -19.5043, -14.0296, -7.5685]}
+{"task": "bank_norm_category", "merchant": "Jornard Bros", "pred": 3, "answer": 4, "correct": 0, "scores": [-5.6973, -15.4568, -4.1477, -2.2298, -7.0423, -7.0658, -7.4808, -10.9173, -9.0423, -9.7298, -7.8548, -7.0276]}
+{"task": "bank_hard_category", "merchant": "Jornard Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.1226, -6.7594, -0.4528, -3.9469, -2.6344, -9.3515, -6.4883, -3.7594, -3.8219, -8.6031, -3.6969, -5.0433]}
+{"task": "bank_hard_norm_category", "merchant": "Jornard Bros", "pred": 2, "answer": 4, "correct": 0, "scores": [-2.6302, -4.466, -1.4347, -2.841, -3.591, -8.6899, -6.381, -4.0285, -6.466, -8.716, -3.966, -5.0797]}
+{"task": "bank_norm_category", "merchant": "Quilby & Sons", "pred": 2, "answer": 4, "correct": 0, "scores": [-7.8629, -15.1905, -4.5371, -8.6671, -6.7921, -7.0715, -8.5232, -9.0108, -11.6358, -17.5225, -10.1358, -6.2126]}
+{"task": "bank_hard_category", "merchant": "Quilby & Sons", "pred": 2, "answer": 4, "correct": 0, "scores": [-3.6904, -8.571, -0.7228, -5.6335, -7.446, -7.726, -6.8144, -6.8835, -4.946, -8.8835, -4.7585, -5.9668]}
+{"task": "bank_hard_norm_category", "merchant": "Quilby & Sons", "pred": 2, "answer": 4, "correct": 0, "scores": [-7.7926, -14.3523, -4.4164, -8.2741, -5.8991, -7.416, -8.5886, -8.4616, -10.7429, -17.4812, -9.3366, -6.2385]}
+{"task": "bank_norm_category", "merchant": "Talwick", "pred": 2, "answer": 4, "correct": 0, "scores": [-9.9446, -20.283, -6.4717, -16.2473, -12.3567, -11.9702, -9.7484, -13.3567, -13.7004, -20.6458, -18.9973, -7.8176]}
+{"task": "bank_hard_category", "merchant": "Talwick", "pred": 2, "answer": 4, "correct": 0, "scores": [-5.4487, -14.3107, -2.4728, -6.8888, -6.0138, -5.9161, -7.5657, -7.3263, -7.3263, -8.545, -8.2013, -7.8267]}
+{"task": "bank_hard_norm_category", "merchant": "Talwick", "pred": 2, "answer": 4, "correct": 0, "scores": [-9.9446, -20.283, -6.4717, -16.2473, -12.3567, -11.9702, -9.7484, -13.3567, -13.7004, -20.6458, -18.9973, -7.8176]}
+{"task": "bank_norm_category", "merchant": "Marby Inc", "pred": 3, "answer": 5, "correct": 0, "scores": [-6.7186, -10.2013, -5.3779, -3.2638, -9.3576, -3.8067, -7.8211, -7.1701, -12.2638, -10.3888, -6.8263, -7.9881]}
+{"task": "bank_hard_category", "merchant": "Marby Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.721, -6.5969, -1.8666, -4.5656, -4.5031, -7.0679, -6.6114, -5.1281, -4.6906, -5.3156, -4.9406, -6.1256]}
+{"task": "bank_hard_norm_category", "merchant": "Marby Inc", "pred": 5, "answer": 5, "correct": 1, "scores": [-6.3098, -9.4987, -5.3669, -3.8737, -9.2175, -3.3118, -7.4857, -5.9362, -10.5612, -9.9362, -5.4987, -7.7241]}
+{"task": "bank_norm_category", "merchant": "Garden", "pred": 0, "answer": 5, "correct": 0, "scores": [-3.5419, -11.5896, -3.9307, -13.0271, -12.5896, -6.1756, -6.1406, -10.9646, -6.6521, -10.8396, -6.4021, -6.7645]}
+{"task": "bank_hard_category", "merchant": "Garden", "pred": 0, "answer": 5, "correct": 0, "scores": [-1.3835, -7.4392, -2.5055, -9.9392, -8.283, -4.8955, -6.2878, -6.8767, -5.5017, -9.158, -4.1892, -6.3447]}
+{"task": "bank_hard_norm_category", "merchant": "Garden", "pred": 0, "answer": 5, "correct": 0, "scores": [-3.5419, -11.5896, -3.9307, -13.0271, -12.5896, -6.1756, -6.1406, -10.9646, -6.6521, -10.8396, -6.4021, -6.7645]}
+{"task": "bank_norm_category", "merchant": "Quilmere", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.6237, -16.2504, -3.6556, -12.2338, -13.6244, -5.639, -6.5817, -12.6244, -7.9525, -12.9369, -8.4213, -7.1165]}
+{"task": "bank_hard_category", "merchant": "Quilmere", "pred": 2, "answer": 5, "correct": 0, "scores": [-2.3498, -8.3486, -1.2525, -5.0361, -4.5361, -6.2093, -6.7782, -4.7236, -5.2861, -7.6611, -1.7861, -5.2337]}
+{"task": "bank_hard_norm_category", "merchant": "Quilmere", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.6237, -16.2504, -3.6556, -12.2338, -13.6244, -5.639, -6.5817, -12.6244, -7.9525, -12.9369, -8.4213, -7.1165]}
+{"task": "bank_norm_category", "merchant": "Halbury", "pred": 5, "answer": 5, "correct": 1, "scores": [-5.94, -10.9824, -5.9079, -7.2324, -10.6386, -3.8286, -7.7709, -12.4824, -13.3261, -13.2636, -12.4511, -9.3796]}
+{"task": "bank_hard_category", "merchant": "Halbury", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.2408, -9.6077, -1.9776, -4.8264, -5.0139, -4.7936, -7.1739, -6.3889, -5.3264, -7.6077, -4.8889, -7.7978]}
+{"task": "bank_hard_norm_category", "merchant": "Halbury", "pred": 5, "answer": 5, "correct": 1, "scores": [-5.94, -10.9824, -5.9079, -7.2324, -10.6386, -3.8286, -7.7709, -12.4824, -13.3261, -13.2636, -12.4511, -9.3796]}
+{"task": "bank_norm_category", "merchant": "Torden Co", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.8627, -9.6814, -2.7556, -7.2127, -9.9314, -5.578, -7.6025, -11.8064, -9.3064, -14.2889, -9.7752, -6.3567]}
+{"task": "bank_hard_category", "merchant": "Torden Co", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.1234, -6.5637, -1.0958, -5.5637, -4.3762, -7.4092, -6.0855, -5.7512, -4.8762, -9.1262, -4.5637, -6.7913]}
+{"task": "bank_hard_norm_category", "merchant": "Torden Co", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.6935, -9.1232, -2.5388, -6.3732, -8.0294, -6.3293, -7.1442, -11.0919, -8.0607, -12.4903, -9.4669, -6.3498]}
+{"task": "bank_norm_category", "merchant": "Dovton LLC", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.7366, -13.9725, -2.867, -9.536, -7.286, -8.6913, -5.7667, -10.3641, -10.0047, -9.3172, -10.8797, -6.2864]}
+{"task": "bank_hard_category", "merchant": "Dovton LLC", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.6173, -10.1696, -1.7959, -5.8258, -6.3571, -5.8528, -6.9534, -6.5758, -4.0133, -8.2321, -5.8883, -6.0849]}
+{"task": "bank_hard_norm_category", "merchant": "Dovton LLC", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.1401, -11.0929, -1.7645, -8.4522, -6.8897, -7.7286, -5.1747, -9.671, -9.3585, -9.5772, -9.671, -5.7131]}
+{"task": "bank_norm_category", "merchant": "Lomlock Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-7.0203, -15.1922, -4.5897, -10.3406, -13.7156, -5.334, -6.9051, -11.4656, -10.9031, -15.4265, -14.4812, -7.6407]}
+{"task": "bank_hard_category", "merchant": "Lomlock Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.3721, -7.4518, -1.9498, -8.4206, -6.6393, -7.5102, -6.9263, -3.8268, -4.2643, -10.6393, -4.3268, -6.1269]}
+{"task": "bank_hard_norm_category", "merchant": "Lomlock Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-6.7128, -14.9979, -4.4502, -9.9198, -13.4198, -4.9192, -7.0933, -11.6698, -10.2948, -15.0135, -14.5526, -7.8384]}
+{"task": "bank_norm_category", "merchant": "Grimere Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.5487, -12.8593, -3.9671, -14.0937, -15.9433, -7.4105, -8.489, -12.4374, -12.8124, -15.3066, -10.2656, -8.3931]}
+{"task": "bank_hard_category", "merchant": "Grimere Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-2.1787, -5.5106, -0.6618, -6.1981, -4.1981, -7.0088, -6.5945, -5.1356, -3.6981, -6.7919, -4.2606, -5.8251]}
+{"task": "bank_hard_norm_category", "merchant": "Grimere Group", "pred": 2, "answer": 5, "correct": 0, "scores": [-4.2297, -11.7105, -3.5793, -13.437, -15.1438, -5.9594, -8.6828, -11.9761, -11.9917, -14.8003, -9.0855, -8.2542]}
+{"task": "bank_norm_category", "merchant": "Garley Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.083, -13.4799, -3.0918, -9.1284, -5.8784, -5.8192, -8.3623, -10.8471, -16.8706, -12.9721, -12.7534, -6.2316]}
+{"task": "bank_hard_category", "merchant": "Garley Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-2.2583, -9.181, -0.653, -5.1497, -3.3372, -6.8268, -6.6659, -4.8997, -6.3997, -7.556, -4.8372, -5.4192]}
+{"task": "bank_hard_norm_category", "merchant": "Garley Inc", "pred": 2, "answer": 5, "correct": 0, "scores": [-5.3114, -12.5951, -2.9563, -10.6889, -6.4701, -6.1131, -8.8883, -10.0639, -15.9428, -12.9389, -11.5483, -6.0443]}
+{"task": "bank_norm_category", "merchant": "Dovby", "pred": 0, "answer": 5, "correct": 0, "scores": [-4.6112, -16.165, -4.7623, -13.9385, -7.7978, -7.6206, -5.9598, -7.4228, -8.8603, -9.3603, -9.7353, -5.6224]}
+{"task": "bank_hard_category", "merchant": "Dovby", "pred": 2, "answer": 5, "correct": 0, "scores": [-3.8569, -11.3319, -1.7875, -7.4256, -7.0194, -6.5747, -6.5279, -4.1444, -2.4569, -6.1444, -7.8944, -5.7827]}
+{"task": "bank_hard_norm_category", "merchant": "Dovby", "pred": 0, "answer": 5, "correct": 0, "scores": [-4.6112, -16.165, -4.7623, -13.9385, -7.7978, -7.6206, -5.9598, -7.4228, -8.8603, -9.3603, -9.7353, -5.6224]}
+{"task": "bank_norm_category", "merchant": "Polstead Ltd", "pred": 10, "answer": 6, "correct": 0, "scores": [-5.0049, -6.2561, -4.3219, -14.3177, -12.8733, -8.991, -7.5457, -9.3811, -10.9905, -6.6311, -3.1311, -9.4018]}
+{"task": "bank_hard_category", "merchant": "Polstead Ltd", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.4391, -7.9111, -0.7446, -5.4424, -3.0049, -7.287, -6.2336, -6.7861, -2.8799, -7.1299, -4.7549, -5.7602]}
+{"task": "bank_hard_norm_category", "merchant": "Polstead Ltd", "pred": 10, "answer": 6, "correct": 0, "scores": [-5.5151, -5.5057, -3.8712, -13.3299, -12.7557, -8.0924, -7.3693, -9.3807, -9.5682, -7.1932, -2.1932, -9.895]}
+{"task": "bank_norm_category", "merchant": "Bexby Co", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.2514, -10.8037, -3.141, -10.46, -9.3037, -6.9853, -7.8403, -8.8662, -11.9912, -15.5693, -6.3975, -6.8376]}
+{"task": "bank_hard_category", "merchant": "Bexby Co", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.6382, -7.8481, -1.7366, -5.0981, -3.9106, -7.1146, -6.5637, -5.2231, -8.4418, -3.8481, -4.5356, -7.2745]}
+{"task": "bank_hard_norm_category", "merchant": "Bexby Co", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.2514, -10.8037, -3.141, -10.46, -9.3037, -6.9853, -7.8403, -8.8662, -11.9912, -15.5693, -6.3975, -6.8376]}
+{"task": "bank_norm_category", "merchant": "Jorvarro & Sons", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.0981, -15.5579, -4.9912, -13.1361, -16.8978, -9.2016, -5.1653, -12.4954, -8.8704, -9.9954, -6.8079, -7.3896]}
+{"task": "bank_hard_category", "merchant": "Jorvarro & Sons", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.79, -7.8501, -1.7716, -2.8501, -5.4751, -4.7798, -6.3674, -5.6001, -5.1001, -7.3188, -4.5376, -6.9175]}
+{"task": "bank_hard_norm_category", "merchant": "Jorvarro & Sons", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.0309, -14.5237, -4.679, -12.9144, -16.4617, -9.0565, -4.7978, -12.2737, -8.9612, -9.93, -6.1487, -7.3619]}
+{"task": "bank_norm_category", "merchant": "Kormoor LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.5145, -11.8973, -1.7113, -8.1473, -10.6473, -7.3611, -6.7442, -10.0223, -6.5536, -7.7098, -8.2411, -7.0343]}
+{"task": "bank_hard_category", "merchant": "Kormoor LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.2577, -8.6667, -0.5668, -5.2292, -3.9167, -6.9604, -6.4294, -5.2917, -3.8542, -5.6667, -4.8542, -5.8444]}
+{"task": "bank_hard_norm_category", "merchant": "Kormoor LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.3555, -11.4273, -1.4699, -8.0835, -10.8179, -6.5982, -6.6513, -9.646, -6.9585, -7.4585, -8.396, -6.7723]}
+{"task": "bank_norm_category", "merchant": "Dunvarro Ltd", "pred": 8, "answer": 6, "correct": 0, "scores": [-7.8168, -10.4233, -3.6708, -11.392, -12.4076, -10.4607, -7.3489, -9.1108, -2.3608, -13.767, -14.0795, -6.8147]}
+{"task": "bank_hard_category", "merchant": "Dunvarro Ltd", "pred": 2, "answer": 6, "correct": 0, "scores": [-4.072, -7.8918, -2.3687, -4.3606, -7.2668, -6.1545, -6.6069, -8.2981, -3.6731, -6.1731, -9.5793, -7.2318]}
+{"task": "bank_hard_norm_category", "merchant": "Dunvarro Ltd", "pred": 8, "answer": 6, "correct": 0, "scores": [-7.6253, -9.1927, -3.3872, -11.349, -12.3177, -9.7725, -6.9006, -8.4427, -2.0052, -12.8177, -13.8411, -6.9632]}
+{"task": "bank_norm_category", "merchant": "Gribury", "pred": 6, "answer": 6, "correct": 1, "scores": [-5.3954, -16.1345, -4.3691, -13.7439, -17.9158, -9.379, -4.3212, -16.0174, -10.197, -13.2439, -9.8533, -7.7389]}
+{"task": "bank_hard_category", "merchant": "Gribury", "pred": 2, "answer": 6, "correct": 0, "scores": [-2.6643, -9.9801, -1.8414, -5.6051, -7.4176, -7.4016, -6.2101, -6.2301, -4.1051, -8.1363, -7.6051, -6.4454]}
+{"task": "bank_hard_norm_category", "merchant": "Gribury", "pred": 6, "answer": 6, "correct": 1, "scores": [-5.3954, -16.1345, -4.3691, -13.7439, -17.9158, -9.379, -4.3212, -16.0174, -10.197, -13.2439, -9.8533, -7.7389]}
+{"task": "bank_norm_category", "merchant": "Ulmlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.5924, -15.0341, -5.5844, -9.9325, -12.4325, -11.1411, -5.7871, -11.87, -7.87, -17.6825, -9.87, -7.9795]}
+{"task": "bank_hard_category", "merchant": "Ulmlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-5.5834, -13.6978, -2.5956, -7.8149, -13.1431, -4.663, -6.6812, -9.9399, -6.6274, -9.5337, -8.3462, -7.2404]}
+{"task": "bank_hard_norm_category", "merchant": "Ulmlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-7.5924, -15.0341, -5.5844, -9.9325, -12.4325, -11.1411, -5.7871, -11.87, -7.87, -17.6825, -9.87, -7.9795]}
+{"task": "bank_norm_category", "merchant": "Sabham", "pred": 2, "answer": 6, "correct": 0, "scores": [-4.0742, -8.1222, -3.1841, -7.4659, -5.7472, -10.8306, -5.8865, -10.7472, -6.1222, -13.1769, -10.4659, -6.4129]}
+{"task": "bank_hard_category", "merchant": "Sabham", "pred": 3, "answer": 6, "correct": 0, "scores": [-6.2785, -13.3019, -4.2071, -2.6457, -9.2394, -6.1213, -7.9206, -11.9894, -8.4894, -9.3644, -7.2707, -6.9611]}
+{"task": "bank_hard_norm_category", "merchant": "Sabham", "pred": 2, "answer": 6, "correct": 0, "scores": [-4.0742, -8.1222, -3.1841, -7.4659, -5.7472, -10.8306, -5.8865, -10.7472, -6.1222, -13.1769, -10.4659, -6.4129]}
+{"task": "bank_norm_category", "merchant": "Fenlock", "pred": 5, "answer": 6, "correct": 0, "scores": [-4.6563, -12.6874, -3.9338, -11.4062, -7.9999, -3.3723, -5.8096, -12.6093, -7.4062, -12.3437, -12.6405, -6.5709]}
+{"task": "bank_hard_category", "merchant": "Fenlock", "pred": 2, "answer": 6, "correct": 0, "scores": [-3.7235, -12.6997, -2.1278, -10.2466, -10.0903, -7.6448, -5.868, -4.6528, -2.2778, -13.5825, -6.8716, -6.5823]}
+{"task": "bank_hard_norm_category", "merchant": "Fenlock", "pred": 5, "answer": 6, "correct": 0, "scores": [-4.6563, -12.6874, -3.9338, -11.4062, -7.9999, -3.3723, -5.8096, -12.6093, -7.4062, -12.3437, -12.6405, -6.5709]}
+{"task": "bank_norm_category", "merchant": "Lommere LLC", "pred": 8, "answer": 6, "correct": 0, "scores": [-5.3599, -8.6557, -2.4863, -8.3745, -8.312, -12.1563, -7.3085, -10.8901, -2.312, -12.6714, -2.4995, -7.1654]}
+{"task": "bank_hard_category", "merchant": "Lommere LLC", "pred": 2, "answer": 6, "correct": 0, "scores": [-1.866, -5.479, -0.6712, -6.0415, -5.4165, -6.837, -6.3867, -6.354, -3.5415, -8.2915, -4.0415, -5.2807]}
+{"task": "bank_hard_norm_category", "merchant": "Lommere LLC", "pred": 10, "answer": 6, "correct": 0, "scores": [-4.5648, -5.4004, -2.2837, -7.5254, -8.2441, -10.4538, -5.8946, -9.1191, -2.6504, -11.9941, -1.7129, -6.5154]}
+{"task": "bank_norm_category", "merchant": "Vorwen Ltd", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.8757, -11.0573, -1.9044, -7.8854, -6.7604, -6.475, -6.3001, -8.3854, -5.6354, -10.5104, -9.4479, -6.7086]}
+{"task": "bank_hard_category", "merchant": "Vorwen Ltd", "pred": 2, "answer": 7, "correct": 0, "scores": [-2.8331, -6.341, -0.9821, -4.2785, -4.091, -7.1419, -6.54, -4.966, -2.9035, -7.716, -4.716, -5.7899]}
+{"task": "bank_hard_norm_category", "merchant": "Vorwen Ltd", "pred": 2, "answer": 7, "correct": 0, "scores": [-4.4849, -10.9651, -1.9501, -9.6057, -6.9807, -6.6634, -7.1496, -8.1994, -4.6994, -12.4416, -9.5119, -7.2282]}
+{"task": "bank_norm_category", "merchant": "Talmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.6864, -12.0462, -4.6184, -11.5618, -13.4368, -8.8985, -7.3382, -4.9055, -9.1555, -14.9915, -13.7493, -8.2821]}
+{"task": "bank_hard_category", "merchant": "Talmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-2.8782, -8.9076, -1.1322, -7.5013, -6.5638, -5.6624, -6.6641, -4.6263, -2.8763, -8.3763, -5.1888, -6.5558]}
+{"task": "bank_hard_norm_category", "merchant": "Talmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.5577, -11.7165, -4.4248, -11.4353, -13.3572, -8.8336, -7.5108, -4.9353, -9.2478, -14.7087, -13.6697, -8.2977]}
+{"task": "bank_norm_category", "merchant": "Holwen Bros", "pred": 3, "answer": 7, "correct": 0, "scores": [-5.7625, -12.0283, -3.9126, -3.2783, -10.0908, -5.2808, -7.2471, -6.747, -8.247, -11.4658, -7.747, -7.4731]}
+{"task": "bank_hard_category", "merchant": "Holwen Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.4168, -8.1779, -0.7803, -3.6779, -3.4279, -7.7792, -6.2018, -5.5529, -3.1154, -8.4591, -5.0529, -5.5997]}
+{"task": "bank_hard_norm_category", "merchant": "Holwen Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.2267, -10.6604, -3.1301, -9.2541, -12.0979, -8.1776, -7.5289, -6.7854, -6.7229, -14.176, -9.2854, -7.0695]}
+{"task": "bank_norm_category", "merchant": "Halby Bros", "pred": 7, "answer": 7, "correct": 1, "scores": [-5.2057, -6.7025, -4.2713, -13.4877, -13.2962, -7.2847, -7.3005, -3.7025, -10.6556, -9.7962, -8.3587, -7.8635]}
+{"task": "bank_hard_category", "merchant": "Halby Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.6524, -6.7801, -1.2005, -5.2489, -4.1239, -7.2837, -6.7705, -3.5614, -4.3739, -8.6239, -2.3114, -5.6938]}
+{"task": "bank_hard_norm_category", "merchant": "Halby Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.1237, -6.1142, -4.191, -14.4423, -12.661, -6.795, -7.8193, -4.3954, -10.3954, -10.1298, -9.6454, -8.1669]}
+{"task": "bank_norm_category", "merchant": "Elrford & Sons", "pred": 2, "answer": 7, "correct": 0, "scores": [-6.7345, -9.9133, -3.2577, -4.8195, -5.6945, -5.9448, -6.6733, -5.507, -3.757, -6.257, -6.1945, -7.4786]}
+{"task": "bank_hard_category", "merchant": "Elrford & Sons", "pred": 2, "answer": 7, "correct": 0, "scores": [-2.5378, -7.8382, -0.6241, -4.7132, -3.0257, -7.0485, -6.2332, -3.8382, -5.2132, -7.5257, -2.5882, -5.7761]}
+{"task": "bank_hard_norm_category", "merchant": "Elrford & Sons", "pred": 8, "answer": 7, "correct": 0, "scores": [-6.8187, -7.7833, -2.8192, -9.0333, -8.7521, -6.5706, -7.2151, -5.2521, -2.3771, -6.1271, -5.6271, -7.485]}
+{"task": "bank_norm_category", "merchant": "Polmere", "pred": 7, "answer": 7, "correct": 1, "scores": [-6.2669, -14.4146, -4.3966, -10.3053, -7.9615, -6.6436, -9.7912, -4.3365, -12.2271, -13.1646, -8.7115, -8.131]}
+{"task": "bank_hard_category", "merchant": "Polmere", "pred": 2, "answer": 7, "correct": 0, "scores": [-1.968, -9.4103, -1.2421, -9.129, -7.3478, -5.9122, -6.3998, -8.379, -5.9415, -7.129, -2.3165, -5.4821]}
+{"task": "bank_hard_norm_category", "merchant": "Polmere", "pred": 7, "answer": 7, "correct": 1, "scores": [-6.2669, -14.4146, -4.3966, -10.3053, -7.9615, -6.6436, -9.7912, -4.3365, -12.2271, -13.1646, -8.7115, -8.131]}
+{"task": "bank_norm_category", "merchant": "Jorwick Inc", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.3481, -9.6065, -2.8407, -8.9503, -9.3565, -9.6546, -9.4852, -6.3878, -3.3253, -8.419, -12.544, -7.3872]}
+{"task": "bank_hard_category", "merchant": "Jorwick Inc", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.0512, -6.2817, -0.7078, -4.7817, -3.5317, -8.1755, -6.1388, -5.1567, -4.4067, -7.6254, -4.6567, -5.7675]}
+{"task": "bank_hard_norm_category", "merchant": "Jorwick Inc", "pred": 2, "answer": 7, "correct": 0, "scores": [-5.7198, -11.366, -3.4602, -11.0535, -10.4597, -9.7377, -10.1598, -7.3347, -4.5847, -9.4597, -12.4285, -8.0487]}
+{"task": "bank_norm_category", "merchant": "Bexhurst", "pred": 2, "answer": 7, "correct": 0, "scores": [-7.0229, -8.6684, -3.7975, -15.5419, -16.2699, -7.9844, -5.4466, -4.4184, -5.8559, -13.2621, -10.3246, -8.0327]}
+{"task": "bank_hard_category", "merchant": "Bexhurst", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.2155, -8.5611, -0.8304, -5.4673, -5.2173, -7.6747, -5.6836, -6.0923, -3.0923, -9.4048, -4.4048, -5.1134]}
+{"task": "bank_hard_norm_category", "merchant": "Bexhurst", "pred": 2, "answer": 7, "correct": 0, "scores": [-7.0229, -8.6684, -3.7975, -15.5419, -16.2699, -7.9844, -5.4466, -4.4184, -5.8559, -13.2621, -10.3246, -8.0327]}
+{"task": "bank_norm_category", "merchant": "Fenmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-4.3793, -7.2895, -2.1441, -10.7895, -12.8598, -9.3454, -5.7313, -2.602, -5.2895, -10.5238, -2.1645, -7.1718]}
+{"task": "bank_hard_category", "merchant": "Fenmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-3.2717, -6.8405, -0.7355, -8.3717, -6.778, -8.1636, -6.6798, -3.3717, -3.7467, -8.6842, -3.7467, -5.9198]}
+{"task": "bank_hard_norm_category", "merchant": "Fenmoor Group", "pred": 2, "answer": 7, "correct": 0, "scores": [-4.154, -6.9288, -1.7629, -10.2726, -12.2257, -8.893, -5.633, -2.8351, -5.2726, -9.9601, -2.0851, -6.9715]}
+{"task": "bank_norm_category", "merchant": "Marton Bros", "pred": 8, "answer": 7, "correct": 0, "scores": [-6.2515, -9.7246, -3.1404, -7.3184, -10.459, -7.5649, -8.4248, -6.5059, -2.0371, -9.2871, -8.7871, -7.8621]}
+{"task": "bank_hard_category", "merchant": "Marton Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-1.8922, -6.2126, -0.8586, -4.0876, -4.5876, -6.9217, -6.269, -4.9001, -6.0251, -6.2126, -4.8376, -6.2656]}
+{"task": "bank_hard_norm_category", "merchant": "Marton Bros", "pred": 2, "answer": 7, "correct": 0, "scores": [-6.2018, -5.0563, -2.3156, -10.4469, -9.8063, -9.6743, -7.1374, -6.6813, -2.3688, -8.6188, -10.0875, -6.7725]}
+{"task": "bank_norm_category", "merchant": "Dovmoor & Sons", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.4962, -12.9937, -3.3544, -9.8999, -14.1578, -5.3361, -7.6579, -8.3062, -2.3687, -9.4312, -10.0562, -7.8711]}
+{"task": "bank_hard_category", "merchant": "Dovmoor & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.0803, -9.9524, -1.2418, -7.3586, -6.7649, -5.1055, -7.2272, -6.4524, -3.7649, -7.8899, -6.5774, -6.548]}
+{"task": "bank_hard_norm_category", "merchant": "Dovmoor & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-6.0959, -10.9773, -2.6829, -10.2898, -13.2429, -6.6118, -7.308, -8.7273, -2.946, -7.9148, -8.7273, -7.608]}
+{"task": "bank_norm_category", "merchant": "Calford", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.1583, -10.9784, -4.3079, -15.244, -14.994, -9.1249, -7.7536, -10.0722, -6.3222, -16.4159, -10.3222, -6.733]}
+{"task": "bank_hard_category", "merchant": "Calford", "pred": 2, "answer": 8, "correct": 0, "scores": [-2.0282, -8.4602, -1.2922, -6.8977, -6.0852, -5.9532, -6.1652, -6.0227, -4.5852, -8.054, -6.0227, -6.186]}
+{"task": "bank_hard_norm_category", "merchant": "Calford", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.1583, -10.9784, -4.3079, -15.244, -14.994, -9.1249, -7.7536, -10.0722, -6.3222, -16.4159, -10.3222, -6.733]}
+{"task": "bank_norm_category", "merchant": "Quilmoor", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.4938, -10.1842, -3.7418, -10.7467, -14.5904, -6.6585, -5.7073, -6.9967, -7.9967, -13.1685, -8.2467, -7.1719]}
+{"task": "bank_hard_category", "merchant": "Quilmoor", "pred": 2, "answer": 8, "correct": 0, "scores": [-2.188, -10.1717, -0.6023, -6.031, -5.281, -5.3963, -6.4338, -5.5935, -3.3435, -8.1873, -3.5935, -5.778]}
+{"task": "bank_hard_norm_category", "merchant": "Quilmoor", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.4938, -10.1842, -3.7418, -10.7467, -14.5904, -6.6585, -5.7073, -6.9967, -7.9967, -13.1685, -8.2467, -7.1719]}
+{"task": "bank_norm_category", "merchant": "Holham Group", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.8434, -12.4991, -3.6091, -9.0616, -13.5459, -10.7448, -8.9348, -10.7491, -0.5928, -13.3272, -11.5616, -7.4074]}
+{"task": "bank_hard_category", "merchant": "Holham Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.8335, -7.8533, -1.2174, -5.447, -5.1345, -6.5082, -7.0598, -6.197, -3.5095, -8.7595, -5.8845, -5.8604]}
+{"task": "bank_hard_norm_category", "merchant": "Holham Group", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.6582, -11.773, -3.2129, -8.3355, -12.2573, -10.3218, -8.9206, -10.148, -0.7417, -12.273, -10.9292, -7.3348]}
+{"task": "bank_norm_category", "merchant": "Calton Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.9683, -8.5237, -3.073, -13.8519, -13.3675, -8.5395, -8.1842, -9.4925, -5.2112, -8.43, -12.5237, -7.88]}
+{"task": "bank_hard_category", "merchant": "Calton Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.373, -6.0556, -0.8778, -4.9931, -4.3056, -8.874, -7.2376, -4.9931, -2.2431, -5.9306, -5.8681, -5.2908]}
+{"task": "bank_hard_norm_category", "merchant": "Calton Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.6196, -7.5963, -2.7456, -12.112, -10.9088, -9.0547, -8.3544, -9.2838, -4.5963, -6.5338, -11.1901, -8.1861]}
+{"task": "bank_norm_category", "merchant": "Istby LLC", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.8851, -7.7331, -2.725, -8.0456, -8.6394, -8.9932, -6.4981, -10.3425, -2.7956, -5.6706, -6.4831, -8.4121]}
+{"task": "bank_hard_category", "merchant": "Istby LLC", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.029, -6.4769, -1.2565, -4.2894, -5.1019, -8.351, -6.379, -4.1019, -2.4769, -7.8519, -3.2269, -6.2238]}
+{"task": "bank_hard_norm_category", "merchant": "Istby LLC", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.4224, -5.857, -1.981, -6.8258, -8.5445, -8.8677, -6.2696, -9.232, -3.1695, -5.982, -6.7945, -7.7919]}
+{"task": "bank_norm_category", "merchant": "Osklock Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-6.3864, -10.1296, -3.9551, -10.0984, -11.5671, -10.1715, -8.4305, -8.4734, -4.0984, -9.7234, -12.4421, -8.0606]}
+{"task": "bank_hard_category", "merchant": "Osklock Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.1991, -9.8355, -1.2171, -3.8042, -2.6792, -7.1548, -6.701, -5.5542, -5.1167, -8.4917, -3.8667, -5.7883]}
+{"task": "bank_hard_norm_category", "merchant": "Osklock Group", "pred": 2, "answer": 8, "correct": 0, "scores": [-6.1533, -9.8637, -3.5241, -9.1449, -10.3324, -9.2291, -8.5516, -8.2074, -3.7699, -8.4262, -11.3012, -8.3566]}
+{"task": "bank_norm_category", "merchant": "Holwick", "pred": 8, "answer": 8, "correct": 1, "scores": [-5.6454, -8.8054, -3.6872, -11.6022, -12.3054, -9.9438, -7.6647, -12.2116, -0.4304, -13.3913, -14.3679, -9.8097]}
+{"task": "bank_hard_category", "merchant": "Holwick", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.253, -13.6962, -1.701, -6.954, -4.954, -4.5128, -6.7545, -7.7977, -9.329, -6.704, -7.2977, -6.9579]}
+{"task": "bank_hard_norm_category", "merchant": "Holwick", "pred": 8, "answer": 8, "correct": 1, "scores": [-5.6454, -8.8054, -3.6872, -11.6022, -12.3054, -9.9438, -7.6647, -12.2116, -0.4304, -13.3913, -14.3679, -9.8097]}
+{"task": "bank_norm_category", "merchant": "Orlley & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.831, -10.8811, -3.4212, -12.3186, -13.3186, -8.4122, -9.2852, -9.1311, -5.0374, -12.8967, -12.7874, -7.7651]}
+{"task": "bank_hard_category", "merchant": "Orlley & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-3.7873, -7.3012, -1.7251, -3.6449, -2.0199, -6.7938, -6.4687, -5.2699, -6.1449, -8.4574, -3.9574, -6.1887]}
+{"task": "bank_hard_norm_category", "merchant": "Orlley & Sons", "pred": 2, "answer": 8, "correct": 0, "scores": [-7.1382, -8.9908, -2.7431, -11.7876, -11.8501, -8.3217, -9.3673, -8.2095, -5.1158, -11.6158, -10.8345, -7.4769]}
+{"task": "bank_norm_category", "merchant": "Korley Co", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.6269, -6.4139, -3.0412, -6.8514, -11.0077, -9.1822, -7.4504, -8.1952, -3.0389, -12.8045, -9.9452, -6.04]}
+{"task": "bank_hard_category", "merchant": "Korley Co", "pred": 2, "answer": 8, "correct": 0, "scores": [-4.036, -5.9831, -1.2167, -4.9831, -5.5456, -8.7438, -6.4229, -4.9831, -2.1081, -6.6081, -4.4206, -5.6889]}
+{"task": "bank_hard_norm_category", "merchant": "Korley Co", "pred": 8, "answer": 8, "correct": 1, "scores": [-6.0064, -4.4136, -2.7084, -6.4761, -9.5074, -9.4286, -7.3758, -8.8824, -1.4136, -10.2574, -9.3511, -6.3272]}
+{"task": "bank_norm_category", "merchant": "Falden Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-5.9147, -9.0988, -3.5198, -10.1926, -7.5363, -7.7743, -7.4166, -10.0363, -4.8801, -13.8957, -10.1926, -6.9911]}
+{"task": "bank_hard_category", "merchant": "Falden Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.7996, -6.8414, -1.6085, -5.6539, -4.5289, -7.4857, -6.8723, -5.9664, -2.2789, -7.0601, -3.0289, -6.7486]}
+{"task": "bank_hard_norm_category", "merchant": "Falden Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.1322, -8.9066, -3.3515, -9.0941, -7.7816, -8.005, -7.2543, -9.3753, -3.8753, -12.891, -10.0941, -7.1397]}
+{"task": "bank_norm_category", "merchant": "Calnard Co", "pred": 0, "answer": 9, "correct": 0, "scores": [-2.0358, -8.1288, -3.9787, -14.1092, -11.91, -5.9462, -7.3631, -12.3319, -13.5155, -4.1913, -10.5038, -9.5624]}
+{"task": "bank_hard_category", "merchant": "Calnard Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.523, -7.9314, -0.9604, -5.4001, -2.0876, -5.984, -6.8498, -5.7126, -6.4001, -7.4939, -5.3376, -6.1262]}
+{"task": "bank_hard_norm_category", "merchant": "Calnard Co", "pred": 0, "answer": 9, "correct": 0, "scores": [-2.0358, -8.1288, -3.9787, -14.1092, -11.91, -5.9462, -7.3631, -12.3319, -13.5155, -4.1913, -10.5038, -9.5624]}
+{"task": "bank_norm_category", "merchant": "Pexlock LLC", "pred": 10, "answer": 9, "correct": 0, "scores": [-4.9573, -10.3039, -5.4831, -11.4133, -13.1945, -9.7015, -7.4392, -10.5539, -11.1633, -6.5852, -4.3352, -9.9145]}
+{"task": "bank_hard_category", "merchant": "Pexlock LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.2973, -14.2471, -3.151, -3.7784, -6.2159, -6.1736, -6.6828, -6.9971, -7.0596, -10.7315, -4.5909, -7.2273]}
+{"task": "bank_hard_norm_category", "merchant": "Pexlock LLC", "pred": 10, "answer": 9, "correct": 0, "scores": [-5.0003, -9.333, -5.3301, -11.2705, -12.9268, -9.3268, -6.9426, -10.2393, -10.6455, -6.5518, -3.9268, -9.7284]}
+{"task": "bank_norm_category", "merchant": "Falbury Bros", "pred": 9, "answer": 9, "correct": 1, "scores": [-7.4176, -14.1889, -5.1113, -7.2046, -8.8608, -8.9279, -7.4368, -10.0171, -9.1421, -3.7046, -5.3296, -9.2824]}
+{"task": "bank_hard_category", "merchant": "Falbury Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.895, -9.0403, -1.9794, -5.9778, -6.0403, -4.8704, -7.4302, -4.9153, -3.7278, -8.6966, -4.5403, -7.1211]}
+{"task": "bank_hard_norm_category", "merchant": "Falbury Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.2978, -9.5111, -4.7966, -9.1361, -8.5736, -9.0112, -7.1168, -7.7611, -8.6674, -4.8549, -4.9799, -9.3102]}
+{"task": "bank_norm_category", "merchant": "Ulmton LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.4313, -16.7591, -4.6532, -13.2655, -12.328, -9.4186, -6.9459, -10.9217, -9.203, -5.0155, -9.203, -8.2731]}
+{"task": "bank_hard_category", "merchant": "Ulmton LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-2.6428, -7.244, -1.0613, -3.4003, -3.2128, -7.8589, -6.0039, -4.4003, -6.619, -8.9315, -4.2753, -5.577]}
+{"task": "bank_hard_norm_category", "merchant": "Ulmton LLC", "pred": 2, "answer": 9, "correct": 0, "scores": [-5.9134, -15.518, -4.0999, -12.436, -11.8423, -8.9574, -6.7194, -10.0298, -8.7485, -5.0923, -8.4048, -8.0141]}
+{"task": "bank_norm_category", "merchant": "Orlwick Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-9.5564, -13.0564, -5.9669, -15.0643, -13.5408, -10.2873, -9.2624, -10.2127, -8.1502, -7.2127, -10.9002, -10.2249]}
+{"task": "bank_hard_category", "merchant": "Orlwick Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.25, -12.6507, -1.7299, -6.4788, -5.1038, -5.9917, -7.1321, -6.2913, -6.7913, -6.4163, -8.7601, -7.1262]}
+{"task": "bank_hard_norm_category", "merchant": "Orlwick Co", "pred": 2, "answer": 9, "correct": 0, "scores": [-9.5564, -13.0564, -5.9669, -15.0643, -13.5408, -10.2873, -9.2624, -10.2127, -8.1502, -7.2127, -10.9002, -10.2249]}
+{"task": "bank_norm_category", "merchant": "Kelford Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-4.3038, -10.4214, -3.0662, -13.4839, -10.6402, -7.4538, -7.2472, -11.1402, -12.9996, -5.3589, -10.7964, -7.6924]}
+{"task": "bank_hard_category", "merchant": "Kelford Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-1.9464, -8.2024, -1.0897, -4.1711, -3.2961, -6.8378, -6.2562, -5.1711, -7.2961, -7.1086, -4.4836, -5.8609]}
+{"task": "bank_hard_norm_category", "merchant": "Kelford Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.6263, -7.1669, -2.0931, -13.1044, -10.5107, -7.048, -7.5779, -11.5107, -12.9638, -5.6669, -10.6357, -7.7787]}
+{"task": "bank_norm_category", "merchant": "Holden Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-6.2833, -13.5784, -3.7652, -4.2815, -8.0315, -8.8202, -7.2443, -5.0315, -7.8752, -7.5315, -5.719, -7.1353]}
+{"task": "bank_hard_category", "merchant": "Holden Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.3826, -8.9006, -0.9916, -3.9943, -3.1818, -8.1556, -6.5056, -4.1193, -4.9318, -7.8693, -2.9943, -5.7547]}
+{"task": "bank_hard_norm_category", "merchant": "Holden Bros", "pred": 2, "answer": 9, "correct": 0, "scores": [-5.4681, -8.5303, -1.8541, -6.3428, -4.8428, -8.9694, -5.6856, -4.3428, -4.1553, -8.1865, -3.8428, -5.7633]}
+{"task": "bank_norm_category", "merchant": "Wexham Inc", "pred": 0, "answer": 9, "correct": 0, "scores": [-3.1893, -10.0376, -3.7827, -6.9751, -9.9439, -8.1489, -6.798, -7.6939, -12.4985, -6.7876, -8.7876, -8.8821]}
+{"task": "bank_hard_category", "merchant": "Wexham Inc", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.5824, -7.9884, -0.9061, -5.7384, -5.2384, -6.966, -6.8199, -5.1134, -3.3009, -8.0196, -4.4884, -5.7159]}
+{"task": "bank_hard_norm_category", "merchant": "Wexham Inc", "pred": 2, "answer": 9, "correct": 0, "scores": [-3.8, -8.1355, -2.3221, -8.1355, -8.2293, -7.7103, -6.0468, -5.4793, -5.6043, -8.4793, -3.4793, -8.2009]}
+{"task": "bank_norm_category", "merchant": "Fennard Inc", "pred": 9, "answer": 9, "correct": 1, "scores": [-8.9581, -15.1317, -4.5152, -14.6786, -11.6473, -11.2371, -9.3175, -11.0223, -15.0457, -4.2411, -12.9286, -8.6194]}
+{"task": "bank_hard_category", "merchant": "Fennard Inc", "pred": 4, "answer": 9, "correct": 0, "scores": [-4.9079, -10.6326, -1.9736, -8.0076, -1.8826, -5.7873, -7.6726, -5.2576, -6.1951, -7.8513, -7.2888, -5.9053]}
+{"task": "bank_hard_norm_category", "merchant": "Fennard Inc", "pred": 2, "answer": 9, "correct": 0, "scores": [-9.009, -13.4049, -4.3618, -14.7018, -11.1705, -10.1082, -9.4318, -9.3268, -13.9049, -4.608, -12.5611, -8.7417]}
+{"task": "bank_norm_category", "merchant": "Pexlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.0003, -9.333, -5.3301, -11.2705, -12.9268, -9.3268, -6.9426, -10.2393, -10.6455, -6.5518, -3.9268, -9.7284]}
+{"task": "bank_hard_category", "merchant": "Pexlock", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.4408, -14.5759, -3.4041, -3.9289, -6.8039, -6.0616, -6.8363, -6.8039, -6.7727, -10.5227, -4.4289, -7.2909]}
+{"task": "bank_hard_norm_category", "merchant": "Pexlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.0003, -9.333, -5.3301, -11.2705, -12.9268, -9.3268, -6.9426, -10.2393, -10.6455, -6.5518, -3.9268, -9.7284]}
+{"task": "bank_norm_category", "merchant": "Elrvarro", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.1312, -11.1563, -3.742, -9.3594, -12.2032, -8.1206, -6.9929, -7.4532, -9.6407, -12.2657, -2.6719, -8.6964]}
+{"task": "bank_hard_category", "merchant": "Elrvarro", "pred": 0, "answer": 10, "correct": 0, "scores": [-3.3628, -7.5606, -3.517, -9.2794, -10.5294, -7.7907, -6.2812, -6.5919, -9.4981, -7.6231, -7.9669, -7.6979]}
+{"task": "bank_hard_norm_category", "merchant": "Elrvarro", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.1312, -11.1563, -3.742, -9.3594, -12.2032, -8.1206, -6.9929, -7.4532, -9.6407, -12.2657, -2.6719, -8.6964]}
+{"task": "bank_norm_category", "merchant": "Falton Ltd", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.9301, -8.122, -3.8615, -6.2157, -8.872, -9.4406, -8.2616, -8.9657, -6.0282, -9.872, -1.4032, -7.8971]}
+{"task": "bank_hard_category", "merchant": "Falton Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-3.6145, -8.4404, -1.1972, -4.9092, -2.4717, -6.644, -6.9886, -6.1592, -3.3467, -7.6592, -4.0967, -5.7183]}
+{"task": "bank_hard_norm_category", "merchant": "Falton Ltd", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.0963, -7.4736, -3.1766, -8.9111, -9.5674, -9.2078, -8.3923, -8.0674, -5.2236, -11.1455, -2.2861, -7.9993]}
+{"task": "bank_norm_category", "merchant": "Dunham Inc", "pred": 10, "answer": 10, "correct": 1, "scores": [-4.3596, -11.0162, -5.245, -11.2037, -12.985, -9.7968, -7.5219, -11.0475, -8.1412, -13.9225, -2.9537, -8.6549]}
+{"task": "bank_hard_category", "merchant": "Dunham Inc", "pred": 2, "answer": 10, "correct": 0, "scores": [-3.793, -6.0086, -1.5541, -4.9461, -5.2586, -8.4637, -5.8591, -8.6649, -3.7586, -9.7899, -3.3211, -6.2153]}
+{"task": "bank_hard_norm_category", "merchant": "Dunham Inc", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.0156, -11.0891, -4.8665, -11.5579, -13.5735, -9.078, -7.373, -10.5579, -6.3391, -14.6516, -2.8391, -8.6746]}
+{"task": "bank_norm_category", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.0789, -8.2078, -3.0332, -7.0828, -8.9265, -10.4342, -6.7485, -8.3953, -6.1453, -8.7703, -7.1453, -7.1182]}
+{"task": "bank_hard_category", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-2.3934, -6.8345, -2.0305, -3.4907, -5.1782, -6.187, -6.4774, -6.4907, -5.1157, -6.9282, -4.9907, -6.8752]}
+{"task": "bank_hard_norm_category", "merchant": "Vorvarro Ltd", "pred": 2, "answer": 10, "correct": 0, "scores": [-4.1252, -5.9539, -2.5044, -7.5789, -8.6414, -8.1708, -6.4688, -6.8289, -5.2039, -7.9227, -6.0164, -6.8418]}
+{"task": "bank_norm_category", "merchant": "Elrhurst & Sons", "pred": 10, "answer": 10, "correct": 1, "scores": [-7.0163, -11.1074, -4.5127, -8.1387, -15.8652, -6.8571, -5.4206, -9.1387, -11.1387, -10.5137, -2.1387, -8.4943]}
+{"task": "bank_hard_category", "merchant": "Elrhurst & Sons", "pred": 2, "answer": 10, "correct": 0, "scores": [-3.2086, -7.7172, -0.8596, -5.0922, -3.7172, -7.7051, -6.4646, -4.7172, -3.2797, -6.9985, -4.3422, -5.38]}
+{"task": "bank_hard_norm_category", "merchant": "Elrhurst & Sons", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.9979, -10.1008, -4.26, -7.9758, -15.4914, -7.0814, -5.2018, -10.2883, -11.4133, -11.1945, -1.7258, -8.4978]}
+{"task": "bank_norm_category", "merchant": "Halton", "pred": 5, "answer": 10, "correct": 0, "scores": [-7.5942, -14.7427, -4.3563, -13.274, -18.1075, -3.5508, -8.6938, -11.5552, -12.4927, -17.5631, -10.4302, -7.2382]}
+{"task": "bank_hard_category", "merchant": "Halton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.4412, -12.0335, -2.1717, -9.9085, -10.9397, -3.9932, -8.2458, -6.0335, -7.6585, -12.7366, -7.4085, -6.1312]}
+{"task": "bank_hard_norm_category", "merchant": "Halton", "pred": 5, "answer": 10, "correct": 0, "scores": [-7.5942, -14.7427, -4.3563, -13.274, -18.1075, -3.5508, -8.6938, -11.5552, -12.4927, -17.5631, -10.4302, -7.2382]}
+{"task": "bank_norm_category", "merchant": "Arddale Group", "pred": 2, "answer": 10, "correct": 0, "scores": [-7.0437, -16.1459, -4.3942, -15.1205, -15.0658, -4.5027, -9.4607, -12.1674, -10.2924, -18.4408, -12.683, -8.5931]}
+{"task": "bank_hard_category", "merchant": "Arddale Group", "pred": 2, "answer": 10, "correct": 0, "scores": [-3.7417, -12.9318, -2.8337, -9.1349, -6.2287, -4.3694, -7.1612, -9.5724, -10.3224, -10.6974, -6.6662, -6.6804]}
+{"task": "bank_hard_norm_category", "merchant": "Arddale Group", "pred": 2, "answer": 10, "correct": 0, "scores": [-6.4633, -14.9187, -3.9494, -14.0671, -13.7233, -4.3127, -9.1992, -11.1765, -9.239, -17.0827, -11.1765, -8.6719]}
+{"task": "bank_norm_category", "merchant": "Fenton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.6276, -13.1645, -2.9302, -8.8755, -10.5317, -6.5296, -6.4236, -11.438, -6.0005, -10.7505, -6.688, -8.1528]}
+{"task": "bank_hard_category", "merchant": "Fenton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.4069, -12.4895, -2.9299, -5.4114, -6.2239, -5.8691, -6.5894, -8.3801, -7.2864, -7.5051, -7.0364, -6.3438]}
+{"task": "bank_hard_norm_category", "merchant": "Fenton", "pred": 2, "answer": 10, "correct": 0, "scores": [-5.6276, -13.1645, -2.9302, -8.8755, -10.5317, -6.5296, -6.4236, -11.438, -6.0005, -10.7505, -6.688, -8.1528]}
+{"task": "bank_norm_category", "merchant": "Nevlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.8022, -14.6619, -4.7722, -13.7244, -11.4276, -4.2889, -8.3565, -7.4901, -13.3651, -17.3846, -1.6776, -9.8069]}
+{"task": "bank_hard_category", "merchant": "Nevlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-5.5791, -13.6026, -3.2655, -5.9776, -4.6651, -6.7726, -7.6545, -7.6651, -5.6026, -10.2589, -2.8526, -6.5809]}
+{"task": "bank_hard_norm_category", "merchant": "Nevlock", "pred": 10, "answer": 10, "correct": 1, "scores": [-6.8022, -14.6619, -4.7722, -13.7244, -11.4276, -4.2889, -8.3565, -7.4901, -13.3651, -17.3846, -1.6776, -9.8069]}
+{"task": "bank_norm_category", "merchant": "Holhurst Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-7.9079, -14.4072, -4.9412, -11.3447, -12.7353, -10.7928, -8.7718, -7.6572, -9.6884, -11.5634, -6.5947, -9.1422]}
+{"task": "bank_hard_category", "merchant": "Holhurst Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.8475, -8.1902, -0.9404, -4.3465, -3.4715, -7.3013, -6.3945, -6.3465, -2.909, -8.4715, -3.784, -5.4941]}
+{"task": "bank_hard_norm_category", "merchant": "Holhurst Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-8.1093, -13.3502, -4.5115, -12.2408, -12.3346, -9.45, -8.0541, -7.5221, -8.9596, -13.8033, -7.6471, -9.1252]}
+{"task": "bank_norm_category", "merchant": "Elrmere LLC", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.87, -15.1438, -3.5757, -14.0267, -15.4563, -11.3889, -7.3113, -13.6673, -9.011, -14.011, -8.886, -8.1239]}
+{"task": "bank_hard_category", "merchant": "Elrmere LLC", "pred": 2, "answer": 11, "correct": 0, "scores": [-1.5453, -7.7997, -1.1265, -6.0184, -6.2684, -6.8878, -5.9376, -5.3934, -4.8309, -7.3309, -5.0184, -5.9599]}
+{"task": "bank_hard_norm_category", "merchant": "Elrmere LLC", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.2245, -11.8818, -2.7739, -12.8193, -16.0146, -10.2571, -6.4235, -11.5068, -8.6005, -14.288, -7.2255, -7.3724]}
+{"task": "bank_norm_category", "merchant": "Caldale", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.8626, -17.1697, -0.6721, -12.0759, -12.3103, -6.9457, -6.1255, -10.9041, -13.6462, -14.1228, -11.4353, -5.6726]}
+{"task": "bank_hard_category", "merchant": "Caldale", "pred": 3, "answer": 11, "correct": 0, "scores": [-4.0068, -12.5682, -3.402, -3.2088, -5.3338, -3.7729, -7.1128, -6.8963, -8.74, -10.9275, -6.4588, -6.1712]}
+{"task": "bank_hard_norm_category", "merchant": "Caldale", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.8626, -17.1697, -0.6721, -12.0759, -12.3103, -6.9457, -6.1255, -10.9041, -13.6462, -14.1228, -11.4353, -5.6726]}
+{"task": "bank_norm_category", "merchant": "Ulmwen Inc", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.3146, -14.4315, -2.8173, -11.7284, -10.7284, -5.2763, -8.9259, -13.744, -13.6503, -16.0766, -14.0097, -7.2324]}
+{"task": "bank_hard_category", "merchant": "Ulmwen Inc", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.4459, -10.1745, -1.726, -3.2682, -3.3932, -5.6994, -7.1863, -7.1432, -6.5807, -8.3932, -6.7995, -5.6339]}
+{"task": "bank_hard_norm_category", "merchant": "Ulmwen Inc", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.3973, -12.9189, -2.1755, -11.5439, -10.4657, -5.0188, -8.833, -12.5751, -11.6064, -15.165, -13.1376, -6.6652]}
+{"task": "bank_norm_category", "merchant": "Yarhurst Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-6.8206, -18.0218, -5.1978, -14.5813, -20.2063, -10.9155, -8.7237, -13.347, -11.722, -13.3157, -12.847, -7.3955]}
+{"task": "bank_hard_category", "merchant": "Yarhurst Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.0327, -7.842, -0.5772, -5.8732, -4.7482, -7.4077, -6.2257, -5.5607, -3.8107, -5.9357, -4.6232, -5.7382]}
+{"task": "bank_hard_norm_category", "merchant": "Yarhurst Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-6.2901, -16.5136, -4.7463, -12.8339, -18.9589, -10.032, -8.6533, -12.5527, -10.8964, -13.3339, -12.0214, -7.4081]}
+{"task": "bank_norm_category", "merchant": "Rincott Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.9682, -12.1818, -3.256, -9.1974, -12.1349, -7.8185, -6.1519, -13.3303, -9.9474, -13.9631, -10.7599, -6.5907]}
+{"task": "bank_hard_category", "merchant": "Rincott Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.5496, -7.5496, -0.8382, -6.9871, -5.9871, -7.966, -6.884, -5.7371, -3.1746, -9.3308, -5.7996, -5.5366]}
+{"task": "bank_hard_norm_category", "merchant": "Rincott Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.7368, -11.8746, -2.9964, -9.4527, -11.9215, -7.3119, -6.0616, -13.1871, -10.0777, -13.3121, -10.5465, -6.3682]}
+{"task": "bank_norm_category", "merchant": "Fensley Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.5963, -9.219, -2.2673, -9.9378, -9.4378, -9.3623, -6.3025, -9.594, -7.7815, -5.7815, -11.094, -6.8852]}
+{"task": "bank_hard_category", "merchant": "Fensley Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-4.3226, -8.8662, -1.3526, -7.7725, -4.585, -6.7328, -6.9232, -6.335, -5.46, -5.71, -7.8037, -4.9071]}
+{"task": "bank_hard_norm_category", "merchant": "Fensley Ltd", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.6656, -9.3977, -2.1124, -11.9289, -10.7727, -8.3424, -6.5781, -9.8977, -8.4289, -8.3352, -10.8039, -7.1846]}
+{"task": "bank_norm_category", "merchant": "Calmere", "pred": 5, "answer": 11, "correct": 0, "scores": [-6.9788, -16.4006, -4.3675, -18.2365, -12.6194, -1.9655, -8.8689, -12.5881, -14.3069, -18.924, -13.8694, -6.996]}
+{"task": "bank_hard_category", "merchant": "Calmere", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.0006, -8.4025, -1.8108, -6.715, -5.0275, -5.33, -5.9468, -6.4025, -4.5275, -6.8087, -4.215, -5.8567]}
+{"task": "bank_hard_norm_category", "merchant": "Calmere", "pred": 5, "answer": 11, "correct": 0, "scores": [-6.9788, -16.4006, -4.3675, -18.2365, -12.6194, -1.9655, -8.8689, -12.5881, -14.3069, -18.924, -13.8694, -6.996]}
+{"task": "bank_norm_category", "merchant": "Bramton Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-7.2098, -12.7222, -1.9293, -12.7534, -14.144, -8.2366, -9.3458, -9.0034, -10.8784, -13.7847, -12.2847, -7.9479]}
+{"task": "bank_hard_category", "merchant": "Bramton Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.5234, -10.0318, -1.3332, -4.7818, -3.5318, -6.3627, -6.3268, -5.0943, -4.9693, -8.7193, -4.3443, -5.4312]}
+{"task": "bank_hard_norm_category", "merchant": "Bramton Group", "pred": 2, "answer": 11, "correct": 0, "scores": [-6.9872, -12.3743, -1.6067, -12.3431, -13.3899, -7.9061, -9.4639, -8.9681, -10.2493, -13.3274, -11.4681, -8.0731]}
+{"task": "bank_norm_category", "merchant": "Lomby", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.1246, -19.2849, -1.4627, -10.5818, -13.9724, -9.2407, -9.0455, -10.6755, -16.864, -15.3005, -11.5193, -5.488]}
+{"task": "bank_hard_category", "merchant": "Lomby", "pred": 2, "answer": 11, "correct": 0, "scores": [-3.1947, -9.3686, -1.0572, -5.9936, -7.6186, -6.9689, -7.1538, -5.8061, -6.1186, -9.6811, -5.9936, -4.8684]}
+{"task": "bank_hard_norm_category", "merchant": "Lomby", "pred": 2, "answer": 11, "correct": 0, "scores": [-5.1246, -19.2849, -1.4627, -10.5818, -13.9724, -9.2407, -9.0455, -10.6755, -16.864, -15.3005, -11.5193, -5.488]}
