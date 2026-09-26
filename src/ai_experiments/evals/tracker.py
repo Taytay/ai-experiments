@@ -92,11 +92,17 @@ def _git(*args: str) -> str | None:
         return None
 
 
+# Files the runs themselves write. A finished run rewrites runs.jsonl, an EVAL_ONLY run updates its
+# results JSON, so counting them would mark every later run in a chain as dirty. Code and data
+# provenance is what the flag is for; these outputs are not it.
+RUN_OUTPUTS = (":!evals/runs.jsonl", ":!evals/LEADERBOARD.md", ":!results")
+
+
 def git_state() -> dict:
     return {
         "commit": _git("rev-parse", "HEAD"),
         "branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
-        "dirty": bool(_git("status", "--porcelain", "--untracked-files=no")),
+        "dirty": bool(_git("status", "--porcelain", "--untracked-files=no", "--", ".", *RUN_OUTPUTS)),
     }
 
 
