@@ -287,6 +287,7 @@ attributed to diversity from one two-point comparison. EntiGraph-style generated
 discussed but not run. The literature reports saturation near 10 paraphrases per fact (LIT-1).
 *Experiment:* at fixed 420 steps, 1 / 3 / 7 / 14 templated and 14 + 28 LLM-generated texts per
 merchant; plot `clean_category` vs distinct texts.
+**Status (2026-09-16):** answered, PLAN step 16, REPORT.md 27 (universe, arm A, Qwen2.5-3B, fixed 12,800 sequences). Recall in the trained format saturates at three templates (100; one template 73.8). Manipulation does not come from paraphrases at any count or kind (chance for 1 to 14 templates, permutations, reverse statements, LLM sentences) but from the six negative and comparative texts per species (98.8 / 93.8 with them). Hard backward recall comes only from reverse-direction sentences (69.4; everything else at chance). More variety at a fixed budget costs more general ability (WikiText 51 at 14 templates, 83 with attribute permutations, 27 with LLM prose; ARC-Easy at the base for 3 to 7 templates). The merchant `clean_category` version was not run; the universe ladder gives the same question a richer readout.
 
 ### MODEL — model and architecture choice
 
@@ -503,6 +504,7 @@ the most). Replay protects what is replayed.
 *Experiment:* PLAN row 25: add a few percent of pretraining-style text (a FineWeb or WikiText slice) to arm C's mix, run
 with `PERIODIC=200`, and read `K_arc_easy` and the corpus perplexity of row 24 against arm C's curve; then the same with
 a lower learning rate on the knowledge stream, since the loss is paid while the facts are written.
+**Status (2026-09-15):** done, PLAN step 26, REPORT.md 19. The knowledge stream was overhead-bound (arm A 313 tokens/s padded, 35 to 60% utilisation); packed 2,048-token rows through unsloth's block-diagonal path (verified: neighbours change a sequence's log-probs by exactly 0) with one 16-sequence micro-batch give 1,000 to 3,100 tokens/s, and the batched scorer cuts evaluation from 26 to 3 minutes; the numbers stay within the same-seed run-to-run floor. Every run from step 26 on uses the fast path.
 
 **Status (2026-09-15):** PLAN step 26, REPORT.md section 19. Yes, overhead-bound, and packing changed the speed and not the results: sequence packing through unsloth's packed_seq_lengths (xformers block-diagonal attention, verified directly) with one 16-sequence micro-batch gives arm C 2.5x and arm A 2x at identical sequences per step; the batched scorer gives evaluation 3x (10x without the section 10 extras). A fast-path retrain of arm C lies inside the same-seed run-to-run spread of the two old-path runs (17.9% flips between them, 19.8% against the new one).
 
