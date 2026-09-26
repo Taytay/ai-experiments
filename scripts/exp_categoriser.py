@@ -75,7 +75,7 @@ MICRO = int(os.environ.get("MICRO", "4"))  # sequences per forward/backward (row
 EFF_BATCH = int(os.environ.get("EFF_BATCH", "16"))  # sequences per optimizer step (row 60, TRAIN-12: the batch-size ablation); 16 in every run before it
 assert EFF_BATCH % MICRO == 0
 ACCUM, MAXLEN = EFF_BATCH // MICRO, 1536
-LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
+LLM_BASE, ENC_BASE = os.environ.get("LLM_BASE", "Qwen/Qwen2.5-3B-Instruct"), "BAAI/bge-base-en-v1.5"  # row 70: LLM_BASE=Qwen/Qwen2.5-7B-Instruct / 14B
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
 SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
@@ -95,11 +95,13 @@ assert TRAINER in ("unsloth", "hf")
 assert not (ALL_LABELS and (CHAT or DB == "ret")), "ALL_LABELS is built for the plain prompt (no record in it)"
 assert not (DBEP and (CHAT or DB == "ret")), "DBEP builds plain episodes without a record"
 assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs ALL_LABELS and 0 < w < 1"
-DOC = R6.load(REAL6_DB)
-DBREC = DOC["fact_db"]
-DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
-OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
+POI = os.environ.get("POI", "")  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
+assert not POI or (DB == "none" and not DBEP and not DB_EPISODES and not REC_CAT and SHOTS == "fixed"), "POI-1 has no fact DB"
+DOC = json.loads((ROOT / "data" / "processed" / f"{POI}.json").read_text()) if POI else R6.load(REAL6_DB)
+DBREC = DOC.get("fact_db", {})
+DB_ONLY = set() if POI else R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
+OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
 
@@ -350,7 +352,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)

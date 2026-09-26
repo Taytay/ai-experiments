@@ -883,6 +883,8 @@ longer context than Laya's 512 if the shots need it; no-record and record arms; 
 categoriser on row 45's groups and row 42's held-out folds; milliseconds per item beside the 3B's. The question is whether
 this layout lets an encoder read the shots where GLiClass could not.
 
+**Status (2026-09-26):** done, PLAN step 53, REPORT.md 62. Trained across users, the layout reads the shots (unlike GLiClass): level with the 3B on POI-1 (57.6 against 55 to 59), 15 points under it on REAL-6 without the record (merchant knowledge the encoder lacks), 8 under with it; about 7 to 10 ms per item batched on an H100.
+
 **MODEL-7 Does a bidirectional slot read (a diffusion LM) categorise better than a causal readout, and does it hold at scale?**
 djev-dev and razorback16/openjev (`diffusiongemma_djev_analysis.md`) read every answer from one decoder pass of
 DiffusionGemma 26B-A4B: a fixed answer template, one single-token label slot per question, one denoising step, the exact
@@ -1022,12 +1024,16 @@ category but another kind, only opaque merchants); the number of coined categori
 under another name); scored for the untrained and trained models, model sizes (3B, 7B; 14B on Modal) and a blind Opus sample.
 Says whether the models copy the nearest example's label or induce the word's meaning.
 
+**Status (2026-09-26):** done, PLAN step 64, REPORT.md 60. One or two examples of other businesses filed under a coined word teach every model its meaning (v2, with three empty coined categories so elimination cannot solve it: 14B untrained 12 to 66% from 0 to 1 example, blind Opus 25 to 100); fine-tuning with rename augmentation or database episodes brings a 3B to the untrained 14B (77 to 78 at base); opaque example names teach nothing. The models copy the nearest example: one same-kind business filed elsewhere costs 15 to 19 points and 60 to 74% of the errors pick its category, where Opus keeps 97%.
+
 **POI-1 Categorisation of real places at scale.** Overture places (81.5M, 288 basic categories and a finer taxonomy, per-row
 licences) as a labelled benchmark: many-way multiple choice on real labels (Q1), synthetic users whose schemes merge, rename and
 coin Overture's categories over real places (Q3), and a knowledge-injection testbed at real scale with places held out (Q2).
 *Experiment:* frozen sets from a sampled, category-stratified slice (US first): the plain task at 10 / 50 / all basic categories;
 user schemes built as REAL-6's are (merge, split, rename, coin) but over Overture's categories; held-out places and held-out users;
 renderings obscure / full / clean; the scorecard of EVAL-9.
+
+**Status (2026-09-26):** first set done, PLAN step 65, REPORT.md 61 (`poi1_v1`: 200 users, 12 to 20 categories over 20 to 45 Overture basic categories, 2,053 places in no history, clean rendering). Blind Opus 56%, the POI-trained 3B 55 to 59, untrained 3B / 7B / 14B 45 / 48 / 53; the kind lookup answers 59% exactly and lookup-then-model reads 80; kind-retrieved shots add 8 to 18 points. Open: the plain many-way task (10 / 50 / all categories), the obscure rendering, all folds, inconsistent users.
 
 **REAL-21 Does a database taught as decisions teach facts or a skill?** Database episodes built from real places (Overture),
 scored on places in the injected database and on places held out of it, same categories: the first measures stored facts, the
@@ -1038,3 +1044,42 @@ suggests; capacity against the held-out gain.
 name's hidden states across layers (section 40's method): whether the standard category, the user's label and the business kind are
 linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its
 name's representation after injection.
+
+**MODEL-9 Which training objective makes a multiple-choice encoder's confidence trustworthy?** The owner (2026-09-26): Jev trains
+with a loss that takes confidence into account, so the model learns when to claim high confidence. Cross-entropy is already a strictly
+proper scoring rule (its optimum is the true conditional distribution); over-confidence comes from fitting one-hot labels on finite
+data, and Laya's "RLCD" is cross-entropy plus a noisy estimate of a spherical-score gradient (`laya_analysis.md` 3.2). The levers
+that change what is learned are soft targets, a bounded proper score beside the log score, and post-hoc temperatures. *Experiment
+(row 68):* the row 53 encoder with each objective, and with the layout pre-trained on general multiple-choice data first (UniMC,
+Yang et al. 2022, is the prior art for [MASK]-per-option encoders trained on many MC datasets); read by bits, ECE, AURC and coverage
+at a realised 98% precision on held-out users, which is what auto-filing needs.
+
+**MODEL-10 Can GLiClass-type and instruction-tuned masked-LM encoders be made to work as user categorisers?** Section 46's GLiClass
+(151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the rows) was hurt by the 24 shots;
+section 29's ModernBERT was plain ModernBERT-large taught letters in 800 steps and stayed at chance. Neither had what row 53's
+encoder had: the shots as plain lines on every episode, options shuffled, 24,000 episodes. *Experiment (row 69):* GLiClass
+modern-large v3.0 (its label-token pooling and scorer) and ModernBERT-Large-Instruct (its card's `ANSWER: [unused0] [MASK]` template,
+the MLM head over the options' IDs) through the same data, loop and scorer; for ModernBERT-Instruct, letter IDs against unused
+tokens with no prior meaning, since option IDs carry selection bias (Zheng et al. ICLR 2024; Robinson and Wingate ICLR 2023 on
+multiple-choice symbol binding). The question is whether the family matters once the training matches.
+
+**Status (2026-09-26):** MODEL-10 done, PLAN step 69, REPORT.md 63. Trained like row 53, GLiClass-large equals Laya's layout; ModernBERT-Instruct's single mask works with the record but needs far more training without it; letter IDs carry position bias and unused-token IDs fail at 1,500 steps.
+
+**MODEL-11 Does a larger fine-tuned decoder close the gap to each set's ceiling?** Every trained categoriser so far is the 3B. REAL-6's
+ceiling is about 94 (section 48; the split categories are a coin flip); POI-1's is bracketed by blind Opus (56) and the kind-lookup
+hybrid (80). *Experiment (row 70):* the three best 3B recipes at 7B and 14B, fold 0 first.
+
+**Status (2026-09-26):** done, PLAN step 70, REPORT.md 64. No: REAL-6's best runs are at 95 to 96% of its ceiling at every size; on POI-1 the 14B gains one point over the 3B (60.2 against 59.2) where kind-retrieved shots gain nine. The limit is what the prompt shows.
+
+**MODEL-12 How many associative hops can a model follow in one pass, and do thinking steps raise the limit for an encoder?** The
+owner (2026-09-26): given "foo = bar", "bar = baz", "baz = flibbert", ... in the prompt, how far along the chain can a model answer
+what foo equals, for single-token and multi-token names, encoders against decoders? Theory: one forward pass of a fixed-depth
+transformer does a bounded number of serial steps; k-hop lookup ("k-hop induction heads") can be done in about log k layers by
+pointer doubling and needs depth growing with k (Sanford, Hsu and Telgarsky 2024); a chain of thought adds one serial step per
+generated token, so constant-depth decoders with CoT solve serial problems they cannot without it (Li, Liu, Zhou and Ma, ICLR 2024;
+Merrill and Sabharwal, ICLR 2024). Empirically RULER's variable-tracking task (Hsieh et al. 2024) is this chain in long context and
+degrades with hops; latent two-hop over facts stored in weights mostly fails without CoT (the "two-hop curse", Balesni et al. 2024;
+Yang et al. 2024), though in-context hops are easier. For encoders the analogues of thinking are extra computation positions
+(pause tokens, Goyal et al. ICLR 2024), looping the network (looped transformers, Saunshi et al. ICLR 2025), and iterative unmasking
+(masked diffusion LMs, MODEL-7). Our categoriser decisions are short hops (query -> similar example -> its label -> option), and
+section 63's single-mask failure may be a hop limit. *Experiment (row 71):* decoders 0.5B to 14B with and without CoT; the encoder layout trained on short chains; the encoder with scratch rounds; a looped encoder (a tied block repeated r times, trained at r <= 4, tested to 12) and Huginn-0125's test-time recurrence; diffusion LMs (Dream-7B paired with Qwen2.5-7B, LLaDA-8B, LFM2.5-Encoder-350M-Diffusion) with 1 to k denoising steps. The owner asked for the looping encoder and a diffusion model explicitly.

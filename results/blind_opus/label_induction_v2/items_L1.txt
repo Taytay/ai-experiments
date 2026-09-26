@@ -1,0 +1,4680 @@
+### item 1
+Categories: Travel, Entertainment, Fitness, Rukaror, Rozix, Telecom & Utilities, Groceries, Pharmacy & Health, Home Improvement, Gas & Auto, Modox, Lesunol, Pets, Niruzix, Zotagor
+
+Transaction: Cornerstone Coffee House, Mitchell SD | $12.37 | Tue
+Category: Zotagor
+
+Transaction: National Camera Exchange, Golden Valley MN | $314.91 | Mon
+Category: Lesunol
+
+Transaction: Icell Phone Repair, Jacksonville FL | $121.69 | Sun
+Category: Telecom & Utilities
+
+Transaction: Morzawick, Albany NY | $28.24 | Wed
+Category: Rozix
+
+Transaction: Rosemont Car Wash, Frederick MD | $212.18 | Tue
+Category: Gas & Auto
+
+Transaction: Island Fit Pilates, Alameda CA | $34.03 | Sat
+Category: Fitness
+
+Transaction: Denny's Auto, Riverton UT | $52.99 | Fri
+Category: Gas & Auto
+
+Transaction: Settle Inn & Suites Linn, Linn MO | $399.33 | Sat
+Category: Travel
+
+Transaction: Boost Mobile Springfield Town Center, Springfield VA | $66.08 | Thu
+Category: Telecom & Utilities
+
+Transaction: Sushi Blue Wave, Lihue HI | $13.12 | Tue
+Category: Zotagor
+
+Transaction: Neptune Nursery, Palm City FL | $13.34 | Wed
+Category: Home Improvement
+
+Transaction: ZeFit Training, Portage WI | $14.22 | Thu
+Category: Fitness
+
+Transaction: Burhenn's Pharmacy, Erie PA | $39.71 | Mon
+Category: Pharmacy & Health
+
+Transaction: Nude Foods Market, Boulder CO | $44.61 | Thu
+Category: Groceries
+
+Transaction: Cobb Theater Arcade, Clearwater FL | $56.07 | Tue
+Category: Entertainment
+
+Transaction: Mauston Pet Hospital, Mauston WI | $12.72 | Thu
+Category: Pets
+
+Transaction: US Lumber and Supply, Lynbrook NY | $20.99 | Sun
+Category: Home Improvement
+
+Transaction: Best Western Colony Inn, Forrest City AR | $277.63 | Tue
+Category: Travel
+
+Transaction: South Paws, Omaha NE | $12.36 | Thu
+Category: Pets
+
+Transaction: Dr Rothman & Cammarano DMD, Woodbridge CT | $32.48 | Tue
+Category: Pharmacy & Health
+
+Transaction: Writing Center Computer Room, Girard KS | $89.82 | Thu
+Category: Lesunol
+
+Transaction: Ardzemere Inc, Tampa FL | $161.29 | Thu
+Category: Rozix
+
+Transaction: TJ's Evergreen Herbal Market, Rio Rancho NM | $80.60 | Tue
+Category: Groceries
+
+Transaction: Pixels Arcade & Taproom, San Rafael CA | $15.47 | Tue
+Category: Entertainment
+
+Transaction: Manic Shoes, Dearborn MI | $65.10 | Thu
+Category:
+
+### item 2
+Categories: Volen, Ledax, Tekopor, Fitness, Pharmacy & Health, Gimix, Electronics, Ziror, Home Improvement, Gas & Auto, Clothing, Groceries, Travel, Zebala, Entertainment
+
+Transaction: Elite Fitness for Women, Wareham MA | $32.67 | Fri
+Category: Fitness
+
+Transaction: Rod's Supermarket, Church Point LA | $76.38 | Wed
+Category: Groceries
+
+Transaction: LG Electronics, Huntsville AL | $518.01 | Sat
+Category: Electronics
+
+Transaction: James Genobaga DDS, Yuba City CA | $8.56 | Thu
+Category: Pharmacy & Health
+
+Transaction: International Inn on the Bay, Miami Beach FL | $161.34 | Sat
+Category: Travel
+
+Transaction: native nursery llc, Upton MA | $28.02 | Wed
+Category: Home Improvement
+
+Transaction: Perennial Power, Hermiston OR | $76.48 | Tue
+Category: Gimix
+
+Transaction: Vacation Inn Cape Cod, Teaticket MA | $1714.23 | Sun
+Category: Travel
+
+Transaction: S.e.c. Custom Computers, Inc., Louisville KY | $412.44 | Thu
+Category: Electronics
+
+Transaction: Bluff City Bowl, Natchez MS | $8.03 | Sun
+Category: Entertainment
+
+Transaction: Julie's Grooming, Bishop CA | $52.75 | Wed
+Category: Zebala
+
+Transaction: Ignite Yoga and Fitness, Coral Springs FL | $129.61 | Fri
+Category: Fitness
+
+Transaction: North Irwin VFC Bowling Lanes, North Irwin PA | $64.97 | Mon
+Category: Entertainment
+
+Transaction: Ken's Fruit Market, Grand Rapids MI | $31.70 | Mon
+Category: Groceries
+
+Transaction: Wagner Foods, New Richland MN | $24.03 | Wed
+Category: Groceries
+
+Transaction: Tires And Wheels, Irving TX | $34.51 | Sun
+Category: Gas & Auto
+
+Transaction: Biyu Puppies & Grooming, Hialeah FL | $14.85 | Sat
+Category: Zebala
+
+Transaction: Cruz Tires, Salinas CA | $43.30 | Tue
+Category: Gas & Auto
+
+Transaction: T-Mobile, Wenatchee WA | $129.07 | Fri
+Category: Gimix
+
+Transaction: South Lake Tahoe Ace Hardware, South Lake Tahoe CA | $153.13 | Wed
+Category: Home Improvement
+
+Transaction: Pinelake Dental, Chandler AZ | $23.24 | Sat
+Category: Pharmacy & Health
+
+Transaction: Hissyfits Boutique, Southern Pines NC | $20.20 | Mon
+Category: Clothing
+
+Transaction: Tony Laguda Formal Wear, Ambler PA | $18.74 | Tue
+Category: Clothing
+
+Transaction: Abc Chinese Restaurant, Scotts Valley CA | $10.28 | Mon
+Category: Ziror
+
+Transaction: El Toreado Authentic Mexican Grill, Kamas UT | $5.87 | Sun
+Category:
+
+### item 3
+Categories: Travel, Takuvol, Electronics, Pets, Groceries, Lazovar, Entertainment, Gofabux, Voporex, Telecom & Utilities, Clothing, Kerusar, Pharmacy & Health, Rulelon, Restaurants
+
+Transaction: Blue Hawk Audio Video Bismarck, Bismarck ND | $164.93 | Wed
+Category: Electronics
+
+Transaction: Longhorn Produce Co, Lamar Heights MO | $149.32 | Sun
+Category: Groceries
+
+Transaction: Mustang Family Dental, Mustang OK | $31.59 | Wed
+Category: Pharmacy & Health
+
+Transaction: Master Automotive Centers, Las Vegas NV | $69.76 | Thu
+Category: Rulelon
+
+Transaction: Almaz Cafe, Philadelphia PA | $37.75 | Sat
+Category: Restaurants
+
+Transaction: Friendly Market, Greenville MS | $75.97 | Thu
+Category: Groceries
+
+Transaction: Firehouse BBQ and Blues, Dunkirk IN | $15.94 | Tue
+Category: Restaurants
+
+Transaction: Homestead Veterinary Care, Rhinelander WI | $40.77 | Tue
+Category: Pets
+
+Transaction: Hotel Anthracite, Carbondale PA | $67.27 | Tue
+Category: Travel
+
+Transaction: Mainway Telecom, Plainview NY | $99.07 | Sat
+Category: Telecom & Utilities
+
+Transaction: VTEK Strength & Fitness, Dracut MA | $84.95 | Sun
+Category: Lazovar
+
+Transaction: Wiggle Bums Dog Grooming, Grants Pass OR | $33.03 | Sun
+Category: Pets
+
+Transaction: New Gardena Hotel, Gardena CA | $458.15 | Tue
+Category: Travel
+
+Transaction: Fun Factory XL, Greenwood SC | $38.38 | Fri
+Category: Entertainment
+
+Transaction: Expertec Automotive, Smithfield UT | $48.85 | Sat
+Category: Rulelon
+
+Transaction: Lemon Boutique, Miami FL | $12.83 | Wed
+Category: Clothing
+
+Transaction: Old School Arcade Room, Tyler TX | $21.94 | Thu
+Category: Entertainment
+
+Transaction: 40 Park Pilates, Rutherford NJ | $21.07 | Mon
+Category: Lazovar
+
+Transaction: The Diva Dancewear Boutique, Hazleton PA | $94.54 | Wed
+Category: Clothing
+
+Transaction: Suncoast Roofing Supply, Sebring FL | $57.76 | Thu
+Category: Kerusar
+
+Transaction: St. John Providence Outpatient Pharmacy, Madison Heights MI | $24.77 | Fri
+Category: Pharmacy & Health
+
+Transaction: Capital Computer Group, Llc, Mendota Heights MN | $55.39 | Fri
+Category: Electronics
+
+Transaction: Integra Telecom, Inc., Medford OR | $88.18 | Tue
+Category: Telecom & Utilities
+
+Transaction: Family Meat Processing, Sumrall MS | $79.84 | Tue
+Category: Groceries
+
+Transaction: Alpine Lumber Company, Farmington NM | $3.23 | Mon
+Category:
+
+### item 4
+Categories: Home Improvement, Groceries, Fitness, Bovamer, Fudemon, Zabun, Zasan, Papir, Restaurants, Entertainment, Gas & Auto, Electronics, Pets, Telecom & Utilities, Clothing
+
+Transaction: Main Street Photo-Video, Norman OK | $189.28 | Sun
+Category: Electronics
+
+Transaction: Reisman Auto Repair LLC, Jasper NY | $48.17 | Fri
+Category: Gas & Auto
+
+Transaction: Springfield Hardware, New York NY | $209.69 | Thu
+Category: Home Improvement
+
+Transaction: All NYS Wireless, Amityville NY | $93.97 | Fri
+Category: Telecom & Utilities
+
+Transaction: Superior Auto-westbrook, Westbrook CT | $41.70 | Wed
+Category: Gas & Auto
+
+Transaction: Cazadores Tacos | Mexican, Onarga IL | $21.43 | Sun
+Category: Restaurants
+
+Transaction: Movies Havasu, Lake Havasu City AZ | $69.02 | Mon
+Category: Entertainment
+
+Transaction: Thomas L Tolles, Dmd, Palm Bay FL | $24.49 | Sat
+Category: Bovamer
+
+Transaction: Frankfort Animal Hospital, Frankfort IN | $17.27 | Wed
+Category: Pets
+
+Transaction: Metta Yoga, Phoenix AZ | $109.64 | Sat
+Category: Fitness
+
+Transaction: RIA Fitness Center, Rock Island IL | $48.73 | Thu
+Category: Fitness
+
+Transaction: Dragon Asian Grocery, Akron OH | $61.30 | Tue
+Category: Groceries
+
+Transaction: WSC Designs Boutique, Dumont NJ | $235.83 | Sun
+Category: Clothing
+
+Transaction: JM Mobile, Passaic NJ | $50.73 | Fri
+Category: Telecom & Utilities
+
+Transaction: Friendly Computers, Herndon VA | $493.37 | Wed
+Category: Electronics
+
+Transaction: Eagle's Den Suites Cotulla, Cotulla TX | $1079.41 | Fri
+Category: Fudemon
+
+Transaction: East Smithfield Hardware, Smithfield Twp PA | $61.58 | Sun
+Category: Home Improvement
+
+Transaction: Reid Dentistry, Chester SC | $25.09 | Wed
+Category: Bovamer
+
+Transaction: Midfield Meats, Midfield AL | $93.65 | Sat
+Category: Groceries
+
+Transaction: Motel 6 Buttonwillow, Ca Central, Buttonwillow CA | $117.48 | Tue
+Category: Fudemon
+
+Transaction: Harrisonville Animal Clinic, Harrisonville MO | $27.03 | Sun
+Category: Pets
+
+Transaction: Water Street Cafe, Batavia IL | $14.47 | Wed
+Category: Restaurants
+
+Transaction: Shoe Shack, Glendive MT | $71.67 | Thu
+Category: Clothing
+
+Transaction: Pat Tarsio Lanes, Newburgh NY | $30.01 | Mon
+Category: Entertainment
+
+Transaction: Lark Lawn and Garden, Cadillac MI | $26.83 | Wed
+Category:
+
+### item 5
+Categories: Kufir, Pharmacy & Health, Home Improvement, Gas & Auto, Zusar, Travel, Salotun, Clothing, Entertainment, Zivur, Logir, Fitness, Sinel, Electronics, Groceries
+
+Transaction: Holyoak Dental, Encinitas CA | $13.45 | Tue
+Category: Pharmacy & Health
+
+Transaction: The Clarkson Inn, Potsdam NY | $228.75 | Mon
+Category: Travel
+
+Transaction: Troy's Auto Service, Paducah KY | $50.32 | Mon
+Category: Gas & Auto
+
+Transaction: Hinkson Memorial Hometown Theater, St Johns AZ | $32.57 | Fri
+Category: Entertainment
+
+Transaction: Alleigh Kyle Boutique, Macon GA | $70.02 | Wed
+Category: Clothing
+
+Transaction: Grant's Lumber, Ephrata WA | $80.40 | Sun
+Category: Home Improvement
+
+Transaction: Dr. Benjamin J. Lin, Dmd, Bakersfield CA | $44.14 | Sun
+Category: Pharmacy & Health
+
+Transaction: Sunny Market Place, Providence RI | $49.81 | Wed
+Category: Groceries
+
+Transaction: Emerald Meats, Worcester MA | $88.04 | Thu
+Category: Groceries
+
+Transaction: Paws N Claws Animal Wellness Center, Union City GA | $10.88 | Fri
+Category: Salotun
+
+Transaction: Rita's Grooming and Boarding, Stuttgart AR | $22.05 | Wed
+Category: Salotun
+
+Transaction: One Ocean Yoga, Bridgehampton NY | $55.49 | Sun
+Category: Fitness
+
+Transaction: CMX Cinemas Arlington Heights, Arlington Heights IL | $97.53 | Fri
+Category: Entertainment
+
+Transaction: Capital City Computers Madison, Madison TN | $133.24 | Tue
+Category: Electronics
+
+Transaction: Americas Best Value Inn Marion, Marion NC | $352.50 | Sat
+Category: Travel
+
+Transaction: Charis Pilates, Poway CA | $29.61 | Sat
+Category: Fitness
+
+Transaction: Stella's Pizza and Italian Restaurant, Wethersfield CT | $19.60 | Sat
+Category: Zivur
+
+Transaction: Fred's Sound Of Music Audio Video, Portland OR | $401.44 | Fri
+Category: Electronics
+
+Transaction: Caliber Collision, Saraland AL | $53.78 | Mon
+Category: Gas & Auto
+
+Transaction: Da Rae Korean restaurant, Fullerton CA | $67.46 | Fri
+Category: Zivur
+
+Transaction: Accessory Door & Hardware, Avon CT | $117.50 | Tue
+Category: Home Improvement
+
+Transaction: Restaurant Partners Management Llc, Grand Rapids MI | $16.60 | Thu
+Category: Zivur
+
+Transaction: Thayne Valley Market, Thayne WY | $94.00 | Thu
+Category: Groceries
+
+Transaction: Off Broadway Shoe Warehouse, Knoxville TN | $80.36 | Sun
+Category: Clothing
+
+Transaction: Total Communications, Cape Coral FL | $108.32 | Sat
+Category:
+
+### item 6
+Categories: Pets, Feral, Electronics, Telecom & Utilities, Mavurel, Restaurants, Travel, Rela, Groceries, Butor, Fudulon, Rusugan, Home Improvement, Entertainment, Gas & Auto
+
+Transaction: C and R Market, Milwaukee WI | $44.55 | Sun
+Category: Groceries
+
+Transaction: R3 Hardware, Honesdale PA | $114.59 | Fri
+Category: Home Improvement
+
+Transaction: T-Mobile, Nashville TN | $86.43 | Thu
+Category: Telecom & Utilities
+
+Transaction: Curb Appeal Automotive Paint Pro, Mt Crawford VA | $39.98 | Sun
+Category: Gas & Auto
+
+Transaction: Channel Lane Inn, Pentwater MI | $553.91 | Fri
+Category: Travel
+
+Transaction: Shin Sushi, Pleasant Hill CA | $9.42 | Tue
+Category: Restaurants
+
+Transaction: Western Feed and Pet Supply, Carmichael CA | $7.32 | Thu
+Category: Pets
+
+Transaction: Healing Light Yoga and Massage, Portland OR | $23.44 | Wed
+Category: Mavurel
+
+Transaction: M-66 Bowl, Battle Creek MI | $19.46 | Sun
+Category: Entertainment
+
+Transaction: Main Bowl, Columbia City IN | $19.32 | Thu
+Category: Entertainment
+
+Transaction: Public Water Supply District 12, Festus MO | $60.79 | Tue
+Category: Telecom & Utilities
+
+Transaction: M&o Electronics, Inc., San Jose CA | $70.10 | Wed
+Category: Electronics
+
+Transaction: Basil Viet Kitchen, Seattle WA | $31.19 | Fri
+Category: Restaurants
+
+Transaction: Acorn Motor Inn, Oak Harbor WA | $153.57 | Sun
+Category: Travel
+
+Transaction: Tech Qube, Pflugerville TX | $157.90 | Sun
+Category: Electronics
+
+Transaction: Your Pet Fish, Carrollton TX | $40.30 | Sun
+Category: Pets
+
+Transaction: Sparkle Couture Boutique, Flanders NJ | $71.40 | Fri
+Category: Feral
+
+Transaction: Corner Market, Jackson MS | $29.16 | Mon
+Category: Groceries
+
+Transaction: Four Star Car Wash, New Stanton PA | $60.66 | Fri
+Category: Gas & Auto
+
+Transaction: Gentle Dental Care, Gunnison CO | $37.00 | Sun
+Category: Fudulon
+
+Transaction: Carolina Foothills Dental, Union SC | $42.72 | Thu
+Category: Fudulon
+
+Transaction: Diamond Goddess Boutique, Beaumont MS | $42.36 | Sun
+Category: Feral
+
+Transaction: RIS Insulation Supply, Hazelwood MO | $52.14 | Tue
+Category: Home Improvement
+
+Transaction: Aladdin's Market, Ann Arbor MI | $148.46 | Mon
+Category: Groceries
+
+Transaction: Fitness 360, Panama City Beach FL | $88.17 | Sat
+Category:
+
+### item 7
+Categories: Telecom & Utilities, Gas & Auto, Clothing, Electronics, Gesax, Groceries, Pets, Entertainment, Travel, Fitness, Zulofo, Mafur, Pavipax, Restaurants, Nimul
+
+Transaction: Mea Pharmacy Inc., Kew Gardens NY | $104.80 | Thu
+Category: Mafur
+
+Transaction: Sunoco Gas Station, Coral Springs FL | $21.91 | Mon
+Category: Gas & Auto
+
+Transaction: Fetter's Meat Market, Milton PA | $99.48 | Sun
+Category: Groceries
+
+Transaction: Tim's Computers, Baton Rouge LA | $964.70 | Tue
+Category: Electronics
+
+Transaction: New Fancy House Of Pizza, South Grafton MA | $6.45 | Fri
+Category: Restaurants
+
+Transaction: Queen Shasta Fashion, Decatur IL | $71.55 | Sat
+Category: Clothing
+
+Transaction: Piazza's Equipment and Electronics, Abbeville LA | $363.05 | Sun
+Category: Electronics
+
+Transaction: Specialized Grooming, Grants Pass OR | $47.98 | Fri
+Category: Pets
+
+Transaction: Husky Mafia Health & Fitness, Mary Esther FL | $117.11 | Wed
+Category: Fitness
+
+Transaction: Everyday Yoga, Clawson MI | $84.91 | Fri
+Category: Fitness
+
+Transaction: Shoreline Pizza, Warwick RI | $18.42 | Wed
+Category: Restaurants
+
+Transaction: Howard Johnson Inn, Hot Springs AR | $80.41 | Sat
+Category: Travel
+
+Transaction: The Wyman Hotel, Silverton CO | $310.83 | Tue
+Category: Travel
+
+Transaction: Clothing Stories, El Paso TX | $39.70 | Tue
+Category: Clothing
+
+Transaction: Mckinnon's Market - Everett, Ma, Danvers MA | $190.71 | Thu
+Category: Groceries
+
+Transaction: Shen Yun Bushnell Theatre, Hartford CT | $63.53 | Wed
+Category: Entertainment
+
+Transaction: Pops and Family Plant Nursery, Albemarle NC | $15.79 | Sun
+Category: Nimul
+
+Transaction: Cute Pets Grooming, San Marcos CA | $65.26 | Fri
+Category: Pets
+
+Transaction: Andys Mobile Auto Care, Hanford CA | $44.74 | Thu
+Category: Gas & Auto
+
+Transaction: Houston Family Dental, Houston TX | $13.77 | Tue
+Category: Mafur
+
+Transaction: Coast Hardware - Willits, Willits CA | $24.13 | Fri
+Category: Nimul
+
+Transaction: Poplar Grove Utility District, Atoka TN | $53.10 | Sat
+Category: Telecom & Utilities
+
+Transaction: Laclede Electric Cooperative, Lebanon MO | $86.76 | Sat
+Category: Telecom & Utilities
+
+Transaction: Aleta Sill's Bowling World, Farmington Hills MI | $7.39 | Mon
+Category: Entertainment
+
+Transaction: Kowaliga Whole Health Pet Care, Eclectic AL | $82.19 | Sun
+Category:
+
+### item 8
+Categories: Gas & Auto, Fuvar, Groceries, Clothing, Electronics, Telecom & Utilities, Lulur, Travel, Bizodo, Sorar, Pets, Belox, Mevi, Entertainment, Pharmacy & Health
+
+Transaction: Lowry Utilities, Gaffney SC | $118.25 | Sat
+Category: Telecom & Utilities
+
+Transaction: Navarro County Electric Cooperative, Corsicana TX | $226.50 | Thu
+Category: Telecom & Utilities
+
+Transaction: Nancy Jo's Burgers and Fries, Salem OR | $13.16 | Tue
+Category: Bizodo
+
+Transaction: Animal Inns Of America, Garden Grove CA | $17.64 | Thu
+Category: Pets
+
+Transaction: Max Bloom's Cafe Noir, Fullerton CA | $56.93 | Sun
+Category: Bizodo
+
+Transaction: Roger's Burgers, Hayden ID | $4.64 | Sat
+Category: Bizodo
+
+Transaction: A Computer Doctor, Jacksonville FL | $427.55 | Sat
+Category: Electronics
+
+Transaction: Animal Fare, Brooklyn NY | $24.05 | Sun
+Category: Pets
+
+Transaction: Harveys Supermarket, Charlotte NC | $44.68 | Sat
+Category: Groceries
+
+Transaction: RC Sons Garden Center, Easton PA | $75.45 | Fri
+Category: Mevi
+
+Transaction: All Family Dental and Braces, Arlington Heights IL | $10.84 | Fri
+Category: Pharmacy & Health
+
+Transaction: Pins & Cues Bowling Center, Weslaco TX | $58.42 | Sun
+Category: Entertainment
+
+Transaction: Royal Motel, Elizabeth NJ | $946.11 | Fri
+Category: Travel
+
+Transaction: Montgomery County - KY- Farmers' Market, Mt Sterling KY | $218.54 | Wed
+Category: Groceries
+
+Transaction: Econo Lodge, Prescott AR | $204.96 | Mon
+Category: Travel
+
+Transaction: Pony Express Foods, Akron PA | $76.81 | Tue
+Category: Groceries
+
+Transaction: J & H Automotive, Tangent OR | $71.18 | Mon
+Category: Gas & Auto
+
+Transaction: Compass Rose Boutique, York PA | $40.13 | Fri
+Category: Clothing
+
+Transaction: Gibbs Garden Center, Hanceville AL | $57.65 | Sun
+Category: Mevi
+
+Transaction: Alamo Auto Glass & Collision, Tucson AZ | $35.89 | Tue
+Category: Gas & Auto
+
+Transaction: Al-Tech Electronics, Sayre PA | $123.00 | Tue
+Category: Electronics
+
+Transaction: Cameron Theatre, Lawton OK | $10.73 | Thu
+Category: Entertainment
+
+Transaction: Stars Boutique, Tomah WI | $66.54 | Wed
+Category: Clothing
+
+Transaction: Tracktown Pharmacy, Eugene OR | $5.64 | Sat
+Category: Pharmacy & Health
+
+Transaction: Eagle Yoga House, Eagle ID | $46.16 | Tue
+Category:
+
+### item 9
+Categories: Vaveke, Entertainment, Home Improvement, Electronics, Travel, Pets, Vezibo, Telecom & Utilities, Clothing, Fitness, Groceries, Dilafon, Bofax, Gas & Auto, Lupiter
+
+Transaction: Cookies Clothing Co, Aiea HI | $24.38 | Sun
+Category: Clothing
+
+Transaction: Jupiter Smile Care Dentistry, Jupiter FL | $33.43 | Sun
+Category: Vaveke
+
+Transaction: Robinson Car Wash, Leetsdale PA | $38.25 | Sat
+Category: Gas & Auto
+
+Transaction: Seoul Market, La Canada Flintridge CA | $34.84 | Tue
+Category: Groceries
+
+Transaction: Sonny's & Rickey's Arcade, Seaside Heights NJ | $45.60 | Thu
+Category: Entertainment
+
+Transaction: Daley Patrick B DDS, Irmo SC | $82.43 | Tue
+Category: Vaveke
+
+Transaction: Level 256 Classic Arcade Bar, Asheville NC | $41.93 | Fri
+Category: Entertainment
+
+Transaction: Marlene's Sass and Class Boutique, Sulphur Springs TX | $182.84 | Thu
+Category: Clothing
+
+Transaction: Safeway Fresh Foods Llc, Vineland NJ | $69.50 | Sun
+Category: Groceries
+
+Transaction: Goldstar Tech, Eau Claire WI | $614.02 | Tue
+Category: Electronics
+
+Transaction: Virginia Parkway Pet Hospital, McKinney TX | $32.84 | Thu
+Category: Pets
+
+Transaction: Lantern Inn & Suites, Sarasota FL | $106.14 | Sun
+Category: Travel
+
+Transaction: Alpine Lumber Company, Farmington NM | $63.81 | Tue
+Category: Home Improvement
+
+Transaction: Ritual Training, Bend OR | $40.07 | Mon
+Category: Fitness
+
+Transaction: Sprint Store By Mobile Center, Hilliard OH | $71.08 | Tue
+Category: Telecom & Utilities
+
+Transaction: Williamsburg Coffee and Tea Company, Williamsburg VA | $12.77 | Fri
+Category: Vezibo
+
+Transaction: ISmart Tech Repair, Brownsville TX | $16.68 | Tue
+Category: Electronics
+
+Transaction: Primeval Forest Nursery, Buffalo NY | $126.97 | Wed
+Category: Home Improvement
+
+Transaction: Slides Gourmet Burger, La Mesa CA | $34.14 | Thu
+Category: Vezibo
+
+Transaction: Pierz Automotive, Pierz MN | $45.37 | Sat
+Category: Gas & Auto
+
+Transaction: Mercer Street Veterinary Hospital, Seattle WA | $24.40 | Fri
+Category: Pets
+
+Transaction: Mobile Jl, Orange CA | $72.74 | Wed
+Category: Telecom & Utilities
+
+Transaction: My Health Matters Fitness, Hadley MA | $109.68 | Sun
+Category: Fitness
+
+Transaction: Sportsman's Lodge Brethren Bungalows, Brethren MI | $575.20 | Sun
+Category: Travel
+
+Transaction: Atlas Construction Supply Inc, San Diego CA | $28.41 | Mon
+Category:
+
+### item 10
+Categories: Difofu, Telecom & Utilities, Entertainment, Pharmacy & Health, Home Improvement, Pets, Vafabu, Gas & Auto, Vosupal, Fitness, Momon, Dosanun, Travel, Lazar, Clothing
+
+Transaction: My Home Computer Guy, Sierra Vista AZ | $284.44 | Mon
+Category: Difofu
+
+Transaction: Marc Dandois DDS, Carrollton TX | $25.86 | Mon
+Category: Pharmacy & Health
+
+Transaction: Baldwin Builders Supply, Milledgeville GA | $35.79 | Sun
+Category: Home Improvement
+
+Transaction: Columbus Local Pharmacy, Columbus TX | $19.86 | Tue
+Category: Pharmacy & Health
+
+Transaction: High Country Computers, Edwards CO | $78.32 | Sat
+Category: Difofu
+
+Transaction: Apparel Us, Los Angeles CA | $28.25 | Thu
+Category: Clothing
+
+Transaction: The Strength Collective, Lebanon MO | $119.36 | Tue
+Category: Fitness
+
+Transaction: Better Fresh Burger, Glendale CA | $42.18 | Sun
+Category: Vafabu
+
+Transaction: Star Motel, San Francisco CA | $240.39 | Sat
+Category: Travel
+
+Transaction: Blossom Inn, Myrtle Beach SC | $199.03 | Sat
+Category: Travel
+
+Transaction: Sprint Store By Wireless View PCS, Midland TX | $146.43 | Wed
+Category: Telecom & Utilities
+
+Transaction: Paradise Pizza, Millville NJ | $16.70 | Sat
+Category: Vafabu
+
+Transaction: Handy Corner Meats Inc, Largo FL | $121.26 | Sun
+Category: Lazar
+
+Transaction: Grit and Grace Hot Yoga, Cumming GA | $44.12 | Sun
+Category: Fitness
+
+Transaction: Sanderson Meats, Grover Hill OH | $51.67 | Sat
+Category: Lazar
+
+Transaction: Dragon Asian Grocery, Akron OH | $59.66 | Sat
+Category: Fitness
+
+Transaction: Rosewood Theater, New York NY | $40.05 | Wed
+Category: Entertainment
+
+Transaction: Pick of the Litter Grooming Salon, Chattanooga TN | $35.35 | Sat
+Category: Pets
+
+Transaction: Fox and Hound Boutique, Petoskey MI | $74.28 | Thu
+Category: Clothing
+
+Transaction: Jlp Automotive, Greer SC | $54.26 | Tue
+Category: Gas & Auto
+
+Transaction: Holly Acres Pet Resort, Fort Lauderdale FL | $12.63 | Sat
+Category: Pets
+
+Transaction: Boone Concrete Supply, Boone NC | $19.59 | Tue
+Category: Home Improvement
+
+Transaction: Liberty Performing Arts Theatre, Liberty MO | $12.52 | Wed
+Category: Entertainment
+
+Transaction: MP Auto Body & Collision, San Fernando CA | $36.02 | Wed
+Category: Gas & Auto
+
+Transaction: Tree Top Grocery, Cincinnati OH | $51.85 | Sat
+Category:
+
+### item 11
+Categories: Vonirol, Home Improvement, Clothing, Pets, Travel, Nomupo, Bafoval, Gas & Auto, Saval, Telecom & Utilities, Entertainment, Kutin, Pharmacy & Health, Electronics, Galapo
+
+Transaction: Lalla Grill Oceanside, Monterey CA | $15.52 | Mon
+Category: Saval
+
+Transaction: O'Bryan Dental Clinic, Brandon MS | $63.90 | Tue
+Category: Pharmacy & Health
+
+Transaction: Styles 4 You Boutique, New Castle IN | $25.13 | Thu
+Category: Clothing
+
+Transaction: La Fiesta Meat Market, Hanford CA | $47.93 | Wed
+Category: Nomupo
+
+Transaction: Decks & Docks Lumber Company Naples, Naples FL | $15.64 | Mon
+Category: Home Improvement
+
+Transaction: L.J. Allen Tire and Auto Service, Springettsbury Twp PA | $86.76 | Fri
+Category: Gas & Auto
+
+Transaction: Rosebush Hardware and Welding, Rosebush MI | $18.42 | Tue
+Category: Home Improvement
+
+Transaction: Atherial Aerial Yoga and Barre Fitness, Denver CO | $58.96 | Sat
+Category: Bafoval
+
+Transaction: Westmont Pharmacy, Westmont IL | $6.38 | Sun
+Category: Pharmacy & Health
+
+Transaction: HOTEL BLUE, DeLand FL | $154.38 | Sun
+Category: Travel
+
+Transaction: Heathsville Animal Hospital, Heathsville VA | $77.64 | Wed
+Category: Pets
+
+Transaction: Banfield Pet Hospital, Pinole CA | $30.66 | Wed
+Category: Pets
+
+Transaction: Parma Grill & Tap, St. Louis MO | $27.75 | Wed
+Category: Pets
+
+Transaction: Nana Super Computer Center, Philadelphia PA | $131.29 | Wed
+Category: Electronics
+
+Transaction: Tom & Jerry's Auto Body, Chicago IL | $42.44 | Wed
+Category: Gas & Auto
+
+Transaction: Flagship Cinemas Lewiston, Lewiston ME | $66.20 | Wed
+Category: Entertainment
+
+Transaction: Norris Public Power District, Beatrice NE | $65.23 | Mon
+Category: Telecom & Utilities
+
+Transaction: Asian Market, Orlando FL | $37.44 | Thu
+Category: Nomupo
+
+Transaction: Crew Coffee & Cremerie, Newport Beach CA | $8.71 | Sun
+Category: Saval
+
+Transaction: Hickory Extended Stay Suites, Hickory NC | $403.72 | Fri
+Category: Travel
+
+Transaction: Fitness 4 Less, Clinton MD | $55.95 | Tue
+Category: Bafoval
+
+Transaction: Colonie Center Movie, Albany NY | $9.23 | Fri
+Category: Entertainment
+
+Transaction: Carolina Girl Boutique, Llc, Sanford NC | $29.06 | Fri
+Category: Clothing
+
+Transaction: Wooden Camera, Dallas TX | $63.98 | Tue
+Category: Electronics
+
+Transaction: Nicole's Italia Restaurant, Guilderland NY | $10.05 | Mon
+Category:
+
+### item 12
+Categories: Clothing, Gas & Auto, Maval, Ronasal, Groceries, Restaurants, Kulanar, Puvin, Pharmacy & Health, Binu, Entertainment, Telecom & Utilities, Fitness, Fagodil, Electronics
+
+Transaction: Iguanas Mexican Restaurant, Harrisburg AR | $32.51 | Tue
+Category: Restaurants
+
+Transaction: Spin Alley Bowling, Shoreline WA | $19.24 | Wed
+Category: Entertainment
+
+Transaction: Primeval Forest Nursery, Buffalo NY | $86.88 | Thu
+Category: Maval
+
+Transaction: Papillon Boutique, Findlay OH | $152.02 | Mon
+Category: Clothing
+
+Transaction: Basic Computers, Ashland KY | $134.63 | Tue
+Category: Electronics
+
+Transaction: Knights Inn Green River, Green River UT | $311.68 | Mon
+Category: Puvin
+
+Transaction: Joe Byrd's Boxing Academy, Mt Morris MI | $45.60 | Thu
+Category: Fitness
+
+Transaction: Aker's Shoe Repair, Yorktown VA | $80.36 | Fri
+Category: Clothing
+
+Transaction: Stephens Computer Service, Birmingham AL | $19.26 | Thu
+Category: Electronics
+
+Transaction: Arroyo Grande Movie Theater, Arroyo Grande CA | $5.06 | Sun
+Category: Entertainment
+
+Transaction: Larry's Body Shop, Ellijay GA | $52.67 | Sat
+Category: Gas & Auto
+
+Transaction: JR's Produce, Bristol VA | $95.74 | Thu
+Category: Groceries
+
+Transaction: Northeast Knox Utility District, Corryton TN | $96.71 | Thu
+Category: Telecom & Utilities
+
+Transaction: Zorn Dental Associates, Parkton MD | $12.20 | Thu
+Category: Pharmacy & Health
+
+Transaction: Telecom South Inc, Pompano Beach FL | $81.25 | Wed
+Category: Telecom & Utilities
+
+Transaction: Food Lion Grocery Store, Frostburg MD | $124.14 | Thu
+Category: Groceries
+
+Transaction: Nancy Jo's Burgers and Fries, Salem OR | $9.00 | Mon
+Category: Restaurants
+
+Transaction: Eagleson's Auto, Lagrange IN | $26.31 | Mon
+Category: Gas & Auto
+
+Transaction: Timber Creek Meats, Parsons KS | $50.79 | Thu
+Category: Groceries
+
+Transaction: Admiral Dental Care, Farragut TN | $17.22 | Fri
+Category: Pharmacy & Health
+
+Transaction: Town & Country Hardware, Independence OR | $140.24 | Mon
+Category: Maval
+
+Transaction: Blink Fitness, West Islip NY | $33.49 | Thu
+Category: Fitness
+
+Transaction: Tacos La Bala, Houston TX | $15.40 | Sat
+Category: Restaurants
+
+Transaction: Foghorn Harbor Inn, Marina del Rey CA | $150.62 | Tue
+Category: Puvin
+
+Transaction: All Paws Veterinary Clinic, Knoxville TN | $12.44 | Tue
+Category:
+
+### item 13
+Categories: Difafar, Gas & Auto, Pets, Mefofir, Travel, Lumol, Restaurants, Entertainment, Lunar, Telecom & Utilities, Home Improvement, Gotor, Fitness, Clothing, Sude
+
+Transaction: Cat Care Veterinary Clinic, Morrisville NC | $5.29 | Sun
+Category: Pets
+
+Transaction: Bob Evans Restaurant, Holiday FL | $26.77 | Fri
+Category: Restaurants
+
+Transaction: Yoga Under The Palms, Honolulu HI | $18.54 | Thu
+Category: Fitness
+
+Transaction: Demetris Uptown Market, Bridgeport PA | $91.37 | Fri
+Category: Sude
+
+Transaction: Sloat Garden Center, Martinez CA | $72.39 | Thu
+Category: Home Improvement
+
+Transaction: Computer Data Projectors, Atlanta GA | $535.83 | Fri
+Category: Difafar
+
+Transaction: Long Animal Hospital & Emergency Center, Charlotte NC | $29.40 | Thu
+Category: Pets
+
+Transaction: Bi-wise Market, Allenstown NH | $149.96 | Sun
+Category: Sude
+
+Transaction: Cheri Theatres, Murray KY | $34.67 | Fri
+Category: Entertainment
+
+Transaction: Telesource Communications Inc., Katy TX | $72.53 | Sun
+Category: Telecom & Utilities
+
+Transaction: Tall Men's Clothing Co, Ashwaubenon WI | $43.16 | Tue
+Category: Clothing
+
+Transaction: Oaks Motel, Detroit MI | $242.58 | Fri
+Category: Travel
+
+Transaction: Cooper's Bowl, Marion OH | $74.57 | Thu
+Category: Entertainment
+
+Transaction: Hissyfits Boutique, Southern Pines NC | $39.44 | Tue
+Category: Clothing
+
+Transaction: Clifton Dental Care, Cincinnati OH | $8.82 | Fri
+Category: Gotor
+
+Transaction: Ferguson Fitness, Roanoke VA | $71.09 | Wed
+Category: Fitness
+
+Transaction: Fitzy's Car Wash, North Grafton MA | $121.61 | Fri
+Category: Gas & Auto
+
+Transaction: Arcol Tire Shop, Roselle NJ | $29.25 | Sun
+Category: Gas & Auto
+
+Transaction: Santa Rita Pizza Corp, Astoria NY | $9.40 | Fri
+Category: Restaurants
+
+Transaction: Union Dental INC, Union MS | $39.52 | Tue
+Category: Gotor
+
+Transaction: Novick Hardware, Jersey City NJ | $69.65 | Sun
+Category: Home Improvement
+
+Transaction: Hotel Ordway, Ordway CO | $121.20 | Mon
+Category: Travel
+
+Transaction: Viet Hoa Supermarket, Lakewood CO | $121.55 | Thu
+Category: Sude
+
+Transaction: Sky Communications, Seattle WA | $111.86 | Mon
+Category: Telecom & Utilities
+
+Transaction: Camera Service Center, Anchorage AK | $159.47 | Wed
+Category:
+
+### item 14
+Categories: Pets, Fitness, Restaurants, Pharmacy & Health, Revapa, Kuvir, Clothing, Ladegal, Fadiman, Gageso, Dagabel, Home Improvement, Travel, Electronics, Entertainment
+
+Transaction: Bluetooth Audio, Bloomington CA | $282.48 | Mon
+Category: Electronics
+
+Transaction: Hammer Training & Fitness, Allentown PA | $60.92 | Tue
+Category: Fitness
+
+Transaction: Tru-Bilt Lumber Co, Sunbury PA | $45.52 | Wed
+Category: Home Improvement
+
+Transaction: Kelreby, Raleigh NC | $57.93 | Sun
+Category: Kuvir
+
+Transaction: ABC Paging & Cellular, Chicago IL | $57.83 | Sun
+Category: Revapa
+
+Transaction: Cleveland Street Cafe, Elloree SC | $11.00 | Sun
+Category: Restaurants
+
+Transaction: ARs Entertainment Hub San Antonio, Balcones Heights TX | $58.60 | Sun
+Category: Entertainment
+
+Transaction: DU Wireless, Lansdowne PA | $92.72 | Sun
+Category: Revapa
+
+Transaction: Auto Stiegler, Reseda CA | $47.13 | Wed
+Category: Fadiman
+
+Transaction: Mount Rock Vet, Shippensburg PA | $23.24 | Tue
+Category: Pets
+
+Transaction: Artisan Bistro, Boston MA | $78.59 | Sun
+Category: Restaurants
+
+Transaction: Elks Lodge, Glendale CA | $1182.82 | Sat
+Category: Travel
+
+Transaction: Square View Inn, Unionville MO | $323.53 | Sun
+Category: Travel
+
+Transaction: Split Second Fitness, New Orleans LA | $25.85 | Fri
+Category: Fitness
+
+Transaction: R & A Auto Services & Tires, Downey CA | $34.27 | Mon
+Category: Fadiman
+
+Transaction: Lakeland Animal Clinic, Syracuse IN | $45.54 | Sat
+Category: Pets
+
+Transaction: Mr Style Men wear, Tupelo MS | $69.60 | Mon
+Category: Clothing
+
+Transaction: Big Y Pharmacy & Wellness, Great Barrington MA | $21.22 | Thu
+Category: Pharmacy & Health
+
+Transaction: Marneholm Co, Portland OR | $84.22 | Thu
+Category: Kuvir
+
+Transaction: Cobalt Audio Video, Lexington KY | $775.01 | Mon
+Category: Electronics
+
+Transaction: Mamis Boutique, Tulsa OK | $105.65 | Tue
+Category: Clothing
+
+Transaction: Manassas Pharmacy, Manassas VA | $19.16 | Sat
+Category: Pharmacy & Health
+
+Transaction: Talladega Bowling Center, Talladega AL | $41.57 | Sun
+Category: Entertainment
+
+Transaction: Fox Den Landscape & Nursery, Mayville WI | $52.56 | Tue
+Category: Home Improvement
+
+Transaction: Sunset Foods Ltd., West Des Moines IA | $124.90 | Mon
+Category:
+
+### item 15
+Categories: Groceries, Katil, Telecom & Utilities, Electronics, Zebefex, Entertainment, Gidan, Home Improvement, Vibapon, Sumex, Pharmacy & Health, Kaza, Gas & Auto, Pets, Restaurants
+
+Transaction: Deja Brew Coffeehouse & Deli, Bethlehem PA | $16.64 | Mon
+Category: Restaurants
+
+Transaction: Oxnard Market, Oxnard CA | $155.14 | Thu
+Category: Groceries
+
+Transaction: Hawkeye Electric, Hiawatha IA | $98.30 | Fri
+Category: Telecom & Utilities
+
+Transaction: The Lanes, Maple Heights OH | $20.29 | Wed
+Category: Entertainment
+
+Transaction: Himalayan Grill & Curry Murrieta, Murrieta CA | $62.35 | Thu
+Category: Restaurants
+
+Transaction: Superior Collision & Restoration, Traverse City MI | $62.11 | Fri
+Category: Gas & Auto
+
+Transaction: Jasmer Automotive, Redding CA | $22.47 | Tue
+Category: Gas & Auto
+
+Transaction: Bol Bol Produce Market, Chula Vista CA | $290.56 | Fri
+Category: Groceries
+
+Transaction: San Manuel Theater of Performing Arts, San Bernardino CA | $14.08 | Wed
+Category: Entertainment
+
+Transaction: Eddy's Mobile Home Supply, Longview TX | $166.73 | Sun
+Category: Home Improvement
+
+Transaction: House of Yoga, Huntingdon Valley PA | $21.42 | Thu
+Category: Kaza
+
+Transaction: Mediterranean Island International Foods, Grand Rapids MI | $30.41 | Thu
+Category: Groceries
+
+Transaction: Barrel House Feed & Hardware, Pipe Creek TX | $25.41 | Mon
+Category: Home Improvement
+
+Transaction: Moes Diner, Dinwiddie VA | $22.92 | Sun
+Category: Restaurants
+
+Transaction: Dr. Elmira Gadol DMD, New York NY | $20.70 | Sun
+Category: Pharmacy & Health
+
+Transaction: Lynnwood Computers, Lynnwood WA | $81.49 | Fri
+Category: Electronics
+
+Transaction: Hilltop Animal Health West, Davis OK | $41.66 | Sat
+Category: Pets
+
+Transaction: T-Mobile, Dumas TX | $117.47 | Fri
+Category: Telecom & Utilities
+
+Transaction: MoveMore Fitness, Franklin NC | $13.25 | Thu
+Category: Kaza
+
+Transaction: Raritan Valley Pharmacy, Branchburg Twp NJ | $89.40 | Wed
+Category: Pharmacy & Health
+
+Transaction: MVP Computers, Oxnard CA | $87.85 | Sat
+Category: Electronics
+
+Transaction: Golden Hills Motel, Tehachapi CA | $220.37 | Sun
+Category: Katil
+
+Transaction: Xenia Country Inn, Xenia OH | $1019.33 | Tue
+Category: Katil
+
+Transaction: Petite Paws Seattle, Seattle WA | $16.30 | Mon
+Category: Pets
+
+Transaction: Madson Boutique, High Springs FL | $65.85 | Sat
+Category:
+
+### item 16
+Categories: Rifi, Clothing, Telecom & Utilities, Govi, Restaurants, Gas & Auto, Electronics, Entertainment, Kafen, Meper, Dimetar, Pharmacy & Health, Home Improvement, Travel, Lota
+
+Transaction: McCool NWW Beach Resort, North Wildwood NJ | $537.69 | Mon
+Category: Travel
+
+Transaction: Radisson Hotel Denver Central, Denver CO | $980.54 | Sun
+Category: Travel
+
+Transaction: The Brick Mexican Grill, Sterling MA | $41.01 | Sat
+Category: Restaurants
+
+Transaction: Christian H. Moe Laboratory Theater, Carbondale IL | $151.96 | Wed
+Category: Entertainment
+
+Transaction: Penngrove Market, Penngrove CA | $46.72 | Sat
+Category: Meper
+
+Transaction: Jasmer Automotive, Redding CA | $30.64 | Fri
+Category: Gas & Auto
+
+Transaction: Trustworthy Hardware, Laconia NH | $72.99 | Mon
+Category: Home Improvement
+
+Transaction: Neighborhood Computer Store, Hampton VA | $911.60 | Tue
+Category: Electronics
+
+Transaction: Headon and Considine's Market, Creston IL | $55.50 | Tue
+Category: Meper
+
+Transaction: Wayback Burgers, Tulare CA | $24.42 | Sat
+Category: Restaurants
+
+Transaction: TPC Communications LLC, Pflugerville TX | $140.83 | Fri
+Category: Telecom & Utilities
+
+Transaction: Fivetown Grocery, Napa CA | $61.11 | Mon
+Category: Meper
+
+Transaction: E and S Pharmacy, Doniphan MO | $22.99 | Tue
+Category: Pharmacy & Health
+
+Transaction: Maynard Automotive, Kansas City KS | $60.42 | Fri
+Category: Gas & Auto
+
+Transaction: Computer Man Electronics, Highlands NC | $213.08 | Mon
+Category: Electronics
+
+Transaction: Paws In The Patch Pet Salon, Dickinson ND | $35.94 | Fri
+Category: Rifi
+
+Transaction: Charm Boutique, Portsmouth OH | $18.32 | Wed
+Category: Clothing
+
+Transaction: Oak Country Lumber and Ranch Supply, Santa Margarita CA | $13.22 | Tue
+Category: Home Improvement
+
+Transaction: Hiroshi "Hershey" Miyamura VA Clinic, Gallup NM | $61.79 | Wed
+Category: Pharmacy & Health
+
+Transaction: Make IT Wireless, Santa Barbara CA | $151.16 | Sun
+Category: Telecom & Utilities
+
+Transaction: Evolution Fitness & Performance, Ashburn VA | $99.16 | Thu
+Category: Govi
+
+Transaction: Meraki Market + Boutique, Sterling CO | $57.30 | Fri
+Category: Clothing
+
+Transaction: St Pauls Lanes, Aurora IL | $37.67 | Mon
+Category: Entertainment
+
+Transaction: Talon School of Fitness, Franklin TN | $27.41 | Wed
+Category: Govi
+
+Transaction: Air Depot Animal Hospital, Midwest City OK | $21.17 | Sun
+Category:
+
+### item 17
+Categories: Takux, Pets, Clothing, Groceries, Home Improvement, Kipozal, Kesa, Restaurants, Pharmacy & Health, Mevox, Telecom & Utilities, Electronics, Travel, Entertainment, Tofipan
+
+Transaction: Detail Garage, San Jose CA | $30.71 | Mon
+Category: Tofipan
+
+Transaction: Monument Inn & Suites, Gering NE | $189.77 | Fri
+Category: Travel
+
+Transaction: Panther Lanes, Prairie View TX | $61.15 | Thu
+Category: Entertainment
+
+Transaction: Simon Eye - Milford, Milford DE | $28.27 | Wed
+Category: Pharmacy & Health
+
+Transaction: Noah's Ark Veterinary Practice, Brooklyn NY | $18.17 | Mon
+Category: Pets
+
+Transaction: Redwood Motel, Godfrey IL | $346.23 | Thu
+Category: Travel
+
+Transaction: Maditude Children's Boutique & Toys, Fairview Twp PA | $21.58 | Sat
+Category: Clothing
+
+Transaction: Arrowhead Lanes, Waukon IA | $153.87 | Tue
+Category: Entertainment
+
+Transaction: Cameta Camera, Amityville NY | $238.65 | Fri
+Category: Electronics
+
+Transaction: Mobile Area Water & Sewer, Mobile AL | $38.32 | Wed
+Category: Telecom & Utilities
+
+Transaction: Eagle Automotive and Transmission Repair, Lavon TX | $71.56 | Fri
+Category: Tofipan
+
+Transaction: Pilates On Riverwatch, Augusta GA | $130.59 | Wed
+Category: Kipozal
+
+Transaction: Bellevue Meat Processing Plant, Haughton LA | $95.92 | Tue
+Category: Groceries
+
+Transaction: Blush Boutique, Amory MS | $33.04 | Mon
+Category: Clothing
+
+Transaction: J Tananis Richard DDS, Laurel DE | $12.06 | Wed
+Category: Pharmacy & Health
+
+Transaction: Village Pro Hardware, Dillsboro IN | $143.71 | Wed
+Category: Home Improvement
+
+Transaction: Anytime Fitness, Pflugerville TX | $36.73 | Mon
+Category: Kipozal
+
+Transaction: K C Electronics, East Setauket NY | $89.41 | Mon
+Category: Electronics
+
+Transaction: Kabob Grill, Rochester Hills MI | $19.49 | Thu
+Category: Restaurants
+
+Transaction: Sun Foods, St Paul MN | $74.21 | Sun
+Category: Groceries
+
+Transaction: Wesley Chapel Rock & Landscape Supply, Wesley Chapel FL | $88.25 | Wed
+Category: Home Improvement
+
+Transaction: Vca At The Oaks Animal Hospital, Bakersfield CA | $19.84 | Sat
+Category: Pets
+
+Transaction: Englewood Water District, Englewood FL | $50.28 | Thu
+Category: Telecom & Utilities
+
+Transaction: Owl's Nest Restaurant, Upper St Clair PA | $104.73 | Sun
+Category: Restaurants
+
+Transaction: Rina Boutique, Boston MA | $115.28 | Wed
+Category:
+
+### item 18
+Categories: Restaurants, Melu, Travel, Soposox, Pharmacy & Health, Clothing, Bufapar, Groceries, Mitax, Natisol, Fitness, Pets, Electronics, Vutamun, Entertainment
+
+Transaction: JJ's Restaurant, Benton AR | $34.36 | Wed
+Category: Restaurants
+
+Transaction: Avalon Dental of Newport, Wilmington DE | $28.86 | Fri
+Category: Pharmacy & Health
+
+Transaction: Cell & Vape, Zebulon NC | $143.76 | Fri
+Category: Vutamun
+
+Transaction: Niche Boutique, Lakeview OR | $70.93 | Sun
+Category: Clothing
+
+Transaction: Tech Armor, Honolulu HI | $78.64 | Fri
+Category: Electronics
+
+Transaction: Arbor Suites Medical Mile, Springfield MO | $362.72 | Mon
+Category: Travel
+
+Transaction: Sprankles Butcher Shop, Covington OH | $54.60 | Sun
+Category: Groceries
+
+Transaction: Cruise & Tour Center, Pottsville AR | $214.81 | Thu
+Category: Travel
+
+Transaction: Emporium Arcade Bar, San Francisco CA | $6.43 | Mon
+Category: Entertainment
+
+Transaction: Dr. Edwin L. Wagstaff, DDS, Wilmington OH | $26.67 | Tue
+Category: Pharmacy & Health
+
+Transaction: Stonehedge Nursery, Priceville AL | $30.74 | Wed
+Category: Mitax
+
+Transaction: Tusc Construction Supply, Dover OH | $28.97 | Thu
+Category: Mitax
+
+Transaction: Kate's Kitchen, San Francisco CA | $10.96 | Sat
+Category: Restaurants
+
+Transaction: T-Mobile, Cody WY | $91.42 | Thu
+Category: Vutamun
+
+Transaction: Cheyenne Theatre, St Francis KS | $18.38 | Thu
+Category: Entertainment
+
+Transaction: Carmine & Arthur Clothiers, New York NY | $33.38 | Mon
+Category: Clothing
+
+Transaction: Pro Camera, Charlottesville VA | $48.03 | Fri
+Category: Electronics
+
+Transaction: Premier Fitness, Concord CA | $27.57 | Thu
+Category: Fitness
+
+Transaction: Max Auto Xpress, Woodbridge VA | $68.73 | Thu
+Category: Melu
+
+Transaction: Gibson Family Produce, Greenville KY | $177.76 | Thu
+Category: Groceries
+
+Transaction: Gold's Gym, Cincinnati OH | $99.36 | Sat
+Category: Fitness
+
+Transaction: Doggie Styles: Austin Dog Grooming Salon, Austin TX | $21.73 | Sat
+Category: Pets
+
+Transaction: Animal Clinic East, Chattanooga TN | $62.39 | Thu
+Category: Pets
+
+Transaction: Fat Boys Produce, Columbus GA | $25.41 | Tue
+Category: Groceries
+
+Transaction: Blue Falls Car Wash, Parma OH | $31.56 | Sun
+Category:
+
+### item 19
+Categories: Pets, Fimuval, Telecom & Utilities, Clothing, Electronics, Entertainment, Pharmacy & Health, Vozogix, Gas & Auto, Peni, Fitness, Gedesun, Restaurants, Ginipox, Dadume
+
+Transaction: Deep Roots Garden Center, Bloomington IN | $32.52 | Wed
+Category: Peni
+
+Transaction: Rusty Wrench Garage, Odessa MO | $63.23 | Tue
+Category: Gas & Auto
+
+Transaction: Lansdowne Dentistry By Design, Leesburg VA | $70.44 | Fri
+Category: Pharmacy & Health
+
+Transaction: Callobury, Raleigh NC | $20.94 | Tue
+Category: Dadume
+
+Transaction: Sleepy Hollow Lodge, Burney CA | $185.06 | Tue
+Category: Vozogix
+
+Transaction: CrossFit Flathead, Kalispell MT | $79.60 | Fri
+Category: Fitness
+
+Transaction: Garrison Animal Care Clinic, Lakewood CO | $67.53 | Wed
+Category: Pets
+
+Transaction: Julia Anna's Boutique, Granite Falls MN | $64.36 | Fri
+Category: Clothing
+
+Transaction: Melissa Feed, Seed and Hardware, Melissa TX | $62.54 | Sun
+Category: Peni
+
+Transaction: Gerber Collision & Glass, Charlotte NC | $58.31 | Sun
+Category: Gas & Auto
+
+Transaction: Talsoford Inc, Tucson AZ | $54.93 | Sun
+Category: Dadume
+
+Transaction: All West Veterinary Hospital, Bozeman MT | $94.07 | Thu
+Category: Pets
+
+Transaction: East Durham Motel, East Durham NY | $294.64 | Wed
+Category: Vozogix
+
+Transaction: Tribe Fitness, Amsterdam NY | $22.65 | Sun
+Category: Fitness
+
+Transaction: Mobile Guru, Saginaw MI | $91.89 | Fri
+Category: Telecom & Utilities
+
+Transaction: Roadrunner Theatre, Tucson AZ | $27.14 | Mon
+Category: Entertainment
+
+Transaction: The Griddle Diner, Clayton NY | $11.18 | Sat
+Category: Restaurants
+
+Transaction: Dary and Son Electronics, New York NY | $1497.92 | Tue
+Category: Electronics
+
+Transaction: Cumberland Town Water Department, Cumberland RI | $71.24 | Sun
+Category: Telecom & Utilities
+
+Transaction: Imax Theatre, Chicago IL | $42.11 | Wed
+Category: Entertainment
+
+Transaction: Red Wing Shoes, Las Vegas NV | $30.22 | Sun
+Category: Clothing
+
+Transaction: Rodriguez Vicky DDS, Miami FL | $40.23 | Fri
+Category: Pharmacy & Health
+
+Transaction: Computer Marketing Group Inc, Charlotte NC | $247.07 | Sun
+Category: Electronics
+
+Transaction: Maven Coffee House, Le Sueur MN | $56.10 | Thu
+Category: Restaurants
+
+Transaction: The Butcher Block & Smokehouse, Versailles OH | $36.41 | Thu
+Category:
+
+### item 20
+Categories: Pharmacy & Health, Pavul, Pets, Groceries, Electronics, Entertainment, Home Improvement, Telecom & Utilities, Clothing, Mozutin, Travel, Kegi, Zelex, Restaurants, Ketuzel
+
+Transaction: Lenox Cellular, Lenox IA | $99.52 | Mon
+Category: Telecom & Utilities
+
+Transaction: Fox Den Landscape & Nursery, Mayville WI | $161.48 | Sun
+Category: Home Improvement
+
+Transaction: Fort Myer Bowling Center, Fort Myer VA | $27.94 | Fri
+Category: Entertainment
+
+Transaction: Central Square Auto, East Weymouth MA | $34.93 | Sun
+Category: Zelex
+
+Transaction: Ideal Orthodontics, Schoharie NY | $27.03 | Mon
+Category: Pharmacy & Health
+
+Transaction: Elivma's Boutique, Cathedral City CA | $63.12 | Fri
+Category: Clothing
+
+Transaction: Shoe Train, Potomac MD | $108.34 | Tue
+Category: Clothing
+
+Transaction: Allouez Animal Hospital, Green Bay WI | $27.50 | Sat
+Category: Pets
+
+Transaction: Peppertree Cafe, Glendora CA | $30.95 | Sat
+Category: Restaurants
+
+Transaction: Merkord's Garage, Egg Harbor City NJ | $24.30 | Thu
+Category: Zelex
+
+Transaction: Tri-City Building Supply, Seminole OK | $62.90 | Sun
+Category: Home Improvement
+
+Transaction: QA Computer Services, Port Angeles WA | $51.11 | Sun
+Category: Electronics
+
+Transaction: Prelude Coffee Roasters, Oklahoma City OK | $19.05 | Mon
+Category: Restaurants
+
+Transaction: Apex Communications, Jonesboro AR | $126.05 | Sat
+Category: Telecom & Utilities
+
+Transaction: Palo Alto Foods, Newark CA | $161.37 | Sat
+Category: Groceries
+
+Transaction: Silver Star Theater, Mesa AZ | $52.20 | Fri
+Category: Entertainment
+
+Transaction: Naperville Fresh Market, Naperville IL | $63.15 | Mon
+Category: Groceries
+
+Transaction: Action Camera, Rocklin CA | $218.78 | Fri
+Category: Electronics
+
+Transaction: CrossFit Cameron Park, Cameron Park CA | $108.00 | Tue
+Category: Mozutin
+
+Transaction: Iconix Fitness Inglewood, Inglewood CA | $29.58 | Fri
+Category: Mozutin
+
+Transaction: Above & Beyond Travel, Arnold CA | $59.87 | Tue
+Category: Travel
+
+Transaction: Faerie Tails Pet Grooming, Kingston NH | $97.90 | Thu
+Category: Pets
+
+Transaction: World Exotic Travel, Wheeling WV | $490.56 | Sun
+Category: Travel
+
+Transaction: Mirror Lake Dentistry, Seagoville TX | $9.91 | Fri
+Category: Pharmacy & Health
+
+Transaction: Restaurant Partners Management Llc, Grand Rapids MI | $20.68 | Wed
+Category:
+
+### item 21
+Categories: Groceries, Pets, Votal, Reper, Vapaber, Fitness, Restaurants, Electronics, Travel, Dafir, Telecom & Utilities, Zelofan, Entertainment, Home Improvement, Clothing
+
+Transaction: Bell Fence Supply, Pensacola FL | $51.66 | Wed
+Category: Home Improvement
+
+Transaction: CPR Cell Phone Repair Belle Vernon, Belle Vernon PA | $99.01 | Thu
+Category: Telecom & Utilities
+
+Transaction: River North Gym at 600W, Chicago IL | $35.82 | Wed
+Category: Fitness
+
+Transaction: Almaz Cafe, Philadelphia PA | $36.63 | Mon
+Category: Restaurants
+
+Transaction: Tex-Mex Fence Supply, Amarillo TX | $30.44 | Fri
+Category: Home Improvement
+
+Transaction: American Spoon Foods, Charlevoix MI | $45.26 | Wed
+Category: Groceries
+
+Transaction: H2OM Yoga, Needham IN | $18.21 | Thu
+Category: Fitness
+
+Transaction: The Lamp Boutique, Spartanburg SC | $70.49 | Sat
+Category: Clothing
+
+Transaction: Animal Alley Grooming, Venice FL | $28.72 | Wed
+Category: Pets
+
+Transaction: YoYo Burgers and Chicken, Anaheim CA | $24.37 | Mon
+Category: Restaurants
+
+Transaction: Central Valley Computer Parts, Ripon CA | $64.23 | Wed
+Category: Electronics
+
+Transaction: Legacy Dental Co., Houston TX | $9.65 | Thu
+Category: Dafir
+
+Transaction: Orange Mobile, Indianapolis IN | $88.54 | Tue
+Category: Telecom & Utilities
+
+Transaction: Dr. Robert Phong Ho DDS, San Francisco CA | $35.16 | Sun
+Category: Dafir
+
+Transaction: Econo Lodge Pottery, Williamsburg VA | $448.87 | Sat
+Category: Travel
+
+Transaction: Funtime Bowl, Atlanta GA | $20.42 | Sun
+Category: Entertainment
+
+Transaction: H & L Produce, Lakewood WA | $50.97 | Sat
+Category: Groceries
+
+Transaction: P2 Squared Boutique LLC, Atlanta GA | $120.00 | Sun
+Category: Clothing
+
+Transaction: Five Star Auto Body, Arnold MO | $54.24 | Fri
+Category: Votal
+
+Transaction: Luxury Inn, Houston TX | $505.31 | Fri
+Category: Travel
+
+Transaction: WILD Pet Provisions, Portland OR | $34.64 | Mon
+Category: Pets
+
+Transaction: Capital Computer Group, Llc, Mendota Heights MN | $119.05 | Fri
+Category: Electronics
+
+Transaction: Cary Collision Center, Apex NC | $61.59 | Mon
+Category: Votal
+
+Transaction: RCE Theaters - Henderson, Henderson NC | $28.86 | Sun
+Category: Entertainment
+
+Transaction: Three3 Electronics, Carson CA | $586.93 | Thu
+Category:
+
+### item 22
+Categories: Semin, Seloben, Pets, Groceries, Clothing, Luvodur, Travel, Home Improvement, Pharmacy & Health, Telecom & Utilities, Safal, Entertainment, Gas & Auto, Kebex, Zuse
+
+Transaction: Schooley Auto Repair, Sylvan Twp MI | $31.96 | Sat
+Category: Gas & Auto
+
+Transaction: Yoga East Austin, Austin TX | $72.70 | Sun
+Category: Safal
+
+Transaction: Wiley's Garden Center, Covington VA | $24.19 | Tue
+Category: Home Improvement
+
+Transaction: Shadow's Promise Raw Dog Food, Oxford CT | $35.31 | Tue
+Category: Pets
+
+Transaction: Elevation Veterinary Services, Windsor CO | $17.98 | Thu
+Category: Pets
+
+Transaction: Hardware Hank, Wilton WI | $84.62 | Wed
+Category: Home Improvement
+
+Transaction: CrossFit Yelm, Yelm WA | $17.08 | Wed
+Category: Safal
+
+Transaction: A Plus Computer, Apple Valley CA | $346.15 | Mon
+Category: Seloben
+
+Transaction: Julian's Deli & Market, Hyde Park NY | $7.42 | Mon
+Category: Semin
+
+Transaction: Franco's Family Restaurant, Madison IN | $15.28 | Tue
+Category: Semin
+
+Transaction: Greenfer Inn, St Peters MO | $248.92 | Mon
+Category: Travel
+
+Transaction: Hotel Rea, Corydon IA | $190.82 | Mon
+Category: Travel
+
+Transaction: American Broadband, Troy SC | $79.54 | Mon
+Category: Telecom & Utilities
+
+Transaction: J-Town Computer, Jupiter FL | $73.07 | Sat
+Category: Seloben
+
+Transaction: Elite Auto Body, Nutley NJ | $30.09 | Tue
+Category: Gas & Auto
+
+Transaction: Barbara Malz DDS Family Dentistry, New Britain CT | $37.88 | Sun
+Category: Pharmacy & Health
+
+Transaction: Webster's Retail Meat, Norwood NY | $93.87 | Sat
+Category: Groceries
+
+Transaction: Computer Man Electronics, Highlands NC | $138.64 | Fri
+Category: Home Improvement
+
+Transaction: Coal City Pharmacy, Coal City IL | $59.91 | Fri
+Category: Pharmacy & Health
+
+Transaction: Cheri Theatres, Murray KY | $51.24 | Wed
+Category: Entertainment
+
+Transaction: Starlite Family Fun Center of Sharpsburg, Sharpsburg GA | $12.31 | Sun
+Category: Entertainment
+
+Transaction: Simply Ohio Boutique, Kidron OH | $48.05 | Thu
+Category: Clothing
+
+Transaction: La Princessita Boutique, Memphis TN | $72.81 | Fri
+Category: Clothing
+
+Transaction: McLanahan's Downtown Market, State College PA | $118.78 | Tue
+Category: Groceries
+
+Transaction: Sierra Electronics, Sparks NV | $260.74 | Thu
+Category:
+
+### item 23
+Categories: Pharmacy & Health, Lapul, Entertainment, Home Improvement, Ladu, Voziza, Pets, Bemagon, Nobedux, Groceries, Fitness, Telecom & Utilities, Gas & Auto, Vokurix, Electronics
+
+Transaction: Lone Star Satellite Communications, Pleasanton TX | $56.56 | Thu
+Category: Telecom & Utilities
+
+Transaction: CrossFit West Chester, West Chester PA | $66.80 | Wed
+Category: Fitness
+
+Transaction: Reel Deal Theater, Los Alamos NM | $19.79 | Sat
+Category: Entertainment
+
+Transaction: Anh Restaurant & Bar, Richmond CA | $22.98 | Thu
+Category: Voziza
+
+Transaction: Scott Camera & Studio, Peekskill NY | $60.72 | Sat
+Category: Electronics
+
+Transaction: Computer Mechanic, Santa Rosa CA | $651.56 | Tue
+Category: Electronics
+
+Transaction: Sprint Store by Cell Phone 4 U, Hudsonville MI | $52.74 | Wed
+Category: Telecom & Utilities
+
+Transaction: Xclusive Automotive, San Dimas CA | $40.76 | Mon
+Category: Gas & Auto
+
+Transaction: Montz and Maher Dental Group, Pearland TX | $41.00 | Wed
+Category: Pharmacy & Health
+
+Transaction: Pace's Italian Market, Bronx NY | $35.96 | Wed
+Category: Groceries
+
+Transaction: Mahoney's Building Supply, Mattapoisett MA | $38.53 | Fri
+Category: Home Improvement
+
+Transaction: Nirvana Fine Dine Indian Restaurant, Huntington NY | $42.99 | Mon
+Category: Voziza
+
+Transaction: Banfield Pet Hospital, Kildeer IL | $84.95 | Sun
+Category: Pets
+
+Transaction: Firehouse Hot Yoga- Ventura, Ventura CA | $60.39 | Tue
+Category: Fitness
+
+Transaction: Schiedel Nursery, Aurora OR | $67.11 | Sun
+Category: Home Improvement
+
+Transaction: Colonial Motel, Manistique MI | $231.77 | Mon
+Category: Lapul
+
+Transaction: The Body Shop Autobody Works LLC, Salt Lake City UT | $54.33 | Mon
+Category: Gas & Auto
+
+Transaction: CMX Cinemas Arlington Heights, Arlington Heights IL | $17.56 | Wed
+Category: Entertainment
+
+Transaction: Pets First Wellness Center, Estero FL | $40.65 | Wed
+Category: Pets
+
+Transaction: Atlanta Dental Spa, Atlanta GA | $11.69 | Tue
+Category: Pharmacy & Health
+
+Transaction: Zygma European Groceries, Pineville NC | $225.00 | Tue
+Category: Groceries
+
+Transaction: SouthernCharm Boutique, Bloomfield IN | $45.05 | Sat
+Category: Vokurix
+
+Transaction: The Unique Boutique US, Tega Cay SC | $92.62 | Thu
+Category: Vokurix
+
+Transaction: Huntingdon Motor Inn, Huntingdon PA | $57.24 | Sat
+Category: Lapul
+
+Transaction: Riverside Inn, Bangor ME | $446.58 | Sun
+Category:
+
+### item 24
+Categories: Telecom & Utilities, Pharmacy & Health, Kopesir, Zezaden, Restaurants, Entertainment, Bilubi, Bogol, Fitness, Rerimon, Pets, Gas & Auto, Groceries, Travel, Ribir
+
+Transaction: Chang Dental Group, Framingham MA | $20.01 | Thu
+Category: Pharmacy & Health
+
+Transaction: Slote Nursery, Mohnton PA | $37.37 | Sun
+Category: Bogol
+
+Transaction: Paco's Auto Body Repair, Omaha NE | $26.56 | Thu
+Category: Gas & Auto
+
+Transaction: Kim's Unique Boutique, Canton OH | $24.96 | Sun
+Category: Rerimon
+
+Transaction: Fun Point, Starke FL | $7.23 | Mon
+Category: Entertainment
+
+Transaction: Az Pet Foods, Bronx NY | $63.72 | Tue
+Category: Pets
+
+Transaction: C&G International Market, Fort Wayne IN | $64.36 | Wed
+Category: Groceries
+
+Transaction: The Dog Store, LLC, Bruce Twp MI | $81.19 | Sat
+Category: Pets
+
+Transaction: Dharma Yoga Studio, Fort Pierce FL | $44.38 | Sat
+Category: Fitness
+
+Transaction: Curtis Lumber Co. Inc., Ballston Spa NY | $84.60 | Fri
+Category: Bogol
+
+Transaction: Vpc Computers, Inc., Anaheim CA | $116.03 | Fri
+Category: Ribir
+
+Transaction: Hansen Inn & Cabins, Wall SD | $372.51 | Fri
+Category: Travel
+
+Transaction: Maru Sushi & Grill, Ventura CA | $22.38 | Mon
+Category: Restaurants
+
+Transaction: Parma Grill & Tap, St. Louis MO | $57.27 | Thu
+Category: Restaurants
+
+Transaction: Temple Theatre, Portland TN | $13.64 | Sat
+Category: Entertainment
+
+Transaction: West Jefferson Hotel, West Jefferson NC | $832.20 | Sun
+Category: Travel
+
+Transaction: Castro Valley Eye Center, Castro Valley CA | $20.60 | Sun
+Category: Pharmacy & Health
+
+Transaction: Stronger Than Labels Fitness, Cary NC | $20.78 | Wed
+Category: Fitness
+
+Transaction: Coyote Fresh Foods, Quartzsite AZ | $131.02 | Fri
+Category: Groceries
+
+Transaction: North Shore Water Commission, Glendale WI | $94.42 | Sun
+Category: Telecom & Utilities
+
+Transaction: B E Computer & Software, Columbia City IN | $115.43 | Fri
+Category: Ribir
+
+Transaction: Eddie's Clothing Store, Harrisburg PA | $133.51 | Sat
+Category: Rerimon
+
+Transaction: Br Tire Center Llc, Orange NJ | $30.72 | Sat
+Category: Gas & Auto
+
+Transaction: T-mobile, Lancaster PA | $48.26 | Tue
+Category: Telecom & Utilities
+
+Transaction: Hooper Camera & Imaging, Thousand Oaks CA | $222.67 | Thu
+Category:
+
+### item 25
+Categories: Entertainment, Pets, Home Improvement, Fitness, Gas & Auto, Vuzur, Lovir, Travel, Clothing, Pharmacy & Health, Zusiber, Telecom & Utilities, Ninokex, Povox, Nutevon
+
+Transaction: Barnes Hardware General Merchandise, Mableton GA | $59.72 | Wed
+Category: Home Improvement
+
+Transaction: Head Trick Theatre, Providence RI | $23.40 | Mon
+Category: Entertainment
+
+Transaction: Crews & Nibert DDS, Barboursville WV | $78.63 | Tue
+Category: Pharmacy & Health
+
+Transaction: Lo/Cal Coffee & Market - Fairfax, Los Angeles CA | $14.52 | Tue
+Category: Povox
+
+Transaction: Puppy Dog Tails Grooming, Seabrook TX | $132.76 | Sun
+Category: Pets
+
+Transaction: Stephens City Dental Care, Stephens City VA | $8.78 | Mon
+Category: Pharmacy & Health
+
+Transaction: Hotel Terrace Hall, Pittsburgh PA | $1166.18 | Sun
+Category: Travel
+
+Transaction: Central Valley Computer Parts, Ripon CA | $150.43 | Sun
+Category: Nutevon
+
+Transaction: Clothes Minded Boutique, Ashland OH | $31.53 | Mon
+Category: Clothing
+
+Transaction: Nevmiley LLC, Reno NV | $112.87 | Sun
+Category: Ninokex
+
+Transaction: San Juan Water Commission, Farmington NM | $118.38 | Sat
+Category: Telecom & Utilities
+
+Transaction: Childersburg Water Department, Childersburg AL | $192.21 | Wed
+Category: Telecom & Utilities
+
+Transaction: Jordabury Group, Tampa FL | $68.07 | Mon
+Category: Ninokex
+
+Transaction: Shannon's Twisted Steel Garage, Sevierville TN | $70.92 | Thu
+Category: Gas & Auto
+
+Transaction: Mt Joy Lanes, Knox PA | $25.67 | Sun
+Category: Entertainment
+
+Transaction: Yoga With TG, Kirksville MO | $24.26 | Wed
+Category: Fitness
+
+Transaction: Wags N Whiskers Grooming Salon, Moorhead MN | $76.40 | Sun
+Category: Pets
+
+Transaction: Body Blocks Fitness, Buffalo NY | $75.29 | Wed
+Category: Fitness
+
+Transaction: Graning Paint, Knoxville TN | $30.36 | Wed
+Category: Home Improvement
+
+Transaction: Audio Advantage, Columbus MS | $171.60 | Mon
+Category: Nutevon
+
+Transaction: yamato sushi steak house, Union MO | $37.24 | Sun
+Category: Povox
+
+Transaction: By The Pier Motel, Kure Beach NC | $93.79 | Mon
+Category: Travel
+
+Transaction: The Shoe Mart, Norwalk CT | $72.32 | Fri
+Category: Clothing
+
+Transaction: Rocky's Wheels and Tires, Phoenix AZ | $48.35 | Mon
+Category: Gas & Auto
+
+Transaction: Mountain Fresh Supermarket, Hunlock Creek PA | $70.74 | Sat
+Category:
+
+### item 26
+Categories: Daga, Pharmacy & Health, Restaurants, Reten, Fitness, Entertainment, Dirofox, Bogi, Electronics, Clothing, Telecom & Utilities, Tipovux, Pets, Home Improvement, Niliser
+
+Transaction: Taco Libre, St Augustine FL | $48.83 | Sun
+Category: Restaurants
+
+Transaction: PayMore - Buy, Sell & Trade Electronics, Lincoln NE | $118.41 | Sun
+Category: Electronics
+
+Transaction: Sudz Car Wash & Detail Center, Peekskill NY | $35.84 | Sun
+Category: Bogi
+
+Transaction: Humble Roots Boutique, Centerville MN | $22.92 | Tue
+Category: Clothing
+
+Transaction: Super Z Motel, Hempstead TX | $417.07 | Tue
+Category: Daga
+
+Transaction: Cclassic Tropical Market, Llc, Marietta GA | $48.25 | Wed
+Category: Niliser
+
+Transaction: Jacksonville ISD John Alexander Gym, Jacksonville TX | $52.34 | Mon
+Category: Fitness
+
+Transaction: Dakota Theater, Yankton SD | $13.97 | Sun
+Category: Entertainment
+
+Transaction: L&w Supply - Roselle, Il, Roselle IL | $24.43 | Sat
+Category: Home Improvement
+
+Transaction: Dome Lanes, Marinette WI | $31.63 | Tue
+Category: Entertainment
+
+Transaction: Millan Used Tires, Crossville TN | $36.01 | Sun
+Category: Bogi
+
+Transaction: T-mobile, Logansport IN | $62.84 | Tue
+Category: Telecom & Utilities
+
+Transaction: Pura Vida Fitness, Charlotte NC | $68.24 | Tue
+Category: Fitness
+
+Transaction: Tod Rist, DDS, Novato CA | $82.82 | Sat
+Category: Pharmacy & Health
+
+Transaction: Childersburg Water Department, Childersburg AL | $49.08 | Fri
+Category: Telecom & Utilities
+
+Transaction: Kaufmann's Cameras Inc., United States Air Force Academy CO | $49.66 | Tue
+Category: Electronics
+
+Transaction: Grainger Industrial Supply, Perrysburg OH | $150.52 | Thu
+Category: Home Improvement
+
+Transaction: Pet Supplies Plus Fort Wayne - Coldwater, Fort Wayne IN | $28.77 | Fri
+Category: Pets
+
+Transaction: Americas Best Value Inn, Blue Ridge GA | $904.67 | Wed
+Category: Daga
+
+Transaction: Don Pancho Mexican Restaurant, Buffalo SC | $16.63 | Thu
+Category: Restaurants
+
+Transaction: Guilbeau's Thrifty Way Pharmacy, Carencro LA | $62.26 | Sun
+Category: Pharmacy & Health
+
+Transaction: Lakeland Animal Clinic, Syracuse IN | $7.12 | Mon
+Category: Pets
+
+Transaction: Urbanä Boutique, Oakmont PA | $30.77 | Fri
+Category: Clothing
+
+Transaction: Jackson Meat, Hutchinson KS | $49.95 | Sat
+Category: Niliser
+
+Transaction: HPI Motor Sports, Bohemia NY | $32.69 | Sat
+Category:
+
+### item 27
+Categories: Pharmacy & Health, Travel, Restaurants, Clothing, Groceries, Telecom & Utilities, Rikede, Entertainment, Electronics, Natuzul, Lapimur, Nomel, Fitness, Soga, Lapux
+
+Transaction: Fords Grocery, San Francisco CA | $46.84 | Mon
+Category: Groceries
+
+Transaction: The Inn At Ellsworth Estate, Hailey ID | $129.78 | Tue
+Category: Travel
+
+Transaction: VK Electronics Kearney, Kearney NE | $193.09 | Mon
+Category: Electronics
+
+Transaction: Chrin's Automotive, Easton PA | $50.63 | Sat
+Category: Rikede
+
+Transaction: Encinal Nursery, Alameda CA | $252.31 | Wed
+Category: Nomel
+
+Transaction: Hashtag Pizza and Subs, Dumfries VA | $26.32 | Sun
+Category: Restaurants
+
+Transaction: Alaska Theatre Of Youth, Anchorage AK | $32.94 | Sun
+Category: Entertainment
+
+Transaction: Sterling Pharmacy, Rushford MN | $5.88 | Sun
+Category: Pharmacy & Health
+
+Transaction: Dog Gone Gorgeous, Statesville NC | $25.92 | Wed
+Category: Natuzul
+
+Transaction: Maaco Collision Repair & Auto Painting, Cathedral City CA | $33.40 | Sun
+Category: Rikede
+
+Transaction: Complete Veterinary Care, Lincoln Park NJ | $95.26 | Sat
+Category: Natuzul
+
+Transaction: Brotherhood Gourmet Deli, Bronx NY | $36.60 | Wed
+Category: Restaurants
+
+Transaction: Foundation Pilates, Petaluma CA | $22.40 | Sat
+Category: Fitness
+
+Transaction: T-Mobile, Hartford CT | $72.61 | Wed
+Category: Telecom & Utilities
+
+Transaction: Lincoln Grocery, Lincoln KS | $140.60 | Tue
+Category: Groceries
+
+Transaction: Anytime Fitness, Spokane WA | $45.47 | Mon
+Category: Fitness
+
+Transaction: Dunn Lumber, Shoreline WA | $63.20 | Sat
+Category: Entertainment
+
+Transaction: Days Inn Texarkana, Texarkana AR | $536.31 | Sun
+Category: Travel
+
+Transaction: Pleasant Hill Lanes, Wilmington DE | $6.21 | Thu
+Category: Entertainment
+
+Transaction: Oak Country Lumber and Ranch Supply, Santa Margarita CA | $43.37 | Sun
+Category: Nomel
+
+Transaction: Tiara's Boutique, Fultondale AL | $31.22 | Fri
+Category: Clothing
+
+Transaction: Grizzly Clothing, Hermosa Beach CA | $77.96 | Fri
+Category: Clothing
+
+Transaction: Dr. Dental, Norwalk CT | $74.42 | Tue
+Category: Pharmacy & Health
+
+Transaction: Burgh's Electronics Co., Eureka CA | $39.64 | Thu
+Category: Electronics
+
+Transaction: Sneade's Ace Home Center, Lusby MD | $84.29 | Mon
+Category:
+
+### item 28
+Categories: Pets, Telecom & Utilities, Fitness, Ruvun, Punar, Restaurants, Travel, Groceries, Electronics, Lilibox, Pharmacy & Health, Ruzel, Home Improvement, Pinevin, Romer
+
+Transaction: Moonshine Yoga Liberty Hill, Liberty Hill TX | $34.77 | Sat
+Category: Fitness
+
+Transaction: Jem Computers, Inc., Elkins Park PA | $1047.74 | Mon
+Category: Electronics
+
+Transaction: Peppertree Cafe, Glendora CA | $16.00 | Tue
+Category: Restaurants
+
+Transaction: Brooke Hills Playhouse, Wellsburg WV | $16.08 | Tue
+Category: Ruzel
+
+Transaction: All West Veterinary Hospital, Bozeman MT | $53.61 | Mon
+Category: Pets
+
+Transaction: Cedar Brook Animal Hospital, Sicklerville NJ | $8.61 | Sat
+Category: Pets
+
+Transaction: Family Discount Pharmacy, Brewton AL | $70.89 | Fri
+Category: Pharmacy & Health
+
+Transaction: T-mobile, Smithfield RI | $69.87 | Fri
+Category: Telecom & Utilities
+
+Transaction: African Grocery & Halal Meat, Denton TX | $126.65 | Tue
+Category: Groceries
+
+Transaction: Interlaken Inn, Lakeville CT | $265.08 | Sun
+Category: Travel
+
+Transaction: Luigi's Coal Oven Pizza, Fort Lauderdale FL | $25.78 | Wed
+Category: Restaurants
+
+Transaction: Inwood Dentistry, Dallas TX | $65.69 | Thu
+Category: Pharmacy & Health
+
+Transaction: J.P. Haynes Lumber Company, Canton GA | $85.78 | Fri
+Category: Home Improvement
+
+Transaction: Treasure Lanes, Port Charlotte FL | $12.03 | Wed
+Category: Ruzel
+
+Transaction: Cowtown Ag Supply, Miles City MT | $34.32 | Mon
+Category: Home Improvement
+
+Transaction: Cars Fix Auto Repair, Indianapolis IN | $60.10 | Sat
+Category: Ruvun
+
+Transaction: Peak Wellness and Fitness, Gillette WY | $68.73 | Sun
+Category: Fitness
+
+Transaction: Dayton Auto Care, Endicott NY | $33.33 | Thu
+Category: Ruvun
+
+Transaction: Berg's Shoes, Spokane WA | $33.94 | Wed
+Category: Lilibox
+
+Transaction: Azalea Inn & Suites, Wilmington NC | $1362.29 | Tue
+Category: Travel
+
+Transaction: Water Management Services, Eastpoint FL | $81.13 | Mon
+Category: Telecom & Utilities
+
+Transaction: Local TV & Electronics, Inc., Willard OH | $10.57 | Mon
+Category: Electronics
+
+Transaction: Fresh Wear, Shafter CA | $21.91 | Mon
+Category: Lilibox
+
+Transaction: Mariel's Meat Market, Montgomery TX | $50.55 | Fri
+Category: Groceries
+
+Transaction: Xpressions Boutique, Lee's Summit MO | $52.28 | Mon
+Category:
+
+### item 29
+Categories: Rilokex, Movar, Entertainment, Groceries, Bizilil, Pharmacy & Health, Fopi, Pets, Home Improvement, Restaurants, Electronics, Gas & Auto, Fitness, Telecom & Utilities, Rolutex
+
+Transaction: PawPetMart - Pet Supplies & Accessories, Sheridan WY | $60.35 | Fri
+Category: Pets
+
+Transaction: Dental Planet, San Fernando CA | $13.00 | Thu
+Category: Pharmacy & Health
+
+Transaction: Glasson's Auto Repair & Maintenance, Woodbridge NJ | $80.31 | Thu
+Category: Gas & Auto
+
+Transaction: Bradley M Smith DDS, Galion OH | $24.85 | Fri
+Category: Pharmacy & Health
+
+Transaction: Rocky's Pizza Too, Ransomville NY | $35.19 | Sun
+Category: Restaurants
+
+Transaction: Sprint Store By United Cellular, Surfside Bch SC | $99.85 | Wed
+Category: Telecom & Utilities
+
+Transaction: Madison Motel, Madison TN | $222.52 | Wed
+Category: Movar
+
+Transaction: Sinaloa Grocery Store Inc, Chicago IL | $38.03 | Sun
+Category: Groceries
+
+Transaction: Red Roof Inn, Florence KY | $247.43 | Mon
+Category: Movar
+
+Transaction: Rockville Camera, Rockville Centre NY | $105.54 | Fri
+Category: Electronics
+
+Transaction: Jimmy's Family Restaurant, Walker MN | $23.66 | Sat
+Category: Restaurants
+
+Transaction: CrossFit 248, Farmington Hills MI | $50.60 | Thu
+Category: Fitness
+
+Transaction: Star Cinemas, Lake Havasu City AZ | $31.60 | Thu
+Category: Entertainment
+
+Transaction: Mapleview Animal Hospital, Norwalk OH | $60.98 | Mon
+Category: Pets
+
+Transaction: Irwin Electronics, LLC, Peoria AZ | $191.05 | Thu
+Category: Electronics
+
+Transaction: P48 Boutique, Fort Dodge IA | $31.25 | Wed
+Category: Rilokex
+
+Transaction: Courtesy Market, Los Angeles CA | $123.69 | Thu
+Category: Groceries
+
+Transaction: Ray's Shoes, Mauston WI | $84.21 | Fri
+Category: Rilokex
+
+Transaction: Mainway Telecom, Plainview NY | $45.69 | Sat
+Category: Telecom & Utilities
+
+Transaction: Mid South Building Supply, Fredericksburg VA | $286.85 | Wed
+Category: Home Improvement
+
+Transaction: Legacy Fitness, New Century KS | $26.24 | Wed
+Category: Fitness
+
+Transaction: Peters Body Shop, Fort Wayne IN | $49.05 | Wed
+Category: Gas & Auto
+
+Transaction: Ace Lumber Co, Youngstown OH | $130.74 | Fri
+Category: Home Improvement
+
+Transaction: McKenzie Palace Theatre, Antigo WI | $18.36 | Mon
+Category: Entertainment
+
+Transaction: New Tech, Davie FL | $217.70 | Mon
+Category:
+
+### item 30
+Categories: Ramipan, Novur, Electronics, Home Improvement, Groceries, Restaurants, Travel, Fitness, Dadaful, Vitatir, Gas & Auto, Manil, Milux, Clothing, Telecom & Utilities
+
+Transaction: Clarion Super Foods, Clarion IA | $70.18 | Fri
+Category: Groceries
+
+Transaction: The Fitness Warehouse VT, Newport VT | $33.03 | Wed
+Category: Fitness
+
+Transaction: 60 Bull Cafe, Charleston SC | $28.97 | Thu
+Category: Restaurants
+
+Transaction: Fashion Rush, City of Industry CA | $102.68 | Sat
+Category: Clothing
+
+Transaction: T-Mobile, Boynton Beach FL | $76.59 | Fri
+Category: Telecom & Utilities
+
+Transaction: Craft Communications, Forest City IA | $41.63 | Fri
+Category: Telecom & Utilities
+
+Transaction: Pyramid Computers, Stone Mountain GA | $28.43 | Wed
+Category: Electronics
+
+Transaction: M&M Dental Care, Chula Vista CA | $48.77 | Sun
+Category: Ramipan
+
+Transaction: Cole Lumber - Auburn, KY, Auburn KY | $74.97 | Wed
+Category: Home Improvement
+
+Transaction: Recell Tech, Lodi NJ | $56.59 | Wed
+Category: Electronics
+
+Transaction: Garveby Group, Madison WI | $24.86 | Sun
+Category: Dadaful
+
+Transaction: Tires Plus, Deland FL | $21.54 | Sat
+Category: Gas & Auto
+
+Transaction: A & R Auto Electric, Oneida KY | $63.58 | Fri
+Category: Gas & Auto
+
+Transaction: Indian Lake Theater, Indian Lake NY | $5.27 | Sun
+Category: Novur
+
+Transaction: Royal Inn, Charlotte NC | $143.39 | Mon
+Category: Travel
+
+Transaction: California Theatre, San Jose CA | $57.10 | Fri
+Category: Novur
+
+Transaction: Village PRO Hardware Company, Marblehead OH | $50.54 | Mon
+Category: Home Improvement
+
+Transaction: Hotel Xilo Glendale, Glendale CA | $272.59 | Mon
+Category: Travel
+
+Transaction: Jorbidale LLC, Madison WI | $20.68 | Wed
+Category: Dadaful
+
+Transaction: Kudos Dental Care, Elmwood Park IL | $6.87 | Wed
+Category: Ramipan
+
+Transaction: GalaFresh Supermarket West Boca Raton, Boca Raton FL | $65.35 | Wed
+Category: Groceries
+
+Transaction: Morning Vibes Cafe, San Francisco CA | $9.79 | Sun
+Category: Restaurants
+
+Transaction: Eagle Yoga House, Eagle ID | $45.58 | Sat
+Category: Fitness
+
+Transaction: U.Na U.Na Apparel, New York NY | $28.21 | Wed
+Category: Clothing
+
+Transaction: Groveway Veterinary Hospital, Castro Valley CA | $24.28 | Wed
+Category:
+
+### item 31
+Categories: Miron, Travel, Pharmacy & Health, Bonan, Entertainment, Fitness, Famir, Pets, Groceries, Gas & Auto, Electronics, Difor, Dokoson, Mirabax, Home Improvement
+
+Transaction: Day An Night Animal Hospital, Memphis TN | $33.60 | Tue
+Category: Pets
+
+Transaction: Kaptech Water Submetering, Beachwood OH | $60.64 | Fri
+Category: Difor
+
+Transaction: Lemay Family Dentistry, St Louis MO | $38.12 | Sun
+Category: Pharmacy & Health
+
+Transaction: Chocolate Chic Boutique, Phoenix AZ | $22.17 | Sat
+Category: Dokoson
+
+Transaction: Appletree Nursery, Tilton NH | $49.35 | Tue
+Category: Home Improvement
+
+Transaction: Mediacom Communications Corporation, Saint Peter MN | $67.70 | Sat
+Category: Difor
+
+Transaction: Adams Garage and Upholstery Shop, Maysville NC | $121.80 | Wed
+Category: Gas & Auto
+
+Transaction: Ntb-national Tire & Battery, Houston TX | $92.23 | Tue
+Category: Gas & Auto
+
+Transaction: Zip In Grocery, Fort Worth TX | $147.60 | Tue
+Category: Groceries
+
+Transaction: Sigma Dental Specialists of Southlake, Southlake TX | $8.66 | Fri
+Category: Pharmacy & Health
+
+Transaction: Pizza Hut Express, Pasadena TX | $9.54 | Mon
+Category: Mirabax
+
+Transaction: Dr Cell Repair, Crowley LA | $63.12 | Mon
+Category: Electronics
+
+Transaction: Knights Inn Hadley, Hadley MA | $1739.90 | Sun
+Category: Travel
+
+Transaction: Baldwin Electronics, Odessa TX | $96.74 | Wed
+Category: Electronics
+
+Transaction: Crossfit Brooksville, Brooksville FL | $20.36 | Sun
+Category: Fitness
+
+Transaction: Northcoast Audio, Eureka CA | $101.56 | Sat
+Category: Electronics
+
+Transaction: Andover Diner, Andover OH | $21.73 | Tue
+Category: Mirabax
+
+Transaction: La' Bella Boutique, Baltimore MD | $95.34 | Sun
+Category: Dokoson
+
+Transaction: Royal Treatment Pet Salon, Warwick RI | $12.46 | Wed
+Category: Pets
+
+Transaction: Downtown Cinemas, Las Vegas NV | $14.53 | Mon
+Category: Entertainment
+
+Transaction: La Esquina Argentina Video Arcade, Idyllwild-Pine Cove CA | $14.28 | Sun
+Category: Entertainment
+
+Transaction: Vianela Mini Market, Philadelphia PA | $36.58 | Sat
+Category: Groceries
+
+Transaction: Colonial Motel, Salem OH | $354.47 | Thu
+Category: Travel
+
+Transaction: Nunda Lumber & Hardware, Nunda NY | $11.02 | Fri
+Category: Home Improvement
+
+Transaction: Lucki Communications, Chicago IL | $70.44 | Thu
+Category:
+
+### item 32
+Categories: Fokol, Pets, Laser, Fofigi, Surovor, Gas & Auto, Electronics, Groceries, Gibin, Home Improvement, Telecom & Utilities, Entertainment, Sakar, Restaurants, Clothing
+
+Transaction: S & O Computers, L.L.C., Summit Hill PA | $56.96 | Tue
+Category: Electronics
+
+Transaction: Harve's Shoe Box, North Dartmouth MA | $75.45 | Thu
+Category: Clothing
+
+Transaction: All American Veterinary Hospital, Raeford NC | $89.53 | Mon
+Category: Pets
+
+Transaction: Mediterranean Market, Porterville CA | $131.18 | Wed
+Category: Groceries
+
+Transaction: Hefele William J DDS, Ashland VA | $19.53 | Sun
+Category: Sakar
+
+Transaction: Camacho Communications, Sacramento CA | $55.88 | Wed
+Category: Telecom & Utilities
+
+Transaction: RT Tire Shop, Hammond IN | $61.14 | Thu
+Category: Gas & Auto
+
+Transaction: Firestone Complete Auto Care, Portland OR | $37.12 | Mon
+Category: Gas & Auto
+
+Transaction: Maranatha Roofing & Siding Supply, New York NY | $137.55 | Tue
+Category: Home Improvement
+
+Transaction: Trestle Inn, Woodward IA | $74.09 | Sun
+Category: Fokol
+
+Transaction: Southland Communication, Van Nuys CA | $62.75 | Wed
+Category: Telecom & Utilities
+
+Transaction: Shelly's Cafe, Tampa FL | $4.58 | Fri
+Category: Restaurants
+
+Transaction: AMC Entertainment, Fort Worth TX | $15.95 | Wed
+Category: Entertainment
+
+Transaction: Rock On Main Clothing Company, Northville MI | $17.83 | Thu
+Category: Clothing
+
+Transaction: TACOS El Pariente, West Chester PA | $26.12 | Sat
+Category: Restaurants
+
+Transaction: Eastern World Market, Leesburg VA | $101.73 | Mon
+Category: Groceries
+
+Transaction: Banfield Pet Hospital, Midlothian VA | $94.05 | Thu
+Category: Pets
+
+Transaction: Micro Tech Systems, Northbrook IL | $20.39 | Wed
+Category: Electronics
+
+Transaction: Kelly's Hardware, Chelan WA | $24.54 | Sat
+Category: Home Improvement
+
+Transaction: Regal Entertainment Group, Pinellas Park FL | $27.24 | Thu
+Category: Entertainment
+
+Transaction: Valley Meats Llc, Coal Valley IL | $34.21 | Sat
+Category: Groceries
+
+Transaction: Golden Smiles Dental, Rancho Cucamonga CA | $16.51 | Tue
+Category: Sakar
+
+Transaction: Angelina Bakery, New York NY | $31.64 | Tue
+Category: Restaurants
+
+Transaction: Courtyard Travel, Great Neck NY | $720.90 | Sun
+Category: Fokol
+
+Transaction: Boro Barbell Gym, Streetsboro OH | $21.48 | Sat
+Category:
+
+### item 33
+Categories: Dupagan, Gas & Auto, Restaurants, Telecom & Utilities, Electronics, Polir, Tetun, Clothing, Groceries, Zaminix, Travel, Sabuzax, Fitness, Home Improvement, Munasel
+
+Transaction: Miller's Feed & Pet, Farmington MO | $13.14 | Tue
+Category: Tetun
+
+Transaction: African Grocery & Halal Meat, Denton TX | $99.94 | Wed
+Category: Groceries
+
+Transaction: Taco Picoso LLC, Kennett Square PA | $14.13 | Sat
+Category: Restaurants
+
+Transaction: Chris' Computer Customware Inc, Slatington PA | $189.68 | Mon
+Category: Electronics
+
+Transaction: Otter Creek Veterinary Clinic, Schleswig IA | $49.32 | Mon
+Category: Tetun
+
+Transaction: Purpose Boutique, Silverdale WA | $35.65 | Tue
+Category: Clothing
+
+Transaction: Lifetime Building Supply, Bend OR | $36.16 | Thu
+Category: Home Improvement
+
+Transaction: Digital Lens Rental - Norfolk, Norfolk VA | $52.27 | Tue
+Category: Electronics
+
+Transaction: Armoire Boutique, New Orleans LA | $138.60 | Mon
+Category: Clothing
+
+Transaction: Ozark Mountain Inn, Harrison AR | $433.14 | Sun
+Category: Travel
+
+Transaction: cellular world, Alexandria LA | $86.06 | Fri
+Category: Telecom & Utilities
+
+Transaction: Water's Edge Restaurant - Oregon, OH, Oregon OH | $14.21 | Tue
+Category: Restaurants
+
+Transaction: Kamper Tire & Exhaust, Pickford MI | $174.40 | Fri
+Category: Gas & Auto
+
+Transaction: Nicholas A. Narducci, DMD, PA., Jacksonville FL | $42.61 | Thu
+Category: Sabuzax
+
+Transaction: Green Dentistry, Silver Spring MD | $13.28 | Fri
+Category: Sabuzax
+
+Transaction: The Gym - Riverside Center, Auburndale MA | $221.63 | Fri
+Category: Fitness
+
+Transaction: Katz Tires, Lima OH | $32.12 | Sat
+Category: Gas & Auto
+
+Transaction: I Perform Fitness, Wickliffe OH | $47.47 | Tue
+Category: Fitness
+
+Transaction: Odd Duck Market, North Charleston SC | $49.63 | Thu
+Category: Groceries
+
+Transaction: South Side Market, Portsmouth Twp MI | $85.59 | Wed
+Category: Groceries
+
+Transaction: Palms Inn, Gila Bend AZ | $395.70 | Fri
+Category: Travel
+
+Transaction: The Red Sea Ethiopian Restaurant, Minneapolis MN | $34.48 | Mon
+Category: Restaurants
+
+Transaction: T-mobile, Ocoee FL | $92.88 | Thu
+Category: Telecom & Utilities
+
+Transaction: Ace Home Center East Lyme, East Lyme CT | $34.03 | Mon
+Category: Home Improvement
+
+Transaction: ACX Pioneer 3 Theater, Nebraska City NE | $35.45 | Tue
+Category:
+
+### item 34
+Categories: Fitness, Gurogun, Travel, Gas & Auto, Lukaral, Electronics, Home Improvement, Ragil, Mufo, Telecom & Utilities, Sanar, Pharmacy & Health, Pets, Entertainment, Nesusa
+
+Transaction: Stars & Strikes Bowling Center, South Paris ME | $26.77 | Sun
+Category: Entertainment
+
+Transaction: Littleton Motel, Littleton NH | $237.36 | Wed
+Category: Travel
+
+Transaction: Lomwe Auto, Houston TX | $42.28 | Fri
+Category: Gas & Auto
+
+Transaction: The Butcher Shop, Caroline WI | $66.08 | Thu
+Category: Mufo
+
+Transaction: Greenwood Collision Center LLC, Greenwood SC | $67.64 | Fri
+Category: Gas & Auto
+
+Transaction: Carson Valley Cinemas, Minden NV | $27.15 | Tue
+Category: Entertainment
+
+Transaction: Velix Supreme Audio, El Centro CA | $11.92 | Tue
+Category: Electronics
+
+Transaction: Milwaukee Food Market, Milwaukee WI | $88.03 | Fri
+Category: Mufo
+
+Transaction: Stedman Drug Center, Stedman NC | $13.77 | Wed
+Category: Pharmacy & Health
+
+Transaction: Miller Paint, Everett WA | $160.87 | Tue
+Category: Home Improvement
+
+Transaction: Foothills Meat Center, Jonesville NC | $37.88 | Tue
+Category: Mufo
+
+Transaction: K9 Cleaners Inc. Mobile Dog Grooming, Phoenix AZ | $41.98 | Thu
+Category: Pets
+
+Transaction: Meadows Cafe, Fresh Meadows NY | $28.36 | Thu
+Category: Gurogun
+
+Transaction: U.S Fried Chicken & PIZZA HALALA, Springfield MA | $11.93 | Tue
+Category: Gurogun
+
+Transaction: Vertin Matthew J Dds, Dearborn Heights MI | $71.43 | Wed
+Category: Pharmacy & Health
+
+Transaction: Minvielle Lumber Company, Abbeville LA | $43.17 | Thu
+Category: Home Improvement
+
+Transaction: Kwik Phone Repair 2, Bedford TX | $102.18 | Fri
+Category: Telecom & Utilities
+
+Transaction: Machine Shed Fitness, Menomonie WI | $19.12 | Fri
+Category: Fitness
+
+Transaction: Three3 Electronics, Carson CA | $209.79 | Wed
+Category: Electronics
+
+Transaction: Brooklyn CrossFit : Columbia Street, Brooklyn NY | $54.58 | Thu
+Category: Fitness
+
+Transaction: Marquesa Hotel, Key West FL | $117.76 | Wed
+Category: Travel
+
+Transaction: Firehouse Veterinary Clinic, Plymouth MA | $28.36 | Mon
+Category: Pets
+
+Transaction: T-Mobile, Nashville TN | $102.93 | Mon
+Category: Telecom & Utilities
+
+Transaction: Demarco Solar clothing store, District Heights MD | $46.69 | Sat
+Category: Lukaral
+
+Transaction: Hayes Shoes, Clarksville IN | $31.04 | Mon
+Category:
+
+### item 35
+Categories: Fokan, Restaurants, Groceries, Kimozel, Pets, Tufesel, Rodirul, Telecom & Utilities, Fevise, Visur, Home Improvement, Fitness, Travel, Pharmacy & Health, Electronics
+
+Transaction: Wye Computers, Queenstown MD | $117.10 | Tue
+Category: Electronics
+
+Transaction: Aroma Restaurant Bar and Banquet, Fairfax VA | $18.92 | Thu
+Category: Restaurants
+
+Transaction: Mills Veterinary Service, LLC, Chapman KS | $45.86 | Thu
+Category: Pets
+
+Transaction: Brett's Hardware, Dover Plains NY | $159.14 | Fri
+Category: Home Improvement
+
+Transaction: Advanced Telecom Services, King Of Prussia PA | $76.74 | Sat
+Category: Telecom & Utilities
+
+Transaction: Pawsitively Dog Lodge & Spa, Northfield OH | $92.82 | Sat
+Category: Pets
+
+Transaction: Train Station Fitness, Winston-Salem NC | $24.18 | Sat
+Category: Fitness
+
+Transaction: Shoe Dept., Exton PA | $86.15 | Tue
+Category: Rodirul
+
+Transaction: Citrus Heights Car Wash, Citrus Heights CA | $31.27 | Thu
+Category: Visur
+
+Transaction: Fbr Travel Services Llc, Bridgeport CT | $108.17 | Thu
+Category: Travel
+
+Transaction: Hillcrest Motel, Norton KS | $173.26 | Mon
+Category: Travel
+
+Transaction: Hughes Lumber, Catoosa OK | $65.43 | Thu
+Category: Home Improvement
+
+Transaction: O&V Paint Auto Body, San Bernardino CA | $43.49 | Wed
+Category: Visur
+
+Transaction: Triangle Meat Company, Memphis TN | $145.52 | Sat
+Category: Groceries
+
+Transaction: M & S Electronics, Elkins WV | $124.34 | Fri
+Category: Electronics
+
+Transaction: Greater Omaha Area Bowling, Omaha NE | $70.17 | Sun
+Category: Fokan
+
+Transaction: Dungeness Dental, Sequim WA | $62.84 | Wed
+Category: Pharmacy & Health
+
+Transaction: Positively Pilates, Yucaipa CA | $24.58 | Thu
+Category: Fitness
+
+Transaction: Hoover Dental Center, Los Angeles CA | $29.57 | Wed
+Category: Pharmacy & Health
+
+Transaction: West Newton Pizza House, West Newton PA | $16.56 | Tue
+Category: Restaurants
+
+Transaction: Al Madina market, Louisville KY | $94.37 | Sat
+Category: Groceries
+
+Transaction: Hughes Rural Electric Solutions, Lakeside AZ | $99.95 | Tue
+Category: Telecom & Utilities
+
+Transaction: Divine Boutique By Letisha, Winston Salem NC | $62.70 | Fri
+Category: Rodirul
+
+Transaction: Whitman Theater, New York NY | $31.51 | Sat
+Category: Fokan
+
+Transaction: Blush Boutique & Tan, ONeill NE | $143.22 | Fri
+Category:
+
+### item 36
+Categories: Home Improvement, Rafir, Fitness, Migufer, Ralobin, Entertainment, Telecom & Utilities, Vunugel, Pets, Sedil, Groceries, Mafo, Clothing, Pharmacy & Health, Gas & Auto
+
+Transaction: Pershing Express $4 Car Wash, Chicago IL | $101.76 | Sun
+Category: Gas & Auto
+
+Transaction: TJ CELL repair & more, Rosemead CA | $110.74 | Sat
+Category: Telecom & Utilities
+
+Transaction: Dial Electronics, Scotch Plains NJ | $188.10 | Sat
+Category: Mafo
+
+Transaction: Georgetown Yoga, Georgetown CA | $54.60 | Tue
+Category: Fitness
+
+Transaction: Cat Clinic, Pasadena CA | $44.77 | Sat
+Category: Pets
+
+Transaction: Pexleton Co, Denver CO | $205.25 | Mon
+Category: Vunugel
+
+Transaction: Jab Fitness, Othello WA | $50.94 | Tue
+Category: Fitness
+
+Transaction: East Park Cinema 5, Clinton NC | $22.25 | Tue
+Category: Entertainment
+
+Transaction: Star Home Center, Middlebury IN | $69.81 | Sun
+Category: Home Improvement
+
+Transaction: Mike Lerew Quality Computers, Avon Park FL | $260.56 | Wed
+Category: Mafo
+
+Transaction: Fred's Food Market, Lancaster OH | $74.21 | Sun
+Category: Groceries
+
+Transaction: Giant Clothing Co., Los Angeles CA | $40.73 | Wed
+Category: Clothing
+
+Transaction: Augusta Hardware and Variety, Augusta WI | $15.02 | Sat
+Category: Home Improvement
+
+Transaction: Scott Stewart DMD PLLC, Silverdale WA | $11.02 | Mon
+Category: Pharmacy & Health
+
+Transaction: Fine Arts Theatre, Beverly Hills CA | $48.33 | Wed
+Category: Entertainment
+
+Transaction: Mamis Boutique, Tulsa OK | $27.53 | Wed
+Category: Clothing
+
+Transaction: Gem Valley Veterinary Service, Soda Springs ID | $24.70 | Tue
+Category: Pets
+
+Transaction: Gena's Grill, New York NY | $23.30 | Wed
+Category: Sedil
+
+Transaction: Signature Dental, Las Vegas NV | $19.21 | Sun
+Category: Pharmacy & Health
+
+Transaction: City of Glendora Water Division, Glendora CA | $110.66 | Sun
+Category: Telecom & Utilities
+
+Transaction: Ardmaham Ltd, Tampa FL | $165.37 | Wed
+Category: Vunugel
+
+Transaction: Dairyland Auto Llc, Randolph WI | $92.55 | Mon
+Category: Gas & Auto
+
+Transaction: Frontera Mex-Mex Grill, Atlanta GA | $26.40 | Wed
+Category: Sedil
+
+Transaction: Family Fare Supermarket, Holland MI | $104.19 | Wed
+Category: Groceries
+
+Transaction: Stagecoach Inn, Goshen NY, Goshen NY | $481.80 | Mon
+Category:
+
+### item 37
+Categories: Fitness, Groceries, Sino, Gas & Auto, Rinatex, Kuruzin, Pets, Teregu, Home Improvement, Travel, Restaurants, Clothing, Tuzo, Durin, Telecom & Utilities
+
+Transaction: Victory Clothing Boutique, Denver CO | $31.54 | Thu
+Category: Clothing
+
+Transaction: Desert Springs Bar & Grill, Daggett CA | $13.04 | Mon
+Category: Restaurants
+
+Transaction: Riverfront Cafe, Fort Worth TX | $5.29 | Sat
+Category: Restaurants
+
+Transaction: Elite Paint & Body Shop, Riviera Beach FL | $24.46 | Thu
+Category: Gas & Auto
+
+Transaction: Companion Animal Hospital, Shingle Springs CA | $45.55 | Tue
+Category: Pets
+
+Transaction: Ace Barnes Hardware-Washtenaw, Ann Arbor MI | $21.00 | Tue
+Category: Home Improvement
+
+Transaction: Center City Lanes, Roswell NM | $19.63 | Fri
+Category: Durin
+
+Transaction: Pet Envy Grooming & Boutique Dinuba, Dinuba CA | $63.34 | Sun
+Category: Pets
+
+Transaction: Terrace Lanes Tenpin Center, Frederick MD | $39.79 | Tue
+Category: Durin
+
+Transaction: Jumbo Foods, Inc., Enid OK | $71.95 | Wed
+Category: Groceries
+
+Transaction: Urban Collective Boutique Hotel, Edwardsville IL | $192.35 | Mon
+Category: Travel
+
+Transaction: Deli & Grocery Super24, Brooklyn MD | $100.67 | Thu
+Category: Groceries
+
+Transaction: North Plains Electric Cooperative, Perryton TX | $58.17 | Thu
+Category: Telecom & Utilities
+
+Transaction: Hils Pharmacy, Moberly MO | $50.65 | Thu
+Category: Rinatex
+
+Transaction: Daisy Luxe Scrubs Boutique, Los Angeles CA | $180.03 | Sun
+Category: Clothing
+
+Transaction: Metric Yoga, Salt Lake City UT | $78.68 | Fri
+Category: Fitness
+
+Transaction: Pro Audio Technology, Lake Forest CA | $53.82 | Sun
+Category: Sino
+
+Transaction: McDougall Lodge, Skwentna AK | $182.91 | Fri
+Category: Travel
+
+Transaction: Pioneer Electric Co-Op, Ulysses KS | $62.92 | Tue
+Category: Telecom & Utilities
+
+Transaction: Park Slope Yoga Center, Brooklyn NY | $62.29 | Tue
+Category: Fitness
+
+Transaction: Tnt Pharmacy 2 & Compounding Center, Orange CA | $7.68 | Sat
+Category: Rinatex
+
+Transaction: Heights Lumber Center, New Windsor NY | $110.34 | Sun
+Category: Home Improvement
+
+Transaction: Stahl's Farm Market, North Benton OH | $57.85 | Sat
+Category: Groceries
+
+Transaction: N.B.C. Auto Parts, Clifton NJ | $15.06 | Wed
+Category: Gas & Auto
+
+Transaction: Chris' Electronics, Fairhaven MA | $60.14 | Sun
+Category:
+
+### item 38
+Categories: Restaurants, Pets, Nerul, Travel, Home Improvement, Fitness, Gas & Auto, Lufo, Clothing, Entertainment, Pomikax, Groceries, Telecom & Utilities, Rukudox, Nipene
+
+Transaction: RF Computers, Modesto CA | $387.32 | Mon
+Category: Pomikax
+
+Transaction: Kismet Clothing Boutique, San Anselmo CA | $135.97 | Sat
+Category: Clothing
+
+Transaction: Advanced Collision Center, Kingsland GA | $19.90 | Sat
+Category: Gas & Auto
+
+Transaction: Donner Summit Gas, Soda Springs CA | $46.21 | Sun
+Category: Gas & Auto
+
+Transaction: Shoreview North Oaks Animal Hospital, Shoreview MN | $31.17 | Wed
+Category: Pets
+
+Transaction: Boost Mobile Store by Fuel Wireless, Florence KY | $42.88 | Fri
+Category: Telecom & Utilities
+
+Transaction: Boulevard Bowl, Schenectady NY | $5.49 | Thu
+Category: Entertainment
+
+Transaction: Best Western Kennesaw Inn, Kennesaw GA | $487.01 | Wed
+Category: Travel
+
+Transaction: J & G Soto Produce LLC, Omaha NE | $96.01 | Thu
+Category: Groceries
+
+Transaction: Lantern Lodge Bar & Grill, Myerstown PA | $9.62 | Fri
+Category: Restaurants
+
+Transaction: Wasno Dental, Allentown PA | $19.99 | Tue
+Category: Nipene
+
+Transaction: Kentucky Power, Ashland KY | $55.79 | Mon
+Category: Telecom & Utilities
+
+Transaction: Garden Traditions Inc, N Chesterfld VA | $21.88 | Sat
+Category: Home Improvement
+
+Transaction: Bending Iron Gym, Spanish Fork UT | $30.30 | Tue
+Category: Fitness
+
+Transaction: Jb Doppes Sons Lumber Co, Cincinnati OH | $576.65 | Sat
+Category: Home Improvement
+
+Transaction: MVP Computers, Oxnard CA | $574.17 | Fri
+Category: Pomikax
+
+Transaction: The Dope Clothing, Greensboro GA | $36.75 | Thu
+Category: Clothing
+
+Transaction: Walmart Grocery Pickup and Delivery, Rio Rancho NM | $59.72 | Fri
+Category: Groceries
+
+Transaction: Ascot Suites, Morro Bay CA | $238.30 | Thu
+Category: Travel
+
+Transaction: Bolamperti & O'Malley Family Dentistry, Omaha NE | $23.16 | Thu
+Category: Nipene
+
+Transaction: Phillips Feed and Pet Supply, Plant City FL | $12.70 | Wed
+Category: Pets
+
+Transaction: W3AR3 Training, Monrovia CA | $49.73 | Sat
+Category: Fitness
+
+Transaction: Timer's Cafe, Ardmore TN | $18.25 | Sat
+Category: Restaurants
+
+Transaction: Stampede Troupe Theatre, Greeley CO | $27.22 | Mon
+Category: Entertainment
+
+Transaction: Global Market & Food Hall, Madison WI | $35.22 | Sat
+Category:
+
+### item 39
+Categories: Fupe, Misan, Nizen, Nubipux, Entertainment, Home Improvement, Pharmacy & Health, Fitness, Linabel, Gas & Auto, Clothing, Electronics, Restaurants, Groceries, Rosifur
+
+Transaction: Moapa Valley Water District, Overton NV | $54.98 | Mon
+Category: Nizen
+
+Transaction: Dog Gone Gorgeous, Statesville NC | $14.48 | Sat
+Category: Nubipux
+
+Transaction: Fitzy's Car Wash, North Grafton MA | $39.30 | Sun
+Category: Gas & Auto
+
+Transaction: Homegrown Meats, Richmond MN | $71.45 | Wed
+Category: Groceries
+
+Transaction: Canyon Ridge High School Theatre, Twin Falls ID | $17.72 | Thu
+Category: Entertainment
+
+Transaction: Carmel Fitness Center, Charlotte NC | $27.48 | Fri
+Category: Fitness
+
+Transaction: InForm Fitness Reston, Reston VA | $36.09 | Wed
+Category: Fitness
+
+Transaction: Whistle Express Car Wash, Medina OH | $19.05 | Tue
+Category: Gas & Auto
+
+Transaction: Fritz Nursery & Garden Center, Stockton IL | $145.87 | Tue
+Category: Home Improvement
+
+Transaction: Janosik's Pharmacy, Monessen PA | $13.09 | Wed
+Category: Pharmacy & Health
+
+Transaction: Alabama Power, Reform AL | $143.08 | Thu
+Category: Nizen
+
+Transaction: Computer Reporting, New York NY | $696.73 | Wed
+Category: Electronics
+
+Transaction: Rubenstein Lumber Co., Chicago IL | $48.52 | Wed
+Category: Home Improvement
+
+Transaction: Premiere Theatre 7, Cambridge OH | $16.60 | Sat
+Category: Entertainment
+
+Transaction: Erin London Boutique, Clarkesville GA | $28.52 | Thu
+Category: Clothing
+
+Transaction: Pecos Dental, Pecos TX | $19.50 | Wed
+Category: Pharmacy & Health
+
+Transaction: South Asian market, Louisville KY | $115.31 | Fri
+Category: Groceries
+
+Transaction: Golden China Restaurant, Conway SC | $30.96 | Sat
+Category: Restaurants
+
+Transaction: Spring Green Motel, Spring Green WI | $323.41 | Wed
+Category: Fupe
+
+Transaction: Urban Escape Boutique, Spicer MN | $49.24 | Mon
+Category: Clothing
+
+Transaction: Western Veterinary Partners, Denver CO | $21.77 | Fri
+Category: Nubipux
+
+Transaction: Sureway Supermarket, Henderson KY | $35.38 | Sat
+Category: Groceries
+
+Transaction: Looking Glass Photo & Camera, Berkeley CA | $58.55 | Mon
+Category: Electronics
+
+Transaction: Balderas Crossroads Cafe, Winthrop AR | $8.38 | Wed
+Category: Restaurants
+
+Transaction: Blackthorne Inn & Restaurant, Upperville VA | $207.64 | Mon
+Category:
+
+### item 40
+Categories: Home Improvement, Clothing, Desur, Fufel, Telecom & Utilities, Groceries, Travel, Vudemol, Kevupu, Kofa, Pets, Kadever, Entertainment, Electronics, Restaurants
+
+Transaction: Kaliber Fitness Studio, Saratoga Springs NY | $16.12 | Sat
+Category: Fufel
+
+Transaction: Escondido Metal Supply, Escondido CA | $30.93 | Wed
+Category: Home Improvement
+
+Transaction: Cricket Hill Garden, Thomaston CT | $22.49 | Sat
+Category: Home Improvement
+
+Transaction: The Yoga Underground, Sand Springs OK | $41.47 | Fri
+Category: Fufel
+
+Transaction: Scottsdale Animal Clinic, Burbank IL | $36.66 | Sun
+Category: Pets
+
+Transaction: Keyaki Sushi, Murray UT | $16.02 | Thu
+Category: Restaurants
+
+Transaction: Kropf's Meat Processing, Bowler WI | $162.88 | Tue
+Category: Groceries
+
+Transaction: Scooter's Farm Fresh Produce, Long Beach MS | $110.60 | Fri
+Category: Groceries
+
+Transaction: Paw-rific Pet Grooming, Ishpeming MI | $23.75 | Tue
+Category: Pets
+
+Transaction: Advanced Dental, Burbank CA | $35.36 | Sun
+Category: Desur
+
+Transaction: T&F Camera, Vineland NJ | $300.46 | Tue
+Category: Electronics
+
+Transaction: Friendly Computers, Herndon VA | $99.75 | Thu
+Category: Electronics
+
+Transaction: Gretna Theatre, Gretna VA | $5.35 | Sun
+Category: Entertainment
+
+Transaction: Aquillbella Boutique, Erie PA | $239.53 | Fri
+Category: Clothing
+
+Transaction: Norris Public Power District, Beatrice NE | $44.40 | Thu
+Category: Telecom & Utilities
+
+Transaction: Swisher and Lohse Pharmacy, Mason WV | $39.14 | Fri
+Category: Desur
+
+Transaction: Fedora's Pizza and Gyros, Peoria IL | $27.14 | Sat
+Category: Restaurants
+
+Transaction: Consumer Cellular, Surprise AZ | $56.43 | Wed
+Category: Telecom & Utilities
+
+Transaction: G & P Market, Royal Oak MI | $43.21 | Mon
+Category: Groceries
+
+Transaction: Napoleon's Bakery Waipahu, Waipahu HI | $11.99 | Tue
+Category: Restaurants
+
+Transaction: Travel Inn, Wilmington NC | $180.40 | Wed
+Category: Travel
+
+Transaction: Sissy Tea’s Boutique, Flint TX | $22.83 | Tue
+Category: Clothing
+
+Transaction: adoba hotel Naubinway, Garfield Twp MI | $224.02 | Thu
+Category: Travel
+
+Transaction: Empire 8 Theatre, Jackson TN | $47.92 | Sun
+Category: Entertainment
+
+Transaction: Chico's Tire Shop, Jemison AL | $61.37 | Mon
+Category:
+
+### item 41
+Categories: Fitness, Pharmacy & Health, Gas & Auto, Restaurants, Zukakan, Telecom & Utilities, Relozi, Fopal, Lulavor, Entertainment, Home Improvement, Dakevel, Travel, Clothing, Fipunul
+
+Transaction: Durango Western Wear, Tulsa OK | $76.86 | Thu
+Category: Clothing
+
+Transaction: Clear Creek Community Theatre, Houston TX | $46.76 | Tue
+Category: Entertainment
+
+Transaction: Olympus Travel Group, Greenwood Village CO | $547.21 | Mon
+Category: Travel
+
+Transaction: The Gibson a Boutique Hotel, Great Falls MT | $419.44 | Fri
+Category: Travel
+
+Transaction: Arnold Lumber Company, South Kingstown RI | $26.22 | Sat
+Category: Home Improvement
+
+Transaction: Groom All Pet Grooming Palace, Llc., Breckenridge Hills MO | $31.18 | Sat
+Category: Fipunul
+
+Transaction: Pronto Pizza, Oradell NJ | $67.63 | Wed
+Category: Restaurants
+
+Transaction: Perdido Bay Fitness, Lillian AL | $48.49 | Mon
+Category: Fitness
+
+Transaction: Club Car Wash, Omaha NE | $78.73 | Wed
+Category: Gas & Auto
+
+Transaction: Silver Communications, Eden Prairie MN | $44.59 | Mon
+Category: Telecom & Utilities
+
+Transaction: Vianela Mini Market, Philadelphia PA | $87.79 | Tue
+Category: Lulavor
+
+Transaction: Woodbury Water Department, Woodbury TN | $61.93 | Fri
+Category: Telecom & Utilities
+
+Transaction: Dr. Howard Strauss DDS, Cumberland MD | $15.73 | Thu
+Category: Pharmacy & Health
+
+Transaction: Grooming Easy, Cleveland OH | $12.36 | Sat
+Category: Fipunul
+
+Transaction: I Too Fashion, Miami FL | $26.07 | Thu
+Category: Clothing
+
+Transaction: 84 Lumber - Window Warehouse, Atlanta GA | $98.97 | Tue
+Category: Home Improvement
+
+Transaction: NLF2 Supplements & Fitness, Paintsville KY | $35.93 | Mon
+Category: Fitness
+
+Transaction: Pho Dakao & Grill, Houston TX | $15.39 | Fri
+Category: Restaurants
+
+Transaction: Accurate Tire & Wheel, Traverse City MI | $25.73 | Fri
+Category: Gas & Auto
+
+Transaction: Regal Fox Theater, Laramie WY | $22.02 | Tue
+Category: Entertainment
+
+Transaction: Rosemont Market & Bakery, Portland ME | $283.17 | Sat
+Category: Lulavor
+
+Transaction: Swish Dental, Austin TX | $51.84 | Thu
+Category: Pharmacy & Health
+
+Transaction: Falronard Group, Tucson AZ | $169.71 | Sun
+Category: Zukakan
+
+Transaction: Holnonard LLC, Raleigh NC | $110.96 | Sun
+Category: Zukakan
+
+Transaction: BC Computers, Chesapeake VA | $398.18 | Sat
+Category:
+
+### item 42
+Categories: Pharmacy & Health, Pets, Zibimul, Travel, Tigir, Gokobon, Home Improvement, Netun, Entertainment, Fitness, Nazen, Electronics, Gas & Auto, Clothing, Mitox
+
+Transaction: Airpark Animal Hospital, Cottonwood AZ | $93.15 | Sun
+Category: Pets
+
+Transaction: In Bloom Boutique, Murfreesboro TN | $67.33 | Sun
+Category: Clothing
+
+Transaction: Aurora Pharmacy, Racine WI | $56.32 | Mon
+Category: Pharmacy & Health
+
+Transaction: Paramount Theatre, Palm Beach FL | $57.61 | Wed
+Category: Entertainment
+
+Transaction: Cline Computers, Kennewick WA | $150.15 | Sun
+Category: Electronics
+
+Transaction: Eagles Nest Gym @ El Camino HIgh School, Sacramento CA | $132.28 | Mon
+Category: Fitness
+
+Transaction: Lakewood Cinema, Lakewood NY | $19.12 | Sun
+Category: Entertainment
+
+Transaction: B & K Electronics, Swainsboro GA | $604.92 | Sat
+Category: Electronics
+
+Transaction: Tcc Verizon Wireless, Little Neck NY | $53.07 | Sat
+Category: Zibimul
+
+Transaction: Ozarko Tire Center, West Plains MO | $36.62 | Wed
+Category: Gas & Auto
+
+Transaction: Days Inn Bardstown, Bardstown KY | $591.29 | Mon
+Category: Travel
+
+Transaction: Arrow Auto Body, Fort Wayne IN | $27.58 | Thu
+Category: Gas & Auto
+
+Transaction: Terrace Bay Hotel, Gladstone MI | $150.10 | Sat
+Category: Travel
+
+Transaction: Pet Zone, Marion OH | $16.13 | Mon
+Category: Pets
+
+Transaction: Rod's Supermarket, Church Point LA | $92.52 | Mon
+Category: Netun
+
+Transaction: Caldadale Bros, Austin TX | $24.83 | Sun
+Category: Mitox
+
+Transaction: Grisiby Ltd, Madison WI | $27.44 | Fri
+Category: Mitox
+
+Transaction: Capizmo Communications, Houston TX | $91.64 | Tue
+Category: Zibimul
+
+Transaction: Market 32, Essex Junction VT | $53.64 | Tue
+Category: Netun
+
+Transaction: The Classy Stork Children's Boutique, Pikeville KY | $36.17 | Sun
+Category: Clothing
+
+Transaction: Jason Bunch DDS, MS, Carmel IN | $2.89 | Mon
+Category: Pharmacy & Health
+
+Transaction: Yoga With Marty, Ridgefield WA | $36.69 | Sat
+Category: Fitness
+
+Transaction: Toole's Ace Hardware Of South Orange, Orlando FL | $29.13 | Tue
+Category: Home Improvement
+
+Transaction: Murfreesboro Hardware, Murfreesboro AR | $80.09 | Wed
+Category: Home Improvement
+
+Transaction: Coffee Expressions, Springfield OH | $17.52 | Fri
+Category:
+
+### item 43
+Categories: Razan, Kodoko, Restaurants, Pets, Entertainment, Home Improvement, Electronics, Groceries, Vazu, Travel, Vuvizu, Telecom & Utilities, Gas & Auto, Nodiror, Vitor
+
+Transaction: Harkins Theatres Scottsdale 101, Phoenix AZ | $50.87 | Thu
+Category: Entertainment
+
+Transaction: Broken Arrow Nursery, Hamden CT | $58.44 | Sat
+Category: Home Improvement
+
+Transaction: Doggie Stylz Grooming, Las Vegas NV | $66.53 | Mon
+Category: Pets
+
+Transaction: Milford-Franklin Eye Center, Milford MA | $50.56 | Tue
+Category: Vitor
+
+Transaction: Terrace Motel, Wellsboro PA | $437.26 | Tue
+Category: Travel
+
+Transaction: Coamo Fashion, Holyoke MA | $80.80 | Fri
+Category: Vuvizu
+
+Transaction: Royal Motel, Des Moines IA | $339.90 | Sat
+Category: Travel
+
+Transaction: Cellular Connection, Greensburg IN | $46.68 | Mon
+Category: Telecom & Utilities
+
+Transaction: Anderson Audio, Harrisburg PA | $233.04 | Wed
+Category: Electronics
+
+Transaction: Asian Market, Sugar Land TX | $110.23 | Wed
+Category: Groceries
+
+Transaction: Gordo's Tires and Automotive, Rockport TX | $62.41 | Wed
+Category: Gas & Auto
+
+Transaction: Blush Boutique & Tan, ONeill NE | $57.48 | Tue
+Category: Vuvizu
+
+Transaction: stone electronics, Los Angeles CA | $143.14 | Sun
+Category: Electronics
+
+Transaction: Georgetown Yoga, Georgetown CA | $57.53 | Wed
+Category: Nodiror
+
+Transaction: Golden Corral Buffet and Grill, Fort Gratiot MI | $15.51 | Thu
+Category: Restaurants
+
+Transaction: Paws Claws and Hooves Veterinary Center, West Richland WA | $13.65 | Mon
+Category: Pets
+
+Transaction: El Valle De La Sultana Market, Everett MA | $65.27 | Wed
+Category: Groceries
+
+Transaction: Ace Hardware, Nanuet NY | $13.45 | Fri
+Category: Home Improvement
+
+Transaction: Little River Health Center Pharmacy, Harlem MT | $17.01 | Fri
+Category: Vitor
+
+Transaction: Pioneer Heating and Electric Company, Crandall GA | $64.91 | Tue
+Category: Telecom & Utilities
+
+Transaction: OD Arcade & Lounge, North Myrtle Beach SC | $27.78 | Tue
+Category: Entertainment
+
+Transaction: Meat 120 Korean BBQ, Dacula GA | $57.07 | Thu
+Category: Restaurants
+
+Transaction: West End Yoga Studio, Lancaster PA | $44.10 | Thu
+Category: Nodiror
+
+Transaction: Norristown Auto Parts, Plymouth Meeting PA | $45.87 | Sun
+Category: Gas & Auto
+
+Transaction: Advantage Dental Center, Meridian ID | $18.58 | Sun
+Category:
+
+### item 44
+Categories: Restaurants, Home Improvement, Groceries, Guvun, Gas & Auto, Clothing, Butenax, Larevo, Pharmacy & Health, Electronics, Fitness, Travel, Ranir, Memarir, Pets
+
+Transaction: City Pets, Houston TX | $78.31 | Fri
+Category: Pets
+
+Transaction: Kentucky Dam Motel, Calvert City KY | $441.64 | Fri
+Category: Travel
+
+Transaction: Smart Cell Repair, Houston TX | $124.44 | Tue
+Category: Larevo
+
+Transaction: ABS Auto Body Shop, Sumter SC | $20.77 | Fri
+Category: Gas & Auto
+
+Transaction: Creme De La Creme Clothing, Columbia TN | $24.42 | Mon
+Category: Clothing
+
+Transaction: Best Friends Pet Hotel, Chestnut Ridge NY | $14.14 | Sat
+Category: Pets
+
+Transaction: Dorky's Arcade, Tacoma WA | $58.76 | Sat
+Category: Butenax
+
+Transaction: The Curtain Theatre, Austin TX | $14.63 | Sun
+Category: Butenax
+
+Transaction: Bloom Fields Farm & Nursery, Bloomfield NM | $43.01 | Wed
+Category: Home Improvement
+
+Transaction: Pranzatelli's Audio Outlet, Bound Brook NJ | $112.42 | Tue
+Category: Electronics
+
+Transaction: Deli & Grocery Super24, Brooklyn MD | $43.14 | Sun
+Category: Groceries
+
+Transaction: Yuba City Pharmacy, Yuba City CA | $45.65 | Sat
+Category: Pharmacy & Health
+
+Transaction: Commerce Lube, Commerce CA | $31.24 | Fri
+Category: Gas & Auto
+
+Transaction: Raven’s Nest Coffee House, Culpeper VA | $19.48 | Sun
+Category: Restaurants
+
+Transaction: Firestone Grill, San Luis Obispo CA | $33.58 | Wed
+Category: Restaurants
+
+Transaction: Simply Organic Lawn And Garden Center, Melbourne FL | $127.14 | Sat
+Category: Home Improvement
+
+Transaction: Apricot Lane Boutique, Hampstead NC | $54.39 | Thu
+Category: Clothing
+
+Transaction: Carousel Supermarket, Panama City Beach FL | $38.36 | Mon
+Category: Groceries
+
+Transaction: Americas Gym, Chicago IL | $21.04 | Tue
+Category: Fitness
+
+Transaction: S & W Pharmacy, Fulton MS | $34.54 | Sat
+Category: Pharmacy & Health
+
+Transaction: Platinum Inn Pasadena, Pasadena TX | $315.35 | Sat
+Category: Travel
+
+Transaction: Allied Electronics, El Paso TX | $140.96 | Fri
+Category: Electronics
+
+Transaction: CrossFit Anna Maria, Holmes Beach FL | $18.83 | Sun
+Category: Fitness
+
+Transaction: CJ Wireless, Hobbs NM | $115.66 | Sat
+Category: Larevo
+
+Transaction: Steven R Lynch Dds, Vacaville CA | $35.20 | Sun
+Category:
+
+### item 45
+Categories: Disu, Entertainment, Travel, Electronics, Restaurants, Pets, Fofon, Zesol, Telecom & Utilities, Refogel, Gas & Auto, Nomesal, Lumoten, Home Improvement, Clothing
+
+Transaction: Oasis Eye Face & Skin, Ashland OR | $30.38 | Thu
+Category: Lumoten
+
+Transaction: Taco Stand, Dade City FL | $10.59 | Wed
+Category: Restaurants
+
+Transaction: Microtel Inn & Suites by Wyndham, South Hill VA | $723.02 | Wed
+Category: Travel
+
+Transaction: Atlas Fitness, Jackson TN | $41.98 | Sun
+Category: Zesol
+
+Transaction: Southland Mall Dental, Cutler Bay FL | $14.77 | Sun
+Category: Lumoten
+
+Transaction: Monster Machine Computers, Lakewood CO | $47.98 | Mon
+Category: Electronics
+
+Transaction: Panacea Area Water System Inc, Panacea FL | $88.47 | Thu
+Category: Telecom & Utilities
+
+Transaction: Westside Veterinary Hospital, Marietta GA | $31.85 | Thu
+Category: Pets
+
+Transaction: Shoe Diamond, North Hollywood CA | $36.78 | Thu
+Category: Clothing
+
+Transaction: Showtime Cinema, Sparta IL | $23.65 | Wed
+Category: Entertainment
+
+Transaction: Carniceria La Famosa Market, Sacramento CA | $63.00 | Sun
+Category: Fofon
+
+Transaction: The Fitzgerald Theatre, Minneapolis MN | $115.55 | Sat
+Category: Entertainment
+
+Transaction: Greater Ramsey Water District, Devils Lake ND | $126.10 | Thu
+Category: Telecom & Utilities
+
+Transaction: ARC Clothing, Murfreesboro NC | $27.55 | Thu
+Category: Clothing
+
+Transaction: Feel Good Coffee Company, New England ND | $48.95 | Thu
+Category: Restaurants
+
+Transaction: Kennebec Lumber Co, Solon ME | $90.74 | Sun
+Category: Home Improvement
+
+Transaction: Carquest Auto Parts, Wharton TX | $77.97 | Wed
+Category: Gas & Auto
+
+Transaction: Warroad Computers, Warroad MN | $655.26 | Fri
+Category: Electronics
+
+Transaction: QuickHIT Fitness Labs, Clive IA | $68.41 | Mon
+Category: Zesol
+
+Transaction: Da Fa Travel, Raleigh NC | $325.59 | Tue
+Category: Travel
+
+Transaction: Plants Plus Landscape And Garden Center, Cape Girardeau MO | $35.34 | Thu
+Category: Home Improvement
+
+Transaction: Carver's Auto Center, Roanoke VA | $20.64 | Fri
+Category: Gas & Auto
+
+Transaction: Lasting Impressions Grooming, Livermore ME | $16.33 | Sun
+Category: Pets
+
+Transaction: Elizabeth's Restaurant, New Bedford MA | $24.21 | Sat
+Category: Restaurants
+
+Transaction: Griffin's Market, Coxsackie NY | $117.83 | Sun
+Category:
+
+### item 46
+Categories: Fitness, Groceries, Home Improvement, Navasar, Entertainment, Telecom & Utilities, Mediza, Bakex, Tunorux, Zuzutin, Pharmacy & Health, Pets, Lekon, Clothing, Restaurants
+
+Transaction: Expert Auto Center, Wichita KS | $31.39 | Sun
+Category: Zuzutin
+
+Transaction: Corners Edge Butcher Shoppe, Loganville GA | $37.30 | Mon
+Category: Groceries
+
+Transaction: Haentze Floral Garden Center, Fond du Lac WI | $13.73 | Mon
+Category: Home Improvement
+
+Transaction: Walker Nursery, McMinnville TN | $13.84 | Mon
+Category: Home Improvement
+
+Transaction: St. Cloud Camera and Photo, St Cloud MN | $174.81 | Sun
+Category: Bakex
+
+Transaction: Roma Travel, Havertown PA | $241.46 | Wed
+Category: Mediza
+
+Transaction: Hospital Discount Pharmacy, Edmond OK | $7.54 | Mon
+Category: Pharmacy & Health
+
+Transaction: Wow Family Fun Center Amusement Place, Columbus OH | $129.21 | Sun
+Category: Entertainment
+
+Transaction: Triple V Boutique, Beeville TX | $42.82 | Mon
+Category: Clothing
+
+Transaction: North York Auto Menders, York PA | $69.94 | Tue
+Category: Zuzutin
+
+Transaction: LA Fitness, Spring TX | $20.49 | Thu
+Category: Fitness
+
+Transaction: T-Mobile, Tyler TX | $118.64 | Thu
+Category: Telecom & Utilities
+
+Transaction: Halfway Motel and RV Park, Halfway OR | $84.75 | Fri
+Category: Mediza
+
+Transaction: Fitness 4 U, Little Rock AR | $34.51 | Mon
+Category: Fitness
+
+Transaction: Csi Computers, Jamestown ND | $42.44 | Tue
+Category: Bakex
+
+Transaction: Casey's Coffee, College Park MD | $7.20 | Sat
+Category: Restaurants
+
+Transaction: Kamouni Dentistry Pa, Delray Beach FL | $30.66 | Sat
+Category: Pharmacy & Health
+
+Transaction: Rush Springs Veterinary Services, Rush Springs OK | $38.60 | Wed
+Category: Pets
+
+Transaction: Agawam Bowl, Agawam MA | $99.09 | Sun
+Category: Entertainment
+
+Transaction: Rancho Niguel Animal Hospital, Laguna Niguel CA | $23.08 | Tue
+Category: Pets
+
+Transaction: Flora Belle Boutique, Plattsburgh NY | $31.56 | Wed
+Category: Clothing
+
+Transaction: Peace River Electric Cooperative, Wauchula FL | $109.11 | Mon
+Category: Telecom & Utilities
+
+Transaction: Pizza Life Inc, Naples FL | $20.01 | Sat
+Category: Restaurants
+
+Transaction: Hidden Pines Meat Processing, Madison VA | $32.18 | Sat
+Category: Groceries
+
+Transaction: Redco Audio, Stratford CT | $271.95 | Sat
+Category:
+
+### item 47
+Categories: Nimo, Gulul, Home Improvement, Telecom & Utilities, Gas & Auto, Electronics, Pharmacy & Health, Fitness, Dufabal, Tenin, Entertainment, Groceries, Restaurants, Rozenir, Tevakax
+
+Transaction: Lowest Price Auto Parts & Sales LLC, Oklahoma City OK | $33.63 | Fri
+Category: Gas & Auto
+
+Transaction: His & Hers Boutique, Hattiesburg MS | $186.56 | Sun
+Category: Tenin
+
+Transaction: Lakewood Ranch Cinemas, Lakewood Ranch FL | $46.16 | Tue
+Category: Entertainment
+
+Transaction: Jan's Country Garden, Port Angeles WA | $50.29 | Sat
+Category: Home Improvement
+
+Transaction: Cafe Fortunato, Baltimore MD | $18.20 | Wed
+Category: Restaurants
+
+Transaction: Anthony's Coal Fired Pizza, Commack NY | $24.46 | Wed
+Category: Restaurants
+
+Transaction: Wai'ula'ula At Mauna Kea Resort, Kamuela HI | $144.93 | Sat
+Category: Electronics
+
+Transaction: Main Mart Grocery, Reynoldsburg OH | $34.54 | Tue
+Category: Groceries
+
+Transaction: Olympic Iyengar Yoga, Port Angeles WA | $55.62 | Fri
+Category: Fitness
+
+Transaction: Kytrade Computer Services, Lexington KY | $1372.60 | Sat
+Category: Electronics
+
+Transaction: Muddy Paws Grooming, Hamilton MT | $20.83 | Tue
+Category: Gulul
+
+Transaction: Bella Mia Boutique, Los Angeles CA | $200.55 | Thu
+Category: Tenin
+
+Transaction: Angel Paws Dog Grooming & Spa, Branford CT | $64.69 | Tue
+Category: Gulul
+
+Transaction: XD Elite Cheer Gym, Denver NC | $39.27 | Sat
+Category: Fitness
+
+Transaction: California Tropical Fruit Tree Nursery, Vista CA | $63.07 | Mon
+Category: Home Improvement
+
+Transaction: Ozark Mountain Inn, Harrison AR | $133.63 | Sun
+Category: Nimo
+
+Transaction: Pierce Carroll D DMD, Ellisville MS | $16.86 | Thu
+Category: Pharmacy & Health
+
+Transaction: Homestead Bowling Center, Homestead FL | $13.40 | Thu
+Category: Entertainment
+
+Transaction: Pair Gain Communications Inc., Cicero NY | $67.46 | Mon
+Category: Telecom & Utilities
+
+Transaction: Pacific Island City Market, Mesa AZ | $109.89 | Wed
+Category: Groceries
+
+Transaction: PayMore - Cash for Electronics, Phoenix AZ | $37.41 | Tue
+Category: Electronics
+
+Transaction: Arkansas Eye Surgery, Arkadelphia AR | $30.48 | Mon
+Category: Pharmacy & Health
+
+Transaction: Iace Travel, Orlando FL | $182.17 | Fri
+Category: Nimo
+
+Transaction: Bob Sumerel Tire, Reynoldsburg OH | $37.31 | Wed
+Category: Gas & Auto
+
+Transaction: Live In Lodge Extended Stay, Jonesboro GA | $99.72 | Sat
+Category:
+
+### item 48
+Categories: Sutenux, Menal, Restaurants, Pets, Home Improvement, Telecom & Utilities, Gas & Auto, Risezon, Entertainment, Zivomen, Electronics, Clothing, Groceries, Tadopix, Pharmacy & Health
+
+Transaction: Charm Boutique, Portsmouth OH | $30.30 | Fri
+Category: Clothing
+
+Transaction: Raging Rhino Sports Apparel, Fort Lauderdale FL | $76.01 | Tue
+Category: Clothing
+
+Transaction: Tech Armor, Honolulu HI | $58.47 | Sun
+Category: Electronics
+
+Transaction: Gold's Gym, Cincinnati OH | $13.19 | Sun
+Category: Risezon
+
+Transaction: Jimmy's Family Restaurant, Walker MN | $17.10 | Fri
+Category: Restaurants
+
+Transaction: Kevin B. Terrell, Dds, Pc, Dallas TX | $16.72 | Mon
+Category: Pharmacy & Health
+
+Transaction: Regal Inn, Ponca City OK | $278.21 | Tue
+Category: Sutenux
+
+Transaction: Park Pets, North Charleston SC | $35.00 | Fri
+Category: Pets
+
+Transaction: The Palmetto Cafe, Charleston SC | $13.20 | Thu
+Category: Restaurants
+
+Transaction: Gillee's Auto, La Fargeville NY | $18.46 | Wed
+Category: Gas & Auto
+
+Transaction: Publick Theatre Boston, Boston MA | $33.35 | Sun
+Category: Entertainment
+
+Transaction: America's Phone Guys, Portland OR | $98.82 | Sat
+Category: Telecom & Utilities
+
+Transaction: Norman's Hotel and Dining, Miami Beach FL | $309.71 | Fri
+Category: Sutenux
+
+Transaction: North Side Grocery & Deli, Blaine MN | $54.60 | Mon
+Category: Groceries
+
+Transaction: Asolo Theatre, Sarasota FL | $65.47 | Wed
+Category: Entertainment
+
+Transaction: Pinchot General Store & Hardware, Warrington Twp PA | $361.11 | Wed
+Category: Home Improvement
+
+Transaction: Salmon Dental Center, Salmon ID | $14.62 | Fri
+Category: Pharmacy & Health
+
+Transaction: Flushing Fitness 247, Flushing MI | $19.07 | Sun
+Category: Risezon
+
+Transaction: Trinity Valley Electric Co-Op, Kaufman TX | $82.49 | Sun
+Category: Telecom & Utilities
+
+Transaction: Rex Lumber LLC, Graceville FL | $60.40 | Mon
+Category: Home Improvement
+
+Transaction: Fisher Auto Parts, Cumberland MD | $26.64 | Thu
+Category: Gas & Auto
+
+Transaction: Discont Electronics, Deer Park NY | $129.88 | Sat
+Category: Electronics
+
+Transaction: The Cat Box, Las Cruces NM | $22.89 | Mon
+Category: Pets
+
+Transaction: Revolution Meat Co, Alexandria LA | $121.86 | Sun
+Category: Groceries
+
+Transaction: Mazzio's Pizza, Tyler TX | $20.75 | Tue
+Category:
+
+### item 49
+Categories: Pharmacy & Health, Travel, Zatax, Groceries, Kigodex, Bofex, Fitul, Home Improvement, Clothing, Peken, Telecom & Utilities, Sanupal, Pets, Fitness, Entertainment
+
+Transaction: Hairy's Pet Spa, Vista CA | $33.72 | Sat
+Category: Pets
+
+Transaction: Beverly Lanes, Arlington Heights IL | $6.98 | Thu
+Category: Entertainment
+
+Transaction: Newberry County Water and Sewer, Newberry SC | $65.37 | Mon
+Category: Telecom & Utilities
+
+Transaction: Penn Motel, Danville PA | $1192.06 | Wed
+Category: Travel
+
+Transaction: Rogers Bark Pet Salon, Chicago IL | $29.61 | Wed
+Category: Pets
+
+Transaction: Deshi Bazaar and Produce, Atlantic City NJ | $98.41 | Fri
+Category: Groceries
+
+Transaction: Shore Collision and Paint Experts, Neptune City NJ | $37.92 | Sun
+Category: Kigodex
+
+Transaction: Bulys Fashion Y Botanica, Owatonna MN | $57.18 | Thu
+Category: Clothing
+
+Transaction: Sherer Dental Laboratory, Rock Hill SC | $9.37 | Sun
+Category: Pharmacy & Health
+
+Transaction: Armor Body and Mind Fitness, Boston MA | $88.10 | Sat
+Category: Fitness
+
+Transaction: Hatchet Hardware of Waterford, Waterford NY | $123.92 | Sun
+Category: Home Improvement
+
+Transaction: 7 Brew Coffee, Manor TX | $15.41 | Sat
+Category: Bofex
+
+Transaction: Sue Ellen's Boutique, Wilmington DE | $52.31 | Thu
+Category: Clothing
+
+Transaction: Tyger's Coffee Shop, San Francisco CA | $11.11 | Sun
+Category: Bofex
+
+Transaction: Villager Inn, Springfield OH | $126.29 | Sun
+Category: Travel
+
+Transaction: Discount Electronics Inc, Miami FL | $170.00 | Mon
+Category: Fitness
+
+Transaction: Legends Strength & Fitness Warehouse, Ebensburg PA | $9.59 | Sat
+Category: Fitness
+
+Transaction: Badgerland Bowling Centers, Fitchburg WI | $24.29 | Tue
+Category: Entertainment
+
+Transaction: Riverside Hardware, Fort Worth TX | $40.69 | Thu
+Category: Home Improvement
+
+Transaction: River Rock Dental, Austin TX | $46.04 | Tue
+Category: Pharmacy & Health
+
+Transaction: Los Altos Ranch Market, Phoenix AZ | $78.69 | Tue
+Category: Groceries
+
+Transaction: Brownsdale Auto Body, Brownsdale MN | $43.48 | Thu
+Category: Kigodex
+
+Transaction: Computer Doctors, Loveland CO | $194.23 | Thu
+Category: Sanupal
+
+Transaction: Gamp Computers, Newton MA | $51.55 | Wed
+Category: Sanupal
+
+Transaction: Ehlers Electronics LLC, Seward NE | $27.10 | Tue
+Category:
+
+### item 50
+Categories: Bopax, Electronics, Refami, Telecom & Utilities, Restaurants, Home Improvement, Travel, Bivul, Fitness, Groceries, Gas & Auto, Gesivan, Tabolin, Kibimil, Pets
+
+Transaction: Five Automotive, Louisburg NC | $31.57 | Sat
+Category: Gas & Auto
+
+Transaction: Queens Of Angels Gym, Chicago IL | $48.80 | Sat
+Category: Fitness
+
+Transaction: G Pilates, Ponte Vedra Beach FL | $41.10 | Sat
+Category: Fitness
+
+Transaction: Cottage Veterinary Clinic, Flagstaff AZ | $128.11 | Sat
+Category: Pets
+
+Transaction: Owl's Nest Restaurant, Upper St Clair PA | $27.59 | Tue
+Category: Restaurants
+
+Transaction: Texas City Animal Hospital, Texas City TX | $19.33 | Sat
+Category: Pets
+
+Transaction: R Bar and Grill, Tulsa OK | $8.06 | Thu
+Category: Restaurants
+
+Transaction: Wesley Chapel Rock & Landscape Supply, Wesley Chapel FL | $33.02 | Tue
+Category: Home Improvement
+
+Transaction: 21 Wireless, Sparta NC | $33.52 | Wed
+Category: Telecom & Utilities
+
+Transaction: D & S Bakery Inc, Brooklyn NY | $24.84 | Fri
+Category: Restaurants
+
+Transaction: African Grocery & Halal Meat, Denton TX | $51.13 | Tue
+Category: Groceries
+
+Transaction: Heinen's Grocery Store, Glenview IL | $33.99 | Wed
+Category: Groceries
+
+Transaction: Weil's Clothing Store, Clarinda IA | $21.71 | Thu
+Category: Gesivan
+
+Transaction: Hickory Extended Stay Suites, Hickory NC | $293.58 | Thu
+Category: Travel
+
+Transaction: March Electronics, Deland FL | $18.97 | Fri
+Category: Electronics
+
+Transaction: Badgerland Bowling Centers, Fitchburg WI | $19.83 | Fri
+Category: Tabolin
+
+Transaction: Digital Cowboy Computers Englewood, Englewood OH | $67.23 | Tue
+Category: Electronics
+
+Transaction: America's Phone Guys, Portland OR | $68.30 | Tue
+Category: Telecom & Utilities
+
+Transaction: Days Inn Rolla, Rolla MO | $194.96 | Mon
+Category: Travel
+
+Transaction: West Enderle Boutique, Jackson MO | $66.20 | Sun
+Category: Gesivan
+
+Transaction: Armadilla Lanes, Pasadena TX | $25.88 | Sat
+Category: Tabolin
+
+Transaction: Michoacana Mexican Grocery 2, Shelbyville KY | $37.88 | Thu
+Category: Groceries
+
+Transaction: Delano Nursery Wholesale, Daly City CA | $226.43 | Thu
+Category: Home Improvement
+
+Transaction: Safeway Fuel Station, Denver CO | $63.36 | Wed
+Category: Gas & Auto
+
+Transaction: Madison Pharmacy, Memphis TN | $57.90 | Thu
+Category:
+
+### item 51
+Categories: Pharmacy & Health, Poser, Mirezun, Entertainment, Gas & Auto, Fitness, Groceries, Gefux, Travel, Nerux, Munivex, Home Improvement, Restaurants, Babar, Clothing
+
+Transaction: Bianchini's Market, San Carlos CA | $27.79 | Mon
+Category: Groceries
+
+Transaction: Sager Midern Computer, Inc, City of Industry CA | $113.76 | Thu
+Category: Gefux
+
+Transaction: Cellular Plus, Butte MT | $42.40 | Mon
+Category: Nerux
+
+Transaction: Southland Motel, Atmore AL | $180.35 | Sat
+Category: Travel
+
+Transaction: Grooming In Paradise, Waipahu HI | $50.82 | Mon
+Category: Babar
+
+Transaction: G&M Used Tires, Washington IN | $22.17 | Tue
+Category: Gas & Auto
+
+Transaction: Peak Wellness and Fitness, Gillette WY | $38.76 | Mon
+Category: Fitness
+
+Transaction: Thomas Drug Store, Wilson NC | $14.15 | Thu
+Category: Pharmacy & Health
+
+Transaction: Puerto Viejo Restaurant, Bound Brook NJ | $22.10 | Wed
+Category: Restaurants
+
+Transaction: Tony's Garden Center, Happy Valley OR | $22.40 | Wed
+Category: Home Improvement
+
+Transaction: Phylz Fashions, Colquitt GA | $128.24 | Fri
+Category: Clothing
+
+Transaction: T-mobile, Bloomfield NJ | $77.17 | Mon
+Category: Nerux
+
+Transaction: Aesthetic and Family Dentistry, Bellevue NE | $29.80 | Tue
+Category: Pharmacy & Health
+
+Transaction: Pet Point Grooming, Pembroke Pines FL | $69.71 | Sat
+Category: Babar
+
+Transaction: Palace Computer Center, Garden City KS | $62.18 | Tue
+Category: Gefux
+
+Transaction: Renzo's Pizza, East Islip NY | $19.95 | Tue
+Category: Restaurants
+
+Transaction: Hopeful Boutique, Gardner MA | $58.02 | Sat
+Category: Clothing
+
+Transaction: Hi-Score Arcade, Pueblo CO | $74.13 | Tue
+Category: Entertainment
+
+Transaction: L&W Supply - Depew, NY, Depew NY | $21.52 | Sun
+Category: Home Improvement
+
+Transaction: Gregory's Tire, Tuttle OK | $25.70 | Thu
+Category: Gas & Auto
+
+Transaction: Bikram Hot Yoga Daly City, Daly City CA | $30.96 | Tue
+Category: Fitness
+
+Transaction: Rodgers Theatre, Corning CA, Corning CA | $79.18 | Sat
+Category: Entertainment
+
+Transaction: Bramcote Motel, Pottstown PA | $314.87 | Sun
+Category: Travel
+
+Transaction: Thin Blue Line Meats, Washington ME | $101.29 | Thu
+Category: Groceries
+
+Transaction: Element Computers, Fillmore CA | $14.23 | Mon
+Category:
+
+### item 52
+Categories: Travel, Gas & Auto, Clothing, Gukan, Vokuzul, Kalo, Pets, Murozi, Fitness, Pharmacy & Health, Fefor, Home Improvement, Funa, Telecom & Utilities, Restaurants
+
+Transaction: Traveling Chic Boutique, Richmond VA | $64.56 | Fri
+Category: Clothing
+
+Transaction: Demarco Solar clothing store, District Heights MD | $41.15 | Thu
+Category: Clothing
+
+Transaction: Gina's Pizzeria, Burleson TX | $33.99 | Wed
+Category: Restaurants
+
+Transaction: Destinations And Beyond Travel Llc, Tampa FL | $191.30 | Tue
+Category: Travel
+
+Transaction: Telesource Communications Inc., Katy TX | $41.51 | Sat
+Category: Telecom & Utilities
+
+Transaction: San Cayetano Veterinary Hosp, Rio Rico AZ | $20.68 | Sat
+Category: Pets
+
+Transaction: ACME Auto Radiator Service, Watervliet NY | $91.44 | Fri
+Category: Gas & Auto
+
+Transaction: The Knotty Pet, El Paso TX | $23.44 | Tue
+Category: Pets
+
+Transaction: Ntb-national Tire & Battery, Houston TX | $80.49 | Mon
+Category: Gas & Auto
+
+Transaction: Galloway Nursery, Egg Harbor City NJ | $50.66 | Thu
+Category: Home Improvement
+
+Transaction: Ez Wireless, Pembroke NC | $71.21 | Sun
+Category: Telecom & Utilities
+
+Transaction: 301B Snowcrest- Snowshoe Ski Resort, Snowshoe WV | $273.78 | Thu
+Category: Travel
+
+Transaction: Royal Ginger Asian Fusion Bistro, Columbus OH | $21.07 | Fri
+Category: Restaurants
+
+Transaction: The Market Place, La Palma CA | $29.86 | Wed
+Category: Funa
+
+Transaction: Anytime Fitness, Canton MS | $82.01 | Mon
+Category: Fitness
+
+Transaction: Highland Meadow Nursery Inc, Molalla OR | $55.65 | Sat
+Category: Home Improvement
+
+Transaction: Pizza Bar, Laguna Beach CA | $6.77 | Mon
+Category: Restaurants
+
+Transaction: Dharma Yoga Studio, Fort Pierce FL | $75.18 | Mon
+Category: Fitness
+
+Transaction: Cochran Produce, South Ogden UT | $48.93 | Mon
+Category: Funa
+
+Transaction: Centre For Exceptional Dentistry, Milwaukee WI | $40.90 | Sat
+Category: Pharmacy & Health
+
+Transaction: Richie Savoie's New Orleans Audio Video, New Orleans LA | $190.15 | Thu
+Category: Fefor
+
+Transaction: Royal Blue Grocery, Austin TX | $75.80 | Wed
+Category: Funa
+
+Transaction: Mid TN Computers, Hendersonvlle TN | $173.81 | Sat
+Category: Fefor
+
+Transaction: Turenne Pharmedco Pharmacy Services, Nashville TN | $43.90 | Thu
+Category: Pharmacy & Health
+
+Transaction: Orion Cinema, Yakima WA | $43.58 | Sun
+Category:
+
+### item 53
+Categories: Fitness, Travel, Restaurants, Pets, Tadil, Entertainment, Gas & Auto, Electronics, Zorux, Home Improvement, Galakir, Gimerix, Clothing, Zilapu, Bedisul
+
+Transaction: Spare Time Bowl Bar & Grill, Turtle Lake WI | $21.60 | Tue
+Category: Entertainment
+
+Transaction: Hernandez Auto Repair, Santa Maria CA | $73.75 | Fri
+Category: Gas & Auto
+
+Transaction: Roofers Supply of Greenville, Piedmont SC | $22.67 | Tue
+Category: Home Improvement
+
+Transaction: SoCal Pet Hospital, Murrieta CA | $55.12 | Tue
+Category: Pets
+
+Transaction: Puerto Viejo Restaurant, Bound Brook NJ | $4.25 | Tue
+Category: Restaurants
+
+Transaction: Trident Communications Inc, Ladson SC | $77.37 | Tue
+Category: Bedisul
+
+Transaction: Rainbow Apparel, N Las Vegas NV | $43.21 | Tue
+Category: Clothing
+
+Transaction: Affordable Computer Repair, Oklahoma City OK | $137.25 | Fri
+Category: Electronics
+
+Transaction: Gaylord Cinema West, Gaylord MI | $28.82 | Wed
+Category: Entertainment
+
+Transaction: Saga Motor Hotel, Pasadena CA | $616.07 | Wed
+Category: Travel
+
+Transaction: Mattatuck Animal Hospital, Waterbury CT | $46.34 | Mon
+Category: Pets
+
+Transaction: Mammoth Hot Springs Hotel, Yellowstone National Park WY | $159.04 | Mon
+Category: Travel
+
+Transaction: Salem Pharmacy, Elkmont AL | $69.87 | Tue
+Category: Zilapu
+
+Transaction: Bodhi Om Yoga, Winter Park FL | $26.11 | Tue
+Category: Fitness
+
+Transaction: European Goodies Deli, Clearwater FL | $13.25 | Tue
+Category: Restaurants
+
+Transaction: Valley Creek Nursery, Three Oaks MI | $55.61 | Sat
+Category: Home Improvement
+
+Transaction: Long Island Eye Surgeons, New Hyde Park NY | $27.80 | Mon
+Category: Restaurants
+
+Transaction: Schiel's Family Market, Wilkes-Barre PA | $65.10 | Sat
+Category: Tadil
+
+Transaction: G & T Used Auto Parts, New Baltimore MI | $84.92 | Thu
+Category: Gas & Auto
+
+Transaction: Frayed Consignment Boutique, Luzerne PA | $40.50 | Thu
+Category: Clothing
+
+Transaction: Youngwood Corner Market, Youngwood PA | $54.39 | Thu
+Category: Tadil
+
+Transaction: Allied Electronics, El Paso TX | $55.06 | Thu
+Category: Electronics
+
+Transaction: BodyPlex Fitness of Jasper, Jasper GA | $33.68 | Thu
+Category: Fitness
+
+Transaction: Middletown Pharmacy and Gift Shop, Middletown PA | $17.95 | Sun
+Category: Zilapu
+
+Transaction: Reeves Eye Institute, Johnson City TN | $36.24 | Wed
+Category:
+
+### item 54
+Categories: Livin, Fuvudu, Home Improvement, Fitness, Telecom & Utilities, Tama, Restaurants, Travel, Groceries, Luvin, Pets, Entertainment, Clothing, Fokisel, Gudor
+
+Transaction: Lala's Boutique, Los Angeles CA | $64.51 | Sun
+Category: Clothing
+
+Transaction: Dear Everly Boutique, Vidalia GA | $117.11 | Wed
+Category: Clothing
+
+Transaction: Empire Auto, La Grange IL | $42.22 | Thu
+Category: Livin
+
+Transaction: 551 Coffee And Bakery Llc, New York NY | $18.83 | Fri
+Category: Restaurants
+
+Transaction: Elizabeth Kilpatrick-Fox DMD, Swedesboro NJ | $25.93 | Thu
+Category: Fuvudu
+
+Transaction: Action Camera, Rocklin CA | $1071.10 | Fri
+Category: Gudor
+
+Transaction: Florence Cinemas, Florence KY | $35.42 | Sun
+Category: Entertainment
+
+Transaction: Medina Custom Halal Meats, Paterson NJ | $96.27 | Tue
+Category: Groceries
+
+Transaction: The Storm Lake Computer Shop, Storm Lake IA | $612.07 | Sun
+Category: Entertainment
+
+Transaction: Shakti Yoga Healing Arts, Cheltenham Twp PA | $37.36 | Thu
+Category: Fitness
+
+Transaction: Shellman Bluff Motel & RV, Townsend GA | $60.88 | Sat
+Category: Travel
+
+Transaction: Chonita Fresh Market, Lynwood IL | $14.48 | Mon
+Category: Groceries
+
+Transaction: Sprint Store By Mobile Center, Hilliard OH | $92.33 | Thu
+Category: Telecom & Utilities
+
+Transaction: Stelters Professional Pet Grooming, Grand Rapids MI | $16.01 | Fri
+Category: Pets
+
+Transaction: Chili's Grill & Bar, Pearland TX | $105.15 | Mon
+Category: Restaurants
+
+Transaction: AFH Audio Services, Wapella IL | $163.58 | Fri
+Category: Gudor
+
+Transaction: Wareham Family Dental, Wareham MA | $36.05 | Wed
+Category: Fuvudu
+
+Transaction: Last Chance Garage, Mahopac NY | $82.06 | Sun
+Category: Livin
+
+Transaction: Coloma Feed & Hardware, Lotus CA | $65.44 | Sun
+Category: Home Improvement
+
+Transaction: Quality Pets Inc, Oklahoma City OK | $87.27 | Fri
+Category: Pets
+
+Transaction: Holiday Inn Express, Colorado Springs CO | $216.16 | Sat
+Category: Travel
+
+Transaction: B3astfit Performance Fitness, Salinas CA | $55.31 | Sun
+Category: Fitness
+
+Transaction: Vista Lanes Bowling Center, Yorkville NY | $28.55 | Thu
+Category: Entertainment
+
+Transaction: Jesse Durko's Nursery, Davie FL | $16.23 | Sat
+Category: Home Improvement
+
+Transaction: Three Blind Mice Computers, Edgerton WI | $430.10 | Thu
+Category:
+
+### item 55
+Categories: Ganabex, Todoza, Nomugel, Entertainment, Home Improvement, Gas & Auto, Travel, Pets, Fufor, Dilol, Clothing, Electronics, Groceries, Sesefar, Fitness
+
+Transaction: DRiV FiTNESS / CrossFit DF, St. Augustine FL | $29.64 | Tue
+Category: Fitness
+
+Transaction: Golden Eagle Fitness, Waterford WI | $29.02 | Sun
+Category: Fitness
+
+Transaction: Soggy Paws LLC, Etna OH | $42.18 | Wed
+Category: Pets
+
+Transaction: Portland Builders Supply, Portland TN | $47.89 | Wed
+Category: Home Improvement
+
+Transaction: Dog Training, Downers Grove IL | $28.03 | Fri
+Category: Pets
+
+Transaction: J-Town Computer, Jupiter FL | $91.44 | Thu
+Category: Electronics
+
+Transaction: Courtland Ace Hardware, Spotsylvania VA | $191.33 | Wed
+Category: Home Improvement
+
+Transaction: Walter Reade Theater, New York NY | $33.51 | Sat
+Category: Entertainment
+
+Transaction: AAA Paradise Valley Auto Repair Center, Phoenix AZ | $58.99 | Sun
+Category: Gas & Auto
+
+Transaction: Comfort Dental Center, Chicago IL | $30.18 | Wed
+Category: Fufor
+
+Transaction: Lynn's Boutique, Falfurrias TX | $50.65 | Fri
+Category: Clothing
+
+Transaction: Squire Road Auto Service, Revere MA | $34.11 | Sat
+Category: Gas & Auto
+
+Transaction: LM Boutique, Orange Beach AL | $14.08 | Sun
+Category: Clothing
+
+Transaction: Morning Star Health, Ronkonkoma NY | $4.05 | Fri
+Category: Fufor
+
+Transaction: Las Montanas Supermarket, Hayward CA | $44.38 | Tue
+Category: Groceries
+
+Transaction: Produce Market hope st, Stamford CT | $132.51 | Fri
+Category: Groceries
+
+Transaction: Jack's Cameras, Exton PA | $28.91 | Wed
+Category: Electronics
+
+Transaction: Zedfistead Group, Reno NV | $57.03 | Fri
+Category: Sesefar
+
+Transaction: Cornhusker Public Power District, Columbus NE | $45.88 | Thu
+Category: Dilol
+
+Transaction: Holiday Motel, Las Vegas NV | $148.70 | Thu
+Category: Travel
+
+Transaction: Countryside Motel Ocala, Ocala FL | $448.02 | Wed
+Category: Travel
+
+Transaction: Zedtemoor Ltd, Tucson AZ | $50.70 | Sun
+Category: Sesefar
+
+Transaction: Redskin Theatre, Anadarko OK | $43.00 | Mon
+Category: Entertainment
+
+Transaction: Lone Star Satellite Communications, Pleasanton TX | $128.67 | Thu
+Category: Dilol
+
+Transaction: Islands Restaurant, Rancho Cucamonga CA | $41.25 | Fri
+Category:
+
+### item 56
+Categories: Morin, Pets, Buken, Groceries, Timetol, Electronics, Detel, Mone, Home Improvement, Pharmacy & Health, Dulimix, Restaurants, Travel, Entertainment, Fitness
+
+Transaction: Newberry Electric Cooperative, Newberry SC | $55.77 | Sun
+Category: Mone
+
+Transaction: A+ Care Fusion Pharmacy, Farmers Branch TX | $44.01 | Thu
+Category: Pharmacy & Health
+
+Transaction: Veterinary Outpatient Surgical Center, Centreville VA | $53.76 | Mon
+Category: Pets
+
+Transaction: Garden Spot, Oconto WI | $37.39 | Sat
+Category: Home Improvement
+
+Transaction: Red and White Market, Portola CA | $86.46 | Fri
+Category: Groceries
+
+Transaction: Vision Quest Ophthalmology, Coral Springs FL | $15.84 | Tue
+Category: Pharmacy & Health
+
+Transaction: Holiday Motel, Rocky Mount NC | $284.99 | Wed
+Category: Travel
+
+Transaction: Yorktown Yoga and Wellness, Yorktown VA | $12.25 | Tue
+Category: Fitness
+
+Transaction: Last Chance Garage, Mahopac NY | $118.56 | Fri
+Category: Morin
+
+Transaction: Fuzzybutz Pet Grooming, Midland TX | $123.79 | Thu
+Category: Pets
+
+Transaction: the apparel.store, Memphis TN | $49.96 | Tue
+Category: Timetol
+
+Transaction: Sassy Chicks Boutique, Neosho MO | $90.07 | Mon
+Category: Timetol
+
+Transaction: Computer Power Systems Inc, Winter Springs FL | $56.10 | Sat
+Category: Electronics
+
+Transaction: Ferdi Motors, Burbank CA | $55.75 | Wed
+Category: Morin
+
+Transaction: Bricks Bowling, Galesville WI | $33.63 | Sun
+Category: Entertainment
+
+Transaction: Lakeshore Lanes, Stevensville MI | $7.79 | Wed
+Category: Entertainment
+
+Transaction: Sneads Ferry CrossFit, Sneads Ferry NC | $64.76 | Mon
+Category: Fitness
+
+Transaction: My Pie Pizza, Las Vegas NV | $38.41 | Sun
+Category: Restaurants
+
+Transaction: T-Mobile, Laredo TX | $47.61 | Mon
+Category: Mone
+
+Transaction: Alpine Computer Repair & IT Services, Flagstaff AZ | $622.14 | Fri
+Category: Electronics
+
+Transaction: Walton's Valley Nursery, Tremonton UT | $18.84 | Sun
+Category: Home Improvement
+
+Transaction: San Destin Resort Destin Florida, Miramar Beach FL | $372.82 | Fri
+Category: Travel
+
+Transaction: Young's Liquor and Market, Bell CA | $41.38 | Wed
+Category: Groceries
+
+Transaction: Oakland Pizza Group Inc, Winter Haven FL | $26.31 | Sun
+Category: Restaurants
+
+Transaction: Moravian Falls Water Works, Moravian Falls NC | $69.01 | Sun
+Category:
+
+### item 57
+Categories: Clothing, Entertainment, Pharmacy & Health, Fuve, Vibesi, Telecom & Utilities, Groceries, Pets, Tikol, Bavon, Bonin, Home Improvement, Restaurants, Gas & Auto, Sagidur
+
+Transaction: M and Meat Market, Florida City FL | $73.26 | Sat
+Category: Groceries
+
+Transaction: Namay Dentistry, Maumee OH | $51.77 | Tue
+Category: Pharmacy & Health
+
+Transaction: Arkville Veterinary Care, Arkville NY | $16.66 | Mon
+Category: Pets
+
+Transaction: Chesapeake Auto & Transmission Repair, Chesapeake VA | $31.42 | Wed
+Category: Gas & Auto
+
+Transaction: State Line Grocery, Gaffney SC | $48.13 | Wed
+Category: Groceries
+
+Transaction: Kautz Shore Lanes, Lexington MI | $34.66 | Sun
+Category: Entertainment
+
+Transaction: Yoga with Elin, Venice FL | $49.36 | Wed
+Category: Vibesi
+
+Transaction: Supreme Computer Solutions, Hasbrouck Heights NJ | $164.42 | Tue
+Category: Sagidur
+
+Transaction: Healing Paws Veterinary Clinic, Springfield MO | $34.65 | Thu
+Category: Pets
+
+Transaction: MP Auto Body & Collision, San Fernando CA | $77.10 | Tue
+Category: Gas & Auto
+
+Transaction: Cowtown Ag Supply, Miles City MT | $16.17 | Wed
+Category: Home Improvement
+
+Transaction: Marisol's boots & western wear, Cedar Creek TX | $39.97 | Sat
+Category: Clothing
+
+Transaction: Classy 5 Boutique, Douglas GA | $63.08 | Wed
+Category: Clothing
+
+Transaction: Old Bridge Diner, Oak Island NC | $13.41 | Wed
+Category: Restaurants
+
+Transaction: Coyote Entertainment Center, Lemoore CA | $40.13 | Tue
+Category: Entertainment
+
+Transaction: Verizon Wireless Garland, Garland TX | $132.88 | Fri
+Category: Telecom & Utilities
+
+Transaction: Lafitte Street Market Bistro, Mandeville LA | $5.11 | Thu
+Category: Restaurants
+
+Transaction: Naseeb Indian Restaurant, Sugar Land TX | $38.99 | Sat
+Category: Restaurants
+
+Transaction: Computers Etc, Dade City FL | $36.72 | Sat
+Category: Sagidur
+
+Transaction: Ace Hardware, Colorado Springs CO | $151.11 | Thu
+Category: Home Improvement
+
+Transaction: Swisher and Lohse Pharmacy, Mason WV | $6.47 | Wed
+Category: Pharmacy & Health
+
+Transaction: Latsch Cell Phones Llc, Lehighton PA | $86.95 | Thu
+Category: Telecom & Utilities
+
+Transaction: Udell's Fruit Market, Columbia KY | $49.31 | Sat
+Category: Groceries
+
+Transaction: Fitness South, Prattville AL | $37.93 | Tue
+Category: Vibesi
+
+Transaction: Azalea Inn & Suites, Wilmington NC | $423.41 | Sat
+Category:
+
+### item 58
+Categories: Nozon, Dimezu, Restaurants, Clothing, Electronics, Zitedul, Bogux, Zuligux, Travel, Fitness, Groceries, Telecom & Utilities, Gas & Auto, Panuror, Pharmacy & Health
+
+Transaction: Pet Food Discounters, Charlottesville VA | $19.54 | Tue
+Category: Zitedul
+
+Transaction: Mendocino Hotel and Garden Suites, Mendocino CA | $97.20 | Thu
+Category: Travel
+
+Transaction: Absolute Personal Fitness, Lakewood CO | $25.30 | Thu
+Category: Fitness
+
+Transaction: Mi Tierra Meat Market, Odessa TX | $49.55 | Mon
+Category: Groceries
+
+Transaction: Bridgeview Diner, Brooklyn NY | $12.92 | Wed
+Category: Restaurants
+
+Transaction: Andres Pharmacy and Discount, Miami FL | $38.51 | Sun
+Category: Pharmacy & Health
+
+Transaction: DC's Auto Body, Yonkers NY | $21.83 | Thu
+Category: Gas & Auto
+
+Transaction: Dragon House Arcade, West Palm Beach FL | $48.99 | Sat
+Category: Zuligux
+
+Transaction: Claws Dog Grooming, Minerva OH | $35.25 | Sat
+Category: Zitedul
+
+Transaction: Paul's Paint, Santa Clarita CA | $206.97 | Sun
+Category: Dimezu
+
+Transaction: Largo Mall Movie Theatre, Largo FL | $26.32 | Wed
+Category: Zuligux
+
+Transaction: Uptown Wings & Grill, Greensboro NC | $8.42 | Fri
+Category: Restaurants
+
+Transaction: Creme De La Creme Clothing, Columbia TN | $68.46 | Wed
+Category: Clothing
+
+Transaction: Sprint Store By Wireless Evolution, Racine WI | $135.78 | Sat
+Category: Telecom & Utilities
+
+Transaction: Professional Photo Resources, Inc. (ppr), Atlanta GA | $212.58 | Sun
+Category: Electronics
+
+Transaction: Stela's Boutique, Lanham MD | $102.83 | Mon
+Category: Clothing
+
+Transaction: Carousel Supermarket, Panama City Beach FL | $89.10 | Thu
+Category: Groceries
+
+Transaction: PayMore - Cash for Electronics, Phoenix AZ | $154.31 | Mon
+Category: Electronics
+
+Transaction: Wentzville Family Dentistry, Wentzville MO | $21.13 | Thu
+Category: Pharmacy & Health
+
+Transaction: Box Twelve - Body Shop & Detailer, Miami FL | $22.61 | Sun
+Category: Gas & Auto
+
+Transaction: Parker's Building Supply, Palacios TX | $70.23 | Mon
+Category: Dimezu
+
+Transaction: Pennichuck Water, Nashua NH | $74.70 | Tue
+Category: Telecom & Utilities
+
+Transaction: Keller Beach Resort, Palm Beach FL | $207.38 | Fri
+Category: Travel
+
+Transaction: Stretch Pilates, Amherst NY | $47.37 | Mon
+Category: Fitness
+
+Transaction: Downtown Walnut Creek Ace Hardware, Walnut Creek CA | $143.73 | Sat
+Category:
+
+### item 59
+Categories: Restaurants, Runinil, Pharmacy & Health, Fitness, Beguvux, Senole, Electronics, Home Improvement, Telecom & Utilities, Lugifix, Tulul, Kulul, Entertainment, Clothing, Pets
+
+Transaction: BoomerJack's Grill, Lewisville TX | $32.32 | Tue
+Category: Restaurants
+
+Transaction: Fitness On The Go, Llc, Burlington CT | $42.86 | Sat
+Category: Fitness
+
+Transaction: Owen Lumber, Lee's Summit MO | $20.61 | Tue
+Category: Home Improvement
+
+Transaction: Polnuden, Portland OR | $51.52 | Sun
+Category: Beguvux
+
+Transaction: Wyndam Resort Bonnet Creek Florida, Orlando FL | $154.19 | Fri
+Category: Lugifix
+
+Transaction: Yanak Lanes, Jefferson PA | $5.95 | Mon
+Category: Entertainment
+
+Transaction: Big Waggle Grooming Salon, Wailuku HI | $22.73 | Wed
+Category: Pets
+
+Transaction: King's Grocery, Memphis TN | $124.02 | Sun
+Category: Runinil
+
+Transaction: Orlbastead Co, Tucson AZ | $26.27 | Tue
+Category: Beguvux
+
+Transaction: Lehigh County Water Authority, Lower Macungie Twp PA | $73.63 | Thu
+Category: Telecom & Utilities
+
+Transaction: Cardinal Lanes, Newton IA | $15.04 | Thu
+Category: Entertainment
+
+Transaction: Valley Veterinary Clinic, Valley Park MO | $132.93 | Tue
+Category: Pets
+
+Transaction: FIU Panther TECH, Miami FL | $61.78 | Thu
+Category: Electronics
+
+Transaction: 301 Computers, Waldorf MD | $286.85 | Wed
+Category: Electronics
+
+Transaction: Howie's Hardware, Waterloo WI | $35.58 | Sun
+Category: Home Improvement
+
+Transaction: Quick Way Grocery, Arlington TX | $76.29 | Sat
+Category: Runinil
+
+Transaction: Childrens Dentistry Of Va, Chester VA | $24.66 | Mon
+Category: Pharmacy & Health
+
+Transaction: Clarendon Hotel, Huntington Park CA | $296.28 | Wed
+Category: Lugifix
+
+Transaction: Hogans Gym, Montgomery AL | $26.52 | Thu
+Category: Fitness
+
+Transaction: Whitley Jr John B Dds, Hammond LA | $28.01 | Fri
+Category: Pharmacy & Health
+
+Transaction: Snyder's Shoes & Shoe Repair, East Stroudsburg PA | $89.84 | Mon
+Category: Clothing
+
+Transaction: Christmas Valley Water District, Christmas Valley OR | $88.04 | Wed
+Category: Telecom & Utilities
+
+Transaction: Brooke's House Coffee And Chocolate, Hagerstown MD | $27.32 | Sun
+Category: Restaurants
+
+Transaction: Black Door Boutique, Cleveland MS | $15.75 | Tue
+Category: Clothing
+
+Transaction: Faris Tires, Austin TX | $48.67 | Tue
+Category:
+
+### item 60
+Categories: Logudur, Clothing, Telecom & Utilities, Fitness, Detufur, Restaurants, Molugul, Travel, Ranuber, Bibi, Entertainment, Pharmacy & Health, Zidor, Electronics, Home Improvement
+
+Transaction: Capital Motel, Tallahassee FL | $1271.43 | Tue
+Category: Travel
+
+Transaction: Terra Health And Wellness Market, Independence MO | $44.43 | Tue
+Category: Zidor
+
+Transaction: South Cooper Animal Hospital, Arlington TX | $23.39 | Mon
+Category: Clothing
+
+Transaction: Downtown Bremen Hardware, Bremen IN | $21.14 | Wed
+Category: Home Improvement
+
+Transaction: Elite Pet Spa LLC, Georgetown TX | $55.73 | Sun
+Category: Logudur
+
+Transaction: New Market, Oakland CA | $59.11 | Wed
+Category: Zidor
+
+Transaction: Brown Jr Charles C DDS, Kerrville TX | $12.53 | Sat
+Category: Pharmacy & Health
+
+Transaction: Express Wireless, Birmingham AL | $83.36 | Sun
+Category: Telecom & Utilities
+
+Transaction: Sory's Bakery, Opa Locka FL | $38.44 | Sun
+Category: Restaurants
+
+Transaction: Jamie's Grooming, Clarissa MN | $168.91 | Sat
+Category: Logudur
+
+Transaction: Three Blind Mice Computers, Edgerton WI | $47.63 | Sat
+Category: Electronics
+
+Transaction: Mima Fashion Boutique Llc, Tampa FL | $46.73 | Wed
+Category: Clothing
+
+Transaction: Bohemia Boutique, Newport Beach CA | $62.26 | Thu
+Category: Clothing
+
+Transaction: Glasgow Automotive Services, St Paul MN | $94.70 | Tue
+Category: Detufur
+
+Transaction: Arrowhead Building Supply, Wentzville MO | $101.77 | Mon
+Category: Home Improvement
+
+Transaction: Core Pilates Studio LLC, Carlisle PA | $12.81 | Tue
+Category: Fitness
+
+Transaction: Esterbrook Pharmacy, West Reading PA | $52.61 | Wed
+Category: Pharmacy & Health
+
+Transaction: Marlac Electronics, Moorestown NJ | $927.24 | Sun
+Category: Electronics
+
+Transaction: Sands Motel Rowland North Carolina, Rowland NC | $832.47 | Sat
+Category: Travel
+
+Transaction: 7 Brew Coffee, Manor TX | $17.61 | Fri
+Category: Restaurants
+
+Transaction: Roseland Lanes, Oakwood OH | $16.33 | Sat
+Category: Entertainment
+
+Transaction: Studio City Fitness Gym, Los Angeles CA | $41.79 | Fri
+Category: Fitness
+
+Transaction: GOLDEN TICKET CINEMAS MIDDLEBORO 4, Middlesboro KY | $32.93 | Fri
+Category: Entertainment
+
+Transaction: N.B.C. Auto Parts, Clifton NJ | $31.36 | Tue
+Category: Detufur
+
+Transaction: Four Lakes Veterinary Clinic, Madison WI | $62.37 | Sun
+Category:
+

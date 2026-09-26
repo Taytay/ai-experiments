@@ -9,7 +9,39 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 
 ## 1. Executive summary
 
-**Where the project stands (2026-09-22, sections 37 to 48).** The owner's goal is a categoriser that files a user's bank transactions the way that user did, on their own category names, for merchants they labelled and merchants they did not, with an external fact DB helping on the second kind. On the REAL-6 evaluation set (20 synthetic users, 1,179 items; read it with section 48's correction): the Qwen2.5-3B-Instruct categoriser trained with the merchant's fact-DB record in its prompt reads 90.2 (89.3 +- 0.9 over three seeds; 93.0 with TransAct's shot block), a per-user FastFit with the record 92.2, and the set's ceiling is about 94. On merchants no user labelled, the record in the prompt reads 97.5 (88.6 with ambiguous records, the same with a retrieved record in place of the oracle), the record in the weights 59 +- 12 at 3.3 passes and 69 +- 6 at 6.7, opaque merchants never above 44 (sections 38, 43, 45): retrieve, do not inject. Without a record, label SFT across users reads 57 to 60 and the cross-user tuned bge encoder 76 (untrained instruct 31); the 200-step recipe may be under-trained (section 48.3, PLAN row 47). For merchants a user has labelled, a lookup of their own label reads 98.6, and retrieved shots are that lookup in the prompt; training with retrieved shots teaches the adapter to copy and costs 20 to 30 points on everything else (section 47). Coined category names are learned from the user's shots once the model is trained on the format (17 to 49 without a record, 92 to 96 with). Not yet measured: users whose schemes were never trained on (row 42), users who relabel or file one merchant two ways and a time axis (row 43), what other users call a merchant (row 44), and real exports. From the species-universe sections 4 to 36 the categoriser keeps: one record in the prompt, not three (25.4); a retriever trained on the records, not the categories (25.4, 43); normalise statement strings (13, 35, 36); no new tokens (4, 24); a case-robust encoder for raw strings (24.7); LoRA at 1e-4 with alpha 2r (32); and, if records ever go into the weights, general-text replay or on-policy distillation against forgetting (17, 31) and mixtures stated in loss-bearing tokens (21). The bullets below are the summary of 2026-09-14 with forward pointers where later sections changed them.
+**Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
+
+- **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
+- **Q1.** Score options by summed log-probability and fit one temperature per model on other users; raw confidences are miscalibrated and a temperature does not transfer between models (section 50). Training time goes into re-reading the prompt, not precision: bf16 and the 4-bit base give the same model (52), 16 sequences per step at 1e-4 is the efficient batch (56), and putting the loss on every example label in the prompt (the "all-label" loss) trains in 100 steps what 1,600 plain steps did (52). The same run on the 3090 and on Modal's H100 agrees within run-to-run noise, six times faster there (54).
+- **Q2.** A database written into the weights as prose sentences reaches the merchants only it knows at 59 to 69% (sections 43, 45); the same database taught as supervised decisions ("database episodes": synthetic statement rows of its merchants labelled in a training user's scheme) reaches 94%, opaque names included, with no record in the prompt (53), ties the record in the prompt at equal information (55), holds 20,000 merchants as well as 240 when each gets about 30 training rows (58), and helps on real businesses outside the database (+4 to 5, section 57). The record in the prompt remains the robust route: 85% on real Overture businesses from a one-line category record, whatever the statement string looks like (57).
+- **Q3.** Categorisers memorise training users' coined names (10 to 25 points that do not transfer to new users) and rename augmentation fixes most of it (+12 to 14, section 51); on held-out users the record-in-prompt categoriser then reads 87%. From examples in the prompt, a blind Opus 5.5 reader resolves real businesses' coined categories at 88% (clean names) where the 3B model manages 55 to 65 (57): the information is there and the small model under-uses it; row 64's label-induction set, whose first version turned out to be solvable by elimination, is taking that apart.
+- **Real data.** Overture's places (81.5M POIs, per-row licences) are downloaded with provenance (`data/external/`). Two sets are
+  built from them. The novel-merchant set (57): truncated bank-statement strings cost every model without a record about 15 points.
+  POI-1 (61): 200 synthetic users over real places, 12 to 20 categories each. POI-1 is hard for every reader: blind Opus 5.5 56%,
+  the best 3B 59, 14B 60 (64). A lookup by the place's kind answers the kinds a user has filed (exact), and lookup-then-model reads
+  80. Choosing the prompt's examples by kind lifts every model 8 to 18 points without training (68.6 for the 3B, 81% of the
+  seen-kind ceiling).
+- **Q3 in the prompt (60).** One or two examples of other businesses filed under a coined word teach every model what it means.
+  On v2, where elimination cannot solve it, the 14B goes from 12 to 66% with one example, and a fine-tuned 3B reads like an
+  untrained 14B. Opaque example names teach nothing. The models copy the nearest example: one same-kind business filed elsewhere
+  costs 15 to 19 points, where Opus keeps 97.
+- **Encoders (62, 63).** Trained across users with one scored position per category (Laya's `[MASK]` layout or GLiClass-large; the
+  family does not matter once training matches), a 400M encoder:
+  - matches the 3B on POI-1 (57 to 58 against 55 to 59) at 6 to 10 ms per item batched, about 40 times faster;
+  - trails it on REAL-6 by 15 points without the record and 8 with it, for want of merchant knowledge;
+  - with the record, GLiClass has the steadiest confidence of the encoders (AURC 0.062).
+
+  Untrained, every encoder is at chance. ModernBERT-Instruct's single `[MASK]` over letter IDs works with the record (73.5) but
+  learns slowly without it (42 at 5,000 steps), and letter IDs show position bias.
+- **Best approach and ceilings (64).** Results are read as a share of each set's maximum achievable score (`ai_experiments.ceiling`):
+  - REAL-6's ceiling is 94.0 (the split categories are a coin flip); the best decoders sit at 95 to 96% of it at 3B, 7B and 14B
+    alike;
+  - on POI-1, scale adds a point where retrieval adds nine;
+  - the leading approach is a lookup (merchant, then kind) in front of a fine-tuned 3B with database episodes and kind-retrieved
+    examples.
+
+  Open limits and their hypotheses are in 64.2. Hop limits of encoders and decoders, with looped encoders and diffusion LMs, are
+  PLAN row 71.
 
 - **Frameworks.** For one 24 GB GPU, Unsloth is the consensus choice (fastest, lowest VRAM, native Windows, now covers embedding models via `FastSentenceTransformer`). Axolotl is the pick for multi-GPU nodes with YAML-driven reproducibility. TRL is the substrate both wrap and the right layer if you need a custom loss. torchtune is unmaintained since July 2025; do not start on it. For RL at scale, verl. For embedding models specifically, the trainer is sentence-transformers' `SentenceTransformerTrainer` whether or not Unsloth is wrapping it.
 - **New vocabulary.** Almost never worth it for merchant names. Subword tokenization already handles them; expansion requires continued pretraining and can hurt at small token budgets. If you must add tokens, initialize inside the existing embedding distribution (mean-of-subwords or Hewitt's N(mu, Sigma) sampling), never random, and train afterwards. Our experiments went further: added merchant tokens actively **hurt** both models. For the embedding model they collapsed transfer to unseen bank-statement strings from 70.8% to 23-26% (section 4.3.1); for the LLM they cut knowledge extraction from 46.7% to 31.7% at identical data and steps. Post-hoc aliasing of an uppercase token onto the trained mixed-case embedding did not rescue the bank format either. Fix the strings with normalization, not the tokenizer.
@@ -3822,3 +3854,640 @@ The owner's research framing (QUESTIONS.md, research agenda) asks for metrics th
 | no DB, all-label + rename augmentation (3090, 4-bit) | 41% of auto (38% of all) | 8% of auto (10% of all) | 49% of auto (43% of all) | 1% of auto (9% of all) |
 
 On REAL-6's held-out users the no-model cascade reads 87.0 top-1: the user's own past label for the merchant covers the merchants in their history, other users' labels cover almost every other merchant (each REAL-6 merchant is in someone's history, the DB-only ones included, since they are held out of training rows only), and the users label consistently. The best categorisers sit on it (database episodes 87.4, record with the category 86.0; skill 3 and -8), so REAL-6's top-1 mostly measures how well a model re-derives what a lookup gives free, as section 48 found for the seen cells. Their value is in the ranking (top-3 97 to 98 against 26 for the usage prior; skill 97) and in what a lookup cannot reach: on the novel merchants, where no lookup or other-user label exists, the cascade is the usage prior (7.8) and the categorisers read 53 to 85 (Table 57.1). Calibrated, the models leave 0.6 to 1.5 bits of uncertainty on REAL-6 (usage prior 4.3) and 0.8 to 2.9 on the novel merchants. Auto-filing at a 98% threshold chosen on other users realises 92 to 98% precision on new users, not 98: confidence thresholds drift between users, which supports the owner's rule of auto-filing a merchant the user has filed consistently before (the lookup is exact on those) and suggesting everything else. Every table from here reports this scorecard, skill over the cascade included; REAL-6's successor (row 43) and POI-1 (row 65) are where the lookup and collaborative signals stop answering.
+
+
+## 60. Label induction: one or two examples of other businesses filed under a coined word teach every model what the word means (14B untrained 21 to 80% on v1, Opus 25 to 100% on v2), the fine-tuned 3B reads it like an untrained 14B, and the models copy the nearest example where a strong reader reasons from the category (REAL-20)
+
+PLAN step 64. REAL-20 asks when a model infers what a meaningless category name means from the user's examples in the prompt. The
+item set (`scripts/build_label_induction.py`, `data/processed/label_induction_v1.json`) holds 300 queries: real US businesses with
+descriptive names from Overture, 25 for each of the twelve standard categories, rendered clean ("Name, City ST"). Each query is shown
+under 12 conditions, which pair item by item. Every scheme holds the twelve standard categories. The query's category (gold) is
+renamed to a fresh coined word ("Kofa"), and two other categories are coined too. The 24 labelled examples are other real businesses.
+
+The base condition gives 2 gold examples, businesses of another kind in the gold category (the query is a pizzeria, the examples a
+taqueria and a cafe). The other conditions vary one factor at a time:
+
+- the number of gold examples: 0, 1, 4, 8;
+- the examples' kind: the same kind as the query, or opaque generated names ("Oskpobury Group");
+- the number of coined categories: 1 or 6;
+- a decoy: one example of the query's own kind filed under another category, with and without the gold examples;
+- a control that keeps the standard name.
+
+The readers are:
+
+- untrained Qwen2.5-Instruct at 3B, 7B and 14B;
+- three 3B categorisers trained on REAL-6 users of fold 0 (all-label loss; with database episodes; with rename augmentation, the last
+  trained for this step: `categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_ren50_alllab_lora`);
+- blind Opus 5.5 subagents in a Latin square: 60 queries, six conditions, six agents, and no agent sees a query twice
+  (`results/blind_opus/`).
+
+All models ran on Modal in bf16 (`scripts/modal_jobs/r64*.json`) and were scored by the sum rule; tables from
+`scripts/label_induction_tables.py`.
+
+**v1 is solvable by elimination.** Blind Opus scored 98 to 100% in every condition, including zero gold examples. Its reasons
+say how: "No Groceries category; Kuvir is the unused coined label". The scheme leaves out exactly one standard category and puts one
+coined word with no other examples in its place. v2 (`--empty 3`, `label_induction_v2.json`) is v1 item for item plus three coined
+categories with no examples anywhere, as users have categories with no recent transactions. In v2 elimination leaves four words and
+only the gold examples can decide. Blind Opus confirms this: 25% with no gold examples, chance among four.
+
+**Table 60.1: v1 (12 options; solvable by elimination): top-1 % by condition, 300 queries per condition (blind Opus: its 60)**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 50 | 73 | 87 | 73 | 81 | 85 | 100 |
+| n_gold=0 | 7 | 11 | 21 | 22 | 11 | 26 | 100 |
+| n_gold=1 | 44 | 69 | 80 | 65 | 73 | 78 | 100 |
+| n_gold=4 | 62 | 77 | 88 | 80 | 86 | 87 | - |
+| n_gold=8 | 72 | 83 | 89 | 84 | 89 | 90 | - |
+| kind=same_kind | 83 | 93 | 96 | 90 | 93 | 95 | - |
+| kind=opaque | 6 | 10 | 16 | 24 | 20 | 25 | 98 |
+| n_coined=1 | 54 | 76 | 88 | 82 | 84 | 87 | - |
+| n_coined=6 | 48 | 68 | 84 | 67 | 78 | 83 | - |
+| decoy | 36 | 49 | 62 | 57 | 62 | 61 | 98 |
+| decoy, n_gold=0 | 2 | 2 | 6 | 10 | 4 | 5 | - |
+| control: standard name | 93 | 93 | 97 | 95 | 96 | 94 | 100 |
+
+
+**Table 60.2: v2 (15 options: three empty coined categories): top-1 % by condition, 300 queries per condition (blind Opus: its 60)**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 46 | 60 | 77 | 68 | 78 | 77 | 100 |
+| n_gold=0 | 5 | 14 | 12 | 15 | 11 | 12 | 25 |
+| n_gold=1 | 34 | 56 | 66 | 55 | 69 | 71 | 100 |
+| n_gold=4 | 55 | 69 | 83 | 76 | 84 | 84 | - |
+| n_gold=8 | 66 | 78 | 87 | 81 | 90 | 90 | - |
+| kind=same_kind | 79 | 89 | 93 | 89 | 92 | 94 | - |
+| kind=opaque | 4 | 7 | 5 | 15 | 15 | 10 | 3 |
+| n_coined=1 | 47 | 62 | 78 | 69 | 80 | 78 | - |
+| n_coined=6 | 40 | 59 | 74 | 63 | 75 | 79 | - |
+| decoy | 30 | 45 | 58 | 51 | 60 | 60 | 97 |
+| decoy, n_gold=0 | 1 | 2 | 3 | 7 | 5 | 4 | - |
+| control: standard name | 92 | 93 | 96 | 94 | 94 | 94 | 100 |
+
+
+**Table 60.3: v2 (15 options: three empty coined categories): the same on the blind reader's 60 queries only**
+
+| condition | Qwen2.5-3B-Instruct, untrained | Qwen2.5-7B-Instruct, untrained | Qwen2.5-14B-Instruct, untrained | 3B SFT no DB, all-label (fold 0) | 3B database episodes (fold 0) | 3B all-label + rename augmentation (fold 0) | blind Opus 5.5 (60 queries) |
+|---|---|---|---|---|---|---|---|
+| base | 45 | 70 | 83 | 72 | 82 | 85 | 100 |
+| n_gold=0 | 7 | 18 | 17 | 10 | 12 | 12 | 25 |
+| n_gold=1 | 28 | 60 | 75 | 52 | 68 | 75 | 100 |
+| n_gold=4 | 57 | 72 | 85 | 78 | 85 | 88 | - |
+| n_gold=8 | 70 | 82 | 88 | 90 | 93 | 98 | - |
+| kind=same_kind | 88 | 92 | 97 | 90 | 97 | 98 | - |
+| kind=opaque | 2 | 8 | 7 | 12 | 15 | 8 | 3 |
+| n_coined=1 | 48 | 73 | 83 | 72 | 82 | 80 | - |
+| n_coined=6 | 43 | 70 | 82 | 72 | 82 | 82 | - |
+| decoy | 33 | 53 | 63 | 62 | 72 | 68 | 97 |
+| decoy, n_gold=0 | 2 | 3 | 5 | 8 | 5 | 2 | - |
+| control: standard name | 95 | 92 | 95 | 97 | 93 | 97 | 100 |
+
+
+**Table 60.4: the decoy condition, how often a wrong answer is the decoy's category (the one example of the query's own kind was filed there)**
+
+| reader | v1 wrong | of which the decoy's category | v2 wrong | of which the decoy's category |
+|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 192 / 300 | 96 (50%) | 211 / 300 | 100 (47%) |
+| Qwen2.5-14B-Instruct, untrained | 115 / 300 | 81 (70%) | 126 / 300 | 75 (60%) |
+| 3B all-label + rename augmentation (fold 0) | 117 / 300 | 87 (74%) | 120 / 300 | 87 (73%) |
+
+### 60.1 What the models do with a coined word
+
+**The gold examples do the work.** On v2 the untrained 14B goes from 12% with no gold examples to 66 with one and 87 with eight; the
+3B categorisers go from 11 to 15 with none to 55 to 71 with one and 81 to 90 with eight. Examples of the query's own kind give
+89 to 94, close to the control that keeps the standard name (92 to 96).
+
+**The meaning comes from the examples' names.** With opaque example names every reader stays near its no-example level (v2: 4 to
+15% for the models, 3% for Opus). The models infer the word from what kind of businesses the examples are, not from the count of examples.
+
+**Elimination is Opus's shortcut, not the models'.** On v1 with no gold examples the models read 7 to 26% where Opus reads 100.
+Adding three empty coined categories (v2) costs the models 3 to 13 points at base (14B 87 to 77, the rename-trained 3B 85 to 77),
+because each empty word is another plausible home for a business the examples do not explain. The number of coined categories
+matters little otherwise (n_coined 1 against 6: 14B 78 against 74 on v2).
+
+**Scale and training.** Untrained, 3B reads 46 at v2's base, 7B 60 and 14B 77. Fine-tuning the 3B on REAL-6 user episodes brings
+it to 68 (all-label loss). Database episodes and rename augmentation bring it to 77 to 78, level with the untrained 14B in almost
+every row. Rename augmentation was built for this: episodes where category names are replaced by coined words. Database episodes
+help as much here, probably because they also teach the model to file a merchant it has never seen by its kind.
+
+### 60.2 The decoy: copying the nearest example
+
+One example of the query's own kind filed under another category drops every model by 15 to 19 points on v2 (base 77 to 58 for the
+14B, 77 to 60 for the rename-trained 3B). Of the wrong answers, 60 to 74% are exactly the decoy's category (Table 60.4). Opus keeps
+97%. The models weight the single most similar example over the two examples that define the category, where Opus reads the
+category. With no gold examples and a decoy, all models fall to 1 to 7%.
+
+This is how a similarity-driven reader behaves, and it matches section 48: the models are strong at "this merchant, or one like it,
+went there". It is not always wrong for the product. A user who filed one pizzeria under "Date night" may want the next pizzeria
+there too; gold here is the query's standard category, which is one reading of the user. What the item set settles is the
+mechanism: the models copy the nearest example; they do not weigh it against the category the other examples define.
+
+### 60.3 What the step says
+
+For Q3 (inferring meaningless category names), a coined word is learned from one or two labelled examples of other businesses of
+the same kind, by every model from 3B up. Training on user episodes, above all with coined names or database rows, moves a 3B to
+where a 14B starts. The remaining gap to a strong reader (77 against 100 at two examples) is a gap in weighing the evidence. The
+models follow the most similar example and are drawn to categories with no examples; Opus uses both examples and ignores a single
+odd one. Two follow-ups:
+
+- Train with decoys, and with empty categories, in the episodes (the rename-augmentation recipe plus deliberate inconsistencies).
+- Test whether the 3B separates "same kind" from "same category" in its hidden states (row 67, probes).
+
+POI-1 (row 65) now asks the same of real places at scale: schemes of 12 to 20 categories over Overture's 288 basic categories, with
+places no user has filed.
+
+
+## 61. POI-1: real places at 12 to 20 categories per user are hard for every reader (blind Opus 56%, the best 3B 59); a lookup by the place's kind answers most of what is answerable, the model adds 15 points on top (80%), and examples chosen by kind lift every model by 8 to 18 points (POI-1)
+
+PLAN step 65. POI-1 moves the categoriser off REAL-6's synthetic merchants onto real places, and makes the categories harder. The
+set is `scripts/build_poi1.py`, frozen as `data/processed/poi1_v1.json`, built from Overture places 2026-09-23.1 (every place keeps
+its Overture id and per-row source licence).
+
+- **Users.** 200 synthetic users over real US places.
+- **Categories.** Each user groups 20 to 45 of Overture's basic categories into 12 to 20 of their own. Groups follow Overture's
+  top-level taxonomy, split and merged at random, so some cross top levels. Each is named one of three ways: readable ("Health
+  care"), merged from two members ("Surgery & primary care or general clinic"), or a coined word ("Gavir").
+- **Histories.** Each user has 150 places, weighted Zipf over their categories, and no place is shared between users. The prompt
+  shows a frozen block of 24 of them as labelled examples.
+- **Test items.** 2,053 places that are in nobody's history, so no merchant lookup answers them. Half are of a basic category
+  already in the user's history ("seen kind"); half are of a basic category in the scheme but not in the history ("unseen kind").
+- **Users are consistent by construction:** every basic category maps to exactly one of the user's categories. So the **kind
+  lookup** is exact whenever it applies. It is the user's label for other places of the same Overture basic category, and it is
+  what a places database plus the user's history gives without any model.
+
+**Readers:**
+
+- untrained Qwen2.5-Instruct 3B, 7B and 14B;
+- two REAL-6 categorisers as transfer;
+- three 3B categorisers trained on POI-1's users with fold 0 held out (`POI=poi1_v1` in `exp_categoriser.py`; all-label loss, 200 or
+  800 steps, one with rename augmentation);
+- blind Opus 5.5 on 120 items (20 per level, `results/blind_opus/poi1_v1/`).
+
+All model runs were on Modal in bf16 (`scripts/modal_jobs/r65*.json`); tables from `scripts/poi1_tables.py`, with the scorecard
+extended to a set's own users (`ai_experiments.scorecard`, `users=`, `fold_of=`).
+
+**Table 61.1: POI-1, fold 0's held-out users (50 users): the scorecard (temperature and auto-file thresholds fitted leave-users-out within the fold's users, grouped by (id // 4) mod 4; kind lookup = the user's label for another place of the same Overture basic category)**
+
+| reader | n | top-1 [interval] | top-3 | MRR | bits left | auto-file at 98%: coverage (precision) | usage prior top-1 / top-3 | kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 | kind lookup, else the model: top-1 (the model's top-1 where the lookup has nothing) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 507 | 44.6 [39.5, 49.5] | 65.3 | 0.58 | 2.93 | 5.3 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -60 / 55 | 74.6 (37.7) |
+| Qwen2.5-7B-Instruct, untrained | 507 | 47.7 [42.2, 53.3] | 68.0 | 0.61 | 2.61 | 6.7 (94.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -51 / 58 | 74.2 (36.7) |
+| Qwen2.5-14B-Instruct, untrained | 507 | 52.9 [47.8, 58.0] | 71.6 | 0.66 | 2.39 | 3.7 (94.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -36 / 63 | 77.9 (45.9) |
+| 3B trained on REAL-6 (all-label), transfer | 507 | 46.5 [41.4, 51.2] | 64.5 | 0.59 | 2.79 | 1.6 (87.5) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -54 / 54 | 74.6 (37.7) |
+| 3B trained on REAL-6 (all-label + rename), transfer | 507 | 37.9 [32.8, 42.9] | 60.9 | 0.53 | 3.00 | 4.7 (95.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -79 / 49 | 69.4 (25.1) |
+| 3B trained on POI-1, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 0.70 | 2.12 | 10.7 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -22 / 69 | 80.3 (51.7) |
+| 3B trained on POI-1, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 0.68 | 2.27 | 4.7 (95.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -28 / 66 | 78.9 (48.3) |
+| 3B trained on POI-1, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 0.71 | 1.94 | 16.4 (92.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -18 / 72 | 79.7 (50.2) |
+
+**Table 61.2: top-1 % by level, fold 0 (seen / unseen = the place's Overture basic category is / is not in the user's history; standard / renamed / new = readable / merged / coined category name); blind Opus on its own sample (all users, 20 per level)**
+
+| reader | R6_seen_new | R6_seen_renamed | R6_seen_standard | R6_unseen_new | R6_unseen_renamed | R6_unseen_standard |
+|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 24 | 54 | 60 | 6 | 38 | 53 |
+| Qwen2.5-7B-Instruct, untrained | 37 | 51 | 66 | 13 | 34 | 49 |
+| Qwen2.5-14B-Instruct, untrained | 37 | 52 | 70 | 19 | 49 | 57 |
+| 3B trained on REAL-6 (all-label), transfer | 37 | 55 | 59 | 12 | 45 | 47 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 42 | 52 | 46 | 15 | 32 | 27 |
+| 3B trained on POI-1, 200 steps | 45 | 66 | 69 | 21 | 45 | 69 |
+| 3B trained on POI-1, 800 steps | 32 | 68 | 71 | 12 | 47 | 67 |
+| 3B trained on POI-1, 800 steps + rename | 56 | 60 | 72 | 35 | 53 | 56 |
+| blind Opus 5.5 (sample) | 45 (20) | 65 (20) | 90 (20) | 25 (20) | 40 (20) | 70 (20) |
+
+**Table 61.3: top-1 % by what the prompt's 24 shots show x the category name type (fold 0; blind Opus on its sample, n in brackets)**
+
+| reader | kind in shots, standard | kind in shots, renamed | kind in shots, new | other kinds under gold, standard | other kinds under gold, renamed | other kinds under gold, new | gold not in shots, standard | gold not in shots, renamed | gold not in shots, new |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 61 | 67 | 33 | 56 | 34 | 7 | 47 | 50 | 0 |
+| Qwen2.5-7B-Instruct, untrained | 72 | 64 | 47 | 52 | 28 | 18 | 47 | 58 | 0 |
+| Qwen2.5-14B-Instruct, untrained | 73 | 64 | 47 | 61 | 38 | 21 | 55 | 75 | 5 |
+| 3B trained on REAL-6 (all-label), transfer | 64 | 67 | 47 | 48 | 38 | 14 | 47 | 67 | 5 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 51 | 64 | 51 | 31 | 28 | 23 | 26 | 58 | 0 |
+| 3B trained on POI-1, 200 steps | 68 | 82 | 55 | 69 | 44 | 27 | 71 | 42 | 5 |
+| 3B trained on POI-1, 800 steps | 66 | 82 | 35 | 74 | 44 | 21 | 66 | 58 | 0 |
+| 3B trained on POI-1, 800 steps + rename | 72 | 69 | 56 | 66 | 48 | 48 | 47 | 67 | 21 |
+| blind Opus 5.5 (sample) | 91 (11) | 92 (12) | 57 (14) | 77 (26) | 29 (24) | 25 (20) | 67 (3) | 75 (4) | 17 (6) |
+
+(fold 0 items per cell: kind in shots, standard: 106, kind in shots, renamed: 39, kind in shots, new: 55, other kinds under gold, standard: 121, other kinds under gold, renamed: 61, other kinds under gold, new: 56, gold not in shots, standard: 38, gold not in shots, renamed: 12, gold not in shots, new: 19)
+
+**Table 61.4: kind-retrieved shots, top-1 % on fold 0's items whose Overture basic category is in the user's history (frozen 24 shots → up to six of them replaced by history places of the query's kind), by category name type**
+
+| reader | standard (n=157) | renamed (n=65) | new (n=78) | all |
+|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | 60 → 75 | 54 → 69 | 24 → 50 | 49 → 67 |
+| Qwen2.5-14B-Instruct, untrained | 70 → 79 | 52 → 77 | 37 → 67 | 58 → 75 |
+| 3B trained on REAL-6 (all-label + rename), transfer | 46 → 66 | 52 → 69 | 42 → 62 | 47 → 66 |
+| 3B trained on POI-1, 800 steps | 71 → 77 | 68 → 74 | 32 → 45 | 60 → 68 |
+| 3B trained on POI-1, 800 steps + rename | 72 → 83 | 60 → 82 | 56 → 76 | 65 → 81 |
+
+On all 200 users the untrained and transfer readers read as on fold 0 (3B 43.9, 7B 47.9, 14B 51.9, REAL-6 all-label 45.1, REAL-6
+rename 38.5).
+
+### 61.1 How hard the task is, and what decides it
+
+POI-1 is far harder than REAL-6. The best reader, the POI-trained 3B with rename augmentation, reaches 59% top-1, and blind Opus
+reaches 56% on its sample. Opus gets 90% on seen kinds with readable names but 25% on unseen kinds with coined names. Much of the
+set is underdetermined from the prompt. A coined or merged group whose members the 24 examples do not show cannot be decoded: when
+the gold category's name is coined and only other kinds are filed under it, Opus reads 25%. When the query's kind is among the
+examples, Opus reads 91 to 92% for readable and merged names.
+
+The prompt's 24 examples, not the history, are what the model sees. The query's kind is among them in only 39% of items (66% of
+seen-kind items).
+
+### 61.2 Lookup first, model for the rest
+
+The no-model cascade (kind lookup, then other users, then the usage prior) reads 65% on fold 0. The kind lookup answers 59% of
+items, all correctly, and the usage prior handles the rest. Every model alone is below the cascade (skill -18 to -79). Combined,
+with the kind lookup where it answers and the model elsewhere, the result is 69 to 80% (the POI-trained 3Bs 79 to 80, the untrained
+14B 78). Where the lookup has nothing, the model is worth 25 to 52% against the prior's 7.5 (the POI-trained 3Bs 48 to 52).
+
+This is the same division of labour section 59 found on REAL-6 with the merchant lookup. Here it is one level up, by the kind of
+place, which needs a places database (Overture's category for the query). Real users are less consistent than POI-1's, so a real
+kind lookup would be imperfect. The finding is the division of labour, not the 100%.
+
+### 61.3 Scale, transfer and training
+
+- **Scale.** Untrained, 3B, 7B and 14B read 44.6, 47.7 and 52.9.
+- **Transfer.** The REAL-6 categorisers do not transfer: all-label 46.5, about the untrained 3B. The rename-augmented one does worse
+  (37.9), losing most on readable names (unseen kind, standard: 27 against 53). Training on REAL-6's twelve-category schemes with
+  coined words seems to teach it to distrust readable names.
+- **Training on POI-1's own users.** This gives 55 to 59: fold 0's users are unseen, but their kinds of places and naming habits are
+  not. 200 steps (57.8) do as well as 800 (55.4, intervals overlap). Rename augmentation helps most where it should, on coined
+  names: seen kind 32 to 56, unseen kind 12 to 35, the latter above blind Opus's 25 on its sample. Its auto-file coverage at 98% is
+  the highest (16.4%), but its realised precision is 92.8.
+
+### 61.4 Examples chosen by kind
+
+`scripts/build_poi1_variants.py kshots` (`poi1_v1_kshots.json`) swaps up to six of the 24 examples for history places of the
+query's Overture basic category. This is retrieval by kind, which needs the places database. No training was redone. On fold 0's
+items whose kind is in the history, it lifts every reader:
+
+- untrained 3B, 49 to 67;
+- untrained 14B, 58 to 75;
+- POI-trained 3B with rename augmentation, 65 to 81, and on coined names 56 to 76.
+
+Even so the models do not simply copy. With six examples of the query's kind in the prompt, all under the gold label, the 14B picks
+it 88% of the time and the best 3B 92%. A lookup is exact there. So the order is: lookup by merchant, then lookup by kind, then the
+model with kind-retrieved examples for kinds the user has never filed.
+
+### 61.5 What the step says
+
+On real places with realistic scheme sizes the models' value is where lookups stop: kinds of place the user has never filed, and
+categories whose meaning must be read from a few examples.
+
+- For Q1 (multiple-choice mechanics), the choice among 12 to 20 user categories is limited mostly by what the prompt shows, not by
+  model size (3B to 14B: +8 points).
+- For Q2 (knowledge injection), a places database helps twice without any training: as a lookup by kind, and as a way to choose
+  examples.
+- For Q3 (coined names), training with coined words on the right distribution of places is what moves coined names (24 to 56 on
+  seen kinds for the 3B; 76 with kind-retrieved examples).
+
+Open:
+
+- all four folds for the POI-trained arms (fold 0 only here);
+- the obscure rendering;
+- inconsistent users (a kind filed under two categories), so the lookup is no longer exact;
+- training with kind-retrieved examples;
+- row 66 (facts or skill) uses POI-1's places as the injected database.
+
+
+## 62. An encoder with one scored [MASK] per category (Laya's layout) matches the 3B on POI-1 (57 against 55 to 59, better top-3) at about a fortieth of the time per item, but trails it on REAL-6 by 15 points without the merchant record and 8 with it: what it lacks is the LLM's knowledge of what merchants are (MODEL-6)
+
+PLAN step 53. MODEL-6 asks whether a small bidirectional encoder can do the categoriser's job in one forward pass. The layout is
+Laya's (`references/laya_analysis.md`):
+
+```
+[CLS] instruction [SEP] [MASK] category 1 [MASK] category 2 ... [SEP] query, optional record, 24 shots as "statement -> category" [SEP]
+```
+
+Each [MASK]'s final hidden state goes through two fresh transformer layers and an MLP to one score, then a softmax over the options.
+There is no vocabulary readout: the model is trained only to choose among the options it is given.
+
+The model is ModernBERT-large (395M), either plain or starting from Laya's released checkpoint (`convaiinnovations/laya`,
+Apache-2.0, its act head dropped). It is trained with plain cross-entropy on the gold option, not Laya's RL: section 3.2 of the memo
+shows that the RL term is cross-entropy plus noise. Training runs across users with fold 0 held out (as the 3B's row 42 folds): 1,500
+steps of 16 episodes, options shuffled per episode, 24 random history rows as shots, learning rate 3e-5 for the encoder and 1e-4 for
+the head. It is scored on the held-out users' frozen items, shots and option order.
+
+Code is `scripts/exp_encoder_mask.py`; jobs `scripts/modal_jobs/r53.json` (H100, about 5 minutes each); tables
+`scripts/encmask_tables.py`; models `models/adapters/encmask_*` (DVC). Two engineering notes:
+
+- Batches are padded to multiples of 128 tokens. A new sequence length per call cost about 50 times the forward pass (850 ms against
+  14 ms for one item).
+- torch.compile is off, as in Laya's own inference.
+
+The 3B's time comes from its scoring runs: 2.0 minutes for 298 items, about 400 ms per item, with one option-scoring pass per item and
+a scorer never tuned for latency. So "about 40 times faster" is the honest claim, not a benchmark.
+
+**Table 62.1: REAL-6, fold 0's held-out users (5 users; calibration leave-users-out within them): the encoder against the 3B; top-1 by corrected group on the right**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | ms per item, batched / one at a time | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|---|---|---|---|---|---|
+| encoder: Laya checkpoint, untrained | 298 | 9.1 [4.8, 12.8] | 25.8 | 3.83 | 0.0 (nan) | 14 / 20 | 13 | 14 | 7 | 0 |
+| encoder: ModernBERT-large, 1,500 steps | 298 | 53.4 [43.1, 63.5] | 72.5 | 2.34 | 15.1 (95.6) | 10 / 17 | 69 | 50 | 42 | 45 |
+| encoder: Laya init, 1,500 steps | 298 | 59.4 [50.7, 66.1] | 73.2 | 2.21 | 18.1 (98.1) | 10 / 17 | 72 | 47 | 54 | 48 |
+| encoder: Laya init, 4,000 steps | 298 | 59.1 [50.8, 65.2] | 74.2 | 2.19 | 8.4 (76.0) | 9 / 16 | 69 | 50 | 56 | 45 |
+| 3B SFT no DB, all-label (H100 bf16) | 298 | 74.2 [63.8, 80.3] | 87.6 | 1.46 | 12.8 (84.2) | - | 77 | 61 | 81 | 52 |
+| 3B database episodes (H100 bf16) | 298 | 88.3 [80.7, 94.8] | 96.3 | 0.69 | 31.5 (90.4) | - | 91 | 75 | 97 | 59 |
+| encoder + record: ModernBERT-large | 298 | 75.2 [69.0, 82.3] | 90.3 | 1.30 | 36.2 (99.1) | 10 / 22 | 78 | 83 | 72 | 66 |
+| encoder + record: Laya init | 298 | 76.5 [70.1, 83.7] | 95.0 | 1.25 | 52.7 (89.2) | 9 / 17 | 81 | 78 | 76 | 59 |
+| 3B + record in the prompt (H100 bf16) | 298 | 82.9 [76.8, 90.1] | 96.0 | 0.77 | 20.8 (91.9) | - | 86 | 81 | 92 | 45 |
+| 3B + record with category (H100 bf16) | 298 | 85.2 [77.9, 92.2] | 97.0 | 0.61 | 65.8 (98.0) | - | 88 | 72 | 98 | 34 |
+
+**Table 62.2: POI-1, fold 0's held-out users (50 users), readers trained on POI-1's other users**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | ms per item, batched / one at a time |
+|---|---|---|---|---|---|---|
+| encoder: ModernBERT-large, 1,500 steps | 507 | 57.6 [53.4, 61.9] | 81.1 | 1.97 | 5.7 (93.1) | 7 / 36 |
+| encoder: Laya init, 1,500 steps | 507 | 57.0 [52.4, 62.5] | 79.7 | 1.99 | 7.3 (94.6) | 7 / 40 |
+| 3B, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 2.12 | 10.7 (96.3) | - |
+| 3B, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 2.27 | 4.7 (95.8) | - |
+| 3B, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 1.94 | 16.4 (92.8) | - |
+
+### 62.1 What the encoder does and does not do
+
+**Untrained, Laya's checkpoint is useless here (9%).** Its training (general decisions, 512 tokens) does not carry over to a user's
+own categories with shots. Trained for 1,500 steps it reaches 59.4 (plain ModernBERT 53.4; the Laya start is worth a few points,
+within the interval). 4,000 steps add nothing.
+
+**On REAL-6 the gap is merchant knowledge.** Without the record the encoder trails the 3B by 15 points (59 against 74) and the
+database-episode 3B by 29. The gap is largest where the merchant's standard category decides the answer: 42 to 56% against 81 to 97%.
+The 3B knows from pre-training what "GOLD'S GYM" or "BARTELL DRUGS" is; the encoder has to learn it from the training rows. On
+merchants in the user's history the two are closer (69 to 72 against 77).
+
+With the record in the input the encoder reaches 75 to 77, 8 points under the 3B with the record (83 to 85). Its top-3 is 95.0
+against 96 to 97, and it has the highest auto-file coverage in the table (52.7% of items at a threshold chosen for 98%). But that
+threshold realises 89% precision on these five users: the calibration drift of section 59, sharper with five users to fit on.
+
+**On POI-1 the encoder is level with the 3B.** It reaches 57.6 against 55.4 to 59.2, and its top-3 is better (81 against 74 to 79).
+POI-1's places carry their kind in the name ("Northside Pediatrics"), and the task is reading the user's 24 examples, not recalling
+what an obscure merchant sells. That is exactly what the layout is for, and it does it at 7 ms per item batched on an H100.
+
+### 62.2 What the step says
+
+For Q1 (multiple-choice mechanics), an encoder trained to choose among runtime-defined options, one scored marker each, does the
+in-prompt part of the job as well as a 3B decoder: it reads the shots, which GLiClass could not (section 46). What it lacks is
+world knowledge about merchants, which is where a decoder's pre-training pays.
+
+For Q2 (knowledge injection), the encoder's weakness is fixed most cheaply by the record (+16 to 22 points). That points to a
+production shape: a places or merchants database supplies the facts, and a small encoder reads them with the user's examples.
+
+Open:
+
+- all four folds (fold 0 has five REAL-6 users, so the intervals are wide);
+- database episodes for the encoder (does it store merchant facts as the 3B did?);
+- calibration objectives (soft targets, a bounded proper score beside the log score, temperature by option count), measured by bits,
+  ECE and coverage at a realised 98%;
+- pre-training the layout on general multiple-choice data before our task.
+
+
+## 63. GLiClass and ModernBERT-Instruct through the same training: GLiClass-large works as well as Laya's layout (57 without the record, 74 with it, 58 on POI-1), and with the record it has the steadiest confidence of any encoder; ModernBERT-Instruct's single mask works with the record (73.5) but learns slowly without it (29 at 1,500 steps, 42 at 5,000), and its letters show position bias (MODEL-10)
+
+PLAN step 69, on the owner's request to make GLiNER-type models and ModernBERT-Instruct work (2026-09-26). Both had failed here
+before for reasons unrelated to their families:
+
+- section 46's GLiClass was the 151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the
+  rows;
+- section 29's ModernBERT was plain ModernBERT-large taught letters in 800 steps, never the instruction-tuned checkpoint.
+
+Here both go through row 53's data, loop and scorer (`scripts/exp_encoder_mask.py`, `ARCH=gliclass|mbinstruct`): 1,500 steps of 16
+episodes, the 24 shots as plain "statement -> category" lines on every episode, options shuffled, fold 0's users held out,
+cross-entropy over the options only.
+
+- **GLiClass modern-large v3.0.** The input is `<<LABEL>>name` per category, `<<SEP>>`, then the state. GLiClass's own label-token
+  pooling and scorer give one logit per label; padded label slots are masked, which GLiClass does not do itself.
+- **ModernBERT-Large-Instruct.** The model card's template, `QUESTION: <state> CHOICES: - A: name ... ANSWER: [unused0] [MASK]`,
+  with the MLM head at the mask read over the options' IDs only.
+- **Option IDs.** Letters carry prior meaning and a position preference (option-ID selection bias, Zheng et al. ICLR 2024;
+  multiple-choice symbol binding, Robinson and Wingate ICLR 2023; the owner raised the same concern). One arm names the options
+  `[unused1]`, `[unused2]`, ... instead: tokens with no prior meaning, learned in fine-tuning only.
+- **Two follow-ups for ModernBERT-Instruct's weak no-record result:**
+  - `MBI_SHOTLAB=1` writes each shot's label with its ID ("-> H: Grendo"), a test of whether binding the label to its ID is the
+    obstacle;
+  - 5,000 steps, a test of plain under-training.
+
+Following the owner's steer that the 98% auto-file point is arbitrary, the tables now read confidence along the whole coverage
+curve (precision on the most confident 25 / 50 / 75% of items, and AURC, the mean error over all coverages; lower is better). They
+also add position bias: the total variation between where a model's picks sit in the option list and where the gold answers sit.
+
+Jobs `scripts/modal_jobs/r69*.json`; tables `scripts/encmask_tables.py`.
+
+**Table 63.1: REAL-6, fold 0's held-out users (5 users; calibration leave-users-out within them): the encoder against the 3B; top-1 by corrected group on the right**
+
+| reader | n | top-1 [interval] | top-3 | bits left | precision at 25 / 50 / 75% coverage | AURC | position bias | ms per item, batched / one at a time | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| encoder: Laya checkpoint, untrained | 298 | 9.1 [4.8, 12.8] | 25.8 | 3.83 | 11 / 7 / 9 | 0.888 | 0.65 | 14 / 20 | 13 | 14 | 7 | 0 |
+| encoder: ModernBERT-large, 1,500 steps | 298 | 53.4 [43.1, 63.5] | 72.5 | 2.34 | 85 / 79 / 65 | 0.219 | 0.14 | 10 / 17 | 69 | 50 | 42 | 45 |
+| encoder: Laya init, 1,500 steps | 298 | 59.4 [50.7, 66.1] | 73.2 | 2.21 | 92 / 81 / 70 | 0.190 | 0.15 | 10 / 17 | 72 | 47 | 54 | 48 |
+| encoder: Laya init, 4,000 steps | 298 | 59.1 [50.8, 65.2] | 74.2 | 2.19 | 85 / 80 / 73 | 0.222 | 0.14 | 9 / 16 | 69 | 50 | 56 | 45 |
+| GLiClass large, untrained | 298 | 7.7 [2.9, 12.7] | 28.2 | 3.87 | 12 / 10 / 10 | 0.888 | 0.66 | 13 / 27 | 6 | 6 | 10 | 10 |
+| GLiClass large, 1,500 steps | 298 | 56.7 [45.5, 66.5] | 72.1 | 2.22 | 92 / 85 / 69 | 0.189 | 0.16 | 8 / 20 | 67 | 47 | 53 | 45 |
+| ModernBERT-Instruct, letters, untrained | 298 | 10.4 [4.0, 15.8] | 27.9 | 3.82 | 16 / 10 / 10 | 0.880 | 0.81 | 11 / 14 | 12 | 8 | 11 | 3 |
+| ModernBERT-Instruct, letters, 1,500 steps | 298 | 28.9 [23.8, 32.9] | 43.6 | 3.33 | 58 / 46 / 35 | 0.483 | 0.27 | 9 / 16 | 50 | 19 | 20 | 0 |
+| ModernBERT-Instruct, unused-token IDs, 1,500 steps | 298 | 13.8 [6.9, 19.0] | 30.5 | 3.73 | 32 / 21 / 17 | 0.724 | 0.65 | 9 / 19 | 27 | 8 | 7 | 3 |
+| ModernBERT-Instruct, letters, shot labels carry the letter | 298 | 27.2 [22.1, 30.8] | 43.0 | 3.36 | 57 / 44 / 34 | 0.493 | 0.32 | 9 / 16 | 48 | 22 | 18 | 0 |
+| ModernBERT-Instruct, unused IDs, shot labels carry the ID | 298 | 19.1 [14.6, 23.9] | 39.3 | 3.75 | 35 / 26 / 21 | 0.713 | 0.45 | 8 / 18 | 36 | 6 | 14 | 0 |
+| ModernBERT-Instruct, letters, 5,000 steps | 298 | 41.9 [36.3, 48.3] | 58.7 | 2.83 | 74 / 65 / 51 | 0.356 | 0.20 | 10 / 18 | 63 | 31 | 35 | 3 |
+| 3B SFT no DB, all-label (H100 bf16) | 298 | 74.2 [63.8, 80.3] | 87.6 | 1.46 | 91 / 93 / 85 | 0.142 | 0.13 | - | 77 | 61 | 81 | 52 |
+| 3B database episodes (H100 bf16) | 298 | 88.3 [80.7, 94.8] | 96.3 | 0.69 | 93 / 96 / 95 | 0.073 | 0.07 | - | 91 | 75 | 97 | 59 |
+| encoder + record: ModernBERT-large | 298 | 75.2 [69.0, 82.3] | 90.3 | 1.30 | 99 / 90 / 88 | 0.092 | 0.09 | 10 / 22 | 78 | 83 | 72 | 66 |
+| encoder + record: Laya init | 298 | 76.5 [70.1, 83.7] | 95.0 | 1.25 | 93 / 88 / 87 | 0.102 | 0.11 | 9 / 17 | 81 | 78 | 76 | 59 |
+| GLiClass large + record | 298 | 74.2 [69.8, 82.3] | 85.2 | 1.26 | 100 / 97 / 90 | 0.062 | 0.13 | 6 / 14 | 75 | 78 | 73 | 66 |
+| ModernBERT-Instruct + record | 298 | 73.5 [68.9, 79.8] | 90.6 | 1.27 | 95 / 94 / 87 | 0.087 | 0.13 | 12 / 19 | 76 | 78 | 72 | 62 |
+| 3B + record in the prompt (H100 bf16) | 298 | 82.9 [76.8, 90.1] | 96.0 | 0.77 | 96 / 97 / 94 | 0.060 | 0.12 | - | 86 | 81 | 92 | 45 |
+| 3B + record with category (H100 bf16) | 298 | 85.2 [77.9, 92.2] | 97.0 | 0.61 | 99 / 99 / 97 | 0.031 | 0.12 | - | 88 | 72 | 98 | 34 |
+
+**Table 63.2: POI-1, fold 0's held-out users (50 users), readers trained on POI-1's other users**
+
+| reader | n | top-1 [interval] | top-3 | bits left | precision at 25 / 50 / 75% coverage | AURC | position bias | ms per item, batched / one at a time |
+|---|---|---|---|---|---|---|---|---|
+| encoder: ModernBERT-large, 1,500 steps | 507 | 57.6 [53.4, 61.9] | 81.1 | 1.97 | 91 / 81 / 68 | 0.210 | 0.10 | 7 / 36 |
+| encoder: Laya init, 1,500 steps | 507 | 57.0 [52.4, 62.5] | 79.7 | 1.99 | 94 / 80 / 70 | 0.195 | 0.06 | 7 / 40 |
+| GLiClass large, 1,500 steps | 507 | 58.4 [54.7, 62.5] | 79.9 | 1.96 | 90 / 79 / 71 | 0.194 | 0.09 | 6 / 26 |
+| 3B, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 2.12 | 93 / 78 / 69 | 0.194 | 0.10 | - |
+| 3B, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 2.27 | 89 / 79 / 66 | 0.227 | 0.08 | - |
+| 3B, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 1.94 | 98 / 83 / 72 | 0.172 | 0.08 | - |
+
+### 63.1 What makes an encoder work here
+
+**Every encoder is useless untrained** (GLiClass 7.7, ModernBERT-Instruct 10.4, Laya 9.1). The task, filing into one person's own
+categories from their examples, is not in any of their training mixtures.
+
+**Trained the same way, GLiClass-large and Laya's layout are equivalent.**
+
+- Without the record: 56.7 and 59.4.
+- With the record: 74.2 and 76.5.
+- On POI-1: 58.4 and 57.0.
+
+Both put a scored position next to each option's name. GLiClass's confidence is the steadiest of the encoders with the record:
+100% precision on its most confident quarter, 97% on half, AURC 0.062, level with the 3B plus record (0.060).
+
+So the earlier GLiClass failure (section 46) was the training, not the family: the base model, a fifth of the episodes, and shots
+on half of them in a format the checkpoint had no token for.
+
+**ModernBERT-Instruct's single mask works when the answer is a meaning match.** With the record it reads 73.5, with the best
+encoder top-3 (90.6). Without the record it reaches 28.9 at 1,500 steps and 41.9 at 5,000, still climbing, far below the
+per-option designs at 1,500 steps.
+
+The binding hypothesis is rejected: labelling the shots with their letter changes nothing (27.2). The reading that fits is where
+the decision is made. The per-option designs give every category its own position, which can attend to that category's name
+and to the shots filed under it. The single mask must find the similar shot, carry its label, and map it to a letter, all
+through one position and the vocabulary head. With the record, the record-to-name match is a direct semantic comparison, which
+the instruction tuning already does.
+
+**Letters do carry bias; unused IDs are worse.**
+
+- ModernBERT-Instruct with letters has the highest position bias among the trained encoders (0.27 to 0.32, against 0.14 to 0.16
+  for the per-option designs).
+- Unused-token IDs, which carry no prior, fail (13.8, bias 0.65). 1,500 steps do not teach 26 fresh embeddings to act as pointers,
+  so the model falls back on position.
+
+The per-option designs avoid the question: no ID is ever predicted.
+
+### 63.2 What the step says
+
+The best encoder design for this task scores each option at its own position: Laya's layout or GLiClass, either one.
+
+- **On POI-1** both match the 3B decoder (57 to 58 against 55 to 59) at 6 to 10 ms per item batched.
+- **On REAL-6** the gap to the 3B stays where section 62 put it, merchant knowledge (the "determined by category" group: 53 to 56
+  against 81 to 97). With the record the encoders reach 74 to 77 against 85.
+
+**Hypotheses for the remaining gap:**
+
+- **Merchant facts.** Database episodes, which lifted the 3B from 74 to 88 on fold 0, would do the same for an encoder. Test: the
+  encoder with the 3B's database episodes.
+- **Model size.** A larger per-option encoder (GLiClass-large is 400M; no larger modern encoder is public) or distillation from
+  the 3B's distributions (soft targets, row 68) closes part of it.
+- **ModernBERT-Instruct's single mask** reaches the per-option designs only with far more training; it is not the design to
+  pursue.
+
+Models `models/adapters/enc{gli,mbi}_*` (DVC).
+
+
+## 64. Results as a share of the maximum achievable score, and the scale test: on REAL-6 the best decoders sit at 95 to 96% of the ceiling (94.0 overall) and 7B / 14B add nothing over the 3B; on POI-1 a 14B gains one point over the 3B (60.2 against 59.2) where choosing the shots by kind gains nine; the limit on POI-1 is what the prompt shows, not model size (MODEL-11)
+
+PLAN step 70, and the owner's request (2026-09-26) to express results as a percentage of the maximum theoretical score.
+
+**The ceilings** (`ai_experiments.ceiling`, `scripts/ceiling_tables.py`). Each item gets the best probability of a correct top-1 that
+any reader could have from what is observable; a set's ceiling is the mean over its items, so it applies to any subset, and "% of
+ceiling" is top-1 over the ceiling on the same items.
+
+- **REAL-6, exact.** An ideal reader knows the merchant's true standard category and the user's exact scheme, but not the
+  per-merchant coin flip of a split category: 1 in history, else 1 / (the number of the user's categories holding the merchant's
+  standard category).
+
+  The coin-flip assumption was checked. On all 103 split items the four-fold runs score 40 to 47% (no run beats 50; the
+  fold-0-only shares above 100 in Table 64.2's split column are 29 items of noise).
+- **Label induction, exact per condition.** 1 when a readable example of the gold word is in the prompt; else 1 / (the coined words
+  no readable example explains).
+- **POI-1, exact only on seen kinds.** 100 when the place's Overture basic category is in the user's history, since a perfect
+  places database plus the history decides it. A never-filed kind has no computable ceiling. A rule that ignored the category
+  names (a guess among the groups sharing the item's top level) was beaten by every trained reader, because a readable name
+  ("Health care") tells a reader where a new clinic goes. So unseen kinds are read as a bracket: the best reader below, 100 above.
+
+**The scale test** (row 70) trains the three best 3B recipes at Qwen2.5-7B and 14B, fold 0, bf16 on Modal (`LLM_BASE` in
+`exp_categoriser.py`, `scripts/modal_jobs/r70.json`; MICRO 8 for the 14B):
+
+- database episodes with all-label loss, 200 steps;
+- the record stating the category, 200 steps;
+- POI-1 all-label with rename augmentation, 800 steps.
+
+**Table 64.1: REAL-6's ceiling by corrected group (an ideal reader: the merchant's true category and the user's exact scheme, not the coin flip of a split)**
+
+| group | items (all users) | ceiling, all users | items (fold 0) | ceiling, fold 0 |
+|---|---|---|---|---|
+| in history | 444 | 100.0 | 106 | 100.0 |
+| labelled seen, not in history | 115 | 90.9 | 36 | 88.9 |
+| determined by category | 509 | 99.1 | 123 | 99.2 |
+| split category | 103 | 50.0 | 29 | 50.0 |
+| other | 8 | 50.0 | 4 | 50.0 |
+| all | 1179 | 94.0 | 298 | 92.8 |
+
+**Table 64.2: REAL-6, fold 0's held-out users: top-1 as a share of the ceiling on the same items**
+
+| run | n | top-1 | ceiling on the same items | % of ceiling | headroom left (points) | in history: % of ceiling | labelled seen, not in history: % of ceiling | determined by category: % of ceiling | split category: % of ceiling |
+|---|---|---|---|---|---|---|---|---|---|
+| 3B SFT no DB, all-label | 298 | 74.2 | 92.8 | 79.9 | 18.6 | 77 | 69 | 82 | 103 |
+| 3B database episodes | 298 | 88.3 | 92.8 | 95.1 | 4.5 | 91 | 84 | 98 | 117 |
+| 7B database episodes | 298 | 87.2 | 92.8 | 94.0 | 5.5 | 90 | 97 | 98 | 69 |
+| 14B database episodes | 298 | 88.9 | 92.8 | 95.8 | 3.9 | 91 | 94 | 97 | 124 |
+| 3B + record with category | 298 | 85.2 | 92.8 | 91.9 | 7.6 | 88 | 81 | 99 | 69 |
+| 7B + record with category | 298 | 82.2 | 92.8 | 88.6 | 10.6 | 86 | 91 | 89 | 90 |
+| 14B + record with category | 298 | 88.6 | 92.8 | 95.5 | 4.2 | 93 | 94 | 97 | 90 |
+| encoder (Laya layout), no record | 298 | 59.1 | 92.8 | 63.7 | 33.7 | 72 | 53 | 54 | 97 |
+| GLiClass-large + record | 298 | 74.2 | 92.8 | 79.9 | 18.6 | 75 | 88 | 74 | 131 |
+| encoder (Laya layout) + record | 298 | 76.2 | 92.8 | 82.1 | 16.6 | 80 | 88 | 76 | 117 |
+
+**Table 64.3: POI-1, fold 0. Seen kinds (the place's Overture basic category is in the user's history) have an exact ceiling of 100 (a perfect places database plus the history); unseen kinds have none, so they are read as a bracket: the best reader below, 100 above**
+
+(fold 0: 300 seen-kind items, 207 unseen-kind; blind Opus 5.5 read 56 on its sample)
+
+| run | seen kind: top-1 = % of ceiling | seen kind, coined name | unseen kind: top-1 | all items: top-1 |
+|---|---|---|---|---|
+| untrained 14B | 57.7 | 37.2 | 45.9 | 52.9 |
+| 3B, all-label + rename | 65.3 | 56.4 | 50.2 | 59.2 |
+| 7B, all-label + rename | 63.0 | 57.7 | 51.2 | 58.2 |
+| 14B, all-label + rename | 66.0 | 66.7 | 51.7 | 60.2 |
+| GLiClass-large | 65.3 | 53.8 | 48.3 | 58.4 |
+| 3B + kind-retrieved shots | 81.0 | 75.6 | 50.7 | 68.6 |
+
+(unseen kinds: the ceiling lies between 51.7, the best reader here, and 100)
+
+**Table 64.4 label_induction_v2: ceiling and % of ceiling by condition**
+
+| condition | ceiling | 3B: top-1 / % of ceiling | 14B: top-1 / % of ceiling | 3B rename-trained: top-1 / % of ceiling |
+|---|---|---|---|---|
+| base | 100 | 46 / 46 | 77 / 77 | 77 / 77 |
+| n_gold=0 | 25 | 5 / 19 | 12 / 48 | 12 / 49 |
+| n_gold=1 | 100 | 34 / 34 | 66 / 66 | 71 / 71 |
+| n_gold=4 | 100 | 55 / 55 | 83 / 83 | 84 / 84 |
+| n_gold=8 | 100 | 66 / 66 | 87 / 87 | 90 / 90 |
+| kind=same_kind | 100 | 79 / 79 | 93 / 93 | 94 / 94 |
+| kind=opaque | 25 | 4 / 16 | 5 / 21 | 10 / 40 |
+| n_coined=1 | 100 | 47 / 47 | 78 / 78 | 78 / 78 |
+| n_coined=6 | 100 | 40 / 40 | 74 / 74 | 79 / 79 |
+| decoy | 100 | 30 / 30 | 58 / 58 | 60 / 60 |
+| decoy, n_gold=0 | 25 | 1 / 5 | 3 / 13 | 4 / 15 |
+| control: standard name | 100 | 92 / 92 | 96 / 96 | 94 / 94 |
+
+### 64.1 Where each set stands
+
+**REAL-6 is effectively solved at 3B.** The best runs sit at 95 to 96% of the ceiling:
+
+- 3B database episodes: 88.3, 95.1%;
+- 14B database episodes: 88.9, 95.8%;
+- 14B record with category: 88.6, 95.5%.
+
+That leaves about 4 points. Most of it is on merchants in the user's history (91% of ceiling): the lookup is exact there (section
+48), so a lookup in front of the model (section 59's cascade) takes those points. The 7B is not better than the 3B (87.2, 82.2).
+On five users the differences between 3B, 7B and 14B are within noise.
+
+**POI-1 is limited by what the prompt shows, not by model size.**
+
+- On seen kinds, where the ceiling is 100, the trained 3B, 7B and 14B read 63 to 66%, and the 14B gains one point overall (60.2
+  against 59.2).
+- Choosing up to six of the 24 shots by the place's kind lifts the 3B to 81% of ceiling on seen kinds (68.6 overall) with no
+  retraining. A kind lookup reaches 100% there by construction.
+- The 14B's one clear gain is coined names on seen kinds (57 to 67): larger models read a coined word from its examples better,
+  as section 60 found.
+- On unseen kinds every trained reader is at 48 to 52. That is the bracket's floor; blind Opus read 25 to 70 across unseen-kind
+  levels.
+
+**Label induction** is where the gap to the ceiling is widest for the models. At two gold examples the best reach 77% of a ceiling
+Opus reaches, and with a decoy they fall to 58 to 60% of it (section 60).
+
+### 64.2 Hypotheses for what is left
+
+1. **REAL-6's last 4 points are the lookup.** A model given the user's own label for a merchant in their history (the merchant
+   lookup in front, or retrieved shots of the same merchant) should reach about 99% of ceiling on the in-history group. Test: the
+   cascade lookup, then the model, read against the ceiling.
+2. **POI-1's seen kinds are a retrieval problem.** Kind-retrieved shots reach 81% of ceiling, a lookup 100. Training with
+   kind-retrieved shots (the model learns to trust the same-kind examples), or putting the kind in the prompt as a record, should
+   close most of the remaining 19 points. Test: train with the `poi1_v1_kshots` layout and with an Overture record.
+3. **POI-1's unseen kinds need the category names' meaning.** 14B does not beat 3B there (51.7 against 50.2), so it is not raw
+   capacity. Candidates:
+   - a description of each user category from its filed places ("Gavir: counselling, psychology"), put in the prompt;
+   - the examples' kinds as records.
+4. **Label induction's gap is the decoy and one-example cases** (section 60): train with decoys and empty categories.
+
+Models from rows 69 and 70 are in DVC (`models/adapters/categoriser_Qwen2.5-{7B,14B}-Instruct_*`, `enc{gli,mbi}_*`).

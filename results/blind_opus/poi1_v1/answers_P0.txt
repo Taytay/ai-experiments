@@ -1,0 +1,60 @@
+item 1 | Detavul | Bar; this person filed a bar and grill under Detavul
+item 2 | Airport & parking | Private jets and air travel belong with airports
+item 3 | Rupen | Doctor visit; no health category seen, so the unused invented name
+item 4 | Services and business | Marine systems business, no clearer match
+item 5 | Sports and recreation | Trail; parks and trails go here
+item 6 | Specialty store & office supply store | Tattoo supplies are a specialty store
+item 7 | Services and business | Lab or technical business, no clearer match
+item 8 | Services and business | Government recruiting office, a generic service
+item 9 | Health care | Naturopathic medicine counts as health care
+item 10 | Zusara | Professional-services firm; Zusara holds law and personal services
+item 11 | Education | Child care center sits closest to education
+item 12 | Regor | Chiropractic is like acupuncture, which is Regor
+item 13 | Shopping | Supply house purchase is shopping
+item 14 | B2b transportation and storage service & supplier or distributor | Blue Rhino was filed here before
+item 15 | Sports and recreation | Kids' dig-themed play park is recreation
+item 16 | Kebivon | Medical specialist clinic; the oncology visit went to Kebivon
+item 17 | Lodging | An inn is lodging
+item 18 | Parking | Parking company
+item 19 | Health care | Rehab and nursing facility is health care
+item 20 | Education | Test prep and tutoring is education
+item 21 | Shopping | Retail store
+item 22 | Lounge & coffee shop | Bar and lounge
+item 23 | Services and business | Condo association fee is a property service
+item 24 | Services and business | Industrial coating service
+item 25 | Health care | Named individual, like the earlier person filed as health care
+item 26 | Arts and entertainment | Music festival
+item 27 | Services and business | Oil supply business
+item 28 | Education | Academy is a school
+item 29 | College university & library | University conference center
+item 30 | Shopping | Printer ink retail
+item 31 | Vamusox | Parks were filed as Vamusox
+item 32 | Urgent care clinic & surgery | Surgeon (FACS), like the earlier MD filed here
+item 33 | Shopping | Paint store retail
+item 34 | Health care | Medical lab
+item 35 | Sporting goods store & animal and pet store | Sporting goods
+item 36 | Services and business | Apartment rent; no housing category
+item 37 | Services and business | Auto repair; no vehicle category
+item 38 | Health care | Hospital
+item 39 | Lifestyle services | Spa and wellness went to Lifestyle services before
+item 40 | Shopping | Power tools retail
+item 41 | Fuzox | Medical practices were filed as Fuzox
+item 42 | Industrial facility or service & laundry service | Industrial finishing service
+item 43 | Farm & atm | Bitcoin ATM, like Cash2Bitcoin earlier
+item 44 | Sport field & sport league | Youth sports league
+item 45 | Shopping | Branded merchandise
+item 46 | Health care | Women's health clinic
+item 47 | Kogi | Physical therapy, like the rehab center filed under Kogi
+item 48 | Public transit facility or service & train station | Subway station
+item 49 | Services and business | Generic business services
+item 50 | Benotol | Service business; Benotol held the U-Haul service
+item 51 | Sports and recreation | Social sports venue
+item 52 | Lodging | Retreat house stay
+item 53 | Services and business | Graphic design business
+item 54 | Food and drink | Coffee shop
+item 55 | Travel and transportation | Airport jet center
+item 56 | Surgery & primary care or general clinic | Surgeon's office
+item 57 | Services and business | Creative services business
+item 58 | Legal service & home service | Law firm, like Moynahan Law Firm earlier
+item 59 | Vavekor | Pharmacy; CVS was filed as Vavekor
+item 60 | Sports and recreation | Martial arts school

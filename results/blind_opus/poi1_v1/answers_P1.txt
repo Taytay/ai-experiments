@@ -1,0 +1,60 @@
+item 1 | Brewery & casual eatery | Brewing company, like Glasshouse and Rock Bottom
+item 2 | Sports and recreation | Place-named outdoor spot, like Zimmerman Trail
+item 3 | Shopping | Redbox is video rental retail; stores filed as Shopping
+item 4 | Shopping | Farmers market is a retail food purchase
+item 5 | Linil | School district; Zion Middle School filed Linil
+item 6 | Second hand store & pharmacy and drug store | Gold and coin buyer is a second-hand dealer
+item 7 | Sports and recreation | Playground is recreation, like Allen Holland Field
+item 8 | Shopping | Likely a game or hobby shop
+item 9 | Vosil | Home trade service like the HVAC contractor
+item 10 | Food and drink | Coffee and donut chain
+item 11 | Sports and recreation | Bike park is recreation
+item 12 | Shopping | Auto parts retail store
+item 13 | Kazir | Funeral service fits no other listed category
+item 14 | Services and business | Landscaping contractor is a business service
+item 15 | Arts and entertainment | Escape room is entertainment
+item 16 | Health care | Hospital, like Walmart Vision filed Health care
+item 17 | Services and business | Generic company name, like Quail Bay
+item 18 | Shopping | Redbox video rental retail kiosk
+item 19 | Tigomen | Business-to-business service, like printing and IT
+item 20 | Laundry service & environmental or ecological service | Ag supply coop, like South Central FS
+item 21 | Bed and breakfast | Inn, like the other B&B lodging
+item 22 | Health care | Pediatrics clinic, like Tier Pediatrics
+item 23 | Second hand store | Antique shop is second-hand retail
+item 24 | Sports and recreation | Baseball training facility is sports
+item 25 | Services and business | Environmental services company
+item 26 | Services and business | Boat repair service
+item 27 | Services and business | Propane energy supplier, like Tri-Force Energy
+item 28 | Sports and recreation | Tennis center is sports facility
+item 29 | Travel and transportation | EV charging relates to transportation
+item 30 | Services and business | Accounting firm is a professional service
+item 31 | Shopping | Discount retail store
+item 32 | Sport or recreation club & recreational equipment rental | Water sports equipment rental
+item 33 | Vove | Golf club, like Brookside Golf filed Vove
+item 34 | Services and business | Printing systems business service
+item 35 | Arts and entertainment | Theater is entertainment
+item 36 | Bugozer | Multimodal station, like Woodbourne station
+item 37 | Education | Middle school
+item 38 | Nina | Wireless communications, like Fireground Communications
+item 39 | Second hand store & pharmacy and drug store | Drugstore/pharmacy
+item 40 | Casino & psychic advising | Psychic, like Brujeria Y Mas
+item 41 | Travel and transportation | Chauffeur, like limos and taxis
+item 42 | Pimox | Park, like the playground parks filed Pimox
+item 43 | Housing or property service & atm | ATM
+item 44 | Travel service & vehicle service | Schooner sailing tour is a travel service
+item 45 | Shopping | Likely baby goods retail shop
+item 46 | Health care | Physician MD office
+item 47 | Services and business | Generic enterprises company
+item 48 | Zale | Antique retail; Zale holds store purchases like CVS
+item 49 | Vehicle dealer | Peterbilt truck dealership
+item 50 | Dipo | Hearing clinic, closest to dental health clinics
+item 51 | Bodolel | Rest area travel stop, like Travel Refresh 365
+item 52 | Art gallery & amusement park | Art gallery, like the other galleries
+item 53 | Kazir | USO nonprofit fits no other category
+item 54 | Shopping | Specialty mushroom retail shop
+item 55 | Zimo | Boardwalk amusement ride, like Sea Serpent Wildwood
+item 56 | Lirokal | Large industrial corporation, like PPG and Enerplus
+item 57 | Services and business | Food distribution business
+item 58 | Sport or recreation club | Dance studio, like the taekwondo club
+item 59 | Figesex | Florist; no flower or shopping category exists
+item 60 | Health care | Family practice medical clinic

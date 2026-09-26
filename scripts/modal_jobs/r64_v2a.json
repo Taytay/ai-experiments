@@ -1,0 +1,67 @@
+[
+ {
+  "tag": "r64b-base-3b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r64b-base-7b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-7B-Instruct"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r64b-base-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r64b-N-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "ADAPTERS_FROM": "r58-N-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r64b-E-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "ADAPTERS_FROM": "r58-E-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_alllab_dbep50_lora"
+  ]
+ }
+]

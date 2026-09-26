@@ -1,0 +1,34 @@
+[
+ {
+  "tag": "r69-mbi-b",
+  "env": {
+   "ARCH": "mbinstruct",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r69-mbi-unused-b",
+  "env": {
+   "ARCH": "mbinstruct",
+   "MBI_IDS": "unused",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r69-mbi-ctx-b",
+  "env": {
+   "ARCH": "mbinstruct",
+   "CTX": "1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
