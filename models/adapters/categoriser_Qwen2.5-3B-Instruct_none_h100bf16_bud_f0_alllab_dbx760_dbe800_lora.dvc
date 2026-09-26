@@ -1,0 +1,7 @@
+outs:
+- md5: 42223867b6b18948516407071f4c31f5.dir
+  size: 490440636
+  nfiles: 6
+  hash: md5
+  path: 
+    categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f0_alllab_dbx760_dbe800_lora

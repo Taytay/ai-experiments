@@ -1,0 +1,6 @@
+outs:
+- md5: 5b92017f6a4b01f80ee27424c0d7ef5c.dir
+  size: 8768232957
+  nfiles: 40
+  hash: md5
+  path: fastfit_bge_full

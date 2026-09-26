@@ -1,0 +1,6 @@
+outs:
+- md5: c12cc18090cf7d4d57ec3b922d2d1cda.dir
+  size: 46276971
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_merchant_ft_newtok_mean

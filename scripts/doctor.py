@@ -115,7 +115,8 @@ def check_dvc_remote() -> None:
         return
     adapters = ROOT / "models" / "adapters"
     n = len([p for p in adapters.iterdir() if p.is_dir()]) if adapters.is_dir() else 0
-    report("OK" if n else "WARN", "dvc remote", f"{url}; {n} adapter dirs in models/adapters" + ("" if n else " (run `uv run dvc pull`)"))
+    tracked = len(list(adapters.glob("*.dvc"))) if adapters.is_dir() else 0
+    report("OK", "dvc remote", f"{url}; {n} of {tracked} tracked adapters present locally (`just pull NAME` fetches one)")
 
 
 def check_claude_settings() -> None:

@@ -1,0 +1,6 @@
+outs:
+- md5: 0cf9aa39f3bbd12a0218635c7c6374df.dir
+  size: 490440687
+  nfiles: 6
+  hash: md5
+  path: categoriser_Qwen2.5-3B-Instruct_ret_s1_lora

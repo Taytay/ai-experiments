@@ -1,0 +1,6 @@
+outs:
+- md5: 4833235e539af4adc4b0a970856a9507.dir
+  size: 46162431
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_universe_trained
