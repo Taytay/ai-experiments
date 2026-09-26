@@ -101,6 +101,14 @@ def chat_item(item):
     return dict(item, prompt=chat_prompt(item["prompt"]), prompt_ctx=chat_prompt(item["prompt_ctx"]))
 
 
+def category_record(merchant, record):
+    """Row 58 (REAL-16): the fact-DB record with the merchant's category stated, the same sentence the prose arm of row 57 trained on
+    ("X is a Groceries store that sells ..."), so the record in the prompt carries the information the database episodes had."""
+    from . import transactions as T
+    cat = {m["name"]: m["category"] for m in T.load()["merchants"]}[merchant]
+    return f"{merchant} is a {cat} store that sells {record.split(' sells ', 1)[1]}"
+
+
 def set_record(item, record):
     """The item with another merchant record in its context prompt (the ambiguous DB, or a retrieved record, right or wrong)."""
     head, sep, q = item["prompt_ctx"].rpartition("\nTransaction: ")

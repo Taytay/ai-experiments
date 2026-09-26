@@ -57,6 +57,9 @@ _fold = re.search(r"_f(\d)(?:_|$)", WHAT)  # row 42: a fold adapter (exp_categor
 USERS = os.environ.get("USERS", "all" if _fold is None else ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == int(_fold.group(1))))
 if USERS != "all":
     ITEMS = [it for it in ITEMS if str(it["user"]) in USERS.split(",")]
+REC_CAT = bool(int(os.environ.get("REC_CAT", "1" if "_reccat" in WHAT else "0")))  # row 58: the test record states the category, as in training
+if REC_CAT and ROUTE == "llm":
+    ITEMS = [R6.set_record(it, R6.category_record(it["merchant"], it["record"])) for it in ITEMS]
 if ROUTE == "llm":
     from ai_experiments import real6_shots as RS
     USERS_BY_ID = {u["user"]: u for u in DOC["users"]}

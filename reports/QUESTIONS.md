@@ -930,3 +930,21 @@ all-label episodes, against the prose records given the same category (`DB_CAT`)
 folds so that no (user, merchant) answer is supervised for a scored user; the DB-only merchants without the record (known chains
 and opaque ones) are the cell that measures it, plus the other groups of REPORT.md 48 and ARC / MMLU. Frame: this improves the
 no-record route (retrieval missing or unavailable at serving time); with the record in the prompt the DB-only merchants are at 97.5.
+
+## Added 2026-09-26: database episodes against retrieval, and at scale
+
+**REAL-16 (O) Do database episodes beat the record in the prompt when both carry the same information?**
+Row 57 put the DB-only merchants at 94 on held-out users with no record at test, after training on database episodes built
+from a category field; the record-in-prompt categoriser has only ever seen product sentences (section 38: 97.6 on training
+users, 81.6 overall on held-out ones). *Experiment:* on row 42's held-out folds, one hardware and precision for every arm (H100,
+bf16, one 16-sequence pass per step, 200 steps): no DB (all-label), database episodes (all-label, `DBEP=0.5`), the record in the
+prompt (plain SFT, products only), and the record in the prompt stating the category (`REC_CAT`, `real6.category_record`, in
+training and at test); the corrected groups of REPORT.md 48, the DB-only merchants split into known chains and opaque ones.
+
+**REAL-17 (O) How many merchants can database episodes hold?**
+Row 57's database has 240 merchants; a production one has millions, and section 29 found interference once a rank-64 adapter
+holds 5,000 species at a fixed exposure. *Experiment:* the REAL-6 database padded with generated merchants (opaque names, a
+standard category each, product records from the category pools) to about 1,000, 5,000 and 20,000, database episodes drawn
+over all of them; the DB-only merchants of REAL-6 scored on held-out users as before, at a fixed step budget (fewer rows per
+merchant as the database grows) and at a fixed exposure per merchant (steps grow with the database); the point at which the
+DB-only accuracy falls is the capacity figure for a 3B model with a rank-64 adapter.
