@@ -31,7 +31,7 @@ SMOKE = bool(os.environ.get("SMOKE"))
 MAXLEN = 1536  # MMLU 5-shot prompts run to about 900 tokens; the scorer cuts prompts to MAXLEN - 32 and options must fit in the rest
 what = sys.argv[1] if len(sys.argv) > 1 else "base"
 if what == "base":
-    src, tag, kind = MODEL, "base", "base"
+    src, tag, kind = MODEL, "base" if MODEL == "Qwen/Qwen2.5-3B" else f"base_{MODEL.split('/')[-1]}", "base"  # another base model gets its own file
 elif what == "full":
     src, tag, kind = sys.argv[2], os.path.basename(sys.argv[2].rstrip("/")), "full"
 else:

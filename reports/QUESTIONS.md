@@ -627,6 +627,8 @@ DB (none; parametric injection of the DB texts first, section 8's recipe or an e
 record at inference, section 25). The number that matters is the gain on merchants present in the DB but
 absent from the user's history, split by seen and unseen category names, and whether the gain survives
 unseen scheme names. Everything else (recall of the DB, general-ability cost) is reported as before.
+**Status (2026-09-19):** answered for two of the three training routes, PLAN step 33, REPORT.md 38, on the REAL-6 set with a DB-only control (60 merchants no training row carries). Label SFT (LoRA on Qwen2.5-3B-Instruct in the 24-shot prompt format, one adapter for 20 users) reads 57.1 over the set (untrained 31.2), 96 when the merchant is among the shots, 55 on merchants other users labelled, 51 on DB-only merchants (real chains 70, opaque 25); the tuned bge-base encoder 75.7 (frozen 36.5), 80 on the user's and on other users' merchants, 38 on DB-only. The gain from the DB on the DB-only merchants: parametric injection of the records is nil at one pass (SFT 51 to 54, encoder 38 to 39) and +21 at three passes (SFT 72; opaque 25 to 54; coined names 32 to 68) at nine ARC-Easy points; the record at inference is +33 for the encoder (71; opaque 50; coined 77) and +46 for the SFT model (98; opaque 94; coined 96) at no general-ability cost. The gain survives, and is largest on, the user's own and coined names. Not run: teacher-trace distillation / GRPO; a learned retriever (oracle used); the ambiguous-products v2 set.
+
 
 **REAL-6 (O) An evaluation set shaped like the production task: users, schemes, histories.**
 No eval has per-user category schemes. *Task:* synthetic users over the merchant set (then REAL-1's
