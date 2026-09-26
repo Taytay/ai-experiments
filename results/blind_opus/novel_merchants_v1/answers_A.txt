@@ -1,0 +1,60 @@
+item 1 | Tabbin
+item 2 | Yurra
+item 3 | Nastel
+item 4 | Halmer
+item 5 | Fitness
+item 6 | Juvix
+item 7 | Dravik
+item 8 | Zindle
+item 9 | Grendo
+item 10 | Subscriptions
+item 11 | Car
+item 12 | Home Improvement
+item 13 | Eating out
+item 14 | Fennow
+item 15 | Lumbry
+item 16 | Eating out
+item 17 | Nastel
+item 18 | Electronics
+item 19 | Yurra
+item 20 | Dining
+item 21 | Weekly shop
+item 22 | Korrel
+item 23 | Nastel
+item 24 | Yurra
+item 25 | Halmer
+item 26 | Dravik
+item 27 | Gas & Auto
+item 28 | Quorra
+item 29 | Gas & Auto
+item 30 | Hardware
+item 31 | Quorra
+item 32 | Blint
+item 33 | Gadgets & Food shopping
+item 34 | Quorra
+item 35 | Eating out
+item 36 | Fuel and car
+item 37 | Electronics
+item 38 | Gas & Auto
+item 39 | Quorra
+item 40 | Entertainment
+item 41 | Home Improvement
+item 42 | Home repairs
+item 43 | Gadgets & Food shopping
+item 44 | Fennow
+item 45 | Yurra
+item 46 | Home repairs
+item 47 | Nastel
+item 48 | Juvix
+item 49 | Fun
+item 50 | Blint
+item 51 | Nastel
+item 52 | Yurra
+item 53 | Entertainment
+item 54 | Trips & Medical
+item 55 | Special occasions
+item 56 | Gadgets & Food shopping
+item 57 | Fitness
+item 58 | Dravik
+item 59 | Eating out
+item 60 | Korrel

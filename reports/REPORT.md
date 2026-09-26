@@ -3664,3 +3664,161 @@ With the same information the two routes tie: database episodes, with nothing in
 REAL-16 asked whether database episodes beat the record in the prompt at equal information. They match it. So a merchant database can be served from the weights at no loss against retrieval, at this size: no lookup at serving time, and it still works when retrieval cannot find the record, at the cost of retraining when the database changes. Which to prefer then turns on the database's size and churn: row 59 measures how many merchants the weights can hold, and the combination (episodes in training, the record in the prompt when it is found) is the obvious next arm.
 
 Not done: episodes with the record also in the prompt, the record arms with the all-label loss and rename augmentation, and the ambiguous database of section 43.
+
+## 56. Batch size on the H100: 16 sequences per step at 1e-4 is already the efficient point; bigger batches match it only with the rate scaled, more data per step buys at most a point, and larger passes are not faster (TRAIN-12)
+
+*PLAN step 60, from the owner's question whether batch sizes had been ablated on the H100. Code: `EFF_BATCH` in `scripts/exp_categoriser.py` (sequences per optimizer step; 16 in every earlier run), `scripts/modal_jobs/r60.json`, `scripts/batch_tables.py`. The all-label no-DB categoriser on bf16, all 20 users, one seed per setting against the three batch-16 seeds of section 52.4. [Q1]*
+
+Only the layout had been compared before (four passes of 4 against one of 16 at the same 16 sequences per step, section 54). This step varies the effective batch itself, at equal samples (fewer steps for bigger batches, the rate at 1e-4 and scaled by the square root of the batch ratio) and at equal steps (two and four times the data), and the pass size for throughput.
+
+**Table 56.1: batch size and pass size on the H100 (all-label no-DB categoriser, bf16, all 20 users; accuracy %)**
+
+| setting | per step | per pass | steps | rate | sequences | minutes | tokens/s | peak GiB | final loss | all | in history | determined by category | coined | DB-only | ARC-Easy | MMLU | ICL symbol |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| batch 16, seed 0 | 16 | 16 | 200 | 1e-4 | 3,200 | 3.0 | 14052 | 28.69 | 0.001 | 79.6 | 85.6 | 87.4 | 88.0 | 54.1 | 75.0 | 55.0 | 73.5 |
+| batch 16, seed 1 | 16 | 16 | 200 | 1e-4 | 3,200 | 2.9 | 14697 | 28.47 | 0.003 | 78.8 | 83.8 | 87.0 | 86.7 | 52.5 | 77.5 | 57.5 | 70.3 |
+| batch 16, seed 2 | 16 | 16 | 200 | 1e-4 | 3,200 | 2.9 | 14637 | 28.57 | 0.002 | 81.6 | 86.9 | 89.0 | 88.8 | 57.4 | 72.0 | 55.0 | 74.0 |
+| batch 16, passes of 8 | 16 | 8 | 200 | 1e-4 | 3,200 | 2.9 | 14761 | 18.0 | 0.002 | 80.7 | 86.7 | 88.4 | 87.6 | 54.9 | 77.5 | 56.5 | 74.5 |
+| batch 32, equal samples | 32 | 32 | 100 | 1.41e-4 | 3,200 | 3.3 | 13033 | 50.96 | 0.004 | 79.5 | 84.9 | 87.2 | 87.1 | 51.6 | 73.5 | 53.5 | 72.4 |
+| batch 32, equal samples, rate unscaled | 32 | 32 | 100 | 1e-4 | 3,200 | 3.3 | 13135 | 50.96 | 0.005 | 79.7 | 85.1 | 86.2 | 87.6 | 51.6 | 75.5 | 53.5 | 74.0 |
+| batch 64, equal samples | 64 | 32 | 50 | 2e-4 | 3,200 | 3.3 | 13027 | 51.3 | 0.017 | 80.1 | 85.8 | 87.6 | 87.1 | 55.7 | 76.5 | 51.5 | 70.8 |
+| batch 64, equal samples, rate unscaled | 64 | 32 | 50 | 1e-4 | 3,200 | 3.3 | 12905 | 51.3 | 0.07 | 72.3 | 78.4 | 77.0 | 73.1 | 52.5 | 72.5 | 54.5 | 70.8 |
+| batch 32, equal steps | 32 | 32 | 200 | 1.41e-4 | 6,400 | 6.4 | 13321 | 50.96 | 0.0 | 81.6 | 87.4 | 89.8 | 90.4 | 60.7 | 77.5 | 54.0 | 72.9 |
+| batch 64, equal steps | 64 | 32 | 200 | 2e-4 | 12,800 | 13.1 | 13105 | 51.4 | 0.0 | 80.9 | 87.2 | 89.8 | 92.4 | 58.2 | 80.0 | 54.0 | 72.9 |
+
+The H100 is saturated at 8 to 16 sequences per pass: 14,761 tokens a second at 8, about 14,400 at 16 and 13,000 at 32, where each batch is padded to its longest sequence. At equal samples (3,200 sequences) a batch of 32 or 64 matches the batch-16 seeds (79.5 to 80.1 against 78.8 to 81.6) only when the rate is scaled; the batch of 64 at the unscaled rate stops at 72.3 with a final loss of 0.07, having had 50 steps of which 20 are warmup. At equal steps, twice and four times the data read 81.6 and 80.9, at the top of the seed range, for two and four times the compute. The general measures do not move. TRAIN-12's answer: keep 16 sequences per step at 1e-4 for 200 steps (three minutes on the H100); if a larger batch is ever wanted, scale the rate by the square root of the batch ratio and lengthen the warmup with it.
+
+## 57. Novel merchants from a real POI database: with a readable name the categoriser files unknown businesses well (database episodes 88% on descriptive names, clean rendering), the bank-statement truncation costs every model without a record about 15 points, a real-database record fixes both at 85%, and the user's coined names remain the gap a strong reader closes (REAL-19)
+
+*PLAN step 62, the owner's idea to build the novel merchants from Overture. Code: `scripts/build_novel_merchants.py` (frozen `data/processed/novel_merchants_v1.json`), `scripts/build_novel_merchants_variants.py` (`_full`, `_clean`), `ITEMS_SET` in `scripts/exp_real6.py`, `ADAPTERS_FROM` in `scripts/modal_app.py`, `scripts/modal_jobs/r62*.json`, `scripts/novel_merchants_tables.py`, `scripts/blind_ceiling.py` with its prompts and answers in `results/blind_opus/`. Row 58's bf16 fold adapters on their held-out users, and the untrained instruct model. [Q1, Q2, Q3]*
+
+REAL-6 cannot ask whether a categoriser can infer an unknown merchant's kind from its name: its merchants all have records and its opaque names mean nothing. This set takes real US businesses from Overture's places (release 2026-09-23.1, downloaded 2026-09-26 with per-row licences, `data/external/overture_places_2026-09-23.1/`) that are in no database and no user history: 100 per standard category through an explicit map of Overture's taxonomy (ambiguous types such as furniture or convenience stores left out), each category split into 40 independents whose name contains a word for their kind ("Chappaqua Dentistry"), 40 whose name contains no category word of any category ("Bark N' Bubbles"), and 20 chains (a brand with 25 or more US locations); 1,198 items, each put to one REAL-6 user with that user's frozen 24 shots and labelled in their scheme, with a record built from Overture's category ("Chappaqua Dentistry is listed as a dental clinic") for the record arms. Overture's own category is the label, errors included (a liquor store tagged grocery_store; famous chains without a brand tag land among the plain names). At the owner's request the same items exist in three renderings that differ only in the query's statement string: the generator's (names cut to 8 or 10 characters or abbreviated: `THE GRMNG SHPP*8011`), the full name with bank noise (`DEBIT CARD PURCHASE THE GROOMING SHOPPE #0366 LODI NJ`) and the clean name first (`The Grooming Shoppe, Lodi NJ`).
+
+**Table 57.1: the novel merchants (held-out users; top-1, top-3 and bits from the scorecard: options ranked by summed log-probability, bits after the leave-users-out temperature; the group columns are top-1 under the mean-per-token rule of every earlier REAL-6 table; the two rules differ by under a point)**
+
+| arm | rendering | top-1 | top-3 | bits | descriptive | plain | chain | standard name | renamed | coined |
+|---|---|---|---|---|---|---|---|---|---|---|
+| untrained instruct, no record | A obscure | 39.6 | 57.6 | 2.93 | 46.2 | 29.8 | 37.8 | 42.6 | 44.8 | 13.1 |
+| untrained instruct, no record | B full name + bank noise | 49.7 | 68.7 | 2.47 | 59.2 | 34.8 | 49.2 | 57.0 | 54.5 | 10.0 |
+| untrained instruct, no record | C clean | 53.6 | 70.5 | 2.32 | 63.5 | 39.8 | 54.6 | 62.2 | 62.5 | 7.7 |
+| untrained instruct + Overture record | A obscure | 69.3 | 84.7 | 1.46 | 65.6 | 71.7 | 73.5 | 83.7 | 72.3 | 30.8 |
+| untrained instruct + Overture record | B full name + bank noise | 69.9 | 85.5 | 1.43 | 68.8 | 71.5 | 71.0 | 84.0 | 73.2 | 31.7 |
+| untrained instruct + Overture record | C clean | 71.2 | 86.0 | 1.42 | 70.8 | 71.5 | 71.8 | 84.4 | 75.8 | 30.8 |
+| SFT no DB | A obscure | 52.8 | 68.4 | 2.41 | 62.9 | 36.5 | 62.2 | 55.1 | 53.7 | 42.1 |
+| SFT no DB | B full name + bank noise | 65.9 | 80.8 | 1.81 | 80.8 | 47.1 | 72.7 | 68.6 | 68.1 | 53.8 |
+| SFT no DB | C clean | 67.8 | 80.9 | 1.73 | 82.3 | 50.2 | 74.8 | 70.9 | 70.5 | 55.7 |
+| database episodes | A obscure | 57.2 | 73.8 | 2.10 | 67.1 | 42.9 | 66.0 | 59.3 | 59.0 | 48.4 |
+| database episodes | B full name + bank noise | 71.0 | 83.6 | 1.51 | 85.6 | 53.5 | 79.8 | 75.9 | 73.4 | 57.9 |
+| database episodes | C clean | 72.5 | 85.5 | 1.41 | 87.9 | 53.5 | 78.6 | 75.9 | 74.1 | 60.2 |
+| record arm + Overture record | A obscure | 85.1 | 93.1 | 0.88 | 85.6 | 85.8 | 85.3 | 94.3 | 87.6 | 61.1 |
+| record arm + Overture record | B full name + bank noise | 85.1 | 92.8 | 0.87 | 85.8 | 85.8 | 84.0 | 94.3 | 87.8 | 59.7 |
+| record arm + Overture record | C clean | 84.0 | 92.5 | 0.87 | 85.6 | 84.8 | 83.2 | 94.7 | 86.7 | 57.5 |
+| record + category arm + Overture record | A obscure | 84.8 | 93.7 | 0.81 | 84.4 | 85.2 | 84.5 | 93.3 | 84.5 | 64.7 |
+| record + category arm + Overture record | B full name + bank noise | 84.6 | 94.0 | 0.80 | 83.1 | 85.2 | 84.5 | 93.0 | 83.8 | 64.3 |
+| record + category arm + Overture record | C clean | 85.1 | 94.0 | 0.79 | 83.8 | 86.5 | 85.3 | 93.9 | 85.4 | 63.8 |
+
+**Table 57.2: clean minus obscure on the same items, top-1 points [user-resampled interval]**
+
+| arm | all | descriptive | plain | chain | coined |
+|---|---|---|---|---|---|
+| untrained instruct, no record | +14.3 [+9.2, +19.2] | +17.3 [+10.5, +23.8] | +10.0 [+4.2, +15.0] | +16.8 [+9.6, +24.7] | -5.4 [-10.4, -0.6] |
+| untrained instruct + Overture record | +1.7 [-0.9, +4.3] | +5.2 [+1.5, +8.6] | -0.2 [-3.4, +2.7] | -1.7 [-4.7, +1.9] | +0.0 [-6.1, +4.7] |
+| SFT no DB | +15.8 [+13.8, +18.4] | +19.4 [+15.5, +24.3] | +13.8 [+10.2, +17.0] | +12.6 [+8.3, +16.9] | +13.6 [+8.4, +19.6] |
+| database episodes | +15.1 [+12.2, +18.8] | +20.8 [+16.7, +26.0] | +10.6 [+6.4, +14.5] | +12.6 [+7.6, +19.4] | +11.8 [+6.2, +17.3] |
+| record arm + Overture record | -0.8 [-2.0, +0.3] | +0.0 [-1.4, +1.4] | -1.0 [-3.0, +0.6] | -2.1 [-3.9, -0.4] | -3.6 [-8.5, +0.0] |
+| record + category arm + Overture record | +0.4 [-0.4, +1.4] | -0.6 [-1.7, +0.3] | +1.2 [+0.0, +2.6] | +0.8 [-1.0, +2.8] | -0.9 [-2.9, +1.1] |
+
+**Table 57.3: descriptive names in the obscure rendering (n = 480; the category word survives in 65%; accuracy %)**
+
+| arm | word survives the rendering (n=314) | word lost (n=166) | standard single category (n=203) | renamed single (n=135) | merged (n=47) | coined (n=95) | word survives + standard single (n=131) |
+|---|---|---|---|---|---|---|---|
+| untrained instruct, no record | 60.8 | 18.7 | 55.7 | 54.8 | 48.9 | 12.6 | 76.3 |
+| SFT no DB | 79.6 | 31.3 | 66.5 | 68.9 | 48.9 | 53.7 | 85.5 |
+| database episodes | 83.8 | 35.5 | 70.4 | 70.4 | 59.6 | 58.9 | 90.1 |
+| record arm + Overture record | 85.4 | 86.1 | 94.1 | 93.3 | 76.6 | 61.1 | 93.9 |
+
+**Table 57.4: a blind Opus 5.5 ceiling on 60 items (40 with coined category names), obscure (A) and clean (C) renderings (accuracy %)**
+
+| reader | coined, all (n=40) | coined, descriptive (n=14) | coined, plain (n=14) | coined, chain (n=12) | controls (n=20) | all (n=60) |
+|---|---|---|---|---|---|---|
+| blind Opus 5.5, rendering A | 75 | 93 | 50 | 83 | 80 | 77 |
+| blind Opus 5.5, rendering C | 88 | 100 | 71 | 92 | 90 | 88 |
+| 3B no DB (obscure) | 42 | 57 | 29 | 42 | 65 | 50 |
+| 3B database episodes (obscure) | 55 | 64 | 36 | 67 | 75 | 62 |
+| 3B database episodes (clean) | 65 | 79 | 50 | 67 | 75 | 68 |
+
+### 57.1 What the model infers from a name, and what the rendering takes away
+
+With a readable name, the categoriser trained with database episodes files these never-seen businesses at 72.5 top-1 and 85.5 top-3 (clean): 87.9 on descriptive names, 78.6 on chains, 53.5 on names with no category word, which is still seven times chance. The untrained instruct model reads 53.6; label SFT without a database 67.8; the database episodes add 4.7 on top of that although none of these businesses is in their database (Table 57.1): what they teach is partly the general step from "what kind of store" to "which of this user's categories". The bank-statement truncation costs every model without a record 14 to 16 points (Table 57.2), almost all of it from truncation and abbreviation: the full name inside bank noise reads within two points of the clean name. On descriptive names the category word survives the generator's rendering 65% of the time, and where it is lost the models fall to 19 to 36 (Table 57.3); where it survives and the user's category has its standard name, the episode model reads 90.1. The remaining errors there are mostly ambiguous businesses or Overture's labels (a gas-station food mart tagged grocery_store, an electrical supplier tagged hardware_store).
+
+### 57.2 A real-database record, and the coined names
+
+Given the Overture category as a record, the record-in-prompt categoriser, trained on REAL-6's synthetic product records, reads 85% in every rendering and every name group (plain names 85.8): retrieval from a real POI database transfers directly, and makes the rendering irrelevant. The weak cell in every arm is the user's coined category name: 42 to 60 without a record, 58 to 65 with one. Two explanations were tested and failed: the coined category's examples in the prompt containing a recognisable chain does not raise accuracy (42 against 42 for the no-DB arm), and neither does whether the training users used the same coined word for another category (REAL-6's coined words come from a shared list of 24). A blind Opus 5.5 pass on 60 items (Table 57.4) reads the coined names at 88% from clean strings (100% on descriptive names; its reasons are the induction chain itself, "Macy's went to Tabbin") and at 75% from the generator's strings: the information is in the prompt, the 3B model reaches 55 to 65 of it. The untrained model's coined-name accuracy falls as the name becomes clearer (13 to 8): with a readable business name it prefers the category word that means the business over the user's invented word the examples point to.
+
+### 57.3 What the step says
+
+REAL-19 asked whether the categoriser can infer an unknown merchant's kind from its name and the user's examples, and whether baking a database in costs that. It can, well when the name is readable (88 on descriptive names, 79 on chains), and the baked-in database helps rather than costs (+4.7 clean and +4.4 obscure top-1 over the same recipe without it). The statement string matters as much as the model: truncated bank strings take 15 points that a record in the prompt gives back. The user's coined category names are the capacity gap between a 3B model and a strong reader, and row 64 takes that apart.
+
+## 58. Capacity: database episodes hold 20,000 merchants as well as 240 when each gets about 30 training rows (DB-only merchants 92 to 96, opaque ones 90 to 94); a fixed budget spread thinner loses them, and the cost grows linearly (REAL-17)
+
+*PLAN step 59. Code: `DB_EXTRA` (`merchants.build_extra`: generated opaque merchants in REAL-6's style, a standard category each, product records from the pools) and `DB_EPISODES` (database episodes as their own pool entries, targets cycling through the merchants) in `scripts/exp_categoriser.py`, `scripts/modal_jobs/r59.json`, `scripts/db_scale_tables.py`. H100, bf16, all-label, row 42's four held-out folds; REAL-6's 60 DB-only merchants are the measure. [Q2]*
+
+A CPU check before launch found that the training pool holds 150 episodes per user, so more steps alone would repeat the same database rows; database episodes became their own pool entries with a set count. Fixed exposure gives every merchant 30 database rows (the 800 episodes of the 240-merchant run, scaled), the user episodes unchanged, 1.4 passes over the pool; fixed budget keeps 800 database episodes at every size.
+
+**Table 58.1: database episodes as the database grows (held-out users; accuracy %; last column: DB-only minus no DB on the same items [user interval])**
+
+| merchants in the DB | mode | DB rows per merchant | steps | train minutes | all | coined | determined by category | DB-only | DB-only known | DB-only opaque | DB-only minus no DB |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| none (section 55) | - | 0 | 200 | 2.9 | 76.8 | 77.9 | 83.5 | 56.6 | 83.1 | 19.6 | - |
+| 240 | fixed exposure | 30.0 | 267 | 3.9 | 86.3 | 83.5 | 93.5 | 91.8 | 91.5 | 92.2 | +35.2 [+25.2, +44.7] |
+| 1,000 | fixed exposure | 30.0 | 489 | 7.1 | 86.3 | 83.1 | 94.1 | 95.9 | 97.2 | 94.1 | +39.3 [+30.3, +48.6] |
+| 1,000 | fixed budget | 7.2 | 267 | 4.0 | 83.1 | 76.3 | 89.6 | 82.8 | 93.0 | 68.6 | +26.2 [+18.3, +35.1] |
+| 5,000 | fixed exposure | 30.0 | 1656 | 24.4 | 86.7 | 82.7 | 93.9 | 93.4 | 94.4 | 92.2 | +36.9 [+28.8, +45.0] |
+| 5,000 | fixed budget | 1.4 | 267 | 4.0 | 79.6 | 77.5 | 86.6 | 69.7 | 87.3 | 45.1 | +13.1 [+4.9, +22.0] |
+| 20,000 | fixed exposure | 30.0 | 6031 | 89.2 | 85.8 | 87.6 | 93.7 | 92.6 | 94.4 | 90.2 | +36.1 [+25.9, +46.7] |
+| 20,000 | fixed budget | 0.4 | 267 | 4.0 | 77.4 | 75.1 | 83.3 | 56.6 | 80.3 | 23.5 | +0.0 [-10.6, +13.2] |
+
+At a fixed exposure the DB-only merchants read 91.8, 95.9, 93.4 and 92.6 at 240, 1,000, 5,000 and 20,000 merchants, the opaque ones among them 92.2, 94.1, 92.2 and 90.2, and nothing else moves (all items 85.8 to 86.7, coined names 83 to 88): no interference up to 20,000 merchants for a rank-64 adapter on a 3B model. Section 29 found interference at 5,000 species for recalling several attributes per entity; filing a merchant into one of twelve categories is a far smaller fact. At a fixed budget the rows per merchant fall with the database (7.2, 1.4, 0.4) and so does the gain (82.8, 69.7, 56.6: nothing at 20,000). The cost is linear in the database: 20,000 merchants at 30 rows each is 6,031 steps, 89 minutes on one H100 (about $6). REAL-17's answer at this range: exposure, not capacity, is the constraint. Open: the minimum rows per merchant (between 7 and 30), the curve beyond 20,000 (a million merchants at this rate is about 75 H100-hours), and real merchants in place of generated ones (row 66, on Overture).
+
+## 59. One scorecard for every run: on REAL-6 a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers; their value there is the top-3 (98 against 26) and everything a lookup cannot reach (EVAL-9)
+
+*PLAN step 63. Code: `ai_experiments.scorecard` (top-1, top-3, MRR; bits and Brier after the leave-users-out temperature of section 50; coverage at 95% and 98% precision with the threshold from other users; the baseline ladder: uniform, the user's usage prior, their merchant lookup, other users' labels mapped into the user's scheme, the cascade lookup -> other users -> prior; skill as the share of the headroom over the best baseline), `scripts/scorecard_tables.py`. [Q1-3]*
+
+The owner's research framing (QUESTIONS.md, research agenda) asks for metrics that match how a prediction is used: auto-file the extremely confident, suggest the rest. Top-1 against uniform chance matched neither.
+
+**Table S.1: REAL-6 on held-out users, the scorecard (top-k in %; bits = -log2 p(gold) after the leave-users-out temperature; auto-file threshold chosen on other users; skill = share of the headroom over the best baseline; intervals resample users)**
+
+| run | n | top-1 [interval] | top-3 [interval] | MRR | bits left [interval] | bits gained over the usage prior | auto-file at 98%: coverage (precision) | uniform top-1 / top-3 | usage prior top-1 / top-3 | lookup → other users → prior, top-1 | skill top-1 / top-3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| SFT no DB, 800 steps (3090, 4-bit) | 1179 | 69.6 [65.7, 73.7] | 83.9 [81.0, 86.6] | 0.78 | 1.49 [1.29, 1.66] | +2.80 | 34.3 (96.8) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -134 / 78 |
+| SFT no DB, all-label (H100, bf16) | 1179 | 76.7 [73.3, 79.8] | 90.2 [87.7, 92.4] | 0.84 | 1.22 [1.04, 1.41] | +3.07 | 7.9 (92.5) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -80 / 87 |
+| database episodes (H100, bf16) | 1179 | 87.4 [83.5, 90.8] | 97.8 [95.5, 99.3] | 0.93 | 0.63 [0.45, 0.83] | +3.66 | 24.6 (91.7) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | 3 / 97 |
+| record in the prompt (H100, bf16) | 1179 | 83.3 [78.4, 87.6] | 96.6 [94.5, 98.4] | 0.90 | 0.74 [0.58, 0.92] | +3.55 | 50.8 (97.3) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -29 / 95 |
+| record with category in the prompt (H100, bf16) | 1179 | 86.0 [81.8, 90.0] | 97.5 [95.8, 99.0] | 0.92 | 0.57 [0.44, 0.71] | +3.72 | 65.6 (97.9) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -8 / 97 |
+| record in the prompt + rename augmentation (3090, 4-bit) | 1179 | 86.5 [83.3, 89.7] | 95.6 [93.2, 97.9] | 0.91 | 0.76 [0.57, 1.01] | +3.53 | 38.4 (97.1) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -4 / 94 |
+| no DB, all-label + rename augmentation (3090, 4-bit) | 1179 | 78.0 [73.7, 82.1] | 89.5 [87.4, 91.7] | 0.85 | 1.12 [0.93, 1.32] | +3.17 | 52.5 (97.6) | 7.3 / 21.9 | 8.6 / 25.7 | 87.0 | -69 / 86 |
+
+**Table S.2: the novel merchants (Overture, obscure renderings), the scorecard (no merchant lookup or other-user label exists for them)**
+
+| run | n | top-1 [interval] | top-3 [interval] | MRR | bits left [interval] | bits gained over the usage prior | auto-file at 98%: coverage (precision) | uniform top-1 / top-3 | usage prior top-1 / top-3 | lookup → other users → prior, top-1 | skill top-1 / top-3 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| untrained instruct, no record | 1198 | 39.6 [34.9, 43.3] | 57.6 [52.6, 61.2] | 0.53 | 2.93 [2.78, 3.15] | +1.20 | 0.1 (0.0) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 34 / 41 |
+| untrained instruct + Overture record | 1198 | 69.3 [63.4, 75.4] | 84.7 [80.3, 88.8] | 0.79 | 1.46 [1.21, 1.74] | +2.68 | 14.4 (96.0) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 67 / 79 |
+| SFT no DB | 1198 | 52.8 [46.7, 57.6] | 68.4 [62.7, 72.7] | 0.64 | 2.41 [2.23, 2.62] | +1.73 | 1.3 (86.7) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 49 / 56 |
+| database episodes | 1198 | 57.2 [51.6, 61.4] | 73.8 [69.5, 77.4] | 0.69 | 2.10 [1.91, 2.35] | +2.03 | 3.6 (95.3) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 54 / 63 |
+| record arm + Overture record | 1198 | 85.1 [78.5, 90.4] | 93.1 [90.3, 95.6] | 0.90 | 0.88 [0.63, 1.16] | +3.26 | 42.6 (96.7) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 84 / 90 |
+| record + category arm + Overture record | 1198 | 84.8 [79.6, 89.1] | 93.7 [90.3, 96.1] | 0.90 | 0.81 [0.6, 1.04] | +3.33 | 48.5 (97.2) | 7.9 / 23.6 | 7.8 / 28.3 | 7.8 | 84 / 91 |
+
+**Table S.3: what the auto-file set (98% precision) is made of, REAL-6 held-out users (share of auto-filed items per group, and the group's share of all items)**
+
+| run | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|
+| SFT no DB, 800 steps (3090, 4-bit) | 51% of auto (38% of all) | 7% of auto (10% of all) | 40% of auto (43% of all) | 1% of auto (9% of all) |
+| SFT no DB, all-label (H100, bf16) | 45% of auto (38% of all) | 13% of auto (10% of all) | 37% of auto (43% of all) | 5% of auto (9% of all) |
+| database episodes (H100, bf16) | 38% of auto (38% of all) | 10% of auto (10% of all) | 44% of auto (43% of all) | 8% of auto (9% of all) |
+| record in the prompt (H100, bf16) | 46% of auto (38% of all) | 10% of auto (10% of all) | 42% of auto (43% of all) | 2% of auto (9% of all) |
+| record with category in the prompt (H100, bf16) | 43% of auto (38% of all) | 9% of auto (10% of all) | 44% of auto (43% of all) | 2% of auto (9% of all) |
+| record in the prompt + rename augmentation (3090, 4-bit) | 48% of auto (38% of all) | 8% of auto (10% of all) | 42% of auto (43% of all) | 3% of auto (9% of all) |
+| no DB, all-label + rename augmentation (3090, 4-bit) | 41% of auto (38% of all) | 8% of auto (10% of all) | 49% of auto (43% of all) | 1% of auto (9% of all) |
+
+On REAL-6's held-out users the no-model cascade reads 87.0 top-1: the user's own past label for the merchant covers the merchants in their history, other users' labels cover almost every other merchant (each REAL-6 merchant is in someone's history, the DB-only ones included, since they are held out of training rows only), and the users label consistently. The best categorisers sit on it (database episodes 87.4, record with the category 86.0; skill 3 and -8), so REAL-6's top-1 mostly measures how well a model re-derives what a lookup gives free, as section 48 found for the seen cells. Their value is in the ranking (top-3 97 to 98 against 26 for the usage prior; skill 97) and in what a lookup cannot reach: on the novel merchants, where no lookup or other-user label exists, the cascade is the usage prior (7.8) and the categorisers read 53 to 85 (Table 57.1). Calibrated, the models leave 0.6 to 1.5 bits of uncertainty on REAL-6 (usage prior 4.3) and 0.8 to 2.9 on the novel merchants. Auto-filing at a 98% threshold chosen on other users realises 92 to 98% precision on new users, not 98: confidence thresholds drift between users, which supports the owner's rule of auto-filing a merchant the user has filed consistently before (the lookup is exact on those) and suggesting everything else. Every table from here reports this scorecard, skill over the cascade included; REAL-6's successor (row 43) and POI-1 (row 65) are where the lookup and collaborative signals stop answering.

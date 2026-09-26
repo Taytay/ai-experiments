@@ -1,0 +1,4680 @@
+### item 1
+Categories: Weekly shop, Restaurants, Fuel and car, Tabbin, Computers, Big projects, Prescriptions, Nights out, Work trips, Grendo, Fitness, Telecom & Utilities, Gadgets and media, Small fixes, Wellness, Top-up shop, Holidays, Subscriptions
+
+Transaction: DEBIT CARD PURCHASE HALWEN BROS STORE 4620 AUSTIN TX | $49.67 | Sun
+Category: Computers
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Grendo
+
+Transaction: TST* ULMBURY LTD MADISON WI | $36.01 | Wed
+Category: Grendo
+
+Transaction: RGL CNMS ALBANY NY 05/14 | $37.68 | Mon
+Category: Subscriptions
+
+Transaction: CKCD 07/18 TACO BELL | $27.01 | Sat
+Category: Restaurants
+
+Transaction: PP*EQUINOX 5905 | $33.88 | Thu
+Category: Fitness
+
+Transaction: SQ *HILTON FRESNO CA 11/18 | $258.14 | Mon
+Category: Holidays
+
+Transaction: POS ISTDL BRS 7030 | $35.61 | Sat
+Category: Restaurants
+
+Transaction: CARD PURCHASE RITE AID 9302 BOISE ID | $31.64 | Tue
+Category: Prescriptions
+
+Transaction: TST* DUNWEN GROUP RALEIGH NC | $42.29 | Thu
+Category: Telecom & Utilities
+
+Transaction: PAYPAL *HALLEY | $48.07 | Fri
+Category: Top-up shop
+
+Transaction: CHECKCARD 05/04 MACY'S PORTLAND OR | $45.88 | Sat
+Category: Tabbin
+
+Transaction: CKCD 07/02 TACO BELL | $23.72 | Fri
+Category: Restaurants
+
+Transaction: POS TC BLL 2224 | $25.89 | Tue
+Category: Restaurants
+
+Transaction: PP*CVS 6582 | $63.26 | Tue
+Category: Wellness
+
+Transaction: TST* GRITON DENVER CO | $235.20 | Fri
+Category: Gadgets and media
+
+Transaction: ISTMERE GROUP TUCSON AZ | $154.49 | Tue
+Category: Work trips
+
+Transaction: CHECKCARD 09/11 VALERO TAMPA FL | $64.73 | Tue
+Category: Fuel and car
+
+Transaction: POS ULMBRY LTD 7756 | $42.96 | Mon
+Category: Grendo
+
+Transaction: TC BLL RALEIGH NC 04/12 | $14.84 | Tue
+Category: Restaurants
+
+Transaction: TACO BELL RALEIGH | $12.51 | Mon
+Category: Restaurants
+
+Transaction: CKCD 08/14 ISTDALE BROS | $16.79 | Sun
+Category: Restaurants
+
+Transaction: DEBIT CARD PURCHASE BRAMBY AND SONS STORE 6224 MADISON WI | $45.13 | Sat
+Category: Small fixes
+
+Transaction: BRAMWEN  06068 OMAHA | $200.97 | Fri
+Category: Big projects
+
+Transaction: Charlotte Russe, Vernon Hills IL | $48.52 | Wed
+Category:
+
+### item 2
+Categories: Weekly shop, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Big projects, Prescriptions, Nights out, Work trips, Yurra, Workout, Bills, Top-up shop, Small fixes, Gadgets and media, Wellness, Special occasions, Holidays, Sit-down meals, Subscriptions
+
+Transaction: CARD PURCHASE SHERWIN-WILLIAMS 7125 ALBANY NY | $107.88 | Sat
+Category: Small fixes
+
+Transaction: SHERWIN-WI ALBANY | $74.48 | Sun
+Category: Small fixes
+
+Transaction: MCDONALD'S #3444 | $28.99 | Wed
+Category: Coffee and snacks
+
+Transaction: CKCD 05/10 ORLCOTT INC | $33.16 | Thu
+Category: Top-up shop
+
+Transaction: MACY'S #5115 | $128.88 | Wed
+Category: Special occasions
+
+Transaction: PAYPAL *GARHOLM CO | $70.50 | Fri
+Category: Work trips
+
+Transaction: REGAL CINE ALBANY | $8.47 | Thu
+Category: Subscriptions
+
+Transaction: BANDH PHOT DENVER | $635.52 | Tue
+Category: Gadgets and media
+
+Transaction: TST* HERTZ BOISE ID | $110.64 | Fri
+Category: Holidays
+
+Transaction: TST* PEXLOCK PORTLAND OR | $90.75 | Sun
+Category: Bills
+
+Transaction: BRAMWEN  06068 OMAHA | $200.97 | Fri
+Category: Big projects
+
+Transaction: POS TLHLM AND SNS 8612 | $42.29 | Thu
+Category: Computers
+
+Transaction: SQ *BOWLERO RENO NV 10/03 | $20.34 | Sun
+Category: Nights out
+
+Transaction: BRTLL DRGS BOISE ID 06/26 | $25.52 | Thu
+Category: Prescriptions
+
+Transaction: CHECKCARD 06/12 ORLWICK CO ALBANY NY | $46.83 | Thu
+Category: Workout
+
+Transaction: VLR TAMPA FL 03/13 | $97.48 | Mon
+Category: Gas & Auto
+
+Transaction: DEBIT CARD PURCHASE NORDSTROM STORE 8041 RENO NV | $58.33 | Sat
+Category: Everyday clothes
+
+Transaction: POS DEBIT NORDSTROM #6455 RENO NV 08/14 | $88.43 | Wed
+Category: Everyday clothes
+
+Transaction: NORDSTROM RENO | $30.98 | Thu
+Category: Everyday clothes
+
+Transaction: RINFORD TAMPA FL | $15.06 | Wed
+Category: Sit-down meals
+
+Transaction: HALLEY OMAHA | $60.52 | Sat
+Category: Weekly shop
+
+Transaction: TST* ORLWICK CO ALBANY NY | $35.24 | Fri
+Category: Workout
+
+Transaction: WEXHURST A FRESNO | $69.05 | Fri
+Category: Yurra
+
+Transaction: DUANE READE*02769 ALBANY NY 09/22 | $4.19 | Tue
+Category: Wellness
+
+Transaction: Bark N' Bubbles, North Whitehall Twp PA | $22.18 | Thu
+Category:
+
+### item 3
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Tilly's, Queen Creek AZ | $52.41 | Fri
+Category:
+
+### item 4
+Categories: Supermarket, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Halmer, Prescriptions, Nights out, Travel, Dog and cat, Workout, Telecom & Utilities, Sit-down meals, Special occasions, Gadgets and media, Wellness, Subscriptions
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Prescriptions
+
+Transaction: POS ISTDL BRS 7174 | $12.83 | Wed
+Category: Coffee and snacks
+
+Transaction: BEST BUY AUSTIN TX | $86.78 | Thu
+Category: Computers
+
+Transaction: POS MRTN LLC 2311 | $34.93 | Mon
+Category: Nights out
+
+Transaction: KSR PRMNNT*6345 | $61.34 | Tue
+Category: Wellness
+
+Transaction: CARD PURCHASE POLBY 9754 RALEIGH NC | $77.26 | Sun
+Category: Workout
+
+Transaction: CHECKCARD 11/05 QUILDALE GROUP FRESNO CA | $10.52 | Fri
+Category: Everyday clothes
+
+Transaction: ZEDBURY* 7481 | $24.29 | Sat
+Category: Sit-down meals
+
+Transaction: CHECKCARD 04/28 PGANDE TAMPA FL | $155.29 | Sat
+Category: Telecom & Utilities
+
+Transaction: SQ *KAISER PERMANENTE PORTLAND OR 04/26 | $33.81 | Mon
+Category: Wellness
+
+Transaction: CHECKCARD 09/01 ZEDBURY OMAHA NE | $29.09 | Wed
+Category: Sit-down meals
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Telecom & Utilities
+
+Transaction: TST* OLD NAVY OMAHA NE | $33.32 | Fri
+Category: Special occasions
+
+Transaction: POS ISTDL BRS 7030 | $35.61 | Sat
+Category: Coffee and snacks
+
+Transaction: CHECKCARD 12/02 PEXLOCK PORTLAND OR | $87.67 | Wed
+Category: Telecom & Utilities
+
+Transaction: HALLEY #6385 | $78.28 | Wed
+Category: Supermarket
+
+Transaction: MRBRY INC*4765 | $90.68 | Thu
+Category: Dog and cat
+
+Transaction: SQ *GNC TAMPA FL 10/19 | $22.48 | Thu
+Category: Prescriptions
+
+Transaction: DELTA AI* 9273 | $476.61 | Wed
+Category: Travel
+
+Transaction: BRAMBY A 01674 MADISON | $41.11 | Tue
+Category: Halmer
+
+Transaction: CKCD 01/07 HOLTON AND SONS | $184.91 | Wed
+Category: Supermarket
+
+Transaction: CARD PURCHASE ISTDALE BROS 087 PORTLAND OR | $9.64 | Tue
+Category: Coffee and snacks
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Subscriptions
+
+Transaction: SQ *PEP BOYS RALEIGH NC 05/20 | $42.35 | Fri
+Category: Gas & Auto
+
+Transaction: AMES Tools, Millcreek UT | $83.63 | Mon
+Category:
+
+### item 5
+Categories: Groceries, Zindle, Fuel and car, Everyday clothes, Electronics, Home Improvement, Mistle, Nights out, Trips, Dog and cat, Fitness, Telecom & Utilities, Subscriptions, Special occasions
+
+Transaction: PAYPAL *TACO BELL | $31.79 | Tue
+Category: Zindle
+
+Transaction: ATNDT AUSTIN TX 02/22 | $72.92 | Mon
+Category: Telecom & Utilities
+
+Transaction: WEXLEY G 08385 AUSTIN | $141.11 | Thu
+Category: Electronics
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Trips
+
+Transaction: MNRDS DENVER CO 04/04 | $41.35 | Sat
+Category: Home Improvement
+
+Transaction: PAYPAL *PANERA BRE | $31.38 | Tue
+Category: Zindle
+
+Transaction: MENARDS #950 | $16.84 | Fri
+Category: Home Improvement
+
+Transaction: POS DEBIT TACO BELL #8166 RALEIGH NC 04/04 | $14.25 | Sat
+Category: Zindle
+
+Transaction: POS DEBIT TACO BELL #8855 RALEIGH NC 11/02 | $35.04 | Wed
+Category: Zindle
+
+Transaction: POS YRTN BRS 0135 | $75.22 | Sat
+Category: Everyday clothes
+
+Transaction: CARD PURCHASE MENARDS 5332 DENVER CO | $11.88 | Sat
+Category: Home Improvement
+
+Transaction: PEXLEY TAMPA | $75.97 | Tue
+Category: Groceries
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Fuel and car
+
+Transaction: CARD PURCHASE BARTELL DRUGS 2280 BOISE ID | $30.36 | Wed
+Category: Mistle
+
+Transaction: CARD PURCHASE EQUINOX 8238 TUCSON AZ | $85.51 | Thu
+Category: Fitness
+
+Transaction: POS KSR PRMNNT 3828 | $77.46 | Sun
+Category: Mistle
+
+Transaction: TC BLL*5922 | $35.89 | Thu
+Category: Zindle
+
+Transaction: OLD NAVY 04243 OMAHA | $27.83 | Wed
+Category: Special occasions
+
+Transaction: DEBIT CARD PURCHASE ZEDBURY STORE 5871 OMAHA NE | $23.50 | Sat
+Category: Zindle
+
+Transaction: CARD PURCHASE FALVARRO BROS 2176 AUSTIN TX | $324.47 | Thu
+Category: Trips
+
+Transaction: TACO BELL*07919 RALEIGH NC 10/05 | $4.51 | Sun
+Category: Zindle
+
+Transaction: ROVER 09828 TAMPA | $89.45 | Wed
+Category: Dog and cat
+
+Transaction: TICKETMAST BOISE | $49.40 | Sat
+Category: Subscriptions
+
+Transaction: CHECKCARD 03/02 ISTNARD LLC PORTLAND OR | $39.44 | Thu
+Category: Nights out
+
+Transaction: Bend The Bar, Piedmont AL | $55.47 | Sat
+Category:
+
+### item 6
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Ice Drip Urban Clothing, Memphis TN | $111.75 | Tue
+Category:
+
+### item 7
+Categories: Dravik, Dining, Fuel and car, Wardrobe, Blint, Home Improvement, Medical & Fun, Flights and hotels, Juvix, Fitness, Telecom & Utilities
+
+Transaction: WGMNS*1326 | $82.71 | Fri
+Category: Dravik
+
+Transaction: TST* MENARDS DENVER CO | $39.98 | Fri
+Category: Home Improvement
+
+Transaction: MENARDS DENVER CO | $28.43 | Sat
+Category: Home Improvement
+
+Transaction: FALVARRO BROS #9708 | $494.71 | Sat
+Category: Flights and hotels
+
+Transaction: TST* ULMMOOR INC TAMPA FL | $89.57 | Wed
+Category: Juvix
+
+Transaction: PAYPAL *TACO BELL | $15.64 | Tue
+Category: Dining
+
+Transaction: VERIZON 07455 PORTLAND | $94.02 | Sun
+Category: Telecom & Utilities
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Juvix
+
+Transaction: CARD PURCHASE ULMMOOR INC 6549 TAMPA FL | $29.96 | Thu
+Category: Juvix
+
+Transaction: UNITED AIRLINES #6687 | $28.96 | Thu
+Category: Flights and hotels
+
+Transaction: DUANE READE*00523 ALBANY NY 04/06 | $52.84 | Wed
+Category: Medical & Fun
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Fitness
+
+Transaction: UNITED A* 7381 | $553.51 | Wed
+Category: Flights and hotels
+
+Transaction: CKCD 12/15 UNITED AIRLINES | $624.47 | Fri
+Category: Flights and hotels
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Wardrobe
+
+Transaction: TST* TACO BELL RALEIGH NC | $12.01 | Tue
+Category: Dining
+
+Transaction: VLR TAMPA FL 02/02 | $90.42 | Sat
+Category: Fuel and car
+
+Transaction: UNITED AIRLINES DENVER CO | $76.07 | Fri
+Category: Flights and hotels
+
+Transaction: DEBIT CARD PURCHASE FENFORD GROUP STORE 2295 DENVER CO | $56.83 | Fri
+Category: Fitness
+
+Transaction: SQ *TACO BELL RALEIGH NC 08/20 | $50.32 | Tue
+Category: Dining
+
+Transaction: CARD PURCHASE TACO BELL 1140 RALEIGH NC | $19.22 | Thu
+Category: Dining
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Blint
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 5977 DENVER CO | $12.42 | Mon
+Category: Home Improvement
+
+Transaction: CHECKCARD 04/14 FALVARRO BROS AUSTIN TX | $272.88 | Tue
+Category: Flights and hotels
+
+Transaction: Vons, Long Beach CA | $141.67 | Tue
+Category:
+
+### item 8
+Categories: Groceries, Zindle, Fuel and car, Everyday clothes, Electronics, Home Improvement, Mistle, Nights out, Trips, Dog and cat, Fitness, Telecom & Utilities, Subscriptions, Special occasions
+
+Transaction: PAYPAL *TACO BELL | $31.79 | Tue
+Category: Zindle
+
+Transaction: ATNDT AUSTIN TX 02/22 | $72.92 | Mon
+Category: Telecom & Utilities
+
+Transaction: WEXLEY G 08385 AUSTIN | $141.11 | Thu
+Category: Electronics
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Trips
+
+Transaction: MNRDS DENVER CO 04/04 | $41.35 | Sat
+Category: Home Improvement
+
+Transaction: PAYPAL *PANERA BRE | $31.38 | Tue
+Category: Zindle
+
+Transaction: MENARDS #950 | $16.84 | Fri
+Category: Home Improvement
+
+Transaction: POS DEBIT TACO BELL #8166 RALEIGH NC 04/04 | $14.25 | Sat
+Category: Zindle
+
+Transaction: POS DEBIT TACO BELL #8855 RALEIGH NC 11/02 | $35.04 | Wed
+Category: Zindle
+
+Transaction: POS YRTN BRS 0135 | $75.22 | Sat
+Category: Everyday clothes
+
+Transaction: CARD PURCHASE MENARDS 5332 DENVER CO | $11.88 | Sat
+Category: Home Improvement
+
+Transaction: PEXLEY TAMPA | $75.97 | Tue
+Category: Groceries
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Fuel and car
+
+Transaction: CARD PURCHASE BARTELL DRUGS 2280 BOISE ID | $30.36 | Wed
+Category: Mistle
+
+Transaction: CARD PURCHASE EQUINOX 8238 TUCSON AZ | $85.51 | Thu
+Category: Fitness
+
+Transaction: POS KSR PRMNNT 3828 | $77.46 | Sun
+Category: Mistle
+
+Transaction: TC BLL*5922 | $35.89 | Thu
+Category: Zindle
+
+Transaction: OLD NAVY 04243 OMAHA | $27.83 | Wed
+Category: Special occasions
+
+Transaction: DEBIT CARD PURCHASE ZEDBURY STORE 5871 OMAHA NE | $23.50 | Sat
+Category: Zindle
+
+Transaction: CARD PURCHASE FALVARRO BROS 2176 AUSTIN TX | $324.47 | Thu
+Category: Trips
+
+Transaction: TACO BELL*07919 RALEIGH NC 10/05 | $4.51 | Sun
+Category: Zindle
+
+Transaction: ROVER 09828 TAMPA | $89.45 | Wed
+Category: Dog and cat
+
+Transaction: TICKETMAST BOISE | $49.40 | Sat
+Category: Subscriptions
+
+Transaction: CHECKCARD 03/02 ISTNARD LLC PORTLAND OR | $39.44 | Thu
+Category: Nights out
+
+Transaction: Meyers' Hometown Bakery & Beanery, Lake Odessa MI | $59.40 | Mon
+Category:
+
+### item 9
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Iron Hawk CrossFit, Kalispell MT | $37.66 | Sun
+Category:
+
+### item 10
+Categories: Groceries, Zindle, Fuel and car, Everyday clothes, Electronics, Home Improvement, Mistle, Nights out, Trips, Dog and cat, Fitness, Telecom & Utilities, Subscriptions, Special occasions
+
+Transaction: PAYPAL *TACO BELL | $31.79 | Tue
+Category: Zindle
+
+Transaction: ATNDT AUSTIN TX 02/22 | $72.92 | Mon
+Category: Telecom & Utilities
+
+Transaction: WEXLEY G 08385 AUSTIN | $141.11 | Thu
+Category: Electronics
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Trips
+
+Transaction: MNRDS DENVER CO 04/04 | $41.35 | Sat
+Category: Home Improvement
+
+Transaction: PAYPAL *PANERA BRE | $31.38 | Tue
+Category: Zindle
+
+Transaction: MENARDS #950 | $16.84 | Fri
+Category: Home Improvement
+
+Transaction: POS DEBIT TACO BELL #8166 RALEIGH NC 04/04 | $14.25 | Sat
+Category: Zindle
+
+Transaction: POS DEBIT TACO BELL #8855 RALEIGH NC 11/02 | $35.04 | Wed
+Category: Zindle
+
+Transaction: POS YRTN BRS 0135 | $75.22 | Sat
+Category: Everyday clothes
+
+Transaction: CARD PURCHASE MENARDS 5332 DENVER CO | $11.88 | Sat
+Category: Home Improvement
+
+Transaction: PEXLEY TAMPA | $75.97 | Tue
+Category: Groceries
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Fuel and car
+
+Transaction: CARD PURCHASE BARTELL DRUGS 2280 BOISE ID | $30.36 | Wed
+Category: Mistle
+
+Transaction: CARD PURCHASE EQUINOX 8238 TUCSON AZ | $85.51 | Thu
+Category: Fitness
+
+Transaction: POS KSR PRMNNT 3828 | $77.46 | Sun
+Category: Mistle
+
+Transaction: TC BLL*5922 | $35.89 | Thu
+Category: Zindle
+
+Transaction: OLD NAVY 04243 OMAHA | $27.83 | Wed
+Category: Special occasions
+
+Transaction: DEBIT CARD PURCHASE ZEDBURY STORE 5871 OMAHA NE | $23.50 | Sat
+Category: Zindle
+
+Transaction: CARD PURCHASE FALVARRO BROS 2176 AUSTIN TX | $324.47 | Thu
+Category: Trips
+
+Transaction: TACO BELL*07919 RALEIGH NC 10/05 | $4.51 | Sun
+Category: Zindle
+
+Transaction: ROVER 09828 TAMPA | $89.45 | Wed
+Category: Dog and cat
+
+Transaction: TICKETMAST BOISE | $49.40 | Sat
+Category: Subscriptions
+
+Transaction: CHECKCARD 03/02 ISTNARD LLC PORTLAND OR | $39.44 | Thu
+Category: Nights out
+
+Transaction: Phoenix - 19th Avenue and Northern, Phoenix AZ | $14.98 | Sun
+Category:
+
+### item 11
+Categories: Weekly shop, Coffee and snacks, Car, Everyday clothes, Computers, Big projects, Prescriptions, Nights out, Work trips, Pets, Fitness, Bills, Subscriptions, Special occasions, Top-up shop, Gadgets and media, Small fixes, Wellness, Holidays, Sit-down meals
+
+Transaction: POS UNTD ARLNS 7853 | $188.61 | Tue
+Category: Work trips
+
+Transaction: CKCD 06/03 HALMERE GROUP | $31.90 | Thu
+Category: Small fixes
+
+Transaction: ELRMOOR #1030 | $33.92 | Thu
+Category: Everyday clothes
+
+Transaction: PAYPAL *DUNWICK | $421.38 | Fri
+Category: Holidays
+
+Transaction: SQ *UNITED AIRLINES DENVER CO 01/21 | $220.29 | Thu
+Category: Work trips
+
+Transaction: ACE HARD 04550 ALBANY | $257.38 | Tue
+Category: Big projects
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Top-up shop
+
+Transaction: CARD PURCHASE DUNHURST LTD 2997 MADISON WI | $68.06 | Sun
+Category: Bills
+
+Transaction: PEP BOYS #6422 | $43.61 | Sat
+Category: Car
+
+Transaction: PAYPAL *UNITED AIR | $949.28 | Fri
+Category: Work trips
+
+Transaction: GRTN*8508 | $739.88 | Tue
+Category: Computers
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Pets
+
+Transaction: GRBY CO*9722 | $21.27 | Fri
+Category: Nights out
+
+Transaction: CARD PURCHASE DUANE READE 4572 ALBANY NY | $30.79 | Thu
+Category: Wellness
+
+Transaction: SQ *BOWLERO RENO NV 10/03 | $20.34 | Sun
+Category: Subscriptions
+
+Transaction: POS DEBIT UNITED AIRLINES #8117 DENVER CO 07/27 | $337.22 | Sun
+Category: Work trips
+
+Transaction: POS DEBIT UNITED AIRLINES #7847 DENVER CO 01/17 | $42.98 | Tue
+Category: Work trips
+
+Transaction: WEXHAM BROS*04434 FRESNO CA 07/02 | $80.41 | Thu
+Category: Car
+
+Transaction: UNITED A* 2315 | $479.02 | Sun
+Category: Work trips
+
+Transaction: DEBIT CARD PURCHASE LUNDALE INC STORE 3281 BOISE ID | $44.36 | Wed
+Category: Fitness
+
+Transaction: PAYPAL *CHICK-FIL- | $14.10 | Tue
+Category: Sit-down meals
+
+Transaction: DELL*01136 MADISON WI 09/28 | $139.07 | Sat
+Category: Gadgets and media
+
+Transaction: PP*NEVNARD  9694 | $21.07 | Tue
+Category: Fitness
+
+Transaction: POS PBLX 6333 | $124.89 | Tue
+Category: Weekly shop
+
+Transaction: Phillips 66, El Reno OK | $46.97 | Thu
+Category:
+
+### item 12
+Categories: Groceries, Coffee and snacks, Gas & Auto, Clothing, Computers, Home Improvement, Prescriptions, Entertainment, Work trips, Pets, Gym, Telecom & Utilities, Wellness, Sit-down meals, Holidays, Gadgets and media
+
+Transaction: CHECKCARD 03/15 TOPGOLF OMAHA NE | $21.10 | Sat
+Category: Entertainment
+
+Transaction: POS JRDN INC 4963 | $25.12 | Mon
+Category: Entertainment
+
+Transaction: QUILDALE GROUP FRESNO CA | $9.81 | Sun
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: SQ *DELTA AIR LINES RENO NV 10/19 | $182.62 | Thu
+Category: Holidays
+
+Transaction: MENARDS*02540 DENVER CO 12/23 | $54.83 | Fri
+Category: Home Improvement
+
+Transaction: POS ULMBRY LTD 4383 | $32.70 | Wed
+Category: Pets
+
+Transaction: CARD PURCHASE HOME DEPOT 1740 FRESNO CA | $192.70 | Mon
+Category: Home Improvement
+
+Transaction: WEXLEY GRO AUSTIN | $122.99 | Mon
+Category: Computers
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Work trips
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Wellness
+
+Transaction: POLSTEAD LLC #7061 | $90.55 | Mon
+Category: Gas & Auto
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym
+
+Transaction: GMSTP ALBANY NY 08/12 | $58.87 | Fri
+Category: Computers
+
+Transaction: DEBIT CARD PURCHASE MACY'S STORE 2652 PORTLAND OR | $90.46 | Tue
+Category: Clothing
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Gadgets and media
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 01/03 | $8.12 | Sat
+Category: Coffee and snacks
+
+Transaction: CHICK-FI* 9144 | $40.14 | Wed
+Category: Sit-down meals
+
+Transaction: PAYPAL *ALDI | $58.39 | Mon
+Category: Groceries
+
+Transaction: CARD PURCHASE DUNHURST LTD 1231 MADISON WI | $50.65 | Wed
+Category: Telecom & Utilities
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Coffee and snacks
+
+Transaction: DUNNARD  05468 ALBANY | $96.74 | Sun
+Category: Groceries
+
+Transaction: VITAMIN SH DENVER | $39.09 | Wed
+Category: Prescriptions
+
+Transaction: CKCD 12/28 NEVNARD BROS | $24.29 | Sat
+Category: Gym
+
+Transaction: Lumbertown, Zanesville OH | $68.49 | Tue
+Category:
+
+### item 13
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Christopher Louie, Fremont CA | $5.52 | Fri
+Category:
+
+### item 14
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: Mayhem Amusements Arcade, Wilkes-Barre PA | $22.95 | Mon
+Category:
+
+### item 15
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: Hm Food Inc, Hicksville NY | $51.98 | Thu
+Category:
+
+### item 16
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: The Old Sandmeyer Barn, Buhl ID | $133.64 | Sat
+Category:
+
+### item 17
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Styles Boutique Miami, Miami Lakes FL | $50.46 | Sun
+Category:
+
+### item 18
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: Stereo Advantage, Williamsville NY | $113.16 | Tue
+Category:
+
+### item 19
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Jimmy John's, Blue Springs MO | $14.28 | Wed
+Category:
+
+### item 20
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: Richard's Foodporium, Bradenton FL | $62.81 | Fri
+Category:
+
+### item 21
+Categories: Weekly shop, Restaurants, Gas & Auto, Wardrobe, Tech, Big projects, Medical, Nights out, Work trips, Pets, Fitness, Telecom & Utilities, Subscriptions, Small fixes, Holidays, Top-up shop
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Pets
+
+Transaction: TST* GARHOLM CO MADISON WI | $445.55 | Mon
+Category: Holidays
+
+Transaction: CARD PURCHASE ZEDDEN 1230 ALBANY NY | $33.96 | Wed
+Category: Fitness
+
+Transaction: ARDTN INC AUSTIN TX 05/10 | $570.54 | Thu
+Category: Work trips
+
+Transaction: POS TR VL 7631 | $15.95 | Sun
+Category: Small fixes
+
+Transaction: SABBY CO* 3751 | $55.71 | Tue
+Category: Top-up shop
+
+Transaction: ATZN*9813 | $80.98 | Tue
+Category: Gas & Auto
+
+Transaction: HOLDALE MADISON WI | $26.47 | Fri
+Category: Subscriptions
+
+Transaction: POS DEBIT QUILDEN GROUP #2537 TUCSON AZ 01/17 | $35.09 | Sat
+Category: Big projects
+
+Transaction: PP*TOPGOLF 9906 | $49.53 | Tue
+Category: Nights out
+
+Transaction: CHECKCARD 10/14 BARTELL DRUGS BOISE ID | $29.07 | Thu
+Category: Medical
+
+Transaction: FENNARD* 0965 | $6.93 | Fri
+Category: Medical
+
+Transaction: JORHOLM BROS RENO NV | $6.58 | Sun
+Category: Wardrobe
+
+Transaction: PAYPAL *TOPGOLF | $24.28 | Mon
+Category: Nights out
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Medical
+
+Transaction: DUKE ENERGY*07816 DENVER CO 06/04 | $97.86 | Tue
+Category: Telecom & Utilities
+
+Transaction: DEBIT CARD PURCHASE REI STORE 1468 RALEIGH NC | $31.48 | Thu
+Category: Fitness
+
+Transaction: PAYPAL *BANDH PHOT | $872.00 | Tue
+Category: Tech
+
+Transaction: FENNARD*08924 PORTLAND OR 06/19 | $23.70 | Thu
+Category: Medical
+
+Transaction: DEBIT CARD PURCHASE SABBY CO STORE 9806 RENO NV | $50.94 | Sun
+Category: Top-up shop
+
+Transaction: POS DEBIT COSTCO #1522 AUSTIN TX 04/20 | $68.88 | Wed
+Category: Weekly shop
+
+Transaction: CHECKCARD 04/28 PGANDE TAMPA FL | $155.29 | Sat
+Category: Telecom & Utilities
+
+Transaction: GAMESTOP*06652 ALBANY NY 02/07 | $426.50 | Tue
+Category: Tech
+
+Transaction: CHCK-FL- MADISON WI 01/22 | $18.09 | Sat
+Category: Restaurants
+
+Transaction: Dan's Used Auto Parts, Carterville IL | $59.20 | Sun
+Category:
+
+### item 22
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: Omni William Penn Hotel, Pittsburgh PA | $604.13 | Tue
+Category:
+
+### item 23
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Abercrombie & Fitch, Lynnfield MA | $13.21 | Thu
+Category:
+
+### item 24
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Mesquite Dental & Implant Center, Mesquite TX | $20.52 | Sun
+Category:
+
+### item 25
+Categories: Supermarket, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Halmer, Prescriptions, Nights out, Travel, Dog and cat, Workout, Telecom & Utilities, Sit-down meals, Special occasions, Gadgets and media, Wellness, Subscriptions
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Prescriptions
+
+Transaction: POS ISTDL BRS 7174 | $12.83 | Wed
+Category: Coffee and snacks
+
+Transaction: BEST BUY AUSTIN TX | $86.78 | Thu
+Category: Computers
+
+Transaction: POS MRTN LLC 2311 | $34.93 | Mon
+Category: Nights out
+
+Transaction: KSR PRMNNT*6345 | $61.34 | Tue
+Category: Wellness
+
+Transaction: CARD PURCHASE POLBY 9754 RALEIGH NC | $77.26 | Sun
+Category: Workout
+
+Transaction: CHECKCARD 11/05 QUILDALE GROUP FRESNO CA | $10.52 | Fri
+Category: Everyday clothes
+
+Transaction: ZEDBURY* 7481 | $24.29 | Sat
+Category: Sit-down meals
+
+Transaction: CHECKCARD 04/28 PGANDE TAMPA FL | $155.29 | Sat
+Category: Telecom & Utilities
+
+Transaction: SQ *KAISER PERMANENTE PORTLAND OR 04/26 | $33.81 | Mon
+Category: Wellness
+
+Transaction: CHECKCARD 09/01 ZEDBURY OMAHA NE | $29.09 | Wed
+Category: Sit-down meals
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Telecom & Utilities
+
+Transaction: TST* OLD NAVY OMAHA NE | $33.32 | Fri
+Category: Special occasions
+
+Transaction: POS ISTDL BRS 7030 | $35.61 | Sat
+Category: Coffee and snacks
+
+Transaction: CHECKCARD 12/02 PEXLOCK PORTLAND OR | $87.67 | Wed
+Category: Telecom & Utilities
+
+Transaction: HALLEY #6385 | $78.28 | Wed
+Category: Supermarket
+
+Transaction: MRBRY INC*4765 | $90.68 | Thu
+Category: Dog and cat
+
+Transaction: SQ *GNC TAMPA FL 10/19 | $22.48 | Thu
+Category: Prescriptions
+
+Transaction: DELTA AI* 9273 | $476.61 | Wed
+Category: Travel
+
+Transaction: BRAMBY A 01674 MADISON | $41.11 | Tue
+Category: Halmer
+
+Transaction: CKCD 01/07 HOLTON AND SONS | $184.91 | Wed
+Category: Supermarket
+
+Transaction: CARD PURCHASE ISTDALE BROS 087 PORTLAND OR | $9.64 | Tue
+Category: Coffee and snacks
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Subscriptions
+
+Transaction: SQ *PEP BOYS RALEIGH NC 05/20 | $42.35 | Fri
+Category: Gas & Auto
+
+Transaction: St. Helens Ace Hardware, St Helens OR | $214.13 | Sun
+Category:
+
+### item 26
+Categories: Dravik, Dining, Fuel and car, Wardrobe, Blint, Home Improvement, Medical & Fun, Flights and hotels, Juvix, Fitness, Telecom & Utilities
+
+Transaction: WGMNS*1326 | $82.71 | Fri
+Category: Dravik
+
+Transaction: TST* MENARDS DENVER CO | $39.98 | Fri
+Category: Home Improvement
+
+Transaction: MENARDS DENVER CO | $28.43 | Sat
+Category: Home Improvement
+
+Transaction: FALVARRO BROS #9708 | $494.71 | Sat
+Category: Flights and hotels
+
+Transaction: TST* ULMMOOR INC TAMPA FL | $89.57 | Wed
+Category: Juvix
+
+Transaction: PAYPAL *TACO BELL | $15.64 | Tue
+Category: Dining
+
+Transaction: VERIZON 07455 PORTLAND | $94.02 | Sun
+Category: Telecom & Utilities
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Juvix
+
+Transaction: CARD PURCHASE ULMMOOR INC 6549 TAMPA FL | $29.96 | Thu
+Category: Juvix
+
+Transaction: UNITED AIRLINES #6687 | $28.96 | Thu
+Category: Flights and hotels
+
+Transaction: DUANE READE*00523 ALBANY NY 04/06 | $52.84 | Wed
+Category: Medical & Fun
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Fitness
+
+Transaction: UNITED A* 7381 | $553.51 | Wed
+Category: Flights and hotels
+
+Transaction: CKCD 12/15 UNITED AIRLINES | $624.47 | Fri
+Category: Flights and hotels
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Wardrobe
+
+Transaction: TST* TACO BELL RALEIGH NC | $12.01 | Tue
+Category: Dining
+
+Transaction: VLR TAMPA FL 02/02 | $90.42 | Sat
+Category: Fuel and car
+
+Transaction: UNITED AIRLINES DENVER CO | $76.07 | Fri
+Category: Flights and hotels
+
+Transaction: DEBIT CARD PURCHASE FENFORD GROUP STORE 2295 DENVER CO | $56.83 | Fri
+Category: Fitness
+
+Transaction: SQ *TACO BELL RALEIGH NC 08/20 | $50.32 | Tue
+Category: Dining
+
+Transaction: CARD PURCHASE TACO BELL 1140 RALEIGH NC | $19.22 | Thu
+Category: Dining
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Blint
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 5977 DENVER CO | $12.42 | Mon
+Category: Home Improvement
+
+Transaction: CHECKCARD 04/14 FALVARRO BROS AUSTIN TX | $272.88 | Tue
+Category: Flights and hotels
+
+Transaction: Piggly Wiggly, Pelham GA | $60.24 | Thu
+Category:
+
+### item 27
+Categories: Grocery run, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Home Improvement, Prescriptions, Entertainment, Work trips, Dog and cat, Exercise, Phone and internet, Wellness, Gadgets and media, Sit-down meals, Special occasions, Holidays
+
+Transaction: CHECKCARD 09/04 ROVER TAMPA FL | $42.76 | Mon
+Category: Dog and cat
+
+Transaction: WEXLEY G* 8001 | $130.18 | Wed
+Category: Computers
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Exercise
+
+Transaction: POS ARDTN INC 4515 | $227.80 | Sat
+Category: Work trips
+
+Transaction: CKCD 08/02 KROGER | $53.73 | Fri
+Category: Grocery run
+
+Transaction: MORTON LLC DENVER CO | $27.07 | Thu
+Category: Entertainment
+
+Transaction: DUKE ENERGY*07816 DENVER CO 06/04 | $97.86 | Tue
+Category: Phone and internet
+
+Transaction: PP*TORHURST 9861 | $181.24 | Wed
+Category: Everyday clothes
+
+Transaction: POS DEBIT UNITED AIRLINES #7847 DENVER CO 01/17 | $42.98 | Tue
+Category: Holidays
+
+Transaction: AUTOZONE* 8002 | $45.38 | Mon
+Category: Gas & Auto
+
+Transaction: CHECKCARD 10/07 UNITED AIRLINES DENVER CO | $49.92 | Sat
+Category: Holidays
+
+Transaction: STRBCKS*8557 | $19.57 | Mon
+Category: Sit-down meals
+
+Transaction: PP*GRIDALE 7962 | $12.45 | Sun
+Category: Prescriptions
+
+Transaction: ROVER* 9581 | $61.22 | Sun
+Category: Dog and cat
+
+Transaction: ELRHURST CO*03381 PORTLAND OR 01/23 | $31.81 | Sun
+Category: Coffee and snacks
+
+Transaction: TOPGOLF* 7175 | $87.41 | Thu
+Category: Entertainment
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category: Work trips
+
+Transaction: PP*GARDEN G 8750 | $13.71 | Fri
+Category: Wellness
+
+Transaction: POS ISTBRY 8064 | $40.96 | Thu
+Category: Special occasions
+
+Transaction: KSR PRMNNT*086 | $23.64 | Mon
+Category: Prescriptions
+
+Transaction: HLWN BRS*5049 | $145.38 | Thu
+Category: Gadgets and media
+
+Transaction: POS HLTN 1324 | $244.89 | Wed
+Category: Holidays
+
+Transaction: PP*GRIWEN B 1452 | $20.97 | Fri
+Category: Entertainment
+
+Transaction: SSR Autobody, Orange CA | $67.68 | Sat
+Category:
+
+### item 28
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Cedar Wood Inn, Deadwood SD | $101.63 | Fri
+Category:
+
+### item 29
+Categories: Supermarket, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Halmer, Prescriptions, Nights out, Travel, Dog and cat, Workout, Telecom & Utilities, Sit-down meals, Special occasions, Gadgets and media, Wellness, Subscriptions
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Prescriptions
+
+Transaction: POS ISTDL BRS 7174 | $12.83 | Wed
+Category: Coffee and snacks
+
+Transaction: BEST BUY AUSTIN TX | $86.78 | Thu
+Category: Computers
+
+Transaction: POS MRTN LLC 2311 | $34.93 | Mon
+Category: Nights out
+
+Transaction: KSR PRMNNT*6345 | $61.34 | Tue
+Category: Wellness
+
+Transaction: CARD PURCHASE POLBY 9754 RALEIGH NC | $77.26 | Sun
+Category: Workout
+
+Transaction: CHECKCARD 11/05 QUILDALE GROUP FRESNO CA | $10.52 | Fri
+Category: Everyday clothes
+
+Transaction: ZEDBURY* 7481 | $24.29 | Sat
+Category: Sit-down meals
+
+Transaction: CHECKCARD 04/28 PGANDE TAMPA FL | $155.29 | Sat
+Category: Telecom & Utilities
+
+Transaction: SQ *KAISER PERMANENTE PORTLAND OR 04/26 | $33.81 | Mon
+Category: Wellness
+
+Transaction: CHECKCARD 09/01 ZEDBURY OMAHA NE | $29.09 | Wed
+Category: Sit-down meals
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Telecom & Utilities
+
+Transaction: TST* OLD NAVY OMAHA NE | $33.32 | Fri
+Category: Special occasions
+
+Transaction: POS ISTDL BRS 7030 | $35.61 | Sat
+Category: Coffee and snacks
+
+Transaction: CHECKCARD 12/02 PEXLOCK PORTLAND OR | $87.67 | Wed
+Category: Telecom & Utilities
+
+Transaction: HALLEY #6385 | $78.28 | Wed
+Category: Supermarket
+
+Transaction: MRBRY INC*4765 | $90.68 | Thu
+Category: Dog and cat
+
+Transaction: SQ *GNC TAMPA FL 10/19 | $22.48 | Thu
+Category: Prescriptions
+
+Transaction: DELTA AI* 9273 | $476.61 | Wed
+Category: Travel
+
+Transaction: BRAMBY A 01674 MADISON | $41.11 | Tue
+Category: Halmer
+
+Transaction: CKCD 01/07 HOLTON AND SONS | $184.91 | Wed
+Category: Supermarket
+
+Transaction: CARD PURCHASE ISTDALE BROS 087 PORTLAND OR | $9.64 | Tue
+Category: Coffee and snacks
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Subscriptions
+
+Transaction: SQ *PEP BOYS RALEIGH NC 05/20 | $42.35 | Fri
+Category: Gas & Auto
+
+Transaction: Thorntons, New Lenox IL | $32.45 | Wed
+Category:
+
+### item 30
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Armstrong Garden Centers, Pasadena CA | $7.79 | Thu
+Category:
+
+### item 31
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: GP Mechanical Services, Hagerstown MD | $79.49 | Thu
+Category:
+
+### item 32
+Categories: Dravik, Dining, Fuel and car, Wardrobe, Blint, Home Improvement, Medical & Fun, Flights and hotels, Juvix, Fitness, Telecom & Utilities
+
+Transaction: WGMNS*1326 | $82.71 | Fri
+Category: Dravik
+
+Transaction: TST* MENARDS DENVER CO | $39.98 | Fri
+Category: Home Improvement
+
+Transaction: MENARDS DENVER CO | $28.43 | Sat
+Category: Home Improvement
+
+Transaction: FALVARRO BROS #9708 | $494.71 | Sat
+Category: Flights and hotels
+
+Transaction: TST* ULMMOOR INC TAMPA FL | $89.57 | Wed
+Category: Juvix
+
+Transaction: PAYPAL *TACO BELL | $15.64 | Tue
+Category: Dining
+
+Transaction: VERIZON 07455 PORTLAND | $94.02 | Sun
+Category: Telecom & Utilities
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Juvix
+
+Transaction: CARD PURCHASE ULMMOOR INC 6549 TAMPA FL | $29.96 | Thu
+Category: Juvix
+
+Transaction: UNITED AIRLINES #6687 | $28.96 | Thu
+Category: Flights and hotels
+
+Transaction: DUANE READE*00523 ALBANY NY 04/06 | $52.84 | Wed
+Category: Medical & Fun
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Fitness
+
+Transaction: UNITED A* 7381 | $553.51 | Wed
+Category: Flights and hotels
+
+Transaction: CKCD 12/15 UNITED AIRLINES | $624.47 | Fri
+Category: Flights and hotels
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Wardrobe
+
+Transaction: TST* TACO BELL RALEIGH NC | $12.01 | Tue
+Category: Dining
+
+Transaction: VLR TAMPA FL 02/02 | $90.42 | Sat
+Category: Fuel and car
+
+Transaction: UNITED AIRLINES DENVER CO | $76.07 | Fri
+Category: Flights and hotels
+
+Transaction: DEBIT CARD PURCHASE FENFORD GROUP STORE 2295 DENVER CO | $56.83 | Fri
+Category: Fitness
+
+Transaction: SQ *TACO BELL RALEIGH NC 08/20 | $50.32 | Tue
+Category: Dining
+
+Transaction: CARD PURCHASE TACO BELL 1140 RALEIGH NC | $19.22 | Thu
+Category: Dining
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Blint
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 5977 DENVER CO | $12.42 | Mon
+Category: Home Improvement
+
+Transaction: CHECKCARD 04/14 FALVARRO BROS AUSTIN TX | $272.88 | Tue
+Category: Flights and hotels
+
+Transaction: Upstream Computers, Des Moines IA | $127.87 | Wed
+Category:
+
+### item 33
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Wireless Solution of MD, Silver Spring MD | $78.00 | Thu
+Category:
+
+### item 34
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Allied Building Products Corp, Vero Beach FL | $19.01 | Wed
+Category:
+
+### item 35
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Salvatore Ferragamo, Orlando FL | $55.31 | Thu
+Category:
+
+### item 36
+Categories: Weekly shop, Coffee and snacks, Fuel and car, Everyday clothes, Computers, Big projects, Prescriptions, Nights out, Work trips, Dog and cat, Gym, Telecom & Utilities, Small fixes, Subscriptions, Holidays, Sit-down meals, Wellness, Gadgets and media, Special occasions, Top-up shop
+
+Transaction: OSKBURY LL DENVER | $177.46 | Sun
+Category: Computers
+
+Transaction: PP*DUNHURST 5767 | $115.36 | Wed
+Category: Telecom & Utilities
+
+Transaction: UNITED AIRLINES*07811 DENVER CO 06/12 | $123.89 | Fri
+Category: Holidays
+
+Transaction: PAYPAL *WEXLEY GRO | $53.30 | Sat
+Category: Gadgets and media
+
+Transaction: POS TRNRD GRP 6262 | $270.89 | Sat
+Category: Work trips
+
+Transaction: POS DEBIT OLIVE GARDEN #3483 OMAHA NE 08/18 | $32.95 | Thu
+Category: Sit-down meals
+
+Transaction: POS DEBIT BOWLERO #8018 RENO NV 03/15 | $28.83 | Tue
+Category: Subscriptions
+
+Transaction: POS CRNCH FTNSS 9125 | $43.15 | Tue
+Category: Gym
+
+Transaction: GRIBY CO*06506 TUCSON AZ 09/10 | $3.39 | Fri
+Category: Nights out
+
+Transaction: CARD PURCHASE MENARDS 4675 DENVER CO | $25.16 | Sat
+Category: Small fixes
+
+Transaction: WEXLEY GROUP #8611 | $167.45 | Fri
+Category: Gadgets and media
+
+Transaction: TST* BARTELL DRUGS BOISE ID | $38.21 | Sun
+Category: Prescriptions
+
+Transaction: PAYPAL *UNITED AIR | $949.28 | Fri
+Category: Holidays
+
+Transaction: PP*UNITED A 9439 | $226.09 | Mon
+Category: Holidays
+
+Transaction: SQ *UNITED AIRLINES DENVER CO 12/18 | $29.07 | Fri
+Category: Holidays
+
+Transaction: POS DEBIT HALSLEY LTD #7434 DENVER CO 06/20 | $157.07 | Tue
+Category: Special occasions
+
+Transaction: POS ULMMR INC 3165 | $37.74 | Wed
+Category: Dog and cat
+
+Transaction: UNTD ARLNS DENVER CO 03/13 | $1952.48 | Wed
+Category: Holidays
+
+Transaction: DEBIT CARD PURCHASE MACY'S STORE 2652 PORTLAND OR | $90.46 | Tue
+Category: Everyday clothes
+
+Transaction: CKCD 03/27 BRAMBY AND SONS | $95.91 | Wed
+Category: Big projects
+
+Transaction: CHECKCARD 02/24 PEP BOYS RALEIGH NC | $34.90 | Tue
+Category: Fuel and car
+
+Transaction: PAYPAL *UNITED AIR | $99.63 | Wed
+Category: Holidays
+
+Transaction: CARD PURCHASE KROGER 8074 TUCSON AZ | $114.58 | Fri
+Category: Top-up shop
+
+Transaction: UNTD ARLNS DENVER CO 03/01 | $268.73 | Tue
+Category: Holidays
+
+Transaction: Ultracars Motor Sports, Boerne TX | $43.67 | Fri
+Category:
+
+### item 37
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Computer Doctor, Mcallen TX | $17.66 | Sun
+Category:
+
+### item 38
+Categories: Weekly shop, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Big projects, Prescriptions, Nights out, Work trips, Yurra, Workout, Bills, Top-up shop, Small fixes, Gadgets and media, Wellness, Special occasions, Holidays, Sit-down meals, Subscriptions
+
+Transaction: CARD PURCHASE SHERWIN-WILLIAMS 7125 ALBANY NY | $107.88 | Sat
+Category: Small fixes
+
+Transaction: SHERWIN-WI ALBANY | $74.48 | Sun
+Category: Small fixes
+
+Transaction: MCDONALD'S #3444 | $28.99 | Wed
+Category: Coffee and snacks
+
+Transaction: CKCD 05/10 ORLCOTT INC | $33.16 | Thu
+Category: Top-up shop
+
+Transaction: MACY'S #5115 | $128.88 | Wed
+Category: Special occasions
+
+Transaction: PAYPAL *GARHOLM CO | $70.50 | Fri
+Category: Work trips
+
+Transaction: REGAL CINE ALBANY | $8.47 | Thu
+Category: Subscriptions
+
+Transaction: BANDH PHOT DENVER | $635.52 | Tue
+Category: Gadgets and media
+
+Transaction: TST* HERTZ BOISE ID | $110.64 | Fri
+Category: Holidays
+
+Transaction: TST* PEXLOCK PORTLAND OR | $90.75 | Sun
+Category: Bills
+
+Transaction: BRAMWEN  06068 OMAHA | $200.97 | Fri
+Category: Big projects
+
+Transaction: POS TLHLM AND SNS 8612 | $42.29 | Thu
+Category: Computers
+
+Transaction: SQ *BOWLERO RENO NV 10/03 | $20.34 | Sun
+Category: Nights out
+
+Transaction: BRTLL DRGS BOISE ID 06/26 | $25.52 | Thu
+Category: Prescriptions
+
+Transaction: CHECKCARD 06/12 ORLWICK CO ALBANY NY | $46.83 | Thu
+Category: Workout
+
+Transaction: VLR TAMPA FL 03/13 | $97.48 | Mon
+Category: Gas & Auto
+
+Transaction: DEBIT CARD PURCHASE NORDSTROM STORE 8041 RENO NV | $58.33 | Sat
+Category: Everyday clothes
+
+Transaction: POS DEBIT NORDSTROM #6455 RENO NV 08/14 | $88.43 | Wed
+Category: Everyday clothes
+
+Transaction: NORDSTROM RENO | $30.98 | Thu
+Category: Everyday clothes
+
+Transaction: RINFORD TAMPA FL | $15.06 | Wed
+Category: Sit-down meals
+
+Transaction: HALLEY OMAHA | $60.52 | Sat
+Category: Weekly shop
+
+Transaction: TST* ORLWICK CO ALBANY NY | $35.24 | Fri
+Category: Workout
+
+Transaction: WEXHURST A FRESNO | $69.05 | Fri
+Category: Yurra
+
+Transaction: DUANE READE*02769 ALBANY NY 09/22 | $4.19 | Tue
+Category: Wellness
+
+Transaction: Marathon Gas, Indian Trail NC | $45.58 | Wed
+Category:
+
+### item 39
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: K9 Design, Colville WA | $3.35 | Thu
+Category:
+
+### item 40
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Hiawatha Telephone Company, Munising MI | $59.14 | Tue
+Category:
+
+### item 41
+Categories: Grocery run, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Home Improvement, Prescriptions, Entertainment, Work trips, Dog and cat, Exercise, Phone and internet, Wellness, Gadgets and media, Sit-down meals, Special occasions, Holidays
+
+Transaction: CHECKCARD 09/04 ROVER TAMPA FL | $42.76 | Mon
+Category: Dog and cat
+
+Transaction: WEXLEY G* 8001 | $130.18 | Wed
+Category: Computers
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Exercise
+
+Transaction: POS ARDTN INC 4515 | $227.80 | Sat
+Category: Work trips
+
+Transaction: CKCD 08/02 KROGER | $53.73 | Fri
+Category: Grocery run
+
+Transaction: MORTON LLC DENVER CO | $27.07 | Thu
+Category: Entertainment
+
+Transaction: DUKE ENERGY*07816 DENVER CO 06/04 | $97.86 | Tue
+Category: Phone and internet
+
+Transaction: PP*TORHURST 9861 | $181.24 | Wed
+Category: Everyday clothes
+
+Transaction: POS DEBIT UNITED AIRLINES #7847 DENVER CO 01/17 | $42.98 | Tue
+Category: Holidays
+
+Transaction: AUTOZONE* 8002 | $45.38 | Mon
+Category: Gas & Auto
+
+Transaction: CHECKCARD 10/07 UNITED AIRLINES DENVER CO | $49.92 | Sat
+Category: Holidays
+
+Transaction: STRBCKS*8557 | $19.57 | Mon
+Category: Sit-down meals
+
+Transaction: PP*GRIDALE 7962 | $12.45 | Sun
+Category: Prescriptions
+
+Transaction: ROVER* 9581 | $61.22 | Sun
+Category: Dog and cat
+
+Transaction: ELRHURST CO*03381 PORTLAND OR 01/23 | $31.81 | Sun
+Category: Coffee and snacks
+
+Transaction: TOPGOLF* 7175 | $87.41 | Thu
+Category: Entertainment
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category: Work trips
+
+Transaction: PP*GARDEN G 8750 | $13.71 | Fri
+Category: Wellness
+
+Transaction: POS ISTBRY 8064 | $40.96 | Thu
+Category: Special occasions
+
+Transaction: KSR PRMNNT*086 | $23.64 | Mon
+Category: Prescriptions
+
+Transaction: HLWN BRS*5049 | $145.38 | Thu
+Category: Gadgets and media
+
+Transaction: POS HLTN 1324 | $244.89 | Wed
+Category: Holidays
+
+Transaction: PP*GRIWEN B 1452 | $20.97 | Fri
+Category: Entertainment
+
+Transaction: Wolf Bedliners Inc, Riverside CA | $56.49 | Thu
+Category:
+
+### item 42
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: Green Planters Nursery, Hayes VA | $176.47 | Mon
+Category:
+
+### item 43
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Total Wireless, Fayetteville GA | $88.34 | Tue
+Category:
+
+### item 44
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: Skyrush, Hershey PA | $19.72 | Sat
+Category:
+
+### item 45
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Viareggio Italian Restaurant, Las Vegas NV | $43.99 | Sun
+Category:
+
+### item 46
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: Aquacell, Delano CA | $120.28 | Sun
+Category:
+
+### item 47
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Childrens Nook II, North Charleston SC | $60.01 | Mon
+Category:
+
+### item 48
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Evie & Co Boutique, Waunakee WI | $66.00 | Wed
+Category:
+
+### item 49
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: Kids Kingdom Arcade and Pizza, Rosiclare IL | $21.80 | Sat
+Category:
+
+### item 50
+Categories: Dravik, Dining, Fuel and car, Wardrobe, Blint, Home Improvement, Medical & Fun, Flights and hotels, Juvix, Fitness, Telecom & Utilities
+
+Transaction: WGMNS*1326 | $82.71 | Fri
+Category: Dravik
+
+Transaction: TST* MENARDS DENVER CO | $39.98 | Fri
+Category: Home Improvement
+
+Transaction: MENARDS DENVER CO | $28.43 | Sat
+Category: Home Improvement
+
+Transaction: FALVARRO BROS #9708 | $494.71 | Sat
+Category: Flights and hotels
+
+Transaction: TST* ULMMOOR INC TAMPA FL | $89.57 | Wed
+Category: Juvix
+
+Transaction: PAYPAL *TACO BELL | $15.64 | Tue
+Category: Dining
+
+Transaction: VERIZON 07455 PORTLAND | $94.02 | Sun
+Category: Telecom & Utilities
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Juvix
+
+Transaction: CARD PURCHASE ULMMOOR INC 6549 TAMPA FL | $29.96 | Thu
+Category: Juvix
+
+Transaction: UNITED AIRLINES #6687 | $28.96 | Thu
+Category: Flights and hotels
+
+Transaction: DUANE READE*00523 ALBANY NY 04/06 | $52.84 | Wed
+Category: Medical & Fun
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Fitness
+
+Transaction: UNITED A* 7381 | $553.51 | Wed
+Category: Flights and hotels
+
+Transaction: CKCD 12/15 UNITED AIRLINES | $624.47 | Fri
+Category: Flights and hotels
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Wardrobe
+
+Transaction: TST* TACO BELL RALEIGH NC | $12.01 | Tue
+Category: Dining
+
+Transaction: VLR TAMPA FL 02/02 | $90.42 | Sat
+Category: Fuel and car
+
+Transaction: UNITED AIRLINES DENVER CO | $76.07 | Fri
+Category: Flights and hotels
+
+Transaction: DEBIT CARD PURCHASE FENFORD GROUP STORE 2295 DENVER CO | $56.83 | Fri
+Category: Fitness
+
+Transaction: SQ *TACO BELL RALEIGH NC 08/20 | $50.32 | Tue
+Category: Dining
+
+Transaction: CARD PURCHASE TACO BELL 1140 RALEIGH NC | $19.22 | Thu
+Category: Dining
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Blint
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 5977 DENVER CO | $12.42 | Mon
+Category: Home Improvement
+
+Transaction: CHECKCARD 04/14 FALVARRO BROS AUSTIN TX | $272.88 | Tue
+Category: Flights and hotels
+
+Transaction: Electronic Express, Decatur AL | $58.17 | Sun
+Category:
+
+### item 51
+Categories: Yurra, Nastel, Electronics, Hardware, Health, Fun & Car, Trips & Food shopping, Pet care, Gym & Bills
+
+Transaction: PP*PEP BOYS 5587 | $34.41 | Thu
+Category: Fun & Car
+
+Transaction: ROVER TAMPA | $41.04 | Wed
+Category: Pet care
+
+Transaction: HILTON*02595 FRESNO CA 06/22 | $619.44 | Sun
+Category: Trips & Food shopping
+
+Transaction: POS YRTN BRS 6326 | $56.14 | Mon
+Category: Nastel
+
+Transaction: CHECKCARD 12/09 EQUINOX TUCSON AZ | $46.23 | Sun
+Category: Gym & Bills
+
+Transaction: PP*TACO BEL 4331 | $46.20 | Thu
+Category: Yurra
+
+Transaction: VITAMIN SH DENVER | $39.82 | Sun
+Category: Health
+
+Transaction: SHERWIN-* 4736 | $21.73 | Sun
+Category: Hardware
+
+Transaction: SAMSUNG AUSTIN | $127.06 | Thu
+Category: Electronics
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Nastel
+
+Transaction: DEBIT CARD PURCHASE ISTDALE BROS STORE 4518 PORTLAND OR | $40.89 | Wed
+Category: Yurra
+
+Transaction: CKCD 09/08 SHERWIN-WILLIAMS | $62.60 | Mon
+Category: Hardware
+
+Transaction: SQ *ZEDBURY OMAHA NE 11/22 | $8.36 | Tue
+Category: Yurra
+
+Transaction: POS SHRWN-WLLMS 8963 | $79.72 | Sun
+Category: Hardware
+
+Transaction: CKCD 02/02 TACO BELL | $10.06 | Sun
+Category: Yurra
+
+Transaction: TACO BELL*08954 RALEIGH NC 06/20 | $29.15 | Fri
+Category: Yurra
+
+Transaction: ISTDL BRS PORTLAND OR 05/24 | $18.85 | Fri
+Category: Yurra
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Gym & Bills
+
+Transaction: PAYPAL *ISTDALE BR | $27.49 | Fri
+Category: Yurra
+
+Transaction: ULMMOOR INC*01743 TAMPA FL 05/08 | $12.18 | Sun
+Category: Pet care
+
+Transaction: PAYPAL *YARTON BRO | $57.68 | Thu
+Category: Nastel
+
+Transaction: ULMBRY LTD MADISON WI 06/27 | $14.26 | Sun
+Category: Pet care
+
+Transaction: SQ *TACO BELL RALEIGH NC 07/16 | $16.56 | Sat
+Category: Yurra
+
+Transaction: POS DEBIT JIFFY LUBE #3611 OMAHA NE 02/10 | $97.38 | Tue
+Category: Fun & Car
+
+Transaction: Under Armour, Annapolis MD | $42.25 | Fri
+Category:
+
+### item 52
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: H-E-B Pharmacy, Mcallen TX | $39.66 | Tue
+Category:
+
+### item 53
+Categories: Weekly shop, Coffee and snacks, Gas & Auto, Everyday clothes, Computers, Home Improvement, Prescriptions, Entertainment, Work trips, Dog and cat, Exercise, Utilities, Holidays, Gadgets and media, Wellness, Special occasions, Top-up shop, Sit-down meals
+
+Transaction: CARD PURCHASE REGAL CINEMAS 8140 ALBANY NY | $45.23 | Mon
+Category: Entertainment
+
+Transaction: DEBIT CARD PURCHASE SONY STORE 4900 AUSTIN TX | $662.17 | Wed
+Category: Gadgets and media
+
+Transaction: POS DEBIT ALDI #1775 MADISON WI 02/24 | $47.36 | Mon
+Category: Weekly shop
+
+Transaction: ISTWICK GROUP*09815 PORTLAND OR 02/04 | $74.10 | Fri
+Category: Dog and cat
+
+Transaction: CARD PURCHASE GARDEN GROUP 5841 PORTLAND OR | $38.76 | Fri
+Category: Prescriptions
+
+Transaction: CHECKCARD 06/06 OSKBURY LLC DENVER CO | $116.96 | Sun
+Category: Computers
+
+Transaction: PP*TORHURST 9861 | $181.24 | Wed
+Category: Special occasions
+
+Transaction: PP*DUNNARD  9870 | $97.34 | Thu
+Category: Top-up shop
+
+Transaction: GARDEN GROUP*06824 PORTLAND OR 06/22 | $22.52 | Tue
+Category: Prescriptions
+
+Transaction: CHECKCARD 09/11 GNC TAMPA FL | $31.07 | Wed
+Category: Wellness
+
+Transaction: UNITED AIRLINES #728 | $717.52 | Wed
+Category: Holidays
+
+Transaction: POS DEBIT OLIVE GARDEN #3483 OMAHA NE 08/18 | $32.95 | Thu
+Category: Coffee and snacks
+
+Transaction: CHECKCARD 03/01 T-MOBILE DENVER CO | $55.02 | Mon
+Category: Utilities
+
+Transaction: DEBIT CARD PURCHASE WEXDEN INC STORE 6467 BOISE ID | $54.37 | Sun
+Category: Gas & Auto
+
+Transaction: CKCD 09/18 UNITED AIRLINES | $135.78 | Sat
+Category: Holidays
+
+Transaction: CKCD 05/07 JORHOLM BROS | $22.66 | Fri
+Category: Everyday clothes
+
+Transaction: SHERWIN-WILLIAMS*01628 ALBANY NY 07/04 | $27.31 | Sat
+Category: Home Improvement
+
+Transaction: TST* STARBUCKS FRESNO CA | $15.08 | Tue
+Category: Sit-down meals
+
+Transaction: POS DEBIT POLFORD LTD #1241 BOISE ID 01/06 | $154.68 | Thu
+Category: Work trips
+
+Transaction: CARD PURCHASE UNITED AIRLINES 7057 DENVER CO | $267.45 | Sun
+Category: Holidays
+
+Transaction: CKCD 10/18 REI | $45.34 | Tue
+Category: Exercise
+
+Transaction: TST* MENARDS DENVER CO | $82.66 | Tue
+Category: Home Improvement
+
+Transaction: SQ *RITE AID BOISE ID 11/07 | $43.55 | Sun
+Category: Wellness
+
+Transaction: POS DEBIT UNITED AIRLINES #7847 DENVER CO 01/17 | $42.98 | Tue
+Category: Holidays
+
+Transaction: Classic Cinemas Lake Theatre, Oak Park IL | $18.11 | Tue
+Category:
+
+### item 54
+Categories: Lumbry, Dining, Gas & Auto, Clothing, Electronics, Home Improvement, Fun, Trips & Medical, Quorra, Blint, Utilities
+
+Transaction: GRIDEN GROUP PORTLAND OR | $108.05 | Sun
+Category: Home Improvement
+
+Transaction: MCY'S PORTLAND OR 07/28 | $17.34 | Sat
+Category: Clothing
+
+Transaction: MENARDS*08358 DENVER CO 04/20 | $24.82 | Thu
+Category: Home Improvement
+
+Transaction: MENARDS* 8551 | $54.15 | Thu
+Category: Home Improvement
+
+Transaction: CKCD 04/15 NEVDEN BROS | $13.15 | Sun
+Category: Trips & Medical
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Gas & Auto
+
+Transaction: SQ *HALHURST CO FRESNO CA 03/26 | $28.48 | Fri
+Category: Electronics
+
+Transaction: SQ *HOME DEPOT FRESNO CA 08/10 | $57.62 | Tue
+Category: Home Improvement
+
+Transaction: CKCD 01/27 DUNHURST BROS | $83.47 | Tue
+Category: Utilities
+
+Transaction: CKCD 01/17 ISTMOOR GROUP | $75.80 | Sun
+Category: Lumbry
+
+Transaction: PP*RITE AID 9288 | $10.57 | Tue
+Category: Trips & Medical
+
+Transaction: ISTDL BRS*2817 | $7.62 | Thu
+Category: Dining
+
+Transaction: CARD PURCHASE TRACTOR SUPPLY 6637 DENVER CO | $29.65 | Sat
+Category: Home Improvement
+
+Transaction: ELRHRST CO PORTLAND OR 10/09 | $12.85 | Thu
+Category: Dining
+
+Transaction: VLR TAMPA FL 08/12 | $47.62 | Tue
+Category: Gas & Auto
+
+Transaction: CKCD 04/26 NEVNARD BROS | $21.94 | Wed
+Category: Blint
+
+Transaction: SABBY CO*06849 RENO NV 06/09 | $34.03 | Mon
+Category: Lumbry
+
+Transaction: WAG*04534 TAMPA FL 09/15 | $77.06 | Wed
+Category: Quorra
+
+Transaction: QUEST DI 03574 OMAHA | $19.67 | Mon
+Category: Trips & Medical
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 2598 DENVER CO | $97.23 | Wed
+Category: Home Improvement
+
+Transaction: MACY'S*05227 PORTLAND OR 11/12 | $70.25 | Mon
+Category: Clothing
+
+Transaction: MENARDS* 7393 | $121.29 | Tue
+Category: Home Improvement
+
+Transaction: TST* ISTDALE BROS PORTLAND OR | $28.33 | Sun
+Category: Dining
+
+Transaction: SPTFY*4268 | $61.55 | Mon
+Category: Fun
+
+Transaction: Montana Farmacy, Eureka MT | $273.28 | Wed
+Category:
+
+### item 55
+Categories: Groceries, Zindle, Fuel and car, Everyday clothes, Electronics, Home Improvement, Mistle, Nights out, Trips, Dog and cat, Fitness, Telecom & Utilities, Subscriptions, Special occasions
+
+Transaction: PAYPAL *TACO BELL | $31.79 | Tue
+Category: Zindle
+
+Transaction: ATNDT AUSTIN TX 02/22 | $72.92 | Mon
+Category: Telecom & Utilities
+
+Transaction: WEXLEY G 08385 AUSTIN | $141.11 | Thu
+Category: Electronics
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Trips
+
+Transaction: MNRDS DENVER CO 04/04 | $41.35 | Sat
+Category: Home Improvement
+
+Transaction: PAYPAL *PANERA BRE | $31.38 | Tue
+Category: Zindle
+
+Transaction: MENARDS #950 | $16.84 | Fri
+Category: Home Improvement
+
+Transaction: POS DEBIT TACO BELL #8166 RALEIGH NC 04/04 | $14.25 | Sat
+Category: Zindle
+
+Transaction: POS DEBIT TACO BELL #8855 RALEIGH NC 11/02 | $35.04 | Wed
+Category: Zindle
+
+Transaction: POS YRTN BRS 0135 | $75.22 | Sat
+Category: Everyday clothes
+
+Transaction: CARD PURCHASE MENARDS 5332 DENVER CO | $11.88 | Sat
+Category: Home Improvement
+
+Transaction: PEXLEY TAMPA | $75.97 | Tue
+Category: Groceries
+
+Transaction: POS MRTHN 9470 | $40.76 | Wed
+Category: Fuel and car
+
+Transaction: CARD PURCHASE BARTELL DRUGS 2280 BOISE ID | $30.36 | Wed
+Category: Mistle
+
+Transaction: CARD PURCHASE EQUINOX 8238 TUCSON AZ | $85.51 | Thu
+Category: Fitness
+
+Transaction: POS KSR PRMNNT 3828 | $77.46 | Sun
+Category: Mistle
+
+Transaction: TC BLL*5922 | $35.89 | Thu
+Category: Zindle
+
+Transaction: OLD NAVY 04243 OMAHA | $27.83 | Wed
+Category: Special occasions
+
+Transaction: DEBIT CARD PURCHASE ZEDBURY STORE 5871 OMAHA NE | $23.50 | Sat
+Category: Zindle
+
+Transaction: CARD PURCHASE FALVARRO BROS 2176 AUSTIN TX | $324.47 | Thu
+Category: Trips
+
+Transaction: TACO BELL*07919 RALEIGH NC 10/05 | $4.51 | Sun
+Category: Zindle
+
+Transaction: ROVER 09828 TAMPA | $89.45 | Wed
+Category: Dog and cat
+
+Transaction: TICKETMAST BOISE | $49.40 | Sat
+Category: Subscriptions
+
+Transaction: CHECKCARD 03/02 ISTNARD LLC PORTLAND OR | $39.44 | Thu
+Category: Nights out
+
+Transaction: Korczynski's Photo Lab & Studio, Victoria TX | $83.36 | Mon
+Category:
+
+### item 56
+Categories: Apparel & Eating out & Car, Gadgets & Food shopping, Quorra, Pharmacy & Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+
+Transaction: SQ *BARTELL DRUGS BOISE ID 06/01 | $14.06 | Sat
+Category: Pharmacy & Health
+
+Transaction: PP*RINLOCK 3820 | $18.26 | Mon
+Category: Apparel & Eating out & Car
+
+Transaction: CHECKCARD 12/01 WEXLEY GROUP AUSTIN TX | $209.51 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: POS MNRDS 8839 | $79.70 | Sun
+Category: Quorra
+
+Transaction: MENARDS*05582 DENVER CO 01/08 | $73.88 | Tue
+Category: Quorra
+
+Transaction: POS DEBIT LUNDALE INC #6510 BOISE ID 03/02 | $98.63 | Sat
+Category: Grendo
+
+Transaction: PP*MENARDS 6522 | $136.45 | Wed
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 698 DENVER CO | $481.95 | Thu
+Category: Quorra
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 6876 DENVER CO | $568.95 | Mon
+Category: Quorra
+
+Transaction: POS DEBIT HALHOLM AND SONS #5014 TUCSON AZ 11/05 | $39.79 | Tue
+Category: Animals
+
+Transaction: PP*HILTON 1276 | $157.06 | Sun
+Category: Plenk
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+
+Transaction: CKCD 01/26 NORDSTROM | $60.67 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: RITE AID BOISE ID | $68.53 | Sun
+Category: Pharmacy & Health
+
+Transaction: CARD PURCHASE FALVARRO BROS 720 AUSTIN TX | $320.12 | Thu
+Category: Plenk
+
+Transaction: CHECKCARD 12/15 ROVER TAMPA FL | $132.90 | Fri
+Category: Animals
+
+Transaction: CHECKCARD 02/16 MENARDS DENVER CO | $55.35 | Sat
+Category: Quorra
+
+Transaction: SQ *HALHOLM AND SONS TUCSON AZ 01/18 | $96.26 | Tue
+Category: Animals
+
+Transaction: OSKHURST B TAMPA | $25.75 | Sun
+Category: Entertainment
+
+Transaction: PP*YARTON B 5283 | $68.12 | Fri
+Category: Apparel & Eating out & Car
+
+Transaction: PET SUPP* 0757 | $118.28 | Wed
+Category: Animals
+
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets & Food shopping
+
+Transaction: Netsource Computer Technologies, Glendale AZ | $284.30 | Wed
+Category:
+
+### item 57
+Categories: Dravik, Dining, Fuel and car, Wardrobe, Blint, Home Improvement, Medical & Fun, Flights and hotels, Juvix, Fitness, Telecom & Utilities
+
+Transaction: WGMNS*1326 | $82.71 | Fri
+Category: Dravik
+
+Transaction: TST* MENARDS DENVER CO | $39.98 | Fri
+Category: Home Improvement
+
+Transaction: MENARDS DENVER CO | $28.43 | Sat
+Category: Home Improvement
+
+Transaction: FALVARRO BROS #9708 | $494.71 | Sat
+Category: Flights and hotels
+
+Transaction: TST* ULMMOOR INC TAMPA FL | $89.57 | Wed
+Category: Juvix
+
+Transaction: PAYPAL *TACO BELL | $15.64 | Tue
+Category: Dining
+
+Transaction: VERIZON 07455 PORTLAND | $94.02 | Sun
+Category: Telecom & Utilities
+
+Transaction: CKCD 11/01 ULMMOOR INC | $32.63 | Thu
+Category: Juvix
+
+Transaction: CARD PURCHASE ULMMOOR INC 6549 TAMPA FL | $29.96 | Thu
+Category: Juvix
+
+Transaction: UNITED AIRLINES #6687 | $28.96 | Thu
+Category: Flights and hotels
+
+Transaction: DUANE READE*00523 ALBANY NY 04/06 | $52.84 | Wed
+Category: Medical & Fun
+
+Transaction: POS NVNRD BRS 4108 | $85.83 | Mon
+Category: Fitness
+
+Transaction: UNITED A* 7381 | $553.51 | Wed
+Category: Flights and hotels
+
+Transaction: CKCD 12/15 UNITED AIRLINES | $624.47 | Fri
+Category: Flights and hotels
+
+Transaction: YRTN BRS*2908 | $30.41 | Tue
+Category: Wardrobe
+
+Transaction: TST* TACO BELL RALEIGH NC | $12.01 | Tue
+Category: Dining
+
+Transaction: VLR TAMPA FL 02/02 | $90.42 | Sat
+Category: Fuel and car
+
+Transaction: UNITED AIRLINES DENVER CO | $76.07 | Fri
+Category: Flights and hotels
+
+Transaction: DEBIT CARD PURCHASE FENFORD GROUP STORE 2295 DENVER CO | $56.83 | Fri
+Category: Fitness
+
+Transaction: SQ *TACO BELL RALEIGH NC 08/20 | $50.32 | Tue
+Category: Dining
+
+Transaction: CARD PURCHASE TACO BELL 1140 RALEIGH NC | $19.22 | Thu
+Category: Dining
+
+Transaction: TST* BEST BUY AUSTIN TX | $252.28 | Thu
+Category: Blint
+
+Transaction: DEBIT CARD PURCHASE MENARDS STORE 5977 DENVER CO | $12.42 | Mon
+Category: Home Improvement
+
+Transaction: CHECKCARD 04/14 FALVARRO BROS AUSTIN TX | $272.88 | Tue
+Category: Flights and hotels
+
+Transaction: The Ballet Physique, Littleton CO | $20.99 | Mon
+Category:
+
+### item 58
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: T-mobile Authorized Retailer, Waldorf MD | $142.18 | Tue
+Category:
+
+### item 59
+Categories: Groceries, Eating out, Gas & Auto, Juvix, Electronics, Home Improvement, Yurra, Fun, Quorra, Sibbet, Fitness, Dravik
+
+Transaction: EXPEDIA* 1017 | $501.91 | Thu
+Category: Quorra
+
+Transaction: CKCD 09/13 ORLCOTT INC | $163.80 | Sun
+Category: Groceries
+
+Transaction: PAYPAL *DUANE READ | $36.09 | Thu
+Category: Yurra
+
+Transaction: SQ *SABBY CO RENO NV 02/17 | $118.75 | Wed
+Category: Groceries
+
+Transaction: DEBIT CARD PURCHASE ROVER STORE 5802 TAMPA FL | $28.42 | Thu
+Category: Sibbet
+
+Transaction: CHECKCARD 11/14 WEXLEY GROUP AUSTIN TX | $990.31 | Fri
+Category: Electronics
+
+Transaction: ISTDL BRS*9976 | $42.91 | Mon
+Category: Eating out
+
+Transaction: PP*REGAL CI 3031 | $23.74 | Thu
+Category: Fun
+
+Transaction: HOME DEPOT #1667 | $59.23 | Wed
+Category: Home Improvement
+
+Transaction: SQ *WEXLEY GROUP AUSTIN TX 06/05 | $266.25 | Tue
+Category: Electronics
+
+Transaction: CARD PURCHASE GRITON 8996 DENVER CO | $296.74 | Tue
+Category: Electronics
+
+Transaction: POS DEBIT POLSTEAD LLC #0884 AUSTIN TX 07/13 | $43.29 | Sun
+Category: Gas & Auto
+
+Transaction: CHECKCARD 04/04 ROVER TAMPA FL | $25.65 | Tue
+Category: Sibbet
+
+Transaction: CARD PURCHASE TORTON INC 5406 BOISE ID | $36.97 | Sun
+Category: Yurra
+
+Transaction: ISTDALE BROS*04818 PORTLAND OR 04/08 | $45.49 | Sat
+Category: Eating out
+
+Transaction: POS DEBIT ISTDALE BROS #3784 PORTLAND OR 02/17 | $21.72 | Thu
+Category: Eating out
+
+Transaction: CHECKCARD 05/28 ATANDT AUSTIN TX | $107.35 | Sun
+Category: Dravik
+
+Transaction: NEVDEN BROS #8016 | $64.14 | Thu
+Category: Yurra
+
+Transaction: PP*ULMMOOR  2814 | $188.88 | Fri
+Category: Sibbet
+
+Transaction: WEXLEY GROUP*04996 AUSTIN TX 06/05 | $673.97 | Sun
+Category: Electronics
+
+Transaction: NRDSTRM*4384 | $43.21 | Fri
+Category: Juvix
+
+Transaction: OLD NAVY 04412 OMAHA | $37.82 | Tue
+Category: Juvix
+
+Transaction: WEXDALE  04502 MADISON | $43.98 | Mon
+Category: Sibbet
+
+Transaction: PP*PELOTON 1343 | $12.29 | Thu
+Category: Fitness
+
+Transaction: Sun's Donuts, Marysville CA | $17.59 | Fri
+Category:
+
+### item 60
+Categories: Grocery run, Restaurants, Gas & Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $27.08 | Wed
+Category: Gas & Auto
+
+Transaction: CHECKCARD 05/27 ISTDALE BROS PORTLAND OR | $15.22 | Sat
+Category: Restaurants
+
+Transaction: NETFLIX 09488 ALBANY | $32.83 | Fri
+Category: Fennow
+
+Transaction: DEBIT CARD PURCHASE TOPGOLF STORE 4382 OMAHA NE | $12.78 | Fri
+Category: Fennow
+
+Transaction: PP*MACY'S 1829 | $95.68 | Tue
+Category: Clothing
+
+Transaction: CKCD 08/20 GRIBY CO | $11.27 | Fri
+Category: Fennow
+
+Transaction: SQ *LABCORP AUSTIN TX 05/20 | $31.34 | Sat
+Category: Drugstore
+
+Transaction: CHECKCARD 04/26 VALERO TAMPA FL | $41.42 | Sat
+Category: Gas & Auto
+
+Transaction: SABSTEAD BROS*03536 FRESNO CA 03/11 | $67.55 | Fri
+Category: Phone and internet
+
+Transaction: POS OSKBRY LLC 7277 | $50.07 | Tue
+Category: Zindle
+
+Transaction: CHECKCARD 02/05 SHERWIN-WILLIAMS ALBANY NY | $83.12 | Mon
+Category: Home repairs
+
+Transaction: SHERWIN-WI ALBANY | $238.32 | Thu
+Category: Home repairs
+
+Transaction: ISTDALE BROS*05549 PORTLAND OR 06/08 | $15.71 | Sun
+Category: Restaurants
+
+Transaction: SHERWIN-WILLIAMS ALBANY NY | $68.75 | Wed
+Category: Home repairs
+
+Transaction: SQ *BEXWEN AND SONS DENVER CO 11/13 | $162.94 | Thu
+Category: Exercise
+
+Transaction: SQ *ISTDALE BROS PORTLAND OR 05/13 | $12.68 | Tue
+Category: Restaurants
+
+Transaction: PETSMART 01662 TAMPA | $21.57 | Fri
+Category: Pravin
+
+Transaction: PP*ISTMERE  8146 | $930.05 | Fri
+Category: Korrel
+
+Transaction: TPGLF*7915 | $32.51 | Fri
+Category: Fennow
+
+Transaction: WHOLE FO 04449 RENO | $69.17 | Tue
+Category: Grocery run
+
+Transaction: CHECKCARD 09/26 POLSTEAD LLC AUSTIN TX | $105.64 | Sun
+Category: Gas & Auto
+
+Transaction: POS DEBIT SHERWIN-WILLIAMS #4739 ALBANY NY 06/08 | $38.01 | Sat
+Category: Home repairs
+
+Transaction: CARD PURCHASE WEXHAM BROS 1376 FRESNO CA | $87.48 | Tue
+Category: Gas & Auto
+
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: The Crypto Merchant, Daytona Beach FL | $474.30 | Mon
+Category:
+

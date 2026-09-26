@@ -1,0 +1,125 @@
+{
+  "noctx": {
+    "R6_all": 54.8,
+    "R6_all_n": 261,
+    "R6_all_ci": [
+      48.7,
+      60.9
+    ],
+    "R6_all_null": [
+      5.4,
+      11.9
+    ],
+    "R6_all_uci": [
+      43.2,
+      67.2
+    ],
+    "R6_all_chance": 8.6,
+    "R6_all_new": 49.0,
+    "R6_all_new_n": 49,
+    "R6_all_new_ci": [
+      34.7,
+      63.3
+    ],
+    "R6_all_new_null": [
+      6.1,
+      24.5
+    ],
+    "R6_all_new_uci": [
+      40.7,
+      66.7
+    ],
+    "R6_all_new_chance": 10.0,
+    "R6_all_renamed": 53.1,
+    "R6_all_renamed_n": 81,
+    "R6_all_renamed_ci": [
+      42.0,
+      63.0
+    ],
+    "R6_all_renamed_null": [
+      4.9,
+      18.5
+    ],
+    "R6_all_renamed_uci": [
+      34.3,
+      86.2
+    ],
+    "R6_all_renamed_chance": 9.6,
+    "R6_all_standard": 58.0,
+    "R6_all_standard_n": 131,
+    "R6_all_standard_ci": [
+      49.6,
+      65.6
+    ],
+    "R6_all_standard_null": [
+      6.9,
+      16.8
+    ],
+    "R6_all_standard_uci": [
+      50.5,
+      63.5
+    ],
+    "R6_all_standard_chance": 7.4,
+    "R6_unseen_all": 54.8,
+    "R6_unseen_all_n": 261,
+    "R6_unseen_all_ci": [
+      48.7,
+      60.9
+    ],
+    "R6_unseen_all_null": [
+      5.4,
+      11.9
+    ],
+    "R6_unseen_all_uci": [
+      43.2,
+      67.2
+    ],
+    "R6_unseen_all_chance": 8.6,
+    "R6_unseen_new": 49.0,
+    "R6_unseen_new_n": 49,
+    "R6_unseen_new_ci": [
+      34.7,
+      63.3
+    ],
+    "R6_unseen_new_null": [
+      6.1,
+      24.5
+    ],
+    "R6_unseen_new_uci": [
+      40.7,
+      66.7
+    ],
+    "R6_unseen_new_chance": 10.0,
+    "R6_unseen_renamed": 53.1,
+    "R6_unseen_renamed_n": 81,
+    "R6_unseen_renamed_ci": [
+      42.0,
+      63.0
+    ],
+    "R6_unseen_renamed_null": [
+      4.9,
+      18.5
+    ],
+    "R6_unseen_renamed_uci": [
+      34.3,
+      86.2
+    ],
+    "R6_unseen_renamed_chance": 9.6,
+    "R6_unseen_standard": 58.0,
+    "R6_unseen_standard_n": 131,
+    "R6_unseen_standard_ci": [
+      49.6,
+      65.6
+    ],
+    "R6_unseen_standard_null": [
+      6.9,
+      16.8
+    ],
+    "R6_unseen_standard_uci": [
+      50.5,
+      63.5
+    ],
+    "R6_unseen_standard_chance": 7.4,
+    "minutes": 1.7
+  }
+}

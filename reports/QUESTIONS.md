@@ -953,6 +953,7 @@ standard category each, product records from the category pools) to about 1,000,
 over all of them; the DB-only merchants of REAL-6 scored on held-out users as before, at a fixed step budget (fewer rows per
 merchant as the database grows) and at a fixed exposure per merchant (steps grow with the database); the point at which the
 DB-only accuracy falls is the capacity figure for a 3B model with a rank-64 adapter.
+**Status (2026-09-26):** answered at this range, PLAN step 59, REPORT.md 58. At a fixed exposure of 30 database rows per merchant, the DB-only merchants read 91.8 / 95.9 / 93.4 / 92.6 at 240 / 1,000 / 5,000 / 20,000 merchants (opaque 92 / 94 / 92 / 90), with no loss elsewhere: no interference up to 20,000 for a rank-64 adapter on 3B. A fixed budget spread over more merchants loses them (7.2 rows each 82.8, 1.4 rows 69.7, 0.4 rows no gain). Cost is linear: 20,000 merchants took 89 H100 minutes. Open: the minimum rows per merchant, beyond 20,000, real merchants (REAL-21).
 
 **TRAIN-12 (O) Is 16 sequences per step the right batch for the categoriser, now that an H100 can take more?**
 The owner (2026-09-26): have batch sizes been ablated on the H100? Only the layout was: four passes of 4 against one of 16, at the
@@ -962,6 +963,7 @@ H100: effective batch 32 and 64 at equal samples (100 and 50 steps; the rate at 
 ratio) and at equal steps (200, the scaled rate), against the three batch-16 seeds of section 52.4; passes of 8, 16 and 32
 sequences for the throughput curve; REAL-6 by group and the ARC / MMLU / ICL items. The 20-step warmup is fixed, so the 50-step
 runs warm up for 40% of their training.
+**Status (2026-09-26):** answered, PLAN step 60, REPORT.md 56. Keep 16 sequences per step at 1e-4 for 200 steps. At equal samples a batch of 32 or 64 matches it (79.5 to 80.1 against the seeds' 78.8 to 81.6) only with the rate scaled by the square root of the batch ratio (64 at 1e-4: 72.3, under-trained); at equal steps 2x and 4x the data read 81.6 and 80.9. Passes of 8 to 16 sequences saturate the H100 (14,400 to 14,800 tokens/s; 32 per pass is slower, 13,000).
 
 **REAL-18 (O) Can a merchant known from the database be filed under a label the model has never seen?**
 The owner (2026-09-26). REAL-6's coined category names come from a list of 24 words shared by all users: 13 of the 25 coined names
@@ -977,6 +979,7 @@ The owner (2026-09-26). Every REAL-6 merchant has a record and its opaque names 
 a small item set of merchants in no database and no history: descriptive names ("Harbor Pet Supply", "Oak Street Dental") whose
 kind the name and the user's shots should give, and opaque ones as the floor; statement strings in the generator's renderings,
 labels in each user's scheme; scored for the no-DB, episode and record arms (the record arms with no record for these merchants).
+**Status (2026-09-26):** answered, PLAN step 62, REPORT.md 57. Built from Overture (1,198 real US places, three renderings of the same items). With a readable name the categoriser infers well: database episodes 72.5 top-1 / 85.5 top-3 on clean strings, 87.9 on descriptive names, 78.6 on chains, 53.5 on names with no category word; baking the database in helps (+4.7) rather than costs. Truncated bank strings cost every no-record model 14 to 16 points; a record built from Overture's category gives 85 in every rendering. The user's coined category names stay at 55 to 65 against a blind Opus 5.5 ceiling of 88 on the same prompts.
 
 
 ## Research agenda, 2026-09-26 (the owner's framing)
@@ -1009,6 +1012,7 @@ the leave-users-out temperature of section 50; coverage at 95% and 98% precision
 against uniform, the user's usage prior, the user's merchant lookup and other users' labels, with skill = the share of the headroom
 over the best of those the model captures; per-item chance normalisation for the number of categories. Re-read every REAL-6 and
 novel-merchant run with it.
+**Status (2026-09-26):** done, PLAN step 63, REPORT.md 59. On REAL-6's held-out users the no-model cascade (the user's merchant lookup, else other users' labels, else the usage prior) reads 87.0 top-1, level with the best categorisers; their value is the ranking (top-3 97 to 98 against 26) and whatever no lookup reaches (novel merchants: cascade 7.8, models 53 to 85). Thresholds for 98% auto-filing chosen on other users realise 92 to 98% on new users.
 
 **REAL-20 Label induction: when can a model infer what a meaningless category name means from the user's examples?**
 Blind Opus solves the novel merchants' coined names at 88% from clean strings; the 3B categorisers at 42 to 55. *Experiment
