@@ -54,7 +54,8 @@ if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS_SET = os.environ.get("ITEMS_SET", "")  # row 62: score another frozen item set in REAL-6's format (data/processed/<set>.json), e.g. novel_merchants_v1
 if ITEMS_SET:
-    DOC = dict(DOC, items=json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())["items"])
+    _set = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
+    DOC = dict(DOC, items=_set["items"], **({"users": _set["users"]} if "users" in _set else {}))  # row 65: a set with its own users (poi1_v1)
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
 _fold = re.search(r"_f(\d)(?:_|$)", WHAT)  # row 42: a fold adapter (exp_categoriser.py FOLD=k) is scored on its held-out users unless USERS says otherwise
 USERS = os.environ.get("USERS", "all" if _fold is None else ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == int(_fold.group(1))))
