@@ -561,6 +561,7 @@ EntiGraph (2409.07431) generates text about pairs and triples of entities (rando
 lifts closed-book QA from 39.5 to 56.2; the K stream's comparative sentences are a one-hop version.
 *Experiment:* replace part of the knowledge stream with E-A-E walk texts at a fixed token budget; score pair, yes/no
 and Timmy from the weights against arm C. PLAN row 29.
+**Status (2026-09-19):** answered, PLAN step 29, REPORT.md 41. Arm Cw (a ninth of the knowledge sequences as templated three-entity walks, `universe.walk_texts`, 1.22x arm C's knowledge-side tokens) reads yes/no 88.8, pair 77.5, Timmy 59.4 against the same-path arm C's 87.5 / 73.8 / 56.9, inside the section 20 same-seed spread; recall 100, general measures unchanged. Two-hop walks are read as more comparative sentences; the lever on those levels remains the step count (section 28). Not run: walks at a larger share, LLM-written walks.
 
 **GRAPH-4 (R) Is weakness stored as f(type) or per entity?**
 The weakness = f(type) map (DATA-1) is an attribute-attribute edge the training text never states.

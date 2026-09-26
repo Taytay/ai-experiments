@@ -25,6 +25,7 @@ Dr/Dc/Dk  arm D controls (PLAN step 12, TRAIN-2): Dr restarts the learning-rate 
         peak rate after the warmup; Dk replays 10% knowledge texts in phase 2 (episodes .75 + knowledge .10
         + replay .15) under the shared schedule
 Cg      knowledge .45 + episodes .35 + replay .15 + general .05  plain   (PLAN step 25, TRAIN-7)
+Cw      knowledge .40 + two-hop walk texts .05 + episodes .40 + replay .15   (PLAN step 29, GRAPH-3: EntiGraph-lite)
 A1      one knowledge text per species (universe.single_texts, all attributes, no paraphrases), LM loss
 A1m     the same 136 texts under MASKED FINE-TUNING (Pan et al. 2510.09885, PLAN step 8, TRAIN-5): the
         sample is "Recover the original passage from the masked version.\nMasked: <text with a random
@@ -127,6 +128,8 @@ MIXTURES = {  # arm -> list of phases; each phase = dict(source -> fraction)
     "Cr": [dict(K=0.45, Er=0.40, R=0.15)],                        # C-RAFT: episodes with retrieved context, gold + distractors (PLAN step 14)
     "E": [dict(K=0.45, E=0.40, R=0.15)],
     "Cg": [dict(K=0.45, E=0.35, R=0.15, G=0.05)],
+    "Cw": [dict(K=0.40, W=0.05, E=0.40, R=0.15)],  # PLAN step 29 (GRAPH-3): a ninth of the knowledge sequences as two-hop walk texts (universe.walk_texts, 80 tokens
+    # against the knowledge texts' 23, so the knowledge-side tokens are about 1.3x arm C's; tok_K / tok_W in the results give the exact count)
     "A1": [dict(K1=1.0)],
     "A1m": [dict(Km=1.0)],
     "C1": [dict(K1=0.45, E=0.40, R=0.15)],
@@ -390,6 +393,8 @@ def train(model, tok, phases, run):
         streams["R"] = Stream(S.replay_episodes(n=4000, seed=11), rng)
     if "G" in need:
         streams["G"] = Stream(S.general_replay_texts(n=4000, seed=19), rng)
+    if "W" in need:
+        streams["W"] = Stream(U.walk_texts(species, n=2000, seed=21), rng)
     if "S" in need:
         streams["S"] = Stream(U.self_teaching(species, n=4000, seed=5), rng)
     if "K1" in need:
