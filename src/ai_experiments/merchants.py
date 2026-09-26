@@ -76,6 +76,25 @@ def build(n_per_cat=10, seed=0):
     return merchants
 
 
+_MID = [c + v for c in "bdfgklmnprstvz" for v in "aeiou"]  # 70 syllables: prefix + syllable + suffix + tag gives ~400k names
+
+
+def build_extra(n, taken, seed=59):
+    """Row 59 (REAL-17): n more opaque merchants in the style of `build` (prefix + a middle syllable + suffix + tag, a standard
+    category drawn uniformly, three products from its pool), none of whose names is in `taken`; deterministic in (n, seed)."""
+    rng = random.Random(seed)
+    names, out = set(taken), []
+    while len(out) < n:
+        name = rng.choice(_PREFIX) + rng.choice(_MID) + rng.choice(_SUFFIX) + rng.choice(_TAG)
+        if name in names:
+            continue
+        names.add(name)
+        cat = rng.choice(CATEGORY_LIST)
+        out.append({"name": name, "category": cat, "products": rng.sample(CATEGORIES[cat], 3), "city": rng.choice(_CITIES),
+                    "n": rng.randint(1, 9999), "d": f"{rng.randint(1, 12):02d}/{rng.randint(1, 28):02d}", "bank_tmpl": rng.randrange(len(_BANK_TMPL))})
+    return out
+
+
 def bank_string(m):
     return _BANK_TMPL[m["bank_tmpl"]].format(U=m["name"].upper().replace("&", "AND"),
                                              n=m["n"], city=m["city"], d=m["d"])

@@ -23,3 +23,13 @@ that go into the tracker config (`items_version`, `items_sha`). Per-item scores 
 `results/per_item/` are keyed by these ids, so runs from any commit are paired item by item.
 Changing a generator does not change what gets scored; `uv run python -m ai_experiments.items check`
 reports the drift, and new items mean a new `VERSION` in `items.py`, frozen on purpose.
+
+## External data
+
+`external/` holds the provenance of data downloaded from outside the repo; the data itself is not in git.
+
+| Directory | Data (outside the repo) | Licence |
+|---|---|---|
+| `external/overture_places_2026-09-23.1/` | Overture Maps places theme, release 2026-09-23.1: 81.5M places, 16 GeoParquet files (11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/` on the WSL machine (downloaded 2026-09-26 from Overture's public S3 bucket) | multi-source, per row in `sources[].license`: CDLA-Permissive-2.0 (most providers), Apache-2.0 (Foursquare), CC0-1.0 (AllThePlaces); see its `PROVENANCE.md`, `MANIFEST.json` and `LICENSES/` |
+
+Anything frozen from it into `processed/` keeps each place's `id` and `sources` so provenance stays per row.
