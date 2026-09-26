@@ -1,0 +1,502 @@
+[
+ {
+  "tag": "r59-exp-N240-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "FOLD": "0",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f0_alllab_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N1000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "0",
+   "DB_EPISODES": "3333",
+   "STEPS": "489",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f0_alllab_dbx760_dbe3333_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N1000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "0",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f0_alllab_dbx760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N5000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "0",
+   "DB_EPISODES": "16667",
+   "STEPS": "1656",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f0_alllab_dbx4760_dbe16667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N5000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "0",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f0_alllab_dbx4760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N20000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "0",
+   "DB_EPISODES": "66667",
+   "STEPS": "6031",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f0_alllab_dbx19760_dbe66667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N20000-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "0",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f0_alllab_dbx19760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N240-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "FOLD": "1",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f1_alllab_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N1000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "1",
+   "DB_EPISODES": "3333",
+   "STEPS": "489",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f1_alllab_dbx760_dbe3333_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N1000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "1",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f1_alllab_dbx760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N5000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "1",
+   "DB_EPISODES": "16667",
+   "STEPS": "1656",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f1_alllab_dbx4760_dbe16667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N5000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "1",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f1_alllab_dbx4760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N20000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "1",
+   "DB_EPISODES": "66667",
+   "STEPS": "6031",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f1_alllab_dbx19760_dbe66667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N20000-f1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "1",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f1_alllab_dbx19760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N240-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "FOLD": "2",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f2_alllab_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N1000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "2",
+   "DB_EPISODES": "3333",
+   "STEPS": "489",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f2_alllab_dbx760_dbe3333_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N1000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "2",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f2_alllab_dbx760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N5000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "2",
+   "DB_EPISODES": "16667",
+   "STEPS": "1656",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f2_alllab_dbx4760_dbe16667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N5000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "2",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f2_alllab_dbx4760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N20000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "2",
+   "DB_EPISODES": "66667",
+   "STEPS": "6031",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f2_alllab_dbx19760_dbe66667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N20000-f2",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "2",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f2_alllab_dbx19760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N240-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "FOLD": "3",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f3_alllab_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N1000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "3",
+   "DB_EPISODES": "3333",
+   "STEPS": "489",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f3_alllab_dbx760_dbe3333_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N1000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "760",
+   "FOLD": "3",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f3_alllab_dbx760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N5000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "3",
+   "DB_EPISODES": "16667",
+   "STEPS": "1656",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f3_alllab_dbx4760_dbe16667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N5000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "4760",
+   "FOLD": "3",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f3_alllab_dbx4760_dbe800_lora"
+  ]
+ },
+ {
+  "tag": "r59-exp-N20000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "3",
+   "DB_EPISODES": "66667",
+   "STEPS": "6031",
+   "RUN_TAG": "h100bf16_exp"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_exp_f3_alllab_dbx19760_dbe66667_lora"
+  ]
+ },
+ {
+  "tag": "r59-bud-N20000-f3",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "CONDS": "noctx",
+   "DB_EXTRA": "19760",
+   "FOLD": "3",
+   "DB_EPISODES": "800",
+   "STEPS": "267",
+   "RUN_TAG": "h100bf16_bud"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_bud_f3_alllab_dbx19760_dbe800_lora"
+  ]
+ }
+]

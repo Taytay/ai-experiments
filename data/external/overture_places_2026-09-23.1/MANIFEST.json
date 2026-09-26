@@ -1,0 +1,61 @@
+{
+ "source": "s3://overturemaps-us-west-2/release/2026-09-23.1/theme=places/type=place/",
+ "release": "2026-09-23.1",
+ "license": "multi-source: the Overture places theme has no single licence; each place lists its sources with a licence per source (`sources[].license`): CDLA-Permissive-2.0 (Overture, Meta, Microsoft, BrightQuery, PinMeTo, Krick, RenderSEO, DAC, Overture-signals), Apache-2.0 (Foursquare, with its NOTICE), CC0-1.0 (AllThePlaces). See PROVENANCE.md and LICENSES/.",
+ "files": {
+  "part-00000-417d568b-a25f-57b3-9e15-9876068be5d6-c000.zstd.parquet": 680811676,
+  "part-00001-947ef15d-91bf-56dd-a6a3-aad846cc7a28-c000.zstd.parquet": 736561336,
+  "part-00002-c0c1dd40-1cc6-5636-81da-0df43a88fa9d-c000.zstd.parquet": 752486655,
+  "part-00003-d872971a-e957-5cc9-a661-27396e8592fc-c000.zstd.parquet": 758320439,
+  "part-00004-4792ea94-09f0-5546-beb1-f50d71febd84-c000.zstd.parquet": 679312122,
+  "part-00005-19ebf8b3-812f-5237-8867-7e5b47d1d6dd-c000.zstd.parquet": 693781428,
+  "part-00006-4f05dab3-5982-5cee-9cd0-714856eac08e-c000.zstd.parquet": 729007835,
+  "part-00007-61ac23fc-0af6-5d61-8c46-5776ba7e6bf0-c000.zstd.parquet": 728373349,
+  "part-00008-7a297224-4f30-5864-bfad-ebbcb6047b29-c000.zstd.parquet": 662849078,
+  "part-00009-3f7e01dc-2fb9-50a7-8be5-65df80c1cdd4-c000.zstd.parquet": 621355675,
+  "part-00010-1c7c0e0e-408b-5c7c-8dc8-a1687f22ef6e-c000.zstd.parquet": 632147404,
+  "part-00011-9aa07e3a-309b-5031-8820-4ec743a80d43-c000.zstd.parquet": 632751442,
+  "part-00012-5e6c496a-f443-52b4-bc5e-0b71af05ae54-c000.zstd.parquet": 669380586,
+  "part-00013-87182afd-1282-5a98-b777-73886b671c42-c000.zstd.parquet": 656760524,
+  "part-00014-1d36203b-4312-5a97-b9e0-5c110ae7a274-c000.zstd.parquet": 683038313,
+  "part-00015-b21e3943-1706-5729-88ab-f4f5777eaae4-c000.zstd.parquet": 679288164
+ },
+ "downloaded": "2026-09-26 06:25",
+ "rows": 81455423,
+ "source_rows_by_dataset_license": {
+  "Overture|CDLA-Permissive-2.0": 81455423,
+  "meta|CDLA-Permissive-2.0": 58783121,
+  "Overture-signals|CDLA-Permissive-2.0": 10583924,
+  "BrightQuery|CDLA-Permissive-2.0": 10255071,
+  "Microsoft|CDLA-Permissive-2.0": 6135466,
+  "Foursquare|Apache-2.0": 4138835,
+  "AllThePlaces|CC0-1.0": 1809219,
+  "PinMeTo|CDLA-Permissive-2.0": 167667,
+  "DAC|CDLA-Permissive-2.0": 148791,
+  "Krick|CDLA-Permissive-2.0": 13501,
+  "RenderSEO|CDLA-Permissive-2.0": 3752
+ },
+ "licence_documents": {
+  "Apache-2.0.txt": {
+   "bytes": 10280,
+   "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+  },
+  "CC0-1.0.txt": {
+   "bytes": 7048,
+   "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  "CDLA-Permissive-2.0.txt": {
+   "bytes": 2354,
+   "sha256": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868"
+  },
+  "foursquare_places_NOTICE.html": {
+   "bytes": 91201,
+   "sha256": "48dc40366760de50657534d34f1369a2acb7831726b1f2c7e3b74ad94dbdd15f"
+  },
+  "overture_attribution_page.html": {
+   "bytes": 125952,
+   "sha256": "0074f0dc0d9bbe582174f7efe0581863622a8c3b40897230def5e37ab0a6c383"
+  }
+ },
+ "licence_documents_fetched": "2026-09-26"
+}
