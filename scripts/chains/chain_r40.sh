@@ -7,7 +7,7 @@
 cd "$(dirname "$0")/../.." || exit 1
 mkdir -p logs
 AD=models/adapters; G=logs/gpu40
-run() { log=$1; shift; echo "start $log $(date +%H:%M)" >> $G.log; "$@" > ${G}_$log.log 2>&1; echo "end $log $(date +%H:%M) exit $? $(grep -ci 'error\|traceback' ${G}_$log.log) errors" >> $G.log; }
+run() { log=$1; shift; echo "start $log $(date +%H:%M)" >> $G.log; "$@" > ${G}_$log.log 2>&1; rc=$?; echo "end $log $(date +%H:%M) exit $rc $(grep -i 'error\|traceback' ${G}_$log.log | grep -vc torchao) errors" >> $G.log; }  # rc first: a $? after $(date) reads date's status
 
 run A1_logreg env CTX=0 uv run python scripts/exp_real6_fewshot.py logreg
 run A2_logreg_ctx env CTX=1 uv run python scripts/exp_real6_fewshot.py logreg

@@ -51,6 +51,7 @@ MICRO, MAXLEN = 4, 1536  # 4 x 4 = 16 sequences per step
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
+SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
 CHAT = bool(int(os.environ.get("CHAT", "0")))  # row 39: the prompt as the user turn of the chat template, the label as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
 # unsloth-trained categoriser is QLoRA on the 4-bit base and must be scored on it (REPORT.md section 44). LOAD_4BIT=0 loads bf16; TRAINER=hf / SCORER=hf are bf16.
@@ -58,7 +59,7 @@ assert TRAINER in ("unsloth", "hf")
 DOC = R6.load(REAL6_DB)
 DBREC = DOC["fact_db"]
 DB_ONLY = R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
+SFX = f"{DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_Qwen2.5-3B-Instruct_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 OUT = ROOT / "results" / f"categoriser_{ROUTE}_{SFX}{'_smoke' if SMOKE else ''}.json"
 rng = random.Random(SEED)
@@ -76,13 +77,20 @@ def sft_examples(per_user=150):
     """(prompt, answer) pairs in the REAL-6 format from the users' histories; the test items' merchants are not excluded (they are
     the seen cells), but the test transactions themselves are not history rows."""
     ex = []
+    shots = None
+    if SHOTS != "fixed":
+        from ai_experiments.real6_shots import Shots
+        shots = Shots(SHOTS, seed=SEED, exclude=DB_ONLY)
     for u in DOC["users"]:
         hist = [h for h in u["history"] if h["merchant"] not in DB_ONLY]
         header = "Categories: " + ", ".join(c["name"] for c in u["categories"]) + "\n\n"
         rows = list(range(len(hist))); rng.shuffle(rows)
         for i in rows[:per_user]:
             h = hist[i]
-            others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
+            if shots is not None:  # the rule's pool for training is the same DB_ONLY-free history, in the same order
+                others = shots.select(u, h["text"], train=True, query_index=i)
+            else:
+                others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
             demo = "".join(f"Transaction: {o['text']} | ${o['amount']:.2f} | {o['weekday']}\nCategory: {o['label']}\n\n" for o in others)
             note = f"Note: {DBREC[h['merchant']]}\n" if DB == "ret" else ""
             prompt = header + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory:"

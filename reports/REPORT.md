@@ -3066,3 +3066,155 @@ Table 46.2 is the same classifiers with the record appended to the statement. Fa
 ### 46.3 What the step says
 
 BASE-6 asked whether FastFit beats the prototype classifier on the per-user categories. It beats the per-user centroid it was compared against (49 against 36.5 from the history, 31 against 23.5 from the shots), it does so on the seen merchants, and its distinctive move, scoring against the label's text, pays 16 points on standard category names and nothing on renamed or coined ones. It does not approach the cross-user models without a record (the tuned centroid at 75.7, SFT at 57.1): other users' labels are worth more than any per-user method, which is section 38's collaborative finding again. With the record on the statement the ordering inverts: a per-user FastFit reads 92.2, level with the 3B categoriser's 90.2 and agreeing with it on 92.5% of items, and a logistic head on the frozen encoder 87.2. The record is the thing, and once it is on the input the classifier can be a hundred times smaller. GLiClass adds the cleanest measurement of what label semantics alone can do (standard names 90, coined names 0 with the record, untrained) and a warning about its few-shot mode at this length. Recommendation for production unchanged in substance, sharper in shape: retrieve the record onto the statement; then a shared encoder with a per-user head, or a shared FastFit, before any per-user encoder; the SFT model's remaining edge is 2 points on the DB-only merchants at a thousand times the inference cost. **Not run:** FastFit and the logistic head on the ambiguous DB of section 43 (the disjoint pools flatter the record arms); a single FastFit shared across users (the shape that would compete with the tuned centroid without a record); seeds (one per arm; the per-user fits are 20 independent models each, so the all-items intervals are honest but the per-cell ones are single-seed); the GLiClass examples failure; SetFit, which section 24 already found no better than the centroid.
+
+## 47. Retrieved shots: every rule's gain is the user's own label for the same merchant, which a lookup already gives at 98.6; on the items decided by the merchant's category the shot choice moves nothing at test and training with retrieved shots costs 20 to 30 points, because the adapter learns to copy (REAL-9)
+
+*PLAN step 41. Code: `ai_experiments.real6_shots` (the rules `recent`, `nearest`, `transact`, `cluster`, and `render`, which rebuilds the REAL-6 prompt from any shot list in the builder's exact format), `SHOTS=<rule>` in `scripts/exp_categoriser.py` (training shots per query by the rule over the DB-only-free history, the query excluded from its own pool) and in `scripts/exp_real6.py` (test shots), `ai_experiments.real6_cells` (the corrected groups of QUESTIONS.md REAL-13), `scripts/retrieved_shots_tables.py`, `scripts/chains/chain_r41.sh` (log `logs/gpu41.log`, 28 steps, 12.7 hours). Results `results/real6_*_shots<rule>*.json`, `results/categoriser_llm_{none,ret}_shots<rule>.json`, per-item records with `merchant_in_shots` and `gold_in_shots`. QLoRA on the 4-bit base throughout, seed 0.*
+
+The owner frames the categoriser as a recommender: the user's labelled history is the interaction log, and the choice of which rows go into the prompt is the retrieval step. Every REAL-6 prompt so far carried one frozen block of 24 shots per user, stratified over the categories and filled at random, and the SFT trainer drew 24 random rows per training query. This step chooses the 24 per query by four rules and runs them on the untrained instruct base, on the fixed-shot adapters of section 38 read with the rule's shots at test only, and on adapters trained with the rule's shots. `recent` is the 24 rows before the query in history order; REAL-6 histories are a frozen shuffle with no time, so here it is a random block, the control that separates "different shots" from "chosen shots" (row 43's set gives it a meaning). `nearest` is the 24 rows most similar to the query string under the row 37 MiniLM retriever. `transact` is TransAct V2's rule: the 8 most recent rows plus the nearest row of each of the user's categories in turn until the block is full. `cluster` is Pinner Progression's: k-means over the user's rows (k = the number of categories, 2 to 15) and greedy picks by similarity discounted 0.7 per shot already taken from the same cluster.
+
+Midway through the chain, a review of the evaluation set (QUESTIONS.md REAL-13) found that REAL-6's cell names hide what decides an item. A user files every merchant under one label, so an item whose merchant is in the user's history is answered by a lookup (the label of the nearest history row under the same retriever reads 98.6 on those 444 items); 115 of the 559 items labelled "seen" lost every history row of their merchant to the 300-row cut; and of the remaining items, 509 are decided by the merchant's standard category (which the user's scheme renames or merges) and 103 fall in a category the user split in two with nothing to say which side. Table 47.5 reads the runs in those groups, and it is the table that says what the rules did. Tables 47.1 to 47.3 keep the original cells for comparison with sections 37 to 46.
+
+**Table 47.5: the corrected cells (accuracy %; groups from `real6_cells`: 444 items whose merchant is in the user's history, 115 labelled seen whose merchant the 300-row cut removed, 509 determined by the merchant's standard category, 103 in a category the user split; 'hybrid' = the label of the nearest history row when its retriever cosine is at least 0.8, else the model; interval = users resampled)**
+
+| arm | rule | in history | labelled seen, not in history | determined by category | split category | all [user interval] | hybrid, all |
+|---|---|---|---|---|---|---|---|
+| nearest-row lookup alone | - | 98.6 | 15.7 | 19.1 | 6.8 | 47.5 | - |
+| Instruct base, no record | fixed | 37.6 | 30.4 | 28.5 | 20.4 | 31.2 [27.7, 34.7] | 47.7 |
+| Instruct base, no record | recent | 41.0 | 33.0 | 31.0 | 14.6 | 33.4 [29.4, 37.7] | 48.3 |
+| Instruct base, no record | nearest | 95.3 | 33.0 | 30.8 | 13.6 | 53.6 [49.8, 57.6] | 54.2 |
+| Instruct base, no record | transact | 79.1 | 32.2 | 30.5 | 11.7 | 47.2 [42.4, 52.1] | 52.0 |
+| Instruct base, no record | cluster | 93.9 | 34.8 | 35.4 | 19.4 | 55.9 [52.4, 59.3] | 56.7 |
+| Instruct base + record | fixed | 62.2 | 60.0 | 60.1 | 31.1 | 58.0 [53.3, 62.2] | 68.0 |
+| Instruct base + record | recent | 63.5 | 56.5 | 62.7 | 17.5 | 58.1 [51.3, 63.7] | 67.4 |
+| Instruct base + record | nearest | 95.0 | 55.7 | 54.6 | 24.3 | 67.2 [63.7, 70.9] | 68.3 |
+| Instruct base + record | transact | 86.5 | 56.5 | 63.1 | 29.1 | 68.0 [63.2, 72.6] | 71.6 |
+| Instruct base + record | cluster | 90.3 | 60.0 | 60.1 | 24.3 | 68.2 [63.8, 72.3] | 71.0 |
+| SFT no DB (fixed-shot adapter), rule shots at test | fixed | 65.3 | 40.9 | 59.3 | 27.2 | 57.1 [53.6, 60.3] | 65.3 |
+| SFT no DB (fixed-shot adapter), rule shots at test | recent | 57.4 | 44.3 | 60.5 | 27.2 | 55.0 [51.1, 58.5] | 65.2 |
+| SFT no DB (fixed-shot adapter), rule shots at test | nearest | 99.1 | 43.5 | 58.5 | 31.1 | 70.1 [66.9, 73.2] | 70.0 |
+| SFT no DB (fixed-shot adapter), rule shots at test | transact | 98.9 | 46.1 | 59.5 | 34.0 | 70.9 [67.0, 74.4] | 70.8 |
+| SFT no DB (fixed-shot adapter), rule shots at test | cluster | 99.3 | 44.3 | 60.3 | 26.2 | 70.6 [66.8, 74.3] | 70.5 |
+| SFT + record (fixed-shot adapter), rule shots at test | fixed | 94.1 | 83.5 | 97.4 | 50.5 | 90.2 [86.0, 93.5] | 91.3 |
+| SFT + record (fixed-shot adapter), rule shots at test | recent | 91.2 | 84.3 | 94.3 | 46.6 | 87.8 [82.6, 92.1] | 89.9 |
+| SFT + record (fixed-shot adapter), rule shots at test | nearest | 99.1 | 82.6 | 93.3 | 54.4 | 90.8 [86.8, 94.1] | 90.7 |
+| SFT + record (fixed-shot adapter), rule shots at test | transact | 98.6 | 82.6 | 97.4 | 60.2 | 93.0 [89.4, 95.7] | 93.0 |
+| SFT + record (fixed-shot adapter), rule shots at test | cluster | 98.9 | 84.3 | 95.9 | 49.5 | 91.4 [87.2, 94.7] | 91.4 |
+| SFT no DB, trained and read with the rule | fixed | 65.3 | 40.9 | 59.3 | 27.2 | 57.1 [53.6, 60.3] | 65.3 |
+| SFT no DB, trained and read with the rule | recent | 61.5 | 47.0 | 56.0 | 13.6 | 53.5 [49.2, 57.2] | 63.4 |
+| SFT no DB, trained and read with the rule | nearest | 98.6 | 33.9 | 36.1 | 14.6 | 57.5 [53.5, 62.1] | 57.5 |
+| SFT no DB, trained and read with the rule | transact | 97.5 | 30.4 | 29.5 | 15.5 | 53.9 [50.4, 57.5] | 54.1 |
+| SFT no DB, trained and read with the rule | cluster | 98.6 | 38.3 | 50.5 | 13.6 | 64.0 [59.2, 68.7] | 64.1 |
+| SFT + record, trained and read with the rule | fixed | 94.1 | 83.5 | 97.4 | 50.5 | 90.2 [86.0, 93.5] | 91.3 |
+| SFT + record, trained and read with the rule | recent | 92.1 | 85.2 | 89.8 | 49.5 | 86.4 [82.3, 90.2] | 88.0 |
+| SFT + record, trained and read with the rule | nearest | 99.1 | 75.7 | 79.2 | 47.6 | 83.5 [79.4, 87.4] | 83.6 |
+| SFT + record, trained and read with the rule | transact | 99.5 | 79.1 | 87.2 | 46.6 | 87.3 [83.9, 90.2] | 87.2 |
+| SFT + record, trained and read with the rule | cluster | 99.3 | 78.3 | 80.6 | 47.6 | 84.2 [81.1, 87.0] | 84.2 |
+
+**Table 47.1: the shot rules on the REAL-6 items (accuracy % [95% bootstrap interval]; the fixed column is the frozen stratified block of sections 37, 38, 43; 4-bit throughout; DB-only = unseen merchants no user labelled in training)**
+
+| arm | cell | fixed | recent | nearest | transact | cluster |
+|---|---|---|---|---|---|---|
+| Instruct base, no record | all items | 31.2 [28.7, 33.8] | 33.4 [31, 36.1] | 53.6 [50.6, 56.5] | 47.2 [44.5, 50.1] | 55.9 [53, 58.8] |
+| Instruct base, no record | seen merchant | 36.1 [32.2, 40.3] | 39.4 [35.4, 43.3] | 82.5 [79.4, 85.3] | 69.4 [65.7, 72.8] | 81.8 [78.7, 84.8] |
+| Instruct base, no record | unseen merchant | 26.8 [23.4, 30.3] | 28.1 [24.5, 31.6] | 27.6 [24.2, 31.1] | 27.3 [23.9, 31.1] | 32.6 [29, 36.1] |
+| Instruct base, no record | unseen, renamed | 29.2 [23.8, 35] | 22.5 [17.5, 28.3] | 25.4 [19.6, 31.2] | 26.7 [21.2, 32.5] | 31.7 [25.8, 38.3] |
+| Instruct base, no record | unseen, new word | 10.7 [5.7, 16.4] | 8.6* [4.3, 13.6] | 11.4 [6.4, 17.1] | 10* [5.7, 15] | 23.6 [16.4, 30.7] |
+| Instruct base, no record | DB-only merchants | 30.1 | 31.7 | 34.1 | 32.5 | 33.3 |
+| Instruct base + record | all items | 58 [55.1, 60.8] | 58.1 [55.3, 60.8] | 67.2 [64.5, 69.7] | 68 [65.3, 70.7] | 68.2 [65.5, 70.9] |
+| Instruct base + record | seen merchant | 61.7 [57.6, 65.8] | 62.1 [58.3, 66] | 86.9 [84.3, 89.4] | 80.3 [76.7, 83.4] | 84.1 [81, 86.9] |
+| Instruct base + record | unseen merchant | 54.7 [50.8, 58.5] | 54.5 [50.3, 58.5] | 49.4 [45.3, 53.2] | 56.9 [52.9, 60.8] | 53.9 [49.8, 57.9] |
+| Instruct base + record | unseen, renamed | 51.2 [44.6, 57.5] | 38.8 [32.5, 45] | 39.2 [32.9, 45.4] | 49.6 [42.5, 56.2] | 43.8 [37.1, 50] |
+| Instruct base + record | unseen, new word | 33.6 [25.7, 41.4] | 35.7 [27.9, 43.6] | 23.6 [16.4, 30.7] | 43.6 [35.7, 52.1] | 38.6 [30.7, 47.9] |
+| Instruct base + record | DB-only merchants | 48.8 | 53.7 | 55.3 | 57.7 | 56.9 |
+| SFT no DB (fixed-shot adapter), rule shots at test | all items | 57.1 [54.3, 59.9] | 55 [52.3, 57.8] | 70.1 [67.4, 72.8] | 70.9 [68.3, 73.5] | 70.6 [67.9, 73.1] |
+| SFT no DB (fixed-shot adapter), rule shots at test | seen merchant | 60.3 [56.2, 64.4] | 54.7 [50.8, 58.9] | 87.7 [85, 90.2] | 88 [85.2, 90.5] | 88 [85.3, 90.5] |
+| SFT no DB (fixed-shot adapter), rule shots at test | unseen merchant | 54.2 [50.3, 58.1] | 55.2 [51.1, 59.4] | 54.2 [50.2, 58.2] | 55.5 [51.3, 59.4] | 54.8 [50.8, 58.7] |
+| SFT no DB (fixed-shot adapter), rule shots at test | unseen, renamed | 47.1 [41.2, 53.8] | 49.6 [43.3, 55.8] | 50 [43.3, 56.2] | 51.7 [45.8, 58.3] | 47.9 [41.7, 54.2] |
+| SFT no DB (fixed-shot adapter), rule shots at test | unseen, new word | 42.9 [35, 51.4] | 43.6 [35.7, 52.1] | 44.3 [36.4, 52.9] | 47.9 [40.7, 55.7] | 48.6 [40.7, 57.1] |
+| SFT no DB (fixed-shot adapter), rule shots at test | DB-only merchants | 51.2 | 48.0 | 52.0 | 50.4 | 56.1 |
+| SFT + record (fixed-shot adapter), rule shots at test | all items | 90.2 [88.4, 91.7] | 87.8 [85.8, 89.7] | 90.8 [89.1, 92.4] | 93 [91.3, 94.3] | 91.4 [89.7, 92.9] |
+| SFT + record (fixed-shot adapter), rule shots at test | seen merchant | 91.9 [89.6, 94.1] | 89.8 [87.5, 92.3] | 95.7 [93.9, 97.1] | 95.3 [93.6, 96.8] | 95.9 [94.1, 97.3] |
+| SFT + record (fixed-shot adapter), rule shots at test | unseen merchant | 88.5 [86, 91.1] | 86 [83.4, 88.7] | 86.3 [83.5, 88.9] | 90.8 [88.4, 93.1] | 87.4 [84.8, 90.2] |
+| SFT + record (fixed-shot adapter), rule shots at test | unseen, renamed | 75 [69.6, 80.4] | 75 [69.6, 80.4] | 76.7 [71.7, 82.1] | 80.8 [75.4, 85.4] | 75 [69.6, 80.4] |
+| SFT + record (fixed-shot adapter), rule shots at test | unseen, new word | 92.1 [87.9, 96.4] | 80.7 [74.3, 87.1] | 79.3 [72.9, 85.7] | 92.9 [88.6, 96.4] | 87.9 [82.1, 92.9] |
+| SFT + record (fixed-shot adapter), rule shots at test | DB-only merchants | 97.6 | 96.7 | 96.7 | 96.7 | 95.9 |
+| SFT no DB, trained and read with the rule | all items | 57.1 [54.3, 59.9] | 53.5 [50.9, 56.4] | 57.5 [54.6, 60.6] | 53.9 [51.1, 56.7] | 64 [61.2, 66.9] |
+| SFT no DB, trained and read with the rule | seen merchant | 60.3 [56.2, 64.4] | 58.5 [54.9, 62.8] | 85.3 [82.3, 88.2] | 83.7 [80.9, 86.8] | 86.2 [83.4, 88.9] |
+| SFT no DB, trained and read with the rule | unseen merchant | 54.2 [50.3, 58.1] | 49 [44.8, 52.9] | 32.4 [28.4, 35.6] | 27.1 [23.4, 30.8] | 44 [40.2, 48.1] |
+| SFT no DB, trained and read with the rule | unseen, renamed | 47.1 [41.2, 53.8] | 44.6 [38.3, 50.8] | 29.6 [24.2, 35.4] | 25.8 [20.4, 31.7] | 35.8 [30, 42.1] |
+| SFT no DB, trained and read with the rule | unseen, new word | 42.9 [35, 51.4] | 28.6 [21.4, 35.7] | 29.3 [22.1, 37.9] | 25 [18.6, 32.1] | 44.3 [35.7, 52.9] |
+| SFT no DB, trained and read with the rule | DB-only merchants | 51.2 | 43.1 | 38.2 | 26.0 | 41.5 |
+| SFT + record, trained and read with the rule | all items | 90.2 [88.4, 91.7] | 86.4 [84.3, 88.3] | 83.5 [81.3, 85.8] | 87.3 [85.3, 89.2] | 84.2 [81.8, 86.2] |
+| SFT + record, trained and read with the rule | seen merchant | 91.9 [89.6, 94.1] | 90.7 [88.2, 93] | 94.3 [92.3, 96.1] | 95.3 [93.6, 97] | 95 [93.2, 96.6] |
+| SFT + record, trained and read with the rule | unseen merchant | 88.5 [86, 91.1] | 82.6 [79.5, 85.5] | 73.9 [70.3, 77.6] | 80 [76.8, 82.9] | 74.5 [71, 78.1] |
+| SFT + record, trained and read with the rule | unseen, renamed | 75 [69.6, 80.4] | 72.5 [67.1, 77.9] | 67.9 [62.1, 73.8] | 68.8 [62.1, 74.6] | 70.4 [64.6, 75.8] |
+| SFT + record, trained and read with the rule | unseen, new word | 92.1 [87.9, 96.4] | 70 [62.9, 77.1] | 46.4 [38.6, 55] | 70 [62.1, 77.1] | 55 [46.4, 63.6] |
+| SFT + record, trained and read with the rule | DB-only merchants | 97.6 | 91.1 | 75.6 | 77.2 | 75.6 |
+
+**Table 47.2: each rule paired per item with the fixed block for the same arm (share of items with the same prediction; both right; either right; net gain in points)**
+
+| arm | recent | nearest | transact | cluster |
+|---|---|---|---|---|
+| Instruct base, no record | same 43.8, both 21.0, either 43.6, +2.2 | same 37.1, both 24.8, either 60.1, +22.4 | same 41.1, both 24.0, either 54.5, +16.0 | same 38.7, both 25.7, either 61.4, +24.7 |
+| Instruct base + record | same 58.3, both 43.9, either 72.2, +0.1 | same 55.4, both 45.9, either 79.3, +9.2 | same 58.6, both 48.7, either 77.4, +10.0 | same 59.8, both 48.4, either 77.8, +10.2 |
+| SFT no DB (fixed-shot adapter), rule shots at test | same 70.3, both 48.1, either 64.0, -2.1 | same 66.4, both 52.7, either 74.5, +13.0 | same 69.0, both 53.9, either 74.0, +13.8 | same 66.1, both 52.5, either 75.1, +13.5 |
+| SFT + record (fixed-shot adapter), rule shots at test | same 93.5, both 85.9, either 92.0, -2.4 | same 93.7, both 87.4, either 93.6, +0.6 | same 94.5, both 88.9, either 94.2, +2.8 | same 94.9, both 88.3, either 93.3, +1.3 |
+| SFT no DB, trained and read with the rule | same 52.4, both 41.8, either 68.8, -3.6 | same 47.1, both 40.9, either 73.7, +0.4 | same 43.2, both 37.4, either 73.6, -3.1 | same 52.1, both 46.2, either 74.9, +7.0 |
+| SFT + record, trained and read with the rule | same 88.5, both 82.7, either 93.9, -3.7 | same 83.5, both 79.1, either 94.6, -6.6 | same 85.7, both 81.8, either 95.6, -2.9 | same 82.4, both 78.8, either 95.6, -5.9 |
+
+**Table 47.3: seen items by whether the query's merchant is among the 24 shots (accuracy %, share of items in the group), and all items by whether the gold label is among the shot labels**
+
+| arm | group | fixed | recent | nearest | transact | cluster |
+|---|---|---|---|---|---|---|
+| Instruct base, no record | seen, merchant among the shots | 60.6 (14%) | 82.9 (10%) | 95.5 (38%) | 79.2 (38%) | 93.9 (38%) |
+| Instruct base, no record | seen, merchant not among the shots | 26.3 (34%) | 27.1 (37%) | 32.8 (10%) | 31.9 (10%) | 34.8 (10%) |
+| Instruct base, no record | gold label among the shot labels | 31.5 (99%) | 40.1 (67%) | 69.6 (69%) | 47.5 (99%) | 64.2 (82%) |
+| Instruct base, no record | gold label not among the shot labels | 0.0 (1%) | 19.5 (33%) | 17.2 (31%) | 23.1 (1%) | 18.3 (18%) |
+| Instruct base + record | seen, merchant among the shots | 78.1 (14%) | 90.2 (10%) | 95.3 (38%) | 86.7 (38%) | 90.3 (38%) |
+| Instruct base + record | seen, merchant not among the shots | 55.1 (34%) | 54.1 (37%) | 55.2 (10%) | 56.0 (10%) | 60.0 (10%) |
+| Instruct base + record | gold label among the shot labels | 58.5 (99%) | 66.3 (67%) | 80.7 (69%) | 68.6 (99%) | 75.6 (82%) |
+| Instruct base + record | gold label not among the shot labels | 8.3 (1%) | 41.1 (33%) | 36.4 (31%) | 15.4 (1%) | 34.7 (18%) |
+| SFT no DB (fixed-shot adapter), rule shots at test | seen, merchant among the shots | 96.2 (14%) | 96.7 (10%) | 99.1 (38%) | 98.9 (38%) | 99.3 (38%) |
+| SFT no DB (fixed-shot adapter), rule shots at test | seen, merchant not among the shots | 45.9 (34%) | 42.9 (37%) | 44.0 (10%) | 46.6 (10%) | 44.3 (10%) |
+| SFT no DB (fixed-shot adapter), rule shots at test | gold label among the shot labels | 57.2 (99%) | 61.6 (67%) | 81.4 (69%) | 71.2 (99%) | 78.3 (82%) |
+| SFT no DB (fixed-shot adapter), rule shots at test | gold label not among the shot labels | 50.0 (1%) | 41.1 (33%) | 44.2 (31%) | 46.2 (1%) | 35.7 (18%) |
+| SFT + record (fixed-shot adapter), rule shots at test | seen, merchant among the shots | 96.2 (14%) | 99.2 (10%) | 99.3 (38%) | 98.9 (38%) | 98.9 (38%) |
+| SFT + record (fixed-shot adapter), rule shots at test | seen, merchant not among the shots | 90.2 (34%) | 87.2 (37%) | 81.9 (10%) | 81.9 (10%) | 84.3 (10%) |
+| SFT + record (fixed-shot adapter), rule shots at test | gold label among the shot labels | 91.0 (99%) | 92.5 (67%) | 96.2 (69%) | 93.4 (99%) | 94.9 (82%) |
+| SFT + record (fixed-shot adapter), rule shots at test | gold label not among the shot labels | 8.3 (1%) | 78.1 (33%) | 78.3 (31%) | 53.8 (1%) | 75.6 (18%) |
+| SFT no DB, trained and read with the rule | seen, merchant among the shots | 96.2 (14%) | 96.7 (10%) | 98.6 (38%) | 97.5 (38%) | 98.6 (38%) |
+| SFT no DB, trained and read with the rule | seen, merchant not among the shots | 45.9 (34%) | 47.7 (37%) | 34.5 (10%) | 31.0 (10%) | 38.3 (10%) |
+| SFT no DB, trained and read with the rule | gold label among the shot labels | 57.2 (99%) | 60.0 (67%) | 72.4 (69%) | 54.4 (99%) | 72.3 (82%) |
+| SFT no DB, trained and read with the rule | gold label not among the shot labels | 50.0 (1%) | 40.1 (33%) | 23.6 (31%) | 15.4 (1%) | 26.8 (18%) |
+| SFT + record, trained and read with the rule | seen, merchant among the shots | 96.2 (14%) | 100.0 (10%) | 99.1 (38%) | 99.8 (38%) | 99.3 (38%) |
+| SFT + record, trained and read with the rule | seen, merchant not among the shots | 90.2 (34%) | 88.1 (37%) | 75.9 (10%) | 78.4 (10%) | 78.3 (10%) |
+| SFT + record, trained and read with the rule | gold label among the shot labels | 91.0 (99%) | 90.3 (67%) | 92.9 (69%) | 87.8 (99%) | 91.1 (82%) |
+| SFT + record, trained and read with the rule | gold label not among the shot labels | 8.3 (1%) | 78.4 (33%) | 62.2 (31%) | 38.5 (1%) | 53.1 (18%) |
+
+**Table 47.4: training cost of the rule-trained adapters (minutes, final loss over the last steps)**
+
+| adapter | fixed | recent | nearest | transact | cluster |
+|---|---|---|---|---|---|
+| SFT none | 17.7 min, loss 0.141 | 18.4 min, loss 0.072 | 19.2 min, loss 0.015 | 19.2 min, loss 0.036 | 19.4 min, loss 0.027 |
+| SFT ret | 18.2 min, loss 0.035 | 18.7 min, loss 0.015 | 19.5 min, loss 0.006 | 19.3 min, loss 0.001 | 25.1 min, loss 0.001 |
+
+### 47.1 At test: a chosen block puts the merchant's own rows in the prompt, the model copies them, and nothing else moves
+
+Read with the rule's shots, the fixed-shot adapters and the untrained base gain 9 to 25 points over the whole set: the no-DB adapter 57.1 to 70.1 / 70.9 / 70.6 (nearest / transact / cluster), the base 31.2 to 53.6 / 47.2 / 55.9, and the recent block, a different random 24, changes nothing (55.0, 33.4), so the gain is the choice and not the variety. Table 47.5 says where it is. In the in-history group the no-DB adapter goes from 65.3 to 99.1 and the base from 37.6 to 95.3: a similarity rule puts the merchant's own rows among the shots for all of these items (38% of all items, against 14% under the frozen block, Table 47.3) and the model copies the label, as section 38 found it does at 96 when a frozen block happens to contain one. On the items decided by the merchant's category the rules leave the no-DB adapter where it was (59.3 fixed; 58.5 to 60.5 under every rule) and the base within three points except for cluster (35.4 against 28.5), and the 115 truncated items and the 103 split ones move inside their noise. The copy is exactly the lookup: the nearest-row label alone reads 98.6 on the in-history group and 47.5 overall, the fixed-shot adapter with that lookup in front of it (the hybrid column) 65.3, and the adapters reading nearest shots are the same number with or without the lookup (70.1 and 70.0). A 3B model with retrieved shots is, on REAL-6, a merchant lookup plus the model it already was.
+
+The record-in-prompt adapter is at the set's ceiling (97.4 on the category-determined items, a coin flip on the split ones), so the rules can only rearrange it: transact reads 93.0 against 90.2 (paired: 94.5% of the predictions the same, +2.8 net), from the in-history group (94.1 to 98.6) and the split items (50.5 to 60.2 on 103 items, inside a coin flip's noise); nearest reads 90.8 and loses 4 points on the category-determined items (93.3), and the reason is in Table 47.3: a pure similarity block leaves the gold label out of the shots for 31% of the items (cluster 18%, transact and the frozen block 1%). Section 33 found that no arm picks a label no demonstration carries; that holds for the untrained base (17 to 23 when the gold label is missing from the shots, 0 in the frozen block's 1%), while the record adapter picks it at 78 because the category list plus the record is enough once it has been trained on the format. TransAct's rule keeps the category coverage of the frozen block and adds the merchant's rows, which is why it is the best test-time block for both adapters.
+
+### 47.2 Trained with the rule: the adapter learns to copy and loses the merchants it cannot copy
+
+Trained with the rule's shots, the adapters are worse than the fixed-shot adapters read with the same shots on every rule: no DB 53.5 / 57.5 / 53.9 / 64.0 (recent / nearest / transact / cluster) against 55.0 / 70.1 / 70.9 / 70.6, record 86.4 / 83.5 / 87.3 / 84.2 against 87.8 / 90.8 / 93.0 / 91.4. The in-history group is at 98 to 99.5 either way; the loss is on everything the shots cannot answer. The category-determined items fall from 59.3 to 36.1 (nearest) and 29.5 (transact) without the DB, and from 97.4 to 79.2 / 87.2 / 80.6 with the record; the DB-only merchants, the owner's second goal, from 97.6 to 75.6 / 77.2 / 75.6 for the record adapter, the same size of loss that section 43's ambiguous records cost. Training loss says why: 0.001 to 0.015 at the end against 0.035 to 0.141 for the fixed-shot recipe. Every training query is a history row, and a merchant with several rows has its siblings in the pool, so under a similarity rule nearly every training target is sitting in the prompt with its label; the adapter learns that the answer is the label of the matching shot and stops reading the record and the category list. The random-block `recent` training costs 3.6 points against its own fixed-shot baseline, which is the expected cost of a different random block and not the copy. Row 46 withholds the query's merchant from its own training pool in 60% of the episodes (the share of test items whose merchant the history lacks), so the training distribution matches the test's mix of copyable and uncopyable items.
+
+### 47.3 Cost
+
+The rules cost one retriever pass over the user's 300 rows per user and one per query; the rule-trained adapters train in 18 to 25 minutes (fixed 18), and scoring a rule is the same 25 minutes as the fixed block. The chain ran 12.7 GPU hours for 20 scorings and 8 trainings.
+
+### 47.4 What the step says
+
+REAL-9 asked whether the fixed shots leave accuracy on the table and which shots a real history should supply. On REAL-6 the answer is narrower than the whole-set numbers suggest. The rules' gain (up to 25 points) is the user's own label for the same merchant, which a lookup on the history gives at 98.6 without a model; on everything the lookup cannot answer, no rule moves a trained categoriser at test, and training with retrieved shots teaches the adapter to copy and costs 20 to 30 points on the merchants it has not seen, the DB-only ones included. For a production design that means: put the merchant lookup, or a nearest-row block, in front of the model for merchants the user has labelled; at test use TransAct's block (recent plus the nearest per category), which keeps every category represented and gave the best record-in-prompt number (93.0 against 90.2, paired +2.8, one adapter); and do not train with retrieved shots unless the query's merchant is withheld from its own pool (row 46). What REAL-6 cannot say is whether shots beat a lookup when they disagree: its users never relabel, never file one merchant two ways and never split a category on anything observable, so the in-history group is a lookup by construction and the recent rule has no time to follow. Those are row 43's cells.
+
+Not done: seeds (the trained adapters are one seed each; the test-only arms are paired on the same adapter and need none), a rule with more than 24 shots, the gold-label-aware block at training time. Cost: 12.7 GPU hours.

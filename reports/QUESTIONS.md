@@ -690,6 +690,7 @@ retriever, (b) recency, the 24 most recent rows, and (c) TransAct V2's rule (ref
 the most recent r actions plus the K history rows nearest to the candidate, selected per candidate, concatenated), at train and at test; the untrained base, the no-DB SFT and the
 record-in-prompt SFT; paired per item with the fixed-shot adapters of sections 38 and 43; the seen-merchant cell (where the
 merchant's own rows can now be in the prompt) reported separately from the unseen ones.
+**Status (2026-09-22):** answered, PLAN step 41, REPORT.md 47. The rules (recent, nearest, TransAct's 8 recent plus the nearest per category, k-means cluster coverage) lift the whole set by 9 to 25 points at test (no-DB adapter 57.1 to 70.1 / 70.9 / 70.6; base 31.2 to 53.6 / 47.2 / 55.9; the random recent block 55.0), all of it on items whose merchant is in the user's history, where the model copies the merchant's label (65 to 99) and a nearest-row lookup alone reads 98.6 (REAL-13). On the items decided by the merchant's standard category nothing moves at test (no DB 59.3 against 58.5 to 60.5; record 97.4 against 93 to 97). Best test block for the record adapter: transact, 93.0 against 90.2 (paired +2.8), because it keeps the gold label among the shots (99%; nearest 69%). Adapters trained with the rules learn to copy (final loss 0.001 to 0.015) and lose the uncopyable items: category-determined 59 to 36 / 30 (no DB, nearest / transact), 97 to 79 / 87 (record); DB-only 97.6 to 76 / 77. Recommendation: lookup or nearest rows in front of the model for labelled merchants, TransAct's block at test, training with retrieved shots only with the query's merchant withheld (row 46). Whether shots beat a lookup when a user relabels or files a merchant two ways needs row 43's set.
 
 **REAL-10 (O) Does the categoriser hold for users whose schemes were never trained on?**
 Every REAL-6 number is on the 20 training users' own schemes: unseen merchants, never unseen users. The real application
@@ -700,6 +701,7 @@ train the no-DB and record-in-prompt SFT on 15 users and score the other 5, plai
 episode, a random subset of the user's category names replaced by fresh coined words, consistently across the shots and
 the target), three seeds; compare with the all-20 adapters on the same 5 users; the cost of the augmentation on standard
 names is the other number.
+**Amended (2026-09-22, REAL-13):** four folds of five users in place of one 15/5 split at three seeds (every user held out once, the same number of trainings), user-resampled intervals, the corrected cells of row 45; on REAL-6 the record arm sits at the set's ceiling for the training users, so the no-record arm and the renamed and coined cells carry the answer.
 
 **REAL-11 (O) An evaluation set shaped like the real population, with a time axis.**
 The owner (2026-09-21): over a million users, most on the default category set, some with custom labels, each filing
@@ -754,3 +756,47 @@ Section 38: one pass over the records injected nothing, three passes gave +21 on
 *Experiment:* six and twelve passes (800 and 1,600 steps at 50%) on the same axis; and the REAL-6 prompt through the instruct
 model's chat template, since production will use it.
 **Status (2026-09-22):** answered, PLAN step 39, REPORT.md 45. Three seeds per point, QLoRA on the 4-bit base: DB-only merchants 49.1 +- 3.8 without the DB, 53.7 at one pass, 59.3 +- 12.3 at 3.3 passes, 68.8 +- 5.8 at 6.7 passes (800 steps at 50%), 64.2 +- 5.7 at 13.3 passes (1,600 steps); opaque DB-only merchants 26 / 14 / 31 +- 21 / 44 +- 10 / 34 +- 10 against 94 to 96 with the record in the prompt; real chains plateau at 87. ARC-Easy 73.2 +- 2.3 at 6.7 passes (the base's level; section 38's nine-point cost was one seed) and 65.7 +- 8.3 at 13.3 (one seed at 57); MMLU 51 to 52 throughout; ICL 3 to 4 points under the no-DB adapter at both exposures. The whole set goes 63.8 +- 2.3 to 76.8 +- 2.2 to 78.2 +- 0.3, but the history exposure doubles with the DB exposure (6,400 and 12,800 history sequences against 3,200) and no no-DB arm at those step counts was run. Chat template (`real6.chat_prompt`, the cue as an assistant prefill): the no-DB and record-in-prompt categorisers trained and scored in it read 58.9 and 90.0 (plain 57.1, 90.2; 73% and 92% of the predictions the same); the instruct base with the record 63.2 (58.0), without it 10.0 (31.2), its predictions piling on two option positions. Recommendation: retrieve; if parametric, 800 steps at 50% and a same-step no-DB control; the template is free for a trained model.
+
+## Review at the model change, 2026-09-22
+
+The queue was handed to a new model mid-row 41 with the instruction to examine the work so far critically. What it found
+in the categoriser line, measured on CPU from the frozen set and the saved per-item records (no rescoring):
+
+**REAL-13 Is REAL-6 measuring what its cells say, and where is its ceiling?**
+(1) `real6.build` splits each history merchant's rows into history and test before it cuts the shuffled history to 300
+rows, so 115 of the 559 items labelled seen have a merchant with no row left in the user's history: a fifth of every "seen"
+cell since section 37 is unseen items (Table 37.2's "in the history, not the shots" row counts them as in the history).
+(2) Every user files a merchant under exactly one label (0 of 1,026 user-merchant pairs carry two), so a merchant lookup on
+the user's history answers all 444 truly seen items and the label of the nearest history row under the row 37 retriever
+answers 98.6 of them from the statement string; no model column so far was compared with that, and section 37.3's "targets
+to beat" on seen merchants (the 55.6 / 59.7 prototypes) were set without it. (3) Every scheme is a merge and rename of the
+standard categories plus arbitrary splits, so of the 735 items whose merchant is not in the history 603 are determined by the
+merchant's standard category and the user's history, 119 fall in a split category with no signal for the side, and 13 in
+neither: the record-in-prompt categoriser reads 96.7 on the determined items and 50.4 on the split ones, the set's ceiling,
+so REAL-6 cannot rank record-in-prompt variants (sections 43, 46, rows 41, 42, 44). (4) Intervals bootstrap items, but the
+set samples 20 users; resampling users widens the record arm's interval from [88.4, 91.8] to [86.0, 93.5]. The level
+names and the item set are frozen and stay; what changes is the reading. *Task (CPU only):* `ai_experiments.real6_cells`
+(corrected groups: in history / labelled seen but not in it / determined by category / split; the nearest-row lookup and
+the lookup-then-model hybrid; a user bootstrap), a user-resampled interval in `real6_eval.summarize`, the tables of sections
+37, 38, 43, 45, 46 and 47 re-cut into those groups in one new REPORT section, and a correction note at the top of REPORT.md
+beside the 4-bit one. Row 43's set is built so that none of the four holds (see PLAN row 43).
+Checked on the way (2026-09-22): the option rule. REAL-6 scores category names by mean log-probability per token, the rule
+section 10 found length-biased on novel labels; re-read from the per-item sums, the trained categorisers move by at most 0.9
+points on any name type under the sum or per-byte rule (no DB 57.1 / 57.3 / 56.8, record 90.2 / 90.3 / 89.5), the instruct
+base with the record by 2.7 (58.0 to 60.7 under the sum, standard names 74 to 81). No conclusion depends on the rule; row 45
+reports the sum column beside it. Not checkable on REAL-6: the statement renderings, the section 35 normaliser and the
+section 43 retriever's training renderings come from one template family, so their recall is in-distribution (row 43).
+
+**REPORT-5 The report's summary and its superseded claims.**
+A review of sections 1 to 36 at the same hand-over found that the executive summary was written after section 8 and never
+updated, and that claims later overturned carry no forward pointer: staging loses manipulation and pairwise reasoning (section
+1; undone by 11, 20, 23), induction on a never-trained partition (weakness was type: 33, 39), perplexity 15 vs 20 (the
+one-paragraph number retired in 16), 10k entities in 17 minutes (exposure, not steps, is the limit: 29, 45), 10+ paraphrases
+and full fine-tuning (section 5; 27, 28), RAFT as the route (25.4: +3 to 7, one seed), "define labels by examples, not names"
+(6.5.1; 36.2 found the name vector plus centroid best), the confidence and novel-choice claims of 6.2 (a constant predictor
+and a scorer artefact: 10.3, 10.5), "one mixed run, about half knowledge" (8.3; 21), section 24's heading on the uncased
+tokenizer (withdrawn in 24.7), 33.2's window explanation (it was the 4-bit mismatch of 44), section 31's "exactly the base"
+(its teacher was the 4-bit base, its comparison Cg at bf16), 33.4's "not more fine-tuning" (38: SFT lifts coined names 17 to
+49), and several single-seed gaps inside section 20's spread (28's "best on every number", 26's "vanishes at 7B", 31 against
+Cg, 17's heading). The summary also never states the result the project now rests on: the record in the prompt (90) over
+the record in the weights (59 +- 12). *Task:* rewrite section 1 and add the pointers; no runs.
