@@ -431,6 +431,7 @@ Base models already know head merchants; the long tail is noisy strings for know
 merchants; frequency is Zipfian. No real or realistic transaction data appears anywhere.
 *Experiment:* realistic synthetic set from real merchant names with Zipf frequencies and real-style
 truncations, or an anonymized export; accuracy by frequency bucket and by known/unknown merchant.
+**Status (2026-09-19):** answered on a realistic synthetic history, PLAN step 22, REPORT.md 36 (`ai_experiments.transactions`: 120 real chains + the 120 opaque merchants, Zipf frequencies, noisy strings, amounts, weekdays, 3,000 transactions, frozen). With frozen encoders and k labelled transactions per category the prototype reads 42 / 53 / 69 12-way at k = 1 / 3 / 10 (normalised strings; raw 31 / 40 / 55), which is 85 to 90 on merchants among the labelled examples and 14 to 18 on the rest; head / torso / tail 55-85 / 15-38 / 13-24. Unseen real chains are categorised by the category name's embedding at 38 to 56 (the encoder's pretraining knowledge); unseen opaque merchants are at chance for every method. Real exports not used.
 
 **REAL-2 (R) What does end-to-end retrieval achieve, as opposed to the oracle?**
 The "RAG ceiling" inserts the exact fact verbatim; the 70.8% embedding number is nearest
@@ -453,6 +454,7 @@ users have 10 to 30 imbalanced categories and transactions carry amount and date
 "pick the space where the user's examples cluster" idea is never implemented.
 *Experiment:* 12-way imbalanced prototype eval with k in {1, 3, 10}; concatenate amount-band and
 weekday features; implement the cluster-tightness attribute selector on habitat-vs-type items.
+**Status (2026-09-19):** answered in part, PLAN step 22, REPORT.md 36. 12-way imbalanced prototype eval at k in {1, 3, 10} on the frozen transaction history: 42 / 53 / 69 (MiniLM, normalised strings), a third to a half of the balanced 3-way numbers of sections 6.3 and 24, and a merchant memory (85-90 seen, 14-18 unseen). Amount band and weekday appended as one-hot features at weight 0.5 cost the prototype 0.4 to 7 points at every k and help label propagation only below ten labels. The cluster-tightness attribute selector was not implemented (it needs the multi-attribute universe items).
 
 ### REPORT — clarity and presentation gaps
 
@@ -549,6 +551,7 @@ classifiers when labels are few (miniImageNet 1-shot 53.8 vs 49.4) and the gain 
 renderings of one merchant are the one real graph structure in the transaction data.
 *Experiment:* kNN graph over embeddings of all transaction strings, labelled and not; LP vs prototypes at k in
 {1, 3, 10}, by merchant-frequency bucket and known vs unknown merchant. Inside PLAN row 22.
+**Status (2026-09-19):** answered, PLAN step 22, REPORT.md 36.3. Label propagation over the 10-NN graph of all 3,000 transaction embeddings (alpha 0.9) loses to the prototype at k = 1 and 3 (21 vs 42, 39 vs 53 on MiniLM) and ties at k = 10 (67 vs 69), the reverse of the few-shot image result: with twelve labels in a Zipf graph the mass follows the head merchants' clusters. At k = 10 it beats the prototype on opaque (46 vs 38) and tail (28 vs 24) merchants, where a labelled rendering propagates to the same merchant's other renderings.
 
 **GRAPH-3 (R) Do texts generated from two-hop walks teach the pairwise and yes/no levels?**
 EntiGraph (2409.07431) generates text about pairs and triples of entities (random walks on the entity graph) and
@@ -573,6 +576,7 @@ With PLAN row 13, rerun after 21.
 StarSpace (1709.03856) and ZestXML co-embed labels and inputs; the section 6.3 centroid is StarSpace with the label
 vector fixed to the member mean. Merchant categories have meaningful names; universe labels do not.
 *Experiment:* category vector from its name vs k-example centroid vs their mix, on the merchant set. Inside PLAN row 22.
+**Status (2026-09-19):** answered, PLAN step 22, REPORT.md 36.2. Yes: the category name's embedding alone reads 38.9 (MiniLM) / 47.5 (bge-base) 12-way with zero examples, beats the one-example prototype on bge-base, and reaches unseen real chains at 38 to 56 where the centroid reads 18 to 25; the unit mean of name vector and centroid is the best classifier at every k (48 / 57 / 70 and 52 / 62 / 70). Opaque merchants without an example stay at chance under every vector.
 
 **GRAPH-7 (R) Does the model use E-A-E structure without the attribute vocabulary?**
 *Experiment:* Timmy with context given as co-typed species lists per demo and no attribute names (a KAPING-style

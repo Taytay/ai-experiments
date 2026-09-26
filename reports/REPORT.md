@@ -2215,3 +2215,80 @@ DATA-2's question was how much of the category result is recall of the products 
 DATA-4: the fix the reviewer asked about works, and which half of it matters depends on the model. For the embedding route, renderings in training and a normaliser at test time are each sufficient on section 4's bank strings (70.8 to 100 either way) and the normaliser carries the truncated strings too (44.8 to 92.7); for the 0.5B decoder only the normaliser works (12.5 to 44.2, its clean-name level), and renderings in training barely move it while costing backward recall. The string-alignment failure that section 4 reported for the decoder was real and is solved outside the model. DATA-2: the category result is mostly bridge, not recall (recalling the products lifts category accuracy by three points), and the bridge is what product ambiguity breaks: the v2 set costs 13 points of category on a model whose product recall is unchanged, and multi-category merchants read at half the single-category rate. For the owner's categoriser both halves point the same way: normalise the statement string before anything else (it is the cheapest and largest gain in this report), train the encoder route on renderings if the strings truncate, and expect the products-to-category step, not merchant recall, to be the residual error on real merchants, whose products are ambiguous by nature; a category-level signal (the user's own labels, row 35) rather than a product description is what closes that gap. Cost: eight training runs, 12 minutes in all.
 
 Not run: renderings for the 3B decoder or the section 24.7 encoders (the recipe here is section 4's, chosen so the baselines replicate), a learned normaliser, and the v2 set with the user-labelled evaluation of row 35, where the ambiguity will matter most.
+
+## 36. Real-use replicate: on a Zipf history with noisy strings the prototype recognises the merchants it was shown (85 to 90) and not the others (14 to 18), the category's name is the only thing that categorises an unseen real chain (38 to 56), an opaque unseen merchant is at chance for every method, label propagation loses to the prototype below ten labels, and amount and weekday features hurt (REAL-1, REAL-4, GRAPH-2, GRAPH-6)
+
+*PLAN step 22. Code: `ai_experiments.transactions` (the history; frozen as `data/processed/transactions_v1.json`), `scripts/exp_realuse.py` (the grid), `scripts/realuse_tables.py` (the tables). Results `results/realuse.json`; tracker experiment `realuse`. No training.*
+
+Every merchant result so far was on 120 opaque names with one clean bank string each and balanced categories, and every prototype result on 3-way balanced name-only trials; the reviewer's REAL-1 and REAL-4 said so. This step builds the history a categoriser actually sees and re-runs the prototype family on it, without training anything, so the numbers are what a frozen encoder gives a new user on day one. The history (`transactions.build_merchants` / `build_transactions`) has 240 merchants: 120 real chains a pretrained model has read about (Kroger, Starbucks, Shell, Home Depot, CVS, Delta, Petco, Verizon and so on, ten per section 4 category) and the 120 opaque merchants of section 4 (nobody has read about them), shuffled into one Zipf rank order (exponent 1.1) so that real and opaque merchants share the head and the tail; 3,000 transactions drawn by frequency, each a card-statement string from the section 4 test templates or the step 36 rendering templates (prefixes, truncations, abbreviations, store numbers, cities, dates), with a log-normal amount per category and a weekday. The result is what a real statement looks like: 24 head merchants make 2,048 of the 3,000 transactions, the tail of 144 merchants makes 343, the categories run from 784 transactions (Travel, because an airline landed at rank 1) to 80 (Groceries), and 19 merchants never appear at all.
+
+The protocol is REAL-4's: a trial draws k labelled transactions per category (k = 1, 3, 10; a category with fewer gives what it has), and the classifier labels the other transactions 12-way; ten trials per cell. Four classifiers on unit-normalised embeddings of the string, raw or through the step 36 normaliser: the k-example centroid of section 6.3 and 24 (`proto`); the same with the amount band (seven bands) and weekday appended at weight 0.5 (`text+af`); label propagation over a 10-nearest-neighbour graph of all 3,000 strings, labelled and not (Zhou et al., alpha 0.9; GRAPH-2); and, for GRAPH-6, the category *name's* embedding as the class vector (`name`, which needs no labelled example) and its unit mean with the centroid (`mix`). Accuracy is broken down by merchant frequency bucket (head = the top 10% of merchants by count, torso = the next 30%, tail = the rest), by real against opaque merchant, and by whether the test transaction's merchant appears among the k labelled examples (seen) or not (unseen). Two frozen encoders: all-MiniLM-L6-v2 (22M) and bge-base-en-v1.5 (109M).
+
+**Table 36.1: 12-way category accuracy on the 3,000-transaction history (frozen encoders; 10 trials; chance 8.3) by classifier and labelled transactions per category k; name = the category name's embedding alone, mix = its unit mean with the k-example centroid, lp = label propagation over the kNN graph of all 3,000 strings**
+
+| encoder | strings | k | name (k=0 vector) | prototype | mix | label propagation |
+|---|---|---|---|---|---|---|
+| MiniLM | raw | 1 | 25.9 | 31 | 36.9 | 15.3 |
+| MiniLM | raw | 3 | 25.9 | 40.5 | 45.8 | 23 |
+| MiniLM | raw | 10 | 25.9 | 55.2 | 55.8 | 39.4 |
+| MiniLM | norm | 1 | 38.9 | 41.7 | 48.3 | 21.2 |
+| MiniLM | norm | 3 | 38.9 | 53 | 57.2 | 39.1 |
+| MiniLM | norm | 10 | 38.9 | 68.8 | 70.4 | 67.1 |
+| bge-base | raw | 1 | 27 | 32.4 | 38.2 | 18 |
+| bge-base | raw | 3 | 27 | 41 | 48.4 | 24.5 |
+| bge-base | raw | 10 | 27 | 56.3 | 57.2 | 41.2 |
+| bge-base | norm | 1 | 47.5 | 43 | 51.8 | 22 |
+| bge-base | norm | 3 | 47.5 | 53 | 61.7 | 41.6 |
+| bge-base | norm | 10 | 47.5 | 67.4 | 70.4 | 68 |
+
+**Table 36.2: the prototype and label-propagation classifiers by merchant frequency bucket (head = top 10% of merchants by count, torso = next 30%, tail = rest), known (real chain) vs opaque merchant, whether the test transaction's merchant is among the labelled examples, and the unseen merchants split by known vs opaque (accuracy %, normalised strings)**
+
+| encoder | k | method | all | head | torso | tail | known | opaque | seen merchant | unseen merchant | unseen, known chain | unseen, opaque |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| MiniLM | 1 | proto | 41.7 | 54.5 | 14.6 | 12.9 | 52.7 | 12.3 | 84.9 | 14.1 | 20.6 | 5.6 |
+| MiniLM | 1 | lp | 21.2 | 25.4 | 11.9 | 12.3 | 24.7 | 11.8 | 44.3 | 6.7 | 7.1 | 6.1 |
+| MiniLM | 3 | proto | 53 | 66.6 | 27.6 | 16.2 | 61.1 | 31.3 | 84.2 | 17.6 | 24.5 | 8.3 |
+| MiniLM | 3 | lp | 39.1 | 47.4 | 23.1 | 16.8 | 43.5 | 27.2 | 67.6 | 7.4 | 8.5 | 6.1 |
+| MiniLM | 10 | proto | 68.8 | 84.8 | 38 | 24 | 80 | 38.3 | 86.9 | 16.4 | 24.5 | 7.5 |
+| MiniLM | 10 | lp | 67.1 | 80.2 | 42.9 | 28.2 | 75 | 45.7 | 86.4 | 11 | 16.3 | 5.6 |
+| bge-base | 1 | proto | 43 | 55.5 | 16.9 | 14.5 | 54.1 | 13.2 | 89.6 | 13.2 | 18 | 6.7 |
+| bge-base | 1 | lp | 22 | 25.9 | 13.2 | 14.1 | 25.5 | 12.6 | 45 | 7.5 | 8.2 | 6.5 |
+| bge-base | 3 | proto | 53 | 65.7 | 29.1 | 19.2 | 61.5 | 30.3 | 87.1 | 14 | 19.3 | 6.7 |
+| bge-base | 3 | lp | 41.6 | 49.6 | 25.4 | 22.2 | 46.6 | 28.1 | 68.3 | 11.6 | 14.4 | 7.7 |
+| bge-base | 10 | proto | 67.4 | 81.6 | 40.8 | 26.6 | 78.9 | 36.3 | 85.3 | 15.8 | 24.8 | 6.3 |
+| bge-base | 10 | lp | 68 | 80.5 | 45.2 | 31.2 | 75.9 | 46.6 | 86.7 | 14.1 | 20.6 | 7.4 |
+
+**Table 36.3: amount band and weekday appended to the text embedding (weight 0.5), normalised strings (accuracy %)**
+
+| encoder | k | prototype, text | prototype, text + amount + weekday | lp, text | lp, text + amount + weekday |
+|---|---|---|---|---|---|
+| MiniLM | 1 | 41.7 | 41.3 | 21.2 | 31 |
+| MiniLM | 3 | 53 | 49.9 | 39.1 | 44.2 |
+| MiniLM | 10 | 68.8 | 65.2 | 67.1 | 66.2 |
+| bge-base | 1 | 43 | 40.3 | 22 | 31 |
+| bge-base | 3 | 53 | 47.3 | 41.6 | 43.6 |
+| bge-base | 10 | 67.4 | 60.1 | 68 | 60.4 |
+
+MiniLM: 0.7 minutes for the grid.
+
+bge-base: 0.7 minutes for the grid.
+
+### 36.1 What a frozen encoder gives a new user: the prototype is a merchant memory, and the normaliser is worth ten points at every k
+
+Pooled over the 3,000 transactions the numbers look like a working classifier: with ten labelled transactions per category the prototype reads 68.8 (MiniLM) and 67.4 (bge-base) 12-way, with three 53.0 on both, with one 41.7 and 43.0, all on normalised strings; the raw strings cost ten to thirteen points at every k (31.0 / 40.5 / 55.2 for MiniLM), so the step 36 normaliser is the first thing to apply and the largest single gain on this history too. The breakdown says what the pooled number is made of. On transactions whose merchant appears among the k labelled examples the prototype reads 84 to 90 at every k for both encoders; on transactions whose merchant does not, 13 to 18 (chance 8.3). The frequency buckets are the same fact seen through the Zipf distribution: the 24 head merchants, which make two thirds of the transactions and are nearly always among the labelled examples, read 55 / 67 / 85 at k = 1 / 3 / 10, the torso 15 / 28 / 38, the tail 13 / 16 / 24. A prototype built from a user's labelled transactions is a memory of the merchants in those transactions: it labels a new transaction from a labelled merchant almost perfectly, and it barely labels anything else. The k axis is the axis of how many merchants have been shown (with ten labels per category about 90 distinct merchants are seen and the head is covered), not of how well the classifier generalises.
+
+### 36.2 The unseen merchant: the category's name reaches real chains through the encoder's own knowledge and nothing reaches an opaque one (GRAPH-6, REAL-1)
+
+GRAPH-6 asked whether a category with zero examples can be classified from its name. It can, on the merchants the encoder has read about: the embedding of the bare category name (`Groceries`, `Gas & Auto`) as the class vector, with no labelled transaction at all, reads 38.9 (MiniLM) and 47.5 (bge-base) over the whole history, which beats the one-example prototype on bge-base (43.0) and is four points under it on MiniLM. On the unseen real chains, where the prototype reads 18 to 25, the name vector reads 38.3 to 42.4 (MiniLM) and 52.0 to 56.2 (bge-base): the encoder knows that `Kroger` is groceries and `Petco` is pets from pretraining, and the category name is the query that reaches that knowledge, where a centroid of other merchants' strings does not. The mix (the unit mean of the name vector and the k-example centroid) is the best classifier in the table at every k for both encoders: 48.3 / 57.2 / 70.4 on MiniLM and 51.8 / 61.7 / 70.4 on bge-base, six to nine points over the prototype at k = 1 and 3 and two to three at k = 10, where the centroid has the head covered and the name adds only its reach into the unseen. On the opaque merchants that no example covers, every method is at chance: prototype 5.6 to 8.3, label propagation 5.6 to 7.7, name vector 4.9 to 11.6, mix 5.3 to 7.3. REAL-1's known/unknown split is therefore not a nuance but the whole result: a real chain the model has read about is categorisable from the category's name alone at 40 to 56 with no example, an unknown merchant is categorisable only after an example of it is labelled, and no method in this table changes either statement.
+
+### 36.3 Label propagation and the amount and weekday features (GRAPH-2, REAL-4)
+
+GRAPH-2 expected transductive label propagation over the kNN graph of all 3,000 strings to beat the prototype when labels are few and to tie it at k = 5 or so, as it does on the few-shot image benchmarks. Here it is the reverse. With one or three labels per category label propagation reads 21 to 22 and 39 to 42 against the prototype's 42 to 43 and 53; at ten labels the two tie (67 to 68). The graph is real (repeated renderings of one merchant are near neighbours) but so is the Zipf distribution: with twelve labelled nodes in a 3,000-node graph, two thirds of whose nodes belong to 24 merchants, the propagated mass follows the head merchants' clusters and the small categories drown (the seen-merchant accuracy of label propagation at k = 1 is 44 against the prototype's 85), and it recovers only when enough labels sit inside each cluster. Label propagation does buy something the prototype does not, once it has labels: at k = 10 it reads 46 against 38 on the opaque merchants and 28 to 31 against 24 to 27 on the tail, because a labelled transaction of an opaque merchant propagates to that merchant's other renderings through the graph while the centroid dilutes it among the category's other merchants. That is the graph's real use on transaction data, and it is a k = 10 use.
+
+REAL-4's second half was the transaction features. Appending the amount band (seven one-hot bands) and the weekday (seven) to the text embedding at weight 0.5 costs the prototype 0.4 to 7.3 points at every k on both encoders (MiniLM 41.7 / 53.0 / 68.8 to 41.3 / 49.9 / 65.2), and helps label propagation only at k = 1 and 3 (21 to 31, 39 to 44 on MiniLM), where the text graph was too sparse to propagate and any feature that groups transactions helps; at k = 10 it costs label propagation too (67.1 to 66.2 on MiniLM, 68.0 to 60.4 on bge-base). The categories' amount distributions overlap by construction (a log-normal per category with means from 18 to 270 dollars), and weekday carries nothing in this history, so the features add a noisy dimension to a centroid that was already a merchant memory. A learned weighting or a per-user feature selection might do better; concatenation at a fixed weight does not.
+
+### 36.4 What the step says
+
+The four questions of the row, in the owner's terms. REAL-1: on a realistic history the prototype family is a merchant memory: 85 to 90 on transactions of merchants the user has labelled, 14 to 18 on the rest, and the pooled 69 at ten labels per category is that mixture weighted by the Zipf head. The long tail is the unseen tail, and for it the encoder's pretrained knowledge of real chains is the only lever without an example: a category name reaches it at 38 to 56, an opaque merchant stays at chance. GRAPH-6: yes, a zero-example category is classifiable from its name, and mixing the name vector into the centroid is the best classifier at every k. GRAPH-2: label propagation is not the few-label method here; it loses to the prototype below ten labels and pays off only on opaque and tail merchants once their renderings carry a label. REAL-4: 12-way, imbalanced, on strings, the prototype protocol of sections 6.3 and 24 gives numbers a third to a half of the balanced 3-way ones, and amount and weekday features as fixed-weight one-hots hurt. For the categoriser: normalise the string, use the category name as part of every class vector so that new categories and real chains are covered from day one, treat the labelled history as the merchant memory it is, and expect nothing for a merchant the user has never labelled unless it is a chain the encoder knows or a fact database (rows 33 and 35) supplies it. Cost: 1.3 minutes of GPU for the whole grid.
+
+Not run: a fine-tuned encoder on the user's own history (row 33), a learned feature weighting, the cluster-tightness attribute selector of REAL-4 (which needs the multi-attribute universe items, not this history), and real transaction exports.
