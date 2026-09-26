@@ -60,6 +60,8 @@ Always uses unsloth FastLanguageModel + LoRA r64 (like exp_universe_ladder.py ..
 
 EVAL_ONLY=1 re-scores the saved adapter of a trained arm instead of training (base arms only ever score).
 LOAD_4BIT=1 loads the base weights in 4-bit NF4 (QLoRA; PLAN step 15 runs Qwen2.5-7B this way on the 24 GB card).
+LORA_R=<r> (alpha 2r), LORA_TARGETS=all|mlp|attn, FULL_FT=1 (every weight in bf16, bitsandbytes 8-bit AdamW): the PLAN step 17 sweep (TRAIN-4);
+steps and learning rate are argv 3 and 4 as before. Pair with RUN_TAG.
 KTEXTS=descK | desc14perm | desc14rev | desc14llm swaps the knowledge stream for an augmentation variant (universe.knowledge_texts,
 PLAN step 16, DATA-5); pair it with RUN_TAG=<same> so the results and adapter names carry it.
 SEED=N (default 0) seeds the LoRA init, the stream shuffles and the mixture draws; N > 0 adds "_sN" to the
@@ -82,7 +84,7 @@ from ai_experiments.paths import ROOT
 
 # The batched scorer's 64-row forwards fragment the caching allocator; without expandable segments the first
 # backward after a periodic evaluation ran out of memory (REPORT.md 19). Must be set before CUDA initialises.
-os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True,garbage_collection_threshold:0.8")  # three runs OOMed in the backward after a periodic evaluation at 11 to 16 GiB (2026-09-16)
 
 import unsloth  # noqa: F401  (before transformers)
 import torch
@@ -138,7 +140,11 @@ MASK_INSTRUCTION = "Recover the original passage from the masked version.\nMaske
 MASK_RNG = random.Random(1000 + int(os.environ.get("SEED", "0")))
 BY_LOSS = ARM.startswith("M")          # fractions are per-stream loss weights, not just sampling odds
 RET = bool(os.environ.get("RET"))      # retrieved-context and neighbour-list evaluation conditions (PLAN step 14)
-LOAD_4BIT = bool(os.environ.get("LOAD_4BIT"))  # QLoRA: 4-bit base weights (bitsandbytes NF4) for models that do not fit in bf16 (PLAN step 15, 7B)
+LOAD_4BIT = bool(os.environ.get("LOAD_4BIT"))
+LORA_R = int(os.environ.get("LORA_R", "64"))                 # PLAN step 17 (TRAIN-4): rank (alpha = 2r), target set, or full fine-tuning
+LORA_TARGETS = {"all": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"], "mlp": ["gate_proj", "up_proj", "down_proj"],
+                "attn": ["q_proj", "k_proj", "v_proj", "o_proj"]}[os.environ.get("LORA_TARGETS", "all")]
+FULL_FT = bool(os.environ.get("FULL_FT"))                    # no adapter: every weight trained in bf16 with bitsandbytes 8-bit AdamW  # QLoRA: 4-bit base weights (bitsandbytes NF4) for models that do not fit in bf16 (PLAN step 15, 7B)
 _RETRIEVER = None
 
 
@@ -244,7 +250,8 @@ def evaluate(model, tok):
 
 def periodic_eval(model, tok):
     """Cheap mid-training point: a fixed subsample, no extra passes, no per-item file. Leaves the model in train mode."""
-    model.eval(); torch.cuda.empty_cache(); t0 = time.time()
+    import gc
+    model.eval(); gc.collect(); torch.cuda.empty_cache(); t0 = time.time()
     sc = Scorer(model, tok, maxlen=MAXLEN, extras=False, rows_per_forward=16 if LOAD_4BIT else 32, tokens_per_forward=8192 if LOAD_4BIT else 16384)  # smaller footprint mid-training
     m = aggregate(sc.score(ladder[::4]) + sc.score(suite[::2]) + (sc.score(known) if known else []))
     sym = [v for k, v in m.items() if k.startswith("ICL_symbol")]
@@ -252,7 +259,7 @@ def periodic_eval(model, tok):
     m["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
     m.update(wikitext_ppl(model, tok))
     m["eval_minutes"] = round((time.time() - t0) / 60, 1)
-    model.train(); torch.cuda.empty_cache()
+    del sc; model.train(); gc.collect(); torch.cuda.empty_cache()
     return m
 
 
@@ -336,12 +343,18 @@ def pack_rows(batch, srcs, cap):
 
 
 def train(model, tok, phases, run):
-    model = FastLanguageModel.get_peft_model(
-        model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-        use_gradient_checkpointing=GRAD_CKPT, random_state=SEED)
+    if FULL_FT:
+        for p_ in model.parameters():
+            p_.requires_grad_(True)
+        model.gradient_checkpointing_enable()
+        if hasattr(model, "enable_input_require_grads"):
+            model.enable_input_require_grads()
+    else:
+        model = FastLanguageModel.get_peft_model(
+            model, r=LORA_R, lora_alpha=2 * LORA_R, lora_dropout=0.0, bias="none",
+            target_modules=LORA_TARGETS, use_gradient_checkpointing=GRAD_CKPT, random_state=SEED)
     params = [p for p in model.parameters() if p.requires_grad]
-    print(f"   LoRA trainable: {sum(p.numel() for p in params) / 1e6:.0f}M params | micro {MICRO} x accum {ACCUM} | grad ckpt {GRAD_CKPT}", flush=True)
+    print(f"   {'full FT' if FULL_FT else 'LoRA'} trainable: {sum(p.numel() for p in params) / 1e6:.0f}M params | micro {MICRO} x accum {ACCUM} | grad ckpt {GRAD_CKPT}", flush=True)
     rng = random.Random(SEED)
     streams = {"K": Stream(K_texts, rng)}
     need = {k for ph in phases for k in ph}
@@ -364,7 +377,11 @@ def train(model, tok, phases, run):
         streams["K1"] = Stream(U.single_texts(species), rng)
     if "Km" in need:
         streams["Km"] = Stream([dict(mask=t) for t in U.single_texts(species)], rng)
-    opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
+    if FULL_FT:
+        import bitsandbytes as bnb
+        opt = bnb.optim.AdamW8bit(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
+    else:
+        opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     def lr_factor(s):
         if SCHEDULE == "constant":
             return min(1.0, (s + 1) / 30)
@@ -456,7 +473,7 @@ def train(model, tok, phases, run):
 results = {}
 phases = MIXTURES.get(ARM)
 cfg = dict(arm=ARM, steps=STEPS if phases else 0, bs=BS, micro=MICRO, accum=ACCUM, lr=LR, seed=SEED, maxlen=MAXLEN,
-           method="unsloth_qlora" if LOAD_4BIT else "unsloth_lora", load_4bit=LOAD_4BIT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=64, lora_alpha=128, lora_targets="all_linear", morph_p=MORPH_P,
+           method="full_ft_adamw8bit" if FULL_FT else ("unsloth_qlora" if LOAD_4BIT else "unsloth_lora"), load_4bit=LOAD_4BIT, full_ft=FULL_FT, grad_ckpt=str(GRAD_CKPT), pack=PACK, extras=EXTRAS, run_tag=RUN_TAG, loss_by_stream=BY_LOSS, all_answer_loss=ALL_ANSWER, schedule=SCHEDULE, lora_r=LORA_R, lora_alpha=2 * LORA_R, lora_targets=os.environ.get("LORA_TARGETS", "all"), morph_p=MORPH_P,
            mixture=json.dumps(phases), n_species=len(species), n_heldout=sum(s["heldout"] for s in species),
            n_knowledge_texts=len(K_texts), ktexts=KTEXTS, llm_texts_sha=LLM_TEXTS_SHA, n_ladder_items=len(ladder), n_probes=len(probes), n_icl_items=len(suite),
            n_known_items=len(known), periodic=PERIODIC, **FROZEN.config())

@@ -342,6 +342,7 @@ weights. WiSE-FT was tried at alpha 0.5 only; general-text replay is absent from
 *Experiment:* on arm C, sweep r in {16, 64, 256}, lr in {5e-5, 1e-4, 2e-4}, steps in {400, 1600};
 one 3B full-FT run with 8-bit AdamW and bf16 weights; WiSE-FT alpha in {0.3, 0.7}; 10% FineWeb
 replay in `ft_aug`.
+**Status (2026-09-16):** answered, PLAN step 17, REPORT.md 28 (arm C, Qwen2.5-3B, seed 0). Rank, learning rate and step count form one axis: rank 16, lr 5e-5 and 400 steps store the facts (recall 100 / 100 / 95.6) and cannot use them (manipulation and induction at the base); lr 2e-4 uses them best of the 800-step runs and forgets most. 1,600 steps at the recipe's rate improves every from-the-weights number (97.5 / 91.2; 81 / 72 / 77) and the general-ability costs at once: the recipe's 800 steps under-trained the mixture. Rank 256 matches 64 at higher perplexity and memory; MLP-only LoRA matches all-linear at lower cost; full fine-tuning (8-bit AdamW, 19.7 GiB) erases the model at 1e-4 and learns nothing at 1e-5. LoRA is the right vehicle here. WiSE-FT alphas and merchant FineWeb replay were not run.
 
 ### BASE — missing baselines and alternative methods
 

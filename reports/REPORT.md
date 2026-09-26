@@ -1629,3 +1629,77 @@ At 12,800 sequences the variants differ in how far they move the model off its d
 ### 27.4 What DATA-5 now says
 
 Answered. Recall needs three distinct renderings per fact and no more; the "ten paraphrases" figure is not a recall requirement here. Manipulation comes from negative and comparative texts, not from paraphrase count or kind; backward recall comes from backward sentences and from nothing else; sentence-order permutation buys nothing on this ladder and costs the most perplexity; LLM-written sentences are the cheapest volume in general-ability terms and teach nothing the templates did not. Single seeds, arm A only, at one budget; the trade with repetition (94 passes at one template) is folded into the sweep.
+
+## 28. Hyperparameters: rank, rate and steps are one axis, 1,600 steps is the recipe's missing parameter, MLP-only LoRA matches all-linear, and full fine-tuning found no working rate (TRAIN-4)
+
+Date: 2026-09-16. Code: `LORA_R=<r> | LORA_TARGETS=mlp | FULL_FT=1` and the step and learning-rate arguments of `exp_curriculum.py` (new knobs; alpha stays 2r), `RUN_TAG=<variant> PERIODIC=200 uv run python scripts/exp_curriculum.py C ...`; data `results/curriculum_Qwen2.5-3B_C_<variant>_p200.json` with per-item files and curves; the baseline is the section 15 rerun of arm C (seed 0) with section 20's three-seed band beside it.
+
+TRAIN-4 noted that rank 64, alpha 128, no dropout, no weight decay, betas (0.9, 0.95) and 800 steps were fixed across every arm, that the only sweeps had been learning rates, and that the one full fine-tuning attempt on 3B had run out of memory with fp32 master weights; and it asked whether LoRA is the right vehicle for injection at all. The survey's reading: Biderman et al. recommend rank 256 on all modules and the highest stable learning rate, and find the LoRA-to-full-FT gap does not close at any rank for continued-pretraining-style text; against that, three papers find rank 16 equal to much higher ranks or to full FT for extraction and prompt-format training, and Allen-Zhu and Li find target type matters more than rank. This section moves one thing at a time off arm C's recipe: rank 16 and 256; learning rate 5e-5 and 2e-4; 400 and 1,600 steps (the schedule rescaled to the run); LoRA on the MLP projections only; and full fine-tuning of all 3.09B weights in bf16 with bitsandbytes 8-bit AdamW on the same 800 x 16 sequences, at the adapter's rate (1e-4) and at 1e-5. Four of the runs died of an out-of-memory error in the first backward after a periodic evaluation (rank 256 and MLP-only at step 600, 1,600 steps at step 1,000, full fine-tuning at step 0) and were rerun with 1,024-token packed rows, the 1,600-step one with a periodic point every 400 steps; the allocator now garbage-collects around the periodic evaluation. Everything else is section 8's arm C on the fast path, seed 0.
+
+**Table 28.1: arm C under the hyperparameter variants (seed 0; the baseline column carries section 20's three-seed mean +- sd in brackets)**
+
+| measure | C (r64, lr 1e-4, 800, all) | r16 | r256 | lr 5e-5 | lr 2e-4 | 400 steps | 1,600 steps | MLP-only r64 | full FT, lr 1e-4 | full FT, lr 1e-5 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| recall, trained fmt | 100 [100.0 +- 0.0] | 100 | 100 | 100 | 100 | 95.6 | 100 | 100 | 100 | 19.4 |
+| recall, bare | 19.4 [18.4 +- 1.3] | 20.6 | 21.2 | 15.6 | 20.6 | 16.9 | 20 | 18.8 | 21.9 | 20 |
+| yes/no | 77.5 [80.0 +- 12.7] | 55 | 78.8 | 73.8 | 96.2 | 46.2 | 97.5 | 81.2 | 50 | 45 |
+| pair | 81.2 [78.7 +- 12.7] | 50 | 85 | 56.2 | 85 | 50 | 91.2 | 72.5 | 50 | 50 |
+| Timmy k=3 | 61.9 [63.8 +- 9.2] | 43.1 | 67.5 | 44.4 | 63.8 | 39.4 | 81.2 | 61.9 | 40.6 | 32.5 |
+| k=4 | 51.9 [57.9 +- 11.0] | 42.5 | 63.8 | 38.8 | 63.1 | 25.6 | 71.9 | 59.4 | 22.5 | 29.4 |
+| weakness | 60 [59.6 +- 11.9] | 41.2 | 61.9 | 38.8 | 65 | 38.1 | 76.9 | 58.1 | 38.8 | 33.8 |
+| habitat | 29.4 [33.1 +- 3.3] | 34.4 | 44.4 | 32.5 | 34.4 | 29.4 | 33.8 | 35 | 28.1 | 34.4 |
+| reverse easy | 30.6 | 27.5 | 66.9 | 31.2 | 31.2 | 29.4 | 90.6 | 33.1 | 73.1 | 30.6 |
+| ICL symbol | 78.6 [79.0 +- 1.1] | 75.5 | 76.5 | 79.2 | 79.2 | 76.6 | 78.1 | 77.1 | 59.9 | 58.9 |
+| ICL natural | 87 [87.5 +- 0.9] | 89.1 | 84.4 | 90.6 | 84.3 | 87.5 | 85.4 | 86 | 69.8 | 84.9 |
+| ARC-Easy | 58.5 [64.0 +- 4.8] | 63.5 | 61.5 | 70.5 | 54.5 | 59 | 65.5 | 67 | 45 | 72.5 |
+| WikiText ppl | 22.787 [22.6 +- 0.2] | 19.033 | 31.107 | 17.919 | 28.648 | 20.612 | 20.949 | 20.933 | 94.414 | 11.67 |
+| training minutes | 50.3 | 10.9 | 16 | 11.2 | 11.2 | 5.6 | 25.8 | 11.1 | 14.5 | 14.5 |
+| tokens/s | 415 | 1919 | 1307 | 1868 | 1865 | 1876 | 1615 | 1881 | 1441 | 1442 |
+| peak GiB | 8.71 | 10.59 | 15.24 | 11.6 | 11.6 | 11.6 | 9.84 | 9.41 | 19.66 | 19.66 |
+
+**Table 28.2: with the field guide in context**
+
+| measure | C (r64, lr 1e-4, 800, all) | r16 | r256 | lr 5e-5 | lr 2e-4 | 400 steps | 1,600 steps | MLP-only r64 | full FT, lr 1e-4 | full FT, lr 1e-5 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Timmy k=3 | 70.6 | 73.8 | 84.4 | 72.5 | 77.5 | 73.8 | 74.4 | 77.5 | 41.9 | 38.8 |
+| held-out species | 72.9 | 68.8 | 82.3 | 65.6 | 63.5 | 71.9 | 72.9 | 72.9 | 33.3 | 37.5 |
+| pair | 76.2 | 71.2 | 76.2 | 73.8 | 88.8 | 70 | 73.8 | 77.5 | 51.2 | 73.8 |
+
+base recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 42.5 / 63.5, 200: 10.0 / 47.5 / 66.7, 400: 92.5 / 35.0 / 65.6, 600: 100.0 / 45.0 / 72.9
+
+r16 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 10.0 / 37.5 / 72.9, 400: 75.0 / 37.5 / 74.0, 600: 100.0 / 37.5 / 74.0
+
+r256 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 77.5 / 47.5 / 67.7, 400: 97.5 / 37.5 / 72.9, 600: 100.0 / 55.0 / 74.0
+
+lr5e-5 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 15.0 / 42.5 / 70.8, 400: 85.0 / 45.0 / 78.1, 600: 100.0 / 45.0 / 71.9
+
+lr2e-4 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 65.0 / 47.5 / 65.6, 400: 100.0 / 45.0 / 67.7, 600: 100.0 / 45.0 / 77.1
+
+s400 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 17.5 / 32.5 / 81.2
+
+s1600 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 400: 100.0 / 50.0 / 75.0, 800: 100.0 / 65.0 / 80.2, 1200: 100.0 / 82.5 / 78.1
+
+mlp recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 17.5 / 37.5 / 78.1, 400: 100.0 / 40.0 / 74.0, 600: 100.0 / 52.5 / 73.9
+
+fullft recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 100.0 / 37.5 / 43.8, 400: 100.0 / 30.0 / 47.9, 600: 100.0 / 45.0 / 55.2
+
+fullft1e-5 recall_fmt / Timmy / ICL sym by step: 0: 12.5 / 40.0 / 63.5, 200: 10.0 / 27.5 / 61.5, 400: 7.5 / 22.5 / 60.4, 600: 20.0 / 22.5 / 62.5
+
+
+### 28.1 One axis: how far the adapter moves buys use of the facts and pays in forgetting
+
+Every variant stores the facts: trained-format recall is 100 for all of them but the 400-step run (95.6). What the variants differ in is whether the facts can be used, and the pattern is a single axis (Table 28.1). The two changes that move the model less, rank 16 and learning rate 5e-5, keep recall at 100 and drop manipulation to chance or near it (55.0 / 50.0 and 73.8 / 56.2 against the baseline's 77.5 / 81.2) and induction from the weights to the base model's level (43.1 and 44.4 on Timmy against 61.9; k=4 42.5 and 38.8 against 51.9). They also cost the least: WikiText 19.0 and 17.9 against 22.8, ARC-Easy 63.5 and 70.5 against 58.5. The change that moves the model more, learning rate 2e-4, is the mirror image: the best manipulation and induction of any arm C run in the project (96.2 / 85.0; Timmy 63.8, k=4 63.1, weakness 65.0) at the largest cost (WikiText 28.6, ARC-Easy 54.5, natural-label ICL 84.3 against 87.0). Rank 256 sits with the baseline on the ladder (78.8 / 85.0; 67.5 / 63.8 / 61.9) at a higher perplexity (31.1) and twice the memory (15.2 GiB; its first run at 2,048-token rows died at step 600, 28.2).
+
+The step count is the same axis in time (Table 28.1 and the curves): at 400 steps the facts are in (95.6) and nothing else is (manipulation 46.2 / 50.0, induction 39.4 / 25.6 / 38.1, the base's numbers), which is what section 15's curves showed at the 400-step point of the 800-step run; at 1,600 steps (the same warmup and decay stretched over the run) every from-the-weights number is the best any arm C run has produced and the general-ability costs are *lower* than the baseline's: manipulation 97.5 / 91.2, Timmy 81.2, k=4 71.9, weakness 76.9 (baseline 61.9 / 51.9 / 60.0), ICL suite 78.1 / 85.4, ARC-Easy 65.5 (baseline 58.5), WikiText 20.9 (baseline 22.8). The curve says why: recall is at 100 by step 400 and stays there, while induction from the weights keeps climbing, 50.0 / 65.0 / 82.5 / 81.2 at steps 400 / 800 / 1,200 / 1,600, and the symbol-label ICL suite holds at 75 to 80 throughout. Section 15 read the 800-step curves as facts by step 200 and induction still rising at the end; it was. The recipe's 800 steps under-trained the mixture, and the second 800 steps, taken at a decaying rate, teach the use of the facts without moving the general-text distribution further, where the same movement compressed into 800 steps at 2e-4 costs 6 perplexity points and 4 ARC-Easy points. Longer at the same peak rate is the better direction than hotter.
+
+Read against section 20's seed band (manipulation sd 12.7, induction 9 to 12 for arm C), the rank 16, learning-rate 5e-5 and 400-step drops of 20 to 30 points on manipulation and 18 to 26 on induction are outside it, and the rank-256 and learning-rate 2e-4 differences from the baseline are not, except 2e-4's yes/no (+18.7) and its general-ability costs (perplexity and ARC-Easy have sd 0.2 and 4.8). The survey's two camps both find their evidence here: rank 16 equals higher ranks for *recall* (Bornschein, prompt distillation) and does not for *manipulation and induction* (Biderman's "learns less" at low rank). What the sweep adds is that the learning rate and the step count sit on the same axis as the rank: any of the three, turned down, gives a model that recalls and cannot use, and turned up gives one that uses and forgets.
+
+### 28.2 Where the adapter goes: MLP-only, and full fine-tuning
+
+LoRA on the three MLP projections only (rank 64, 15% fewer trainable parameters than all seven, `mlp` in Table 28.1) is the baseline: recall 100, manipulation 81.2 / 72.5, induction 61.9 / 59.4 / 58.1, ICL 77.1 / 86.0, and a smaller cost (WikiText 20.9 against 22.8, ARC-Easy 67.0 against 58.5). The attention projections add nothing this ladder can see, which is Allen-Zhu and Li's finding that target type matters and their observation that the knowledge sits in the MLP blocks; it also says the section 8 recipe could drop the attention adapters and lose nothing but 3 GiB of optimiser state.
+
+Full fine-tuning at the adapter's learning rate is not a comparison, it is a demonstration: all 3.09B weights in bf16 with 8-bit AdamW at 1e-4 (`full FT, lr 1e-4`) reach 100 recall by step 200 and nothing else, manipulation and induction at chance, the symbol-label ICL suite at 59.9 and the natural-label one at 69.8 (from 60.4 and 84.9), ARC-Easy 45.0, WikiText perplexity 94.4. At 1e-4 the whole model moves, and 800 steps of 12,800 synthetic sequences are enough to overwrite it. At 1e-5, the rate full fine-tuning is usually run at, the same 800 steps learn nothing: trained-format recall 19.4 (the curve reads 10.0 / 7.5 / 20.0 at steps 200 / 400 / 600), manipulation and induction at the base, and the model otherwise untouched (WikiText 11.7 against the base's 10.6, ARC-Easy 72.5, natural-label ICL 84.9). Between an order of magnitude that erases the model and one that does not reach it, the full fine-tune's working rate for 136 species in 800 steps was not found in two runs; 3e-5 is the next point if full fine-tuning is ever needed. Either way the cost of full fine-tuning is real: 19.7 GiB, a 5.8 GB checkpoint per run, two attempts to get one through the periodic evaluations, and no result on this ladder that the rank-64 adapter does not match.
+
+### 28.3 What TRAIN-4 now says
+
+Answered, as far as one seed per point allows. Rank, learning rate and step count are one axis on this ladder: turned down (rank 16, 5e-5, 400 steps) the adapter stores the facts and cannot use them, turned up (2e-4) it uses them and forgets more; 1,600 steps at the recipe's peak rate is the exception that improves both sides (manipulation 97.5 / 91.2, induction 81 / 72 / 77, perplexity and ARC-Easy better than at 800), so the recipe's step count was the parameter that was wrong. Rank 256 buys nothing over 64 and costs perplexity and memory; MLP-only LoRA matches all-linear at lower cost; full fine-tuning at the adapter's rate destroys the model and at 1e-5 learns nothing in 800 steps (recall 19.4), so its working rate lies between and was not found. LoRA is the right vehicle here, at rank 64 on the MLP projections, for twice the steps. Not run: WiSE-FT at other alphas and FineWeb replay in the merchant runs (the merchant pipeline is section 4's; general-text replay was done for the universe in section 17).
