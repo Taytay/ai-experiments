@@ -1,0 +1,66 @@
+[
+ {
+  "tag": "r71s-dec",
+  "env": {
+   "PER_CELL": "1",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-0.5B-Instruct",
+   "COT_TOKENS": "256"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71s-hug",
+  "env": {
+   "PER_CELL": "1",
+   "ARM": "huginn",
+   "MODEL": "tomg-group-umd/huginn-0125",
+   "STEPS": "1,8"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71s-llada",
+  "env": {
+   "PER_CELL": "1",
+   "ARM": "diffusion",
+   "MODEL": "GSAI-ML/LLaDA-8B-Instruct",
+   "DSTEPS": "12"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen python scripts/exp_hops.py",
+   "MODE=gen uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71s-dream",
+  "env": {
+   "PER_CELL": "1",
+   "ARM": "diffusion",
+   "MODEL": "Dream-org/Dream-v0-Instruct-7B",
+   "DSTEPS": "12"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen python scripts/exp_hops.py",
+   "MODE=gen uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71s-lfm",
+  "env": {
+   "PER_CELL": "1",
+   "ARM": "diffusion",
+   "MODEL": "LiquidAI/LFM2.5-Encoder-350M-Diffusion",
+   "DSTEPS": "12"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen python scripts/exp_hops.py",
+   "MODE=gen uv run --frozen python scripts/exp_hops.py"
+  ]
+ }
+]
