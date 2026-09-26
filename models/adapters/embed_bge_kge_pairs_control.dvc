@@ -1,0 +1,6 @@
+outs:
+- md5: 0d48ad0cf03ece63ef0edc2ef91efff5.dir
+  size: 219795595
+  nfiles: 10
+  hash: md5
+  path: embed_bge_kge_pairs_control

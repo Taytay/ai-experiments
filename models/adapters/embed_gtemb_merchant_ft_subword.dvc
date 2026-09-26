@@ -1,0 +1,6 @@
+outs:
+- md5: 13a3d40a34e6102ef408c5fc80745194.dir
+  size: 301642300
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_merchant_ft_subword

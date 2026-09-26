@@ -1,0 +1,6 @@
+outs:
+- md5: a9f799942f4dabc0936bd2c62d3c26a7.dir
+  size: 490440687
+  nfiles: 6
+  hash: md5
+  path: categoriser_Qwen2.5-3B-Instruct_ret_shotsrecent_lora

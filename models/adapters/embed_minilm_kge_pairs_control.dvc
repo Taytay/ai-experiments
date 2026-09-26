@@ -1,0 +1,6 @@
+outs:
+- md5: 84c15c33241c8c731ee3949d21e843af.dir
+  size: 46162431
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_kge_pairs_control

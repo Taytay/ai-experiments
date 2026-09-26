@@ -1,0 +1,6 @@
+outs:
+- md5: bdda4a41e9f7d0658af2c8be3c0f97c6.dir
+  size: 46186925
+  nfiles: 11
+  hash: md5
+  path: retriever_real6_minilm

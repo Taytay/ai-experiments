@@ -1,0 +1,6 @@
+outs:
+- md5: ee9e53eb709806d777f248270019a427.dir
+  size: 1684156730
+  nfiles: 2
+  hash: md5
+  path: hops_enc_scratch_k1-3_st3000

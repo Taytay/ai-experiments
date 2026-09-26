@@ -1,0 +1,6 @@
+outs:
+- md5: be6736f7ba9bffa847f76042c5bc64d5.dir
+  size: 219795595
+  nfiles: 10
+  hash: md5
+  path: embed_bge_universe_trained

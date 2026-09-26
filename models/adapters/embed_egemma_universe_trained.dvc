@@ -1,0 +1,6 @@
+outs:
+- md5: 339bf03d1417ebea29590aabf2309712.dir
+  size: 658043179
+  nfiles: 14
+  hash: md5
+  path: embed_egemma_universe_trained
