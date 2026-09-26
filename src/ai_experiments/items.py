@@ -25,6 +25,10 @@ was already frozen by `icl_suite.py` (one file, both universes); it gets ids and
 11, TRAIN-3): 200 four-option ARC-Easy test questions (allenai/ai2_arc) in the ladder's cloze
 format, level K_arc_easy. Facts the base model knows that no arm trains on; a drop means damage.
 
+`reverse` (plain universe only) holds 160 easy and 160 hard backward questions (attributes -> species name,
+`universe.reverse_items`, levels L8_reverse_easy / L8_reverse_hard, PLAN step 8, TRAIN-5 / EVAL-7), scored
+without and with the entries of the four option species in context.
+
 `corpus_ppl` (one file, both universes) is the general-text perplexity slice (PLAN step 24, TRAIN-3):
 WikiText-2 raw test paragraphs, detokenised, shuffled with a seed and taken until 3,500 words (about
 4,500 Qwen tokens). Replaces the one 249-word paragraph of `merchants.GENERAL_TEXT`, whose perplexity
@@ -50,6 +54,7 @@ VERSION = "v1"
 SETS = ("ladder", "heldout_induction", "probes")
 KNOWN = "known_facts"
 KNOWN_N, KNOWN_SEED = 200, 17
+REVERSE = "reverse"
 CORPUS = "corpus_ppl"
 CORPUS_WORDS, CORPUS_SEED, CORPUS_MIN_WORDS = 3500, 23, 60
 MORPH_P = 0.7  # the morphology universe's marker probability (exp_curriculum.py arms E, base_m)
@@ -147,6 +152,26 @@ def generate_corpus(words: int = CORPUS_WORDS, seed: int = CORPUS_SEED) -> list[
     return out
 
 
+def generate_reverse(morph: bool = False) -> list[dict]:
+    """Backward-question items (universe.reverse_items) with the field-guide entries of the four option species as context."""
+    species = U.build(morph_p=MORPH_P if morph else 0.0)
+    by_name = {s["name"]: s for s in species}
+    items = U.reverse_items(species)
+    return _with_ids([dict(it, prompt_ctx="Field guide:\n" + "\n".join(U.entry(by_name[n]) for n in it["demos"]) + "\n\n" + it["prompt"])
+                      for it in items])
+
+
+def freeze_reverse(version: str = VERSION, force: bool = False) -> None:
+    p = path(REVERSE, False, version)
+    if p.exists() and not force:
+        sys.exit(f"{p.name} exists; frozen sets are immutable. Bump VERSION for new items.")
+    items = generate_reverse()
+    doc = dict(name=REVERSE, version=version, morph_p=0.0, n_items=len(items), sha256=sha256(items), items=items,
+               source="universe.reverse_items(seed=8): 160 easy + 160 hard four-option backward questions, plain universe")
+    p.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"wrote {p.name}: {len(items)} items, sha256 {doc['sha256'][:12]}")
+
+
 def freeze_corpus(version: str = VERSION, force: bool = False) -> None:
     p = path(CORPUS, False, version)
     if p.exists() and not force:
@@ -182,6 +207,7 @@ class Frozen:
     suite: list[dict]
     known: list[dict] = field(default_factory=list)   # K_arc_easy forgetting proxy; [] if not frozen yet
     corpus: list[str] = field(default_factory=list)   # general-text perplexity paragraphs; [] if not frozen yet
+    reverse: list[dict] = field(default_factory=list)  # L8_reverse_easy / _hard backward questions (plain universe); [] if not frozen
     sha: dict[str, str] = field(default_factory=dict)  # set name -> sha256 of its items
 
     def config(self) -> dict:
@@ -212,9 +238,13 @@ def load_all(morph: bool, version: str = VERSION) -> Frozen:
     if path(CORPUS, False, version).exists():
         cdoc = load(CORPUS, False, version)
         corpus, sha[CORPUS] = [i["text"] for i in cdoc["items"]], cdoc["sha256"]
+    reverse = []
+    if not morph and path(REVERSE, False, version).exists():
+        rdoc = load(REVERSE, False, version)
+        reverse, sha[REVERSE] = rdoc["items"], rdoc["sha256"]
     return Frozen(version=version, morph=morph,
                   ladder=docs["ladder"]["items"] + docs["heldout_induction"]["items"],
-                  probes=docs["probes"]["items"], suite=suite, known=known, corpus=corpus, sha=sha)
+                  probes=docs["probes"]["items"], suite=suite, known=known, corpus=corpus, reverse=reverse, sha=sha)
 
 
 def check(version: str = VERSION) -> bool:
@@ -243,10 +273,13 @@ def main(argv=None) -> None:
             freeze(morph, force="--force" in argv)
         freeze_known(force="--force" in argv)
         freeze_corpus(force="--force" in argv)
+        freeze_reverse(force="--force" in argv)
     elif cmd == "freeze-known":
         freeze_known(force="--force" in argv)
     elif cmd == "freeze-corpus":
         freeze_corpus(force="--force" in argv)
+    elif cmd == "freeze-reverse":
+        freeze_reverse(force="--force" in argv)
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":
@@ -254,7 +287,7 @@ def main(argv=None) -> None:
             f = load_all(morph)
             print(f"{'morph' if morph else 'plain'} {f.version}: {len(f.ladder)} ladder(+heldout) items, "
                   f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items, "
-                  f"{len(f.corpus)} perplexity paragraphs")
+                  f"{len(f.corpus)} perplexity paragraphs, {len(f.reverse)} reverse items")
             for k, v in f.sha.items():
                 print(f"   {k:18s} {v}")
     else:
