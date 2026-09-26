@@ -57,6 +57,7 @@ RUN_TAG = os.environ.get("RUN_TAG", "")
 BASE = {"mask": "answerdotai/ModernBERT-large", "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MBI_IDS = os.environ.get("MBI_IDS", "letters"); assert MBI_IDS in ("letters", "unused")
+MBI_SHOTLAB = bool(int(os.environ.get("MBI_SHOTLAB", "0")))  # row 69: each shot's label carries its option ID ("-> H: Grendo"), so the ID is bound in the shots
 OPT_IDS = list(LETTERS) if MBI_IDS == "letters" else [f"[unused{k + 1}]" for k in range(26)]
 MBI_HEAD = ("You will be given a person's new bank transaction, their past transactions with the budget category they filed each under, and "
             "their categories. Select the category they would file the new transaction under.\nQUESTION: ")
@@ -70,7 +71,7 @@ TEST = TRAIN_DOC
 if ITEMS_SET:
     _s = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
     TEST = dict(items=_s["items"], users=_s.get("users", TRAIN_DOC["users"]))
-SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}"
+SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}"
 NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT}_{SFX}"
 COND = "ctx" if CTX else "noctx"
 rng = random.Random(SEED); torch.manual_seed(SEED)
@@ -146,8 +147,8 @@ def line(r):
     return f"{r['text']} | ${r['amount']:.2f} | {r['weekday']}"
 
 
-def state_text(query, shots, record):
-    return f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {s['label']}\n" for s in shots)
+def state_text(query, shots, record, lab=lambda x: x):
+    return f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {lab(s['label'])}\n" for s in shots)
 
 
 def encode(tok, names, query, shots, record=None):
@@ -159,7 +160,8 @@ def encode(tok, names, query, shots, record=None):
     if ARCH == "mbinstruct":
         assert len(names) <= len(LETTERS)
         tail = tok("CHOICES:\n" + "".join(f"- {OPT_IDS[k]}: {n}\n" for k, n in enumerate(names)) + "ANSWER: [unused0] [MASK]", add_special_tokens=False)["input_ids"]
-        head = tok(MBI_HEAD + state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(tail) - 2)]
+        lab = (lambda x: f"{OPT_IDS[names.index(x)]}: {x}") if MBI_SHOTLAB else (lambda x: x)
+        head = tok(MBI_HEAD + state_text(query, shots, record, lab), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(tail) - 2)]
         ids = [tok.cls_token_id] + head + tail + [tok.sep_token_id]
         return ids, [ids.index(tok.mask_token_id)] * len(names)
     head = tok(INSTR, add_special_tokens=False)["input_ids"]
@@ -246,7 +248,7 @@ def score(tok, model):
 
 
 if __name__ == "__main__":
-    cfg = dict(arch=ARCH, init=INIT, mbi_ids=MBI_IDS, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
+    cfg = dict(arch=ARCH, init=INIT, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()

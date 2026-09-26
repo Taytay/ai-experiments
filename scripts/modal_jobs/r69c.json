@@ -1,0 +1,36 @@
+[
+ {
+  "tag": "r69c-mbi-shotlab",
+  "env": {
+   "ARCH": "mbinstruct",
+   "MBI_SHOTLAB": "1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r69c-mbi-unused-shotlab",
+  "env": {
+   "ARCH": "mbinstruct",
+   "MBI_IDS": "unused",
+   "MBI_SHOTLAB": "1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r69c-mbi-st5000",
+  "env": {
+   "ARCH": "mbinstruct",
+   "STEPS": "5000",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
