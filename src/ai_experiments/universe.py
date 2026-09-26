@@ -486,3 +486,103 @@ def heldout_induction(species, seed=7, n=96):
             f"Following the same rule, how is he likely to label his {q['name']}?\nAnswer:"),
             options=[" " + l for l in labels], answer=vals.index(qv), query=q["name"], demos=[d["name"] for d in demos]))
     return items
+
+
+# ------------------------------------------------------------------ identifiable induction (PLAN step 20, EVAL-4)
+INDUCT2_ATTRS = ["type", "habitat", "diet", "region"]  # weakness is a bijection of type (WEAKNESS), so "group by weakness" is "group by type"
+_DISTRACT = {"type": ["habitat", "diet", "region"], "habitat": ["type", "diet", "region"], "diet": ["type", "habitat", "region"],
+             "region": ["type", "habitat", "diet"]}
+
+
+def _timmy(demos, labels, q_name):
+    demo_txt = " and ".join(f"his {d['name']} '{l}'" for d, l in zip(demos, labels))
+    return (f"Timmy labels his creature cards with his own made-up tags. He labeled {demo_txt}. "
+            f"Following the same rule, how is he likely to label his {q_name}?\nAnswer:")
+
+
+def induction_v2(species, seed=21, n_per_level=160, k=3):
+    """Label-induction items whose rule is identifiable (EVAL-4). Each of the k groups has TWO demos that share the generating
+    attribute and differ on every other attribute (type, habitat, diet, region; weakness follows type), so "group by b" is
+    inconsistent with the demos for every b other than the generating one; the query is a seen species outside the demos whose
+    value of the attribute is one of the k. The v1 items (`ladder`) use one demo per group, where any attribute on which the
+    demos differ is a consistent rule. Levels I2_<attr> (nonsense labels), and I2_type_unseen: demos for k-1 types only, k
+    options of which one never appears in the demos, and a query of a k-th type, whose answer is the unused label (the
+    unseen-label protocol of 2505.14233: the rule has to be applied, not copied)."""
+    rng = random.Random(seed)
+    seen = [s for s in species if not s["heldout"]]
+    items = []
+
+    def pair(pool, attr, v, taken):
+        """Two species with attr == v that differ on every distractor attribute and are not yet taken."""
+        cands = [s for s in pool if s[attr] == v and s["name"] not in taken]
+        rng.shuffle(cands)
+        for i, a in enumerate(cands):
+            for b in cands[i + 1:]:
+                if all(a[d] != b[d] for d in _DISTRACT[attr]):
+                    return [a, b]
+        return None
+
+    for attr in INDUCT2_ATTRS:
+        made = 0
+        while made < n_per_level:
+            vals = rng.sample(sorted({s[attr] for s in seen}), k)
+            taken, groups = set(), []
+            for v in vals:
+                p = pair(seen, attr, v, taken)
+                if p is None:
+                    break
+                groups.append(p); taken.update(s["name"] for s in p)
+            if len(groups) < k:
+                continue
+            qv = rng.choice(vals)
+            qs = [s for s in seen if s[attr] == qv and s["name"] not in taken]
+            if not qs:
+                continue
+            q = rng.choice(qs)
+            labels = rng.sample(NONSENSE, k)
+            demos = [d for g in groups for d in g]
+            lab = [labels[i] for i, g in enumerate(groups) for _ in g]
+            order = list(range(len(demos))); rng.shuffle(order)
+            demos, lab = [demos[i] for i in order], [lab[i] for i in order]
+            items.append(dict(level=f"I2_{attr}", prompt=_timmy(demos, lab, q["name"]), options=[" " + l for l in labels],
+                              answer=vals.index(qv), k=k, attr=attr, labels="nonsense", query=q["name"], demos=[d["name"] for d in demos]))
+            made += 1
+    # unseen label: k-1 demoed types, the query's type is not among them, the answer is the label no demo carries
+    made = 0
+    while made < n_per_level:
+        vals = rng.sample(TYPE_LIST, k)
+        shown, unseen_v = vals[:-1], vals[-1]
+        taken, groups = set(), []
+        for v in shown:
+            p = pair(seen, "type", v, taken)
+            if p is None:
+                break
+            groups.append(p); taken.update(s["name"] for s in p)
+        if len(groups) < k - 1:
+            continue
+        q = rng.choice([s for s in seen if s["type"] == unseen_v])
+        labels = rng.sample(NONSENSE, k)
+        demos = [d for g in groups for d in g]
+        lab = [labels[i] for i, g in enumerate(groups) for _ in g]
+        order = list(range(len(demos))); rng.shuffle(order)
+        demos, lab = [demos[i] for i in order], [lab[i] for i in order]
+        opts = list(labels); rng.shuffle(opts)
+        items.append(dict(level="I2_type_unseen", prompt=_timmy(demos, lab, q["name"]), options=[" " + l for l in opts],
+                          answer=opts.index(labels[k - 1]), k=k, attr="type", labels="nonsense", query=q["name"], demos=[d["name"] for d in demos]))
+        made += 1
+    return items
+
+
+def rule_agreement(item, species_by_name, attrs=("type", "habitat", "diet", "region")):
+    """For a v1 induction item (one demo per group): which attribute rules are consistent with the demos and what answer each
+    gives. Returns {attr: answer index or None}; an attribute whose rule labels two demos alike is inconsistent (None), one that
+    matches the query to no demo is silent (None), otherwise the index of the matched demo's label."""
+    demos = [species_by_name[n] for n in item["demos"]]
+    q = species_by_name[item["query"]]
+    out = {}
+    for a in attrs:
+        vals = [d[a] for d in demos]
+        if len(set(vals)) < len(vals):
+            out[a] = None; continue
+        out[a] = vals.index(q[a]) if q[a] in vals else None
+    return out

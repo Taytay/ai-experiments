@@ -41,6 +41,15 @@ _REPLAY_TEMPLATES = [
     ("[{l}] {t}", "[", "\n"),  # label-first; query line ends with "[" so answer follows directly
 ]
 _SUITE_TEMPLATE = ("Input: {t}\nLabel: {l}", "Input: {q}\nLabel:", "\n\n")
+# suite v2 (PLAN step 20, EVAL-5): a template no replay episode uses and symbol labels from a pool disjoint from random_label
+# (which draws syllable strings, numbers and letters): uncommon English nouns, so neither the frame nor the label source is in-distribution
+_SUITE2_TEMPLATE = ("Q: {t}\nA: {l}", "Q: {q}\nA:", "\n---\n")
+RARE_WORDS = ["gimbal", "tuffet", "quince", "ferrule", "ossuary", "spinney", "grommet", "haversack", "isthmus", "jerkin", "kestrel",
+              "lanyard", "mangrove", "nacelle", "obelisk", "parsnip", "quahog", "rivulet", "sorrel", "tumbrel", "umbel", "verdigris",
+              "wimple", "yarrow", "zither", "abacus", "bodkin", "cudgel", "dirndl", "escritoire", "flagon", "gantry", "hassock",
+              "inkwell", "jodhpurs", "kiln", "loofah", "mizzen", "newel", "oriel", "pennant", "quoin", "rowlock", "sprocket", "trivet",
+              "ulster", "valance", "windlass", "yashmak", "zarf"]
+CACHE2 = ROOT / "data" / "processed" / "icl_suite2_items.json"
 
 
 def _clean(t, n=240):
@@ -79,12 +88,14 @@ def load_group(specs, per_class=300, seed=0):
     return out
 
 
-def make_item(rng, classes, natural, template, k=None, per=None):
+def make_item(rng, classes, natural, template, k=None, per=None, label_pool=None):
     names = sorted(classes)
     k = k or rng.randint(2, min(4, len(names)))
     chosen = rng.sample(names, k)
     if natural:
         labels = list(chosen)
+    elif label_pool:
+        labels = rng.sample(label_pool, k)
     else:
         labels = []
         while len(labels) < k:
@@ -147,6 +158,25 @@ def suite_items(n_per=48, seed=13, refresh=False):
                 items.append(it)
     CACHE.parent.mkdir(exist_ok=True)
     CACHE.write_text(json.dumps(items, indent=1))
+    return items
+
+
+def suite2_items(n_per=48, seed=29, refresh=False):
+    """The out-of-distribution variant of the suite (EVAL-5): same four held-out datasets, the Q/A template with a --- separator
+    (no replay template has either) and rare-word symbol labels. Levels ICL2_symbol_<ds> / ICL2_natural_<ds>."""
+    if CACHE2.exists() and not refresh:
+        return json.loads(CACHE2.read_text())
+    data = load_group(SUITE, seed=seed)
+    rng = random.Random(seed)
+    items = []
+    for ds in sorted(data):
+        for natural in (False, True):
+            for _ in range(n_per):
+                it = make_item(rng, data[ds], natural=natural, template=_SUITE2_TEMPLATE, label_pool=None if natural else RARE_WORDS)
+                it["level"] = f"ICL2_{'natural' if natural else 'symbol'}_{ds}"
+                items.append(it)
+    CACHE2.parent.mkdir(exist_ok=True)
+    CACHE2.write_text(json.dumps(items, indent=1))
     return items
 
 

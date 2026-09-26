@@ -236,11 +236,22 @@ def evaluate(model, tok):
     if FROZEN.reverse:
         recs["noctx"] += sc.score(FROZEN.reverse, label="reverse")
         recs["ctx"] += sc.score(FROZEN.reverse, ctx=True, label="reverse+ctx")
+    if FROZEN.induction2:  # PLAN step 20 (EVAL-4): identifiable induction items, without and with the entries in context
+        recs["noctx"] += sc.score(FROZEN.induction2, label="induction2")
+        recs["ctx"] += sc.score(FROZEN.induction2, ctx=True, label="induction2+ctx")
+    if FROZEN.suite2:  # EVAL-5: the out-of-distribution suite variant and the MMLU slice
+        recs["noctx"] += sc.score(FROZEN.suite2, label="ICL suite2")
+    if FROZEN.mmlu:
+        recs["noctx"] += sc.score(FROZEN.mmlu, label="MMLU")
     noctx = aggregate(recs["noctx"])
     sym = [v for k, v in noctx.items() if k.startswith("ICL_symbol")]
     nat = [v for k, v in noctx.items() if k.startswith("ICL_natural")]
     noctx["ICL_symbol_mean"] = round(sum(sym) / len(sym), 1)
     noctx["ICL_natural_mean"] = round(sum(nat) / len(nat), 1)
+    for pre in ("ICL2_symbol", "ICL2_natural"):
+        vs = [v for k, v in noctx.items() if k.startswith(pre + "_")]
+        if vs:
+            noctx[pre + "_mean"] = round(sum(vs) / len(vs), 1)
     noctx["L7_ppl_general"] = round(perplexity(model, tok, GENERAL_TEXT), 2)
     noctx.update(wikitext_ppl(model, tok))
     ctx = aggregate(recs["ctx"])

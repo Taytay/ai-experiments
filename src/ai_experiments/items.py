@@ -57,6 +57,12 @@ KNOWN_N, KNOWN_SEED = 200, 17
 REVERSE = "reverse"
 CORPUS = "corpus_ppl"
 CORPUS_WORDS, CORPUS_SEED, CORPUS_MIN_WORDS = 3500, 23, 60
+# PLAN step 20 (EVAL-4, EVAL-5): identifiable induction items (plain universe), the out-of-distribution ICL suite variant and a
+# 5-shot MMLU slice; optional sets, loaded when their files exist, so older runs' configs are unchanged
+INDUCT2 = "induction2"
+SUITE2 = "icl_suite2"
+MMLU = "mmlu"
+MMLU_N, MMLU_SEED, MMLU_SHOTS = 200, 31, 5
 MORPH_P = 0.7  # the morphology universe's marker probability (exp_curriculum.py arms E, base_m)
 
 
@@ -104,6 +110,46 @@ def generate_known(n: int = KNOWN_N, seed: int = KNOWN_SEED) -> list[dict]:
     return _with_ids([dict(level="K_arc_easy", prompt=f"Question: {x['question']}\nAnswer:",
                            options=[" " + t for t in x["choices"]["text"]],
                            answer=x["choices"]["label"].index(x["answerKey"]), source_id=x["id"]) for x in rows[:n]])
+
+
+def generate_mmlu(n: int = MMLU_N, seed: int = MMLU_SEED, shots: int = MMLU_SHOTS) -> list[dict]:
+    """MMLU test questions with `shots` demonstrations from the same subject's dev split, in the ladder's cloze format
+    ("Question: ...\nAnswer:" and the four choice texts as options), shuffled with a seed, the first n whose question is at most
+    60 words and whose choices are at most 10 words each (about 900 tokens with five demonstrations)."""
+    import random
+    from datasets import load_dataset
+    test = list(load_dataset("cais/mmlu", "all", split="test"))
+    dev = {}
+    for x in load_dataset("cais/mmlu", "all", split="dev"):
+        dev.setdefault(x["subject"], []).append(x)
+    rng = random.Random(seed)
+    rng.shuffle(test)
+    short = lambda x: len(x["question"].split()) <= 60 and all(len(c.split()) <= 10 for c in x["choices"])  # the scorer's window: prompts are cut to maxlen - 32 tokens, so options must stay short  # noqa: E731
+    items = []
+    for i, x in enumerate([x for x in test if short(x)][:n]):
+        demos = [d for d in dev[x["subject"]] if short(d)][:shots]
+        pre = "".join(f"Question: {d['question'].strip()}\nAnswer: {d['choices'][d['answer']].strip()}\n\n" for d in demos)
+        items.append(dict(level="K_mmlu", prompt=pre + f"Question: {x['question'].strip()}\nAnswer:", options=[" " + c.strip() for c in x["choices"]],
+                          answer=int(x["answer"]), subject=x["subject"], source_index=i))
+    return _with_ids(items)
+
+
+def freeze_v2(version: str = VERSION, force: bool = False) -> None:
+    """Write induction2 (plain universe), icl_suite2 and mmlu."""
+    species = U.build(n_per_type=20, morph_p=0.0)
+    by_name = {s["name"]: s for s in species}
+    ind = _with_ids([dict(it, prompt_ctx=U.with_context(it, by_name)["prompt"]) for it in U.induction_v2(species)])
+    suite2 = _with_ids(S.suite2_items(refresh=force))
+    mmlu = generate_mmlu()
+    for name, items, extra in ((INDUCT2, ind, dict(n_species=len(species), species_sha256=sha256(species))),
+                               (SUITE2, suite2, dict(template=list(S._SUITE2_TEMPLATE), label_pool="RARE_WORDS")),
+                               (MMLU, mmlu, dict(source=f"cais/mmlu all test, {MMLU_SHOTS}-shot from dev, seed {MMLU_SEED}"))):
+        p = path(name, False, version)
+        if p.exists() and not force:
+            sys.exit(f"{p.name} exists; frozen sets are immutable. Bump VERSION for new items.")
+        doc = dict(name=name, version=version, n_items=len(items), sha256=sha256(items), **extra, items=items)
+        p.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"wrote {p.name}: {len(items)} items, sha256 {doc['sha256'][:12]}")
 
 
 def freeze_known(version: str = VERSION, force: bool = False) -> None:
@@ -209,6 +255,9 @@ class Frozen:
     known: list[dict] = field(default_factory=list)   # K_arc_easy forgetting proxy; [] if not frozen yet
     corpus: list[str] = field(default_factory=list)   # general-text perplexity paragraphs; [] if not frozen yet
     reverse: list[dict] = field(default_factory=list)  # L8_reverse_easy / _hard backward questions (plain universe); [] if not frozen
+    induction2: list[dict] = field(default_factory=list)  # I2_* identifiable induction items (plain universe, PLAN step 20); [] if not frozen
+    suite2: list[dict] = field(default_factory=list)      # ICL2_* out-of-distribution suite variant; [] if not frozen
+    mmlu: list[dict] = field(default_factory=list)        # K_mmlu 5-shot slice; [] if not frozen
     sha: dict[str, str] = field(default_factory=dict)  # set name -> sha256 of its items
 
     def config(self) -> dict:
@@ -244,9 +293,14 @@ def load_all(morph: bool, version: str = VERSION, n: int | None = None) -> Froze
     if not morph and not n and path(REVERSE, False, version).exists():
         rdoc = load(REVERSE, False, version)
         reverse, sha[REVERSE] = rdoc["items"], rdoc["sha256"]
+    extra = {}
+    for name in ((INDUCT2,) if not morph and not n else ()) + (SUITE2, MMLU):
+        if path(name, False, version).exists():
+            d = load(name, False, version)
+            extra[{INDUCT2: "induction2", SUITE2: "suite2", MMLU: "mmlu"}[name]], sha[name] = d["items"], d["sha256"]
     return Frozen(version=version, morph=morph,
                   ladder=docs["ladder"]["items"] + docs["heldout_induction"]["items"],
-                  probes=docs["probes"]["items"], suite=suite, known=known, corpus=corpus, reverse=reverse, sha=sha)
+                  probes=docs["probes"]["items"], suite=suite, known=known, corpus=corpus, reverse=reverse, sha=sha, **extra)
 
 
 def check(version: str = VERSION) -> bool:
@@ -284,6 +338,8 @@ def main(argv=None) -> None:
         freeze_corpus(force="--force" in argv)
     elif cmd == "freeze-reverse":
         freeze_reverse(force="--force" in argv)
+    elif cmd == "freeze-v2":  # PLAN step 20: induction2, icl_suite2, mmlu
+        freeze_v2(force="--force" in argv)
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":
@@ -291,7 +347,8 @@ def main(argv=None) -> None:
             f = load_all(morph)
             print(f"{'morph' if morph else 'plain'} {f.version}: {len(f.ladder)} ladder(+heldout) items, "
                   f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items, "
-                  f"{len(f.corpus)} perplexity paragraphs, {len(f.reverse)} reverse items")
+                  f"{len(f.corpus)} perplexity paragraphs, {len(f.reverse)} reverse items, {len(f.induction2)} induction2, "
+                  f"{len(f.suite2)} ICL suite2, {len(f.mmlu)} MMLU")
             for k, v in f.sha.items():
                 print(f"   {k:18s} {v}")
     else:
