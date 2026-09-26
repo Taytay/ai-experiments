@@ -1,0 +1,6 @@
+outs:
+- md5: 19e6411e557de9fd03ba6c1a66167146.dir
+  size: 301849000
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_merchant_ft_newtok_mean

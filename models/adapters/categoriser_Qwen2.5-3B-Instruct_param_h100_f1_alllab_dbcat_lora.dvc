@@ -1,0 +1,6 @@
+outs:
+- md5: 4511e33bcb8654833119c28528f680f4.dir
+  size: 490440687
+  nfiles: 6
+  hash: md5
+  path: categoriser_Qwen2.5-3B-Instruct_param_h100_f1_alllab_dbcat_lora

@@ -1,0 +1,6 @@
+outs:
+- md5: a311f2e54e4ee68d9c60615e593bcf66.dir
+  size: 46276971
+  nfiles: 10
+  hash: md5
+  path: embed_minilm_merchant_ft_newtok_warm

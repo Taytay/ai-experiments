@@ -1,8 +1,10 @@
 # models/
 
-Trained weights, versioned with DVC. Git holds only the pointer file `adapters.dvc` (a hash of
-the whole `adapters/` tree); the bytes live in the DVC remote `dstore`, a plain folder at
-`D:\repos\dvc\ai-experiments` (`/mnt/d/repos/dvc/ai-experiments` from WSL). About 3.8 GB.
+Trained weights, versioned with DVC. Git holds one pointer file per adapter,
+`adapters/<name>.dvc`; the bytes live in the DVC remote `dstore`, a plain folder at
+`D:\repos\dvc\ai-experiments` (`/mnt/d/repos/dvc/ai-experiments` from WSL). All adapters
+together are around 300 GB, so a checkout keeps only the ones it is using: pull an adapter when
+a run needs it and drop it afterwards. D: is the cold store; the local disk is a working set.
 
 The remote's path is deliberately absent from the shared `.dvc/config`, because it differs by
 OS. A fresh clone fails every `dvc` command with `config file error: expected 'url' for
@@ -18,11 +20,22 @@ result. The same instructions are in a comment in `.dvc/config` itself, and `jus
 `just dvc-remote`) runs the right line for the OS it is invoked from.
 
 ```
-uv run dvc pull                 # after a fresh clone or checkout: fetch the adapters this commit expects  (just pull)
-uv run dvc add models/adapters  # after training: re-hash the tree (autostage puts the .dvc file in git)  (just push-models
-uv run dvc push                 # copy new blobs to D:; then commit the .dvc file                            does both)
-uv run dvc status -c            # anything local that is not on the remote?
+just pull NAME [NAME...]    # fetch adapters from D:     (uv run dvc pull models/adapters/NAME)
+just push-models            # after training: dvc add each adapter dir present, then dvc push;
+                            #   autostage puts the new .dvc files in git, then commit them
+just drop-all               # push, then delete local adapter dirs and .dvc/cache to free disk
+just pull-all               # everything this commit tracks (hundreds of GB; rarely wanted)
+uv run dvc status -c        # anything local that is not on the remote?
 ```
+
+`.dvc/config` sets `cache.type = hardlink,copy`, so a pulled adapter is stored once on disk
+(cache and `models/adapters/` share the bytes). Hardlinked files are read-only: write a new
+adapter directory rather than editing files in an existing one. Deleting only the adapter
+directory does not free space while `.dvc/cache` still holds the blobs; `just drop-all` removes
+both.
+
+Before this layout, a single `models/adapters.dvc` tracked the whole tree. Older commits still
+have it; `uv run dvc pull` on one of those fetches that commit's full tree.
 
 Contents of `adapters/`:
 

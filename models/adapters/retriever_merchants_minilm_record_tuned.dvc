@@ -1,0 +1,6 @@
+outs:
+- md5: 9ffa59f6118d0ae5eaf03934c3e8ba0f.dir
+  size: 46175013
+  nfiles: 11
+  hash: md5
+  path: retriever_merchants_minilm_record_tuned

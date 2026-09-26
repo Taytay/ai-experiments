@@ -1,0 +1,6 @@
+outs:
+- md5: 149f0b9830cb4e19a12c5ccba3332d92.dir
+  size: 301642300
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_kge_pairs_control

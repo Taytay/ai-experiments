@@ -55,7 +55,8 @@ On a fresh machine, run the bootstrap for your OS once: `./bootstrap.sh` on WSL/
 can skip it and use the recipes directly.
 
 ```
-just setup                                  # once per checkout: uv sync, DVC remote for this OS, dvc pull (3.8 GB)
+just setup                                  # once per checkout: uv sync, DVC remote for this OS
+just pull NAME                              # fetch one adapter from D: when a run needs it
 just doctor                                 # check machine and checkout; --gpu adds the VRAM-spill test
 just smoke                                  # plumbing check: arm C, 2 training steps, tiny eval; not recorded in the tracker
 uv run python scripts/exp_curriculum.py C   # ARM [model] [steps] [lr]
@@ -63,8 +64,9 @@ uv run evals leaderboard                    # regenerate evals/LEADERBOARD.md
 just                                        # list every recipe
 ```
 
-Without `just`, setup is three commands: `uv sync`; the one `uv run dvc remote modify --local`
-line for your OS from the comment in `.dvc/config`; `uv run dvc pull`.
+Without `just`, setup is two commands: `uv sync`; the one `uv run dvc remote modify --local`
+line for your OS from the comment in `.dvc/config`. Then `uv run dvc pull models/adapters/NAME`
+for each adapter you need.
 
 Large files are not in git. The DVC remote is a plain folder on the D: drive, one folder per
 repo under `D:\repos\dvc\`; from WSL the same folder is `/mnt/d/repos/dvc/ai-experiments`. The

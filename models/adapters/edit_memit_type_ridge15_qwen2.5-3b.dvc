@@ -1,0 +1,6 @@
+outs:
+- md5: 1bc040dc75be07808cee5440a3112139.dir
+  size: 6183354083
+  nfiles: 6
+  hash: md5
+  path: edit_memit_type_ridge15_qwen2.5-3b
