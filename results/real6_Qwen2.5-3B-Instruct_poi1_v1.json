@@ -1,0 +1,185 @@
+{
+  "noctx": {
+    "R6_all": 42.7,
+    "R6_all_n": 2053,
+    "R6_all_ci": [
+      40.4,
+      44.8
+    ],
+    "R6_all_null": [
+      4.9,
+      7.0
+    ],
+    "R6_all_uci": [
+      40.6,
+      45.0
+    ],
+    "R6_all_chance": 6.4,
+    "R6_all_new": 12.4,
+    "R6_all_new_n": 498,
+    "R6_all_new_ci": [
+      9.8,
+      15.5
+    ],
+    "R6_all_new_null": [
+      4.0,
+      7.8
+    ],
+    "R6_all_new_uci": [
+      9.8,
+      15.2
+    ],
+    "R6_all_new_chance": 6.3,
+    "R6_all_renamed": 52.0,
+    "R6_all_renamed_n": 477,
+    "R6_all_renamed_ci": [
+      47.8,
+      56.6
+    ],
+    "R6_all_renamed_null": [
+      5.0,
+      9.4
+    ],
+    "R6_all_renamed_uci": [
+      47.3,
+      57.1
+    ],
+    "R6_all_renamed_chance": 6.5,
+    "R6_all_standard": 52.6,
+    "R6_all_standard_n": 1078,
+    "R6_all_standard_ci": [
+      49.6,
+      55.7
+    ],
+    "R6_all_standard_null": [
+      4.8,
+      7.7
+    ],
+    "R6_all_standard_uci": [
+      49.5,
+      55.7
+    ],
+    "R6_all_standard_chance": 6.4,
+    "R6_seen_all": 47.0,
+    "R6_seen_all_n": 1200,
+    "R6_seen_all_ci": [
+      44.2,
+      49.8
+    ],
+    "R6_seen_all_null": [
+      4.6,
+      7.2
+    ],
+    "R6_seen_all_uci": [
+      44.2,
+      50.1
+    ],
+    "R6_seen_all_chance": 6.4,
+    "R6_seen_new": 18.6,
+    "R6_seen_new_n": 291,
+    "R6_seen_new_ci": [
+      14.1,
+      23.0
+    ],
+    "R6_seen_new_null": [
+      3.1,
+      8.2
+    ],
+    "R6_seen_new_uci": [
+      14.7,
+      23.0
+    ],
+    "R6_seen_new_chance": 6.3,
+    "R6_seen_renamed": 56.4,
+    "R6_seen_renamed_n": 280,
+    "R6_seen_renamed_ci": [
+      50.7,
+      62.5
+    ],
+    "R6_seen_renamed_null": [
+      4.6,
+      10.4
+    ],
+    "R6_seen_renamed_uci": [
+      50.5,
+      62.1
+    ],
+    "R6_seen_renamed_chance": 6.4,
+    "R6_seen_standard": 56.0,
+    "R6_seen_standard_n": 629,
+    "R6_seen_standard_ci": [
+      51.8,
+      59.8
+    ],
+    "R6_seen_standard_null": [
+      4.5,
+      7.9
+    ],
+    "R6_seen_standard_uci": [
+      51.7,
+      60.2
+    ],
+    "R6_seen_standard_chance": 6.4,
+    "R6_unseen_all": 36.7,
+    "R6_unseen_all_n": 853,
+    "R6_unseen_all_ci": [
+      33.2,
+      40.0
+    ],
+    "R6_unseen_all_null": [
+      4.5,
+      7.7
+    ],
+    "R6_unseen_all_uci": [
+      33.3,
+      39.8
+    ],
+    "R6_unseen_all_chance": 6.4,
+    "R6_unseen_new": 3.9,
+    "R6_unseen_new_n": 207,
+    "R6_unseen_new_ci": [
+      1.4,
+      6.8
+    ],
+    "R6_unseen_new_null": [
+      2.9,
+      9.2
+    ],
+    "R6_unseen_new_uci": [
+      1.5,
+      6.8
+    ],
+    "R6_unseen_new_chance": 6.3,
+    "R6_unseen_renamed": 45.7,
+    "R6_unseen_renamed_n": 197,
+    "R6_unseen_renamed_ci": [
+      39.1,
+      52.8
+    ],
+    "R6_unseen_renamed_null": [
+      3.6,
+      10.7
+    ],
+    "R6_unseen_renamed_uci": [
+      38.7,
+      53.1
+    ],
+    "R6_unseen_renamed_chance": 6.5,
+    "R6_unseen_standard": 47.9,
+    "R6_unseen_standard_n": 449,
+    "R6_unseen_standard_ci": [
+      43.4,
+      52.6
+    ],
+    "R6_unseen_standard_null": [
+      4.5,
+      8.7
+    ],
+    "R6_unseen_standard_uci": [
+      43.0,
+      52.8
+    ],
+    "R6_unseen_standard_chance": 6.4,
+    "minutes": 6.2
+  }
+}

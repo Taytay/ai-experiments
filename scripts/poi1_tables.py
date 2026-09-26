@@ -14,6 +14,8 @@ import json
 import sys
 from pathlib import Path
 
+import warnings
+
 import numpy as np
 
 from ai_experiments import real6_cells as RC
@@ -34,7 +36,8 @@ READERS = [("Qwen2.5-3B-Instruct, untrained", f"real6_Qwen2.5-3B-Instruct_{SET}.
            ("3B trained on POI-1, 800 steps", f"{CAT}_{SET}_none_h100bf16_f0_alllab_lora_{SET}.noctx.jsonl"),
            ("3B trained on POI-1, 800 steps + rename", f"{CAT}_{SET}_none_h100bf16_f0_ren50_alllab_lora_{SET}.noctx.jsonl")]
 HEAD = ("| reader | n | top-1 [interval] | top-3 | MRR | bits left | auto-file at 98%: coverage (precision) | usage prior top-1 / top-3 | "
-        "kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 |")
+        "kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 | "
+        "kind lookup, else the model: top-1 (the model's top-1 where the lookup has nothing) |")
 
 
 def load():
@@ -46,28 +49,32 @@ def card(recs, items, users, fold0):
     sc = S.scorecard(recs, items, users=users, fold_of=(lambda u: (u // 4) % 4) if fold0 else None)
     best = max(sc["prior_top1"], sc["kind_cascade_top1"])
     sc["skill_kind"] = 100 * (sc["top1"] - best) / (100 - best)
+    per = sc["_per_item"]
+    sc["hybrid_top1"] = 100 * np.mean([p["kind_ok"] if p["kind_has"] else p["top1"] for p in per.values()])
+    sc["model_on_rest"] = 100 * np.mean([p["top1"] for p in per.values() if not p["kind_has"]])
     return sc
 
 
 def row(label, sc):
     return (f"| {label} | {sc['n']} | {sc['top1']:.1f} [{sc['top1_ci'][0]}, {sc['top1_ci'][1]}] | {sc['top3']:.1f} | {sc['mrr']:.2f} | {sc['bits']:.2f} | "
             f"{sc['cov98']:.1f} ({sc['prec98']:.1f}) | {sc['prior_top1']:.1f} / {sc['prior_top3']:.1f} | {sc['kind_share']:.0f}%, {sc['kind_top1']:.1f} | "
-            f"{sc['kind_cascade_top1']:.1f} | {sc['skill_kind']:.0f} / {sc['skill_top3']:.0f} |")
+            f"{sc['kind_cascade_top1']:.1f} | {sc['skill_kind']:.0f} / {sc['skill_top3']:.0f} | {sc['hybrid_top1']:.1f} ({sc['model_on_rest']:.1f}) |")
 
 
 def table(title, items, users, only_fold0):
-    print(title + "\n"); print(HEAD); print("|" + "---|" * 11)
+    print(title + "\n"); print(HEAD); print("|" + "---|" * 12)
     out = {}
     for label, pat in READERS:
         recs = RC.load_recs(pat)
         recs = {i: r for i, r in recs.items() if not only_fold0 or items[i]["user"] % 4 == 0}
-        if not recs:
+        if not recs or (not only_fold0 and len({items[i]["user"] % 4 for i in recs}) < 4):
             continue
         out[label] = card(recs, items, users, only_fold0); print(row(label, out[label]))
     return out
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore", category=RuntimeWarning)  # empty cells print as nan
     items, users = load()
     table("**Table P.1: POI-1, fold 0's held-out users (50 users): the scorecard (temperature and auto-file thresholds fitted leave-users-out "
           "within the fold's users, grouped by (id // 4) mod 4; kind lookup = the user's label for another place of the same Overture basic category)**",
