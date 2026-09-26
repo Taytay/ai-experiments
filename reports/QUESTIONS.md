@@ -655,6 +655,7 @@ function that builds the image from `uv.lock`, mounts `hf_cache` and the frozen 
 `exp_curriculum.py` / `exp_encoder.py`, and syncs results and adapters back (DVC). Tinker ($20 to $40) is
 worth trying once TRAIN-8 has a local number: its shipped on-policy distillation recipe is the independent
 check, and frontier-size trace generation for REAL-5 costs a few dollars there.
+**Status (2026-09-26):** answered, PLAN step 34, REPORT.md 54. `scripts/modal_app.py` runs the repository's scripts unchanged on an H100 in the owner's workspace from an image built from `uv.lock`; the same run agrees with the 3090 within run-to-run noise (80.1 vs 80.4, 87% of predictions shared) and trains 6x faster with one 16-sequence pass per step; under $1 per train-and-score job, parallel job lists (rows 57, 58: sixteen jobs in about twenty minutes). All GPU work runs there from 2026-09-25. The species-universe long runs this entry was written for were not run.
 
 ## Added 2026-09-19: hardening the REAL-5 result before the cloud runs
 
@@ -943,6 +944,7 @@ users, 81.6 overall on held-out ones). *Experiment:* on row 42's held-out folds,
 bf16, one 16-sequence pass per step, 200 steps): no DB (all-label), database episodes (all-label, `DBEP=0.5`), the record in the
 prompt (plain SFT, products only), and the record in the prompt stating the category (`REC_CAT`, `real6.category_record`, in
 training and at test); the corrected groups of REPORT.md 48, the DB-only merchants split into known chains and opaque ones.
+**Status (2026-09-26):** answered, PLAN step 58, REPORT.md 55. They tie: on held-out users (H100, bf16) database episodes with no record at test read 87.8 [84.1, 91.0], DB-only 93.4 (opaque 94.1); the record in the prompt with the category 86.6 [82.5, 90.4], DB-only 91.8 (opaque 92.2); paired +1.2 [-2.7, 5.0] and +1.6 [-3.5, 6.5]. The category field adds little to the record (+1.6 overall). The episodes' edge on coined names (+9.2) is the all-label loss's. Next: the capacity of episodes (REAL-17) and the two combined.
 
 **REAL-17 (O) How many merchants can database episodes hold?**
 Row 57's database has 240 merchants; a production one has millions, and section 29 found interference once a rank-64 adapter
