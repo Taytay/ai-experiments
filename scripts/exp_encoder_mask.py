@@ -43,7 +43,7 @@ from ai_experiments.real6_eval import summarize, write_recs
 
 ARCH = os.environ.get("ARCH", "mask"); assert ARCH in ("mask", "gliclass", "mbinstruct")
 INIT = os.environ.get("INIT", {"mask": "mbert", "gliclass": "large", "mbinstruct": "instruct"}[ARCH])
-assert INIT in {"mask": ("mbert", "laya"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
+assert INIT in {"mask": ("mbert", "laya", "hops"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
 SMOKE = bool(os.environ.get("SMOKE"))
 STEPS = 3 if SMOKE else int(os.environ.get("STEPS", "1500"))
 BATCH, LR, HEAD_LR = int(os.environ.get("BATCH", "16")), float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
