@@ -4213,3 +4213,126 @@ Open:
 - calibration objectives (soft targets, a bounded proper score beside the log score, temperature by option count), measured by bits,
   ECE and coverage at a realised 98%;
 - pre-training the layout on general multiple-choice data before our task.
+
+
+## 63. GLiClass and ModernBERT-Instruct through the same training: GLiClass-large works as well as Laya's layout (57 without the record, 74 with it, 58 on POI-1), and with the record it has the steadiest confidence of any encoder; ModernBERT-Instruct's single mask works with the record (73.5) but learns slowly without it (29 at 1,500 steps, 42 at 5,000), and its letters show position bias (MODEL-10)
+
+PLAN step 69, on the owner's request to make GLiNER-type models and ModernBERT-Instruct work (2026-09-26). Both had failed here
+before for reasons unrelated to their families:
+
+- section 46's GLiClass was the 151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the
+  rows;
+- section 29's ModernBERT was plain ModernBERT-large taught letters in 800 steps, never the instruction-tuned checkpoint.
+
+Here both go through row 53's data, loop and scorer (`scripts/exp_encoder_mask.py`, `ARCH=gliclass|mbinstruct`): 1,500 steps of 16
+episodes, the 24 shots as plain "statement -> category" lines on every episode, options shuffled, fold 0's users held out,
+cross-entropy over the options only.
+
+- **GLiClass modern-large v3.0.** The input is `<<LABEL>>name` per category, `<<SEP>>`, then the state. GLiClass's own label-token
+  pooling and scorer give one logit per label; padded label slots are masked, which GLiClass does not do itself.
+- **ModernBERT-Large-Instruct.** The model card's template, `QUESTION: <state> CHOICES: - A: name ... ANSWER: [unused0] [MASK]`,
+  with the MLM head at the mask read over the options' IDs only.
+- **Option IDs.** Letters carry prior meaning and a position preference (option-ID selection bias, Zheng et al. ICLR 2024;
+  multiple-choice symbol binding, Robinson and Wingate ICLR 2023; the owner raised the same concern). One arm names the options
+  `[unused1]`, `[unused2]`, ... instead: tokens with no prior meaning, learned in fine-tuning only.
+- **Two follow-ups for ModernBERT-Instruct's weak no-record result:**
+  - `MBI_SHOTLAB=1` writes each shot's label with its ID ("-> H: Grendo"), a test of whether binding the label to its ID is the
+    obstacle;
+  - 5,000 steps, a test of plain under-training.
+
+Following the owner's steer that the 98% auto-file point is arbitrary, the tables now read confidence along the whole coverage
+curve (precision on the most confident 25 / 50 / 75% of items, and AURC, the mean error over all coverages; lower is better). They
+also add position bias: the total variation between where a model's picks sit in the option list and where the gold answers sit.
+
+Jobs `scripts/modal_jobs/r69*.json`; tables `scripts/encmask_tables.py`.
+
+**Table 63.1: REAL-6, fold 0's held-out users (5 users; calibration leave-users-out within them): the encoder against the 3B; top-1 by corrected group on the right**
+
+| reader | n | top-1 [interval] | top-3 | bits left | precision at 25 / 50 / 75% coverage | AURC | position bias | ms per item, batched / one at a time | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| encoder: Laya checkpoint, untrained | 298 | 9.1 [4.8, 12.8] | 25.8 | 3.83 | 11 / 7 / 9 | 0.888 | 0.65 | 14 / 20 | 13 | 14 | 7 | 0 |
+| encoder: ModernBERT-large, 1,500 steps | 298 | 53.4 [43.1, 63.5] | 72.5 | 2.34 | 85 / 79 / 65 | 0.219 | 0.14 | 10 / 17 | 69 | 50 | 42 | 45 |
+| encoder: Laya init, 1,500 steps | 298 | 59.4 [50.7, 66.1] | 73.2 | 2.21 | 92 / 81 / 70 | 0.190 | 0.15 | 10 / 17 | 72 | 47 | 54 | 48 |
+| encoder: Laya init, 4,000 steps | 298 | 59.1 [50.8, 65.2] | 74.2 | 2.19 | 85 / 80 / 73 | 0.222 | 0.14 | 9 / 16 | 69 | 50 | 56 | 45 |
+| GLiClass large, untrained | 298 | 7.7 [2.9, 12.7] | 28.2 | 3.87 | 12 / 10 / 10 | 0.888 | 0.66 | 13 / 27 | 6 | 6 | 10 | 10 |
+| GLiClass large, 1,500 steps | 298 | 56.7 [45.5, 66.5] | 72.1 | 2.22 | 92 / 85 / 69 | 0.189 | 0.16 | 8 / 20 | 67 | 47 | 53 | 45 |
+| ModernBERT-Instruct, letters, untrained | 298 | 10.4 [4.0, 15.8] | 27.9 | 3.82 | 16 / 10 / 10 | 0.880 | 0.81 | 11 / 14 | 12 | 8 | 11 | 3 |
+| ModernBERT-Instruct, letters, 1,500 steps | 298 | 28.9 [23.8, 32.9] | 43.6 | 3.33 | 58 / 46 / 35 | 0.483 | 0.27 | 9 / 16 | 50 | 19 | 20 | 0 |
+| ModernBERT-Instruct, unused-token IDs, 1,500 steps | 298 | 13.8 [6.9, 19.0] | 30.5 | 3.73 | 32 / 21 / 17 | 0.724 | 0.65 | 9 / 19 | 27 | 8 | 7 | 3 |
+| ModernBERT-Instruct, letters, shot labels carry the letter | 298 | 27.2 [22.1, 30.8] | 43.0 | 3.36 | 57 / 44 / 34 | 0.493 | 0.32 | 9 / 16 | 48 | 22 | 18 | 0 |
+| ModernBERT-Instruct, unused IDs, shot labels carry the ID | 298 | 19.1 [14.6, 23.9] | 39.3 | 3.75 | 35 / 26 / 21 | 0.713 | 0.45 | 8 / 18 | 36 | 6 | 14 | 0 |
+| ModernBERT-Instruct, letters, 5,000 steps | 298 | 41.9 [36.3, 48.3] | 58.7 | 2.83 | 74 / 65 / 51 | 0.356 | 0.20 | 10 / 18 | 63 | 31 | 35 | 3 |
+| 3B SFT no DB, all-label (H100 bf16) | 298 | 74.2 [63.8, 80.3] | 87.6 | 1.46 | 91 / 93 / 85 | 0.142 | 0.13 | - | 77 | 61 | 81 | 52 |
+| 3B database episodes (H100 bf16) | 298 | 88.3 [80.7, 94.8] | 96.3 | 0.69 | 93 / 96 / 95 | 0.073 | 0.07 | - | 91 | 75 | 97 | 59 |
+| encoder + record: ModernBERT-large | 298 | 75.2 [69.0, 82.3] | 90.3 | 1.30 | 99 / 90 / 88 | 0.092 | 0.09 | 10 / 22 | 78 | 83 | 72 | 66 |
+| encoder + record: Laya init | 298 | 76.5 [70.1, 83.7] | 95.0 | 1.25 | 93 / 88 / 87 | 0.102 | 0.11 | 9 / 17 | 81 | 78 | 76 | 59 |
+| GLiClass large + record | 298 | 74.2 [69.8, 82.3] | 85.2 | 1.26 | 100 / 97 / 90 | 0.062 | 0.13 | 6 / 14 | 75 | 78 | 73 | 66 |
+| ModernBERT-Instruct + record | 298 | 73.5 [68.9, 79.8] | 90.6 | 1.27 | 95 / 94 / 87 | 0.087 | 0.13 | 12 / 19 | 76 | 78 | 72 | 62 |
+| 3B + record in the prompt (H100 bf16) | 298 | 82.9 [76.8, 90.1] | 96.0 | 0.77 | 96 / 97 / 94 | 0.060 | 0.12 | - | 86 | 81 | 92 | 45 |
+| 3B + record with category (H100 bf16) | 298 | 85.2 [77.9, 92.2] | 97.0 | 0.61 | 99 / 99 / 97 | 0.031 | 0.12 | - | 88 | 72 | 98 | 34 |
+
+**Table 63.2: POI-1, fold 0's held-out users (50 users), readers trained on POI-1's other users**
+
+| reader | n | top-1 [interval] | top-3 | bits left | precision at 25 / 50 / 75% coverage | AURC | position bias | ms per item, batched / one at a time |
+|---|---|---|---|---|---|---|---|---|
+| encoder: ModernBERT-large, 1,500 steps | 507 | 57.6 [53.4, 61.9] | 81.1 | 1.97 | 91 / 81 / 68 | 0.210 | 0.10 | 7 / 36 |
+| encoder: Laya init, 1,500 steps | 507 | 57.0 [52.4, 62.5] | 79.7 | 1.99 | 94 / 80 / 70 | 0.195 | 0.06 | 7 / 40 |
+| GLiClass large, 1,500 steps | 507 | 58.4 [54.7, 62.5] | 79.9 | 1.96 | 90 / 79 / 71 | 0.194 | 0.09 | 6 / 26 |
+| 3B, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 2.12 | 93 / 78 / 69 | 0.194 | 0.10 | - |
+| 3B, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 2.27 | 89 / 79 / 66 | 0.227 | 0.08 | - |
+| 3B, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 1.94 | 98 / 83 / 72 | 0.172 | 0.08 | - |
+
+### 63.1 What makes an encoder work here
+
+**Every encoder is useless untrained** (GLiClass 7.7, ModernBERT-Instruct 10.4, Laya 9.1). The task, filing into one person's own
+categories from their examples, is not in any of their training mixtures.
+
+**Trained the same way, GLiClass-large and Laya's layout are equivalent.**
+
+- Without the record: 56.7 and 59.4.
+- With the record: 74.2 and 76.5.
+- On POI-1: 58.4 and 57.0.
+
+Both put a scored position next to each option's name. GLiClass's confidence is the steadiest of the encoders with the record:
+100% precision on its most confident quarter, 97% on half, AURC 0.062, level with the 3B plus record (0.060).
+
+So the earlier GLiClass failure (section 46) was the training, not the family: the base model, a fifth of the episodes, and shots
+on half of them in a format the checkpoint had no token for.
+
+**ModernBERT-Instruct's single mask works when the answer is a meaning match.** With the record it reads 73.5, with the best
+encoder top-3 (90.6). Without the record it reaches 28.9 at 1,500 steps and 41.9 at 5,000, still climbing, far below the
+per-option designs at 1,500 steps.
+
+The binding hypothesis is rejected: labelling the shots with their letter changes nothing (27.2). The reading that fits is where
+the decision is made. The per-option designs give every category its own position, which can attend to that category's name
+and to the shots filed under it. The single mask must find the similar shot, carry its label, and map it to a letter, all
+through one position and the vocabulary head. With the record, the record-to-name match is a direct semantic comparison, which
+the instruction tuning already does.
+
+**Letters do carry bias; unused IDs are worse.**
+
+- ModernBERT-Instruct with letters has the highest position bias among the trained encoders (0.27 to 0.32, against 0.14 to 0.16
+  for the per-option designs).
+- Unused-token IDs, which carry no prior, fail (13.8, bias 0.65). 1,500 steps do not teach 26 fresh embeddings to act as pointers,
+  so the model falls back on position.
+
+The per-option designs avoid the question: no ID is ever predicted.
+
+### 63.2 What the step says
+
+The best encoder design for this task scores each option at its own position: Laya's layout or GLiClass, either one.
+
+- **On POI-1** both match the 3B decoder (57 to 58 against 55 to 59) at 6 to 10 ms per item batched.
+- **On REAL-6** the gap to the 3B stays where section 62 put it, merchant knowledge (the "determined by category" group: 53 to 56
+  against 81 to 97). With the record the encoders reach 74 to 77 against 85.
+
+**Hypotheses for the remaining gap:**
+
+- **Merchant facts.** Database episodes, which lifted the 3B from 74 to 88 on fold 0, would do the same for an encoder. Test: the
+  encoder with the 3B's database episodes.
+- **Model size.** A larger per-option encoder (GLiClass-large is 400M; no larger modern encoder is public) or distillation from
+  the 3B's distributions (soft targets, row 68) closes part of it.
+- **ModernBERT-Instruct's single mask** reaches the per-option designs only with far more training; it is not the design to
+  pursue.
+
+Models `models/adapters/enc{gli,mbi}_*` (DVC).

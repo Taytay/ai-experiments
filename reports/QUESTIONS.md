@@ -1062,3 +1062,9 @@ modern-large v3.0 (its label-token pooling and scorer) and ModernBERT-Large-Inst
 the MLM head over the options' IDs) through the same data, loop and scorer; for ModernBERT-Instruct, letter IDs against unused
 tokens with no prior meaning, since option IDs carry selection bias (Zheng et al. ICLR 2024; Robinson and Wingate ICLR 2023 on
 multiple-choice symbol binding). The question is whether the family matters once the training matches.
+
+**Status (2026-09-26):** MODEL-10 done, PLAN step 69, REPORT.md 63. Trained like row 53, GLiClass-large equals Laya's layout; ModernBERT-Instruct's single mask works with the record but needs far more training without it; letter IDs carry position bias and unused-token IDs fail at 1,500 steps.
+
+**MODEL-11 Does a larger fine-tuned decoder close the gap to each set's ceiling?** Every trained categoriser so far is the 3B. REAL-6's
+ceiling is about 94 (section 48; the split categories are a coin flip); POI-1's is bracketed by blind Opus (56) and the kind-lookup
+hybrid (80). *Experiment (row 70):* the three best 3B recipes at 7B and 14B, fold 0 first.
