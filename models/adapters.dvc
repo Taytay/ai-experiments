@@ -1,6 +1,6 @@
 outs:
-- md5: 174c01c470b096b2e570f69b2377d75a.dir
-  size: 5935126277
-  nfiles: 49
+- md5: 1ea112d2784b2da1d209211302b9c6f5.dir
+  size: 6414137829
+  nfiles: 52
   hash: md5
   path: adapters

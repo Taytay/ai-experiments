@@ -790,3 +790,65 @@ Knowledge text alone costs the most: arm A adds 1.40 nats per token and takes th
 The corpus number exists only for the final adapters: no mid-training checkpoints were saved, so the TRAIN-3 perplexity curve is still open and arrives with step 25, whose run reports `L7_ppl_wikitext` at every periodic point. Step 10 (three seeds) will show whether the 0.03 to 0.13 nat run-to-run spread measured here on two pairs holds. The paired standard error of about 0.02 to 0.03 nats between adapters of one base sets what a "no cost" claim can mean from now on: an arm that matches C within 0.05 nats is at C's cost.
 
 **What the report should say.** The one-paragraph perplexity is retired: on a frozen 4,972-token WikiText-2 slice, two runs of arm C agree to 0.03 nats where the paragraph put them at 14.9 and 30.3. Every knowledge-injecting arm costs general-text likelihood, from 0.8 nats per token with ICL replay in the mix (C, D, E, perplexity 10.6 to 23) to 1.4 without episodes or replay (A, to 38); episodes alone cost 0.37 and distillation 0.09. The replay stream's own contribution is 0.22 nats (Cn to C); the rest of C's advantage over A is seeing fewer knowledge sequences.
+## 17. General-text replay keeps the language model and ARC-Easy, and takes it out of induction (TRAIN-7)
+
+Date: 2026-09-15. Code: `PERIODIC=200 uv run python scripts/exp_curriculum.py Cg`, stream `icl_suite.general_replay_texts`; data `results/curriculum_Qwen2.5-3B_Cg_p200.json`, per-item `results/per_item/curriculum_Qwen2.5-3B_Cg_p200.*.jsonl`, curves `reports/curves_Qwen2.5-3B.md`, adapter `models/adapters/curriculum_Qwen2.5-3B_Cg_p200_lora`; tracker `curriculum_v2`, arm Cg; PLAN.md step 25.
+
+Section 15.3 found every arm losing 11 to 16 ARC-Easy points in its first 200 steps whether or not it replayed ICL episodes, and section 16 put the same loss in nats: 0.8 to 1.4 per token of general text. Replay protected what was replayed and nothing else. TRAIN-7 asks whether replaying general text protects general knowledge the same way. Arm Cg is arm C with 5% of its sequences turned into pretraining-style text: paragraphs of the WikiText-2 *train* split (the perplexity slice of section 16 is from the test split, so the two never meet), detokenised, cut to 70 words, about 95 tokens each, trained with the full-sequence loss like the knowledge texts. The 5% came out of the episode stream (episodes .40 to .35; knowledge .45 and ICL replay .15 unchanged), same seed, learning rate and 800 steps, scored every 200 steps on the section 15 subsample. Because knowledge texts are 24 tokens long and general paragraphs 95, five percent of sequences is a quarter of the loss:
+
+**Table 17.1: what each stream is, by sequences and by loss-bearing tokens (arm Cg, 12,800 sequences; arm C from section 8.1 in brackets)**
+
+| stream | sequences | tokens seen | loss-bearing tokens | share of the loss |
+|---|---|---|---|---|
+| K knowledge texts | 5,843 (45.6%) | 147,582 | 141,739 | 62.5% [84%] |
+| E episodes | 4,394 (34.3%) | 600,720 | 17,058 | 7.5% [12%] |
+| R ICL replay | 1,920 (15.0%) | 406,134 | 7,132 | 3.1% [4%] |
+| G general text | 643 (5.0%) | 61,499 | 60,856 | 26.8% |
+
+Training took 29 minutes at 691 tokens per second (8.7 GiB). The per-stream counts are new in the results (`tok_*`, `lb_*`), for step 9.
+
+**Table 17.2: curves, arm C (section 15 rerun) / arm Cg (accuracy %; ppl is the section 16 slice)**
+
+| step | recall, trained fmt | Timmy k=3 | ICL suite symbol | ARC-Easy (K) | WikiText ppl |
+|---|---|---|---|---|---|
+| 0 (base) | 12.5 / 12.5 | 42.5 / 42.5 | 63.5 / 63.5 | 73.5 / 73.5 | 10.61 / 10.61 |
+| 200 | 10.0 / 30.0 | 47.5 / 22.5 | 66.7 / 69.8 | 62.5 / **66.5** | . / 11.50 |
+| 400 | 92.5 / 97.5 | 35.0 / 27.5 | 65.6 / 77.1 | 52.5 / **69.0** | . / 11.83 |
+| 600 | 100 / 100 | 45.0 / 47.5 | 72.9 / 80.2 | 56.0 / **67.5** | . / 11.47 |
+| 800, all items | 100 / 100 | 61.2 / **47.5** | 78.1 / 81.2 | 59.0 / **71.0** | 22.80 / **11.60** |
+
+**Table 17.3: final evaluation, Cg beside C, with the paired difference on the same items (bootstrap 95% CI, McNemar p)**
+
+| level | C (15) | Cg | Cg minus C | | Cg minus base |
+|---|---|---|---|---|---|
+| recall, trained format | 100 | 100 | 0 | | |
+| recall, bare format | 19.4 | 18.8 | -0.6 [-3.8, 2.5], p = 1 | | |
+| yes/no | 77.5 | 73.8 | -3.8 [-16, 10], p = 0.72 | | +31.2, p = 0.002 |
+| pair | 80.0 | 58.8 | **-21.2 [-36, -6], p = 0.014** | | +7.5, p = 0.55 |
+| Timmy k=3 | 61.2 | 47.5 | **-13.8 [-22.5, -4.4], p = 0.004** | | +10.6, p = 0.03 |
+| k=4 | 53.8 | 46.9 | -6.9 [-15.6, 1.9], p = 0.15 | | |
+| weakness | 60.0 | 50.0 | **-10.0 [-18.1, -2.5], p = 0.023** | | +18.1, p = 0.001 |
+| habitat | 29.4 | 31.9 | +2.5 [-5.6, 10], p = 0.63 | | |
+| held-out species | 29.2 | 30.2 | +1.0 [-7.3, 9.4] | | |
+| ICL suite symbol | 78.1 | 81.2 | +3.1 [-2.1, 8.3], p = 0.35 | | +20.8, p = 1e-6 |
+| ICL suite natural | 87.5 | 89.1 | +1.6 [-2.6, 5.7] | | +4.7, p = 0.06 |
+| ARC-Easy | 59.0 | 71.0 | **+12.0 [6.5, 17.5], p = 4e-5** | | -2.5 (base 73.5, no per-item file) |
+| WikiText ppl | 22.80 | 11.60 | -0.75 nats | | +0.09 nats |
+
+### 17.1 The language model stays where it was
+
+Arm Cg's perplexity on the section 16 slice is 11.50 at step 200, 11.83, 11.47, 11.60 at the end: 0.09 nats per token above the base model, where arm C's rerun ends 0.84 above it and every section 16 arm with a knowledge stream is between 0.8 and 1.4. The curve is flat from the first checkpoint, so the cost that every other arm pays in its first 200 steps (section 15.3, 16.2) is not paid here at all. A quarter of the loss on 643 WikiText paragraphs holds a 3B model's general-text likelihood at base level while 141,739 tokens of knowledge text are written into the same adapter.
+
+### 17.2 ARC-Easy holds, and the facts arrive no slower
+
+ARC-Easy is 66.5 at step 200 where C read 62.5, A 62.0 and D 57.5; it ends at 71.0 against C's 59.0 on the same 200 items (+12.0, CI [6.5, 17.5], p = 4e-5) and 2.5 points under the base model's 73.5, inside the level's half-width. Against arm A on the same items it is +5.0 [0.5, 9.5]. So section 15.3's rule holds with the sign it predicted: replay protects what is replayed, and general text is what ARC-Easy needs. Recall in the trained format is 30.0 at step 200 (C: 10.0), 97.5 at 400 (C: 92.5) and 100 from step 600; the knowledge stream lost no sequences to the general text and the facts land at least as early. The ICL suite is the best of any arm, 81.2 symbol and 89.1 natural, +3.1 and +1.6 over C (both within noise) and +20.8 over the base.
+
+### 17.3 What paid: induction from the weights
+
+The three levels where arm C beat every other arm in section 8 came down: Timmy k=3 from 61.2 to 47.5 (-13.8, p = 0.004), weakness induction from 60.0 to 50.0 (p = 0.023), pairwise same-type from 80.0 to 58.8 (p = 0.014); k=4 and habitat moved within noise. Cg still induces above the base model (Timmy +10.6, weakness +18.1, yes/no +31.2, all p < 0.05), but it is arm C at about two thirds of its induction gain. Two things changed at once and this run cannot separate them: the episode stream went from 40% to 35% of sequences and, more to the point, from 12% to 7.5% of the loss-bearing tokens, because the 61k general-text tokens outweigh the 17k episode tokens three and a half to one (Table 17.1); and general text is a new signal competing for the same rank-64 adapter. Section 8.1 already noted that the episode signal producing the induction gains was the thinnest stream by loss, and it just got thinner. The clean follow-up is the same 5% taken from the knowledge stream instead (K .40, E .40, R .15, G .05), or the token-weighted mixture that step 9 builds; both are one run each. The mid-training Timmy readings (22.5, 27.5, 47.5 on 40 items) say what 15.4 said: the induction skill arrives in the second half and the 40-item subsample cannot resolve it.
+
+### 17.4 What TRAIN-7 now says
+
+General-text replay at 5% of sequences (27% of the loss) buys back the whole general-text perplexity cost and about all of the ARC-Easy loss of arm C, at no cost to recall or to the ICL suite, and at a measured cost to induction that is confounded with the episode share it displaced. The two forgetting proxies of section 15 now disagree in a useful way: perplexity says nothing was forgotten (0.09 nats), ARC-Easy says 2.5 points that the interval cannot see. For the merchant use case, where the model's existing knowledge is the product, the replay fraction belongs in the recipe; for the induction result it should come out of the knowledge stream, not the episodes, and that is step 9's job.
+
+**What the report should say.** Replaying 5% pretraining-style text (a quarter of the loss) beside arm C's mixture keeps the WikiText perplexity at the base model's (+0.09 nats against C's +0.84) and ARC-Easy at 71.0 against C's 59.0 (+12 paired, p = 4e-5; base 73.5), from the first checkpoint on, with recall at 100 and the ICL suite at its best (81.2). Induction from the weights fell by 10 to 21 points on three levels, which is either the episode share it displaced (12% to 7.5% of the loss) or competition for the adapter; one more run with the 5% taken from the knowledge stream decides.
