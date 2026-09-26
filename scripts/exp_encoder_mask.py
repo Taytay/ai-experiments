@@ -112,7 +112,7 @@ def encode(tok, names, query, shots, record=None):
 
 
 def collate(tok, batch):
-    L = max(len(i) for i, _ in batch); K = max(len(p) for _, p in batch)
+    L = -(-max(len(i) for i, _ in batch) // 128) * 128; K = max(len(p) for _, p in batch)  # lengths bucketed: a new shape per call costs ~50x the forward
     ids = torch.full((len(batch), L), tok.pad_token_id); att = torch.zeros((len(batch), L), dtype=torch.long)
     pos = torch.full((len(batch), K), -1); pm = torch.zeros((len(batch), K), dtype=torch.bool)
     for b, (i, p) in enumerate(batch):
