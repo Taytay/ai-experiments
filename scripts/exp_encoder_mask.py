@@ -1,5 +1,13 @@
-"""Encoder option scorer in Laya's layout (PLAN step 53, QUESTIONS.md MODEL-6): can a 400M bidirectional encoder with one scored [MASK]
-per category do the categoriser's job, in one forward pass, at milliseconds per item?
+"""Encoder option scorers (PLAN steps 53 and 69, QUESTIONS.md MODEL-6, MODEL-10): can a 150-400M bidirectional encoder choose among a user's
+categories in one forward pass? Three families share the data, training loop and scorer (ARCH), so they differ only in the model:
+
+  ARCH=mask       Laya's layout below (INIT=mbert|laya)
+  ARCH=gliclass   GLiClass (Knowledgator, arXiv 2508.07662; INIT=base|large: gliclass-modern-{base,large}-v3.0): "<<LABEL>>name..." for
+                  every category, "<<SEP>>", then the state; its own pooling and scorer give one logit per label
+  ARCH=mbinstruct ModernBERT-Large-Instruct (Answer.AI, arXiv 2502.03793), its model card's template: "QUESTION: <state> CHOICES: - A: name
+                  ... ANSWER: [unused0] [MASK]", the MLM head read at the mask over the letters " A", " B", ... of the options (up to 26);
+                  MBI_IDS=unused names the options [unused1], [unused2], ... instead: tokens with no prior meaning, so no letter bias
+                  (Zheng et al. ICLR 2024 on option-ID selection bias), learned in fine-tuning only
 
 Sequence (Laya's `build_sequence`, `references/laya_analysis.md` 2.1):
   [CLS] choice question: <instruction> [SEP] [MASK] <category 1> [MASK] <category 2> ... [SEP] <state> [SEP]
@@ -11,7 +19,7 @@ Training: across users, the fold's users held out (FOLD=k: user id mod 4, as row
 shuffled per episode, the 24 shots drawn at random from the rest of the user's history (REAL-6: DB-only merchants excluded, as the SFT
 categoriser). Scored on the held-out users' frozen items with their frozen shots and the item's option order.
 
-env: INIT=mbert|laya (plain ModernBERT-large or the Laya checkpoint), STEPS (default 1500; 0 = score the initial model, zero-shot),
+env: ARCH=mask|gliclass|mbinstruct, INIT=mbert|laya (mask) or base|large (gliclass), STEPS (default 1500; 0 = score the initial model, zero-shot),
      BATCH=16, LR=3e-5 (encoder; the head 1e-4), CTX=0|1, FOLD=0..3, POI=<set> (train on a set's own users, poi1_v1), ITEMS_SET=<set>
      (score another frozen set; its users when it has them), MAXLEN=2048, SEED, SMOKE=1
 out: results/per_item/real6_encmask_<init>_<sfx>[_<set>].<noctx|ctx>.jsonl (sum_lp = the log-softmax over options, so every table and
@@ -33,7 +41,9 @@ from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import ROOT
 from ai_experiments.real6_eval import summarize, write_recs
 
-INIT = os.environ.get("INIT", "mbert"); assert INIT in ("mbert", "laya")
+ARCH = os.environ.get("ARCH", "mask"); assert ARCH in ("mask", "gliclass", "mbinstruct")
+INIT = os.environ.get("INIT", {"mask": "mbert", "gliclass": "large", "mbinstruct": "instruct"}[ARCH])
+assert INIT in {"mask": ("mbert", "laya"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
 SMOKE = bool(os.environ.get("SMOKE"))
 STEPS = 3 if SMOKE else int(os.environ.get("STEPS", "1500"))
 BATCH, LR, HEAD_LR = int(os.environ.get("BATCH", "16")), float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
@@ -44,7 +54,12 @@ ITEMS_SET = os.environ.get("ITEMS_SET", "")
 MAXLEN = int(os.environ.get("MAXLEN", "2048"))
 SEED = int(os.environ.get("SEED", "0"))
 RUN_TAG = os.environ.get("RUN_TAG", "")
-BASE = "answerdotai/ModernBERT-large"
+BASE = {"mask": "answerdotai/ModernBERT-large", "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+MBI_IDS = os.environ.get("MBI_IDS", "letters"); assert MBI_IDS in ("letters", "unused")
+OPT_IDS = list(LETTERS) if MBI_IDS == "letters" else [f"[unused{k + 1}]" for k in range(26)]
+MBI_HEAD = ("You will be given a person's new bank transaction, their past transactions with the budget category they filed each under, and "
+            "their categories. Select the category they would file the new transaction under.\nQUESTION: ")
 INSTR = "choice question: Which of this person's own budget categories would they file the transaction under? Their past filings follow the transaction."
 assert not (POI and CTX), "POI-1's history rows carry no records"
 
@@ -55,8 +70,8 @@ TEST = TRAIN_DOC
 if ITEMS_SET:
     _s = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
     TEST = dict(items=_s["items"], users=_s.get("users", TRAIN_DOC["users"]))
-SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}"
-NAME = f"encmask_{INIT}_{SFX}"
+SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}"
+NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT}_{SFX}"
 COND = "ctx" if CTX else "noctx"
 rng = random.Random(SEED); torch.manual_seed(SEED)
 
@@ -79,9 +94,41 @@ class DecisionModel(nn.Module):
         return self.scorer(m).squeeze(-1).float().masked_fill(~pmask, -1e4)
 
 
+class GLiClassScorer(nn.Module):
+    """GLiClass as an option scorer: its logits for the first K labels, padded label slots masked (it leaves them unmasked)."""
+
+    def __init__(self, glimodel):
+        super().__init__(); self.encoder = glimodel
+
+    def forward(self, ids, att, pos, pmask):
+        return self.encoder(input_ids=ids, attention_mask=att, max_num_classes=pmask.size(1)).logits[:, :pmask.size(1)].float().masked_fill(~pmask, -1e4)
+
+
+class MBInstructScorer(nn.Module):
+    """ModernBERT-Large-Instruct's MLM head at the one [MASK], restricted to the options' letters (the vocabulary never enters the softmax)."""
+
+    def __init__(self, mlm, letter_ids):
+        super().__init__(); self.encoder = mlm; self.register_buffer("letters", torch.tensor(letter_ids))
+
+    def forward(self, ids, att, pos, pmask):
+        h = self.encoder.model(input_ids=ids, attention_mask=att).last_hidden_state
+        m = h[torch.arange(h.size(0), device=h.device), pos[:, 0]]
+        logits = self.encoder.decoder(self.encoder.head(m))[:, self.letters[:pmask.size(1)]]
+        return logits.float().masked_fill(~pmask, -1e4)
+
+
 def load_model():
-    from transformers import AutoModel, AutoTokenizer
+    from transformers import AutoModel, AutoModelForMaskedLM, AutoTokenizer
+    if ARCH == "gliclass":
+        from gliclass import GLiClassModel
+        tok = AutoTokenizer.from_pretrained(BASE, add_prefix_space=True)
+        return tok, GLiClassScorer(GLiClassModel.from_pretrained(BASE)).cuda()
     tok = AutoTokenizer.from_pretrained(BASE)
+    if ARCH == "mbinstruct":
+        mlm = AutoModelForMaskedLM.from_pretrained(BASE, attn_implementation="sdpa"); mlm.config.reference_compile = False
+        ids = [tok(" " + c, add_special_tokens=False)["input_ids"] if MBI_IDS == "letters" else [tok.convert_tokens_to_ids(c)] for c in OPT_IDS]
+        assert all(len(i) == 1 and i[0] != tok.unk_token_id for i in ids)
+        return tok, MBInstructScorer(mlm, [i[0] for i in ids]).cuda()
     enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa")
     enc.config.reference_compile = False  # as Laya's inference: no torch.compile, whose recompiles per shape would swamp the latency read
     model = DecisionModel(enc)
@@ -99,15 +146,28 @@ def line(r):
     return f"{r['text']} | ${r['amount']:.2f} | {r['weekday']}"
 
 
+def state_text(query, shots, record):
+    return f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {s['label']}\n" for s in shots)
+
+
 def encode(tok, names, query, shots, record=None):
-    """input ids and the [MASK] positions, Laya's layout; the state is truncated from the end (the last shots) when too long."""
+    """input ids and one position per option (ARCH=mask: its [MASK]; mbinstruct: the answer [MASK], repeated; gliclass: unused); the
+    state is truncated from the end (the last shots) when too long, the options and the answer slot never."""
+    if ARCH == "gliclass":
+        ids = tok("".join(f"<<LABEL>>{n}" for n in names) + "<<SEP>>" + state_text(query, shots, record), truncation=True, max_length=MAXLEN)["input_ids"]
+        return ids, [0] * len(names)
+    if ARCH == "mbinstruct":
+        assert len(names) <= len(LETTERS)
+        tail = tok("CHOICES:\n" + "".join(f"- {OPT_IDS[k]}: {n}\n" for k, n in enumerate(names)) + "ANSWER: [unused0] [MASK]", add_special_tokens=False)["input_ids"]
+        head = tok(MBI_HEAD + state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(tail) - 2)]
+        ids = [tok.cls_token_id] + head + tail + [tok.sep_token_id]
+        return ids, [ids.index(tok.mask_token_id)] * len(names)
     head = tok(INSTR, add_special_tokens=False)["input_ids"]
     ids = [tok.cls_token_id] + head + [tok.sep_token_id]; pos = []
     for n in names:
         pos.append(len(ids)); ids += [tok.mask_token_id] + tok(" " + n, add_special_tokens=False)["input_ids"][:24]
     ids.append(tok.sep_token_id)
-    state = f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {s['label']}\n" for s in shots)
-    st = tok(state, add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
+    st = tok(state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
     return ids + st + [tok.sep_token_id], pos
 
 
@@ -186,7 +246,7 @@ def score(tok, model):
 
 
 if __name__ == "__main__":
-    cfg = dict(init=INIT, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
+    cfg = dict(arch=ARCH, init=INIT, mbi_ids=MBI_IDS, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()
