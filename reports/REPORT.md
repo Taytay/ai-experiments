@@ -1459,3 +1459,98 @@ Table 25.4 is retrieval end to end. Because the record-tuned retriever's top-1 i
 - REAL-2: measured. Record-tuned MiniLM: recall@1 100 from bank strings at 120 records (zero-shot 78 to 88, category-tuned 29 to 55); end to end equals the oracle on Qwen2.5-3B (81 / 75 on bank strings), top-3 halves it, the 0.5B model cannot read the record from a bank string.
 - GRAPH-7: yes. A list of co-typed species per name, with no attribute words, is the best context for the episode-trained arms (Timmy 87.5 for C, 93.1 for Cr; oracle 70.6 / 69.4) and worthless for the base model (36.9): the trained model uses the entity-entity structure. It does nothing for the partition the list does not encode (habitat at chance).
 - The distilled arm P2 reads context worse than the base model on every induction and manipulation level; do not deploy it with retrieval.
+
+## 26. Scale: the mixture's induction and ICL gains hold at 1.5B and 7B, the manipulation trade vanishes at 7B, and the sequential arm forgets a third of the facts at 7B (MODEL-1)
+
+Date: 2026-09-16. Code: `PERIODIC=200 uv run python scripts/exp_curriculum.py {base,A,C,D} Qwen/Qwen2.5-1.5B` and `LOAD_4BIT=1 PERIODIC=200 uv run python scripts/exp_curriculum.py {base,A,C,D} Qwen/Qwen2.5-7B` (QLoRA: NF4 base weights, the same LoRA r=64 on all linear layers, the same 800 x 16 sequences, seed 0, fast path); data `results/curriculum_Qwen2.5-{1.5B,7B}_{base,A_p200,C_p200,D_p200}.json` with per-item files and learning curves; the 3B column is the section 15 rerun (seed 0) with section 20's three-seed means beside it.
+
+MODEL-1 asked why the 7B model was in none of the graphs. Every knowledge and curriculum result before this section is Qwen2.5-3B (or 0.5B in section 4), and the survey's reading was that label induction from symbol tuning is a scale phenomenon (never tested below 8B; at 8B it cost natural-label and benchmark points), so the 3B result could not say whether interleaving still wins, or is still needed, at another size. This section runs the four arms of section 8 at 1.5B and 7B with the same data, steps and hyperparameters, and reports the natural-label ICL column and the knowledge benchmark (ARC-Easy) separately, as the survey asked. The 7B runs use QLoRA, which is the only way a 7B model trains on this card; section 7 measured the 4-bit forward at about the bf16 3B's speed, and the adapters are the same shape.
+
+**Table 26.1: the four arms at three scales, seed 0, from the weights (accuracy %; 3B three-seed mean +- sd in brackets where section 20 has it)**
+
+| measure | 1.5B base | 1.5B A | 1.5B C | 1.5B D | 3B base | 3B A | 3B C | 3B D | 7B base | 7B A | 7B C | 7B D |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| recall, trained fmt | 13.1 | 100 | 100 | 91.9 | 13.1 | 100 [100.0 +- 0.0] | 100 [100.0 +- 0.0] | 93.1 [91.5 +- 3.5] | 10.6 | 100 | 100 | 65.6 |
+| recall, bare | 19.4 | 20.6 | 16.2 | 64.4 | 18.1 | 23.1 [21.2 +- 1.6] | 19.4 [18.4 +- 1.3] | 58.8 [44.2 +- 20.6] | 18.8 | 19.4 | 19.4 | 65.6 |
+| yes/no | 51.2 | 85 | 55 | 55 | 42.5 | 100 [98.3 +- 2.9] | 77.5 [80.0 +- 12.7] | 63.8 [70.9 +- 8.3] | 45 | 97.5 | 93.8 | 88.8 |
+| pair | 50 | 68.8 | 53.8 | 50 | 51.2 | 88.8 [90.8 +- 1.9] | 81.2 [78.7 +- 12.7] | 72.5 [68.7 +- 16.0] | 50 | 95 | 91.2 | 80 |
+| Timmy k=3 | 35.6 | 29.4 | 55.6 | 48.8 | 35.6 | 40 [35.9 +- 3.6] | 61.9 [63.8 +- 9.2] | 53.1 [59.2 +- 7.0] | 33.1 | 55 | 73.8 | 71.2 |
+| real-name labels | 33.1 | 56.9 | 56.9 | 56.2 | 38.1 | 76.2 | 77.5 | 66.2 | 35 | 80.6 | 95.6 | 89.4 |
+| k=4 | 28.8 | 30.6 | 45 | 41.2 | 27.5 | 41.9 [35.2 +- 6.9] | 51.9 [57.9 +- 11.0] | 51.9 [54.6 +- 7.0] | 27.5 | 44.4 | 66.2 | 62.5 |
+| weakness | 31.9 | 38.1 | 46.2 | 50 | 35 | 46.2 [41.5 +- 4.1] | 60 [59.6 +- 11.9] | 54.4 [55.8 +- 6.7] | 38.1 | 60 | 78.8 | 73.1 |
+| habitat | 33.8 | 33.8 | 36.2 | 31.9 | 31.2 | 30.6 [32.3 +- 2.4] | 29.4 [33.1 +- 3.3] | 41.9 [39.8 +- 7.7] | 30.6 | 36.2 | 36.9 | 38.8 |
+| held-out species | 40.6 | 29.2 | 32.3 | 36.5 | 39.6 | 22.9 [26.0 +- 2.8] | 29.2 [31.9 +- 3.2] | 36.5 [36.1 +- 2.6] | 46.9 | 30.2 | 33.3 | 31.2 |
+| ICL symbol | 56.8 | 50 | 75 | 81.2 | 60.4 | 47.4 [50.3 +- 2.9] | 78.6 [79.0 +- 1.1] | 80.2 [79.2 +- 1.8] | 57.3 | 53.1 | 83.9 | 83.3 |
+| ICL natural | 87.5 | 85.4 | 87.5 | 88 | 84.9 | 80.8 [81.1 +- 1.1] | 87 [87.5 +- 0.9] | 87.5 [88.4 +- 1.1] | 88 | 90.6 | 88 | 91.1 |
+| ARC-Easy | 75.5 | 57 | 59.5 | 55.5 | 73.5 | 66 [63.7 +- 2.1] | 58.5 [64.0 +- 4.8] | 64.5 [63.7 +- 2.4] | 76.5 | 64.5 | 65.5 | 68.5 |
+| WikiText ppl | 11.97 | 55.071 | 29.803 | 28.878 | 10.614 | 34.055 [39.1 +- 5.2] | 22.787 [22.6 +- 0.2] | 22.621 [21.9 +- 0.9] | 9.777 | 20.701 | 16.874 | 15.776 |
+| reverse easy | 21.9 | 65 | 34.4 | 30 | 23.1 | 88.8 | 30.6 | 31.2 | 23.1 | 86.2 | 59.4 | 34.4 |
+| training minutes | - | 5.3 | 6.8 | 7.9 | - | 17.2 | 50.3 | 28.3 | - | 10.2 | 20.8 | 22.4 |
+| tokens/s | - | 1010 | 3077 | 2730 | - | 313 | 415 | 762 | - | 529 | 1003 | 965 |
+| peak GiB | - | 4.97 | 8.09 | 8.09 | - | 8.06 | 8.71 | 8.7 | - | 11.51 | 13.62 | 13.87 |
+
+**Table 26.2: with the field guide in context**
+
+| measure | 1.5B base | 1.5B A | 1.5B C | 1.5B D | 3B base | 3B A | 3B C | 3B D | 7B base | 7B A | 7B C | 7B D |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Timmy k=3 | 35.6 | 36.9 | 75.6 | 74.4 | 49.4 | 38.1 | 70.6 | 78.8 | 40.6 | 46.9 | 75.6 | 66.9 |
+| k=4 | 28.8 | 28.8 | 66.2 | 74.4 | 40.6 | 40.6 | 60.6 | 71.9 | 28.8 | 31.9 | 70.6 | 62.5 |
+| habitat | 33.8 | 31.9 | 69.4 | 67.5 | 38.1 | 30 | 65.6 | 75.6 | 35.6 | 33.1 | 71.9 | 78.8 |
+| held-out species | 42.7 | 36.5 | 71.9 | 74 | 43.8 | 26 | 72.9 | 69.8 | 46.9 | 39.6 | 74 | 70.8 |
+| pair | 75 | 77.5 | 56.2 | 50 | 82.5 | 91.2 | 76.2 | 73.8 | 52.5 | 90 | 73.8 | 73.8 |
+
+**Table 26.3: the headline gaps per scale (C - A, D - C, C - base)**
+
+| gap | measure | 1.5B | 3B | 7B |
+|---|---|---|---|---|
+| C - A | Timmy k=3 | +26.2 | +21.9 | +18.8 |
+| C - A | yes/no | -30.0 | -22.5 | -3.7 |
+| C - A | ICL symbol | +25.0 | +31.2 | +30.8 |
+| C - A | ICL natural | +2.1 | +6.2 | -2.6 |
+| C - A | ARC-Easy | +2.5 | -7.5 | +1.0 |
+| C - A | WikiText ppl | -25.3 | -11.3 | -3.8 |
+| D - C | Timmy k=3 | -6.8 | -8.8 | -2.6 |
+| D - C | yes/no | +0.0 | -13.7 | -5.0 |
+| D - C | ICL symbol | +6.2 | +1.6 | -0.6 |
+| D - C | ICL natural | +0.5 | +0.5 | +3.1 |
+| D - C | ARC-Easy | -4.0 | +6.0 | +3.0 |
+| D - C | WikiText ppl | -0.9 | -0.2 | -1.1 |
+| C - base | Timmy k=3 | +20.0 | +26.3 | +40.7 |
+| C - base | yes/no | +3.8 | +35.0 | +48.8 |
+| C - base | ICL symbol | +18.2 | +18.2 | +26.6 |
+| C - base | ICL natural | +0.0 | +2.1 | +0.0 |
+| C - base | ARC-Easy | -16.0 | -15.0 | -11.0 |
+| C - base | WikiText ppl | +17.8 | +12.2 | +7.1 |
+| A - base | Timmy k=3 | -6.2 | +4.4 | +21.9 |
+| A - base | yes/no | +33.8 | +57.5 | +52.5 |
+| A - base | ICL symbol | -6.8 | -13.0 | -4.2 |
+| A - base | ICL natural | -2.1 | -4.1 | +2.6 |
+| A - base | ARC-Easy | -18.5 | -7.5 | -12.0 |
+| A - base | WikiText ppl | +43.1 | +23.4 | +10.9 |
+
+
+### 26.1 What holds at every scale
+
+Three of section 8's claims, the ones section 20 found clear at 3B, hold at 1.5B and at 7B with the same sign and about the same size (Tables 26.1 and 26.3):
+
+- The mixture teaches induction from the weights and knowledge-only does not. Timmy k=3, C minus A: +26.2 at 1.5B, +21.9 at 3B, +18.8 at 7B; k=4 +14.4 / +10.0 / +21.8; weakness +8.1 / +13.8 / +18.8. Knowledge-only is at or near the base model's induction at 1.5B and 3B (29.4 / 40.0 against bases of 35.6 / 35.6) and above it at 7B (55.0 against 33.1), so the biggest model does some induction from the facts alone; the mixture still adds 19 points on top.
+- The mixture keeps the symbol-label ICL suite and knowledge-only halves it: C minus A +25.0 / +31.2 / +30.8; A ends at 50.0 / 47.4 / 53.1 against bases of 56.8 / 60.4 / 57.3. The natural-label column, which the survey singled out as where symbol tuning cost at 8B, does not move at any scale: C is within 2 points of its base at 1.5B and 3B and at 88.0 against 88.0 at 7B.
+- Every trained arm loses the knowledge benchmark and the base model's perplexity, and the size of the loss is the same at every scale: ARC-Easy -16 to -20 (1.5B), -7.5 to -15 (3B), -11 to -12 (7B) for arms A and C; WikiText +0.9 to +1.5 nats per token for A, +0.5 to +0.9 for C, with the mixture always the cheaper. QLoRA at 7B forgets no less than LoRA at 3B.
+
+Trained-format recall is 100 for A and C at every scale and 91.9 / 93.1 / 65.6 for the sequential arm (26.3); bare-format recall stays at the base's level for A and C everywhere (the section 12 result), and held-out species stay at chance.
+
+### 26.2 What changes with scale: manipulation, and the cost of the mixture
+
+The one headline that does not hold across scales is arm A's manipulation advantage, and it changes in both directions. At 1.5B knowledge-only manipulates (yes/no 85.0, pair 68.8) and the mixture does not (55.0 / 53.8, chance 50 / 50): the small model cannot hold the facts and the induction skill at once, and the mixture at 45% knowledge by sequence loses the facts' usability while keeping their recall. At 3B the gap is 18 / 12 points (section 20: inside 2 sd). At 7B it is 3.7 / 3.8 (97.5 / 95.0 against 93.8 / 91.2): the model has room for both. The "trade" that section 8 described, manipulation for induction, is a small-model trade; at 7B the mixture arm is the best arm on every from-the-weights level but the two manipulation questions, and it loses those by less than the 160-item noise.
+
+Two other scale-dependent numbers. Knowledge-only's perplexity cost falls with scale (WikiText 55.1 / 34.1 / 20.7 against bases of 12.0 / 10.6 / 9.8: +1.5 / +1.2 / +0.75 nats) while the mixture's is flat (+0.9 / +0.8 / +0.55), so at 7B the two arms are 0.2 nats apart where at 1.5B they were 0.6. And the backward direction: arm A's easy reverse lookup is 65.0 / 88.8 / 86.2 by scale, from the paraphrase set's type-before-name renderings (section 22), while the mixture reads 34.4 / 30.6 / 59.4: at 7B the mixture starts to recover the backward direction it loses at the smaller sizes.
+
+### 26.3 The sequential arm at scale
+
+The sequential arm is the one arm whose behaviour changes with scale in the direction section 23 predicted. Its recall curve is the same at every size: 95 to 100 at step 400 when the knowledge phase ends, then a slide through the episode phase. At 1.5B and 3B the slide stops at 91.9 and 93.1 (the shared schedule's decaying rate holds the forgetting to a few points, section 23). At 7B it does not: 100 at step 400, 65.0 at step 600, 65.6 at the end. The larger adapter (161M parameters, r=64 on 28 layers) overwrites more per step of episode-only training at the same learning rate, and the tail of the schedule is no longer enough to protect the facts. Everything else about D at 7B is good: induction 71.2 (C 73.8), ICL 83.3, the best ARC-Easy (68.5) and WikiText (15.8) of any trained arm, and the bare-format recall of 65.6 is the only bare-format number above the base in the table. The section 23 remedy, 10% knowledge replay in phase 2, is what a 7B staged run needs; without it, staging at 7B loses a third of the facts.
+
+### 26.4 What the runs cost, and what MODEL-1 now says
+
+Table 26.1's last rows: 1.5B trains an arm in 5 to 8 minutes at 1,000 to 3,100 tokens per second and evaluates in 1.5 minutes; 7B QLoRA trains in 10 to 21 minutes at 530 to 1,000 tokens per second and 11.5 to 13.6 GiB. Its evaluation is the cost: the first 7B mixture run scored the with-context ladder in 35 minutes at the 24 GB limit, where the driver spills to system memory instead of raising the out-of-memory error the scorer halves its batch on (section 7's warning), and the whole evaluation took 51 minutes; with a quarter of the forward budget for 4-bit models (the change is in the script) the D run evaluated in 6.4 minutes. A 7B arm is an hour, a 1.5B arm ten minutes; the 3B arm at 15 minutes remains the working size.
+
+MODEL-1: the mixture recipe is not a 3B artefact. Interleaving still wins at 7B on induction (+19 on Timmy) and ICL (+31 on symbol labels), and it is still needed, since knowledge-only at 7B halves the ICL suite the same way it does at 3B. What 7B changes is the price: the manipulation gap between knowledge-only and the mixture, 18 points at 3B and 30 at 1.5B, is 4 points at 7B. The natural-label column is flat at every scale, which the survey's 8B symbol-tuning result had made the thing to watch, and the knowledge benchmark loses the same 10 to 15 points at every scale, which is the forgetting cost that no scale removes. Single seeds at 1.5B and 7B; the 3B seed sd (section 20) is the band to read them against.
