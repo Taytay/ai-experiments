@@ -1,0 +1,4680 @@
+### item 1
+Categories: Guron, Educational facility, Lodging, Mozimo, Gesotil, Services and business, Event or party service & farm, Arts and entertainment, Babal, Office supply store, Convenience store & sporting goods store, Detavul, Food and drink, Poguzo, Sports and recreation, Tibun, Health care
+
+Transaction: Fennig Equipment L.L.C., Celina OH | $92.64 | Tue
+Category: Mozimo
+
+Transaction: NAMI North Texas, Dallas TX | $298.18 | Sat
+Category: Health care
+
+Transaction: Big Daddy's Bar and Grill, Augusta GA | $37.60 | Wed
+Category: Detavul
+
+Transaction: Cowley County Fair, Winfield KS | $183.01 | Thu
+Category: Babal
+
+Transaction: Midlands Family Urgent Care, La Vista NE | $60.01 | Fri
+Category: Tibun
+
+Transaction: Essex County Riverfront Park, Newark NJ | $17.05 | Sun
+Category: Poguzo
+
+Transaction: AFC Urgent Care Haverhill, Haverhill MA | $95.91 | Mon
+Category: Gesotil
+
+Transaction: Huntington Bank, Traverse City MI | $105.37 | Wed
+Category: Services and business
+
+Transaction: Stockmar Airport, Villa Rica GA | $52.23 | Thu
+Category: Guron
+
+Transaction: Crown Point Sportsplex, Crown Point IN | $74.35 | Sat
+Category: Poguzo
+
+Transaction: Kuenzi Family Vineyard, Salem OR | $33.31 | Tue
+Category: Food and drink
+
+Transaction: Capital Rowing Club, Washington DC | $22.97 | Thu
+Category: Sports and recreation
+
+Transaction: Oasis, Billings MT | $69.51 | Mon
+Category: Poguzo
+
+Transaction: Hope Academy, The Dalles OR | $53.70 | Fri
+Category: Educational facility
+
+Transaction: Official American Basketball Circuit, Robinson Twp PA | $40.38 | Tue
+Category: Sports and recreation
+
+Transaction: Whitetails Farm, Clarksburg MD | $344.84 | Tue
+Category: Event or party service & farm
+
+Transaction: Nassau Pickleball 365, Yulee FL | $44.29 | Sat
+Category: Sports and recreation
+
+Transaction: CMAC Services of Alabama, Fairhope AL | $38.96 | Mon
+Category: Convenience store & sporting goods store
+
+Transaction: Fort Smith Marshals Baseball, Fort Smith AR | $7.67 | Tue
+Category: Sports and recreation
+
+Transaction: Washington Park, Tunkhannock PA | $63.03 | Fri
+Category: Poguzo
+
+Transaction: Sadowsky Autism Services, Platte City MO | $35.05 | Wed
+Category: Gesotil
+
+Transaction: The Stockade Bed and Breakfast, Baton Rouge LA | $214.59 | Fri
+Category: Lodging
+
+Transaction: Municipal Park, Fairhope AL | $78.61 | Tue
+Category: Poguzo
+
+Transaction: Westin Amphitheater, Kalama WA | $24.23 | Tue
+Category: Arts and entertainment
+
+Transaction: Missile Bar, Atlantic City NJ | $47.91 | Mon
+Category:
+
+### item 2
+Categories: Fuzozen, Arts and entertainment, Food and drink, Lifestyle services, Sports and recreation, Airport & parking, Shopping, Education, Inn, Services and business, Bank or credit union & professional service, Tobal
+
+Transaction: Opportunity Bank of Montana, Helena MT | $111.80 | Wed
+Category: Bank or credit union & professional service
+
+Transaction: Animal Medical Center Of Panola County, Carthage TX | $63.82 | Sun
+Category: Lifestyle services
+
+Transaction: Ramada by Wyndham Rome/Verona, Rome NY | $228.96 | Sun
+Category: Fuzozen
+
+Transaction: Venue 2066, Chicago IL | $9.52 | Tue
+Category: Arts and entertainment
+
+Transaction: Baca County Conservation, Springfield CO | $84.22 | Fri
+Category: Services and business
+
+Transaction: Olympia Ecosystems, Olympia WA | $42.93 | Tue
+Category: Services and business
+
+Transaction: Premier Inns Concord, Concord CA | $67.20 | Sat
+Category: Inn
+
+Transaction: VASA Fitness, Lincoln NE | $21.95 | Fri
+Category: Sports and recreation
+
+Transaction: Deer Lodge City County Airport TCA, Deer Lodge MT | $46.70 | Tue
+Category: Airport & parking
+
+Transaction: Fitness 1 Gym, Phoenix AZ | $58.09 | Wed
+Category: Sports and recreation
+
+Transaction: Garage East, Gilbert AZ | $13.14 | Fri
+Category: Food and drink
+
+Transaction: Madhouse Gym, Douglasville GA | $25.67 | Mon
+Category: Sports and recreation
+
+Transaction: Silicon Valley Environmental Group, San Jose CA | $126.85 | Tue
+Category: Services and business
+
+Transaction: King Muir Fund Advisors, Llc, Chicago IL | $245.68 | Sat
+Category: Tobal
+
+Transaction: Coast To Coast Trophies LLC, Glendale AZ | $197.73 | Thu
+Category: Shopping
+
+Transaction: Epic Escape Room & Party, Humboldt TN | $357.26 | Sun
+Category: Arts and entertainment
+
+Transaction: Happy Bee Meadery, Cave Creek AZ | $20.43 | Mon
+Category: Food and drink
+
+Transaction: Kooskia Community Library, Kooskia ID | $225.51 | Mon
+Category: Education
+
+Transaction: Pure Barre, Surprise AZ | $31.72 | Thu
+Category: Sports and recreation
+
+Transaction: Fairfax Red Top Cab, Falls Church VA | $26.47 | Fri
+Category: Airport & parking
+
+Transaction: BLISS, Bryan TX | $88.11 | Sun
+Category: Shopping
+
+Transaction: Mid Kansas Ag, St John KS | $45.19 | Tue
+Category: Services and business
+
+Transaction: Twin Cities South Trailers, Pilot Point TX | $16.74 | Mon
+Category: Shopping
+
+Transaction: 37th Parallel Wines, Santa Cruz CA | $18.55 | Sun
+Category: Food and drink
+
+Transaction: Sun Air Jets, Van Nuys CA | $46.44 | Tue
+Category:
+
+### item 3
+Categories: Travel and transportation, Sports and recreation, Arts and entertainment, Rupen, Food and drink, Gufer, Home service & legal service, Second hand store, Services and business, Agricultural service & b2b energy and utility service, Shopping, Hardware home and garden store & auto dealer
+
+Transaction: Tropical Grill Tiki Hut, Spring Hill FL | $57.91 | Mon
+Category: Food and drink
+
+Transaction: Level 3 Nightclub, New York NY | $24.63 | Thu
+Category: Arts and entertainment
+
+Transaction: Toys"R"Us, Jacksonville FL | $42.92 | Mon
+Category: Hardware home and garden store & auto dealer
+
+Transaction: Freedom Boat Club of West Michigan, Muskegon MI | $24.12 | Sun
+Category: Sports and recreation
+
+Transaction: Mary Warner Mack Dog Park (private), Fort Mill SC | $78.83 | Sat
+Category: Sports and recreation
+
+Transaction: All Green Produce, Oakland CA | $34.85 | Wed
+Category: Shopping
+
+Transaction: Stalcup Agricultural Service, Storm Lake IA | $119.27 | Thu
+Category: Agricultural service & b2b energy and utility service
+
+Transaction: Nl Technology, North Andover MA | $69.87 | Sun
+Category: Services and business
+
+Transaction: Universal Security Services, Inc, North Hollywood CA | $31.48 | Sat
+Category: Gufer
+
+Transaction: Raybern Foods, Shannon MS | $12.86 | Thu
+Category: Shopping
+
+Transaction: Adams Pizza, Heflin AL | $16.00 | Wed
+Category: Home service & legal service
+
+Transaction: Roche Bobois, Natick MA | $32.58 | Sat
+Category: Hardware home and garden store & auto dealer
+
+Transaction: AMF WESTERN BRANCH LANES, Chesapeake VA | $14.97 | Sat
+Category: Arts and entertainment
+
+Transaction: Flying Embers Social Club And Brewery, Los Angeles CA | $35.09 | Wed
+Category: Food and drink
+
+Transaction: Center Plate Development Co, Burr Ridge IL | $144.89 | Sun
+Category: Services and business
+
+Transaction: Marcus Point Cinema, Madison WI | $91.50 | Mon
+Category: Arts and entertainment
+
+Transaction: Superpawn, Peoria AZ | $63.84 | Mon
+Category: Second hand store
+
+Transaction: Toys "R" US, Montebello CA | $36.89 | Wed
+Category: Hardware home and garden store & auto dealer
+
+Transaction: Victoria Grace Event Center, Grand Prairie TX | $18.45 | Thu
+Category: Arts and entertainment
+
+Transaction: Aldi, Bloomington IL | $48.62 | Fri
+Category: Shopping
+
+Transaction: The Shop, Waxahachie TX | $34.20 | Sat
+Category: Travel and transportation
+
+Transaction: Build-A-Bear Workshop, Arlington VA | $29.13 | Thu
+Category: Hardware home and garden store & auto dealer
+
+Transaction: Sercal, Carlsbad CA | $55.69 | Fri
+Category: Gufer
+
+Transaction: Rainbow Grocery, Detroit MI | $84.99 | Tue
+Category: Shopping
+
+Transaction: Ricardo Vicuna, MD, Fort Lauderdale FL | $66.58 | Sat
+Category:
+
+### item 4
+Categories: Sports and recreation, Health care, Travel and transportation, Arts and entertainment, Lifestyle services, Apartment, Shopping, Kobise, Marax, Laundry service, Ravipan, Rukebex, Services and business, Naburen, Food and drink, Bar
+
+Transaction: Everett one cab, Everett WA | $53.75 | Thu
+Category: Travel and transportation
+
+Transaction: Attica Family Medicine, Attica NY | $92.00 | Fri
+Category: Health care
+
+Transaction: Pelham Lab High School, Bronx NY | $324.42 | Wed
+Category: Ravipan
+
+Transaction: RideRudo, Sandy Springs GA | $46.47 | Tue
+Category: Travel and transportation
+
+Transaction: Gene Brenner pottery, Sebring FL | $166.81 | Tue
+Category: Arts and entertainment
+
+Transaction: Dave Hansen Whitewater, Jackson WY | $40.89 | Tue
+Category: Sports and recreation
+
+Transaction: Compton Goethals Hall, New York NY | $28.24 | Thu
+Category: Ravipan
+
+Transaction: Visual Expansion Gallery, West Chester PA | $19.32 | Wed
+Category: Arts and entertainment
+
+Transaction: Swag at OWA, Foley AL | $201.51 | Tue
+Category: Shopping
+
+Transaction: Desert Blue Cleaners, El Centro CA | $130.17 | Wed
+Category: Laundry service
+
+Transaction: Next Day Signs, Plano TX | $89.57 | Tue
+Category: Marax
+
+Transaction: Torrance Flite, Torrance CA | $91.02 | Mon
+Category: Services and business
+
+Transaction: Pop Bubble Tea, Asheville NC | $40.55 | Sun
+Category: Food and drink
+
+Transaction: Hope Academy & Nursing Services, Upper Marlboro MD | $206.84 | Sat
+Category: Ravipan
+
+Transaction: Target, Fairview OR | $106.70 | Fri
+Category: Shopping
+
+Transaction: Lift N Take, Newark OH | $129.98 | Thu
+Category: Lifestyle services
+
+Transaction: Las Ventanas, Pleasanton CA | $61.66 | Tue
+Category: Apartment
+
+Transaction: Rhode Island Watercolor Society, Pawtucket RI | $68.49 | Wed
+Category: Arts and entertainment
+
+Transaction: The Gallery at Greenly Center, Bloomsburg PA | $36.99 | Mon
+Category: Arts and entertainment
+
+Transaction: Bazaar Barn, Cashiers NC | $82.90 | Sun
+Category: Kobise
+
+Transaction: The garage sale store, Cut Bank MT | $26.22 | Tue
+Category: Kobise
+
+Transaction: Comprehensive Medical Inc., Sacramento CA | $124.78 | Sat
+Category: Services and business
+
+Transaction: Madisonville Junior High School, Madisonville LA | $391.44 | Fri
+Category: Ravipan
+
+Transaction: Arc Express Walk-in Clinic, Little Rock AR | $35.43 | Fri
+Category: Health care
+
+Transaction: Thomas Marine Systems, Inc., Fort Lauderdale FL | $62.19 | Tue
+Category:
+
+### item 5
+Categories: Shopping, Sports and recreation, Vakarir, Food and drink, Kafamur, Education, Meman, Services and business, Sezusun, Industrial facility or service & b2b science and technology service, Health care, Emergency department & outpatient care facility, Puzipul, Supplier or distributor & corporate or business office
+
+Transaction: Spectralux Avionics, Redmond WA | $66.55 | Sat
+Category: Meman
+
+Transaction: Drill America Inc, Lindenhurst NY | $52.32 | Wed
+Category: Supplier or distributor & corporate or business office
+
+Transaction: Munson Hills, Tallahassee FL | $9.46 | Mon
+Category: Sports and recreation
+
+Transaction: MAC Cosmetics, Seattle WA | $56.69 | Wed
+Category: Shopping
+
+Transaction: Ricaurte A Solis, Augusta GA | $60.42 | Thu
+Category: Emergency department & outpatient care facility
+
+Transaction: Bio Research Institute, Cotati CA | $480.02 | Sat
+Category: Industrial facility or service & b2b science and technology service
+
+Transaction: PERI Formwork Systems, Woodland WA | $197.21 | Mon
+Category: Services and business
+
+Transaction: Fxe Jet Center, Fort Lauderdale FL | $52.77 | Thu
+Category: Meman
+
+Transaction: North River Fronts Park, Eau Claire WI | $48.50 | Tue
+Category: Sports and recreation
+
+Transaction: Lounge 917, Crockett TX | $20.27 | Thu
+Category: Food and drink
+
+Transaction: Willet Stained Glass Studios, Philadelphia PA | $87.66 | Tue
+Category: Education
+
+Transaction: Lanier Aircraft Maintenance, Gainesville GA | $70.88 | Wed
+Category: Meman
+
+Transaction: Atchison Public Library, Atchison KS | $159.48 | Mon
+Category: Education
+
+Transaction: Ocean Hammock Park Walkway, St Augustine FL | $77.99 | Fri
+Category: Sports and recreation
+
+Transaction: Dannelly Field, Montgomery AL | $42.19 | Sun
+Category: Meman
+
+Transaction: Delta Air Lines, San Jose CA | $48.74 | Thu
+Category: Meman
+
+Transaction: More Life Chiropractic, Blacksburg SC | $21.62 | Wed
+Category: Health care
+
+Transaction: Dirt T Shirts, Kingston NY | $31.80 | Sun
+Category: Puzipul
+
+Transaction: Ocean Club Resort, North Myrtle Beach SC | $140.20 | Mon
+Category: Kafamur
+
+Transaction: Fresh Air Aviation, Beaver Island MI | $164.95 | Fri
+Category: Meman
+
+Transaction: Viva KTV, New York NY | $9.62 | Sun
+Category: Vakarir
+
+Transaction: Amity Babylon Warehouse Wine and Liquor, Copiague NY | $45.97 | Fri
+Category: Shopping
+
+Transaction: Broadlawns Medical Center Emergency Room, Des Moines IA | $64.15 | Tue
+Category: Emergency department & outpatient care facility
+
+Transaction: Tuckaway Shores Resort, Indialantic FL | $240.69 | Fri
+Category: Kafamur
+
+Transaction: Loch Raven Trail, Cockeysville MD | $55.84 | Fri
+Category:
+
+### item 6
+Categories: Ziger, Sotipox, Food service & wellness service, Lodging, Food and drink, Sports and recreation, Casino & music venue, Services and business, Condominium & agricultural service, Shopping, Specialty store & office supply store, Education, Elementary school & educational service
+
+Transaction: Urban Air Trampoline and Adventure Park, Webster TX | $45.68 | Fri
+Category: Services and business
+
+Transaction: Angel Cakes & More, Alvin TX | $46.63 | Sun
+Category: Food and drink
+
+Transaction: Bay Sound, Daphne AL | $28.97 | Thu
+Category: Shopping
+
+Transaction: Redhouse Music Venue, Boonton NJ | $51.71 | Sun
+Category: Casino & music venue
+
+Transaction: Valley View Elementary School, Rockford MI | $155.10 | Thu
+Category: Elementary school & educational service
+
+Transaction: iTrip Vacations, Pigeon Forge TN | $352.87 | Tue
+Category: Lodging
+
+Transaction: Attleboro Village, Langhorne PA | $71.60 | Mon
+Category: Condominium & agricultural service
+
+Transaction: JetForce Studios, Brooklyn NY | $107.80 | Sat
+Category: Services and business
+
+Transaction: Big Tony's Pizza, Chicago IL | $50.90 | Sun
+Category: Food service & wellness service
+
+Transaction: Farmstead Fabrics & Variety, Arthur IL | $14.39 | Fri
+Category: Shopping
+
+Transaction: Advanced Drainage Systems, Inc., Wahpeton ND | $88.34 | Sat
+Category: Services and business
+
+Transaction: Stoneridge Landing, Inverness FL | $74.16 | Sun
+Category: Services and business
+
+Transaction: Green Acres Learning Center, Greenacres FL | $25.44 | Tue
+Category: Education
+
+Transaction: Jason Carr, C-FNP, Poplarville MS | $12.91 | Wed
+Category: Sotipox
+
+Transaction: East Junior High Library, Boise ID | $132.33 | Mon
+Category: Elementary school & educational service
+
+Transaction: Gap Travel, Levittown NY | $20.89 | Thu
+Category: Ziger
+
+Transaction: Steam Station, Fresno CA | $142.20 | Thu
+Category: Specialty store & office supply store
+
+Transaction: Myriad Gardens Community Dog Park, Oklahoma City OK | $41.86 | Sat
+Category: Services and business
+
+Transaction: Flavor Chef Catering, Vista CA | $360.26 | Wed
+Category: Services and business
+
+Transaction: Market Street Grill, Colusa CA | $26.36 | Sat
+Category: Food and drink
+
+Transaction: Xpress Wellness Urgent Care, Elk City OK | $128.32 | Mon
+Category: Sotipox
+
+Transaction: Goodhart Coffee Catering of Denver, Lakewood CO | $759.42 | Thu
+Category: Services and business
+
+Transaction: Arradiance, Littleton MA | $286.74 | Thu
+Category: Services and business
+
+Transaction: UF FYCS Department, Gainesville FL | $70.02 | Sun
+Category: Elementary school & educational service
+
+Transaction: Enrique's Tattoo Supplies, Fitchburg WI | $58.48 | Tue
+Category:
+
+### item 7
+Categories: Dog park, Health care, Ripur, Namenel, Services and business, Attorney or law firm & laundry service, Arts and entertainment, Stadium arena, Educational service, Education, Industrial facility or service & legal service, Environmental or ecological service & media service, Shopping, Melevun
+
+Transaction: Stern Safe, Lynwood IL | $261.19 | Tue
+Category: Industrial facility or service & legal service
+
+Transaction: Circle K, Ruskin FL | $37.23 | Thu
+Category: Shopping
+
+Transaction: Kristina Marie Gaietto, MD, Pittsburgh PA | $64.12 | Sun
+Category: Health care
+
+Transaction: Camp Tiewonon, Salem Twp PA | $42.53 | Tue
+Category: Education
+
+Transaction: Matlin Injury Law, Parker CO | $114.65 | Wed
+Category: Environmental or ecological service & media service
+
+Transaction: Millennium Hilton New York One UN Plaza, New York NY | $183.75 | Thu
+Category: Namenel
+
+Transaction: Herrs Memory Lane, Washington KS | $11.50 | Tue
+Category: Arts and entertainment
+
+Transaction: Home Goods, Carbondale IL | $168.28 | Tue
+Category: Melevun
+
+Transaction: Classic Design & Fabrication, Athens GA | $153.12 | Sat
+Category: Ripur
+
+Transaction: Palmer Field, Middletown CT | $23.78 | Wed
+Category: Stadium arena
+
+Transaction: 99 Cents Only Stores, Yuma AZ | $79.91 | Mon
+Category: Shopping
+
+Transaction: J. Karl Trucks, P.A., Panama City FL | $93.44 | Tue
+Category: Attorney or law firm & laundry service
+
+Transaction: D & R Car Top, Morris-Plains NJ | $54.22 | Tue
+Category: Ripur
+
+Transaction: Burns & McDonnell, Wallingford CT | $109.50 | Wed
+Category: Services and business
+
+Transaction: 5 Corners Mini Mart, Fort Scott KS | $58.13 | Mon
+Category: Shopping
+
+Transaction: Kiger's Grocery, Henderson NC | $15.45 | Mon
+Category: Shopping
+
+Transaction: Circle K, Jacksonville FL | $23.58 | Fri
+Category: Shopping
+
+Transaction: Roy Dog Park, Roy UT | $16.00 | Thu
+Category: Dog park
+
+Transaction: Robert A. Swearingen, P.c, College Station TX | $306.08 | Thu
+Category: Industrial facility or service & legal service
+
+Transaction: Bomgaars, Richmond IN | $14.32 | Thu
+Category: Melevun
+
+Transaction: Environmental Compliance Professionals, Lee's Summit MO | $59.57 | Wed
+Category: Environmental or ecological service & media service
+
+Transaction: Master Rack Lodge, Union Springs AL | $44.84 | Sat
+Category: Environmental or ecological service & media service
+
+Transaction: Speedy Q, Lapeer MI | $104.17 | Thu
+Category: Shopping
+
+Transaction: Rb Carco, San Diego CA | $137.16 | Sun
+Category: Ripur
+
+Transaction: t.Lab, Garden City MI | $32.15 | Mon
+Category:
+
+### item 8
+Categories: Travel and transportation, Food and drink, Fetifir, Wellness service, Education, Services and business, Discount store, Tuke, Apartment, Zunugi, Guden, Arts and entertainment, Migo, Shipping or delivery service & building or construction service, Laundry service & corporate or business office, Health care, Niluro
+
+Transaction: D&A Hibachi  Express  LLC, Del Rio TX | $44.60 | Thu
+Category: Food and drink
+
+Transaction: La Routonda At City Hall Orlando, Orlando FL | $13.00 | Mon
+Category: Tuke
+
+Transaction: Tacos El Gordo, Columbus TX | $14.69 | Sun
+Category: Food and drink
+
+Transaction: SP+, Nashville TN | $130.14 | Tue
+Category: Travel and transportation
+
+Transaction: Dishforce, Valdosta GA | $204.76 | Fri
+Category: Services and business
+
+Transaction: Range Ordinance Cleanup, New Bern NC | $99.62 | Thu
+Category: Laundry service & corporate or business office
+
+Transaction: Ross Dress for Less, Rapid City SD | $18.95 | Sat
+Category: Discount store
+
+Transaction: Berkshire Roots, Pittsfield MA | $99.00 | Sat
+Category: Health care
+
+Transaction: Just4hoopin, Chandler AZ | $32.41 | Wed
+Category: Fetifir
+
+Transaction: Tom's Glass & Muffler Center, Red Bluff CA | $16.18 | Tue
+Category: Travel and transportation
+
+Transaction: Muerto de hambre F.T, El Paso TX | $33.36 | Mon
+Category: Food and drink
+
+Transaction: Monroe County Hospital and Clinics, Albia IA | $30.19 | Wed
+Category: Niluro
+
+Transaction: ZS Associates, San Diego CA | $98.40 | Mon
+Category: Laundry service & corporate or business office
+
+Transaction: Pajaro Pride, West Palm Beach FL | $101.82 | Mon
+Category: Arts and entertainment
+
+Transaction: Psychic Reader, Redondo Beach CA | $47.58 | Sat
+Category: Migo
+
+Transaction: Andrew J Smith Elementary School, Union Springs NY | $152.29 | Sat
+Category: Education
+
+Transaction: Lashes by Nikki, San Jose CA | $56.32 | Sat
+Category: Wellness service
+
+Transaction: Tacos Mayra Taco Truck, Houston TX | $15.65 | Tue
+Category: Food and drink
+
+Transaction: Complete Home Care Of Va Llc, Cave Spring VA | $18.57 | Fri
+Category: Health care
+
+Transaction: Residences at Wells School, Southbridge MA | $41.37 | Fri
+Category: Apartment
+
+Transaction: The Maze NYC, New York NY | $24.09 | Tue
+Category: Laundry service & corporate or business office
+
+Transaction: Amazon Locker - Alby, Sanford FL | $187.30 | Mon
+Category: Shipping or delivery service & building or construction service
+
+Transaction: SP+, Baltimore MD | $99.71 | Tue
+Category: Travel and transportation
+
+Transaction: Helen's Healthy Kitchen, Snoqualmie WA | $179.91 | Sat
+Category: Guden
+
+Transaction: US Marine Corps Recruiting, Tukwila WA | $69.62 | Mon
+Category:
+
+### item 9
+Categories: Shopping, Food service, Vubo, Health care, Solel, Food and drink, Nulan, Merel, Banix, Services and business, Legal service & agricultural service, Atm & family service, Zatonen, Telecommunications service & media service
+
+Transaction: Waking Dreams Retreat, Asheville NC | $342.29 | Tue
+Category: Banix
+
+Transaction: Celestial Healing, Chicago IL | $11.76 | Wed
+Category: Nulan
+
+Transaction: David Lenaurd Smith, Circleville OH | $18.86 | Fri
+Category: Health care
+
+Transaction: Bitcoin Pizza - Michigan Park, Washington DC | $184.84 | Sun
+Category: Food service
+
+Transaction: SML Boat Rentals, Huddleston VA | $85.68 | Sun
+Category: Merel
+
+Transaction: Priority Quick Lane Tire and Auto Center, Norfolk VA | $30.60 | Mon
+Category: Vubo
+
+Transaction: Amada Concierge Care, San Clemente CA | $113.19 | Thu
+Category: Zatonen
+
+Transaction: First Citizens Bank ATM, Waynesville NC | $246.85 | Mon
+Category: Atm & family service
+
+Transaction: Ms Mary’s Old Town Snoballs, Bay St Louis MS | $58.03 | Mon
+Category: Food and drink
+
+Transaction: Highlands Center For Natural History, Prescott AZ | $94.78 | Sun
+Category: Solel
+
+Transaction: Steve Willis Photography, Colorado Springs CO | $124.10 | Wed
+Category: Telecommunications service & media service
+
+Transaction: AKTV, Cape Coral FL | $241.51 | Tue
+Category: Telecommunications service & media service
+
+Transaction: John Deere, Billings MT | $92.90 | Tue
+Category: Legal service & agricultural service
+
+Transaction: Steadfast Telecommunications Inc., New York NY | $108.91 | Wed
+Category: Telecommunications service & media service
+
+Transaction: Wenzel Nursery, College Place WA | $214.52 | Fri
+Category: Shopping
+
+Transaction: The Gill Welcome Center, Ashland OH | $394.00 | Mon
+Category: Solel
+
+Transaction: MFA Distribution Warehouse, Sedalia MO | $55.77 | Wed
+Category: Legal service & agricultural service
+
+Transaction: All Wiring Needs, Charleston SC | $46.56 | Tue
+Category: Telecommunications service & media service
+
+Transaction: Alto Litigation, San Francisco CA | $380.66 | Fri
+Category: Legal service & agricultural service
+
+Transaction: Building Performance Group, Crestwood KY | $63.98 | Fri
+Category: Zatonen
+
+Transaction: Geval6, Inc. Usa, Hoffman Estates IL | $34.44 | Mon
+Category: Zatonen
+
+Transaction: Blue Rhino Propane Exchange, Perry MO | $170.71 | Fri
+Category: Services and business
+
+Transaction: Original Richard's Bakery, National City CA | $43.83 | Fri
+Category: Food and drink
+
+Transaction: Waffle House, Phenix City AL | $7.16 | Fri
+Category: Food and drink
+
+Transaction: Health for Life Naturopathic Medicine, Phoenix AZ | $43.95 | Sat
+Category:
+
+### item 10
+Categories: Education, Sports and recreation, Arts and entertainment, Food service, Zusara, Travel and transportation, Bed and breakfast, Guval, Services and business, Sovux, Rolodex, Industrial facility or service & b2b service, Dodel
+
+Transaction: Aloha Island Mart Kahala, Honolulu HI | $22.27 | Sat
+Category: Sovux
+
+Transaction: Najera Pool Service, Bakersfield CA | $35.38 | Thu
+Category: Sports and recreation
+
+Transaction: British American School - LA, Santa Monica CA | $43.81 | Tue
+Category: Education
+
+Transaction: Strike the Right Note, Carrollton TX | $35.45 | Thu
+Category: Rolodex
+
+Transaction: Redbox, Dallas TX | $303.95 | Mon
+Category: Rolodex
+
+Transaction: PianoWerkes, Albuquerque NM | $85.39 | Wed
+Category: Rolodex
+
+Transaction: Boston Express Bus Station, Nashua NH | $13.67 | Thu
+Category: Travel and transportation
+
+Transaction: Freight Liquidators, Poughkeepsie NY | $230.50 | Mon
+Category: Industrial facility or service & b2b service
+
+Transaction: Helena Bulka, DO, Troy MI | $148.93 | Thu
+Category: Zusara
+
+Transaction: Sea Ott Swimming, Whippany NJ | $36.59 | Wed
+Category: Sports and recreation
+
+Transaction: Oat's Art Studio And Gallery, Lake Worth FL | $123.39 | Sat
+Category: Arts and entertainment
+
+Transaction: Bent Tree Winery, Mason OH | $32.06 | Mon
+Category: Guval
+
+Transaction: Shasta Starr Ranch Bed and Breakfast, Mount Shasta CA | $219.27 | Mon
+Category: Bed and breakfast
+
+Transaction: Cashmere City Pool, Cashmere WA | $8.43 | Sat
+Category: Sports and recreation
+
+Transaction: Giving Tree Surrogacy, Irvine CA | $19.40 | Tue
+Category: Zusara
+
+Transaction: Neary and Hunter, Worcester MA | $39.07 | Thu
+Category: Zusara
+
+Transaction: Cyberlead Inc. - Car Dealer Leads, Islandia NY | $179.79 | Thu
+Category: Industrial facility or service & b2b service
+
+Transaction: Quail Run Farm, Marshall VA | $188.24 | Mon
+Category: Bed and breakfast
+
+Transaction: Alivemind, Commerce CA | $424.61 | Fri
+Category: Industrial facility or service & b2b service
+
+Transaction: Journeys Coffeehouse, Midland MI | $18.32 | Wed
+Category: Guval
+
+Transaction: SafeSplash - Yonkers - Riverdale, Yonkers NY | $72.66 | Wed
+Category: Sports and recreation
+
+Transaction: Bounce Around Rentals, Delray Beach FL | $117.09 | Mon
+Category: Services and business
+
+Transaction: Noteworthy Guitars, Kingsland GA | $47.64 | Sat
+Category: Rolodex
+
+Transaction: Denham Oaks Elementary School, Lutz FL | $25.15 | Wed
+Category: Education
+
+Transaction: Hanley New York, New York NY | $147.78 | Tue
+Category:
+
+### item 11
+Categories: Food service & wellness service, Education, Safirur, Stadium arena & movie theater, Bugobe, Public transit facility or service & train station, Health care, Food and drink, Services and business, Popebo, B2b transportation and storage service, Shopping, Tamovur, Printing service & legal service, Personal care and beauty store & warehouse club store, Department store & pharmacy and drug store
+
+Transaction: Fam First Trucking, Richmond VA | $169.57 | Wed
+Category: B2b transportation and storage service
+
+Transaction: Rader Funeral Home Longview, Longview TX | $164.97 | Sat
+Category: Printing service & legal service
+
+Transaction: Pet Supermarket, Miami FL | $37.23 | Mon
+Category: Shopping
+
+Transaction: SNOWFOX, St Johns MI | $69.62 | Tue
+Category: Popebo
+
+Transaction: Galfin Passon & Greely LLP, Irvine CA | $8.16 | Wed
+Category: Health care
+
+Transaction: PATCO: Haddonfield Station, Haddonfield NJ | $27.31 | Fri
+Category: Public transit facility or service & train station
+
+Transaction: Lynnwood's Market, Ripley TN | $15.19 | Mon
+Category: Popebo
+
+Transaction: Cache River State Natural Area, Belknap IL | $64.72 | Mon
+Category: Safirur
+
+Transaction: Papa John's Pizza, Los Lunas NM | $44.67 | Mon
+Category: Food service & wellness service
+
+Transaction: Ross Dress for Less, Fort Worth TX | $15.83 | Thu
+Category: Department store & pharmacy and drug store
+
+Transaction: Midway Food Market, Fort Lauderdale FL | $113.45 | Sat
+Category: Popebo
+
+Transaction: East Region Public Health, El Cajon CA | $32.43 | Sun
+Category: Health care
+
+Transaction: Posh Tutoring And Recreation Center, Chicago IL | $45.87 | Mon
+Category: Education
+
+Transaction: Krookid Leyk Distilling, Hammondsport NY | $6.89 | Sun
+Category: Food and drink
+
+Transaction: Black Law Offices, LLC, Toccoa GA | $11.36 | Mon
+Category: Services and business
+
+Transaction: Greyhound: Bus Station, San Jose CA | $11.24 | Wed
+Category: Public transit facility or service & train station
+
+Transaction: Treasury Liquors, Mt Crested Butte CO | $39.27 | Thu
+Category: Popebo
+
+Transaction: Homefield Courts, Olathe KS | $36.77 | Fri
+Category: Stadium arena & movie theater
+
+Transaction: Tony's Meat Market, New York NY | $53.24 | Sun
+Category: Popebo
+
+Transaction: Carondelet Medical Group, Tucson AZ | $137.06 | Fri
+Category: Health care
+
+Transaction: Fastening Solutions, High Point NC | $69.89 | Sat
+Category: Personal care and beauty store & warehouse club store
+
+Transaction: Sojourners Advocacy Cafe, Santa Fe NM | $21.35 | Wed
+Category: Food and drink
+
+Transaction: DeRiso, DeRiso, Suher and Jeffries, Pittsburgh PA | $337.09 | Wed
+Category: Services and business
+
+Transaction: Excel Prosthetics & Orthotics, Bluefield WV | $97.92 | Tue
+Category: Health care
+
+Transaction: Jefferson Child Care Center, Philadelphia PA | $104.23 | Mon
+Category:
+
+### item 12
+Categories: Travel and transportation, Food and drink, Arts and entertainment, Nipe, Private lodging, Services and business, Nokotox, Vodar, Shopping, B2b science and technology service & home service, Felafo, Regor, Health care, Flowers and gifts store & pharmacy and drug store, Second hand store & electronics store
+
+Transaction: Face The Music, Stone Ridge NY | $18.64 | Sun
+Category: Nokotox
+
+Transaction: Acupuncture Professionals, San Francisco CA | $102.18 | Sat
+Category: Regor
+
+Transaction: Brooklyn College-Gershwin Theater, Brooklyn NY | $67.67 | Tue
+Category: Arts and entertainment
+
+Transaction: Ambulance Service-Pope County, Russellville AR | $59.43 | Tue
+Category: Health care
+
+Transaction: The Antique Corner, Piedmont AL | $174.87 | Tue
+Category: Second hand store & electronics store
+
+Transaction: Sano Totum, Cleveland Heights OH | $8.07 | Sat
+Category: Arts and entertainment
+
+Transaction: Keys Training Thrift Store, Homosassa FL | $112.65 | Mon
+Category: Second hand store & electronics store
+
+Transaction: Sunburst Cafe, Naples FL | $36.50 | Mon
+Category: Food and drink
+
+Transaction: Barber Blue Ranch, Blue Ridge TX | $190.01 | Tue
+Category: Private lodging
+
+Transaction: Peppermint Pony, Gadsden AL | $62.52 | Sat
+Category: Flowers and gifts store & pharmacy and drug store
+
+Transaction: Yesterday’s Keepsakes, Hebron ND | $13.32 | Sat
+Category: Second hand store & electronics store
+
+Transaction: Chris Nichols Landscaping, Mt Airy MD | $421.64 | Fri
+Category: B2b science and technology service & home service
+
+Transaction: Club Lobo, Sioux Falls SD | $28.55 | Sat
+Category: Food and drink
+
+Transaction: Vans, Canoga Park CA | $7.77 | Mon
+Category: Services and business
+
+Transaction: psychic readings by regina, Sacramento CA | $104.33 | Sun
+Category: Arts and entertainment
+
+Transaction: HomeGoods, Holland MI | $90.39 | Wed
+Category: Shopping
+
+Transaction: Royalty Design House, Marietta GA | $31.03 | Mon
+Category: B2b science and technology service & home service
+
+Transaction: One More Time Store, Mora MN | $20.19 | Tue
+Category: Second hand store & electronics store
+
+Transaction: NYCHA - Bushwick/Hylan Community Center, Brooklyn NY | $48.38 | Wed
+Category: Arts and entertainment
+
+Transaction: Seattle Financial Staffing, Seattle WA | $21.22 | Sat
+Category: Felafo
+
+Transaction: Mir Corporation, Seattle WA | $16.83 | Sat
+Category: Travel and transportation
+
+Transaction: World Taekwondo Monroe Trumbull, Monroe CT | $24.84 | Thu
+Category: Nipe
+
+Transaction: Trunkshop Apparel, Long Beach CA | $55.85 | Sun
+Category: Second hand store & electronics store
+
+Transaction: Soft Cloud Inc, Los Angeles CA | $255.30 | Thu
+Category: Vodar
+
+Transaction: Calloway Chiropractic, Carlinville IL | $19.67 | Sun
+Category:
+
+### item 13
+Categories: Brewery, Education, Rv park, Arts and entertainment, Housing or property service, Febesor, Health care, Gadizun, Travel and transportation, Automotive service, Shopping, Sodal, Services and business, Financial service & rental service, Sports and recreation, Sport court & dog park, Filofe, Art gallery & event venue, Vehicle dealer, Auto dealer & arts crafts and hobby store
+
+Transaction: Street Game Performance and Customs, Waldorf MD | $126.24 | Sun
+Category: Travel and transportation
+
+Transaction: Mercy Hospital Ardmore, Ardmore OK | $111.14 | Sat
+Category: Gadizun
+
+Transaction: Horse & Dragon Brewing Company, Fort Collins CO | $16.88 | Wed
+Category: Brewery
+
+Transaction: Wellington of Arlington, Arlington Heights IL | $10.35 | Sat
+Category: Art gallery & event venue
+
+Transaction: Zen Den Yoga, Iowa City IA | $77.73 | Fri
+Category: Sports and recreation
+
+Transaction: Joe Belmont Guitar Lessons, Florence MA | $31.15 | Sat
+Category: Febesor
+
+Transaction: Royse City Rv Park, Royse City TX | $168.18 | Sun
+Category: Rv park
+
+Transaction: Fraternal Order Of Eagles, Dickinson ND | $7.92 | Sat
+Category: Filofe
+
+Transaction: Chamber Opera Chicago Studio, Chicago IL | $12.80 | Fri
+Category: Arts and entertainment
+
+Transaction: Classic Legacy, Germantown TN | $75.94 | Wed
+Category: Services and business
+
+Transaction: Ultimate Outdoors, Buffalo WY | $45.15 | Sat
+Category: Automotive service
+
+Transaction: Farm Bureau Insurance, Pikeville TN | $75.39 | Thu
+Category: Financial service & rental service
+
+Transaction: Shredder Authority, Richmond VA | $31.67 | Tue
+Category: Shopping
+
+Transaction: Raw Dog Food and Company, Commerce City CO | $293.38 | Sat
+Category: Sodal
+
+Transaction: Hurst Chiropractic Center, McMinnville TN | $36.28 | Fri
+Category: Health care
+
+Transaction: A Plus Better Nursing Institute, North Miami Beach FL | $70.25 | Fri
+Category: Education
+
+Transaction: Piche Family Chiropractic, Traverse City MI | $86.07 | Sat
+Category: Health care
+
+Transaction: LUKOIL, Camden NJ | $114.48 | Mon
+Category: Travel and transportation
+
+Transaction: Tennis Court 3, New York NY | $9.61 | Mon
+Category: Sport court & dog park
+
+Transaction: Land Rover Cincinnati, Blue Ash OH | $10.85 | Tue
+Category: Auto dealer & arts crafts and hobby store
+
+Transaction: Metro Denver Accident & Injury Centers, Aurora CO | $14.62 | Mon
+Category: Health care
+
+Transaction: Santa Monica Yoga, Santa Monica CA | $9.27 | Tue
+Category: Sports and recreation
+
+Transaction: Gordon Food Service Store, Traverse City MI | $28.08 | Mon
+Category: Shopping
+
+Transaction: Abba House, Chillicothe MO | $439.37 | Fri
+Category: Housing or property service
+
+Transaction: Kem Supply House, Inc., Thibodaux LA | $77.47 | Mon
+Category:
+
+### item 14
+Categories: Gaming venue, Sports and recreation, Wellness service, Kekun, Sorir, Health care, Public transit facility or service, Boramar, Home service, B2b transportation and storage service & supplier or distributor, Services and business, Discount store, Shopping
+
+Transaction: Crescent Products, Rogers MN | $42.24 | Sun
+Category: Shopping
+
+Transaction: Benefit Cosmetics BrowBar, Chico CA | $65.74 | Tue
+Category: Wellness service
+
+Transaction: National Charter Bus Los Angeles, Los Angeles CA | $14.63 | Tue
+Category: Public transit facility or service
+
+Transaction: Dollar General, Greensburg LA | $28.48 | Tue
+Category: Discount store
+
+Transaction: Blue Rhino Propane Exchange, Warrenton MO | $125.42 | Fri
+Category: B2b transportation and storage service & supplier or distributor
+
+Transaction: Link Mechanical, Inc., Mesa AZ | $970.09 | Sat
+Category: Home service
+
+Transaction: Dollar Tree, Metairie LA | $34.45 | Mon
+Category: Discount store
+
+Transaction: Kmart, Harrison OH | $500.29 | Tue
+Category: Discount store
+
+Transaction: Family Dollar, Artesia NM | $44.74 | Fri
+Category: Discount store
+
+Transaction: Greyhound Bus, Gainesville GA | $53.63 | Wed
+Category: Public transit facility or service
+
+Transaction: The Lodge at Doublehead, Town Creek AL | $141.23 | Mon
+Category: B2b transportation and storage service & supplier or distributor
+
+Transaction: Ross Dress for Less, Minot ND | $178.48 | Sun
+Category: Discount store
+
+Transaction: InSight EyeCare, Houston TX | $58.28 | Mon
+Category: Health care
+
+Transaction: Shc Bjj Nova, Ashburn VA | $40.15 | Fri
+Category: Sports and recreation
+
+Transaction: Law Offices Of Mark Tudino, Hollywood FL | $63.75 | Wed
+Category: Boramar
+
+Transaction: The Vida Mia, Honolulu HI | $23.00 | Fri
+Category: Sports and recreation
+
+Transaction: Sanderson's Wooden Bowls, East Burke VT | $13.93 | Sun
+Category: Shopping
+
+Transaction: Grindstone Island Winery, Clayton NY | $16.07 | Tue
+Category: Sorir
+
+Transaction: Odyssey Escape Game Schaumburg, Schaumburg IL | $15.38 | Mon
+Category: Gaming venue
+
+Transaction: Beverly Vista Middle School, Beverly Hills CA | $44.01 | Wed
+Category: Kekun
+
+Transaction: Capital Ophthalmology, Albany NY | $15.87 | Fri
+Category: Health care
+
+Transaction: Dionysus Wine & Brew, Altus AR | $62.57 | Fri
+Category: Sorir
+
+Transaction: Roses Discount Store, Middlesboro KY | $53.90 | Sun
+Category: Discount store
+
+Transaction: Ollie's Bargain Outlet, Joplin MO | $43.35 | Fri
+Category: Discount store
+
+Transaction: Blue Rhino Propane Exchange, Sacramento CA | $40.78 | Sat
+Category:
+
+### item 15
+Categories: Travel and transportation, Vetin, Sports and recreation, Nodafol, Shopping, Bigevix, Bar & restaurant, Services and business, Design service, Bank or credit union & supplier or distributor, Building or construction service & media service, Lelefal, Health care
+
+Transaction: Aeos Web Design, Oakland FL | $66.15 | Tue
+Category: Design service
+
+Transaction: Blackrocks, Presque Isle, Marquette MI | $20.96 | Wed
+Category: Sports and recreation
+
+Transaction: Dixon Library, Dixon CA | $16.96 | Sun
+Category: Nodafol
+
+Transaction: Over the Rainbow Farm, Fallbrook CA | $15.47 | Fri
+Category: Sports and recreation
+
+Transaction: Pickleball Social, Houston TX | $26.83 | Thu
+Category: Sports and recreation
+
+Transaction: Cumberland Marketplace, Silver Spring Twp PA | $57.76 | Mon
+Category: Shopping
+
+Transaction: Saddlebrooke Dentistry, Tucson AZ | $144.48 | Fri
+Category: Health care
+
+Transaction: King of Prussia Mall, Bethlehem PA | $33.07 | Sun
+Category: Shopping
+
+Transaction: Brandywine Ballet Co, West Chester PA | $45.20 | Tue
+Category: Sports and recreation
+
+Transaction: Lincoln Public Library, Lincoln MA | $118.21 | Sat
+Category: Nodafol
+
+Transaction: Exxon, Buckatunna MS | $260.44 | Thu
+Category: Travel and transportation
+
+Transaction: Mariscos Negro Durazo, Chula Vista CA | $3.54 | Wed
+Category: Bar & restaurant
+
+Transaction: Shorecrest Towers at Trump Village 2, Brooklyn NY | $95.20 | Tue
+Category: Services and business
+
+Transaction: NW Radon Testing, Arlington Heights IL | $187.26 | Wed
+Category: Building or construction service & media service
+
+Transaction: Gwinnett Inn, Lilburn GA | $321.24 | Mon
+Category: Bigevix
+
+Transaction: Giorgio’s Discotheque, West Hollywood CA | $37.13 | Thu
+Category: Vetin
+
+Transaction: Blue Rhino Propane Exchange, Marion IN | $201.90 | Wed
+Category: Bank or credit union & supplier or distributor
+
+Transaction: Helen Ross McNabb, Oak Ridge TN | $86.34 | Wed
+Category: Lelefal
+
+Transaction: Mathey Sign, Coon Rapids MN | $222.08 | Wed
+Category: Design service
+
+Transaction: Primeval Games, Kentwood MI | $185.09 | Sun
+Category: Shopping
+
+Transaction: Ventura Place, Studio City CA | $67.68 | Sat
+Category: Shopping
+
+Transaction: Timrod Library, Summerville SC | $280.84 | Thu
+Category: Nodafol
+
+Transaction: Coeur d'Alene Public Library, Coeur D'Alene ID | $104.44 | Fri
+Category: Nodafol
+
+Transaction: The Orchard Inn Boutique Hotel & Spa, Saluda NC | $215.01 | Wed
+Category: Bigevix
+
+Transaction: Dig World, Katy TX | $141.01 | Wed
+Category:
+
+### item 16
+Categories: Kebivon, Travel and transportation, Tafitun, Supplier or distributor, Shopping, Services and business, Condominium & b2b energy and utility service, Casual eatery & bar, Restaurant & lounge, Education, Veror, Electronics store & discount store, Rusabel, Skating rink, Sports and recreation
+
+Transaction: Famous Wok, Rochester NY | $6.24 | Fri
+Category: Restaurant & lounge
+
+Transaction: MC European Inc, Wylie TX | $38.94 | Wed
+Category: Rusabel
+
+Transaction: Norfolk Southern, South Whitley IN | $69.31 | Wed
+Category: Travel and transportation
+
+Transaction: Glendale Garden Terraces, Springfield MO | $45.08 | Mon
+Category: Services and business
+
+Transaction: Don Tomas Bakery, Monte Vista CO | $21.13 | Sat
+Category: Casual eatery & bar
+
+Transaction: Haverford Pharmacy, Philadelphia PA | $43.08 | Sun
+Category: Shopping
+
+Transaction: Radio Maria, Alexandria LA | $26.63 | Tue
+Category: Condominium & b2b energy and utility service
+
+Transaction: Auto Dash, West Point MS | $51.87 | Wed
+Category: Rusabel
+
+Transaction: Borderland Roller Derby, El Paso TX | $18.50 | Mon
+Category: Skating rink
+
+Transaction: University of Minnesota Duluth, Duluth MN | $210.64 | Mon
+Category: Veror
+
+Transaction: Carolina Center of Oncology, North Charleston SC | $165.50 | Tue
+Category: Kebivon
+
+Transaction: South Halifax Park, Robbinsdale MN | $28.13 | Thu
+Category: Sports and recreation
+
+Transaction: Southern Adventist University Fountain, Collegedale TN | $1374.67 | Thu
+Category: Veror
+
+Transaction: Spilman Park, Jeffersonton VA | $45.59 | Thu
+Category: Sports and recreation
+
+Transaction: Grimaldi Candies, Rockledge FL | $12.26 | Sat
+Category: Casual eatery & bar
+
+Transaction: 43rd station, Chicago IL | $40.17 | Sun
+Category: Travel and transportation
+
+Transaction: Family Dollar, Newark OH | $67.38 | Sat
+Category: Electronics store & discount store
+
+Transaction: Hickory Corner Kennels, Vincennes IN | $72.21 | Sun
+Category: Tafitun
+
+Transaction: Blue Rhino Propane Exchange, Hereford TX | $107.19 | Sat
+Category: Supplier or distributor
+
+Transaction: Gator, Myrtle Beach SC | $808.61 | Sun
+Category: Condominium & b2b energy and utility service
+
+Transaction: Volvo Construction Equipment Rents, Mills River NC | $69.13 | Mon
+Category: Rusabel
+
+Transaction: Ecoadventures Llc, Millersville MD | $313.28 | Sat
+Category: Education
+
+Transaction: Dodge City Community College, Dodge City KS | $86.71 | Wed
+Category: Veror
+
+Transaction: Dynamics Auto Center, Highland IN | $83.14 | Wed
+Category: Rusabel
+
+Transaction: Willow Women's Health, Frisco TX | $37.41 | Mon
+Category:
+
+### item 17
+Categories: Education, Food and drink, Travel and transportation, Sports and recreation, Gomol, Shopping, Lodging, Services and business, Industrial facility or service & b2b service, Lidufor, Behavioral or mental health clinic, Media service & farm, Telecommunications service & environmental or ecological service, Arts and entertainment, Dance club & art gallery, Surgery & hospital, Losegun
+
+Transaction: First Convenience Bank, Sherman TX | $15.35 | Fri
+Category: Lidufor
+
+Transaction: The Wreck, Lake Elsinore CA | $7.87 | Mon
+Category: Food and drink
+
+Transaction: Dc Design Professionals, Orlando FL | $152.02 | Mon
+Category: Services and business
+
+Transaction: Green Bay Tap, Wever IA | $20.57 | Fri
+Category: Food and drink
+
+Transaction: Dustie L. Wiser, NP, Blacksburg VA | $201.22 | Fri
+Category: Surgery & hospital
+
+Transaction: COTU Pinball, Ashland VA | $45.86 | Tue
+Category: Arts and entertainment
+
+Transaction: St. Mary's Sun Prairie Emergency Center, Sun Prairie WI | $55.51 | Fri
+Category: Surgery & hospital
+
+Transaction: Delaney Kinchen, D.O., Searcy AR | $26.85 | Fri
+Category: Surgery & hospital
+
+Transaction: Proper Food, San Francisco CA | $89.00 | Tue
+Category: Gomol
+
+Transaction: River Ranch RV Park, Glencoe NM | $489.81 | Wed
+Category: Lodging
+
+Transaction: Elite Tutoring Place, Evansville IN | $211.18 | Sat
+Category: Education
+
+Transaction: Richard F McPartlin M.D., Downers Grove IL | $138.73 | Mon
+Category: Surgery & hospital
+
+Transaction: Vritti Gupta, Sterling Heights MI | $51.93 | Sun
+Category: Surgery & hospital
+
+Transaction: Timato Productions, Vancouver WA | $174.87 | Thu
+Category: Media service & farm
+
+Transaction: Converse Factory Store, Vacaville CA | $105.95 | Fri
+Category: Shopping
+
+Transaction: East Rockaway High School, East Rockaway NY | $34.30 | Tue
+Category: Education
+
+Transaction: Sarah Green, MD, Philadelphia PA | $543.84 | Sat
+Category: Losegun
+
+Transaction: The Edge, Norfolk VA | $28.20 | Mon
+Category: Dance club & art gallery
+
+Transaction: The Meltdown, Hoffman Estates IL | $69.42 | Mon
+Category: Gomol
+
+Transaction: The Beachcomber, Honolulu HI | $8.70 | Tue
+Category: Travel and transportation
+
+Transaction: Verayoga, New York NY | $19.71 | Tue
+Category: Sports and recreation
+
+Transaction: Sultan Loggers, Sultan WA | $45.86 | Fri
+Category: Food and drink
+
+Transaction: Industrious, New York NY | $386.38 | Mon
+Category: Telecommunications service & environmental or ecological service
+
+Transaction: Rose Bean Events & Design, Beaverton OR | $58.63 | Sat
+Category: Industrial facility or service & b2b service
+
+Transaction: Stone House Inn, Little Compton RI | $152.96 | Sat
+Category:
+
+### item 18
+Categories: Memen, Nuredul, Food and drink, Liretil, Education, Shopping, Arts and entertainment, Rubafer, Parking, Travel and transportation, Books music and video store & auto dealer, Deku
+
+Transaction: Royale Transportation, Albany NY | $34.08 | Sun
+Category: Travel and transportation
+
+Transaction: Ampco Products LLC, Miami FL | $36.18 | Sun
+Category: Parking
+
+Transaction: Briarcliffe Swim Club, Darby Twp PA | $34.72 | Mon
+Category: Nuredul
+
+Transaction: Life's Journey Bookstore, Metairie LA | $86.42 | Sat
+Category: Books music and video store & auto dealer
+
+Transaction: Pleasanton Airport Service, Pleasanton CA | $21.56 | Sun
+Category: Travel and transportation
+
+Transaction: Pleasantville Wellness Group, Pleasantville NY | $181.02 | Sun
+Category: Liretil
+
+Transaction: DMY Limo LLC, Anaheim CA | $35.79 | Sun
+Category: Travel and transportation
+
+Transaction: Herb and Plow, Grimsley TN | $113.77 | Fri
+Category: Memen
+
+Transaction: HCI Supply, Jackson TN | $50.23 | Thu
+Category: Shopping
+
+Transaction: Christine Etzrodt, Newtown PA | $139.41 | Mon
+Category: Liretil
+
+Transaction: McDonald's, Brooklyn NY | $27.40 | Wed
+Category: Food and drink
+
+Transaction: South Bend Airport, South Bend IN | $30.82 | Wed
+Category: Travel and transportation
+
+Transaction: NIU School of Music, Dekalb IL | $45.87 | Thu
+Category: Arts and entertainment
+
+Transaction: Flea Junktion, Blue Earth MN | $34.34 | Sun
+Category: Deku
+
+Transaction: Michael’s Divinations , Bloomington IL | $15.90 | Sat
+Category: Rubafer
+
+Transaction: Nereson Automotive Inc., Detroit Lakes MN | $55.65 | Wed
+Category: Travel and transportation
+
+Transaction: Broader Spectrum Counseling Pllc, Hattiesburg MS | $88.31 | Tue
+Category: Liretil
+
+Transaction: 507-509 West 21st Street, New York NY | $90.22 | Mon
+Category: Parking
+
+Transaction: Stiner Pavilion, Waukegan IL | $30.49 | Fri
+Category: Arts and entertainment
+
+Transaction: Taco Tuesday, Chula Vista CA | $10.21 | Mon
+Category: Food and drink
+
+Transaction: The Heritage Players, Catonsville MD | $33.20 | Sun
+Category: Arts and entertainment
+
+Transaction: Seattle Christian Counseling, Seattle WA | $51.53 | Sun
+Category: Liretil
+
+Transaction: Platt Electric Supply, Hamilton MT | $33.97 | Sat
+Category: Shopping
+
+Transaction: Alamo Library, Alamo NV | $210.45 | Thu
+Category: Education
+
+Transaction: LAZ Parking, Aurora CO | $56.44 | Sun
+Category:
+
+### item 19
+Categories: Services and business, Education, Sports and recreation, Gororun, Arts and entertainment, Zodox, Lifestyle services, Vetor, Shopping, Animal and pet store, Specialty store & vehicle dealer, Health care, Kavidal
+
+Transaction: Il Porcellino Salumi Wholesale, Basalt CO | $188.51 | Sun
+Category: Services and business
+
+Transaction: Allyn Ice Arena, Skaneateles NY | $11.05 | Sun
+Category: Sports and recreation
+
+Transaction: Freedom Road Dispensary, Trinidad CO | $83.43 | Thu
+Category: Specialty store & vehicle dealer
+
+Transaction: Great Lakes Kite Boarding, East Tawas MI | $142.75 | Sun
+Category: Specialty store & vehicle dealer
+
+Transaction: Tack Of The Town, Henderson NV | $31.97 | Tue
+Category: Animal and pet store
+
+Transaction: ProHealth Urgent Care, Waukesha WI | $118.51 | Wed
+Category: Kavidal
+
+Transaction: Camel Crossing Bed & Breakfast, Warrensburg MO | $249.42 | Tue
+Category: Zodox
+
+Transaction: BSEtec | Blockchain Development Company, Mesa AZ | $13.14 | Thu
+Category: Arts and entertainment
+
+Transaction: School House Bed & Breakfast, Rocheport MO | $277.98 | Fri
+Category: Zodox
+
+Transaction: Conemaugh Memorial Medical Center, Johnstown PA | $91.42 | Sun
+Category: Health care
+
+Transaction: Cloverhill Yarn Shop, Catonsville MD | $44.44 | Sat
+Category: Shopping
+
+Transaction: Greyhound Bus, McAllen TX | $176.28 | Mon
+Category: Vetor
+
+Transaction: Marston Hall, Amherst MA | $73.82 | Mon
+Category: Education
+
+Transaction: Vfw Post 5612, Plymouth WI | $52.93 | Wed
+Category: Arts and entertainment
+
+Transaction: Astro Skate of Tarpon Springs, Tarpon Springs FL | $35.20 | Sat
+Category: Sports and recreation
+
+Transaction: Redbar, St Francis WI | $22.94 | Mon
+Category: Gororun
+
+Transaction: Twin Creek Kayak and Canoe Livery, Germantown OH | $260.28 | Wed
+Category: Sports and recreation
+
+Transaction: Cloudm New York Times Square, New York NY | $23.51 | Tue
+Category: Gororun
+
+Transaction: The SpeakEasy Marco Island, Marco Island FL | $20.88 | Mon
+Category: Gororun
+
+Transaction: O'Connor Company Inc, Oklahoma City OK | $125.72 | Wed
+Category: Services and business
+
+Transaction: Jimmie's Rollerdrome, Elsmere KY | $58.09 | Sat
+Category: Sports and recreation
+
+Transaction: Fuel4life, Hopewell Junction NY | $32.83 | Sun
+Category: Lifestyle services
+
+Transaction: Crestwood train station, Tuckahoe NY | $3.82 | Fri
+Category: Vetor
+
+Transaction: The Happy Beast, Lafayette CO | $219.84 | Sun
+Category: Animal and pet store
+
+Transaction: Meadow Park Rehabilitation & Healthcare, Catonsville MD | $190.62 | Fri
+Category:
+
+### item 20
+Categories: Health care, Zuken, Education, Dada, Lodging, Wellness service, Gaming venue & amusement park, Punovar, Zavizal, Sports and recreation, Kebel, Shopping, Services and business, Folese, Apartment & media service, Vopax
+
+Transaction: Eco Sober House, Boston MA | $74.44 | Wed
+Category: Vopax
+
+Transaction: Circle of Events, Fresno CA | $306.97 | Sun
+Category: Vopax
+
+Transaction: Delaware Ave Parking Lot, Towson MD | $92.34 | Tue
+Category: Dada
+
+Transaction: Jay Peak Resort, Jay VT | $61.48 | Fri
+Category: Lodging
+
+Transaction: Walmart Express, Pikeville NC | $73.48 | Sun
+Category: Kebel
+
+Transaction: Dr. Riolan Marbun, San Diego CA | $146.15 | Tue
+Category: Health care
+
+Transaction: Perry City Recreation Department, Perry IA | $50.98 | Thu
+Category: Zavizal
+
+Transaction: Saint Lawrence Academy, Santa Clara CA | $69.44 | Sat
+Category: Education
+
+Transaction: Beliefs Project, Reno NV | $41.42 | Wed
+Category: Vopax
+
+Transaction: A & W Communications, Inc., Monroeville PA | $705.83 | Thu
+Category: Services and business
+
+Transaction: Runenation, Gilsum NH | $33.15 | Sat
+Category: Zavizal
+
+Transaction: Ketterer's Rescue Products, Harrisburg PA | $53.29 | Sun
+Category: Shopping
+
+Transaction: Winners Pull Tabs, Wasilla AK | $14.07 | Wed
+Category: Gaming venue & amusement park
+
+Transaction: Crown Point Swim Club, Crown Point IN | $67.89 | Thu
+Category: Sports and recreation
+
+Transaction: Rodeway Inn, Grand Island NE | $163.17 | Sun
+Category: Lodging
+
+Transaction: Stonecreek Pool, Raleigh NC | $18.61 | Fri
+Category: Sports and recreation
+
+Transaction: Trio Pharmaceuticals, Inc., San Diego CA | $61.63 | Mon
+Category: Vopax
+
+Transaction: Cadbury Press Inc, West Babylon NY | $52.49 | Wed
+Category: Apartment & media service
+
+Transaction: City of Jacksonville Library Garage, Jacksonville FL | $66.80 | Wed
+Category: Dada
+
+Transaction: At&t Store, Warren NJ | $31.13 | Thu
+Category: Shopping
+
+Transaction: Xenikos Us Inc., Syracuse NY | $35.72 | Tue
+Category: Vopax
+
+Transaction: BREC Olympia Stadium, Baton Rouge LA | $32.46 | Fri
+Category: Punovar
+
+Transaction: Baymont by Wyndham Tallahassee Central, Tallahassee FL | $167.26 | Wed
+Category: Lodging
+
+Transaction: Spanglish Radio, Lawrence MA | $157.85 | Sun
+Category: Folese
+
+Transaction: EDU PrepSpace, Houston TX | $162.40 | Sun
+Category:
+
+### item 21
+Categories: Lodging, Food and drink, Penox, Lifestyle services, Novifu, Zibimar, Mozel, Shopping, Pharmacy and drug store & hardware home and garden store, Education, Rakutux, Health care, Giral, Corporate or business office, Event or party service & industrial facility or service
+
+Transaction: Interstate bingo, Bristol VA | $16.04 | Mon
+Category: Novifu
+
+Transaction: Hertz Car Rental - Rincon - Ga-21 HLE, Rincon GA | $16.46 | Tue
+Category: Zibimar
+
+Transaction: Jyoti Sharma, MD, Enola PA | $146.18 | Thu
+Category: Giral
+
+Transaction: NeighboRx Pharmacy, Pearl River NY | $22.16 | Sat
+Category: Pharmacy and drug store & hardware home and garden store
+
+Transaction: Popular Market, Lawrence MA | $283.38 | Thu
+Category: Shopping
+
+Transaction: Gypsy Glen Stadium, Beaver PA | $32.23 | Sun
+Category: Novifu
+
+Transaction: Novaone Networks, Madison WI | $7.60 | Mon
+Category: Event or party service & industrial facility or service
+
+Transaction: Chrissa Imports Ltd, South San Francisco CA | $14.31 | Mon
+Category: Shopping
+
+Transaction: Tu-Endie-Wei State Park, Point Pleasant WV | $17.22 | Wed
+Category: Penox
+
+Transaction: Kaleidoscope Massage, Fairbanks AK | $37.04 | Thu
+Category: Lifestyle services
+
+Transaction: Burger King, Delaware OH | $7.37 | Sun
+Category: Food and drink
+
+Transaction: Walmart Vision & Glasses, Las Vegas NV | $191.45 | Thu
+Category: Health care
+
+Transaction: Circle K, Bessemer AL | $37.05 | Tue
+Category: Shopping
+
+Transaction: McManigal Electric, LLC, Holton KS | $239.31 | Fri
+Category: Mozel
+
+Transaction: Razzle Dazzle Body Co, Austin TX | $22.87 | Wed
+Category: Lifestyle services
+
+Transaction: Walgreens, Old Bridge NJ | $181.68 | Mon
+Category: Pharmacy and drug store & hardware home and garden store
+
+Transaction: George Washington Wood Bed and Breakfast, Conshohocken PA | $686.69 | Sat
+Category: Lodging
+
+Transaction: BU Bruins, Bellevue NE | $90.53 | Mon
+Category: Rakutux
+
+Transaction: Billtown Escape Rooms, Williamsport PA | $30.83 | Sat
+Category: Novifu
+
+Transaction: S B Mart Convenience Store, New Haven CT | $18.94 | Wed
+Category: Shopping
+
+Transaction: Cornell Pharmacy Inc, Cornell WI | $107.56 | Thu
+Category: Pharmacy and drug store & hardware home and garden store
+
+Transaction: Blake's Country Store, Union Grove NC | $231.37 | Mon
+Category: Shopping
+
+Transaction: Curant Health, Smyrna GA | $175.89 | Fri
+Category: Pharmacy and drug store & hardware home and garden store
+
+Transaction: Tom Thumb, Milton FL | $177.90 | Thu
+Category: Shopping
+
+Transaction: Scout Shop, Indianapolis IN | $87.77 | Sun
+Category:
+
+### item 22
+Categories: Maga, Zosifen, Health care, Vehicle service, Services and business, Home service & radio station, Punol, Arts and entertainment, Nubu, Education, Sports and recreation, Skating rink & fitness studio, Food and drink, Lounge & coffee shop, Shopping, Warehouse club store & specialty store, Farmers market & convenience store, Ripavor
+
+Transaction: El Colega, Odessa TX | $11.84 | Thu
+Category: Food and drink
+
+Transaction: Hartland Farmer's Market, Hartland MI | $104.04 | Mon
+Category: Farmers market & convenience store
+
+Transaction: Starlite Skate Center, Topeka KS | $25.05 | Sun
+Category: Skating rink & fitness studio
+
+Transaction: Palmina Wines Tasting Room, Solvang CA | $20.92 | Fri
+Category: Food and drink
+
+Transaction: Willamette University Volleyball Parking, Salem OR | $44.32 | Wed
+Category: Sports and recreation
+
+Transaction: Miller Family Farm, Durham ME | $10.54 | Mon
+Category: Shopping
+
+Transaction: Jmb Solutions Llc, Lewiston ID | $30.91 | Wed
+Category: Ripavor
+
+Transaction: Gateway Fun Park, Collinsville IL | $50.54 | Fri
+Category: Punol
+
+Transaction: Sun Diego, San Diego CA | $95.01 | Mon
+Category: Ripavor
+
+Transaction: United States Postal Service, Lincoln Park MI | $81.59 | Sat
+Category: Services and business
+
+Transaction: Harbor Freight Tools, Streetsboro OH | $25.81 | Mon
+Category: Shopping
+
+Transaction: Speedie Recovery and Towing, Cape Coral FL | $33.55 | Fri
+Category: Vehicle service
+
+Transaction: Kkid 92.9 Fm, Rolla MO | $57.97 | Mon
+Category: Home service & radio station
+
+Transaction: Starbucks, Minneapolis MN | $16.15 | Thu
+Category: Lounge & coffee shop
+
+Transaction: After School Programs, Orlando FL | $43.49 | Sat
+Category: Education
+
+Transaction: Blacksburg RV Park, Blacksburg SC | $29.65 | Thu
+Category: Zosifen
+
+Transaction: Capitol Bingo, Austin TX | $52.04 | Tue
+Category: Punol
+
+Transaction: Man Vs Fries, Grand Prairie TX | $58.84 | Thu
+Category: Maga
+
+Transaction: AA & J Discount, Wyoming MI | $73.47 | Mon
+Category: Warehouse club store & specialty store
+
+Transaction: United Express Care, Lubbock TX | $60.92 | Fri
+Category: Health care
+
+Transaction: Toys "R" US, Sherman TX | $235.01 | Wed
+Category: Ripavor
+
+Transaction: City Knoll Middle School Ms 933, New York NY | $88.25 | Mon
+Category: Nubu
+
+Transaction: Jack Kane Custom Bikes, Jacksonville NC | $34.57 | Sat
+Category: Ripavor
+
+Transaction: WEEI Boston's Sports Original, Boston MA | $186.72 | Tue
+Category: Home service & radio station
+
+Transaction: Whispers Bar & Lounge, Lithonia GA | $13.19 | Thu
+Category:
+
+### item 23
+Categories: Education, Health care, Lodging, Dagir, Lounge, Shopping, Services and business, Kigax, Travel and transportation, Parking & airport, Sport or recreation club, Dog park & sport field, Vehicle dealer & electronics store, Discount store & fashion and apparel store, Letax, Toful
+
+Transaction: Fertilizers Usa Llc, Newport Beach CA | $37.06 | Tue
+Category: Kigax
+
+Transaction: SP+, Harrisburg PA | $30.71 | Mon
+Category: Parking & airport
+
+Transaction: Mt Tabor Preschool Program, Winston Salem NC | $159.01 | Fri
+Category: Education
+
+Transaction: Blossman Gas, Gordonsville VA | $63.14 | Thu
+Category: Services and business
+
+Transaction: Fredericksburg H-E-B, Fredericksburg TX | $103.50 | Mon
+Category: Toful
+
+Transaction: American Eagle MMA & Kettlebells, Ho Ho Kus NJ | $20.37 | Fri
+Category: Sport or recreation club
+
+Transaction: Paramus Park, Paramus NJ | $65.00 | Fri
+Category: Shopping
+
+Transaction: Animalbiome, Oakland CA | $38.17 | Tue
+Category: Kigax
+
+Transaction: Dover Downs, Dover DE | $26.48 | Sun
+Category: Dagir
+
+Transaction: The Let's Roll Express, Fall River MA | $47.57 | Thu
+Category: Toful
+
+Transaction: The Lounge, Orange NJ | $6.71 | Wed
+Category: Lounge
+
+Transaction: Quick Lane at Thomas Ford, Beverly MA | $75.32 | Thu
+Category: Travel and transportation
+
+Transaction: Red Lake Falls Volunteer Ambulance, Red Lake Falls MN | $63.36 | Sat
+Category: Health care
+
+Transaction: Verizon, Gloucester Twp NJ | $102.35 | Mon
+Category: Vehicle dealer & electronics store
+
+Transaction: Angel's Secret, Boynton Beach FL | $50.17 | Sat
+Category: Discount store & fashion and apparel store
+
+Transaction: Acme Superstore, Longwood FL | $20.15 | Sun
+Category: Vehicle dealer & electronics store
+
+Transaction: Maui Breeze Retreat, Wailea HI | $332.14 | Tue
+Category: Lodging
+
+Transaction: Jefferson Lines, Cameron MO | $47.81 | Thu
+Category: Travel and transportation
+
+Transaction: Jackpot Joanie's, Las Vegas NV | $28.52 | Fri
+Category: Dagir
+
+Transaction: Westminster Preschool, West Chester PA | $36.73 | Fri
+Category: Education
+
+Transaction: Labelle Golf Club, Oconomowoc WI | $43.04 | Thu
+Category: Dog park & sport field
+
+Transaction: Kenneth E Foeste Masonry Inc, Cape Girardeau MO | $420.04 | Fri
+Category: Services and business
+
+Transaction: Ithaca League Of Women Rollers, Ithaca NY | $17.75 | Fri
+Category: Dog park & sport field
+
+Transaction: Regulatory Training Center, South Charleston WV | $300.38 | Sat
+Category: Services and business
+
+Transaction: Parc Court Condominium Association, Plantation FL | $681.17 | Tue
+Category:
+
+### item 24
+Categories: Education, Wellness service, Lodging, Services and business, Pharmacy and drug store, Supplier or distributor & real estate service, Gira, Litax, Food and drink, Shopping, Auto dealer & flowers and gifts store, Sports and recreation, Skate park & golf course, Stadium arena, Arts and entertainment, Health care, Urgent care clinic, Travel and transportation, Automotive service & gas station
+
+Transaction: Sherwin-Williams, Atlanta GA | $70.11 | Thu
+Category: Auto dealer & flowers and gifts store
+
+Transaction: Pentagon Metro Station, Arlington VA | $87.67 | Tue
+Category: Travel and transportation
+
+Transaction: UPS Authorized Shipping Outlet, Republic MO | $54.12 | Fri
+Category: Gira
+
+Transaction: Exeter Lions Little League, Exeter PA | $59.84 | Thu
+Category: Sports and recreation
+
+Transaction: Juice Stop, Sioux Falls SD | $22.61 | Mon
+Category: Food and drink
+
+Transaction: Blue Rhino Propane Exchange, Buford GA | $49.53 | Sun
+Category: Supplier or distributor & real estate service
+
+Transaction: Planet Smoothie, Athens GA | $116.24 | Wed
+Category: Food and drink
+
+Transaction: The Palms RV Park, Aransas Pass TX | $134.73 | Sun
+Category: Lodging
+
+Transaction: Vinted Go Parcel Shop, Houston  | $48.61 | Fri
+Category: Gira
+
+Transaction: Z Med Clinic, Houston TX | $33.31 | Wed
+Category: Wellness service
+
+Transaction: Waukesha Cellphone Repair, Waukesha WI | $58.40 | Wed
+Category: Shopping
+
+Transaction: Xtreme Nutrition, Nederland TX | $9.26 | Thu
+Category: Litax
+
+Transaction: Fraternal Order Of Eagles, Wooster OH | $11.42 | Wed
+Category: Arts and entertainment
+
+Transaction: County Drug, Sturgis SD | $170.17 | Wed
+Category: Pharmacy and drug store
+
+Transaction: Puree Artisan Juice Bar, Bethesda MD | $24.56 | Sun
+Category: Food and drink
+
+Transaction: Mathnasium, Los Feliz CA | $207.87 | Sun
+Category: Education
+
+Transaction: The Forest of Nisene Marks State Park, Aptos CA | $35.38 | Wed
+Category: Skate park & golf course
+
+Transaction: Baxter's Lakeside Grille, Lake Ozark MO | $13.26 | Thu
+Category: Litax
+
+Transaction: Troy Junior Baseball Knoop Complex, Troy OH | $7.27 | Thu
+Category: Sports and recreation
+
+Transaction: Moe's Southwest Grill, Hanover MD | $13.89 | Fri
+Category: Litax
+
+Transaction: Sanford Bemidji Clinic 1705 Anne St, Bemidji MN | $62.06 | Mon
+Category: Health care
+
+Transaction: Hacienda Del Rio, Edgewater FL | $6.77 | Sun
+Category: Services and business
+
+Transaction: Ripley’s Mirror Maze, Orlando FL | $27.64 | Fri
+Category: Arts and entertainment
+
+Transaction: Dana's 360 Nutrition, Granbury TX | $12.07 | Sun
+Category: Food and drink
+
+Transaction: American Powder Coating, Merced CA | $817.05 | Fri
+Category:
+
+### item 25
+Categories: Specialty school, Gaka, Food service, Attorney or law firm, Ranufor, Services and business, Shipping or delivery service & building or construction service, Tonolu, Lodging, Gizomur, Arts and entertainment, Health care, Surgery, Warehouse club store, Shopping, Sports and recreation, Swimming pool, Bazar, Faper
+
+Transaction: United States Postal Service, Whittington IL | $194.07 | Sat
+Category: Shipping or delivery service & building or construction service
+
+Transaction: Ivy Rehab Physical Therapy, Lumberton NJ | $91.38 | Mon
+Category: Health care
+
+Transaction: Phillips 66, Coalinga CA | $14.86 | Wed
+Category: Shopping
+
+Transaction: Domino's Pizza, Valdese NC | $75.52 | Tue
+Category: Food service
+
+Transaction: Rowlett Piano Studio, Rowlett TX | $269.37 | Fri
+Category: Specialty school
+
+Transaction: Southside Investment Club, Affton MO | $14.19 | Fri
+Category: Arts and entertainment
+
+Transaction: Webster Wellness Professionals, Webster Groves MO | $291.37 | Mon
+Category: Ranufor
+
+Transaction: Atlantan Hotel, Atlanta GA | $291.86 | Mon
+Category: Tonolu
+
+Transaction: Innovations Medical, Dallas TX | $64.81 | Thu
+Category: Surgery
+
+Transaction: Gulfstream Aerospace Corporation, Westfield MA | $12.11 | Sat
+Category: Faper
+
+Transaction: Oktober Haus in Downtown Hermann, Hermann MO | $425.10 | Sat
+Category: Lodging
+
+Transaction: Spear Machine LLC, Sand Springs OK | $198.59 | Sat
+Category: Faper
+
+Transaction: Courtney Tafesse, Murfreesboro TN | $68.24 | Tue
+Category: Health care
+
+Transaction: Nancy's house of psychic wonders, Los Angeles CA | $39.62 | Fri
+Category: Gizomur
+
+Transaction: Berkeley Park Outdoor Pool, Denver CO | $8.27 | Sat
+Category: Swimming pool
+
+Transaction: Jared's Dream Playground, Columbia TN | $18.00 | Sat
+Category: Sports and recreation
+
+Transaction: Scottsdale Property Management, Scottsdale AZ | $64.63 | Sat
+Category: Services and business
+
+Transaction: Tropic Supply, Cape Coral FL | $90.06 | Thu
+Category: Warehouse club store
+
+Transaction: Clearlab US Inc., Suwanee GA | $74.17 | Thu
+Category: Bazar
+
+Transaction: Bennett-Rogers Pipe Coating, Kansas City KS | $183.49 | Wed
+Category: Faper
+
+Transaction: Desert Hand and Physical Therapy, Peoria AZ | $104.10 | Thu
+Category: Health care
+
+Transaction: Matthew Joseph TerBush, MD, Erie PA | $57.23 | Thu
+Category: Surgery
+
+Transaction: Law Offices of Dean C Werst, West Linn OR | $25.83 | Mon
+Category: Attorney or law firm
+
+Transaction: Rami Lutfi, Md, Chicago IL | $89.52 | Fri
+Category: Surgery
+
+Transaction: Mary Korpacz Fink, Islip NY | $126.82 | Thu
+Category:
+
+### item 26
+Categories: Lodging, Lifestyle services, Travel and transportation, Professional service & printing service, Sports and recreation, Services and business, Media service & industrial facility or service, Security service & apartment, Shopping, Personal care and beauty store, Arts and entertainment, Sotozor, Fanor, Health care, Playground & golf course, Skating rink, Neranul, Food and drink, Place of learning, High school & campus building
+
+Transaction: Palamerican Security Salt Lake City, Murray UT | $66.69 | Wed
+Category: Security service & apartment
+
+Transaction: The Lakes at El Segundo, El Segundo CA | $62.99 | Fri
+Category: Playground & golf course
+
+Transaction: Beverly Stores Llc, Beverly Hills CA | $51.34 | Sun
+Category: Services and business
+
+Transaction: Printlynx, Sedalia MO | $80.73 | Sun
+Category: Professional service & printing service
+
+Transaction: Collar and Comb Dog Grooming LLC, York NE | $78.34 | Sat
+Category: Lifestyle services
+
+Transaction: Whispering Waters Campground, Hastings MI | $929.60 | Sat
+Category: Lodging
+
+Transaction: Buffalo Ridge Apartments, Silverthorne CO | $34.53 | Sat
+Category: Services and business
+
+Transaction: Central Texas Bark Park, Temple TX | $23.32 | Fri
+Category: Sports and recreation
+
+Transaction: Twisted L Coatings, Waller TX | $140.79 | Mon
+Category: Media service & industrial facility or service
+
+Transaction: Ivory Nola Lounge, Harvey LA | $10.58 | Mon
+Category: Neranul
+
+Transaction: Boardwalk Bumper Buggies, Vallejo CA | $362.69 | Fri
+Category: Arts and entertainment
+
+Transaction: Next Gen Surface Solutions, Alton NH | $501.56 | Tue
+Category: Media service & industrial facility or service
+
+Transaction: Universal Medical Service, Brooklyn NY | $188.97 | Sun
+Category: Health care
+
+Transaction: Starbucks, Agawam MA | $19.18 | Wed
+Category: Food and drink
+
+Transaction: Broken String Guitars, Salida CO | $147.55 | Tue
+Category: Shopping
+
+Transaction: The Studio Theatre, Little Rock AR | $13.70 | Sun
+Category: Sotozor
+
+Transaction: Englewood STEM High School, Chicago IL | $73.08 | Wed
+Category: High school & campus building
+
+Transaction: Bell Supply Co, Evans CO | $50.59 | Mon
+Category: Professional service & printing service
+
+Transaction: Dragonfly Psychological Services, Topsham ME | $47.14 | Fri
+Category: Fanor
+
+Transaction: Starbucks, Petaluma CA | $9.45 | Thu
+Category: Food and drink
+
+Transaction: St. Joseph Academy, Walton KY | $130.60 | Tue
+Category: Place of learning
+
+Transaction: Elite Town Car Services, Houston TX | $42.56 | Fri
+Category: Travel and transportation
+
+Transaction: CosmoProf, Chula Vista CA | $35.20 | Sat
+Category: Personal care and beauty store
+
+Transaction: Gateway Powder Coating, O Fallon MO | $241.39 | Sun
+Category: Media service & industrial facility or service
+
+Transaction: Lake Champlain Chamber Music Festival, Winooski VT | $28.12 | Sat
+Category:
+
+### item 27
+Categories: Sports and recreation, Bodolel, Lifestyle services, Health care, Lodging, Food and drink, Psychic advising, Condominium & design service, Gamenix, Figesex, Books music and video store, Education, Campus building & preschool, Telecommunications service, Services and business, Vehicle parts store, Animal and pet store & auto dealer
+
+Transaction: William G. Houston Middle School, Angola NY | $311.76 | Wed
+Category: Education
+
+Transaction: International Sports Bar, San Francisco CA | $6.32 | Tue
+Category: Food and drink
+
+Transaction: Wag N' Wash, Littleton CO | $77.35 | Sun
+Category: Animal and pet store & auto dealer
+
+Transaction: Beachcomber Resort, Lucerne CA | $212.54 | Sat
+Category: Lodging
+
+Transaction: Lawn Medic of Syracuse, Baldwinsville NY | $27.92 | Sat
+Category: Services and business
+
+Transaction: VAB Studio, Greenacres FL | $60.90 | Wed
+Category: Lifestyle services
+
+Transaction: Addiction Rehab Leesburg, Leesburg VA | $24.44 | Sun
+Category: Health care
+
+Transaction: Hillside Middle School, Manchester NH | $23.64 | Sat
+Category: Education
+
+Transaction: DHR Global, Franklin TN | $58.35 | Sat
+Category: Condominium & design service
+
+Transaction: Crystal Visions Spiritual Center, Calabasas CA | $47.70 | Mon
+Category: Psychic advising
+
+Transaction: Davenport University, Holland MI | $124.24 | Sun
+Category: Campus building & preschool
+
+Transaction: Gulf Middle School, Cape Coral FL | $202.77 | Thu
+Category: Education
+
+Transaction: Ars Of Aberdeen, Aberdeen MD | $48.78 | Thu
+Category: Health care
+
+Transaction: Alliance Medical Supply & Rntl, San Jose CA | $37.50 | Wed
+Category: Gamenix
+
+Transaction: Kucera Middle School, Rialto CA | $107.60 | Sun
+Category: Education
+
+Transaction: Select Physical Therapy, Santee CA | $127.62 | Wed
+Category: Health care
+
+Transaction: Travel Refresh 365, Corrigan TX | $43.78 | Sun
+Category: Bodolel
+
+Transaction: Waynesville Middle School, Waynesville NC | $40.49 | Tue
+Category: Education
+
+Transaction: Quality Inn, Huntington WV | $97.53 | Sun
+Category: Lodging
+
+Transaction: Wellspring Physical Therapy, Federal Way WA | $270.09 | Mon
+Category: Health care
+
+Transaction: Crossroads, Phoenix AZ | $280.07 | Tue
+Category: Health care
+
+Transaction: Colocation America, San Francisco CA | $109.00 | Tue
+Category: Telecommunications service
+
+Transaction: Hermano Jesus, Miami FL | $45.13 | Wed
+Category: Psychic advising
+
+Transaction: True Living Fitness LLC, Centennial CO | $43.98 | Fri
+Category: Sports and recreation
+
+Transaction: Allied Oil & Supply, Inc., Hugo MN | $66.34 | Tue
+Category:
+
+### item 28
+Categories: Nekun, Dadulel, Travel and transportation, Education, Befux, Services and business, Wholesaler, B2b energy and utility service & security service, Office supply store, Real estate service & technical service, Mugirex, Vehicle dealer, Goter, Campground, Lodging
+
+Transaction: Digital Copier Supercenter, Elk Grove Village IL | $13.07 | Tue
+Category: Office supply store
+
+Transaction: Quiet Valley Mobile Village, Vernon NY | $33.61 | Sun
+Category: B2b energy and utility service & security service
+
+Transaction: Formost Graphic Communications, Gaithersburg MD | $176.81 | Tue
+Category: Mugirex
+
+Transaction: Orlando Chauffeured Services Inc., Orlando FL | $23.91 | Wed
+Category: Travel and transportation
+
+Transaction: Big Bear Mobile Estate, Big Bear Lake CA | $92.38 | Sun
+Category: B2b energy and utility service & security service
+
+Transaction: Bruce Kirschner, M.D., Burlingame CA | $39.52 | Mon
+Category: Dadulel
+
+Transaction: Bed and Breakfast, Louisville KY | $158.79 | Sun
+Category: Lodging
+
+Transaction: Weston's Market, Murrieta CA | $34.09 | Sat
+Category: Goter
+
+Transaction: The Oak Bluffs Inn, Oak Bluffs MA | $71.46 | Mon
+Category: Lodging
+
+Transaction: Hoyt House Bed & Breakfast, Fernandina Beach FL | $115.03 | Thu
+Category: Lodging
+
+Transaction: WNWN, Kalamazoo MI | $431.86 | Mon
+Category: Services and business
+
+Transaction: Moon Star BBS, Farmville VA | $39.61 | Sun
+Category: Real estate service & technical service
+
+Transaction: SuperGreen Solutions, Georgetown KY | $133.35 | Wed
+Category: B2b energy and utility service & security service
+
+Transaction: Old Fort Harrod State Park, Harrodsburg KY | $15.92 | Sat
+Category: Befux
+
+Transaction: Starkey Campground, Eureka Springs AR | $195.75 | Mon
+Category: Campground
+
+Transaction: The Launch Pad Guest House, Moab UT | $111.02 | Fri
+Category: Lodging
+
+Transaction: Jones Sand Volleyball Court, Wiscasset ME | $127.96 | Tue
+Category: Befux
+
+Transaction: 20/20 Eye Clinic, Houston TX | $144.90 | Sun
+Category: Dadulel
+
+Transaction: Windy Hill Tree Farm, Massillon OH | $20.55 | Sun
+Category: Mugirex
+
+Transaction: Zane Grey Lounge, Islamorada FL | $69.38 | Fri
+Category: Nekun
+
+Transaction: Allegiance Bed & Breakfast, Mt Morris NY | $235.03 | Thu
+Category: Lodging
+
+Transaction: Hulbert High School Football Field, Hulbert OK | $313.57 | Sat
+Category: Education
+
+Transaction: West End Eye Care, Hartford CT | $169.75 | Sun
+Category: Dadulel
+
+Transaction: Heritage Oaks Racquet Club, Jupiter FL | $41.12 | Mon
+Category: Befux
+
+Transaction: Wilmington Beach Academy, Leland NC | $30.61 | Wed
+Category:
+
+### item 29
+Categories: Food and drink, Health care, Travel and transportation, Campground, Shopping, Arts and entertainment, Personal or beauty service, Sports and recreation, Gebegol, Education, College university & library, Goguzin, Services and business
+
+Transaction: Wappinger Creek Greenway Trail, La Grange NY | $49.61 | Mon
+Category: Sports and recreation
+
+Transaction: Scaroon Manor, Schroon Lake NY | $35.91 | Sun
+Category: Campground
+
+Transaction: Children's Institute Inc. Watts Site, Los Angeles CA | $20.98 | Mon
+Category: Health care
+
+Transaction: Not Quite Opera Productions, San Francisco CA | $72.55 | Fri
+Category: Arts and entertainment
+
+Transaction: Virgin Falls Main Trailhead, Sparta TN | $32.21 | Sun
+Category: Sports and recreation
+
+Transaction: Storar Construction, Bakersfield CA | $753.13 | Sat
+Category: Services and business
+
+Transaction: Camp Yale, McKenzie Bridge OR | $356.32 | Mon
+Category: Campground
+
+Transaction: Paradise Pools by the Lake, South Hill VA | $1475.93 | Fri
+Category: Services and business
+
+Transaction: AB&A Towing, Irving TX | $366.28 | Sun
+Category: Travel and transportation
+
+Transaction: Marshall Middle School, Wichita KS | $88.38 | Fri
+Category: Education
+
+Transaction: Camping World, West Boylston MA | $121.91 | Sun
+Category: Shopping
+
+Transaction: Purdue Borch Dept of MCMP, West Lafayette IN | $39.48 | Tue
+Category: College university & library
+
+Transaction: Washington Junior High School, Naperville IL | $246.70 | Fri
+Category: College university & library
+
+Transaction: Music for Christ Studios, Bridgeport CT | $190.11 | Sun
+Category: Education
+
+Transaction: Scripps College of Communication, Athens OH | $699.85 | Wed
+Category: College university & library
+
+Transaction: Sinnin Skinn InkWorks, Brodhead WI | $46.59 | Sat
+Category: Personal or beauty service
+
+Transaction: Wilson Medical Associates, Wilson NC | $141.39 | Sun
+Category: Health care
+
+Transaction: Cargill Long Park, Longview TX | $103.73 | Thu
+Category: Sports and recreation
+
+Transaction: Smith Roofing Co, San Diego CA | $25.54 | Mon
+Category: Services and business
+
+Transaction: Elmont Career Center, Hempstead NY | $118.69 | Sat
+Category: Education
+
+Transaction: Medical Center of Margate, Margate City NJ | $39.13 | Mon
+Category: Health care
+
+Transaction: Crescent Farm, Clinton SC | $15.84 | Thu
+Category: Food and drink
+
+Transaction: Sendero de luz tarot, Rapid City SD | $44.83 | Wed
+Category: Gebegol
+
+Transaction: Iowa State Bank, Des Moines IA | $210.01 | Mon
+Category: Goguzin
+
+Transaction: New Mexico Tech Macey Conference Center, Socorro NM | $78.37 | Sun
+Category:
+
+### item 30
+Categories: Food and drink, Health care, Food service, Education, Travel and transportation, Lodging, Services and business, Shopping, Real estate service & telecommunications service, Home service & family service, Arts and entertainment, Art gallery & movie theater, Sports and recreation, Sport field, Convenience store & second hand store, Hardware home and garden store
+
+Transaction: Friendly Mart Inc, Faison NC | $115.62 | Thu
+Category: Convenience store & second hand store
+
+Transaction: Chungking Studio, Los Angeles CA | $12.56 | Sat
+Category: Art gallery & movie theater
+
+Transaction: T-Mobile, Whittier CA | $14.01 | Thu
+Category: Shopping
+
+Transaction: Avon Grove Flag Football, London Grove Twp PA | $78.53 | Wed
+Category: Sports and recreation
+
+Transaction: Moakley Center for Public Management, Boston MA | $228.79 | Tue
+Category: Education
+
+Transaction: WilcoHess, La Grange NC | $35.49 | Mon
+Category: Convenience store & second hand store
+
+Transaction: Harrisonville Telephone Company, Waterloo IL | $57.17 | Wed
+Category: Real estate service & telecommunications service
+
+Transaction: Boedeker's Bungalow - Westside B&B, Maynard IA | $190.61 | Tue
+Category: Lodging
+
+Transaction: Mundrugstore, Los Angeles CA | $445.77 | Sun
+Category: Health care
+
+Transaction: Curtis Britch, Newport VT | $181.72 | Tue
+Category: Home service & family service
+
+Transaction: ZIP ZONE EXPRESS INC 4, Debord KY | $60.54 | Mon
+Category: Travel and transportation
+
+Transaction: BP, Spencer NC | $93.42 | Thu
+Category: Travel and transportation
+
+Transaction: The Boulevard Inn, Richmond VA | $465.53 | Wed
+Category: Lodging
+
+Transaction: Sunoco, Cincinnati OH | $19.02 | Sat
+Category: Travel and transportation
+
+Transaction: Visions Mens Club, New Orleans LA | $51.95 | Fri
+Category: Arts and entertainment
+
+Transaction: ON THE WAY, Bloomington IN | $51.08 | Fri
+Category: Travel and transportation
+
+Transaction: The Saint Louis University Museum Of Art, Saint Louis MO | $18.12 | Fri
+Category: Arts and entertainment
+
+Transaction: Greenridge Variety and Liquor, Dalton MA | $59.35 | Mon
+Category: Convenience store & second hand store
+
+Transaction: Jimmy's Men Store & Pawn Shop, Fort Walton Beach FL | $51.72 | Sun
+Category: Convenience store & second hand store
+
+Transaction: Calavida Cantina Corrales, Albuquerque NM | $14.25 | Sat
+Category: Food and drink
+
+Transaction: Diamond-Cargo Sales, Douglas GA | $19.51 | Fri
+Category: Services and business
+
+Transaction: Great Notion, Portland OR | $22.03 | Fri
+Category: Art gallery & movie theater
+
+Transaction: Pawhuska Chiropractic & Wellness Center, Pawhuska OK | $160.10 | Mon
+Category: Health care
+
+Transaction: Domino's Pizza, Lehi UT | $25.00 | Mon
+Category: Food service
+
+Transaction: Cartridge World, Mays Landing NJ | $94.71 | Wed
+Category:
+
+### item 31
+Categories: Bomin, Gotemol, Education, Lifestyle services, Health care, Services and business, Discount store, Vehicle parts store & department store, Arts and entertainment, Zokusun, Vamusox, Semir, Air transport facility or service, Forizul, Emergency or urgent care facility, Outpatient care facility & hospital, B2b office and professional service & b2b science and technology service, Rekagun
+
+Transaction: Robert Rich Senior All High Stadium, Buffalo NY | $27.53 | Tue
+Category: Zokusun
+
+Transaction: OC Violin Shop, Buena Park CA | $40.05 | Sat
+Category: Vehicle parts store & department store
+
+Transaction: Planet Rent TO Own Llc, Saint Charles MO | $30.74 | Mon
+Category: Forizul
+
+Transaction: Family Dollar, Barberton OH | $47.10 | Fri
+Category: Discount store
+
+Transaction: The Lucky Moose Casino & Tavern, Nashua NH | $16.74 | Thu
+Category: Arts and entertainment
+
+Transaction: Taco Bell, Pompano Beach FL | $34.38 | Wed
+Category: Bomin
+
+Transaction: Blue Rhino Propane Exchange, Granbury TX | $883.57 | Fri
+Category: Services and business
+
+Transaction: Insomnia Cookies, Indianapolis IN | $38.27 | Mon
+Category: Lifestyle services
+
+Transaction: Katrina Thomas Academy, Canonsburg PA | $101.31 | Tue
+Category: Arts and entertainment
+
+Transaction: Planned Parenthood, Fort Worth TX | $278.21 | Tue
+Category: Outpatient care facility & hospital
+
+Transaction: Dollar Venture, Dallas TX | $62.39 | Wed
+Category: Discount store
+
+Transaction: Glenn Silverman, MD, San Diego CA | $42.32 | Sat
+Category: Health care
+
+Transaction: Duke Occupational Therapy Doctorate, Durham NC | $297.53 | Mon
+Category: Education
+
+Transaction: Sparrow Clinton Hospital Emergency Room, St Johns MI | $76.19 | Wed
+Category: Health care
+
+Transaction: Iron Belle Fitness, Phoenix AZ | $33.59 | Wed
+Category: Semir
+
+Transaction: Penryn Park, Penryn CA | $12.04 | Sat
+Category: Vamusox
+
+Transaction: The Mary Baker Eddy Library, Boston MA | $27.08 | Mon
+Category: Education
+
+Transaction: Cassandra Beaulieu, MD, FAAP, Redmond WA | $25.26 | Wed
+Category: Health care
+
+Transaction: Jackson Jet Center, Boise ID | $528.16 | Sun
+Category: Services and business
+
+Transaction: 3168-001, Cincinnati OH | $147.55 | Sun
+Category: Lifestyle services
+
+Transaction: M-Power Prosthetics & Orthotics, Dallas TX | $99.68 | Sun
+Category: Health care
+
+Transaction: MedStar Health, Lutherville Timonium MD | $112.76 | Sat
+Category: Emergency or urgent care facility
+
+Transaction: Charles Park, Oceanport NJ | $51.66 | Wed
+Category: Vamusox
+
+Transaction: RN Engineering Inspection & Construction, Coral Springs FL | $83.55 | Sat
+Category: B2b office and professional service & b2b science and technology service
+
+Transaction: Jack Hill State Park, Reidsville GA | $8.50 | Thu
+Category:
+
+### item 32
+Categories: Dosikal, Razir, Vove, Sports and recreation, Zilor, Health care, Urgent care clinic & surgery, Fural, Arts and entertainment, Shopping, Personal care and beauty store, Air transport facility or service, Travel and transportation, Services and business, Bank or credit union, Food truck stand & smoothie juice bar, Gibarar, Wholesaler, Agricultural service
+
+Transaction: Kyle Moyles, Md, Mba, Melbourne FL | $149.86 | Sun
+Category: Urgent care clinic & surgery
+
+Transaction: First Student, Inc, Verona WI | $33.57 | Tue
+Category: Travel and transportation
+
+Transaction: Wisdom Healing Tarot, Santa Cruz CA | $15.62 | Sat
+Category: Fural
+
+Transaction: Champion Legacy Dance Academy, Sioux Falls SD | $16.22 | Sun
+Category: Sports and recreation
+
+Transaction: Brookside Golf & Grill, Gowen MI | $52.06 | Sun
+Category: Vove
+
+Transaction: El Pichiiz Burger’s 🍔 🌭🇲🇽, Chicago IL | $26.81 | Tue
+Category: Food truck stand & smoothie juice bar
+
+Transaction: AG Design, State Center IA | $90.70 | Sun
+Category: Agricultural service
+
+Transaction: U.S. Renal Care - Foxborough, Foxborough MA | $94.85 | Mon
+Category: Health care
+
+Transaction: Escape It Houston, Houston TX | $19.67 | Sun
+Category: Arts and entertainment
+
+Transaction: Catalan Loop, St Louis MO | $54.33 | Wed
+Category: Travel and transportation
+
+Transaction: Brookwood Speciality Care, Chelsea AL | $245.24 | Thu
+Category: Razir
+
+Transaction: Fresh Thyme Farmers Market, Grand Island NE | $18.99 | Mon
+Category: Shopping
+
+Transaction: 3F's Poultry and Rabbit Processing, Checotah OK | $57.19 | Wed
+Category: Wholesaler
+
+Transaction: Charters 2000, Marina del Rey CA | $216.38 | Mon
+Category: Sports and recreation
+
+Transaction: Tradition Brewing Company, Newport News VA | $26.56 | Fri
+Category: Zilor
+
+Transaction: Spring Gardens Draper, Draper UT | $387.94 | Wed
+Category: Dosikal
+
+Transaction: Chef MarthaK, Davie FL | $81.54 | Tue
+Category: Services and business
+
+Transaction: Bank of America ATM, Great Neck NY | $120.70 | Sun
+Category: Bank or credit union
+
+Transaction: M&J Reflection Studio, Houston TX | $32.49 | Sun
+Category: Sports and recreation
+
+Transaction: Fine Line Dance Company, Bessemer City NC | $30.19 | Fri
+Category: Sports and recreation
+
+Transaction: Video Azul, Phoenix AZ | $157.81 | Sun
+Category: Services and business
+
+Transaction: Nod Hill Brewery, Ridgefield CT | $29.97 | Mon
+Category: Zilor
+
+Transaction: Dairyland Aviation Inc., Trenton WI | $81.61 | Wed
+Category: Agricultural service
+
+Transaction: Pearl Airport Taxi and Limousine, Holmdel NJ | $99.70 | Thu
+Category: Air transport facility or service
+
+Transaction: Michael L. Bobo, Dds, Md, Facs, Murray KY | $22.50 | Wed
+Category:
+
+### item 33
+Categories: Airport & parking, Arts and entertainment, Food and drink, Gym, Health care, Semese, Family service, Services and business, Education, Middle school & specialty school, B2b industrial and machine service, Condominium & laundry service, Figadel, Sibever, Lopux, Shopping
+
+Transaction: AT&T, Hoover AL | $227.75 | Sun
+Category: Shopping
+
+Transaction: Breaking Cycles Nutrition, Pompano Beach FL | $8.22 | Tue
+Category: Food and drink
+
+Transaction: Best Cleaners, Delmar NY | $36.36 | Thu
+Category: Condominium & laundry service
+
+Transaction: Metro by T-Mobile, Bossier City LA | $19.63 | Mon
+Category: Shopping
+
+Transaction: Worth Lot, Portsmouth NH | $66.56 | Fri
+Category: Airport & parking
+
+Transaction: JNT Turkey calls, Conway SC | $203.74 | Sat
+Category: Sibever
+
+Transaction: Visiting Angels, Doylestown PA | $51.52 | Fri
+Category: Health care
+
+Transaction: Walgreens, Rutherfordton NC | $105.42 | Sun
+Category: Semese
+
+Transaction: Helmer Johnson & Misiaszek, Utica NY | $110.31 | Fri
+Category: Services and business
+
+Transaction: Chadbourne Hall, Orono ME | $163.82 | Sun
+Category: Education
+
+Transaction: Buckley Law Offices, P.C., Concord NH | $11.67 | Mon
+Category: Services and business
+
+Transaction: Karen's Korner, Largo FL | $18.29 | Fri
+Category: Lopux
+
+Transaction: Michael Jerome Massie, Portsmouth VA | $26.66 | Tue
+Category: Services and business
+
+Transaction: Laz Parking, Bryn Mawr PA | $43.52 | Fri
+Category: Airport & parking
+
+Transaction: Oak Cliff Womans Club, Dallas TX | $30.08 | Mon
+Category: Arts and entertainment
+
+Transaction: Stepping Stones Learning Center, Neenah WI | $44.46 | Fri
+Category: Family service
+
+Transaction: FedEx Office Print and Ship Center, San Antonio TX | $37.70 | Tue
+Category: Figadel
+
+Transaction: Argentine Middle School, Kansas City KS | $25.72 | Wed
+Category: Middle school & specialty school
+
+Transaction: Magna Legal Services, New York NY | $55.22 | Mon
+Category: Services and business
+
+Transaction: Boston College Club, Boston MA | $16.96 | Fri
+Category: Arts and entertainment
+
+Transaction: Living Care Home Services, Bethlehem PA | $38.52 | Thu
+Category: Health care
+
+Transaction: Gfit Tampa, Tampa FL | $46.25 | Tue
+Category: Gym
+
+Transaction: Siglo Coatings, Jacksonville TX | $7.45 | Wed
+Category: B2b industrial and machine service
+
+Transaction: Coosa County Central Middle School, Rockford AL | $215.39 | Wed
+Category: Middle school & specialty school
+
+Transaction: VIP Paints, Chicago IL | $41.88 | Sat
+Category:
+
+### item 34
+Categories: Lifestyle services, Todel, Food and drink, Arts and entertainment, Lodging, Siritir, Talodix, Services and business, Shipping or delivery service & b2b energy and utility service, Kopilu, Sports and recreation, Sport league & sport court, Technical service & b2b transportation and storage service, Industrial facility or service & laundry service, Health care, Emergency or urgent care facility & primary care or general clinic
+
+Transaction: A & B Freight Lines, Rockford IL | $181.62 | Fri
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Baldwinville laundromat, Templeton MA | $224.26 | Thu
+Category: Industrial facility or service & laundry service
+
+Transaction: Global Services, Houston TX | $6.47 | Thu
+Category: Siritir
+
+Transaction: SunBuggy Silver Lake, Mears MI | $8.31 | Mon
+Category: Sports and recreation
+
+Transaction: Bulldog Fire & Emergency Apparatus, Bozrah CT | $43.37 | Mon
+Category: Emergency or urgent care facility & primary care or general clinic
+
+Transaction: Camden Pickleball Plaza, Camden SC | $17.18 | Fri
+Category: Sport league & sport court
+
+Transaction: The Great American Alligator Museum, New Orleans LA | $17.84 | Mon
+Category: Arts and entertainment
+
+Transaction: Lodi Valley Historical Society Wisconsin, Lodi WI | $33.46 | Sun
+Category: Arts and entertainment
+
+Transaction: Four Eleven Kitchen, Cambridge MD | $67.84 | Fri
+Category: Lifestyle services
+
+Transaction: Get Up and Go Kayaking, New Smyrna Beach FL | $52.11 | Wed
+Category: Sports and recreation
+
+Transaction: People's Community Clinic of Newberg, Newberg OR | $91.80 | Sat
+Category: Emergency or urgent care facility & primary care or general clinic
+
+Transaction: Jefferson Centre Garage, Louisville KY | $7.82 | Thu
+Category: Todel
+
+Transaction: O. Joseph Williams Law Office Pllc, Okmulgee OK | $31.48 | Fri
+Category: Services and business
+
+Transaction: Mccleary Museum, McCleary WA | $42.34 | Mon
+Category: Arts and entertainment
+
+Transaction: Alison H Conravey, MD, Jefferson LA | $49.00 | Tue
+Category: Health care
+
+Transaction: United States Postal Service, Greenville IN | $26.09 | Fri
+Category: Shipping or delivery service & b2b energy and utility service
+
+Transaction: Hanalei River Boat Yard, Hanalei HI | $44.98 | Fri
+Category: Sports and recreation
+
+Transaction: Blue Mountain Bikes, Blue Ridge GA | $39.31 | Tue
+Category: Sports and recreation
+
+Transaction: Sam's Club, Jackson MI | $391.80 | Sat
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Jefferson Hall, Forest Grove OR | $295.52 | Sat
+Category: Talodix
+
+Transaction: Domino's Pizza, Indianola IA | $48.87 | Tue
+Category: Lifestyle services
+
+Transaction: Crowbar, Sandusky OH | $15.95 | Fri
+Category: Food and drink
+
+Transaction: San Diego Friction Products, San Diego CA | $132.47 | Sun
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Tropical Isle, Fort Walton Beach FL | $171.90 | Sun
+Category: Lodging
+
+Transaction: WestPac Labs, Newport Beach CA | $245.61 | Thu
+Category:
+
+### item 35
+Categories: Vopox, Arts and entertainment, Tulux, Sports and recreation, Services and business, Medical service, Sporting goods store & animal and pet store, Family service & housing or property service, Diagnostics imaging or lab service & emergency or urgent care facility, Health care, Food and drink, Tulal, Shopping, Zalol, Botero, Industrial facility or service & condominium
+
+Transaction: Cindy Ho Law Apc, San Jose CA | $242.38 | Tue
+Category: Services and business
+
+Transaction: SYNERGY HomeCare of Yuma, Yuma AZ | $28.86 | Mon
+Category: Medical service
+
+Transaction: Alpha Doce Pares Eskrima Academy, Woodhaven NY | $38.18 | Thu
+Category: Sports and recreation
+
+Transaction: Burton Music Barn, Murphysboro IL | $18.10 | Thu
+Category: Zalol
+
+Transaction: United All Breed Registry, Caulfield MO | $31.89 | Sun
+Category: Sporting goods store & animal and pet store
+
+Transaction: 1880 Train, Keystone SD | $45.38 | Fri
+Category: Tulux
+
+Transaction: Adel Eldahmy, MD Psychiatrist, Long Beach CA | $269.24 | Sun
+Category: Health care
+
+Transaction: Connie Bleile,, Mason City IA | $95.03 | Fri
+Category: Diagnostics imaging or lab service & emergency or urgent care facility
+
+Transaction: Bucket List Stays, Peachtree Corners GA | $218.24 | Wed
+Category: Vopox
+
+Transaction: Easy Movers, Charlotte NC | $71.14 | Tue
+Category: Shopping
+
+Transaction: Kozy's Resort, Curtis MI | $124.48 | Sat
+Category: Vopox
+
+Transaction: Naureen Habib, DPT,MHS, Highland IN | $558.86 | Mon
+Category: Health care
+
+Transaction: Boyle's Pub, Olathe KS | $12.18 | Sat
+Category: Food and drink
+
+Transaction: Amtrak, Fullerton CA | $16.38 | Sun
+Category: Tulux
+
+Transaction: Co Men Bar & Lounge, Duncan OK | $22.41 | Tue
+Category: Food and drink
+
+Transaction: Miller Funeral Home, Roxbury NY | $414.75 | Mon
+Category: Family service & housing or property service
+
+Transaction: Spring Dry Cleaners, Midland Park NJ | $477.77 | Sun
+Category: Botero
+
+Transaction: Crystal City Casino, Havre MT | $23.54 | Sat
+Category: Arts and entertainment
+
+Transaction: The Ash Boutique Vacation Rentals, Sault Ste. Marie MI | $128.19 | Tue
+Category: Vopox
+
+Transaction: Uruguma Saludable, Rahway NJ | $13.26 | Sat
+Category: Tulal
+
+Transaction: Lasalle Street, Chicago IL | $74.64 | Fri
+Category: Tulux
+
+Transaction: Anthony Philip Lomonaco, Knoxville TN | $91.36 | Sun
+Category: Services and business
+
+Transaction: Phil Tarlton Oxford, Vancouver WA | $42.75 | Thu
+Category: Family service & housing or property service
+
+Transaction: Astoria At Meydenbauer, Bellevue WA | $406.04 | Mon
+Category: Industrial facility or service & condominium
+
+Transaction: McU Sports, Boise ID | $61.05 | Mon
+Category:
+
+### item 36
+Categories: Lounge & distillery, Air transport facility or service & automotive service, Arts and entertainment, Education, Sports and recreation, Private lodging, Kulu, Services and business, Radio station & rental service, Corporate or business office & shipping or delivery service, Shopping, Vipidan
+
+Transaction: 100 North Kitchen And Lounge, Fullerton CA | $12.92 | Sun
+Category: Lounge & distillery
+
+Transaction: Jackson Street Park, Brenham TX | $14.45 | Tue
+Category: Sports and recreation
+
+Transaction: Striefel Park, Brooklyn Park MN | $22.08 | Tue
+Category: Sports and recreation
+
+Transaction: Chilly Dog, Broomall PA | $113.08 | Tue
+Category: Shopping
+
+Transaction: Blue Rhino Propane Exchange, Porter TX | $345.02 | Thu
+Category: Radio station & rental service
+
+Transaction: Hollywood Feed, Fort Myers FL | $46.36 | Fri
+Category: Shopping
+
+Transaction: Laser Tag and Arcade of Lincoln, Lincoln NE | $21.08 | Wed
+Category: Arts and entertainment
+
+Transaction: On The Spot Liquidation, Dowelltown TN | $96.58 | Sat
+Category: Vipidan
+
+Transaction: Sunbury Street Playground, Shamokin PA | $129.80 | Mon
+Category: Sports and recreation
+
+Transaction: United States Postal Service, Inwood IA | $138.55 | Wed
+Category: Corporate or business office & shipping or delivery service
+
+Transaction: PetSmart, Plantation FL | $50.50 | Mon
+Category: Shopping
+
+Transaction: Chicken Hill Distillery, East Lampeter Twp PA | $32.07 | Fri
+Category: Lounge & distillery
+
+Transaction: Taters Produce Shack, Gaston SC | $31.91 | Sat
+Category: Shopping
+
+Transaction: Zion Skyline Resort, Hurricane UT | $118.57 | Tue
+Category: Private lodging
+
+Transaction: The Hoover Institution, Stanford CA | $610.45 | Mon
+Category: Education
+
+Transaction: Copper Mule Distillery, Hermann MO | $20.84 | Wed
+Category: Lounge & distillery
+
+Transaction: Van Cleve Park, Minneapolis MN | $196.44 | Sat
+Category: Sports and recreation
+
+Transaction: GPMS International, Inc., Waterbury VT | $147.76 | Fri
+Category: Air transport facility or service & automotive service
+
+Transaction: Booktraders, Spokane WA | $41.93 | Sun
+Category: Shopping
+
+Transaction: Best Cleaners, Bloomingdale IL | $73.65 | Tue
+Category: Services and business
+
+Transaction: Carry Bay Getaway, North Hero VT | $157.00 | Wed
+Category: Private lodging
+
+Transaction: Quick-Tag, Suffolk VA | $34.63 | Sun
+Category: Shopping
+
+Transaction: Neurology Center, Hays KS | $28.06 | Mon
+Category: Kulu
+
+Transaction: USA Network, New York NY | $27.73 | Sun
+Category: Corporate or business office & shipping or delivery service
+
+Transaction: twin oaks apartments, Temple TX | $65.17 | Mon
+Category:
+
+### item 37
+Categories: Shopping, Sports and recreation, Vakarir, Food and drink, Kafamur, Education, Meman, Services and business, Sezusun, Industrial facility or service & b2b science and technology service, Health care, Emergency department & outpatient care facility, Puzipul, Supplier or distributor & corporate or business office
+
+Transaction: Spectralux Avionics, Redmond WA | $66.55 | Sat
+Category: Meman
+
+Transaction: Drill America Inc, Lindenhurst NY | $52.32 | Wed
+Category: Supplier or distributor & corporate or business office
+
+Transaction: Munson Hills, Tallahassee FL | $9.46 | Mon
+Category: Sports and recreation
+
+Transaction: MAC Cosmetics, Seattle WA | $56.69 | Wed
+Category: Shopping
+
+Transaction: Ricaurte A Solis, Augusta GA | $60.42 | Thu
+Category: Emergency department & outpatient care facility
+
+Transaction: Bio Research Institute, Cotati CA | $480.02 | Sat
+Category: Industrial facility or service & b2b science and technology service
+
+Transaction: PERI Formwork Systems, Woodland WA | $197.21 | Mon
+Category: Services and business
+
+Transaction: Fxe Jet Center, Fort Lauderdale FL | $52.77 | Thu
+Category: Meman
+
+Transaction: North River Fronts Park, Eau Claire WI | $48.50 | Tue
+Category: Sports and recreation
+
+Transaction: Lounge 917, Crockett TX | $20.27 | Thu
+Category: Food and drink
+
+Transaction: Willet Stained Glass Studios, Philadelphia PA | $87.66 | Tue
+Category: Education
+
+Transaction: Lanier Aircraft Maintenance, Gainesville GA | $70.88 | Wed
+Category: Meman
+
+Transaction: Atchison Public Library, Atchison KS | $159.48 | Mon
+Category: Education
+
+Transaction: Ocean Hammock Park Walkway, St Augustine FL | $77.99 | Fri
+Category: Sports and recreation
+
+Transaction: Dannelly Field, Montgomery AL | $42.19 | Sun
+Category: Meman
+
+Transaction: Delta Air Lines, San Jose CA | $48.74 | Thu
+Category: Meman
+
+Transaction: More Life Chiropractic, Blacksburg SC | $21.62 | Wed
+Category: Health care
+
+Transaction: Dirt T Shirts, Kingston NY | $31.80 | Sun
+Category: Puzipul
+
+Transaction: Ocean Club Resort, North Myrtle Beach SC | $140.20 | Mon
+Category: Kafamur
+
+Transaction: Fresh Air Aviation, Beaver Island MI | $164.95 | Fri
+Category: Meman
+
+Transaction: Viva KTV, New York NY | $9.62 | Sun
+Category: Vakarir
+
+Transaction: Amity Babylon Warehouse Wine and Liquor, Copiague NY | $45.97 | Fri
+Category: Shopping
+
+Transaction: Broadlawns Medical Center Emergency Room, Des Moines IA | $64.15 | Tue
+Category: Emergency department & outpatient care facility
+
+Transaction: Tuckaway Shores Resort, Indialantic FL | $240.69 | Fri
+Category: Kafamur
+
+Transaction: Ken's Automotive, Phoenixville PA | $79.89 | Wed
+Category:
+
+### item 38
+Categories: Novapen, Nidokan, Katizur, Education, Personal or beauty service, Services and business, Health care, Physical medicine and rehabilitation & vision or eye care clinic, Lonufal, Shopping, Second hand store, Amusement park, Arts and entertainment, Resasil, Housing or property service, Vopase, Sports and recreation
+
+Transaction: Coin Laundry, Duarte CA | $7.25 | Tue
+Category: Lonufal
+
+Transaction: Keypoint Lending, Charlotte NC | $249.98 | Thu
+Category: Resasil
+
+Transaction: Johnson Jennifer L, Waukesha WI | $95.77 | Wed
+Category: Physical medicine and rehabilitation & vision or eye care clinic
+
+Transaction: Reeder Companies Llc, Realtors, Hammond IN | $285.95 | Sat
+Category: Resasil
+
+Transaction: J. T. Reddick School, Tifton GA | $590.47 | Wed
+Category: Education
+
+Transaction: Psychic Readings, Cumming GA | $66.76 | Sun
+Category: Arts and entertainment
+
+Transaction: BSA Advanced Wound Care Clinic, Amarillo TX | $148.74 | Tue
+Category: Health care
+
+Transaction: The Town Barre, Nolensville TN | $23.68 | Sat
+Category: Vopase
+
+Transaction: Benzer Pharmacy, Largo FL | $38.49 | Wed
+Category: Shopping
+
+Transaction: Kutu Salon, South Fulton GA | $48.62 | Wed
+Category: Personal or beauty service
+
+Transaction: Reeder Enterprises Inc, Goodlettsville TN | $35.28 | Mon
+Category: Resasil
+
+Transaction: Global Luxury Suites Downtown Boston, Boston MA | $1332.78 | Fri
+Category: Novapen
+
+Transaction: Anaheim Shores Estates Mobile Home Park, Anaheim CA | $18.62 | Mon
+Category: Housing or property service
+
+Transaction: Sacred Bee Beauty, South Jordan UT | $40.16 | Sun
+Category: Personal or beauty service
+
+Transaction: Centre County Grange Fair, Centre Hall PA | $8.27 | Fri
+Category: Arts and entertainment
+
+Transaction: Pro Nails, Saint Helena CA | $65.69 | Tue
+Category: Personal or beauty service
+
+Transaction: Westcave Cellars Winery, Johnson City TX | $20.27 | Fri
+Category: Nidokan
+
+Transaction: Treasure Island Waterslide and Cabanas, Treasure Island FL | $50.04 | Fri
+Category: Amusement park
+
+Transaction: North Florida Luxury Transportation, Jacksonville FL | $36.29 | Wed
+Category: Katizur
+
+Transaction: Maxville Winery, St Helena CA | $12.53 | Tue
+Category: Nidokan
+
+Transaction: The Orchards Golf Club, Washington MI | $25.31 | Fri
+Category: Sports and recreation
+
+Transaction: The Ropes Course, Morgan Township OH | $35.28 | Wed
+Category: Amusement park
+
+Transaction: Jeske Equestrian, Taylor WI | $13.31 | Mon
+Category: Amusement park
+
+Transaction: Quail Bay, Corning NY | $118.24 | Thu
+Category: Services and business
+
+Transaction: Franklin Hospital Medical Center, Hempstead NY | $30.15 | Thu
+Category:
+
+### item 39
+Categories: Education, Food and drink, Sports and recreation, Lifestyle services, Foburen, Arts and entertainment, Porar, Services and business, Shipping or delivery service & b2b transportation and storage service, Health care, Diagnostics imaging or lab service & emergency department, Farmers market, Zale
+
+Transaction: 100 Center Apartments, Mishawaka IN | $240.43 | Tue
+Category: Services and business
+
+Transaction: Snow White's Scary Adventures, Bay Lake FL | $31.14 | Thu
+Category: Arts and entertainment
+
+Transaction: Loso Hall, La Grande OR | $31.78 | Fri
+Category: Education
+
+Transaction: CVS Pharmacy, Pigeon Forge TN | $63.73 | Fri
+Category: Zale
+
+Transaction: UPS Access Point location, Sarasota FL | $14.60 | Fri
+Category: Shipping or delivery service & b2b transportation and storage service
+
+Transaction: OrangeTwist San Juan Capistrano, San Juan Capistrano CA | $117.07 | Mon
+Category: Lifestyle services
+
+Transaction: Kemp Natural Resources Station, Woodruff WI | $138.82 | Mon
+Category: Porar
+
+Transaction: Hartman's Distilling Co., Buffalo NY | $14.23 | Thu
+Category: Food and drink
+
+Transaction: Steward Urgent Care, Youngstown OH | $146.99 | Thu
+Category: Health care
+
+Transaction: Green Cultured, Denver CO | $99.72 | Tue
+Category: Education
+
+Transaction: Florida Cane Distillery, Tampa FL | $12.37 | Wed
+Category: Food and drink
+
+Transaction: Total Charter Bus Indianapolis, Indianapolis IN | $41.11 | Thu
+Category: Foburen
+
+Transaction: Bio/Data Corporation, Horsham PA | $198.96 | Sat
+Category: Education
+
+Transaction: The Ice Center, Waterbury VT | $18.75 | Mon
+Category: Sports and recreation
+
+Transaction: All Wellness, Inc., Las Vegas NV | $28.37 | Wed
+Category: Lifestyle services
+
+Transaction: Reflections Medical Spa, Charlotte NC | $69.82 | Wed
+Category: Health care
+
+Transaction: The Co-op at Shoal Creek, Pleasant Valley MO | $120.23 | Sat
+Category: Health care
+
+Transaction: Three Roll Estate, Baton Rouge LA | $25.06 | Mon
+Category: Food and drink
+
+Transaction: Sun States Courier & Delivery Services, Scottsdale AZ | $217.85 | Tue
+Category: Shipping or delivery service & b2b transportation and storage service
+
+Transaction: FedEx ShipSite, Corpus Christi TX | $63.57 | Thu
+Category: Shipping or delivery service & b2b transportation and storage service
+
+Transaction: Eisenhower Urgent Care, Palm Springs CA | $204.41 | Mon
+Category: Health care
+
+Transaction: Horseshoe Bend Airport, Weatherford TX | $23.45 | Wed
+Category: Foburen
+
+Transaction: Scott County Farmers Market, Scottsburg IN | $4.50 | Sun
+Category: Farmers market
+
+Transaction: AFC Urgent Care Warrington, Warrington PA | $80.19 | Sun
+Category: Health care
+
+Transaction: The Sanctuary Spa, Winfield AL | $9.60 | Fri
+Category:
+
+### item 40
+Categories: Femi, Sports and recreation, Education, Health care, Lodging, Services and business, Vehicle dealer, Arts and entertainment, Casino & theatre venue, Shopping mall & second hand store, Atm & real estate service, Zonufel, Shopping, Mekanex, Mebepa, Travel and transportation
+
+Transaction: Karie Anne's Boise West, Boise ID | $39.25 | Thu
+Category: Femi
+
+Transaction: I P Casino and Spa, Biloxi MS | $19.03 | Thu
+Category: Casino & theatre venue
+
+Transaction: Mansfield Lahm Regional Airport, Mansfield OH | $61.64 | Thu
+Category: Mebepa
+
+Transaction: Orchard Villas LLC, Roanoke VA | $137.12 | Thu
+Category: Lodging
+
+Transaction: O'Reilly Auto Parts, Sinton TX | $147.82 | Sat
+Category: Mekanex
+
+Transaction: Midtown Market & Deli, Sacramento CA | $217.00 | Mon
+Category: Shopping
+
+Transaction: Pat's Motel, Great Falls MT | $348.74 | Sun
+Category: Lodging
+
+Transaction: Christmas Capital Of Texas, Grapevine TX | $44.20 | Thu
+Category: Arts and entertainment
+
+Transaction: Clinton Regional Airport, Clinton OK | $127.03 | Fri
+Category: Mebepa
+
+Transaction: Around the World Travel, Blakely PA | $61.95 | Mon
+Category: Travel and transportation
+
+Transaction: Rite Aid, Brewster NY | $47.47 | Wed
+Category: Shopping
+
+Transaction: Cruise 'N Market and Deli, Redmond OR | $127.70 | Sun
+Category: Shopping
+
+Transaction: Dodge's Southern Style, Charleston SC | $180.15 | Tue
+Category: Shopping
+
+Transaction: All Occasion Party Rentals, Riverside CA | $61.14 | Tue
+Category: Zonufel
+
+Transaction: Infinity Health Clinic, El Paso TX | $34.40 | Mon
+Category: Health care
+
+Transaction: Coral Academy Cadence Campus, Henderson NV | $97.58 | Sun
+Category: Education
+
+Transaction: ATM HOLYOKE CREDIT UNION, Feeding Hills MA | $88.99 | Wed
+Category: Atm & real estate service
+
+Transaction: V and J Service Center, Ranger TX | $19.68 | Wed
+Category: Services and business
+
+Transaction: Stockton Municipal Airport (Missouri), Stockton MO | $33.16 | Mon
+Category: Mebepa
+
+Transaction: Sunbury City Ice Rink, Sunbury PA | $56.80 | Fri
+Category: Sports and recreation
+
+Transaction: The Pony - Starkville Strip Club, Starkville MS | $5.54 | Sat
+Category: Arts and entertainment
+
+Transaction: My Golf Carts, Arlington TX | $55.01 | Sat
+Category: Vehicle dealer
+
+Transaction: Circle K, Norman OK | $143.75 | Sat
+Category: Shopping
+
+Transaction: Greenhouse Marketplace, San Leandro CA | $124.85 | Sun
+Category: Shopping mall & second hand store
+
+Transaction: Metabo HPT, Braselton GA | $34.89 | Mon
+Category:
+
+### item 41
+Categories: Rv park, Arts and entertainment, Devax, Services and business, Sibesul, Vuvupor, Arts crafts and hobby store & second hand store, Shipping or delivery service & design service, Senior living facility & printing service, Fuzox, Health care, Food and drink, Brewery, Recreational equipment rental & skate park, Sports and recreation, Dabidul, Specialty store
+
+Transaction: Western Way, Tucson AZ | $72.20 | Sat
+Category: Rv park
+
+Transaction: R. Michelle Galen, M.D.,FAAFP,FAWM, Newburgh IN | $74.49 | Tue
+Category: Fuzox
+
+Transaction: Ivie League Properties, La Habra CA | $401.86 | Sat
+Category: Vuvupor
+
+Transaction: BlackBox Music & Arts, San Antonio TX | $20.83 | Thu
+Category: Dabidul
+
+Transaction: Dairy Queen Grill & Chill, Cary NC | $42.10 | Sat
+Category: Food and drink
+
+Transaction: GameStop, Amarillo TX | $23.25 | Fri
+Category: Sibesul
+
+Transaction: WNY Medical PC, Derby NY | $63.21 | Sat
+Category: Fuzox
+
+Transaction: St Barnabas Hospital, Bronx NY | $402.85 | Mon
+Category: Health care
+
+Transaction: Rip van winkle Ranch, Haines Falls NY | $35.33 | Mon
+Category: Recreational equipment rental & skate park
+
+Transaction: Cell Phone Repair, Westland MI | $81.76 | Thu
+Category: Vuvupor
+
+Transaction: Purple Hawk Country Club, Cambridge MN | $14.77 | Sat
+Category: Sports and recreation
+
+Transaction: Kure CBD & Vape, Moore OK | $34.17 | Mon
+Category: Specialty store
+
+Transaction: South Park Family Pharmacy, Winston-Salem NC | $82.86 | Thu
+Category: Sibesul
+
+Transaction: The Laundry Wizard, Vancouver WA | $20.14 | Wed
+Category: Senior living facility & printing service
+
+Transaction: Quail Ridge RV Resort AZ, Huachuca City AZ | $118.46 | Thu
+Category: Rv park
+
+Transaction: Gray Line Taxidermy Studio, Lewistown IL | $39.18 | Tue
+Category: Vuvupor
+
+Transaction: Rhinegeist Brewery, Cincinnati OH | $11.12 | Tue
+Category: Brewery
+
+Transaction: Wooapartment, Dallas TX | $82.08 | Sun
+Category: Vuvupor
+
+Transaction: UPS Access Point location, Saint Petersburg FL | $22.89 | Mon
+Category: Shipping or delivery service & design service
+
+Transaction: Budget Car Rental, Miami Beach FL | $184.95 | Thu
+Category: Services and business
+
+Transaction: 125 Lattimore Medical Facilities, Rochester NY | $26.98 | Thu
+Category: Health care
+
+Transaction: Hannibal Bus Garage, Hannibal NY | $258.95 | Wed
+Category: Devax
+
+Transaction: Roland Reyes, MD, Cleveland OH | $61.96 | Wed
+Category: Fuzox
+
+Transaction: The Lazarus Pinball Museum, Fenton MO | $45.19 | Wed
+Category: Arts and entertainment
+
+Transaction: Np Healthcare Associates, Llc, Arlington TX | $20.58 | Mon
+Category:
+
+### item 42
+Categories: Lifestyle services, Todel, Food and drink, Arts and entertainment, Lodging, Siritir, Talodix, Services and business, Shipping or delivery service & b2b energy and utility service, Kopilu, Sports and recreation, Sport league & sport court, Technical service & b2b transportation and storage service, Industrial facility or service & laundry service, Health care, Emergency or urgent care facility & primary care or general clinic
+
+Transaction: A & B Freight Lines, Rockford IL | $181.62 | Fri
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Baldwinville laundromat, Templeton MA | $224.26 | Thu
+Category: Industrial facility or service & laundry service
+
+Transaction: Global Services, Houston TX | $6.47 | Thu
+Category: Siritir
+
+Transaction: SunBuggy Silver Lake, Mears MI | $8.31 | Mon
+Category: Sports and recreation
+
+Transaction: Bulldog Fire & Emergency Apparatus, Bozrah CT | $43.37 | Mon
+Category: Emergency or urgent care facility & primary care or general clinic
+
+Transaction: Camden Pickleball Plaza, Camden SC | $17.18 | Fri
+Category: Sport league & sport court
+
+Transaction: The Great American Alligator Museum, New Orleans LA | $17.84 | Mon
+Category: Arts and entertainment
+
+Transaction: Lodi Valley Historical Society Wisconsin, Lodi WI | $33.46 | Sun
+Category: Arts and entertainment
+
+Transaction: Four Eleven Kitchen, Cambridge MD | $67.84 | Fri
+Category: Lifestyle services
+
+Transaction: Get Up and Go Kayaking, New Smyrna Beach FL | $52.11 | Wed
+Category: Sports and recreation
+
+Transaction: People's Community Clinic of Newberg, Newberg OR | $91.80 | Sat
+Category: Emergency or urgent care facility & primary care or general clinic
+
+Transaction: Jefferson Centre Garage, Louisville KY | $7.82 | Thu
+Category: Todel
+
+Transaction: O. Joseph Williams Law Office Pllc, Okmulgee OK | $31.48 | Fri
+Category: Services and business
+
+Transaction: Mccleary Museum, McCleary WA | $42.34 | Mon
+Category: Arts and entertainment
+
+Transaction: Alison H Conravey, MD, Jefferson LA | $49.00 | Tue
+Category: Health care
+
+Transaction: United States Postal Service, Greenville IN | $26.09 | Fri
+Category: Shipping or delivery service & b2b energy and utility service
+
+Transaction: Hanalei River Boat Yard, Hanalei HI | $44.98 | Fri
+Category: Sports and recreation
+
+Transaction: Blue Mountain Bikes, Blue Ridge GA | $39.31 | Tue
+Category: Sports and recreation
+
+Transaction: Sam's Club, Jackson MI | $391.80 | Sat
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Jefferson Hall, Forest Grove OR | $295.52 | Sat
+Category: Talodix
+
+Transaction: Domino's Pizza, Indianola IA | $48.87 | Tue
+Category: Lifestyle services
+
+Transaction: Crowbar, Sandusky OH | $15.95 | Fri
+Category: Food and drink
+
+Transaction: San Diego Friction Products, San Diego CA | $132.47 | Sun
+Category: Technical service & b2b transportation and storage service
+
+Transaction: Tropical Isle, Fort Walton Beach FL | $171.90 | Sun
+Category: Lodging
+
+Transaction: Supreme Finishes Unlimited, Sparrows Point MD | $350.76 | Fri
+Category:
+
+### item 43
+Categories: Sports and recreation, Travel and transportation, Educational service & campus building, Magul, Kimel, Arts and entertainment, Services and business, Shopping, Specialty store, Feniper, Duvezal, Farm & atm, Pizax
+
+Transaction: Magic Valley Skateland, Valley AL | $37.12 | Thu
+Category: Sports and recreation
+
+Transaction: NYU Libraries, New York NY | $327.62 | Wed
+Category: Educational service & campus building
+
+Transaction: San Diego Ice Arena, San Diego CA | $20.79 | Fri
+Category: Sports and recreation
+
+Transaction: Cafe Express, Santa Ana CA | $109.88 | Mon
+Category: Travel and transportation
+
+Transaction: Cash2Bitcoin ATM, Lower Salford PA | $232.02 | Sun
+Category: Farm & atm
+
+Transaction: Infinite Event Suite, Homewood IL | $32.15 | Mon
+Category: Arts and entertainment
+
+Transaction: Skeleton Key Recording, Las Vegas NV | $168.89 | Fri
+Category: Duvezal
+
+Transaction: Security Plumbing and Heating Supply, Pamelia NY | $43.00 | Sun
+Category: Shopping
+
+Transaction: Newbridge Arena, Bellmore NY | $30.28 | Mon
+Category: Sports and recreation
+
+Transaction: Doug's Coin-Op Laundry, Oklahoma City OK | $61.69 | Thu
+Category: Pizax
+
+Transaction: The Artistic Home Ensemble, Chicago IL | $37.08 | Wed
+Category: Duvezal
+
+Transaction: Millennium Plastics, Groveland MA | $47.44 | Thu
+Category: Services and business
+
+Transaction: Swamp Rabbit Inn And Properties, Greenville SC | $164.10 | Sat
+Category: Magul
+
+Transaction: Classic Rock 96.1 – Texas' Best Rock, Tyler TX | $89.51 | Wed
+Category: Duvezal
+
+Transaction: Raritan Ridge Indoor Golf, Middlesex NJ | $50.42 | Sat
+Category: Sports and recreation
+
+Transaction: City Center/PVD Rink, Providence RI | $109.00 | Tue
+Category: Sports and recreation
+
+Transaction: Kelly's Home Medical - Davenport, Davenport IA | $48.14 | Tue
+Category: Specialty store
+
+Transaction: Chomps, Naples FL | $60.00 | Sun
+Category: Services and business
+
+Transaction: Northern Public Radio, Dekalb IL | $173.06 | Wed
+Category: Duvezal
+
+Transaction: Destroyer Park Golf, Akron NY | $30.20 | Thu
+Category: Sports and recreation
+
+Transaction: William F. Lapenna, MD, Battle Creek MI | $55.81 | Mon
+Category: Kimel
+
+Transaction: Old Town Skating Rink, Atwater CA | $49.93 | Thu
+Category: Sports and recreation
+
+Transaction: Poughkeepsie Train Station, Highland NY | $102.46 | Thu
+Category: Travel and transportation
+
+Transaction: Chicken Wiggle Farm, Chelsea VT | $52.15 | Fri
+Category: Farm & atm
+
+Transaction: LibertyX Bitcoin ATM, Danbury CT | $92.26 | Thu
+Category:
+
+### item 44
+Categories: Fesate, Warehouse club store, Bank or credit union & housing or property service, Services and business, Arts crafts and hobby store, Health care, Loberox, Sports and recreation, Sport field & sport league, Shopping, Zefa, Travel and transportation, Tapefen, Education, Educational facility, Food and drink, Pokunar, Beromix, Event venue
+
+Transaction: Harmonic Hammers, Denton TX | $47.75 | Tue
+Category: Shopping
+
+Transaction: Pet Foods Plus, Bristol RI | $17.22 | Fri
+Category: Fesate
+
+Transaction: Mercy Family Medicine - 900 East Cherry, Troy MO | $41.26 | Thu
+Category: Health care
+
+Transaction: Puebla Luxury Car Services, Brooklyn NY | $31.83 | Fri
+Category: Tapefen
+
+Transaction: Ohio Valley Educational Cooperative, Shelbyville KY | $224.82 | Tue
+Category: Education
+
+Transaction: Dutch Bros Coffee, Oakley CA | $30.21 | Sat
+Category: Food and drink
+
+Transaction: Falcon Advance Products, Pontiac MI | $14.41 | Tue
+Category: Travel and transportation
+
+Transaction: Wilkes-Barre General Hospital, Kingston PA | $175.49 | Mon
+Category: Loberox
+
+Transaction: American Airlines, San Francisco CA | $54.20 | Tue
+Category: Travel and transportation
+
+Transaction: Exquisite Express Services Plus, Miami Gardens FL | $47.18 | Sat
+Category: Travel and transportation
+
+Transaction: Camp Skylark, Plano, Plano TX | $286.64 | Fri
+Category: Educational facility
+
+Transaction: Fresno Downtown Stadium, Fresno CA | $47.55 | Wed
+Category: Beromix
+
+Transaction: Wired Coffee Bar, Ooltewah TN | $15.82 | Mon
+Category: Food and drink
+
+Transaction: The Real Food Dude, Homer AK | $7.25 | Thu
+Category: Pokunar
+
+Transaction: Sunrise Mobile Park, Livermore CA | $438.07 | Sun
+Category: Bank or credit union & housing or property service
+
+Transaction: 13 Acres, Deer Park WI | $177.61 | Sun
+Category: Services and business
+
+Transaction: Lily Bay studio + bazaar, Savannah GA | $82.80 | Wed
+Category: Arts crafts and hobby store
+
+Transaction: The Supply Place at Lenoch & Cilek, Iowa City IA | $13.02 | Sun
+Category: Warehouse club store
+
+Transaction: Instituto Cervantes Los Angeles, Los Angeles CA | $149.93 | Tue
+Category: Educational facility
+
+Transaction: EHOB, Indianapolis IN | $112.07 | Mon
+Category: Education
+
+Transaction: Ottumwa Girls Softball Fields, Ottumwa IA | $14.84 | Fri
+Category: Sport field & sport league
+
+Transaction: Davinci Meeting Rooms, Appleton WI | $32.45 | Wed
+Category: Event venue
+
+Transaction: Georgia Physicians South, Waycross GA | $185.85 | Wed
+Category: Health care
+
+Transaction: BTC-Seller LLC, Elgin SC | $98.32 | Sat
+Category: Zefa
+
+Transaction: Saint Athanasius Sports, New York NY | $40.83 | Sat
+Category:
+
+### item 45
+Categories: Pinezer, Arts and entertainment, Modil, Personal or beauty service, Shopping, Sakuzul, Warehouse club store & department store, Food and drink, Coffee shop & brewery, Vovox, Pafakir, Travel and transportation, Ev charging station & airport, Rogul, Sokan, Services and business, Building or construction service, Hardware home and garden store & convenience store, Animal and pet store
+
+Transaction: Antelope Canyon Gift Shop, Page AZ | $107.14 | Fri
+Category: Shopping
+
+Transaction: A Pitbull's Paradise, Pensacola FL | $113.91 | Sun
+Category: Animal and pet store
+
+Transaction: American Paving & Asphalt, Lafayette IN | $25.21 | Sat
+Category: Building or construction service
+
+Transaction: Greyhound Bus, Warrensburg MO | $45.42 | Sat
+Category: Travel and transportation
+
+Transaction: The Story, Boonville NC | $83.95 | Thu
+Category: Hardware home and garden store & convenience store
+
+Transaction: Alphabiocom, King of Prussia PA | $216.76 | Tue
+Category: Services and business
+
+Transaction: Senior Helpers, Soldotna AK | $76.73 | Fri
+Category: Vovox
+
+Transaction: Amrote Limo, Aurora CO | $129.58 | Thu
+Category: Travel and transportation
+
+Transaction: The Lane County Fair, Eugene OR | $40.61 | Mon
+Category: Arts and entertainment
+
+Transaction: McDonald's, Green Bay WI | $27.70 | Fri
+Category: Food and drink
+
+Transaction: Shang's Tea House, Kansas City MO | $51.90 | Tue
+Category: Food and drink
+
+Transaction: Law Offices of Lloyd J. Jassin, New York NY | $314.28 | Sat
+Category: Sakuzul
+
+Transaction: Chuan Fa America Arkansas, Fayetteville AR | $29.10 | Fri
+Category: Sokan
+
+Transaction: Anthem Blue Cross and Blue Shield, Flushing NY | $84.09 | Sun
+Category: Vovox
+
+Transaction: Vein Institute of the Midwest, Shawnee KS | $100.64 | Sat
+Category: Pafakir
+
+Transaction: Arby's, Victoria TX | $16.22 | Wed
+Category: Food and drink
+
+Transaction: Puppy Ciao Boutique, Rio Rancho NM | $77.07 | Wed
+Category: Animal and pet store
+
+Transaction: The Garden Basket, Preston MD | $36.00 | Wed
+Category: Shopping
+
+Transaction: Walmart Supercenter, Greenville MS | $26.36 | Tue
+Category: Warehouse club store & department store
+
+Transaction: Nail Stop, Buffalo NY | $41.91 | Sat
+Category: Personal or beauty service
+
+Transaction: AWS Corp, Hitchcock TX | $652.08 | Wed
+Category: Services and business
+
+Transaction: Haven Beer Company, Hamden CT | $83.65 | Mon
+Category: Coffee shop & brewery
+
+Transaction: Dogwood Airfield, Palestine TX | $21.07 | Sun
+Category: Ev charging station & airport
+
+Transaction: Stroman INSURANCE ADVISORS, Marietta GA | $114.96 | Wed
+Category: Vovox
+
+Transaction: Your Swag Squad, Estes Park CO | $102.22 | Fri
+Category:
+
+### item 46
+Categories: Sports and recreation, Food and drink, Education, Shopping, Hotel, Travel and transportation, Lifestyle services, Services and business, Attorney or law firm & atm, Arts and entertainment, Paroke, Health care, Movie theater & gaming venue, Nanaro
+
+Transaction: Dr. E. E. Grif Griffith, Stuart FL | $174.14 | Tue
+Category: Health care
+
+Transaction: Texasx, Fort Worth TX | $116.35 | Fri
+Category: Shopping
+
+Transaction: Portage Area Ambulance Association, Portage PA | $34.26 | Fri
+Category: Health care
+
+Transaction: Studio Theater, San Francisco CA | $44.60 | Sat
+Category: Nanaro
+
+Transaction: Augie & Annie's Acres, Fort Myers FL | $58.98 | Wed
+Category: Sports and recreation
+
+Transaction: Frontier Lounge, Charleston SC | $23.57 | Tue
+Category: Food and drink
+
+Transaction: Millbury Savings Bank, Millbury MA | $16.93 | Mon
+Category: Services and business
+
+Transaction: MAA Town Center, Jacksonville FL | $29.00 | Fri
+Category: Attorney or law firm & atm
+
+Transaction: Siti Company, New York NY | $14.06 | Wed
+Category: Arts and entertainment
+
+Transaction: Extended Stay America, East Providence RI | $116.15 | Mon
+Category: Hotel
+
+Transaction: Lava Lounge, Atlanta GA | $5.52 | Tue
+Category: Food and drink
+
+Transaction: Aéropostale, Milpitas CA | $43.40 | Thu
+Category: Shopping
+
+Transaction: Rich City Skate Inc, Richton Park IL | $20.05 | Wed
+Category: Movie theater & gaming venue
+
+Transaction: Breaker Boys Cigar Club & Lounge, Carbondale PA | $34.28 | Fri
+Category: Food and drink
+
+Transaction: Lil Chub Decks, Fitzgerald GA | $163.23 | Mon
+Category: Travel and transportation
+
+Transaction: Bunzl New England, West Boylston MA | $46.10 | Wed
+Category: Shopping
+
+Transaction: Bank Rhode Island, East Providence RI | $50.60 | Thu
+Category: Services and business
+
+Transaction: J.K. Stone USA, Lakewood CO | $32.92 | Fri
+Category: Shopping
+
+Transaction: Lounge 114, Jackson MS | $61.70 | Thu
+Category: Food and drink
+
+Transaction: Lawrence Bellomo Attorney at Law, Mission-Viejo CA | $42.68 | Mon
+Category: Attorney or law firm & atm
+
+Transaction: Shear Gold Salon, Kewaskum WI | $32.65 | Fri
+Category: Lifestyle services
+
+Transaction: Dr. Bonnie Brown, Las Vegas NV | $225.86 | Fri
+Category: Health care
+
+Transaction: Clark State College, Bellefontaine OH | $101.03 | Sun
+Category: Education
+
+Transaction: Marcus, Gould and Sussman, White Plains NY | $148.38 | Mon
+Category: Attorney or law firm & atm
+
+Transaction: Women's Healthcare Associates, LLC, Portland OR | $68.73 | Thu
+Category:
+
+### item 47
+Categories: Wellness service, Sports and recreation, Education, Shopping, Kogi, Resort, Zudafux, Zezin, Arts and entertainment, Psychic advising, Fevebon, Food and drink
+
+Transaction: McCoy Wellness and Rehabilitation Center, Kyle TX | $52.53 | Wed
+Category: Kogi
+
+Transaction: Albany Academy Hockey Rink, Albany NY | $64.78 | Thu
+Category: Sports and recreation
+
+Transaction: Woodside Community Theatre, Redwood City CA | $10.97 | Sat
+Category: Arts and entertainment
+
+Transaction: Fantasyland Skate Center, McAllen TX | $19.61 | Thu
+Category: Sports and recreation
+
+Transaction: 97.1 KVVL Everything That Rocks, Maryville MO | $424.57 | Thu
+Category: Zudafux
+
+Transaction: Woodland Heights Middle School, Mooresville NC | $102.07 | Thu
+Category: Education
+
+Transaction: Adam & Eve Stores, Southgate MI | $41.39 | Sun
+Category: Arts and entertainment
+
+Transaction: McKinley Skate Park, Pittsburgh PA | $90.15 | Sun
+Category: Sports and recreation
+
+Transaction: Palo Duro Canyon State Park, TX, Canyon TX | $48.38 | Wed
+Category: Sports and recreation
+
+Transaction: Prohibition Spirits, Sonoma CA | $16.60 | Mon
+Category: Food and drink
+
+Transaction: McDonald's, Franklin TN | $26.37 | Thu
+Category: Fevebon
+
+Transaction: Hooligan's Pub, Put-in-Bay OH | $23.57 | Fri
+Category: Fevebon
+
+Transaction: Krispy Kreme, Auburn AL | $17.25 | Tue
+Category: Food and drink
+
+Transaction: Seward Farmer's Market on the Square, Seward NE | $22.94 | Sat
+Category: Shopping
+
+Transaction: Skate A Rama Usa, Commerce GA | $46.13 | Wed
+Category: Sports and recreation
+
+Transaction: Days Inn by Wyndham Greenwood SC, Greenwood SC | $959.15 | Tue
+Category: Resort
+
+Transaction: Scheels IcePlex, Sioux Falls SD | $20.05 | Tue
+Category: Sports and recreation
+
+Transaction: Penske Used Truck Center, Torrance CA | $110.02 | Thu
+Category: Shopping
+
+Transaction: Clyde Head Start, Clyde NY | $112.11 | Sun
+Category: Education
+
+Transaction: James W Scruggs, Wheaton IL | $169.16 | Wed
+Category: Kogi
+
+Transaction: Oracle Erin, Boise ID | $7.32 | Sun
+Category: Psychic advising
+
+Transaction: Shazia Hyder, Redlands CA | $69.95 | Sat
+Category: Wellness service
+
+Transaction: Lemhi County Airport, Salmon ID | $28.02 | Wed
+Category: Zezin
+
+Transaction: White Star Farm, London OH | $7.71 | Sat
+Category: Arts and entertainment
+
+Transaction: Gigi Malvas, Dpt, North Port FL | $61.10 | Wed
+Category:
+
+### item 48
+Categories: Food service & wellness service, Education, Safirur, Stadium arena & movie theater, Bugobe, Public transit facility or service & train station, Health care, Food and drink, Services and business, Popebo, B2b transportation and storage service, Shopping, Tamovur, Printing service & legal service, Personal care and beauty store & warehouse club store, Department store & pharmacy and drug store
+
+Transaction: Fam First Trucking, Richmond VA | $169.57 | Wed
+Category: B2b transportation and storage service
+
+Transaction: Rader Funeral Home Longview, Longview TX | $164.97 | Sat
+Category: Printing service & legal service
+
+Transaction: Pet Supermarket, Miami FL | $37.23 | Mon
+Category: Shopping
+
+Transaction: SNOWFOX, St Johns MI | $69.62 | Tue
+Category: Popebo
+
+Transaction: Galfin Passon & Greely LLP, Irvine CA | $8.16 | Wed
+Category: Health care
+
+Transaction: PATCO: Haddonfield Station, Haddonfield NJ | $27.31 | Fri
+Category: Public transit facility or service & train station
+
+Transaction: Lynnwood's Market, Ripley TN | $15.19 | Mon
+Category: Popebo
+
+Transaction: Cache River State Natural Area, Belknap IL | $64.72 | Mon
+Category: Safirur
+
+Transaction: Papa John's Pizza, Los Lunas NM | $44.67 | Mon
+Category: Food service & wellness service
+
+Transaction: Ross Dress for Less, Fort Worth TX | $15.83 | Thu
+Category: Department store & pharmacy and drug store
+
+Transaction: Midway Food Market, Fort Lauderdale FL | $113.45 | Sat
+Category: Popebo
+
+Transaction: East Region Public Health, El Cajon CA | $32.43 | Sun
+Category: Health care
+
+Transaction: Posh Tutoring And Recreation Center, Chicago IL | $45.87 | Mon
+Category: Education
+
+Transaction: Krookid Leyk Distilling, Hammondsport NY | $6.89 | Sun
+Category: Food and drink
+
+Transaction: Black Law Offices, LLC, Toccoa GA | $11.36 | Mon
+Category: Services and business
+
+Transaction: Greyhound: Bus Station, San Jose CA | $11.24 | Wed
+Category: Public transit facility or service & train station
+
+Transaction: Treasury Liquors, Mt Crested Butte CO | $39.27 | Thu
+Category: Popebo
+
+Transaction: Homefield Courts, Olathe KS | $36.77 | Fri
+Category: Stadium arena & movie theater
+
+Transaction: Tony's Meat Market, New York NY | $53.24 | Sun
+Category: Popebo
+
+Transaction: Carondelet Medical Group, Tucson AZ | $137.06 | Fri
+Category: Health care
+
+Transaction: Fastening Solutions, High Point NC | $69.89 | Sat
+Category: Personal care and beauty store & warehouse club store
+
+Transaction: Sojourners Advocacy Cafe, Santa Fe NM | $21.35 | Wed
+Category: Food and drink
+
+Transaction: DeRiso, DeRiso, Suher and Jeffries, Pittsburgh PA | $337.09 | Wed
+Category: Services and business
+
+Transaction: Excel Prosthetics & Orthotics, Bluefield WV | $97.92 | Tue
+Category: Health care
+
+Transaction: 125th St, Ny, New York NY | $17.22 | Mon
+Category:
+
+### item 49
+Categories: Sports and recreation, Behavioral or mental health clinic, Art gallery & gaming venue, Travel and transportation, Private lodging & campground, Food and drink, Ruke, Services and business, Education, Elementary school & campus building, Industrial facility or service & b2b energy and utility service, Laundry service & attorney or law firm, Shopping, Office supply store & vehicle dealer
+
+Transaction: C.O.O.R. Special Educational Center, Roscommon MI | $22.52 | Tue
+Category: Elementary school & campus building
+
+Transaction: Faithway Powder Coating, Llc, Lake Butler FL | $632.28 | Wed
+Category: Industrial facility or service & b2b energy and utility service
+
+Transaction: Greek n Go Food Truck, Provo UT | $14.02 | Sun
+Category: Food and drink
+
+Transaction: Edmonds Library, Edmonds WA | $505.15 | Sat
+Category: Education
+
+Transaction: Holloway Memorial Funeral Home, Durham NC | $140.57 | Sun
+Category: Industrial facility or service & b2b energy and utility service
+
+Transaction: Deluxe Cleaners, Nashville TN | $30.10 | Sun
+Category: Laundry service & attorney or law firm
+
+Transaction: St Paul's Lutheran School, Bangor WI | $1273.24 | Tue
+Category: Elementary school & campus building
+
+Transaction: West Pettigrew Parking Deck, Durham NC | $12.13 | Fri
+Category: Travel and transportation
+
+Transaction: McKinley Junior High School, Pasadena CA | $254.98 | Fri
+Category: Elementary school & campus building
+
+Transaction: Venetucci Elementary School, Colorado Springs CO | $83.42 | Wed
+Category: Elementary school & campus building
+
+Transaction: Sun Beauty, Fort Valley GA | $45.79 | Sun
+Category: Office supply store & vehicle dealer
+
+Transaction: Karen Estry, P.a., Altamonte Springs FL | $89.29 | Wed
+Category: Laundry service & attorney or law firm
+
+Transaction: SOI Bingo, Butler PA | $17.56 | Mon
+Category: Art gallery & gaming venue
+
+Transaction: Burke County Life Center, Waynesboro GA | $251.20 | Wed
+Category: Elementary school & campus building
+
+Transaction: Daves Avenue Elementary School, Monte Sereno CA | $10.71 | Sun
+Category: Elementary school & campus building
+
+Transaction: Erie County Holding Center, Buffalo NY | $672.38 | Sat
+Category: Elementary school & campus building
+
+Transaction: Paradise Art Center, Paradise CA | $17.74 | Tue
+Category: Art gallery & gaming venue
+
+Transaction: La Bruja Apothecary, Middle Smithfield Twp PA | $45.99 | Wed
+Category: Art gallery & gaming venue
+
+Transaction: Redbox, Alice TX | $151.32 | Wed
+Category: Industrial facility or service & b2b energy and utility service
+
+Transaction: Regal Auburn - California, Auburn CA | $42.52 | Wed
+Category: Art gallery & gaming venue
+
+Transaction: Pinehurst Golf Course, Pinehurst ID | $75.69 | Thu
+Category: Sports and recreation
+
+Transaction: Tradition Elementary School, St Hedwig TX | $108.80 | Fri
+Category: Elementary school & campus building
+
+Transaction: La Brea Tar Pits Museum Parking, Los Angeles CA | $69.74 | Wed
+Category: Travel and transportation
+
+Transaction: RS&H, Inc., Lake City FL | $183.20 | Fri
+Category: Services and business
+
+Transaction: Indigo Lifestyle Solutions, Inc., Fairfax VA | $15.94 | Thu
+Category:
+
+### item 50
+Categories: Hotel & private lodging, Education, Sports and recreation, Arts and entertainment, Bukumol, Benotol, Music venue & amusement park, Art gallery & casino, Brewery, Food and drink, Shopping, Specialty store & books music and video store, Health care, Urgent care clinic & specialized medical facility, Zubax, Travel and transportation
+
+Transaction: Fresenius Kidney Care Fort Wayne Dupont, Fort Wayne IN | $90.80 | Thu
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: Pink Martini, Portland OR | $127.44 | Tue
+Category: Music venue & amusement park
+
+Transaction: Station Centre, Greenwich CT | $19.92 | Fri
+Category: Shopping
+
+Transaction: Fennel & Iris, Chicago IL | $16.88 | Wed
+Category: Food and drink
+
+Transaction: Catawba Valley Urgent Care - Piedmont, Hickory NC | $199.63 | Tue
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: DaVita Medford Kidney Center, Medford NY | $99.57 | Wed
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: BEK Home Medical Equipment, El Paso TX | $117.37 | Sun
+Category: Specialty store & books music and video store
+
+Transaction: Osage County Historical Society, Lyndon KS | $44.07 | Sat
+Category: Arts and entertainment
+
+Transaction: UPMC Pinnacle, Lebanon PA | $40.31 | Thu
+Category: Health care
+
+Transaction: U-Haul Neighborhood Dealer, Middle River MD | $78.88 | Wed
+Category: Benotol
+
+Transaction: Metro Urgicare, Bronx NY | $49.16 | Mon
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: Zura Blooms, Bloomfield NJ | $14.93 | Thu
+Category: Sports and recreation
+
+Transaction: Maps For Recovery, Austin TX | $103.29 | Mon
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: Hospice of CCMH, Gillette WY | $22.83 | Mon
+Category: Health care
+
+Transaction: Breakwater Brewing Co., Oceanside CA | $27.37 | Fri
+Category: Brewery
+
+Transaction: Lips, Chicago IL | $31.79 | Thu
+Category: Art gallery & casino
+
+Transaction: Cruise Holidays of Topeka, Topeka KS | $111.42 | Sun
+Category: Zubax
+
+Transaction: Mina's School of Great Falls, Great Falls VA | $105.65 | Sat
+Category: Education
+
+Transaction: Westerly, Rhode Island, Westerly RI | $75.14 | Fri
+Category: Travel and transportation
+
+Transaction: Pediatric Acute Care Of Columbus, Columbus GA | $106.99 | Mon
+Category: Urgent care clinic & specialized medical facility
+
+Transaction: Happy Valley In Home Preschool Childcare, Phoenix AZ | $21.97 | Fri
+Category: Bukumol
+
+Transaction: City Steam Brewery, Hartford CT | $33.10 | Sat
+Category: Brewery
+
+Transaction: Dorothy Molter Museum, Ely MN | $49.63 | Sun
+Category: Arts and entertainment
+
+Transaction: Central States Funds, Rosemont IL | $34.73 | Sat
+Category: Food and drink
+
+Transaction: Monterrey Security, Chicago IL | $64.67 | Mon
+Category:
+
+### item 51
+Categories: Airport, Smoothie juice bar, Inn, Arts and entertainment, Warehouse club store & vehicle dealer, Shopping, Services and business, Toliban, Supplier or distributor & manufacturer, Rutalol, Kekonox, Casino & stadium arena, Sports and recreation, Golf course, Sebun, Educational facility, Neri, Animal or pet service, Health care, Urgent care clinic
+
+Transaction: Casino Club, Redding CA | $49.01 | Tue
+Category: Casino & stadium arena
+
+Transaction: Ankona Boats, Fort Pierce FL | $138.16 | Thu
+Category: Supplier or distributor & manufacturer
+
+Transaction: Focus Urgent Care, Depew NY | $3.87 | Fri
+Category: Urgent care clinic
+
+Transaction: Scenthound, Winter Park FL | $45.32 | Tue
+Category: Animal or pet service
+
+Transaction: Adult & Child Mental Health Care, Pensacola FL | $77.32 | Tue
+Category: Health care
+
+Transaction: Holiday Inn Express & Suites Bonham, Bonham TX | $23.02 | Wed
+Category: Arts and entertainment
+
+Transaction: Huntsman Pigments, Augusta GA | $80.58 | Tue
+Category: Supplier or distributor & manufacturer
+
+Transaction: Jamba, Nampa ID | $7.02 | Wed
+Category: Smoothie juice bar
+
+Transaction: Buena Vista Inn, Delhi NY | $254.73 | Mon
+Category: Inn
+
+Transaction: Hummingbird Music Camp, Jemez Springs NM | $25.00 | Tue
+Category: Educational facility
+
+Transaction: Orlando International Airport, Orlando FL | $57.04 | Thu
+Category: Airport
+
+Transaction: Oak Room, Charlotte NC | $64.67 | Wed
+Category: Kekonox
+
+Transaction: Aziz Law Firm, Charlotte NC | $184.56 | Mon
+Category: Rutalol
+
+Transaction: Music & Arts, Hickory NC | $140.23 | Wed
+Category: Shopping
+
+Transaction: Symphony Clinical Research, Vernon Hills IL | $62.45 | Tue
+Category: Sebun
+
+Transaction: Inn On The Avenue Bed and Breakfast, New Smyrna Beach FL | $230.28 | Fri
+Category: Inn
+
+Transaction: Lacey's Place, McHenry IL | $25.86 | Tue
+Category: Casino & stadium arena
+
+Transaction: Lee Supply, Muncie IN | $64.72 | Fri
+Category: Warehouse club store & vehicle dealer
+
+Transaction: Stockwell, Harris, Woolverton & Fox, Los Angeles CA | $515.26 | Fri
+Category: Rutalol
+
+Transaction: Yosemite Lakes Park Golf Course, Coarsegold CA | $30.28 | Thu
+Category: Golf course
+
+Transaction: Clarendon Park Tennis Courts, Chicago IL | $50.02 | Sat
+Category: Sports and recreation
+
+Transaction: Mountain laundry, Pasadena CA | $68.95 | Mon
+Category: Services and business
+
+Transaction: Camp Fusion, West Palm Beach FL | $60.45 | Thu
+Category: Educational facility
+
+Transaction: Chicago's Favorite Nail Spa, Calumet Park IL | $61.69 | Sun
+Category: Neri
+
+Transaction: Sport-Social, Las Vegas NV | $24.52 | Wed
+Category:
+
+### item 52
+Categories: Food and drink, Bakubux, Arts and entertainment, Lodging, Health care, Travel and transportation, Zofunax, Tovotux, Education, Middle school, Shopping, Tunoke, Services and business, Media service & corporate or business office
+
+Transaction: Redbox, Culver City CA | $135.31 | Fri
+Category: Zofunax
+
+Transaction: Floating Mountain, New York NY | $14.42 | Fri
+Category: Food and drink
+
+Transaction: Ganjoo Law Office, San Francisco CA | $481.19 | Tue
+Category: Media service & corporate or business office
+
+Transaction: Mendy Lou Psychic, Albuquerque NM | $15.52 | Wed
+Category: Arts and entertainment
+
+Transaction: Orangetheory Fitness, Nottingham MD | $32.83 | Mon
+Category: Bakubux
+
+Transaction: Maryland General Hospital, Baltimore MD | $298.79 | Mon
+Category: Health care
+
+Transaction: Camie Tea, San Diego CA | $65.33 | Sat
+Category: Food and drink
+
+Transaction: Comerica Bank, Houston TX | $41.94 | Sun
+Category: Media service & corporate or business office
+
+Transaction: Farmer Brown's, Bend OR | $72.30 | Mon
+Category: Shopping
+
+Transaction: J. R. Trippe Middle School, Vidalia GA | $45.47 | Mon
+Category: Middle school
+
+Transaction: Appearance Products Inc, Grand Rapids MI | $58.73 | Tue
+Category: Tovotux
+
+Transaction: High Line Auto Sales of Salem, Salem NH | $65.73 | Tue
+Category: Tunoke
+
+Transaction: Shannon's Cycle Service, Oconto Falls WI | $243.62 | Fri
+Category: Travel and transportation
+
+Transaction: ANewExcellence Website Designer, Atlanta GA | $508.46 | Wed
+Category: Tovotux
+
+Transaction: Stanford L4 Neurosurgical IICU, Palo Alto CA | $128.98 | Mon
+Category: Health care
+
+Transaction: Drawn Dialogue LLC, West Friendship MD | $186.11 | Thu
+Category: Tovotux
+
+Transaction: Horseshoe Bend Family Campground, Morganton NC | $161.05 | Mon
+Category: Lodging
+
+Transaction: Calamity Janes, Hamilton MT | $3.97 | Fri
+Category: Arts and entertainment
+
+Transaction: St. Augustine Studio, St Augustine FL | $208.85 | Tue
+Category: Education
+
+Transaction: Barnsley Resort, Adairsville GA | $127.64 | Mon
+Category: Lodging
+
+Transaction: Alleghany Health Services, Sparta NC | $59.67 | Sun
+Category: Health care
+
+Transaction: The Sign Stop, State College PA | $42.26 | Sun
+Category: Tovotux
+
+Transaction: Prince Street Garage, Lancaster PA | $70.21 | Sun
+Category: Travel and transportation
+
+Transaction: Cresco Farmer's Market, Cresco IA | $51.12 | Fri
+Category: Shopping
+
+Transaction: Jesuit Retreat House, Oshkosh WI | $343.84 | Thu
+Category:
+
+### item 53
+Categories: Vehicle service, Diagnostics imaging or lab service, Sports and recreation, Tesar, Lifestyle services, Mikax, Zuvemi, Event venue, Vuvix, Services and business, B2b science and technology service, Wholesaler & bank or credit union, Shopping, Discount store & food and beverage store, Arts and entertainment, Fanun
+
+Transaction: Tri-Force Energy, Somerville NJ | $27.56 | Mon
+Category: Services and business
+
+Transaction: Man Vs Fries, Mount Laurel Township NJ | $53.42 | Sun
+Category: Lifestyle services
+
+Transaction: The Clothier, Hastings MI | $25.85 | Mon
+Category: Zuvemi
+
+Transaction: Marsh Marine, Naples FL | $32.05 | Thu
+Category: Vehicle service
+
+Transaction: Tuesday Morning, Augusta GA | $21.14 | Fri
+Category: Discount store & food and beverage store
+
+Transaction: Buddy V's Cake Slice, Philadelphia PA | $20.12 | Tue
+Category: Lifestyle services
+
+Transaction: Mountain View Intermediate School, Franklin NC | $245.25 | Wed
+Category: Tesar
+
+Transaction: First Interstate Bank, Billings MT | $134.23 | Sat
+Category: Wholesaler & bank or credit union
+
+Transaction: United Petroleum Transports, Baytown TX | $649.84 | Sat
+Category: Vuvix
+
+Transaction: Sea La Vie, Virginia Beach VA | $53.29 | Thu
+Category: Shopping
+
+Transaction: 85th Street Playground, Sea Isle City NJ | $70.93 | Thu
+Category: Sports and recreation
+
+Transaction: Rafael Gallery, New York NY | $17.74 | Sun
+Category: Fanun
+
+Transaction: The Ivy Room, Fort Worth TX | $38.95 | Thu
+Category: Event venue
+
+Transaction: Papa John's Pizza, Dixon IL | $13.86 | Wed
+Category: Lifestyle services
+
+Transaction: Dakota Magic Casino, Hankinson ND | $17.97 | Thu
+Category: Arts and entertainment
+
+Transaction: Marina Pet Hospital, Marina CA | $32.36 | Wed
+Category: Lifestyle services
+
+Transaction: American Jerky Company, Ontario CA | $409.65 | Wed
+Category: Vuvix
+
+Transaction: Prentice Funeral Home Inc, Akron OH | $29.03 | Mon
+Category: Mikax
+
+Transaction: Kaniksu Health Services, Ponderay ID | $277.13 | Sat
+Category: Diagnostics imaging or lab service
+
+Transaction: Helio Health, Irvine CA | $606.93 | Mon
+Category: B2b science and technology service
+
+Transaction: BNSF Depot Gillette, Wyo., Gillette WY | $451.91 | Fri
+Category: Vuvix
+
+Transaction: Taylor Splash Pad, Hobbs NM | $48.00 | Mon
+Category: Sports and recreation
+
+Transaction: kiddywampus, St Louis Park MN | $40.83 | Wed
+Category: Zuvemi
+
+Transaction: NFI, Keasbey NJ | $60.75 | Wed
+Category: Vuvix
+
+Transaction: Grafix By Design, Logan OH | $279.71 | Wed
+Category:
+
+### item 54
+Categories: Sports and recreation, Travel and transportation, Supevo, Performing arts venue, Services and business, Building or construction service & b2b science and technology service, Education, Campus building & high school, Arts and entertainment, Stadium arena & social club, Outpatient care facility, Miza, Specialty store, Shopping, Food and drink, Nubotax, Rental service, Fadel
+
+Transaction: Harold Clark Simmons Hall, University Park TX | $118.76 | Mon
+Category: Campus building & high school
+
+Transaction: Appalachian Woodcrafts Llc, Mill Hall PA | $554.17 | Tue
+Category: Building or construction service & b2b science and technology service
+
+Transaction: Fairmont Specialty Center, Lodi CA | $51.85 | Mon
+Category: Miza
+
+Transaction: Ketchum Hall, Buffalo NY | $212.86 | Tue
+Category: Campus building & high school
+
+Transaction: Surf City Squeeze, New York NY | $8.98 | Mon
+Category: Food and drink
+
+Transaction: Avis, Jacksonville FL | $113.36 | Wed
+Category: Rental service
+
+Transaction: Barnum Hall, Medford MA | $101.37 | Wed
+Category: Campus building & high school
+
+Transaction: Domino's Pizza, Logan UT | $42.78 | Tue
+Category: Supevo
+
+Transaction: Automation and Electronics, Asheville NC | $143.13 | Tue
+Category: Fadel
+
+Transaction: Kooken Field Stadium, Hamilton TX | $18.50 | Sun
+Category: Stadium arena & social club
+
+Transaction: Diversity Health Center, Hinesville GA | $79.76 | Thu
+Category: Outpatient care facility
+
+Transaction: Paul E. Meacham Student Services, Las Vegas NV | $31.09 | Mon
+Category: Campus building & high school
+
+Transaction: el conejo bus, Dallas TX | $74.94 | Fri
+Category: Travel and transportation
+
+Transaction: Resurrection Lutheran School, Cary NC | $123.44 | Thu
+Category: Education
+
+Transaction: Banana Republic, Victor NY | $9.55 | Sun
+Category: Shopping
+
+Transaction: Prescott Preserve Trail, Prescott AZ | $23.28 | Tue
+Category: Sports and recreation
+
+Transaction: Eisenberg Classroom Building, Slippery Rock PA | $240.47 | Mon
+Category: Campus building & high school
+
+Transaction: Pet Valu, Wyckoff NJ | $39.99 | Tue
+Category: Shopping
+
+Transaction: BesaMe Wellness Dispensary - Smithville, Smithville MO | $28.55 | Mon
+Category: Specialty store
+
+Transaction: The Prodigy Piano and Art School, Fairfield CT | $18.63 | Sat
+Category: Performing arts venue
+
+Transaction: US Army Recruiting Office Natchez, Natchez MS | $326.16 | Thu
+Category: Campus building & high school
+
+Transaction: Dallas Environmental Center, Seagoville TX | $18.66 | Wed
+Category: Services and business
+
+Transaction: Emporium Pies, Dallas TX | $15.82 | Sun
+Category: Nubotax
+
+Transaction: Banfield Pet Hospital, Whittier CA | $117.04 | Sat
+Category: Shopping
+
+Transaction: Starbucks, Snohomish WA | $31.38 | Tue
+Category:
+
+### item 55
+Categories: Travel and transportation, Bizel, Resort, Health care, Fisetex, Food and drink, Mavurox, Shopping, Services and business, Senior living facility & design service, Keroko, Arts and entertainment, Radio station & technical service, Telecommunications service, Pena, Primary care or general clinic & hospital, Park, Zanatax, Lifer, Food truck stand
+
+Transaction: Rosebud Ambulance Service, Rosebud SD | $113.28 | Mon
+Category: Health care
+
+Transaction: Stansbery Seed & Service, Upper Sandusky OH | $461.92 | Mon
+Category: Senior living facility & design service
+
+Transaction: Fieldhouse Volleyball Club, Northlake TX | $22.82 | Mon
+Category: Zanatax
+
+Transaction: The Crepe Stand, Dillon CO | $28.02 | Tue
+Category: Food and drink
+
+Transaction: Kucifer Travel, Oak Creek WI | $89.41 | Sun
+Category: Travel and transportation
+
+Transaction: Da Reggae Cafe, Greensboro NC | $10.40 | Thu
+Category: Lifer
+
+Transaction: Vernal Theatre: Live, Vernal UT | $10.20 | Tue
+Category: Keroko
+
+Transaction: Books Inc., Mountain View CA | $41.42 | Sun
+Category: Shopping
+
+Transaction: Phlebotomy Training Specialists, Los Angeles CA | $47.05 | Tue
+Category: Bizel
+
+Transaction: Ryan Whitted, M.D., Atlanta GA | $194.44 | Thu
+Category: Pena
+
+Transaction: VinDogs Food Truck, Haverhill NH | $18.96 | Wed
+Category: Food truck stand
+
+Transaction: Highline, Dalton NE | $190.29 | Sat
+Category: Telecommunications service
+
+Transaction: Grays Harbor College, Ilwaco WA | $55.43 | Sun
+Category: Bizel
+
+Transaction: Home2 Suites by Hilton Hinesville, Hinesville GA | $97.90 | Wed
+Category: Resort
+
+Transaction: Super 91.7 WMPH, Wilmington DE | $25.99 | Wed
+Category: Radio station & technical service
+
+Transaction: Le Champion, Kansas City MO | $12.51 | Sat
+Category: Lifer
+
+Transaction: Seaplanes North, Anchorage AK | $64.48 | Wed
+Category: Mavurox
+
+Transaction: Leatherwood-Blackey, Cornettsville KY | $95.04 | Sun
+Category: Primary care or general clinic & hospital
+
+Transaction: Ben Nelson Golf & Outdoor, Biloxi MS | $251.18 | Wed
+Category: Mavurox
+
+Transaction: Custom Boat Tours and Rentals, Queensbury NY | $30.64 | Wed
+Category: Fisetex
+
+Transaction: Transitex International, Orlando FL | $36.14 | Mon
+Category: Services and business
+
+Transaction: Buffalo Run Casino & Resort, Miami OK | $12.77 | Sat
+Category: Arts and entertainment
+
+Transaction: St. Nicholas Child Health Center, New York NY | $207.31 | Wed
+Category: Primary care or general clinic & hospital
+
+Transaction: SurfBerry, Wrightsville Beach NC | $23.51 | Sat
+Category: Lifer
+
+Transaction: Jet Center Medford, Medford OR | $27.25 | Thu
+Category:
+
+### item 56
+Categories: Fashion and apparel store & specialty store, Food and drink, Zigel, Services and business, Health care, Surgery & primary care or general clinic, Nogan, Arts and entertainment, Gogozin, Bank or credit union & financial service, Atm, B2b office and professional service & family service, Vitetox
+
+Transaction: Neel-Schaffer, Mobile AL | $361.56 | Sun
+Category: Nogan
+
+Transaction: SouthForkBrewCo, Cool CA | $7.95 | Wed
+Category: Food and drink
+
+Transaction: G&G Steel Inc., Russellville AL | $76.28 | Sat
+Category: Services and business
+
+Transaction: Roadrunner Theatre, Tucson AZ | $25.59 | Wed
+Category: Gogozin
+
+Transaction: Connect Hearing, Loveland CO | $73.40 | Fri
+Category: Fashion and apparel store & specialty store
+
+Transaction: Capital One ATM, Harahan LA | $356.21 | Fri
+Category: Bank or credit union & financial service
+
+Transaction: Smoothie King, Melbourne FL | $15.46 | Sat
+Category: Food and drink
+
+Transaction: Flat Earth Brewing Company, Saint Paul MN | $34.66 | Mon
+Category: Food and drink
+
+Transaction: Black Sky Brewery, Denver CO | $14.96 | Wed
+Category: Food and drink
+
+Transaction: Method Machine Lab, Ojai CA | $28.09 | Wed
+Category: Gogozin
+
+Transaction: Snitzer Dental, Kirkwood MO | $187.13 | Thu
+Category: Health care
+
+Transaction: Gwinnett Resource Center, Lawrenceville GA | $146.89 | Thu
+Category: Surgery & primary care or general clinic
+
+Transaction: WSEN Transmitter Site, Liverpool NY | $92.53 | Tue
+Category: Vitetox
+
+Transaction: Gateway Dental Care, Pleasanton CA | $119.07 | Tue
+Category: Health care
+
+Transaction: The Loft Dental Studio, Costa Mesa CA | $127.31 | Sat
+Category: Health care
+
+Transaction: Alto Partners, Cleveland OH | $62.57 | Fri
+Category: Services and business
+
+Transaction: ATM 7ELEVEN-FCTI, Greensboro NC | $522.68 | Mon
+Category: Atm
+
+Transaction: The Vapor Stop, Sparks NV | $110.53 | Fri
+Category: Fashion and apparel store & specialty store
+
+Transaction: Fraternal Order Of Eagles, Immokalee FL | $23.29 | Sun
+Category: Arts and entertainment
+
+Transaction: Victoria PARK, Riverside CA | $94.38 | Thu
+Category: Zigel
+
+Transaction: SpeedPro Corporate Headquarters, Centennial CO | $18.13 | Wed
+Category: B2b office and professional service & family service
+
+Transaction: Peterson Paul F DDS, Indianapolis IN | $143.02 | Fri
+Category: Health care
+
+Transaction: Caboose Tavern, Vienna VA | $12.88 | Mon
+Category: Food and drink
+
+Transaction: Canyon Dental Care, San Antonio TX | $56.70 | Sun
+Category: Health care
+
+Transaction: Douglas Senderoff, Md, Facs, New York NY | $28.83 | Tue
+Category:
+
+### item 57
+Categories: Travel and transportation, Arts and entertainment, Sport court & recreational equipment rental, Mebagil, Food and drink, Lifestyle services, Shopping, Zonima, Services and business, Professional service & b2b transportation and storage service, Attorney or law firm, B2b service & laundry service, Elementary school & place of learning, Specialty school
+
+Transaction: Chateau Pomije Winery, Guilford IN | $17.24 | Thu
+Category: Food and drink
+
+Transaction: Mestayer & Associates Pa, Pascagoula MS | $47.43 | Thu
+Category: Attorney or law firm
+
+Transaction: Daniel Cannon, MD, Coeur D Alene ID | $208.55 | Sun
+Category: Mebagil
+
+Transaction: MedEZ, Davie FL | $187.71 | Wed
+Category: B2b service & laundry service
+
+Transaction: Rani Sharma, Libertyville IL | $281.02 | Mon
+Category: Mebagil
+
+Transaction: Nashville International Airport, Nashville TN | $159.53 | Sun
+Category: Travel and transportation
+
+Transaction: Steven Colson, Portland OR | $46.52 | Mon
+Category: Mebagil
+
+Transaction: Westwoods Elementary School, Traverse City MI | $114.45 | Fri
+Category: Elementary school & place of learning
+
+Transaction: Empire Beauty School, Midlothian VA | $149.91 | Mon
+Category: Specialty school
+
+Transaction: Print Shop & Office Supplies, Grangeville ID | $38.34 | Sat
+Category: Shopping
+
+Transaction: Keegan Performance, Titusville FL | $168.97 | Thu
+Category: Arts and entertainment
+
+Transaction: Simon-Kucher, New York NY | $91.34 | Tue
+Category: Services and business
+
+Transaction: McAvoy Law Offices LLC, Waukesha WI | $74.70 | Sun
+Category: Attorney or law firm
+
+Transaction: Allright Parking Syr, Syracuse NY | $44.56 | Tue
+Category: Travel and transportation
+
+Transaction: Newsradio 620 WTMJ, Milwaukee WI | $70.85 | Sun
+Category: B2b service & laundry service
+
+Transaction: Splendora Woods RV Park, Splendora TX | $906.86 | Fri
+Category: Zonima
+
+Transaction: Crescent City Airport, Crescent City CA | $30.59 | Sun
+Category: Travel and transportation
+
+Transaction: Hickey Contracting, Pittsburgh PA | $30.61 | Tue
+Category: Professional service & b2b transportation and storage service
+
+Transaction: Holy Trinity Catholic School, Kewaskum WI | $306.88 | Mon
+Category: Elementary school & place of learning
+
+Transaction: Wisconsin Canoe Company, Spring Green WI | $20.04 | Fri
+Category: Sport court & recreational equipment rental
+
+Transaction: Benefit Cosmetics BrowBar, Sterling VA | $48.78 | Sat
+Category: Lifestyle services
+
+Transaction: Pop Factory Llc, Miami Beach FL | $107.52 | Sat
+Category: B2b service & laundry service
+
+Transaction: Erb's Electric, Scurry TX | $59.61 | Wed
+Category: Shopping
+
+Transaction: Yakima Valley Wine Country, Prosser WA | $11.23 | Sun
+Category: Food and drink
+
+Transaction: Imaginework, Austin TX | $53.20 | Sat
+Category:
+
+### item 58
+Categories: College university & specialty school, Food truck stand, Sports and recreation, Bed and breakfast, Design service, Services and business, Health care, Vision or eye care clinic & medical service, Mosuto, Shopping, Sporting goods store & books music and video store, Legal service & home service, Bidar
+
+Transaction: Euclid Records, St Louis MO | $40.65 | Sun
+Category: Sporting goods store & books music and video store
+
+Transaction: AAA Hayward Branch, Hayward CA | $453.92 | Mon
+Category: Legal service & home service
+
+Transaction: Milburn Eye Center - Frisco Optical, Frisco TX | $79.35 | Sun
+Category: Vision or eye care clinic & medical service
+
+Transaction: Champion Driving Academy, Yukon OK | $72.17 | Sat
+Category: College university & specialty school
+
+Transaction: Vsas Orthopaedics, Bethlehem PA | $158.16 | Mon
+Category: Health care
+
+Transaction: J and B Concessions, Hawley MN | $6.85 | Thu
+Category: Food truck stand
+
+Transaction: ColorTech Powder Coating, Tullytown PA | $122.32 | Wed
+Category: Mosuto
+
+Transaction: Brenna E Weston, FNP-C, Greenville NC | $109.65 | Sat
+Category: Health care
+
+Transaction: Seven Hills Senior Living, St Paul MN | $367.48 | Wed
+Category: Services and business
+
+Transaction: Infrastructure Materials Management, Unionville CT | $9.14 | Sat
+Category: Bidar
+
+Transaction: Hibbett, North Little Rock AR | $122.01 | Tue
+Category: Sporting goods store & books music and video store
+
+Transaction: Moynahan Law Firm, Waterbury CT | $20.02 | Wed
+Category: Legal service & home service
+
+Transaction: Artrageous Potter, Alpharetta GA | $43.00 | Sat
+Category: College university & specialty school
+
+Transaction: Redbox, Grimes IA | $37.61 | Tue
+Category: Sporting goods store & books music and video store
+
+Transaction: Jeremy Liang, OD - SightMD New Rochelle, New Rochelle NY | $14.43 | Tue
+Category: Health care
+
+Transaction: Malcolm Pol MacConmara, MD, Dallas TX | $279.30 | Sat
+Category: Health care
+
+Transaction: Lutheran Health Imaging, Wabash IN | $200.77 | Wed
+Category: Health care
+
+Transaction: Planet Fitness, Fort Gratiot MI | $55.74 | Thu
+Category: Sports and recreation
+
+Transaction: Grand Victorian Bed & Breakfast Inn, Bellaire MI | $219.98 | Sun
+Category: Bed and breakfast
+
+Transaction: Superscapes, Carrollton TX | $12.92 | Thu
+Category: Legal service & home service
+
+Transaction: Dino Riese, Hempstead NY | $21.03 | Tue
+Category: Design service
+
+Transaction: Trek Bicycle Ormond Beach, Ormond Beach FL | $104.02 | Thu
+Category: Sporting goods store & books music and video store
+
+Transaction: Canos & Canos, Ironton OH | $182.17 | Tue
+Category: Health care
+
+Transaction: Rosary Towers, Holyoke MA | $81.46 | Thu
+Category: Services and business
+
+Transaction: Law Offices Of Michelle E. Matti, Glendale CA | $39.88 | Fri
+Category:
+
+### item 59
+Categories: Health care, Rv park & private lodging, Automotive service, Food and drink, Fetelol, Podezex, Vavekor, Shopping, Services and business, Telecommunications service & b2b industrial and machine service, Arts and entertainment, Gaming venue & amusement park, Vevizix, Zapiten
+
+Transaction: Dalton Garage, Dalton PA | $23.82 | Sun
+Category: Automotive service
+
+Transaction: Dollar Tree, San Bernardino CA | $68.10 | Tue
+Category: Shopping
+
+Transaction: Scary Ranch, Wenatchee WA | $31.38 | Tue
+Category: Gaming venue & amusement park
+
+Transaction: Dollar Tree, Erwin TN | $18.25 | Sat
+Category: Shopping
+
+Transaction: Diablo Industries, Minden NV | $235.75 | Tue
+Category: Telecommunications service & b2b industrial and machine service
+
+Transaction: Richmond Memorial Hospital, Rockingham NC | $151.44 | Wed
+Category: Health care
+
+Transaction: Groomington Coat Factory, Midland Park NJ | $54.76 | Mon
+Category: Fetelol
+
+Transaction: Edgemoore East Farm, Vanceboro NC | $20.24 | Wed
+Category: Gaming venue & amusement park
+
+Transaction: Salsas Mexican Restaurant, Wheat Ridge CO | $16.74 | Sun
+Category: Food and drink
+
+Transaction: Penny Pinchers, Tipton IN | $18.35 | Wed
+Category: Shopping
+
+Transaction: Vee's Victorians Doll Clothes, Lynnwood WA | $53.23 | Thu
+Category: Zapiten
+
+Transaction: Haksec Food Llc, Myrtle Beach SC | $67.91 | Tue
+Category: Food and drink
+
+Transaction: Percival Landing Boardwalk, Olympia WA | $35.38 | Fri
+Category: Podezex
+
+Transaction: Dollar General, Edgewood TX | $200.47 | Tue
+Category: Shopping
+
+Transaction: The Connected Office, Burnsville MN | $90.91 | Mon
+Category: Telecommunications service & b2b industrial and machine service
+
+Transaction: CVS, Scarsdale NY | $43.82 | Sat
+Category: Vavekor
+
+Transaction: 7-Eleven, Orlando FL | $34.28 | Mon
+Category: Vevizix
+
+Transaction: Natural Chimneys Park and Campground, Mount Solon VA | $21.95 | Wed
+Category: Gaming venue & amusement park
+
+Transaction: Fox Theatre Atchison, Atchison KS | $29.38 | Thu
+Category: Arts and entertainment
+
+Transaction: Mary Rose Herb Farm & Retreat, Bristow IN | $24.49 | Sat
+Category: Services and business
+
+Transaction: South Lions Dim Sum & Tea, Hoboken NJ | $18.08 | Fri
+Category: Food and drink
+
+Transaction: Carmelina’s , Smithtown NY | $17.55 | Tue
+Category: Food and drink
+
+Transaction: The Enchanted Glamp- River Ranch Lot 312, River Ranch FL | $67.55 | Thu
+Category: Rv park & private lodging
+
+Transaction: Louisiana John's Fish Market, Compton CA | $48.45 | Wed
+Category: Food and drink
+
+Transaction: Rite Aid, Hardwick VT | $122.53 | Thu
+Category:
+
+### item 60
+Categories: Novapen, Nidokan, Katizur, Education, Personal or beauty service, Services and business, Health care, Physical medicine and rehabilitation & vision or eye care clinic, Lonufal, Shopping, Second hand store, Amusement park, Arts and entertainment, Resasil, Housing or property service, Vopase, Sports and recreation
+
+Transaction: Coin Laundry, Duarte CA | $7.25 | Tue
+Category: Lonufal
+
+Transaction: Keypoint Lending, Charlotte NC | $249.98 | Thu
+Category: Resasil
+
+Transaction: Johnson Jennifer L, Waukesha WI | $95.77 | Wed
+Category: Physical medicine and rehabilitation & vision or eye care clinic
+
+Transaction: Reeder Companies Llc, Realtors, Hammond IN | $285.95 | Sat
+Category: Resasil
+
+Transaction: J. T. Reddick School, Tifton GA | $590.47 | Wed
+Category: Education
+
+Transaction: Psychic Readings, Cumming GA | $66.76 | Sun
+Category: Arts and entertainment
+
+Transaction: BSA Advanced Wound Care Clinic, Amarillo TX | $148.74 | Tue
+Category: Health care
+
+Transaction: The Town Barre, Nolensville TN | $23.68 | Sat
+Category: Vopase
+
+Transaction: Benzer Pharmacy, Largo FL | $38.49 | Wed
+Category: Shopping
+
+Transaction: Kutu Salon, South Fulton GA | $48.62 | Wed
+Category: Personal or beauty service
+
+Transaction: Reeder Enterprises Inc, Goodlettsville TN | $35.28 | Mon
+Category: Resasil
+
+Transaction: Global Luxury Suites Downtown Boston, Boston MA | $1332.78 | Fri
+Category: Novapen
+
+Transaction: Anaheim Shores Estates Mobile Home Park, Anaheim CA | $18.62 | Mon
+Category: Housing or property service
+
+Transaction: Sacred Bee Beauty, South Jordan UT | $40.16 | Sun
+Category: Personal or beauty service
+
+Transaction: Centre County Grange Fair, Centre Hall PA | $8.27 | Fri
+Category: Arts and entertainment
+
+Transaction: Pro Nails, Saint Helena CA | $65.69 | Tue
+Category: Personal or beauty service
+
+Transaction: Westcave Cellars Winery, Johnson City TX | $20.27 | Fri
+Category: Nidokan
+
+Transaction: Treasure Island Waterslide and Cabanas, Treasure Island FL | $50.04 | Fri
+Category: Amusement park
+
+Transaction: North Florida Luxury Transportation, Jacksonville FL | $36.29 | Wed
+Category: Katizur
+
+Transaction: Maxville Winery, St Helena CA | $12.53 | Tue
+Category: Nidokan
+
+Transaction: The Orchards Golf Club, Washington MI | $25.31 | Fri
+Category: Sports and recreation
+
+Transaction: The Ropes Course, Morgan Township OH | $35.28 | Wed
+Category: Amusement park
+
+Transaction: Jeske Equestrian, Taylor WI | $13.31 | Mon
+Category: Amusement park
+
+Transaction: Quail Bay, Corning NY | $118.24 | Thu
+Category: Services and business
+
+Transaction: Team Silva School, Oakland Park FL | $23.19 | Fri
+Category:
+
