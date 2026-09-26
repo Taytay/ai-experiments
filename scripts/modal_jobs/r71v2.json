@@ -1,0 +1,161 @@
+[
+ {
+  "tag": "r71v2-enc-plain-k3",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "TRAIN_KS": "1-3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-plain-k12",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "TRAIN_KS": "1-12"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-loop4-k3",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "LOOP": "4",
+   "TRAIN_KS": "1-3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-loop4-k12",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "LOOP": "4",
+   "TRAIN_KS": "1-12"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-scratch-k3",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "scratch",
+   "TRAIN_KS": "1-3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-lab-k3",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "LABEL_LINES": "1",
+   "TRAIN_KS": "1-3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-enc-labaux-k3",
+  "env": {
+   "HOPS": "v2",
+   "MODE": "options",
+   "LABEL_LINES": "1",
+   "AUX": "1",
+   "TRAIN_KS": "1-3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_hops_encoder.py",
+   "EVAL_ONLY=1 ITEMS=hops_v2_cut uv run --frozen python scripts/exp_hops_encoder.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-0.5b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-0.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-1.5b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-1.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-3b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-7b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-7B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71v2-dec-14b",
+  "env": {
+   "ITEMS": "hops_v2",
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct",
+   "BATCH": "16",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ }
+]

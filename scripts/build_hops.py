@@ -12,8 +12,12 @@ Huginn; the 20,000 most frequent English words in wordfreq, 4 to 8 letters, so t
 syllable strings of 2 to 4 Qwen2.5 tokens, more than one token in every tokenizer). N items per cell, paired across nothing (each
 item fresh). `chains(...)` is exported so the encoder arms can train on fresh chains from disjoint names (split="train").
 
+v1's options turned out to carry a shortcut (2026-09-26): only the target chain gave intermediate names, so "the end one link from
+another option" is the gold for k >= 3, and a trained encoder learned it (the cut control: it kept picking the old end). v2
+(--version v2) makes the options symmetric: the end and the one-hop-short name of each of three chains (at k = 1 the start), so
+every end sits one link from another option; the statements are v1's generator with the same seed.
 Frozen as data/processed/hops_v1.json: {"items": [{id, k, names, prompt, question, options, answer, chain, statements}], "pools": ...}.
-usage: uv run --with wordfreq python scripts/build_hops.py [--force]; uv run python scripts/build_hops.py --cut (the control set)
+usage: uv run --with wordfreq python scripts/build_hops.py [--force]; uv run python scripts/build_hops.py --version v2 [--cut]
 """
 import json
 import random
@@ -22,7 +26,9 @@ from functools import lru_cache
 
 from ai_experiments.paths import PROCESSED
 
-OUT = PROCESSED / "hops_v1.json"
+VERSION = sys.argv[sys.argv.index("--version") + 1] if "--version" in sys.argv else "v1"
+POOLS = PROCESSED / "hops_v1.json"  # the frozen name pools (every version shares them)
+OUT = PROCESSED / f"hops_{VERSION}.json"
 SEED, N_PER_CELL, KS, N_CHAINS, N_OPT = 71, 50, list(range(1, 13)), 4, 6
 TOKENIZERS = ["Qwen/Qwen2.5-3B-Instruct", "answerdotai/ModernBERT-large", "GSAI-ML/LLaDA-8B-Instruct",
               "LiquidAI/LFM2.5-Encoder-350M-Diffusion", "tomg-group-umd/huginn-0125"]
@@ -44,7 +50,7 @@ def _n(tok, w):
 @lru_cache(maxsize=1)
 def pools():
     """The frozen pools from hops_v1.json (so training needs neither wordfreq nor the tokenizers), else built as below."""
-    if OUT.exists() and "pools" in (doc := json.loads(OUT.read_text())):
+    if POOLS.exists() and "pools" in (doc := json.loads(POOLS.read_text())):
         return doc["pools"]
     return make_pools()
 
@@ -72,13 +78,17 @@ def make_pools():
     return out
 
 
-def chains(rng, k, kind, split="test", n_chains=N_CHAINS, n_opt=N_OPT):
-    """One item: n_chains chains of k links over fresh names, shuffled statements, and n_opt options (see the module docstring)."""
+def chains(rng, k, kind, split="test", n_chains=N_CHAINS, n_opt=N_OPT, version="v1"):
+    """One item: n_chains chains of k links over fresh names, shuffled statements, and n_opt options (see the module docstring;
+    version="v2": the symmetric options)."""
     names = rng.sample(pools()[kind][split], n_chains * (k + 1))
     cs = [names[i * (k + 1):(i + 1) * (k + 1)] for i in range(n_chains)]
     statements = [(c[j], c[j + 1]) for c in cs for j in range(k)]
     rng.shuffle(statements)
     target = cs[0]
+    if version == "v2":  # each of three chains gives its end and its name one hop short (at k = 1 its start): no option-set shortcut
+        opts = [n for c in cs[:3] for n in (c[-1], c[-2])]
+        return _item(rng, k, kind, statements, target, opts)
     opts = [target[-1]]
     if k >= 2:
         opts.append(target[k - 1])
@@ -88,6 +98,10 @@ def chains(rng, k, kind, split="test", n_chains=N_CHAINS, n_opt=N_OPT):
     rest = [n for c in cs[1:] for n in c[:-1] if n not in opts]
     rng.shuffle(rest)
     opts = (opts + rest)[:n_opt]
+    return _item(rng, k, kind, statements, target, opts)
+
+
+def _item(rng, k, kind, statements, target, opts):
     order = list(range(len(opts))); rng.shuffle(order)
     options = [opts[i] for i in order]
     lines = "\n".join(f"- {a} = {b}" for a, b in statements)
@@ -102,16 +116,16 @@ def build():
     for kind in ("single", "multi"):
         for k in KS:
             for n in range(N_PER_CELL):
-                it = chains(rng, k, kind)
-                items.append(dict(id=f"hops_{kind}_k{k:02d}_{n:03d}", **it))
-    p = make_pools()
-    return {"version": "v1", "seed": SEED, "n_per_cell": N_PER_CELL, "ks": KS, "n_chains": N_CHAINS, "n_options": N_OPT,
+                it = chains(rng, k, kind, version=VERSION)
+                items.append(dict(id=f"hops{'' if VERSION == 'v1' else VERSION}_{kind}_k{k:02d}_{n:03d}", **it))
+    p = pools()
+    return {"version": VERSION, "seed": SEED, "n_per_cell": N_PER_CELL, "ks": KS, "n_chains": N_CHAINS, "n_options": N_OPT,
             "tokenizers": TOKENIZERS, "pool_sizes": {k: {s: len(v) for s, v in d.items()} for k, d in p.items()}, "items": items,
-            "pools": p}
+            **({"pools": p} if VERSION == "v1" else {})}
 
 
 def cut():
-    """The shortcut control, hops_v1_cut.json: every item with k >= 2 minus the target chain's middle link (chain[k // 2] = chain[k // 2 + 1]),
+    """The shortcut control, hops_<version>_cut.json: every item with k >= 2 minus the target chain's middle link (chain[k // 2] = chain[k // 2 + 1]),
     so the start no longer reaches the old end. The answer field still names the old end: a reader that follows links picks it at
     most at chance, one that uses a shortcut keeps picking it."""
     doc = json.loads(OUT.read_text())
@@ -124,7 +138,7 @@ def cut():
         assert len(st) == len(it["statements"]) - 1
         lines = "\n".join(f"- {a} = {b}" for a, b in st)
         items.append({**it, "id": it["id"] + "_cut", "statements": st, "cut": list(drop), "prompt": f"{INSTR}\n\n{lines}\n\n{it['question']}"})
-    (PROCESSED / "hops_v1_cut.json").write_text(json.dumps({"version": "v1_cut", "source": "hops_v1", "items": items}, indent=1))
+    (PROCESSED / f"hops_{VERSION}_cut.json").write_text(json.dumps({"version": f"{VERSION}_cut", "source": f"hops_{VERSION}", "items": items}, indent=1))
     print(len(items), "cut items")
 
 

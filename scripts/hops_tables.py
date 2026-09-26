@@ -17,7 +17,7 @@ from ai_experiments.paths import PROCESSED, ROOT
 
 LIMIT = float(os.environ.get("LIMIT", "80"))
 PI = ROOT / "results" / "per_item"
-ITEMS = {i["id"]: i for s in ("hops_v1", "hops_v1_cut") for i in json.loads((PROCESSED / f"{s}.json").read_text())["items"]}
+ITEMS = {i["id"]: i for s in ("hops_v1", "hops_v1_cut", "hops_v2", "hops_v2_cut") for i in json.loads((PROCESSED / f"{s}.json").read_text())["items"]}
 KS = list(range(1, 13))
 
 
