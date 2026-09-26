@@ -803,3 +803,4 @@ tokenizer (withdrawn in 24.7), 33.2's window explanation (it was the 4-bit misma
 49), and several single-seed gaps inside section 20's spread (28's "best on every number", 26's "vanishes at 7B", 31 against
 Cg, 17's heading). The summary also never states the result the project now rests on: the record in the prompt (90) over
 the record in the weights (59 +- 12). *Task:* rewrite section 1 and add the pointers; no runs.
+**Status (2026-09-22):** done, PLAN step 48. Section 1 opens with a paragraph on where the project stands and fourteen earlier claims carry forward pointers (sections 1, 5, 6.5.1, 8.3, 8.6, 11, 17, 24, 26, 28.3, 31.5, 33.2, 34.3; PLAN row 13). Not taken: the 6.2 confidence claim (section 10.5's constant predictors are the yes/no levels, not the margins) and a 33.4 sentence that is not in the report.
