@@ -251,11 +251,11 @@ if __name__ == "__main__":
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()
         stats = train(tok, model) if STEPS else {}
-        if STEPS and not SMOKE:
+        recs, timing = score(tok, model)
+        if STEPS and not SMOKE:  # after scoring, so a save failure cannot lose the results; cloned, as tied weights (the MLM decoder) cannot be saved shared
             from safetensors.torch import save_file
             d = ROOT / "models" / "adapters" / NAME; d.mkdir(parents=True, exist_ok=True)
-            save_file({k: v.contiguous() for k, v in model.state_dict().items()}, d / "model.safetensors"); (d / "config.json").write_text(json.dumps(cfg, indent=1))
-        recs, timing = score(tok, model)
+            save_file({k: v.detach().clone().contiguous() for k, v in model.state_dict().items()}, d / "model.safetensors"); (d / "config.json").write_text(json.dumps(cfg, indent=1))
         summ = summarize(recs); summ.update(timing)
         print(f"  {NAME} {COND}: all {summ['R6_all']} (n={summ['R6_all_n']}), {timing}", flush=True)
         run.log({k: v for k, v in summ.items() if isinstance(v, (int, float))}, condition=COND)
