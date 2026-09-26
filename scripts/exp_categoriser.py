@@ -64,7 +64,9 @@ LR = float(os.environ.get("LR", "1e-4"))
 DB_FRAC = float(os.environ.get("DB_FRAC", "0.3"))  # share of the LLM's training sequences that are DB texts under DB=param
 RUN_TAG = os.environ.get("RUN_TAG", "")  # suffix on the adapter and results names (variants such as the longer parametric run)
 EPOCHS = 1 if SMOKE else int(os.environ.get("EPOCHS", "3"))
-MICRO, MAXLEN = 4, 1536  # 4 x 4 = 16 sequences per step
+MICRO = int(os.environ.get("MICRO", "4"))  # sequences per forward/backward; 16 per step always (row 34: MICRO=16 = one pass per step on an 80 GB GPU)
+assert 16 % MICRO == 0
+ACCUM, MAXLEN = 16 // MICRO, 1536
 LLM_BASE, ENC_BASE = "Qwen/Qwen2.5-3B-Instruct", "BAAI/bge-base-en-v1.5"
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
 TRAINER = os.environ.get("TRAINER", "unsloth")
@@ -239,7 +241,7 @@ def train_llm(run):
     print(f"   {len(ex)} SFT examples, {len(kt)} DB texts, {STEPS} steps x 16 sequences, lr {LR}", flush=True)
     for step in range(STEPS):
         loss_acc = 0.0
-        for _ in range(4):
+        for _ in range(ACCUM):
             batch = []
             for _ in range(MICRO):
                 if kt and rng.random() < DB_FRAC:
@@ -261,9 +263,9 @@ def train_llm(run):
                     shot = valid & ~fin
                     li = ce[fin & valid].mean()
                     loss = loss + (ANS_WEIGHT * li + (1 - ANS_WEIGHT) * ce[shot].mean() if shot.any() else li)
-                loss = loss / len(batch) / 4
+                loss = loss / len(batch) / ACCUM
             else:
-                loss = sum(torch.nn.functional.cross_entropy(logits[i].float(), tgt[i], ignore_index=-100, reduction="sum") for i in range(len(batch))) / n_lab / 4
+                loss = sum(torch.nn.functional.cross_entropy(logits[i].float(), tgt[i], ignore_index=-100, reduction="sum") for i in range(len(batch))) / n_lab / ACCUM
             loss.backward(); loss_acc += loss.item(); del logits
         torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss_acc)
@@ -313,7 +315,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, micro=MICRO)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
