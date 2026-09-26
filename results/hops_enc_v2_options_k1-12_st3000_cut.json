@@ -1,0 +1,65 @@
+{
+ "config": {
+  "hops": "v2",
+  "label_lines": false,
+  "aux": 0.0,
+  "items": "hops_v2_cut",
+  "eval_only": true,
+  "mode": "options",
+  "loop": 0,
+  "block": [
+   9,
+   17
+  ],
+  "r_test": [
+   1
+  ],
+  "train_ks": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "steps": 3000,
+  "batch": 32,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "seed": 0,
+  "base": "answerdotai/ModernBERT-large"
+ },
+ "test_seconds": 8,
+ "acc": {
+  "plain": {
+   "multi_k02": 2.0,
+   "multi_k03": 98.0,
+   "multi_k04": 94.0,
+   "multi_k05": 88.0,
+   "multi_k06": 92.0,
+   "multi_k07": 84.0,
+   "multi_k08": 70.0,
+   "multi_k09": 70.0,
+   "multi_k10": 74.0,
+   "multi_k11": 62.0,
+   "multi_k12": 56.0,
+   "single_k02": 0.0,
+   "single_k03": 98.0,
+   "single_k04": 96.0,
+   "single_k05": 84.0,
+   "single_k06": 78.0,
+   "single_k07": 66.0,
+   "single_k08": 78.0,
+   "single_k09": 58.0,
+   "single_k10": 62.0,
+   "single_k11": 56.0,
+   "single_k12": 58.0
+  }
+ }
+}
