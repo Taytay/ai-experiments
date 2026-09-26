@@ -1,0 +1,2602 @@
+{
+ "name": "graph4",
+ "version": "v1",
+ "weakness": "type",
+ "n_items": 144,
+ "species_sha256": "fdd1172e9f0970c95466ecc07eb12b6fc4c6737a2921fc3009a4a72193ddea56",
+ "sha256": "a65d5aef84e21abaf5d010aeabc6b32d401f93b746acb7c7afab57effd52ae14",
+ "items": [
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Voltrix-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:000"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Pyrrhan-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:001"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Tidewell-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:002"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Lithor-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:003"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Verdane-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:004"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Umbrine-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:005"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Gustral-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:006"
+  },
+  {
+   "level": "G4_type_weakness_bare",
+   "prompt": "Question: What type are Frostel-type creatures weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "majority_share": 1.0,
+   "id": "G4_type_weakness_bare:007"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Javish is a Frostel-type creature. Question: What type is Javish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Javish",
+   "id": "G4_type_weakness_path:000"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zarig is a Gustral-type creature. Question: What type is Zarig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Zarig",
+   "id": "G4_type_weakness_path:001"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Radorc is a Gustral-type creature. Question: What type is Radorc weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Radorc",
+   "id": "G4_type_weakness_path:002"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Briath is a Pyrrhan-type creature. Question: What type is Briath weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Briath",
+   "id": "G4_type_weakness_path:003"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gorook is a Frostel-type creature. Question: What type is Gorook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Gorook",
+   "id": "G4_type_weakness_path:004"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkarn is a Verdane-type creature. Question: What type is Ulkarn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Ulkarn",
+   "id": "G4_type_weakness_path:005"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zimdor is a Frostel-type creature. Question: What type is Zimdor weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Zimdor",
+   "id": "G4_type_weakness_path:006"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falook is a Frostel-type creature. Question: What type is Falook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Falook",
+   "id": "G4_type_weakness_path:007"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falell is a Verdane-type creature. Question: What type is Falell weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Falell",
+   "id": "G4_type_weakness_path:008"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velsup is a Lithor-type creature. Question: What type is Velsup weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Velsup",
+   "id": "G4_type_weakness_path:009"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Syaoz is a Voltrix-type creature. Question: What type is Syaoz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Syaoz",
+   "id": "G4_type_weakness_path:010"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Taveel is a Gustral-type creature. Question: What type is Taveel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Taveel",
+   "id": "G4_type_weakness_path:011"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morble is a Lithor-type creature. Question: What type is Morble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Morble",
+   "id": "G4_type_weakness_path:012"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Myrent is a Verdane-type creature. Question: What type is Myrent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Myrent",
+   "id": "G4_type_weakness_path:013"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yoreel is a Tidewell-type creature. Question: What type is Yoreel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Yoreel",
+   "id": "G4_type_weakness_path:014"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morath is a Umbrine-type creature. Question: What type is Morath weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Morath",
+   "id": "G4_type_weakness_path:015"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ekkook is a Gustral-type creature. Question: What type is Ekkook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Ekkook",
+   "id": "G4_type_weakness_path:016"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ekkurn is a Lithor-type creature. Question: What type is Ekkurn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Ekkurn",
+   "id": "G4_type_weakness_path:017"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Frodrock is a Verdane-type creature. Question: What type is Frodrock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Frodrock",
+   "id": "G4_type_weakness_path:018"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Myrilk is a Gustral-type creature. Question: What type is Myrilk weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Myrilk",
+   "id": "G4_type_weakness_path:019"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Oxxax is a Frostel-type creature. Question: What type is Oxxax weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Oxxax",
+   "id": "G4_type_weakness_path:020"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Syaott is a Verdane-type creature. Question: What type is Syaott weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Syaott",
+   "id": "G4_type_weakness_path:021"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Cynrock is a Frostel-type creature. Question: What type is Cynrock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Cynrock",
+   "id": "G4_type_weakness_path:022"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ithump is a Verdane-type creature. Question: What type is Ithump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Ithump",
+   "id": "G4_type_weakness_path:023"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Hyssup is a Tidewell-type creature. Question: What type is Hyssup weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Hyssup",
+   "id": "G4_type_weakness_path:024"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Skalax is a Pyrrhan-type creature. Question: What type is Skalax weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Skalax",
+   "id": "G4_type_weakness_path:025"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falvan is a Verdane-type creature. Question: What type is Falvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Falvan",
+   "id": "G4_type_weakness_path:026"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Blaxux is a Tidewell-type creature. Question: What type is Blaxux weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Blaxux",
+   "id": "G4_type_weakness_path:027"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Syaump is a Pyrrhan-type creature. Question: What type is Syaump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Syaump",
+   "id": "G4_type_weakness_path:028"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Blaxent is a Voltrix-type creature. Question: What type is Blaxent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Blaxent",
+   "id": "G4_type_weakness_path:029"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velble is a Umbrine-type creature. Question: What type is Velble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Velble",
+   "id": "G4_type_weakness_path:030"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Kroash is a Frostel-type creature. Question: What type is Kroash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Kroash",
+   "id": "G4_type_weakness_path:031"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkoz is a Umbrine-type creature. Question: What type is Ulkoz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Ulkoz",
+   "id": "G4_type_weakness_path:032"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Blaxeel is a Umbrine-type creature. Question: What type is Blaxeel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Blaxeel",
+   "id": "G4_type_weakness_path:033"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Blaxvan is a Tidewell-type creature. Question: What type is Blaxvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Blaxvan",
+   "id": "G4_type_weakness_path:034"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Nixvan is a Frostel-type creature. Question: What type is Nixvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Nixvan",
+   "id": "G4_type_weakness_path:035"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morish is a Umbrine-type creature. Question: What type is Morish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Morish",
+   "id": "G4_type_weakness_path:036"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gorig is a Lithor-type creature. Question: What type is Gorig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Gorig",
+   "id": "G4_type_weakness_path:037"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Tunarn is a Voltrix-type creature. Question: What type is Tunarn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Tunarn",
+   "id": "G4_type_weakness_path:038"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Frodig is a Lithor-type creature. Question: What type is Frodig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Frodig",
+   "id": "G4_type_weakness_path:039"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falish is a Gustral-type creature. Question: What type is Falish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Falish",
+   "id": "G4_type_weakness_path:040"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gorome is a Gustral-type creature. Question: What type is Gorome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Gorome",
+   "id": "G4_type_weakness_path:041"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Nolvan is a Lithor-type creature. Question: What type is Nolvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Nolvan",
+   "id": "G4_type_weakness_path:042"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Quonorc is a Umbrine-type creature. Question: What type is Quonorc weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Quonorc",
+   "id": "G4_type_weakness_path:043"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morump is a Verdane-type creature. Question: What type is Morump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Morump",
+   "id": "G4_type_weakness_path:044"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ekkome is a Tidewell-type creature. Question: What type is Ekkome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Ekkome",
+   "id": "G4_type_weakness_path:045"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velent is a Voltrix-type creature. Question: What type is Velent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Velent",
+   "id": "G4_type_weakness_path:046"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velump is a Lithor-type creature. Question: What type is Velump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Velump",
+   "id": "G4_type_weakness_path:047"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Mordor is a Lithor-type creature. Question: What type is Mordor weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Mordor",
+   "id": "G4_type_weakness_path:048"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Oxxilk is a Tidewell-type creature. Question: What type is Oxxilk weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Oxxilk",
+   "id": "G4_type_weakness_path:049"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Dolell is a Verdane-type creature. Question: What type is Dolell weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Dolell",
+   "id": "G4_type_weakness_path:050"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Radsup is a Voltrix-type creature. Question: What type is Radsup weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Radsup",
+   "id": "G4_type_weakness_path:051"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Nolent is a Pyrrhan-type creature. Question: What type is Nolent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Nolent",
+   "id": "G4_type_weakness_path:052"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Nixish is a Frostel-type creature. Question: What type is Nixish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Nixish",
+   "id": "G4_type_weakness_path:053"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Frodux is a Verdane-type creature. Question: What type is Frodux weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Frodux",
+   "id": "G4_type_weakness_path:054"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gribump is a Umbrine-type creature. Question: What type is Gribump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Gribump",
+   "id": "G4_type_weakness_path:055"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Radble is a Frostel-type creature. Question: What type is Radble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Radble",
+   "id": "G4_type_weakness_path:056"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Frodish is a Umbrine-type creature. Question: What type is Frodish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Frodish",
+   "id": "G4_type_weakness_path:057"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Orvax is a Umbrine-type creature. Question: What type is Orvax weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Orvax",
+   "id": "G4_type_weakness_path:058"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gribilk is a Gustral-type creature. Question: What type is Gribilk weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Gribilk",
+   "id": "G4_type_weakness_path:059"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Tunurn is a Pyrrhan-type creature. Question: What type is Tunurn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Tunurn",
+   "id": "G4_type_weakness_path:060"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gribent is a Pyrrhan-type creature. Question: What type is Gribent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Gribent",
+   "id": "G4_type_weakness_path:061"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Hulrock is a Pyrrhan-type creature. Question: What type is Hulrock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Hulrock",
+   "id": "G4_type_weakness_path:062"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Dolorc is a Lithor-type creature. Question: What type is Dolorc weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Dolorc",
+   "id": "G4_type_weakness_path:063"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Radurn is a Tidewell-type creature. Question: What type is Radurn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Radurn",
+   "id": "G4_type_weakness_path:064"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ithvan is a Gustral-type creature. Question: What type is Ithvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Ithvan",
+   "id": "G4_type_weakness_path:065"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velux is a Frostel-type creature. Question: What type is Velux weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Velux",
+   "id": "G4_type_weakness_path:066"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ithble is a Umbrine-type creature. Question: What type is Ithble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Ithble",
+   "id": "G4_type_weakness_path:067"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velott is a Pyrrhan-type creature. Question: What type is Velott weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Velott",
+   "id": "G4_type_weakness_path:068"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Draent is a Pyrrhan-type creature. Question: What type is Draent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Draent",
+   "id": "G4_type_weakness_path:069"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkook is a Lithor-type creature. Question: What type is Ulkook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Ulkook",
+   "id": "G4_type_weakness_path:070"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Frodook is a Umbrine-type creature. Question: What type is Frodook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Frodook",
+   "id": "G4_type_weakness_path:071"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Syavan is a Pyrrhan-type creature. Question: What type is Syavan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Syavan",
+   "id": "G4_type_weakness_path:072"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Hulent is a Voltrix-type creature. Question: What type is Hulent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Hulent",
+   "id": "G4_type_weakness_path:073"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Kelome is a Tidewell-type creature. Question: What type is Kelome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Kelome",
+   "id": "G4_type_weakness_path:074"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Keloz is a Tidewell-type creature. Question: What type is Keloz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Keloz",
+   "id": "G4_type_weakness_path:075"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Lumeel is a Pyrrhan-type creature. Question: What type is Lumeel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Lumeel",
+   "id": "G4_type_weakness_path:076"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Syaell is a Voltrix-type creature. Question: What type is Syaell weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Syaell",
+   "id": "G4_type_weakness_path:077"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zimux is a Pyrrhan-type creature. Question: What type is Zimux weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Zimux",
+   "id": "G4_type_weakness_path:078"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ithrock is a Pyrrhan-type creature. Question: What type is Ithrock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Ithrock",
+   "id": "G4_type_weakness_path:079"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Tunvan is a Pyrrhan-type creature. Question: What type is Tunvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Tunvan",
+   "id": "G4_type_weakness_path:080"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Tunump is a Voltrix-type creature. Question: What type is Tunump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Tunump",
+   "id": "G4_type_weakness_path:081"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Draeel is a Tidewell-type creature. Question: What type is Draeel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Draeel",
+   "id": "G4_type_weakness_path:082"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ithent is a Verdane-type creature. Question: What type is Ithent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Ithent",
+   "id": "G4_type_weakness_path:083"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gorish is a Lithor-type creature. Question: What type is Gorish weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Gorish",
+   "id": "G4_type_weakness_path:084"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorump is a Tidewell-type creature. Question: What type is Yorump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Yorump",
+   "id": "G4_type_weakness_path:085"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorome is a Voltrix-type creature. Question: What type is Yorome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Yorome",
+   "id": "G4_type_weakness_path:086"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Noline is a Gustral-type creature. Question: What type is Noline weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Noline",
+   "id": "G4_type_weakness_path:087"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Wexent is a Frostel-type creature. Question: What type is Wexent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Wexent",
+   "id": "G4_type_weakness_path:088"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Quonome is a Pyrrhan-type creature. Question: What type is Quonome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Quonome",
+   "id": "G4_type_weakness_path:089"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Orvook is a Umbrine-type creature. Question: What type is Orvook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Orvook",
+   "id": "G4_type_weakness_path:090"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falath is a Voltrix-type creature. Question: What type is Falath weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Falath",
+   "id": "G4_type_weakness_path:091"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkvan is a Verdane-type creature. Question: What type is Ulkvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Ulkvan",
+   "id": "G4_type_weakness_path:092"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorarn is a Umbrine-type creature. Question: What type is Yorarn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Yorarn",
+   "id": "G4_type_weakness_path:093"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkome is a Voltrix-type creature. Question: What type is Ulkome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Ulkome",
+   "id": "G4_type_weakness_path:094"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Wexump is a Pyrrhan-type creature. Question: What type is Wexump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Wexump",
+   "id": "G4_type_weakness_path:095"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Dolvan is a Umbrine-type creature. Question: What type is Dolvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Dolvan",
+   "id": "G4_type_weakness_path:096"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Orvvan is a Voltrix-type creature. Question: What type is Orvvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Orvvan",
+   "id": "G4_type_weakness_path:097"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ulkdor is a Voltrix-type creature. Question: What type is Ulkdor weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Ulkdor",
+   "id": "G4_type_weakness_path:098"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Hysump is a Frostel-type creature. Question: What type is Hysump weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Hysump",
+   "id": "G4_type_weakness_path:099"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Hysent is a Gustral-type creature. Question: What type is Hysent weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Hysent",
+   "id": "G4_type_weakness_path:100"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velell is a Gustral-type creature. Question: What type is Velell weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Velell",
+   "id": "G4_type_weakness_path:101"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Griburn is a Tidewell-type creature. Question: What type is Griburn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Griburn",
+   "id": "G4_type_weakness_path:102"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Tunash is a Umbrine-type creature. Question: What type is Tunash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Tunash",
+   "id": "G4_type_weakness_path:103"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Krovan is a Umbrine-type creature. Question: What type is Krovan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Krovan",
+   "id": "G4_type_weakness_path:104"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Huloz is a Voltrix-type creature. Question: What type is Huloz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Huloz",
+   "id": "G4_type_weakness_path:105"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Noldor is a Tidewell-type creature. Question: What type is Noldor weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Noldor",
+   "id": "G4_type_weakness_path:106"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Dolook is a Verdane-type creature. Question: What type is Dolook weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Dolook",
+   "id": "G4_type_weakness_path:107"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Wexash is a Lithor-type creature. Question: What type is Wexash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Wexash",
+   "id": "G4_type_weakness_path:108"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Cynome is a Tidewell-type creature. Question: What type is Cynome weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Cynome",
+   "id": "G4_type_weakness_path:109"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Myrurn is a Voltrix-type creature. Question: What type is Myrurn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Myrurn",
+   "id": "G4_type_weakness_path:110"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorott is a Lithor-type creature. Question: What type is Yorott weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Yorott",
+   "id": "G4_type_weakness_path:111"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morig is a Frostel-type creature. Question: What type is Morig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Morig",
+   "id": "G4_type_weakness_path:112"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Quonash is a Gustral-type creature. Question: What type is Quonash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Quonash",
+   "id": "G4_type_weakness_path:113"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zimine is a Frostel-type creature. Question: What type is Zimine weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Zimine",
+   "id": "G4_type_weakness_path:114"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Drarock is a Verdane-type creature. Question: What type is Drarock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Drarock",
+   "id": "G4_type_weakness_path:115"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Velrock is a Gustral-type creature. Question: What type is Velrock weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Velrock",
+   "id": "G4_type_weakness_path:116"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morine is a Lithor-type creature. Question: What type is Morine weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Morine",
+   "id": "G4_type_weakness_path:117"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Draoz is a Lithor-type creature. Question: What type is Draoz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Draoz",
+   "id": "G4_type_weakness_path:118"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Javott is a Lithor-type creature. Question: What type is Javott weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Javott",
+   "id": "G4_type_weakness_path:119"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Ekkilk is a Tidewell-type creature. Question: What type is Ekkilk weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Ekkilk",
+   "id": "G4_type_weakness_path:120"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zarash is a Frostel-type creature. Question: What type is Zarash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Zarash",
+   "id": "G4_type_weakness_path:121"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Faline is a Verdane-type creature. Question: What type is Faline weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Faline",
+   "id": "G4_type_weakness_path:122"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Faleel is a Gustral-type creature. Question: What type is Faleel weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Faleel",
+   "id": "G4_type_weakness_path:123"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Morurn is a Tidewell-type creature. Question: What type is Morurn weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Morurn",
+   "id": "G4_type_weakness_path:124"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorble is a Verdane-type creature. Question: What type is Yorble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Yorble",
+   "id": "G4_type_weakness_path:125"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Falott is a Tidewell-type creature. Question: What type is Falott weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 5,
+   "type": "Tidewell",
+   "query": "Falott",
+   "id": "G4_type_weakness_path:126"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Yorig is a Voltrix-type creature. Question: What type is Yorig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Yorig",
+   "id": "G4_type_weakness_path:127"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zarble is a Gustral-type creature. Question: What type is Zarble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Zarble",
+   "id": "G4_type_weakness_path:128"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Zimoz is a Voltrix-type creature. Question: What type is Zimoz weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 3,
+   "type": "Voltrix",
+   "query": "Zimoz",
+   "id": "G4_type_weakness_path:129"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Kelash is a Lithor-type creature. Question: What type is Kelash weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 6,
+   "type": "Lithor",
+   "query": "Kelash",
+   "id": "G4_type_weakness_path:130"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Myrig is a Verdane-type creature. Question: What type is Myrig weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 7,
+   "type": "Verdane",
+   "query": "Myrig",
+   "id": "G4_type_weakness_path:131"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Radvan is a Umbrine-type creature. Question: What type is Radvan weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 0,
+   "type": "Umbrine",
+   "query": "Radvan",
+   "id": "G4_type_weakness_path:132"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Skaldor is a Gustral-type creature. Question: What type is Skaldor weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 1,
+   "type": "Gustral",
+   "query": "Skaldor",
+   "id": "G4_type_weakness_path:133"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Gorath is a Frostel-type creature. Question: What type is Gorath weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 2,
+   "type": "Frostel",
+   "query": "Gorath",
+   "id": "G4_type_weakness_path:134"
+  },
+  {
+   "level": "G4_type_weakness_path",
+   "prompt": "Cynble is a Pyrrhan-type creature. Question: What type is Cynble weak to?\nAnswer:",
+   "options": [
+    " Voltrix",
+    " Pyrrhan",
+    " Tidewell",
+    " Lithor",
+    " Verdane",
+    " Umbrine",
+    " Gustral",
+    " Frostel"
+   ],
+   "answer": 4,
+   "type": "Pyrrhan",
+   "query": "Cynble",
+   "id": "G4_type_weakness_path:135"
+  }
+ ]
+}

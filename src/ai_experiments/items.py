@@ -101,6 +101,7 @@ def _with_ids(items: list[dict]) -> list[dict]:
 
 
 PROBES2 = "probes2"  # PLAN step 21 (DATA-3): probes with never-trained name parts (M2_*); optional set, plain and every morph universe
+GRAPH4 = "graph4"  # PLAN step 30 (GRAPH-4, DATA-1): the induced type -> weakness edge, bare and path forms (G4_*); optional, plain and _wind universes
 
 
 def generate(morph: bool, n: int | None = None, morph_p: float = MORPH_P, morph_pos: str = "suffix", weakness: str = "type") -> tuple[dict[str, list[dict]], list[dict]]:
@@ -276,6 +277,7 @@ class Frozen:
     suite2: list[dict] = field(default_factory=list)      # ICL2_* out-of-distribution suite variant; [] if not frozen
     mmlu: list[dict] = field(default_factory=list)        # K_mmlu 5-shot slice; [] if not frozen
     probes2: list[dict] = field(default_factory=list)     # M2_* probes with never-trained name parts (PLAN step 21); [] if not frozen
+    graph4: list[dict] = field(default_factory=list)      # G4_* type -> weakness edge items (PLAN step 30); [] if not frozen
     sha: dict[str, str] = field(default_factory=dict)  # set name -> sha256 of its items
 
     def config(self) -> dict:
@@ -314,6 +316,9 @@ def load_all(morph: bool, version: str = VERSION, n: int | None = None, morph_p:
         rdoc = load(REVERSE, False, version)
         reverse, sha[REVERSE] = rdoc["items"], rdoc["sha256"]
     extra = {}
+    if not n and not morph and path(GRAPH4, False, version, n, weakness=weakness).exists():
+        d = load(GRAPH4, False, version, n, weakness=weakness)
+        extra["graph4"], sha[GRAPH4] = d["items"], d["sha256"]
     if not n and path(PROBES2, morph, version, n, morph_p, morph_pos, weakness).exists():
         d = load(PROBES2, morph, version, n, morph_p, morph_pos, weakness)
         extra["probes2"], sha[PROBES2] = d["items"], d["sha256"]
@@ -372,6 +377,16 @@ def main(argv=None) -> None:
         freeze(True, force="--force" in argv, morph_p=float(argv[1]), morph_pos="prefix" if "prefix" in argv else "suffix")
     elif cmd == "freeze-wind":  # PLAN step 23 (DATA-1): the plain universe with weakness independent of type
         freeze(False, force="--force" in argv, weakness="independent")
+    elif cmd == "freeze-graph4":  # PLAN step 30 (GRAPH-4): the type -> weakness edge items for the plain and the independent-weakness universes
+        for wk in ("type", "independent"):
+            species = U.build(n_per_type=20, weakness=wk)
+            items = _with_ids(U.graph4_items(species))
+            p = path(GRAPH4, False, VERSION, weakness=wk)
+            if p.exists() and "--force" not in argv:
+                sys.exit(f"{p.name} exists; frozen sets are immutable.")
+            doc = dict(name=GRAPH4, version=VERSION, weakness=wk, n_items=len(items), species_sha256=sha256(species), sha256=sha256(items), items=items)
+            p.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"wrote {p.name}: {len(items)} items, sha256 {doc['sha256'][:12]}")
     elif cmd == "check":
         sys.exit(0 if check() else 1)
     elif cmd == "show":
@@ -380,7 +395,7 @@ def main(argv=None) -> None:
             print(f"{'morph' if morph else 'plain'} {f.version}: {len(f.ladder)} ladder(+heldout) items, "
                   f"{len(f.probes)} probes, {len(f.suite)} ICL suite items, {len(f.known)} known-facts items, "
                   f"{len(f.corpus)} perplexity paragraphs, {len(f.reverse)} reverse items, {len(f.induction2)} induction2, "
-                  f"{len(f.suite2)} ICL suite2, {len(f.mmlu)} MMLU, {len(f.probes2)} probes2")
+                  f"{len(f.suite2)} ICL suite2, {len(f.mmlu)} MMLU, {len(f.probes2)} probes2, {len(f.graph4)} graph4")
             for k, v in f.sha.items():
                 print(f"   {k:18s} {v}")
     else:

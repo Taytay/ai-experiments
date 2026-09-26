@@ -243,6 +243,8 @@ def evaluate(model, tok):
         recs["ctx"] += sc.score(FROZEN.reverse, ctx=True, label="reverse+ctx")
     if FROZEN.probes2:  # PLAN step 21 (DATA-3): probes whose non-marker part no trained name has
         recs["noctx"] += sc.score(FROZEN.probes2, label="probes2")
+    if FROZEN.graph4:  # PLAN step 30 (GRAPH-4): the induced type -> weakness edge, bare and path forms
+        recs["noctx"] += sc.score(FROZEN.graph4, label="graph4")
     if FROZEN.induction2:  # PLAN step 20 (EVAL-4): identifiable induction items, without and with the entries in context
         recs["noctx"] += sc.score(FROZEN.induction2, label="induction2")
         recs["ctx"] += sc.score(FROZEN.induction2, ctx=True, label="induction2+ctx")

@@ -1,0 +1,9 @@
+{
+  "trained": {
+    "G4_type_weakness_bare": 0.0,
+    "G4_type_weakness_path": 14.0,
+    "G4_bare_correct_of_8": 0,
+    "G4_path_types_above_half": 1,
+    "eval_minutes": 0.1
+  }
+}
