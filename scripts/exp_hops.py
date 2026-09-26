@@ -32,6 +32,7 @@ from collections import defaultdict
 import torch
 import torch.nn.functional as F
 
+from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import PROCESSED, ROOT
 
 ARM = os.environ.get("ARM", "decoder")
@@ -136,8 +137,14 @@ def write(name, conds, extra):
             for r in recs:
                 f.write(json.dumps(r) + "\n")
     acc = summarise(conds)
-    (ROOT / "results" / f"hops_{name}.json").write_text(json.dumps({"model": MODEL, "arm": ARM, "mode": MODE, "items": ITEMS,
-                                                                     "per_cell": PER_CELL, **extra, "acc": acc}, indent=1))
+    cfg = {"arm": ARM, "mode": MODE, "items": ITEMS, "per_cell": PER_CELL, "steps": STEPS if ARM == "huginn" else None,
+           "dsteps": DSTEPS if MODE == "gen" else None, "cot_tokens": COT_TOKENS if MODE == "cot" else None}
+    out = ROOT / "results" / f"hops_{name}.json"
+    out.write_text(json.dumps({"model": MODEL, **cfg, **extra, "acc": acc}, indent=1))
+    with Run("hops", model=MODEL, config=cfg, enabled=not PER_CELL) as run:
+        for cond, a in acc.items():
+            run.log({"acc_mean": sum(a.values()) / len(a), **a}, condition=cond)
+        run.artifact(out)
     for cond, a in acc.items():
         print(cond, " ".join(f"{k}:{v:.0f}" for k, v in a.items()), flush=True)
 

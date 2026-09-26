@@ -28,6 +28,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import PROCESSED, ROOT
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -205,7 +206,12 @@ if __name__ == "__main__":
         acc[cond] = {f"{n}_k{k:02d}": round(100 * float(np.mean(v)), 1) for (n, k), v in sorted(by.items())}
         print(cond, " ".join(f"{k}:{v:.0f}" for k, v in acc[cond].items()), flush=True)
     cfg = dict(mode=MODE, loop=LOOP, block=BLOCK, r_test=R_TEST, train_ks=TRAIN_KS, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, seed=SEED, base=BASE)
-    (ROOT / "results" / f"hops_enc_{NAME}.json").write_text(json.dumps({"config": cfg, **info, "acc": acc}, indent=1))
+    out = ROOT / "results" / f"hops_enc_{NAME}.json"
+    out.write_text(json.dumps({"config": cfg, **info, "acc": acc}, indent=1))
+    with Run("hops_encoder", model=BASE, config=cfg, enabled=STEPS >= 100) as run:
+        for cond, a in acc.items():
+            run.log({"acc_mean": sum(a.values()) / len(a), **a}, condition=cond)
+        run.artifact(out)
     if STEPS:
         if LOOP:
             model.set_loops(1)

@@ -1,0 +1,36 @@
+{
+ "model": "Qwen/Qwen2.5-3B-Instruct",
+ "arm": "decoder",
+ "mode": "direct",
+ "items": "hops_v1",
+ "per_cell": 0,
+ "seconds": 192,
+ "acc": {
+  "direct": {
+   "multi_k01": 88.0,
+   "multi_k02": 28.0,
+   "multi_k03": 28.0,
+   "multi_k04": 14.0,
+   "multi_k05": 24.0,
+   "multi_k06": 18.0,
+   "multi_k07": 20.0,
+   "multi_k08": 28.0,
+   "multi_k09": 24.0,
+   "multi_k10": 20.0,
+   "multi_k11": 34.0,
+   "multi_k12": 18.0,
+   "single_k01": 64.0,
+   "single_k02": 20.0,
+   "single_k03": 8.0,
+   "single_k04": 8.0,
+   "single_k05": 16.0,
+   "single_k06": 12.0,
+   "single_k07": 16.0,
+   "single_k08": 22.0,
+   "single_k09": 20.0,
+   "single_k10": 20.0,
+   "single_k11": 16.0,
+   "single_k12": 18.0
+  }
+ }
+}
