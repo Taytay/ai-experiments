@@ -3,6 +3,7 @@
 Date: 2026-09-12 to 2026-09-14. Hardware: RTX 3090 (24 GB), driver 591.86, Windows 11, torch 2.11 + cu128.
 Sections 4 and 6 ran with transformers + torch only (Smart App Control blocked triton at the time; see NOTES.md); sections 7 and 8 use unsloth.
 **Correction (2026-09-21, section 44).** unsloth's `FastLanguageModel.from_pretrained` defaults to `load_in_4bit=True`, and six scripts never overrode it: `exp_categoriser.py` and `exp_real6.py` (sections 37, 38, 43: every categoriser is QLoRA on the NF4 4-bit base and every number in those sections, the instruct base's included, is read on that base, consistently), `exp_items_v2.py` (the ARC / MMLU / induction re-reads of section 33 and Table 38.3), `exp_lre.py` (section 40), `exp_graph4.py` (section 42) and `exp_onpolicy_distill.py` (section 31: the teacher is the 4-bit base, perplexity 11.12 against the bf16 base's 10.61, and the student was trained on it). `exp_curriculum.py` always set the flag, so the arms of sections 8 to 34 are bf16 LoRA on the bf16 base as stated; the four back-fill and OPD scripts read those bf16 adapters on the 4-bit base, a mismatch whose size section 44 measures. Every script now sets the precision explicitly (`LOAD_4BIT`).
+**Correction (2026-09-22, section 48).** The REAL-6 cells of sections 37 to 47 do not mean what their names say. A fifth of the "seen merchant" items (115 of 559) have no row of their merchant left in the user's 300-row history (the builder chose the test rows before the cut); every user files a merchant under one label, so the items whose merchant is in the history are answered by a lookup (the nearest history row's label, 98.6); and of the rest, 509 are decided by the merchant's standard category and 103 fall in categories the user split with nothing to say which side, where the record-in-prompt categorisers sit at the set's ceiling (97 and a coin flip). The intervals resample items over 20 users; resampled by user they are about twice as wide. Section 48 re-reads every REAL-6 run in the corrected groups; the conclusions that change are listed there.
 
 Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md). Code: `../scripts/`. Raw numbers: `../results/`. Every run is tracked with config + git commit in `../evals/` (see `../evals/LEADERBOARD.md`).
 
@@ -3218,3 +3219,86 @@ The rules cost one retriever pass over the user's 300 rows per user and one per 
 REAL-9 asked whether the fixed shots leave accuracy on the table and which shots a real history should supply. On REAL-6 the answer is narrower than the whole-set numbers suggest. The rules' gain (up to 25 points) is the user's own label for the same merchant, which a lookup on the history gives at 98.6 without a model; on everything the lookup cannot answer, no rule moves a trained categoriser at test, and training with retrieved shots teaches the adapter to copy and costs 20 to 30 points on the merchants it has not seen, the DB-only ones included. For a production design that means: put the merchant lookup, or a nearest-row block, in front of the model for merchants the user has labelled; at test use TransAct's block (recent plus the nearest per category), which keeps every category represented and gave the best record-in-prompt number (93.0 against 90.2, paired +2.8, one adapter); and do not train with retrieved shots unless the query's merchant is withheld from its own pool (row 46). What REAL-6 cannot say is whether shots beat a lookup when they disagree: its users never relabel, never file one merchant two ways and never split a category on anything observable, so the in-history group is a lookup by construction and the recent rule has no time to follow. Those are row 43's cells.
 
 Not done: seeds (the trained adapters are one seed each; the test-only arms are paired on the same adapter and need none), a rule with more than 24 shots, the gold-label-aware block at training time. Cost: 12.7 GPU hours.
+
+## 48. The REAL-6 audit: the seen cells are a lookup, the unseen cells are the merchant's standard category, the record-in-prompt categorisers sit at the set's ceiling of about 94, and the section 45 whole-set gain is mostly on items the DB cannot explain (REAL-13)
+
+*PLAN step 45. Code: `ai_experiments.real6_cells` (the corrected groups, the nearest-row lookup cached in `results/real6_nn1.json`, the lookup-then-model hybrid, a user bootstrap), `real6_eval.summarize` (now also `_uci`, the interval with users resampled), `scripts/real6_audit_tables.py`. Every number is re-read from the saved per-item records of sections 37 to 47; nothing was rescored or retrained. CPU only.*
+
+When the queue changed hands during row 41, a review of the evaluation set found four properties that the REAL-6 cell names hide (QUESTIONS.md REAL-13). First, `real6.build` chooses each history merchant's test rows before it cuts the shuffled history to 300 rows, so 115 of the 559 items labelled "seen" have no row of their merchant left in the history the model is given. Second, every user files every merchant under one label (0 of 1,026 user-merchant pairs carry two), so an item whose merchant is in the history is answered by looking the merchant up: the label of the history row nearest to the statement under the row 37 retriever is right on 98.6% of those 444 items, from the string alone. Third, every scheme is built from the twelve standard categories by merging, renaming and splitting, and a split assigns merchants to its halves at random; so of the 620 items whose merchant the history never had, 509 are decided by the merchant's standard category (the history shows which of the user's names that category became), 103 fall in a split category with nothing observable to say which half, and 8 in neither. Fourth, the intervals resample items, but the set samples 20 users and a user's items are not independent. Table 48.1 gives the groups, Table 48.2 re-reads every REAL-6 run of the report in them, and Table 48.3 the seeded arms.
+
+**Table 48.1: REAL-6 in the corrected groups (`ai_experiments.real6_cells`); lookup = the label of the user's history row nearest to the statement under the row 37 retriever**
+
+| group | items | of which DB-only merchants | labelled level | lookup accuracy | what decides the item |
+|---|---|---|---|---|---|
+| in history | 444 | 108 | seen | 98.6 | the user's own label for this merchant (one label per user-merchant pair) |
+| labelled seen, not in history | 115 | 27 | seen | 15.7 | the merchant's category, as for an unseen merchant: the 300-row cut removed its rows |
+| determined by category | 509 | 113 | unseen | 19.1 | the merchant's standard category, renamed or merged by the user's scheme |
+| split category | 103 | 9 | unseen | 6.8 | which half of a split category the user put this merchant in: nothing observable |
+| other (the history shows a different label for the category) | 8 | | unseen | 0.0 | |
+
+**Table 48.2: every REAL-6 run of sections 37 to 47 in the corrected groups (accuracy %; DB-only = determined or split items whose merchant no user labelled in training; interval over items, then over users; sum = the option rule summing token log-probabilities instead of averaging them, LLM runs only; hybrid = the lookup when its cosine is at least 0.8, else the run)**
+
+| sec. | run | in history | labelled seen, not in history | determined by category | split category | DB-only | all | item interval | user interval | sum rule, all | hybrid, all |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 37 | Qwen2.5-3B base, 24 shots | 32.9 | 24.3 | 21.8 | 13.6 | 23.8 | 25.4 | [23.0, 28.1] | [21.4, 29.4] | 28.1 | 43.2 |
+| 37 | Qwen2.5-3B base + record | 57.4 | 40.9 | 47.9 | 25.2 | 48.4 | 48.6 | [45.7, 51.6] | [42.4, 55.0] | 56.8 | 59.7 |
+| 37 | Instruct, 24 shots | 37.6 | 30.4 | 28.5 | 20.4 | 30.3 | 31.2 | [28.7, 33.8] | [27.7, 34.7] | 32.1 | 47.7 |
+| 37 | Instruct + record | 62.2 | 60.0 | 60.1 | 31.1 | 48.4 | 58.0 | [55.1, 60.8] | [53.3, 62.2] | 60.7 | 68.0 |
+| 37 | MiniLM prototype, 24 shots | 37.4 | 12.2 | 15.9 | 7.8 | 13.9 | 22.8 | [20.4, 25.2] | [19.3, 26.2] | - | 39.0 |
+| 37 | MiniLM prototype, full history | 66.2 | 14.8 | 16.7 | 3.9 | 16.4 | 33.9 | [31.3, 36.5] | [31.1, 37.1] | - | 40.6 |
+| 37 | MiniLM mix | 62.2 | 22.6 | 27.3 | 2.9 | 26.2 | 37.8 | [34.9, 40.6] | [33.4, 42.3] | - | 45.9 |
+| 37 | bge prototype, full history | 68.9 | 24.3 | 18.7 | 1.0 | 17.2 | 36.5 | [33.6, 39.0] | [33.5, 40.3] | - | 42.6 |
+| 37 | bge mix | 65.3 | 32.2 | 30.1 | 5.8 | 27.9 | 41.2 | [38.3, 43.9] | [37.8, 44.6] | - | 48.6 |
+| 38 | bge tuned across users, full history | 86.0 | 57.4 | 79.6 | 38.8 | 38.5 | 75.7 | [73.2, 77.9] | [71.5, 80.2] | - | 78.8 |
+| 38 | bge tuned + record on the query | 91.7 | 71.3 | 89.2 | 42.7 | 71.3 | 83.7 | [81.6, 85.8] | [78.4, 88.7] | - | 85.4 |
+| 38 | bge tuned + records in training | 85.1 | 54.8 | 78.8 | 21.4 | 39.3 | 73.3 | [70.8, 75.6] | [69.2, 77.1] | - | 76.5 |
+| 38 | SFT no DB | 65.3 | 40.9 | 59.3 | 27.2 | 51.6 | 57.1 | [54.3, 59.9] | [53.6, 60.3] | 57.3 | 65.3 |
+| 38 | SFT, records in the weights (1 pass) | 65.3 | 42.6 | 53.8 | 25.2 | 54.1 | 54.5 | [51.7, 57.3] | [50.9, 58.2] | 54.7 | 62.9 |
+| 38 | SFT, records in the weights (3.3 passes) | 71.2 | 49.6 | 69.0 | 51.5 | 72.1 | 66.3 | [63.9, 69.0] | [62.1, 70.0] | 67.2 | 72.3 |
+| 38 | SFT + record in prompt | 94.1 | 83.5 | 97.4 | 50.5 | 97.5 | 90.2 | [88.4, 91.7] | [86.0, 93.5] | 90.3 | 91.3 |
+| 43 | SFT + record, ambiguous DB (trained on it) | 91.7 | 85.2 | 93.5 | 43.7 | 88.5 | 87.4 | [85.7, 89.2] | [83.1, 91.1] | 87.4 | 89.3 |
+| 43 | SFT + record, retrieved top-1 | 93.7 | 83.5 | 97.2 | 50.5 | 97.5 | 89.9 | [88.0, 91.5] | [85.8, 93.2] | 90.1 | 91.1 |
+| 44 | SFT no DB, transformers + peft (hf scorer) | 65.8 | 43.5 | 63.5 | 35.9 | 57.4 | 59.5 | [57.0, 62.3] | [56.6, 62.1] | 58.9 | 67.0 |
+| 44 | SFT + record, transformers + peft (hf scorer) | 94.6 | 82.6 | 94.5 | 42.7 | 92.6 | 88.5 | [86.6, 90.2] | [84.5, 91.8] | 88.5 | 89.7 |
+| 45 | Instruct, chat template | 13.3 | 9.6 | 9.2 | 1.0 | 8.2 | 10.0 | [8.4, 11.8] | [7.0, 13.0] | 10.2 | 34.0 |
+| 45 | Instruct + record, chat template | 69.1 | 61.7 | 66.8 | 25.2 | 62.3 | 63.2 | [60.5, 66.0] | [58.0, 68.2] | 63.3 | 71.3 |
+| 45 | SFT no DB, chat template | 65.5 | 40.0 | 61.9 | 35.9 | 54.1 | 58.9 | [56.2, 61.8] | [55.4, 62.1] | 58.8 | 67.3 |
+| 45 | SFT + record, chat template | 95.5 | 85.2 | 92.9 | 59.2 | 98.4 | 90.0 | [88.3, 91.6] | [85.5, 93.8] | 89.5 | 90.9 |
+| 46 | FastFit bge, 24 shots | 46.2 | 26.1 | 24.8 | 5.8 | 24.6 | 31.3 | [28.7, 33.9] | [27.8, 35.4] | - | 44.6 |
+| 46 | FastFit bge, full history | 86.9 | 24.3 | 30.3 | 9.7 | 27.9 | 49.0 | [46.1, 51.8] | [46.0, 52.3] | - | 49.0 |
+| 46 | FastFit bge + record, full history | 100.0 | 88.7 | 98.8 | 36.9 | 95.9 | 92.2 | [90.7, 93.6] | [88.0, 95.6] | - | 92.1 |
+| 46 | logistic head, frozen bge, C=100 | 87.6 | 17.4 | 21.0 | 1.0 | 14.8 | 43.9 | [41.1, 46.6] | [40.5, 47.3] | - | 43.9 |
+| 46 | logistic head + record, C=100 | 100.0 | 81.7 | 89.0 | 35.9 | 93.4 | 87.2 | [85.2, 89.1] | [82.7, 91.0] | - | 87.1 |
+| 47 | SFT no DB, transact shots at test | 98.9 | 46.1 | 59.5 | 34.0 | 50.8 | 70.9 | [68.3, 73.5] | [67.0, 74.4] | 71.1 | 70.8 |
+| 47 | SFT + record, transact shots at test | 98.6 | 82.6 | 97.4 | 60.2 | 96.7 | 93.0 | [91.3, 94.3] | [89.4, 95.7] | 92.7 | 93.0 |
+| 47 | SFT + record, trained with transact shots | 99.5 | 79.1 | 87.2 | 46.6 | 77.0 | 87.3 | [85.3, 89.2] | [83.9, 90.2] | 87.2 | 87.2 |
+
+**Table 48.3: the seeded arms in the corrected groups (mean +- sd over seeds 0, 1, 2; accuracy %)**
+
+| arm | in history | labelled seen, not in history | determined by category | split category | DB-only | all |
+|---|---|---|---|---|---|---|
+| SFT no DB (sec. 43) | 68.5 +- 2.8 | 44.6 +- 3.9 | 62.7 +- 3.1 | 35.6 +- 7.4 | 49.5 +- 3.8 | 60.5 +- 3.0 |
+| SFT + record (sec. 43) | 94.1 +- 0.6 | 84.3 +- 0.9 | 95.8 +- 1.4 | 45.3 +- 7.4 | 91.5 +- 5.5 | 89.3 +- 0.8 |
+| records in the weights, 3.3 passes (sec. 43) | 70.9 +- 0.4 | 49.9 +- 2.2 | 64.9 +- 4.6 | 43.4 +- 7.2 | 59.3 +- 12.0 | 63.8 +- 2.3 |
+| records in the weights, 6.7 passes (sec. 45) | 81.9 +- 0.9 | 62.6 +- 4.8 | 82.0 +- 3.5 | 44.0 +- 12.8 | 68.9 +- 5.4 | 76.8 +- 2.1 |
+| records in the weights, 13.3 passes (sec. 45) | 84.1 +- 0.6 | 68.4 +- 2.7 | 85.1 +- 2.4 | 30.7 +- 5.9 | 64.5 +- 5.5 | 78.3 +- 0.3 |
+
+### 48.1 The seen cells were a lookup, and the models were below it
+
+Every "seen" number in sections 37 to 47 mixes 444 lookup items with 115 unseen ones. In the in-history group alone the nearest-row lookup reads 98.6; the untrained instruct base with its frozen 24 shots 37.6, the full-history prototypes of section 37 66 to 69 (not the 55.6 / 59.7 section 37.3 set as the target for labelled merchants), the SFT categoriser 65.3 without the record and 94.1 with it, the tuned bge encoder 86.0 and 91.7. Only the per-user classifiers with the record on the statement (section 46: FastFit 100, a logistic head on frozen bge 100) and the categorisers reading nearest or TransAct shots (section 47: 98.6 to 99.5) reach the lookup, and those shots are the lookup inside the prompt. The hybrid column puts the lookup in front wherever its cosine clears 0.8 (74% of the in-history items, none of the others): the no-record SFT goes from 57.1 to 65.3, the tuned bge from 75.7 to 78.8, the record SFT from 90.2 to 91.3. For merchants a user has labelled, a production system should look the label up and not ask a model, and REAL-6 cannot say whether a model should ever overrule the lookup, because its users never change their minds (row 43's set).
+
+### 48.2 The unseen cells were the standard category, and the record-in-prompt arms are at the ceiling
+
+On the 509 category-determined items the record-in-prompt categorisers read 95.8 +- 1.4 over three seeds (97.4 for seed 0), FastFit with the record 98.8, and on the 103 split items every run in the report is between 1 and 60, which is what a coin flip over two halves gives for trained models on 103 items. The attainable ceiling for the whole set is therefore about 94 (the lookup group at 99, the 624 category-determined and truncated items at 97 or so, the split ones at 50): the best systems of sections 46 and 47 (per-user FastFit with the record 92.2, the record SFT with TransAct shots 93.0) are at it, and no variant of the record arm can be ranked on this set any more. That includes the comparisons of sections 43 to 47 that differ by two to three points: the retrieved-record, hf-trainer and chat-template variants all sit inside the record arm's user interval ([86.0, 93.5]). The DB-only results, the owner's second goal, stand as reported: the DB-only merchants in the corrected groups read 97.5 with the record in the prompt, 91.5 +- 5.5 over seeds, and the no-DB arm 49.5 +- 3.8; they were already restricted to unseen levels, and only 9 of the 122 are in split categories.
+
+### 48.3 The section 45 whole-set gain is mostly not the DB
+
+Section 45 reported the whole set going from 60.5 (no DB) to 76.8 and 78.3 with the records in the weights at 6.7 and 13.3 passes, and noted that the history exposure doubled with the DB exposure. The corrected groups show where the gain is: the in-history items rise from 68.5 to 81.9 and 84.1 and the category-determined items from 62.7 to 82.0 and 85.1, while the DB-only merchants rise from 49.5 to 68.9 and 64.5. An in-history item's label is in the user's training rows, and a category-determined merchant is, for up to three quarters of those items (the 396 that are not DB-only), one other users labelled in training; the records cannot be what teaches either, and 800 or 1,600 steps over the users' histories (against 200 for the no-DB arm) can. So the no-DB categoriser is probably under-trained by a factor of four, which would be the cheapest gain the report has found for the production shape, and row 47 (the no-DB arm at 800 and 1,600 steps) moves up the queue from a control to a recipe question. The DB-only gain (+19 at 6.7 passes) is the part of section 45 that the records own.
+
+### 48.4 Smaller corrections
+
+The option rule: the untrained bases read 1 to 8 points higher when the options are scored by summed rather than mean token log-probability (the instruct base with the record 58.0 to 60.7, the base with the record 48.6 to 56.8), so section 37's untrained columns understate them; every trained categoriser moves by under a point. The user intervals are 1.3 to 2.2 times as wide as the item intervals (record SFT [88.4, 91.7] to [86.0, 93.5]); every REAL-6 table from here on carries the user interval, and differences under about four points on the whole set between separately trained adapters should be read as ties. Section 37.2's "elsewhere in the history" row (399 items at 20 to 26 for the untrained LLMs) contains the 115 truncated items; without them the untrained model is still at its unseen-merchant level on merchants that are in the history but not among the shots, so the reading (the model only uses what is in the prompt) stands.
+
+### 48.5 What the step says
+
+REAL-6 measured three things well: whether a categoriser reads the user's scheme at all (the coined names), whether a fact-DB record reaches merchants no user labelled (the DB-only merchants), and whether training across users carries a merchant's category to another user's scheme. It cannot measure the rest of the owner's task. The seen cells are a lookup, so the in-context route's advantage over a lookup table (following a user's relabelling, filing one merchant two ways, reasons the history shows but the merchant does not) is untested; and the unseen cells reduce to knowing the merchant's standard category, which the record gives, so the record-in-prompt arms are at the set's ceiling and further variants of them are ties. The queue follows from that: held-out users (row 42) still has something to measure on REAL-6 (the schemes are new even if the categories are not); row 43's set has to be built so that neither a lookup nor the standard category decides an item; the collaborative record (row 44) waits for that set; and the no-DB recipe question of 48.3 (row 47) goes first, because it may change every no-record number and costs a few GPU hours.
