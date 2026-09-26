@@ -52,13 +52,16 @@ DOC = R6.load(REAL6_DB)
 RETRIEVED = None
 if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/exp_real6_retriever.py; its record comes from the DB in use
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
+ITEMS_SET = os.environ.get("ITEMS_SET", "")  # row 62: score another frozen item set in REAL-6's format (data/processed/<set>.json), e.g. novel_merchants_v1
+if ITEMS_SET:
+    DOC = dict(DOC, items=json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())["items"])
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
 _fold = re.search(r"_f(\d)(?:_|$)", WHAT)  # row 42: a fold adapter (exp_categoriser.py FOLD=k) is scored on its held-out users unless USERS says otherwise
 USERS = os.environ.get("USERS", "all" if _fold is None else ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == int(_fold.group(1))))
 if USERS != "all":
     ITEMS = [it for it in ITEMS if str(it["user"]) in USERS.split(",")]
 REC_CAT = bool(int(os.environ.get("REC_CAT", "1" if "_reccat" in WHAT else "0")))  # row 58: the test record states the category, as in training
-if REC_CAT and ROUTE == "llm":
+if REC_CAT and ROUTE == "llm" and not ITEMS_SET:  # a set built from another database carries its own records
     ITEMS = [R6.set_record(it, R6.category_record(it["merchant"], it["record"])) for it in ITEMS]
 if ROUTE == "llm":
     from ai_experiments import real6_shots as RS
@@ -71,6 +74,8 @@ if ROUTE == "llm":
 if CHAT and ROUTE == "llm":
     ITEMS = [R6.chat_item(it) for it in ITEMS]
 tag = (MODEL.split("/")[-1] if WHAT == "base" else WHAT) if ROUTE == "llm" else WHAT
+if ITEMS_SET:
+    tag += f"_{ITEMS_SET}"
 if ROUTE == "llm" and SHOTS != "fixed" and f"_shots{SHOTS}" not in WHAT:
     tag += f"_shots{SHOTS}"  # a fixed-shot model read with the rule's shots at test only
 OUT = ROOT / "results" / f"real6_{tag}{'_smoke' if SMOKE else ''}.json"

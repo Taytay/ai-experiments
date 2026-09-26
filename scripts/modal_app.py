@@ -76,6 +76,8 @@ def run(cmds: list, env: dict, tag: str):
     import subprocess
     import time
     _prepare()
+    for src in [s for s in env.get("ADAPTERS_FROM", "").split(",") if s]:  # adapters trained by earlier jobs, from their result directories
+        shutil.copytree(f"/out/{src}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
     before = _snapshot(); t0 = time.time(); log = []
     for cmd in cmds:
         started = time.strftime("%H:%M:%S")
