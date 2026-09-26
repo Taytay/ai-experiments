@@ -12,7 +12,7 @@ Huginn; the 20,000 most frequent English words in wordfreq, 4 to 8 letters, so t
 syllable strings of 2 to 4 Qwen2.5 tokens, more than one token in every tokenizer). N items per cell, paired across nothing (each
 item fresh). `chains(...)` is exported so the encoder arms can train on fresh chains from disjoint names (split="train").
 
-Frozen as data/processed/hops_v1.json: {"items": [{id, k, names, prompt, question, options, answer, chain, statements}]}.
+Frozen as data/processed/hops_v1.json: {"items": [{id, k, names, prompt, question, options, answer, chain, statements}], "pools": ...}.
 usage: uv run --with wordfreq python scripts/build_hops.py [--force]
 """
 import json
@@ -43,6 +43,13 @@ def _n(tok, w):
 
 @lru_cache(maxsize=1)
 def pools():
+    """The frozen pools from hops_v1.json (so training needs neither wordfreq nor the tokenizers), else built as below."""
+    if OUT.exists() and "pools" in (doc := json.loads(OUT.read_text())):
+        return doc["pools"]
+    return make_pools()
+
+
+def make_pools():
     """Name pools: single-token common words and coined multi-token words, each split in half by a fixed shuffle: 'test' for the
     frozen items, 'train' for the encoder arms' training chains, so a trained reader never sees a test name."""
     toks = _toks()
@@ -97,9 +104,10 @@ def build():
             for n in range(N_PER_CELL):
                 it = chains(rng, k, kind)
                 items.append(dict(id=f"hops_{kind}_k{k:02d}_{n:03d}", **it))
-    p = pools()
+    p = make_pools()
     return {"version": "v1", "seed": SEED, "n_per_cell": N_PER_CELL, "ks": KS, "n_chains": N_CHAINS, "n_options": N_OPT,
-            "tokenizers": TOKENIZERS, "pool_sizes": {k: {s: len(v) for s, v in d.items()} for k, d in p.items()}, "items": items}
+            "tokenizers": TOKENIZERS, "pool_sizes": {k: {s: len(v) for s, v in d.items()} for k, d in p.items()}, "items": items,
+            "pools": p}
 
 
 if __name__ == "__main__":

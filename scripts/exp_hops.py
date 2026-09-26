@@ -13,9 +13,11 @@ fixed "Answer:" (each option scored as " name", so single-token names are one to
         MODE=score: the answer slot masked after "Answer:" (as many masks as the option has tokens, then the end-of-turn tokens);
         score1 = the sum of the option's log-probs with every slot masked at once (one denoising step), scoreL = the chain rule,
         one slot revealed per step left to right (for single-token names the two are the same).
-        MODE=gen DSTEPS=12,48,192: the thinking analogue: GEN masked tokens after the assistant prompt, the chain-of-thought
+        MODE=gen DSTEPS=24,96,192: the thinking analogue: GEN masked tokens after the assistant prompt, the chain-of-thought
         instruction, filled by confidence-ordered unmasking in semi-autoregressive blocks of BLOCK tokens with DSTEPS denoising
         steps in all; the answer parsed from the text (the option named after the last "Answer:", else the last option named).
+Huginn, Dream and LLaDA's remote code predates transformers 5 (the project's 5.5): run them with
+`uv run --frozen --with transformers==4.57.1`.
 Subsample with PER_CELL (items per k and name type; default all 50). Writes results/per_item/hops_<name>.<cond>.jsonl (id, k,
 names, answer, sum_lp over options, pred, and the generated text for cot / gen) and results/hops_<name>.json (accuracy by
 names and k per condition).
@@ -38,7 +40,7 @@ MODE = os.environ.get("MODE", "direct")
 PER_CELL = int(os.environ.get("PER_CELL", "0"))
 COT_TOKENS = int(os.environ.get("COT_TOKENS", "768"))
 STEPS = [int(s) for s in os.environ.get("STEPS", "1,4,8,16,32,64").split(",")]
-DSTEPS = [int(s) for s in os.environ.get("DSTEPS", "12,48,192").split(",")]
+DSTEPS = [int(s) for s in os.environ.get("DSTEPS", "24,96,192").split(",")]
 GEN, BLOCK = int(os.environ.get("GEN", "192")), int(os.environ.get("BLOCK", "32"))
 BATCH = int(os.environ.get("BATCH", "16"))
 ITEMS = os.environ.get("ITEMS", "hops_v1")
@@ -70,10 +72,18 @@ def chat(tok, text):
     return tok.apply_chat_template([{"role": "user", "content": text}], tokenize=False, add_generation_prompt=True)
 
 
+def special(tok, i):
+    """A control token: in the tokenizer's special ids, or written <|...|> (LLaDA's and Dream's end-of-turn tokens are not listed)."""
+    t = tok.convert_ids_to_tokens(i)
+    return i in tok.all_special_ids or (t.startswith("<|") and t.endswith("|>"))
+
+
 def turn_end(tok):
-    """The chat template's text after an assistant message (the end-of-turn tokens)."""
+    """The token ids that close an assistant message in the chat template, up to its first special token (LLaDA's template goes
+    on to open another assistant turn)."""
     full = tok.apply_chat_template([{"role": "user", "content": "q"}, {"role": "assistant", "content": "XQXZ"}], tokenize=False)
-    return full.split("XQXZ")[-1]
+    ids = enc(tok, full.split("XQXZ")[-1]); sp = [j for j, x in enumerate(ids) if special(tok, x)]
+    return ids[:sp[0] + 1] if sp else ids
 
 
 def enc(tok, s):
@@ -192,7 +202,7 @@ class Diffusion:
         cls = AutoModelForMaskedLM if self.kind == "lfm" else AutoModel
         self.model = cls.from_pretrained(MODEL, dtype=torch.bfloat16, trust_remote_code=True).to(DEV).eval()
         self.vocab = len(self.tok)
-        self.banned = [t for t in self.tok.all_special_ids if t not in (self.tok.eos_token_id,)]
+        self.banned = [t for t in self.tok.all_special_ids if t != self.tok.eos_token_id] + [self.mask]
 
     @torch.no_grad()
     def logits(self, ids):
@@ -205,7 +215,7 @@ class Diffusion:
 def run_diffusion(items, name):
     D = Diffusion(); tok = D.tok; conds, t0 = defaultdict(list), time.time()
     if MODE == "score":
-        end = enc(tok, turn_end(tok))
+        end = turn_end(tok)
         for n, it in enumerate(items):
             p = enc(tok, chat(tok, user_text(it, False)) + "Answer:")
             s1, sL = [], []
@@ -223,6 +233,9 @@ def run_diffusion(items, name):
             if n % 100 == 0:
                 print(f"score {n}/{len(items)} {time.time() - t0:.0f}s", flush=True)
     else:
+        te = turn_end(tok)
+        stop = {tok.eos_token_id} | {i for i in te if special(tok, i)}
+        marker = tok.decode([i for i in te if not special(tok, i)]).strip()  # LFM2.5's "[/Answer]"
         for S in DSTEPS:
             nb = GEN // BLOCK; per_block = max(1, S // nb)
             for n, it in enumerate(items):
@@ -239,9 +252,10 @@ def run_diffusion(items, name):
                         conf, tid = lg.softmax(-1).max(-1)
                         top = conf.topk(min(m, len(pos))).indices
                         ids[0, pos[top]] = tid[top]
-                g = ids[0, len(p):].tolist()
-                eos = [j for j, t in enumerate(g) if t in (tok.eos_token_id, *enc(tok, turn_end(tok))[:1])]
-                text = tok.decode(g[:eos[0]] if eos else g, skip_special_tokens=True)
+                g = ids[0, len(p):].tolist(); cut = [j for j, x in enumerate(g) if x in stop]
+                text = tok.decode(g[:cut[0]] if cut else g, skip_special_tokens=True)
+                if marker:
+                    text = text.split(marker)[0]
                 conds[f"gen_s{S:03d}"].append(rec(it, None, pred=parse(text, it["options"]), gen=text))
                 if n % 50 == 0:
                     print(f"gen S={S} {n}/{len(items)} {time.time() - t0:.0f}s", flush=True)

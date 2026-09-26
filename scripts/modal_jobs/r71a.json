@@ -1,0 +1,114 @@
+[
+ {
+  "tag": "r71-dec-0.5b",
+  "env": {
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-0.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-dec-1.5b",
+  "env": {
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-1.5B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-dec-3b",
+  "env": {
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-dec-7b",
+  "env": {
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-7B-Instruct",
+   "BATCH": "32",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-dec-14b",
+  "env": {
+   "ARM": "decoder",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct",
+   "BATCH": "16",
+   "COT_TOKENS": "768"
+  },
+  "cmds": [
+   "MODE=direct uv run --frozen python scripts/exp_hops.py",
+   "MODE=cot uv run --frozen python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-huginn",
+  "env": {
+   "ARM": "huginn",
+   "MODEL": "tomg-group-umd/huginn-0125",
+   "STEPS": "1,4,8,16,32,64"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-llada",
+  "env": {
+   "ARM": "diffusion",
+   "MODEL": "GSAI-ML/LLaDA-8B-Instruct",
+   "DSTEPS": "24,96,192"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py",
+   "MODE=gen PER_CELL=10 uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-dream",
+  "env": {
+   "ARM": "diffusion",
+   "MODEL": "Dream-org/Dream-v0-Instruct-7B",
+   "DSTEPS": "24,96,192"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py",
+   "MODE=gen PER_CELL=10 uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py"
+  ]
+ },
+ {
+  "tag": "r71-lfm",
+  "env": {
+   "ARM": "diffusion",
+   "MODEL": "LiquidAI/LFM2.5-Encoder-350M-Diffusion",
+   "DSTEPS": "24,96,192"
+  },
+  "cmds": [
+   "MODE=score uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py",
+   "MODE=gen PER_CELL=20 uv run --frozen --with transformers==4.57.1 python scripts/exp_hops.py"
+  ]
+ }
+]
