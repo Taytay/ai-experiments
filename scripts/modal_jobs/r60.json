@@ -1,0 +1,128 @@
+[
+ {
+  "tag": "r60-b16m8",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "16",
+   "MICRO": "8",
+   "STEPS": "200",
+   "LR": "1e-4",
+   "RUN_TAG": "h100bf16_b16m8"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b16m8_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b16m8_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b32s100",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "32",
+   "MICRO": "32",
+   "STEPS": "100",
+   "LR": "1.41e-4",
+   "RUN_TAG": "h100bf16_b32s100"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s100_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s100_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b32s100lr1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "32",
+   "MICRO": "32",
+   "STEPS": "100",
+   "LR": "1e-4",
+   "RUN_TAG": "h100bf16_b32s100lr1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s100lr1_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s100lr1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b64s50",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "64",
+   "MICRO": "32",
+   "STEPS": "50",
+   "LR": "2e-4",
+   "RUN_TAG": "h100bf16_b64s50"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s50_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b64s50lr1",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "64",
+   "MICRO": "32",
+   "STEPS": "50",
+   "LR": "1e-4",
+   "RUN_TAG": "h100bf16_b64s50lr1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s50lr1_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s50lr1_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b32s200",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "32",
+   "MICRO": "32",
+   "STEPS": "200",
+   "LR": "1.41e-4",
+   "RUN_TAG": "h100bf16_b32s200"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s200_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b32s200_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r60-b64s200",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ALL_LABELS": "1",
+   "CONDS": "noctx",
+   "EFF_BATCH": "64",
+   "MICRO": "32",
+   "STEPS": "200",
+   "LR": "2e-4",
+   "RUN_TAG": "h100bf16_b64s200"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s200_alllab_lora",
+   "MODEL=Qwen/Qwen2.5-3B-Instruct uv run --frozen python scripts/exp_items_v2.py categoriser_Qwen2.5-3B-Instruct_none_h100bf16_b64s200_alllab_lora"
+  ]
+ }
+]

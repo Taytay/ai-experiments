@@ -953,3 +953,12 @@ standard category each, product records from the category pools) to about 1,000,
 over all of them; the DB-only merchants of REAL-6 scored on held-out users as before, at a fixed step budget (fewer rows per
 merchant as the database grows) and at a fixed exposure per merchant (steps grow with the database); the point at which the
 DB-only accuracy falls is the capacity figure for a 3B model with a rank-64 adapter.
+
+**TRAIN-12 (O) Is 16 sequences per step the right batch for the categoriser, now that an H100 can take more?**
+The owner (2026-09-26): have batch sizes been ablated on the H100? Only the layout was: four passes of 4 against one of 16, at the
+same 16 sequences per optimizer step (section 54: same accuracy, 1.6x the throughput). The effective batch has been 16 since the
+categoriser was built (section 38) and never varied, nor the rate with it. *Experiment:* the all-label recipe on bf16, all 20 users,
+H100: effective batch 32 and 64 at equal samples (100 and 50 steps; the rate at 1e-4 and scaled by the square root of the batch
+ratio) and at equal steps (200, the scaled rate), against the three batch-16 seeds of section 52.4; passes of 8, 16 and 32
+sequences for the throughput curve; REAL-6 by group and the ARC / MMLU / ICL items. The 20-step warmup is fixed, so the 50-step
+runs warm up for 40% of their training.
