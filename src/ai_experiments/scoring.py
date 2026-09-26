@@ -143,6 +143,46 @@ def perplexity(model, tok, text: str) -> float:
     return math.exp(F.cross_entropy(logits[0, :-1], ids[0, 1:]).item())
 
 
+def option_logprobs_batched(model, tok, prompts: list[list[int]], options: list[list[list[int]]]) -> list[torch.Tensor]:
+    """Sum of option-token log-probs for every (prompt, option) pair of a batch, differentiable, in one
+    right-padded forward. prompts: token ids per example; options: per example, token ids per option.
+    Returns one 1-D tensor per example (one value per option), i.e. log P(option | prompt).
+
+    Only the option positions go through the LM head: unsloth returns the final hidden states in place
+    of logits when UNSLOTH_RETURN_HIDDEN_STATES=1, so a batch of 64 rows never materialises 64 x L x V
+    logits. Right padding, because left padding changed these sums by up to 0.6 nats under unsloth
+    (PLAN step 27); same arithmetic as Scorer._forward, checked against it in
+    scripts/diag_distill_options.py."""
+    import os
+    pad = tok.pad_token_id or 0
+    seqs, owner = [], []
+    for i, (p, opts) in enumerate(zip(prompts, options)):
+        for j, o in enumerate(opts):
+            seqs.append(p + o); owner.append((i, j, len(p), len(o)))
+    L = max(map(len, seqs))
+    ids = torch.tensor([s + [pad] * (L - len(s)) for s in seqs], device="cuda")
+    att = torch.tensor([[1] * len(s) + [0] * (L - len(s)) for s in seqs], device="cuda")
+    prev = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES")
+    os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
+    try:
+        hidden = model(input_ids=ids, attention_mask=att).logits  # [rows, L, H]
+    finally:
+        if prev is None:
+            os.environ.pop("UNSLOTH_RETURN_HIDDEN_STATES", None)
+        else:
+            os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = prev
+    head = model.get_output_embeddings()
+    ri = torch.cat([torch.full((lo,), r, device="cuda", dtype=torch.long) for r, (_, _, lp, lo) in enumerate(owner)])
+    pi = torch.cat([torch.arange(lp - 1, lp + lo - 1, device="cuda") for (_, _, lp, lo) in owner])
+    logits = head(hidden[ri, pi].to(head.weight.dtype)).float()
+    tok_lp = F.log_softmax(logits, -1).gather(-1, ids[ri, pi + 1].unsqueeze(-1)).squeeze(-1)
+    out = [[None] * len(opts) for opts in options]
+    k = 0
+    for (i, j, _, lo) in owner:
+        out[i][j] = tok_lp[k:k + lo].sum(); k += lo
+    return [torch.stack(row) for row in out]
+
+
 @torch.no_grad()
 def corpus_perplexity(model, tok, chunks: list[str], maxlen: int = 768) -> dict:
     """Token-weighted perplexity over text chunks (each cut to maxlen tokens), with the standard error
