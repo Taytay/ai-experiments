@@ -1,0 +1,6 @@
+outs:
+- md5: 5ff7a110f638b815482808073e41e838.dir
+  size: 140822415
+  nfiles: 3
+  hash: md5
+  path: universe_Qwen2.5-0.5B_lr0.0001_lora

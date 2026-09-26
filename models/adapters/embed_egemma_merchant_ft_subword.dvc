@@ -1,0 +1,6 @@
+outs:
+- md5: beeca13042f57c9f9d2bef8ef84db364.dir
+  size: 658043179
+  nfiles: 14
+  hash: md5
+  path: embed_egemma_merchant_ft_subword

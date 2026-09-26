@@ -1,0 +1,6 @@
+outs:
+- md5: e6c82c559761ae00d68e98a53134640b.dir
+  size: 219806910
+  nfiles: 11
+  hash: md5
+  path: embed_bge_kge_distmult

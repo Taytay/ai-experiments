@@ -1,0 +1,6 @@
+outs:
+- md5: e15078b0c191e2a7673a55fc91e7b976.dir
+  size: 301642300
+  nfiles: 9
+  hash: md5
+  path: embed_gtemb_universe_trained

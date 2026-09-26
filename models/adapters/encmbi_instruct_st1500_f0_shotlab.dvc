@@ -1,0 +1,6 @@
+outs:
+- md5: f842d600f8de78286459812a69d9a0f9.dir
+  size: 894937364
+  nfiles: 2
+  hash: md5
+  path: encmbi_instruct_st1500_f0_shotlab

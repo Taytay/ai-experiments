@@ -1,0 +1,6 @@
+outs:
+- md5: 0c89911dcd26511efc0cd82d6b1d97d2.dir
+  size: 1595951631
+  nfiles: 2
+  hash: md5
+  path: encgli_large_st1500_f0_ctx

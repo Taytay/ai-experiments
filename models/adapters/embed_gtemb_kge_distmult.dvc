@@ -1,0 +1,6 @@
+outs:
+- md5: 53a1c331c96cb9269ec945b5e43a5465.dir
+  size: 301653615
+  nfiles: 10
+  hash: md5
+  path: embed_gtemb_kge_distmult
