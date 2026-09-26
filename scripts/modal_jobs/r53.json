@@ -1,0 +1,88 @@
+[
+ {
+  "tag": "r53-laya-zs",
+  "env": {
+   "INIT": "laya",
+   "STEPS": "0",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-mbert",
+  "env": {
+   "INIT": "mbert",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-laya",
+  "env": {
+   "INIT": "laya",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-laya-st4000",
+  "env": {
+   "INIT": "laya",
+   "STEPS": "4000",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-mbert-ctx",
+  "env": {
+   "INIT": "mbert",
+   "CTX": "1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-laya-ctx",
+  "env": {
+   "INIT": "laya",
+   "CTX": "1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-poi-mbert",
+  "env": {
+   "INIT": "mbert",
+   "POI": "poi1_v1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r53-poi-laya",
+  "env": {
+   "INIT": "laya",
+   "POI": "poi1_v1",
+   "FOLD": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
