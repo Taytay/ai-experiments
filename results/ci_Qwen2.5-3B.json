@@ -1,0 +1,10047 @@
+{
+ "tag": "Qwen2.5-3B",
+ "rule": "mean",
+ "draws": 1000,
+ "arms": {
+  "base": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 18.1,
+     "ci": [
+      12.5,
+      25.0
+     ],
+     "null": [
+      15.6,
+      20.6,
+      17.8
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": false
+    },
+    "L1_recall_fmt": {
+     "acc": 11.9,
+     "ci": [
+      6.9,
+      16.9
+     ],
+     "null": [
+      8.8,
+      14.4,
+      11.5
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L2_manip_isa": {
+     "acc": 42.5,
+     "ci": [
+      32.5,
+      53.8
+     ],
+     "null": [
+      42.5,
+      47.5,
+      45.2
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L2_manip_pair": {
+     "acc": 51.2,
+     "ci": [
+      41.2,
+      62.5
+     ],
+     "null": [
+      48.8,
+      51.2,
+      50.0
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 36.9,
+     "ci": [
+      29.4,
+      44.4
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L3_induct_type_realnames": {
+     "acc": 38.1,
+     "ci": [
+      31.2,
+      45.6
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L3_induct_type_k2": {
+     "acc": 54.4,
+     "ci": [
+      46.9,
+      61.9
+     ],
+     "null": [
+      43.1,
+      56.9,
+      49.6
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_k4": {
+     "acc": 25.0,
+     "ci": [
+      18.1,
+      31.9
+     ],
+     "null": [
+      20.0,
+      32.5,
+      26.1
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": false
+    },
+    "L4_induct_weakness": {
+     "acc": 31.9,
+     "ci": [
+      25.0,
+      38.8
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.6
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L4_induct_habitat": {
+     "acc": 31.9,
+     "ci": [
+      25.0,
+      39.4
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 11.2,
+     "ci": [
+      6.9,
+      16.2
+     ],
+     "null": [
+      6.2,
+      14.4,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 16.7,
+     "ci": [
+      4.2,
+      33.3
+     ],
+     "null": [
+      4.2,
+      20.8,
+      12.7
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 16.7,
+     "ci": [
+      4.2,
+      33.3
+     ],
+     "null": [
+      12.5,
+      25.0,
+      18.8
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 40.6,
+     "ci": [
+      31.2,
+      51.0
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.8
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      18.8
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 14.6,
+     "ci": [
+      6.2,
+      25.0
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 14.6,
+     "ci": [
+      6.2,
+      25.0
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.8
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 66.7,
+     "ci": [
+      54.2,
+      81.2
+     ],
+     "null": [
+      20.8,
+      47.9,
+      33.8
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 93.8,
+     "ci": [
+      85.4,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      41.3
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 52.1,
+     "ci": [
+      39.6,
+      66.7
+     ],
+     "null": [
+      22.9,
+      50.0,
+      36.9
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 95.8,
+     "ci": [
+      89.6,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      40.0
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      77.1
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.1
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_sst2": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      41.7,
+      66.7,
+      55.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 60.4,
+     "ci": [
+      45.8,
+      75.0
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_subj": {
+     "acc": 56.2,
+     "ci": [
+      41.7,
+      70.8
+     ],
+     "null": [
+      35.4,
+      64.6,
+      50.1
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 60.4,
+     "ci": [
+      53.6,
+      67.2
+     ],
+     "null": [
+      34.9,
+      49.0,
+      42.5
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 84.4,
+     "ci": [
+      78.6,
+      89.6
+     ],
+     "null": [
+      39.6,
+      53.6,
+      46.0
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 98.8,
+     "ci": [
+      96.9,
+      100.0
+     ],
+     "null": [
+      10.6,
+      21.2,
+      15.7
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.6
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 81.2,
+     "ci": [
+      72.5,
+      88.8
+     ],
+     "null": [
+      38.8,
+      61.2,
+      49.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 48.8,
+     "ci": [
+      41.2,
+      56.2
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 69.4,
+     "ci": [
+      61.9,
+      76.2
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 61.9,
+     "ci": [
+      53.8,
+      69.4
+     ],
+     "null": [
+      41.9,
+      56.9,
+      50.1
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 41.2,
+     "ci": [
+      32.5,
+      48.8
+     ],
+     "null": [
+      20.6,
+      33.8,
+      27.0
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 45.6,
+     "ci": [
+      38.1,
+      53.1
+     ],
+     "null": [
+      25.6,
+      40.0,
+      32.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 36.2,
+     "ci": [
+      28.8,
+      43.8
+     ],
+     "null": [
+      26.9,
+      40.6,
+      34.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 14.4,
+     "ci": [
+      9.4,
+      19.4
+     ],
+     "null": [
+      5.0,
+      12.5,
+      8.6
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      18.0
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 43.8,
+     "ci": [
+      33.3,
+      54.2
+     ],
+     "null": [
+      24.0,
+      40.6,
+      32.2
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "A": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 25.0,
+     "ci": [
+      18.8,
+      31.9
+     ],
+     "null": [
+      14.4,
+      21.2,
+      17.6
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 96.2,
+     "ci": [
+      91.2,
+      100.0
+     ],
+     "null": [
+      38.8,
+      61.2,
+      50.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 91.2,
+     "ci": [
+      85.0,
+      97.5
+     ],
+     "null": [
+      38.8,
+      61.2,
+      49.8
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 40.0,
+     "ci": [
+      32.5,
+      47.5
+     ],
+     "null": [
+      25.6,
+      40.0,
+      32.6
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L3_induct_type_realnames": {
+     "acc": 71.9,
+     "ci": [
+      65.0,
+      78.8
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 59.4,
+     "ci": [
+      51.2,
+      66.9
+     ],
+     "null": [
+      43.1,
+      56.9,
+      50.0
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 34.4,
+     "ci": [
+      27.5,
+      41.9
+     ],
+     "null": [
+      19.4,
+      32.5,
+      25.8
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 45.0,
+     "ci": [
+      36.9,
+      53.1
+     ],
+     "null": [
+      26.2,
+      40.0,
+      33.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 35.0,
+     "ci": [
+      28.1,
+      41.9
+     ],
+     "null": [
+      26.9,
+      41.2,
+      34.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 12.5,
+     "ci": [
+      7.5,
+      17.5
+     ],
+     "null": [
+      5.6,
+      13.8,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      29.2
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 25.0,
+     "ci": [
+      8.3,
+      41.7
+     ],
+     "null": [
+      12.5,
+      25.0,
+      20.3
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 24.0,
+     "ci": [
+      15.6,
+      33.3
+     ],
+     "null": [
+      24.0,
+      43.8,
+      33.3
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      20.8
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 6.2,
+     "ci": [
+      0.0,
+      14.6
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.4
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 14.6,
+     "ci": [
+      4.2,
+      25.0
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.7
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 54.2,
+     "ci": [
+      39.6,
+      68.8
+     ],
+     "null": [
+      18.8,
+      45.8,
+      32.5
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      27.1,
+      54.2,
+      41.4
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 41.7,
+     "ci": [
+      27.1,
+      56.2
+     ],
+     "null": [
+      25.0,
+      50.0,
+      37.8
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": false
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      27.1,
+      54.2,
+      40.3
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 56.2,
+     "ci": [
+      41.7,
+      70.8
+     ],
+     "null": [
+      35.4,
+      64.6,
+      50.3
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_sst2": {
+     "acc": 87.5,
+     "ci": [
+      77.1,
+      95.8
+     ],
+     "null": [
+      41.7,
+      66.7,
+      54.2
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 54.2,
+     "ci": [
+      39.6,
+      68.8
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_subj": {
+     "acc": 52.1,
+     "ci": [
+      37.5,
+      66.7
+     ],
+     "null": [
+      39.6,
+      64.6,
+      52.1
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 51.6,
+     "ci": [
+      44.8,
+      58.3
+     ],
+     "null": [
+      36.5,
+      50.0,
+      42.7
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 80.7,
+     "ci": [
+      75.0,
+      85.9
+     ],
+     "null": [
+      39.6,
+      53.1,
+      46.5
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 40.6,
+     "ci": [
+      33.8,
+      48.1
+     ],
+     "null": [
+      11.2,
+      20.0,
+      15.7
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.6
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 96.2,
+     "ci": [
+      91.2,
+      100.0
+     ],
+     "null": [
+      38.8,
+      61.2,
+      49.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 43.1,
+     "ci": [
+      35.6,
+      50.6
+     ],
+     "null": [
+      25.6,
+      40.0,
+      32.7
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 76.9,
+     "ci": [
+      70.6,
+      83.1
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 62.5,
+     "ci": [
+      55.0,
+      69.4
+     ],
+     "null": [
+      42.5,
+      57.5,
+      50.3
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 39.4,
+     "ci": [
+      32.5,
+      47.5
+     ],
+     "null": [
+      19.4,
+      33.1,
+      25.7
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 43.1,
+     "ci": [
+      34.4,
+      51.2
+     ],
+     "null": [
+      26.2,
+      39.4,
+      32.9
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 31.2,
+     "ci": [
+      24.4,
+      38.1
+     ],
+     "null": [
+      26.9,
+      41.2,
+      34.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 13.1,
+     "ci": [
+      8.1,
+      18.1
+     ],
+     "null": [
+      5.6,
+      13.8,
+      9.9
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 54.2,
+     "ci": [
+      33.3,
+      75.0
+     ],
+     "null": [
+      4.2,
+      25.0,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 70.8,
+     "ci": [
+      50.0,
+      87.5
+     ],
+     "null": [
+      8.3,
+      33.3,
+      17.9
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 32.3,
+     "ci": [
+      24.0,
+      41.7
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.3
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    }
+   }
+  },
+  "B": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 13.1,
+     "ci": [
+      8.1,
+      18.8
+     ],
+     "null": [
+      10.6,
+      16.2,
+      13.2
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": false
+    },
+    "L1_recall_fmt": {
+     "acc": 12.5,
+     "ci": [
+      7.5,
+      17.5
+     ],
+     "null": [
+      9.4,
+      14.4,
+      11.6
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L2_manip_isa": {
+     "acc": 56.2,
+     "ci": [
+      45.0,
+      66.2
+     ],
+     "null": [
+      53.8,
+      56.2,
+      54.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L2_manip_pair": {
+     "acc": 50.0,
+     "ci": [
+      38.8,
+      60.0
+     ],
+     "null": [
+      50.0,
+      50.0,
+      50.0
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 33.1,
+     "ci": [
+      25.6,
+      40.0
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L3_induct_type_realnames": {
+     "acc": 41.9,
+     "ci": [
+      34.4,
+      49.4
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 58.8,
+     "ci": [
+      51.2,
+      66.2
+     ],
+     "null": [
+      42.5,
+      57.5,
+      50.0
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 27.5,
+     "ci": [
+      20.6,
+      34.4
+     ],
+     "null": [
+      18.8,
+      31.9,
+      25.2
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": false
+    },
+    "L4_induct_weakness": {
+     "acc": 33.8,
+     "ci": [
+      26.9,
+      41.9
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L4_induct_habitat": {
+     "acc": 31.2,
+     "ci": [
+      23.8,
+      38.1
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.7
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 11.2,
+     "ci": [
+      6.9,
+      16.2
+     ],
+     "null": [
+      5.6,
+      13.8,
+      9.7
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 16.7,
+     "ci": [
+      4.2,
+      33.3
+     ],
+     "null": [
+      4.2,
+      20.8,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 4.2,
+     "ci": [
+      0.0,
+      12.5
+     ],
+     "null": [
+      0.0,
+      12.5,
+      6.3
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 30.2,
+     "ci": [
+      20.8,
+      39.6
+     ],
+     "null": [
+      24.0,
+      43.8,
+      34.2
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      6.2,
+      18.8,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      20.8
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 89.6,
+     "ci": [
+      81.2,
+      97.9
+     ],
+     "null": [
+      22.9,
+      47.9,
+      35.2
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 95.8,
+     "ci": [
+      89.6,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      41.5
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 68.8,
+     "ci": [
+      56.2,
+      81.2
+     ],
+     "null": [
+      27.1,
+      52.1,
+      38.9
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      39.1
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 72.9,
+     "ci": [
+      60.4,
+      85.4
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.9
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_sst2": {
+     "acc": 87.5,
+     "ci": [
+      77.1,
+      95.8
+     ],
+     "null": [
+      41.7,
+      66.7,
+      55.5
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 64.6,
+     "ci": [
+      52.1,
+      77.1
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.8
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_subj": {
+     "acc": 64.6,
+     "ci": [
+      52.1,
+      77.1
+     ],
+     "null": [
+      39.6,
+      64.6,
+      52.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 74.0,
+     "ci": [
+      67.7,
+      80.2
+     ],
+     "null": [
+      35.9,
+      49.5,
+      42.6
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 87.0,
+     "ci": [
+      81.8,
+      91.7
+     ],
+     "null": [
+      39.6,
+      53.1,
+      46.4
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      10.6,
+      21.2,
+      15.8
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 98.8,
+     "ci": [
+      96.9,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 73.8,
+     "ci": [
+      63.8,
+      82.5
+     ],
+     "null": [
+      43.8,
+      61.2,
+      53.2
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 50.0,
+     "ci": [
+      38.8,
+      60.0
+     ],
+     "null": [
+      50.0,
+      50.0,
+      50.0
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 78.1,
+     "ci": [
+      71.2,
+      84.4
+     ],
+     "null": [
+      26.9,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 84.4,
+     "ci": [
+      78.8,
+      89.4
+     ],
+     "null": [
+      26.9,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 85.0,
+     "ci": [
+      79.4,
+      90.0
+     ],
+     "null": [
+      42.5,
+      58.8,
+      50.2
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 76.2,
+     "ci": [
+      69.4,
+      81.9
+     ],
+     "null": [
+      20.0,
+      33.1,
+      26.3
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 74.4,
+     "ci": [
+      67.5,
+      81.2
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 76.2,
+     "ci": [
+      70.0,
+      82.5
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.6
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 13.1,
+     "ci": [
+      8.1,
+      18.8
+     ],
+     "null": [
+      5.6,
+      11.9,
+      8.6
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      18.0
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 79.2,
+     "ci": [
+      70.8,
+      87.5
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.7
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "C": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 20.6,
+     "ci": [
+      14.4,
+      26.9
+     ],
+     "null": [
+      16.2,
+      20.6,
+      18.2
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": false
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 86.2,
+     "ci": [
+      78.8,
+      92.5
+     ],
+     "null": [
+      38.8,
+      61.2,
+      49.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 73.8,
+     "ci": [
+      63.8,
+      82.5
+     ],
+     "null": [
+      38.8,
+      58.8,
+      49.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 58.8,
+     "ci": [
+      51.2,
+      66.2
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 70.6,
+     "ci": [
+      63.8,
+      77.5
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 76.2,
+     "ci": [
+      69.4,
+      82.5
+     ],
+     "null": [
+      42.5,
+      57.5,
+      50.2
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 50.6,
+     "ci": [
+      43.1,
+      58.1
+     ],
+     "null": [
+      20.0,
+      32.5,
+      26.2
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 51.9,
+     "ci": [
+      43.8,
+      59.4
+     ],
+     "null": [
+      26.2,
+      40.6,
+      32.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 34.4,
+     "ci": [
+      27.5,
+      41.2
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 8.1,
+     "ci": [
+      4.4,
+      12.5
+     ],
+     "null": [
+      5.6,
+      14.4,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      29.2
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 20.8,
+     "ci": [
+      4.2,
+      37.5
+     ],
+     "null": [
+      20.8,
+      20.8,
+      20.8
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 30.2,
+     "ci": [
+      20.8,
+      38.5
+     ],
+     "null": [
+      22.9,
+      42.7,
+      32.6
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 4.2,
+     "ci": [
+      0.0,
+      10.4
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 6.2,
+     "ci": [
+      0.0,
+      14.6
+     ],
+     "null": [
+      4.2,
+      20.8,
+      12.7
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 83.3,
+     "ci": [
+      70.8,
+      93.8
+     ],
+     "null": [
+      20.8,
+      47.9,
+      34.6
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 97.9,
+     "ci": [
+      91.7,
+      100.0
+     ],
+     "null": [
+      29.2,
+      54.2,
+      41.9
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 85.4,
+     "ci": [
+      75.0,
+      95.8
+     ],
+     "null": [
+      27.1,
+      52.1,
+      39.4
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      39.1
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 79.2,
+     "ci": [
+      66.7,
+      89.6
+     ],
+     "null": [
+      37.5,
+      62.5,
+      49.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_sst2": {
+     "acc": 87.5,
+     "ci": [
+      77.1,
+      95.8
+     ],
+     "null": [
+      41.7,
+      66.7,
+      54.2
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 70.8,
+     "ci": [
+      58.3,
+      83.3
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.0
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_subj": {
+     "acc": 66.7,
+     "ci": [
+      52.1,
+      81.2
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.8
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_all": {
+     "acc": 79.7,
+     "ci": [
+      74.0,
+      85.4
+     ],
+     "null": [
+      35.9,
+      50.0,
+      42.7
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 88.0,
+     "ci": [
+      83.3,
+      92.7
+     ],
+     "null": [
+      39.1,
+      52.6,
+      45.8
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 98.8,
+     "ci": [
+      96.9,
+      100.0
+     ],
+     "null": [
+      10.6,
+      21.2,
+      15.7
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.6
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 70.0,
+     "ci": [
+      60.0,
+      80.0
+     ],
+     "null": [
+      42.5,
+      57.5,
+      49.8
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 76.2,
+     "ci": [
+      69.4,
+      82.5
+     ],
+     "null": [
+      27.5,
+      41.9,
+      34.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 85.0,
+     "ci": [
+      79.4,
+      90.0
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 81.9,
+     "ci": [
+      75.6,
+      87.5
+     ],
+     "null": [
+      41.9,
+      58.1,
+      50.0
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 69.4,
+     "ci": [
+      62.5,
+      76.2
+     ],
+     "null": [
+      19.4,
+      32.5,
+      25.5
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 73.1,
+     "ci": [
+      66.2,
+      80.0
+     ],
+     "null": [
+      26.9,
+      41.2,
+      34.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 61.9,
+     "ci": [
+      53.8,
+      69.4
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.4
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 13.1,
+     "ci": [
+      8.1,
+      18.1
+     ],
+     "null": [
+      5.6,
+      13.1,
+      9.3
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      18.0
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 75.0,
+     "ci": [
+      65.6,
+      83.3
+     ],
+     "null": [
+      25.0,
+      43.8,
+      34.4
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "Cn": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 21.2,
+     "ci": [
+      15.0,
+      28.1
+     ],
+     "null": [
+      14.4,
+      20.6,
+      17.7
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 81.2,
+     "ci": [
+      72.5,
+      88.8
+     ],
+     "null": [
+      41.2,
+      61.2,
+      51.0
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 77.5,
+     "ci": [
+      68.8,
+      86.2
+     ],
+     "null": [
+      37.5,
+      60.0,
+      49.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 60.0,
+     "ci": [
+      52.5,
+      67.5
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.9
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 73.1,
+     "ci": [
+      66.2,
+      80.0
+     ],
+     "null": [
+      26.9,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 73.8,
+     "ci": [
+      67.5,
+      80.6
+     ],
+     "null": [
+      42.5,
+      57.5,
+      50.2
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 58.1,
+     "ci": [
+      50.0,
+      65.6
+     ],
+     "null": [
+      19.4,
+      33.1,
+      26.1
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 61.2,
+     "ci": [
+      54.4,
+      68.1
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 38.8,
+     "ci": [
+      31.2,
+      46.9
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 12.5,
+     "ci": [
+      7.5,
+      17.5
+     ],
+     "null": [
+      6.2,
+      14.4,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      29.2
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 20.8,
+     "ci": [
+      4.2,
+      37.5
+     ],
+     "null": [
+      20.8,
+      20.8,
+      20.8
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 33.3,
+     "ci": [
+      24.0,
+      42.7
+     ],
+     "null": [
+      22.9,
+      41.7,
+      32.3
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 4.2,
+     "ci": [
+      0.0,
+      10.4
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 8.3,
+     "ci": [
+      2.1,
+      16.7
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.7
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 89.6,
+     "ci": [
+      79.2,
+      97.9
+     ],
+     "null": [
+      22.9,
+      50.0,
+      36.4
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 97.9,
+     "ci": [
+      91.7,
+      100.0
+     ],
+     "null": [
+      29.2,
+      54.2,
+      41.9
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      77.1
+     ],
+     "null": [
+      27.1,
+      52.1,
+      38.8
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      39.1
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 68.8,
+     "ci": [
+      54.2,
+      81.2
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.8
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_sst2": {
+     "acc": 85.4,
+     "ci": [
+      75.0,
+      95.8
+     ],
+     "null": [
+      43.8,
+      68.8,
+      54.9
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      75.0
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.0
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_subj": {
+     "acc": 64.6,
+     "ci": [
+      52.1,
+      77.1
+     ],
+     "null": [
+      39.6,
+      64.6,
+      51.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 70.8,
+     "ci": [
+      64.1,
+      76.6
+     ],
+     "null": [
+      35.9,
+      50.0,
+      42.8
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 87.0,
+     "ci": [
+      82.3,
+      91.7
+     ],
+     "null": [
+      39.6,
+      53.1,
+      46.2
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 99.4,
+     "ci": [
+      98.1,
+      100.0
+     ],
+     "null": [
+      10.6,
+      21.2,
+      15.7
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 93.8,
+     "ci": [
+      87.5,
+      98.8
+     ],
+     "null": [
+      41.2,
+      61.2,
+      51.2
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 71.2,
+     "ci": [
+      61.2,
+      80.0
+     ],
+     "null": [
+      41.2,
+      58.8,
+      49.8
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 82.5,
+     "ci": [
+      76.9,
+      88.1
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.9
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 75.6,
+     "ci": [
+      68.8,
+      82.5
+     ],
+     "null": [
+      26.2,
+      40.0,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 89.4,
+     "ci": [
+      84.4,
+      93.8
+     ],
+     "null": [
+      41.9,
+      58.1,
+      50.1
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 73.1,
+     "ci": [
+      66.2,
+      80.0
+     ],
+     "null": [
+      19.4,
+      32.5,
+      25.6
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 73.8,
+     "ci": [
+      66.9,
+      80.6
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.9
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 68.8,
+     "ci": [
+      61.2,
+      75.6
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.4
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 16.9,
+     "ci": [
+      11.2,
+      23.1
+     ],
+     "null": [
+      5.6,
+      14.4,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      18.0
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 77.1,
+     "ci": [
+      68.8,
+      85.4
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.8
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "D": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 61.2,
+     "ci": [
+      53.8,
+      68.8
+     ],
+     "null": [
+      10.0,
+      20.6,
+      15.2
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 96.2,
+     "ci": [
+      93.1,
+      98.8
+     ],
+     "null": [
+      8.1,
+      18.1,
+      13.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 61.2,
+     "ci": [
+      51.2,
+      72.5
+     ],
+     "null": [
+      38.8,
+      53.8,
+      46.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 66.2,
+     "ci": [
+      55.0,
+      76.2
+     ],
+     "null": [
+      38.8,
+      61.2,
+      50.0
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 59.4,
+     "ci": [
+      51.9,
+      66.9
+     ],
+     "null": [
+      27.5,
+      41.9,
+      34.6
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 58.8,
+     "ci": [
+      51.2,
+      66.2
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 69.4,
+     "ci": [
+      61.9,
+      76.2
+     ],
+     "null": [
+      41.9,
+      56.9,
+      50.3
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 54.4,
+     "ci": [
+      46.2,
+      62.5
+     ],
+     "null": [
+      19.4,
+      31.9,
+      25.6
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 53.8,
+     "ci": [
+      46.2,
+      61.9
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.7
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 45.6,
+     "ci": [
+      37.5,
+      53.8
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 14.4,
+     "ci": [
+      9.4,
+      20.0
+     ],
+     "null": [
+      6.2,
+      14.4,
+      10.0
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      25.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 95.8,
+     "ci": [
+      87.5,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      17.3
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 34.4,
+     "ci": [
+      25.0,
+      43.8
+     ],
+     "null": [
+      22.9,
+      40.6,
+      31.9
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 8.3,
+     "ci": [
+      2.1,
+      16.7
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      4.2,
+      20.8,
+      12.7
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      18.8
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      20.8
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      20.8,
+      47.9,
+      34.7
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 97.9,
+     "ci": [
+      91.7,
+      100.0
+     ],
+     "null": [
+      29.2,
+      54.2,
+      41.9
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 89.6,
+     "ci": [
+      81.2,
+      97.9
+     ],
+     "null": [
+      27.1,
+      52.1,
+      39.4
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      39.1
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 70.8,
+     "ci": [
+      58.3,
+      83.3
+     ],
+     "null": [
+      37.5,
+      62.5,
+      49.4
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_sst2": {
+     "acc": 85.4,
+     "ci": [
+      75.0,
+      93.8
+     ],
+     "null": [
+      39.6,
+      68.8,
+      53.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 72.9,
+     "ci": [
+      60.4,
+      85.4
+     ],
+     "null": [
+      35.4,
+      60.4,
+      49.2
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_subj": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      77.1
+     ],
+     "null": [
+      37.5,
+      66.7,
+      51.4
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 81.2,
+     "ci": [
+      75.5,
+      86.5
+     ],
+     "null": [
+      35.4,
+      49.5,
+      42.6
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 86.5,
+     "ci": [
+      81.2,
+      91.1
+     ],
+     "null": [
+      39.1,
+      52.6,
+      45.9
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      10.6,
+      21.2,
+      15.8
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 90.6,
+     "ci": [
+      85.6,
+      95.0
+     ],
+     "null": [
+      8.1,
+      18.8,
+      13.1
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.6
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 77.5,
+     "ci": [
+      68.8,
+      86.2
+     ],
+     "null": [
+      40.0,
+      60.0,
+      49.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 80.0,
+     "ci": [
+      73.8,
+      86.2
+     ],
+     "null": [
+      27.5,
+      41.2,
+      34.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 83.8,
+     "ci": [
+      78.1,
+      89.4
+     ],
+     "null": [
+      26.2,
+      40.0,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 86.2,
+     "ci": [
+      80.6,
+      91.9
+     ],
+     "null": [
+      42.5,
+      58.8,
+      50.3
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 71.2,
+     "ci": [
+      64.4,
+      78.1
+     ],
+     "null": [
+      19.4,
+      32.5,
+      25.8
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 75.0,
+     "ci": [
+      68.1,
+      81.2
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 73.8,
+     "ci": [
+      66.9,
+      80.6
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.4
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 16.9,
+     "ci": [
+      11.2,
+      23.1
+     ],
+     "null": [
+      6.2,
+      14.4,
+      10.3
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      25.0,
+      12.4
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      33.3,
+      18.0
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 77.1,
+     "ci": [
+      67.7,
+      85.4
+     ],
+     "null": [
+      24.0,
+      42.7,
+      33.4
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "base_m": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 18.1,
+     "ci": [
+      11.9,
+      24.4
+     ],
+     "null": [
+      13.1,
+      17.5,
+      15.5
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 10.0,
+     "ci": [
+      5.6,
+      15.0
+     ],
+     "null": [
+      8.8,
+      13.1,
+      10.9
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L2_manip_isa": {
+     "acc": 41.2,
+     "ci": [
+      31.2,
+      52.5
+     ],
+     "null": [
+      41.2,
+      48.8,
+      45.4
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L2_manip_pair": {
+     "acc": 50.0,
+     "ci": [
+      38.8,
+      60.0
+     ],
+     "null": [
+      47.5,
+      52.5,
+      50.1
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 40.6,
+     "ci": [
+      33.1,
+      48.1
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.7
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L3_induct_type_realnames": {
+     "acc": 46.2,
+     "ci": [
+      38.8,
+      54.4
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 55.0,
+     "ci": [
+      46.9,
+      62.5
+     ],
+     "null": [
+      42.5,
+      57.5,
+      49.8
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "L3_induct_type_k4": {
+     "acc": 38.8,
+     "ci": [
+      30.6,
+      46.2
+     ],
+     "null": [
+      20.6,
+      33.1,
+      26.7
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 49.4,
+     "ci": [
+      42.5,
+      56.9
+     ],
+     "null": [
+      26.2,
+      40.6,
+      34.0
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 32.5,
+     "ci": [
+      25.0,
+      40.0
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.1
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 13.8,
+     "ci": [
+      8.8,
+      18.8
+     ],
+     "null": [
+      9.4,
+      18.8,
+      13.6
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      29.2
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      25.0
+     ],
+     "null": [
+      0.0,
+      12.5,
+      5.8
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 33.3,
+     "ci": [
+      24.0,
+      42.7
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.9
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      8.3,
+      18.8,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      20.8
+     ],
+     "null": [
+      8.3,
+      16.7,
+      12.6
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 10.4,
+     "ci": [
+      2.1,
+      18.8
+     ],
+     "null": [
+      8.3,
+      18.8,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 66.7,
+     "ci": [
+      54.2,
+      81.2
+     ],
+     "null": [
+      20.8,
+      47.9,
+      33.8
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 93.8,
+     "ci": [
+      85.4,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      41.3
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 52.1,
+     "ci": [
+      39.6,
+      66.7
+     ],
+     "null": [
+      22.9,
+      50.0,
+      36.9
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 95.8,
+     "ci": [
+      89.6,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      40.0
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      77.1
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.1
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_sst2": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      41.7,
+      66.7,
+      55.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 60.4,
+     "ci": [
+      45.8,
+      75.0
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_natural_subj": {
+     "acc": 56.2,
+     "ci": [
+      41.7,
+      70.8
+     ],
+     "null": [
+      35.4,
+      64.6,
+      50.1
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 60.4,
+     "ci": [
+      53.6,
+      67.2
+     ],
+     "null": [
+      34.9,
+      49.0,
+      42.5
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 84.4,
+     "ci": [
+      78.6,
+      89.6
+     ],
+     "null": [
+      39.6,
+      53.6,
+      46.0
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      9.4,
+      20.6,
+      14.5
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.8,
+      13.2
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.6
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 90.0,
+     "ci": [
+      82.5,
+      96.2
+     ],
+     "null": [
+      40.0,
+      60.0,
+      49.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 45.6,
+     "ci": [
+      38.1,
+      53.1
+     ],
+     "null": [
+      25.6,
+      40.0,
+      32.6
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 70.6,
+     "ci": [
+      63.1,
+      77.5
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 68.1,
+     "ci": [
+      61.2,
+      75.0
+     ],
+     "null": [
+      43.1,
+      58.1,
+      50.3
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 40.0,
+     "ci": [
+      32.5,
+      47.5
+     ],
+     "null": [
+      20.6,
+      33.8,
+      27.4
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 48.1,
+     "ci": [
+      40.0,
+      55.6
+     ],
+     "null": [
+      25.6,
+      40.0,
+      32.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 38.1,
+     "ci": [
+      30.6,
+      45.6
+     ],
+     "null": [
+      25.6,
+      41.2,
+      33.4
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 21.2,
+     "ci": [
+      15.6,
+      28.1
+     ],
+     "null": [
+      10.0,
+      19.4,
+      14.6
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      29.2,
+      12.9
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      29.2,
+      13.7
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 45.8,
+     "ci": [
+      35.4,
+      56.2
+     ],
+     "null": [
+      24.0,
+      41.7,
+      32.7
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  },
+  "E": {
+   "noctx": {
+    "L1_recall": {
+     "acc": 18.1,
+     "ci": [
+      12.5,
+      23.8
+     ],
+     "null": [
+      11.9,
+      16.2,
+      14.4
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.8,
+      13.2
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 96.2,
+     "ci": [
+      91.2,
+      100.0
+     ],
+     "null": [
+      41.2,
+      61.2,
+      50.9
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 96.2,
+     "ci": [
+      91.2,
+      100.0
+     ],
+     "null": [
+      38.8,
+      61.2,
+      49.8
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 75.0,
+     "ci": [
+      68.1,
+      81.2
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.8
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 73.8,
+     "ci": [
+      66.9,
+      80.0
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 81.9,
+     "ci": [
+      75.6,
+      87.5
+     ],
+     "null": [
+      41.9,
+      58.1,
+      50.1
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 75.6,
+     "ci": [
+      68.8,
+      81.9
+     ],
+     "null": [
+      18.8,
+      32.5,
+      25.6
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 76.9,
+     "ci": [
+      70.6,
+      83.1
+     ],
+     "null": [
+      25.6,
+      40.6,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 32.5,
+     "ci": [
+      25.0,
+      39.4
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.2
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": false
+    },
+    "L5_novel_choices": {
+     "acc": 17.5,
+     "ci": [
+      11.9,
+      23.1
+     ],
+     "null": [
+      10.0,
+      20.0,
+      14.9
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 12.5,
+     "ci": [
+      0.0,
+      29.2
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 4.2,
+     "ci": [
+      0.0,
+      12.5
+     ],
+     "null": [
+      4.2,
+      4.2,
+      4.2
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L3_induct_heldout": {
+     "acc": 45.8,
+     "ci": [
+      35.4,
+      56.2
+     ],
+     "null": [
+      24.0,
+      43.8,
+      33.6
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "M_probe_marked": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_marked_fmt": {
+     "acc": 93.8,
+     "ci": [
+      85.4,
+      100.0
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.3
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "M_probe_plain": {
+     "acc": 12.5,
+     "ci": [
+      4.2,
+      22.9
+     ],
+     "null": [
+      12.5,
+      12.5,
+      12.5
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "M_probe_plain_fmt": {
+     "acc": 14.6,
+     "ci": [
+      4.2,
+      25.0
+     ],
+     "null": [
+      4.2,
+      22.9,
+      12.7
+     ],
+     "n": 48,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "ICL_symbol_banking77": {
+     "acc": 87.5,
+     "ci": [
+      77.1,
+      95.8
+     ],
+     "null": [
+      20.8,
+      47.9,
+      34.8
+     ],
+     "n": 48,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "ICL_natural_banking77": {
+     "acc": 91.7,
+     "ci": [
+      83.3,
+      97.9
+     ],
+     "null": [
+      29.2,
+      54.2,
+      41.6
+     ],
+     "n": 48,
+     "chance": 41.0,
+     "above_null": true
+    },
+    "ICL_symbol_dbpedia": {
+     "acc": 85.4,
+     "ci": [
+      75.0,
+      95.8
+     ],
+     "null": [
+      27.1,
+      52.1,
+      39.3
+     ],
+     "n": 48,
+     "chance": 35.4,
+     "above_null": true
+    },
+    "ICL_natural_dbpedia": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      27.1,
+      54.2,
+      39.1
+     ],
+     "n": 48,
+     "chance": 36.3,
+     "above_null": true
+    },
+    "ICL_symbol_sst2": {
+     "acc": 79.2,
+     "ci": [
+      66.7,
+      89.6
+     ],
+     "null": [
+      37.5,
+      62.5,
+      49.6
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_sst2": {
+     "acc": 83.3,
+     "ci": [
+      72.9,
+      93.8
+     ],
+     "null": [
+      41.7,
+      66.7,
+      54.3
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_symbol_subj": {
+     "acc": 77.1,
+     "ci": [
+      64.6,
+      87.5
+     ],
+     "null": [
+      35.4,
+      64.6,
+      49.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "ICL_natural_subj": {
+     "acc": 62.5,
+     "ci": [
+      47.9,
+      77.1
+     ],
+     "null": [
+      37.5,
+      62.5,
+      50.7
+     ],
+     "n": 48,
+     "chance": 50.0,
+     "above_null": false
+    },
+    "ICL_symbol_all": {
+     "acc": 82.3,
+     "ci": [
+      77.1,
+      87.5
+     ],
+     "null": [
+      35.4,
+      49.5,
+      42.6
+     ],
+     "n": 192,
+     "chance": 42.2,
+     "above_null": true
+    },
+    "ICL_natural_all": {
+     "acc": 84.4,
+     "ci": [
+      79.2,
+      89.6
+     ],
+     "null": [
+      39.1,
+      52.6,
+      45.7
+     ],
+     "n": 192,
+     "chance": 44.3,
+     "above_null": true
+    }
+   },
+   "ctx": {
+    "L1_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      9.4,
+      20.6,
+      14.5
+     ],
+     "n": 160,
+     "chance": 13.8,
+     "above_null": true
+    },
+    "L1_recall_fmt": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      8.1,
+      18.8,
+      13.2
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L2_manip_isa": {
+     "acc": 97.5,
+     "ci": [
+      93.8,
+      100.0
+     ],
+     "null": [
+      40.0,
+      62.5,
+      50.8
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L2_manip_pair": {
+     "acc": 80.0,
+     "ci": [
+      71.2,
+      87.5
+     ],
+     "null": [
+      40.0,
+      60.0,
+      49.7
+     ],
+     "n": 80,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_nonsense": {
+     "acc": 71.9,
+     "ci": [
+      64.4,
+      78.8
+     ],
+     "null": [
+      26.2,
+      40.0,
+      33.5
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_realnames": {
+     "acc": 81.2,
+     "ci": [
+      75.0,
+      86.9
+     ],
+     "null": [
+      26.2,
+      41.2,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L3_induct_type_k2": {
+     "acc": 89.4,
+     "ci": [
+      84.4,
+      93.8
+     ],
+     "null": [
+      43.1,
+      58.1,
+      50.4
+     ],
+     "n": 160,
+     "chance": 50.0,
+     "above_null": true
+    },
+    "L3_induct_type_k4": {
+     "acc": 73.8,
+     "ci": [
+      66.9,
+      80.0
+     ],
+     "null": [
+      18.8,
+      32.5,
+      25.3
+     ],
+     "n": 160,
+     "chance": 25.0,
+     "above_null": true
+    },
+    "L4_induct_weakness": {
+     "acc": 72.5,
+     "ci": [
+      65.6,
+      78.8
+     ],
+     "null": [
+      26.2,
+      40.6,
+      33.4
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L4_induct_habitat": {
+     "acc": 73.8,
+     "ci": [
+      66.9,
+      80.0
+     ],
+     "null": [
+      26.9,
+      41.2,
+      33.3
+     ],
+     "n": 160,
+     "chance": 33.3,
+     "above_null": true
+    },
+    "L5_novel_choices": {
+     "acc": 19.4,
+     "ci": [
+      13.8,
+      25.6
+     ],
+     "null": [
+      10.6,
+      20.0,
+      15.2
+     ],
+     "n": 160,
+     "chance": 12.5,
+     "above_null": false
+    },
+    "L6_unseen_recall": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      4.2,
+      29.2,
+      12.9
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L6_seen_recall_ctrl": {
+     "acc": 100.0,
+     "ci": [
+      100.0,
+      100.0
+     ],
+     "null": [
+      0.0,
+      29.2,
+      13.7
+     ],
+     "n": 24,
+     "chance": 12.5,
+     "above_null": true
+    },
+    "L3_induct_heldout": {
+     "acc": 83.3,
+     "ci": [
+      77.1,
+      90.6
+     ],
+     "null": [
+      25.0,
+      43.8,
+      33.9
+     ],
+     "n": 96,
+     "chance": 33.3,
+     "above_null": true
+    }
+   }
+  }
+ },
+ "paired": {
+  "base->A|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 25.0,
+    "diff": 6.9,
+    "ci": [
+     3.1,
+     11.2
+    ],
+    "only_a": 1,
+    "only_b": 12,
+    "p": 0.0034
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 11.9,
+    "acc_b": 100.0,
+    "diff": 88.1,
+    "ci": [
+     83.1,
+     93.1
+    ],
+    "only_a": 0,
+    "only_b": 141,
+    "p": 0.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 42.5,
+    "acc_b": 96.2,
+    "diff": 53.8,
+    "ci": [
+     41.2,
+     65.0
+    ],
+    "only_a": 2,
+    "only_b": 45,
+    "p": 0.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 51.2,
+    "acc_b": 91.2,
+    "diff": 40.0,
+    "ci": [
+     27.5,
+     52.5
+    ],
+    "only_a": 5,
+    "only_b": 37,
+    "p": 0.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 36.9,
+    "acc_b": 40.0,
+    "diff": 3.1,
+    "ci": [
+     -6.9,
+     13.8
+    ],
+    "only_a": 36,
+    "only_b": 41,
+    "p": 0.6488
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 71.9,
+    "diff": 33.8,
+    "ci": [
+     25.6,
+     41.2
+    ],
+    "only_a": 5,
+    "only_b": 59,
+    "p": 0.0
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 59.4,
+    "diff": 5.0,
+    "ci": [
+     -3.8,
+     13.8
+    ],
+    "only_a": 24,
+    "only_b": 32,
+    "p": 0.3497
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 34.4,
+    "diff": 9.4,
+    "ci": [
+     0.0,
+     18.8
+    ],
+    "only_a": 21,
+    "only_b": 36,
+    "p": 0.0627
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 45.0,
+    "diff": 13.1,
+    "ci": [
+     2.5,
+     23.1
+    ],
+    "only_a": 24,
+    "only_b": 45,
+    "p": 0.0154
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 35.0,
+    "diff": 3.1,
+    "ci": [
+     -6.9,
+     13.1
+    ],
+    "only_a": 28,
+    "only_b": 33,
+    "p": 0.6089
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 11.2,
+    "acc_b": 12.5,
+    "diff": 1.2,
+    "ci": [
+     -1.2,
+     4.4
+    ],
+    "only_a": 2,
+    "only_b": 4,
+    "p": 0.6875
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 12.5,
+    "diff": -4.2,
+    "ci": [
+     -12.5,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 25.0,
+    "diff": 8.3,
+    "ci": [
+     0.0,
+     20.8
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 40.6,
+    "acc_b": 24.0,
+    "diff": -16.7,
+    "ci": [
+     -29.2,
+     -4.2
+    ],
+    "only_a": 29,
+    "only_b": 13,
+    "p": 0.0195
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 10.4,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 6.2,
+    "diff": -4.2,
+    "ci": [
+     -14.6,
+     6.2
+    ],
+    "only_a": 4,
+    "only_b": 2,
+    "p": 0.6875
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 12.5,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 14.6,
+    "diff": 0.0,
+    "ci": [
+     -12.5,
+     12.5
+    ],
+    "only_a": 5,
+    "only_b": 5,
+    "p": 1.0
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 54.2,
+    "diff": -12.5,
+    "ci": [
+     -27.1,
+     2.1
+    ],
+    "only_a": 9,
+    "only_b": 3,
+    "p": 0.146
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 91.7,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 41.7,
+    "diff": -10.4,
+    "ci": [
+     -27.1,
+     6.2
+    ],
+    "only_a": 11,
+    "only_b": 6,
+    "p": 0.3323
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 91.7,
+    "diff": -4.2,
+    "ci": [
+     -10.4,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 56.2,
+    "diff": -6.2,
+    "ci": [
+     -22.9,
+     10.4
+    ],
+    "only_a": 10,
+    "only_b": 7,
+    "p": 0.6291
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 87.5,
+    "diff": -4.2,
+    "ci": [
+     -16.7,
+     8.3
+    ],
+    "only_a": 5,
+    "only_b": 3,
+    "p": 0.7266
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 54.2,
+    "diff": -6.2,
+    "ci": [
+     -22.9,
+     8.3
+    ],
+    "only_a": 9,
+    "only_b": 6,
+    "p": 0.6072
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 52.1,
+    "diff": -4.2,
+    "ci": [
+     -20.8,
+     10.4
+    ],
+    "only_a": 8,
+    "only_b": 6,
+    "p": 0.7905
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 51.6,
+    "diff": -8.9,
+    "ci": [
+     -16.7,
+     -1.0
+    ],
+    "only_a": 39,
+    "only_b": 22,
+    "p": 0.0396
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 80.7,
+    "diff": -3.6,
+    "ci": [
+     -9.4,
+     1.0
+    ],
+    "only_a": 16,
+    "only_b": 9,
+    "p": 0.2295
+   }
+  },
+  "base->A|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 98.8,
+    "acc_b": 40.6,
+    "diff": -58.1,
+    "ci": [
+     -65.6,
+     -50.6
+    ],
+    "only_a": 93,
+    "only_b": 0,
+    "p": 0.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 96.2,
+    "diff": 15.0,
+    "ci": [
+     5.0,
+     25.0
+    ],
+    "only_a": 3,
+    "only_b": 15,
+    "p": 0.0075
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 48.8,
+    "acc_b": 43.1,
+    "diff": -5.6,
+    "ci": [
+     -15.6,
+     5.0
+    ],
+    "only_a": 40,
+    "only_b": 31,
+    "p": 0.3425
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 76.9,
+    "diff": 7.5,
+    "ci": [
+     0.6,
+     14.4
+    ],
+    "only_a": 11,
+    "only_b": 23,
+    "p": 0.0576
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 61.9,
+    "acc_b": 62.5,
+    "diff": 0.6,
+    "ci": [
+     -8.8,
+     10.6
+    ],
+    "only_a": 26,
+    "only_b": 27,
+    "p": 1.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 41.2,
+    "acc_b": 39.4,
+    "diff": -1.9,
+    "ci": [
+     -11.2,
+     8.8
+    ],
+    "only_a": 39,
+    "only_b": 36,
+    "p": 0.8176
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 43.1,
+    "diff": -2.5,
+    "ci": [
+     -13.1,
+     8.1
+    ],
+    "only_a": 36,
+    "only_b": 32,
+    "p": 0.7163
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 36.2,
+    "acc_b": 31.2,
+    "diff": -5.0,
+    "ci": [
+     -14.4,
+     3.8
+    ],
+    "only_a": 28,
+    "only_b": 20,
+    "p": 0.3123
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 13.1,
+    "diff": -1.2,
+    "ci": [
+     -6.2,
+     3.8
+    ],
+    "only_a": 10,
+    "only_b": 8,
+    "p": 0.8145
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 54.2,
+    "diff": -45.8,
+    "ci": [
+     -66.7,
+     -25.0
+    ],
+    "only_a": 11,
+    "only_b": 0,
+    "p": 0.001
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 70.8,
+    "diff": -29.2,
+    "ci": [
+     -50.0,
+     -12.5
+    ],
+    "only_a": 7,
+    "only_b": 0,
+    "p": 0.0156
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 43.8,
+    "acc_b": 32.3,
+    "diff": -11.5,
+    "ci": [
+     -24.0,
+     1.0
+    ],
+    "only_a": 25,
+    "only_b": 14,
+    "p": 0.1081
+   }
+  },
+  "base->B|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 13.1,
+    "diff": -5.0,
+    "ci": [
+     -11.2,
+     1.2
+    ],
+    "only_a": 18,
+    "only_b": 10,
+    "p": 0.1849
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 11.9,
+    "acc_b": 12.5,
+    "diff": 0.6,
+    "ci": [
+     -3.1,
+     4.4
+    ],
+    "only_a": 5,
+    "only_b": 6,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 42.5,
+    "acc_b": 56.2,
+    "diff": 13.8,
+    "ci": [
+     -8.8,
+     33.8
+    ],
+    "only_a": 33,
+    "only_b": 44,
+    "p": 0.2543
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 51.2,
+    "acc_b": 50.0,
+    "diff": -1.2,
+    "ci": [
+     -22.5,
+     20.0
+    ],
+    "only_a": 40,
+    "only_b": 39,
+    "p": 1.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 36.9,
+    "acc_b": 33.1,
+    "diff": -3.8,
+    "ci": [
+     -14.4,
+     5.6
+    ],
+    "only_a": 37,
+    "only_b": 31,
+    "p": 0.5446
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 41.9,
+    "diff": 3.8,
+    "ci": [
+     -4.4,
+     11.2
+    ],
+    "only_a": 18,
+    "only_b": 24,
+    "p": 0.4408
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 58.8,
+    "diff": 4.4,
+    "ci": [
+     -5.0,
+     13.1
+    ],
+    "only_a": 25,
+    "only_b": 32,
+    "p": 0.427
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 27.5,
+    "diff": 2.5,
+    "ci": [
+     -6.9,
+     11.2
+    ],
+    "only_a": 25,
+    "only_b": 29,
+    "p": 0.6835
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 33.8,
+    "diff": 1.9,
+    "ci": [
+     -7.5,
+     11.9
+    ],
+    "only_a": 31,
+    "only_b": 34,
+    "p": 0.8043
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 31.2,
+    "diff": -0.6,
+    "ci": [
+     -9.4,
+     7.5
+    ],
+    "only_a": 23,
+    "only_b": 22,
+    "p": 1.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 11.2,
+    "acc_b": 11.2,
+    "diff": 0.0,
+    "ci": [
+     -2.5,
+     2.5
+    ],
+    "only_a": 2,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 16.7,
+    "diff": 0.0,
+    "ci": [
+     -16.7,
+     16.7
+    ],
+    "only_a": 2,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 4.2,
+    "diff": -12.5,
+    "ci": [
+     -29.2,
+     4.2
+    ],
+    "only_a": 4,
+    "only_b": 1,
+    "p": 0.375
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 40.6,
+    "acc_b": 30.2,
+    "diff": -10.4,
+    "ci": [
+     -24.0,
+     2.1
+    ],
+    "only_a": 25,
+    "only_b": 15,
+    "p": 0.1539
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     -12.5,
+     12.5
+    ],
+    "only_a": 5,
+    "only_b": 5,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 12.5,
+    "diff": 2.1,
+    "ci": [
+     0.0,
+     6.2
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 12.5,
+    "diff": -2.1,
+    "ci": [
+     -14.6,
+     10.4
+    ],
+    "only_a": 5,
+    "only_b": 4,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 12.5,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 89.6,
+    "diff": 22.9,
+    "ci": [
+     10.4,
+     35.4
+    ],
+    "only_a": 0,
+    "only_b": 11,
+    "p": 0.001
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 95.8,
+    "diff": 2.1,
+    "ci": [
+     0.0,
+     6.2
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 68.8,
+    "diff": 16.7,
+    "ci": [
+     0.0,
+     31.2
+    ],
+    "only_a": 4,
+    "only_b": 12,
+    "p": 0.0768
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 100.0,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 72.9,
+    "diff": 10.4,
+    "ci": [
+     -8.3,
+     29.2
+    ],
+    "only_a": 7,
+    "only_b": 12,
+    "p": 0.3593
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 87.5,
+    "diff": -4.2,
+    "ci": [
+     -14.6,
+     4.2
+    ],
+    "only_a": 4,
+    "only_b": 2,
+    "p": 0.6875
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 64.6,
+    "diff": 4.2,
+    "ci": [
+     -12.5,
+     22.9
+    ],
+    "only_a": 8,
+    "only_b": 10,
+    "p": 0.8145
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 64.6,
+    "diff": 8.3,
+    "ci": [
+     -6.2,
+     22.9
+    ],
+    "only_a": 5,
+    "only_b": 9,
+    "p": 0.424
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 74.0,
+    "diff": 13.5,
+    "ci": [
+     5.2,
+     21.4
+    ],
+    "only_a": 19,
+    "only_b": 45,
+    "p": 0.0016
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 87.0,
+    "diff": 2.6,
+    "ci": [
+     -2.6,
+     7.3
+    ],
+    "only_a": 9,
+    "only_b": 14,
+    "p": 0.4049
+   }
+  },
+  "base->B|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 98.8,
+    "acc_b": 100.0,
+    "diff": 1.2,
+    "ci": [
+     0.0,
+     3.1
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 98.8,
+    "diff": -1.2,
+    "ci": [
+     -3.1,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 73.8,
+    "diff": -26.2,
+    "ci": [
+     -36.2,
+     -17.5
+    ],
+    "only_a": 21,
+    "only_b": 0,
+    "p": 0.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 50.0,
+    "diff": -31.2,
+    "ci": [
+     -40.0,
+     -21.2
+    ],
+    "only_a": 25,
+    "only_b": 0,
+    "p": 0.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 48.8,
+    "acc_b": 78.1,
+    "diff": 29.4,
+    "ci": [
+     20.0,
+     38.8
+    ],
+    "only_a": 14,
+    "only_b": 61,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 84.4,
+    "diff": 15.0,
+    "ci": [
+     6.9,
+     23.1
+    ],
+    "only_a": 13,
+    "only_b": 37,
+    "p": 0.0009
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 61.9,
+    "acc_b": 85.0,
+    "diff": 23.1,
+    "ci": [
+     14.4,
+     31.9
+    ],
+    "only_a": 12,
+    "only_b": 49,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 41.2,
+    "acc_b": 76.2,
+    "diff": 35.0,
+    "ci": [
+     26.2,
+     44.4
+    ],
+    "only_a": 12,
+    "only_b": 68,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 74.4,
+    "diff": 28.8,
+    "ci": [
+     19.4,
+     37.5
+    ],
+    "only_a": 11,
+    "only_b": 57,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 36.2,
+    "acc_b": 76.2,
+    "diff": 40.0,
+    "ci": [
+     31.2,
+     50.0
+    ],
+    "only_a": 10,
+    "only_b": 74,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 13.1,
+    "diff": -1.2,
+    "ci": [
+     -3.8,
+     1.2
+    ],
+    "only_a": 3,
+    "only_b": 1,
+    "p": 0.625
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 43.8,
+    "acc_b": 79.2,
+    "diff": 35.4,
+    "ci": [
+     24.0,
+     45.8
+    ],
+    "only_a": 4,
+    "only_b": 38,
+    "p": 0.0
+   }
+  },
+  "base->C|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 20.6,
+    "diff": 2.5,
+    "ci": [
+     -1.9,
+     6.9
+    ],
+    "only_a": 5,
+    "only_b": 9,
+    "p": 0.424
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 11.9,
+    "acc_b": 100.0,
+    "diff": 88.1,
+    "ci": [
+     83.1,
+     93.1
+    ],
+    "only_a": 0,
+    "only_b": 141,
+    "p": 0.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 42.5,
+    "acc_b": 86.2,
+    "diff": 43.8,
+    "ci": [
+     32.5,
+     55.0
+    ],
+    "only_a": 2,
+    "only_b": 37,
+    "p": 0.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 51.2,
+    "acc_b": 73.8,
+    "diff": 22.5,
+    "ci": [
+     11.2,
+     33.8
+    ],
+    "only_a": 4,
+    "only_b": 22,
+    "p": 0.0005
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 36.9,
+    "acc_b": 58.8,
+    "diff": 21.9,
+    "ci": [
+     12.5,
+     31.9
+    ],
+    "only_a": 14,
+    "only_b": 49,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 70.6,
+    "diff": 32.5,
+    "ci": [
+     23.1,
+     40.0
+    ],
+    "only_a": 7,
+    "only_b": 59,
+    "p": 0.0
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 76.2,
+    "diff": 21.9,
+    "ci": [
+     12.5,
+     30.6
+    ],
+    "only_a": 16,
+    "only_b": 51,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 50.6,
+    "diff": 25.6,
+    "ci": [
+     16.2,
+     34.4
+    ],
+    "only_a": 12,
+    "only_b": 53,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 51.9,
+    "diff": 20.0,
+    "ci": [
+     10.6,
+     29.4
+    ],
+    "only_a": 18,
+    "only_b": 50,
+    "p": 0.0001
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 34.4,
+    "diff": 2.5,
+    "ci": [
+     -6.2,
+     11.2
+    ],
+    "only_a": 24,
+    "only_b": 28,
+    "p": 0.6778
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 11.2,
+    "acc_b": 8.1,
+    "diff": -3.1,
+    "ci": [
+     -6.9,
+     0.6
+    ],
+    "only_a": 8,
+    "only_b": 3,
+    "p": 0.2266
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 12.5,
+    "diff": -4.2,
+    "ci": [
+     -12.5,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 20.8,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     12.5
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 40.6,
+    "acc_b": 30.2,
+    "diff": -10.4,
+    "ci": [
+     -21.9,
+     0.0
+    ],
+    "only_a": 21,
+    "only_b": 11,
+    "p": 0.1102
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 4.2,
+    "diff": -6.2,
+    "ci": [
+     -18.8,
+     4.2
+    ],
+    "only_a": 5,
+    "only_b": 2,
+    "p": 0.4531
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 12.5,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 6.2,
+    "diff": -8.3,
+    "ci": [
+     -20.8,
+     4.2
+    ],
+    "only_a": 7,
+    "only_b": 3,
+    "p": 0.3438
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 83.3,
+    "diff": 16.7,
+    "ci": [
+     6.2,
+     29.2
+    ],
+    "only_a": 1,
+    "only_b": 9,
+    "p": 0.0215
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 97.9,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 85.4,
+    "diff": 33.3,
+    "ci": [
+     18.8,
+     50.0
+    ],
+    "only_a": 2,
+    "only_b": 18,
+    "p": 0.0004
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 100.0,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 79.2,
+    "diff": 16.7,
+    "ci": [
+     0.0,
+     35.4
+    ],
+    "only_a": 6,
+    "only_b": 14,
+    "p": 0.1153
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 87.5,
+    "diff": -4.2,
+    "ci": [
+     -16.7,
+     8.3
+    ],
+    "only_a": 5,
+    "only_b": 3,
+    "p": 0.7266
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 70.8,
+    "diff": 10.4,
+    "ci": [
+     -6.2,
+     27.1
+    ],
+    "only_a": 6,
+    "only_b": 11,
+    "p": 0.3323
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 66.7,
+    "diff": 10.4,
+    "ci": [
+     -2.1,
+     22.9
+    ],
+    "only_a": 3,
+    "only_b": 8,
+    "p": 0.2266
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 79.7,
+    "diff": 19.3,
+    "ci": [
+     10.9,
+     27.1
+    ],
+    "only_a": 15,
+    "only_b": 52,
+    "p": 0.0
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 88.0,
+    "diff": 3.6,
+    "ci": [
+     -1.0,
+     8.3
+    ],
+    "only_a": 8,
+    "only_b": 15,
+    "p": 0.21
+   }
+  },
+  "base->C|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 98.8,
+    "acc_b": 98.8,
+    "diff": 0.0,
+    "ci": [
+     -2.5,
+     2.5
+    ],
+    "only_a": 2,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 70.0,
+    "diff": -11.2,
+    "ci": [
+     -21.2,
+     0.0
+    ],
+    "only_a": 15,
+    "only_b": 6,
+    "p": 0.0784
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 48.8,
+    "acc_b": 76.2,
+    "diff": 27.5,
+    "ci": [
+     18.1,
+     36.9
+    ],
+    "only_a": 17,
+    "only_b": 61,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 85.0,
+    "diff": 15.6,
+    "ci": [
+     8.1,
+     23.8
+    ],
+    "only_a": 12,
+    "only_b": 37,
+    "p": 0.0005
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 61.9,
+    "acc_b": 81.9,
+    "diff": 20.0,
+    "ci": [
+     11.2,
+     28.8
+    ],
+    "only_a": 12,
+    "only_b": 44,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 41.2,
+    "acc_b": 69.4,
+    "diff": 28.1,
+    "ci": [
+     19.4,
+     38.1
+    ],
+    "only_a": 17,
+    "only_b": 62,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 73.1,
+    "diff": 27.5,
+    "ci": [
+     18.8,
+     36.2
+    ],
+    "only_a": 10,
+    "only_b": 54,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 36.2,
+    "acc_b": 61.9,
+    "diff": 25.6,
+    "ci": [
+     16.9,
+     35.0
+    ],
+    "only_a": 15,
+    "only_b": 56,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 13.1,
+    "diff": -1.2,
+    "ci": [
+     -6.9,
+     5.0
+    ],
+    "only_a": 12,
+    "only_b": 10,
+    "p": 0.8318
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 43.8,
+    "acc_b": 75.0,
+    "diff": 31.2,
+    "ci": [
+     19.8,
+     43.8
+    ],
+    "only_a": 7,
+    "only_b": 37,
+    "p": 0.0
+   }
+  },
+  "base->Cn|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 21.2,
+    "diff": 3.1,
+    "ci": [
+     -1.9,
+     8.1
+    ],
+    "only_a": 5,
+    "only_b": 10,
+    "p": 0.3018
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 11.9,
+    "acc_b": 100.0,
+    "diff": 88.1,
+    "ci": [
+     83.1,
+     93.1
+    ],
+    "only_a": 0,
+    "only_b": 141,
+    "p": 0.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 42.5,
+    "acc_b": 81.2,
+    "diff": 38.8,
+    "ci": [
+     23.8,
+     52.5
+    ],
+    "only_a": 9,
+    "only_b": 40,
+    "p": 0.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 51.2,
+    "acc_b": 77.5,
+    "diff": 26.2,
+    "ci": [
+     13.8,
+     40.0
+    ],
+    "only_a": 7,
+    "only_b": 28,
+    "p": 0.0005
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 36.9,
+    "acc_b": 60.0,
+    "diff": 23.1,
+    "ci": [
+     15.0,
+     31.2
+    ],
+    "only_a": 10,
+    "only_b": 47,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 73.1,
+    "diff": 35.0,
+    "ci": [
+     24.4,
+     44.4
+    ],
+    "only_a": 12,
+    "only_b": 68,
+    "p": 0.0
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 73.8,
+    "diff": 19.4,
+    "ci": [
+     9.4,
+     28.8
+    ],
+    "only_a": 20,
+    "only_b": 51,
+    "p": 0.0003
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 58.1,
+    "diff": 33.1,
+    "ci": [
+     23.8,
+     41.9
+    ],
+    "only_a": 11,
+    "only_b": 64,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 61.2,
+    "diff": 29.4,
+    "ci": [
+     19.4,
+     38.1
+    ],
+    "only_a": 13,
+    "only_b": 60,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 38.8,
+    "diff": 6.9,
+    "ci": [
+     -3.1,
+     16.9
+    ],
+    "only_a": 25,
+    "only_b": 36,
+    "p": 0.2
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 11.2,
+    "acc_b": 12.5,
+    "diff": 1.2,
+    "ci": [
+     -2.5,
+     5.0
+    ],
+    "only_a": 4,
+    "only_b": 6,
+    "p": 0.7539
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 12.5,
+    "diff": -4.2,
+    "ci": [
+     -12.5,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 20.8,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     12.5
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 40.6,
+    "acc_b": 33.3,
+    "diff": -7.3,
+    "ci": [
+     -18.8,
+     4.2
+    ],
+    "only_a": 21,
+    "only_b": 14,
+    "p": 0.3105
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 4.2,
+    "diff": -6.2,
+    "ci": [
+     -16.7,
+     4.2
+    ],
+    "only_a": 5,
+    "only_b": 2,
+    "p": 0.4531
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 12.5,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 8.3,
+    "diff": -6.2,
+    "ci": [
+     -18.8,
+     6.2
+    ],
+    "only_a": 7,
+    "only_b": 4,
+    "p": 0.5488
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 89.6,
+    "diff": 22.9,
+    "ci": [
+     10.4,
+     37.5
+    ],
+    "only_a": 1,
+    "only_b": 12,
+    "p": 0.0034
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 97.9,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 62.5,
+    "diff": 10.4,
+    "ci": [
+     -4.2,
+     27.1
+    ],
+    "only_a": 5,
+    "only_b": 10,
+    "p": 0.3018
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 100.0,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 68.8,
+    "diff": 6.2,
+    "ci": [
+     -8.3,
+     20.8
+    ],
+    "only_a": 5,
+    "only_b": 8,
+    "p": 0.5811
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 85.4,
+    "diff": -6.2,
+    "ci": [
+     -18.8,
+     6.2
+    ],
+    "only_a": 6,
+    "only_b": 3,
+    "p": 0.5078
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 62.5,
+    "diff": 2.1,
+    "ci": [
+     -16.7,
+     20.8
+    ],
+    "only_a": 9,
+    "only_b": 10,
+    "p": 1.0
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 64.6,
+    "diff": 8.3,
+    "ci": [
+     -6.2,
+     22.9
+    ],
+    "only_a": 5,
+    "only_b": 9,
+    "p": 0.424
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 70.8,
+    "diff": 10.4,
+    "ci": [
+     2.6,
+     18.2
+    ],
+    "only_a": 20,
+    "only_b": 40,
+    "p": 0.0135
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 87.0,
+    "diff": 2.6,
+    "ci": [
+     -2.6,
+     7.8
+    ],
+    "only_a": 11,
+    "only_b": 16,
+    "p": 0.4421
+   }
+  },
+  "base->Cn|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 98.8,
+    "acc_b": 99.4,
+    "diff": 0.6,
+    "ci": [
+     -1.2,
+     2.5
+    ],
+    "only_a": 1,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 93.8,
+    "diff": -6.2,
+    "ci": [
+     -12.5,
+     -1.2
+    ],
+    "only_a": 5,
+    "only_b": 0,
+    "p": 0.0625
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 71.2,
+    "diff": -10.0,
+    "ci": [
+     -21.2,
+     0.0
+    ],
+    "only_a": 15,
+    "only_b": 7,
+    "p": 0.1338
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 48.8,
+    "acc_b": 82.5,
+    "diff": 33.8,
+    "ci": [
+     25.0,
+     41.9
+    ],
+    "only_a": 9,
+    "only_b": 63,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 75.6,
+    "diff": 6.2,
+    "ci": [
+     -1.9,
+     14.4
+    ],
+    "only_a": 18,
+    "only_b": 28,
+    "p": 0.1839
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 61.9,
+    "acc_b": 89.4,
+    "diff": 27.5,
+    "ci": [
+     19.4,
+     35.6
+    ],
+    "only_a": 7,
+    "only_b": 51,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 41.2,
+    "acc_b": 73.1,
+    "diff": 31.9,
+    "ci": [
+     23.1,
+     41.9
+    ],
+    "only_a": 13,
+    "only_b": 64,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 73.8,
+    "diff": 28.1,
+    "ci": [
+     20.0,
+     36.2
+    ],
+    "only_a": 8,
+    "only_b": 53,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 36.2,
+    "acc_b": 68.8,
+    "diff": 32.5,
+    "ci": [
+     23.1,
+     42.5
+    ],
+    "only_a": 15,
+    "only_b": 67,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 16.9,
+    "diff": 2.5,
+    "ci": [
+     -3.8,
+     8.1
+    ],
+    "only_a": 10,
+    "only_b": 14,
+    "p": 0.5413
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 43.8,
+    "acc_b": 77.1,
+    "diff": 33.3,
+    "ci": [
+     20.8,
+     44.8
+    ],
+    "only_a": 5,
+    "only_b": 37,
+    "p": 0.0
+   }
+  },
+  "base->D|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 61.2,
+    "diff": 43.1,
+    "ci": [
+     32.5,
+     53.1
+    ],
+    "only_a": 15,
+    "only_b": 84,
+    "p": 0.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 11.9,
+    "acc_b": 96.2,
+    "diff": 84.4,
+    "ci": [
+     78.1,
+     90.0
+    ],
+    "only_a": 0,
+    "only_b": 135,
+    "p": 0.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 42.5,
+    "acc_b": 61.2,
+    "diff": 18.8,
+    "ci": [
+     10.0,
+     27.5
+    ],
+    "only_a": 0,
+    "only_b": 15,
+    "p": 0.0001
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 51.2,
+    "acc_b": 66.2,
+    "diff": 15.0,
+    "ci": [
+     -1.2,
+     32.5
+    ],
+    "only_a": 19,
+    "only_b": 31,
+    "p": 0.1189
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 36.9,
+    "acc_b": 59.4,
+    "diff": 22.5,
+    "ci": [
+     12.5,
+     31.9
+    ],
+    "only_a": 17,
+    "only_b": 53,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 58.8,
+    "diff": 20.6,
+    "ci": [
+     11.2,
+     29.4
+    ],
+    "only_a": 14,
+    "only_b": 47,
+    "p": 0.0
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 69.4,
+    "diff": 15.0,
+    "ci": [
+     5.6,
+     23.8
+    ],
+    "only_a": 19,
+    "only_b": 43,
+    "p": 0.0032
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 54.4,
+    "diff": 29.4,
+    "ci": [
+     19.4,
+     38.8
+    ],
+    "only_a": 13,
+    "only_b": 60,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 53.8,
+    "diff": 21.9,
+    "ci": [
+     11.9,
+     31.2
+    ],
+    "only_a": 18,
+    "only_b": 53,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.9,
+    "acc_b": 45.6,
+    "diff": 13.8,
+    "ci": [
+     3.1,
+     24.4
+    ],
+    "only_a": 25,
+    "only_b": 47,
+    "p": 0.0128
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 11.2,
+    "acc_b": 14.4,
+    "diff": 3.1,
+    "ci": [
+     -1.2,
+     7.5
+    ],
+    "only_a": 3,
+    "only_b": 8,
+    "p": 0.2266
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 12.5,
+    "diff": -4.2,
+    "ci": [
+     -25.0,
+     16.7
+    ],
+    "only_a": 4,
+    "only_b": 3,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 16.7,
+    "acc_b": 95.8,
+    "diff": 79.2,
+    "ci": [
+     58.3,
+     95.8
+    ],
+    "only_a": 1,
+    "only_b": 20,
+    "p": 0.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 40.6,
+    "acc_b": 34.4,
+    "diff": -6.2,
+    "ci": [
+     -18.8,
+     5.2
+    ],
+    "only_a": 19,
+    "only_b": 13,
+    "p": 0.3771
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 8.3,
+    "diff": -4.2,
+    "ci": [
+     -18.8,
+     8.3
+    ],
+    "only_a": 6,
+    "only_b": 4,
+    "p": 0.7539
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 12.5,
+    "diff": 2.1,
+    "ci": [
+     -8.3,
+     12.5
+    ],
+    "only_a": 3,
+    "only_b": 4,
+    "p": 1.0
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 10.4,
+    "diff": -4.2,
+    "ci": [
+     -18.8,
+     10.4
+    ],
+    "only_a": 7,
+    "only_b": 5,
+    "p": 0.7744
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 10.4,
+    "diff": -4.2,
+    "ci": [
+     -16.7,
+     6.2
+    ],
+    "only_a": 5,
+    "only_b": 3,
+    "p": 0.7266
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 91.7,
+    "diff": 25.0,
+    "ci": [
+     12.5,
+     37.5
+    ],
+    "only_a": 1,
+    "only_b": 13,
+    "p": 0.0018
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 97.9,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 89.6,
+    "diff": 37.5,
+    "ci": [
+     22.9,
+     54.2
+    ],
+    "only_a": 2,
+    "only_b": 20,
+    "p": 0.0001
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 100.0,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 70.8,
+    "diff": 8.3,
+    "ci": [
+     -10.4,
+     29.2
+    ],
+    "only_a": 9,
+    "only_b": 13,
+    "p": 0.5235
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 85.4,
+    "diff": -6.2,
+    "ci": [
+     -18.8,
+     4.2
+    ],
+    "only_a": 5,
+    "only_b": 2,
+    "p": 0.4531
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 72.9,
+    "diff": 12.5,
+    "ci": [
+     -2.1,
+     25.0
+    ],
+    "only_a": 3,
+    "only_b": 9,
+    "p": 0.146
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 62.5,
+    "diff": 6.2,
+    "ci": [
+     -8.3,
+     20.8
+    ],
+    "only_a": 4,
+    "only_b": 7,
+    "p": 0.5488
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 81.2,
+    "diff": 20.8,
+    "ci": [
+     13.0,
+     28.6
+    ],
+    "only_a": 15,
+    "only_b": 55,
+    "p": 0.0
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 86.5,
+    "diff": 2.1,
+    "ci": [
+     -2.6,
+     6.8
+    ],
+    "only_a": 9,
+    "only_b": 13,
+    "p": 0.5235
+   }
+  },
+  "base->D|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 98.8,
+    "acc_b": 100.0,
+    "diff": 1.2,
+    "ci": [
+     0.0,
+     3.1
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 90.6,
+    "diff": -9.4,
+    "ci": [
+     -14.4,
+     -5.0
+    ],
+    "only_a": 15,
+    "only_b": 0,
+    "p": 0.0001
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 77.5,
+    "diff": -3.8,
+    "ci": [
+     -13.8,
+     7.5
+    ],
+    "only_a": 11,
+    "only_b": 8,
+    "p": 0.6476
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 48.8,
+    "acc_b": 80.0,
+    "diff": 31.2,
+    "ci": [
+     21.9,
+     40.0
+    ],
+    "only_a": 12,
+    "only_b": 62,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 83.8,
+    "diff": 14.4,
+    "ci": [
+     6.9,
+     21.9
+    ],
+    "only_a": 12,
+    "only_b": 35,
+    "p": 0.0011
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 61.9,
+    "acc_b": 86.2,
+    "diff": 24.4,
+    "ci": [
+     15.6,
+     32.5
+    ],
+    "only_a": 10,
+    "only_b": 49,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 41.2,
+    "acc_b": 71.2,
+    "diff": 30.0,
+    "ci": [
+     21.2,
+     39.4
+    ],
+    "only_a": 12,
+    "only_b": 60,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 75.0,
+    "diff": 29.4,
+    "ci": [
+     20.0,
+     38.1
+    ],
+    "only_a": 12,
+    "only_b": 59,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 36.2,
+    "acc_b": 73.8,
+    "diff": 37.5,
+    "ci": [
+     28.8,
+     46.2
+    ],
+    "only_a": 7,
+    "only_b": 67,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 16.9,
+    "diff": 2.5,
+    "ci": [
+     -3.8,
+     8.8
+    ],
+    "only_a": 12,
+    "only_b": 16,
+    "p": 0.5716
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 43.8,
+    "acc_b": 77.1,
+    "diff": 33.3,
+    "ci": [
+     21.9,
+     43.8
+    ],
+    "only_a": 3,
+    "only_b": 35,
+    "p": 0.0
+   }
+  },
+  "A->C|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 25.0,
+    "acc_b": 20.6,
+    "diff": -4.4,
+    "ci": [
+     -8.1,
+     -1.2
+    ],
+    "only_a": 8,
+    "only_b": 1,
+    "p": 0.0391
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 96.2,
+    "acc_b": 86.2,
+    "diff": -10.0,
+    "ci": [
+     -18.8,
+     -1.2
+    ],
+    "only_a": 11,
+    "only_b": 3,
+    "p": 0.0574
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 91.2,
+    "acc_b": 73.8,
+    "diff": -17.5,
+    "ci": [
+     -30.0,
+     -5.0
+    ],
+    "only_a": 21,
+    "only_b": 7,
+    "p": 0.0125
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 40.0,
+    "acc_b": 58.8,
+    "diff": 18.8,
+    "ci": [
+     7.5,
+     29.4
+    ],
+    "only_a": 28,
+    "only_b": 58,
+    "p": 0.0016
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 71.9,
+    "acc_b": 70.6,
+    "diff": -1.2,
+    "ci": [
+     -10.0,
+     7.5
+    ],
+    "only_a": 27,
+    "only_b": 25,
+    "p": 0.8899
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 59.4,
+    "acc_b": 76.2,
+    "diff": 16.9,
+    "ci": [
+     7.5,
+     26.9
+    ],
+    "only_a": 22,
+    "only_b": 49,
+    "p": 0.0018
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 34.4,
+    "acc_b": 50.6,
+    "diff": 16.2,
+    "ci": [
+     5.6,
+     26.2
+    ],
+    "only_a": 29,
+    "only_b": 55,
+    "p": 0.006
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 45.0,
+    "acc_b": 51.9,
+    "diff": 6.9,
+    "ci": [
+     -4.4,
+     18.1
+    ],
+    "only_a": 36,
+    "only_b": 47,
+    "p": 0.2723
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 35.0,
+    "acc_b": 34.4,
+    "diff": -0.6,
+    "ci": [
+     -11.9,
+     9.4
+    ],
+    "only_a": 40,
+    "only_b": 39,
+    "p": 1.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 12.5,
+    "acc_b": 8.1,
+    "diff": -4.4,
+    "ci": [
+     -8.1,
+     -0.6
+    ],
+    "only_a": 9,
+    "only_b": 2,
+    "p": 0.0654
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 25.0,
+    "acc_b": 20.8,
+    "diff": -4.2,
+    "ci": [
+     -12.5,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 24.0,
+    "acc_b": 30.2,
+    "diff": 6.2,
+    "ci": [
+     -6.2,
+     18.8
+    ],
+    "only_a": 17,
+    "only_b": 23,
+    "p": 0.4296
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 12.5,
+    "diff": 2.1,
+    "ci": [
+     0.0,
+     6.2
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 6.2,
+    "acc_b": 4.2,
+    "diff": -2.1,
+    "ci": [
+     -10.4,
+     6.2
+    ],
+    "only_a": 3,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 14.6,
+    "acc_b": 6.2,
+    "diff": -8.3,
+    "ci": [
+     -18.8,
+     0.0
+    ],
+    "only_a": 5,
+    "only_b": 1,
+    "p": 0.2188
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 54.2,
+    "acc_b": 83.3,
+    "diff": 29.2,
+    "ci": [
+     12.5,
+     43.8
+    ],
+    "only_a": 2,
+    "only_b": 16,
+    "p": 0.0013
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 97.9,
+    "diff": 6.2,
+    "ci": [
+     0.0,
+     14.6
+    ],
+    "only_a": 0,
+    "only_b": 3,
+    "p": 0.25
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 41.7,
+    "acc_b": 85.4,
+    "diff": 43.8,
+    "ci": [
+     29.2,
+     60.4
+    ],
+    "only_a": 1,
+    "only_b": 22,
+    "p": 0.0
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 100.0,
+    "diff": 8.3,
+    "ci": [
+     2.1,
+     16.7
+    ],
+    "only_a": 0,
+    "only_b": 4,
+    "p": 0.125
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 79.2,
+    "diff": 22.9,
+    "ci": [
+     6.2,
+     39.6
+    ],
+    "only_a": 5,
+    "only_b": 16,
+    "p": 0.0266
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 87.5,
+    "acc_b": 87.5,
+    "diff": 0.0,
+    "ci": [
+     -8.3,
+     8.3
+    ],
+    "only_a": 2,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 54.2,
+    "acc_b": 70.8,
+    "diff": 16.7,
+    "ci": [
+     -2.1,
+     33.3
+    ],
+    "only_a": 7,
+    "only_b": 15,
+    "p": 0.1338
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 66.7,
+    "diff": 14.6,
+    "ci": [
+     -4.2,
+     33.3
+    ],
+    "only_a": 6,
+    "only_b": 13,
+    "p": 0.1671
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 51.6,
+    "acc_b": 79.7,
+    "diff": 28.1,
+    "ci": [
+     20.3,
+     36.5
+    ],
+    "only_a": 15,
+    "only_b": 69,
+    "p": 0.0
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 80.7,
+    "acc_b": 88.0,
+    "diff": 7.3,
+    "ci": [
+     2.1,
+     13.0
+    ],
+    "only_a": 8,
+    "only_b": 22,
+    "p": 0.0161
+   }
+  },
+  "A->C|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 40.6,
+    "acc_b": 98.8,
+    "diff": 58.1,
+    "ci": [
+     50.6,
+     65.0
+    ],
+    "only_a": 0,
+    "only_b": 93,
+    "p": 0.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 96.2,
+    "acc_b": 70.0,
+    "diff": -26.2,
+    "ci": [
+     -36.2,
+     -15.0
+    ],
+    "only_a": 24,
+    "only_b": 3,
+    "p": 0.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 43.1,
+    "acc_b": 76.2,
+    "diff": 33.1,
+    "ci": [
+     21.9,
+     43.8
+    ],
+    "only_a": 23,
+    "only_b": 76,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 76.9,
+    "acc_b": 85.0,
+    "diff": 8.1,
+    "ci": [
+     0.6,
+     15.6
+    ],
+    "only_a": 17,
+    "only_b": 30,
+    "p": 0.0789
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 62.5,
+    "acc_b": 81.9,
+    "diff": 19.4,
+    "ci": [
+     9.4,
+     29.4
+    ],
+    "only_a": 20,
+    "only_b": 51,
+    "p": 0.0003
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 39.4,
+    "acc_b": 69.4,
+    "diff": 30.0,
+    "ci": [
+     18.1,
+     41.2
+    ],
+    "only_a": 26,
+    "only_b": 74,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 43.1,
+    "acc_b": 73.1,
+    "diff": 30.0,
+    "ci": [
+     19.4,
+     40.6
+    ],
+    "only_a": 19,
+    "only_b": 67,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 31.2,
+    "acc_b": 61.9,
+    "diff": 30.6,
+    "ci": [
+     20.0,
+     41.9
+    ],
+    "only_a": 22,
+    "only_b": 71,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 13.1,
+    "acc_b": 13.1,
+    "diff": 0.0,
+    "ci": [
+     -3.8,
+     3.8
+    ],
+    "only_a": 5,
+    "only_b": 5,
+    "p": 1.0
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 54.2,
+    "acc_b": 100.0,
+    "diff": 45.8,
+    "ci": [
+     25.0,
+     66.7
+    ],
+    "only_a": 0,
+    "only_b": 11,
+    "p": 0.001
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 70.8,
+    "acc_b": 100.0,
+    "diff": 29.2,
+    "ci": [
+     12.5,
+     50.0
+    ],
+    "only_a": 0,
+    "only_b": 7,
+    "p": 0.0156
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 32.3,
+    "acc_b": 75.0,
+    "diff": 42.7,
+    "ci": [
+     29.2,
+     56.2
+    ],
+    "only_a": 9,
+    "only_b": 50,
+    "p": 0.0
+   }
+  },
+  "Cn->C|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 21.2,
+    "acc_b": 20.6,
+    "diff": -0.6,
+    "ci": [
+     -4.4,
+     3.1
+    ],
+    "only_a": 5,
+    "only_b": 4,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 81.2,
+    "acc_b": 86.2,
+    "diff": 5.0,
+    "ci": [
+     -3.8,
+     15.0
+    ],
+    "only_a": 6,
+    "only_b": 10,
+    "p": 0.4545
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 77.5,
+    "acc_b": 73.8,
+    "diff": -3.8,
+    "ci": [
+     -16.2,
+     7.5
+    ],
+    "only_a": 13,
+    "only_b": 10,
+    "p": 0.6776
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 60.0,
+    "acc_b": 58.8,
+    "diff": -1.2,
+    "ci": [
+     -8.1,
+     6.9
+    ],
+    "only_a": 21,
+    "only_b": 19,
+    "p": 0.8746
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 73.1,
+    "acc_b": 70.6,
+    "diff": -2.5,
+    "ci": [
+     -10.0,
+     5.0
+    ],
+    "only_a": 20,
+    "only_b": 16,
+    "p": 0.6177
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 73.8,
+    "acc_b": 76.2,
+    "diff": 2.5,
+    "ci": [
+     -4.4,
+     9.4
+    ],
+    "only_a": 16,
+    "only_b": 20,
+    "p": 0.6177
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 58.1,
+    "acc_b": 50.6,
+    "diff": -7.5,
+    "ci": [
+     -16.2,
+     0.6
+    ],
+    "only_a": 30,
+    "only_b": 18,
+    "p": 0.1114
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 61.2,
+    "acc_b": 51.9,
+    "diff": -9.4,
+    "ci": [
+     -16.9,
+     -1.2
+    ],
+    "only_a": 29,
+    "only_b": 14,
+    "p": 0.0315
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 38.8,
+    "acc_b": 34.4,
+    "diff": -4.4,
+    "ci": [
+     -11.2,
+     3.8
+    ],
+    "only_a": 22,
+    "only_b": 15,
+    "p": 0.324
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 12.5,
+    "acc_b": 8.1,
+    "diff": -4.4,
+    "ci": [
+     -8.1,
+     -0.6
+    ],
+    "only_a": 8,
+    "only_b": 1,
+    "p": 0.0391
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 20.8,
+    "acc_b": 20.8,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 33.3,
+    "acc_b": 30.2,
+    "diff": -3.1,
+    "ci": [
+     -12.5,
+     6.2
+    ],
+    "only_a": 12,
+    "only_b": 9,
+    "p": 0.6636
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 4.2,
+    "acc_b": 4.2,
+    "diff": 0.0,
+    "ci": [
+     -8.3,
+     8.3
+    ],
+    "only_a": 2,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 8.3,
+    "acc_b": 6.2,
+    "diff": -2.1,
+    "ci": [
+     -10.4,
+     6.2
+    ],
+    "only_a": 3,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 89.6,
+    "acc_b": 83.3,
+    "diff": -6.2,
+    "ci": [
+     -16.7,
+     4.2
+    ],
+    "only_a": 5,
+    "only_b": 2,
+    "p": 0.4531
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 97.9,
+    "acc_b": 97.9,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 85.4,
+    "diff": 22.9,
+    "ci": [
+     10.4,
+     37.5
+    ],
+    "only_a": 1,
+    "only_b": 12,
+    "p": 0.0034
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 68.8,
+    "acc_b": 79.2,
+    "diff": 10.4,
+    "ci": [
+     -2.1,
+     22.9
+    ],
+    "only_a": 3,
+    "only_b": 8,
+    "p": 0.2266
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 85.4,
+    "acc_b": 87.5,
+    "diff": 2.1,
+    "ci": [
+     -6.2,
+     10.4
+    ],
+    "only_a": 2,
+    "only_b": 3,
+    "p": 1.0
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 70.8,
+    "diff": 8.3,
+    "ci": [
+     -4.2,
+     20.8
+    ],
+    "only_a": 3,
+    "only_b": 7,
+    "p": 0.3438
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 64.6,
+    "acc_b": 66.7,
+    "diff": 2.1,
+    "ci": [
+     -10.4,
+     14.6
+    ],
+    "only_a": 4,
+    "only_b": 5,
+    "p": 1.0
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 70.8,
+    "acc_b": 79.7,
+    "diff": 8.9,
+    "ci": [
+     2.6,
+     16.1
+    ],
+    "only_a": 12,
+    "only_b": 29,
+    "p": 0.0115
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 87.0,
+    "acc_b": 88.0,
+    "diff": 1.0,
+    "ci": [
+     -2.6,
+     4.7
+    ],
+    "only_a": 6,
+    "only_b": 8,
+    "p": 0.7905
+   }
+  },
+  "Cn->C|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 99.4,
+    "acc_b": 98.8,
+    "diff": -0.6,
+    "ci": [
+     -3.1,
+     1.2
+    ],
+    "only_a": 2,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 93.8,
+    "acc_b": 100.0,
+    "diff": 6.2,
+    "ci": [
+     1.2,
+     12.5
+    ],
+    "only_a": 0,
+    "only_b": 5,
+    "p": 0.0625
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 71.2,
+    "acc_b": 70.0,
+    "diff": -1.2,
+    "ci": [
+     -5.0,
+     2.5
+    ],
+    "only_a": 2,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 82.5,
+    "acc_b": 76.2,
+    "diff": -6.2,
+    "ci": [
+     -12.5,
+     0.0
+    ],
+    "only_a": 20,
+    "only_b": 10,
+    "p": 0.0987
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 75.6,
+    "acc_b": 85.0,
+    "diff": 9.4,
+    "ci": [
+     4.4,
+     15.0
+    ],
+    "only_a": 2,
+    "only_b": 17,
+    "p": 0.0007
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 89.4,
+    "acc_b": 81.9,
+    "diff": -7.5,
+    "ci": [
+     -13.1,
+     -1.9
+    ],
+    "only_a": 16,
+    "only_b": 4,
+    "p": 0.0118
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 73.1,
+    "acc_b": 69.4,
+    "diff": -3.8,
+    "ci": [
+     -11.9,
+     3.1
+    ],
+    "only_a": 21,
+    "only_b": 15,
+    "p": 0.405
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 73.8,
+    "acc_b": 73.1,
+    "diff": -0.6,
+    "ci": [
+     -6.2,
+     6.2
+    ],
+    "only_a": 14,
+    "only_b": 13,
+    "p": 1.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 68.8,
+    "acc_b": 61.9,
+    "diff": -6.9,
+    "ci": [
+     -13.8,
+     -0.6
+    ],
+    "only_a": 19,
+    "only_b": 8,
+    "p": 0.0522
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 16.9,
+    "acc_b": 13.1,
+    "diff": -3.8,
+    "ci": [
+     -7.5,
+     0.0
+    ],
+    "only_a": 9,
+    "only_b": 3,
+    "p": 0.146
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 77.1,
+    "acc_b": 75.0,
+    "diff": -2.1,
+    "ci": [
+     -10.4,
+     6.2
+    ],
+    "only_a": 10,
+    "only_b": 8,
+    "p": 0.8145
+   }
+  },
+  "D->C|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 61.2,
+    "acc_b": 20.6,
+    "diff": -40.6,
+    "ci": [
+     -50.6,
+     -30.0
+    ],
+    "only_a": 81,
+    "only_b": 16,
+    "p": 0.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 96.2,
+    "acc_b": 100.0,
+    "diff": 3.8,
+    "ci": [
+     1.2,
+     6.9
+    ],
+    "only_a": 0,
+    "only_b": 6,
+    "p": 0.0312
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 61.2,
+    "acc_b": 86.2,
+    "diff": 25.0,
+    "ci": [
+     12.5,
+     36.2
+    ],
+    "only_a": 4,
+    "only_b": 24,
+    "p": 0.0002
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 66.2,
+    "acc_b": 73.8,
+    "diff": 7.5,
+    "ci": [
+     -5.0,
+     21.2
+    ],
+    "only_a": 12,
+    "only_b": 18,
+    "p": 0.3616
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 59.4,
+    "acc_b": 58.8,
+    "diff": -0.6,
+    "ci": [
+     -9.4,
+     9.4
+    ],
+    "only_a": 26,
+    "only_b": 25,
+    "p": 1.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 58.8,
+    "acc_b": 70.6,
+    "diff": 11.9,
+    "ci": [
+     4.4,
+     19.4
+    ],
+    "only_a": 11,
+    "only_b": 30,
+    "p": 0.0043
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 69.4,
+    "acc_b": 76.2,
+    "diff": 6.9,
+    "ci": [
+     -0.6,
+     14.4
+    ],
+    "only_a": 14,
+    "only_b": 25,
+    "p": 0.1081
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 54.4,
+    "acc_b": 50.6,
+    "diff": -3.8,
+    "ci": [
+     -11.9,
+     4.4
+    ],
+    "only_a": 27,
+    "only_b": 21,
+    "p": 0.4709
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 53.8,
+    "acc_b": 51.9,
+    "diff": -1.9,
+    "ci": [
+     -10.0,
+     6.2
+    ],
+    "only_a": 25,
+    "only_b": 22,
+    "p": 0.7709
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 34.4,
+    "diff": -11.2,
+    "ci": [
+     -18.1,
+     -3.8
+    ],
+    "only_a": 27,
+    "only_b": 9,
+    "p": 0.0039
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 14.4,
+    "acc_b": 8.1,
+    "diff": -6.2,
+    "ci": [
+     -10.6,
+     -2.5
+    ],
+    "only_a": 11,
+    "only_b": 1,
+    "p": 0.0063
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     -20.8,
+     20.8
+    ],
+    "only_a": 3,
+    "only_b": 3,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 95.8,
+    "acc_b": 20.8,
+    "diff": -75.0,
+    "ci": [
+     -91.7,
+     -50.0
+    ],
+    "only_a": 19,
+    "only_b": 1,
+    "p": 0.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 34.4,
+    "acc_b": 30.2,
+    "diff": -4.2,
+    "ci": [
+     -13.5,
+     4.2
+    ],
+    "only_a": 11,
+    "only_b": 7,
+    "p": 0.4807
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 8.3,
+    "acc_b": 12.5,
+    "diff": 4.2,
+    "ci": [
+     -8.3,
+     18.8
+    ],
+    "only_a": 4,
+    "only_b": 6,
+    "p": 0.7539
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 4.2,
+    "diff": -8.3,
+    "ci": [
+     -18.8,
+     2.1
+    ],
+    "only_a": 6,
+    "only_b": 2,
+    "p": 0.2891
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 12.5,
+    "diff": 2.1,
+    "ci": [
+     -12.5,
+     14.6
+    ],
+    "only_a": 5,
+    "only_b": 6,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 6.2,
+    "diff": -4.2,
+    "ci": [
+     -14.6,
+     6.2
+    ],
+    "only_a": 4,
+    "only_b": 2,
+    "p": 0.6875
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 83.3,
+    "diff": -8.3,
+    "ci": [
+     -18.8,
+     0.0
+    ],
+    "only_a": 5,
+    "only_b": 1,
+    "p": 0.2188
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 97.9,
+    "acc_b": 97.9,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 89.6,
+    "acc_b": 85.4,
+    "diff": -4.2,
+    "ci": [
+     -10.4,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 70.8,
+    "acc_b": 79.2,
+    "diff": 8.3,
+    "ci": [
+     -2.1,
+     20.8
+    ],
+    "only_a": 2,
+    "only_b": 6,
+    "p": 0.2891
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 85.4,
+    "acc_b": 87.5,
+    "diff": 2.1,
+    "ci": [
+     -6.2,
+     8.3
+    ],
+    "only_a": 1,
+    "only_b": 2,
+    "p": 1.0
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 72.9,
+    "acc_b": 70.8,
+    "diff": -2.1,
+    "ci": [
+     -12.5,
+     8.3
+    ],
+    "only_a": 4,
+    "only_b": 3,
+    "p": 1.0
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 66.7,
+    "diff": 4.2,
+    "ci": [
+     -4.2,
+     12.5
+    ],
+    "only_a": 1,
+    "only_b": 3,
+    "p": 0.625
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 81.2,
+    "acc_b": 79.7,
+    "diff": -1.6,
+    "ci": [
+     -6.8,
+     3.6
+    ],
+    "only_a": 13,
+    "only_b": 10,
+    "p": 0.6776
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 86.5,
+    "acc_b": 88.0,
+    "diff": 1.6,
+    "ci": [
+     -1.0,
+     4.7
+    ],
+    "only_a": 2,
+    "only_b": 5,
+    "p": 0.4531
+   }
+  },
+  "D->C|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 98.8,
+    "diff": -1.2,
+    "ci": [
+     -3.1,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 90.6,
+    "acc_b": 100.0,
+    "diff": 9.4,
+    "ci": [
+     5.0,
+     14.4
+    ],
+    "only_a": 0,
+    "only_b": 15,
+    "p": 0.0001
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 77.5,
+    "acc_b": 70.0,
+    "diff": -7.5,
+    "ci": [
+     -13.8,
+     -2.5
+    ],
+    "only_a": 6,
+    "only_b": 0,
+    "p": 0.0312
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 80.0,
+    "acc_b": 76.2,
+    "diff": -3.8,
+    "ci": [
+     -10.0,
+     2.5
+    ],
+    "only_a": 16,
+    "only_b": 10,
+    "p": 0.3269
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 83.8,
+    "acc_b": 85.0,
+    "diff": 1.2,
+    "ci": [
+     -4.4,
+     6.2
+    ],
+    "only_a": 8,
+    "only_b": 10,
+    "p": 0.8145
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 86.2,
+    "acc_b": 81.9,
+    "diff": -4.4,
+    "ci": [
+     -10.0,
+     0.6
+    ],
+    "only_a": 13,
+    "only_b": 6,
+    "p": 0.1671
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 71.2,
+    "acc_b": 69.4,
+    "diff": -1.9,
+    "ci": [
+     -8.8,
+     4.4
+    ],
+    "only_a": 15,
+    "only_b": 12,
+    "p": 0.7011
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 75.0,
+    "acc_b": 73.1,
+    "diff": -1.9,
+    "ci": [
+     -8.8,
+     5.0
+    ],
+    "only_a": 17,
+    "only_b": 14,
+    "p": 0.7201
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 73.8,
+    "acc_b": 61.9,
+    "diff": -11.9,
+    "ci": [
+     -19.4,
+     -5.6
+    ],
+    "only_a": 27,
+    "only_b": 8,
+    "p": 0.0019
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 16.9,
+    "acc_b": 13.1,
+    "diff": -3.8,
+    "ci": [
+     -8.8,
+     1.2
+    ],
+    "only_a": 12,
+    "only_b": 6,
+    "p": 0.2379
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 77.1,
+    "acc_b": 75.0,
+    "diff": -2.1,
+    "ci": [
+     -8.3,
+     5.2
+    ],
+    "only_a": 7,
+    "only_b": 5,
+    "p": 0.7744
+   }
+  },
+  "base_m->E|noctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 18.1,
+    "acc_b": 18.1,
+    "diff": 0.0,
+    "ci": [
+     -3.8,
+     3.8
+    ],
+    "only_a": 5,
+    "only_b": 5,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 10.0,
+    "acc_b": 100.0,
+    "diff": 90.0,
+    "ci": [
+     85.0,
+     94.4
+    ],
+    "only_a": 0,
+    "only_b": 144,
+    "p": 0.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 41.2,
+    "acc_b": 96.2,
+    "diff": 55.0,
+    "ci": [
+     42.5,
+     67.5
+    ],
+    "only_a": 3,
+    "only_b": 47,
+    "p": 0.0
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 50.0,
+    "acc_b": 96.2,
+    "diff": 46.2,
+    "ci": [
+     35.0,
+     57.5
+    ],
+    "only_a": 1,
+    "only_b": 38,
+    "p": 0.0
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 40.6,
+    "acc_b": 75.0,
+    "diff": 34.4,
+    "ci": [
+     26.2,
+     43.1
+    ],
+    "only_a": 5,
+    "only_b": 60,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 46.2,
+    "acc_b": 73.8,
+    "diff": 27.5,
+    "ci": [
+     17.5,
+     36.2
+    ],
+    "only_a": 11,
+    "only_b": 55,
+    "p": 0.0
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 55.0,
+    "acc_b": 81.9,
+    "diff": 26.9,
+    "ci": [
+     18.1,
+     35.6
+    ],
+    "only_a": 11,
+    "only_b": 54,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 38.8,
+    "acc_b": 75.6,
+    "diff": 36.9,
+    "ci": [
+     26.9,
+     46.2
+    ],
+    "only_a": 12,
+    "only_b": 71,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 49.4,
+    "acc_b": 76.9,
+    "diff": 27.5,
+    "ci": [
+     19.4,
+     35.0
+    ],
+    "only_a": 8,
+    "only_b": 52,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 32.5,
+    "acc_b": 32.5,
+    "diff": 0.0,
+    "ci": [
+     -9.4,
+     8.8
+    ],
+    "only_a": 28,
+    "only_b": 28,
+    "p": 1.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 13.8,
+    "acc_b": 17.5,
+    "diff": 3.8,
+    "ci": [
+     -0.6,
+     8.1
+    ],
+    "only_a": 3,
+    "only_b": 9,
+    "p": 0.146
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 12.5,
+    "acc_b": 4.2,
+    "diff": -8.3,
+    "ci": [
+     -20.8,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 33.3,
+    "acc_b": 45.8,
+    "diff": 12.5,
+    "ci": [
+     1.0,
+     24.0
+    ],
+    "only_a": 11,
+    "only_b": 23,
+    "p": 0.0576
+   },
+   "M_probe_marked": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 12.5,
+    "diff": 0.0,
+    "ci": [
+     -6.2,
+     6.2
+    ],
+    "only_a": 1,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "M_probe_marked_fmt": {
+    "n": 48,
+    "acc_a": 12.5,
+    "acc_b": 93.8,
+    "diff": 81.2,
+    "ci": [
+     70.8,
+     91.7
+    ],
+    "only_a": 0,
+    "only_b": 39,
+    "p": 0.0
+   },
+   "M_probe_plain": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 12.5,
+    "diff": 2.1,
+    "ci": [
+     0.0,
+     6.2
+    ],
+    "only_a": 0,
+    "only_b": 1,
+    "p": 1.0
+   },
+   "M_probe_plain_fmt": {
+    "n": 48,
+    "acc_a": 10.4,
+    "acc_b": 14.6,
+    "diff": 4.2,
+    "ci": [
+     -10.4,
+     18.8
+    ],
+    "only_a": 5,
+    "only_b": 7,
+    "p": 0.7744
+   },
+   "ICL_symbol_banking77": {
+    "n": 48,
+    "acc_a": 66.7,
+    "acc_b": 87.5,
+    "diff": 20.8,
+    "ci": [
+     8.3,
+     33.3
+    ],
+    "only_a": 0,
+    "only_b": 10,
+    "p": 0.002
+   },
+   "ICL_natural_banking77": {
+    "n": 48,
+    "acc_a": 93.8,
+    "acc_b": 91.7,
+    "diff": -2.1,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 1,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "ICL_symbol_dbpedia": {
+    "n": 48,
+    "acc_a": 52.1,
+    "acc_b": 85.4,
+    "diff": 33.3,
+    "ci": [
+     18.8,
+     50.0
+    ],
+    "only_a": 2,
+    "only_b": 18,
+    "p": 0.0004
+   },
+   "ICL_natural_dbpedia": {
+    "n": 48,
+    "acc_a": 95.8,
+    "acc_b": 100.0,
+    "diff": 4.2,
+    "ci": [
+     0.0,
+     10.4
+    ],
+    "only_a": 0,
+    "only_b": 2,
+    "p": 0.5
+   },
+   "ICL_symbol_sst2": {
+    "n": 48,
+    "acc_a": 62.5,
+    "acc_b": 79.2,
+    "diff": 16.7,
+    "ci": [
+     0.0,
+     33.3
+    ],
+    "only_a": 5,
+    "only_b": 13,
+    "p": 0.0963
+   },
+   "ICL_natural_sst2": {
+    "n": 48,
+    "acc_a": 91.7,
+    "acc_b": 83.3,
+    "diff": -8.3,
+    "ci": [
+     -20.8,
+     2.1
+    ],
+    "only_a": 6,
+    "only_b": 2,
+    "p": 0.2891
+   },
+   "ICL_symbol_subj": {
+    "n": 48,
+    "acc_a": 60.4,
+    "acc_b": 77.1,
+    "diff": 16.7,
+    "ci": [
+     0.0,
+     33.3
+    ],
+    "only_a": 6,
+    "only_b": 14,
+    "p": 0.1153
+   },
+   "ICL_natural_subj": {
+    "n": 48,
+    "acc_a": 56.2,
+    "acc_b": 62.5,
+    "diff": 6.2,
+    "ci": [
+     -6.2,
+     18.8
+    ],
+    "only_a": 3,
+    "only_b": 6,
+    "p": 0.5078
+   },
+   "ICL_symbol_all": {
+    "n": 192,
+    "acc_a": 60.4,
+    "acc_b": 82.3,
+    "diff": 21.9,
+    "ci": [
+     14.1,
+     29.2
+    ],
+    "only_a": 13,
+    "only_b": 55,
+    "p": 0.0
+   },
+   "ICL_natural_all": {
+    "n": 192,
+    "acc_a": 84.4,
+    "acc_b": 84.4,
+    "diff": 0.0,
+    "ci": [
+     -4.7,
+     4.7
+    ],
+    "only_a": 10,
+    "only_b": 10,
+    "p": 1.0
+   }
+  },
+  "base_m->E|ctx": {
+   "L1_recall": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L1_recall_fmt": {
+    "n": 160,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L2_manip_isa": {
+    "n": 80,
+    "acc_a": 100.0,
+    "acc_b": 97.5,
+    "diff": -2.5,
+    "ci": [
+     -6.2,
+     0.0
+    ],
+    "only_a": 2,
+    "only_b": 0,
+    "p": 0.5
+   },
+   "L2_manip_pair": {
+    "n": 80,
+    "acc_a": 90.0,
+    "acc_b": 80.0,
+    "diff": -10.0,
+    "ci": [
+     -18.8,
+     -1.2
+    ],
+    "only_a": 12,
+    "only_b": 4,
+    "p": 0.0768
+   },
+   "L3_induct_type_nonsense": {
+    "n": 160,
+    "acc_a": 45.6,
+    "acc_b": 71.9,
+    "diff": 26.2,
+    "ci": [
+     16.9,
+     35.6
+    ],
+    "only_a": 14,
+    "only_b": 56,
+    "p": 0.0
+   },
+   "L3_induct_type_realnames": {
+    "n": 160,
+    "acc_a": 70.6,
+    "acc_b": 81.2,
+    "diff": 10.6,
+    "ci": [
+     1.9,
+     18.1
+    ],
+    "only_a": 15,
+    "only_b": 32,
+    "p": 0.0186
+   },
+   "L3_induct_type_k2": {
+    "n": 160,
+    "acc_a": 68.1,
+    "acc_b": 89.4,
+    "diff": 21.2,
+    "ci": [
+     13.1,
+     28.8
+    ],
+    "only_a": 7,
+    "only_b": 41,
+    "p": 0.0
+   },
+   "L3_induct_type_k4": {
+    "n": 160,
+    "acc_a": 40.0,
+    "acc_b": 73.8,
+    "diff": 33.8,
+    "ci": [
+     23.8,
+     43.1
+    ],
+    "only_a": 14,
+    "only_b": 68,
+    "p": 0.0
+   },
+   "L4_induct_weakness": {
+    "n": 160,
+    "acc_a": 48.1,
+    "acc_b": 72.5,
+    "diff": 24.4,
+    "ci": [
+     15.0,
+     34.4
+    ],
+    "only_a": 16,
+    "only_b": 55,
+    "p": 0.0
+   },
+   "L4_induct_habitat": {
+    "n": 160,
+    "acc_a": 38.1,
+    "acc_b": 73.8,
+    "diff": 35.6,
+    "ci": [
+     26.2,
+     45.0
+    ],
+    "only_a": 11,
+    "only_b": 68,
+    "p": 0.0
+   },
+   "L5_novel_choices": {
+    "n": 160,
+    "acc_a": 21.2,
+    "acc_b": 19.4,
+    "diff": -1.9,
+    "ci": [
+     -8.1,
+     4.4
+    ],
+    "only_a": 15,
+    "only_b": 12,
+    "p": 0.7011
+   },
+   "L6_unseen_recall": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L6_seen_recall_ctrl": {
+    "n": 24,
+    "acc_a": 100.0,
+    "acc_b": 100.0,
+    "diff": 0.0,
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "only_a": 0,
+    "only_b": 0,
+    "p": 1.0
+   },
+   "L3_induct_heldout": {
+    "n": 96,
+    "acc_a": 45.8,
+    "acc_b": 83.3,
+    "diff": 37.5,
+    "ci": [
+     26.0,
+     49.0
+    ],
+    "only_a": 5,
+    "only_b": 41,
+    "p": 0.0
+   }
+  }
+ }
+}
