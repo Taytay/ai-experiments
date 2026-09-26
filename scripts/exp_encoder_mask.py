@@ -1,7 +1,7 @@
 """Encoder option scorers (PLAN steps 53 and 69, QUESTIONS.md MODEL-6, MODEL-10): can a 150-400M bidirectional encoder choose among a user's
 categories in one forward pass? Three families share the data, training loop and scorer (ARCH), so they differ only in the model:
 
-  ARCH=mask       Laya's layout below (INIT=mbert|laya)
+  ARCH=mask       Laya's layout below (INIT=mbert|laya|hops; hops: row 76, a row 71 hop encoder named by HOPS_FROM)
   ARCH=gliclass   GLiClass (Knowledgator, arXiv 2508.07662; INIT=base|large: gliclass-modern-{base,large}-v3.0): "<<LABEL>>name..." for
                   every category, "<<SEP>>", then the state; its own pooling and scorer give one logit per label
   ARCH=mbinstruct ModernBERT-Large-Instruct (Answer.AI, arXiv 2502.03793), its model card's template: "QUESTION: <state> CHOICES: - A: name
@@ -72,7 +72,9 @@ if ITEMS_SET:
     _s = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
     TEST = dict(items=_s["items"], users=_s.get("users", TRAIN_DOC["users"]))
 SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}"
-NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT}_{SFX}"
+HOPS_FROM = os.environ.get("HOPS_FROM", "v2_options_k1-3_st3000")  # INIT=hops: which row 71 encoder (models/adapters/hops_enc_<HOPS_FROM>)
+INIT_TAG = INIT if INIT != "hops" else "hops-" + HOPS_FROM.replace("_st3000", "").replace("_", "-")
+NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
 COND = "ctx" if CTX else "noctx"
 rng = random.Random(SEED); torch.manual_seed(SEED)
 
@@ -140,6 +142,11 @@ def load_model():
         sd = {k: v for k, v in sd.items() if not k.startswith("act_head") and k != "temperature"}
         missing, unexpected = model.load_state_dict(sd, strict=False)
         assert not unexpected and not [k for k in missing if not k.startswith("encoder.")] and len(missing) < 5, (missing[:5], unexpected[:5])
+    if INIT == "hops":  # row 76: a row 71 hop encoder (same encoder, head and scorer; its hop pointer dropped, the question-type vector fresh)
+        sd = torch.load(ROOT / "models" / "adapters" / f"hops_enc_{HOPS_FROM}" / "model.pt")
+        sd = {k: v for k, v in sd.items() if not k.startswith(("q.", "k.", "end_key"))}
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        assert not unexpected and missing == ["type_emb.weight"], (missing[:5], unexpected[:5])
     return tok, model.cuda()
 
 
@@ -248,7 +255,7 @@ def score(tok, model):
 
 
 if __name__ == "__main__":
-    cfg = dict(arch=ARCH, init=INIT, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
+    cfg = dict(arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()
