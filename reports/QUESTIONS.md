@@ -883,6 +883,8 @@ longer context than Laya's 512 if the shots need it; no-record and record arms; 
 categoriser on row 45's groups and row 42's held-out folds; milliseconds per item beside the 3B's. The question is whether
 this layout lets an encoder read the shots where GLiClass could not.
 
+**Status (2026-09-26):** done, PLAN step 53, REPORT.md 62. Trained across users, the layout reads the shots (unlike GLiClass): level with the 3B on POI-1 (57.6 against 55 to 59), 15 points under it on REAL-6 without the record (merchant knowledge the encoder lacks), 8 under with it; about 7 to 10 ms per item batched on an H100.
+
 **MODEL-7 Does a bidirectional slot read (a diffusion LM) categorise better than a causal readout, and does it hold at scale?**
 djev-dev and razorback16/openjev (`diffusiongemma_djev_analysis.md`) read every answer from one decoder pass of
 DiffusionGemma 26B-A4B: a fixed answer template, one single-token label slot per question, one denoising step, the exact
@@ -1042,3 +1044,12 @@ suggests; capacity against the held-out gain.
 name's hidden states across layers (section 40's method): whether the standard category, the user's label and the business kind are
 linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its
 name's representation after injection.
+
+**MODEL-9 Which training objective makes a multiple-choice encoder's confidence trustworthy?** The owner (2026-09-26): Jev trains
+with a loss that takes confidence into account, so the model learns when to claim high confidence. Cross-entropy is already a strictly
+proper scoring rule (its optimum is the true conditional distribution); over-confidence comes from fitting one-hot labels on finite
+data, and Laya's "RLCD" is cross-entropy plus a noisy estimate of a spherical-score gradient (`laya_analysis.md` 3.2). The levers
+that change what is learned are soft targets, a bounded proper score beside the log score, and post-hoc temperatures. *Experiment
+(row 68):* the row 53 encoder with each objective, and with the layout pre-trained on general multiple-choice data first (UniMC,
+Yang et al. 2022, is the prior art for [MASK]-per-option encoders trained on many MC datasets); read by bits, ECE, AURC and coverage
+at a realised 98% precision on held-out users, which is what auto-filing needs.

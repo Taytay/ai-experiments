@@ -4123,3 +4123,93 @@ Open:
 - inconsistent users (a kind filed under two categories), so the lookup is no longer exact;
 - training with kind-retrieved examples;
 - row 66 (facts or skill) uses POI-1's places as the injected database.
+
+
+## 62. An encoder with one scored [MASK] per category (Laya's layout) matches the 3B on POI-1 (57 against 55 to 59, better top-3) at about a fortieth of the time per item, but trails it on REAL-6 by 15 points without the merchant record and 8 with it: what it lacks is the LLM's knowledge of what merchants are (MODEL-6)
+
+PLAN step 53. MODEL-6 asks whether a small bidirectional encoder can do the categoriser's job in one forward pass. The layout is
+Laya's (`references/laya_analysis.md`):
+
+```
+[CLS] instruction [SEP] [MASK] category 1 [MASK] category 2 ... [SEP] query, optional record, 24 shots as "statement -> category" [SEP]
+```
+
+Each [MASK]'s final hidden state goes through two fresh transformer layers and an MLP to one score, then a softmax over the options.
+There is no vocabulary readout: the model is trained only to choose among the options it is given.
+
+The model is ModernBERT-large (395M), either plain or starting from Laya's released checkpoint (`convaiinnovations/laya`,
+Apache-2.0, its act head dropped). It is trained with plain cross-entropy on the gold option, not Laya's RL: section 3.2 of the memo
+shows that the RL term is cross-entropy plus noise. Training runs across users with fold 0 held out (as the 3B's row 42 folds): 1,500
+steps of 16 episodes, options shuffled per episode, 24 random history rows as shots, learning rate 3e-5 for the encoder and 1e-4 for
+the head. It is scored on the held-out users' frozen items, shots and option order.
+
+Code is `scripts/exp_encoder_mask.py`; jobs `scripts/modal_jobs/r53.json` (H100, about 5 minutes each); tables
+`scripts/encmask_tables.py`; models `models/adapters/encmask_*` (DVC). Two engineering notes:
+
+- Batches are padded to multiples of 128 tokens. A new sequence length per call cost about 50 times the forward pass (850 ms against
+  14 ms for one item).
+- torch.compile is off, as in Laya's own inference.
+
+The 3B's time comes from its scoring runs: 2.0 minutes for 298 items, about 400 ms per item, with one option-scoring pass per item and
+a scorer never tuned for latency. So "about 40 times faster" is the honest claim, not a benchmark.
+
+**Table 62.1: REAL-6, fold 0's held-out users (5 users; calibration leave-users-out within them): the encoder against the 3B; top-1 by corrected group on the right**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | ms per item, batched / one at a time | in history | labelled seen, not in history | determined by category | split category |
+|---|---|---|---|---|---|---|---|---|---|---|
+| encoder: Laya checkpoint, untrained | 298 | 9.1 [4.8, 12.8] | 25.8 | 3.83 | 0.0 (nan) | 14 / 20 | 13 | 14 | 7 | 0 |
+| encoder: ModernBERT-large, 1,500 steps | 298 | 53.4 [43.1, 63.5] | 72.5 | 2.34 | 15.1 (95.6) | 10 / 17 | 69 | 50 | 42 | 45 |
+| encoder: Laya init, 1,500 steps | 298 | 59.4 [50.7, 66.1] | 73.2 | 2.21 | 18.1 (98.1) | 10 / 17 | 72 | 47 | 54 | 48 |
+| encoder: Laya init, 4,000 steps | 298 | 59.1 [50.8, 65.2] | 74.2 | 2.19 | 8.4 (76.0) | 9 / 16 | 69 | 50 | 56 | 45 |
+| 3B SFT no DB, all-label (H100 bf16) | 298 | 74.2 [63.8, 80.3] | 87.6 | 1.46 | 12.8 (84.2) | - | 77 | 61 | 81 | 52 |
+| 3B database episodes (H100 bf16) | 298 | 88.3 [80.7, 94.8] | 96.3 | 0.69 | 31.5 (90.4) | - | 91 | 75 | 97 | 59 |
+| encoder + record: ModernBERT-large | 298 | 75.2 [69.0, 82.3] | 90.3 | 1.30 | 36.2 (99.1) | 10 / 22 | 78 | 83 | 72 | 66 |
+| encoder + record: Laya init | 298 | 76.5 [70.1, 83.7] | 95.0 | 1.25 | 52.7 (89.2) | 9 / 17 | 81 | 78 | 76 | 59 |
+| 3B + record in the prompt (H100 bf16) | 298 | 82.9 [76.8, 90.1] | 96.0 | 0.77 | 20.8 (91.9) | - | 86 | 81 | 92 | 45 |
+| 3B + record with category (H100 bf16) | 298 | 85.2 [77.9, 92.2] | 97.0 | 0.61 | 65.8 (98.0) | - | 88 | 72 | 98 | 34 |
+
+**Table 62.2: POI-1, fold 0's held-out users (50 users), readers trained on POI-1's other users**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | ms per item, batched / one at a time |
+|---|---|---|---|---|---|---|
+| encoder: ModernBERT-large, 1,500 steps | 507 | 57.6 [53.4, 61.9] | 81.1 | 1.97 | 5.7 (93.1) | 7 / 36 |
+| encoder: Laya init, 1,500 steps | 507 | 57.0 [52.4, 62.5] | 79.7 | 1.99 | 7.3 (94.6) | 7 / 40 |
+| 3B, 200 steps | 507 | 57.8 [53.4, 62.1] | 76.5 | 2.12 | 10.7 (96.3) | - |
+| 3B, 800 steps | 507 | 55.4 [50.4, 60.1] | 73.6 | 2.27 | 4.7 (95.8) | - |
+| 3B, 800 steps + rename | 507 | 59.2 [55.5, 63.2] | 78.5 | 1.94 | 16.4 (92.8) | - |
+
+### 62.1 What the encoder does and does not do
+
+**Untrained, Laya's checkpoint is useless here (9%).** Its training (general decisions, 512 tokens) does not carry over to a user's
+own categories with shots. Trained for 1,500 steps it reaches 59.4 (plain ModernBERT 53.4; the Laya start is worth a few points,
+within the interval). 4,000 steps add nothing.
+
+**On REAL-6 the gap is merchant knowledge.** Without the record the encoder trails the 3B by 15 points (59 against 74) and the
+database-episode 3B by 29. The gap is largest where the merchant's standard category decides the answer: 42 to 56% against 81 to 97%.
+The 3B knows from pre-training what "GOLD'S GYM" or "BARTELL DRUGS" is; the encoder has to learn it from the training rows. On
+merchants in the user's history the two are closer (69 to 72 against 77).
+
+With the record in the input the encoder reaches 75 to 77, 8 points under the 3B with the record (83 to 85). Its top-3 is 95.0
+against 96 to 97, and it has the highest auto-file coverage in the table (52.7% of items at a threshold chosen for 98%). But that
+threshold realises 89% precision on these five users: the calibration drift of section 59, sharper with five users to fit on.
+
+**On POI-1 the encoder is level with the 3B.** It reaches 57.6 against 55.4 to 59.2, and its top-3 is better (81 against 74 to 79).
+POI-1's places carry their kind in the name ("Northside Pediatrics"), and the task is reading the user's 24 examples, not recalling
+what an obscure merchant sells. That is exactly what the layout is for, and it does it at 7 ms per item batched on an H100.
+
+### 62.2 What the step says
+
+For Q1 (multiple-choice mechanics), an encoder trained to choose among runtime-defined options, one scored marker each, does the
+in-prompt part of the job as well as a 3B decoder: it reads the shots, which GLiClass could not (section 46). What it lacks is
+world knowledge about merchants, which is where a decoder's pre-training pays.
+
+For Q2 (knowledge injection), the encoder's weakness is fixed most cheaply by the record (+16 to 22 points). That points to a
+production shape: a places or merchants database supplies the facts, and a small encoder reads them with the user's examples.
+
+Open:
+
+- all four folds (fold 0 has five REAL-6 users, so the intervals are wide);
+- database episodes for the encoder (does it store merchant facts as the 3B did?);
+- calibration objectives (soft targets, a bounded proper score beside the log score, temperature by option count), measured by bits,
+  ECE and coverage at a realised 98%;
+- pre-training the layout on general multiple-choice data before our task.
