@@ -1,0 +1,6 @@
+outs:
+- md5: 8753becc701ee675aa9ccd1fdd290b51.dir
+  size: 1684141343
+  nfiles: 2
+  hash: md5
+  path: encmask_mbert_st1500_r68_f1_objlogsph

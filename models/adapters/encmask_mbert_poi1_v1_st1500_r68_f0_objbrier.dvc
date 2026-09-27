@@ -1,0 +1,6 @@
+outs:
+- md5: cd634130f3fff27e7f343806744619ae.dir
+  size: 1684141357
+  nfiles: 2
+  hash: md5
+  path: encmask_mbert_poi1_v1_st1500_r68_f0_objbrier

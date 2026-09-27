@@ -3,7 +3,8 @@
 cross-entropy + Brier (exp_encoder_mask.py OBJ), four folds, each fold's model read on its own held-out users and the folds pooled.
 
   O.1  per objective and set: top-1, NLL and ECE raw, ECE after a temperature fitted on the other three folds' items (leave-fold-out),
-       AURC, coverage at a realised 98% and 95% precision (thresholds chosen leave-fold-out), and the scorecard's bits left
+       ECE after one temperature per option-count bucket (<= 12, 13 to 16, >= 17 categories; Laya's per-count calibration), AURC,
+       coverage at a realised 98% and 95% precision (thresholds chosen leave-fold-out), and the scorecard's bits left
 usage: uv run python scripts/objectives_tables.py
 """
 import json
@@ -46,8 +47,8 @@ if __name__ == "__main__":
     sets.append(("POI-1", "real6_encmask_mbert_poi1_v1_st1500_r68", {i["id"]: i for i in doc["items"]}, {u["user"]: u for u in doc["users"]}))
     print("**Table O.1: the [MASK] encoder by training objective, four folds pooled (each item read by the model that held its user out); "
           "temperature and thresholds fitted leave-fold-out; ECE in points over 10 bins, AURC in % risk**\n")
-    print("| set | objective | n | top-1 | NLL raw | ECE raw | T (mean) | ECE tempered | AURC | coverage at 98% (realised precision) | coverage at 95% (precision) | bits left |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    print("| set | objective | n | top-1 | NLL raw | ECE raw | T (mean) | ECE tempered | ECE, a temperature per option count | AURC | coverage at 98% (realised precision) | coverage at 95% (precision) | bits left |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for sname, prefix, items, users in sets:
         for oname, sfx in OBJS:
             recs = pooled(prefix, sfx, items)
@@ -64,6 +65,17 @@ if __name__ == "__main__":
                     ts[i] = t
                 return {i: CA.softmax(z[i], t) for i in own}
             p_t = leave_fold(recs, items, temp)
+            bucket = lambda i: 0 if len(z[i]) <= 12 else 1 if len(z[i]) <= 16 else 2  # noqa: E731
+            def temp_k(fit, own):
+                out = {}
+                for b in range(3):
+                    f_b = [i for i in fit if bucket(i) == b] or fit; o_b = [i for i in own if bucket(i) == b]
+                    if o_b:
+                        t = CA.fit_temperature(CA.pad([z[i] for i in f_b]), np.array([y[i] for i in f_b]))
+                        out.update({i: CA.softmax(z[i], t) for i in o_b})
+                return out
+            p_k = leave_fold(recs, items, temp_k)
+            ece_k = 100 * CA.ece(np.array([p_k[i].max() for i in ids]), corr)
             conf_t = np.array([p_t[i].max() for i in ids])
             def cover(prec):
                 acc = []
@@ -76,4 +88,4 @@ if __name__ == "__main__":
             c98, p98 = cover(0.98); c95, p95 = cover(0.95)
             sc = S.scorecard(recs, items, users=users)
             print(f"| {sname} | {oname} | {len(ids)} | {100 * corr.mean():.1f} | {nll_raw:.3f} | {100 * CA.ece(conf, corr):.1f} | {np.mean(list(ts.values())):.2f} | "
-                  f"{100 * CA.ece(conf_t, corr):.1f} | {100 * CA.aurc(conf_t, corr):.1f} | {c98:.1f} ({p98:.1f}) | {c95:.1f} ({p95:.1f}) | {sc['bits']:.2f} |")
+                  f"{100 * CA.ece(conf_t, corr):.1f} | {ece_k:.1f} | {100 * CA.aurc(conf_t, corr):.1f} | {c98:.1f} ({p98:.1f}) | {c95:.1f} ({p95:.1f}) | {sc['bits']:.2f} |")

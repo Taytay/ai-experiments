@@ -1062,6 +1062,8 @@ that change what is learned are soft targets, a bounded proper score beside the 
 Yang et al. 2022, is the prior art for [MASK]-per-option encoders trained on many MC datasets); read by bits, ECE, AURC and coverage
 at a realised 98% precision on held-out users, which is what auto-filing needs.
 
+**Status (2026-09-27):** PLAN step 68 (first stage), REPORT.md 72: the objective (ce, label smoothing, log + spherical, ce + Brier) does not buy trustworthy confidence; a temperature fitted on other users does (ECE ~5 for every arm but label smoothing, which caps confidence and ruins the ranking). Soft targets and MC pre-training not run.
+
 **MODEL-10 Can GLiClass-type and instruction-tuned masked-LM encoders be made to work as user categorisers?** Section 46's GLiClass
 (151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the rows) was hurt by the 24 shots;
 section 29's ModernBERT was plain ModernBERT-large taught letters in 800 steps and stayed at chance. Neither had what row 53's

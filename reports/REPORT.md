@@ -5196,3 +5196,50 @@ categories alone; if the decoy case matters, both. Hypothesis 4 holds for the de
 (with empty categories).
 
 Tables: `uv run python scripts/li_training_tables.py`. Job list: `scripts/modal_jobs/r74.json`.
+
+
+## 72. Training objectives for the encoder's confidence: cross-entropy, label smoothing, log + spherical score and cross-entropy + Brier give the same accuracy (56 to 59); all but label smoothing are over-confident raw (REAL-6 ECE 25 to 28 points) and one temperature fitted on other users fixes that (ECE about 5); label smoothing looks calibrated raw but ranks its confident answers worse, so its auto-file coverage collapses (MODEL-9)
+
+PLAN step 68, first stage. MODEL-9 asks which training objective makes a multiple-choice encoder's confidence trustworthy (the owner,
+2026-09-26: Jev trains with a loss that accounts for confidence). The row 53 encoder (ModernBERT-large, one scored [MASK] per
+category, 1,500 steps, no record) was trained on each of four folds with four objectives (`exp_encoder_mask.py OBJ`), each a strictly
+proper scoring rule or a smoothed one:
+
+- **ce:** cross-entropy (the log score), the baseline;
+- **ls:** label smoothing 0.1, spread over the valid options only;
+- **logsph:** log score minus the spherical score p_y / ||p||_2, the pair behind Laya's RL training (section 62; here with its exact
+  gradient, no sampling);
+- **brier:** cross-entropy plus the Brier score, as decider and kev offer.
+
+Every item is read by the fold model that held its user out. Temperatures and auto-file thresholds are fitted on the other three folds'
+items (`scripts/objectives_tables.py`; the metric definitions are `ai_experiments.calibration`'s, after kev's `metrics.py`). A first
+launch of the label-smoothing arm spread mass onto padded options (the model fills them with -1e4, not -inf); it was fixed and rerun.
+
+**Table 72.1: the [MASK] encoder by training objective, four folds pooled (each item read by the model that held its user out); temperature and thresholds fitted leave-fold-out; ECE in points over 10 bins, AURC in % risk**
+
+| set | objective | n | top-1 | NLL raw | ECE raw | T (mean) | ECE tempered | ECE, a temperature per option count | AURC | coverage at 98% (realised precision) | coverage at 95% (precision) | bits left |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| REAL-6 | cross-entropy | 1179 | 56.7 | 2.436 | 27.8 | 2.93 | 5.3 | 4.7 | 17.1 | 12.9 (97.4) | 30.8 (93.9) | 2.11 |
+| REAL-6 | label smoothing 0.1 | 1179 | 56.6 | 1.603 | 13.2 | 1.25 | 9.5 | 8.8 | 20.6 | 2.8 (69.7) | 8.6 (87.1) | 2.25 |
+| REAL-6 | log + spherical score | 1179 | 56.4 | 2.515 | 25.5 | 3.00 | 5.2 | 5.7 | 18.2 | 3.8 (95.6) | 22.3 (92.4) | 2.22 |
+| REAL-6 | cross-entropy + Brier | 1179 | 58.8 | 2.396 | 24.7 | 2.83 | 5.1 | 3.9 | 17.3 | 11.1 (96.2) | 16.7 (93.4) | 2.15 |
+| POI-1 | cross-entropy | 2053 | 56.5 | 1.457 | 11.8 | 1.34 | 1.9 | 1.8 | 22.4 | 5.2 (97.2) | 9.8 (94.5) | 2.01 |
+| POI-1 | label smoothing 0.1 | 2053 | 55.9 | 1.431 | 7.0 | 1.03 | 5.7 | 5.4 | 22.5 | 4.7 (96.9) | 10.1 (95.7) | 2.06 |
+| POI-1 | log + spherical score | 2053 | 56.2 | 1.423 | 12.2 | 1.31 | 4.1 | 4.3 | 22.1 | 5.7 (94.8) | 13.2 (95.2) | 1.97 |
+| POI-1 | cross-entropy + Brier | 2053 | 55.8 | 1.428 | 11.7 | 1.31 | 3.3 | 3.5 | 21.9 | 8.7 (97.2) | 15.3 (94.9) | 1.99 |
+
+### 72.1 What the step says
+
+- **The objective does not buy trustworthy confidence; a temperature does.** Raw, the cross-entropy encoder on REAL-6 is badly
+  over-confident (ECE 27.8 points, fitted temperature 2.9); log + spherical and Brier move that by 2 to 3 points. One temperature fitted
+  on other users brings every objective to ECE 5 or so; a temperature per option-count bucket (Laya's scheme) adds little (3.9 to 5.7).
+- **Label smoothing is the trap.** It lowers raw ECE (13.2 against 27.8) because it caps the top probability, but it flattens the
+  ranking among confident answers: AURC 20.6 against 17.1, and at a 98% target its out-of-fold threshold accepts 2.8% of items at a
+  realised 69.7%. For auto-filing, which needs the most confident answers to be right, it is the worst of the four.
+- **Accuracy is unchanged** (REAL-6 56.4 to 58.8, POI-1 55.8 to 56.5), so coverage at 98% stays small for every objective (4 to 13%
+  on REAL-6): at 57% top-1 there are few items an encoder can be sure of. Confidence is limited by accuracy here, not by the loss.
+- Not run in this stage: soft targets from a calibrated teacher, and general multiple-choice pre-training before the task. Given that a
+  temperature already calibrates every arm, a teacher could matter only through accuracy; the one-slot decoders of section 73 are the
+  better place to test confidence objectives.
+
+Tables: `uv run python scripts/objectives_tables.py`. Job lists: `scripts/modal_jobs/r68*.json`.
