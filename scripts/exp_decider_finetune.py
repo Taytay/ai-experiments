@@ -34,6 +34,9 @@ LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels 
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
 ABSTAIN_SWAP = float(os.environ.get("ABSTAIN_SWAP", "0.25"))  # ... and in this share of those the gold category is hidden (removed from the header
 ABSTAIN_OPT = "not listed here"  # and the options; shots keep its label), so the abstain option is the answer. decider's neutral wording
+EVFREE = float(os.environ.get("EVFREE", "0"))  # row 84: share of episodes made evidence-free (the query's merchant a fresh opaque name in no DB and no history)
+EVFREE_MODE = os.environ.get("EVFREE_MODE", "opt")  # opt: the answer is a last option CANT_TELL (shown on as many normal episodes too); soft: a uniform target over the options
+CANT_TELL = "cannot tell from this"  # decider's abstain wording family ("cannot tell" prefix)
 QUESTION = "Which of this user's categories does the last transaction belong to?"  # as exp_decision_models.py
 
 # exp_categoriser.py's episode builder under the same env (its module level up to the model code: config, data, sft_examples)
@@ -44,6 +47,7 @@ C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / 
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
 SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
+SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
 NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
@@ -74,6 +78,34 @@ def abstain_aug(e, rng):
         e = (ctx, opts + [ABSTAIN_OPT], len(opts)) + (([(a + d, b + d) for a, b in e[3]],) if len(e) > 3 else ())
         return e
     return (ctx, opts + [ABSTAIN_OPT], gold) + tuple(e[3:])
+
+
+def evfree_aug(e, rng):
+    """Row 84. With probability EVFREE the query transaction (the Context's last line) becomes a row of a fresh opaque merchant (never in
+    the DB, a history or REAL-6), amount from a random category; target: CANT_TELL added last (opt) or None, read as a uniform target
+    (soft). In opt mode CANT_TELL is also added to as many normal episodes, gold unchanged, so its presence carries no signal."""
+    if not EVFREE:
+        return e
+    ctx, opts, gold = e[0], list(e[1]), e[2]
+    if rng.random() < EVFREE:
+        from ai_experiments import merchants as M
+        from ai_experiments import transactions as T
+        import math
+        while True:
+            name = rng.choice(M._PREFIX) + rng.choice(M._MID) + rng.choice(M._SUFFIX) + rng.choice(M._TAG)
+            if name not in C["MERCHANT"]:
+                break
+        cat = rng.choice(M.CATEGORY_LIST); mu, sig = T.AMOUNT[cat]
+        m = dict(name=name, category=cat, city=rng.choice(M._CITIES))
+        head, last = ctx.rsplit("\n", 1)
+        assert last.startswith("Transaction: "), last[:40]
+        ctx = head + f"\nTransaction: {T.render(m, rng)} | ${math.exp(rng.gauss(mu, sig)):.2f} | {rng.choice(T.WEEKDAYS)}"
+        if EVFREE_MODE == "opt":
+            return (ctx, opts + [CANT_TELL], len(opts)) + tuple(e[3:])
+        return (ctx, opts, None) + tuple(e[3:])
+    if EVFREE_MODE == "opt" and rng.random() < EVFREE / (1 - EVFREE):
+        return (ctx, opts + [CANT_TELL], gold) + tuple(e[3:])
+    return e
 
 
 def episodes():
@@ -112,7 +144,7 @@ def main():
     model.train(); t0 = time.time(); losses = []; n_tok = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
-        picked = [abstain_aug(rng.choice(eps), rng) for _ in range(MICRO)]
+        picked = [evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
         built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
@@ -123,7 +155,11 @@ def main():
         N = max(len(b["labs"]) for b in built)  # each question's own label tokens; padded options at -inf
         z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float(), (0, N - len(b["labs"])), value=float("-inf"))
                          for i, b in enumerate(built)])
-        loss = F.cross_entropy(z, torch.tensor([b["gold"] for b in built], device="cuda"))
+        soft = torch.tensor([b["gold"] < 0 for b in built], device="cuda")  # row 84 soft: evidence-free, a uniform target over the options
+        gold = torch.tensor([max(b["gold"], 0) for b in built], device="cuda")
+        lz = F.log_softmax(z, -1).masked_fill(torch.isinf(z), 0.0)
+        per = torch.where(soft, -lz.sum(-1) / torch.tensor([len(b["labs"]) for b in built], device="cuda"), -lz.gather(1, gold[:, None])[:, 0])
+        loss = per.mean()
         if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
             rows, pos, tgt = [], [], []
             for i, e in enumerate(picked):
@@ -149,7 +185,8 @@ if __name__ == "__main__":
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
                poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
-               abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS)
+               abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
+               evfree=EVFREE, evfree_mode=EVFREE_MODE)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)

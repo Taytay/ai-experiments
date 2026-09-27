@@ -47,6 +47,7 @@ DECISION_CODE_REV = "60ea30a48285ea097a9b3a728e71649b78331601"  # the last Sol-2
 KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
 ADAPTER = os.environ.get("ADAPTER", "")
 ORDER_SEED = os.environ.get("ORDER_SEED", "")  # row 50: every item's options shuffled by this seed before scoring (and decider's own label order too), scores mapped back  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
+EXTRA_OPTS = [o for o in os.environ.get("EXTRA_OPTS", "").split("|") if o]  # row 84: options appended to every question (abstain options offered at inference); their scores follow the real options'
 LABELS = os.environ.get("LABELS", "letters")  # FAMILY=decider: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
@@ -55,7 +56,7 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}"
+TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}"
 
 
 def state_of(it, cond):
@@ -66,7 +67,7 @@ def state_of(it, cond):
 
 
 def options_of(it):
-    return [o.strip() for o in it["options"]]
+    return [o.strip() for o in it["options"]] + [o for o in EXTRA_OPTS if o not in (x.strip() for x in it["options"])]
 
 
 # --- the four families: each returns score(items, cond) -> list of per-option log-prob lists --------------------------------
