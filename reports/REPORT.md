@@ -5845,3 +5845,20 @@ labels and random labels + ALT.
 Limits: fold 0, two seeds, six shots of the merchant in every item, one test threshold ($40) and one day set (Fri / Sat).
 
 Tables: `uv run python scripts/alternation_tables.py`. Items: `scripts/build_alternation.py`. Job lists: `scripts/modal_jobs/r86*.json`.
+
+## 87. Scale: Qwen3.5-9B in the one-slot layout with the best recipe matches decider-4B (REAL-6 87.2, novel names 89.3, auto-filed 69.1% at 98.1%) and does not pass it; what is left on these sets is taught by training, not bought by size (MODEL-16)
+
+PLAN step 87. Qwen3.5-9B (Apache-2.0), trained in decider's one-slot layout with row 81's recipe + random A..Z labels (shot-label
+loss, database episodes, rename 0.5), 800 steps, one seed; 49 training minutes on one H100 (4B: about 38), 31 GiB peak.
+
+| reader | seeds | REAL-6 top-1 [interval] | top-3 | bits left | auto-filed at 98% (precision) | novel names | misleading-name set, all items | alternation set, all items |
+|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-9B one slot, recipe + random labels | 1 | 87.2 [78.0, 93.4] | 98.3 | 0.63 | 69.1 (98.1) | 89.3 | 40.2 | 60.4 |
+| decider-4B, the same (row 84 control, seed 0) | 1 | 88.9 [80.3, 94.9] | 97.0 | 0.66 | 67.1 (97.0) | – | 40.9 (row 81) | 61.6 (two seeds) |
+
+The 9B reads like the 4B on every set: REAL-6 is 2 points under its ceiling for both, and the misleading-name, override,
+evidence-free and alternation behaviours of sections 80 to 86 were set by what training showed, not by model size (the 4B untrained
+on them fails them in the same way the 9B does here). Scale is not the lever for these questions; decider-35B-A3B (an H200 run) is
+deprioritised until a set shows a gap that training does not close.
+
+Job list: `scripts/modal_jobs/r87.json`.
