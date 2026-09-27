@@ -4491,3 +4491,160 @@ Opus reaches, and with a decoy they fall to 58 to 60% of it (section 60).
 4. **Label induction's gap is the decoy and one-example cases** (section 60): train with decoys and empty categories.
 
 Models from rows 69 and 70 are in DVC (`models/adapters/categoriser_Qwen2.5-{7B,14B}-Instruct_*`, `enc{gli,mbi}_*`).
+
+## 65. Hop limits: one forward pass follows as many hops as it was trained to, plus one or two; a decoder follows one hop without a chain of thought and about five with one (14B); an encoder that writes each hop into its input and re-reads it follows all twelve after training on three; looping the encoder or labelling its inputs adds about one hop; the untrained diffusion and recurrent-depth models fail the task, except Dream-7B, whose denoising steps act as a chain of thought (MODEL-12)
+
+PLAN row 71, the owner's question (2026-09-26): given "foo = bar", "bar = baz", ..., how many hops can a model follow, for
+single-token and multi-token names, encoders against decoders, and can "thinking" steps raise an encoder's limit? The owner also
+asked for a looping encoder and a diffusion model.
+
+**The item set** (`scripts/build_hops.py`, `data/processed/hops_v2.json`). Each item lists equalities "- a = b", one per line,
+shuffled: four chains of k links each, the target and three distractors of the same length. The question names the target's start
+and asks where its chain ends. k runs from 1 to 12; 50 items per k and name type. Names are either single tokens in every reader's
+tokenizer (common English words, 4 to 8 letters, from wordfreq) or coined syllable strings of 2 to 4 Qwen2.5 tokens. Six options:
+the end and the one-hop-short name of each of three chains (at k = 1 the start), so chance is 17 and a reader that only finds chain
+ends scores 33. Training chains for the encoders come from the other half of the name pools, so no test name is seen in training.
+
+**v1 had a shortcut, caught by a control.** The first set (`hops_v1`) offered the target chain's intermediate names but only the
+other chains' ends, so "the end one link away from another option" was always the gold. The plain encoder trained on k <= 3 read
+88 to 100 at every k up to 12. A control with the target's middle link deleted (the start can no longer reach the old end) showed
+it still picking the old end at k >= 4 (64 to 98%). v2 makes the options symmetric; the v1 encoder runs were stopped and every arm
+was rerun on v2. The final control, `hops_v2_cutlast`, deletes the target's last link, so the start's chain now ends at the
+one-short name, which v2 always offers: a reader that follows links moves its pick to the new end, one that recognises the old end
+by any other cue does not. v1's untrained-reader results (Huginn, the diffusion models) stand, since an untrained reader has no way
+to learn the leak and the decoders read the same on both versions.
+
+**Readers** (`scripts/exp_hops.py`, `scripts/exp_hops_encoder.py`; Modal job lists `r71*.json`):
+
+- Qwen2.5-Instruct 0.5B to 14B, untrained: the options scored after "Answer:" (one pass), and after a greedy chain of thought of up
+  to 768 tokens.
+- ModernBERT-large in row 53's layout (a [MASK] before each option, Laya's head), trained 3,000 steps on fresh chains:
+  - plain, trained on k <= 3 or on k <= 12;
+  - looped: layers 9 to 17 repeated r times with tied weights, r drawn from 1 to 4 in training, tested at r = 1 to 12;
+  - labelled lines (the owner's idea): a [MASK] before every statement too, with and without a hop loss that makes each line's
+    [MASK] point at the line continuing its chain;
+  - scratch rounds: one hop per forward pass, the path so far written into the input, the next line or "the end" picked, up to 16
+    rounds.
+- Huginn-0125 (3.5B recurrent depth), 1 to 64 recurrences, options scored.
+- Diffusion LMs, untrained: LLaDA-8B-Instruct, Dream-v0-Instruct-7B (initialised from Qwen2.5-7B), LFM2.5-Encoder-350M-Diffusion.
+  Options scored with the answer slot masked (one step, and the chain rule one slot at a time); and generation with a chain-of-thought
+  instruction, 192 masked tokens filled in 24, 96 or 192 denoising steps (10 items per cell, 20 for LFM). Huginn, Dream and LLaDA
+  run on transformers 4.57 (their remote code predates the project's 5.5).
+
+**Table 65.1: hops_v2, accuracy (%) by hops k, single-token names (multi-token names within a few points everywhere; full grids,
+both name types, in `scripts/hops_tables.py`)**
+
+| reader | k=1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | limit (every k up to it >= 80) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B, one pass | 82 | 22 | 18 | 12 | 22 | 12 | 20 | 18 | 16 | 1 |
+| Qwen2.5-7B, one pass | 100 | 56 | 30 | 22 | 22 | 20 | 36 | 34 | 22 | 1 |
+| Qwen2.5-14B, one pass | 94 | 62 | 56 | 40 | 28 | 26 | 38 | 34 | 34 | 1 |
+| Qwen2.5-3B, chain of thought | 72 | 52 | 58 | 44 | 60 | 46 | 50 | 42 | 40 | 0 |
+| Qwen2.5-7B, chain of thought | 40 | 100 | 92 | 82 | 62 | 48 | 32 | 24 | 28 | 0 (k = 2 to 4 >= 80) |
+| Qwen2.5-14B, chain of thought | 100 | 92 | 88 | 80 | 80 | 76 | 56 | 46 | 44 | 5 |
+| encoder, trained k <= 3 | 100 | 100 | 100 | 88 | 34 | 26 | 18 | 14 | 30 | 4 |
+| encoder, labelled lines | 100 | 100 | 100 | 100 | 88 | 60 | 40 | 26 | 34 | 5 |
+| encoder, labelled lines + hop loss | 100 | 100 | 100 | 98 | 86 | 38 | 40 | 28 | 42 | 5 |
+| looped encoder, k <= 3, r = 1 | 100 | 100 | 100 | 94 | 54 | 44 | 40 | 38 | 34 | 4 |
+| looped encoder, k <= 3, r = 4 (trained max) | 100 | 100 | 100 | 100 | 78 | 54 | 32 | 28 | 24 | 4 |
+| looped encoder, k <= 3, r = 12 | 100 | 100 | 98 | 100 | 80 | 52 | 36 | 28 | 24 | 5 |
+| encoder, trained k <= 12 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 12 |
+| looped encoder, k <= 12, r = 4 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 12 |
+| looped encoder, k <= 12, r = 12 | 100 | 100 | 100 | 100 | 98 | 98 | 88 | 56 | 30 | 8 |
+| encoder, scratch rounds, trained k <= 3 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 100 | 12 |
+
+**Table 65.2: the control (hops_v2_cutlast, the target's last link removed): % picking the new end / % still picking the removed
+end, by the hops left, both name types**
+
+| encoder | k=2 | 4 | 5 | 6 | 8 | 11 |
+|---|---|---|---|---|---|---|
+| trained k <= 12 | 100 / 0 | 99 / 1 | 99 / 1 | 98 / 2 | 95 / 5 | 98 / 2 |
+| scratch rounds, trained k <= 3 | 100 / 0 | 100 / 0 | 100 / 0 | 100 / 0 | 99 / 0 | 99 / 0 |
+| trained k <= 3 | 100 / 0 | 85 / 14 | 24 / 66 | 16 / 79 | 15 / 72 | 15 / 70 |
+| labelled lines | 100 / 0 | 98 / 0 | 78 / 7 | 58 / 15 | 39 / 11 | 35 / 6 |
+| labelled lines + hop loss | 100 / 0 | 98 / 0 | 68 / 7 | 41 / 14 | 28 / 16 | 29 / 11 |
+| looped, k <= 3, r = 8 | 99 / 0 | 97 / 0 | 63 / 0 | 37 / 3 | 13 / 0 | 11 / 3 |
+
+**Table 65.3: the untrained diffusion and recurrent-depth models (hops_v1; accuracy %, single-token names, k = 1 / 2 / 3 / 6 / 10)**
+
+| reader | k=1 | 2 | 3 | 6 | 10 |
+|---|---|---|---|---|---|
+| LLaDA-8B, one step (options scored) | 72 | 74 | 40 | 18 | 20 |
+| Dream-7B, one step | 56 | 32 | 18 | 18 | 16 |
+| Dream-7B, generation, 24 / 96 / 192 denoising steps (10 items) | 0 / 40 / 20 | 60 / 30 / 10 | 50 / 50 / 60 | 20 / 40 / 60 | 10 / 20 / 50 |
+| LLaDA-8B, generation, 192 steps | 0 | 10 | 0 | 0 | 20 |
+| LFM2.5-Encoder-350M-Diffusion, one step / 192 steps | 48 / 20 | 14 / 5 | 8 / 15 | 26 / 15 | 14 / 5 |
+| Huginn-0125, 1 / 16 / 64 recurrences | 22 / 38 / 36 | 10 / 16 / 14 | 26 / 16 / 16 | 14 / 14 / 18 | 22 / 12 / 18 |
+
+(Dream's multi-token rows are similar: 192 steps reads 30 to 70 at k = 3 to 11.)
+
+**What the tables say.**
+
+1. **Without a chain of thought every decoder follows one hop.** 7B and 14B read 94 to 100 at k = 1 and fall to 20 to 60 from k = 2.
+   On v1, 94% of the 14B's wrong picks were another chain's end: it finds where chains end but not which chain it started on.
+2. **A chain of thought extends the limit with size.** The 14B stays at 80 or above to k = 5 and near 45 at k = 10 to 12; the 7B to
+   k = 4; the 3B gains little (about 50 at every k); 1.5B and 0.5B are at chance either way. The chains of thought are short (on v1, 14B: 87
+   tokens on average, two items of 1,200 hit the 768-token cap), so the budget is not the limit. The 14B's long-chain failures are
+   lookup failures: it writes nine links correctly, misses the statement for the tenth, and declares the chain over. The 7B's
+   k = 1 failures (40) are the reverse: it invents further links that are not in the statements.
+3. **A trained encoder's one-pass limit is set by its training, not its depth.** Trained on k <= 3 it holds to k = 4 and collapses at
+   5, and beyond its range it guesses (it mostly picks a removed end the control makes unreachable). Trained on k <= 12 the same
+   network reads 100 at every k, and the control confirms it follows the links (95 to 99 move to the new end). So 28 layers of
+   bidirectional attention can resolve 12 hops in one pass; what they do not do is extrapolate past the hop counts seen in training.
+4. **Thinking rounds remove the limit.** The encoder that writes each hop into its input and re-reads it, trained only on k <= 3,
+   reads 100 at every k to 12 and passes the control perfectly. It learns a one-hop step, and the rounds compose it, exactly as a
+   chain of thought does for the decoder, but without the decoder's lookup misses.
+5. **Looping, labelling and a hop loss each add about one hop.** Looping to the trained maximum (r = 4) lifts k = 5 from 54 to 78;
+   looping further (r = 8 to 12) adds a few points at k = 5 and nothing beyond, and on the network trained to k = 12, 12 loops start
+   to break it (k = 10: 56). Labelled lines read 88 at k = 5; the hop loss makes the network refuse the unreachable end (7 to 16%
+   against 66 to 79% without) but does not lengthen the chain it can follow. None of the three matches training on long chains or
+   the scratch rounds.
+6. **The untrained diffusion and recurrent models mostly fail the task itself.** LLaDA, scored in one step, follows two hops on
+   single-token names (72, 74), better than any decoder's one pass, then drops to chance. Dream (from Qwen2.5-7B) follows one hop in
+   one step, like its parent; given room to write, more denoising steps help (24 steps: 0 to 60, often empty; 192 steps: 20 to 70
+   across k, correct ten-link chains at k = 10), the one diffusion result where denoising steps act as thinking, on 10 items per
+   cell. LLaDA's generations and LFM2.5's do not follow the instruction, and Huginn is at chance at every recurrence count (1 to 64),
+   so neither says anything about hop limits; they cannot do the task untrained.
+7. **Single-token against multi-token names makes no difference** for any reader (within a few points everywhere).
+
+**For the categoriser.** A categoriser decision is one to three hops (query -> a similar example -> its label -> an option). Every
+reader here does one to three hops in one pass, so hop count is unlikely to be what limits REAL-6 or POI-1 (sections 61 to 64 point
+to what the prompt shows). The one lesson that carries over is section 63's: a trained encoder does what it was trained on, and a
+short-hop training distribution gives a short-hop reader.
+
+**Limits.** One seed per arm; the encoders see a synthetic, tidy format (one statement per line) and the decoders are untrained, so
+"encoder beats decoder" here is "trained beats untrained", not an architecture result. The diffusion generations are 10 items per
+cell. Huginn and LFM2.5 would need training on the format to be tested fairly.
+
+Tables: `uv run python scripts/hops_tables.py`. Items: `scripts/build_hops.py` (v1, v2, the cut controls). Models:
+`models/adapters/hops_enc_*.dvc`.
+
+## 66. Does the hop-trained encoder transfer to the categoriser? Not zero-shot; after 200 steps on POI-1 it matches Laya's pretrained checkpoint (48.5 against 47.3, ModernBERT 40.2), on REAL-6 it does not help, and by 1,500 steps every start converges (MODEL-13)
+
+PLAN row 76, the owner's idea (2026-09-26): train an encoder on the multiple-choice hop task and see whether the skill generalises
+to the original task. Row 53's categoriser (Laya's layout on ModernBERT-large, `scripts/exp_encoder_mask.py`, new `INIT=hops`) is
+started from a row 71 v2 hop encoder (the plain options arm, or labelled lines + hop loss; same encoder, head and scorer) instead of
+ModernBERT-large or Laya's checkpoint, and read on fold 0's held-out users after 0, 200 and 1,500 steps (one seed).
+
+**Table 66.1: top-1 [user-resampled interval] / bits left, fold 0**
+
+| start | REAL-6, 0 steps | REAL-6, 200 | REAL-6, 1,500 | POI-1, 0 steps | POI-1, 200 | POI-1, 1,500 |
+|---|---|---|---|---|---|---|
+| ModernBERT-large | - | 23.2 [17.8, 31.9] / 3.45 | 53.4 [43.1, 63.5] / 2.34 | - | 40.2 [34.8, 45.5] / 2.80 | 57.6 [53.4, 61.9] / 1.97 |
+| Laya checkpoint | 9.1 / 3.83 | 29.9 [25.8, 34.4] / 3.13 | 59.4 [50.7, 66.1] / 2.21 | 15.8 / 3.85 | 47.3 [43.0, 51.8] / 2.44 | 57.0 [52.4, 62.5] / 1.99 |
+| hop encoder, plain | 6.7 / 3.82 | 20.8 [16.1, 27.5] / 3.39 | 60.1 [47.1, 69.2] / 2.15 | 6.7 / 4.01 | 48.5 [43.6, 53.3] / 2.41 | 57.2 [53.2, 61.8] / 1.95 |
+| hop encoder, labelled + hop loss | 5.0 / 3.82 | 21.8 [15.4, 31.9] / 3.40 | 53.4 [45.9, 60.3] / 2.19 | 9.5 / 4.01 | 44.4 [39.5, 49.1] / 2.75 | 55.6 [51.2, 60.2] / 1.99 |
+
+- **Zero-shot nothing transfers:** the hop encoder is at chance on real categories (REAL-6's chance is near 8, POI-1's near 10).
+- **At 200 steps on POI-1 the plain hop start is 8 points over ModernBERT** and level with Laya's checkpoint, which was pretrained on
+  multiple choice: learning to choose among options on chains buys about what Laya's pretraining buys. On REAL-6, where the decision
+  rests on knowing the merchant, it does not help (21 against 23 and 30).
+- **By 1,500 steps all starts are within noise** (53 to 60 on REAL-6, 56 to 58 on POI-1): the categoriser learns to choose from its
+  own data. The labelled-lines start is no better than the plain one; its line pointers have nothing to attach to in the
+  categoriser's layout.
+
+**Hypothesis.** What transfers is the option-scoring head's habit of comparing option names with the text (useful where the
+category name is readable, POI-1), not a general reasoning skill; a multiple-choice warm-up would matter only when the categoriser's
+own training data is small. Testable with two more seeds at 200 steps and a 50-step point.
+
+Tables: `uv run python scripts/transfer_tables.py`. Job list: `scripts/modal_jobs/r76.json`.
