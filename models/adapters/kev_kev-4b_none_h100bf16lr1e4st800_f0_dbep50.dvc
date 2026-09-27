@@ -1,0 +1,6 @@
+outs:
+- md5: 925259c3dcc3669cf372bd8bdbe75bb3.dir
+  size: 155189635
+  nfiles: 9
+  hash: md5
+  path: kev_kev-4b_none_h100bf16lr1e4st800_f0_dbep50
