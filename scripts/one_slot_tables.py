@@ -36,7 +36,9 @@ if __name__ == "__main__":
                    ("decider-2B, one slot, 800 steps", "real6_dm_decider_decider_decider-2b_none_h100bf16st800_f0_dbep50_lora_real6.noctx.jsonl"),
                    ("decider-2B, one slot + shot-label loss, 200 steps", "real6_dm_decider_decider_decider-2b_none_h100bf16_f0_dbep50_aux100_lora_real6.noctx.jsonl"),
                    ("decider-2B, one slot + shot-label loss, 800 steps", "real6_dm_decider_decider_decider-2b_none_h100bf16st800_f0_dbep50_aux100_lora_real6.noctx.jsonl"),
-                   ("kev-4B fine-tuned (its trainer, from the released checkpoint)", "real6_dm_kev_kev_kev-4b_none_h100bf16_f0_dbep50_real6.noctx.jsonl"),
+                   ("decider-4B, one slot + shot-label loss, 800 steps", "real6_dm_decider_decider_decider-4b_none_h100bf16st800_f0_dbep50_aux100_lora_real6.noctx.jsonl"),
+                   ("Qwen3.5-4B, per-option loss + all-label (row 78), 200 steps", "real6_categoriser_Qwen3.5-4B_none_h100bf16_hf_f0_alllab_dbep50_lora_hfs.noctx.jsonl"),
+                   ("kev-4B fine-tuned (its trainer, from the released checkpoint), lr 2e-5, 200 steps", "real6_dm_kev_kev_kev-4b_none_h100bf16_f0_dbep50_real6.noctx.jsonl"),
                    ("kev-4B fine-tuned, lr 1e-4, 800 steps", "real6_dm_kev_kev_kev-4b_none_h100bf16lr1e4st800_f0_dbep50_real6.noctx.jsonl"),
                    ("decider-2B zero-shot", "real6_dm_decider_decider-2b_real6.noctx.jsonl"),
                    ("kev-4B zero-shot", "real6_dm_kev_kev-4b_real6.noctx.jsonl")]:
@@ -49,6 +51,7 @@ if __name__ == "__main__":
     print(HEAD + " seen-kind top-1 | unseen-kind top-1 |"); print("|---|---|---|---|---|---|---|---|")
     for lab, f in [("Qwen3.5-2B, per-option loss + all-label (row 78)", f"{Q35}_poi1_v1_none_h100bf16_hf_pkind_pdesc_uns50_f0_ren50_alllab_lora_poi1_v1_desc_kshots_kinds_hfs.noctx.jsonl"),
                    ("Qwen3.5-2B, one slot", "real6_dm_decider_slot_Qwen3.5-2B_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora_poi1_v1_desc_kshots_kinds.noctx.jsonl"),
+                   ("decider-4B, one slot + shot-label loss", "real6_dm_decider_decider_decider-4b_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_aux100_lora_poi1_v1_desc_kshots_kinds.noctx.jsonl"),
                    ("decider-2B, one slot (row 77)", "real6_dm_decider_decider_decider-2b_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora_poi1_v1_desc_kshots_kinds.noctx.jsonl")]:
         recs = O.load(f)
         ex = f" {O.top1(recs, poi, lambda i: i['seen']):.1f} | {O.top1(recs, poi, lambda i: not i['seen']):.1f} |"
