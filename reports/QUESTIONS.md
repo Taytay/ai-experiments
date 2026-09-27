@@ -1055,6 +1055,8 @@ name's hidden states across layers (section 40's method): whether the standard c
 linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its
 name's representation after injection.
 
+**Status (2026-09-27):** PLAN step 67, REPORT.md 74: the decision forms by layers 12 to 15 of Qwen3.5-2B; database episodes write DB-only merchants' categories into the same representation as learned merchants (91% at the statement, 100% at the cue).
+
 **MODEL-9 Which training objective makes a multiple-choice encoder's confidence trustworthy?** The owner (2026-09-26): Jev trains
 with a loss that takes confidence into account, so the model learns when to claim high confidence. Cross-entropy is already a strictly
 proper scoring rule (its optimum is the true conditional distribution); over-confidence comes from fitting one-hot labels on finite

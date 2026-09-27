@@ -5298,3 +5298,60 @@ REAL-6's merchants are synthetic, so POI-1's real places test it:
   see often, retrieve the rest.
 
 Tables: `uv run python scripts/facts_skill_tables.py`. Job list: `scripts/modal_jobs/r66.json`.
+
+
+## 74. Where the decision forms and what the weights store: after training, the merchant's category is linearly readable from its statement string by layer 15 and at the answer cue by layer 12; database episodes write DB-only merchants' categories into the same representation (91% at the statement, 100% at the cue, against about 30% without them), so the injected facts sit where the model's own merchant knowledge sits (MODEL-8)
+
+PLAN step 67. MODEL-8 asks where in the network the categoriser's decision forms and what database episodes put in the weights.
+Following section 40's method, `scripts/exp_probes.py` runs every REAL-6 item's prompt (no record) through Qwen3.5-2B (row 78's open
+base) untrained, trained without a database (200 steps, all-label loss, fold 0) and trained with database episodes (row 78's adapter),
+and fits a logistic-regression probe on each layer's hidden state at two positions: the last token of the query's statement string,
+and the final "Category:" cue. The merchant's standard category (REAL-6's twelve) is probed with merchant-grouped five-fold
+cross-validation on the merchants some user labelled, and a probe trained on all of those is read on the DB-only merchants, whose
+category reaches the weights only through database episodes. At the cue, the gold label's standard category is probed with
+user-grouped folds.
+
+**Table 74.1: probe accuracy (%) at the last token of the query's statement string, by layer (0 = embeddings): the merchant's standard category, cross-validated by merchant / read on the 258 DB-only items**
+
+| layer | untrained | trained, no database | trained, database episodes |
+|---|---|---|---|
+| 0 | 9 / 9 | 9 / 9 | 9 / 9 |
+| 3 | 9 / 10 | 10 / 9 | 10 / 10 |
+| 6 | 9 / 11 | 19 / 14 | 25 / 22 |
+| 9 | 11 / 11 | 27 / 12 | 45 / 40 |
+| 12 | 15 / 13 | 63 / 25 | 78 / 74 |
+| 15 | 16 / 13 | 87 / 31 | 94 / 91 |
+| 18 | 16 / 16 | 80 / 28 | 88 / 85 |
+| 21 | 15 / 13 | 77 / 29 | 84 / 80 |
+| 24 | 18 / 16 | 79 / 29 | 89 / 85 |
+
+**Table 74.2: probe accuracy (%) at the final "Category:" token, by layer (0 = embeddings): the merchant's standard category, cross-validated by merchant / read on the 258 DB-only items / the gold label's standard category**
+
+| layer | untrained | trained, no database | trained, database episodes |
+|---|---|---|---|
+| 0 | 13 / 3 / 9 | 13 / 3 / 9 | 13 / 3 / 9 |
+| 3 | 12 / 12 / 39 | 12 / 10 / 31 | 11 / 10 / 36 |
+| 6 | 20 / 22 / 29 | 24 / 28 / 43 | 49 / 42 / 54 |
+| 9 | 25 / 20 / 41 | 72 / 29 / 72 | 83 / 72 / 84 |
+| 12 | 30 / 31 / 39 | 94 / 36 / 87 | 99 / 99 / 95 |
+| 15 | 32 / 31 / 50 | 96 / 38 / 90 | 99 / 100 / 95 |
+| 18 | 37 / 35 / 50 | 96 / 42 / 89 | 100 / 100 / 94 |
+| 21 | 38 / 33 / 37 | 95 / 41 / 84 | 100 / 100 / 88 |
+| 24 | 38 / 31 / 35 | 95 / 40 / 81 | 99 / 100 / 88 |
+
+### 74.1 What the step says
+
+- **Untrained, the category is barely there** (at most 18% at the statement, 38% at the cue): the base model reads the statement
+  string without committing to a spending category.
+- **Training writes the category into the merchant's representation mid-network.** Without a database, labelled merchants' categories
+  are readable at the statement position from layer 12 (63%) to 87% at layer 15, and at the cue at 94 to 96% from layer 12; the gold
+  label's category at the cue peaks at 90% around layer 15 and falls to 81% at the last layer, where the representation turns to the
+  option tokens.
+- **Database episodes put the facts in the same place.** DB-only merchants, never in a history, are readable at 91% at the statement
+  (layer 15) and 100% at the cue (from layer 12) after database episodes, against 29 to 42% without them. The probe that reads them
+  was trained on the other merchants, so the injected facts use the same directions as the model's learned ones: one representation
+  of "what this merchant is", filled from histories or from the database alike.
+- The no-database model reads REAL-6 at 72.5 on its own (fold 0), the database model at 86.9 (section 69): the probes show where that
+  difference lives.
+
+Tables: `uv run python scripts/probes_tables.py`. Job list: `scripts/modal_jobs/r67.json`.
