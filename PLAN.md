@@ -24,7 +24,7 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   strong-reader ceiling (`scripts/blind_ceiling.py`) for new item sets.
 - **Branches:** nothing is merged to main; the owner merges. Stack #24 in PR order ends ... #58 plan-49-calibration, #59
   plan-56-train-efficiency, #60 plan-57-db-episodes, #61 plan-34-modal, #62 plan-58-fair-record, #63 plan-60-batch, #64
-  plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (rows 64 to 78), plan-79-one-slot
+  plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (rows 64 to 78), #68 plan-79-one-slot
   (top, rows 79 on; owner 2026-09-27: a new layer to keep the stack organised). New work branches from the
   top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
   merge-forward: resolve as the union of rows by `run_id`, sorted.
