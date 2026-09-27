@@ -104,6 +104,7 @@ def run_llm(run):
         import unsloth  # noqa: F401
         from unsloth import FastLanguageModel
         model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
+        tok = getattr(tok, "tokenizer", tok)  # row 78: Qwen3.5 checkpoints are vision-language; unsloth returns their processor, which reads text as an image
     tok.padding_side = "right"; model.eval()
     if CHAT:
         assert R6.chat_wrap("x") == tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True), "chat template drift"

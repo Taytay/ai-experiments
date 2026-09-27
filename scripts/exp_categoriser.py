@@ -281,6 +281,7 @@ def load_llm():
         import unsloth  # noqa: F401
         from unsloth import FastLanguageModel
         model, tok = FastLanguageModel.from_pretrained(LLM_BASE, max_seq_length=MAXLEN, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
+        tok = getattr(tok, "tokenizer", tok)  # row 78: Qwen3.5 checkpoints are vision-language; unsloth returns their processor, which reads text as an image
         model = FastLanguageModel.get_peft_model(model, r=64, lora_alpha=128, lora_dropout=0.0, bias="none", use_gradient_checkpointing=True, random_state=SEED, target_modules=TARGETS)
     tok.padding_side = "right"
     if CHAT:  # the hand-written wrapper must be the tokenizer's own template, and the label must end the assistant turn (eos is <|im_end|>)
