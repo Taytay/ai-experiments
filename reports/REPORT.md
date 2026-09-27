@@ -5575,3 +5575,49 @@ REAL-6 item with the option added (full) and with its gold category hidden (nogo
   the plain argmax; the scorecard's 88.3 for row 80 counts one exact bf16 tie at the top as right (`scorecard._rank`).
 
 Tables: `uv run python scripts/abstain_tables.py`. Items: `scripts/build_real6_abstain.py`. Job list: `scripts/modal_jobs/r52.json`.
+
+## 80. Misleading merchant names: facts trained into the weights override the name completely (decider-4B 97.4 on misleading names, the same as on neutral twins, none pulled to the name's category, from 7.9 untrained); the user's history mostly does too at 4B (86.8 to 90.8), but the per-option Qwen and decider-2B follow the name against the user's own filings a third of the time (REAL-15)
+
+PLAN step 83 (the owner, 2026-09-27). REAL-6's made-up merchants are meaningless (Istlock), so whether a fact in the weights beats a
+name that points elsewhere was untested. `build_mislead.py` writes `mislead_v1`: 48 made-up names that suggest another category than
+their own, 4 per category ("Tire Barn" is a restaurant, "Pixel Depot" a grocery store, "Pill Box" a home-improvement store), 48 neutral
+twins in REAL-6's style, and 16 real brands whose names mislead (Kayak, Cricket Wireless, Buffalo Wild Wings; none a REAL-6 merchant).
+Half of the made-up merchants of each kind are in the fact DB, which `MISLEAD=mislead_v1` adds to the database episodes (288 merchants
+instead of 240). Items use fold 0's users (their header and 24 shots, the query swapped): the merchant alone, and, for the merchants
+in no DB, two of the shots replaced by this merchant's rows filed under the user's category. The pull is the share of answers that
+pick the category the name suggests, on the items where that is a separate option (the rest merge it with the gold's category).
+Readers: row 81's recipe (decider one slot + shot-label loss + database episodes + rename 0.5) and the per-option Qwen3.5-2B with
+database episodes, each without the set (the row 81 / 78 models) and trained with it.
+
+**Table 80.1: misleading merchant names, fold 0: top-1 % / share pulled to the name's category % (n; n with a separate decoy option)**
+
+| reader | misleading, in DB, alone | neutral twin, in DB, alone | misleading, not in DB, alone | neutral twin, not in DB, alone | misleading, not in DB, in history | neutral twin, not in DB, in history | real brand, alone |
+|---|---|---|---|---|---|---|---|
+| decider-4B (row 81), set not trained | 7.9 / 51 (76; 45) | 14.5 / nan (76; 0) | 2.6 / 69 (76; 52) | 15.8 / nan (76; 0) | 90.8 / 6 (76; 52) | 90.8 / nan (76; 0) | 75.0 / 0 (52; 35) |
+| decider-4B, set's DB trained | 97.4 / 0 (76; 45) | 97.4 / nan (76; 0) | 6.6 / 60 (76; 52) | 14.5 / nan (76; 0) | 86.8 / 15 (76; 52) | 93.4 / nan (76; 0) | 75.0 / 3 (52; 35) |
+| decider-2B (row 81), set not trained | 7.9 / 47 (76; 45) | 19.7 / nan (76; 0) | 3.9 / 63 (76; 52) | 10.5 / nan (76; 0) | 67.1 / 33 (76; 52) | 90.8 / nan (76; 0) | 51.9 / 11 (52; 35) |
+| decider-2B, set's DB trained | 97.4 / 0 (76; 45) | 97.4 / nan (76; 0) | 13.2 / 46 (76; 52) | 22.4 / nan (76; 0) | 86.8 / 8 (76; 52) | 90.8 / nan (76; 0) | 61.5 / 3 (52; 35) |
+| Qwen3.5-2B per-option, DB (row 78), set not trained | 6.6 / 51 (76; 45) | 9.2 / nan (76; 0) | 6.6 / 58 (76; 52) | 13.2 / nan (76; 0) | 55.3 / 31 (76; 52) | 80.3 / nan (76; 0) | 63.5 / 14 (52; 35) |
+| Qwen3.5-2B per-option, DB + rename, set's DB trained | 89.5 / 0 (76; 45) | 94.7 / nan (76; 0) | 11.8 / 48 (76; 52) | 25.0 / nan (76; 0) | 73.7 / 19 (76; 52) | 88.2 / nan (76; 0) | 55.8 / 14 (52; 35) |
+
+### 80.1 What the step says
+
+- **Facts in the weights beat the name.** Trained with the set's DB, decider-4B and -2B file misleading names as well as their neutral
+  twins (97.4 on both) and never pick the name's category; untrained they got 7.9 with half the answers pulled to it. The per-option
+  Qwen keeps a trace of the name (89.5 against 94.7): its score is the category name's likelihood after the prompt, closer to the
+  merchant's own words.
+- **The user's history: 4B trusts it, 2B and the per-option reader do not fully.** With two of the user's rows filing this merchant,
+  decider-4B reads misleading and neutral names alike before training (90.8), and 86.8 against 93.4 after (a pull of 15%, 8 of 52).
+  decider-2B untrained on the set follows the name a third of the time (67.1 against 90.8), and the per-option Qwen3.5-2B the same
+  (55.3 against 80.3): a lookup that should be exact loses to a word.
+- **With nothing to go on, the name decides** (misleading names not in the DB, alone: 3 to 13 right, 46 to 69% pulled to the name).
+  That is the right guess from the evidence; the neutral twins in the same cell (10 to 25) are the evidence-free case row 84 measures.
+- **Real brands whose names mislead:** decider-4B 75.0 and almost never pulled (0 to 3%); its errors go elsewhere. 2B readers 52 to
+  64. Pretrained brand knowledge is thinner than the misleading surface suggests but is not overridden by it.
+- **REAL-6 after adding 48 merchants to the DB:** decider-4B 88.3 (row 81: 91.9), decider-2B 87.9 (89.9), Qwen3.5-2B 86.6. Both
+  deciders drop, inside the intervals: dilution (each REAL-6 merchant gets 17% fewer database episodes) or row 81 being a lucky
+  seed. Seeds of row 81's recipe are needed before its 91.9 is quoted as the recipe's level.
+
+Limits: fold 0; 76 items per made-up cell (19 merchants x 4 users in reach), 45 to 52 with a separate decoy option; one seed.
+
+Tables: `uv run python scripts/mislead_tables.py`. Items: `scripts/build_mislead.py`. Job list: `scripts/modal_jobs/r83.json`.
