@@ -224,7 +224,7 @@ def sanity_items():
 
 
 if __name__ == "__main__":
-    open_licence(MODEL)
+    open_licence(os.environ.get("LICENCE_OF", MODEL))  # LICENCE_OF: the Hub model a local run (a kev fine-tune, row 80) derives from
     if os.environ.get("SANITY"):
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
