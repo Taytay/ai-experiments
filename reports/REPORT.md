@@ -5716,3 +5716,39 @@ With nothing to go on the reader still commits: its confidence on evidence-free 
 threshold separates them. Training has never shown it a question without an answer in evidence (every training target is a merchant
 in a history or the database). Row 84 trains that case: evidence-free episodes with a "can't tell" option (switchable at inference),
 against soft uniform targets. The temperature the scorecard fits will lower these numbers somewhat but cannot reorder items.
+
+## 84. The user's own filing over the database and the name: without training for it, a merchant the database knows is pulled back to its database category in a quarter to a half of the questions where the user's two filings say otherwise; with lookup and override episodes the user's filing wins 98 to 100% of the time, misleading names included, at no cost on REAL-6 (REAL-15)
+
+PLAN step 85 (the owner, 2026-09-27: make sure the training covers a user filing a merchant against what its name or the database says).
+REPORT 80 found that of 2,250 training episodes only 6 put the target merchant's own row in the shots, and no user ever filed a merchant
+against its database category. `LOOKUP=p OVERRIDE=q` (`exp_categoriser.py`): per episode, with probability q (a database target) the
+user files the target merchant under another of their categories, in two or more shots and in the target; else with probability p two
+or more shots carry the target merchant under the target's label. `build_override.py` writes `override_v1` (684 items, fold 0): two of
+the user's shots file a database merchant under the user's category for its database category (agree) or under another category
+(override, then the answer), for REAL-6's DB-only merchants (chains and opaque names) and mislead_v1's misleading names and neutral
+twins. decider-4B, row 81's recipe + MISLEAD + random A..Z labels, without (control) and with LOOKUP = OVERRIDE = 0.1, two seeds each;
+rows 81 and 83's models as read before.
+
+**Table 84.1: the user's filing (2 shots) against the database and the name, fold 0: top-1 % and the share of override items answered with the DB category instead**
+
+| reader | REAL-6 DB-only chain: agree | REAL-6 DB-only chain: override | REAL-6 DB-only chain: override, pulled to DB | REAL-6 DB-only opaque: agree | REAL-6 DB-only opaque: override | REAL-6 DB-only opaque: override, pulled to DB | misleading name: agree | misleading name: override | misleading name: override, pulled to DB | neutral twin: agree | neutral twin: override | neutral twin: override, pulled to DB | REAL-6 top-1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 (set's merchants not in its DB) | 100.0 | 75.3 | 24.7 | 100.0 | 68.8 | 31.2 | 90.8 | 92.1 | 0.0 | 86.8 | 92.1 | 0.0 | 91.9 |
+| row 83 (misleading names in its DB) | 100.0 | 51.5 | 47.4 | 100.0 | 64.5 | 34.4 | 100.0 | 71.1 | 28.9 | 100.0 | 60.5 | 38.2 | 88.3 |
+| control: + random labels | 100.0 [100.0, 100.0] | 60.8 [39.2, 82.5] | 39.2 [17.5, 60.8] | 98.9 [97.8, 100.0] | 64.0 [46.2, 81.7] | 36.0 [18.3, 53.8] | 100.0 [100.0, 100.0] | 75.7 [61.8, 89.5] | 24.3 [10.5, 38.2] | 100.0 [100.0, 100.0] | 63.8 [42.1, 85.5] | 35.5 [14.5, 56.6] | 89.8 [89.6, 89.9] |
+| + lookup and override episodes | 100.0 [100.0, 100.0] | 99.5 [99.0, 100.0] | 0.5 [0.0, 1.0] | 100.0 [100.0, 100.0] | 98.4 [97.8, 98.9] | 0.5 [0.0, 1.1] | 100.0 [100.0, 100.0] | 98.7 [98.7, 98.7] | 1.3 [1.3, 1.3] | 100.0 [100.0, 100.0] | 98.7 [97.4, 100.0] | 1.3 [0.0, 2.6] | 89.4 [89.3, 89.6] |
+
+### 84.1 What the step says
+
+- **Untrained, the database competes with the user.** When the user's two filings disagree with the database, the control reader
+  follows the user 61 to 76% of the time and returns the database's category for the rest; the more of the set's merchants the model
+  learned as facts, the more it overrides the user (row 81, which never learned the misleading names: 92% on them; row 83, which did:
+  71%). Where the user agrees with the database it is 99 to 100% right.
+- **Override episodes settle it.** With 10% override and 10% lookup episodes the user's filing wins on 98.4 to 99.5% of override
+  items in every merchant kind, misleading names included (the name, the database and the user all disagree there), with no loss where
+  they agree and REAL-6 at 89.4 against 89.8 (inside the seed spread).
+- The override is learned as "the user's own rows of this merchant decide", not as distrust of the database: agree items stay at 100.
+
+Limits: fold 0, two seeds, two shots of the merchant in every item (one shot, or conflicting shots, untested).
+
+Tables: `uv run python scripts/override_tables.py`. Items: `scripts/build_override.py`. Job list: `scripts/modal_jobs/r85.json`.
