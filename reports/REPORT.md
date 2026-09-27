@@ -5355,3 +5355,26 @@ user-grouped folds.
   difference lives.
 
 Tables: `uv run python scripts/probes_tables.py`. Job list: `scripts/modal_jobs/r67.json`.
+
+
+## 75. The one-slot readers barely depend on option order: across four orders of the labelled options their top-1 moves by 0.6 to 1.7 points and 1.3 to 5.7% of answers change; decider-2B is the steadiest, and averaging orders buys at most half a point (EVAL-8)
+
+PLAN step 50, re-scoped on 2026-09-27 to the readers that now lead (sections 69, 76): one answer slot over labelled options is exposed
+to position and letter bias, which a per-option scorer is not. Each reader was re-scored with every item's options shuffled under three
+seeds (`exp_decision_models.py ORDER_SEED`; the labels A, B, ... follow the new order, the category list in the prompt stays), fold 0.
+
+**Table 75.1: one-slot readers under four option orders (the original and three seeds), fold 0: top-1 per order, flip rate (items whose top-1 differs in any order), and the four-order average**
+
+| reader | n | original | seed 1 | seed 2 | seed 3 | spread (points) | flip rate | four-order average |
+|---|---|---|---|---|---|---|---|---|
+| decider-2B one slot, POI-1 | 507 | 92.5 | 92.5 | 93.1 | 92.7 | 0.6 | 1.8% | 92.7 |
+| Qwen3.5-2B one slot, POI-1 | 507 | 91.9 | 92.1 | 92.5 | 92.7 | 0.8 | 2.2% | 92.3 |
+| decider-2B one slot + shot labels, REAL-6 | 298 | 87.9 | 87.2 | 87.9 | 87.2 | 0.7 | 1.3% | 87.9 |
+| Qwen3.5-2B one slot + shot labels, REAL-6 | 298 | 85.9 | 85.9 | 84.2 | 84.2 | 1.7 | 5.7% | 84.9 |
+
+The readers learned the options from their names, not their positions: flips are rare and mostly on items near a tie. decider-2B,
+trained on shuffled options at scale before this task, is the steadiest (1.3 to 1.8%); the plain Qwen3.5-2B one-slot model trained
+here for 800 steps flips most (5.7% on REAL-6), and its REAL-6 top-1 varies by 1.7 points, still within the interval. Averaging four
+orders is not worth four passes. The untrained-model letter bias of section 45 does not carry over to trained one-slot readers.
+
+Tables: `uv run python scripts/order_tables.py`. Job list: `scripts/modal_jobs/r50.json`.

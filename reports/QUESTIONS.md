@@ -842,6 +842,8 @@ further seeds (shots and query unchanged); argmax flip rate per corrected group 
 order, and of the two- and three-order averaged distributions; the same with a lettered list and letter readout on the
 untrained model only (the adapters were trained on names). Precision matched to training (CLAUDE.md, section 44).
 
+**Status (2026-09-27):** PLAN step 50 (re-scoped to the one-slot readers), REPORT.md 75: option order moves top-1 by at most 1.7 points; 1.3 to 5.7% of answers change.
+
 **TRAIN-10 Do counterfactual minimal pairs teach the categoriser to read its evidence rather than its prior?**
 Across the series, training on decision data raised in-distribution accuracy and lost on held-out items (reflex, Open-Jev,
 decider, Laya), with one clear exception: Nimble's 2,676 rows of base/counterfactual pairs, whose contexts differ in one
