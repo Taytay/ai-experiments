@@ -210,10 +210,10 @@ def train_episodes():
 
 
 def objective(z, y):
-    """The training loss over each row's valid options (padded options hold -inf logits). Every arm is a strictly proper scoring rule or
+    """The training loss over each row's valid options (padded options hold -1e4). Every arm is a strictly proper scoring rule or
     a smoothed one: ce = log score; ls = cross-entropy against 0.9 on the gold + 0.1 spread over the valid options; logsph = log score
     minus the spherical score p_y / ||p||_2 (Laya's pair, section 62); brier = log score + sum_k (p_k - 1[k = y])^2."""
-    valid = torch.isfinite(z)
+    valid = z > -1e3  # the models fill padded options with -1e4, not -inf
     lp = torch.log_softmax(z, -1).masked_fill(~valid, 0.0)
     nll = -lp.gather(1, y[:, None]).squeeze(1)
     if OBJ == "ce":

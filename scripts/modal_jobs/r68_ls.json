@@ -1,0 +1,30 @@
+[
+ {
+  "tag": "r68-ls-real6",
+  "env": {
+   "OBJ": "ls",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-ls-poi",
+  "env": {
+   "OBJ": "ls",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
