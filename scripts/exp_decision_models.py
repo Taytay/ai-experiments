@@ -77,7 +77,7 @@ def decider():
     path = snapshot_download(MODEL)
     cfg = json.loads(Path(path, "decider_config.json").read_text()) if Path(path, "decider_config.json").exists() else {}
     assert cfg.get("layout", "plain") in ("plain", "state_first") and not cfg.get("chat_template"), f"chat layout not handled: {cfg}"
-    sys.path.insert(0, path)
+    sys.path.insert(0, snapshot_download("Mapika/decider-2b", allow_patterns=["decider/*"]))  # decider's prompt code; row 79 reads plain Qwen3.5 with it
     P = importlib.import_module("decider.prompt")
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(path)

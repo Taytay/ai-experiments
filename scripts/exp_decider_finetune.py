@@ -11,6 +11,7 @@ here (one decision per episode).
 env: MODEL (default Mapika/decider-2b), STEPS (800), MICRO (16 sequences per step), LR (1e-4), RUN_TAG, SEED, plus the episode knobs.
 Writes models/adapters/decider_<model>_<episode suffix>_lora (peft) and results/decider_ft_<same>.json; score it with
 exp_decision_models.py FAMILY=decider ADAPTER=<that dir name>. Tracker experiment "decider_finetune".
+Row 79 (MODEL-16) uses it to train plain Qwen3.5 with one answer slot (MODEL=Qwen/Qwen3.5-2B; adapter slot_<model>_...).
 usage: POI=poi1_v1 FOLD=0 RENAME=0.5 POI_KIND=1 POI_DESC=1 POI_UNSEEN=0.5 uv run --with transformers==5.17.0 --with flash-linear-attention
        --with "peft>=0.21" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py
 """
@@ -24,7 +25,8 @@ import time
 from ai_experiments.evals.tracker import Run
 from ai_experiments.paths import ROOT
 
-MODEL = os.environ.get("MODEL", "Mapika/decider-2b")
+MODEL = os.environ.get("MODEL", "Mapika/decider-2b")  # row 79: a plain Qwen3.5 (Qwen/Qwen3.5-2B) trained in decider's layout and readout
+DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.build, the letter table) renders the episodes
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
 SEED = int(os.environ.get("SEED", "0"))
 QUESTION = "Which of this user's categories does the last transaction belong to?"  # as exp_decision_models.py
@@ -36,7 +38,7 @@ _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = 
 C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "")
-NAME = f"decider_{MODEL.split('/')[-1]}_{SFX}_lora"
+NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
 
@@ -65,7 +67,7 @@ def main():
     from peft import LoraConfig, get_peft_model
     from transformers import AutoModelForCausalLM, AutoTokenizer
     path = snapshot_download(MODEL)
-    sys.path.insert(0, path)
+    sys.path.insert(0, snapshot_download(DECIDER_CODE, allow_patterns=["decider/*"]))  # decider's prompt code; the weights may be any Qwen3.5 (row 79)
     P = importlib.import_module("decider.prompt")
     tok = AutoTokenizer.from_pretrained(path)
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda()
