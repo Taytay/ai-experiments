@@ -33,7 +33,8 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   Qwen3.5-9B matches decider-4B: scale is not the lever here (87). Users who alternate between categories at one merchant: the reader
   ignored their rule; alternation episodes teach it (stores 58 to 88, restaurants 48 to 77) and split targets hedge random 60 / 40
   choices correctly (86, 88). All of it composes in one model (88), at a cost of 5 points on novel names and some auto-file coverage
-  that the alternation share is being tuned to reduce (row 89).
+  that disappear at an alternation share of 0.1 (89). The final recipe reads REAL-6 at 91.3 over all 20 users by
+  the model alone, 97% of the ceiling and level with the earlier lookup cascade (90).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -5947,3 +5948,31 @@ evidence-free confident 0.7%, the rule read 88.3 / 74.2); the random 60 / 40 spl
 database episodes + rename 0.5 + random A..Z labels + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation v2 0.1.
 
 Job list: `scripts/modal_jobs/r89.json`.
+
+## 90. The final recipe on all 20 users: REAL-6 91.3 by the model alone (97% of the 94.0 ceiling), level with section 70's best run with the merchant lookup in front and 3.9 points above that run alone; novel names 89.4, real places outside the database 75.0; 77% auto-filed at a realised 96.7% (EVAL-9)
+
+PLAN step 90. Section 89's recipe (decider-4B one slot + shot-label loss + database episodes with the misleading-name set + rename 0.5
++ random A..Z labels + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation v2 0.1) trained with each of folds 1, 2
+and 3 held out (fold 0: row 89, seed 0); each fold's model read on its own held-out users; the scorecard's temperature and thresholds
+leave-fold-out.
+
+**Table 90.1: the final recipe, REAL-6 over the held-out users of folds [0, 1, 2, 3] (1179 items)**
+
+| set | n | top-1 [user interval] | top-3 | bits left | auto-filed at 98% (precision) | auto-filed at 95% (precision) |
+|---|---|---|---|---|---|---|
+| REAL-6 | 1179 | 91.3 [87.1, 95.2] | 98.9 | 0.47 | 77.3 (96.7) | 90.2 (95.2) |
+| novel names | 1179 | 89.4 | | | | |
+| real places in no DB | 1198 | 75.0 | | | | |
+
+Per fold top-1: fold 0 89.9 (n=298), fold 1 93.3 (n=300), fold 2 94.9 (n=295), fold 3 86.7 (n=286)
+
+- **Against the best earlier four-fold run** (section 70: Qwen2.5-3B with database episodes, 87.4 alone, 91.3 with the lookup of the
+  user's own label in front): the final recipe reaches the lookup cascade's number with the model alone. The lookup is now inside the
+  model (section 84's lookup episodes), and the rest of the gain is the one-slot reader, rename augmentation and the 4B.
+- **Per fold** 86.7 to 94.9: fold 3 is the hardest, as in earlier sections; the user interval is 87.1 to 95.2.
+- **Auto-filing** 77.3% of items at a realised 96.7% (the leave-fold-out threshold aims at 98% and misses by a point and a half on
+  1,179 items) or 90.2% at 95.2%.
+- **Not yet all users:** the misleading-name, override, abstention and alternation sets are built for fold 0's users only; rebuilding
+  them per fold would extend sections 80 to 89 to every user.
+
+Tables: `uv run python scripts/final_folds_tables.py`. Job list: `scripts/modal_jobs/r90.json`.
