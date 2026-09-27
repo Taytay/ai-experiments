@@ -123,6 +123,7 @@ assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs 
 POI = os.environ.get("POI", "")
 MISLEAD = os.environ.get("MISLEAD", "")  # row 83
 ALT = float(os.environ.get("ALT", "0"))  # row 86
+ALT_DAYS = os.environ.get("ALT_DAYS", "")  # row 92: "rand" draws each day rule's days as a random set of 1 to 3 weekdays (default: five fixed sets)
 ALT_SOFT = os.environ.get("ALT_SOFT", "") == "1"  # row 86 v2: noisy / random alternation targets as their true split (SOFT[prompt]), rules drawn evenly
 SOFT = {}  # row 86 v2: prompt -> {answer name: probability}; read by exp_decider_finetune.py
 ALT_NAMES = ["Splurges", "Gifts", "Hobby time", "Self care", "Weekend treats", "Family outings", "Big buys", "Little luxuries", "Brunch club", "Game night"]
@@ -141,7 +142,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -238,7 +239,7 @@ def alternation(u, h, others, rng):
     kind = rng.choice(["amount", "day", "partial", "random"] if ALT_SOFT else ["amount", "amount", "day", "day", "partial", "random"])
     base = rng.choice(["amount", "day"])
     t = math.exp(rng.uniform(math.log(15), math.log(120)))
-    days = rng.choice([{"Fri", "Sat"}, {"Sat", "Sun"}, {"Fri", "Sat", "Sun"}, {"Mon", "Tue", "Wed", "Thu"}, {"Sun"}])
+    days = set(rng.sample(T.WEEKDAYS, rng.randint(1, 3))) if ALT_DAYS == "rand" else rng.choice([{"Fri", "Sat"}, {"Sat", "Sun"}, {"Fri", "Sat", "Sun"}, {"Mon", "Tue", "Wed", "Thu"}, {"Sun"}])
     share = rng.uniform(0.3, 0.5)
     rule_on = base if kind in ("partial", "random") else kind
 

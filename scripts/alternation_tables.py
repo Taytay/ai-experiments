@@ -20,7 +20,11 @@ READERS = [("row 81 recipe (letters)", [D.format(tag=t, alt="", lab="", rd="") f
            ("+ random labels (row 84 control)", [D.format(tag=t, alt="", lab="_labrand26", rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
            ("+ random labels + alternation episodes", [D.format(tag=t, alt="_alt15", lab="_labrand26", rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
            ("combined recipe with alternation v2 (row 88)", [f"real6_dm_decider_decider_decider-4b_none_{t}_f0_ren50_dbep50_mislead_v1_alt20s_lk10_ov10_aux100_labrand26_ev10soft_lora_alternation_v1_labrand26.noctx.jsonl"
-                                                           for t in ("h100bf16st800", "h100bf16st800s1", "h100bf16st800s2")])]
+                                                           for t in ("h100bf16st800", "h100bf16st800s1", "h100bf16st800s2")]),
+           ("final recipe, ALT 0.1 (row 89)", [f"real6_dm_decider_decider_decider-4b_none_{t}_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora_alternation_v1_labrand26.noctx.jsonl"
+                                                for t in ("h100bf16st800", "h100bf16st800s1")]),
+           ("final recipe + random day sets (row 92)", [f"real6_dm_decider_decider_decider-4b_none_{t}_f0_ren50_dbep50_mislead_v1_alt10sd_lk10_ov10_aux100_labrand26_ev10soft_lora_alternation_v1_labrand26.noctx.jsonl"
+                                                         for t in ("h100bf16st800", "h100bf16st800s1")])]
 SCEN = ("observable", "partial", "unobservable", "control")
 
 
