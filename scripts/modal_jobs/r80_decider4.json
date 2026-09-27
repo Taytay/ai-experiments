@@ -1,0 +1,40 @@
+[
+ {
+  "tag": "r80-decider4-E800",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RUN_TAG": "h100bf16st800",
+   "MODEL": "Mapika/decider-4b",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_dbep50_aux100_lora ITEMS_SET= CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r80-decider4-P",
+  "env": {
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "POI_KIND": "1",
+   "POI_DESC": "1",
+   "POI_UNSEEN": "0.5",
+   "RUN_TAG": "h100bf16",
+   "MODEL": "Mapika/decider-4b",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_aux100_lora ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]
