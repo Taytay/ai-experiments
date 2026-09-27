@@ -1048,6 +1048,8 @@ scored on places in the injected database and on places held out of it, same cat
 second the general "this kind of business goes in this kind of category" skill that row 62's +5 on merchants outside the database
 suggests; capacity against the held-out gain.
 
+**Status (2026-09-27):** PLAN step 66, REPORT.md 73: facts, not a skill: +21 on places in the injected database, +0 to +3 on places held out of it.
+
 **MODEL-8 Where the categoriser's decision forms, and what the weights store.** Linear probes on the query's and the merchant
 name's hidden states across layers (section 40's method): whether the standard category, the user's label and the business kind are
 linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its

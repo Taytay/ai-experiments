@@ -5239,7 +5239,62 @@ launch of the label-smoothing arm spread mass onto padded options (the model fil
 - **Accuracy is unchanged** (REAL-6 56.4 to 58.8, POI-1 55.8 to 56.5), so coverage at 98% stays small for every objective (4 to 13%
   on REAL-6): at 57% top-1 there are few items an encoder can be sure of. Confidence is limited by accuracy here, not by the loss.
 - Not run in this stage: soft targets from a calibrated teacher, and general multiple-choice pre-training before the task. Given that a
-  temperature already calibrates every arm, a teacher could matter only through accuracy; the one-slot decoders of section 73 are the
+  temperature already calibrates every arm, a teacher could matter only through accuracy; the one-slot decoders of rows 79 and 80 are the
   better place to test confidence objectives.
 
 Tables: `uv run python scripts/objectives_tables.py`. Job lists: `scripts/modal_jobs/r68*.json`.
+
+
+## 73. Facts, not a skill: database episodes built from real places lift POI-1 by 21 points on the places they contain and by 0 to 3 on places held out of them; the weights store the particular places, and the gain is largest where the user has filed nothing of that kind (+28) (REAL-21)
+
+PLAN step 66. REAL-21 asks whether a database taught as decisions (database episodes, section 55) stores facts about its entries or a
+general "this kind of business goes in this kind of category" skill, which row 62's +5 on merchants outside the database suggested.
+REAL-6's merchants are synthetic, so POI-1's real places test it:
+
+- **The database** (`scripts/build_poi1_db.py`, `data/processed/poi1_v1_db.json`): half of POI-1's 2,053 test places, chosen by a
+  hash of the Overture id (1,001 places; 249 of fold 0's 507 test items). No test place is in any user's history.
+- **Training** (Qwen3.5-2B, fold 0's users held out, plain layout, rename 0.5, all-label loss): without database episodes, and with
+  them (`exp_categoriser.py POI_DB`, DBEP 0.5: in half the episodes eight examples and the target are database places, each labelled
+  with the training user's category for the place's Overture kind), for 800 and 1,600 steps. Each place appears about 50 times.
+- **Test:** fold 0's items in the plain layout (no kind lines, so nothing in the prompt says what a place is), split by whether their
+  place is in the database. The in-database gain over the no-database arm is facts plus skill; the held-out gain is skill alone.
+
+**Table 73.1: POI-1 fold 0 (in the database: 249 items; held out: 258), top-1 %, and the gain over the no-database arm; facts = in-database gain minus held-out gain (user-bootstrap 95% interval)**
+
+*all items*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 53.4 | 57.0 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 74.7 | 57.4 | +21.3 | +0.4 | +20.9 [+12.0, +29.7] |
+| database episodes, 1,600 steps | 73.1 | 60.1 | +19.7 | +3.1 | +16.6 [+7.2, +24.9] |
+
+*seen kind*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 62.8 | 64.5 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 79.7 | 61.8 | +16.9 | -2.6 | +19.5 [+6.8, +31.0] |
+| database episodes, 1,600 steps | 78.4 | 67.8 | +15.5 | +3.3 | +12.3 [-0.4, +24.0] |
+
+*unseen kind*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 39.6 | 46.2 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 67.3 | 50.9 | +27.7 | +4.7 | +23.0 [+9.2, +36.6] |
+| database episodes, 1,600 steps | 65.3 | 49.1 | +25.7 | +2.8 | +22.9 [+10.8, +33.6] |
+
+### 73.1 What the step says
+
+- **The database episodes store facts.** On places in the database, 53.4 to 74.7 (+21); on places held out, 57.0 to 57.4 (+0.4 at
+  800 steps, +3.1 at 1,600). The difference, +21 [+12, +30], is what the weights hold about the particular places.
+- **Where the prompt has nothing, the stored fact is everything:** on kinds the user has never filed, +28 in the database against +5
+  held out. On seen kinds the examples already carry most of the answer (+17 against -3).
+- **Longer training does not turn facts into skill** (1,600 steps: +20 in, +3 out), and it does not add facts either: about 50
+  exposures per place are already enough, as section 58 found for REAL-6 (about 30).
+- For Q2, a places database injected by training is a lookup the model carries, not a generalisation; for places it does not hold,
+  retrieval (the record in the prompt, section 67's kind lines) is what helps. The two are complements: train on the places you will
+  see often, retrieve the rest.
+
+Tables: `uv run python scripts/facts_skill_tables.py`. Job list: `scripts/modal_jobs/r66.json`.

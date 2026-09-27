@@ -1,0 +1,6 @@
+outs:
+- md5: 4230021b098eb140c56a59510b29ed66.dir
+  size: 270130772
+  nfiles: 6
+  hash: md5
+  path: categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_f0_ren50_alllab_lora
