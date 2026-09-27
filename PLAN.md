@@ -22,10 +22,10 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (top). New work branches from the
   top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
   merge-forward: resolve as the union of rows by `run_id`, sorted.
-- **Checkouts:** `~/projects/YNAB/ai-experiments` (main checkout, on plan-56; holds every trained adapter under `models/adapters`
-  and runs `just push-models`), `../ai-experiments-wt34` (on the top branch; Modal jobs are launched from here), `../ai-experiments-wt06`
-  (plan-57), `../ai-experiments-wt07` (the owner's, do not touch). Adapters trained on Modal come back in `<checkout>/modal_out/<tag>/`
-  (gitignored): copy them into the main checkout's `models/adapters/`, `just push-models` there, commit `models/adapters.dvc` on the top branch.
+- **Checkouts:** one working checkout, `~/projects/YNAB/ai-experiments`, on the top branch (the owner, 2026-09-26: no more worktrees;
+  Modal made the per-branch GPU checkouts unnecessary). Switch branches there for merge-forward. `../ai-experiments-wt06` (plan-57) is idle,
+  `../ai-experiments-wt07` is the owner's (do not touch). Modal results come back in `modal_out/<tag>/` (gitignored): copy results into the
+  branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
 - **In flight:** nothing on Modal. Rows 53, 69, 70, 71 and 76 done (REPORT.md 62 to 66; 65 is the hop-limit study, 66 the transfer test). Owner's steers (2026-09-26): find the best

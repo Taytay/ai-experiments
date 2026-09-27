@@ -49,10 +49,10 @@ The local 3090 is no longer used for runs; the rules below about it still hold i
   streams their output, and writes every file they create or change to the volume `ai-exp-results` under the job's tag; model
   downloads persist in `ai-exp-hf-cache`. One job: `modal run scripts/modal_app.py --tag T --env "K=V,..." --cmd "cmd1 ;; cmd2"`.
   Many in parallel (at most 8 containers): write a JSON list of `{tag, env, cmds}` to `scripts/modal_jobs/<row>.json`, commit it, then
-  `modal run scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json`. `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
+  `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
 - Bring results back: `modal volume get ai-exp-results <tag> modal_out/` (gitignored), copy `results/` into the branch, union the
-  job's `evals/runs.jsonl` rows into ours by `run_id`, copy adapters into the main checkout's `models/adapters/` and `just push-models` there.
+  job's `evals/runs.jsonl` rows into ours by `run_id`, copy adapters into `models/adapters/`, `just push-models`, commit the new `.dvc` files, `just drop-all`.
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
