@@ -30,6 +30,9 @@ DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.bu
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
 SEED = int(os.environ.get("SEED", "0"))
 AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
+ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
+ABSTAIN_SWAP = float(os.environ.get("ABSTAIN_SWAP", "0.25"))  # ... and in this share of those the gold category is hidden (removed from the header
+ABSTAIN_OPT = "not listed here"  # and the options; shots keep its label), so the abstain option is the answer. decider's neutral wording
 QUESTION = "Which of this user's categories does the last transaction belong to?"  # as exp_decision_models.py
 
 # exp_categoriser.py's episode builder under the same env (its module level up to the model code: config, data, sft_examples)
@@ -39,6 +42,7 @@ _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = 
 C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
+SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
 NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
 OUT_DIR = ROOT / "models" / "adapters" / NAME
@@ -50,6 +54,24 @@ def names_of(prompt):
     if head.startswith("Categories:\n"):
         return [ln[2:].split(": ", 1)[0] for ln in head.split("\n")[1:]]
     return head[len("Categories: "):].split(", ")
+
+
+def abstain_aug(e, rng):
+    """Row 52: with probability ABSTAIN add the abstain option last; with ABSTAIN_SWAP of those hide the gold (header and options), the
+    abstain option then being the answer. The shot-label spans (AUX_LM) sit after the header and move by the header's change in length."""
+    if not ABSTAIN or rng.random() >= ABSTAIN:
+        return e
+    ctx, opts, gold = e[0], list(e[1]), e[2]
+    if rng.random() < ABSTAIN_SWAP and len(opts) > 2:
+        head, rest = ctx.split("\n\n", 1)
+        assert head.startswith("Categories: "), "ABSTAIN_SWAP needs the plain header"
+        g = opts.pop(gold)
+        new_head = "Categories: " + ", ".join(n for n in head[len("Categories: "):].split(", ") if n != g)
+        d = len(new_head) - len(head)
+        ctx = new_head + "\n\n" + rest
+        e = (ctx, opts + [ABSTAIN_OPT], len(opts)) + (([(a + d, b + d) for a, b in e[3]],) if len(e) > 3 else ())
+        return e
+    return (ctx, opts + [ABSTAIN_OPT], gold) + tuple(e[3:])
 
 
 def episodes():
@@ -96,7 +118,7 @@ def main():
     model.train(); t0 = time.time(); losses = []; n_tok = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
-        picked = [rng.choice(eps) for _ in range(MICRO)]
+        picked = [abstain_aug(rng.choice(eps), rng) for _ in range(MICRO)]
         built = [P.build(Ex(e[0], [Q(QUESTION, e[1], e[2])]), tok, rng=rng, max_options=255, max_ctx_tokens=16384) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
@@ -133,7 +155,8 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
-               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM)
+               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
+               abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)
