@@ -115,7 +115,7 @@ def decider():
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            built = [P.build(Ex(state_of(it, cond), [Q(QUESTION, options_of(it), it["answer"])]), tok, rng=random.Random(it["id"]),
+            built = [P.build(Ex(state_of(it, cond), [Q(it.get("question", QUESTION), options_of(it), it["answer"])]), tok, rng=random.Random(it["id"]),
                              max_options=255, max_ctx_tokens=16384) for it in chunk]
             T = max(len(b["ids"]) for b in built)
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
@@ -153,7 +153,7 @@ def decision():
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            rows = [dict(id=it["id"], state=state_of(it, cond), instructions=QUESTION, task_type="choice",
+            rows = [dict(id=it["id"], state=state_of(it, cond), instructions=it.get("question", QUESTION), task_type="choice",
                          options=[{"key": o, "description": None} for o in options_of(it)], label=it["answer"]) for it in chunk]
             enc = [D.encode(r, tok, 16384) for r in rows]
             batch = {key: v.cuda() if torch.is_tensor(v) else v for key, v in D.collate(enc, pad).items()}
@@ -184,7 +184,7 @@ def kev():
     def score(items, cond):
         out = []
         for it in items:
-            rec = {"state": state_of(it, cond), "questions": [{"instr": QUESTION, "options": options_of(it), "label": it["answer"]}]}
+            rec = {"state": state_of(it, cond), "questions": [{"instr": it.get("question", QUESTION), "options": options_of(it), "label": it["answer"]}]}
             enc = m.encode(tok, rec, max_state=8192, max_branch=8192 + 2048)
             p = m.probs(enc)[0].float().clamp_min(1e-30)
             out.append((p.log() / TEMP).log_softmax(-1).tolist())
@@ -206,7 +206,7 @@ def von():
         out = []
         for it in items:
             opts = options_of(it)
-            inputs = tok(model.pack_sequence(state_of(it, cond), QUESTION, opts), return_tensors="pt").to("cuda")
+            inputs = tok(model.pack_sequence(state_of(it, cond), it.get("question", QUESTION), opts), return_tensors="pt").to("cuda")
             pos = (inputs["input_ids"][0] == model.mask_token_id).nonzero(as_tuple=True)[0].tolist()
             assert len(pos) == len(opts), (it["id"], len(pos), len(opts))
             z = model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"], mask_positions=[pos],
@@ -216,8 +216,32 @@ def von():
     return score
 
 
+SANITY = [  # SANITY=1: short questions with an obvious answer (the first is Ollaya's own triage example), each also with the options reversed
+    ("I was charged twice for my subscription this month and want a refund.", "Which team should handle this?",
+     ["billing: Payments, invoices and refunds", "technical: Bugs, errors and outages", "account: Login, profile and settings"], 0),
+    ("The app crashes every time I open the settings page since the last update.", "Which team should handle this?",
+     ["billing: Payments, invoices and refunds", "technical: Bugs, errors and outages", "account: Login, profile and settings"], 1),
+    ("Transaction: SHELL OIL 57442, Austin TX | $48.20 | Mon", "Which category does this transaction belong to?",
+     ["Groceries", "Dining out", "Fuel", "Rent", "Entertainment", "Travel"], 2),
+    ("Transaction: TRADER JOE'S #552, Portland OR | $83.10 | Sat", "Which category does this transaction belong to?",
+     ["Groceries", "Dining out", "Fuel", "Rent", "Entertainment", "Travel"], 0),
+]
+
+
+def sanity_items():
+    out = []
+    for k, (state, q, opts, gold) in enumerate(SANITY):
+        for rev in (False, True):
+            o = opts[::-1] if rev else opts
+            out.append(dict(id=f"S{k}{'r' if rev else ''}", level="sanity", user=0, question=q, answer=o.index(opts[gold]),
+                            options=[" " + x for x in o], prompt=state + "\nCategory:", prompt_ctx=state + "\nCategory:"))
+    return out
+
+
 if __name__ == "__main__":
     open_licence(MODEL)
+    if os.environ.get("SANITY"):
+        ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
     cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
                users=USERS, question=QUESTION, temp=TEMP, kev_sha=KEV_SHA if FAMILY == "kev" else None)
