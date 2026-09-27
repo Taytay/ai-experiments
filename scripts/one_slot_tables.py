@@ -37,6 +37,7 @@ if __name__ == "__main__":
                    ("decider-2B, one slot + shot-label loss, 200 steps", "real6_dm_decider_decider_decider-2b_none_h100bf16_f0_dbep50_aux100_lora_real6.noctx.jsonl"),
                    ("decider-2B, one slot + shot-label loss, 800 steps", "real6_dm_decider_decider_decider-2b_none_h100bf16st800_f0_dbep50_aux100_lora_real6.noctx.jsonl"),
                    ("kev-4B fine-tuned (its trainer, from the released checkpoint)", "real6_dm_kev_kev_kev-4b_none_h100bf16_f0_dbep50_real6.noctx.jsonl"),
+                   ("kev-4B fine-tuned, lr 1e-4, 800 steps", "real6_dm_kev_kev_kev-4b_none_h100bf16lr1e4st800_f0_dbep50_real6.noctx.jsonl"),
                    ("decider-2B zero-shot", "real6_dm_decider_decider-2b_real6.noctx.jsonl"),
                    ("kev-4B zero-shot", "real6_dm_kev_kev-4b_real6.noctx.jsonl")]:
         r = O.card_row(lab, O.load(f), r6)
