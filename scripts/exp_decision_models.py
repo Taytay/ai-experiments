@@ -47,7 +47,7 @@ KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
 DOC = json.loads((PROCESSED / f"{ITEMS_SET}.json").read_text()) if ITEMS_SET else R6.load("v1")
-USERS = os.environ.get("USERS") or ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == 0)
+USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] for it in DOC["items"]}) if u % 4 == 0)
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
