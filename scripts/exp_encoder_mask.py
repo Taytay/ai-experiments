@@ -54,6 +54,8 @@ ITEMS_SET = os.environ.get("ITEMS_SET", "")
 MAXLEN = int(os.environ.get("MAXLEN", "2048"))
 SEED = int(os.environ.get("SEED", "0"))
 RUN_TAG = os.environ.get("RUN_TAG", "")
+OBJ = os.environ.get("OBJ", "ce")  # row 68 (MODEL-9): ce | ls (label smoothing 0.1 over the valid options) | logsph (log score + spherical score, Laya's
+assert OBJ in ("ce", "ls", "logsph", "brier")  # bounded proper score with its exact gradient) | brier (ce + the Brier score, as decider / kev offer)
 BASE = {"mask": "answerdotai/ModernBERT-large", "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MBI_IDS = os.environ.get("MBI_IDS", "letters"); assert MBI_IDS in ("letters", "unused")
@@ -71,7 +73,7 @@ TEST = TRAIN_DOC
 if ITEMS_SET:
     _s = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
     TEST = dict(items=_s["items"], users=_s.get("users", TRAIN_DOC["users"]))
-SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}"
+SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}{'_obj' + OBJ if OBJ != 'ce' else ''}"
 HOPS_FROM = os.environ.get("HOPS_FROM", "v2_options_k1-3_st3000")  # INIT=hops: which row 71 encoder (models/adapters/hops_enc_<HOPS_FROM>)
 INIT_TAG = INIT if INIT != "hops" else "hops-" + HOPS_FROM.replace("_st3000", "").replace("_", "-")
 NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
@@ -207,6 +209,26 @@ def train_episodes():
         yield names, q, others, (DBREC.get(q["merchant"]) if CTX else None), names.index(q["label"])
 
 
+def objective(z, y):
+    """The training loss over each row's valid options (padded options hold -inf logits). Every arm is a strictly proper scoring rule or
+    a smoothed one: ce = log score; ls = cross-entropy against 0.9 on the gold + 0.1 spread over the valid options; logsph = log score
+    minus the spherical score p_y / ||p||_2 (Laya's pair, section 62); brier = log score + sum_k (p_k - 1[k = y])^2."""
+    valid = torch.isfinite(z)
+    lp = torch.log_softmax(z, -1).masked_fill(~valid, 0.0)
+    nll = -lp.gather(1, y[:, None]).squeeze(1)
+    if OBJ == "ce":
+        return nll.mean()
+    p = lp.exp() * valid
+    if OBJ == "ls":
+        k = valid.sum(1, keepdim=True).clamp_min(1)
+        target = 0.1 * valid / k; target = target.scatter_add(1, y[:, None], torch.full_like(nll[:, None], 0.9))
+        return -(target * lp).sum(1).mean()
+    if OBJ == "logsph":
+        return (nll - p.gather(1, y[:, None]).squeeze(1) / p.norm(dim=1).clamp_min(1e-8)).mean()
+    onehot = torch.zeros_like(p).scatter(1, y[:, None], 1.0)
+    return (nll + ((p - onehot) ** 2 * valid).sum(1)).mean()
+
+
 def train(tok, model):
     enc = [p for n, p in model.named_parameters() if n.startswith("encoder.")]; rest = [p for n, p in model.named_parameters() if not n.startswith("encoder.")]
     opt = torch.optim.AdamW([dict(params=enc, lr=LR), dict(params=rest, lr=HEAD_LR)], weight_decay=0.01)
@@ -218,7 +240,7 @@ def train(tok, model):
         ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(ids, att, pos, pm)
-        loss = nn.functional.cross_entropy(logits, torch.tensor([y for *_, y in eps]).cuda())
+        loss = objective(logits.float(), torch.tensor([y for *_, y in eps]).cuda())
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())
         if (step + 1) % 50 == 0 or step + 1 == STEPS:

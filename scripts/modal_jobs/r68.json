@@ -1,0 +1,114 @@
+[
+ {
+  "tag": "r68-ce-real6",
+  "env": {
+   "OBJ": "ce",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-ce-poi",
+  "env": {
+   "OBJ": "ce",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-ls-real6",
+  "env": {
+   "OBJ": "ls",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-ls-poi",
+  "env": {
+   "OBJ": "ls",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-logsph-real6",
+  "env": {
+   "OBJ": "logsph",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-logsph-poi",
+  "env": {
+   "OBJ": "logsph",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-brier-real6",
+  "env": {
+   "OBJ": "brier",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r68-brier-poi",
+  "env": {
+   "OBJ": "brier",
+   "STEPS": "1500",
+   "RUN_TAG": "r68"
+  },
+  "cmds": [
+   "FOLD=0 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=1 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=2 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "FOLD=3 POI=poi1_v1 uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
