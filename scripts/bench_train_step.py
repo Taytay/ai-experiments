@@ -10,6 +10,8 @@ import os
 import random
 import time
 
+if os.environ.get("BENCH_UNSLOTH"):  # import unsloth first, as exp_categoriser's unsloth path does: its zoo patches in the vendored fla kernels
+    import unsloth  # noqa: F401
 import torch
 import torch.nn.functional as F
 from peft import LoraConfig, get_peft_model
@@ -55,13 +57,14 @@ def main():
             model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False}); model.enable_input_require_grads()
         else:
             model.gradient_checkpointing_disable()
-        for mode in ("full", "labelled"):
+        for mode in ("labelled", "full"):
             torch.cuda.reset_peak_memory_stats(); times = []
             for k, (ids, lab, att) in enumerate(bs):
                 torch.cuda.synchronize(); t0 = time.time()
                 if mode == "full":
-                    logits = model(input_ids=ids, attention_mask=att).logits[:, :-1]
-                    loss = F.cross_entropy(logits.float().reshape(-1, logits.shape[-1]), lab[:, 1:].reshape(-1), ignore_index=-100)
+                    logits = model(input_ids=ids, attention_mask=att).logits[:, :-1]  # per sequence, as exp_categoriser.py
+                    n_lab = max(int((lab[:, 1:] != -100).sum()), 1)
+                    loss = sum(F.cross_entropy(logits[i].float(), lab[i, 1:], ignore_index=-100, reduction="sum") for i in range(len(ids))) / n_lab
                 else:
                     h = inner.model(input_ids=ids, attention_mask=att).last_hidden_state[:, :-1]
                     tgt = lab[:, 1:]; sel = tgt != -100
