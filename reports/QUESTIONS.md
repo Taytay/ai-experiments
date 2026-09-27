@@ -1026,6 +1026,8 @@ category but another kind, only opaque merchants); the number of coined categori
 under another name); scored for the untrained and trained models, model sizes (3B, 7B; 14B on Modal) and a blind Opus sample.
 Says whether the models copy the nearest example's label or induce the word's meaning.
 
+**Status (2026-09-27):** PLAN step 74, REPORT.md 71: training with empty coined categories lifts label induction v2 to 80% of its ceiling; decoys with empty categories raise the decoy condition from 59 to 71 (Opus 98 to 100); decoys alone hurt.
+
 **Status (2026-09-26):** done, PLAN step 64, REPORT.md 60. One or two examples of other businesses filed under a coined word teach every model its meaning (v2, with three empty coined categories so elimination cannot solve it: 14B untrained 12 to 66% from 0 to 1 example, blind Opus 25 to 100); fine-tuning with rename augmentation or database episodes brings a 3B to the untrained 14B (77 to 78 at base); opaque example names teach nothing. The models copy the nearest example: one same-kind business filed elsewhere costs 15 to 19 points and 60 to 74% of the errors pick its category, where Opus keeps 97%.
 
 **POI-1 Categorisation of real places at scale.** Overture places (81.5M, 288 basic categories and a finer taxonomy, per-row

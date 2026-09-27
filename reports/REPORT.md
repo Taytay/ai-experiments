@@ -5120,3 +5120,79 @@ earlier runs are re-read on the held-out users of each fold they have (`scripts/
   in-history group.
 
 Tables: `uv run python scripts/lookup_cascade_tables.py`.
+
+
+## 71. Label-induction training with empty categories and decoys: coined categories with no examples in training lift label induction v2 from 75 to 80% of its ceiling (one gold example 65 to 77); decoys alone hurt, but decoys with empty categories raise the decoy condition from 59 to 71 (blind Opus 98 to 100); REAL-6 unchanged (REAL-20)
+
+PLAN step 74 tests REPORT 64.2's hypothesis 4: label induction's gap is the decoy and the one-example cases (section 60). Qwen3.5-2B
+(row 78's open base) was trained on REAL-6 users of fold 0 with row 64's recipe (rename augmentation 0.5, all-label loss, 200 steps)
+and two augmentations in `exp_categoriser.py`:
+
+- **EMPTY=3:** in half the episodes, one to three fresh coined categories with no examples join the category list, as label induction
+  v2's empty categories do (in v1 a single unexplained coined word can be found by elimination; in v2 it cannot).
+- **DECOY=0.3:** in 30% of episodes (23% where one exists), one shot of the target's standard category that carries the target's
+  label is relabelled to one of the user's categories that holds none of that standard category: section 60's decoy, a same-kind
+  business filed elsewhere. Another shot still carries the target's label, and the decoy's own label gets no loss.
+
+**Table 71.1: label induction v2, top-1 % by condition (300 queries each; Qwen3.5-2B)**
+
+| condition | ceiling | Qwen3.5-2B untrained | rename | rename + empty | rename + decoys | rename + decoys + empty |
+|---|---|---|---|---|---|---|
+| base | 100 | 62.7 | 78.3 | 83.3 | 59.7 | 77.7 |
+| n_gold=0 | 25 | 2.0 | 6.7 | 11.3 | 13.0 | 16.0 |
+| n_gold=1 | 100 | 49.3 | 65.0 | 76.7 | 44.7 | 64.7 |
+| n_gold=4 | 100 | 75.7 | 84.0 | 87.0 | 73.0 | 84.0 |
+| n_gold=8 | 100 | 80.3 | 86.3 | 90.0 | 83.3 | 89.0 |
+| kind=same_kind | 100 | 90.0 | 93.7 | 96.0 | 85.0 | 92.3 |
+| kind=opaque | 25 | 10.0 | 11.7 | 14.0 | 14.0 | 13.3 |
+| n_coined=1 | 100 | 65.7 | 78.3 | 82.7 | 62.3 | 78.3 |
+| n_coined=6 | 100 | 60.7 | 74.7 | 83.3 | 57.3 | 78.0 |
+| decoy | 100 | 51.7 | 58.7 | 62.0 | 55.7 | 70.7 |
+| decoy, n_gold=0 | 25 | 1.7 | 1.7 | 3.3 | 11.0 | 8.3 |
+| control: standard name | 100 | 92.3 | 90.3 | 91.7 | 87.0 | 90.3 |
+| all conditions | 81 | 53.5 (66% of ceiling) | 60.8 (75% of ceiling) | 65.1 (80% of ceiling) | 53.8 (66% of ceiling) | 63.6 (78% of ceiling) |
+
+**Table 71.2: label induction v1, top-1 % by condition (300 queries each; Qwen3.5-2B)**
+
+| condition | ceiling | Qwen3.5-2B untrained | rename | rename + empty | rename + decoys | rename + decoys + empty |
+|---|---|---|---|---|---|---|
+| base | 100 | 65.3 | 81.3 | 85.3 | 66.3 | 82.0 |
+| n_gold=0 | 100 | 5.0 | 11.0 | 21.7 | 18.3 | 27.3 |
+| n_gold=1 | 100 | 56.0 | 71.0 | 80.0 | 53.7 | 74.3 |
+| n_gold=4 | 100 | 74.0 | 87.0 | 87.3 | 79.0 | 86.7 |
+| n_gold=8 | 100 | 80.0 | 88.7 | 91.3 | 86.0 | 91.3 |
+| kind=same_kind | 100 | 89.7 | 94.3 | 95.3 | 88.0 | 93.0 |
+| kind=opaque | 100 | 13.0 | 17.7 | 25.7 | 21.3 | 29.3 |
+| n_coined=1 | 100 | 70.0 | 80.7 | 84.7 | 71.7 | 85.7 |
+| n_coined=6 | 100 | 63.0 | 78.7 | 84.7 | 63.7 | 79.3 |
+| decoy | 100 | 57.0 | 62.7 | 64.7 | 60.3 | 75.0 |
+| decoy, n_gold=0 | 100 | 1.0 | 3.0 | 3.7 | 15.7 | 18.7 |
+| control: standard name | 100 | 92.3 | 90.0 | 92.3 | 90.0 | 93.0 |
+| all conditions | 100 | 55.5 (56% of ceiling) | 63.8 (64% of ceiling) | 68.1 (68% of ceiling) | 59.5 (60% of ceiling) | 69.6 (70% of ceiling) |
+
+**Table 71.3: REAL-6, fold 0's held-out users (298 items), top-1 %**
+
+| reader | top-1 |
+|---|---|
+| rename | 74.5 |
+| rename + empty | 73.2 |
+| rename + decoys | 73.5 |
+| rename + decoys + empty | 73.2 |
+
+### 71.1 What the step says
+
+- **Empty categories are the useful augmentation.** Alone they lift every condition with a gold example: v2 base 78 to 83, one gold
+  example 65 to 77, six coined categories 75 to 83; overall 80% of the ceiling against 75% with rename alone. Training without them
+  lets the model learn that an unexplained coined word is the answer by elimination, which v2 punishes.
+- **Decoys alone hurt** (v2 base 60, one example 45): relabelling a same-kind example away from the target teaches the model to
+  distrust the examples in general. **With empty categories they fix the decoy case**: 71 against 59 for rename alone, the largest
+  gain on the condition where section 60 found the widest gap to a strong reader (blind Opus 98 to 100). They cost 5 to 6 points on
+  base and one-example items against empty categories alone.
+- **The augmentations do not cost the ordinary task** (REAL-6 73.2 to 74.5).
+- The zero-gold and opaque conditions stay near their ceilings of chance (25% on v2), as they should.
+
+Which arm is best depends on what users do: if a user rarely files a business of one kind under an unrelated category, empty
+categories alone; if the decoy case matters, both. Hypothesis 4 holds for the decoy (with empty categories) and for one-example items
+(with empty categories).
+
+Tables: `uv run python scripts/li_training_tables.py`. Job list: `scripts/modal_jobs/r74.json`.
