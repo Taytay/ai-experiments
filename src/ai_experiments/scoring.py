@@ -62,9 +62,10 @@ class Scorer:
                  prefix_cache: bool | None = None):
         import os
         self.model, self.tok, self.maxlen, self.extras = model, tok, maxlen, extras
-        # 2026-09-26: each prompt runs once and its options are scored from its KV cache (SCORER_CACHE=0: the packed path, where
-        # every option row repeats the whole prompt; on POI-1's 20 options that is ~95% of the compute)
-        self.prefix_cache = bool(int(os.environ.get("SCORER_CACHE", "1"))) if prefix_cache is None else prefix_cache
+        # SCORER_CACHE=1 (2026-09-26): each prompt runs once and its options are scored from its KV cache. Off by default: under
+        # unsloth a cached forward takes one token at a time through its generation path, and on POI-1 (900-token prompts, 12 to 20
+        # options) that was 2.3x slower than the packed path, which repeats the prompt per option (scripts/check_scorer_cache.py)
+        self.prefix_cache = bool(int(os.environ.get("SCORER_CACHE", "0"))) if prefix_cache is None else prefix_cache
         self.rows, self.tokens = rows_per_forward, tokens_per_forward
         self.pad = tok.pad_token_id or 0
         self._cache: dict[tuple[str, str], tuple[float, int]] = {}  # (premise, option) -> (sum_lp, n_tok)
