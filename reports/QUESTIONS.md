@@ -976,6 +976,7 @@ On it (held-out users, section 55) database episodes read 63.6 and the record wi
 *Experiment (scoring only):* every item re-scored with each user's category names replaced by freshly generated words, consistently
 in the category list, the shots and the options (a new word per user and category, fixed seed), for the no-DB, episode, record and
 record-with-category arms; by original name type and REPORT.md 48's groups.
+**Status (2026-09-27):** answered for the current readers, PLAN step 61, REPORT.md 77. With fresh names the database-episode Qwen3.5-2B falls 86.9 to 68.1 (standard-name items 99 to 70: it files by name meaning), decider-4B one slot 88.3 to 83.6, rename-trained Qwen3.5-2B 74.5 to 73.2. Row 81 trains decider with rename augmentation on top.
 
 **REAL-19 (O) Can the categoriser infer what kind of store an unknown merchant is from its name and the user's examples, and does
 baking a database in cost that?**
@@ -1133,3 +1134,4 @@ against ~25). *Experiment:* Qwen3.5-2B trained with decider's layout and loss (l
 ALL_LABELS shots as extra slots) against the same model with the per-option loss and scorer, on REAL-6 database episodes and POI-1's
 best layout, fold 0: accuracy, calibration, ms per item. Also decider-2B itself on REAL-6 database episodes (merchant knowledge at 2B
 is the doubt: it misfiles Trader Joe's zero-shot), and kev-4B fine-tuned (the best zero-shot reader; its own trainer needs torch < 2.9).
+**Status (2026-09-27):** answered, PLAN steps 79 / 80, REPORT.md 76. One slot matches the per-option loss once the shot labels are trained too (Qwen3.5-2B 85.9 against 86.9); decider-2B 87.9, decider-4B 88.3 with 66% auto-filed at 97.5% and POI-1 92.3; 18 to 24 ms per item warm against ~390; kev-4B fine-tuned 83.2.
