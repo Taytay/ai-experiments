@@ -5799,3 +5799,49 @@ Limits: fold 0, two seeds; the evidence-free test merchants are made-up opaque n
 tested only in that form.
 
 Tables: `uv run python scripts/cant_tell_tables.py`. Job lists: `scripts/modal_jobs/r84.json`, `r84b.json`.
+
+## 86. Users who alternate between categories at one merchant: the best reader ignores the user's rule (44 to 58% where it is fully visible, as if choosing one category regardless); alternation training teaches it to read the rule (stores 87.5, restaurants 76.6) but not to split its probability where the user's choice is noisy or random (still 85 to 91% confident on 60 / 40 splits) (REAL-18)
+
+PLAN step 86 (the owner, 2026-09-27: some users keep a more specific category, "Date night" or "Cozy time", and use it for some of a
+merchant's transactions). `build_alternation.py` writes `alternation_v1` (512 items, fold 0): per user and merchant (8 general stores,
+8 restaurants, real chains outside REAL-6) a new specific category joins the user's list and six of the 24 shots show the merchant filed
+by a rule: stores' purchases of $40 or more, restaurants' Friday and Saturday visits (observable, ceiling 100); the same with each
+label flipped with probability 0.2 (partial, ceiling about 80); 60 / 40 at random (unobservable, ceiling about 60); never (control:
+the specific category is used by another merchant). `ALT=0.15` (`exp_categoriser.py`): alternation episodes with rules drawn per
+episode (random thresholds $15 to $120, random day sets, 20% noise, or a random 30 to 50% share with the target sampled), names
+coined or from a training list disjoint from the test's. decider-4B, row 81's recipe; three seeds letters, two seeds each random
+labels and random labels + ALT.
+
+**Table 86.1 (stores; rule: amount >= $40 to the specific category): top-1 % (ceiling), mean P(gold), and p >= 0.9 share where a confident answer is wrong in kind**
+
+| reader | observable: top-1 (ceiling 100) | partial: top-1 (ceiling 80) | unobservable: top-1 (ceiling 58) | control: top-1 (ceiling 100) | observable: P(gold) | partial: P(gold) | unobservable: P(gold) | control: P(gold) | unobservable: p >= 0.9 | control: specific category chosen |
+|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 54.2 [50.0, 56.2] | 47.9 [46.9, 48.4] | 44.8 [34.4, 51.6] | 100.0 [100.0, 100.0] | 0.55 [0.52, 0.56] | 0.49 [0.48, 0.49] | 0.45 [0.36, 0.52] | 1.00 [1.00, 1.00] | 87.0 [76.6, 93.8] | 0.0 [0.0, 0.0] |
+| + random labels (row 84 control) | 57.8 [56.2, 59.4] | 49.2 [45.3, 53.1] | 44.5 [42.2, 46.9] | 100.0 [100.0, 100.0] | 0.58 [0.56, 0.60] | 0.51 [0.47, 0.54] | 0.45 [0.42, 0.47] | 1.00 [1.00, 1.00] | 93.0 [89.1, 96.9] | 0.0 [0.0, 0.0] |
+| + random labels + alternation episodes | 87.5 [85.9, 89.1] | 53.9 [50.0, 57.8] | 49.2 [43.8, 54.7] | 100.0 [100.0, 100.0] | 0.86 [0.85, 0.87] | 0.56 [0.52, 0.60] | 0.49 [0.45, 0.54] | 1.00 [1.00, 1.00] | 91.4 [90.6, 92.2] | 0.0 [0.0, 0.0] |
+
+**Table 86.1 (restaurants; rule: Fri / Sat to the specific category): top-1 % (ceiling), mean P(gold), and p >= 0.9 share where a confident answer is wrong in kind**
+
+| reader | observable: top-1 (ceiling 100) | partial: top-1 (ceiling 77) | unobservable: top-1 (ceiling 66) | control: top-1 (ceiling 100) | observable: P(gold) | partial: P(gold) | unobservable: P(gold) | control: P(gold) | unobservable: p >= 0.9 | control: specific category chosen |
+|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 44.3 [42.2, 46.9] | 47.4 [46.9, 48.4] | 55.2 [50.0, 57.8] | 99.5 [98.4, 100.0] | 0.45 [0.43, 0.46] | 0.48 [0.47, 0.48] | 0.53 [0.50, 0.56] | 0.99 [0.98, 1.00] | 83.9 [79.7, 89.1] | 0.0 [0.0, 0.0] |
+| + random labels (row 84 control) | 47.7 [45.3, 50.0] | 45.3 [42.2, 48.4] | 52.3 [45.3, 59.4] | 100.0 [100.0, 100.0] | 0.48 [0.46, 0.50] | 0.46 [0.42, 0.51] | 0.53 [0.48, 0.57] | 1.00 [1.00, 1.00] | 87.5 [87.5, 87.5] | 0.0 [0.0, 0.0] |
+| + random labels + alternation episodes | 76.6 [71.9, 81.2] | 50.0 [45.3, 54.7] | 56.2 [56.2, 56.2] | 100.0 [100.0, 100.0] | 0.75 [0.71, 0.80] | 0.50 [0.45, 0.56] | 0.56 [0.54, 0.58] | 1.00 [1.00, 1.00] | 85.2 [84.4, 85.9] | 0.0 [0.0, 0.0] |
+
+### 86.1 What the step says
+
+- **Untrained, the rule is not read.** Half the queries fall on each side of the rule, and the reader scores about half: it picks one
+  of the two categories whatever the amount or day. It is also confident on the random splits (84 to 93% at p >= 0.9), and never
+  misuses the specific category where the user does not use it for this merchant (control 0%).
+- **Alternation episodes teach the rule.** Stores 57.8 to 87.5, restaurants 47.7 to 76.6 on the observable cell (probability on the
+  gold 0.86 and 0.75); the amount threshold is easier than the day set. The control is unchanged (100%, 0% misuse).
+- **They do not teach calibrated splits.** On the partial and unobservable cells top-1 moves little and the reader stays confident
+  (85 to 91% at p >= 0.9 on 60 / 40 splits). Random-share episodes were about 2.5% of training and answered with a sampled label;
+  the next version gives the partial and random episodes their true split as a soft target (as section 85's soft targets did for
+  evidence-free questions) and a larger share.
+- **Cost.** REAL-6 89.3 and 86.2 over the two seeds (the control 88.9 and 90.3), novel names 87.6 and 85.6: possibly a point or two,
+  inside the seed spread.
+
+Limits: fold 0, two seeds, six shots of the merchant in every item, one test threshold ($40) and one day set (Fri / Sat).
+
+Tables: `uv run python scripts/alternation_tables.py`. Items: `scripts/build_alternation.py`. Job lists: `scripts/modal_jobs/r86*.json`.
