@@ -5494,3 +5494,50 @@ Scoring only, fold 0.
 Limits: fold 0 only; one draw of novel words; scoring only (no model saw these words in training).
 
 Tables: `uv run python scripts/novel_labels_tables.py`. Items: `scripts/build_real6_novel.py`. Job list: `scripts/modal_jobs/r61.json`.
+
+## 78. Rename augmentation on top of database episodes makes decider-4B the best reader on real and on novel names alike: REAL-6 91.9 (98% of the 94.0 ceiling, from 88.3) and 89.9 with every category name replaced by a fresh word (from 83.6); standard-name items no longer depend on the name (99.1 on both) (REAL-18)
+
+PLAN step 81, the hypothesis of section 77: a reader trained only with real names leans on what they mean, so rename augmentation
+(RENAME 0.5: in each training episode each category name replaced by a fresh coined word with probability 0.5, consistently in the list,
+the shots and the target) was added to row 80's recipe (decider one slot + shot-label loss + database episodes, 800 steps), fold 0,
+scored on real names and on `real6_v1_novel`.
+
+**Table 78.1: REAL-6 fold 0, real and novel category names, with and without rename augmentation**
+
+| reader | names | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|---|
+| decider-2B, row 80 | real | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-2B, row 80 | novel | 298 | 78.2 [73.1, 84.8] | 90.6 | 1.32 | 10.7 (96.9) |
+| decider-2B, + rename 0.5 | real | 298 | 89.9 [81.1, 94.3] | 98.7 | 0.61 | 58.1 (94.8) |
+| decider-2B, + rename 0.5 | novel | 298 | 83.9 [75.4, 91.5] | 96.6 | 0.87 | 53.4 (96.2) |
+| decider-4B, row 80 | real | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| decider-4B, row 80 | novel | 298 | 83.6 [75.0, 90.3] | 95.6 | 0.91 | 23.8 (97.2) |
+| decider-4B, + rename 0.5 | real | 298 | 91.9 [84.1, 97.2] | 99.3 | 0.45 | 75.5 (96.9) |
+| decider-4B, + rename 0.5 | novel | 298 | 89.9 [81.3, 95.2] | 96.6 | 0.66 | 46.6 (95.0) |
+
+**Table 78.2: top-1 on real → novel names by history and gold name type**
+
+| reader | in history | not in history | name type: new | name type: renamed | name type: standard |
+|---|---|---|---|---|---|
+| decider-2B, row 80 | 90.8 → 81.0 | 85.3 → 75.6 | 92.2 → 92.2 | 75.0 → 61.7 | 99.1 → 87.7 |
+| decider-4B, row 80 | 90.8 → 85.2 | 85.3 → 82.1 | 95.3 → 95.3 | 72.5 → 67.5 | 100.0 → 93.9 |
+| decider-2B, + rename 0.5 | 88.7 → 84.5 | 91.0 → 83.3 | 92.2 → 96.9 | 80.0 → 64.2 | 99.1 → 97.4 |
+| decider-4B, + rename 0.5 | 92.3 → 89.4 | 91.7 → 90.4 | 98.4 → 96.9 | 81.7 → 77.5 | 99.1 → 99.1 |
+
+### 78.1 What the step says
+
+- **The hypothesis holds, and rename augmentation also helps on real names.** decider-4B gains 3.6 points on real names and 6.3 on
+  novel ones; the gap between them shrinks from 4.7 to 2.0. On Qwen3.5-2B with the per-option loss and no database (section 71) rename
+  training cost accuracy; here, with the database episodes carrying the merchant facts, it costs nothing and adds.
+- **Where it helps.** Standard-name items no longer fall when the name goes (99.1 on both): the reader finds the category from the
+  user's examples, not the word. The largest real-name gain is on renamed categories (72.5 to 81.7), REAL-6's hardest group, where
+  the user's name hides a standard category: training on hidden names is training on exactly that.
+- **Confidence.** Bits left fall from 0.69 to 0.45 and 75.5% of items are auto-filed at a realised 96.9% (the leave-fold-out
+  threshold misses 98% by a point on 298 items). On novel names the auto-file band doubles (23.8 to 46.6).
+- **At 2B** the same holds at a smaller scale (87.9 to 89.9 real, 78.2 to 83.9 novel).
+
+The best reader is now decider-4B, one slot, shot-label loss, database episodes and rename augmentation 0.5: 91.9 on REAL-6, 97.8% of
+the ceiling. Limits: fold 0 and one seed (intervals of about ±6 points; the real-name gain over row 80 is inside them, the novel-name
+gain is not quite); POI-1 not yet read with this recipe; the rename rate not swept.
+
+Tables: `uv run python scripts/novel_labels_tables.py`. Job list: `scripts/modal_jobs/r81.json`.
