@@ -123,6 +123,8 @@ assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs 
 POI = os.environ.get("POI", "")
 MISLEAD = os.environ.get("MISLEAD", "")  # row 83
 ALT = float(os.environ.get("ALT", "0"))  # row 86
+ALT_SOFT = os.environ.get("ALT_SOFT", "") == "1"  # row 86 v2: noisy / random alternation targets as their true split (SOFT[prompt]), rules drawn evenly
+SOFT = {}  # row 86 v2: prompt -> {answer name: probability}; read by exp_decider_finetune.py
 ALT_NAMES = ["Splurges", "Gifts", "Hobby time", "Self care", "Weekend treats", "Family outings", "Big buys", "Little luxuries", "Brunch club", "Game night"]
 LOOKUP, OVERRIDE = float(os.environ.get("LOOKUP", "0")), float(os.environ.get("OVERRIDE", "0"))  # row 85
 POI_DB = os.environ.get("POI_DB", "")  # row 66 (REAL-21): data/processed/<POI_DB>.json (build_poi1_db.py), the places DBEP episodes draw from  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
@@ -139,7 +141,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -229,11 +231,11 @@ def alternation(u, h, others, rng):
     """Row 86 (ALT): (h, others, B) with a new specific category B taking some of the target merchant's rows by a drawn rule."""
     import math
     if POI or h.get("merchant") not in MERCHANT:
-        return h, others, None
+        return h, others, None, None
     m = MERCHANT[h["merchant"]]; A = h["label"]
     taken = {c["name"] for c in u["categories"]}
     B = rng.choice([n for n in ALT_NAMES if n not in taken]) if rng.random() < 0.5 else coined(rng, taken)
-    kind = rng.choice(["amount", "amount", "day", "day", "partial", "random"])
+    kind = rng.choice(["amount", "day", "partial", "random"] if ALT_SOFT else ["amount", "amount", "day", "day", "partial", "random"])
     base = rng.choice(["amount", "day"])
     t = math.exp(rng.uniform(math.log(15), math.log(120)))
     days = rng.choice([{"Fri", "Sat"}, {"Sat", "Sun"}, {"Fri", "Sat", "Sun"}, {"Mon", "Tue", "Wed", "Thu"}, {"Sun"}])
@@ -248,27 +250,29 @@ def alternation(u, h, others, rng):
             a = round(math.exp(rng.gauss(*T.AMOUNT[m["category"]])), 2)
             d = rng.choice(sorted(days) if side else sorted(set(T.WEEKDAYS) - days))
         b = side if kind in ("amount", "day") else (side if rng.random() >= 0.2 else not side) if kind == "partial" else rng.random() < share
+        pb = float(side) if kind in ("amount", "day") else (0.8 if side else 0.2) if kind == "partial" else share
         for _ in range(5):
             text = T.render(m, rng)
             if text not in ITEM_TEXTS:
-                return dict(text=text, amount=a, weekday=d, merchant=m["name"], label=B if b else A, synthetic=True)
+                return dict(text=text, amount=a, weekday=d, merchant=m["name"], label=B if b else A, synthetic=True, p_b=pb)
         return None
     for _ in range(10):
         rows = [one() for _ in range(6)]
         if all(rows) and 2 <= sum(r["label"] == B for r in rows) <= 4:
             break
     else:
-        return h, others, None
+        return h, others, None, None
     tgt = one()
     if tgt is None:
-        return h, others, None
+        return h, others, None, None
     same = [k for k, o in enumerate(others) if o.get("merchant") == m["name"]]
     free = same + rng.sample([k for k in range(len(others)) if k not in same], max(0, 6 - len(same)))
     others = list(others)
     for k, r in zip(free, rows):
         others[k] = r
     others = [o for k, o in enumerate(others) if o.get("merchant") != m["name"] or k in free[:6]]
-    return tgt, others, B
+    soft = {B: tgt["p_b"], A: 1 - tgt["p_b"]} if ALT_SOFT and kind in ("partial", "random") else None
+    return tgt, others, B, soft
 
 
 SYLL = [c + v for c in "bdfgklmnprstvz" for v in "aeiou"]
@@ -341,9 +345,9 @@ def sft_examples(per_user=150):
                 h = r if r is not None else h
             if LOOKUP or OVERRIDE:  # row 85
                 h, others = lookup_override(u, h, list(others), rng)
-            alt_b = None
+            alt_b = alt_soft = None
             if ALT and rng.random() < ALT:  # row 86
-                h, others, alt_b = alternation(u, h, list(others), rng)
+                h, others, alt_b, alt_soft = alternation(u, h, list(others), rng)
             names = {c["name"]: c["name"] for c in u["categories"]}
             if RENAME:  # the same fresh word for a category everywhere in this episode
                 taken = set(names)
@@ -387,6 +391,8 @@ def sft_examples(per_user=150):
             if POI_REC:  # row 72: the test items' record line (build_poi1: "<name> is listed as a <kind>.")
                 note = f"Note: {h['merchant']} is listed as a {kind_name(h['basic']).lower()}.\n"
             prompt = hdr + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\n{kind(h)}Category:"
+            if alt_soft:  # row 86 v2
+                SOFT[prompt] = {names[k]: v for k, v in alt_soft.items()}
             ex.append((R6.chat_prompt(prompt) if CHAT else prompt, " " + names[h["label"]]) + ((spans,) if ALL_LABELS else ()))
     if DB_EPISODES:  # row 59: database episodes as their own pool entries, targets cycling through the DB's merchants
         users = training_users(); order = list(DB_NAMES); rng.shuffle(order)

@@ -108,6 +108,9 @@ def evfree_aug(e, rng):
     return e
 
 
+SOFT_CTX = {}  # row 86 v2: episode context -> {option name: probability}
+
+
 def episodes():
     out = []
     for e in C["sft_examples"]():
@@ -115,6 +118,8 @@ def episodes():
         assert prompt.endswith("Category:")
         opts = names_of(prompt)
         out.append((prompt[: -len("Category:")].rstrip(), opts, opts.index(ans)) + ((e[2],) if AUX_LM else ()))
+        if prompt in C["SOFT"]:  # row 86 v2: the target's true split
+            SOFT_CTX[out[-1][0]] = C["SOFT"][prompt]
     return out
 
 
@@ -159,6 +164,11 @@ def main():
         gold = torch.tensor([max(b["gold"], 0) for b in built], device="cuda")
         lz = F.log_softmax(z, -1).masked_fill(torch.isinf(z), 0.0)
         per = torch.where(soft, -lz.sum(-1) / torch.tensor([len(b["labs"]) for b in built], device="cuda"), -lz.gather(1, gold[:, None])[:, 0])
+        for i, (e, b) in enumerate(zip(picked, built)):  # row 86 v2: a split target where the user's choice is noisy or random
+            dist = SOFT_CTX.get(e[0])
+            if dist and b["gold"] >= 0:
+                tv = torch.tensor([dist.get(e[1][oi], 0.0) for oi in b["perm"]] + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
+                per = per.clone(); per[i] = -(tv * lz[i]).sum()
         loss = per.mean()
         if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
             rows, pos, tgt = [], [], []
