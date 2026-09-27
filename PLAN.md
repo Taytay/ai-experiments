@@ -35,10 +35,10 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   approach and name its limits with hypotheses; report results as a share of each set's ceiling (`ai_experiments.ceiling`,
   `scripts/ceiling_tables.py`: REAL-6 94.0 exact; label induction exact per condition; POI-1 exact on seen kinds, a bracket on
   unseen ones); the 98% auto-file point is arbitrary, read the whole coverage curve.
-- **Next:** the rest of REPORT 64.2's hypotheses as rows
-  73 to 75 (row 72 done: kind lines on every example take POI-1 to 90; category descriptions for unseen kinds; label-induction training with decoys
-  and empty categories; the lookup in front of the best runs), row 68 (MODEL-9, encoder objectives for confidence), rows 66 and 67,
-  then the older todo rows (50 to 52, 54, 55, 61) as the agenda maps them.
+- **Next:** rows 74 and 75 (label-induction training with decoys and empty categories; the lookup in front of the best REAL-6
+  runs), then 68, 66, 67 and the older todo rows. Open leads from REPORT 69: decider-2B fine-tuned on REAL-6 database episodes (its
+  one-slot readout at a tenth of the scoring cost), kev-4B fine-tuned (best zero-shot), and a one-slot readout for the Qwen3.5
+  categoriser in place of the per-option scorer. New trained work uses Qwen3.5 or decider (open licences only).
 
 ## Procedure for one step
 
