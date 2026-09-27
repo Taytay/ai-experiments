@@ -1,0 +1,6 @@
+outs:
+- md5: ca4ddbd575c073b00b1cafc74af142d3.dir
+  size: 250132897
+  nfiles: 3
+  hash: md5
+  path: slot_Qwen3.5-2B_none_h100bf16_f0_dbep50_lora

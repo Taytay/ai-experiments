@@ -368,3 +368,6 @@
 /encmask_von_poi1_v1_st200_f0
 /encmask_von_st1500_f0
 /encmask_von_st200_f0
+/slot_Qwen3.5-2B_none_h100bf16_f0_dbep50_lora
+/slot_Qwen3.5-2B_none_h100bf16st800_f0_dbep50_lora
+/slot_Qwen3.5-2B_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora
