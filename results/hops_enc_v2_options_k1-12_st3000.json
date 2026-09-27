@@ -1,0 +1,70 @@
+{
+ "config": {
+  "hops": "v2",
+  "label_lines": false,
+  "aux": 0.0,
+  "items": "hops_v2",
+  "eval_only": false,
+  "mode": "options",
+  "loop": 0,
+  "block": [
+   9,
+   17
+  ],
+  "r_test": [
+   1
+  ],
+  "train_ks": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "steps": 3000,
+  "batch": 32,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "seed": 0,
+  "base": "answerdotai/ModernBERT-large"
+ },
+ "train_minutes": 11.4,
+ "final_loss": 1.9378139382210112e-05,
+ "final_train_acc": 1.0,
+ "test_seconds": 8,
+ "acc": {
+  "plain": {
+   "multi_k01": 100.0,
+   "multi_k02": 100.0,
+   "multi_k03": 100.0,
+   "multi_k04": 100.0,
+   "multi_k05": 100.0,
+   "multi_k06": 100.0,
+   "multi_k07": 100.0,
+   "multi_k08": 100.0,
+   "multi_k09": 100.0,
+   "multi_k10": 100.0,
+   "multi_k11": 100.0,
+   "multi_k12": 100.0,
+   "single_k01": 100.0,
+   "single_k02": 100.0,
+   "single_k03": 100.0,
+   "single_k04": 100.0,
+   "single_k05": 100.0,
+   "single_k06": 100.0,
+   "single_k07": 100.0,
+   "single_k08": 100.0,
+   "single_k09": 100.0,
+   "single_k10": 100.0,
+   "single_k11": 100.0,
+   "single_k12": 100.0
+  }
+ }
+}

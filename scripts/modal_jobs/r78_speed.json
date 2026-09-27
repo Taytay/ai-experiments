@@ -1,0 +1,6 @@
+[
+ {"tag": "r78sp-unsloth-2b", "env": {"LOAD_4BIT": "0", "LLM_BASE": "Qwen/Qwen3.5-2B", "TRAINER": "unsloth", "POI": "poi1_v1", "FOLD": "0", "ALL_LABELS": "1", "STEPS": "60", "MICRO": "16", "RUN_TAG": "h100bf16speed", "RENAME": "0.5", "POI_KIND": "1"},
+  "cmds": ["uv run --frozen python scripts/exp_categoriser.py llm none", "ITEMS_SET=poi1_v1_kinds CONDS=noctx SMOKE=1 SCORER=unsloth uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16speed_pkind_f0_ren50_alllab_lora"]},
+ {"tag": "r78sp-hf-2b", "env": {"LOAD_4BIT": "0", "LLM_BASE": "Qwen/Qwen3.5-2B", "TRAINER": "hf", "POI": "poi1_v1", "FOLD": "0", "ALL_LABELS": "1", "STEPS": "60", "MICRO": "16", "RUN_TAG": "h100bf16speed", "RENAME": "0.5", "POI_KIND": "1"},
+  "cmds": ["uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none"]}
+]

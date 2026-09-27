@@ -1,0 +1,140 @@
+[
+ {
+  "tag": "r72-KSH-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "ALL_LABELS": "1",
+   "STEPS": "800",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "RENAME": "0.5",
+   "POI_SHOTS": "kind"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1_kshots CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-REC-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "ALL_LABELS": "1",
+   "STEPS": "800",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "RENAME": "0.5",
+   "POI_REC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1 CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_prec_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kshots CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_prec_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-KIND-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "ALL_LABELS": "1",
+   "STEPS": "800",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "RENAME": "0.5",
+   "POI_KIND": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pkind_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pkind_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-KSHKIND-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "ALL_LABELS": "1",
+   "STEPS": "800",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "RENAME": "0.5",
+   "POI_SHOTS": "kind",
+   "POI_KIND": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_pkind_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_pkind_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-KSHREC-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "ALL_LABELS": "1",
+   "STEPS": "800",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "RENAME": "0.5",
+   "POI_SHOTS": "kind",
+   "POI_REC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1_kshots CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_prec_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1 CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_prec_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-PREN-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ADAPTERS_FROM": "r65-PREN-f0"
+  },
+  "cmds": [
+   "ITEMS_SET=poi1_v1 CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kshots CONDS=ctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r72-base-3b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-3B-Instruct"
+  },
+  "cmds": [
+   "ITEMS_SET=poi1_v1 CONDS=ctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kshots CONDS=ctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r72-base-14b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "USERS": "all",
+   "MODEL": "Qwen/Qwen2.5-14B-Instruct"
+  },
+  "cmds": [
+   "ITEMS_SET=poi1_v1 CONDS=ctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kshots CONDS=ctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm base",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen python scripts/exp_real6.py llm base"
+  ]
+ }
+]

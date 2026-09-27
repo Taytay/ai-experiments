@@ -7,6 +7,11 @@ the categorisers on the same items.
                              prompt file and a neutral instruction (the one used on 2026-09-26 is in results/blind_opus/README.md)
   score <set>                read answers_<variant>.txt ("item N | <category> | reason" per line) and print accuracy by group, with
                              the categorisers' per-item correctness on the same items (their obscure-rendering scores)
+  latin <set> <conditions...>  for a set with a `condition` and `query` per item (label_induction_v1): a Latin square, one prompt file
+                             per condition slot, so each subagent sees every sampled query once and every condition covers them all
+  score_latin <set>          score the Latin-square answers (answers_L<k>.txt) by condition
+  levels <set> <per_level> <files>  a sample stratified by item level (POI-1), split over <files> prompt files items_P<k>.txt
+  score_levels <set>         score answers_P<k>.txt by level
 usage: uv run python scripts/blind_ceiling.py write novel_merchants_v1 A C; ... ; uv run python scripts/blind_ceiling.py score novel_merchants_v1
 """
 import json
@@ -74,5 +79,74 @@ def score(name):
         print(f"| {label} | " + " | ".join(f"{100 * np.mean([c[i] for i in order if f(items[i])]):.0f}" for _, f in groups) + " |")
 
 
+def latin(name, conditions, n_query=60, seed=64):
+    items = json.loads((PROCESSED / f"{name}.json").read_text())["items"]
+    by = {(x["query"], x["condition"]): x for x in items}
+    qs = random.Random(seed).sample(sorted({x["query"] for x in items}), n_query)
+    k = len(conditions); block = n_query // k; d = OUT / name; d.mkdir(parents=True, exist_ok=True)
+    plan = {}
+    for a in range(k):
+        rows = [(q, conditions[(j // block + a) % k]) for j, q in enumerate(qs)]
+        random.Random(seed + a).shuffle(rows)
+        with open(d / f"items_L{a}.txt", "w") as f:
+            for n, (q, c) in enumerate(rows):
+                f.write(f"### item {n + 1}\n{by[(q, c)]['prompt']}\n\n")
+        plan[f"L{a}"] = [by[(q, c)]["id"] for q, c in rows]
+    (d / "key_latin.json").write_text(json.dumps(dict(plan=plan, conditions=conditions, queries=qs, seed=seed), indent=0))
+    print(k, "files of", n_query, "items")
+
+
+def score_latin(name):
+    d = OUT / name; key = json.loads((d / "key_latin.json").read_text())
+    items = {x["id"]: x for x in json.loads((PROCESSED / f"{name}.json").read_text())["items"]}
+    got = {}
+    for f, ids in key["plan"].items():
+        p = d / f"answers_{f}.txt"
+        if not p.exists():
+            continue
+        for line in p.read_text().splitlines():
+            if line.strip():
+                k, a = [x.strip() for x in line.split("|")[:2]]; i = ids[int(k.split()[1]) - 1]
+                got[i] = a == items[i]["options"][items[i]["answer"]].strip()
+    print("| condition | blind Opus 5.5 (n) |")
+    print("|---|---|")
+    for c in key["conditions"]:
+        v = [ok for i, ok in got.items() if items[i]["condition"] == c]
+        print(f"| {c} | {100 * np.mean(v):.0f} ({len(v)}) |" if v else f"| {c} | - |")
+
+
+def levels(name, per_level, files, seed=65):
+    items = json.loads((PROCESSED / f"{name}.json").read_text())["items"]; rng = random.Random(seed); pick = []
+    for lv in sorted({x["level"] for x in items}):
+        pick += rng.sample([x["id"] for x in items if x["level"] == lv], per_level)
+    rng.shuffle(pick); by = {x["id"]: x for x in items}; d = OUT / name; d.mkdir(parents=True, exist_ok=True); plan = {}
+    for f in range(files):
+        ids = pick[f::files]; plan[f"P{f}"] = ids
+        with open(d / f"items_P{f}.txt", "w") as fh:
+            for n, i in enumerate(ids):
+                fh.write(f"### item {n + 1}\n{by[i]['prompt']}\n\n")
+    (d / "key_levels.json").write_text(json.dumps(dict(plan=plan, seed=seed, per_level=per_level), indent=0))
+    print(len(pick), "items in", files, "files")
+
+
+def score_levels(name):
+    d = OUT / name; key = json.loads((d / "key_levels.json").read_text())
+    items = {x["id"]: x for x in json.loads((PROCESSED / f"{name}.json").read_text())["items"]}; got = {}
+    for f, ids in key["plan"].items():
+        p = d / f"answers_{f}.txt"
+        if p.exists():
+            for line in p.read_text().splitlines():
+                if line.strip():
+                    k, a = [x.strip() for x in line.split("|")[:2]]; i = ids[int(k.split()[1]) - 1]
+                    got[i] = a == items[i]["options"][items[i]["answer"]].strip()
+    print("| level | blind Opus 5.5 (n) |\n|---|---|")
+    for lv in sorted({items[i]["level"] for i in got}) + ["all"]:
+        v = [ok for i, ok in got.items() if lv == "all" or items[i]["level"] == lv]
+        print(f"| {lv} | {100 * np.mean(v):.0f} ({len(v)}) |")
+    return got
+
+
 if __name__ == "__main__":
-    {"write": lambda: write(sys.argv[2], sys.argv[3:]), "score": lambda: score(sys.argv[2])}[sys.argv[1]]()
+    {"write": lambda: write(sys.argv[2], sys.argv[3:]), "score": lambda: score(sys.argv[2]), "latin": lambda: latin(sys.argv[2], sys.argv[3:]),
+     "score_latin": lambda: score_latin(sys.argv[2]), "levels": lambda: levels(sys.argv[2], int(sys.argv[3]), int(sys.argv[4])),
+     "score_levels": lambda: score_levels(sys.argv[2])}[sys.argv[1]]()

@@ -1,0 +1,60 @@
+item 1 | Dimezu | (reason as reported)
+item 2 | Menal | No restaurant category; guessed among the unused invented labels
+item 3 | Mone | Utility bills (electric co-op, phone) go to Mone
+item 4 | Difor | Communications and utility bills were filed as Difor
+item 5 | Pets | Veterinary hospital is a pet expense
+item 6 | Bogi | Car wash and tire shop filed as Bogi, so vehicle-related
+item 7 | Lukaral | No clothing category; guessed among the unused invented labels
+item 8 | Vibapon | Clothing boutique filed as Vibapon
+item 9 | Bakex | Camera and computer stores filed as Bakex, so electronics
+item 10 | Gas & Auto | Tire shop is an auto expense
+item 11 | Melu | No auto category; guessed among the unused invented labels
+item 12 | Rodirul | Shoe store and boutiques filed as Rodirul
+item 13 | Pavul | No restaurant category; guessed among the unused invented labels
+item 14 | Kalo | Arcade filed as Kalo, so entertainment; cinema fits
+item 15 | Volen | No restaurant category; guessed among the unused invented labels
+item 16 | Nomel | Nursery and lumber filed as Nomel, so home improvement
+item 17 | Logudur | Pet spa and grooming filed as Logudur
+item 18 | Disu | No grocery category; guessed among the unused invented labels
+item 19 | Nerul | No grocery category; guessed among the unused invented labels
+item 20 | Electronics | Computer store is electronics
+item 21 | Clothing | Shoe store is clothing
+item 22 | Restaurants | Restaurant is a restaurant
+item 23 | Groceries | Food store is groceries
+item 24 | Rerimon | A camera store was filed under Rerimon
+item 25 | Rifi | No pets category; guessed among the unused invented labels
+item 26 | Guvun | No health category; guessed among the unused invented labels
+item 27 | Saval | Grill and coffee shop filed as Saval, so restaurants
+item 28 | Zaminix | Performing arts theatre filed as Zaminix
+item 29 | Zusar | Wireless provider filed as Zusar
+item 30 | Groceries | Supermarket is groceries
+item 31 | Lazar | Meat shops filed as Lazar, food shopping
+item 32 | Difafar | No electronics category; guessed among the unused invented labels
+item 33 | Mavurel | No fitness category; guessed among the unused invented labels
+item 34 | Lilibox | Shoes and clothing store filed as Lilibox
+item 35 | Takuvol | No home improvement category; guessed among unused invented labels
+item 36 | Zabun | No home improvement category; guessed among unused invented labels
+item 37 | Surovor | Pilates studio filed as Surovor, so fitness
+item 38 | Restaurants | No travel category; the inn has a restaurant
+item 39 | Gefux | Computer stores filed as Gefux
+item 40 | Bizilil | No electronics category; guessed among the unused invented labels
+item 41 | Travel | An inn is travel lodging
+item 42 | Seloben | Computer stores filed as Seloben, so electronics
+item 43 | Refami | Dental filed as Refami, so health; pharmacy fits
+item 44 | Gudor | Camera and audio stores filed as Gudor
+item 45 | Sanupal | Computer stores filed as Sanupal, so electronics
+item 46 | Gesax | No pets category; guessed among the unused invented labels
+item 47 | Dilafon | No home improvement category; guessed among unused invented labels
+item 48 | Restaurants | Coffee shop is food and drink out
+item 49 | Kofa | Auto repair filed as Kofa; tire shop fits
+item 50 | Nimo | Inn and travel agency filed as Nimo
+item 51 | Groceries | Butcher and smokehouse is food shopping
+item 52 | Fagodil | Pet resort filed as Fagodil; vet fits
+item 53 | Belox | Fitness gym filed as Belox; yoga fits
+item 54 | Sino | No electronics category; guessed among the unused invented labels
+item 55 | Bonin | Hotel filed as Bonin, so travel
+item 56 | Vitor | Eye center and pharmacy filed as Vitor, so health
+item 57 | Lapul | Motels and motor inns filed as Lapul
+item 58 | Takux | No clothing category; guessed among the unused invented labels
+item 59 | Zilapu | Pharmacies filed as Zilapu, so health; eye care fits
+item 60 | Reper | No electronics category; guessed among the unused invented labels"}

@@ -1,0 +1,60 @@
+item 1 | Electronics | (reason as reported)
+item 2 | Doderun | Building supply; lumber and nursery went to Doderun
+item 3 | Electronics | Camera store; cameras and AV filed as Electronics
+item 4 | Navasar | No electronics-like label shown; unseen label guessed
+item 5 | Povor | Restaurant group; cafes filed under Povor
+item 6 | Rozix | Shoe store; boutiques filed under Rozix
+item 7 | Kuvir | Food market; meat and Italian market are Kuvir
+item 8 | Kofa | No auto label shown; guessed among unused labels
+item 9 | Sifa | Electronics store; computer parts filed under Sifa
+item 10 | Ninokex | Supermarket; food markets filed under Ninokex
+item 11 | Lapul | Hotel, no travel label shown; unseen label guessed
+item 12 | Pets | Animal hospital
+item 13 | Lipin | Electronics; camera and electronics filed under Lipin
+item 14 | Sesefar | Restaurant; cafe and pizza filed under Sesefar
+item 15 | Dadume | Butcher shop; markets filed under Dadume
+item 16 | Gas & Auto | Car wash
+item 17 | Dadaful | Vet; grooming and dog store filed under Dadaful
+item 18 | Clothing | Shoe store
+item 19 | Home Improvement | Hardware store
+item 20 | Kufir | Telecom, no telecom label shown; unseen label guessed
+item 21 | Laser | Gym, no fitness label shown; unseen label guessed
+item 22 | Fitness | Fitness gym
+item 23 | Zebefex | Boutique, no clothing label shown; unseen label guessed
+item 24 | Mitox | Coffee shop; eateries filed under Mitox
+item 25 | Seloben | Electronics; computer store filed under Seloben
+item 26 | Saval | Italian restaurant; grill filed under Saval
+item 27 | Sanupal | Electronics; computer store filed under Sanupal
+item 28 | Razan | Dentist, no health label shown; unseen label guessed
+item 29 | Punar | Boutique, no clothing label shown; unseen label guessed
+item 30 | Bonin | Inn, no travel label; large opaque charges are Bonin
+item 31 | Debimo | Pizza restaurant; restaurants and cafes filed under Debimo
+item 32 | Zukakan | Computer store; computers and audio are Zukakan
+item 33 | Poser | Computers, no electronics label shown; unseen label guessed
+item 34 | Beguvux | Tire shop; auto repair filed under Beguvux
+item 35 | Ronasal | Vet, no pets label shown; unseen label guessed
+item 36 | Buken | Water utility, no utilities label shown; guessed
+item 37 | Lazar | Grocery; meat market filed under Lazar
+item 38 | Lamuvol | Lawn and garden; hardware filed under Lamuvol
+item 39 | Restaurants | Mexican grill
+item 40 | Sobox | Boutique; boutiques filed under Sobox
+item 41 | Mekolin | Food market; produce and grocery filed under Mekolin
+item 42 | Gidebur | Dentist; pharmacies (health) filed under Gidebur
+item 43 | Kopesir | Camera shop, no electronics label shown; guessed
+item 44 | Gukan | Cinema, no entertainment label shown; guessed
+item 45 | Gudor | Computers; audio electronics filed under Gudor
+item 46 | Dupagan | Theater, no entertainment label shown; guessed
+item 47 | Nimo | Lodging; travel agency filed under Nimo
+item 48 | Zilapu | Eye clinic; pharmacy (health) filed under Zilapu
+item 49 | Logudur | Vet; grooming filed under Logudur
+item 50 | Bopax | Pharmacy, no health label shown; unseen label guessed
+item 51 | Reten | Motor sports, no auto label shown; guessed
+item 52 | Nomel | Home center; lumber supply filed under Nomel
+item 53 | Difor | Communications utility; water utility filed under Difor
+item 54 | Fuvar | Yoga, no fitness label shown; unseen label guessed
+item 55 | Groceries | Market
+item 56 | Vunugel | Inn; motel and travel filed under Vunugel
+item 57 | Kimozel | Boutique, no clothing label shown; unseen label guessed
+item 58 | Home Improvement | Lumber company
+item 59 | Travel | Inn lodging, large charge
+item 60 | Tevax | Pet care; grooming filed under Tevax"}

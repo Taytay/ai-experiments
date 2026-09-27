@@ -8,7 +8,8 @@ check the repo started as is done; the research is what the repo is for now.
 
 ## Start here
 
-**`PLAN.md`** is the work queue and the only file that changes as work gets done. "Do the next
+**`PLAN.md`** is the work queue and the only file that changes as work gets done. Its "Current state" block at the top says where the work stands, which branch is the top of the PR stack, which
+checkout holds what, and what is in flight. "Do the next
 step" means: open `PLAN.md`, take the first `todo` row whose Needs are done, and follow the
 procedure at the top of that file. Do not read anything else first.
 
@@ -36,6 +37,33 @@ we collected, `src/` is library code, `scripts/` is entry points.
 `reports/improvements.html` is an illustrated copy of the report as of section 8.
 `references/lit_review.md` and `references/frameworks.md` are first-day notes, superseded by
 `SURVEY.md`.
+
+## GPU work: Modal (from 2026-09-25)
+
+The owner moved all GPU work to Modal (workspace `ynab`, shared with colleagues: touch nothing but this project's app and volumes).
+The local 3090 is no longer used for runs; the rules below about it still hold if it is ever used again.
+
+- Client: `uv tool install modal` (a uv tool, not a project dependency), then `modal setup`. Modal's agent skill is in
+  `.claude/skills/modal` with its docs bundled (Modal's sample Docker token there is replaced by a placeholder: GitHub push protection).
+- `scripts/modal_app.py` (app `ai-experiments-training`): builds the image from `uv.lock`, runs this repo's scripts unchanged on one H100,
+  streams their output, and writes every file they create or change to the volume `ai-exp-results` under the job's tag; model
+  downloads persist in `ai-exp-hf-cache`. One job: `modal run scripts/modal_app.py --tag T --env "K=V,..." --cmd "cmd1 ;; cmd2"`.
+  Many in parallel (at most 8 containers): write a JSON list of `{tag, env, cmds}` to `scripts/modal_jobs/<row>.json`, commit it, then
+  `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
+  by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
+- Bring results back: `modal volume get ai-exp-results <tag> modal_out/` (gitignored), copy `results/` into the branch, union the
+  job's `evals/runs.jsonl` rows into ours by `run_id`, copy adapters into `models/adapters/`, `just push-models`, commit the new `.dvc` files, `just drop-all`.
+- Open licences only (owner, 2026-09-26): a model, its base and any code must be Apache-2.0, MIT, BSD or CC-BY (`ai_experiments.licences.open_licence`).
+  Qwen2.5-3B-Instruct is under the Qwen Research licence: new trained work uses Qwen3.5 (`LLM_BASE=Qwen/Qwen3.5-2B` or `-4B`; it runs through
+  transformers + peft, `TRAINER=hf`, with `uv run --with transformers==5.17.0 --with flash-linear-attention --with "peft>=0.21" --with torch==2.13.0 --with torchvision==0.28.0`:
+  torch 2.13 brings Triton 3.7.1, which flash-linear-attention needs to train on Hopper). Without fla its DeltaNet layers run in pure
+  PyTorch at a fifth of the speed; fla tunes a kernel per sequence length, so Qwen3.5 batch lengths are rounded up to 64
+  (`scripts/bench_train_step.py`: warm, Qwen3.5-2B trains at ~14k tokens/s, as fast as Qwen2.5-3B in the same loop).
+- Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
+  categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
+  hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+- Report every result with the scorecard (`ai_experiments.scorecard`: top-1, top-3, calibrated bits, auto-file coverage, skill over
+  the no-model cascade) on held-out users, and add a blind strong-reader ceiling (`scripts/blind_ceiling.py`) for a new item set.
 
 ## Working rules for this machine
 

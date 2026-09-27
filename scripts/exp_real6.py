@@ -41,7 +41,7 @@ ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge
 CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions to score (a retrieval-trained adapter needs ctx only)
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
-SCORER = os.environ.get("SCORER", "unsloth")
+SCORER = os.environ.get("SCORER", "hf" if "Qwen3.5" in (os.environ.get("MODEL", "") + " ".join(sys.argv)) else "unsloth")  # row 78: Qwen3.5 through transformers + peft
 SHOTS = os.environ.get("SHOTS", next((r for r in ("recent", "nearest", "transact", "cluster") if f"_shots{r}" in WHAT), "fixed"))  # row 41: shots per query
 CHAT = bool(int(os.environ.get("CHAT", "1" if "_chat" in WHAT else "0")))  # row 39 (REAL-8): the prompt as the user turn, the option as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every
@@ -54,7 +54,8 @@ if "ret1" in CONDS or ENC_CTX == "ret":  # top-1 merchant per item from scripts/
     RETRIEVED = json.loads((ROOT / "results" / "real6_retrieved.json").read_text())["items"]
 ITEMS_SET = os.environ.get("ITEMS_SET", "")  # row 62: score another frozen item set in REAL-6's format (data/processed/<set>.json), e.g. novel_merchants_v1
 if ITEMS_SET:
-    DOC = dict(DOC, items=json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())["items"])
+    _set = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
+    DOC = dict(DOC, items=_set["items"], **({"users": _set["users"]} if "users" in _set else {}))  # row 65: a set with its own users (poi1_v1)
 ITEMS = DOC["items"][::10] if SMOKE else DOC["items"]
 _fold = re.search(r"_f(\d)(?:_|$)", WHAT)  # row 42: a fold adapter (exp_categoriser.py FOLD=k) is scored on its held-out users unless USERS says otherwise
 USERS = os.environ.get("USERS", "all" if _fold is None else ",".join(str(u["user"]) for u in DOC["users"] if u["user"] % 4 == int(_fold.group(1))))
@@ -103,10 +104,11 @@ def run_llm(run):
         import unsloth  # noqa: F401
         from unsloth import FastLanguageModel
         model, tok = FastLanguageModel.from_pretrained(src, max_seq_length=2048, dtype=torch.bfloat16, load_in_4bit=LOAD_4BIT)
+        tok = getattr(tok, "tokenizer", tok)  # row 78: Qwen3.5 checkpoints are vision-language; unsloth returns their processor, which reads text as an image
     tok.padding_side = "right"; model.eval()
     if CHAT:
         assert R6.chat_wrap("x") == tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True), "chat template drift"
-    sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
+    sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576, pad_multiple=64 if "Qwen3.5" in src + MODEL else 1)
     results = {}
     for cond, ctx in (("noctx", False), ("ctx", True), ("ret1", True)):
         if cond not in CONDS:

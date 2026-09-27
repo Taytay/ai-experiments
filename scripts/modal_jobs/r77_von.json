@@ -1,0 +1,4 @@
+[
+ {"tag": "r77ft-von-real6", "env": {"INIT": "von", "FOLD": "0"}, "cmds": [" STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py", " STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py", " STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"]},
+ {"tag": "r77ft-von-poi", "env": {"INIT": "von", "FOLD": "0"}, "cmds": [" POI=poi1_v1 STEPS=0 uv run --frozen python scripts/exp_encoder_mask.py", " POI=poi1_v1 STEPS=200 uv run --frozen python scripts/exp_encoder_mask.py", " POI=poi1_v1 STEPS=1500 uv run --frozen python scripts/exp_encoder_mask.py"]}
+]

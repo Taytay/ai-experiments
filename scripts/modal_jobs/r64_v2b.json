@@ -1,0 +1,15 @@
+[
+ {
+  "tag": "r64b-REN-f0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ITEMS_SET": "label_induction_v2",
+   "CONDS": "noctx",
+   "USERS": "all",
+   "ADAPTERS_FROM": "r64-REN-f0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_real6.py llm categoriser_Qwen2.5-3B-Instruct_none_h100bf16_f0_ren50_alllab_lora"
+  ]
+ }
+]

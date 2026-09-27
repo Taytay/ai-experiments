@@ -154,3 +154,18 @@ An adapter's `adapter_config.json` records the base it was trained on (`unsloth/
 categorisers), which is how it was noticed: the peft-trained bf16 adapter loaded through unsloth landed on the 4-bit base and
 agreed with its bf16 scoring on only 81% of the predictions. Rule: pass `load_in_4bit` explicitly everywhere (`LOAD_4BIT` in the
 scripts) and score on the precision the adapter was trained on.
+
+## 2026-09-27: Qwen3.5 and the decision models on Modal
+
+- Qwen3.5 (hybrid: three Gated DeltaNet layers to one attention layer) needs flash-linear-attention (fla); without it transformers
+  runs the DeltaNet layers in pure PyTorch (a fifth of the speed, and more memory). fla refuses to train on Hopper with Triton in
+  [3.4, 3.7.1) (wrong gradients, fla #640); its tilelang backend needs nvcc, which the Modal image lacks. Two working setups:
+  `uv run --with transformers==5.17.0 --with flash-linear-attention --with "peft>=0.21" --with torch==2.13.0 --with torchvision==0.28.0`
+  (torch 2.13 brings Triton 3.7.1; a bare `--with flash-linear-attention` pulls torch 2.14 against the project's torchvision 0.26 and
+  breaks every import), or unsloth in the project env (its zoo vendors fla with a tile that avoids #640; take `tok.tokenizer` from the
+  processor it returns for these vision-language checkpoints).
+- fla tunes a kernel per sequence length: pad batches to a multiple of 64 (scripts/bench_train_step.py; warm, Qwen3.5-2B trains at
+  ~14k tokens/s, a 200-step run without the rounding averaged 4-7k).
+- Decision-1.0 removed its code from its model repos on 2026-09-27; scripts/exp_decision_models.py loads it from Sol-2B revision
+  60ea30a4 (same prompt version as the weights). kev is fetched as a GitHub archive at a pinned commit.
+- Every model, base and package must have an open licence (ai_experiments.licences.open_licence).

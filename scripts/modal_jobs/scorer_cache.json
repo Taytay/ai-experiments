@@ -1,0 +1,6 @@
+[
+ {"tag": "scache-unsloth-3b-adapter", "env": {"ADAPTERS_FROM": "r65-PREN-f0", "N": "300"}, "cmds": ["uv run --frozen python scripts/check_scorer_cache.py categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora poi1_v1_kinds"]},
+ {"tag": "scache-hf-3b-adapter", "env": {"ADAPTERS_FROM": "r65-PREN-f0", "N": "300", "SCORER": "hf"}, "cmds": ["uv run --frozen python scripts/check_scorer_cache.py categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_f0_ren50_alllab_lora poi1_v1_kinds"]},
+ {"tag": "scache-unsloth-3b-extras", "env": {"N": "150", "EXTRAS": "1"}, "cmds": ["uv run --frozen python scripts/check_scorer_cache.py Qwen/Qwen2.5-3B-Instruct label_induction_v2"]},
+ {"tag": "scache-unsloth-14b", "env": {"N": "200"}, "cmds": ["uv run --frozen python scripts/check_scorer_cache.py Qwen/Qwen2.5-14B-Instruct poi1_v1"]}
+]

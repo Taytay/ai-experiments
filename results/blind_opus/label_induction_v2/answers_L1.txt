@@ -1,0 +1,60 @@
+item 1 | Rukaror | (reason as reported)
+item 2 | Ziror | Restaurant; Ziror used for Chinese restaurant
+item 3 | Kerusar | Building supply; Kerusar used for roofing supply
+item 4 | Home Improvement | Lawn and garden store
+item 5 | Kufir | No telecom category; guessed an unused invented label
+item 6 | Mavurel | Fitness-type business; Mavurel used for yoga studio
+item 7 | Pets | Pet care clinic
+item 8 | Fuvar | No fitness category; guessed an unused invented label
+item 9 | Home Improvement | Construction supply store
+item 10 | Lazar | Grocery; Lazar used for meat markets
+item 11 | Saval | Restaurant; Saval used for grill and cafe
+item 12 | Ronasal | No pets category; guessed an unused invented label
+item 13 | Difafar | Camera shop; Difafar used for electronics
+item 14 | Ladegal | No groceries category; guessed an unused invented label
+item 15 | Zebefex | No clothing category; guessed an unused invented label
+item 16 | Rifi | Animal hospital; Rifi used for pet salon
+item 17 | Clothing | Boutique
+item 18 | Melu | Car wash; Melu used for auto service
+item 19 | Fimuval | No groceries category; guessed an unused invented label
+item 20 | Restaurants | Restaurant management company
+item 21 | Electronics | Electronics store
+item 22 | Seloben | Electronics; Seloben used for computer shops
+item 23 | Lapul | Inn; Lapul used for motels
+item 24 | Ribir | Camera store; Ribir used for computer shops
+item 25 | Vuzur | No groceries category; guessed an unused invented label
+item 26 | Bogi | Motor sports; Bogi used for car wash and tires
+item 27 | Nomel | Home center; Nomel used for lumber and nursery
+item 28 | Lilibox | Boutique; Lilibox used for clothing and shoes
+item 29 | Electronics | Tech store
+item 30 | Vitatir | No pets category; guessed an unused invented label
+item 31 | Difor | Communications company; Difor used for Mediacom and utilities
+item 32 | Laser | No fitness category; guessed an unused invented label
+item 33 | Dupagan | No entertainment category; guessed an unused invented label
+item 34 | Lukaral | Shoes; Lukaral used for clothing store
+item 35 | Rodirul | Boutique; Rodirul used for shoes and boutiques
+item 36 | Rafir | No travel category; guessed an unused invented label
+item 37 | Sino | Electronics; Sino used for audio technology
+item 38 | Groceries | Food market
+item 39 | Fupe | Inn lodging; Fupe used for motel
+item 40 | Vudemol | No auto category; guessed an unused invented label
+item 41 | Relozi | No electronics category; guessed an unused invented label
+item 42 | Tigir | No restaurants category; guessed an unused invented label
+item 43 | Vitor | Dental; Vitor used for eye center and pharmacy
+item 44 | Pharmacy & Health | Dentist
+item 45 | Fofon | Grocery market; Fofon used for carniceria market
+item 46 | Bakex | Audio electronics; Bakex used for camera and computers
+item 47 | Nimo | Lodging; Nimo used for inn and travel
+item 48 | Restaurants | Pizza restaurant
+item 49 | Sanupal | Electronics; Sanupal used for computer shops
+item 50 | Bopax | No pharmacy category; guessed an unused invented label
+item 51 | Gefux | Computers; Gefux used for computer shops
+item 52 | Gukan | No entertainment category; guessed an unused invented label
+item 53 | Zilapu | Health provider; Zilapu used for pharmacies
+item 54 | Gudor | Computers/electronics; Gudor used for camera and audio
+item 55 | Ganabex | No restaurants category; guessed an unused invented label
+item 56 | Mone | Water utility; Mone used for electric and telecom
+item 57 | Fuve | No travel category; guessed an unused invented label
+item 58 | Dimezu | Hardware; Dimezu used for paint and building supply
+item 59 | Senole | No auto category; guessed an unused invented label
+item 60 | Logudur | Vet clinic; Logudur used for pet grooming"}

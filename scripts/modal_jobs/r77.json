@@ -1,0 +1,80 @@
+[
+ {
+  "tag": "r77-decider-2b",
+  "env": {
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-2b"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r77-decider-4b",
+  "env": {
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r77-Decision-1.0-Sol-2B",
+  "env": {
+   "FAMILY": "decision",
+   "MODEL": "llm-semantic-router/Decision-1.0-Sol-2B"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r77-Decision-1.0-Nox-4B",
+  "env": {
+   "FAMILY": "decision",
+   "MODEL": "llm-semantic-router/Decision-1.0-Nox-4B"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r77-kev-4b",
+  "env": {
+   "FAMILY": "kev",
+   "MODEL": "jaredpalmer/kev-4b"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r77-von",
+  "env": {
+   "FAMILY": "von",
+   "MODEL": "wfzyx/von"
+  },
+  "cmds": [
+   "ITEMS_SET= CONDS=noctx,ctx uv run --frozen --with von-sdk --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with von-sdk --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=poi1_v1_kshots_kinds CONDS=noctx uv run --frozen --with von-sdk --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx uv run --frozen --with von-sdk --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]
