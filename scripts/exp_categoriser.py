@@ -323,6 +323,8 @@ def train_llm(run):
                 else:
                     batch.append(enc(rng.choice(ex))); n_sft += 1
             L = max(len(i) for i, *_ in batch)
+            if QWEN35:  # row 78: lengths rounded up to 64 so fla's gated-delta kernels, tuned per shape, see few shapes (4x on a 200-step run)
+                L = -(-L // 64) * 64
             n_tok += sum(len(i) for i, *_ in batch); n_pad += sum(L - len(i) for i, *_ in batch); n_lab_tok += sum(sum(x != -100 for x in lb[1:]) for _, lb, _ in batch)
             ids = torch.tensor([i + [pad] * (L - len(i)) for i, *_ in batch], device="cuda")
             lab = torch.tensor([l + [-100] * (L - len(l)) for _, l, _ in batch], device="cuda")

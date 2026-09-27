@@ -93,7 +93,7 @@ def main():
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
         built = [P.build(Ex(s, [Q(QUESTION, o, g)]), tok, rng=rng, max_options=255, max_ctx_tokens=16384) for s, o, g in (rng.choice(eps) for _ in range(MICRO))]
-        T = max(len(b["ids"]) for b in built); n_tok += sum(len(b["ids"]) for b in built)
+        T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
         att = torch.zeros_like(ids)
         for i, b in enumerate(built):

@@ -59,7 +59,7 @@ class Scorer:
     scorer changes log-probs by the bf16 batch-shape noise only (REPORT.md 19 measures it on saved weights)."""
 
     def __init__(self, model, tok, maxlen: int = 768, extras: bool = True, rows_per_forward: int = 64, tokens_per_forward: int = 32768,
-                 prefix_cache: bool | None = None):
+                 prefix_cache: bool | None = None, pad_multiple: int = 1):
         import os
         self.model, self.tok, self.maxlen, self.extras = model, tok, maxlen, extras
         # SCORER_CACHE=1 (2026-09-26): each prompt runs once and its options are scored from its KV cache. Off by default: under
@@ -67,6 +67,7 @@ class Scorer:
         # options) that was 2.3x slower than the packed path, which repeats the prompt per option (scripts/check_scorer_cache.py)
         self.prefix_cache = bool(int(os.environ.get("SCORER_CACHE", "0"))) if prefix_cache is None else prefix_cache
         self.rows, self.tokens = rows_per_forward, tokens_per_forward
+        self.pad_multiple = pad_multiple  # row 78: batch lengths rounded up (Qwen3.5's fla kernels are tuned per shape); 1 = unchanged
         self.pad = tok.pad_token_id or 0
         self._cache: dict[tuple[str, str], tuple[float, int]] = {}  # (premise, option) -> (sum_lp, n_tok)
         self._head = model.get_output_embeddings() if hasattr(model, "get_output_embeddings") else None
@@ -135,6 +136,7 @@ class Scorer:
     def _run_rows(self, rows: list[tuple[list[int], int, int]]) -> list[float]:
         """rows: (sequence ids, a, b) with the option tokens at [a, b). -> sum of their log-probs, per row."""
         L = max(len(r[0]) for r in rows)
+        L = -(-L // self.pad_multiple) * self.pad_multiple
         ids = torch.tensor([r[0] + [self.pad] * (L - len(r[0])) for r in rows], device="cuda")
         att = torch.tensor([[1] * len(r[0]) + [0] * (L - len(r[0])) for r in rows], device="cuda")
         try:

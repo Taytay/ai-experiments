@@ -102,7 +102,7 @@ def decider():
             chunk = items[k:k + BATCH]
             built = [P.build(Ex(state_of(it, cond), [Q(it.get("question", QUESTION), options_of(it), it["answer"])]), tok, rng=random.Random(it["id"]),
                              max_options=255, max_ctx_tokens=16384) for it in chunk]
-            T = max(len(b["ids"]) for b in built)
+            T = -(-max(len(b["ids"]) for b in built) // 64) * 64  # as decider's own collate: few shapes for fla's per-shape tuning
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
             att = torch.zeros_like(ids)
             for i, b in enumerate(built):

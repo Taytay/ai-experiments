@@ -108,7 +108,7 @@ def run_llm(run):
     tok.padding_side = "right"; model.eval()
     if CHAT:
         assert R6.chat_wrap("x") == tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True), "chat template drift"
-    sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576)
+    sc = Scorer(model, tok, maxlen=2048, extras=False, rows_per_forward=16, tokens_per_forward=24576, pad_multiple=64 if "Qwen3.5" in src + MODEL else 1)
     results = {}
     for cond, ctx in (("noctx", False), ("ctx", True), ("ret1", True)):
         if cond not in CONDS:
