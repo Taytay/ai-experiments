@@ -411,3 +411,6 @@
 /encmask_mbert_st1500_r68_f3_objbrier
 /encmask_mbert_st1500_r68_f3_objlogsph
 /encmask_mbert_st1500_r68_f3_objls
+/decider_decider-2b_none_h100bf16_f0_dbep50_aux100_lora
+/decider_decider-2b_none_h100bf16st800_f0_dbep50_aux100_lora
+/kev_kev-4b_none_h100bf16_f0_dbep50
