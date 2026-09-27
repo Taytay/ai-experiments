@@ -29,6 +29,7 @@ MODEL = os.environ.get("MODEL", "Mapika/decider-2b")  # row 79: a plain Qwen3.5 
 DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.build, the letter table) renders the episodes
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
 SEED = int(os.environ.get("SEED", "0"))
+AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
 QUESTION = "Which of this user's categories does the last transaction belong to?"  # as exp_decision_models.py
 
 # exp_categoriser.py's episode builder under the same env (its module level up to the model code: config, data, sft_examples)
@@ -37,7 +38,8 @@ sys.argv = [sys.argv[0], "llm", "none"]
 _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = [")[0]
 C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
-SFX = C["SFX"].replace("_alllab", "").replace("_hf", "")
+SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
+assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
 NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
@@ -56,7 +58,7 @@ def episodes():
         prompt, ans = e[0], e[1].strip()
         assert prompt.endswith("Category:")
         opts = names_of(prompt)
-        out.append((prompt[: -len("Category:")].rstrip(), opts, opts.index(ans)))
+        out.append((prompt[: -len("Category:")].rstrip(), opts, opts.index(ans)) + ((e[2],) if AUX_LM else ()))
     return out
 
 
@@ -94,7 +96,8 @@ def main():
     model.train(); t0 = time.time(); losses = []; n_tok = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
-        built = [P.build(Ex(s, [Q(QUESTION, o, g)]), tok, rng=rng, max_options=255, max_ctx_tokens=16384) for s, o, g in (rng.choice(eps) for _ in range(MICRO))]
+        picked = [rng.choice(eps) for _ in range(MICRO)]
+        built = [P.build(Ex(e[0], [Q(QUESTION, e[1], e[2])]), tok, rng=rng, max_options=255, max_ctx_tokens=16384) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
         att = torch.zeros_like(ids)
@@ -106,6 +109,17 @@ def main():
         n = torch.tensor([b["nopts"][0] for b in built], device="cuda")
         z = z.masked_fill(torch.arange(z.shape[1], device="cuda")[None] >= n[:, None], float("-inf"))
         loss = F.cross_entropy(z, torch.tensor([b["golds"][0] for b in built], device="cuda"))
+        if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
+            rows, pos, tgt = [], [], []
+            for i, e in enumerate(picked):
+                enc = tok("Context:\n" + e[0], add_special_tokens=False, return_offsets_mapping=True)
+                n = len(built[i]["ids"])
+                for t, (a0, b0) in enumerate(enc["offset_mapping"]):
+                    if 0 < t < n and any(s0 + 9 < b0 and a0 < s1 + 9 for s0, s1 in e[3]):  # 9 = len("Context:\n")
+                        rows.append(i); pos.append(t - 1); tgt.append(enc["input_ids"][t])
+            if tgt:
+                lg = F.linear(h[torch.tensor(rows, device="cuda"), torch.tensor(pos, device="cuda")], head_w).float()
+                loss = loss + AUX_LM * F.cross_entropy(lg, torch.tensor(tgt, device="cuda"))
         loss.backward(); torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())
         if step % 50 == 0 or step == STEPS - 1:
@@ -119,7 +133,7 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
-               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION)
+               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)
