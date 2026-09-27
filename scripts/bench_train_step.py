@@ -1,5 +1,5 @@
 """Where a training step's time goes (row 78: Qwen3.5-2B trained at ~3.7k tokens/s against Qwen2.5-3B's ~14k through unsloth).
-One LoRA (r64, as exp_categoriser.py) on the model, 16 real POI-1 episodes of ~900 tokens per step, timed after warm-up under:
+One LoRA (r64, as exp_categoriser.py) on the model, BATCH (8) real POI-1 items of ~900 tokens per step, timed after warm-up under:
   full     the training loop as exp_categoriser.py's TRAINER=hf path: logits at every position, float32 cross-entropy
   labelled hidden states only, the LM head applied at the labelled positions (~1,200 of ~14,000)
   each with and without gradient checkpointing; plus which gated-delta / conv1d implementation the model's layers hold.
@@ -20,10 +20,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from ai_experiments.paths import PROCESSED
 
 MODEL = os.environ.get("MODEL", "Qwen/Qwen3.5-2B")
+LABEL = os.environ.get("LABEL", MODEL)  # printed on every line: jobs in one launch interleave their logs
+BATCH = int(os.environ.get("BATCH", "8"))
 N_STEPS = int(os.environ.get("N_STEPS", "6"))
 
 
-def batches(tok, n=16):
+def batches(tok, n=BATCH):
     doc = json.loads((PROCESSED / "poi1_v1_kinds.json").read_text())
     rng = random.Random(0); out = []
     for _ in range(N_STEPS + 2):
@@ -47,7 +49,7 @@ def main():
     model = get_peft_model(lm, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
     for m in lm.modules():
         if hasattr(m, "chunk_gated_delta_rule"):
-            print("gated-delta:", m.chunk_gated_delta_rule.__module__, m.chunk_gated_delta_rule.__name__, "| conv1d fn:", getattr(m.causal_conv1d_fn, "__module__", None), flush=True)
+            print(LABEL, "gated-delta:", m.chunk_gated_delta_rule.__module__, m.chunk_gated_delta_rule.__name__, "| conv1d fn:", getattr(m.causal_conv1d_fn, "__module__", None), flush=True)
             break
     bs = batches(tok); inner = model.get_base_model()
     n_tok = sum(int(a.sum()) for _, _, a in bs[2:])
@@ -75,8 +77,8 @@ def main():
                     times.append(time.time() - t0)
             s = sum(times)
             res[f"{mode}{'_ckpt' if ckpt else ''}"] = dict(sec_per_step=round(s / len(times), 3), tok_per_s=round(n_tok / s), peak_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 1))
-            print(MODEL, mode, "ckpt" if ckpt else "no-ckpt", res[f"{mode}{'_ckpt' if ckpt else ''}"], flush=True)
-    print("===", json.dumps(dict(model=MODEL, **res)), flush=True)
+            print(LABEL, mode, "ckpt" if ckpt else "no-ckpt", res[f"{mode}{'_ckpt' if ckpt else ''}"], flush=True)
+    print("===", LABEL, json.dumps(dict(model=MODEL, batch=BATCH, **res)), flush=True)
 
 
 if __name__ == "__main__":
