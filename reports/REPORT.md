@@ -5378,3 +5378,119 @@ here for 800 steps flips most (5.7% on REAL-6), and its REAL-6 top-1 varies by 1
 orders is not worth four passes. The position bias of ModernBERT-Instruct's letter readout (section 63) does not appear in these trained one-slot decoders.
 
 Tables: `uv run python scripts/order_tables.py`. Job list: `scripts/modal_jobs/r50.json`.
+
+## 76. One answer slot over labelled options matches the per-option loss once the shot labels are also trained (REAL-6 85.9 against 86.9 for Qwen3.5-2B, decider-2B 87.9, decider-4B 88.3) at about a fifteenth of the scoring time; decider-4B gives the widest confident band (66% auto-filed at 97.5% precision against 48% for the per-option reader); kev-4B fine-tuned stops at 83.2 (MODEL-16)
+
+PLAN steps 79 and 80. Section 69 found decider-2B, fine-tuned in its own layout (the options labelled A, B, ...; cross-entropy over the
+label tokens at one answer slot), the best POI-1 reader, at a tenth of the scoring time. Here the layout is separated from the model:
+Qwen3.5-2B trained in decider's layout against the same model with this repo's per-option loss and scorer, on the same episodes
+(REAL-6 with database episodes at 0.5; POI-1 with row 73's descriptions, kind lines and kind-retrieved examples), fold 0's held-out
+users. `AUX_LM=1` (`exp_decider_finetune.py`) adds a token loss on the shots' labels inside the context, the one-slot counterpart of
+the all-label loss (section 52). decider-2B / -4B are trained the same way, and kev-4B with its own trainer and pointer head from the
+released checkpoint (source at 5920c5f, run in the Qwen3.5 overlay).
+
+**Table 76.1: REAL-6, fold 0's held-out users, database episodes: one answer slot against the per-option loss**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|
+| Qwen3.5-2B, per-option loss + all-label (row 78), 200 steps | 298 | 86.9 [80.6, 91.0] | 98.3 | 0.61 | 48.0 (97.2) |
+| Qwen3.5-2B, one slot, 200 steps | 298 | 67.4 [58.5, 74.0] | 84.2 | 1.59 | 29.2 (93.1) |
+| Qwen3.5-2B, one slot, 800 steps | 298 | 82.9 [77.3, 87.6] | 93.3 | 1.03 | 26.5 (94.9) |
+| Qwen3.5-2B, one slot + shot-label loss, 200 steps | 298 | 78.2 [71.1, 82.7] | 91.3 | 1.14 | 34.2 (97.1) |
+| Qwen3.5-2B, one slot + shot-label loss, 800 steps | 298 | 85.9 [79.4, 90.2] | 97.0 | 0.79 | 20.1 (95.0) |
+| decider-2B, one slot, 200 steps | 298 | 69.5 [61.7, 74.9] | 82.6 | 1.58 | 39.9 (97.5) |
+| decider-2B, one slot, 800 steps | 298 | 83.9 [77.6, 88.3] | 93.6 | 0.93 | 20.8 (95.2) |
+| decider-2B, one slot + shot-label loss, 200 steps | 298 | 82.2 [75.2, 87.8] | 95.0 | 0.95 | 16.8 (94.0) |
+| decider-2B, one slot + shot-label loss, 800 steps | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-4B, one slot + shot-label loss, 800 steps | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| Qwen3.5-4B, per-option loss + all-label (row 78), 200 steps | 298 | 88.6 [80.9, 92.3] | 97.7 | 0.62 | 50.0 (94.6) |
+| kev-4B fine-tuned (its trainer, from the released checkpoint), lr 2e-5, 200 steps | 298 | 59.7 [52.5, 65.3] | 77.9 | 1.99 | 14.4 (97.7) |
+| kev-4B fine-tuned, lr 1e-4, 800 steps | 298 | 83.2 [78.3, 86.7] | 94.6 | 0.89 | 35.6 (97.2) |
+| decider-2B zero-shot | 298 | 15.8 [7.6, 29.3] | 33.6 | 3.74 | 22.5 (41.8) |
+| kev-4B zero-shot | 298 | 43.3 [40.2, 46.8] | 60.4 | 2.80 | 8.7 (96.2) |
+
+**Table 76.2: POI-1, fold 0's held-out users, row 73's episodes (descriptions + kind lines + kind-retrieved examples)**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | seen-kind top-1 | unseen-kind top-1 |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B, per-option loss + all-label (row 78) | 507 | 91.5 [89.2, 93.8] | 98.6 | 0.32 | 86.0 (97.9) | 99.3 | 80.2 |
+| Qwen3.5-2B, one slot | 507 | 91.9 [89.8, 93.9] | 98.8 | 0.33 | 87.8 (97.8) | 99.7 | 80.7 |
+| decider-4B, one slot + shot-label loss | 507 | 92.3 [90.3, 94.2] | 99.2 | 0.30 | 88.4 (98.0) | 100.0 | 81.2 |
+| decider-2B, one slot (row 77) | 507 | 92.5 [90.4, 94.5] | 99.0 | 0.33 | 86.6 (98.2) | 100.0 | 81.6 |
+
+### 76.1 What the step says
+
+- **The layout costs nothing at the end, but it trains slower.** On POI-1 the one-slot Qwen3.5-2B equals the per-option one (91.9
+  against 91.5) at 200 steps. On REAL-6 it needs 800 steps to reach 82.9, where the per-option reader has 86.9 at 200. The one-slot
+  loss gives one target per episode; the per-option loss with all labels (section 52) gives one per shot as well, 25 times the signal.
+- **Training the shot labels closes the gap.** The shot-label token loss lifts Qwen3.5-2B one slot from 67.4 to 78.2 at 200 steps
+  and from 82.9 to 85.9 at 800, and decider-2B from 69.5 to 82.2 and from 83.9 to 87.9. With it the one-slot layout is within a point
+  of the per-option reader at the same size, inside every interval.
+- **decider's pre-training is worth a little, not its size of knowledge.** decider-2B, trained on shuffled labelled options before
+  this task, is 2 points above Qwen3.5-2B in the same layout and loss (87.9 against 85.9), and decider-4B only 0.4 above decider-2B.
+  Section 69's doubt (decider-2B misfiles Trader Joe's zero-shot) is answered: the database episodes supply the merchant knowledge.
+- **decider-4B's confidence ranks best.** At a realised 97.5% precision it files 66.4% of items without review; the per-option
+  Qwen3.5-4B, equal in top-1, manages 50.0 at 94.6. The 2B one-slot readers are the weakest here (20 to 24%): their errors are
+  confident. Coverage at one threshold on 298 items is noisy; the ordering matches the bits left.
+- **kev-4B fine-tunes, but to less.** Its pointer head at its own rate (2e-5) is under-trained at 200 steps (59.7); at 1e-4 and 800
+  steps it reads 83.2, 5 points under decider at the same size.
+- **Speed.** One slot reads all options in one pass: warm, 18 to 24 ms per item for the 2B readers on both sets (the order runs of
+  section 75, four passes in one container), against about 390 ms for the per-option scorer on Qwen3.5-2B, which re-reads the prompt
+  for each of 12 to 20 options. The first pass in a container takes 130 to 260 ms per item while flash-linear-attention tunes its
+  kernels.
+
+The best decoder categoriser is now decider-4B in its own layout with the shot-label loss and database episodes: 88.3 on REAL-6 (94%
+of the 94.0 ceiling), 92.3 on POI-1, the widest confident band, one pass per question. Limits: fold 0 only (298 and 507 items);
+decider-4B was not run on POI-1 without the shot-label loss, nor at 200 steps on REAL-6.
+
+Tables: `uv run python scripts/one_slot_tables.py`. Job lists: `scripts/modal_jobs/r79*.json`, `r80*.json`.
+
+## 77. Novel category names: the per-option database-episode reader loses 19 points when every category name is replaced by a fresh word (86.9 to 68.1), most on standard names (99 to 70), so it files by what the name means more than by the user's examples; rename training removes the dependence at a cost in accuracy (74.5 to 73.2), and decider-4B one slot loses 5 (88.3 to 83.6) (REAL-18)
+
+PLAN step 61, re-scoped on 2026-09-27 to the current readers. REAL-6's coined names come from a list of 24 that training users share,
+so its coined cell measures familiar words. `build_real6_novel.py` writes `real6_v1_novel`: every user's category names replaced by a
+fresh three-syllable word, consistently in the category list, the shots' labels and the options (same ids, option order and gold).
+Scoring only, fold 0.
+
+**Table 77.1: REAL-6 fold 0, real category names against fresh coined names (same items, options and gold)**
+
+| reader | names | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|---|
+| Qwen3.5-2B untrained | real | 298 | 33.2 [26.5, 38.5] | 50.0 | 3.33 | 5.7 (94.1) |
+| Qwen3.5-2B untrained | novel | 298 | 13.8 [8.8, 18.0] | 30.9 | 3.75 | 8.7 (34.6) |
+| Qwen3.5-2B, per-option, database episodes (row 78) | real | 298 | 86.9 [80.6, 91.0] | 98.3 | 0.61 | 48.0 (97.2) |
+| Qwen3.5-2B, per-option, database episodes (row 78) | novel | 298 | 68.1 [60.6, 74.4] | 84.9 | 1.74 | 5.4 (93.8) |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | real | 298 | 74.5 [64.6, 81.8] | 85.2 | 1.36 | 41.6 (98.4) |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | novel | 298 | 73.2 [68.9, 76.7] | 80.5 | 1.73 | 27.5 (96.3) |
+| decider-2B, one slot + shot labels, database episodes (row 80) | real | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-2B, one slot + shot labels, database episodes (row 80) | novel | 298 | 78.2 [73.1, 84.8] | 90.6 | 1.32 | 10.7 (96.9) |
+| decider-4B, one slot + shot labels, database episodes (row 80) | real | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| decider-4B, one slot + shot labels, database episodes (row 80) | novel | 298 | 83.6 [75.0, 90.3] | 95.6 | 0.91 | 23.8 (97.2) |
+
+**Table 77.2: top-1 on real → novel names, by whether the user has filed the merchant before and by the gold name's type in REAL-6**
+
+| reader | in history | not in history | name type: new (REAL-6's coined) | name type: renamed | name type: standard |
+|---|---|---|---|---|---|
+| Qwen3.5-2B untrained | 38.7 → 21.8 | 28.2 → 6.4 | 34.4 → 23.4 | 23.3 → 11.7 | 43.0 → 10.5 |
+| Qwen3.5-2B, per-option, database episodes (row 78) | 85.9 → 73.9 | 87.8 → 62.8 | 95.3 → 92.2 | 70.8 → 53.3 | 99.1 → 70.2 |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | 78.2 → 71.8 | 71.2 → 74.4 | 89.1 → 82.8 | 62.5 → 65.0 | 78.9 → 76.3 |
+| decider-2B, one slot + shot labels, database episodes (row 80) | 90.8 → 81.0 | 85.3 → 75.6 | 92.2 → 92.2 | 75.0 → 61.7 | 99.1 → 87.7 |
+| decider-4B, one slot + shot labels, database episodes (row 80) | 90.8 → 85.2 | 85.3 → 82.1 | 95.3 → 95.3 | 72.5 → 67.5 | 100.0 → 93.9 |
+
+### 77.1 What the step says
+
+- **The database-episode reader files by name meaning.** Its drop is concentrated where the gold is a standard name (99.1 to 70.2):
+  there it had learned "this merchant is Groceries" and matched the word, and with the word gone it must find the category from the
+  user's examples, which it does for 70%. On REAL-6's own coined names, where it already had to use the examples, it barely moves
+  (95.3 to 92.2). Even merchants in the user's history fall 12 points, though the history names the answer.
+- **Rename training buys robustness with accuracy.** The rename-trained reader moves 1.3 points overall and gains on merchants not in
+  the history, but it is 12 points under the database reader on real names: it never learned the database's facts (no episodes).
+- **decider-4B keeps most of it.** 83.6 on novel names (95% of its real-name score), its standard-name items 100 to 93.9, coined
+  names unchanged. Its confident band shrinks (66% to 24% auto-filed), so it knows when the name no longer helps. decider-2B loses 10.
+- **Hypothesis.** Meaning and examples are two routes to the same answer; a reader trained only with real names leans on the first.
+  Rename augmentation on top of database episodes (the owner's goal: unseen names for unseen merchants) should keep both, near 88 on
+  real names and novel names alike. That is the next training run for decider-4B.
+
+Limits: fold 0 only; one draw of novel words; scoring only (no model saw these words in training).
+
+Tables: `uv run python scripts/novel_labels_tables.py`. Items: `scripts/build_real6_novel.py`. Job list: `scripts/modal_jobs/r61.json`.
