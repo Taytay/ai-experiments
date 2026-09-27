@@ -51,7 +51,19 @@ The local 3090 is no longer used for runs; the rules below about it still hold i
   Many in parallel (at most 8 containers): write a JSON list of `{tag, env, cmds}` to `scripts/modal_jobs/<row>.json`, commit it, then
   `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
-- Bring results back: `modal volume get ai-exp-results <tag> modal_out/` (gitignored), copy `results/` into the branch, union the
+- Watching a job list (2026-09-27: eleven watchers sat "running" for hours after their jobs finished and their results went unnoticed):
+  - start the watcher as a script file, as a background task: `scripts/wait_modal_jobs.sh r83 <scratchpad>/r83.log`. Never an
+    inline `until ! pgrep -f "modal_jobs/r83.json" ...` loop: the task's own shell carries the pattern in its command line, so pgrep
+    matches the watcher itself and it never exits;
+  - one watcher per job list, started right after the launch; when it reports, ingest at once;
+  - before saying what is running, check the truth rather than the task list: `ps -eo pid,etime,args | grep "modal run"` for local
+    clients and `modal container list` for containers (this app's only); TaskStop any watcher whose jobs are gone;
+  - a `--detach` job keeps running if the local client dies; then `modal app logs` or the volume (`modal volume ls ai-exp-results <tag>`)
+    tell whether it finished.
+- Bring results back: `modal volume get ai-exp-results <tag> modal_out/` (gitignored), then `uv run python scripts/ingest_modal.py <tag> ...`
+  (copies results, unions `evals/runs.jsonl` by run_id, copies adapters); stage `results/` and `evals/` only, run `just push-models` before
+  staging anything under `models/adapters/` (staging the adapter folders first puts the weights in git), then commit the `.dvc` files.
+  By hand: copy `results/` into the branch, union the
   job's `evals/runs.jsonl` rows into ours by `run_id`, copy adapters into `models/adapters/`, `just push-models`, commit the new `.dvc` files, `just drop-all`.
 - Open licences only (owner, 2026-09-26): a model, its base and any code must be Apache-2.0, MIT, BSD or CC-BY (`ai_experiments.licences.open_licence`).
   Qwen2.5-3B-Instruct is under the Qwen Research licence: new trained work uses Qwen3.5 (`LLM_BASE=Qwen/Qwen3.5-2B` or `-4B`; it runs through
