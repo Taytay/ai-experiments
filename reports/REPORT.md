@@ -5541,3 +5541,37 @@ the ceiling. Limits: fold 0 and one seed (intervals of about ±6 points; the rea
 gain is not quite); POI-1 not yet read with this recipe; the rename rate not swept.
 
 Tables: `uv run python scripts/novel_labels_tables.py`. Job list: `scripts/modal_jobs/r81.json`.
+
+## 79. Trained abstention: decider's augmentation (a "not listed here" option in 10% of training questions, the true category hidden in a quarter of those) catches 92% of questions whose category is missing with 1.3% false alarms and no cost in accuracy; the option read by its probability separates those questions from ordinary ones better than a confidence threshold (AUROC 0.992 against 0.969) (REAL-14)
+
+PLAN step 52, re-scoped on 2026-09-27 to decider-4B one slot + shot-label loss + database episodes (row 80's recipe; this row
+predates row 81's rename augmentation). `ABSTAIN=p ABSTAIN_SWAP=q` (`exp_decider_finetune.py`): with probability p a training question
+gets a last option "not listed here" (decider's neutral abstain wording); in a share q of those the gold category is removed from the
+header and the options (the shots keep its label), so the option is the answer. `build_real6_abstain.py` writes `real6_v1_abst`: every
+REAL-6 item with the option added (full) and with its gold category hidden (nogold). Fold 0. The second arm of the original row
+(uniform targets on evidence-free episodes) was not run.
+
+**Table 79.1: decider-4B on REAL-6 fold 0 with a "not listed here" option (298 full items, 298 with the gold category hidden)**
+
+| model | top-1, real options | top-1 with the option | option chosen, full (false alarms) | option chosen, nogold (recall) | AUROC nogold vs full: P(option) | AUROC: 1 - top real-option p | REAL-6 top-1, no option |
+|---|---|---|---|---|---|---|---|
+| no abstain training (row 80) | 88.3 | 88.3 | 0.0% | 61.1% | 0.963 | 0.917 | 87.9 |
+| abstain 0.1, hidden gold 0.25 (decider's) | 89.3 | 88.3 | 1.3% | 92.3% | 0.992 | 0.969 | 89.3 |
+| abstain 0.2, hidden gold 0.5 | 86.6 | 86.2 | 0.7% | 93.3% | 0.990 | 0.965 | 87.6 |
+
+### 79.1 What the step says
+
+- **decider already abstains untrained on this task.** Row 80's model, never shown the option in our training, picks it for 61% of
+  questions whose category is missing and never when the category is present: decider's own pre-training (the same augmentation over
+  its task mixture) survives our fine-tune.
+- **decider's recipe on our episodes finishes the job.** Recall 92.3% at 1.3% false alarms, and the real-option accuracy is unchanged
+  (89.3 against 88.3; 87.9 to 89.3 on plain REAL-6, inside the interval). Doubling both rates buys one point of recall and costs two of
+  accuracy: decider's 0.1 / 0.25 is the setting.
+- **A trained option beats a threshold.** Telling nogold from full questions by the option's probability reaches AUROC 0.992; by the
+  top real option's confidence, the only route without the option, 0.969 in the same model and 0.917 without abstain training. The
+  missing-category case is where a threshold is weakest: the model is confidently wrong about the nearest category.
+- **Limits.** The nogold test is the case the augmentation trains (a category hidden), so this is in-distribution; the other reason to
+  abstain (no evidence at all: an opaque merchant in no database and no history) is untested. Fold 0, one seed. REAL-6 top-1 here is
+  the plain argmax; the scorecard's 88.3 for row 80 counts one exact bf16 tie at the top as right (`scorecard._rank`).
+
+Tables: `uv run python scripts/abstain_tables.py`. Items: `scripts/build_real6_abstain.py`. Job list: `scripts/modal_jobs/r52.json`.
