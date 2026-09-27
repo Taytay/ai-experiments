@@ -18,7 +18,7 @@ env: FAMILY, MODEL (HF id), ITEMS_SET (a frozen set in REAL-6's format under dat
 Writes results/per_item/real6_dm_<family>_<model>_<set>.<cond>.jsonl in the Scorer's record shape (sum_lp = the model's log-probability
 per option in the item's option order, n_tok = 1), so the REAL-6 / POI-1 table code reads it unchanged. Tracker experiment
 "decision_models".
-usage: FAMILY=decider MODEL=Mapika/decider-2b ITEMS_SET=poi1_v1 uv run --with transformers==5.17.0 --with flash-linear-attention python scripts/exp_decision_models.py
+usage: FAMILY=decider MODEL=Mapika/decider-2b ITEMS_SET=poi1_v1 uv run --with transformers==5.17.0 --with flash-linear-attention --with "peft>=0.21" --with torch==2.11.0 --with torchvision==0.26.0 python scripts/exp_decision_models.py
 """
 import json
 import os
@@ -38,6 +38,7 @@ CONDS = os.environ.get("CONDS", "noctx").split(",")
 SMOKE = bool(os.environ.get("SMOKE"))
 TEMP = float(os.environ.get("TEMP", "1.0"))
 BATCH = int(os.environ.get("BATCH", "8"))
+DECISION_CODE_REV = "60ea30a48285ea097a9b3a728e71649b78331601"  # the last Sol-2B revision that ships code/decision_model.py (same prompt_version as the weights)
 KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
@@ -115,7 +116,7 @@ def decision():
     import torch
     import torch.nn.functional as F
     from huggingface_hub import snapshot_download
-    code = snapshot_download("llm-semantic-router/Decision-1.0-Sol-2B", allow_patterns=["code/*"])
+    code = snapshot_download("llm-semantic-router/Decision-1.0-Sol-2B", revision=DECISION_CODE_REV, allow_patterns=["code/*"])  # removed from the repos on 2026-09-27
     sys.path.insert(0, str(Path(code, "code")))
     D = importlib.import_module("decision_model")
     path = snapshot_download(MODEL)
