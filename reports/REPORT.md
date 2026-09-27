@@ -5862,3 +5862,55 @@ on them fails them in the same way the 9B does here). Scale is not the lever for
 deprioritised until a set shows a gap that training does not close.
 
 Job list: `scripts/modal_jobs/r87.json`.
+
+## 88. The combined recipe keeps every trained behaviour (misleading names 91.7, the user's override 98.0, confident on evidence-free questions 0.9%, alternation rules read 86.5 / 74.5, and 60 / 40 splits now hedged: 2% confident, from 85 to 93%), at a cost of 1.5 points on REAL-6, 5 on novel names and 14 of auto-file coverage; the confidence it gives up is mostly on REAL-6's coin-flip split categories
+
+PLAN step 88. decider-4B one slot + shot-label loss + database episodes (with mislead_v1's merchants) + rename 0.5 + random A..Z labels
++ lookup / override episodes (0.1) + soft evidence-free questions (0.1) + alternation v2 (`ALT=0.2 ALT_SOFT=1`: noisy and random rules
+drawn as often as observable ones, their targets the true split, `SOFT` in `exp_categoriser.py` read by `exp_decider_finetune.py`),
+three seeds, fold 0, against the readers each piece was measured on (sections 78 to 86).
+
+**Table 88.1: every 2026-09-27 test set, decider-4B readers, fold 0 (mean over seeds [range])**
+
+| reader | seeds | REAL-6 top-1 | REAL-6 auto-filed (precision) | novel names | misleading, in DB | user override | no evidence: p >= 0.9 | alternation observable: stores / restaurants | 60 / 40 splits: p >= 0.9 | real places top-1 | real plain names: p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 3 | 90.2 [88.9, 91.9] | 73.7 [68.8, 76.8] | 89.0 [87.9, 89.9] | 7.9 | 81.0 | 69.7 | 54.2 / 44.3 | 85.4 [78.1, 91.4] | – | – |
+| + random labels (row 84 control) | 2 | 89.6 [88.9, 90.3] | 72.0 [67.1, 76.8] | – | 9.9 [9.2, 10.5] | – | 78.9 [75.0, 82.9] | 57.8 / 47.7 | 90.2 [88.3, 92.2] | 76.2 [75.9, 76.6] | 88.4 [87.9, 88.9] |
+| + soft evidence-free (row 84) | 2 | 89.3 [87.9, 90.6] | 73.7 [70.1, 77.2] | – | 9.2 [9.2, 9.2] | – | 2.6 [2.6, 2.6] | – | – | 74.9 [72.8, 77.0] | 68.2 [66.7, 69.7] |
+| + misleading DB, lookup / override (row 85) | 2 | 89.8 [89.6, 89.9] | 71.0 [66.8, 75.2] | – | 94.7 [93.4, 96.1] | 98.8 [98.5, 99.1] | 60.5 [55.3, 65.8] | – | – | – | – |
+| + alternation v1 (row 86) | 2 | 87.8 [86.2, 89.3] | 60.2 [49.7, 70.8] | 86.6 [85.6, 87.6] | – | – | – | 87.5 / 76.6 | 88.3 [87.5, 89.1] | – | – |
+| combined (row 88) | 3 | 88.7 [86.9, 90.9] | 59.8 [50.3, 68.5] | 84.1 [83.2, 85.6] | 91.7 [89.5, 96.1] | 98.0 [97.1, 98.5] | 0.9 [0.0, 2.6] | 86.5 / 74.5 | 2.1 [1.6, 2.3] | 74.2 [71.6, 75.5] | 58.2 [56.6, 59.6] |
+
+**Table 88.2: alternation v2 on the noisy and random cells (combined recipe, three seeds; section 86's table with this reader)**
+
+| merchants | observable top-1 (ceiling 100) | partial top-1 (ceiling ~80) | partial P(gold) (a matched split: 0.68) | unobservable P(gold) (a matched split: 0.52) | unobservable p >= 0.9 |
+|---|---|---|---|---|---|
+| stores | 86.5 | 53.6 | 0.52 | 0.47 | 3.1% |
+| restaurants | 74.5 | 55.2 | 0.52 | 0.54 | 1.0% |
+
+**Table 88.3: REAL-6 by corrected group (section 48), top-1 and the share given p >= 0.98**
+
+| reader | in history | labelled seen, not in history | determined by category | split category (a coin flip) |
+|---|---|---|---|---|
+| row 81 recipe (3 seeds) | 92.8, 95% | 89.8, 93% | 97.6, 99% | 48.3, 89% |
+| + random labels (2) | 94.3, 96% | 86.1, 93% | 97.6, 98% | 43.1, 90% |
+| + alternation v1 (2) | 92.0, 96% | 83.3, 85% | 98.0, 98% | 37.9, 90% |
+| combined (3) | 94.0, 92% | 85.2, 81% | 97.0, 96% | 40.2, 54% |
+
+### 88.1 What the step says
+
+- **The pieces compose.** Misleading names in the database 91.7 (alone 94.7), the user's override 98.0 (98.8), evidence-free
+  questions confidently answered 0.9% (2.6), the alternation rule read 86.5 / 74.5 (87.5 / 76.6).
+- **Split targets calibrate the random splits.** On the 60 / 40 cells the confident share falls from 85 to 93% to 1 to 3% and the
+  probability on the gold (0.47 and 0.54) matches a reader that knows the split (0.52). On the 80% rule the reader hedges without
+  reading the rule (P(gold) 0.52 where 0.68 is possible): it can tell a user is inconsistent, not yet by how much.
+- **Costs.** REAL-6 88.7 against 90.2; novel names 84.1 against 89.0 (alternation v1 alone: 86.6); auto-filed at the scorecard's 98%
+  threshold 59.8% against 73.7% (alternation v1 alone: 60.2%). By group, the confidence given up is on the split categories (89% to
+  54% at p >= 0.98, where the answer is a coin flip and hedging is right) and on seen merchants whose rows the history lost (93% to
+  81%). The novel-name loss and the auto-file loss both appear with alternation training alone, so alternation is the likely cause:
+  once a user's categories can share a merchant, an unfamiliar category name next to the usual one is a plausible specific category.
+- **Next.** The alternation share: 0.05 and 0.1 inside the combined recipe, two seeds each (row 89).
+
+Limits: fold 0; 298 REAL-6 items (the auto-file coverage moves 50 to 68 across seeds).
+
+Tables: `uv run python scripts/combined_tables.py`, `scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r88.json`.

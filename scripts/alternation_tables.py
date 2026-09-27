@@ -18,7 +18,9 @@ from ai_experiments.paths import PROCESSED
 D = "real6_dm_decider_decider_decider-4b_none_{tag}_f0_ren50_dbep50{alt}_aux100{lab}_lora_alternation_v1{rd}.noctx.jsonl"
 READERS = [("row 81 recipe (letters)", [D.format(tag=t, alt="", lab="", rd="") for t in ("h100bf16st800", "h100bf16st800s1", "h100bf16st800s2")]),
            ("+ random labels (row 84 control)", [D.format(tag=t, alt="", lab="_labrand26", rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
-           ("+ random labels + alternation episodes", [D.format(tag=t, alt="_alt15", lab="_labrand26", rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")])]
+           ("+ random labels + alternation episodes", [D.format(tag=t, alt="_alt15", lab="_labrand26", rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
+           ("combined recipe with alternation v2 (row 88)", [f"real6_dm_decider_decider_decider-4b_none_{t}_f0_ren50_dbep50_mislead_v1_alt20s_lk10_ov10_aux100_labrand26_ev10soft_lora_alternation_v1_labrand26.noctx.jsonl"
+                                                           for t in ("h100bf16st800", "h100bf16st800s1", "h100bf16st800s2")])]
 SCEN = ("observable", "partial", "unobservable", "control")
 
 

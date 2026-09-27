@@ -28,7 +28,9 @@ READERS = [("row 81 recipe (letters)", "ren50_dbep50_aux100", "", T3),
            ("+ soft evidence-free (row 84)", "ren50_dbep50_aux100_labrand26_ev10soft", "_labrand26", T3[:2]),
            ("+ misleading DB, lookup / override (row 85)", "ren50_dbep50_mislead_v1_lk10_ov10_aux100_labrand26", "_labrand26", T3[:2]),
            ("+ alternation v1 (row 86)", "ren50_dbep50_alt15_aux100_labrand26", "_labrand26", T3[:2]),
-           ("combined (row 88)", "ren50_dbep50_mislead_v1_alt20s_lk10_ov10_aux100_labrand26_ev10soft", "_labrand26", T3)]
+           ("combined (row 88)", "ren50_dbep50_mislead_v1_alt20s_lk10_ov10_aux100_labrand26_ev10soft", "_labrand26", T3),
+           ("combined, ALT 0.1 (row 89)", "ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft", "_labrand26", T3[:2]),
+           ("combined, ALT 0.05 (row 89)", "ren50_dbep50_mislead_v1_alt5s_lk10_ov10_aux100_labrand26_ev10soft", "_labrand26", T3[:2])]
 
 
 def sm(z):
