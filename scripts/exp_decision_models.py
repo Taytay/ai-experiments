@@ -33,6 +33,7 @@ from pathlib import Path
 
 from ai_experiments import real6 as R6
 from ai_experiments.evals.tracker import Run
+from ai_experiments.licences import open_licence
 from ai_experiments.paths import PROCESSED, ROOT
 from ai_experiments.real6_eval import write_recs
 
@@ -44,6 +45,7 @@ TEMP = float(os.environ.get("TEMP", "1.0"))
 BATCH = int(os.environ.get("BATCH", "8"))
 DECISION_CODE_REV = "60ea30a48285ea097a9b3a728e71649b78331601"  # the last Sol-2B revision that ships code/decision_model.py (same prompt_version as the weights)
 KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
+ADAPTER = os.environ.get("ADAPTER", "")  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
 DOC = json.loads((PROCESSED / f"{ITEMS_SET}.json").read_text()) if ITEMS_SET else R6.load("v1")
@@ -51,27 +53,7 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}"
-
-
-OPEN = {"apache-2.0", "mit", "bsd-2-clause", "bsd-3-clause", "cc-by-4.0"}
-
-
-def open_licence(model_id):
-    """Stop unless the model card and every base model's card name an open licence (OPEN)."""
-    from huggingface_hub import model_info
-    seen, todo = set(), [model_id]
-    while todo:
-        m = todo.pop()
-        if m in seen:
-            continue
-        seen.add(m)
-        cd = model_info(m).card_data or {}
-        lic = (cd.get("license") or "").lower()
-        assert lic in OPEN, f"{m}: licence {lic!r} is not in the open list {sorted(OPEN)}"
-        base = cd.get("base_model") or []
-        todo += [base] if isinstance(base, str) else list(base)
-    print("licences open:", ", ".join(sorted(seen)), flush=True)
+TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}"
 
 
 def state_of(it, cond):
@@ -100,6 +82,9 @@ def decider():
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(path)
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
+    if ADAPTER:  # a LoRA from exp_decider_finetune.py, merged for scoring
+        from peft import PeftModel
+        lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
     letters = torch.tensor(P.letter_ids(tok), device="cuda")
 
     class Q:  # decider.prompt reads .text / .options / .gold from each question and .context / .qs from the example
@@ -244,7 +229,7 @@ if __name__ == "__main__":
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
     cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
-               users=USERS, question=QUESTION, temp=TEMP, kev_sha=KEV_SHA if FAMILY == "kev" else None)
+               users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, kev_sha=KEV_SHA if FAMILY == "kev" else None)
     with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         for cond in CONDS:
             t0 = time.time()
