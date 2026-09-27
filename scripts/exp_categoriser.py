@@ -47,11 +47,15 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
        Overture basic category (the test layout of poi1_v1_kshots), otherwise none are (an unseen-kind episode, as half the test items
        are); adds _pksh. POI_REC=1: a "Note: <place> is listed as a <kind>." line before the target (the test items' prompt_ctx);
        adds _prec. POI_KIND=1: a "Kind: <kind>" line under every shot and the target (poi1_v1_kinds); adds _pkind.
+     POI_DESC=1 (row 73): the header lists each category with the kinds the user has filed under it, from the history without the
+       target (poi1_v1_desc); adds _pdesc. POI_UNSEEN=p: in a share p of episodes no place of the target's kind is in the shots or the
+       description (an unseen-kind episode); adds _uns<p*100>.
      TRAINER=hf (row 38, INFRA-2): transformers + peft instead of unsloth (same LoRA shape, schedule, batches and data order; peft's own
        LoRA init under torch.manual_seed(SEED); plain gradient checkpointing); adds _hf to the names. The adapter format is peft's either way.
 outputs: models/adapters/categoriser_Qwen2.5-3B-Instruct_<db>_lora  or  models/adapters/categoriser_bge_<db>; results/categoriser_<route>_<db>.json
   (training stats); the REAL-6 scores come from `scripts/exp_real6.py llm <adapter>` / `encoder <dir>` afterwards. Tracker "categoriser".
 """
+import collections
 import json
 import os
 import random
@@ -102,11 +106,13 @@ assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs 
 POI = os.environ.get("POI", "")  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
 assert not POI or (DB == "none" and not DBEP and not DB_EPISODES and not REC_CAT and SHOTS == "fixed"), "POI-1 has no fact DB"
 POI_SHOTS, POI_REC, POI_KIND = os.environ.get("POI_SHOTS", "fixed"), bool(int(os.environ.get("POI_REC", "0"))), bool(int(os.environ.get("POI_KIND", "0")))
-assert POI or (POI_SHOTS == "fixed" and not POI_REC and not POI_KIND), "POI_SHOTS / POI_REC / POI_KIND are POI-1 layouts"
+POI_DESC, POI_UNSEEN = bool(int(os.environ.get("POI_DESC", "0"))), float(os.environ.get("POI_UNSEEN", "0"))
+assert POI or (POI_SHOTS == "fixed" and not POI_REC and not POI_KIND and not POI_DESC and not POI_UNSEEN), "POI_* are POI-1 layouts"
+assert not (POI_UNSEEN and POI_SHOTS == "kind"), "POI_SHOTS=kind has its own unseen-kind half"
 DOC = json.loads((ROOT / "data" / "processed" / f"{POI}.json").read_text()) if POI else R6.load(REAL6_DB)
 DBREC = DOC.get("fact_db", {})
 DB_ONLY = set() if POI else R6.db_only_merchants()  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -187,6 +193,7 @@ def sft_examples(per_user=150):
         rows = list(range(len(hist))); rng.shuffle(rows)
         for i in rows[:per_user]:
             h = hist[i]
+            unseen = POI_UNSEEN and rng.random() < POI_UNSEEN  # row 73: the target's kind absent from shots and description
             if shots is not None:  # the rule's pool for training is the same DB_ONLY-free history, in the same order
                 others = shots.select(u, h["text"], train=True, query_index=i)
             elif POI_SHOTS == "kind":  # row 72: the kshots layout half the time, no place of the target's kind the other half
@@ -196,7 +203,8 @@ def sft_examples(per_user=150):
                 others = [hist[j] for j in same + rng.sample(pool, min(24 - len(same), len(pool)))]
                 rng.shuffle(others)
             else:
-                others = [hist[j] for j in rng.sample([j for j in rows if j != i], min(24, len(rows) - 1))]
+                pool = [j for j in rows if j != i and not (unseen and hist[j]["basic"] == h["basic"])]
+                others = [hist[j] for j in rng.sample(pool, min(24, len(pool)))]
             if DBEP and rng.random() < DBEP:  # row 57: a database episode (8 shots and the target from the fact DB)
                 others = list(others)
                 for j in rng.sample(range(len(others)), min(8, len(others))):
@@ -214,6 +222,12 @@ def sft_examples(per_user=150):
                 hdr = "Categories: " + ", ".join(names[c["name"]] for c in u["categories"]) + "\n\n"
             else:
                 hdr = header
+            if POI_DESC:  # row 73: the kinds filed under each category, from the history without the target (and its kind if unseen)
+                cnt = {c["name"]: collections.Counter() for c in u["categories"]}
+                for j in rows:
+                    if j != i and not (unseen and hist[j]["basic"] == h["basic"]):
+                        cnt[hist[j]["label"]][hist[j]["basic"]] += 1
+                hdr = "Categories:\n" + "\n".join(f"- {names[c['name']]}: " + (", ".join(kind_name(b).lower() for b, _ in cnt[c["name"]].most_common(4)) or "(nothing filed yet)") for c in u["categories"]) + "\n\n"
             demo, spans = "", []  # spans: character ranges of the shot labels (leading space included), for ALL_LABELS
             kind = (lambda r: f"Kind: {kind_name(r['basic'])}\n") if POI_KIND else (lambda r: "")
             for o in others:
@@ -373,7 +387,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND, poi_desc=POI_DESC, poi_unseen=POI_UNSEEN)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)

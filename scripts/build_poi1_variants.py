@@ -9,8 +9,9 @@
   kshots_kinds  (row 72) both.
   desc          (row 73) the header lists each category with the Overture kinds of the places the user has filed under it, most filed
                 first, at most four ("Gavir: counselling, psychology"; "(nothing filed yet)" when none): what the user's own history says each
-                name means, so an unseen kind can be matched to a category through a related kind. desc_kinds adds the Kind: lines too.
-usage: uv run python scripts/build_poi1_variants.py kshots|kinds|kshots_kinds|desc|desc_kinds [--force]
+                name means, so an unseen kind can be matched to a category through a related kind. desc_kinds, desc_kshots_kinds combine.
+  instr_...     (row 73) an instruction line before the header (INSTR), for untrained readers only: does naming the task help them?
+usage: uv run python scripts/build_poi1_variants.py kshots|kinds|kshots_kinds|desc|desc_kinds|desc_kshots_kinds|instr_kshots_kinds|... [--force]
 """
 import json
 import random
@@ -21,6 +22,7 @@ from ai_experiments.paths import PROCESSED
 
 SRC = PROCESSED / "poi1_v1.json"
 K = 6
+INSTR = "Choose the category this user would file the last transaction under.\n\n"
 
 
 def kind_name(basic):
@@ -42,7 +44,7 @@ def described(u, n=4):
     return "Categories:\n" + "\n".join(rows) + "\n\n"
 
 
-def variant(doc, retrieve, kinds, desc=False):
+def variant(doc, retrieve, kinds, desc=False, instr=False):
     users = {u["user"]: u for u in doc["users"]}
     out = []
     for it in doc["items"]:
@@ -56,14 +58,14 @@ def variant(doc, retrieve, kinds, desc=False):
             rng.shuffle(shots)
         else:
             same, shots = [], [by_text[t] for t in u["shots"]]
-        header = described(u) if desc else it["prompt"].split("\n\n", 1)[0] + "\n\n"
+        header = (INSTR if instr else "") + (described(u) if desc else it["prompt"].split("\n\n", 1)[0] + "\n\n")
         demo = "".join(line(s, kinds) + f"Category: {s['label']}\n\n" for s in shots)
         q = it["prompt"].rsplit("\n\n", 1)[1]
         assert q.startswith("Transaction: ") and q.endswith("Category:")
         if kinds:
             q = line(it, True) + "Category:"
         record = f"Note: {it['record']}\n"
-        extra = dict(n_kind_shots=sum(s["basic"] == it["basic"] for s in shots)) if retrieve or kinds else {}
+        extra = dict(n_kind_shots=sum(s["basic"] == it["basic"] for s in shots)) if retrieve or kinds or desc else {}
         out.append(dict(it, prompt=header + demo + q, prompt_ctx=header + demo + record + q, **extra))
     return out
 
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     if dst.exists() and "--force" not in sys.argv:
         sys.exit(f"{dst} exists (frozen); pass --force to rebuild")
     doc = json.loads(SRC.read_text())
-    items = variant(doc, retrieve="kshots" in which, kinds="kinds" in which, desc="desc" in which)
+    items = variant(doc, retrieve="kshots" in which, kinds="kinds" in which, desc="desc" in which, instr="instr" in which)
     # the users' frozen shots stay as they were: the scorer's flags read them, the prompts carry the retrieved ones
     new = dict(doc, version=f"v1_{which}", items=items, sha256=R6.sha256(items), variant_of=f"poi1_v1 ({doc['sha256'][:12]})")
     dst.write_text(json.dumps(new, indent=0, ensure_ascii=False))
