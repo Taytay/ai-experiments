@@ -3,6 +3,7 @@ with each user's category names replaced by fresh coined words (data/processed/r
 fold 0's held-out users, against the same reader on the real names.
 
   N.1  per reader: scorecard on real names and on novel names, and the drop
+  (row 81 adds decider trained with rename augmentation on top)
   N.2  the drop split by whether the user has filed the merchant before (in history / not) and by the gold name's type in REAL-6
        (a real category name, or one of REAL-6's shared coined names)
 usage: uv run python scripts/novel_labels_tables.py
@@ -17,12 +18,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 import open_models_tables as O  # noqa: E402
 
 Q = "real6_categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_"
-D = "real6_dm_decider_decider_decider-{s}_none_h100bf16st800_f0_dbep50_aux100_lora_real6{n}.noctx.jsonl"
+D = "real6_dm_decider_decider_decider-{s}_none_h100bf16st800_f0_{r}dbep50_aux100_lora_real6{n}.noctx.jsonl"
 READERS = [("Qwen3.5-2B untrained", "real6_Qwen3.5-2B_hfs.noctx.jsonl", "real6_Qwen3.5-2B_real6_v1_novel_hfs.noctx.jsonl"),
            ("Qwen3.5-2B, per-option, database episodes (row 78)", f"{Q}alllab_dbep50_lora_hfs.noctx.jsonl", f"{Q}alllab_dbep50_lora_real6_v1_novel_hfs.noctx.jsonl"),
            ("Qwen3.5-2B, per-option, rename 0.5 (row 74)", f"{Q}ren50_alllab_lora_hfs.noctx.jsonl", f"{Q}ren50_alllab_lora_real6_v1_novel_hfs.noctx.jsonl"),
-           ("decider-2B, one slot + shot labels, database episodes (row 80)", D.format(s="2b", n=""), D.format(s="2b", n="_v1_novel")),
-           ("decider-4B, one slot + shot labels, database episodes (row 80)", D.format(s="4b", n=""), D.format(s="4b", n="_v1_novel"))]
+           ("decider-2B, one slot + shot labels, database episodes (row 80)", D.format(s="2b", n="", r=""), D.format(s="2b", n="_v1_novel", r="")),
+           ("decider-4B, one slot + shot labels, database episodes (row 80)", D.format(s="4b", n="", r=""), D.format(s="4b", n="_v1_novel", r="")),
+           ("decider-2B, one slot + shot labels, database episodes, rename 0.5 (row 81)", D.format(s="2b", n="", r="ren50_"), D.format(s="2b", n="_v1_novel", r="ren50_")),
+           ("decider-4B, one slot + shot labels, database episodes, rename 0.5 (row 81)", D.format(s="4b", n="", r="ren50_"), D.format(s="4b", n="_v1_novel", r="ren50_"))]
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=RuntimeWarning)
