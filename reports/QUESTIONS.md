@@ -1089,3 +1089,14 @@ section 63's single-mask failure may be a hop limit. *Experiment (row 71):* deco
 
 **MODEL-13 Does a trained multiple-choice skill transfer to the categoriser?** The owner (2026-09-26): train an encoder on the multiple-choice hop task and see whether the skill generalises to our original task. Row 71's encoders are trained on synthetic chains in the same layout as row 53's categoriser (one [MASK] per option, Laya's head), so their weights load directly. Intermediate-task transfer is well documented for encoders on NLU (STILTs, Phang et al. 2018; Pruksachatkun et al. ACL 2020), with gains largest in low data and sometimes negative; here the question is whether binding names across lines (a = b, b = c) helps inferring a category from a user's examples. *Experiment (row 76):* the categoriser started from the v2 hop encoders against ModernBERT-large and Laya's checkpoint, zero-shot, 200 and 1,500 steps, REAL-6 and POI-1 fold 0.
 **Status (2026-09-26):** done, REPORT.md 66. No zero-shot transfer; at 200 steps on POI-1 the hop start matches Laya's pretrained checkpoint (+8 over ModernBERT); converges by 1,500 steps.
+
+**MODEL-14 Published decision models on our tasks.** The owner (2026-09-26): Ollaya (https://ollaya.dev), a local runtime for
+Jev-like decision models, serves eight families; try the underlying models on these tasks and fine-tune the ones that allow it. Four
+take 12 to 20 options after a ~1,000-token state: decider (Mapika, Qwen3.5-Base full fine-tunes, option-letter logits), Decision-1.0
+(vLLM Semantic Router, Qwen3.5 full fine-tunes plus a candidate head), kev (Jared Palmer, LoRA on Qwen3.5-Base plus a pointer head)
+and Von (ModernBERT-large, a [MASK] per option). Laya's released checkpoints truncate our items (512 to 1,024 tokens), the NLI
+zero-shot models take no in-context examples, Winnow is GGUF only. *Experiment:* each model zero-shot in its own layout on REAL-6,
+POI-1 (plain and row 72's kind lines) and label induction v2, fold 0's users, with the scorecard; then fine-tune decider (letter
+cross-entropy) and Von (its training script) on the same training users as the 3B categoriser, and read both against it. Hypothesis:
+trained on public decision data, they read the prompt as a policy to follow rather than a user's habits to copy, so zero-shot they sit
+near the untrained Qwen2.5 readers, and fine-tuned they match the 3B at their size.
