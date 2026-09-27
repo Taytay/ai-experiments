@@ -5752,3 +5752,50 @@ rows 81 and 83's models as read before.
 Limits: fold 0, two seeds, two shots of the merchant in every item (one shot, or conflicting shots, untested).
 
 Tables: `uv run python scripts/override_tables.py`. Items: `scripts/build_override.py`. Job list: `scripts/modal_jobs/r85.json`.
+
+## 85. Abstention when nothing can tell: a trained "cannot tell" option catches 99% of evidence-free questions but also abstains on names with clues (37% of plain real names, 15% of chains, 18% of merchants the user has filed); soft uniform targets on evidence-free training questions, with no option, cut confident answers there from 79% to 3% while names with clues keep theirs, which is the behaviour asked for (REAL-14)
+
+PLAN step 84, part two (part one: section 83). The owner (2026-09-27): abstain only on extremely ambiguous merchants, never where the
+name carries a clue. `EVFREE=0.1` (`exp_decider_finetune.py`): a tenth of training questions get a fresh opaque merchant (in no
+database, no history, no REAL-6 set) as the query; `EVFREE_MODE=opt` answers them with a last option "cannot tell from this" (shown
+on as many ordinary questions too) together with decider's "not listed here" augmentation (section 79); `soft` gives them a uniform
+target over the user's categories, with no option. decider-4B, row 81's recipe + random A..Z labels, two seeds per arm; read without
+options and with both offered (`exp_decision_models.py EXTRA_OPTS`). Evidence-free items: mislead_v1's neutral merchants in no database
+(section 83); names with clues: mislead_v1's misleading names in no database and novel_merchants_v1_clean's real places (section 57) by
+name group.
+
+**Table 85.1: decider-4B, abstention when nothing can tell, fold 0 (mean over two seeds [range])**
+
+| arm | REAL-6 top-1, no options | REAL-6 top-1, options offered | REAL-6 answers abstaining | evidence-free: "cannot tell" | evidence-free: p >= 0.9 on a real category, no options | same merchants with 2 filings: abstaining | hidden category: "not listed here" | misleading name, not in DB: abstaining | real place, descriptive name: abstaining | real place, chain: abstaining | real place, plain name: abstaining | real places: top-1 with options offered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| no abstention training | 89.6 [88.9, 90.3] | 89.3 [88.9, 89.6] | 0.7 [0.3, 1.0] | 0.0 [0.0, 0.0] | 78.9 [75.0, 82.9] | 0.7 [0.0, 1.3] | 20.6 [16.4, 24.8] | 2.6 [2.6, 2.6] | 1.8 [0.9, 2.7] | 1.0 [0.0, 1.9] | 2.0 [1.0, 3.0] | 75.9 [75.5, 76.2] |
+| "cannot tell" + "not listed here" options | 88.9 [87.9, 89.9] | 87.4 [86.2, 88.6] | 2.3 [2.0, 2.7] | 98.7 [97.4, 100.0] | 44.1 [34.2, 53.9] | 18.4 [13.2, 23.7] | 86.2 [85.2, 87.2] | 37.5 [35.5, 39.5] | 11.4 [8.2, 14.5] | 15.4 [15.4, 15.4] | 36.9 [34.3, 39.4] | 66.7 [65.5, 67.8] |
+| soft uniform targets, no option | 89.1 [87.6, 90.6] | 88.4 [86.9, 89.9] | 0.8 [0.7, 1.0] | 8.6 [5.3, 11.8] | 2.6 [2.6, 2.6] | 2.0 [0.0, 3.9] | 43.6 [33.2, 54.0] | 7.2 [6.6, 7.9] | 3.2 [1.8, 4.5] | 0.0 [0.0, 0.0] | 10.6 [6.1, 15.2] | 73.2 [71.6, 74.7] |
+
+**Table 85.2: the share of items given p >= 0.9 on one real category (no options), and how often those are right, by name group**
+
+| arm | no evidence (neutral, no DB) | misleading name, no DB | real place, descriptive | real place, chain | real place, plain name | REAL-6 auto-filed at 98% (two seeds) |
+|---|---|---|---|---|---|---|
+| no abstention training | 79% | 86% | 95% (95% right) | 96% (82%) | 88% (61%) | 67.1 / 76.8 |
+| "cannot tell" option | 44% | 83% | 97% (93%) | 89% (84%) | 83% (63%) | 75.2 / 72.5 |
+| soft uniform targets | 3% | 67% | 89% (95%) | 91% (81%) | 68% (69%) | 77.2 / 70.1 |
+
+### 85.1 What the step says
+
+- **The trained option learns "unfamiliar merchant", not "no evidence".** It answers "cannot tell" on 99% of evidence-free questions,
+  but also on 37% of real places with plain names, 15% of chains, 11% of descriptive names, 38% of misleading names and 18% of
+  merchants the user has filed twice; with the options offered its top-1 on real places falls from 75.9 to 66.7. A fresh opaque name
+  in training looks like any merchant the model does not know, and those include every real place outside the database.
+- **Soft targets lower confidence in proportion to the evidence.** Confident answers on evidence-free questions fall from 79% to 3%;
+  descriptive names and chains keep 89 to 91% of theirs with the same precision; plain names, the ambiguous ones, fall from 88% to 68%
+  and those left are right more often (69% against 61%). REAL-6 accuracy and auto-file coverage are unchanged within the seed spread.
+  Offered the options anyway, it rarely takes them (0 to 11%).
+- **Recommendation.** Soft targets on evidence-free training questions are the way to have the model say "unsure" (a low top
+  probability that the auto-file threshold turns into a suggestion), with no option to switch off. For a switchable explicit answer,
+  "not listed here" alone (section 79: 92% recall at 1.3% false alarms on hidden categories) remains the candidate; the combination of
+  soft targets and "not listed here" is untested.
+
+Limits: fold 0, two seeds; the evidence-free test merchants are made-up opaque names like the training ones, so "no evidence" is
+tested only in that form.
+
+Tables: `uv run python scripts/cant_tell_tables.py`. Job lists: `scripts/modal_jobs/r84.json`, `r84b.json`.

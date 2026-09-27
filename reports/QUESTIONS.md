@@ -870,6 +870,7 @@ arm, uniform targets over the user's categories on evidence-free episodes; measu
 evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
 that do have evidence.
 **Status (2026-09-27):** PLAN steps 52 / 84, REPORT.md 79, 83: decider's abstain augmentation flags 92% of missing-category questions at 1.3% false alarms, no accuracy cost; evidence-free items are answered with high confidence (70% at p >= 0.9, 19% right): row 84 trains that case.
+**Status (2026-09-27, later):** REPORT.md 85: soft uniform targets on evidence-free training questions (no option) are the way to say "unsure" only where nothing tells; a "cannot tell" option over-abstains on names with clues.
 
 **MODEL-6 Can a small encoder with one scored `[MASK]` marker per category do the categoriser's job?**
 Laya (`laya_analysis.md`) and Verdict 2.0 (`openjev_verdict_analysis.md`) put the options first, each behind its own
