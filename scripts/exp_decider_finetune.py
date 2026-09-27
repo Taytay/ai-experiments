@@ -30,6 +30,7 @@ DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.bu
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
 SEED = int(os.environ.get("SEED", "0"))
 AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
+LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
 ABSTAIN_SWAP = float(os.environ.get("ABSTAIN_SWAP", "0.25"))  # ... and in this share of those the gold category is hidden (removed from the header
 ABSTAIN_OPT = "not listed here"  # and the options; shots keep its label), so the abstain option is the answer. decider's neutral wording
@@ -42,6 +43,7 @@ _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = 
 C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
+SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
 NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
@@ -99,17 +101,9 @@ def main():
     torch.manual_seed(SEED)
     targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "out_proj"]
     model = get_peft_model(lm, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
-    letters = torch.tensor(P.letter_ids(tok), device="cuda")
     head_w = lm.get_output_embeddings().weight  # decider ties or not; its readout is these rows (decider/model.py)
 
-    class Q:
-        def __init__(self, text, options, gold):
-            self.text, self.options, self.gold = text, options, gold
-
-    class Ex:
-        def __init__(self, context, qs):
-            self.context, self.qs = context, qs
-
+    from ai_experiments import oneslot
     eps = episodes(); rng = random.Random(SEED)
     params = [p for p in model.parameters() if p.requires_grad]
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
@@ -119,18 +113,17 @@ def main():
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
         picked = [abstain_aug(rng.choice(eps), rng) for _ in range(MICRO)]
-        built = [P.build(Ex(e[0], [Q(QUESTION, e[1], e[2])]), tok, rng=rng, max_options=255, max_ctx_tokens=16384) for e in picked]
+        built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
         att = torch.zeros_like(ids)
         for i, b in enumerate(built):
             ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
         h = model.base_model.model.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
-        hs = torch.stack([h[i, b["slots"][0]] for i, b in enumerate(built)])
-        z = F.linear(hs, head_w[letters]).float()
-        n = torch.tensor([b["nopts"][0] for b in built], device="cuda")
-        z = z.masked_fill(torch.arange(z.shape[1], device="cuda")[None] >= n[:, None], float("-inf"))
-        loss = F.cross_entropy(z, torch.tensor([b["golds"][0] for b in built], device="cuda"))
+        N = max(len(b["labs"]) for b in built)  # each question's own label tokens; padded options at -inf
+        z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float(), (0, N - len(b["labs"])), value=float("-inf"))
+                         for i, b in enumerate(built)])
+        loss = F.cross_entropy(z, torch.tensor([b["gold"] for b in built], device="cuda"))
         if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
             rows, pos, tgt = [], [], []
             for i, e in enumerate(picked):
@@ -156,7 +149,7 @@ if __name__ == "__main__":
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
                poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
-               abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP)
+               abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)

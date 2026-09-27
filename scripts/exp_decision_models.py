@@ -47,6 +47,7 @@ DECISION_CODE_REV = "60ea30a48285ea097a9b3a728e71649b78331601"  # the last Sol-2
 KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
 ADAPTER = os.environ.get("ADAPTER", "")
 ORDER_SEED = os.environ.get("ORDER_SEED", "")  # row 50: every item's options shuffled by this seed before scoring (and decider's own label order too), scores mapped back  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
+LABELS = os.environ.get("LABELS", "letters")  # FAMILY=decider: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
 DOC = json.loads((PROCESSED / f"{ITEMS_SET}.json").read_text()) if ITEMS_SET else R6.load("v1")
@@ -54,7 +55,7 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}"
+TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}"
 
 
 def state_of(it, cond):
@@ -86,23 +87,15 @@ def decider():
     if ADAPTER:  # a LoRA from exp_decider_finetune.py, merged for scoring
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
-    letters = torch.tensor(P.letter_ids(tok), device="cuda")
-
-    class Q:  # decider.prompt reads .text / .options / .gold from each question and .context / .qs from the example
-        def __init__(self, text, options, gold):
-            self.text, self.options, self.gold = text, options, gold
-
-    class Ex:
-        def __init__(self, context, qs):
-            self.context, self.qs = context, qs
+    from ai_experiments import oneslot
 
     @torch.no_grad()
     def score(items, cond):
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            built = [P.build(Ex(state_of(it, cond), [Q(it.get("question", QUESTION), options_of(it), it["answer"])]), tok, rng=random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")),
-                             max_options=255, max_ctx_tokens=16384) for it in chunk]
+            built = [oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
+                                   random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS) for it in chunk]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64  # as decider's own collate: few shapes for fla's per-shape tuning
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
             att = torch.zeros_like(ids)
@@ -110,8 +103,8 @@ def decider():
                 ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
             h = lm.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
             for i, b in enumerate(built):
-                n, perm = b["nopts"][0], b["perms"][0]
-                z = F.linear(h[i, b["slots"][0]], lm.lm_head.weight[letters[:n]]).float() / TEMP
+                n, perm = len(b["labs"]), b["perm"]
+                z = F.linear(h[i, b["slot"]], lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float() / TEMP
                 lp = F.log_softmax(z, -1).tolist()
                 back = [0.0] * n
                 for j, oi in enumerate(perm):  # label j shows option perm[j]
