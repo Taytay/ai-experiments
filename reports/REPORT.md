@@ -5621,3 +5621,62 @@ database episodes, each without the set (the row 81 / 78 models) and trained wit
 Limits: fold 0; 76 items per made-up cell (19 merchants x 4 users in reach), 45 to 52 with a separate decoy option; one seed.
 
 Tables: `uv run python scripts/mislead_tables.py`. Items: `scripts/build_mislead.py`. Job list: `scripts/modal_jobs/r83.json`.
+
+## 81. Option labels: training with random labels is at least as good as A, B, C in order and helps the plain Qwen most (85.9 to 88.9); random A..Z also lifts novel names for decider-2B (78.2 to 82.9) and its auto-file band (24 to 51%); random labels from all 255 single-token labels train to the same top-1, so labels can reach 255 options (MODEL-16)
+
+PLAN step 82 (the owner, 2026-09-27: labels must not always start at A, and must reach 255 options; numbers are single tokens only to 9
+in Qwen3.5, so they were dropped). `ai_experiments.oneslot` builds decider's plain layout with a choice of labels (`LABELS` in
+`exp_decider_finetune.py` and `exp_decision_models.py`): letters (decider's own: A, B, C, ... after the option shuffle), rand26 (a
+random sample of A..Z in random order per question), rand255 (random from decider's 255 single-token labels: A..Z and 229 two-letter
+tokens). Qwen3.5-2B and decider-2B, one slot + shot-label loss + database episodes, 800 steps, fold 0; each read with its own scheme, and
+the letters-trained models also read with random labels. The reshuffle column is the share of answers that change when the options
+(and so the labels) are drawn again (ORDER_SEED=1).
+
+**Table 81.1: one-slot readers by option-label scheme, REAL-6 fold 0 (trained with one scheme, read with one)**
+
+| model | trained with | read with | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | novel names top-1 | answers changed by a reshuffle |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B | letters | letters | 298 | 85.9 [79.4, 90.2] | 97.0 | 0.79 | 20.1 (95.0) | – | 2.7% |
+| Qwen3.5-2B | letters | rand26 | 298 | 86.2 [79.4, 90.3] | 97.3 | 0.75 | 15.8 (93.6) | – | – |
+| Qwen3.5-2B | letters | rand255 | 298 | 76.5 [67.9, 82.9] | 91.3 | 1.43 | 2.7 (87.5) | – | – |
+| Qwen3.5-2B | rand26 | rand26 | 298 | 88.9 [81.6, 94.0] | 97.7 | 0.67 | 26.8 (96.2) | 83.2 | 2.7% |
+| Qwen3.5-2B | rand255 | rand255 | 298 | 88.9 [83.2, 92.9] | 94.6 | 0.77 | 5.7 (94.1) | 81.2 | 1.0% |
+| decider-2B | letters | letters | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) | 78.2 | 0.7% |
+| decider-2B | letters | rand26 | 298 | 87.6 [81.9, 92.0] | 96.0 | 0.83 | 18.5 (96.4) | – | – |
+| decider-2B | letters | rand255 | 298 | 81.5 [74.6, 86.9] | 90.3 | 1.15 | 21.8 (95.4) | – | – |
+| decider-2B | rand26 | rand26 | 298 | 88.6 [80.1, 93.8] | 96.3 | 0.69 | 51.3 (96.1) | 82.9 | 2.3% |
+| decider-2B | rand255 | rand255 | 298 | 87.6 [80.9, 92.0] | 94.6 | 0.90 | 17.1 (96.1) | 78.5 | 3.4% |
+
+### 81.1 What the step says
+
+- **The letters-trained models never learned "A is first".** Read with random A..Z they lose nothing (85.9 to 86.2, 87.9 to 87.6);
+  they bind each letter to the option it labels. Two-letter labels they were not trained on cost 6 to 9 points.
+- **Training with random labels is an augmentation.** Qwen3.5-2B, with no multiple-choice pre-training, gains 3 points with either
+  random scheme (88.9 against 85.9) and matches decider-2B; decider-2B gains 0.7. Random A..Z also helps decider-2B on novel category
+  names (82.9 against 78.2) and doubles its confident band (51.3% auto-filed at 96.1% against 24.2%).
+- **255 labels work once trained.** rand255 reaches the same top-1 as rand26 on Qwen (88.9) and a point under on decider (87.6), with a
+  weaker top-3 and auto-file band: a two-letter label is a rarer token to bind. The reshuffle rates (1.0 to 3.4%) stay as in section 75.
+
+The recipe takes rand26 from here, and rand255 where a question has more than 26 options. Limits: one seed each, and section 82 puts
+the seed spread of this kind of run at about 3 points, so the gains on top-1 are inside it; the novel-name and auto-file gains are
+larger than that.
+
+Tables: `uv run python scripts/label_scheme_tables.py`. Code: `src/ai_experiments/oneslot.py`. Job list: `scripts/modal_jobs/r82.json`.
+
+## 82. Seeds of the best recipe: decider-4B one slot + shot-label loss + database episodes + rename 0.5 reads REAL-6 at 91.9, 89.6 and 88.9 over three seeds (mean 90.1, 96% of the ceiling) and novel names at 89.9, 87.9 and 89.3 (mean 89.0); section 78's 91.9 was the best of three
+
+REPORT 80 found decider-4B at 88.3 on REAL-6 after 48 merchants were added to its database, against section 78's 91.9, and asked
+whether that was dilution or a lucky seed. Two more seeds of section 78's recipe (`SEED=1, 2`; everything else equal), fold 0.
+
+| seed | REAL-6 top-1 | novel names top-1 |
+|---|---|---|
+| 0 (section 78) | 91.9 | 89.9 |
+| 1 | 89.6 | 87.9 |
+| 2 | 88.9 | 89.3 |
+| mean | 90.1 | 89.0 |
+
+The seed spread is 3 points, as large as most single-run differences in sections 76 to 81; REPORT 80's 88.3 with the larger database
+is inside it, so no dilution is shown. The recipe's level is about 90 on real names and 89 on novel ones, a gap of one point (section
+77's reader without rename augmentation: 88.3 and 83.6, one seed). Comparisons between arms from here should use two or three seeds.
+
+Job list: `scripts/modal_jobs/r81_seeds.json`.
