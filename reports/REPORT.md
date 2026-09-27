@@ -5999,3 +5999,21 @@ rows than a threshold, and alternation training draws day rules from five day se
 users of each fold are the other 15.
 
 Tables: `uv run python scripts/final_behaviours_tables.py`. Job list: `scripts/modal_jobs/r91.json`.
+
+## 92. Random day sets in alternation training make the Friday / Saturday rule worse (restaurants 74.2 to 60.9): the fixed day sets had taught a weekend prior, and reading an arbitrary day rule from six rows is not learned at this exposure; the recipe keeps the fixed sets (REAL-18)
+
+PLAN step 92. Section 91's weakest behaviour is the day-of-week rule. The final recipe with each day rule's days drawn as a random set of
+1 to 3 weekdays (`ALT_DAYS=rand`) instead of five fixed sets (three of which contain Friday or Saturday), two seeds, fold 0.
+
+| reader (two seeds) | stores observable | stores partial | restaurants observable | restaurants P(gold), observable | restaurants partial |
+|---|---|---|---|---|---|
+| final recipe (row 89) | 88.3 | 51.6 | 74.2 | 0.66 | 50.0 |
+| + random day sets | 86.7 | 57.8 | 60.9 | 0.55 | 53.1 |
+
+The hypothesis (too few day sets to learn the rule in general) is rejected: with random sets the Friday / Saturday rule falls 13 points.
+Part of the fixed-set reader's 74 was a prior, weekend visits being the special ones, which matches the test and plausibly real users;
+the general skill of reading which days a user singles out from six rows is not learned by 800 steps at a 10% share. REAL-6 88.9 / 89.3,
+novel names 83.6 / 89.3 (inside the seed spread). The recipe keeps `ALT_DAYS` unset. What would teach the general rule, if it matters:
+more rows of the merchant in the prompt, or a larger share of day-rule episodes.
+
+Tables: `uv run python scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r92.json`.
