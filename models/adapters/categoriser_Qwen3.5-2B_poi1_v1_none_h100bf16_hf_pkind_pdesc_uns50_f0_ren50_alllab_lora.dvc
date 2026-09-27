@@ -1,0 +1,7 @@
+outs:
+- md5: d8e3d76a8ca7971d8a495d1e4ed24414.dir
+  size: 270130772
+  nfiles: 6
+  hash: md5
+  path: 
+    categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_pkind_pdesc_uns50_f0_ren50_alllab_lora
