@@ -15,6 +15,10 @@ QUESTION, and the options are the user's category names; every model is read in 
 env: FAMILY, MODEL (HF id), ITEMS_SET (a frozen set in REAL-6's format under data/processed, e.g. poi1_v1_kinds; empty = REAL-6 v1),
      CONDS (noctx / ctx: the item's prompt or prompt_ctx), USERS (comma list; default the set's fold 0: user % 4 == 0), SMOKE=1 (8 items),
      TEMP (1.0: raw logits; the scorecard fits its own temperature), BATCH.
+Licences (owner, 2026-09-26: open licences only; checked 2026-09-27): every model here and its base is Apache-2.0 on its model card
+(decider, Decision-1.0 and its Qwen3.5 bases, kev and its Qwen3.5-Base bases, Von and ModernBERT-large); the code is Apache-2.0 (the
+decider/ package in the model repos, Decision's code/ at DECISION_CODE_REV, kev at KEV_SHA, von-sdk) or MIT (flash-linear-attention).
+open_licence() refuses a model whose card, or whose base model's card, names any other licence.
 Writes results/per_item/real6_dm_<family>_<model>_<set>.<cond>.jsonl in the Scorer's record shape (sum_lp = the model's log-probability
 per option in the item's option order, n_tok = 1), so the REAL-6 / POI-1 table code reads it unchanged. Tracker experiment
 "decision_models".
@@ -48,6 +52,26 @@ ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
 TAG = f"dm_{FAMILY}_{MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}"
+
+
+OPEN = {"apache-2.0", "mit", "bsd-2-clause", "bsd-3-clause", "cc-by-4.0"}
+
+
+def open_licence(model_id):
+    """Stop unless the model card and every base model's card name an open licence (OPEN)."""
+    from huggingface_hub import model_info
+    seen, todo = set(), [model_id]
+    while todo:
+        m = todo.pop()
+        if m in seen:
+            continue
+        seen.add(m)
+        cd = model_info(m).card_data or {}
+        lic = (cd.get("license") or "").lower()
+        assert lic in OPEN, f"{m}: licence {lic!r} is not in the open list {sorted(OPEN)}"
+        base = cd.get("base_model") or []
+        todo += [base] if isinstance(base, str) else list(base)
+    print("licences open:", ", ".join(sorted(seen)), flush=True)
 
 
 def state_of(it, cond):
@@ -193,6 +217,7 @@ def von():
 
 
 if __name__ == "__main__":
+    open_licence(MODEL)
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
     cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
                users=USERS, question=QUESTION, temp=TEMP, kev_sha=KEV_SHA if FAMILY == "kev" else None)

@@ -1095,7 +1095,7 @@ Jev-like decision models, serves eight families; try the underlying models on th
 take 12 to 20 options after a ~1,000-token state: decider (Mapika, Qwen3.5-Base full fine-tunes, option-letter logits), Decision-1.0
 (vLLM Semantic Router, Qwen3.5 full fine-tunes plus a candidate head), kev (Jared Palmer, LoRA on Qwen3.5-Base plus a pointer head)
 and Von (ModernBERT-large, a [MASK] per option). Laya's released checkpoints truncate our items (512 to 1,024 tokens), the NLI
-zero-shot models take no in-context examples, Winnow is GGUF only. *Experiment:* each model zero-shot in its own layout on REAL-6,
+zero-shot models take no in-context examples, Winnow is GGUF only (and under the Gemma licence). Open licences only (owner, 2026-09-26): all four families and their bases are Apache-2.0, their code Apache-2.0 or MIT (checked 2026-09-27). *Experiment:* each model zero-shot in its own layout on REAL-6,
 POI-1 (plain and row 72's kind lines) and label induction v2, fold 0's users, with the scorecard; then fine-tune decider (letter
 cross-entropy) and Von (its training script) on the same training users as the 3B categoriser, and read both against it. Hypothesis:
 trained on public decision data, they read the prompt as a policy to follow rather than a user's habits to copy, so zero-shot they sit
