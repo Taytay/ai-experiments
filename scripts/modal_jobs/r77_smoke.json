@@ -1,0 +1,6 @@
+[
+ {"tag": "r77s-decider", "env": {"FAMILY": "decider", "MODEL": "Mapika/decider-2b", "ITEMS_SET": "poi1_v1", "SMOKE": "1"}, "cmds": ["uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" python scripts/exp_decision_models.py"]},
+ {"tag": "r77s-decision", "env": {"FAMILY": "decision", "MODEL": "llm-semantic-router/Decision-1.0-Sol-2B", "ITEMS_SET": "poi1_v1", "SMOKE": "1"}, "cmds": ["uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" python scripts/exp_decision_models.py"]},
+ {"tag": "r77s-kev", "env": {"FAMILY": "kev", "MODEL": "jaredpalmer/kev-0.8b", "ITEMS_SET": "poi1_v1", "SMOKE": "1"}, "cmds": ["uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" python scripts/exp_decision_models.py"]},
+ {"tag": "r77s-von", "env": {"FAMILY": "von", "MODEL": "wfzyx/von", "ITEMS_SET": "poi1_v1", "SMOKE": "1"}, "cmds": ["uv run --frozen --with von-sdk python scripts/exp_decision_models.py"]}
+]
