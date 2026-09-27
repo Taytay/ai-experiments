@@ -27,6 +27,13 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   77); rename augmentation on top of database episodes removes that (78). Users who split one merchant's transactions across categories
   (the alternation set) and larger models (Qwen3.5-9B, decider-35B-A3B) are queued.
 - **Method.** One run's seed spread is about 3 points on REAL-6 fold 0 (82): compare arms over two or three seeds.
+- **Later the same day (sections 84 to 88).** The user's own filing now beats the database and the name (lookup and override
+  episodes: 98 to 100%, section 84). Uncertainty is taught where nothing can tell: soft uniform targets on evidence-free training
+  questions cut confident answers there from 79% to 3% while names with clues keep theirs; a "cannot tell" option over-abstains (85).
+  Qwen3.5-9B matches decider-4B: scale is not the lever here (87). Users who alternate between categories at one merchant: the reader
+  ignored their rule; alternation episodes teach it (stores 58 to 88, restaurants 48 to 77) and split targets hedge random 60 / 40
+  choices correctly (86, 88). All of it composes in one model (88), at a cost of 5 points on novel names and some auto-file coverage
+  that the alternation share is being tuned to reduce (row 89).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
