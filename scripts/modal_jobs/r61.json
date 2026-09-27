@@ -1,0 +1,54 @@
+[
+ {
+  "tag": "r61-base-2b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MODEL": "Qwen/Qwen3.5-2B"
+  },
+  "cmds": [
+   "ITEMS_SET=real6_v1_novel CONDS=noctx USERS=0,4,8,12,16 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm base"
+  ]
+ },
+ {
+  "tag": "r61-E-2b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ADAPTERS_FROM": "r78-E-2b"
+  },
+  "cmds": [
+   "ITEMS_SET=real6_v1_novel CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r61-REN-2b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ADAPTERS_FROM": "r74-REN"
+  },
+  "cmds": [
+   "ITEMS_SET=real6_v1_novel CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r61-decider2",
+  "env": {
+   "ADAPTERS_FROM": "r80-decideraux-E800",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-2b"
+  },
+  "cmds": [
+   "ITEMS_SET=real6_v1_novel CONDS=noctx ADAPTER=decider_decider-2b_none_h100bf16st800_f0_dbep50_aux100_lora uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r61-decider4",
+  "env": {
+   "ADAPTERS_FROM": "r80-decider4-E800",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "ITEMS_SET=real6_v1_novel CONDS=noctx ADAPTER=decider_decider-4b_none_h100bf16st800_f0_dbep50_aux100_lora uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]
