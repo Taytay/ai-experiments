@@ -4648,3 +4648,159 @@ category name is readable, POI-1), not a general reasoning skill; a multiple-cho
 own training data is small. Testable with two more seeds at 200 steps and a 50-step point.
 
 Tables: `uv run python scripts/transfer_tables.py`. Job list: `scripts/modal_jobs/r76.json`.
+
+
+## 67. What the prompt says about each place's kind: with a "Kind:" line on every example and the query, and the examples chosen by kind, the trained 3B reads POI-1's seen kinds at 99.3% of the ceiling and unseen kinds at 77 (from 65 and 50); the query's record alone reaches 79 overall, the kind lines 85 to 90, as the hop study predicts (one hop against two); training with kind-retrieved examples adds nothing (POI-1)
+
+PLAN step 72 tests REPORT 64.2's hypothesis 2: POI-1's seen kinds are a retrieval problem. The row 65 recipe (3B, fold 0's users
+held out, 800 steps, all-label loss, rename augmentation at 0.5) was trained in five layouts (`exp_categoriser.py` `POI_SHOTS=kind`,
+`POI_REC=1`, `POI_KIND=1`), and every reader was scored on the matching test layouts (`scripts/build_poi1_variants.py`):
+
+- **plain:** the 24 frozen examples;
+- **record:** a line before the query, "Note: WORD-FM is listed as a radio station.", the places database's answer for the query;
+- **kshots:** up to six of the 24 examples replaced by history places of the query's Overture basic category (section 61.4);
+- **kinds:** a "Kind: Radio station" line under every example and under the query.
+
+The kinds layout comes from the hop study (section 65). With the record alone, filing a place by a same-kind example takes two hops:
+the record gives the query's kind, and the model must itself recognise which examples are of that kind before it can copy their
+label. One forward pass follows about one hop it was not trained on. The kind lines make it one: match the query's kind line to an
+example's kind line, read the label. Training episodes with kind-retrieved examples hold them half the time and none the other half,
+as the test items do (half are unseen kinds).
+
+**Table 67.1: POI-1 fold 0's held-out users, the scorecard by reader and prompt layout (columns as Table 61.1; seen-kind items have a ceiling of 100, unseen-kind items a bracket)**
+
+| reader | layout | n | top-1 [interval] | top-3 | MRR | bits left | auto-file at 98%: coverage (precision) | usage prior top-1 / top-3 | kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 | kind lookup, else the model: top-1 (the model's top-1 where the lookup has nothing) | seen-kind top-1 | unseen-kind top-1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | plain | 507 | 44.6 [39.5, 49.5] | 65.3 | 0.58 | 2.93 | 5.3 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -60 / 55 | 74.6 (37.7) | 49.3 | 37.7 |
+| Qwen2.5-3B-Instruct, untrained | record | 507 | 58.6 [53.2, 63.6] | 73.4 | 0.69 | 2.25 | 5.5 (96.4) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -19 / 65 | 79.3 (49.3) | 65.0 | 49.3 |
+| Qwen2.5-3B-Instruct, untrained | kshots | 507 | 55.8 [51.0, 60.4] | 71.6 | 0.66 | 2.63 | 4.9 (96.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -27 / 63 | 75.1 (39.1) | 67.3 | 39.1 |
+| Qwen2.5-3B-Instruct, untrained | kshots + record | 507 | 62.9 [57.5, 67.5] | 80.3 | 0.73 | 1.94 | 4.9 (96.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -7 / 74 | 77.7 (45.4) | 75.0 | 45.4 |
+| Qwen2.5-3B-Instruct, untrained | kinds | 507 | 64.1 [58.0, 69.4] | 81.1 | 0.74 | 1.84 | 12.0 (96.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -3 / 75 | 77.9 (45.9) | 76.7 | 45.9 |
+| Qwen2.5-3B-Instruct, untrained | kshots + kinds | 507 | 75.0 [70.7, 78.5] | 86.8 | 0.82 | 1.39 | 51.1 (98.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 28 / 83 | 78.1 (46.4) | 94.7 | 46.4 |
+| Qwen2.5-14B-Instruct, untrained | plain | 507 | 52.9 [47.8, 58.0] | 71.6 | 0.66 | 2.39 | 3.7 (94.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -36 / 63 | 77.9 (45.9) | 57.7 | 45.9 |
+| Qwen2.5-14B-Instruct, untrained | record | 507 | 66.5 [62.5, 70.3] | 82.1 | 0.76 | 1.77 | 14.6 (97.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 3 / 77 | 82.6 (57.5) | 72.7 | 57.5 |
+| Qwen2.5-14B-Instruct, untrained | kshots | 507 | 62.9 [58.2, 67.6] | 77.7 | 0.73 | 2.01 | 7.9 (95.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -7 / 71 | 77.5 (44.9) | 75.3 | 44.9 |
+| Qwen2.5-14B-Instruct, untrained | kshots + record | 507 | 75.0 [71.4, 78.2] | 86.8 | 0.82 | 1.39 | 20.5 (98.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 28 / 83 | 83.6 (59.9) | 85.3 | 59.9 |
+| Qwen2.5-14B-Instruct, untrained | kinds | 507 | 71.2 [66.7, 75.5] | 86.6 | 0.80 | 1.41 | 22.1 (97.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 17 / 83 | 82.2 (56.5) | 81.3 | 56.5 |
+| Qwen2.5-14B-Instruct, untrained | kshots + kinds | 507 | 81.1 [77.8, 83.9] | 92.1 | 0.87 | 1.01 | 51.3 (97.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 45 / 90 | 82.1 (56.0) | 98.3 | 56.0 |
+| 3B trained plain (row 65) | plain | 507 | 59.2 [55.5, 63.2] | 78.5 | 0.71 | 1.94 | 16.4 (92.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -18 / 72 | 79.7 (50.2) | 65.3 | 50.2 |
+| 3B trained plain (row 65) | record | 507 | 72.6 [68.4, 76.6] | 89.9 | 0.82 | 1.27 | 42.8 (97.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 21 / 87 | 86.2 (66.2) | 77.0 | 66.2 |
+| 3B trained plain (row 65) | kshots | 507 | 68.6 [64.8, 72.7] | 84.2 | 0.78 | 1.59 | 33.5 (97.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 10 / 79 | 79.9 (50.7) | 81.0 | 50.7 |
+| 3B trained plain (row 65) | kshots + record | 507 | 79.1 [75.4, 82.6] | 91.5 | 0.86 | 0.96 | 56.6 (97.9) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 40 / 89 | 85.4 (64.3) | 89.3 | 64.3 |
+| 3B trained plain (row 65) | kinds | 507 | 78.3 [74.5, 81.7] | 93.1 | 0.86 | 0.94 | 57.2 (97.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 37 / 91 | 85.6 (64.7) | 87.7 | 64.3 |
+| 3B trained plain (row 65) | kshots + kinds | 507 | 85.6 [82.9, 88.3] | 94.7 | 0.91 | 0.69 | 72.6 (97.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 59 / 93 | 86.8 (67.6) | 98.0 | 67.6 |
+| 3B trained with kshots | plain | 507 | 57.0 [52.7, 61.5] | 78.5 | 0.70 | 1.99 | 17.2 (96.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -24 / 72 | 80.3 (51.7) | 60.7 | 51.2 |
+| 3B trained with kshots | kshots | 507 | 65.3 [61.5, 69.4] | 82.6 | 0.76 | 1.66 | 24.9 (95.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 0 / 77 | 79.5 (49.8) | 76.0 | 49.8 |
+| 3B trained with the record | record | 507 | 78.9 [75.3, 82.6] | 94.5 | 0.87 | 0.90 | 51.1 (98.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 39 / 93 | 88.4 (71.5) | 84.0 | 71.5 |
+| 3B trained with the record | kshots + record | 507 | 85.4 [82.4, 88.2] | 95.9 | 0.91 | 0.65 | 69.4 (98.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 58 / 95 | 88.4 (71.5) | 95.0 | 71.5 |
+| 3B trained with kshots + record | record | 507 | 79.5 [75.4, 83.0] | 93.7 | 0.87 | 0.91 | 55.6 (97.5) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 41 / 92 | 89.9 (75.4) | 82.3 | 75.4 |
+| 3B trained with kshots + record | kshots + record | 507 | 86.2 [83.0, 89.2] | 95.5 | 0.91 | 0.66 | 72.4 (97.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 60 / 94 | 90.5 (76.8) | 92.7 | 76.8 |
+| 3B trained with kinds | kinds | 507 | 84.6 [81.1, 87.5] | 97.0 | 0.91 | 0.57 | 75.0 (97.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 56 / 96 | 90.1 (75.8) | 90.7 | 75.8 |
+| 3B trained with kinds | kshots + kinds | 507 | 90.1 [87.9, 92.3] | 97.8 | 0.94 | 0.39 | 85.6 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 72 / 97 | 90.5 (76.8) | 99.3 | 76.8 |
+| 3B trained with kshots + kinds | kinds | 507 | 85.2 [82.0, 88.2] | 96.8 | 0.91 | 0.55 | 74.8 (97.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 57 / 96 | 89.9 (75.4) | 92.0 | 75.4 |
+| 3B trained with kshots + kinds | kshots + kinds | 507 | 89.5 [87.2, 91.6] | 97.0 | 0.94 | 0.38 | 86.0 (97.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 70 / 96 | 89.9 (75.4) | 99.3 | 75.4 |
+
+**Table 67.2: top-1 % by seen / unseen kind x category name type (readable / merged / coined), fold 0**
+
+| reader | layout | seen, standard (n=157) | seen, renamed (n=65) | seen, new (n=78) | unseen, standard (n=108) | unseen, renamed (n=47) | unseen, new (n=52) |
+|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | plain | 60 | 54 | 24 | 53 | 38 | 6 |
+| Qwen2.5-3B-Instruct, untrained | record | 75 | 72 | 38 | 60 | 64 | 13 |
+| Qwen2.5-3B-Instruct, untrained | kshots | 75 | 69 | 50 | 50 | 51 | 6 |
+| Qwen2.5-3B-Instruct, untrained | kshots + record | 83 | 80 | 55 | 57 | 62 | 6 |
+| Qwen2.5-3B-Instruct, untrained | kinds | 83 | 72 | 67 | 56 | 51 | 19 |
+| Qwen2.5-3B-Instruct, untrained | kshots + kinds | 99 | 91 | 90 | 59 | 57 | 10 |
+| Qwen2.5-14B-Instruct, untrained | plain | 70 | 52 | 37 | 57 | 49 | 19 |
+| Qwen2.5-14B-Instruct, untrained | record | 85 | 78 | 44 | 72 | 64 | 21 |
+| Qwen2.5-14B-Instruct, untrained | kshots | 79 | 77 | 67 | 56 | 49 | 17 |
+| Qwen2.5-14B-Instruct, untrained | kshots + record | 92 | 85 | 73 | 76 | 66 | 21 |
+| Qwen2.5-14B-Instruct, untrained | kinds | 85 | 82 | 74 | 69 | 64 | 25 |
+| Qwen2.5-14B-Instruct, untrained | kshots + kinds | 98 | 97 | 100 | 71 | 64 | 17 |
+| 3B trained plain (row 65) | plain | 72 | 60 | 56 | 56 | 53 | 35 |
+| 3B trained plain (row 65) | record | 80 | 89 | 60 | 78 | 68 | 40 |
+| 3B trained plain (row 65) | kshots | 83 | 82 | 76 | 57 | 55 | 33 |
+| 3B trained plain (row 65) | kshots + record | 92 | 94 | 81 | 76 | 64 | 40 |
+| 3B trained plain (row 65) | kinds | 87 | 89 | 88 | 73 | 72 | 38 |
+| 3B trained plain (row 65) | kshots + kinds | 98 | 98 | 97 | 77 | 68 | 48 |
+| 3B trained with kshots | plain | 63 | 62 | 55 | 54 | 66 | 33 |
+| 3B trained with kshots | kshots | 78 | 77 | 72 | 53 | 60 | 35 |
+| 3B trained with the record | record | 86 | 89 | 76 | 82 | 74 | 46 |
+| 3B trained with the record | kshots + record | 96 | 94 | 94 | 83 | 70 | 48 |
+| 3B trained with kshots + record | record | 84 | 80 | 81 | 87 | 74 | 52 |
+| 3B trained with kshots + record | kshots + record | 94 | 92 | 90 | 90 | 74 | 52 |
+| 3B trained with kinds | kinds | 92 | 89 | 90 | 88 | 74 | 52 |
+| 3B trained with kinds | kshots + kinds | 99 | 98 | 100 | 89 | 74 | 54 |
+| 3B trained with kshots + kinds | kinds | 94 | 89 | 91 | 84 | 77 | 56 |
+| 3B trained with kshots + kinds | kshots + kinds | 99 | 98 | 100 | 83 | 79 | 56 |
+
+**Table 67.3: seen-kind items, top-1 % by whether the prompt holds a place of the query's kind (frozen shots: by chance; kshots layouts: whenever the history has one, i.e. always for seen kinds), fold 0**
+
+| reader | layout | frozen shots hold the kind (n=200) | frozen shots do not (n=100) |
+|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | plain | 55 | 39 |
+| Qwen2.5-3B-Instruct, untrained | record | 73 | 49 |
+| Qwen2.5-3B-Instruct, untrained | kshots | 69 | 64 |
+| Qwen2.5-3B-Instruct, untrained | kshots + record | 77 | 71 |
+| Qwen2.5-3B-Instruct, untrained | kinds | 92 | 45 |
+| Qwen2.5-3B-Instruct, untrained | kshots + kinds | 95 | 94 |
+| Qwen2.5-14B-Instruct, untrained | plain | 64 | 45 |
+| Qwen2.5-14B-Instruct, untrained | record | 80 | 59 |
+| Qwen2.5-14B-Instruct, untrained | kshots | 74 | 77 |
+| Qwen2.5-14B-Instruct, untrained | kshots + record | 84 | 87 |
+| Qwen2.5-14B-Instruct, untrained | kinds | 96 | 52 |
+| Qwen2.5-14B-Instruct, untrained | kshots + kinds | 98 | 98 |
+| 3B trained plain (row 65) | plain | 67 | 62 |
+| 3B trained plain (row 65) | record | 82 | 67 |
+| 3B trained plain (row 65) | kshots | 78 | 87 |
+| 3B trained plain (row 65) | kshots + record | 88 | 93 |
+| 3B trained plain (row 65) | kinds | 96 | 70 |
+| 3B trained plain (row 65) | kshots + kinds | 97 | 100 |
+| 3B trained with kshots | plain | 64 | 55 |
+| 3B trained with kshots | kshots | 74 | 79 |
+| 3B trained with the record | record | 88 | 77 |
+| 3B trained with the record | kshots + record | 94 | 96 |
+| 3B trained with kshots + record | record | 88 | 72 |
+| 3B trained with kshots + record | kshots + record | 93 | 92 |
+| 3B trained with kinds | kinds | 99 | 74 |
+| 3B trained with kinds | kshots + kinds | 99 | 100 |
+| 3B trained with kshots + kinds | kinds | 99 | 78 |
+| 3B trained with kshots + kinds | kshots + kinds | 99 | 100 |
+
+### 67.1 What moved
+
+- **The kind lines are the step.** The 3B trained with them reads 84.6 on the frozen examples and 90.1 [87.9, 92.3] with
+  kind-retrieved ones, from row 65's 59.2. Seen kinds reach 99.3 (the ceiling is 100), with auto-file coverage of 85.6% at a
+  realised 98.2% precision and 0.39 bits left. The kind lookup in front adds nothing any more (lookup, else the model: 90.5).
+- **One hop beats two, as predicted.** The record carries the same fact about the query as its kind line, and less about the
+  examples. On seen kinds whose kind is among the frozen examples (Table 67.3), the untrained 3B reads 73 with the record and 92 with
+  the kind lines, the 14B 80 and 96, the trained 3Bs 88 and 99. Where no example of the kind is in the prompt, the kind lines help
+  less than the record for untrained readers (45 against 49) and the gap closes with training.
+- **Unseen kinds moved, which the hypothesis did not predict.** 50 to 77 for the kind-line model. With every example's kind visible,
+  a query of an unseen kind can be filed with the category that holds related kinds ("water park" with the swimming pools). By name
+  type: readable 83 to 89, merged 74 to 79, coined 52 to 56 (row 65: 56, 53, 35; blind Opus 70, 40, 25 on its sample of the plain
+  layout).
+- **Training on the layout matters for unseen kinds, not seen ones.** With kind-retrieved examples and kind lines, the untrained 3B
+  reads seen kinds at 94.7 and the 14B at 98.3, but unseen kinds at 46 and 56 (coined names 10 and 17). The row 65 model, trained on
+  the plain layout, reads the new layouts at 85.6 without retraining (seen 98.0, unseen 67.6).
+- **Training with kind-retrieved examples adds nothing** on any layout (65.3 against 68.6 for the plain-trained model read with
+  them; 89.5 against 90.1 with kind lines). The models already copy same-kind examples; what they lacked was knowing which examples
+  were same-kind.
+
+### 67.2 What the step says
+
+POI-1's seen kinds are solved once the prompt states each place's kind and holds places of the query's kind: a lookup the model now
+does itself, to 99% of the ceiling, and the untrained 14B nearly as well. What is left is unseen kinds, where the bracket is now 77
+(best reader) to 100, and within them coined names (52 to 56).
+
+- For Q1, the hop limit explains a prompt-design result: state every link the model must use, and a single pass matches strings
+  rather than recognising kinds.
+- For Q2, a places database is worth most as a label on every line (the examples and the query), not as a record of the query alone.
+- For Q3, what a coined name means is read from the kinds filed under it. Row 73 tests that directly: a one-line description of each
+  category from the kinds the user has filed under it, on top of the kind-line layout.
+
+Tables: `uv run python scripts/poi1_kinds_tables.py`. Job list: `scripts/modal_jobs/r72.json`.
+
+**Scorer note (2026-09-26).** `Scorer` has an optional prompt cache (`SCORER_CACHE=1`: each prompt run once, its options scored from
+its KV cache). `scripts/check_scorer_cache.py` on Modal: it agrees with the packed scorer within batch-shape noise (0.04 to 0.11 nats
+mean per option, 0 to 0.7% of predictions flipped, accuracy unchanged), but under unsloth a cached forward goes through its
+generation path one token at a time, and it was 2.3x slower on POI-1 with the trained 3B and 1.4x slower with the 14B. It stays off.

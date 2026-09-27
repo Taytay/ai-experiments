@@ -1035,6 +1035,8 @@ renderings obscure / full / clean; the scorecard of EVAL-9.
 
 **Status (2026-09-26):** first set done, PLAN step 65, REPORT.md 61 (`poi1_v1`: 200 users, 12 to 20 categories over 20 to 45 Overture basic categories, 2,053 places in no history, clean rendering). Blind Opus 56%, the POI-trained 3B 55 to 59, untrained 3B / 7B / 14B 45 / 48 / 53; the kind lookup answers 59% exactly and lookup-then-model reads 80; kind-retrieved shots add 8 to 18 points. Open: the plain many-way task (10 / 50 / all categories), the obscure rendering, all folds, inconsistent users.
 
+**Status (2026-09-26):** PLAN step 72, REPORT.md 67: with a "Kind:" line on every example and the query and kind-retrieved examples, the trained 3B reads 90.1 on fold 0 (seen kinds 99.3, unseen 76.8, coined names 52 to 56); what is left is unseen kinds with coined names (row 73).
+
 **REAL-21 Does a database taught as decisions teach facts or a skill?** Database episodes built from real places (Overture),
 scored on places in the injected database and on places held out of it, same categories: the first measures stored facts, the
 second the general "this kind of business goes in this kind of category" skill that row 62's +5 on merchants outside the database
