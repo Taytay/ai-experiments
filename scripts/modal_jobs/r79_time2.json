@@ -1,0 +1,3 @@
+[
+ {"tag": "r79-time-peroption2", "env": {"LOAD_4BIT": "0", "ADAPTERS_FROM": "r78-P-2b"}, "cmds": ["ITEMS_SET=poi1_v1_desc_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_pkind_pdesc_uns50_f0_ren50_alllab_lora", "ITEMS_SET=poi1_v1_desc_kshots_kinds CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_pkind_pdesc_uns50_f0_ren50_alllab_lora"]}
+]
