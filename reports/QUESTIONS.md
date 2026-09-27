@@ -1103,9 +1103,13 @@ cross-entropy) and Von (its training script) on the same training users as the 3
 trained on public decision data, they read the prompt as a policy to follow rather than a user's habits to copy, so zero-shot they sit
 near the untrained Qwen2.5 readers, and fine-tuned they match the 3B at their size.
 
+**Status (2026-09-27):** PLAN step 77, REPORT.md 69: zero-shot only kev-4B and decider-4B come near a general LLM; fine-tuned decider-2B reads POI-1 at 92.5, the best so far, at a tenth of the scoring time; Von's encoder is no better a start than Laya's.
+
 **MODEL-15 An open-licence base for the categoriser.** Qwen2.5-3B-Instruct, the base of nearly every trained categoriser so far, is
 under the Qwen Research licence (non-commercial); the owner (2026-09-26) chose to move new work to Apache-2.0 Qwen3.5 (the bases of
 decider, kev and Decision-1.0, so row 77 compares like with like). Qwen3.5 is a hybrid (three Gated DeltaNet layers to one full
 attention layer), which unsloth's fast path does not cover; it runs through transformers + peft with flash-linear-attention.
 *Experiment:* Qwen3.5-2B and -4B untrained, then the current best recipes on them (REAL-6 database episodes; POI-1 with kind lines
 and kind-retrieved examples), fold 0, against the Qwen2.5-3B numbers and the ceilings; speed and memory per step.
+
+**Status (2026-09-27):** PLAN step 78, REPORT.md 69: Qwen3.5-2B / 4B match Qwen2.5-3B once trained (REAL-6 86.9 / 88.6, POI-1 91.5) and read better untrained; new trained work uses Qwen3.5.

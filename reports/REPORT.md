@@ -4905,3 +4905,171 @@ is coined names for kinds the user has never filed (58), where the only evidence
 The trained arms are on Qwen2.5-3B; row 78 re-runs the best layout on the Apache-2.0 Qwen3.5 base.
 
 Tables: `uv run python scripts/poi1_desc_tables.py`. Job list: `scripts/modal_jobs/r73.json`.
+
+
+## 69. Published decision models and an open base: zero-shot, only kev-4B and decider-4B come near a general LLM (kev with the merchant record 83.9 on REAL-6, 76.9 on POI-1 with kind lines), the others fail on long prompts with many options; fine-tuned on the categoriser's episodes, decider-2B is the best POI-1 reader so far (92.5, unseen kinds 81.6) at about a tenth of the scoring time; Apache-2.0 Qwen3.5-2B / 4B match the research-licensed Qwen2.5-3B once trained and read better untrained (MODEL-14, MODEL-15)
+
+PLAN steps 77 and 78, written together because they share their readers and tables.
+
+**Step 77 (MODEL-14).** The owner asked (2026-09-26) to try the models Ollaya (https://ollaya.dev, a local runtime for Jev-like
+decision models) serves, and to fine-tune those that allow it. Four families take 12 to 20 options after a ~1,000-token state, and
+all are Apache-2.0, as are their bases and code (`ai_experiments.licences.open_licence` checks every model and base card before a
+run):
+
+- **decider** (Mapika): full fine-tunes of Qwen3.5-Base; the answer is read from option-letter logits at an "Answer: (" slot.
+- **Decision-1.0** (vLLM Semantic Router): full fine-tunes of Qwen3.5 plus a candidate head read at each option's last token. Its
+  repos removed their code on 2026-09-27; the code is loaded from the last revision that shipped it (same prompt version as the
+  weights).
+- **kev** (Jared Palmer): a LoRA on Qwen3.5-Base plus a pointer head (each option's closing delimiter against a `<decide>` token).
+- **Von 1.2** (ModernBERT-large): a [MASK] per option, options independent of each other.
+
+Laya's released checkpoints truncate our items, the NLI zero-shot models take no in-context examples, and Winnow is GGUF only
+under the Gemma licence; they were not run. `scripts/exp_decision_models.py` renders each item in the model's own layout: the item's
+prompt (categories, examples, query) is the state, the question is "Which of this user's categories does the last transaction belong
+to?", the options are the category names, and each model's raw scores are recorded (Von's before its rounding and calibration). A
+sanity set (the harness's own triage example and two obvious transactions, each with the options reversed) confirmed every readout:
+answers follow the options through reversal. Fine-tuning: decider-2B on the row 73 episodes with its own letter-slot loss
+(`scripts/exp_decider_finetune.py`, rank-64 LoRA including the DeltaNet projections, 800 steps); Von's encoder as the start of the
+row 53 [MASK] encoder (`exp_encoder_mask.py INIT=von`), against ModernBERT and Laya as in section 66.
+
+**Step 78 (MODEL-15).** Qwen2.5-3B-Instruct, the base of nearly every trained categoriser so far, is under the Qwen Research licence;
+the owner chose (2026-09-26) to move new trained work to Apache-2.0 Qwen3.5. Qwen3.5-2B and -4B, untrained and trained with the two
+best recipes (REAL-6 database episodes, section 58; POI-1 descriptions, kind lines and unseen-kind episodes, section 68), fold 0.
+
+**Table 69.1: REAL-6, fold 0's held-out users: untrained readers without / with the merchant record, and trained readers**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained, no record | 298 | 28.9 [24.3, 34.0] | 46.0 | 3.39 | 5.4 (93.8) |
+| Qwen2.5-3B-Instruct, untrained, record | 298 | 60.4 [51.2, 67.4] | 85.2 | 1.85 | 2.3 (85.7) |
+| Qwen3.5-2B, untrained, no record | 298 | 33.2 [26.5, 38.5] | 50.0 | 3.33 | 5.7 (94.1) |
+| Qwen3.5-2B, untrained, record | 298 | 68.5 [61.9, 75.7] | 86.2 | 1.48 | 2.0 (83.3) |
+| Qwen3.5-4B, untrained, no record | 298 | 45.0 [32.4, 54.3] | 61.4 | 2.81 | 4.0 (91.7) |
+| Qwen3.5-4B, untrained, record | 298 | 79.2 [73.1, 83.8] | 93.6 | 1.05 | 23.8 (97.2) |
+| decider-2b, zero-shot, no record | 298 | 15.8 [7.6, 29.3] | 33.6 | 3.74 | 22.5 (41.8) |
+| decider-2b, zero-shot, record | 298 | 33.9 [20.2, 47.3] | 63.4 | 2.92 | 1.7 (80.0) |
+| decider-4b, zero-shot, no record | 298 | 34.2 [26.3, 42.1] | 56.7 | 3.15 | 6.4 (36.8) |
+| decider-4b, zero-shot, record | 298 | 71.8 [65.4, 78.0] | 89.9 | 1.27 | 34.2 (95.1) |
+| Decision-1.0 Sol-2B, zero-shot, no record | 298 | 5.0 [2.0, 7.9] | 16.4 | 3.83 | 0.0 (nan) |
+| Decision-1.0 Sol-2B, zero-shot, record | 298 | 6.7 [2.9, 11.5] | 16.8 | 3.83 | 0.0 (nan) |
+| Decision-1.0 Nox-4B, zero-shot, no record | 298 | 13.4 [8.7, 19.7] | 32.2 | 3.83 | 0.0 (nan) |
+| Decision-1.0 Nox-4B, zero-shot, record | 298 | 34.6 [24.8, 46.3] | 51.7 | 3.54 | 1.0 (33.3) |
+| kev-4b, zero-shot, no record | 298 | 43.3 [40.2, 46.8] | 60.4 | 2.80 | 8.7 (96.2) |
+| kev-4b, zero-shot, record | 298 | 83.9 [75.6, 90.1] | 98.0 | 0.71 | 42.6 (96.1) |
+| Von 1.2, zero-shot, no record | 298 | 10.7 [5.3, 16.7] | 28.5 | 3.80 | 21.5 (7.8) |
+| Von 1.2, zero-shot, record | 298 | 17.1 [7.5, 25.5] | 38.6 | 3.72 | 0.0 (nan) |
+| Qwen2.5-3B, database episodes (row 70) | 298 | 88.3 [80.7, 94.8] | 96.3 | 0.69 | 31.5 (90.4) |
+| Qwen3.5-2B, database episodes | 298 | 86.9 [80.6, 91.0] | 98.3 | 0.61 | 48.0 (97.2) |
+| Qwen3.5-4B, database episodes | 298 | 88.6 [80.9, 92.3] | 97.7 | 0.62 | 50.0 (94.6) |
+| [MASK] encoder from ModernBERT, 200 steps | 298 | 23.2 [17.8, 31.9] | 40.9 | 3.45 | 6.0 (94.4) |
+| [MASK] encoder from ModernBERT, 1500 steps | 298 | 53.4 [43.1, 63.5] | 72.5 | 2.34 | 15.1 (95.6) |
+| [MASK] encoder from Laya, 200 steps | 298 | 29.9 [25.8, 34.4] | 46.0 | 3.13 | 10.7 (96.9) |
+| [MASK] encoder from Laya, 1500 steps | 298 | 59.4 [50.7, 66.1] | 73.2 | 2.21 | 18.1 (98.1) |
+| [MASK] encoder from Von, 200 steps | 298 | 26.2 [18.7, 33.4] | 44.6 | 3.32 | 10.7 (96.9) |
+| [MASK] encoder from Von, 1500 steps | 298 | 58.7 [52.0, 65.0] | 75.8 | 2.12 | 9.4 (96.4) |
+
+**Table 69.2: POI-1, fold 0's held-out users, by prompt layout (plain; kind lines + kind-retrieved examples; the same with the category descriptions of row 73), with seen / unseen kind top-1**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | seen-kind top-1 | unseen-kind top-1 |
+|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained, plain | 507 | 44.6 [39.5, 49.5] | 65.3 | 2.93 | 5.3 (96.3) | 49.3 | 37.7 |
+| Qwen2.5-3B-Instruct, untrained, kinds + kshots | 507 | 75.0 [70.7, 78.5] | 86.8 | 1.39 | 51.1 (98.1) | 94.7 | 46.4 |
+| Qwen2.5-3B-Instruct, untrained, desc + kinds + kshots | 507 | 79.7 [76.5, 82.7] | 88.6 | 1.28 | 17.9 (96.7) | 98.3 | 52.7 |
+| Qwen3.5-2B, untrained, plain | 507 | 42.6 [38.1, 47.1] | 60.4 | 3.10 | 3.4 (88.2) | 49.0 | 33.3 |
+| Qwen3.5-2B, untrained, kinds + kshots | 507 | 79.1 [75.7, 82.2] | 87.6 | 1.19 | 65.3 (98.2) | 98.7 | 50.7 |
+| Qwen3.5-2B, untrained, desc + kinds + kshots | 507 | 82.2 [79.3, 85.3] | 88.6 | 1.06 | 70.4 (98.0) | 99.0 | 58.0 |
+| Qwen3.5-4B, untrained, plain | 507 | 47.5 [42.3, 53.1] | 65.7 | 2.99 | 0.8 (75.0) | 51.7 | 41.5 |
+| Qwen3.5-4B, untrained, kinds + kshots | 507 | 65.3 [61.5, 69.7] | 77.9 | 2.79 | 29.4 (97.3) | 72.3 | 55.1 |
+| Qwen3.5-4B, untrained, desc + kinds + kshots | 507 | 58.8 [54.8, 63.0] | 71.2 | 3.36 | 7.3 (94.6) | 57.7 | 60.4 |
+| decider-2b, zero-shot, plain | 507 | 26.0 [21.1, 30.6] | 50.3 | 3.48 | 1.2 (66.7) | 30.7 | 18.4 |
+| decider-2b, zero-shot, kinds + kshots | 507 | 34.9 [30.7, 38.9] | 60.7 | 3.16 | 0.2 (0.0) | 35.7 | 32.4 |
+| decider-4b, zero-shot, plain | 507 | 39.6 [34.7, 45.6] | 63.5 | 2.93 | 3.2 (100.0) | 44.0 | 33.3 |
+| decider-4b, zero-shot, kinds + kshots | 507 | 71.0 [67.0, 74.8] | 87.8 | 1.49 | 16.2 (97.6) | 81.3 | 56.0 |
+| Decision-1.0 Sol-2B, zero-shot, plain | 507 | 10.8 [8.0, 13.5] | 23.9 | 4.01 | 0.4 (0.0) | 11.3 | 10.1 |
+| Decision-1.0 Sol-2B, zero-shot, kinds + kshots | 507 | 15.0 [12.2, 17.5] | 26.8 | 4.00 | 0.0 (nan) | 14.7 | 15.5 |
+| Decision-1.0 Nox-4B, zero-shot, plain | 507 | 24.5 [20.5, 28.3] | 41.2 | 3.76 | 2.0 (90.0) | 23.0 | 26.6 |
+| Decision-1.0 Nox-4B, zero-shot, kinds + kshots | 507 | 33.5 [29.2, 37.6] | 48.7 | 3.63 | 11.0 (96.4) | 34.7 | 31.9 |
+| kev-4b, zero-shot, plain | 507 | 44.4 [39.3, 50.3] | 66.1 | 2.69 | 3.0 (93.3) | 49.3 | 37.2 |
+| kev-4b, zero-shot, kinds + kshots | 507 | 76.9 [72.4, 80.9] | 88.8 | 1.21 | 32.3 (97.6) | 90.3 | 57.5 |
+| Von 1.2, zero-shot, plain | 507 | 8.5 [6.7, 10.6] | 23.7 | 4.01 | 0.0 (nan) | 10.3 | 5.8 |
+| Von 1.2, zero-shot, kinds + kshots | 507 | 33.3 [29.8, 37.3] | 54.4 | 3.42 | 1.6 (75.0) | 50.3 | 8.7 |
+| Qwen2.5-3B trained, row 73 recipe, desc + kinds + kshots | 507 | 91.7 [89.5, 93.9] | 98.0 | 0.37 | 86.4 (98.2) | 99.7 | 80.2 |
+| Qwen3.5-2B trained, row 73 recipe, desc + kinds + kshots | 507 | 91.5 [89.2, 93.8] | 98.6 | 0.32 | 86.0 (97.9) | 99.3 | 80.2 |
+| Qwen3.5-4B trained, row 73 recipe, desc + kinds + kshots | 507 | 91.5 [89.2, 93.7] | 98.6 | 0.31 | 87.6 (98.2) | 99.3 | 80.2 |
+| decider-2b trained, row 73 recipe (its letter readout), desc + kinds + kshots | 507 | 92.5 [90.4, 94.5] | 99.0 | 0.33 | 86.6 (98.2) | 100.0 | 81.6 |
+| [MASK] encoder from ModernBERT, 200 steps (its own layout) | 507 | 40.2 [34.8, 45.5] | 63.3 | 2.80 | 3.6 (88.9) | 42.3 | 37.2 |
+| [MASK] encoder from ModernBERT, 1500 steps (its own layout) | 507 | 57.6 [53.4, 61.9] | 81.1 | 1.97 | 5.7 (93.1) | 64.7 | 47.3 |
+| [MASK] encoder from Laya, 200 steps (its own layout) | 507 | 47.3 [43.0, 51.8] | 70.0 | 2.44 | 3.0 (93.3) | 54.3 | 36.7 |
+| [MASK] encoder from Laya, 1500 steps (its own layout) | 507 | 57.0 [52.4, 62.5] | 79.7 | 1.99 | 7.3 (94.6) | 62.0 | 49.8 |
+| [MASK] encoder from Von, 200 steps (its own layout) | 507 | 48.5 [44.1, 53.1] | 73.6 | 2.36 | 2.0 (80.0) | 56.3 | 37.2 |
+| [MASK] encoder from Von, 1500 steps (its own layout) | 507 | 57.4 [53.8, 61.8] | 78.5 | 2.00 | 14.6 (98.6) | 66.0 | 44.9 |
+
+**Table 69.3: label induction v2, fold 0's users (900 items), top-1 %, untrained readers**
+
+| reader | top-1 |
+|---|---|
+| Qwen2.5-3B-Instruct | 42.8 |
+| Qwen3.5-2B | 53.3 |
+| Qwen3.5-4B | 58.4 |
+| decider-2b | 34.4 |
+| decider-4b | 43.9 |
+| Decision-1.0 Sol-2B | 1.6 |
+| Decision-1.0 Nox-4B | 8.7 |
+| kev-4b | 56.3 |
+| Von 1.2 | 5.9 |
+
+**Table 69.4: scoring time per POI-1 item on one H100 (12 to 20 options after a ~900-token prompt), from the jobs' logs; wrappers as written for this study (no CUDA graphs or compilation; kev in float32, one item at a time; Von one item at a time)**
+
+| reader | ms per item | how the options are read |
+|---|---|---|
+| decider-2b, Decision-1.0 Sol-2B | ~25 | one pass per question, all options |
+| decider-4b, Decision-1.0 Nox-4B, Von 1.2 | 35 to 60 | one pass per question, all options |
+| kev-4b | ~200 | one pass per question; float32, unbatched |
+| [MASK] encoder (row 53) | 7 to 10 | one pass, batched |
+| Qwen2.5-3B, the repo's option scorer | ~225 | one row per option: the prompt re-read 12 to 20 times |
+| Qwen2.5-14B, the repo's option scorer | ~600 | one row per option |
+
+### 69.1 What the published decision models do here
+
+- **Zero-shot, two of six are usable.** kev-4B reads REAL-6 with the merchant record at 83.9 (top-3 98.0, 0.71 bits left), close to
+  a trained categoriser (88), and POI-1 with kind lines at 76.9. decider-4B reads 71.8 and 71.0 on the same. Both are at or below the
+  untrained Qwen3.5-4B without a record and on label induction.
+- **The others fail on these prompts, not in general.** Decision-1.0 Sol-2B is near uniform on transactions (5 to 15), and Von reads
+  8.5 on plain POI-1; on the sanity set both answer the triage questions correctly and with high confidence. Their training data are
+  short states with described options; a ~1,000-token state of 24 labelled examples and 12 to 20 bare category names is outside it.
+  Sol-2B, decider-2B and Von also misfile Trader Joe's (Dining out, Dining out, Travel): at 2B and 395M the merchant knowledge is
+  thin, as section 62 found for the encoder.
+- **Speed is their strength** (Table 69.4): one pass reads all options, 25 to 60 ms per POI-1 item against about 225 for Qwen2.5-3B
+  through this repo's scorer, which re-reads the prompt once per option. The prompt-cache attempt of section 67 did not remove that
+  under unsloth.
+- **Fine-tuned, decider-2B is the best POI-1 reader so far:** 92.5 [90.4, 94.5] with descriptions, kind lines and kind-retrieved
+  examples (92.7 without the retrieved examples), seen kinds 100.0, unseen 81.6, against 91.5 to 91.7 for the Qwens on the same
+  episodes. The gain is inside the intervals; the reader is a 2B model at a tenth of the scoring time.
+- **Von's encoder is no better a start than Laya's or ModernBERT's** (POI-1 57.4 against 57.0 and 57.6 at 1,500 steps; REAL-6 58.7
+  against 59.4 and 53.4). Its skill does not transfer to this layout any more than Laya's did (section 66).
+
+### 69.2 The open base
+
+- **Trained, Qwen3.5 matches Qwen2.5-3B**: REAL-6 database episodes 86.9 (2B) and 88.6 (4B) against 88.3, with better calibration
+  (0.61 to 0.62 bits left against 0.69; auto-file coverage 48 to 50% against 31.5); POI-1 91.5 for both against 91.7.
+- **Untrained, Qwen3.5 reads better**: the 4B reads REAL-6 at 45.0 (79.2 with the record) against 28.9 (60.4), label induction at
+  58.4 against 42.8; the 2B reads POI-1 with kind lines at 79.1 against 75.0.
+- **One anomaly:** the untrained 4B reads the kind-line layouts worse than the 2B (65.3 and 58.8 against 79.1 and 82.2). It prefers
+  shorter options (2.95 tokens against the gold's 3.49) with no single-position bias; a likely cause is probability mass on
+  continuations other than a category name after "Category:", which training removes (the trained 4B reads 91.5). Not pursued.
+- **Speed.** Qwen3.5's Gated DeltaNet layers need flash-linear-attention (without it they run in pure PyTorch at a fifth of the
+  speed), and its kernels are tuned per sequence length, so a trainer that pads each batch to its own longest sequence retunes on
+  most steps (`scripts/bench_train_step.py`). Batch lengths are now rounded up to 64 for Qwen3.5; warm, Qwen3.5-2B trains at ~14k
+  tokens per second, as fast as Qwen2.5-3B in the same loop. The runs here predate that fix (4k to 8.5k tokens per second on
+  average); their results are unaffected. Unsloth supports Qwen3.5 with its own bundled kernels once the tokenizer is taken from the
+  processor it returns.
+
+### 69.3 What the steps say
+
+- For Q1, the reader that files these transactions best is a small decoder trained to put its answer in one slot over all options
+  (decider's letter readout), not the option-by-option scorer this repo has used: as accurate, a tenth of the cost.
+- Published decision models trained on generic decision data do not transfer zero-shot to a user's own categories and examples,
+  except where the base model's knowledge carries it (kev-4B with the merchant record). Training on this task is what makes them work.
+- New trained work uses Qwen3.5 (row 78) or decider (row 77); the Qwen2.5-3B results stay as research records.
+
+Tables: `uv run python scripts/open_models_tables.py`. Job lists: `scripts/modal_jobs/r77*.json`, `r78*.json`.
