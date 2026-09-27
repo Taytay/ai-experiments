@@ -13,7 +13,7 @@ rows, filed by the scenario's rule; four queries follow:
 Amounts: stores a mixture (half around $20, half around $75), restaurants around $30; the rule's two sides are both queried. Each item
 carries `rule_pred` (the category the rule gives, the Bayes answer) and `b_idx` / `a_idx`; the ceiling of a cell is the share of items
 whose gold equals `rule_pred`. Merchants: 8 general stores and 8 restaurants, real chains not in REAL-6.
-usage: uv run python scripts/build_alternation.py [--force]
+usage: uv run python scripts/build_alternation.py [--force] [--all]
 """
 import json
 import math
@@ -25,7 +25,8 @@ from ai_experiments import real6 as R6
 from ai_experiments import transactions as T
 from ai_experiments.paths import PROCESSED
 
-DST = PROCESSED / "alternation_v1.json"
+ALL = "--all" in sys.argv  # every user (each fold's model reads its own users), not fold 0 only
+DST = PROCESSED / ("alternation_v1_all.json" if ALL else "alternation_v1.json")
 STORES = ["Target", "Walmart", "Amazon", "Kohl's", "Meijer", "Dollar General", "Fred Meyer", "Big Lots"]
 RESTAURANTS = ["The Cheesecake Factory", "Maggiano's", "Texas Roadhouse", "Red Lobster", "P.F. Chang's", "Outback Steakhouse", "Applebee's", "Buca di Beppo"]
 B_STORE = ["Game stuff", "Cozy time", "Treat yourself", "Craft corner", "Kid stuff", "Hair care"]
@@ -73,7 +74,7 @@ if __name__ == "__main__":
         sys.exit(f"{DST} exists (frozen); pass --force to rebuild")
     doc = R6.load(); items = []
     for u in doc["users"]:
-        if u["user"] % 4:
+        if u["user"] % 4 and not ALL:
             continue
         cats = u["categories"]
         std = {}
@@ -117,7 +118,7 @@ if __name__ == "__main__":
                                           prompt_ctx=prompt, options=[" " + n for n in cat_names], answer=gold, name_type="new" if b else "standard",
                                           seen=True, kind=kind, scen=scen, a_idx=cat_names.index(A), b_idx=cat_names.index(B),
                                           rule_pred=cat_names.index(B if rule else A)))
-    out = dict(version="alternation_v1", variant_of=f"real6 v1 ({doc['sha256'][:12]})", items=items, sha256=R6.sha256(items))
+    out = dict(version="alternation_v1" + ("_all" if ALL else ""), variant_of=f"real6 v1 ({doc['sha256'][:12]})", items=items, sha256=R6.sha256(items))
     DST.write_text(json.dumps(out, indent=0, ensure_ascii=False))
     from collections import Counter
     import numpy as np

@@ -14,7 +14,7 @@ Items, fold 0's held-out users (REAL-6 format; the user's own header and 24 shot
   cond "hist"  out-of-DB made-up merchants only: two of the 24 shots replaced by this merchant's rows filed under the user's category
 Items are made only where the merchant's category maps to one unsplit category of the user; `decoy_idx` is the option of the category the
 name suggests (-1 when that is the gold's own category or split), for the share of answers pulled to it.
-usage: uv run python scripts/build_mislead.py [--force]
+usage: uv run python scripts/build_mislead.py [--force] [--all]
 """
 import json
 import math
@@ -26,7 +26,8 @@ from ai_experiments import real6 as R6
 from ai_experiments import transactions as T
 from ai_experiments.paths import PROCESSED
 
-DST = PROCESSED / "mislead_v1.json"
+ALL = "--all" in sys.argv  # every user (each fold's model reads its own users), not fold 0 only
+DST = PROCESSED / ("mislead_v1_all.json" if ALL else "mislead_v1.json")
 MISLEADING = {  # true category: [(name, the category the name suggests)]
     "Restaurants": [("Tire Barn", "Gas & Auto"), ("Iron Temple", "Fitness"), ("Paws Palace", "Pets"), ("Kiddie Kingdom", "Entertainment")],
     "Groceries": [("Chop Shop Co", "Gas & Auto"), ("Pixel Depot", "Electronics"), ("Wanderlust Lane", "Travel"), ("Timber & Nail", "Home Improvement")],
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 
     doc = R6.load(); items = []
     for u in doc["users"]:
-        if u["user"] % 4:
+        if u["user"] % 4 and not ALL:
             continue
         cats = u["categories"]; names = [c["name"] for c in cats]
         one = {}
@@ -112,7 +113,7 @@ if __name__ == "__main__":
                                   known=m["known"], text=q["text"], amount=q["amount"], weekday=q["weekday"], prompt=prompt, prompt_ctx=prompt,
                                   options=[" " + n for n in names], answer=gold, name_type=owners[0]["name_type"], seen=cond == "hist",
                                   mkind=m["kind"], in_db=m["in_db"], cond=cond, decoy=m["decoy"], decoy_idx=decoy_idx))
-    out = dict(version="mislead_v1", variant_of=f"real6 v1 ({doc['sha256'][:12]})", merchants=ms, fact_db=fact_db, items=items, sha256=R6.sha256(items))
+    out = dict(version="mislead_v1" + ("_all" if ALL else ""), variant_of=f"real6 v1 ({doc['sha256'][:12]})", merchants=ms, fact_db=fact_db, items=items, sha256=R6.sha256(items))
     DST.write_text(json.dumps(out, indent=0, ensure_ascii=False))
     from collections import Counter
     print(len(ms), "merchants,", len(fact_db), "in the DB;", len(items), "items:", dict(Counter(i["level"] for i in items)))

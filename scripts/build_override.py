@@ -8,7 +8,7 @@ merchants placed in two of the user's 24 shots and asked about again:
 Merchants: REAL-6's DB-only merchants (in no training user's history; real chains and opaque names) and mislead_v1's in-DB misleading
 names and neutral twins (in the DB when a model is trained with MISLEAD=mislead_v1). `db_idx` is the option of the DB category's user
 category and `decoy_idx` that of the category a misleading name suggests (-1 when not a separate option), for the share pulled to each.
-usage: uv run python scripts/build_override.py [--force]
+usage: uv run python scripts/build_override.py [--force] [--all]
 """
 import json
 import math
@@ -19,7 +19,8 @@ from ai_experiments import real6 as R6
 from ai_experiments import transactions as T
 from ai_experiments.paths import PROCESSED
 
-DST = PROCESSED / "override_v1.json"
+ALL = "--all" in sys.argv  # every user (each fold's model reads its own users), not fold 0 only
+DST = PROCESSED / ("override_v1_all.json" if ALL else "override_v1.json")
 
 
 def row(m, rng):
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     ms += [dict(m, kind=m["kind"]) for m in ml["merchants"] if m["in_db"]]
     items = []
     for u in doc["users"]:
-        if u["user"] % 4:
+        if u["user"] % 4 and not ALL:
             continue
         cats = u["categories"]; names = [c["name"] for c in cats]
         one = {}
@@ -71,7 +72,7 @@ if __name__ == "__main__":
                                   known=m.get("known", False), text=q["text"], amount=q["amount"], weekday=q["weekday"], prompt=prompt, prompt_ctx=prompt,
                                   options=[" " + n for n in names], answer=gold, name_type=cats[gold]["name_type"], seen=True, mkind=m["kind"], cond=cond,
                                   db_idx=db_idx, decoy_idx=decoy_idx))
-    out = dict(version="override_v1", variant_of=f"real6 v1 ({doc['sha256'][:12]}) + mislead_v1", items=items, sha256=R6.sha256(items))
+    out = dict(version="override_v1" + ("_all" if ALL else ""), variant_of=f"real6 v1 ({doc['sha256'][:12]}) + mislead_v1", items=items, sha256=R6.sha256(items))
     DST.write_text(json.dumps(out, indent=0, ensure_ascii=False))
     from collections import Counter
     print(len(items), "items:", dict(Counter(i["level"] for i in items)))
