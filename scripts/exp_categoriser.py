@@ -85,7 +85,8 @@ assert EFF_BATCH % MICRO == 0
 ACCUM, MAXLEN = EFF_BATCH // MICRO, 1536
 LLM_BASE, ENC_BASE = os.environ.get("LLM_BASE", "Qwen/Qwen2.5-3B-Instruct"), "BAAI/bge-base-en-v1.5"  # row 70: LLM_BASE=Qwen/Qwen2.5-7B-Instruct / 14B
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
-TRAINER = os.environ.get("TRAINER", "unsloth")
+QWEN35 = "Qwen3.5" in os.environ.get("LLM_BASE", "")  # row 78: an Apache-2.0 base (Qwen2.5-3B is under the Qwen Research licence); unsloth's fast path does not cover its DeltaNet layers
+TRAINER = os.environ.get("TRAINER", "hf" if QWEN35 else "unsloth")
 SHOTS = os.environ.get("SHOTS", "fixed")  # row 41 (REAL-9): the 24 training shots chosen per query by a rule of real6_shots (fixed = 24 random rows)
 FOLD = os.environ.get("FOLD")  # row 42: hold out the users with user % 4 == FOLD
 RENAME = float(os.environ.get("RENAME", "0"))
@@ -261,7 +262,7 @@ def sft_examples(per_user=150):
     return ex
 
 
-TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"] + (["in_proj_qkv", "in_proj_z", "out_proj"] if QWEN35 else [])  # Qwen3.5's Gated DeltaNet projections
 
 
 def load_llm():

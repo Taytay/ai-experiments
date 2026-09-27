@@ -41,7 +41,7 @@ ENCODERS = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge
 CONDS = os.environ.get("CONDS", "noctx,ctx").split(",")  # which LLM conditions to score (a retrieval-trained adapter needs ctx only)
 ENC_CTX = os.environ.get("ENC_CTX", "")  # encoder: the merchant's fact-DB record appended to the query string (row 33's retrieval condition; "ret" = the retrieved one)
 REAL6_DB = os.environ.get("REAL6_DB", "v1")
-SCORER = os.environ.get("SCORER", "unsloth")
+SCORER = os.environ.get("SCORER", "hf" if "Qwen3.5" in (os.environ.get("MODEL", "") + " ".join(sys.argv)) else "unsloth")  # row 78: Qwen3.5 through transformers + peft
 SHOTS = os.environ.get("SHOTS", next((r for r in ("recent", "nearest", "transact", "cluster") if f"_shots{r}" in WHAT), "fixed"))  # row 41: shots per query
 CHAT = bool(int(os.environ.get("CHAT", "1" if "_chat" in WHAT else "0")))  # row 39 (REAL-8): the prompt as the user turn, the option as the assistant turn
 LOAD_4BIT = bool(int(os.environ.get("LOAD_4BIT", "1")))  # the unsloth path loads the NF4 4-bit base: unsloth's default, which this script never overrode, so every

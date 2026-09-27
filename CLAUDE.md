@@ -53,6 +53,9 @@ The local 3090 is no longer used for runs; the rules below about it still hold i
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
 - Bring results back: `modal volume get ai-exp-results <tag> modal_out/` (gitignored), copy `results/` into the branch, union the
   job's `evals/runs.jsonl` rows into ours by `run_id`, copy adapters into `models/adapters/`, `just push-models`, commit the new `.dvc` files, `just drop-all`.
+- Open licences only (owner, 2026-09-26): a model, its base and any code must be Apache-2.0, MIT, BSD or CC-BY (`exp_decision_models.open_licence`).
+  Qwen2.5-3B-Instruct is under the Qwen Research licence: new trained work uses Qwen3.5 (`LLM_BASE=Qwen/Qwen3.5-2B` or `-4B`; it runs through
+  transformers + peft, `TRAINER=hf`, with `uv run --with transformers==5.17.0 --with flash-linear-attention --with "peft>=0.21" --with torch==2.11.0 --with torchvision==0.26.0`).
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.

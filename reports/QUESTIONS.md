@@ -1100,3 +1100,10 @@ POI-1 (plain and row 72's kind lines) and label induction v2, fold 0's users, wi
 cross-entropy) and Von (its training script) on the same training users as the 3B categoriser, and read both against it. Hypothesis:
 trained on public decision data, they read the prompt as a policy to follow rather than a user's habits to copy, so zero-shot they sit
 near the untrained Qwen2.5 readers, and fine-tuned they match the 3B at their size.
+
+**MODEL-15 An open-licence base for the categoriser.** Qwen2.5-3B-Instruct, the base of nearly every trained categoriser so far, is
+under the Qwen Research licence (non-commercial); the owner (2026-09-26) chose to move new work to Apache-2.0 Qwen3.5 (the bases of
+decider, kev and Decision-1.0, so row 77 compares like with like). Qwen3.5 is a hybrid (three Gated DeltaNet layers to one full
+attention layer), which unsloth's fast path does not cover; it runs through transformers + peft with flash-linear-attention.
+*Experiment:* Qwen3.5-2B and -4B untrained, then the current best recipes on them (REAL-6 database episodes; POI-1 with kind lines
+and kind-retrieved examples), fold 0, against the Qwen2.5-3B numbers and the ceilings; speed and memory per step.
