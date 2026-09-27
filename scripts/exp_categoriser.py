@@ -39,6 +39,8 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
        merchants so each gets its share (about 9n / DB size rows per merchant); adds _dbe<n>. Use instead of DBEP to set exposure.
      DB_EXTRA=n (row 59, REAL-17): the fact DB padded with n generated opaque merchants (merchants.build_extra, seed 59), which the
        database episodes (DBEP) draw from alongside REAL-6's 240; adds _dbx<n>. Scoring is unchanged (REAL-6's items only).
+     MISLEAD=<set> (row 83): the in-DB merchants of data/processed/<set>.json (build_mislead.py: misleading names and neutral twins)
+       added to the fact DB the database episodes (DBEP) draw from; adds _<set>. Score on ITEMS_SET=<set>.
      DB_CAT=1 (row 57): the DB texts of DB=param also state the merchant's category ("X is a Groceries store that sells ..."), so the
        prose arm has the same information as the episodes; adds _dbcat.
      REC_CAT=1 (row 58, REAL-16): with DB=ret, the record in the training note states the merchant's category too
@@ -110,6 +112,7 @@ assert not (ALL_LABELS and (CHAT or DB == "ret")), "ALL_LABELS is built for the 
 assert not (DBEP and (CHAT or DB == "ret")), "DBEP builds plain episodes without a record"
 assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs ALL_LABELS and 0 < w < 1"
 POI = os.environ.get("POI", "")
+MISLEAD = os.environ.get("MISLEAD", "")  # row 83
 POI_DB = os.environ.get("POI_DB", "")  # row 66 (REAL-21): data/processed/<POI_DB>.json (build_poi1_db.py), the places DBEP episodes draw from  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
 assert not POI or (DB == "none" and (not DBEP or POI_DB) and not DB_EPISODES and not REC_CAT and SHOTS == "fixed"), "POI-1's only fact DB is POI_DB"
 PLACES = json.loads((ROOT / "data" / "processed" / f"{POI_DB}.json").read_text())["places"] if POI_DB else []
@@ -124,7 +127,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -151,6 +154,13 @@ if DB_EXTRA:  # row 59: the padded database (records in the REAL-6 wording)
     for m in M.build_extra(DB_EXTRA, taken=set(MERCHANT)):
         MERCHANT[m["name"]] = m; DBREC[m["name"]] = f"{m['name']} is a store that sells {M.prods(m)}."
     assert DBEP or DB_EPISODES, "DB_EXTRA only matters with database episodes (DBEP or DB_EPISODES)"
+if MISLEAD:  # row 83: the misleading-name set's in-DB merchants (its held-out ones never reach training)
+    assert DBEP and not POI, "MISLEAD needs REAL-6 database episodes"
+    _ml = json.loads((ROOT / "data" / "processed" / f"{MISLEAD}.json").read_text())
+    for m in _ml["merchants"]:
+        if m["in_db"]:
+            assert m["name"] not in MERCHANT
+            MERCHANT[m["name"]] = m; DBREC[m["name"]] = _ml["fact_db"][m["name"]]
 
 
 def db_row(u, rng, names_ok, merchant=None):
@@ -430,7 +440,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND, poi_desc=POI_DESC, poi_unseen=POI_UNSEEN, decoy=DECOY, empty=EMPTY, poi_db=POI_DB)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND, poi_desc=POI_DESC, poi_unseen=POI_UNSEEN, decoy=DECOY, empty=EMPTY, poi_db=POI_DB, mislead=MISLEAD)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)

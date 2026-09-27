@@ -1,0 +1,76 @@
+[
+ {
+  "tag": "r83-d4b",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "RUN_TAG": "h100bf16st800",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "MISLEAD": "mislead_v1",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_aux100_lora CONDS=noctx ITEMS_SET=mislead_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_aux100_lora CONDS=noctx ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r83-d2b",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "RUN_TAG": "h100bf16st800",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "MISLEAD": "mislead_v1",
+   "MODEL": "Mapika/decider-2b"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-2b ADAPTER=decider_decider-2b_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_aux100_lora CONDS=noctx ITEMS_SET=mislead_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-2b ADAPTER=decider_decider-2b_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_aux100_lora CONDS=noctx ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r83-q2b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "DBEP": "0.5",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "MISLEAD": "mislead_v1"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=mislead_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_dbep50_mislead_v1_lora",
+   "CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_dbep50_mislead_v1_lora"
+  ]
+ },
+ {
+  "tag": "r83-before",
+  "env": {
+   "LOAD_4BIT": "0",
+   "ADAPTERS_FROM": "r81-decider4b-ren,r81-decider2b-ren,r78-E-2b",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=mislead_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-2b ADAPTER=decider_decider-2b_none_h100bf16st800_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=mislead_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ITEMS_SET=mislead_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_alllab_dbep50_lora"
+  ]
+ }
+]
