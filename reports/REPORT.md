@@ -34,7 +34,7 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   ignored their rule; alternation episodes teach it (stores 58 to 88, restaurants 48 to 77) and split targets hedge random 60 / 40
   choices correctly (86, 88). All of it composes in one model (88), at a cost of 5 points on novel names and some auto-file coverage
   that disappear at an alternation share of 0.1 (89). The final recipe reads REAL-6 at 91.3 over all 20 users by
-  the model alone, 97% of the ceiling and level with the earlier lookup cascade (90).
+  the model alone, 97% of the ceiling and level with the earlier lookup cascade (90). Its trained behaviours hold on every fold (91).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -5976,3 +5976,26 @@ Per fold top-1: fold 0 89.9 (n=298), fold 1 93.3 (n=300), fold 2 94.9 (n=295), f
   them per fold would extend sections 80 to 89 to every user.
 
 Tables: `uv run python scripts/final_folds_tables.py`. Job list: `scripts/modal_jobs/r90.json`.
+
+## 91. The final recipe's trained behaviours hold on every user: misleading names 93.8, the user's override 98.1, evidence-free items confident 0.6%, alternation rules read 90.1 (stores) and 65.6 (restaurants), random splits confident 7.8%, over the four folds (EVAL-9)
+
+PLAN step 91. The misleading-name, override and alternation sets rebuilt for all 20 users (`build_mislead.py`, `build_override.py`,
+`build_alternation.py --all`: `*_all`, fold 0's items identical to the fold-0 sets), each of section 90's fold models read on its own
+users (fold 0: row 89 seed 0). Scoring only.
+
+**Table 91.1: the final recipe's trained behaviours by fold (each fold's model on its own users) and pooled**
+
+| fold | misleading, in DB | misleading, 2 filings | no evidence: p >= 0.9 | override | override: pulled to DB | alternation observable: stores / restaurants | 60 / 40: p >= 0.9 | control: specific chosen |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 97.4 | 100.0 | 1.3 | 98.5 | 1.5 | 85.9 / 68.8 | 8.6 | 0.0 |
+| 1 | 93.5 | 100.0 | 1.1 | 98.1 | 1.9 | 95.8 / 64.6 | 8.9 | 0.0 |
+| 2 | 93.6 | 98.9 | 0.0 | 97.6 | 2.1 | 89.1 / 65.6 | 7.6 | 0.0 |
+| 3 | 90.8 | 94.7 | 0.0 | 98.2 | 1.5 | 87.5 / 64.6 | 6.2 | 0.0 |
+| **all** | 93.8 | 98.5 | 0.6 | 98.1 | 1.8 | 90.1 / 65.6 | 7.8 | 0.0 |
+
+Every behaviour measured on fold 0 in sections 80 to 89 holds on the other folds within a few points. The weakest is the day-of-week
+rule at restaurants (64.6 to 68.8 against 86 to 96 for the amount rule at stores): a set of days is a harder pattern to read off six
+rows than a threshold, and alternation training draws day rules from five day sets only. Limits: one seed per fold; the training
+users of each fold are the other 15.
+
+Tables: `uv run python scripts/final_behaviours_tables.py`. Job list: `scripts/modal_jobs/r91.json`.
