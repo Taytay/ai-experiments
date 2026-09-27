@@ -1037,6 +1037,8 @@ renderings obscure / full / clean; the scorecard of EVAL-9.
 
 **Status (2026-09-26):** PLAN step 72, REPORT.md 67: with a "Kind:" line on every example and the query and kind-retrieved examples, the trained 3B reads 90.1 on fold 0 (seen kinds 99.3, unseen 76.8, coined names 52 to 56); what is left is unseen kinds with coined names (row 73).
 
+**Status (2026-09-27):** PLAN step 73, REPORT.md 68: category descriptions from the kinds filed under each category, with kind lines and unseen-kind training episodes: 91.7 on fold 0 (unseen kinds 80.2, coined unseen names 58).
+
 **REAL-21 Does a database taught as decisions teach facts or a skill?** Database episodes built from real places (Overture),
 scored on places in the injected database and on places held out of it, same categories: the first measures stored facts, the
 second the general "this kind of business goes in this kind of category" skill that row 62's +5 on merchants outside the database

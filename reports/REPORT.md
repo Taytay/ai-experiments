@@ -4804,3 +4804,104 @@ Tables: `uv run python scripts/poi1_kinds_tables.py`. Job list: `scripts/modal_j
 its KV cache). `scripts/check_scorer_cache.py` on Modal: it agrees with the packed scorer within batch-shape noise (0.04 to 0.11 nats
 mean per option, 0 to 0.7% of predictions flipped, accuracy unchanged), but under unsloth a cached forward goes through its
 generation path one token at a time, and it was 2.3x slower on POI-1 with the trained 3B and 1.4x slower with the 14B. It stays off.
+
+
+## 68. Category descriptions for unseen kinds: a header listing the kinds each category holds, with kind lines and training episodes where the query's kind is absent, takes POI-1 to 91.7 and unseen kinds to 80 (coined names 58); without those unseen-kind episodes the model learns to copy from the description and coined unseen names fall to 38; an instruction line helps untrained readers by about 3 points on the kind-line layout and not at all on the plain one (POI-1, REAL-20)
+
+PLAN step 73 tests REPORT 64.2's hypothesis 3: POI-1's unseen kinds need the category names' meaning. The prompt header lists each
+category with the Overture kinds of the places the user has filed under it, most filed first, at most four ("- Gavir: swimming pool,
+water park"; "(nothing filed yet)" when none), built from the user's whole history (`build_poi1_variants.py desc`). For training
+(`exp_categoriser.py POI_DESC=1`) the description leaves out the target itself, and with `POI_UNSEEN=0.5` half the episodes also leave
+out every place of the target's kind from the examples and the description, as an unseen-kind test item's prompt does. The owner's
+question from row 72, whether an explicit instruction removes doubt about the task, is tested on the untrained readers with the line
+"Choose the category this user would file the last transaction under." before the header (`instr` layouts). All on Qwen2.5-3B, as
+row 72 (launched before the base switch of row 78).
+
+**Table 68.1: POI-1 fold 0's held-out users, the scorecard by reader and layout (columns as Table 61.1)**
+
+| reader | layout | n | top-1 [interval] | top-3 | MRR | bits left | auto-file at 98%: coverage (precision) | usage prior top-1 / top-3 | kind lookup: share, top-1 where it answers | kind lookup → other users → prior, top-1 | skill top-1 over it / top-3 | kind lookup, else the model: top-1 (the model's top-1 where the lookup has nothing) | seen-kind top-1 | unseen-kind top-1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | plain | 507 | 44.6 [39.5, 49.5] | 65.3 | 0.58 | 2.93 | 5.3 (96.3) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -60 / 55 | 74.6 (37.7) | 49.3 | 37.7 |
+| Qwen2.5-3B-Instruct, untrained | instruction | 507 | 44.8 [39.2, 49.7] | 65.5 | 0.59 | 2.84 | 6.1 (96.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -59 / 55 | 74.4 (37.2) | 50.0 | 37.2 |
+| Qwen2.5-3B-Instruct, untrained | desc | 507 | 53.8 [49.2, 58.2] | 70.8 | 0.65 | 2.49 | 3.4 (94.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -33 / 62 | 74.4 (37.2) | 65.3 | 37.2 |
+| Qwen2.5-3B-Instruct, untrained | kshots + kinds | 507 | 75.0 [70.7, 78.5] | 86.8 | 0.82 | 1.39 | 51.1 (98.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 28 / 83 | 78.1 (46.4) | 94.7 | 46.4 |
+| Qwen2.5-3B-Instruct, untrained | instruction + kshots + kinds | 507 | 78.1 [74.1, 81.8] | 88.4 | 0.84 | 1.22 | 55.6 (96.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 37 / 85 | 79.9 (50.7) | 97.0 | 50.7 |
+| Qwen2.5-3B-Instruct, untrained | desc + kinds | 507 | 78.7 [74.7, 82.6] | 87.2 | 0.84 | 1.32 | 39.6 (97.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 39 / 83 | 82.1 (56.0) | 94.3 | 56.0 |
+| Qwen2.5-3B-Instruct, untrained | desc + kshots + kinds | 507 | 79.7 [76.5, 82.7] | 88.6 | 0.85 | 1.28 | 17.9 (96.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 41 / 85 | 80.7 (52.7) | 98.3 | 52.7 |
+| Qwen2.5-14B-Instruct, untrained | plain | 507 | 52.9 [47.8, 58.0] | 71.6 | 0.66 | 2.39 | 3.7 (94.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -36 / 63 | 77.9 (45.9) | 57.7 | 45.9 |
+| Qwen2.5-14B-Instruct, untrained | instruction | 507 | 52.9 [47.8, 58.1] | 74.0 | 0.66 | 2.31 | 4.1 (90.5) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -36 / 66 | 77.3 (44.4) | 58.7 | 44.4 |
+| Qwen2.5-14B-Instruct, untrained | desc | 507 | 59.0 [53.5, 65.0] | 79.9 | 0.71 | 2.03 | 12.0 (91.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -18 / 74 | 75.1 (39.1) | 72.7 | 39.1 |
+| Qwen2.5-14B-Instruct, untrained | kshots + kinds | 507 | 81.1 [77.8, 83.9] | 92.1 | 0.87 | 1.01 | 51.3 (97.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 45 / 90 | 82.1 (56.0) | 98.3 | 56.0 |
+| Qwen2.5-14B-Instruct, untrained | instruction + kshots + kinds | 507 | 84.4 [81.3, 87.4] | 91.9 | 0.89 | 0.90 | 65.1 (97.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 55 / 89 | 85.2 (63.8) | 98.7 | 63.8 |
+| Qwen2.5-14B-Instruct, untrained | desc + kinds | 507 | 83.2 [79.7, 86.3] | 91.1 | 0.88 | 0.90 | 70.0 (98.0) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 52 / 88 | 83.6 (59.9) | 99.3 | 59.9 |
+| Qwen2.5-14B-Instruct, untrained | desc + kshots + kinds | 507 | 84.0 [80.9, 86.9] | 91.1 | 0.89 | 0.90 | 70.8 (97.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 54 / 88 | 84.4 (61.8) | 99.3 | 61.8 |
+| 3B trained with kinds (row 72) | kinds | 507 | 84.6 [81.1, 87.5] | 97.0 | 0.91 | 0.57 | 75.0 (97.6) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 56 / 96 | 90.1 (75.8) | 90.7 | 75.8 |
+| 3B trained with kinds (row 72) | kshots + kinds | 507 | 90.1 [87.9, 92.3] | 97.8 | 0.94 | 0.39 | 85.6 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 72 / 97 | 90.5 (76.8) | 99.3 | 76.8 |
+| 3B trained with kinds (row 72) | desc + kinds | 507 | 88.4 [85.6, 90.8] | 96.6 | 0.93 | 0.54 | 77.1 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 66 / 96 | 90.7 (77.3) | 96.0 | 77.3 |
+| 3B trained with kinds (row 72) | desc + kshots + kinds | 507 | 89.9 [87.1, 92.3] | 96.6 | 0.94 | 0.42 | 85.6 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 71 / 96 | 90.3 (76.3) | 99.3 | 76.3 |
+| 3B trained with kinds, unseen episodes | kinds | 507 | 86.2 [82.6, 89.2] | 97.2 | 0.92 | 0.56 | 77.1 (97.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 60 / 96 | 90.5 (76.8) | 92.7 | 76.8 |
+| 3B trained with kinds, unseen episodes | kshots + kinds | 507 | 90.3 [87.6, 92.8] | 98.2 | 0.94 | 0.39 | 87.0 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 72 / 98 | 90.7 (77.3) | 99.3 | 77.3 |
+| 3B trained with desc, unseen episodes | desc | 507 | 62.9 [58.6, 67.4] | 83.8 | 0.75 | 1.76 | 13.6 (95.7) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | -7 / 79 | 77.3 (44.4) | 75.7 | 44.4 |
+| 3B trained with desc + kinds | desc + kinds | 507 | 88.2 [85.8, 90.3] | 93.7 | 0.92 | 0.63 | 81.7 (98.1) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 66 / 92 | 88.6 (72.0) | 99.3 | 72.0 |
+| 3B trained with desc + kinds | desc + kshots + kinds | 507 | 88.0 [85.4, 90.4] | 93.7 | 0.92 | 0.62 | 81.3 (97.8) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 65 / 92 | 88.4 (71.5) | 99.3 | 71.5 |
+| 3B trained with desc + kinds, unseen episodes | desc + kinds | 507 | 91.3 [88.9, 93.6] | 98.0 | 0.95 | 0.37 | 85.6 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 75 / 97 | 91.7 (79.7) | 99.3 | 79.7 |
+| 3B trained with desc + kinds, unseen episodes | desc + kshots + kinds | 507 | 91.7 [89.5, 93.9] | 98.0 | 0.95 | 0.37 | 86.4 (98.2) | 7.5 / 23.3 | 59%, 100.0 | 65.3 | 76 / 97 | 91.9 (80.2) | 99.7 | 80.2 |
+
+**Table 68.2: unseen-kind items, top-1 % by category name type, fold 0**
+
+| reader | layout | standard (n=108) | renamed (n=47) | new (n=52) |
+|---|---|---|---|---|
+| Qwen2.5-3B-Instruct, untrained | plain | 53 | 38 | 6 |
+| Qwen2.5-3B-Instruct, untrained | instruction | 50 | 45 | 4 |
+| Qwen2.5-3B-Instruct, untrained | desc | 50 | 38 | 10 |
+| Qwen2.5-3B-Instruct, untrained | kshots + kinds | 59 | 57 | 10 |
+| Qwen2.5-3B-Instruct, untrained | instruction + kshots + kinds | 64 | 57 | 17 |
+| Qwen2.5-3B-Instruct, untrained | desc + kinds | 73 | 57 | 19 |
+| Qwen2.5-3B-Instruct, untrained | desc + kshots + kinds | 68 | 53 | 21 |
+| Qwen2.5-14B-Instruct, untrained | plain | 57 | 49 | 19 |
+| Qwen2.5-14B-Instruct, untrained | instruction | 57 | 47 | 15 |
+| Qwen2.5-14B-Instruct, untrained | desc | 51 | 43 | 12 |
+| Qwen2.5-14B-Instruct, untrained | kshots + kinds | 71 | 64 | 17 |
+| Qwen2.5-14B-Instruct, untrained | instruction + kshots + kinds | 80 | 70 | 25 |
+| Qwen2.5-14B-Instruct, untrained | desc + kinds | 73 | 70 | 23 |
+| Qwen2.5-14B-Instruct, untrained | desc + kshots + kinds | 77 | 70 | 23 |
+| 3B trained with kinds (row 72) | kinds | 88 | 74 | 52 |
+| 3B trained with kinds (row 72) | kshots + kinds | 89 | 74 | 54 |
+| 3B trained with kinds (row 72) | desc + kinds | 93 | 74 | 48 |
+| 3B trained with kinds (row 72) | desc + kshots + kinds | 92 | 74 | 46 |
+| 3B trained with kinds, unseen episodes | kinds | 87 | 77 | 56 |
+| 3B trained with kinds, unseen episodes | kshots + kinds | 88 | 74 | 58 |
+| 3B trained with desc, unseen episodes | desc | 52 | 43 | 31 |
+| 3B trained with desc + kinds | desc + kinds | 87 | 72 | 40 |
+| 3B trained with desc + kinds | desc + kshots + kinds | 87 | 72 | 38 |
+| 3B trained with desc + kinds, unseen episodes | desc + kinds | 92 | 74 | 60 |
+| 3B trained with desc + kinds, unseen episodes | desc + kshots + kinds | 94 | 74 | 58 |
+
+### 68.1 What moved
+
+- **Descriptions plus kind lines, trained with unseen-kind episodes, are the best POI-1 reader so far:** 91.7 [89.5, 93.9], seen
+  kinds 99.7, unseen 80.2 (row 72's best: 90.1, 99.3, 76.8), auto-file coverage 86.4% at 98.2% precision, 0.37 bits left. The overall
+  gain is inside the interval; on unseen kinds it is 3.4 points on 207 items, borderline.
+- **The unseen-kind episodes are what make the description useful.** Trained with descriptions but without them, the model reads
+  unseen kinds at 72 and coined names at 38 to 40: in training the target's kind is always in the description, so it learns to find
+  it there. With them, 80 and 58 to 60. The same episodes without descriptions change little (kind lines: 77.3 against 76.8).
+- **The description without kind lines is weak** (62.9): naming the kinds under each category helps only when the query's kind is
+  stated too, the same one-hop point as section 67.
+- **Untrained readers gain a little from descriptions and the instruction line, on the kind-line layout only.** The 3B reads 75.0
+  with kind lines and kind-retrieved examples, 78.1 with the instruction line, 79.7 with descriptions; the 14B 81.1, 84.4, 84.0. On
+  the plain layout the instruction line changes nothing (3B 44.6 to 44.8, 14B 52.9 to 52.9). Coined unseen names stay at 17 to 25
+  for untrained readers whatever the layout.
+
+### 68.2 What the step says
+
+Hypothesis 3 holds in part. What a coined name means can be read from the kinds filed under it, but only by a model trained on
+episodes that make it do so: the untrained 14B, given the same description, reads coined unseen names at 23. What is left on POI-1
+is coined names for kinds the user has never filed (58), where the only evidence is how related the new kind is to the ones listed.
+
+- For Q1, an instruction line is not where the untrained models' errors are; the task is clear to them, the category meanings are
+  not.
+- For Q3, training must include the case it will meet: episodes where the query's kind is absent from everything in the prompt.
+
+The trained arms are on Qwen2.5-3B; row 78 re-runs the best layout on the Apache-2.0 Qwen3.5 base.
+
+Tables: `uv run python scripts/poi1_desc_tables.py`. Job list: `scripts/modal_jobs/r73.json`.
