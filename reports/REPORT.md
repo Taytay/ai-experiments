@@ -5921,3 +5921,29 @@ three seeds, fold 0, against the readers each piece was measured on (sections 78
 Limits: fold 0; 298 REAL-6 items (the auto-file coverage moves 50 to 68 across seeds).
 
 Tables: `uv run python scripts/combined_tables.py`, `scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r88.json`.
+
+## 89. The alternation share: at 0.1 the combined recipe keeps the rule reading (88 / 74) and removes the costs of 0.2 (REAL-6 89.9, auto-filed 75.8%, novel names 87.9, against 88.7, 59.8% and 84.1); at 0.05 the rule is lost (59 / 52). The recipe takes ALT = 0.1 (REAL-18)
+
+PLAN step 89. Section 88's combined recipe with the alternation share (v2, split targets) at 0.05 and 0.1 instead of 0.2, two seeds
+each, every set.
+
+**Table 89.1: every 2026-09-27 test set, decider-4B readers, fold 0 (mean over seeds [range])**
+
+| reader | seeds | REAL-6 top-1 | REAL-6 auto-filed (precision) | novel names | misleading, in DB | user override | no evidence: p >= 0.9 | alternation observable: stores / restaurants | 60 / 40 splits: p >= 0.9 | real places top-1 | real plain names: p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 3 | 90.2 [88.9, 91.9] | 73.7 [68.8, 76.8] | 89.0 [87.9, 89.9] | 7.9 | 81.0 | 69.7 | 54.2 / 44.3 | 85.4 [78.1, 91.4] | – | – |
+| + random labels (row 84 control) | 2 | 89.6 [88.9, 90.3] | 72.0 [67.1, 76.8] | – | 9.9 [9.2, 10.5] | – | 78.9 [75.0, 82.9] | 57.8 / 47.7 | 90.2 [88.3, 92.2] | 76.2 [75.9, 76.6] | 88.4 [87.9, 88.9] |
+| + soft evidence-free (row 84) | 2 | 89.3 [87.9, 90.6] | 73.7 [70.1, 77.2] | – | 9.2 [9.2, 9.2] | – | 2.6 [2.6, 2.6] | – | – | 74.9 [72.8, 77.0] | 68.2 [66.7, 69.7] |
+| + misleading DB, lookup / override (row 85) | 2 | 89.8 [89.6, 89.9] | 71.0 [66.8, 75.2] | – | 94.7 [93.4, 96.1] | 98.8 [98.5, 99.1] | 60.5 [55.3, 65.8] | – | – | – | – |
+| + alternation v1 (row 86) | 2 | 87.8 [86.2, 89.3] | 60.2 [49.7, 70.8] | 86.6 [85.6, 87.6] | – | – | – | 87.5 / 76.6 | 88.3 [87.5, 89.1] | – | – |
+| combined (row 88) | 3 | 88.7 [86.9, 90.9] | 59.8 [50.3, 68.5] | 84.1 [83.2, 85.6] | 91.7 [89.5, 96.1] | 98.0 [97.1, 98.5] | 0.9 [0.0, 2.6] | 86.5 / 74.5 | 2.1 [1.6, 2.3] | 74.2 [71.6, 75.5] | 58.2 [56.6, 59.6] |
+| combined, ALT 0.1 (row 89) | 2 | 89.9 [89.6, 90.3] | 75.8 [68.1, 83.6] | 87.9 [87.2, 88.6] | 94.1 [90.8, 97.4] | 98.2 [98.0, 98.5] | 0.7 [0.0, 1.3] | 88.3 / 74.2 | 11.3 [8.6, 14.1] | 75.1 [74.7, 75.5] | 60.1 [55.6, 64.6] |
+| combined, ALT 0.05 (row 89) | 2 | 90.6 [88.9, 92.3] | 71.6 [70.8, 72.5] | 87.6 [86.6, 88.6] | 96.7 [96.1, 97.4] | 98.0 [98.0, 98.0] | 1.3 [1.3, 1.3] | 59.4 / 52.3 | 2.7 [1.6, 3.9] | 74.7 [74.7, 74.7] | 57.1 [52.5, 61.6] |
+
+At 0.1: REAL-6 and its auto-file coverage are back at the level of the recipe without the new pieces (89.9 and 75.8% against 90.2 and
+73.7%), novel names cost one point (87.9 against 89.0), and every trained behaviour holds (misleading names 94.1, override 98.2,
+evidence-free confident 0.7%, the rule read 88.3 / 74.2); the random 60 / 40 splits are confidently answered 11% of the time (0.2:
+2%; untrained 85 to 93%). At 0.05 the rule is not learned (59.4 / 52.3). **The recipe:** decider-4B one slot + shot-label loss +
+database episodes + rename 0.5 + random A..Z labels + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation v2 0.1.
+
+Job list: `scripts/modal_jobs/r89.json`.
