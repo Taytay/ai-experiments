@@ -5375,6 +5375,6 @@ seeds (`exp_decision_models.py ORDER_SEED`; the labels A, B, ... follow the new 
 The readers learned the options from their names, not their positions: flips are rare and mostly on items near a tie. decider-2B,
 trained on shuffled options at scale before this task, is the steadiest (1.3 to 1.8%); the plain Qwen3.5-2B one-slot model trained
 here for 800 steps flips most (5.7% on REAL-6), and its REAL-6 top-1 varies by 1.7 points, still within the interval. Averaging four
-orders is not worth four passes. The untrained-model letter bias of section 45 does not carry over to trained one-slot readers.
+orders is not worth four passes. The position bias of ModernBERT-Instruct's letter readout (section 63) does not appear in these trained one-slot decoders.
 
 Tables: `uv run python scripts/order_tables.py`. Job list: `scripts/modal_jobs/r50.json`.
