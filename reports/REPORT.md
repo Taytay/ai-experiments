@@ -9,6 +9,25 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 
 ## 1. Executive summary
 
+**Update (2026-09-27, sections 65 to 83).** The owner moved new work to open licences (Qwen3.5, Apache-2.0) and to Modal H100s. The best
+categoriser is now **decider-4B** (Mapika, a Qwen3.5-4B trained for multiple choice) fine-tuned with its **one-slot readout** (options
+labelled, one pass, the answer read from the label logits), the **shot-label loss**, **database episodes** and **rename augmentation**:
+REAL-6 90.1 over three seeds (96% of the 94.0 ceiling; section 82), 89.0 with every category name replaced by a fresh word (77, 78),
+POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). Findings:
+
+- **Q1.** One slot matches per-option scoring in accuracy once the shot labels are trained too (76); random option labels train at
+  least as well as A, B, C and reach 255 options (81); option order moves 1 to 6% of answers (75); decider's "not listed here"
+  augmentation flags 92% of questions whose category is missing at 1.3% false alarms (79), switchable per request. The reader is
+  confidently wrong when nothing can tell (83): row 84.
+- **Q2.** Database episodes store the particular facts (73, 74: +21 on places in the database, 0 to 3 on places held out; the injected
+  categories sit where the model's own merchant knowledge sits), merchants known only from the database read 100%, and trained facts
+  override misleading names ("Tire Barn" is a restaurant: 97.4, as neutral names; 80). Untrained: when the user's history and the name
+  disagree the 4B follows the history, 2B readers follow the name a third of the time (80); the user overriding the database is row 85.
+- **Q3.** Readers trained with real names lean on name meaning (the per-option database reader falls 86.9 to 68.1 with fresh names;
+  77); rename augmentation on top of database episodes removes that (78). Users who split one merchant's transactions across categories
+  (the alternation set) and larger models (Qwen3.5-9B, decider-35B-A3B) are queued.
+- **Method.** One run's seed spread is about 3 points on REAL-6 fold 0 (82): compare arms over two or three seeds.
+
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
 - **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
@@ -5680,3 +5699,20 @@ is inside it, so no dilution is shown. The recipe's level is about 90 on real na
 77's reader without rename augmentation: 88.3 and 83.6, one seed). Comparisons between arms from here should use two or three seeds.
 
 Job list: `scripts/modal_jobs/r81_seeds.json`.
+
+## 83. The best reader does not know when it cannot know: on made-up merchants in no database and no history it is right 15.8% of the time, yet puts 90% or more on its top answer for 70% of them (right on 19% of those); the same merchants with two of the user's filings shown read 90.8 (REAL-14)
+
+PLAN step 84, part one (no training). Section 78's decider-4B (seed 0) read on `mislead_v1`'s neutral made-up merchants that are in no
+database (REPORT 80), alone, against the same merchants with two of the user's filings in the shots, and REAL-6 fold 0. Raw softmax
+over the options (no temperature).
+
+| items | n | top-1 | median top probability | top probability >= 0.9 | right when >= 0.9 | top probability >= 0.98 |
+|---|---|---|---|---|---|---|
+| REAL-6 fold 0 (evidence present) | 298 | 91.9 | 1.00 | 97% | 93% | 93% |
+| no evidence: opaque merchant, no DB, no history | 76 | 15.8 | 0.98 | 70% | 19% | 53% |
+| the same merchants, 2 of the user's filings shown | 76 | 90.8 | 1.00 | 97% | 93% | 95% |
+
+With nothing to go on the reader still commits: its confidence on evidence-free items looks like its confidence where it is right, so no
+threshold separates them. Training has never shown it a question without an answer in evidence (every training target is a merchant
+in a history or the database). Row 84 trains that case: evidence-free episodes with a "can't tell" option (switchable at inference),
+against soft uniform targets. The temperature the scorecard fits will lower these numbers somewhat but cannot reorder items.

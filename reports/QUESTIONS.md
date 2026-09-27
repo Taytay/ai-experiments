@@ -869,6 +869,7 @@ and record SFT arms with the decider augmentation (a "needs review" option in on
 arm, uniform targets over the user's categories on evidence-free episodes; measured with row 49's metrics: the share of
 evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
 that do have evidence.
+**Status (2026-09-27):** PLAN steps 52 / 84, REPORT.md 79, 83: decider's abstain augmentation flags 92% of missing-category questions at 1.3% false alarms, no accuracy cost; evidence-free items are answered with high confidence (70% at p >= 0.9, 19% right): row 84 trains that case.
 
 **MODEL-6 Can a small encoder with one scored `[MASK]` marker per category do the categoriser's job?**
 Laya (`laya_analysis.md`) and Verdict 2.0 (`openjev_verdict_analysis.md`) put the options first, each behind its own
@@ -938,6 +939,7 @@ folds so that no (user, merchant) answer is supervised for a scored user; the DB
 and opaque ones) are the cell that measures it, plus the other groups of REPORT.md 48 and ARC / MMLU. Frame: this improves the
 no-record route (retrieval missing or unavailable at serving time); with the record in the prompt the DB-only merchants are at 97.5.
 **Status (2026-09-26):** answered, PLAN step 57, REPORT.md 53. Yes, by a wide margin. On held-out users with no record in the prompt, database episodes put the DB-only merchants at 94.3 (+50.0 [35.2, 64.4] over no DB), opaque ones at 96.1 (from 11.8), in every fold; prose records with the same category reach 64.8 (opaque 35.3); both together 91.8. Every other cell gains too (all +16.5, coined +20.9). Untested: real bank renderings (row 43), a database larger than 240 merchants (row 59), and the record in the prompt given the same category field (row 58).
+**Status (2026-09-27):** PLAN step 83, REPORT.md 80: database episodes override misleading names completely (97.4); the user's history over the name holds at 4B, not at 2B; the user overriding the database is row 85.
 
 ## Added 2026-09-26: database episodes against retrieval, and at scale
 
@@ -1135,3 +1137,4 @@ ALL_LABELS shots as extra slots) against the same model with the per-option loss
 best layout, fold 0: accuracy, calibration, ms per item. Also decider-2B itself on REAL-6 database episodes (merchant knowledge at 2B
 is the doubt: it misfiles Trader Joe's zero-shot), and kev-4B fine-tuned (the best zero-shot reader; its own trainer needs torch < 2.9).
 **Status (2026-09-27):** answered, PLAN steps 79 / 80, REPORT.md 76. One slot matches the per-option loss once the shot labels are trained too (Qwen3.5-2B 85.9 against 86.9); decider-2B 87.9, decider-4B 88.3 with 66% auto-filed at 97.5% and POI-1 92.3; 18 to 24 ms per item warm against ~390; kev-4B fine-tuned 83.2.
+**Status (2026-09-27, later):** REPORT.md 81: random option labels (A..Z or all 255) train at least as well as letters in order; the recipe uses LABELS=rand26.
