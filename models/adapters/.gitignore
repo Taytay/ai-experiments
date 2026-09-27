@@ -350,3 +350,8 @@
 /universe_Qwen2.5-0.5B_lr0.0001_lora
 /universe_Qwen2.5-3B_lr0.0001_lora
 /universe_Qwen2.5-3B_lr0.0001_unsloth_lora
+/categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pkind_f0_ren50_alllab_lora
+/categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_f0_ren50_alllab_lora
+/categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_pkind_f0_ren50_alllab_lora
+/categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_pksh_prec_f0_ren50_alllab_lora
+/categoriser_Qwen2.5-3B-Instruct_poi1_v1_none_h100bf16_prec_f0_ren50_alllab_lora
