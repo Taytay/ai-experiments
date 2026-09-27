@@ -1016,6 +1016,8 @@ over the best of those the model captures; per-item chance normalisation for the
 novel-merchant run with it.
 **Status (2026-09-26):** done, PLAN step 63, REPORT.md 59. On REAL-6's held-out users the no-model cascade (the user's merchant lookup, else other users' labels, else the usage prior) reads 87.0 top-1, level with the best categorisers; their value is the ranking (top-3 97 to 98 against 26) and whatever no lookup reaches (novel merchants: cascade 7.8, models 53 to 85). Thresholds for 98% auto-filing chosen on other users realise 92 to 98% on new users.
 
+**Status (2026-09-27):** PLAN step 75, REPORT.md 70: the merchant lookup in front of the best runs reaches 97 to 99.5% of REAL-6's ceiling; the split-category part of the ceiling is a floor (models beat the coin flip).
+
 **REAL-20 Label induction: when can a model infer what a meaningless category name means from the user's examples?**
 Blind Opus solves the novel merchants' coined names at 88% from clean strings; the 3B categorisers at 42 to 55. *Experiment
 (scoring only):* a controlled item set on clean renderings, each factor varied with the others fixed and paired items: examples of

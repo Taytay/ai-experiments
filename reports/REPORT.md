@@ -5073,3 +5073,50 @@ best recipes (REAL-6 database episodes, section 58; POI-1 descriptions, kind lin
 - New trained work uses Qwen3.5 (row 78) or decider (row 77); the Qwen2.5-3B results stay as research records.
 
 Tables: `uv run python scripts/open_models_tables.py`. Job lists: `scripts/modal_jobs/r77*.json`, `r78*.json`.
+
+
+## 70. REAL-6's last points are the lookup: with the user's own label for a merchant in their history in front, the best runs reach 97 to 99.5% of the ceiling (Qwen3.5-4B database episodes 92.3 on fold 0, the four-fold Qwen2.5-3B 91.3); every point comes from the in-history group, which the lookup answers exactly; on split categories the models beat the coin-flip ceiling, so that part of the ceiling is a floor (EVAL-9)
+
+PLAN step 75 tests REPORT 64.2's hypothesis 1. The lookup is `ai_experiments.scorecard.lookup` (the user's majority label for the
+merchant over their history rows); where it answers, its answer is taken, elsewhere the run's. No model runs: the per-item records of
+earlier runs are re-read on the held-out users of each fold they have (`scripts/lookup_cascade_tables.py`).
+
+**Table 70.1: REAL-6, held-out users of every fold a run has: the run alone and with the user's merchant lookup in front**
+
+| run | folds | n | top-1 alone | % of ceiling | lookup, then the run: top-1 | % of ceiling | headroom left (points) |
+|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B, database episodes | 0,1,2,3 | 1179 | 87.4 | 92.9 | 91.3 | 97.1 | 2.8 |
+| Qwen2.5-3B + record with category | 0,1,2,3 | 1179 | 86.0 | 91.5 | 89.6 | 95.3 | 4.5 |
+| Qwen2.5-14B, database episodes | 0 | 298 | 88.9 | 95.8 | 92.3 | 99.5 | 0.5 |
+| Qwen2.5-14B + record with category | 0 | 298 | 88.6 | 95.5 | 90.9 | 98.0 | 1.8 |
+| Qwen3.5-2B, database episodes | 0 | 298 | 86.9 | 93.7 | 90.6 | 97.6 | 2.2 |
+| Qwen3.5-4B, database episodes | 0 | 298 | 88.6 | 95.5 | 92.3 | 99.5 | 0.5 |
+
+**Table 70.2: % of ceiling by corrected group, alone → with the lookup in front (the group's ceiling in brackets; the lookup's share of the group's items and its accuracy where it answers)**
+
+| run | in history | labelled seen, not in history | determined by category | split category | other |
+|---|---|---|---|---|---|
+| ceiling (items) | 100 (444) | 91 (115) | 99 (509) | 50 (103) | 50 (8) |
+| lookup: share, accuracy | 100%, 100 | 0%, nan | 0%, nan | 0%, nan | 0%, nan |
+| Qwen2.5-3B, database episodes | 90 → 100 | 93 → 93 | 95 → 95 | 93 → 93 | 200 → 200 |
+| Qwen2.5-3B + record with category | 91 → 100 | 90 → 90 | 93 → 93 | 80 → 80 | 200 → 200 |
+| Qwen2.5-14B, database episodes | 91 → 100 | 94 → 94 | 97 → 97 | 124 → 124 | 150 → 150 |
+| Qwen2.5-14B + record with category | 93 → 100 | 94 → 94 | 97 → 97 | 90 → 90 | 200 → 200 |
+| Qwen3.5-2B, database episodes | 90 → 100 | 84 → 84 | 98 → 98 | 97 → 97 | 150 → 150 |
+| Qwen3.5-4B, database episodes | 90 → 100 | 91 → 91 | 99 → 99 | 110 → 110 | 150 → 150 |
+
+### 70.1 What the step says
+
+- **Hypothesis 1 holds.** The models lose 9 to 10 points of ceiling on merchants the user has already filed (90 to 93% there); the
+  lookup takes all of them (100%), because users file each merchant under one label (section 48). With it in front, the best runs
+  leave 0.5 to 2.8 points of headroom: Qwen3.5-4B and Qwen2.5-14B database episodes 99.5% of ceiling on fold 0, the four-fold
+  Qwen2.5-3B 97.1%.
+- **Where the rest is.** Outside the history the lookup never answers, and the runs sit at 84 to 99% of ceiling on labelled merchants
+  the user has not filed and on merchants the category determines.
+- **The split-category ceiling is too low.** It assumes the choice between two of the user's categories that share a standard
+  category is a coin flip (50%); the models read 48 to 62% there (97 to 124% of it), so amount, weekday or name carry some signal. The
+  overall ceiling (94.0) is therefore a slight underestimate, and "99.5% of ceiling" is an upper bound on how close the runs are.
+- For the product question: lookup first, then the model, as section 59 found; nothing on REAL-6 is left for a model to gain on the
+  in-history group.
+
+Tables: `uv run python scripts/lookup_cascade_tables.py`.
