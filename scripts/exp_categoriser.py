@@ -39,6 +39,10 @@ env: STEPS=200 LR=1e-4 (LLM; 16 sequences per step), DB_FRAC=0.3 (DB share of th
        merchants so each gets its share (about 9n / DB size rows per merchant); adds _dbe<n>. Use instead of DBEP to set exposure.
      DB_EXTRA=n (row 59, REAL-17): the fact DB padded with n generated opaque merchants (merchants.build_extra, seed 59), which the
        database episodes (DBEP) draw from alongside REAL-6's 240; adds _dbx<n>. Scoring is unchanged (REAL-6's items only).
+     LOOKUP=p, OVERRIDE=q (row 85): per episode, with probability q (a fact-DB target) the user files the target's merchant under
+       another of their categories than its DB category, in two or more shots and in the target, so the user's filing beats the DB
+       and the name; else with probability p two or more shots carry the target's own merchant under the target's label (the
+       history lookup, misleading names included). Adds _lk<p*100> / _ov<q*100>.
      MISLEAD=<set> (row 83): the in-DB merchants of data/processed/<set>.json (build_mislead.py: misleading names and neutral twins)
        added to the fact DB the database episodes (DBEP) draw from; adds _<set>. Score on ITEMS_SET=<set>.
      DB_CAT=1 (row 57): the DB texts of DB=param also state the merchant's category ("X is a Groceries store that sells ..."), so the
@@ -113,6 +117,7 @@ assert not (DBEP and (CHAT or DB == "ret")), "DBEP builds plain episodes without
 assert not ANS_WEIGHT or (ALL_LABELS and 0 < ANS_WEIGHT < 1), "ANS_WEIGHT needs ALL_LABELS and 0 < w < 1"
 POI = os.environ.get("POI", "")
 MISLEAD = os.environ.get("MISLEAD", "")  # row 83
+LOOKUP, OVERRIDE = float(os.environ.get("LOOKUP", "0")), float(os.environ.get("OVERRIDE", "0"))  # row 85
 POI_DB = os.environ.get("POI_DB", "")  # row 66 (REAL-21): data/processed/<POI_DB>.json (build_poi1_db.py), the places DBEP episodes draw from  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
 assert not POI or (DB == "none" and (not DBEP or POI_DB) and not DB_EPISODES and not REC_CAT and SHOTS == "fixed"), "POI-1's only fact DB is POI_DB"
 PLACES = json.loads((ROOT / "data" / "processed" / f"{POI_DB}.json").read_text())["places"] if POI_DB else []
@@ -127,7 +132,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -177,6 +182,40 @@ def db_row(u, rng, names_ok, merchant=None):
                 mu, sig = T.AMOUNT[m["category"]]
                 return dict(text=text, amount=round(math.exp(rng.gauss(mu, sig)), 2), weekday=rng.choice(T.WEEKDAYS), merchant=m["name"], label=std_to_name[m["category"]], synthetic=True)
     return None
+
+
+def merchant_row(name, label, rng):
+    """Row 85: a synthetic statement row of merchant `name` filed under `label` (a test string never reused); None if none found."""
+    import math
+    m = MERCHANT[name]
+    for _ in range(5):
+        text = T.render(m, rng)
+        if text not in ITEM_TEXTS:
+            mu, sig = T.AMOUNT[m["category"]]
+            return dict(text=text, amount=round(math.exp(rng.gauss(mu, sig)), 2), weekday=rng.choice(T.WEEKDAYS), merchant=name, label=label, synthetic=True)
+    return None
+
+
+def lookup_override(u, h, others, rng):
+    """Row 85 (LOOKUP / OVERRIDE): returns (h, others) with the target's merchant placed in the shots, relabelled by the user or not."""
+    if POI or h.get("merchant") not in MERCHANT or not (LOOKUP or OVERRIDE):
+        return h, others
+    x = rng.random()
+    if x < OVERRIDE and h["merchant"] in DBREC:
+        alt = [c["name"] for c in u["categories"] if c["name"] != h["label"] and "split" not in c]
+        if not alt:
+            return h, others
+        h = dict(h, label=rng.choice(alt))
+    elif not x < OVERRIDE + LOOKUP:
+        return h, others
+    others = [dict(o, label=h["label"]) if o.get("merchant") == h["merchant"] else o for o in others]  # the user files it one way
+    have = sum(o.get("merchant") == h["merchant"] for o in others)
+    free = [k for k, o in enumerate(others) if o.get("merchant") != h["merchant"]]
+    for k in rng.sample(free, max(0, min(len(free), 2 - have))):
+        r = merchant_row(h["merchant"], h["label"], rng)
+        if r is not None:
+            others[k] = r
+    return h, others
 
 
 SYLL = [c + v for c in "bdfgklmnprstvz" for v in "aeiou"]
@@ -247,6 +286,8 @@ def sft_examples(per_user=150):
                         others[j] = r
                 r = row()
                 h = r if r is not None else h
+            if LOOKUP or OVERRIDE:  # row 85
+                h, others = lookup_override(u, h, list(others), rng)
             names = {c["name"]: c["name"] for c in u["categories"]}
             if RENAME:  # the same fresh word for a category everywhere in this episode
                 taken = set(names)
@@ -440,7 +481,7 @@ def train_encoder(run):
     return dict(train_minutes=round((time.time() - t0) / 60, 1), n_pairs=len(pairs), epochs=EPOCHS, final_loss=round(loss.item(), 3), encoder=str(OUT_DIR.relative_to(ROOT)))
 
 
-cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND, poi_desc=POI_DESC, poi_unseen=POI_UNSEEN, decoy=DECOY, empty=EMPTY, poi_db=POI_DB, mislead=MISLEAD)
+cfg = dict(route=ROUTE, db=DB, steps=STEPS, lr=LR, epochs=EPOCHS, seed=SEED, db_frac=DB_FRAC, run_tag=RUN_TAG, real6_db=REAL6_DB, trainer=TRAINER, chat=CHAT, db_sha=DOC.get("db_sha256"), base=LLM_BASE if ROUTE == "llm" else ENC_BASE, real6_sha=DOC["sha256"], poi=POI, lora_r=64, n_db_only_merchants=len(DB_ONLY), fold=FOLD, rename=RENAME, n_train_users=len(training_users()), all_labels=ALL_LABELS, ans_weight=ANS_WEIGHT, load_in_4bit=LOAD_4BIT, dbep=DBEP, db_cat=DB_CAT, rec_cat=REC_CAT, micro=MICRO, eff_batch=EFF_BATCH, db_extra=DB_EXTRA, db_episodes=DB_EPISODES, poi_shots=POI_SHOTS, poi_rec=POI_REC, poi_kind=POI_KIND, poi_desc=POI_DESC, poi_unseen=POI_UNSEEN, decoy=DECOY, empty=EMPTY, poi_db=POI_DB, mislead=MISLEAD, lookup=LOOKUP, override=OVERRIDE)
 with Run("categoriser", model=cfg["base"], config=cfg, enabled=not SMOKE) as run:
     stats = train_llm(run) if ROUTE == "llm" else train_encoder(run)
     OUT.parent.mkdir(exist_ok=True); OUT.write_text(json.dumps(dict(config=cfg, **stats), indent=2)); run.artifact(OUT)
