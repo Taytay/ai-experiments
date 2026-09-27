@@ -1,7 +1,7 @@
 """Encoder option scorers (PLAN steps 53 and 69, QUESTIONS.md MODEL-6, MODEL-10): can a 150-400M bidirectional encoder choose among a user's
 categories in one forward pass? Three families share the data, training loop and scorer (ARCH), so they differ only in the model:
 
-  ARCH=mask       Laya's layout below (INIT=mbert|laya|hops; hops: row 76, a row 71 hop encoder named by HOPS_FROM)
+  ARCH=mask       Laya's layout below (INIT=mbert|laya|hops|von; hops: row 76, a row 71 hop encoder named by HOPS_FROM; von: row 77, Von 1.2's encoder)
   ARCH=gliclass   GLiClass (Knowledgator, arXiv 2508.07662; INIT=base|large: gliclass-modern-{base,large}-v3.0): "<<LABEL>>name..." for
                   every category, "<<SEP>>", then the state; its own pooling and scorer give one logit per label
   ARCH=mbinstruct ModernBERT-Large-Instruct (Answer.AI, arXiv 2502.03793), its model card's template: "QUESTION: <state> CHOICES: - A: name
@@ -43,7 +43,7 @@ from ai_experiments.real6_eval import summarize, write_recs
 
 ARCH = os.environ.get("ARCH", "mask"); assert ARCH in ("mask", "gliclass", "mbinstruct")
 INIT = os.environ.get("INIT", {"mask": "mbert", "gliclass": "large", "mbinstruct": "instruct"}[ARCH])
-assert INIT in {"mask": ("mbert", "laya", "hops"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
+assert INIT in {"mask": ("mbert", "laya", "hops", "von"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
 SMOKE = bool(os.environ.get("SMOKE"))
 STEPS = 3 if SMOKE else int(os.environ.get("STEPS", "1500"))
 BATCH, LR, HEAD_LR = int(os.environ.get("BATCH", "16")), float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
@@ -147,6 +147,14 @@ def load_model():
         sd = {k: v for k, v in sd.items() if not k.startswith(("q.", "k.", "end_key"))}
         missing, unexpected = model.load_state_dict(sd, strict=False)
         assert not unexpected and missing == ["type_emb.weight"], (missing[:5], unexpected[:5])
+    if INIT == "von":  # row 77: Von 1.2's encoder (wfzyx/von option_marker.pt, Apache-2.0, ModernBERT-large); its scorer MLP differs from this head, which starts fresh
+        from huggingface_hub import hf_hub_download
+        from ai_experiments.licences import open_licence
+        open_licence("wfzyx/von")
+        sd = torch.load(hf_hub_download("wfzyx/von", "option_marker.pt"), map_location="cpu")
+        sd = {k: v for k, v in sd.items() if k.startswith("encoder.")}
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        assert not unexpected and not [k for k in missing if k.startswith("encoder.")], (missing[:5], unexpected[:5])
     return tok, model.cuda()
 
 
