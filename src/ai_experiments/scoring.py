@@ -58,8 +58,13 @@ class Scorer:
     Before 2026-09-15 each item was its own forward (GPU at 26%, 26 minutes per evaluation); the batched
     scorer changes log-probs by the bf16 batch-shape noise only (REPORT.md 19 measures it on saved weights)."""
 
-    def __init__(self, model, tok, maxlen: int = 768, extras: bool = True, rows_per_forward: int = 64, tokens_per_forward: int = 32768):
+    def __init__(self, model, tok, maxlen: int = 768, extras: bool = True, rows_per_forward: int = 64, tokens_per_forward: int = 32768,
+                 prefix_cache: bool | None = None):
+        import os
         self.model, self.tok, self.maxlen, self.extras = model, tok, maxlen, extras
+        # 2026-09-26: each prompt runs once and its options are scored from its KV cache (SCORER_CACHE=0: the packed path, where
+        # every option row repeats the whole prompt; on POI-1's 20 options that is ~95% of the compute)
+        self.prefix_cache = bool(int(os.environ.get("SCORER_CACHE", "1"))) if prefix_cache is None else prefix_cache
         self.rows, self.tokens = rows_per_forward, tokens_per_forward
         self.pad = tok.pad_token_id or 0
         self._cache: dict[tuple[str, str], tuple[float, int]] = {}  # (premise, option) -> (sum_lp, n_tok)
@@ -72,21 +77,60 @@ class Scorer:
         return self._ids(prompt)[-(self.maxlen - 32):]
 
     @torch.no_grad()
-    def _hidden_or_logits(self, ids, att):
-        """Final hidden states [rows, L, H] if the model can return them (unsloth), else full logits."""
+    def _hidden_or_logits(self, ids, att, **kw):
+        """Final hidden states [rows, L, H] if the model can return them (unsloth), else full logits. With use_cache=True
+        returns the model output too (for its past_key_values)."""
         import os
         if self._head is None:
-            return self.model(input_ids=ids, attention_mask=att).logits, False
+            o = self.model(input_ids=ids, attention_mask=att, **kw)
+            return (o.logits, False, o) if kw.get("use_cache") else (o.logits, False)
         prev = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES")
         os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
         try:
-            out = self.model(input_ids=ids, attention_mask=att).logits
+            o = self.model(input_ids=ids, attention_mask=att, **kw)
         finally:
             if prev is None:
                 os.environ.pop("UNSLOTH_RETURN_HIDDEN_STATES", None)
             else:
                 os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = prev
-        return out, out.shape[-1] != self._head.weight.shape[0]  # hidden width vs vocabulary size
+        hid = o.logits.shape[-1] != self._head.weight.shape[0]  # hidden width vs vocabulary size
+        return (o.logits, hid, o) if kw.get("use_cache") else (o.logits, hid)
+
+    @staticmethod
+    def _repeat_cache(cache, n):
+        """The prompt's KV cache repeated for n option rows (a transformers Cache, or the legacy tuple of (k, v) per layer)."""
+        if hasattr(cache, "batch_repeat_interleave"):
+            cache.batch_repeat_interleave(n)
+            return cache
+        return tuple(tuple(t.repeat_interleave(n, dim=0) for t in layer) for layer in cache)
+
+    def _cached_one(self, p: list[int], opts: list[list[int]]) -> list[tuple[float, int]]:
+        """One item: the prompt once (no padding), then every option in one right-padded batch over its repeated cache.
+        Option token k is predicted from the prompt's last position (k = 0) or from option position k - 1."""
+        ids = torch.tensor([p], device="cuda")
+        out, is_hidden, o = self._hidden_or_logits(ids, torch.ones_like(ids), use_cache=True)
+        last = out[0, -1]
+        n, Lo = len(opts), max(len(x) for x in opts)
+        oid = torch.tensor([x + [self.pad] * (Lo - len(x)) for x in opts], device="cuda")
+        att = torch.cat([torch.ones(n, len(p), device="cuda", dtype=torch.long),
+                         torch.tensor([[1] * len(x) + [0] * (Lo - len(x)) for x in opts], device="cuda")], 1)
+        pos = torch.arange(len(p), len(p) + Lo, device="cuda").unsqueeze(0).expand(n, -1)
+        if Lo > 1:
+            cache = self._repeat_cache(o.past_key_values, n)
+            oo = self._hidden_or_logits(oid[:, :-1], att[:, :-1], past_key_values=cache, position_ids=pos[:, :-1], use_cache=True)[0]
+        sel, tgt = [], []
+        for j, x in enumerate(opts):
+            sel.append(last.unsqueeze(0))
+            if len(x) > 1:
+                sel.append(oo[j, :len(x) - 1])
+            tgt.extend(x)
+        sel = torch.cat(sel)
+        logits = self._head(sel.to(self._head.weight.dtype)).float() if is_hidden else sel.float()
+        tok_lp = F.log_softmax(logits, -1).gather(-1, torch.tensor(tgt, device="cuda").unsqueeze(-1)).squeeze(-1).tolist()
+        res, k = [], 0
+        for x in opts:
+            res.append((sum(tok_lp[k:k + len(x)]), len(x))); k += len(x)
+        return res
 
     @torch.no_grad()
     def _run_rows(self, rows: list[tuple[list[int], int, int]]) -> list[float]:
@@ -115,7 +159,9 @@ class Scorer:
     def _forward_many(self, reqs: list[tuple[list[int], list[list[int]]]]) -> list[list[tuple[float, int]]]:
         """reqs: (prompt ids, option ids per option). Every (prompt, option) row of every request is scored,
         rows sorted by length and packed into forwards under the row and token budgets; returns, per request,
-        (sum log-prob, token count) per option."""
+        (sum log-prob, token count) per option. With prefix_cache each request's prompt runs once (_cached_one)."""
+        if self.prefix_cache and all(p and all(opts) for p, opts in reqs):
+            return [self._cached_one(p, opts) for p, opts in reqs]
         rows, owner = [], []
         for r, (p, opts) in enumerate(reqs):
             for j, o in enumerate(opts):
