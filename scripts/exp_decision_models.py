@@ -45,7 +45,8 @@ TEMP = float(os.environ.get("TEMP", "1.0"))
 BATCH = int(os.environ.get("BATCH", "8"))
 DECISION_CODE_REV = "60ea30a48285ea097a9b3a728e71649b78331601"  # the last Sol-2B revision that ships code/decision_model.py (same prompt_version as the weights)
 KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
-ADAPTER = os.environ.get("ADAPTER", "")  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
+ADAPTER = os.environ.get("ADAPTER", "")
+ORDER_SEED = os.environ.get("ORDER_SEED", "")  # row 50: every item's options shuffled by this seed before scoring (and decider's own label order too), scores mapped back  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
 DOC = json.loads((PROCESSED / f"{ITEMS_SET}.json").read_text()) if ITEMS_SET else R6.load("v1")
@@ -53,7 +54,7 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}"
+TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}"
 
 
 def state_of(it, cond):
@@ -100,7 +101,7 @@ def decider():
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            built = [P.build(Ex(state_of(it, cond), [Q(it.get("question", QUESTION), options_of(it), it["answer"])]), tok, rng=random.Random(it["id"]),
+            built = [P.build(Ex(state_of(it, cond), [Q(it.get("question", QUESTION), options_of(it), it["answer"])]), tok, rng=random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")),
                              max_options=255, max_ctx_tokens=16384) for it in chunk]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64  # as decider's own collate: few shapes for fla's per-shape tuning
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
@@ -229,11 +230,17 @@ if __name__ == "__main__":
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
     cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
-               users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, kev_sha=KEV_SHA if FAMILY == "kev" else None)
+               users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, kev_sha=KEV_SHA if FAMILY == "kev" else None)
     with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         for cond in CONDS:
             t0 = time.time()
-            lps = score(ITEMS, cond)
+            if ORDER_SEED:  # the options (and the category list in the prompt is unchanged: only the option order the reader sees moves)
+                perms = [random.Random(f"{it['id']}-order-{ORDER_SEED}").sample(range(len(it["options"])), len(it["options"])) for it in ITEMS]
+                shuffled = [dict(it, options=[it["options"][k] for k in pm], answer=pm.index(it["answer"])) for it, pm in zip(ITEMS, perms)]
+                raw = score(shuffled, cond)
+                lps = [[lp[pm.index(k)] for k in range(len(pm))] for lp, pm in zip(raw, perms)]
+            else:
+                lps = score(ITEMS, cond)
             recs = []
             for it, lp in zip(ITEMS, lps):
                 pred = max(range(len(lp)), key=lp.__getitem__)

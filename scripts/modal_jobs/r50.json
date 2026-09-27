@@ -1,0 +1,62 @@
+[
+ {
+  "tag": "r50-r77ft-decider-2b-P",
+  "env": {
+   "ADAPTERS_FROM": "r77ft-decider-2b-P",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-2b",
+   "ADAPTER": "decider_decider-2b_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ORDER_SEED=1 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=2 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=3 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r50-r79-slot-P",
+  "env": {
+   "ADAPTERS_FROM": "r79-slot-P",
+   "FAMILY": "decider",
+   "MODEL": "Qwen/Qwen3.5-2B",
+   "ADAPTER": "slot_Qwen3.5-2B_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ORDER_SEED=1 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=2 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=3 ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r50-r80-decideraux-E800",
+  "env": {
+   "ADAPTERS_FROM": "r80-decideraux-E800",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-2b",
+   "ADAPTER": "decider_decider-2b_none_h100bf16st800_f0_dbep50_aux100_lora",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ORDER_SEED=1 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=2 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=3 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r50-r79-slotaux-E800",
+  "env": {
+   "ADAPTERS_FROM": "r79-slotaux-E800",
+   "FAMILY": "decider",
+   "MODEL": "Qwen/Qwen3.5-2B",
+   "ADAPTER": "slot_Qwen3.5-2B_none_h100bf16st800_f0_dbep50_aux100_lora",
+   "CONDS": "noctx"
+  },
+  "cmds": [
+   "ORDER_SEED=1 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=2 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "ORDER_SEED=3 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]
