@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-09-26; overwrite this block when it changes)
+## Current state (2026-09-27; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -14,8 +14,10 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   categorisers; Q2 the best way to inject knowledge (fact databases); Q3 inferring meaningless category names from examples in
   training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest.
 - **Base model (owner, 2026-09-26):** open licences only (model, base and code: Apache-2.0 / MIT / BSD / CC-BY). Qwen2.5-3B-Instruct is
-  research-licensed: new trained work uses Apache-2.0 Qwen3.5 (row 78; `LLM_BASE=Qwen/Qwen3.5-2B`, transformers + peft, `TRAINER=hf`).
-  Qwen2.5-3B results stay as research records.
+  research-licensed: new trained work uses Apache-2.0 Qwen3.5 (row 78; `LLM_BASE=Qwen/Qwen3.5-2B`; `TRAINER=hf` with the uv overlay in
+  CLAUDE.md, or `TRAINER=unsloth` in the project env, which bundles the fla kernels) or decider (row 77). Qwen3.5 needs
+  flash-linear-attention and batch lengths rounded to 64 (in the code). Qwen2.5-3B results stay as research records; rows written
+  before 2026-09-27 that name "the 3B" (74, 68) now run on Qwen3.5-2B.
 - **Where the work runs:** all GPU work on Modal (the owner's decision, 2026-09-25), not the local 3090: `scripts/modal_app.py`,
   job lists in `scripts/modal_jobs/`, how-to in CLAUDE.md ("GPU work: Modal"). bf16 is the default base precision for new runs.
   Every table reports the scorecard (`ai_experiments.scorecard`, REPORT.md 59) with skill over the no-model cascade; add a blind
@@ -35,10 +37,9 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   approach and name its limits with hypotheses; report results as a share of each set's ceiling (`ai_experiments.ceiling`,
   `scripts/ceiling_tables.py`: REAL-6 94.0 exact; label induction exact per condition; POI-1 exact on seen kinds, a bracket on
   unseen ones); the 98% auto-file point is arbitrary, read the whole coverage curve.
-- **Next:** rows 74 and 75 (label-induction training with decoys and empty categories; the lookup in front of the best REAL-6
-  runs), then 68, 66, 67 and the older todo rows. Open leads from REPORT 69: decider-2B fine-tuned on REAL-6 database episodes (its
-  one-slot readout at a tenth of the scoring cost), kev-4B fine-tuned (best zero-shot), and a one-slot readout for the Qwen3.5
-  categoriser in place of the per-option scorer. New trained work uses Qwen3.5 or decider (open licences only).
+- **Next:** rows 79 and 80 (the leads of REPORT 69: a one-slot readout for the Qwen3.5 categoriser; decider-2B and kev-4B on REAL-6),
+  then 74 and 75 (label-induction training with decoys and empty categories; the lookup in front of the best REAL-6 runs), then 68,
+  66, 67 and the older todo rows. All on this PR (#67) unless the owner wants a new layer on the stack.
 
 ## Procedure for one step
 
@@ -141,6 +142,8 @@ afternoon each on the 3090.
 | 76 | [Q1] Does a trained multiple-choice skill transfer? (MODEL-13; owner, 2026-09-26) Start row 53's categoriser (Laya's layout, ModernBERT-large) from row 71's v2 hop encoders (plain options arm, the labelled-lines + hop-loss arm) instead of ModernBERT-large or Laya's checkpoint, and read REAL-6 fold 0 and POI-1 fold 0 zero-shot, after 200 steps and after 1,500 steps against both usual inits; hop training teaches binding names across lines, which category induction also needs (query -> similar example -> its label). Needs an INIT=hops option in exp_encoder_mask.py (same head and mask layout). | MODEL-13 | 71 | done | REPORT.md 66; scripts/transfer_tables.py |
 | 77 | [Q1] Published decision models (MODEL-14; owner, 2026-09-26: the models Ollaya serves): decider 2B / 4B, Decision-1.0 Sol-2B / Nox-4B, kev 4B, Von zero-shot in their own layouts on REAL-6, POI-1 (plain, kind lines) and label induction v2 (fold 0, scorecard); then decider and Von fine-tuned on the categoriser's training users against the 3B. `scripts/exp_decision_models.py`. | MODEL-14 | 72 | done | REPORT 69, `scripts/open_models_tables.py` |
 | 78 | [Q1] Re-anchor on an open base (MODEL-15; owner, 2026-09-26: Qwen2.5-3B is research-licensed, move to Apache-2.0 Qwen3.5): Qwen3.5-2B / 4B untrained and trained with the best recipes (REAL-6 database episodes; POI-1 kind lines + kind-retrieved examples), fold 0, against the Qwen2.5-3B rows; new trained work uses Qwen3.5 from here. | MODEL-15 | 72 | done | REPORT 69, `scripts/open_models_tables.py` |
+| 79 | [Q1] One answer slot for the decoder categoriser (MODEL-16; REPORT 69): Qwen3.5-2B trained with decider's layout and letter-slot loss (shot labels as extra slots) against the per-option loss and scorer, REAL-6 database episodes and POI-1's best layout, fold 0; accuracy, calibration, ms per item. | MODEL-16 | 78 | todo | |
+| 80 | [Q1] The published decision models trained on REAL-6 (MODEL-16): decider-2B with database episodes (does 2B merchant knowledge suffice?), and kev-4B fine-tuned with its own trainer (the best zero-shot reader; torch < 2.9 environment), fold 0, against Qwen3.5 database episodes. | MODEL-16 | 77 | todo | |
 | 50 | Category-order sensitivity, eval only: the untrained instruct model and the no-DB and record SFT adapters re-scored with the prompt's category list permuted under two more seeds; argmax flip rate per corrected group and name type, and the accuracy of the two- and three-order averages; a lettered list with letter readout on the untrained model only. | EVAL-8 | 41, 45 | todo | |
 | 53 | Encoder option scorer (Laya's layout): ModernBERT-large with one scored `[MASK]` per category, fine-tuned across users on REAL-6 with the query, the record and the tagged shots in the input, soft-target CE, options shuffled; from the Laya checkpoint and from plain ModernBERT-large; no-record and record arms against GLiClass tuned and the SFT categoriser on row 45's groups and row 42's folds, with milliseconds per item. Does the layout let an encoder read the shots where GLiClass could not? | MODEL-6 | 45 | done | REPORT.md 62; `scripts/encmask_tables.py`; `models/adapters/encmask_*` |
 | 54 | Diffusion slot read on the 3090, zero-shot: one forward with the answer letter as the mask token on REAL-6 (24 shots, with and without the record) for Nemotron-Labs-Diffusion-8B (against its own causal readout, same weights), Dream-v0-Instruct-7B (against Qwen2.5-7B-Instruct), LLaDA-8B-Instruct and LFM2.5-Encoder-350M-Diffusion; row 50's order permutations and row 49's calibration on each; a LoRA fine-tune of the slot read only if one beats its causal twin beyond the seed spread. Separate venv if the remote code needs another transformers. | MODEL-7 | 45, 49, 50 | todo | |

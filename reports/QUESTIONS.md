@@ -1113,3 +1113,11 @@ attention layer), which unsloth's fast path does not cover; it runs through tran
 and kind-retrieved examples), fold 0, against the Qwen2.5-3B numbers and the ceilings; speed and memory per step.
 
 **Status (2026-09-27):** PLAN step 78, REPORT.md 69: Qwen3.5-2B / 4B match Qwen2.5-3B once trained (REAL-6 86.9 / 88.6, POI-1 91.5) and read better untrained; new trained work uses Qwen3.5.
+
+**MODEL-16 One answer slot over all options for the decoder categoriser.** Section 69: decider-2B, fine-tuned on the same episodes,
+reads POI-1 as well as the Qwen categorisers (92.5 against 91.5) from one slot whose logits over option labels are the answer, one pass
+per question, where this repo's scorer runs one row per option (the ~900-token prompt re-read 12 to 20 times, ~225 ms per item
+against ~25). *Experiment:* Qwen3.5-2B trained with decider's layout and loss (labelled options, letter-slot cross-entropy; the
+ALL_LABELS shots as extra slots) against the same model with the per-option loss and scorer, on REAL-6 database episodes and POI-1's
+best layout, fold 0: accuracy, calibration, ms per item. Also decider-2B itself on REAL-6 database episodes (merchant knowledge at 2B
+is the doubt: it misfiles Trader Joe's zero-shot), and kev-4B fine-tuned (the best zero-shot reader; its own trainer needs torch < 2.9).
