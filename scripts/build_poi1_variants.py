@@ -7,7 +7,10 @@
                 database's answer for each line, so matching the query to a same-kind shot is one hop (REPORT 65: one pass follows about one
                 hop it was not trained on) instead of two (record -> kind -> a shot the model must itself recognise as that kind).
   kshots_kinds  (row 72) both.
-usage: uv run python scripts/build_poi1_variants.py kshots|kinds|kshots_kinds [--force]
+  desc          (row 73) the header lists each category with the Overture kinds of the places the user has filed under it, most filed
+                first, at most four ("Gavir: counselling, psychology"; "(nothing filed yet)" when none): what the user's own history says each
+                name means, so an unseen kind can be matched to a category through a related kind. desc_kinds adds the Kind: lines too.
+usage: uv run python scripts/build_poi1_variants.py kshots|kinds|kshots_kinds|desc|desc_kinds [--force]
 """
 import json
 import random
@@ -29,7 +32,17 @@ def line(s, kinds):
     return f"Transaction: {s['text']} | ${s['amount']:.2f} | {s['weekday']}\n" + (f"Kind: {kind_name(s['basic'])}\n" if kinds else "")
 
 
-def variant(doc, retrieve, kinds):
+def described(u, n=4):
+    """The header with each category's kinds from the user's whole history (row 73)."""
+    from collections import Counter
+    cnt = {c["name"]: Counter() for c in u["categories"]}
+    for h in u["history"]:
+        cnt[h["label"]][h["basic"]] += 1
+    rows = [f"- {c['name']}: " + (", ".join(kind_name(b).lower() for b, _ in cnt[c["name"]].most_common(n)) or "(nothing filed yet)") for c in u["categories"]]
+    return "Categories:\n" + "\n".join(rows) + "\n\n"
+
+
+def variant(doc, retrieve, kinds, desc=False):
     users = {u["user"]: u for u in doc["users"]}
     out = []
     for it in doc["items"]:
@@ -43,7 +56,7 @@ def variant(doc, retrieve, kinds):
             rng.shuffle(shots)
         else:
             same, shots = [], [by_text[t] for t in u["shots"]]
-        header = it["prompt"].split("\n\n", 1)[0] + "\n\n"
+        header = described(u) if desc else it["prompt"].split("\n\n", 1)[0] + "\n\n"
         demo = "".join(line(s, kinds) + f"Category: {s['label']}\n\n" for s in shots)
         q = it["prompt"].rsplit("\n\n", 1)[1]
         assert q.startswith("Transaction: ") and q.endswith("Category:")
@@ -61,7 +74,7 @@ if __name__ == "__main__":
     if dst.exists() and "--force" not in sys.argv:
         sys.exit(f"{dst} exists (frozen); pass --force to rebuild")
     doc = json.loads(SRC.read_text())
-    items = variant(doc, retrieve="kshots" in which, kinds="kinds" in which)
+    items = variant(doc, retrieve="kshots" in which, kinds="kinds" in which, desc="desc" in which)
     # the users' frozen shots stay as they were: the scorer's flags read them, the prompts carry the retrieved ones
     new = dict(doc, version=f"v1_{which}", items=items, sha256=R6.sha256(items), variant_of=f"poi1_v1 ({doc['sha256'][:12]})")
     dst.write_text(json.dumps(new, indent=0, ensure_ascii=False))

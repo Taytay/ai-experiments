@@ -105,34 +105,32 @@ class Scorer:
         return tuple(tuple(t.repeat_interleave(n, dim=0) for t in layer) for layer in cache)
 
     def _cached_one(self, p: list[int], opts: list[list[int]]) -> list[tuple[float, int]]:
-        """One item: the prompt once (no padding), then every option in one right-padded batch over its repeated cache.
-        Option token k is predicted from the prompt's last position (k = 0) or from option position k - 1."""
+        """One item: the prompt once (no padding), then the options' tokens one step at a time over its cache repeated per option
+        (unsloth's forward takes a single new token whenever a cache is passed). Option token k is predicted from the prompt's last
+        position (k = 0) or from the step that fed option token k - 1. Rows are right-padded: a row's pad steps come after its own
+        tokens and are never read, so no mask is needed."""
         ids = torch.tensor([p], device="cuda")
         out, is_hidden, o = self._hidden_or_logits(ids, torch.ones_like(ids), use_cache=True)
-        last = out[0, -1]
         n, Lo = len(opts), max(len(x) for x in opts)
         oid = torch.tensor([x + [self.pad] * (Lo - len(x)) for x in opts], device="cuda")
-        att = torch.cat([torch.ones(n, len(p), device="cuda", dtype=torch.long),
-                         torch.tensor([[1] * len(x) + [0] * (Lo - len(x)) for x in opts], device="cuda")], 1)
-        pos = torch.arange(len(p), len(p) + Lo, device="cuda").unsqueeze(0).expand(n, -1)
-        if Lo > 1:
-            cache = self._repeat_cache(o.past_key_values, n)
-            oo = self._hidden_or_logits(oid[:, :-1], att[:, :-1], past_key_values=cache, position_ids=pos[:, :-1], use_cache=True)[0]
-        sel, tgt = [], []
-        for j, x in enumerate(opts):
-            sel.append(last.unsqueeze(0))
-            if len(x) > 1:
-                sel.append(oo[j, :len(x) - 1])
-            tgt.extend(x)
-        sel = torch.cat(sel)
+        steps = [out[0, -1].unsqueeze(0).expand(n, -1)]  # [n, H or V] per step
+        cache = self._repeat_cache(o.past_key_values, n) if Lo > 1 else None
+        for k in range(Lo - 1):
+            att = torch.ones(n, len(p) + k + 1, device="cuda", dtype=torch.long)
+            pos = torch.full((n, 1), len(p) + k, device="cuda", dtype=torch.long)
+            h, _, o = self._hidden_or_logits(oid[:, k:k + 1], att, past_key_values=cache, position_ids=pos, use_cache=True)
+            steps.append(h[:, -1]); cache = o.past_key_values
+        sel = torch.stack(steps, 1)  # [n, Lo, H or V]: position k predicts option token k
+        ri = torch.cat([torch.full((len(x),), j, device="cuda", dtype=torch.long) for j, x in enumerate(opts)])
+        ki = torch.cat([torch.arange(len(x), device="cuda") for x in opts])
+        sel = sel[ri, ki]
         logits = self._head(sel.to(self._head.weight.dtype)).float() if is_hidden else sel.float()
-        tok_lp = F.log_softmax(logits, -1).gather(-1, torch.tensor(tgt, device="cuda").unsqueeze(-1)).squeeze(-1).tolist()
+        tok_lp = F.log_softmax(logits, -1).gather(-1, oid[ri, ki].unsqueeze(-1)).squeeze(-1).tolist()
         res, k = [], 0
         for x in opts:
             res.append((sum(tok_lp[k:k + len(x)]), len(x))); k += len(x)
         return res
 
-    @torch.no_grad()
     def _run_rows(self, rows: list[tuple[list[int], int, int]]) -> list[float]:
         """rows: (sequence ids, a, b) with the option tokens at [a, b). -> sum of their log-probs, per row."""
         L = max(len(r[0]) for r in rows)
