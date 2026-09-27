@@ -5854,7 +5854,7 @@ loss, database episodes, rename 0.5), 800 steps, one seed; 49 training minutes o
 | reader | seeds | REAL-6 top-1 [interval] | top-3 | bits left | auto-filed at 98% (precision) | novel names | misleading-name set, all items | alternation set, all items |
 |---|---|---|---|---|---|---|---|---|
 | Qwen3.5-9B one slot, recipe + random labels | 1 | 87.2 [78.0, 93.4] | 98.3 | 0.63 | 69.1 (98.1) | 89.3 | 40.2 | 60.4 |
-| decider-4B, the same (row 84 control, seed 0) | 1 | 88.9 [80.3, 94.9] | 97.0 | 0.66 | 67.1 (97.0) | – | 40.9 (row 81) | 61.6 (two seeds) |
+| decider-4B, the same (row 84 control, seed 0) | 1 | 88.9 [80.3, 94.9] | 97.0 | 0.66 | 67.1 (97.0) | – | 40.9 (row 81) | 62.1 (two seeds: 60.5, 63.7) |
 
 The 9B reads like the 4B on every set: REAL-6 is 2 points under its ceiling for both, and the misleading-name, override,
 evidence-free and alternation behaviours of sections 80 to 86 were set by what training showed, not by model size (the 4B untrained
