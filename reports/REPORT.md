@@ -6108,3 +6108,23 @@ difference (override rows land at random positions). Row 95 adds move episodes l
 category and the two most recent under the new one, the target following the new, together with the misfiled rows.
 
 Job list: `scripts/modal_jobs/r94.json`.
+
+## 95. Move episodes laid out in time do not recover the moved merchants (35.0 against 57.5 without noise training): REAL-7's moves rarely look like the episodes (the new category's rows are seldom the latest shots, and old rows are rarely shown); the real conflict is a lone unexpected row, which random noise training teaches the reader to distrust (REAL-11)
+
+PLAN step 95. Section 94's recipe (misfiled shots 0.04) + `MOVE=0.1` (`exp_categoriser.py`: two early shots under the old category,
+the two latest under the new, the target following the new), two seeds.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category |
+|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 |
+| + shot noise 0.04 (row 94) | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 |
+| + shot noise + moves in time | 82.2 | 97.8 | 94.8 | 35.0 | 40.8 |
+
+What REAL-7's 60 moved items show: 27 have no row under the new category in the shots (unknowable), 15 exactly one, 18 two or more;
+old-category rows are shown in only 13, and the latest new-category row is the last shot in 7. A move there is mostly a lone row
+filed against the merchant's usual category, which is exactly what a random misfile looks like, and for a real user a lone
+unexpected filing is far likelier to be meant than to be one of 3% of slips. The misfiles that hurt ordinary items (section 93) are
+the other kind: a minority among several rows of one merchant. Row 96 misfiles only there (a merchant with three or more shots, at
+most one misfiled row per merchant), so the majority wins and a lone row stays trusted.
+
+Job list: `scripts/modal_jobs/r95.json`.
