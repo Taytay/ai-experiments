@@ -21,7 +21,8 @@ READERS = [("decider-4B untrained", ["real6_dm_decider_decider-4b_real7_v1.noctx
            ("decider-4B, row 81 recipe", [F.format(t="h100bf16st800", a="ren50_dbep50_aux100", rd="")]),
            ("decider-4B, + random labels (row 84 control)", [F.format(t="h100bf16st800", a="ren50_dbep50_aux100_labrand26", rd="_labrand26")]),
            ("decider-4B, final recipe (row 89)", [F.format(t=t, a=FINAL, rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
-           ("decider-4B, final recipe + shot noise 0.04 (row 94)", [F.format(t=t, a=FINAL.replace("mislead_v1_", "mislead_v1_sn4_"), rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")])]
+           ("decider-4B, final recipe + shot noise 0.04 (row 94)", [F.format(t=t, a=FINAL.replace("mislead_v1_", "mislead_v1_sn4_"), rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")]),
+           ("decider-4B, final recipe + shot noise + moves in time (row 95)", [F.format(t=t, a=FINAL.replace("mislead_v1_", "mislead_v1_sn4_").replace("alt10s_", "alt10s_mv10_"), rd="_labrand26") for t in ("h100bf16st800", "h100bf16st800s1")])]
 
 
 def sm(z):
