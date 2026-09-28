@@ -6150,3 +6150,43 @@ of a merchant's category as an event the product records, or the lookup's recenc
 the recipe stays as section 89 (no shot noise), with the trade-off stated.
 
 Job list: `scripts/modal_jobs/r96.json`.
+
+## 97. Confidence when a user's filings of a merchant change, and a correction to sections 95 and 96: the final recipe is shaken where it should be (mixed filings: 38% of answers at p >= 0.9 against 99% on consistent ones, right 96% of the time when it is confident); misfile training makes it steadier and more accurate on mixed filings (98 to 100); what misfile training costs is the lone unexpected row, not recency (REAL-11)
+
+The owner (2026-09-28): does the model's confidence get shaken when a user starts filing a merchant under a new category? REAL-7, the
+final recipe (row 89) and the majority-only misfile reader (row 96), two seeds each. The merchant's rows in the shots are matched by
+several keys of its name (the full-name prefix, the vowel-dropped abbreviation, the first word), which sections 95 and 96 did not do.
+
+**Table 97.1: REAL-7, by what the shots show of the query's merchant (mean of two seeds)**
+
+| merchant's rows in the shots | n | final recipe: top-1 | mean top p | p >= 0.9 | right when p >= 0.9 | + majority-only misfiles: top-1 | mean top p | p >= 0.9 | right when p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|
+| consistent filings | 533 | 99.0 | 1.00 | 99% | 99% | 95.3 | 0.99 | 97% | 97% |
+| mixed filings, the latest is the answer | 70 | 74.3 | 0.79 | 38% | 96% | 97.9 | 0.96 | 89% | 100% |
+| mixed filings, the latest is not the answer | 28 | 71.4 | 0.77 | 30% | 83% | 83.9 | 0.96 | 88% | 84% |
+| consistent, but the user has since changed it (not visible) | 29 | 10.3 | 0.97 | 91% | 11% | 19.0 | 0.95 | 88% | 16% |
+| merchant not in the shots | 540 | 70.6 | 0.96 | 93% | 73% | 70.4 | 0.95 | 92% | 73% |
+
+**Table 97.2: moved and idiosyncratic merchants whose visible rows all carry the user's unexpected category, by how many rows show it (majority-only misfile reader, two seeds)**
+
+| rows shown | moved: n, top-1 | idiosyncratic: n, top-1 |
+|---|---|---|
+| 1 | 14, 32 | 19, 47 |
+| 2 | 5, 100 | 9, 94 |
+| 3 or more | 8, 100 | 27, 100 |
+
+- **Yes, the final recipe's confidence is shaken by mixed filings,** and usefully: 38% of those answers are confident against 99% on
+  consistent filings, and the confident ones are right 96% of the time. It is right on 74% of them.
+- **Misfile training (row 96) resolves mixed filings instead of hedging:** 98% right where the latest filing is the answer, 84% where
+  it is not, confident on 89%. It is the better reader of mixed filings.
+- **Its cost is the lone unexpected row.** Where the user's unusual filing shows in exactly one row, it follows the merchant's usual
+  category (32 and 47%); with two rows it follows the user (94 to 100). A misfile in training is always a lone disagreeing row, so a
+  lone row reads as a probable slip. **Correction:** sections 95 and 96 described the cost as the majority of a merchant's filings
+  against the latest ones; with the merchant matched properly the cost is this one-row case, and on mixed filings row 96 is better
+  than row 89. Section 95's count of what moves look like undercounted the rows (first-letters matching).
+- **The dangerous case for both:** the user changed the category but no row shows it yet (29 items): confident (88 to 91% at p >= 0.9)
+  and wrong (11 to 19%). Nothing in the prompt can signal it; the product has to (the change as a recorded event).
+- **Choosing.** Whether one unexpected row should be trusted depends on how often real users slip versus change their mind, which
+  synthetic data cannot say. With real histories, the rate of lone disagreeing rows that the user later reverses would set it.
+
+Tables: from `scripts/real7_tables.py`'s readers, with the multi-key merchant match (in this section's code, to be folded into the table script).
