@@ -6189,4 +6189,4 @@ several keys of its name (the full-name prefix, the vowel-dropped abbreviation, 
 - **Choosing.** Whether one unexpected row should be trusted depends on how often real users slip versus change their mind, which
   synthetic data cannot say. With real histories, the rate of lone disagreeing rows that the user later reverses would set it.
 
-Tables: from `scripts/real7_tables.py`'s readers, with the multi-key merchant match (in this section's code, to be folded into the table script).
+Tables: `uv run python scripts/real7_filing_tables.py`.
