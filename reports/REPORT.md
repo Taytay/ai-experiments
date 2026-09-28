@@ -6128,3 +6128,25 @@ the other kind: a minority among several rows of one merchant. Row 96 misfiles o
 most one misfiled row per merchant), so the majority wins and a lone row stays trusted.
 
 Job list: `scripts/modal_jobs/r95.json`.
+
+## 96. Misfiles only among three or more rows of a merchant keep the fix on ordinary items (97.3) and short histories (92.7) but still lose the moved merchants (39.2 against 57.5): noise training of any kind teaches the majority of a merchant's filings, and a genuine move is the latest filings against an older majority. From the prompt alone the two conflict; the product needs dates or an explicit change signal (REAL-11)
+
+PLAN step 96. The final recipe with `SHOT_NOISE=0.15 SHOT_NOISE_MAJ=1` (`exp_categoriser.py`: a shot is misfiled only when its merchant
+has three or more shots, at most one per merchant; about 4% of shot labels), two seeds.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category | idiosyncratic |
+|---|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 | 38.8 |
+| + shot noise 0.04 (row 94) | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 | 36.8 |
+| + majority-only misfiles | 82.1 | 97.3 | 92.7 | 39.2 | 39.8 | 34.5 |
+
+REAL-6 89.6 / 88.3, novel names 90.3 / 86.9, override 99.7 / 99.4, alternation 68.2 / 69.5: no cost elsewhere. Section 95's count of
+what a move looks like matched the merchant by the first letters of the statement string and missed abbreviated renderings, so it
+undercounted the old rows: moved merchants are frequent, and their shots mostly hold older rows under the old category before the new
+ones. The conflict is then the majority of a merchant's filings (what noise training teaches, and what a slip needs) against the
+latest ones (what a move needs). With one or two new rows and no dates, the prompt cannot tell them apart; the final recipe (no noise)
+and the noise-trained ones sit at the two ends. Candidate fixes are outside the prompt as built: dates on the shots, the user's change
+of a merchant's category as an event the product records, or the lookup's recency rule in front of the model. This line stops here;
+the recipe stays as section 89 (no shot noise), with the trade-off stated.
+
+Job list: `scripts/modal_jobs/r96.json`.
