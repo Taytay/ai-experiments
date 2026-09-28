@@ -27279,7 +27279,7 @@
 " Utilities"
 ],
 "answer": 7,
-"best": 7,
+"best": 10,
 "scheme": "default",
 "why": "random_split",
 "in_shots": true,
@@ -35507,7 +35507,7 @@
 " Treat yourself"
 ],
 "answer": 12,
-"best": 12,
+"best": 7,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": true,
@@ -35663,7 +35663,7 @@
 " Kid stuff"
 ],
 "answer": 9,
-"best": 9,
+"best": 8,
 "scheme": "light",
 "why": "random_split",
 "in_shots": false,
@@ -35741,7 +35741,7 @@
 " Kid stuff"
 ],
 "answer": 9,
-"best": 9,
+"best": 8,
 "scheme": "light",
 "why": "random_split",
 "in_shots": false,
@@ -38184,7 +38184,7 @@
 " Date night"
 ],
 "answer": 12,
-"best": 12,
+"best": 1,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": false,
@@ -40183,7 +40183,7 @@
 " Self care"
 ],
 "answer": 13,
-"best": 13,
+"best": 4,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": false,
@@ -45498,7 +45498,7 @@
 " Date night"
 ],
 "answer": 13,
-"best": 13,
+"best": 4,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": false,
@@ -45698,7 +45698,7 @@
 " Date night"
 ],
 "answer": 4,
-"best": 4,
+"best": 13,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": true,
@@ -50675,7 +50675,7 @@
 " Hobby"
 ],
 "answer": 12,
-"best": 12,
+"best": 8,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": false,
@@ -52135,7 +52135,7 @@
 " Weekend fun"
 ],
 "answer": 3,
-"best": 3,
+"best": 12,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": true,
@@ -54255,7 +54255,7 @@
 " Hobby"
 ],
 "answer": 13,
-"best": 13,
+"best": 0,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": false,
@@ -55601,7 +55601,7 @@
 " Big purchases"
 ],
 "answer": 12,
-"best": 12,
+"best": 7,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": false,
@@ -58049,7 +58049,7 @@
 " Date night"
 ],
 "answer": 12,
-"best": 12,
+"best": 3,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": false,
@@ -61796,7 +61796,7 @@
 " Self care"
 ],
 "answer": 14,
-"best": 14,
+"best": 7,
 "scheme": "custom",
 "why": "rule_day",
 "in_shots": false,
@@ -62622,7 +62622,7 @@
 " Big purchases"
 ],
 "answer": 12,
-"best": 12,
+"best": 0,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": false,
@@ -62739,7 +62739,7 @@
 " Big purchases"
 ],
 "answer": 12,
-"best": 12,
+"best": 0,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": false,
@@ -62778,7 +62778,7 @@
 " Big purchases"
 ],
 "answer": 0,
-"best": 0,
+"best": 12,
 "scheme": "light",
 "why": "rule_day",
 "in_shots": true,
@@ -65036,7 +65036,7 @@
 " Treat yourself"
 ],
 "answer": 12,
-"best": 12,
+"best": 1,
 "scheme": "light",
 "why": "rule_amount",
 "in_shots": true,
@@ -67857,5 +67857,5 @@
 "record": "Sabstead Bros is a store that sells natural gas service, cable TV packages and water bills."
 }
 ],
-"sha256": "540b8eac2e58e9720fb94f3e8e2c882089441b9ccdc089d52d1240aa0e6800cc"
+"sha256": "7cf09f43b5974cc00b8617ca4a86b862d2e42f8a9474fbd7d2f0699439f34300"
 }

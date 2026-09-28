@@ -165,7 +165,7 @@ if __name__ == "__main__":
             in_hist = any(h["merchant"] == q["merchant"] for h in hist)
             lookup = cats[same[-1]["filed"]]["name"] if same else None
             # the best answer from what the prompt shows
-            if q["rule_best"] is not None:
+            if q["rule_best"] is not None and len(same) >= 2:  # a rule or split is readable only with two or more of the merchant's rows shown
                 best = q["rule_best"]
             elif same:
                 best = same[-1]["filed"]  # the latest visible filing (the recency rule; a misfiled latest row is not visible as such)

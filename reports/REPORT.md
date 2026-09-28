@@ -6017,3 +6017,72 @@ novel names 83.6 / 89.3 (inside the seed spread). The recipe keeps `ALT_DAYS` un
 more rows of the merchant in the prompt, or a larger share of day-rule episodes.
 
 Tables: `uv run python scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r92.json`.
+
+## 93. REAL-7, a more realistic synthetic population: REAL-6-trained decider-4B readers score 82 of a 84.8 ceiling zero-shot on 200 new users (untrained 51); the final recipe gains where its training applies (a merchant moved mid-year 38 to 58, idiosyncratic merchants 33 to 39) and loses 3 points on ordinary items and 8 on 25-row histories, most likely by trusting a single misfiled row, since REAL-6 never had one (REAL-11)
+
+PLAN step 93, the first version of row 43 (the owner, 2026-09-27: a more realistic synthetic set). `build_real7.py` writes `real7_v1`
+in REAL-6's prompt format: 200 users none of the readers has seen, about 55% on the default scheme ("Dining Out", "Transportation"),
+30% lightly customised (a few renames, personal categories such as "Date night" that take a merchant's transactions by amount or day)
+and 15% with REAL-6's custom schemes; about 8% of a customising user's merchants filed under another category for their own reasons;
+a year of spending with the 24 most recent rows shown; a merchant moved to another category mid-year (the latest filing wins) and a
+new category created mid-year; 3% of history rows misfiled; one merchant split at random for a tenth of users; a quarter of users
+queried with 0, 5 or 25 rows of history; 30% of queries in a statement family held out of every template; overlapping amounts. Each
+item's `best` is the answer a reader that knew the generator would give from what the prompt shows (a split rule only when two or
+more of the merchant's rows are shown); the ceiling is 84.8. At build: the merchant is in the shots for 54% of items (a lookup of its
+latest row is right on 93.7% of those), and 32% are decided by the merchant's category. Scoring only; the per-option Qwen reader's
+script needs REAL-6's per-user histories and did not run.
+
+**Table 93.1: REAL-7 v1, 200 new users, 1,200 items; ceiling 84.8 (the per-item best answer)**
+
+| reader | seeds | top-1 | % of ceiling | default | light | custom | p >= 0.9: share (precision) |
+|---|---|---|---|---|---|---|---|
+| decider-4B untrained | 1 | 50.9 | 60.0% | 57.2 | 43.3 | 44.6 | 31.3 (83.8) |
+| decider-4B, row 81 recipe | 1 | 82.4 | 97.2% | 89.9 | 78.0 | 65.6 | 98.0 (83.1) |
+| decider-4B, + random labels (row 84 control) | 1 | 82.1 | 96.8% | 89.3 | 77.2 | 67.2 | 98.5 (82.8) |
+| decider-4B, final recipe (row 89) | 2 | 82.0 [81.5, 82.4] | 96.6% | 88.8 [88.3, 89.3] | 77.7 [77.2, 78.2] | 66.9 [66.7, 67.2] | 90.9 (85.0) |
+
+**Table 93.2: top-1 by what decides the item**
+
+| reader | plain (n=867, ceiling 98) | idiosyncratic (n=152, ceiling 40) | moved (n=60, ceiling 55) | new_category (n=49, ceiling 53) | rule_amount (n=29, ceiling 76) | rule_day (n=32, ceiling 75) | random_split (n=11, ceiling 45) |
+|---|---|---|---|---|---|---|---|
+| decider-4B untrained | 59.1 | 24.3 | 40.0 | 34.7 | 13.8 | 50.0 | 9.1 |
+| decider-4B, row 81 recipe | 98.2 | 32.9 | 38.3 | 42.9 | 62.1 | 62.5 | 54.5 |
+| decider-4B, + random labels (row 84 control) | 97.6 | 34.2 | 35.0 | 46.9 | 55.2 | 68.8 | 45.5 |
+| decider-4B, final recipe (row 89) | 95.3 [94.7, 96.0] | 38.8 [38.8, 38.8] | 57.5 [56.7, 58.3] | 45.9 [44.9, 46.9] | 60.3 [58.6, 62.1] | 57.8 [56.2, 59.4] | 45.5 [45.5, 45.5] |
+
+**Table 93.3a: top-1 by history length**
+
+| reader | long (n=906, ceiling 81) | short_25 (n=96, ceiling 94) | short_5 (n=132, ceiling 96) | short_0 (n=66, ceiling 97) |
+|---|---|---|---|---|
+| decider-4B untrained | 49.7 | 61.5 | 52.3 | 50.0 |
+| decider-4B, row 81 recipe | 78.3 | 93.8 | 95.5 | 97.0 |
+| decider-4B, + random labels (row 84 control) | 78.1 | 93.8 | 93.9 | 95.5 |
+| decider-4B, final recipe (row 89) | 78.8 [78.5, 79.1] | 85.9 [85.4, 86.5] | 93.2 [91.7, 94.7] | 97.0 [97.0, 97.0] |
+
+**Table 93.3b: top-1 by rendering and by whether the merchant is in the shots**
+
+| reader | trained rendering, in shots (n=442, ceiling 95) | held-out rendering, in shots (n=207, ceiling 95) | trained rendering, not in shots (n=392, ceiling 73) | held-out rendering, not in shots (n=159, ceiling 73) |
+|---|---|---|---|---|
+| decider-4B untrained | 72.4 | 72.5 | 23.7 | 30.2 |
+| decider-4B, row 81 recipe | 92.1 | 93.7 | 70.7 | 69.8 |
+| decider-4B, + random labels (row 84 control) | 93.2 | 91.3 | 69.6 | 69.8 |
+| decider-4B, final recipe (row 89) | 92.3 [91.6, 93.0] | 93.0 [92.3, 93.7] | 69.1 [68.4, 69.9] | 70.4 [69.8, 71.1] |
+
+### 93.1 What the step says
+
+- **Training transfers to new, messier users.** Untrained decider-4B reads 50.9; every REAL-6-trained reader 82.0 to 82.4, 95 to 97%
+  of the ceiling. Default-scheme users 89 to 90, customised 78, custom 66 to 67. The held-out rendering family costs nothing (93.0
+  against 92.3 in the shots, 70.4 against 69.1 outside), and cold starts are read from the merchant alone (0 rows: 97.0).
+- **The final recipe's training shows where it applies.** A merchant moved mid-year: 57.5 against 38.3 (the override and lookup
+  episodes: the latest filing wins); idiosyncratic merchants 38.8 against 32.9; its confident answers are fewer and more precise
+  (90.9% of items at p >= 0.9, 85.0% right, against 98.0% and 83.1%).
+- **It loses on ordinary items (95.3 against 98.2) and on 25-row histories (85.9 against 93.8).** Of the 16 ordinary items row 81's
+  reader gets and both final seeds miss, 13 have the merchant in the shots; the final reader answers with another of the user's
+  categories, often one a misfiled row gives. REAL-6 has no misfiled rows, and the override episodes taught that the user's own rows
+  of a merchant win; a single stray row now pulls the answer. Hypothesis for row 94: shot-label noise in training (a few misfiled
+  shots, their labels out of the loss) teaches the majority of the user's filings over one stray row.
+- **What REAL-7 does not show yet:** the rules and random splits are few (29 to 32 items each, 11 random), so the alternation gains of
+  section 86 are not visible here; 60 moved and 49 new-category items. A larger v2 with more event items, and training on REAL-7's
+  own users, are the next steps for row 43.
+
+Tables: `uv run python scripts/real7_tables.py`. Items: `scripts/build_real7.py`. Job list: `scripts/modal_jobs/r93.json`.
