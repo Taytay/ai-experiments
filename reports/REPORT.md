@@ -35,6 +35,12 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   choices correctly (86, 88). All of it composes in one model (88), at a cost of 5 points on novel names and some auto-file coverage
   that disappear at an alternation share of 0.1 (89). The final recipe reads REAL-6 at 91.3 over all 20 users by
   the model alone, 97% of the ceiling and level with the earlier lookup cascade (90). Its trained behaviours hold on every fold (91).
+- **REAL-7 (sections 92 to 97).** A more realistic synthetic population (200 new users, default-scheme majority, personal
+  categories, moves and new categories mid-year, misfiled rows, cold starts, a held-out statement format): REAL-6-trained readers
+  score 82 of an 84.8 ceiling zero-shot. The open trade-off is a lone unexpected filing: training with misfiled rows makes the reader
+  better on mixed filings (98) but treats a single unusual row as a slip (32 to 47), where the recipe without it trusts that row;
+  which is right depends on real users' slip rate (97). A change not yet visible in the history is confidently misread by every
+  reader: the product must record it.
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
