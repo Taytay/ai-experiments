@@ -6086,3 +6086,25 @@ script needs REAL-6's per-user histories and did not run.
   own users, are the next steps for row 43.
 
 Tables: `uv run python scripts/real7_tables.py`. Items: `scripts/build_real7.py`. Job list: `scripts/modal_jobs/r93.json`.
+
+## 94. Misfiled rows in training fix what REAL-7 exposed (ordinary items 95.3 to 97.5, 25-row histories 85.9 to 94.8) but give back the moved-merchant gain (57.5 to 35.8): one disagreeing row can be a mistake or a change, and nothing in training told them apart (REAL-11)
+
+PLAN step 94. The final recipe with `SHOT_NOISE=0.04` (`exp_categoriser.py`: each shot misfiled under another of the user's categories
+with probability 0.04, its label out of the loss), two seeds, fold 0 training users; REAL-7 zero-shot and the REAL-6-based sets.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category | idiosyncratic | p >= 0.9: share (precision) |
+|---|---|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 | 38.8 | 90.9 (85.0) |
+| + shot noise 0.04 | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 | 36.8 | 94.5 (84.2) |
+
+On the other sets: REAL-6 88.3 / 86.6, novel names 88.9 / 89.9, override 98.1 / 99.9, alternation 66.0 / 64.8 (the final recipe:
+89.9, 87.9, 98.2, about 63).
+
+The hypothesis of section 93 holds: the losses on ordinary items came from a single misfiled shot, and training with misfiled shots
+removes them. The cost is the other side of the same ambiguity: a merchant the user genuinely moved shows as one or two recent rows
+under a new category, which is what a misfile looks like, and the noise-trained reader now discounts them. REAL-7's shots are in time
+order, most recent last; a move is the latest rows switching together, a misfile an isolated row anywhere. Training never showed that
+difference (override rows land at random positions). Row 95 adds move episodes laid out in time: two early rows under the old
+category and the two most recent under the new one, the target following the new, together with the misfiled rows.
+
+Job list: `scripts/modal_jobs/r94.json`.
