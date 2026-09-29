@@ -30,7 +30,8 @@ def build(P, tok, context, question, options, gold, rng, labels="letters", max_c
         return dict(ids=b["ids"], slot=b["slots"][0], gold=b["golds"][0], perm=b["perms"][0], labs=list(P.letter_ids(tok)[:n]))
     _, lab_ids, open_ids = P.label_table(tok)
     opts = list(range(len(options))); rng.shuffle(opts)
-    labs = rng.sample(list(lab_ids[:26 if labels == "rand26" else 255]), len(opts))
+    pool = 26 if labels == "rand26" and len(opts) <= 26 else 255  # rand26 with more than 26 options (blind_v1's detailed schemes) draws from all 255
+    labs = rng.sample(list(lab_ids[:pool]), len(opts))
     ids = tok.encode("Context:\n" + context, add_special_tokens=False)[:max_ctx_tokens]
     ids += tok.encode(f"\n\nQuestion: {question}\nOptions:", add_special_tokens=False)
     for lab, oi in zip(labs, opts):
