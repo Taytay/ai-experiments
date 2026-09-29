@@ -57,6 +57,10 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   - *Labels (105):* readers must be trained on as many options as users have categories (27% of blind items exceed 26).
   - *The recipe and system (107):* row 89 + 255 labels + empty categories; history rule, then the encoder auto-files, then decider
     (blind effort 0.59 to 0.63 against 0.69 for decider alone).
+  - *Knowledge for the encoder (108 to 110):* real Overture business names as training episodes lift Ettin-1B on unknown real
+    businesses from 30 to 73 (decider's level); with empty categories it reads blind_v1 at 79.3 and auto-files 52%; in front of decider
+    the system auto-files 62 to 65% at 97.4% and decider reads 48% of transactions (effort 0.57 to 0.60). Longer training (109) and
+    short-history episodes (110) did not help; new users (category names with nothing to copy) remain both readers' weakest group.
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
