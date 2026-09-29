@@ -7570,8 +7570,9 @@ parameters that peft's module targets do not reach: frozen, as decider's own tra
   stores less (the higher final loss says the same). Row 128 tests whether the experts (or more steps) fix it. On blind_v1 this does not
   show, because blind_v1's merchants are real chains and local names the base model already knows about.
 - **As the escalation reader, untrained is better.** Sent the 35% the small models leave, the trained 35B lifts auto-filing to 70% and
-  effort to 0.500, where the untrained one reached 73% and 0.470 (REPORT 117). Trained on the same episodes, its mistakes overlap the
-  small models' (where they disagree it is right 53.5%, about the untrained 51.4, but it agrees with them more often when they are
-  wrong), so it adds less as a second opinion. Diversity matters more than strength for the third reader.
+  effort to 0.500, where the untrained one reached 73% and 0.470 (REPORT 117), although where the small models disagree it is right
+  as often (53.5 against 51.4). The likely reason (not measured here) is that, trained on the same episodes, its confidence and mistakes
+  overlap the small models', so it adds less as a second opinion: for the third reader, being different may matter more than being
+  stronger.
 - **Where this leaves the system:** at equal cost the best is still the small pair with the untrained 35B for what they leave
   (0.470); the trained 35B alone (0.534, all transactions through a 3B-active model) is simpler and in between.
