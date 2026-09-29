@@ -30,6 +30,8 @@ DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.bu
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
 SEED = int(os.environ.get("SEED", "0"))
 AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
+LAYOUT = os.environ.get("LAYOUT", "")  # row 111 (owner, 2026-09-29): "" (decider's layout), options | labelled | labelled_shots (oneslot.build_layout)
+DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.build_layout)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
 ABSTAIN_SWAP = float(os.environ.get("ABSTAIN_SWAP", "0.25"))  # ... and in this share of those the gold category is hidden (removed from the header
@@ -47,6 +49,7 @@ C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / 
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
 SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
+SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "")
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
@@ -151,7 +154,11 @@ def main():
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
         picked = [evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
-        built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
+        if LAYOUT or DOW_FIRST:  # row 111
+            built = [oneslot.build_layout(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST,
+                                          spans=e[3] if AUX_LM else None) for e in picked]
+        else:
+            built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
         ids = torch.full((len(built), T), pad, dtype=torch.long)
         att = torch.zeros_like(ids)
@@ -174,6 +181,10 @@ def main():
         if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
             rows, pos, tgt = [], [], []
             for i, e in enumerate(picked):
+                if "aux" in built[i]:  # row 111: the layout builder located the shot-label tokens itself
+                    for t, y in built[i]["aux"]:
+                        rows.append(i); pos.append(t); tgt.append(y)
+                    continue
                 enc = tok("Context:\n" + e[0], add_special_tokens=False, return_offsets_mapping=True)
                 n = len(built[i]["ids"])
                 for t, (a0, b0) in enumerate(enc["offset_mapping"]):

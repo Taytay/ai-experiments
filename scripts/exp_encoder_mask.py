@@ -82,6 +82,8 @@ NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARC
 # query), truncated from the start when too long; any ITEMS_SET is then scored from its items' prompt text. The decoder recipe's shot-label
 # loss, soft evidence-free targets and soft splits have no counterpart here (one target per episode, hard).
 DEC_EPISODES = bool(int(os.environ.get("DEC_EPISODES", "0")))
+ENC_LAYOUT = os.environ.get("ENC_LAYOUT", "")  # row 111: "labelled_shots" labels each option and each row's category with a random two-letter label, "(AE) Pets"
+DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.dow_first)
 EVFREE = float(os.environ.get("EVFREE", "0"))  # row 102: this share of DEC_EPISODES episodes made evidence-free (the query a fresh opaque merchant), target uniform (the decoder's EVFREE_MODE=soft)
 if DEC_EPISODES:
     import sys
@@ -89,7 +91,7 @@ if DEC_EPISODES:
     _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = [")[0]
     CAT = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
     exec(compile(_src, "exp_categoriser.py", "exec"), CAT); sys.argv = _argv
-    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "") + (f"_ev{round(EVFREE * 100)}soft" if EVFREE else "")
+    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "") + (f"_ev{round(EVFREE * 100)}soft" if EVFREE else "") + (f"_lay{ENC_LAYOUT}" if ENC_LAYOUT else "") + ("_dow" if DOW_FIRST else "")
     NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
 LOAD_FROM = os.environ.get("LOAD_FROM", "")  # row 99: with STEPS=0, score a saved encoder (models/adapters/<name>) on ITEMS_SET under its own name
 if LOAD_FROM:
@@ -267,11 +269,27 @@ def dec_episodes():
         for names, body, ans, soft in eps:
             names = list(names); rng.shuffle(names)
             if soft:  # row 102: the alternation episode's true split (the decoder's ALT_SOFT)
-                yield names, None, None, body, [soft.get(n, 0.0) for n in names]
+                shown, st = restyle(names, body, rng); yield shown, None, None, st, [soft.get(n, 0.0) for n in names]
             elif EVFREE and rng.random() < EVFREE:
-                yield names, None, None, evfree_body(body), [1.0 / len(names)] * len(names)
+                shown, st = restyle(names, evfree_body(body), rng); yield shown, None, None, st, [1.0 / len(names)] * len(names)
             else:
-                yield names, None, None, body, names.index(ans)
+                shown, st = restyle(names, body, rng); yield shown, None, None, st, names.index(ans)
+
+
+def restyle(names, body, rng_):
+    """Row 111: (option display names, body) under ENC_LAYOUT / DOW_FIRST; the options keep their order."""
+    if not (ENC_LAYOUT or DOW_FIRST):
+        return names, body
+    from ai_experiments import oneslot
+    _, rows, query = oneslot.parse("Categories: " + ", ".join(names) + "\n\n" + body)
+    f = oneslot.dow_first if DOW_FIRST else (lambda x: x)
+    lab = {}
+    if ENC_LAYOUT == "labelled_shots":
+        pool = [a + b for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" for b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+        lab = dict(zip(names, rng_.sample(pool, len(names))))
+    shown = [f"({lab[n]}) {n}" if lab else n for n in names]
+    rows_t = "".join(f"Transaction: {f(fl)}\nCategory: {'(' + lab[c] + ') ' if c in lab else ''}{c}\n\n" for fl, c, _ in rows)
+    return shown, rows_t + f"Transaction: {f(query)}"
 
 
 def evfree_body(body):
@@ -355,7 +373,8 @@ def score(tok, model):
     for it in items:
         if DEC_EPISODES:
             names = [o.strip() for o in it["options"]]
-            seqs.append(encode(tok, names, None, None, state=it["prompt"][: -len("Category:")].rstrip().split("\n\n", 1)[1])); continue
+            shown, st = restyle(names, it["prompt"][: -len("Category:")].rstrip().split("\n\n", 1)[1], random.Random(it["id"]))
+            seqs.append(encode(tok, shown, None, None, state=st)); continue
         u = users[it["user"]]; by_text = {h["text"]: h for h in u["history"]}
         shots = [by_text[t] for t in u["shots"] if t in by_text]
         names = [o.strip() for o in it["options"]]

@@ -16,6 +16,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import math
 import random
 import re
@@ -32,6 +33,11 @@ WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 N_FULL, N_SHORT = 222, 28
 Q_PER_USER = 6
 SLICE_MAX, OWN_MAX, SIM_MAX, SIM_PER_PAYEE = 24, 6, 6, 2
+# row 111 (added by the main session, not the blind builder): BLIND_B48=1 writes blind_v1_b48.json, the same items with a 48-row slice
+# (similar payees up to 10); the payee's own rows stay at OWN_MAX so every item's answer and ideal-reader answer are unchanged
+if os.environ.get("BLIND_B48") == "1":
+    SLICE_MAX, SIM_MAX = 48, 10
+    OUT = OUT.with_name("blind_v1_b48.json")
 DIG = "0123456789"
 ALNUM = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"
 
@@ -2080,7 +2086,7 @@ def main():
             if ln.startswith("Transaction: "):
                 assert ln[13:23] <= it["date"]
                 assert ln.count(" | ") == 3, ln
-        assert len(it["prompt"]) < 5000, (it["id"], len(it["prompt"]))
+        assert len(it["prompt"]) < (10000 if SLICE_MAX > 24 else 5000), (it["id"], len(it["prompt"]))
     notes = (
         "Blind v1: 250 simulated budgeting-app users over calendar 2025 (222 with up to a year of history, some joining "
         "Feb-Jun; 28 new users who joined in Nov-Dec and are queried on their first 0-10 transactions). Schemes: default "

@@ -130,6 +130,7 @@ ALT_DAYS = os.environ.get("ALT_DAYS", "")  # row 92: "rand" draws each day rule'
 ALT_SOFT = os.environ.get("ALT_SOFT", "") == "1"  # row 86 v2: noisy / random alternation targets as their true split (SOFT[prompt]), rules drawn evenly
 SOFT = {}  # row 86 v2: prompt -> {answer name: probability}; read by exp_decider_finetune.py
 ALT_NAMES = ["Splurges", "Gifts", "Hobby time", "Self care", "Weekend treats", "Family outings", "Big buys", "Little luxuries", "Brunch club", "Game night"]
+NSHOTS = int(os.environ.get("NSHOTS", "24"))  # row 111 (owner, 2026-09-29): history rows per episode (48: twice the context)
 KINDS = float(os.environ.get("KINDS", "0"))  # row 109: this share of episodes adds 1 to 3 categories of kinds outside the twelve (ai_experiments.kinds)
 SHORT = float(os.environ.get("SHORT", "0"))  # row 108: this share of episodes keeps only 0 to 10 of its shots (a new user; every episode had 24 before)
 OVDB = float(os.environ.get("OVDB", "0"))  # row 107: this share of episodes gets its target and four shots from real Overture businesses (overture_pool_v1)
@@ -151,7 +152,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}{f'_sh{NSHOTS}' if NSHOTS != 24 else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -376,11 +377,11 @@ def sft_examples(per_user=150):
                 rng.shuffle(others)
             else:
                 pool = [j for j in rows if j != i and not (unseen and hist[j]["basic"] == h["basic"])]
-                others = [hist[j] for j in rng.sample(pool, min(24, len(pool)))]
+                others = [hist[j] for j in rng.sample(pool, min(NSHOTS, len(pool)))]
             if DBEP and rng.random() < DBEP:  # row 57: a database episode (8 shots and the target from the fact DB; row 66: the places DB)
                 others = list(others)
                 row = (lambda: poi_db_row(u, rng)) if POI else (lambda: db_row(u, rng, DB_NAMES))
-                for j in rng.sample(range(len(others)), min(8, len(others))):
+                for j in rng.sample(range(len(others)), min(NSHOTS // 3, len(others))):
                     r = row()
                     if r is not None:
                         others[j] = r
@@ -481,7 +482,7 @@ def sft_examples(per_user=150):
         for k in range(DB_EPISODES):
             u = rng.choice(users)
             hist = [x for x in u["history"] if x["merchant"] not in DB_ONLY]
-            others = rng.sample(hist, min(24, len(hist)))
+            others = rng.sample(hist, min(NSHOTS, len(hist)))
             for j in rng.sample(range(len(others)), min(8, len(others))):
                 r = db_row(u, rng, DB_NAMES)
                 if r is not None:

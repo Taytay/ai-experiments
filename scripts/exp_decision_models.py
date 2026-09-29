@@ -39,6 +39,8 @@ from ai_experiments.real6_eval import write_recs
 
 FAMILY, MODEL = os.environ["FAMILY"], os.environ["MODEL"]
 ITEMS_SET = os.environ.get("ITEMS_SET", "")
+LAYOUT = os.environ.get("LAYOUT", "")  # row 111: oneslot.build_layout (options | labelled | labelled_shots); read with the layout the adapter was trained on
+DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"
 CONDS = os.environ.get("CONDS", "noctx").split(",")
 SMOKE = bool(os.environ.get("SMOKE"))
 TEMP = float(os.environ.get("TEMP", "1.0"))
@@ -56,7 +58,7 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}"
+TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_lay' + LAYOUT if LAYOUT else ''}{'_dow' if DOW_FIRST else ''}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}"
 
 
 def state_of(it, cond):
@@ -95,7 +97,10 @@ def decider():
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            built = [oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
+            built = [oneslot.build_layout(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
+                                          random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST)
+                     if LAYOUT or DOW_FIRST else
+                     oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
                                    random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS) for it in chunk]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64  # as decider's own collate: few shapes for fla's per-shape tuning
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
