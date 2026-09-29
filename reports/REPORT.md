@@ -7405,7 +7405,7 @@ transactions at the end with a placeholder answer each?). One H100, decider-4B w
   The answers are the uncached split layout's: the top category agrees on 99.2 to 99.6% and the log-probabilities differ by at most 0.33
   (bf16 rounding between one long and two shorter passes). The saving grows with the sync (30 transactions: 20.9 ms each).
 - **The split layout itself is free.** Read uncached it costs the same time as today's layout (16 more tokens for two headers) and reads
-  the same (82.5 against 82.4 on blind_v1, REPORT 118's row 118 arm); on these 24 syncs it is 0.8 to 1.2 points under today's layout
+  the same on blind_v1 (the same rows reordered: 82.6 / 82.4 over two seeds against 82.5; row 118); on these 24 syncs it is 0.8 to 1.2 points under today's layout
   zero-shot (the recipe never saw the headers), which the trained arm of row 118 addresses.
 - **One prompt with every transaction is faster still and not free.** One forward pass for the whole sync (13 to 16 ms per transaction)
   beats the cache (no copying, no padding), but each transaction then sees the earlier ones with their slots unanswered, which the
