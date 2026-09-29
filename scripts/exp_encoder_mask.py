@@ -43,7 +43,7 @@ from ai_experiments.real6_eval import summarize, write_recs
 
 ARCH = os.environ.get("ARCH", "mask"); assert ARCH in ("mask", "gliclass", "mbinstruct")
 INIT = os.environ.get("INIT", {"mask": "mbert", "gliclass": "large", "mbinstruct": "instruct"}[ARCH])
-assert INIT in {"mask": ("mbert", "laya", "hops", "von"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
+assert INIT in {"mask": ("mbert", "laya", "hops", "von", "ettin1b", "eurobert"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
 SMOKE = bool(os.environ.get("SMOKE"))
 STEPS = 3 if SMOKE else int(os.environ.get("STEPS", "1500"))
 BATCH, LR, HEAD_LR = int(os.environ.get("BATCH", "16")), float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
@@ -56,7 +56,7 @@ SEED = int(os.environ.get("SEED", "0"))
 RUN_TAG = os.environ.get("RUN_TAG", "")
 OBJ = os.environ.get("OBJ", "ce")  # row 68 (MODEL-9): ce | ls (label smoothing 0.1 over the valid options) | logsph (log score + spherical score, Laya's
 assert OBJ in ("ce", "ls", "logsph", "brier")  # bounded proper score with its exact gradient) | brier (ce + the Brier score, as decider / kev offer)
-BASE = {"mask": "answerdotai/ModernBERT-large", "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
+BASE = {"mask": {"ettin1b": "jhu-clsp/ettin-encoder-1b", "eurobert": "EuroBERT/EuroBERT-2.1B"}.get(INIT, "answerdotai/ModernBERT-large"), "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MBI_IDS = os.environ.get("MBI_IDS", "letters"); assert MBI_IDS in ("letters", "unused")
 MBI_SHOTLAB = bool(int(os.environ.get("MBI_SHOTLAB", "0")))  # row 69: each shot's label carries its option ID ("-> H: Grendo"), so the ID is bound in the shots
@@ -77,8 +77,25 @@ SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'
 HOPS_FROM = os.environ.get("HOPS_FROM", "v2_options_k1-3_st3000")  # INIT=hops: which row 71 encoder (models/adapters/hops_enc_<HOPS_FROM>)
 INIT_TAG = INIT if INIT != "hops" else "hops-" + HOPS_FROM.replace("_st3000", "").replace("_", "-")
 NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
+# row 99 (MODEL-17): DEC_EPISODES=1 trains on exactly the episodes the decoder recipe trains on (exp_categoriser.py's builder under the same
+# env: DBEP, RENAME, MISLEAD, LOOKUP, OVERRIDE, ALT, ...), the state being the episode's prompt text after its header (shots, then the
+# query), truncated from the start when too long; any ITEMS_SET is then scored from its items' prompt text. The decoder recipe's shot-label
+# loss, soft evidence-free targets and soft splits have no counterpart here (one target per episode, hard).
+DEC_EPISODES = bool(int(os.environ.get("DEC_EPISODES", "0")))
+if DEC_EPISODES:
+    import sys
+    os.environ.setdefault("LLM_BASE", "Qwen/Qwen3.5-2B"); _argv = sys.argv; sys.argv = [sys.argv[0], "llm", "none"]
+    _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = [")[0]
+    CAT = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
+    exec(compile(_src, "exp_categoriser.py", "exec"), CAT); sys.argv = _argv
+    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "")
+    NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
+LOAD_FROM = os.environ.get("LOAD_FROM", "")  # row 99: with STEPS=0, score a saved encoder (models/adapters/<name>) on ITEMS_SET under its own name
+if LOAD_FROM:
+    assert not STEPS; NAME = LOAD_FROM
 COND = "ctx" if CTX else "noctx"
 rng = random.Random(SEED); torch.manual_seed(SEED)
+CLS = SEP = None  # set by load_model from the tokenizer (EuroBERT has no [CLS] / [SEP]: its bos / eos)
 
 
 class DecisionModel(nn.Module):
@@ -128,13 +145,18 @@ def load_model():
         from gliclass import GLiClassModel
         tok = AutoTokenizer.from_pretrained(BASE, add_prefix_space=True)
         return tok, GLiClassScorer(GLiClassModel.from_pretrained(BASE)).cuda()
-    tok = AutoTokenizer.from_pretrained(BASE)
+    remote = INIT == "eurobert"  # EuroBERT ships its model code (Apache-2.0)
+    tok = AutoTokenizer.from_pretrained(BASE, trust_remote_code=remote)
+    global CLS, SEP
+    CLS = tok.cls_token_id if tok.cls_token_id is not None else tok.bos_token_id
+    SEP = tok.sep_token_id if tok.sep_token_id is not None else tok.eos_token_id
+    assert CLS is not None and SEP is not None and tok.mask_token_id is not None, (CLS, SEP, tok.mask_token_id)
     if ARCH == "mbinstruct":
         mlm = AutoModelForMaskedLM.from_pretrained(BASE, attn_implementation="sdpa"); mlm.config.reference_compile = False
         ids = [tok(" " + c, add_special_tokens=False)["input_ids"] if MBI_IDS == "letters" else [tok.convert_tokens_to_ids(c)] for c in OPT_IDS]
         assert all(len(i) == 1 and i[0] != tok.unk_token_id for i in ids)
         return tok, MBInstructScorer(mlm, [i[0] for i in ids]).cuda()
-    enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa")
+    enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa", trust_remote_code=remote)
     enc.config.reference_compile = False  # as Laya's inference: no torch.compile, whose recompiles per shape would swamp the latency read
     model = DecisionModel(enc)
     if INIT == "laya":
@@ -168,7 +190,7 @@ def state_text(query, shots, record, lab=lambda x: x):
     return f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {lab(s['label'])}\n" for s in shots)
 
 
-def encode(tok, names, query, shots, record=None):
+def encode(tok, names, query, shots, record=None, state=None):
     """input ids and one position per option (ARCH=mask: its [MASK]; mbinstruct: the answer [MASK], repeated; gliclass: unused); the
     state is truncated from the end (the last shots) when too long, the options and the answer slot never."""
     if ARCH == "gliclass":
@@ -182,12 +204,15 @@ def encode(tok, names, query, shots, record=None):
         ids = [tok.cls_token_id] + head + tail + [tok.sep_token_id]
         return ids, [ids.index(tok.mask_token_id)] * len(names)
     head = tok(INSTR, add_special_tokens=False)["input_ids"]
-    ids = [tok.cls_token_id] + head + [tok.sep_token_id]; pos = []
+    ids = [CLS] + head + [SEP]; pos = []
     for n in names:
         pos.append(len(ids)); ids += [tok.mask_token_id] + tok(" " + n, add_special_tokens=False)["input_ids"][:24]
-    ids.append(tok.sep_token_id)
-    st = tok(state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
-    return ids + st + [tok.sep_token_id], pos
+    ids.append(SEP)
+    if state is not None:  # DEC_EPISODES: the prompt text, the query last, so the oldest rows go first when too long
+        st = tok(state, add_special_tokens=False)["input_ids"]; st = st[max(0, len(st) - max(0, MAXLEN - len(ids) - 1)):]
+    else:
+        st = tok(state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
+    return ids + st + [SEP], pos
 
 
 def collate(tok, batch):
@@ -207,6 +232,19 @@ def train_episodes():
         q = rng.choice(hist); others = rng.sample([h for h in hist if h is not q], min(24, len(hist) - 1))
         names = [c["name"] for c in u["categories"]]; rng.shuffle(names)
         yield names, q, others, (DBREC.get(q["merchant"]) if CTX else None), names.index(q["label"])
+
+
+def dec_episodes():
+    """DEC_EPISODES: (names, None, None, state text, gold) from exp_categoriser.py's episodes, cycled in random order."""
+    eps = []
+    for e in CAT["sft_examples"]():
+        prompt, ans = e[0], e[1].strip()
+        head, body = prompt[: -len("Category:")].rstrip().split("\n\n", 1)
+        eps.append((head[len("Categories: "):].split(", "), body, ans))
+    print(f"   {len(eps)} decoder-recipe episodes", flush=True)
+    while True:
+        names, body, ans = rng.choice(eps); names = list(names); rng.shuffle(names)
+        yield names, None, None, body, names.index(ans)
 
 
 def objective(z, y):
@@ -234,10 +272,10 @@ def train(tok, model):
     opt = torch.optim.AdamW([dict(params=enc, lr=LR), dict(params=rest, lr=HEAD_LR)], weight_decay=0.01)
     warm = max(1, STEPS // 20)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warm) * max(0.0, 1 - s / STEPS))
-    gen = train_episodes(); model.train(); t0 = time.time(); losses = []
+    gen = dec_episodes() if DEC_EPISODES else train_episodes(); model.train(); t0 = time.time(); losses = []
     for step in range(STEPS):
         eps = [next(gen) for _ in range(BATCH)]
-        ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
+        ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, None, r) if DEC_EPISODES else encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(ids, att, pos, pm)
         loss = objective(logits.float(), torch.tensor([y for *_, y in eps]).cuda())
@@ -259,6 +297,9 @@ def score(tok, model):
         items = items[::20]
     recs, seqs = [], []
     for it in items:
+        if DEC_EPISODES:
+            names = [o.strip() for o in it["options"]]
+            seqs.append(encode(tok, names, None, None, state=it["prompt"][: -len("Category:")].rstrip().split("\n\n", 1)[1])); continue
         u = users[it["user"]]; by_text = {h["text"]: h for h in u["history"]}
         shots = [by_text[t] for t in u["shots"] if t in by_text]
         names = [o.strip() for o in it["options"]]
@@ -285,10 +326,14 @@ def score(tok, model):
 
 
 if __name__ == "__main__":
-    cfg = dict(arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
+    cfg = dict(dec_episodes=DEC_EPISODES, load_from=LOAD_FROM, arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()
+        if LOAD_FROM:
+            from safetensors.torch import load_file
+            missing, unexpected = model.load_state_dict(load_file(ROOT / "models" / "adapters" / LOAD_FROM / "model.safetensors"), strict=False)
+            assert not unexpected and not missing, (missing[:5], unexpected[:5])
         stats = train(tok, model) if STEPS else {}
         recs, timing = score(tok, model)
         if STEPS and not SMOKE:  # after scoring, so a save failure cannot lose the results; cloned, as tied weights (the MLM decoder) cannot be saved shared

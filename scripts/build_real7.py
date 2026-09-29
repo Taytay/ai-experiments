@@ -174,7 +174,9 @@ def generate():
                 best = std[0] if len(std) == 1 else (std[0] if std else None)
             options = [" " + c["name"] for c in visible]
             hist_of[f"R7:{u:03d}:{qi:03d}"] = [dict(merchant=h["merchant"], day=h["day"], weekday=h["weekday"], amount=h["amount"], text=h["text"],
-                                                   filed=cats[h["filed"]]["name"]) for h in hist] + [dict(merchant=q["merchant"], day=q["day"], query=True)]
+                                                   filed=cats[h["filed"]]["name"]) for h in hist] + [dict(
+                merchant=q["merchant"], day=q["day"], query=True, rule_best=cats[q["rule_best"]]["name"] if q["rule_best"] is not None else None,
+                default_best=next((cats[i]["name"] for i in vis_idx if q["m"]["category"] in cats[i]["standard"]), None))]
             items.append(dict(id=f"R7:{u:03d}:{qi:03d}", level=f"R7_{kind}", user=u, merchant=q["merchant"], known=q["m"]["known"], text=qtext,
                               amount=q["amount"], weekday=q["weekday"], prompt=prompt, prompt_ctx=prompt.replace("\nCategory:", "", 0),
                               options=options, answer=vis_idx.index(q["gold"]), best=vis_idx.index(best) if best in vis_idx else -1,

@@ -1171,3 +1171,12 @@ Laya's layout with database episodes on REAL-6 and row 73's POI-1 layout, agains
 evidence-free) was built alongside the episodes that train it, and section 92 showed one augmentation teaching a prior the set
 rewarded. *Experiment:* a generator written by an agent that sees the product description and REAL-7's format but not the training
 code or episodes; the final recipe scored on it zero-shot, with a blind strong-reader ceiling. Real anonymised histories outrank it.
+
+**MODEL-18 Newer small open decoders.** The owner (2026-09-28) asked about newer decoders, Kimi among them, under open licences.
+Checked on Hugging Face (2026-09-28): Kimi K2 / K2.5 are ~1T-parameter models under a modified MIT licence (an attribution clause for
+large products), so neither the licence rule nor a per-transaction budget allows them; Kimi Linear 48B-A3B is plain MIT but 48B; Qwen
+3.6 / 3.8 exist only at 27B and 35B-A3B; LFM2 (LFM licence) and Gemma (Gemma licence) are out. Small open candidates: MiniCPM5-2B
+(Apache-2.0, 2026-09), Granite-4.0-micro (Apache-2.0), SmolLM3-3B (Apache-2.0), Phi-4-mini (MIT), Ministral-3 3B / 8B (Apache-2.0,
+but vision-language classes), Olmo-3-7B (Apache-2.0). Section 87 found 9B = 4B, so a new decoder earns its place only by matching
+decider-4B smaller or cheaper. *Experiment (row 101):* the final recipe on MiniCPM5-2B, Granite-4.0-micro, SmolLM3-3B and Phi-4-mini,
+one seed, every set.

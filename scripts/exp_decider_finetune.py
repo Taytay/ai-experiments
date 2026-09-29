@@ -136,7 +136,8 @@ def main():
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda()
     lm.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False}); lm.enable_input_require_grads()
     torch.manual_seed(SEED)
-    targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "out_proj"]
+    targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "out_proj",
+               "qkv_proj", "gate_up_proj", "input_linear", "output_linear"]  # row 99b: Phi-3 fused and Granite 4 names
     model = get_peft_model(lm, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
     head_w = lm.get_output_embeddings().weight  # decider ties or not; its readout is these rows (decider/model.py)
 

@@ -1,0 +1,138 @@
+[
+ {
+  "tag": "r99-mbert",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "RUN_TAG": "h100",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "ARCH": "mask",
+   "INIT": "mbert",
+   "STEPS": "3000"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_mbert_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_mbert_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_mbert_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_mbert_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_recent uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r99-laya",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "RUN_TAG": "h100",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "ARCH": "mask",
+   "INIT": "laya",
+   "STEPS": "3000"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_recent uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r99-gli",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "RUN_TAG": "h100",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "ARCH": "gliclass",
+   "INIT": "large",
+   "STEPS": "3000"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encgli_large_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encgli_large_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encgli_large_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encgli_large_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_recent uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r99-ettin1b",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "RUN_TAG": "h100",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "ARCH": "mask",
+   "INIT": "ettin1b",
+   "STEPS": "3000"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_recent uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r99-eurobert",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "RUN_TAG": "h100",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "ARCH": "mask",
+   "INIT": "eurobert",
+   "STEPS": "6000",
+   "BATCH": "8"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_eurobert_st6000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_eurobert_st6000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_eurobert_st6000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_eurobert_st6000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10 ITEMS_SET=real7_v2_recent uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]
