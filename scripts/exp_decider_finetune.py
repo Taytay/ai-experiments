@@ -32,6 +32,7 @@ SEED = int(os.environ.get("SEED", "0"))
 AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
 LAYOUT = os.environ.get("LAYOUT", "")  # row 111 (owner, 2026-09-29): "" (decider's layout), options | labelled | labelled_shots (oneslot.build_layout)
 DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.build_layout)
+EMA = float(os.environ.get("EMA", "0"))  # row 122 (TRAIN-13): an exponential moving average of the LoRA weights (this decay per step) is what gets saved
 SPLIT = os.environ.get("SPLIT", "") == "1"  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
@@ -51,6 +52,7 @@ exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
 SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
 SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_split" if SPLIT else "")
+SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
@@ -151,6 +153,7 @@ def main():
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
+    ema = [p.detach().clone().float() for p in params] if EMA else None
     model.train(); t0 = time.time(); losses = []; n_tok = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
@@ -195,9 +198,17 @@ def main():
                 lg = F.linear(h[torch.tensor(rows, device="cuda"), torch.tensor(pos, device="cuda")], head_w).float()
                 loss = loss + AUX_LM * F.cross_entropy(lg, torch.tensor(tgt, device="cuda"))
         loss.backward(); torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
+        if EMA:
+            with torch.no_grad():
+                for e_, p_ in zip(ema, params):
+                    e_.mul_(EMA).add_(p_.detach().float(), alpha=1 - EMA)
         losses.append(loss.item())
         if step % 50 == 0 or step == STEPS - 1:
             print(f"   step {step} loss {sum(losses[-50:]) / len(losses[-50:]):.3f} ({(time.time() - t0) / 60:.1f} min)", flush=True)
+    if EMA:
+        with torch.no_grad():
+            for e_, p_ in zip(ema, params):
+                p_.copy_(e_.to(p_.dtype))
     OUT_DIR.mkdir(parents=True, exist_ok=True); model.save_pretrained(OUT_DIR)
     return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
                 peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2), adapter=str(OUT_DIR.relative_to(ROOT)), n_episodes=len(eps))
@@ -209,7 +220,7 @@ if __name__ == "__main__":
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
                poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
                abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
-               evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT)
+               evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)
