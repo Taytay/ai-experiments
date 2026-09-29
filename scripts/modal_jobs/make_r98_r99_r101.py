@@ -63,3 +63,20 @@ for pol in ("all_kind", "mix"):
         r98b.append(dict(tag=f"r98b-{pol}-s{k}", env=dict(RECIPE, MODEL="Mapika/decider-4b", RUN_TAG=tag, SEED=str(k), R7TRAIN=pol), cmds=cmds))
 json.dump(r98b, open("scripts/modal_jobs/r98b.json", "w"), indent=1)
 print("r98b", len(r98b), "jobs", r98b[0]["cmds"][1][:200])
+
+
+# row 99 again (r99b): fresh episodes on every pass (the first run cycled one draw of 2,250 and the encoders memorised it), RUN_TAG h100fresh
+def r99_jobs(run_tag, prefix):
+    out = []
+    for tag, extra in ARMS:
+        env = dict(ENC_ENV, **extra, RUN_TAG=run_tag)
+        name = subprocess.run(["uv", "run", "python", "-c", "import sys; sys.path.insert(0,'scripts'); import exp_encoder_mask as E; print(E.NAME)"],
+                              env=dict(os.environ, **env), capture_output=True, text=True).stdout.strip().splitlines()[-1]
+        sets = ["real6_v1_novel", "real7_v1", "real7_v2_all_kind", "real7_v2_recent"]
+        cmds = ["uv run --frozen python scripts/exp_encoder_mask.py"] + [f"STEPS=0 LOAD_FROM={name} ITEMS_SET={s} uv run --frozen python scripts/exp_encoder_mask.py" for s in sets]
+        out.append(dict(tag=f"{prefix}-{tag}", env=env, cmds=cmds))
+    return out
+
+
+if __name__ == "__main__" and os.environ.get("ONLY") == "r99b":
+    json.dump(r99_jobs("h100fresh", "r99b"), open("scripts/modal_jobs/r99b.json", "w"), indent=1)

@@ -145,7 +145,15 @@ def load_model():
         from gliclass import GLiClassModel
         tok = AutoTokenizer.from_pretrained(BASE, add_prefix_space=True)
         return tok, GLiClassScorer(GLiClassModel.from_pretrained(BASE)).cuda()
-    remote = INIT == "eurobert"  # EuroBERT ships its model code (Apache-2.0)
+    remote = INIT == "eurobert"  # EuroBERT ships its model code (Apache-2.0), written for transformers 4: its rope type "default" is gone in 5
+    if remote:
+        from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS
+
+        def _default_rope(config, device=None, **_):
+            base = getattr(config, "rope_theta", None) or config.rope_parameters["rope_theta"]
+            dim = getattr(config, "head_dim", None) or config.hidden_size // config.num_attention_heads
+            return 1.0 / (base ** (torch.arange(0, dim, 2, dtype=torch.int64).float().to(device) / dim)), 1.0
+        ROPE_INIT_FUNCTIONS.setdefault("default", _default_rope)
     tok = AutoTokenizer.from_pretrained(BASE, trust_remote_code=remote)
     global CLS, SEP
     CLS = tok.cls_token_id if tok.cls_token_id is not None else tok.bos_token_id
@@ -194,7 +202,8 @@ def encode(tok, names, query, shots, record=None, state=None):
     """input ids and one position per option (ARCH=mask: its [MASK]; mbinstruct: the answer [MASK], repeated; gliclass: unused); the
     state is truncated from the end (the last shots) when too long, the options and the answer slot never."""
     if ARCH == "gliclass":
-        ids = tok("".join(f"<<LABEL>>{n}" for n in names) + "<<SEP>>" + state_text(query, shots, record), truncation=True, max_length=MAXLEN)["input_ids"]
+        st = state[-6000:] if state is not None else state_text(query, shots, record)  # DEC_EPISODES: the prompt text (under ~1,200 tokens; the query ends it)
+        ids = tok("".join(f"<<LABEL>>{n}" for n in names) + "<<SEP>>" + st, truncation=True, max_length=MAXLEN)["input_ids"]
         return ids, [0] * len(names)
     if ARCH == "mbinstruct":
         assert len(names) <= len(LETTERS)
@@ -235,16 +244,22 @@ def train_episodes():
 
 
 def dec_episodes():
-    """DEC_EPISODES: (names, None, None, state text, gold) from exp_categoriser.py's episodes, cycled in random order."""
-    eps = []
-    for e in CAT["sft_examples"]():
-        prompt, ans = e[0], e[1].strip()
-        head, body = prompt[: -len("Category:")].rstrip().split("\n\n", 1)
-        eps.append((head[len("Categories: "):].split(", "), body, ans))
-    print(f"   {len(eps)} decoder-recipe episodes", flush=True)
+    """DEC_EPISODES: (names, None, None, state text, gold) from exp_categoriser.py's episode builder, each episode used once: the builder
+    is drawn again whenever its 2,250 are used up (its shots, renames and database rows are random, so no two draws share a prompt). The
+    first version cycled one fixed draw: at 3,000 x 16 that is 21 passes, and the full fine-tuned encoders memorised it (loss 1e-6)."""
+    draws = 0
     while True:
-        names, body, ans = rng.choice(eps); names = list(names); rng.shuffle(names)
-        yield names, None, None, body, names.index(ans)
+        eps = []
+        for e in CAT["sft_examples"]():
+            prompt, ans = e[0], e[1].strip()
+            head, body = prompt[: -len("Category:")].rstrip().split("\n\n", 1)
+            eps.append((head[len("Categories: "):].split(", "), body, ans))
+        draws += 1; rng.shuffle(eps)
+        if draws == 1:
+            print(f"   {len(eps)} decoder-recipe episodes per draw, drawn again when used up", flush=True)
+        for names, body, ans in eps:
+            names = list(names); rng.shuffle(names)
+            yield names, None, None, body, names.index(ans)
 
 
 def objective(z, y):
@@ -340,9 +355,14 @@ if __name__ == "__main__":
             from safetensors.torch import save_file
             d = ROOT / "models" / "adapters" / NAME; d.mkdir(parents=True, exist_ok=True)
             save_file({k: v.detach().clone().contiguous() for k, v in model.state_dict().items()}, d / "model.safetensors"); (d / "config.json").write_text(json.dumps(cfg, indent=1))
-        summ = summarize(recs); summ.update(timing)
+        path = write_recs(NAME + (f"_{ITEMS_SET}" if ITEMS_SET else ""), COND, recs, smoke=SMOKE)  # before the summary, which knows REAL-6's levels only
+        try:
+            summ = summarize(recs)
+        except (IndexError, KeyError):
+            summ = dict(R6_all=round(100 * float(np.mean([r["correct"] for r in recs])), 1), R6_all_n=len(recs))
+        summ.update(timing)
         print(f"  {NAME} {COND}: all {summ['R6_all']} (n={summ['R6_all_n']}), {timing}", flush=True)
         run.log({k: v for k, v in summ.items() if isinstance(v, (int, float))}, condition=COND)
-        run.artifact(write_recs(NAME + (f"_{ITEMS_SET}" if ITEMS_SET else ""), COND, recs, smoke=SMOKE))
+        run.artifact(path)
         out = ROOT / "results" / f"{NAME}{'_' + ITEMS_SET if ITEMS_SET else ''}{'_smoke' if SMOKE else ''}.json"
         out.write_text(json.dumps(dict(config=cfg, train=stats, **{COND: summ}), indent=1)); run.artifact(out)
