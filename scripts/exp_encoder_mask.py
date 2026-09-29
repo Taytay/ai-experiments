@@ -284,10 +284,13 @@ def restyle(names, body, rng_):
     _, rows, query = oneslot.parse("Categories: " + ", ".join(names) + "\n\n" + body)
     f = oneslot.dow_first if DOW_FIRST else (lambda x: x)
     lab = {}
-    if ENC_LAYOUT == "labelled_shots":
+    if ENC_LAYOUT in ("labelled_shots", "json_labelled", "yaml_labelled"):
         pool = [a + b for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" for b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
         lab = dict(zip(names, rng_.sample(pool, len(names))))
     shown = [f"({lab[n]}) {n}" if lab else n for n in names]
+    if ENC_LAYOUT in ("json_labelled", "yaml_labelled"):  # row 113: the rows as JSON lines / a YAML list, categories labelled as the options
+        text, _ = oneslot.records_text(ENC_LAYOUT[:4], rows, query, lab)
+        return shown, text + "?\n</new_transaction>" if ENC_LAYOUT == "yaml_labelled" else text[:-1] + '?"}\n</new_transaction>'
     if ENC_LAYOUT == "table":  # row 111b (owner, 2026-09-29): the history as a TSV table in <historical_transactions>, the query as a one-row table
         C = oneslot._cells
         dated = bool(C(query)[0]) or any(C(fl)[0] for fl, _, _ in rows)

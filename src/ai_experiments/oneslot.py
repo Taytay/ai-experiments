@@ -53,6 +53,10 @@ def build(P, tok, context, question, options, gold, rng, labels="letters", max_c
 #   table_labelled   the labelled category list at the top, the category cells written " (FX) Transportation", the query's category cell
 #                    open: "... <amount>\t (" with the answer slot there. A cell starts with a space: "\t(" + label merges into "(A" + "E"
 #                    for 209 of the 255 labels, "\t (" + label is clean for all of them.
+#   json_labelled    (owner, 2026-09-29) the labelled list at the top, the history as JSON objects one per line in <historical_transactions>
+#                    ({"date", "description", "amount", "weekday", "category": "(FX) Transportation"}), the query as one object in
+#                    <new_transaction> ending '"category": "(' (the label follows the token ' "(' cleanly for all 255 labels)
+#   yaml_labelled    the same as a YAML list of records ("  category: (FX) Transportation"; descriptions quoted), the query ending "  category: ("
 # dow_first moves the weekday next to the date: "Transaction: 2025-01-19 | Fri | TST* BARTELL DRUGS | $60.43".
 # Tokenization (checked on the Qwen3.5 tokenizer for all 255 labels): after "- (" and "Category: (" every label is one token, the same
 # id as the answer slot reads; "\n(AE" at a line start would merge into "(A" + "E", which this layout never writes.
@@ -101,6 +105,14 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     f = dow_first if dow else (lambda x: x)
     in_loss = (lambda st: any(s <= st < e for s, e in spans)) if spans is not None else (lambda st: False)
     parts, targets = [], []  # text pieces; char ranges of trained label text
+    if layout in ("json_labelled", "yaml_labelled"):
+        body, targets = records_text(layout[:4], rows, query, lab_of, in_loss)
+        head = "Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}\n" for oi in opts) + "\n"
+        text = head + body; targets = [(a + len(head), b + len(head)) for a, b in targets]
+        enc = tok(text, add_special_tokens=False, return_offsets_mapping=True)
+        ids, offs = list(enc["input_ids"]), enc["offset_mapping"]
+        aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and any(s < b and a < e for s, e in targets)]
+        return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
     if layout in ("table", "table_labelled"):
         return _build_table(P, tok, names, rows, query, question, options, gold, opts, labs, lab_of, open_ids, layout, in_loss)
     if layout == "options":
@@ -169,3 +181,28 @@ def _build_table(P, tok, names, rows, query, question, options, gold, opts, labs
     else:
         ids += tok.encode(" (", add_special_tokens=False)  # the open category cell: the answer slot reads the label token after " ("
     return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
+
+
+def records_text(fmt, rows, query, lab_of, in_loss=lambda st: False):
+    """Row 113: the history and the query as JSON lines or a YAML list (text ending where the query's label goes), and the char ranges of
+    the trained category values. lab_of: category name -> label (an empty dict writes names without labels)."""
+    import json as _json
+    dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
+    cat = lambda c: (f"({lab_of[c]}) {c}" if c in lab_of else c)  # noqa: E731
+    parts, targets = ["<historical_transactions>\n"], []
+
+    def rec(f, c=None):
+        d, dow, desc, amt = _cells(f)
+        if fmt == "json":
+            head = "{" + (f'"date": "{d}", ' if dated else "") + f'"description": {_json.dumps(desc, ensure_ascii=False)}, "amount": {amt}, "weekday": "{dow}", "category": "'
+            return head, (cat(c) + '"}\n') if c is not None else None
+        head = (f"- date: {d}\n  " if dated else "- ") + f"description: {_json.dumps(desc, ensure_ascii=False)}\n  amount: {amt}\n  weekday: {dow}\n  category: "
+        return head, (cat(c) + "\n") if c is not None else None
+    for f, c, st in rows:
+        head, tail = rec(f, c); parts.append(head)
+        if in_loss(st):
+            n = sum(len(x) for x in parts); targets.append((n, n + len(tail) - 1))
+        parts.append(tail)
+    head, _ = rec(query)
+    parts.append("</historical_transactions>\n\n<new_transaction>\n" + head + "(")
+    return "".join(parts), targets
