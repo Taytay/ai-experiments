@@ -1173,6 +1173,7 @@ Laya's layout with database episodes on REAL-6 and row 73's POI-1 layout, agains
 evidence-free) was built alongside the episodes that train it, and section 92 showed one augmentation teaching a prior the set
 rewarded. *Experiment:* a generator written by an agent that sees the product description and REAL-7's format but not the training
 code or episodes; the final recipe scored on it zero-shot, with a blind strong-reader ceiling. Real anonymised histories outrank it.
+**Status (2026-09-29):** PLAN step 100, REPORT.md 103: blind_v1 (built by a subagent from the product description only): decider-4B row 89 82.0 (93% of the 87.9 ceiling), auto-files 51% at 97.7%; row 98's REAL-7 training does not transfer; encoders 77.5.
 
 **MODEL-18 Newer small open decoders.** The owner (2026-09-28) asked about newer decoders, Kimi among them, under open licences.
 Checked on Hugging Face (2026-09-28): Kimi K2 / K2.5 are ~1T-parameter models under a modified MIT licence (an attribution clause for

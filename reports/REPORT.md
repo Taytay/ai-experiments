@@ -6501,3 +6501,71 @@ the two "+ dated REAL-7 slices" rows); mean [range] over two seeds where run; ms
 
 Tables: `uv run python scripts/rematch_tables.py`. Job lists: `scripts/modal_jobs/r99.json`, `r99b.json`, `r99c.json`. Models
 `models/adapters/enc*_h100fresh*` (DVC).
+
+
+## 103. A test set built blind to every training generator: decider-4B with the final recipe reads 82.0 (93% of the 87.9 ceiling; blind Opus 91% on a sample) and still auto-files 51% at 97.7%; the dated REAL-7 training of section 101 does not carry its gains (81.0, auto-filing 1%), so the recipe stays row 89's; the encoders read 77.5, level with decider on the user's own patterns and far behind on new users and new merchants (world knowledge); Granite-4.0-micro collapses on users with more than 26 categories (EVAL-11)
+
+PLAN step 100 (the review of 2026-09-28: every behaviour set was built with the training episodes that fix it, and REAL-7 became
+in-distribution for section 101's reader). A subagent given only the product description and the prompt format, and forbidden to read
+the repository's code, data or reports, wrote `scripts/build_blind_v1.py` and `blind_v1`: 250 users over 2025 (six scheme kinds from
+YNAB-like defaults to 35 to 45 detailed or 5 to 7 minimal categories, personal names such as "Food we cook" and "Kid 1"), about 250 real
+chains and billers plus invented local businesses, six bank rendering styles per user, recurring bills and payroll, income and refunds
+as negative amounts, Venmo / Zelle, gas stations that sell snacks, trips, a wedding, categories created mid-year, changes of mind,
+2 to 6% misfiled rows, new users with 0 to 10 rows; the production history slice (section 101); 1,500 queries. Its `best` is the
+builder's own rule-based ideal reader (ceiling 87.9; 118 items unknowable); a blind Opus 5.5 reader, given only the prompts of a
+stratified 120, scored 91% (the builder's ceiling on those 120: 91.7). 399 items have more than 26 options: the one-slot readers,
+trained with A..Z, then draw their labels from all 255 (`oneslot`), which only decider has seen in pre-training.
+
+**Table 103.1: blind_v1, 1,500 items (two seeds where run)**
+
+| reader | top-1 | % of ceiling | top-3 | auto-filed at 98% (precision) | items with > 26 options (399) |
+|---|---|---|---|---|---|
+| decider-4B untrained | 76.4 | 86.9% | 87.5 | 23.8 (97.5) | 78.2 |
+| **decider-4B, final recipe (row 89)** | **82.0 [81.5, 82.5]** | **93.3%** | **91.9** | **51.0 (97.7)** | 83.7 |
+| decider-4B, + dated REAL-7 slices (row 98) | 81.0 [79.8, 82.2] | 92.1% | 88.7 | 1.1 (96.2) | 83.8 |
+| Granite-4.0-micro, final recipe (row 101) | 62.5 | 71.0% | 75.5 | 0.1 | 17.5 |
+| GLiClass-large, recipe episodes (row 99) | 77.6 | 88.2% | 86.8 | 43.3 (97.5) | 83.2 |
+| Ettin-encoder 1B, recipe episodes (row 99) | 77.3 | 87.9% | 88.7 | 43.7 (97.6) | 81.5 |
+
+**Table 103.2: top-1 by what decides the item (the larger groups and the ones that separate the readers)**
+
+| why | n | ceiling | decider untrained | row 89 | row 98 | GLiClass | Ettin-1B |
+|---|---|---|---|---|---|---|---|
+| plain | 511 | 100 | 95 | 98 | 99 | 99 | 99 |
+| recurring | 208 | 100 | 99 | 98 | 97 | 100 | 98 |
+| short history (new users, 0 to 10 rows) | 168 | 80 | 60 | 65 | 62 | 35 | 40 |
+| idiosyncratic | 37 | 100 | 73 | 95 | 96 | 100 | 92 |
+| new merchant, chain | 37 | 92 | 46 | 72 | 68 | 57 | 59 |
+| new merchant, descriptive local name | 37 | 95 | 57 | 64 | 53 | 22 | 38 |
+| changed mind | 36 | 83 | 36 | 64 | 76 | 67 | 64 |
+| new category | 36 | 61 | 39 | 50 | 57 | 42 | 44 |
+| weekday split | 37 | 84 | 49 | 72 | 66 | 73 | 57 |
+| amount split | 36 | 58 | 56 | 65 | 58 | 69 | 69 |
+| trip | 36 | 92 | 58 | 65 | 64 | 67 | 64 |
+| refund | 36 | 86 | 64 | 82 | 79 | 69 | 75 |
+| ambiguous P2P | 37 | 14 | 16 | 18 | 23 | 24 | 19 |
+
+### 103.1 What the step says
+
+- **The recipe transfers.** On a population, merchant universe, rendering and behaviour set it never saw, decider-4B with the row 89
+  recipe reads 82.0, 93% of the ceiling, 5.6 points over the untrained model, and its calibrated confidence still auto-files half the
+  transactions at 97.7%. Its misses are where the builder's own ideal reader also struggles or where a reader must know the world: new
+  users (65 of 80), local businesses never seen (64 of 95), trips (65 of 92).
+- **Section 101's REAL-7 training does not transfer as a whole.** It keeps its one real gain, reading a change through the dates
+  (changed mind 64 to 76, new category 50 to 57), but loses elsewhere (new descriptive merchants 64 to 53) and its confidence no longer
+  supports auto-filing (p >= 0.99 on 612 items at 94% precision, against 1,052 at 95.7% for row 89). The 48% auto-filed at 97.8% of
+  section 101 was calibration to the REAL-7 generator. **Decision:** the recipe stays row 89's; dated slices stay the prompt design
+  (sections 99 and 101 show the payee's rows and dates are what matter), and training on them needs data from more than one
+  generator (or real histories) before it is adopted.
+- **Encoders: level on the user's own patterns, behind on the world.** GLiClass and Ettin match or pass decider on plain, recurring,
+  idiosyncratic and amount-split items, and auto-file 43% at 97.5%; they fall to 35 to 40 on new users (decider 65) and 22 to 38 on new
+  local businesses (decider 64). What a 4B decoder knows about what "Harbor Bakery" or a user's "Kid 1" category is, a 400M to 1B
+  encoder does not: the owner's expectation, now measured. A production design could let an encoder file the user's known payees and
+  hand new users and new merchants to the decoder.
+- **Granite-4.0-micro fails on more than 26 categories** (17.5 on those 399 items; 11 and 20 on the detailed and family schemes): its
+  training showed only A..Z. decider handles them (84) because its own pre-training used all 255 labels. Every production reader must be
+  trained with as many options as users have (row 81: training with rand255 costs nothing).
+- **Caveats.** The ceiling is a rule-based reader's, confirmed within a point by blind Opus on a sample; one blind generator is one
+  more synthetic population, better than none and not a substitute for real histories.
+
+Tables: `uv run python scripts/blind_tables.py`. Job lists: `scripts/modal_jobs/r100.json`, `r100b.json`.
