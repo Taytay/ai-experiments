@@ -6621,3 +6621,37 @@ two seeds.
 
 Tables: `uv run python scripts/rematch_tables.py`, `uv run python scripts/blind_tables.py`. Job list: `scripts/modal_jobs/r102.json`.
 Models `models/adapters/enc*_ev10soft` (DVC).
+
+
+## 105. Options beyond 26: training with all 255 single-token labels fixes Granite on users with more than 26 categories (17.5 to 83.2; blind_v1 62.5 to 80.6) and costs decider-4B nothing (blind_v1 82.7, those items 85.7 from 84.2, auto-filed 57% from 51%); adding empty coined categories to training (up to 20) lifts novel names to 90.9 and blind auto-filing to 58%; the recipe takes rand255 + empty categories (one seed) (MODEL-16, EVAL-11)
+
+PLAN step 103. Section 103 found that 27% of blind_v1's items (users with 27 to 45 categories) are outside the A..Z labels every one-slot
+reader was trained with; decider copes because its own pre-training used 255 labels, Granite does not. Here the final recipe is
+trained with `LABELS=rand255` (a random sample of decider's 255 single-token labels per question, section 81), and in a second arm with
+`EMPTY=20` (half the episodes get 1 to 20 extra coined categories with no examples, row 74's device, so that training questions also
+reach past 26 options), on decider-4B and Granite-4.0-micro; one seed each; read with rand255 labels.
+
+**Table 105.1: top-1 (REAL-6 sets fold 0; REAL-7 and blind_v1 all users) and blind_v1's calibrated auto-filing**
+
+| reader | REAL-6 | novel names | REAL-7 v2 all_kind | blind_v1 | blind, > 26 options (399) | blind auto-filed at 98% (precision) | misleading names in the DB |
+|---|---|---|---|---|---|---|---|
+| decider-4B, rand26 (row 89, seed 0) | 89.9 | 88.6 | 88.4 | 82.5 | 84.2 | 50.8 (97.8) | 97.4 |
+| decider-4B, rand255 | 90.3 | 85.9 | 87.4 | 82.7 | 85.7 | 56.8 (97.7) | 93.4 |
+| **decider-4B, rand255 + empty categories** | 89.9 | **90.9** | 86.0 | 82.4 | **86.2** | **58.3 (97.7)** | 94.7 |
+| Granite-4.0-micro, rand26 (row 101) | 89.3 | 85.9 | 86.8 | 62.5 | 17.5 | 0.1 | 84.2 |
+| Granite-4.0-micro, rand255 | 84.9 | 81.5 | 84.6 | 80.6 | 83.2 | 23.8 (96.6) | 78.9 |
+| Granite-4.0-micro, rand255 + empty categories | 89.3 | 84.6 | 84.4 | 79.9 | 81.5 | 19.9 (98.0) | 78.9 |
+
+### 105.1 What the step says
+
+- **A one-slot reader must be trained on as many labels as users have categories.** Granite trained on A..Z reads two-letter labels
+  at 17.5; trained on all 255 it reads them at 83, and the blind set at 80.6 from 62.5.
+- **decider loses nothing by training on 255 labels, and its confidence gains.** Top-1 moves within a point everywhere (the seed spread
+  is about 3; misleading names 93 to 95 against 97 and 91 for row 89's two seeds); the blind set's calibrated 98% threshold auto-files
+  57 to 58% against 51%.
+- **Empty categories help novel names** (90.9 against 88.6 and 85.9): questions with unused coined options teach the reader not to lean
+  on a category having examples, as section 71 found for label induction.
+- **Decision:** the recipe takes `LABELS=rand255 EMPTY=20` (one seed; a second seed is in row 104's runs to come). Granite stays behind
+  decider on stored facts (misleading names 79) and is not a replacement.
+
+Job list: `scripts/modal_jobs/r103.json`.
