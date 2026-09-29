@@ -7657,3 +7657,36 @@ step, `EMA=0.99`); blind_v1, REAL-6 and novel names. `scripts/stability_tables.p
   (spread 4.8) but 62.4 to 64.1% under the per-item rule at W = 10 (spread 1.7), with effort spread 0.03: a fixed cut sits on the steep
   part of each seed's confidence distribution, where the per-item rule weighs each transaction's own costs. REPORT 109's 18-point spread
   was measured at a fixed cut too. Decision: no EMA; the per-item rule (REPORT 118) is also the stability fix.
+
+
+## 125. What decider-35B-A3B costs to serve: in vLLM on one H200 the trained 35B reads one user's sync of 30 at 20.3 ms per transaction with the prefix cache and a queue of syncs at 14.1 ms, 1.4 to 1.6 times decider-4B on an H100 (12.8 and 10.2); about $18 per million transactions against $11, and its 69 GB of weights need a large GPU of their own (INFRA-3, EVAL-12)
+
+PLAN step 130 (owner, 2026-09-29: how much does the 35B cost to train and to infer?). The trained 35B (row 125, adapter merged, bf16)
+in vLLM 0.30 on one H200, on REPORT 120's 24 syncs in the same token ids, with the same readout. `scripts/bench_vllm.py`,
+`results/bench_vllm_35b.json`, job list `scripts/modal_jobs/r130.json`.
+
+**Table 125.1: ms per transaction (top-1 on the 24 syncs in brackets); decider-4B from REPORT 120**
+
+| model, GPU | layout | prefix cache | one sync of 10 | one sync of 30 | 24 syncs at once |
+|---|---|---|---|---|---|
+| decider-4B, H100 | split | off | 28.2 | 25.5 | 24.5 |
+| decider-4B, H100 | split | on | 23.5 | **12.8** | **10.2** |
+| decider-35B-A3B trained, H200 | split | off | 37.6 (82.1) | 28.3 (83.9) | 25.0 |
+| decider-35B-A3B trained, H200 | split | on | 39.9 (82.1) | **20.3** (83.6) | **14.1** |
+| decider-35B-A3B trained, H200 | today's | on | 48.3 (80.8) | 27.2 (83.2) | 20.6 |
+
+**Training** (from the jobs' logs): decider-4B's recipe trains in 25 to 45 minutes on one H100; the 35B's in 42 minutes on one H200 (peak
+77 GiB; 57 minutes with download and scoring): a few dollars each at list prices (about $4 per H100-hour, $4.5 per H200-hour; not
+re-checked).
+
+### 125.1 What the step says
+
+- **Per transaction the 35B costs 1.4 to 1.6 times the 4B**, not the 3 to 4 times first stated in REPORT 117 (corrected there): with 3B
+  parameters active per token its compute is the 4B's, and what it adds is the routing and a larger GPU. Queued: 14.1 ms on an H200
+  (~$18 per million transactions) against 10.2 ms on an H100 (~$11).
+- **As the escalation reader** (a third of transactions) it adds about $6 per million to the 4B-and-encoder system; as the only reader it
+  is ~$18 per million. Either is small next to any hosted API; the operational cost is a second model and an 80 GB-plus GPU kept for it.
+- **A sync of 10 gains nothing from the cache on the 35B** (39.9 against 37.6 ms): concurrent requests of one short sync all compute the
+  prefix before it is cached, and the MoE layers make the duplicated prefill dearer. Syncs of 30 and queues gain (20.3, 14.1).
+- **Top-1 moves by 0.3 between cache on and off** (83.9 against 83.6 at 30): MoE routing in batched bf16 is not bit-stable across batch
+  shapes; the 4B matched to the decimal.
