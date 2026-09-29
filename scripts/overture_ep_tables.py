@@ -28,7 +28,10 @@ READERS = [("decider-4B, recipe", [lambda st, s=s: D.format(s=s, o="", set=st or
            ("decider-4B, recipe + Overture 0.05 (row 108)", [lambda st: D.format(s="", o="_odb5", set=st or "real6")]),
            ("decider-4B, recipe + Overture 0.05 + short (row 108)", [lambda st: D.format(s="", o="_odb5_short15", set=st or "real6")]),
            ("Ettin-1B, + Overture + short (row 108)", [lambda st: E.format(o="_odb20_short15", set="_" + st if st else "")]),
-           ("Ettin-1B, + Overture + short + empty (row 108)", [lambda st: E2.format(o="_odb20_short15", set="_" + st if st else "")])]
+           ("Ettin-1B, + Overture + short + empty (row 108)", [lambda st: E2.format(o="_odb20_short15", set="_" + st if st else ""),
+                                                               lambda st: E2.replace("h100fresh_", "h100freshs1_").format(o="_odb20_short15", set="_" + st if st else "")]),
+           ("decider-4B, recipe + kinds (row 109)", [lambda st, s=s: D.format(s=s, o="_kinds20", set=st or "real6") for s in ("", "s1")]),
+           ("Ettin-1B, encoder recipe + kinds (row 109)", [lambda st: E2.format(o="_odb20_short15_kinds20", set="_" + st if st else "")])]
 
 
 def fmt(v):
