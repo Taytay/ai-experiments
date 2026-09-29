@@ -1,4 +1,4 @@
-"""Tables for PLAN steps 111 and 112 (owner, 2026-09-29): prompt formats, one change at a time against the recipes (decider-4B: row 89 +
+"""Tables for PLAN steps 111 to 114 (owner, 2026-09-29): prompt formats, one change at a time against the recipes (decider-4B: row 89 +
 rand255 + empty categories; Ettin-1B: the encoder recipe with kinds), each arm trained and read in its own format (`oneslot.build_layout`,
 exp_encoder_mask.py ENC_LAYOUT / DOW_FIRST, exp_categoriser.py NSHOTS).
 
@@ -27,9 +27,11 @@ DEC = "real6_dm_decider_decider_decider-4b_none_h100bf16st800{s}_emp20_f0_" + RE
 ENC = "real6_encmask_ettin1b_st3000_h100fresh{s}_f0_decnone_h100fresh{s}_emp20_f0_" + REC + "_odb20_short15_kinds20{n}_ev10soft{lay}_{set}.noctx.jsonl"
 DEC_ARMS = [("decider, recipe (decider's layout)", "", ""), ("labelled list, ends 'Category: ('", "", "_laylabelled"),
             ("labelled list + 'Category: (AE) Pets' rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
-            ("48 rows", "_sh48", ""), ("TSV table (Options / 'Answer: (')", "", "_laytable"), ("TSV table, labelled cells, open ' (' cell", "", "_laytable_labelled")]
+            ("48 rows", "_sh48", ""), ("TSV table (Options / 'Answer: (')", "", "_laytable"), ("TSV table, labelled cells, open ' (' cell", "", "_laytable_labelled"),
+            ("JSON lines, labelled", "", "_layjson_labelled"), ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled")]
 ENC_ARMS = [("encoder, recipe", "", ""), ("labelled options and rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
-            ("48 rows", "_sh48", ""), ("TSV table", "", "_laytable")]
+            ("48 rows", "_sh48", ""), ("TSV table", "", "_laytable"), ("JSON lines, labelled", "", "_layjson_labelled"),
+            ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled")]
 SEEDS = ("", "s1", "s2")
 
 
