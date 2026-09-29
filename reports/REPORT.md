@@ -67,6 +67,8 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   - *Prompt format (113):* writing each history row's category with its option label ("Category: (AE) Pets", the labelled list at the
     top, the query ending "Category: (") lifts decider's blind auto-filing from 56 to 63% (system effort 0.570); the weekday next to the
     date, 48 rows and TSV tables do not help. A label must follow a space: "(AE" at a line start or after a tab tokenizes differently.
+  - *JSON, YAML, TypeScript (114):* none beats plain text with labelled rows (YAML closest, 59% auto-filed); an enum of labels needs the
+    category name repeated in each row; structured formats double the prompt.
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -7011,3 +7013,56 @@ Category: (
   labelled rows to copy from in the ways production will have). The encoder keeps its layout.
 
 Job lists: `scripts/modal_jobs/r113.json`, `r114.json`.
+
+
+## 114. JSON, YAML and TypeScript histories (owner, 2026-09-29): none beats plain text with labelled rows. YAML comes closest (decider blind auto-filing 59%, effort 0.625 against 63% and 0.589); JSON lines, the TypeScript union and the owner's enum auto-file 47 to 55%; the enum works only with the category name repeated as a comment in each row (47% without, 55% with), as the labelled list did in plain text; every structured format roughly doubles the prompt and the training time (MODEL-16)
+
+PLAN steps 113 to 115. The owner asked whether a regular format models know from pre-training (JSON, YAML, TypeScript) reads better than
+section 113's text. Each was built as a labelled variant of the winner (the label next to each row's category, the answer slot where
+the label goes), fields in the same order (date, description, amount, weekday, category), trained and read in its own format, two seeds.
+
+- **JSON lines** (`LAYOUT=json_labelled`): the labelled list at the top, `{"date": ..., "category": "(GU) Medical"}` per row inside
+  `<historical_transactions>`, the query ending `"category": "(`.
+- **YAML** (`yaml_labelled`): a list of records, `  category: (GU) Medical`, descriptions quoted (a statement string can start with
+  "*", a YAML alias), the query ending `  category: (`.
+- **TypeScript, union** (`ts_labelled`): `type CategoryId = | "GU" /* Medical */ ...;`, `interface Transaction`, rows
+  `category: "GU" /* Medical */`, `const next: Transaction = { ..., category: "`.
+- **TypeScript, the owner's enum** (`ts_enum`, `ts_enum_names`): `enum Categories { "GU" = "Medical", ... }`,
+  `const transactions: Array<Transaction> = [...]`, rows `category: Categories["GU"]` (without, and with, `/* Medical */` after it), the
+  query ending `category: Categories["`.
+
+**Tokenization.** Each form was checked for all 255 labels on the Qwen3.5 tokenizer. Clean (the label is one token, the answer slot's):
+`"(GU` in JSON, `: (GU` in YAML, `"GU"` as a string literal, `["GU"` in bracket access, a quoted enum member `"GU" =`. Not clean:
+`Categories.GU` (".G" + "U" for 245 labels) and a bare enum key `GU =` (" GU"). The layouts use only the clean forms, which is why the
+enum has quoted members and bracket access rather than `Categories.GU`.
+
+**Table 114.1: decider-4B, blind_v1 (mean [range] over two seeds; `scripts/format_tables.py`)**
+
+| format | REAL-6 | novel names | misleading | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|
+| decider's layout (the recipe before section 113, 3 seeds) | 89.4 | 89.6 | 93.9 | 82.5 | 55.8 | 0.655 | 0.588 |
+| **text, labelled rows (section 113, the recipe now)** | 86.4 | 84.7 | 91.4 | 82.5 | **63.3** | **0.589** | **0.570** |
+| YAML, labelled | 86.2 | 84.4 | 84.9 | 82.2 | 59.2 [58.3, 60.2] | 0.625 | 0.584 |
+| JSON lines, labelled | 85.6 | 83.2 | 87.5 | 81.6 | 53.8 | 0.679 | 0.607 |
+| TypeScript union, name comments | 86.7 | 83.7 | 84.9 | 82.2 | 52.0 | 0.688 | 0.602 |
+| TypeScript enum, `Categories["GU"]` | 88.4 | 86.6 | 93.4 | 81.7 | 47.0 [46.5, 47.5] | 0.744 | 0.631 |
+| TypeScript enum + name comments | 87.4 | 83.9 | 85.5 | 82.1 | 55.4 [53.0, 57.9] | 0.672 | 0.607 |
+| TSV table, labelled cells (section 113) | 84.7 | 85.2 | 84.9 | 81.3 | 55.1 | 0.674 | 0.608 |
+
+The encoder (Ettin-1B) read JSON and YAML as it reads everything else (system effort 0.587 in both; blind top-1 81.0 and 79.9);
+its TypeScript arm ran out of memory at 16 sequences per step on the longer prompts and was rerun at 8 x 6,000 steps (added below
+when in).
+
+### 114.1 What the step says
+
+- **A familiar format is not what the reader needs; the label next to the name in each row is.** Every structured format carries the
+  same information as the labelled text rows and reads the blind set at the same top-1 (81.6 to 82.2); what separates them is how
+  sure the reader is where it can be, and plain text keeps the most (63% auto-filed), YAML next (59%), the rest 47 to 55%.
+- **The enum needs the names in the rows.** Declared once in the enum, a label has to be bound to its category by looking it up, the
+  hop that hurt the labelled list in plain text (section 113: 45%); the enum does a little better at it (47%), and repeating the name as
+  a comment in every row brings it to 55%. The owner's question (are the comments needed?) has a measured answer: yes, for this reader.
+- **The cost of syntax.** JSON, YAML and TypeScript double the tokens per row: training took 56 to 61 minutes against 25 to 30 for text,
+  and serving would cost about as much more. With no accuracy to show for it, plain text stays.
+- **Decision:** the recipe's layout stays `labelled_shots`.
+
+Job lists: `scripts/modal_jobs/r115.json`, `r116.json`, `r116b.json`, `r117.json`.

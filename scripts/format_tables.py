@@ -24,7 +24,7 @@ from effort_tables import calibrated  # noqa: E402
 REC = R.REC
 PI = "results/per_item/"
 DEC = "real6_dm_decider_decider_decider-4b_none_h100bf16st800{s}_emp20_f0_" + REC + "{n}_aux100_labrand255{lay}_ev10soft_lora_{set}_labrand255{lay}.noctx.jsonl"
-ENC = "real6_encmask_ettin1b_st3000_h100fresh{s}_f0_decnone_h100fresh{s}_emp20_f0_" + REC + "_odb20_short15_kinds20{n}_ev10soft{lay}_{set}.noctx.jsonl"
+ENC = "real6_encmask_ettin1b_st{steps}_h100fresh{s}_f0_decnone_h100fresh{s}_emp20_f0_" + REC + "_odb20_short15_kinds20{n}_ev10soft{lay}_{set}.noctx.jsonl"
 DEC_ARMS = [("decider, recipe (decider's layout)", "", ""), ("labelled list, ends 'Category: ('", "", "_laylabelled"),
             ("labelled list + 'Category: (AE) Pets' rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
             ("48 rows", "_sh48", ""), ("TSV table (Options / 'Answer: (')", "", "_laytable"), ("TSV table, labelled cells, open ' (' cell", "", "_laytable_labelled"),
@@ -32,11 +32,12 @@ DEC_ARMS = [("decider, recipe (decider's layout)", "", ""), ("labelled list, end
             ("TypeScript enum, Categories[\"GU\"]", "", "_layts_enum"), ("TypeScript enum + name comments", "", "_layts_enum_names")]
 ENC_ARMS = [("encoder, recipe", "", ""), ("labelled options and rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
             ("48 rows", "_sh48", ""), ("TSV table", "", "_laytable"), ("JSON lines, labelled", "", "_layjson_labelled"),
-            ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled")]
+            ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled (batch 8 x 6,000 steps)", "", "_layts_labelled")]
 SEEDS = ("", "s1", "s2")
 
 
 def files(pat, st, **kw):
+    kw.setdefault("steps", "6000" if kw.get("lay") == "_layts_labelled" and pat.startswith("real6_encmask") else "3000")
     return [f for s in SEEDS for f in glob.glob(PI + pat.format(s=s, set=st, **kw))]
 
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     its = {s: R.items_of(s) for s in ("", "real6_v1_novel", "mislead_v1", "alternation_v1", "novel_merchants_v1", "blind_v1", "blind_v1_b48")}
     ok = lambda r, it, i: int(np.argmax(r[i]["sum_lp"])) == it[i]["answer"]  # noqa: E731
     base = {"dec": [calibrated(load(f), its["blind_v1"]) for f in files(DEC, "blind_v1", n="", lay="")],
-            "enc": [calibrated(load(f), its["blind_v1"]) for f in files(ENC, "blind_v1", n="", lay="")]}
+            "enc": [calibrated(load(f), its["blind_v1"]) for f in files(ENC, "blind_v1", n="", lay="", steps="3000")]}
     for kind, pat, arms in (("dec", DEC, DEC_ARMS), ("enc", ENC, ENC_ARMS)):
         print(f"\n**Table FM.1{'a' if kind == 'dec' else 'b'}: {'decider-4B' if kind == 'dec' else 'Ettin-1B'} (mean [range] over seeds)**\n")
         print("| arm | seeds | REAL-6 | novel names | misleading | day rule (restaurants) | real businesses (descriptive) | blind_v1 | blind auto-filed | effort alone | effort in the system | blind_v1_b48 |")
@@ -73,7 +74,7 @@ if __name__ == "__main__":
             for f in files(pat, "real6" if kind == "dec" else "", n=n, lay=lay) if kind == "dec" else []:
                 c["r6"].append(R.top1(load(f), its[""], True)[0])
             if kind == "enc":
-                c["r6"] = [R.top1(load(f), its[""], True)[0] for f in glob.glob(PI + pat.format(s="*", set="", n=n, lay=lay).replace("_.noctx", ".noctx"))]
+                c["r6"] = [R.top1(load(f), its[""], True)[0] for f in glob.glob(PI + pat.format(s="*", set="", n=n, lay=lay, steps="6000" if lay == "_layts_labelled" else "3000").replace("_.noctx", ".noctx"))]
             c["nv"] = [R.top1(load(f), its["real6_v1_novel"], True)[0] for f in files(pat, "real6_v1_novel", n=n, lay=lay)]
             for f in files(pat, "mislead_v1", n=n, lay=lay):
                 r = load(f); mi = its["mislead_v1"]; c["m"].append(100 * np.mean([ok(r, mi, i) for i in r if mi[i]["mkind"] == "misleading" and mi[i]["in_db"] and mi[i]["cond"] == "none"]))
