@@ -1,0 +1,5 @@
+outs:
+- md5: fbf19e7636ed93f3262ddabb39648327
+  size: 26222129
+  hash: md5
+  path: poi1_v1_desc_kinds.json

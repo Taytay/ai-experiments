@@ -1,0 +1,17 @@
+/blind_bulk_v1.json
+/blind_bulk_v1_split.json
+/label_induction_v1.json
+/label_induction_v2.json
+/poi1_v1.json
+/poi1_v1_db.json
+/poi1_v1_desc.json
+/poi1_v1_desc_kinds.json
+/poi1_v1_desc_kshots_kinds.json
+/poi1_v1_instr.json
+/poi1_v1_instr_kshots_kinds.json
+/poi1_v1_kinds.json
+/poi1_v1_kshots.json
+/poi1_v1_kshots_kinds.json
+/real7train_v1_all_kind.json
+/real7train_v1_all_kind_u2400.json
+/real7train_v1_mix.json

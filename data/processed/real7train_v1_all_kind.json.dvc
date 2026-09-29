@@ -1,0 +1,5 @@
+outs:
+- md5: 8fdea520839900f403cc2117c77f6d7d
+  size: 5658947
+  hash: md5
+  path: real7train_v1_all_kind.json
