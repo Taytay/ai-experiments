@@ -165,6 +165,12 @@ def load_model():
         assert all(len(i) == 1 and i[0] != tok.unk_token_id for i in ids)
         return tok, MBInstructScorer(mlm, [i[0] for i in ids]).cuda()
     enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa", trust_remote_code=remote)
+    if remote:  # its rotary inv_freq is a non-persistent buffer that transformers 5's meta-device init leaves uninitialised (NaN output); recompute
+        for mod in enc.modules():
+            if hasattr(mod, "inv_freq"):
+                mod.inv_freq = _default_rope(enc.config)[0]
+                if hasattr(mod, "original_inv_freq"):
+                    mod.original_inv_freq = mod.inv_freq
     enc.config.reference_compile = False  # as Laya's inference: no torch.compile, whose recompiles per shape would swamp the latency read
     model = DecisionModel(enc)
     if INIT == "laya":
@@ -293,6 +299,7 @@ def train(tok, model):
         ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, None, r) if DEC_EPISODES else encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(ids, att, pos, pm)
+        assert torch.isfinite(logits[pm]).all(), "non-finite option scores (EuroBERT's uninitialised rope gave NaN, which the loss read as 0)"
         loss = objective(logits.float(), torch.tensor([y for *_, y in eps]).cuda())
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())

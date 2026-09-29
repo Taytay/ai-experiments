@@ -18,6 +18,7 @@ from ai_experiments.paths import PROCESSED, ROOT
 
 REC = "ren50_dbep50_mislead_v1_alt10s_lk10_ov10"
 DEC = f"decnone_h100_f0_{REC}"
+DEC2 = f"decnone_h100fresh_f0_{REC}"
 FINAL = f"decider_decider-4b_none_h100bf16st800_f0_{REC}_aux100_labrand26_ev10soft_lora"
 
 
@@ -32,11 +33,11 @@ def enc(name):
 ENCODERS = [("ModernBERT-large 395M, REAL-6 episodes (row 53)", enc("encmask_mbert_st1500_f0"), "encmask_mbert_st1500_f0"),
             ("Laya 395M, REAL-6 episodes (row 53)", enc("encmask_laya_st1500_f0"), "encmask_laya_st1500_f0"),
             ("GLiClass-large, REAL-6 episodes (row 69)", enc("encgli_large_st1500_f0"), "encgli_large_st1500_f0"),
-            ("ModernBERT-large 395M, recipe episodes", enc(f"encmask_mbert_st3000_h100_f0_{DEC}"), f"encmask_mbert_st3000_h100_f0_{DEC}"),
-            ("Laya 395M, recipe episodes", enc(f"encmask_laya_st3000_h100_f0_{DEC}"), f"encmask_laya_st3000_h100_f0_{DEC}"),
-            ("GLiClass-large 400M, recipe episodes", enc(f"encgli_large_st3000_h100_f0_{DEC}"), f"encgli_large_st3000_h100_f0_{DEC}"),
-            ("Ettin-encoder 1B, recipe episodes", enc(f"encmask_ettin1b_st3000_h100_f0_{DEC}"), f"encmask_ettin1b_st3000_h100_f0_{DEC}"),
-            ("EuroBERT 2.1B, recipe episodes", enc(f"encmask_eurobert_st6000_h100_f0_{DEC}"), f"encmask_eurobert_st6000_h100_f0_{DEC}")]
+            ("ModernBERT-large 395M, recipe episodes", enc(f"encmask_mbert_st3000_h100fresh_f0_{DEC2}"), f"encmask_mbert_st3000_h100fresh_f0_{DEC2}"),
+            ("Laya 395M, recipe episodes", enc(f"encmask_laya_st3000_h100fresh_f0_{DEC2}"), f"encmask_laya_st3000_h100fresh_f0_{DEC2}"),
+            ("GLiClass-large 400M, recipe episodes", enc(f"encgli_large_st3000_h100fresh_f0_{DEC2}"), f"encgli_large_st3000_h100fresh_f0_{DEC2}"),
+            ("Ettin-encoder 1B, recipe episodes", enc(f"encmask_ettin1b_st3000_h100fresh_f0_{DEC2}"), f"encmask_ettin1b_st3000_h100fresh_f0_{DEC2}"),
+            ("EuroBERT 2.1B, recipe episodes", enc(f"encmask_eurobert_st6000_h100fresh_f0_{DEC2}"), f"encmask_eurobert_st6000_h100fresh_f0_{DEC2}")]
 DECODERS = [("decider-4B, final recipe (row 89)", dm(FINAL), None)] + [
     (f"{m}, final recipe", dm(f"slot_{m}_none_h100bf16st800_f0_{REC}_aux100_labrand26_ev10soft_lora"), None)
     for m in ("MiniCPM5-2B", "granite-4.0-micro", "SmolLM3-3B", "Phi-4-mini-instruct")]
