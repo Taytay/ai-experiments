@@ -34,17 +34,25 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-09-29):** nothing on Modal. Rows 97 to 115 done (REPORT.md 98 to 114). The recipe (REPORT 107): decider-4B one slot
-  + shot-label loss + database episodes (with the misleading-name set) + rename 0.5 + `LABELS=rand255 EMPTY=20 LAYOUT=labelled_shots` + lookup / override
-  0.1 + soft evidence-free questions 0.1 + alternation 0.1. The encoder recipe (REPORT 110): Ettin-encoder-1B, `exp_encoder_mask.py
-  DEC_EPISODES=1 EVFREE=0.1 OVDB=0.2 SHORT=0.15 EMPTY=20 KINDS=0.2` with the same episode env (fresh draws). The prompt: the history slice of REPORT 99 / 101 (the payee's
-  latest rows, similar payees, a row per category, recent rows; dated; in date order; nothing from the future). The system: the
-  owner's history rule, then auto-file when the encoder and decider agree and either is confident at its 98% threshold, else suggest (REPORT 115). Test sets: REAL-6, REAL-7 (v1 and
-  the v2 slices), and blind_v1 (built blind by a subagent; REPORT 103), which now decides recipe choices.
-- **Next (2026-09-29):** longer training for recipe v2's combination (800 steps may be too few for both augmentations, REPORT 107);
-  the encoder's world-knowledge gap on new users and new local businesses (blind_v1: a merchant record in the prompt, as section 57's
-  Overture records); a second blind generator by a different model family if one is available; rows 51, 54, 55 deprioritised. Real
-  anonymised histories outrank all of these.
+- **In flight (2026-09-29, evening):** nothing on Modal; everything committed and pushed; models in DVC. Rows 97 to 116 done (REPORT.md 98
+  to 115; section 1 summarises them).
+  - **decider recipe** (REPORT 107, 113): decider-4B one slot + shot-label loss + database episodes (with the misleading-name set) +
+    rename 0.5 + `LABELS=rand255 EMPTY=20` + `LAYOUT=labelled_shots` (labelled list at the top, "Category: (AE) Pets" rows, ending
+    "Category: (") + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation 0.1, 800 steps.
+  - **encoder recipe** (REPORT 104, 110, 111): Ettin-encoder-1B, `exp_encoder_mask.py DEC_EPISODES=1 EVFREE=0.1 OVDB=0.2 SHORT=0.15
+    EMPTY=20 KINDS=0.2` with the same episode env (fresh draws each pass).
+  - **prompt**: the history slice of REPORT 99 / 101 (the payee's latest rows, similar payees, a row per category, recent rows; dated;
+    in date order; nothing from the query's future), 24 rows, plain text (REPORT 113, 114: labels only where they tokenize as the answer
+    token: after a space, never "(AE" at a line start or after a tab, never "Categories.AE").
+  - **system** (REPORT 98, 115): the owner's history rule, then auto-file when the encoder and decider agree and either is confident at
+    its own calibrated 98% threshold (blind_v1: 65% at 97.8%, effort 0.560), else suggest (and flag disagreement). Temperatures and
+    thresholds must be fitted on the product's own users.
+  - **test sets**: REAL-6, REAL-7 (v1, the v2 slices), blind_v1 (and blind_v1_b48), novel_merchants_v1; blind_v1 decides recipe choices,
+    read by user effort (`scorecard.effort`) and calibrated auto-filing, not top-1 alone.
+- **Next (2026-09-29):** real anonymised histories are coming (owner): a data spec and a harness that turns them into the prompt format
+  and scores the saved models and the system on them; then the questions only real data settles (slip vs change of mind, category counts,
+  kinds for decider (REPORT 111, 112), dated-slice training (REPORT 107)). Synthetic: the encoder's new-user gap (category-name meaning),
+  a second blind set from another model family. Rows 51, 54, 55 deprioritised.
 
 ## Procedure for one step
 
