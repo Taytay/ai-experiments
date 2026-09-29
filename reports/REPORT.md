@@ -6857,3 +6857,39 @@ OVDB 0.05 (section 108's Overture episodes at a quarter of the share), + both; E
   transactions; effort 0.57 to 0.60 against 0.63 to 0.69 for decider alone.
 
 Job lists: `scripts/modal_jobs/r109.json`, `r109b.json` (one relaunch after a Modal GPU hardware error).
+
+
+## 111. Kinds outside the twelve spending categories (income, housing, insurance, loans, subscriptions, transfers, fees, cash and others) in training lift new users' bill and income transactions on blind_v1 (decider 55 to 74, the encoder 26 to 42; 19 items) and cost the encoder nothing (blind 79.8, auto-filed 56%, REAL-6 91.3); decider pays 3 points on REAL-6 and 5 on novel names at a 20% share, so its recipe waits for a smaller share (EVAL-11, MODEL-17)
+
+PLAN step 109. Section 110 found that most of blind_v1's new-user misses were transactions of kinds no training episode contained
+(a payroll deposit, an insurance premium, a car-loan payment, a gas bill): REAL-6's world has twelve spending categories and nothing
+else. `ai_experiments.kinds` catalogues thirteen kinds from general knowledge of US budgets (income, rent / mortgage, insurance, loans,
+subscriptions, savings transfers, personal care, gifts, donations, childcare, education, bank fees, cash): payees, statement styles
+(payroll "DIR DEP" / "PPD ID", ACH debits, card, transfer, ATM, fee lines), amounts (recurring ones fixed per user), signs (income
+negative) and the names users give such categories; any payee whose name blind_v1 uses is dropped. `exp_categoriser.py KINDS=0.2`: a
+fifth of episodes add one to three such categories at random places in the list, usually with one to three of the user's rows of that
+kind among the shots, sometimes with the name alone, and sometimes the target. **Caveat:** this row was motivated by reading blind_v1's
+errors, so blind_v1 is less blind for it; the kinds themselves are standard budget categories, not blind_v1's.
+
+**Table 111.1 (decider two seeds, encoder one)**
+
+| reader | blind_v1 | blind new users: bill / income-like (19) / other (149) | blind auto-filed at 98% | REAL-6 | novel names | real businesses in no DB (descriptive) | misleading names |
+|---|---|---|---|---|---|---|---|
+| decider-4B, recipe | 82.6 | 55 / 66 | 55.0 | 89.3 | 89.3 | 65.9 | 93.4 |
+| decider-4B, + kinds | 83.1 | **74** / 67 | 51.3 | 86.1 | 84.7 | 61.8 | 91.4 |
+| Ettin-1B, encoder recipe (section 110, two seeds) | 79.3 | 26 / 50 | 43.1 | 88.8 | 88.9 | 80.0 | 94.7 |
+| **Ettin-1B, + kinds** | **79.8** | **42** / 49 | **56.1** | **91.3** | **90.9** | 82.7 | 92.1 |
+
+### 111.1 What the step says
+
+- **The new-user misses were a gap in the training world.** With income, bills and transfers in training, decider files a new user's
+  payroll and bills at 74 (from 55) and the encoder at 42 (from 26); other new-user items do not move. The encoder, with less world
+  knowledge, still trails there.
+- **The encoder takes them at no cost** (one seed): blind top-1, auto-filing, REAL-6 and novel names all at or above section 110's.
+  Encoder recipe: Ettin-1B + `OVDB=0.2 SHORT=0.15 EMPTY=20 KINDS=0.2`.
+- **decider pays for them** at a 20% share: REAL-6 −3, novel names −5, blind auto-filing −4. As with every added episode family, decider
+  trades REAL-6-style reading for the new family; a 10% share is tested in the three-seed batch that follows.
+- **Section 110's second encoder seed** repeats the first on the blind set (79.3 both) and REAL-6 (86.6 / 90.9), with auto-filing at
+  34 and 52%: auto-filing is the seed-sensitive measure for the encoder too.
+
+Tables: `uv run python scripts/overture_ep_tables.py`. Job lists: `scripts/modal_jobs/r110.json`, `r111.json`.
