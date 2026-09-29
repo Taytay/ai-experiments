@@ -6744,3 +6744,39 @@ decider reads the rest).
   cheaper per item (section 102), so the cascade is also the cheaper system.
 
 Tables: `uv run python scripts/recipe_tables.py`, `uv run python scripts/split_tables.py`. Job list: `scripts/modal_jobs/r106.json`.
+
+
+## 108. Real business names as training episodes close the encoder's knowledge gap on merchants: Ettin-1B reads real businesses in no database at 73 / 48 / 65 (descriptive / plain / chain names) from 30 / 18 / 37, level with decider-4B trained the same way; decider gains too (66 to 77 on descriptive names, blind_v1 83.6) but auto-files less on the blind set (55% to 42%); the encoder recipe takes them, decider's does not yet (MODEL-17, REAL-19)
+
+PLAN step 107. Section 103 left the encoder 20 to 40 points behind decider on new local businesses: a 4B decoder knows what "Harbor
+Bakery" is, a 1B encoder trained on 240 REAL-6 merchants does not. `build_overture_pool.py` draws 33,555 real US businesses from
+Overture places with the novel-merchant builder's category mapping (16,950 with a word for their kind in the name, 14,153 without,
+2,452 chain locations), leaving out every place of the novel-merchant test set and every blind_v1 merchant name;
+`exp_categoriser.py OVDB=0.2` gives a fifth of the training episodes a target and four shots from the pool, filed under the training
+user's category for the place's standard category. decider-4B with the recipe (two seeds) and Ettin-1B with the encoder recipe.
+
+**Table 108.1: `scripts/overture_ep_tables.py` (mean [range] over seeds)**
+
+| reader | real businesses in no DB (novel_merchants_v1, fold 0): descriptive / plain / chain | blind_v1 | blind new merchants: descriptive / chain | blind new users | blind auto-filed at 98% | REAL-6 | novel names | misleading names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, recipe | 65.9 / 44.4 / 58.7 | 82.6 | 68.9 / 74.3 | 64.6 | 55.0 | 89.3 | 89.3 | 93.4 |
+| decider-4B, + Overture episodes | **77.3 / 48.5 / 65.4** | **83.6** | 75.7 / 68.9 | **69.6** | 41.8 | 87.8 | 86.2 | 92.1 |
+| Ettin-1B, encoder recipe | 30.0 / 18.2 / 36.5 | 77.9 | 43.2 / 59.5 | 42.3 | 44.3 | 89.6 | 86.9 | 97.4 |
+| **Ettin-1B, + Overture episodes** | **72.7 / 47.5 / 65.4** | 77.7 | **62.2 / 64.9** | 44.6 | 42.2 | 88.6 | 88.6 | 90.8 |
+
+### 108.1 What the step says
+
+- **The encoder's merchant knowledge was missing training, not capacity.** Filing real business names in training lifts Ettin-1B on
+  unknown real businesses by 29 to 43 points, to decider's level on each name group; on the blind set's new local businesses from 43
+  to 62. As with database episodes (section 53) and the recipe's episodes (section 102), what the encoder lacked was the decisions, not
+  the architecture.
+- **What stays behind is the new user.** With 0 to 10 rows of history the encoder reads 45 (decider 65 to 70): with nothing of the user
+  to copy, the answer depends on what the user's category names mean ("Food we cook", "Wheels"), which real business names do not
+  teach. Label-induction and coined-name training (sections 60, 71) are the candidates.
+- **decider gains on knowledge and loses confidence again.** Novel merchants +5 to +11, blind top-1 83.6 and new users 70, but the blind
+  set's calibrated auto-filing falls from 55% to 42% and REAL-6 and novel names lose 1.5 to 3; the same pattern as the dated slices of
+  section 107: every added episode family so far has cost decider auto-file coverage on the blind set. A smaller share is the next test.
+- **Decisions:** the encoder recipe takes `OVDB=0.2` (Ettin's REAL-6 −1, misleading names 91 from 97 is the price); decider's recipe
+  does not yet. The pool keeps each place's Overture id and per-row sources (licences).
+
+Job list: `scripts/modal_jobs/r108.json`.
