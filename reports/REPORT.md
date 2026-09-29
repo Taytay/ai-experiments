@@ -69,6 +69,9 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
     date, 48 rows and TSV tables do not help. A label must follow a space: "(AE" at a line start or after a tab tokenizes differently.
   - *JSON, YAML, TypeScript (114):* none beats plain text with labelled rows (YAML closest, 59% auto-filed); an enum of labels needs the
     category name repeated in each row; structured formats double the prompt.
+  - *Both models (115):* they agree on 83.5% of blind_v1 (right 90.9% there); auto-filing when they agree and either is confident at its
+    own calibrated 98% threshold files 65% at 97.8% (effort 0.560, the best system); the encoder's calibrated confidence is a probability
+    (ECE 1.9).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -7066,3 +7069,57 @@ reads the same again (blind top-1 80.3, auto-filed 52.8%, system effort 0.583).
 - **Decision:** the recipe's layout stays `labelled_shots`.
 
 Job lists: `scripts/modal_jobs/r115.json`, `r116.json`, `r116b.json`, `r117.json`.
+
+
+## 115. The two models together, and whether the encoder's confidence is a probability: they agree on 83.5% of blind_v1, decider is right on 90.9% of those and on 39.5% of the rest; agreement alone is not auto-fileable (91% precision), but "both agree and either is confident" auto-files 65% at 97.8% for the lowest effort so far (0.560); after the temperature fitted on other users the encoder's confidence is a calibrated probability (ECE 5.6 to 1.9; its 95 to 98% answers are right 98% of the time), and decider's likewise (7.0 to 2.1) (EVAL-10, MODEL-9)
+
+PLAN step 116 (owner, 2026-09-29: can the two models' agreement raise accuracy, and does the encoder's confidence correspond to a real
+probability?). CPU only, over the saved blind_v1 scores of the encoder (Ettin-1B, the encoder recipe, three seeds) and decider-4B (the
+recipe with labelled rows, section 113, two seeds): six seed pairs. Every threshold is chosen on the other users' folds for a 98%
+target, as the scorecard does. `scripts/agreement_tables.py`.
+
+**Table 115.1: agreement (mean [range] over six pairs)**
+
+| agree on the top answer | right when they agree | where they disagree: decider right | encoder right |
+|---|---|---|---|
+| 83.5 [82.4, 85.1] | 90.9 [90.7, 91.1] | 39.5 [36.2, 43.2] | 21.7 [19.1, 24.6] |
+
+**Table 115.2: auto-file policies**
+
+| policy | auto-filed % | precision % | effort |
+|---|---|---|---|
+| decider alone (98%) | 63.3 | 97.9 | 0.589 |
+| encoder alone (98%) | 52.0 | 97.9 | 0.715 |
+| cascade: encoder at its 98%, else decider at its 98% (section 112) | 66.3 | 97.6 | 0.570 |
+| both agree (no threshold) | 83.5 | 90.9 | 0.640 |
+| both agree and both clear their 98% | 48.9 | 98.3 | 0.699 |
+| **both agree and either clears its 98%** | **65.2 [64.0, 66.3]** | **97.8** | **0.560 [0.550, 0.571]** |
+| product of the two distributions, one threshold | 62.5 | 98.0 | 0.578 |
+| mean of the two distributions, one threshold | 62.7 | 97.9 | 0.582 |
+
+**Table 115.3: reliability on blind_v1 (first seed of each): share right among the answers given at each confidence**
+
+| model | probabilities | < 0.5 | 0.5 to 0.7 | 0.7 to 0.8 | 0.8 to 0.9 | 0.9 to 0.95 | 0.95 to 0.98 | 0.98 to 0.99 | 0.99 to 1 | ECE |
+|---|---|---|---|---|---|---|---|---|---|---|
+| encoder | raw | 24 (184) | 52 (155) | 66 (61) | 68 (56) | 67 (33) | 79 (39) | 76 (21) | 97 (951) | 5.6 |
+| encoder | **after the temperature** | 32 (257) | 60 (195) | 78 (58) | 79 (63) | **94 (140)** | **98 (477)** | **99 (232)** | 97 (78) | **1.9** |
+| decider | raw | 18 (102) | 51 (124) | 49 (75) | 61 (77) | 76 (58) | 85 (80) | 92 (62) | 98 (922) | 7.0 |
+| decider | after the temperature | 31 (217) | 59 (158) | 76 (72) | 91 (137) | 96 (137) | 98 (252) | 99 (202) | 99 (325) | 2.1 |
+
+### 115.1 What the step says
+
+- **Agreement is strong evidence, not enough on its own.** When the 1B encoder and the 4B decoder pick the same category (83.5% of
+  transactions) the answer is right 90.9% of the time; when they disagree, neither is reliable (decider 40%, encoder 22%). Auto-filing
+  every agreement would file 84% at 91%, too many mistakes; a disagreement is a good signal to show suggestions instead.
+- **The best policy combines agreement with confidence:** file when the two agree and either is confident at its own calibrated 98%
+  threshold. It files 65% at 97.8%, with the lowest effort of any system so far (0.560, against the cascade's 0.570 and decider's 0.589):
+  agreement lets a confident answer from one model through only when the other does not contradict it. Requiring both to be confident
+  is too strict (49%); multiplying or averaging the two distributions is about the cascade's level.
+- **The encoder's confidence is a probability once calibrated.** Raw, it is over-confident: 951 answers above 0.99 are right 97% of
+  the time, and its 0.9 to 0.98 answers 67 to 79%. With one temperature fitted on other users (REPORT 50, 72) its stated confidence
+  matches its accuracy bin by bin (0.9 to 0.95 -> 94%, 0.95 to 0.98 -> 98%, 0.98 to 0.99 -> 99%; ECE 1.9); decider behaves the same (2.1).
+  The top bin is slightly over-confident for both (97 to 99% right at > 0.99), which a 98% threshold absorbs.
+- **Caveat.** The temperatures and thresholds here are fitted on other blind_v1 users; production must fit them on its own users, and
+  should re-fit when the population changes (REPORT 103: a threshold carried from REAL-7 to blind_v1 did not hold).
+
+Tables: `uv run python scripts/agreement_tables.py`.
