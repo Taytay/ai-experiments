@@ -1139,3 +1139,34 @@ best layout, fold 0: accuracy, calibration, ms per item. Also decider-2B itself 
 is the doubt: it misfiles Trader Joe's zero-shot), and kev-4B fine-tuned (the best zero-shot reader; its own trainer needs torch < 2.9).
 **Status (2026-09-27):** answered, PLAN steps 79 / 80, REPORT.md 76. One slot matches the per-option loss once the shot labels are trained too (Qwen3.5-2B 85.9 against 86.9); decider-2B 87.9, decider-4B 88.3 with 66% auto-filed at 97.5% and POI-1 92.3; 18 to 24 ms per item warm against ~390; kev-4B fine-tuned 83.2.
 **Status (2026-09-27, later):** REPORT.md 81: random option labels (A..Z or all 255) train at least as well as letters in order; the recipe uses LABELS=rand26.
+
+## Review of the categoriser work, 2026-09-28
+
+A review of sections 24 to 97 (the owner approved its plan, 2026-09-28). On REAL-7 the final recipe puts p >= 0.9 on 91% of items at
+85% precision (REAL-6: 77% at 96.7%); the confident errors are items the prompt cannot answer (idiosyncratic, moved and new-category
+merchants not among the 24 recent rows: confident and wrong on 86 to 100% of them). 113 of REAL-7's 1,200 items are in the user's
+history but not in the shots and unanswerable from the prompt. The encoder comparison (62, 63) predates every recipe gain the decoders
+got after it. The behaviour sets (80 to 92) were built together with the training episodes that fix them.
+
+**EVAL-10 User effort and the auto-file policy.** What a user does per transaction: nothing (auto-filed and right), one click (the
+answer is among the top suggestions), a search (it is not), or undo a wrong auto-file (the costliest). *Experiment (CPU):* over the
+saved scores, the effort of three auto-file policies (the model's confidence with a threshold from other users; only merchants the
+user has filed consistently before, the owner's rule; both) with top-3 suggestions for the rest, on REAL-7 and REAL-6; the
+coverage-precision curve of each; which items fail.
+
+**REAL-22 The merchant's own rows in the prompt.** REAL-7's prompt shows the 24 most recent rows; 45% of queried merchants are not
+among them, and 113 items are in the user's history but unanswerable from the prompt. *Experiment:* REAL-7 v2 with each user's
+full history kept and the prompt built by a policy: the recent rows plus the query merchant's own latest rows (up to k), each row
+dated; the ceiling of each policy; read by the final recipe zero-shot, then trained with the policy (the query merchant's rows
+dropped from some training prompts so the model does not only copy, REPORT 47 / row 46). Also whether dates and more of the
+merchant's rows separate a slip from a change (REPORT 97).
+
+**MODEL-17 The encoder against the decoder at equal recipes.** Sections 62 and 63 compared a 400M encoder with the 3B decoder of
+that time; the decoders then gained ~30 points on POI-1 (kind lines, descriptions, kind-retrieved examples) and database episodes on
+REAL-6, which the encoder never got. One-slot decoders cut its speed advantage from ~40x to ~2 to 3x. *Experiment:* GLiClass-large and
+Laya's layout with database episodes on REAL-6 and row 73's POI-1 layout, against decider-4B's recipe; ms per item on one GPU.
+
+**EVAL-11 A test set built blind to the training augmentations.** Every behaviour set (misleading names, overrides, alternation,
+evidence-free) was built alongside the episodes that train it, and section 92 showed one augmentation teaching a prior the set
+rewarded. *Experiment:* a generator written by an agent that sees the product description and REAL-7's format but not the training
+code or episodes; the final recipe scored on it zero-shot, with a blind strong-reader ceiling. Real anonymised histories outrank it.
