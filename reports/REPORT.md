@@ -7266,9 +7266,12 @@ temperature and 98% threshold. `scripts/escalation_tables.py`, job list `scripts
   the small models takes auto-filing from 65.2 to 72.9% at 97.4% (a little under the 98% target: its threshold was fitted on all items,
   not on the escalated ones) and user effort from 0.560 to 0.487; suggestions for the rest from the three models' product take it to
   0.470, 16% less work than REPORT 115's system and 20% less than decider alone.
-- **Cost.** The 35B reads a transaction in about 110 ms on an H100 as run here (batch 2, unoptimised), three to four times decider-4B;
-  sent a third of the transactions, it about doubles the system's GPU cost per transaction (at about $4 per H100-hour: from ~$50-65 to ~$100
-  per million transactions at H100 list price), still far below any hosted API.
+- **Cost.** The 35B read blind_v1 in 2.8 minutes on an H100 (about 110 ms per transaction, batch 2, unoptimised); untrained decider-4B in
+  the same layout and job read it in 2.7 minutes: with 3B parameters active per token the 35B costs about what the 4B does per
+  transaction, but its 69 GB of weights take a whole 80 GB GPU [corrected 2026-09-29: this line first said three to four times
+  decider-4B, comparing with a different setup; row 130 measures both in vLLM];
+  sent a third of the transactions, it adds about a third of a 4B reading to each transaction's cost (a GPU kept for the 35B's
+  weights aside), still far below any hosted API.
 - **Next:** the 35B trained with the recipe (row 125, MODEL-20): the trained behaviours on top of its world knowledge; and it as a
   teacher for the small models (row 123).
 
