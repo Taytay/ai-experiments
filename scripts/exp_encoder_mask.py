@@ -288,6 +288,13 @@ def restyle(names, body, rng_):
         pool = [a + b for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" for b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
         lab = dict(zip(names, rng_.sample(pool, len(names))))
     shown = [f"({lab[n]}) {n}" if lab else n for n in names]
+    if ENC_LAYOUT == "table":  # row 111b (owner, 2026-09-29): the history as a TSV table in <historical_transactions>, the query as a one-row table
+        C = oneslot._cells
+        dated = bool(C(query)[0]) or any(C(fl)[0] for fl, _, _ in rows)
+        head = ("date\t" if dated else "") + "weekday\tdescription\tamount\tcategory\n"
+        line = lambda fl: "\t".join(([C(fl)[0]] if dated else []) + list(C(fl)[1:]))  # noqa: E731
+        return names, ("<historical_transactions>\n" + head + "".join(f"{line(fl)}\t {c}\n" for fl, c, _ in rows) + "</historical_transactions>\n\n"
+                       "<new_transaction>\n" + head + line(query) + "\t ?\n</new_transaction>")
     rows_t = "".join(f"Transaction: {f(fl)}\nCategory: {'(' + lab[c] + ') ' if c in lab else ''}{c}\n\n" for fl, c, _ in rows)
     return shown, rows_t + f"Transaction: {f(query)}"
 

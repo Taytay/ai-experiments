@@ -47,6 +47,12 @@ def build(P, tok, context, question, options, gold, rng, labels="letters", max_c
 #   labelled         the labelled category list once, at the top ("Categories:\n- (FX) Transportation\n..."), rows as they were, and the
 #                    query ending "\nCategory: (" (no Question line, no Options block)
 #   labelled_shots   as labelled, and every row's category written with its label: "Category: (FX) Transportation"
+#   table            (owner, 2026-09-29) the history as one TSV table inside <historical_transactions> with a header row (date, weekday,
+#                    description, amount, category: the category last; no date column when no row is dated), the query as a one-row
+#                    table inside <new_transaction> with its category cell "?"; then the Question / Options / "Answer: (" of `options`
+#   table_labelled   the labelled category list at the top, the category cells written " (FX) Transportation", the query's category cell
+#                    open: "... <amount>\t (" with the answer slot there. A cell starts with a space: "\t(" + label merges into "(A" + "E"
+#                    for 209 of the 255 labels, "\t (" + label is clean for all of them.
 # dow_first moves the weekday next to the date: "Transaction: 2025-01-19 | Fri | TST* BARTELL DRUGS | $60.43".
 # Tokenization (checked on the Qwen3.5 tokenizer for all 255 labels): after "- (" and "Category: (" every label is one token, the same
 # id as the answer slot reads; "\n(AE" at a line start would merge into "(A" + "E", which this layout never writes.
@@ -95,6 +101,8 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     f = dow_first if dow else (lambda x: x)
     in_loss = (lambda st: any(s <= st < e for s, e in spans)) if spans is not None else (lambda st: False)
     parts, targets = [], []  # text pieces; char ranges of trained label text
+    if layout in ("table", "table_labelled"):
+        return _build_table(P, tok, names, rows, query, question, options, gold, opts, labs, lab_of, open_ids, layout, in_loss)
     if layout == "options":
         parts.append("Context:\nCategories: " + ", ".join(names) + "\n\n")
     else:
@@ -119,4 +127,45 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
         ids += tok.encode("\nCategory: (", add_special_tokens=False)
         head = tok.encode("- (" + lab_of[options[opts[0]]] + ")", add_special_tokens=False)
         assert labs[0] in head, "a label does not tokenize as itself after '- ('"
+    return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
+
+
+def _cells(fields):
+    """(date or '', weekday, description, amount) from a row's fields ('2025-01-19 | TEXT | $60.43 | Fri' or 'TEXT | $60.43 | Fri')."""
+    parts = fields.split(" | ")
+    date = parts[0] if _DATE.match(parts[0]) else ""
+    rest = parts[1:] if date else parts
+    return date, rest[-1], " | ".join(rest[:-2]), rest[-2].replace("$", "")
+
+
+def _build_table(P, tok, names, rows, query, question, options, gold, opts, labs, lab_of, open_ids, layout, in_loss):
+    dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
+    head = ("date\t" if dated else "") + "weekday\tdescription\tamount\tcategory\n"
+    line = lambda f: "\t".join(([_cells(f)[0]] if dated else []) + list(_cells(f)[1:])) + "\t"  # noqa: E731
+    parts, targets = [], []
+    if layout == "table":
+        parts.append("Context:\nCategories: " + ", ".join(names) + "\n\n")
+    else:
+        parts.append("Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}\n" for oi in opts) + "\n")
+    parts.append("<historical_transactions>\n" + head)
+    for fields, label, st in rows:
+        parts.append(line(fields))
+        cell = f" ({lab_of[label]}) {label}" if layout == "table_labelled" and label in lab_of else f" {label}"
+        if in_loss(st):
+            n = sum(len(p) for p in parts); targets.append((n, n + len(cell)))
+        parts.append(cell + "\n")
+    parts.append("</historical_transactions>\n\n<new_transaction>\n" + head + line(query))
+    if layout == "table":
+        parts.append(" ?\n</new_transaction>")
+    text = "".join(parts)
+    enc = tok(text, add_special_tokens=False, return_offsets_mapping=True)
+    ids, offs = list(enc["input_ids"]), enc["offset_mapping"]
+    aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and any(s < b and a < e for s, e in targets)]
+    if layout == "table":
+        ids += tok.encode(f"\n\nQuestion: {question}\nOptions:", add_special_tokens=False)
+        for lab, oi in zip(labs, opts):
+            ids += open_ids + [lab] + P._enc_opt(tok, options[oi])
+        ids += tok.encode("\nAnswer: (", add_special_tokens=False)
+    else:
+        ids += tok.encode(" (", add_special_tokens=False)  # the open category cell: the answer slot reads the label token after " ("
     return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
