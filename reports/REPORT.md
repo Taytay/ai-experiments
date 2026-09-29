@@ -7452,3 +7452,49 @@ boundaries so a cached prefix resumes exactly). Latency: one sync submitted at a
   sync start before the prefix is cached. Queued syncs of many users (the throughput row) amortise it best.
 - **Decision:** multi-slot prompts (row 127 a) are not worth training now: they would save a few more ms per transaction at the cost of
   a training change and a 1 to 2 point risk (REPORT 119), where the cache gives the speed with the same answers. Row 127 (a) deprioritised.
+
+
+## 121. The split layout needs no retraining: the recipe reads blind_v1 and one user's sync with the shared rows first and the payee's rows after them as well as in today's date-ordered layout (effort 0.584 against 0.589; bulk 0.496 against 0.497), and training on split episodes adds nothing on the blind set (0.649, seed-unstable) (INFRA-3)
+
+PLAN step 118. The recipe's decider-4B (labelled rows, two seeds) read blind_v1_split (blind_v1's rows reordered: the shared rows under
+"Earlier transactions:", then the payee's own and similar payees' rows under "Earlier transactions at this payee and similar payees:")
+and blind_bulk_v1 in both layouts (one sync per user: the next 30 transactions after a cutoff, history filed before it; 6,660 items),
+zero-shot; and the same recipe trained with split episodes (`SPLIT=1`: the query payee's rows, found by a first-word payee key, moved
+into the second block, with 1 to 4 other rows half the time), two seeds. The encoder (Ettin-1B, two seeds) read blind_bulk_v1 in today's
+layout for the system. Effort and auto-filing as the scorecard (98% cut, W = 5), for comparison with earlier sections.
+`scripts/split_bulk_tables.py`, job list `scripts/modal_jobs/r118.json`.
+
+**Table SB.1: decider-4B with labelled rows, by layout (mean [range] over two seeds): top-1 / auto-filed % / precision % / effort**
+
+| adapter | read on | top-1 | auto-filed % | precision % | effort |
+|---|---|---|---|---|---|
+| the recipe (trained on today's layout) | blind_v1 | 82.5 [82.3, 82.6] | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 0.589 [0.582, 0.597] |
+| the recipe (trained on today's layout) | blind_v1_split | 82.5 [82.4, 82.6] | 62.3 [61.9, 62.7] | 98.1 [98.1, 98.1] | 0.584 [0.583, 0.585] |
+| the recipe (trained on today's layout) | blind_bulk_v1 | 83.8 [83.6, 83.9] | 67.6 [65.8, 69.5] | 98.0 [98.0, 98.0] | 0.497 [0.481, 0.512] |
+| the recipe (trained on today's layout) | blind_bulk_v1_split | 83.6 [83.3, 83.9] | 67.4 [65.7, 69.2] | 98.0 [97.9, 98.0] | 0.496 [0.481, 0.511] |
+| trained on split episodes (SPLIT=1) | blind_v1 | 82.4 [82.1, 82.8] | 57.1 [55.5, 58.7] | 97.8 [97.7, 97.8] | 0.647 [0.630, 0.665] |
+| trained on split episodes (SPLIT=1) | blind_v1_split | 82.7 [82.5, 82.8] | 56.1 [51.4, 60.7] | 97.9 [97.8, 97.9] | 0.649 [0.603, 0.694] |
+| trained on split episodes (SPLIT=1) | blind_bulk_v1_split | 83.4 [83.2, 83.7] | 69.0 [68.3, 69.7] | 97.9 [97.9, 98.0] | 0.484 [0.480, 0.489] |
+
+**Table SB.2: the system on the bulk set (the encoder reads today's layout; decider as shown), agree and either confident**
+
+| decider | read on | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| the recipe | blind_bulk_v1 | 70.6 [69.4, 71.5] | 97.7 [97.6, 97.7] | 0.470 [0.461, 0.479] |
+| the recipe | blind_bulk_v1_split | 70.2 [69.0, 71.2] | 97.8 [97.6, 97.9] | 0.470 [0.462, 0.476] |
+| split-trained | blind_bulk_v1_split | 70.3 [69.6, 71.0] | 97.7 [97.6, 97.8] | 0.471 [0.468, 0.476] |
+
+REAL-6 / novel names / misleading-name set top-1 (two seeds): the recipe 86.4 / 84.7 / 65.6, split-trained 86.7 / 85.4 / 64.0.
+
+### 121.1 What the step says
+
+- **The recipe reads the split layout as it is.** On blind_v1 the same rows reordered read at the same top-1 (82.5), auto-filing (62.3
+  against 63.3%) and effort (0.584 against 0.589); on one user's sync the two layouts are equal (0.496 / 0.497), and so is the system
+  (0.470 both). The layout that lets a sync share its prompt (REPORT 119, 120) costs nothing, so serving can switch to it with the
+  current adapter.
+- **Training on split episodes is not needed and not better.** It keeps top-1 and REAL-6, but its blind auto-filing is lower and
+  seed-unstable (51 to 61%; effort 0.649); on the bulk set it is a little better (0.484 against 0.496). The training split is also an
+  approximation (a first-word payee key, random rows standing in for similar payees). Decision: the recipe stays as trained; serve with
+  the split layout.
+- **One user's sync is easier than blind_v1's queries** (effort 0.50 against 0.59): blind_v1 was sampled to over-represent hard cases
+  (new merchants, changes of mind), where a sync is every transaction in order, mostly ordinary ones.
