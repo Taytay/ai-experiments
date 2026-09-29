@@ -6196,3 +6196,74 @@ several keys of its name (the full-name prefix, the vowel-dropped abbreviation, 
   synthetic data cannot say. With real histories, the rate of lone disagreeing rows that the user later reverses would set it.
 
 Tables: `uv run python scripts/real7_filing_tables.py`.
+
+
+## 98. User effort and the auto-file policy: on REAL-7 the model's confidence, calibrated on other users, can auto-file only 3% of transactions at a 98% target, where the owner's rule (the user's last two filings of the merchant agree) auto-files 60% at 94.5% with every error a change the history cannot show yet; history-or-model cuts the user's effort by 45% on REAL-7 and 69% on REAL-6, and asking the model to agree with the history buys nothing (EVAL-10)
+
+PLAN step 97, after the review of 2026-09-28 (QUESTIONS.md, "Review of the categoriser work"). CPU only, over the saved scores of the
+final recipe (row 89, two seeds; row 96's misfile reader beside it) on REAL-7 and of its four fold models on REAL-6.
+
+**Effort** (`scorecard.effort`) is what a user does per transaction: an auto-filed transaction costs 0 when right and 5 when wrong
+(noticing, undoing, refiling; 3 and 10 also read); the rest show the top three suggestions, 1 click when the answer is among them and a
+search (3) when it is not. **Policies:** *model*: its answer when the calibrated confidence clears the 98% (95%) threshold, temperature
+and threshold fitted on the other users (folds by user id mod 4, as the scorecard); *history (last k)*: the category of the user's last
+k filings of the merchant when they agree, over the whole history before the query (what the product holds; `build_real7.generate()`
+now returns it, the frozen items reproduce to the same hash) or over the 24 rows the prompt shows; *history + model agrees*; *history or
+model*. REAL-6's histories are the users' labels for the merchant (not time-ordered).
+
+**Table 98.1: REAL-7 v1, 200 new users, the final recipe (two seeds pooled, 2,400 readings)**
+
+| policy | auto-filed % | precision % | wrong auto-files, % of all | searches, % of all | effort (wrong = 3 / **5** / 10) |
+|---|---|---|---|---|---|
+| none (suggestions only) | 0.0 | – | 0.0 | 11.2 | 1.22 / **1.22** / 1.22 |
+| model at 98% | 2.7 | 95.4 | 0.1 | 11.1 | 1.20 / **1.20** / 1.21 |
+| model at 95% | 7.1 | 89.4 | 0.8 | 10.5 | 1.16 / **1.18** / 1.21 |
+| history, last 2, prompt rows | 35.7 | 98.8 | 0.4 | 10.9 | 0.87 / **0.88** / 0.90 |
+| history, last 2, whole history | 60.1 | 94.5 | 3.3 | 5.4 | 0.61 / **0.67** / 0.84 |
+| history, last 2, whole history + model agrees | 53.9 | 94.4 | 3.0 | 8.8 | 0.73 / **0.79** / 0.94 |
+| history, last 2, whole history, or model at 98% | 60.9 | 94.5 | 3.4 | 5.4 | 0.60 / **0.67** / 0.84 |
+| history, last 3, whole history | 50.9 | 94.4 | 2.8 | 7.0 | 0.72 / **0.77** / 0.91 |
+
+Row 96's misfile reader gives the same history rows and less from the model (98%: 0.2% auto-filed).
+
+**Table 98.2: REAL-7, final recipe seed 0: wrong / auto-filed by what decides the item (the set's 1,200 items: plain 867,
+idiosyncratic 152, moved 60, new category 49, day rule 32, amount rule 29, random split 11)**
+
+| policy | plain | idiosyncratic | moved | new category | amount rule | day rule | random split |
+|---|---|---|---|---|---|---|---|
+| model at 98% | 0 / 39 | 0 / 0 | 1 / 1 | 0 / 0 | 0 / 0 | 0 / 1 | 1 / 2 |
+| history, last 2, whole history | 0 / 514 | 0 / 92 | 17 / 49 | 13 / 37 | 4 / 10 | 4 / 13 | 2 / 6 |
+| + model agrees | 0 / 500 | 0 / 56 | 17 / 45 | 13 / 31 | 3 / 9 | 3 / 9 | 1 / 3 |
+
+**Table 98.3: REAL-6, all 20 users (the final recipe's four fold models, 1,179 items)**
+
+| policy | auto-filed % | precision % | wrong auto-files, % of all | searches, % of all | effort (wrong = 3 / **5** / 10) |
+|---|---|---|---|---|---|
+| none | 0.0 | – | 0.0 | 1.2 | 1.02 / **1.02** / 1.02 |
+| model at 98% | 77.3 | 96.7 | 2.5 | 0.7 | 0.32 / **0.37** / 0.50 |
+| model at 95% | 90.2 | 95.2 | 4.3 | 0.7 | 0.24 / **0.33** / 0.54 |
+| history, last 2 | 24.9 | 100.0 | 0.0 | 1.0 | 0.77 / **0.77** / 0.77 |
+| history, last 2, or model at 98% | 81.6 | 97.1 | 2.4 | 0.6 | 0.27 / **0.32** / 0.43 |
+
+### 98.1 What the step says
+
+- **REAL-6 overstated what the model's confidence can auto-file.** There it files 77% at a realised 96.7%. On REAL-7 the same
+  procedure, fitted on REAL-7's other users, finds almost no threshold that holds 98%: 2.7% auto-filed. The model is confident on
+  most items (section 93: p >= 0.9 on 91%), and its confident errors are the items the prompt cannot answer (a change not yet
+  visible, a user's unusual filing of a merchant not among the 24 rows), so confidence does not separate them.
+- **The owner's rule carries auto-filing.** The user's last two filings of the merchant, over the whole history, auto-file 60% at
+  94.5%. Every error is on a merchant whose filing changed (moved, a new category) or depends on the transaction (amount and day
+  rules, random splits); plain and idiosyncratic merchants are never wrong (606 auto-filed). Within the 24 prompt rows it files 36% at
+  98.8%. REAL-7 over-samples those events (28% of its items are not plain, up to three of each user's six queries); on a natural
+  stream the rule's precision would be higher.
+- **The model agreeing with the history adds no safety.** It agrees with a stale history exactly where the history is wrong (the
+  change is invisible to both), and it vetoes some right idiosyncratic filings (92 to 56 auto-filed). What would catch the changes is
+  the product recording them (section 97), and for the rules, auto-filing only merchants whose filings do not vary.
+- **Effort.** History-or-model: 0.67 against 1.22 with suggestions only on REAL-7 (-45%), 0.32 against 1.02 on REAL-6 (-69%); at
+  wrong = 10 it still wins on both (0.84, 0.43). The model's other contribution is the suggestion list: the top three hold the answer
+  for 89% of REAL-7's items and 99% of REAL-6's.
+- **For row 98.** The history rule works on the whole history and the model sees only the 24 latest rows; giving the model the
+  merchant's own rows (and their dates) is the step that could let its confidence mean what the rule's does, and let it see the
+  move that the last-two rule misses when the change is already in the history.
+
+Tables: `uv run python scripts/effort_tables.py`.

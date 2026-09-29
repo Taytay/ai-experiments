@@ -86,12 +86,12 @@ def scheme(kind, rng, world):
     return cats, assign, rules
 
 
-if __name__ == "__main__":
-    if DST.exists() and "--force" not in sys.argv:
-        sys.exit(f"{DST} exists (frozen); pass --force to rebuild")
+def generate():
+    """(items, users, hist): the frozen v1 items and users, and per item id the user's whole history before the query as rows
+    (merchant, day, weekday, amount, text, filed category name), of which the prompt shows only the last 24 (rows 97, 98)."""
+    hist_of = {}
     merchants = T.load()["merchants"]; db = R6.load()["fact_db"]
-    std_idx = {c: i for i, c in enumerate(M.CATEGORY_LIST)}
-    rng = random.Random(7); items, users = [], []
+    items, users = [], []
     for u in range(N_USERS):
         r = random.Random(f"real7-{u}")
         kind = "default" if r.random() < 0.55 else "light" if r.random() < 0.67 else "custom"
@@ -173,6 +173,8 @@ if __name__ == "__main__":
                 std = [i for i in vis_idx if q["m"]["category"] in cats[i]["standard"]]
                 best = std[0] if len(std) == 1 else (std[0] if std else None)
             options = [" " + c["name"] for c in visible]
+            hist_of[f"R7:{u:03d}:{qi:03d}"] = [dict(merchant=h["merchant"], day=h["day"], weekday=h["weekday"], amount=h["amount"], text=h["text"],
+                                                   filed=cats[h["filed"]]["name"]) for h in hist] + [dict(merchant=q["merchant"], day=q["day"], query=True)]
             items.append(dict(id=f"R7:{u:03d}:{qi:03d}", level=f"R7_{kind}", user=u, merchant=q["merchant"], known=q["m"]["known"], text=qtext,
                               amount=q["amount"], weekday=q["weekday"], prompt=prompt, prompt_ctx=prompt.replace("\nCategory:", "", 0),
                               options=options, answer=vis_idx.index(q["gold"]), best=vis_idx.index(best) if best in vis_idx else -1,
@@ -181,6 +183,13 @@ if __name__ == "__main__":
                               seen=bool(same), record=db[q["merchant"]]))
         users.append(dict(user=u, scheme=kind, categories=cats, n_rows=n_rows, move=move, newcat=newcat, rules={k: list(v[:2]) for k, v in rules.items()},
                           randsplit=list(randsplit)))
+    return items, users, hist_of
+
+
+if __name__ == "__main__":
+    if DST.exists() and "--force" not in sys.argv:
+        sys.exit(f"{DST} exists (frozen); pass --force to rebuild")
+    items, users, _ = generate()
     out = dict(name="real7", version="v1", n_users=N_USERS, users=users, items=items, sha256=R6.sha256(items))
     DST.write_text(json.dumps(out, indent=0, ensure_ascii=False))
     import numpy as np

@@ -171,3 +171,16 @@ def scorecard(recs, items, n_boot=500, seed=0, users=None, fold_of=None):
         out[k + "_ci"] = tuple(np.percentile(v, [2.5, 97.5]).round(2 if k == "bits" else 1))
     out["_per_item"] = per
     return out
+
+
+# User effort (PLAN step 97, EVAL-10): what a user does per transaction under an auto-file policy. An auto-filed transaction costs
+# nothing when right and `wrong` when wrong (noticing, undoing, refiling); the rest are shown the top three suggestions: one click
+# when the answer is among them, a search through the category list (`search`) when it is not.
+EFFORT = dict(click=1.0, search=3.0, wrong=5.0)
+
+
+def effort(auto, auto_ok, top3_ok, click=EFFORT["click"], search=EFFORT["search"], wrong=EFFORT["wrong"]):
+    """Mean effort per transaction. auto: auto-filed or not; auto_ok: the auto-filed category is right; top3_ok: gold in the top 3
+    suggestions (read only where not auto-filed). All sequences of equal length."""
+    e = [(0.0 if ok else wrong) if a else (click if t3 else search) for a, ok, t3 in zip(auto, auto_ok, top3_ok)]
+    return float(np.mean(e))

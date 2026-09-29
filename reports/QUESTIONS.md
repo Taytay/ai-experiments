@@ -1153,6 +1153,7 @@ answer is among the top suggestions), a search (it is not), or undo a wrong auto
 saved scores, the effort of three auto-file policies (the model's confidence with a threshold from other users; only merchants the
 user has filed consistently before, the owner's rule; both) with top-3 suggestions for the rest, on REAL-7 and REAL-6; the
 coverage-precision curve of each; which items fail.
+**Status (2026-09-28):** PLAN step 97, REPORT.md 98: on REAL-7 the model's confidence auto-files 3% at a 98% target (REAL-6: 77%); the last-two-filings rule over the whole history files 60% at 94.5%, wrong only on changes and rules; history-or-model cuts effort by 45% (REAL-7) and 69% (REAL-6).
 
 **REAL-22 The merchant's own rows in the prompt.** REAL-7's prompt shows the 24 most recent rows; 45% of queried merchants are not
 among them, and 113 items are in the user's history but unanswerable from the prompt. *Experiment:* REAL-7 v2 with each user's
