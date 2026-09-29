@@ -7576,3 +7576,81 @@ parameters that peft's module targets do not reach: frozen, as decider's own tra
   stronger.
 - **Where this leaves the system:** at equal cost the best is still the small pair with the untrained 35B for what they leave
   (0.470); the trained 35B alone (0.534, all transactions through a 3B-active model) is simpler and in between.
+
+
+## 123. Other users' filings in the prompt: trained with a line naming the categories other users file the payee under, decider-4B reads new users 8 points better (61 -> 69) and blind_v1 1.3 points better (83.8), the user's own habits are untouched (86.7), effort at W = 10 falls 0.651 -> 0.619; read untrained, the line does nothing (REAL-23)
+
+PLAN step 124. At test, `blind_v1_others` (`BLIND_OTHERS=1`): blind_v1's items with one line before the query, "Other users file this
+payee as: Restaurants (600), Food (475), Takeout & dining (449)", the top three categories the other 249 users filed the same payee under
+before the query's date, shown when there are at least three such rows (1,040 of 1,500 items, 133 of the 168 new-user items). In
+training (`OTHERS=0.5`, exp_categoriser `others_line`), half the episodes carry such a line built from the query merchant's standard
+category or kind: other users' names for it (the standard name and REAL-6's renames, or the kind's names), led in 20% of lines by another
+category's names (other users disagree), counts log-uniform from 3 to 2,000. The recipe with labelled rows otherwise; two seeds.
+`scripts/others_tables.py`, job list `scripts/modal_jobs/r124.json`.
+
+**Table OT.1: top-1 on blind_v1 by group (mean over seeds)**
+
+| arm | all (n=1500) | items with the line (n=1040) | new users (0-10 rows) (n=168) | new merchants (chain / descriptive / opaque) (n=110) | user's own habit (idiosyncratic, changed mind, named) (n=98) | plain / recurring / income (n=780) |
+|---|---|---|---|---|---|---|
+| the recipe | 82.5 | 85.6 | 61.3 | 49.5 | 85.2 | 99.4 |
+| the recipe, line shown (zero-shot) | 82.7 | 86.2 | 60.7 | 48.2 | 86.7 | 99.5 |
+| trained with the line, line not shown | 82.7 | 86.2 | 61.9 | 45.0 | 86.7 | 99.7 |
+| trained with the line, line shown | 83.8 | 87.8 | 69.3 | 49.5 | 86.7 | 99.9 |
+
+**Table OT.2: effort on blind_v1 (mean [range] over seeds)**
+
+| arm | 98% cut, W = 5: auto-filed % / effort | per-item, W = 10: auto-filed % / precision % / effort |
+|---|---|---|
+| the recipe | 63.0 [61.9, 64.1] / 0.593 [0.586, 0.601] | 62.5 [62.4, 62.6] / 98.1 [98.1, 98.1] / 0.651 [0.645, 0.657] |
+| the recipe, line shown (zero-shot) | 62.9 / 0.585 | 61.4 / 98.2 / 0.649 |
+| trained with the line, line not shown | 61.1 [60.7, 61.4] / 0.609 [0.599, 0.619] | 62.4 [61.1, 63.7] / 97.9 [97.7, 98.0] / 0.662 [0.648, 0.677] |
+| trained with the line, line shown | 60.9 [60.8, 60.9] / 0.587 [0.579, 0.595] | 64.8 [63.4, 66.1] / 97.8 [97.8, 97.9] / 0.619 [0.599, 0.639] |
+
+Other sets, top-1 (seeds 0 / 1), the recipe against trained with the line (no line at test): REAL-6 85.2 / 87.6 against 86.2 / 91.6;
+novel names 84.2 / 85.2 against 87.6 / 82.9; misleading names 65.2 / 66.1 against 65.4 / 63.8; override 98.0 / 97.1 against 98.4 / 98.2.
+
+### 123.1 What the step says
+
+- **Other users' filings are the knowledge a new user lacks, and the reader uses them once trained to.** New users rise from 61 to 69
+  (items with the line from 85.6 to 87.8), where the user's own history cannot help; blind_v1 overall 82.5 -> 83.8, effort at W = 10
+  0.651 -> 0.619 (5% less) with auto-filing 62.5 -> 64.8%.
+- **The user still wins.** Filings for the user's own reasons (idiosyncratic, changed mind, merchant-named categories) stay at 86.7: the
+  20% of training lines where other users disagree taught the reader to treat the line as a prior, as override episodes taught it for
+  the database (REPORT 84).
+- **Untrained, the line is ignored** (82.7 against 82.5), and a model trained with it reads plain prompts as before (82.7) and the other
+  sets within seed noise: the line can be shown when it exists and left out when it does not.
+- **New merchants do not gain** (49.5): the line exists only for payees other users have filed, which new merchants mostly are not.
+- **For production:** the counts come from the whole user base at inference time (a per-payee histogram of category names, cheap to keep);
+  only filings dated before the transaction may count (the rule held here). The synthetic training line maps other users' names through
+  REAL-6's rename lists; real data will show how varied other users' names are.
+- **Decision:** the recipe takes `OTHERS=0.5` when a payee histogram is available (it is in production); the system comparison with it is
+  row 129.
+
+## 124. An exponential moving average of the LoRA weights does not steady the seeds (effort 0.682 against 0.659, auto-filing spread 6 points against 5); the instability was mostly the fixed threshold's: under the per-item rule the plain recipe's auto-filing varies 1.7 points over three seeds (TRAIN-13)
+
+PLAN step 122. The recipe with labelled rows, seeds 0 to 2, plain and with the saved weights an EMA of the LoRA weights (decay 0.99 per
+step, `EMA=0.99`); blind_v1, REAL-6 and novel names. `scripts/stability_tables.py`, job lists `scripts/modal_jobs/r122.json`, `r122b.json`
+(the EMA adapters rescored under their saved names).
+
+**Table ST.1: decider-4B (labelled rows) per seed, plain and with an EMA of the LoRA weights (0.99)**
+
+| weights | seed | blind top-1 | auto-filed at 98% cut | per-item W=10: auto-filed % | precision % | effort | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| plain | s0 | 82.6 | 64.1 | 62.4 | 98.1 | 0.657 | 85.2 | 84.2 |
+| plain | s1 | 82.3 | 61.9 | 62.6 | 98.1 | 0.645 | 87.6 | 85.2 |
+| plain | s2 | 83.1 | 59.3 | 64.1 | 97.6 | 0.674 | 86.9 | 81.9 |
+| plain | **spread** | 0.7 | 4.8 | 1.7 | 0.5 | 0.029 | 2.3 | 3.4 |
+| EMA 0.99 | s0 | 82.8 | 55.9 | 63.0 | 96.9 | 0.717 | 86.2 | 86.9 |
+| EMA 0.99 | s1 | 82.4 | 58.2 | 62.0 | 97.8 | 0.671 | 88.3 | 85.6 |
+| EMA 0.99 | s2 | 82.2 | 62.2 | 63.9 | 97.8 | 0.658 | 85.6 | 86.6 |
+| EMA 0.99 | **spread** | 0.6 | 6.3 | 1.9 | 0.9 | 0.059 | 2.7 | 1.3 |
+
+### 124.1 What the step says
+
+- **EMA does not help.** Top-1 is unchanged, auto-filing at the 98% cut is lower (55.9 to 62.2%) and as spread, effort is higher on
+  average (0.682 against 0.659); at this schedule (the rate decays to zero over 800 steps) the final weights are already an average of
+  sorts, and averaging in earlier, less-trained weights costs confidence.
+- **The seed spread in auto-filing was the fixed threshold.** Three seeds of the plain recipe auto-file 59 to 64% at the fixed 98% cut
+  (spread 4.8) but 62.4 to 64.1% under the per-item rule at W = 10 (spread 1.7), with effort spread 0.03: a fixed cut sits on the steep
+  part of each seed's confidence distribution, where the per-item rule weighs each transaction's own costs. REPORT 109's 18-point spread
+  was measured at a fixed cut too. Decision: no EMA; the per-item rule (REPORT 118) is also the stability fix.

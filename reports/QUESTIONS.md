@@ -1220,6 +1220,7 @@ it did not carry from REAL-7 to blind_v1 (section 103). *Experiment (CPU):* over
 **TRAIN-13 Confidence that does not depend on the seed.** Accuracy is stable across seeds, auto-filing is not (section 109: 46 to 63%;
 48 rows 26 to 58%). *Experiment:* the decider recipe with an average of the last checkpoints (or an EMA of the LoRA weights), three
 seeds, against the plain recipe's seed spread in blind auto-filing.
+**Status (2026-09-29):** PLAN step 122, REPORT.md 124: EMA does not help (effort 0.682 vs 0.659); the seed spread in auto-filing was the fixed cut's: under the per-item rule it is 1.7 points.
 
 **MODEL-19 A large model as teacher.** Never done for the categoriser (sections 14 and 18 distilled a format on the species universe).
 *Experiment (after EVAL-12):* if the large reader is well ahead on blind_v1's weak groups, its calibrated distributions on training
@@ -1229,6 +1230,7 @@ episodes (and on Overture names for the encoder) as soft targets for decider-4B 
 a new user lacks; row 44 (the collaborative record) was deprioritised before the blind set existed. *Experiment:* a line under the query
 ("Other users file this payee as: Coffee 12, Eating out 5") built from other users' histories (blind_v1 users share ~250 real chains),
 in training episodes and at test; effort on blind_v1's new users and new payees.
+**Status (2026-09-29):** PLAN step 124, REPORT.md 123: trained with the line, new users 61 -> 69, blind 82.5 -> 83.8, effort (W=10) 0.651 -> 0.619; the user's own habits unchanged; untrained the line is ignored.
 
 **MODEL-20 The large reader trained with the recipe.** Row 120: decider-35B-A3B untrained reads blind_v1 at 82.0 (the trained 4B 82.5),
 far better on new users (77 against 62) and new businesses (78 to 84 against 62 to 70), far worse where the user's habit overrides the
