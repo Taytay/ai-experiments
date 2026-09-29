@@ -7690,3 +7690,43 @@ re-checked).
   prefix before it is cached, and the MoE layers make the duplicated prefill dearer. Syncs of 30 and queues gain (20.3, 14.1).
 - **Top-1 moves by 0.3 between cache on and off** (83.9 against 83.6 at 30): MoE routing in batched bf16 is not bit-stable across batch
   shapes; the 4B matched to the decimal.
+
+
+## 126. The system with everything that helped, by expected effort under the per-item rule: the encoder and decider-4B (with other users' filings in the prompt), and the untrained decider-35B-A3B for the third they leave, cost the user 0.549 per transaction at W = 10 (decider alone 0.659: 17% less), auto-filing 71% at 97.7%; the other-users line and the 35B overlap (each helps most alone), and past W = 50 only reading everything with all three helps (EVAL-14, REAL-23)
+
+PLAN step 129. blind_v1; decider-4B three seeds each (the recipe; trained with the other-users line and reading blind_v1_others), the
+encoder three seeds, the untrained decider-35B-A3B. Every distribution calibrated with a leave-fold-out temperature; combinations are
+products of the members' calibrated distributions, recalibrated; every auto-file decision is the per-item rule (REPORT 118). "pair ->
+35B": the pair's rule first, the rest re-decided on the three-model product. `scripts/system_v2_tables.py` (BIG=<file> for another third
+reader), job list `scripts/modal_jobs/r129.json` (the line's seed 2).
+
+**Table SY2.1: blind_v1, effort per transaction under the per-item rule (mean [range] over seed pairs; decider seeds: recipe 3, + other users' line 3; encoder seeds 3)**
+
+| decider | system | W = 5 | W = 10 | W = 20 | W = 50 | auto-filed % / precision % at W = 10 | sent to the 35B % |
+|---|---|---|---|---|---|---|---|
+| recipe | decider | 0.556 [0.544, 0.562] | 0.659 [0.645, 0.674] | 0.786 [0.779, 0.795] | 0.994 [0.925, 1.071] | 63.0 [62.4, 64.1] / 97.9 [97.6, 98.1] | 0 |
+| recipe | pair | 0.536 [0.517, 0.547] | 0.630 [0.622, 0.635] | 0.755 [0.723, 0.804] | 1.007 [0.970, 1.078] | 65.8 [64.9, 66.7] / 97.7 [97.6, 97.9] | 0 |
+| recipe | pair -> 35B | 0.463 [0.449, 0.480] | 0.556 [0.538, 0.579] | 0.693 [0.683, 0.721] | 0.971 [0.948, 1.000] | 70.5 [69.2, 71.5] / 97.8 [97.5, 98.0] | 34.2 [33.3, 35.1] |
+| recipe | three for all | 0.456 [0.449, 0.463] | 0.548 [0.534, 0.563] | 0.679 [0.666, 0.697] | 0.921 [0.891, 0.947] | 69.3 [68.3, 70.1] / 98.0 [97.9, 98.2] | 100 |
+| + other users' line | decider | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] | 0.995 [0.983, 1.010] | 65.4 [63.4, 66.5] / 97.8 [97.6, 97.9] | 0 |
+| + other users' line | pair | 0.507 [0.488, 0.524] | 0.603 [0.583, 0.618] | 0.735 [0.717, 0.761] | 1.032 [0.981, 1.072] | 66.4 [65.0, 67.4] / 97.8 [97.5, 98.0] | 0 |
+| + other users' line | pair -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] | 0.985 [0.951, 1.068] | 71.3 [69.5, 72.2] / 97.7 [97.4, 97.9] | 33.6 [32.6, 35.0] |
+| + other users' line | three for all | 0.441 [0.429, 0.451] | 0.541 [0.525, 0.553] | 0.666 [0.651, 0.691] | 0.921 [0.886, 0.974] | 70.1 [68.7, 71.1] / 97.9 [97.7, 98.1] | 100 |
+
+With the trained 35B (row 125) as the third reader instead, "+ other users' line, pair -> 35B" reads 0.470 / 0.570 / 0.718 / 0.990 at
+W = 5 / 10 / 20 / 50 (auto-filed 68.4%): the untrained one is better as the third reader here too (REPORT 122).
+
+### 126.1 What the step says
+
+- **The best system so far:** encoder x decider (trained with other users' filings, shown when the payee has them), and the untrained
+  35B for the ~34% the pair does not auto-file: effort 0.549 at W = 10 against 0.659 for the recipe's decider alone (17% less), 71%
+  auto-filed at 97.7%; the ordering holds at W = 5 and 20. Its GPU cost is about $20 to $25 per million transactions in vLLM
+  (REPORT 120, 125).
+- **Other users' filings and the 35B cover the same gap.** The line takes decider alone from 0.659 to 0.622 and the pair from 0.630 to
+  0.603, but with the 35B behind the pair only from 0.556 to 0.549: both bring knowledge the user's own history lacks (what a payee
+  usually is), and the 35B already has most of it. Without a large model the line is the cheap way to get it.
+- **At W = 50 the picture changes.** When a wrong auto-file is very costly the pair is no better than decider alone (0.99 to 1.03), and
+  only reading everything with all three helps (0.92): at that W only the most certain transactions are auto-filed, and ranking those
+  is where the 35B's confidence adds the most.
+- **What remains open for real data:** W itself (the owner's call, then users' undo behaviour); the calibration fitted on the product's
+  own users (REPORT 116); how varied real users' names are in the other-users line.
