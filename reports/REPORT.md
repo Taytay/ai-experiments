@@ -6686,3 +6686,45 @@ no better than row 89 and could no longer auto-file there. Here the same recipe 
   rand255 + empty categories; row 105 trains the combination with two seeds.
 
 Job list: `scripts/modal_jobs/r104.json`.
+
+
+## 107. The recipe, settled on the blind set by user effort: row 89 + 255 labels + empty categories (blind_v1 82.6, auto-filed 55% at 97.6%, effort 0.63 to 0.69); adding the 300 dated slices on top lifts top-1 (83.1) and REAL-7 (89.1) but costs REAL-6 2 points and auto-filing (40%, effort 0.75 to 0.88), so it stays out; the encoder filing first and decider reading the rest is the best system (effort 0.59 to 0.63, decider reads 56% of transactions) (EVAL-10, EVAL-11, REAL-22)
+
+PLAN steps 104 and 105. Sections 105 and 106 each improved on row 89 alone; recipe v2 trains both changes together (rand255 + EMPTY=20
++ 300 dated slices from the 2,400-user pool), two seeds. The choice between recipes is read on blind_v1 by user effort
+(`scorecard.effort`: auto-filed right 0, wrong 5, top-3 suggestion 1, search 3; auto-filing at each model's own calibrated 98%
+threshold), with the model alone and behind the encoder (Ettin-1B, section 104's recipe, auto-files what clears its own 98% threshold;
+decider reads the rest).
+
+**Table 107.1: decider-4B recipes (mean [range] over seeds; `scripts/recipe_tables.py`)**
+
+| recipe | seeds | REAL-6 | novel names | REAL-7 v2 | blind_v1 | blind > 26 options | blind auto-filed (precision) | misleading | alternation stores / restaurants |
+|---|---|---|---|---|---|---|---|---|---|
+| row 89 (rand26) | 2 | 89.8 | 87.9 | 87.2 | 82.0 | 83.7 | 51.0 (97.7) | 94.1 | 88.3 / 74.2 |
+| **+ rand255 + empty categories** | 2 | 89.3 | **89.3** | 87.0 | 82.6 | 86.2 | **55.0 (97.6)** | 93.4 | 82.0 / 70.3 |
+| + 300 dated slices | 1 | 90.6 | 89.9 | 88.9 | 83.5 | 87.7 | 51.7 (97.9) | 94.7 | 73.4 / 67.2 |
+| recipe v2 (both) | 2 | 87.4 | 88.8 | 89.1 | 83.1 | 87.1 | 39.7 (97.6) | 92.1 | 83.6 / 73.4 |
+
+**Table 107.2: blind_v1, user effort per transaction (lower is better)**
+
+| recipe | seed | decider alone: effort (auto-filed %) | encoder first, decider for the rest: effort (auto-filed %) |
+|---|---|---|---|
+| row 89 | 0 / 1 | 0.693 (50.8) / 0.702 (51.3) | 0.621 (59.1) / 0.631 (59.3) |
+| **+ rand255 + empty** | 0 / 1 | **0.627 (58.3) / 0.691 (51.7)** | **0.588 (63.3) / 0.629 (58.9)** |
+| + 300 dated slices | 0 | 0.704 (51.7) | 0.631 (60.5) |
+| recipe v2 | 0 / 1 | 0.753 (47.1) / 0.878 (32.3) | 0.645 (59.9) / 0.692 (53.8) |
+
+### 107.1 What the step says
+
+- **The changes do not add.** Each of 255 labels + empty categories and 300 dated slices helps alone; together the reader is more
+  accurate on the blind set (83.1) and REAL-7 (89.1) but less sure of itself where it matters (auto-filing 40%, one seed 32%) and 2
+  points lower on REAL-6. Two augmentations that each widen what the reader sees (more options, a new population) seem to share the
+  same training budget; 800 steps may be too few for both (not tested).
+- **Decision: the recipe is row 89 + `LABELS=rand255 EMPTY=20`.** Best effort alone and behind the encoder, auto-files most at 97.6%,
+  and handles users with any number of categories. Dated slices stay the prompt design (sections 99, 101: the payee's rows and the
+  dates are what a reader needs) and out of training until they can be added without the confidence cost, or real histories exist.
+- **The system: history rule, encoder, decoder.** With the owner's rule in front (section 98) and the encoder filing what it is sure of,
+  decider reads 56% of transactions; the blind set's effort falls from 0.69 (decider alone) to 0.59 to 0.63. The encoder is three times
+  cheaper per item (section 102), so the cascade is also the cheaper system.
+
+Tables: `uv run python scripts/recipe_tables.py`, `uv run python scripts/split_tables.py`. Job list: `scripts/modal_jobs/r106.json`.
