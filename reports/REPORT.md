@@ -7050,8 +7050,8 @@ enum has quoted members and bracket access rather than `Categories.GU`.
 | TSV table, labelled cells (section 113) | 84.7 | 85.2 | 84.9 | 81.3 | 55.1 | 0.674 | 0.608 |
 
 The encoder (Ettin-1B) read JSON and YAML as it reads everything else (system effort 0.587 in both; blind top-1 81.0 and 79.9);
-its TypeScript arm ran out of memory at 16 sequences per step on the longer prompts and was rerun at 8 x 6,000 steps (added below
-when in).
+its TypeScript arm ran out of memory at 16 sequences per step on the longer prompts and, rerun at 8 x 6,000 steps (the same episodes),
+reads the same again (blind top-1 80.3, auto-filed 52.8%, system effort 0.583).
 
 ### 114.1 What the step says
 
