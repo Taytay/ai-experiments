@@ -1236,6 +1236,7 @@ merchant (idiosyncratic 49 against 97, changed mind 28 against 61): it has the w
 not help on REAL-6 (section 87: 9B = 4B), where there is no world knowledge to use. *Experiment:* the decider recipe (labelled rows) as
 a LoRA on decider-35B-A3B (attention, linear attention and the shared expert; routed experts frozen, as decider's own training), one
 H200, one seed; every set; alone and as the escalation reader of row 120.
+**Status (2026-09-29):** PLAN step 125, REPORT.md 122: blind_v1 84.8 (best single reader, effort 0.534), new users 74, idiosyncratic 95; REAL-6 74 (DB not stored, routed experts frozen); as escalation reader the untrained 35B is better (0.470 vs 0.500). Row 128: experts / steps.
 
 **EVAL-14 A scoring mechanism without an arbitrary threshold.** The owner (2026-09-29): the 98% threshold is arbitrary; a better mechanism
 for scoring and deciding success. *Experiment (CPU):* success as expected user effort at a stated cost W of a wrong auto-file; auto-file

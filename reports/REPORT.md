@@ -7498,3 +7498,80 @@ REAL-6 / novel names / misleading-name set top-1 (two seeds): the recipe 86.4 / 
   the split layout.
 - **One user's sync is easier than blind_v1's queries** (effort 0.50 against 0.59): blind_v1 was sampled to over-represent hard cases
   (new merchants, changes of mind), where a sync is every transaction in order, mostly ordinary ones.
+
+
+## 122. decider-35B-A3B with the recipe: the best single reader on the blind set (84.8; effort 0.534 against decider-4B's 0.589), with the large model's world knowledge (new users 74, new businesses 78 to 81) and the recipe's behaviours (idiosyncratic 95, weekday rules 84); but it stores the merchant database poorly (REAL-6 74 against 86, training loss 0.64 against ~0.4, routed experts frozen), and as the third reader it helps less than the untrained 35B (effort 0.500 against 0.470) because training made its errors like the small models' (MODEL-20)
+
+PLAN step 125. The decider recipe with labelled rows (row 89 + rand255 + empty categories, `LAYOUT=labelled_shots`, 800 steps x 16,
+lr 1e-4) as a rank-64 LoRA on decider-35B-A3B: attention, linear attention and the shared expert (the routed experts are fused
+parameters that peft's module targets do not reach: frozen, as decider's own training left them); one H200 (`modal_app.py --gpu H200`):
+42 minutes of training, peak 77 GiB, final loss 0.64 (decider-4B's recipe ends near 0.4). One seed. Scored in the labelled layout.
+`scripts/escalation_tables.py` with `BIG=<the trained 35B's blind_v1 file>`, job list `scripts/modal_jobs/r125.json`.
+
+**Table 122.1: top-1 on every set (decider-4B: two seeds of the same recipe)**
+
+| set | decider-4B recipe | decider-35B-A3B recipe |
+|---|---|---|
+| blind_v1 | 82.6 / 82.3 | **84.8** |
+| REAL-6 (fold 0) | 85.2 / 87.6 | 74.2 |
+| REAL-6 novel names | 84.2 / 85.2 | 69.1 |
+| misleading names | 65.2 / 66.1 | 61.4 |
+| override | 98.0 / 97.1 | 98.4 |
+| alternation | 71.1 / 70.5 | 71.9 |
+| novel_merchants_v1 | 51.7 / 53.3 | 59.4 |
+
+**Table ES.1: top-1 on blind_v1 (small models: first seed; agree / disagree: the first encoder and decider seeds)**
+
+| group | n | encoder (Ettin-1B, recipe) | decider-4B, recipe | decider-4B untrained | decider-35B-A3B trained (row 125) |
+|---|---|---|---|---|---|
+| all | 1500 | 79.8 | 82.6 | 76.5 | 84.8 |
+| small models agree | 1257 | 91.0 | 91.0 | 83.9 | 90.9 |
+| small models disagree | 243 | 21.8 | 39.1 | 38.3 | 53.5 |
+| plain | 511 | 99.2 | 99.2 | 95.9 | 99.4 |
+| recurring | 208 | 100.0 | 100.0 | 98.6 | 100.0 |
+| short_history | 168 | 48.2 | 62.5 | 57.7 | 74.4 |
+| income | 61 | 100.0 | 100.0 | 95.1 | 100.0 |
+| misfiled_history | 39 | 76.9 | 87.2 | 92.3 | 89.7 |
+| new_merchant_chain | 37 | 64.9 | 70.3 | 48.6 | 81.1 |
+| ambiguous_p2p | 37 | 27.0 | 21.6 | 16.2 | 21.6 |
+| new_merchant_descriptive | 37 | 56.8 | 62.2 | 56.8 | 78.4 |
+| weekday_split | 37 | 73.0 | 78.4 | 56.8 | 83.8 |
+| idiosyncratic | 37 | 94.6 | 97.3 | 78.4 | 94.6 |
+| trip | 36 | 69.4 | 66.7 | 55.6 | 75.0 |
+| refund | 36 | 61.1 | 83.3 | 63.9 | 77.8 |
+| amount_split | 36 | 55.6 | 61.1 | 47.2 | 66.7 |
+| date_night | 36 | 72.2 | 80.6 | 86.1 | 72.2 |
+| multi_purpose | 36 | 50.0 | 38.9 | 25.0 | 38.9 |
+| new_category | 36 | 50.0 | 52.8 | 38.9 | 58.3 |
+| new_merchant_opaque | 36 | 8.3 | 8.3 | 8.3 | 11.1 |
+| changed_mind | 36 | 58.3 | 61.1 | 38.9 | 52.8 |
+| named_category | 25 | 100.0 | 100.0 | 100.0 | 100.0 |
+| event | 15 | 100.0 | 93.3 | 73.3 | 93.3 |
+
+**Table ES.2: system policies on blind_v1 (mean [range] over six small-model seed pairs)**
+
+| policy | auto-filed % | precision % | effort | sent to the trained 35B % |
+|---|---|---|---|---|
+| agree and either confident (REPORT 115); suggestions from the small models | 64.7 [62.7, 66.3] | 97.8 [97.6, 98.0] | 0.566 [0.550, 0.584] | 0.0 [0.0, 0.0] |
+| the same; suggestions for the rest from the trained 35B | 64.7 [62.7, 66.3] | 97.8 [97.6, 98.0] | 0.539 [0.523, 0.552] | 35.3 [33.7, 37.3] |
+| + the trained 35B confident and agreeing with one small model | 69.7 [69.3, 70.3] | 97.4 [97.2, 97.6] | 0.503 [0.493, 0.513] | 35.3 [33.7, 37.3] |
+| + the trained 35B confident alone | 70.1 [69.7, 70.6] | 97.3 [97.1, 97.5] | 0.500 [0.491, 0.510] | 35.3 [33.7, 37.3] |
+| + the trained 35B, suggestions from the three-model product | 69.7 [69.3, 70.3] | 97.4 [97.2, 97.6] | 0.502 [0.495, 0.514] | 35.3 [33.7, 37.3] |
+| the trained 35B alone at its 98% (no small models) | 64.5 [64.5, 64.5] | 97.8 [97.8, 97.8] | 0.534 [0.534, 0.534] | 100.0 [100.0, 100.0] |
+
+### 122.1 What the step says
+
+- **On the set built blind to our generators, the trained 35B is the best single reader.** 84.8 top-1 (96% of the 87.9 ceiling), and
+  by effort alone 0.534, better than decider-4B (0.589) and the encoder-decider system (0.560). It keeps what the untrained 35B knew (new
+  users 74, new chains 81, new local businesses 78, novel_merchants_v1 59 against 52) and gains what the recipe teaches (idiosyncratic
+  filings 49 -> 95, weekday rules 46 -> 84, changes of mind 28 -> 53).
+- **It did not store the merchant database.** REAL-6 falls to 74 and its novel-name copy to 69 (decider-4B 86 and 85): REAL-6's unseen
+  merchants are answerable only from the database episodes, which a LoRA without the routed experts, at the 4B's steps and rate,
+  stores less (the higher final loss says the same). Row 128 tests whether the experts (or more steps) fix it. On blind_v1 this does not
+  show, because blind_v1's merchants are real chains and local names the base model already knows about.
+- **As the escalation reader, untrained is better.** Sent the 35% the small models leave, the trained 35B lifts auto-filing to 70% and
+  effort to 0.500, where the untrained one reached 73% and 0.470 (REPORT 117). Trained on the same episodes, its mistakes overlap the
+  small models' (where they disagree it is right 53.5%, about the untrained 51.4, but it agrees with them more often when they are
+  wrong), so it adds less as a second opinion. Diversity matters more than strength for the third reader.
+- **Where this leaves the system:** at equal cost the best is still the small pair with the untrained 35B for what they leave
+  (0.470); the trained 35B alone (0.534, all transactions through a 3B-active model) is simpler and in between.

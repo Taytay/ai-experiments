@@ -9,6 +9,7 @@ layout, letters), each calibrated with the leave-fold-out temperature and 98% th
 usage: uv run python scripts/escalation_tables.py
 """
 import glob
+import os
 import json
 import sys
 import warnings
@@ -23,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from agreement_tables import DEC, ENC, fmt, load  # noqa: E402
 from effort_tables import calibrated  # noqa: E402
 
-BIG = "results/per_item/real6_dm_decider_decider-35b-a3b_blind_v1.noctx.jsonl"
+BIG = os.environ.get("BIG", "results/per_item/real6_dm_decider_decider-35b-a3b_blind_v1.noctx.jsonl")  # row 125: BIG=<the trained 35B file>
 SMALL0 = "results/per_item/real6_dm_decider_decider-4b_blind_v1.noctx.jsonl"
 
 
