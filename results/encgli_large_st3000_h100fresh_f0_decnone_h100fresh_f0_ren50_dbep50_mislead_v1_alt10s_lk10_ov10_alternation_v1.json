@@ -1,0 +1,256 @@
+{
+ "config": {
+  "dec_episodes": true,
+  "load_from": "encgli_large_st3000_h100fresh_f0_decnone_h100fresh_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10",
+  "arch": "gliclass",
+  "init": "large",
+  "hops_from": null,
+  "mbi_ids": "letters",
+  "mbi_shotlab": false,
+  "steps": 0,
+  "batch": 16,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "ctx": false,
+  "fold": 0,
+  "poi": "",
+  "items_set": "alternation_v1",
+  "maxlen": 2048,
+  "seed": 0,
+  "base": "knowledgator/gliclass-modern-large-v3.0",
+  "train_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+  "model": "encgli_large_st3000_h100fresh_f0_decnone_h100fresh_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10"
+ },
+ "train": {},
+ "noctx": {
+  "ALT_restaurant_control": 100.0,
+  "ALT_restaurant_control_n": 64,
+  "ALT_restaurant_control_ci": [
+   100.0,
+   100.0
+  ],
+  "ALT_restaurant_control_null": [
+   34.4,
+   59.4
+  ],
+  "ALT_restaurant_control_uci": [
+   100.0,
+   100.0
+  ],
+  "ALT_restaurant_control_chance": 8.9,
+  "ALT_restaurant_observable": 45.3,
+  "ALT_restaurant_observable_n": 64,
+  "ALT_restaurant_observable_ci": [
+   32.8,
+   56.2
+  ],
+  "ALT_restaurant_observable_null": [
+   6.2,
+   21.9
+  ],
+  "ALT_restaurant_observable_uci": [
+   43.8,
+   46.9
+  ],
+  "ALT_restaurant_observable_chance": 8.9,
+  "ALT_restaurant_partial": 59.4,
+  "ALT_restaurant_partial_n": 64,
+  "ALT_restaurant_partial_ci": [
+   46.9,
+   71.9
+  ],
+  "ALT_restaurant_partial_null": [
+   4.7,
+   18.8
+  ],
+  "ALT_restaurant_partial_uci": [
+   56.2,
+   62.5
+  ],
+  "ALT_restaurant_partial_chance": 8.9,
+  "ALT_restaurant_unobservable": 45.3,
+  "ALT_restaurant_unobservable_n": 64,
+  "ALT_restaurant_unobservable_ci": [
+   32.8,
+   56.2
+  ],
+  "ALT_restaurant_unobservable_null": [
+   10.9,
+   28.1
+  ],
+  "ALT_restaurant_unobservable_uci": [
+   34.4,
+   56.2
+  ],
+  "ALT_restaurant_unobservable_chance": 8.9,
+  "ALT_store_control": 100.0,
+  "ALT_store_control_n": 64,
+  "ALT_store_control_ci": [
+   100.0,
+   100.0
+  ],
+  "ALT_store_control_null": [
+   32.8,
+   56.2
+  ],
+  "ALT_store_control_uci": [
+   100.0,
+   100.0
+  ],
+  "ALT_store_control_chance": 8.9,
+  "ALT_store_observable": 92.2,
+  "ALT_store_observable_n": 64,
+  "ALT_store_observable_ci": [
+   85.9,
+   98.4
+  ],
+  "ALT_store_observable_null": [
+   7.8,
+   25.0
+  ],
+  "ALT_store_observable_uci": [
+   87.5,
+   96.9
+  ],
+  "ALT_store_observable_chance": 8.9,
+  "ALT_store_partial": 64.1,
+  "ALT_store_partial_n": 64,
+  "ALT_store_partial_ci": [
+   53.1,
+   76.6
+  ],
+  "ALT_store_partial_null": [
+   9.4,
+   26.6
+  ],
+  "ALT_store_partial_uci": [
+   59.4,
+   68.8
+  ],
+  "ALT_store_partial_chance": 8.9,
+  "ALT_store_unobservable": 50.0,
+  "ALT_store_unobservable_n": 64,
+  "ALT_store_unobservable_ci": [
+   37.5,
+   60.9
+  ],
+  "ALT_store_unobservable_null": [
+   9.4,
+   26.6
+  ],
+  "ALT_store_unobservable_uci": [
+   46.9,
+   53.1
+  ],
+  "ALT_store_unobservable_chance": 8.9,
+  "R6_all": 69.5,
+  "R6_all_n": 512,
+  "R6_all_ci": [
+   65.6,
+   73.2
+  ],
+  "R6_all_null": [
+   17.2,
+   23.2
+  ],
+  "R6_all_uci": [
+   68.0,
+   71.1
+  ],
+  "R6_all_chance": 8.9,
+  "R6_all_control": 100.0,
+  "R6_all_control_n": 128,
+  "R6_all_control_ci": [
+   100.0,
+   100.0
+  ],
+  "R6_all_control_null": [
+   35.9,
+   52.3
+  ],
+  "R6_all_control_uci": [
+   100.0,
+   100.0
+  ],
+  "R6_all_control_chance": 8.9,
+  "R6_all_observable": 68.8,
+  "R6_all_observable_n": 128,
+  "R6_all_observable_ci": [
+   60.2,
+   76.6
+  ],
+  "R6_all_observable_null": [
+   9.4,
+   21.1
+  ],
+  "R6_all_observable_uci": [
+   65.6,
+   71.9
+  ],
+  "R6_all_observable_chance": 8.9,
+  "R6_all_partial": 61.7,
+  "R6_all_partial_n": 128,
+  "R6_all_partial_ci": [
+   53.1,
+   69.5
+  ],
+  "R6_all_partial_null": [
+   7.8,
+   18.8
+  ],
+  "R6_all_partial_uci": [
+   57.8,
+   65.6
+  ],
+  "R6_all_partial_chance": 8.9,
+  "R6_all_unobservable": 47.7,
+  "R6_all_unobservable_n": 128,
+  "R6_all_unobservable_ci": [
+   39.1,
+   56.2
+  ],
+  "R6_all_unobservable_null": [
+   12.5,
+   24.2
+  ],
+  "R6_all_unobservable_uci": [
+   40.6,
+   54.7
+  ],
+  "R6_all_unobservable_chance": 8.9,
+  "R6_restaurant_all": 62.5,
+  "R6_restaurant_all_n": 256,
+  "R6_restaurant_all_ci": [
+   57.4,
+   68.4
+  ],
+  "R6_restaurant_all_null": [
+   14.8,
+   23.4
+  ],
+  "R6_restaurant_all_uci": [
+   60.2,
+   64.8
+  ],
+  "R6_restaurant_all_chance": 8.9,
+  "R6_store_all": 76.6,
+  "R6_store_all_n": 256,
+  "R6_store_all_ci": [
+   71.9,
+   81.6
+  ],
+  "R6_store_all_null": [
+   16.4,
+   25.8
+  ],
+  "R6_store_all_uci": [
+   75.8,
+   77.3
+  ],
+  "R6_store_all_chance": 8.9,
+  "ms_per_item_batched": 7.03,
+  "ms_per_item_single": 34.26,
+  "n_items": 512,
+  "truncated_share": 0.0
+ }
+}

@@ -6435,3 +6435,69 @@ else is row 89.
   built blind to the training generators, is what can say how much of the gain is the generator.
 
 Tables: `uv run python scripts/slice_tables.py`. Job list: `scripts/modal_jobs/r98b.json`. Models `models/adapters/decider_*_r7*` (DVC).
+
+
+## 102. Encoders trained on the decoder recipe's episodes match decider-4B on REAL-6 and novel names at a third of its scoring time: GLiClass-large (400M) 90.8 and Ettin-encoder-1B 90.9 against 89.8 (novel names 88 against 88), misleading names 93 to 95 against 97; the 30-point gap of sections 62 and 63 was the training data, not the architecture. What they lack is what the recipe's soft targets teach (confident on 50 to 57% of evidence-free questions against 1%) and 3 to 5 points on REAL-7 (MODEL-17)
+
+PLAN step 99 (the review of 2026-09-28; the owner is especially curious about encoders, and doubts that they have the general training to
+match a Qwen out of the box). Sections 62 and 63 compared a 400M encoder with the 3B decoder of that time (REAL-6 53 to 59 against 74
+without the record); the decoders then got database episodes, rename, misleading names, lookup and override, alternation and the
+one-slot layout, and the encoders none of it. Here `exp_encoder_mask.py DEC_EPISODES=1` trains the encoders on exactly the episodes the
+decoder recipe trains on (exp_categoriser.py's builder under the same env), the state being the episode's prompt text after its header
+(the rows, then the query), with one scored position per option as before (Laya's [MASK] layout, or GLiClass's label tokens), full
+fine-tuning at 3e-5, 3,000 steps of 16. The recipe's soft targets (evidence-free questions, random splits) and its shot-label loss have
+no counterpart in this trainer yet.
+
+**First run: memorised.** The builder yields 2,250 episodes per draw; the decoder recipe reads them about 6 times through a LoRA, the
+encoders cycled them 21 times with every weight free, and learned them by heart (final loss 1e-6): ModernBERT 28 on REAL-6, Laya 29,
+Ettin-1B 67. Drawing the builder again whenever its episodes are used up (its shots, renames and database rows are random; two draws
+share no prompt) fixed it. **EuroBERT-2.1B** first gave NaN (transformers 5 leaves the rotary buffer of its bundled transformers-4 code
+uninitialised; recomputed) and then did not learn at all (loss flat at 2.69, ln 14, chance, for 6,000 steps); not diagnosed further.
+
+**Table 102.1: top-1 (REAL-6 sets: fold 0's held-out users; REAL-7: all 200 new users, zero-shot for every reader in this table except
+the two "+ dated REAL-7 slices" rows); mean [range] over two seeds where run; ms per item on one H100, warm (batched / one at a time)**
+
+| reader | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind | ms per item |
+|---|---|---|---|---|---|
+| Laya 395M, REAL-6 episodes (section 62) | 59.1 | – | – | – | 10 / 17 |
+| GLiClass-large, REAL-6 episodes (section 63) | 56.7 | – | – | – | 8 / 20 |
+| ModernBERT-large 395M, recipe episodes | 85.9 | 79.9 | 76.4 | 81.6 | 12 / 23 |
+| Laya 395M, recipe episodes | 85.6 [85.6, 85.6] | 83.7 [79.5, 87.9] | 77.0 | 82.5 | 12 / 21 |
+| **GLiClass-large 400M, recipe episodes** | **90.8 [90.6, 90.9]** | 87.8 [87.6, 87.9] | 78.7 | 81.6 | **10 / 28** |
+| **Ettin-encoder 1B, recipe episodes** | **90.9 [88.9, 93.0]** | **88.1 [87.2, 88.9]** | 80.3 | 83.3 | **14 / 31** |
+| GLiClass-large, + dated REAL-7 slices (see below) | 83.2 | 71.1 | 77.3 | 85.0 | 9 / 18 |
+| decider-4B, final recipe (row 89) | 89.8 [89.6, 89.9] | 87.9 [87.2, 88.6] | 82.0 | 87.2 | 32 / 75 |
+| decider-4B, + dated REAL-7 slices (row 98) | 90.8 [89.9, 91.6] | 89.1 [88.6, 89.6] | – | 90.9 | 32 / 75 |
+
+**Table 102.2: the trained behaviours, fold 0 (first seed)**
+
+| reader | misleading names in the DB | override | alternation stores / restaurants | evidence-free: p >= 0.9 | 60 / 40 splits: p >= 0.9 |
+|---|---|---|---|---|---|
+| ModernBERT-large, recipe episodes | 78.9 | 97.7 | 67.2 / 43.8 | 27.6 | 10.2 |
+| Laya, recipe episodes | 92.1 | 98.2 | 54.7 / 57.8 | 56.6 | 2.3 |
+| GLiClass-large, recipe episodes | 93.4 | 98.2 | 92.2 / 45.3 | 53.9 | 18.0 |
+| Ettin-encoder 1B, recipe episodes | 94.7 | 97.7 | 87.5 / 45.3 | 50.0 | 14.8 |
+| decider-4B, final recipe | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+
+### 102.1 What the step says
+
+- **The encoder gap was the training data.** Given the same episodes, GLiClass-large and Ettin-1B read REAL-6 and novel category names
+  as well as decider-4B, the misleading names that only the database can correct at 93 to 95 (decider 97), the user's override at 98,
+  the amount rule at 88 to 92. Database episodes write merchant facts into a 400M encoder as they do into a 4B decoder (section 53's
+  result carries over), and that knowledge, not the architecture, was what sections 62 and 63 found missing.
+- **General pre-training still shows.** The two that match decider are the ones with the most relevant pre-training: GLiClass (trained
+  for label-conditioned classification) and Ettin (1B, 2T tokens); plain ModernBERT-large and Laya stop at 86 on REAL-6 and 80 to 84 on
+  novel names. The owner's doubt holds for the plain encoders; a larger or task-pre-trained encoder closes it.
+- **Speed.** Warm on one H100: 10 to 14 ms per item batched and 20 to 31 one at a time, against decider-4B's 32 and 75 (one slot,
+  measured in the same job layout, row 99c): about 2.5 to 3 times faster, not the 40 times of section 62, which compared per-option
+  decoder scoring.
+- **What they lack is what the trainer does not teach yet.** Confident on 50 to 57% of evidence-free questions (decider 1%) because the
+  soft uniform targets are not in this trainer; the day-of-week alternation rule at 45 (decider 69); 3 to 5 points behind on REAL-7
+  zero-shot. Dated REAL-7 slices added the same way as for decider lifted GLiClass on REAL-7 v2 (81.6 to 85.0) but cost REAL-6 7.6
+  points and novel names 17: the 2,400 slice episodes are fixed, so every redraw repeated them and the encoder memorised them as in the
+  first run.
+- **Next (row 102):** soft targets (evidence-free uniform, alternation splits) in the encoder trainer, and REAL-7 slices from a pool
+  large enough not to repeat; then the encoder is a full candidate for the production reader at a third of the cost.
+
+Tables: `uv run python scripts/rematch_tables.py`. Job lists: `scripts/modal_jobs/r99.json`, `r99b.json`, `r99c.json`. Models
+`models/adapters/enc*_h100fresh*` (DVC).
