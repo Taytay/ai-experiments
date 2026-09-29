@@ -6655,3 +6655,34 @@ reach past 26 options), on decider-4B and Granite-4.0-micro; one seed each; read
   decider on stored facts (misleading names 79) and is not a replacement.
 
 Job list: `scripts/modal_jobs/r103.json`.
+
+
+## 106. A small dose of dated slices keeps what section 101 gained and what section 103 found it lost: 300 episodes drawn from a 2,400-user REAL-7 pool lift blind_v1 to 83.5 (from 82.5) with auto-filing intact (51.7% at 97.9%) and changes of mind to 78 (from 69); the collapse of section 103 came from 2,400 fixed episodes of 300 users, not from dated training (REAL-22, EVAL-11)
+
+PLAN step 104 (first part). Section 103: decider trained with 2,400 dated slice episodes from 300 REAL-7-style users (row 98) read blind_v1
+no better than row 89 and could no longer auto-file there. Here the same recipe takes a random 300, 600 or 1,200 episodes from the
+2,400-user pool of section 104 (`R7TRAIN=all_kind_u2400 R7N=n`) beside its 2,250 REAL-6 episodes; one seed each.
+
+**Table 106.1: decider-4B, row 89's recipe with n dated REAL-7 slice episodes (seed 0)**
+
+| slice episodes | REAL-6 | novel names | REAL-7 v2 all_kind | blind_v1 | blind auto-filed at 98% (precision) | blind: changed mind / new category | misleading names in the DB |
+|---|---|---|---|---|---|---|---|
+| none (row 89) | 89.9 | 88.6 | 88.4 | 82.5 | 50.8 (97.8) | 69 / 53 | 97.4 |
+| **300 from 2,400 users** | **90.6** | **89.9** | 88.9 | **83.5** | **51.7 (97.9)** | **78 / 61** | 94.7 |
+| 600 from 2,400 users | 89.6 | 87.9 | 90.1 | 82.1 | 45.5 (98.0) | 67 / 58 | 92.1 |
+| 1,200 from 2,400 users | 89.3 | 86.6 | 90.8 | 82.7 | 43.8 (98.0) | 75 / 61 | 97.4 |
+| 2,400 from 300 users (row 98) | 89.9 | 88.6 | 90.9 | 79.8 | 0.9 (92.3) | 75 / 56 | 90.8 |
+
+### 106.1 What the step says
+
+- **The auto-file collapse was the dose and the narrowness, not the dates.** Drawn from 2,400 users, 300 to 1,200 slice episodes keep
+  blind_v1's calibrated auto-filing at 44 to 52% (row 98: 1%) and its top-1 at 82 to 83.5, while REAL-7 gains 0.5 to 2.4 points and the
+  blind set's changes of mind 6 to 9. 2,400 episodes from 300 users made REAL-7's population half of training and tuned the reader's
+  confidence to it.
+- **More slices buy REAL-7 (in-distribution) and cost auto-filing elsewhere**: REAL-7 rises with the dose (88.9, 90.1, 90.8) while the
+  blind auto-filed share falls (52, 46, 44). 300 is the best compromise read on the blind set; one seed each, so the ordering of 300 and
+  1,200 on top-1 is inside the seed spread, the auto-filing trend is not.
+- **Decision:** the recipe adds `R7TRAIN=all_kind_u2400 R7N=300` (dated slices at a small dose from a wide pool) to section 105's
+  rand255 + empty categories; row 105 trains the combination with two seeds.
+
+Job list: `scripts/modal_jobs/r104.json`.
