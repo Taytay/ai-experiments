@@ -41,10 +41,10 @@ def patch_gdn(mod):
     cls = mod.Qwen3_5GatedDeltaNet
     orig = cls.forward
 
-    def forward(self, hidden_states, cache_params=None, attention_mask=None):
+    def forward(self, hidden_states, cache_params=None, attention_mask=None, **kw):
         bsz, seq_len, _ = hidden_states.shape
         if cache_params is None or seq_len == 1 or not cache_params.has_previous_state(self.layer_idx):
-            return orig(self, hidden_states, cache_params=cache_params, attention_mask=attention_mask)
+            return orig(self, hidden_states, cache_params=cache_params, attention_mask=attention_mask, **kw)
         layer = cache_params.layers[self.layer_idx]
         conv_state, rec_state = layer.conv_states, layer.recurrent_states
         hidden_states = mod.apply_mask_to_padding_states(hidden_states, attention_mask)
