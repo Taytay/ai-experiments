@@ -1161,6 +1161,7 @@ full history kept and the prompt built by a policy: the recent rows plus the que
 dated; the ceiling of each policy; read by the final recipe zero-shot, then trained with the policy (the query merchant's rows
 dropped from some training prompts so the model does not only copy, REPORT 47 / row 46). Also whether dates and more of the
 merchant's rows separate a slip from a change (REPORT 97).
+**Status (2026-09-29):** PLAN step 98, REPORT.md 99 and 101: the payee's own rows raise the ceiling 84.8 -> 91.6 and the untrained-on-slices reader 81.9 -> 87.1; trained on dated slices of REAL-7-style users it reads 90.9, follows moves and new categories through the dates (66 / 77 against 51 / 41 undated), and auto-files 48% at 97.8%.
 
 **MODEL-17 The encoder against the decoder at equal recipes.** Sections 62 and 63 compared a 400M encoder with the 3B decoder of
 that time; the decoders then gained ~30 points on POI-1 (kind lines, descriptions, kind-retrieved examples) and database episodes on

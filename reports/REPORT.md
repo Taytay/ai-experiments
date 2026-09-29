@@ -6372,3 +6372,66 @@ seed; LoRA targets extended to Phi-3's fused projections and Granite 4's MLP nam
   hedged less by the weaker readers (19 to 27% confident).
 
 Tables: `uv run python scripts/rematch_tables.py`. Job list: `scripts/modal_jobs/r101.json`. Models `models/adapters/slot_*` (DVC).
+
+
+## 101. Trained on dated history slices of REAL-7-style users, the reader uses the slice: REAL-7 87.2 to 90.9 (99% of the 91.6 ceiling), merchants that moved 50 to 66 and new categories 44 to 77 once rows are dated (undated 51 and 41), and its confidence becomes auto-fileable: 48% of transactions at a realised 97.8% against 3%; REAL-6 and the trained behaviours hold (REAL-6 90.8, misleading names 89, the user's override 98) (REAL-22)
+
+PLAN step 98, stage 2. Section 99's reader had never seen a dated row or a slice built around the payee. Here the final recipe (row 89)
+is trained with 2,400 more episodes from 300 REAL-7-style users generated from seeds disjoint from the test users
+(`build_real7_train.py`, `exp_categoriser.py R7TRAIN`): eight queries each from the second half of their year, no held-out rendering,
+the prompt built by section 99's all-parts policy (similar by kind; `all_kind`) or by a policy drawn per episode from recent / self /
+all_kind / all_embrec / all_kind_b48 (`mix`), with the same past-only guard. The target is the user's intended category even where the
+slice cannot show it (what logged data would hold); the generator's misfiled rows carry no shot-label loss. Two seeds each; everything
+else is row 89.
+
+**Table 101.1: REAL-7, all 200 test users (mean of two seeds [range])**
+
+| slice at test | ceiling | row 89 | + dated slices (all_kind) | + dated slices (mix) | auto-filed at 98%: row 89 / all_kind / mix | effort, history or model: row 89 / all_kind / mix |
+|---|---|---|---|---|---|---|
+| recent (v1's layout, dated) | 84.8 | 81.9 | 84.6 [84.3, 84.9] | 84.8 [84.2, 85.3] | 2.2 / 28.9 / 45.3 | 0.671 / 0.605 / 0.572 |
+| self + recent | 91.6 | 87.1 | 90.1 [89.8, 90.3] | 90.3 [90.2, 90.4] | 1.1 / 42.0 / 48.5 | 0.629 / 0.502 / 0.491 |
+| all parts, kind | 91.6 | 87.2 | **90.9 [90.8, 90.9]** | 90.7 [90.7, 90.8] | 3.0 / **48.3 (97.8)** / 55.0 (97.5) | 0.622 / **0.492** / 0.478 |
+| all parts, record embedding | 91.6 | 87.1 | 90.3 [90.2, 90.4] | 90.2 [90.2, 90.3] | 2.0 / 50.2 / 56.5 | 0.624 / 0.491 / 0.474 |
+| all parts, kind, undated | 91.6 | 86.8 | 89.2 [88.8, 89.7] | 89.3 [88.6, 90.1] | 6.5 / 18.7 / 22.9 | 0.611 / 0.592 / 0.581 |
+| all parts, kind, 48 rows | 91.6 | 87.0 | 90.5 [90.4, 90.5] | 90.2 [89.9, 90.6] | 2.2 / 47.0 / 53.8 | 0.625 / 0.495 / 0.484 |
+
+**Table 101.2: REAL-7 top-1 by what decides the item, all-parts slice (mean of two seeds)**
+
+| reader | plain (867) | idiosyncratic (152) | moved (60) | new category (49) | amount rule (29) | day rule (32) | random split (11) |
+|---|---|---|---|---|---|---|---|
+| row 89 | 95.9 | 74.7 | 50.0 | 43.9 | 79.3 | 65.6 | 54.5 |
+| + dated slices (all_kind) | 98.4 | 77.0 | 65.8 | 76.5 | 62.1 | 65.6 | 40.9 |
+| + dated slices (all_kind), the same prompts undated | 98.7 | 74.7 | 50.8 | 40.8 | 74.1 | 71.9 | 59.1 |
+| + dated slices (mix) | 98.7 | 75.0 | 67.5 | 77.6 | 51.7 | 67.2 | 36.4 |
+
+**Table 101.3: REAL-6 and the trained behaviours, fold 0 (seed 0 / seed 1)**
+
+| reader | REAL-6 | novel names | misleading names in the DB | override | alternation stores / restaurants | evidence-free p >= 0.9 | 60 / 40 splits p >= 0.9 |
+|---|---|---|---|---|---|---|---|
+| row 89 | 89.9 / 89.6 | 88.6 / 87.2 | 97.4 / 90.8 | 98.5 / 98.0 | 85.9 / 68.8, 90.6 / 79.7 | 1.3 / 0.0 | 8.6 / 14.1 |
+| + dated slices (all_kind) | 89.9 / 91.6 | 88.6 / 89.6 | 90.8 / 86.8 | 98.5 / 98.2 | 85.9 / 60.9, 90.6 / 68.8 | 6.6 / 6.6 | 16.4 / 18.0 |
+| + dated slices (mix) | 87.6 / 86.9 | 86.6 / 89.9 | 92.1 / 89.5 | 97.7 / 98.0 | 76.6 / 73.4, 85.9 / 68.8 | 2.6 / 1.3 | 18.0 / 10.2 |
+
+### 101.1 What the step says
+
+- **Trained on the slice, the reader uses it.** With the all-parts slice REAL-7 goes from 87.2 to 90.9, 99% of the ceiling; with the
+  old 24-recent-rows layout from 81.9 to 84.6, at the ceiling. Section 99's zero-shot reader left 4 points of the new headroom unused.
+- **Dates are what let it read a change.** Merchants that moved read 66 and merchants taken by a new category 77 with dated rows; the
+  same trained model on the same prompts without dates reads 51 and 41, where row 89 was. Section 97's open question (a lone
+  unexpected row: slip or change?) is answered in part by the dates: the reader now follows a recent change it can see. A change not
+  yet in the history stays unreadable, as it must.
+- **Confidence becomes auto-fileable.** Calibrated on other users, the 98% target auto-files 48% of REAL-7 at a realised 97.8% (mix:
+  55% at 97.5%), where row 89 managed 3%; effort with the history rule in front falls from 0.622 to 0.492 (mix 0.478). Training on
+  users whose histories contain the events it will meet taught it which answers are safe.
+- **What it costs.** On REAL-7 the amount rules fall from 79 to 62 (mix 52): the REAL-7 users' amount rules are one of many signals in
+  a busy slice, and the dated training weights recency above the amount. On REAL-6 the all_kind reader holds (90.8 mean against 89.8;
+  novel names 89.1 against 87.9, override 98), gives up some of the misleading-name facts (89 against 94) and is confident on 6.6% of
+  evidence-free questions (from under 1%). The mix reader costs REAL-6 2.5 points.
+- **Choice.** The recipe takes the all_kind slices (`R7TRAIN=all_kind`): best REAL-7 top-1, REAL-6 held. For production the slice is:
+  the payee's latest rows (up to 6), a few rows of payees of the same kind, the latest row of each category, recent rows to fill,
+  every row dated, in date order. Similar-payee and per-category rows are not what earns the gain (section 99); the payee's rows and the
+  dates are.
+- **Caveat.** The training users come from the REAL-7 generator, so REAL-7 is now in-distribution for this reader. Row 100's test set,
+  built blind to the training generators, is what can say how much of the gain is the generator.
+
+Tables: `uv run python scripts/slice_tables.py`. Job list: `scripts/modal_jobs/r98b.json`. Models `models/adapters/decider_*_r7*` (DVC).
