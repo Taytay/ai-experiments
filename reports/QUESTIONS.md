@@ -1202,6 +1202,7 @@ against today's layout, by user effort; (c) timing on one H100: separate prompts
 once with each transaction's tail read from its cache (the answers must equal the uncached ones); (d) several transactions in one
 prompt, each with its own answer slot, read in one pass (zero-shot; trained only if it is close).
 **Status (2026-09-29):** PLAN steps 117, 119, REPORT.md 119: the cached shared prefix reads one user's sync at 21-26 ms per transaction (53 separately) with the same answers; one prompt with a slot per transaction 13-16 ms but changes 6-7% of answers untrained (row 127: train it; vLLM).
+**Status (2026-09-29, later):** PLAN step 127, REPORT.md 120: vLLM 0.30 with prefix caching on the split layout: 12.8 ms per transaction (sync of 30), 10.2 over a queue, same answers; multi-slot training deprioritised.
 
 **EVAL-12 Sending the hard cases to a large model.** The two small models disagree on 16.5% of blind_v1 and are then right 40% (decider)
 and 22% (encoder) of the time; blind Opus reads blind_v1 at about 91% on a sample against decider's 82. Scale did not help on REAL-6

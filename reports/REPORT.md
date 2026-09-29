@@ -7417,3 +7417,38 @@ transactions at the end with a placeholder answer each?). One H100, decider-4B w
 - **Correctness note.** transformers releases before 5.17 restarted the linear-attention state when several tokens followed a cache
   (initial state None); a cached prefix would have silently changed the answers. The benchmark's check against the uncached prompts is the
   guard; any serving stack for Qwen3.5 must pass the same check.
+
+
+## 120. The same sync in vLLM (0.30): the serving engine alone halves the time (24 to 28 ms per transaction without any cache), its prefix cache on the split layout reads one user's 30 transactions at 12.8 ms each and a whole queue of syncs at 10.2 ms, five times the unoptimised separate prompts, with the same top-1 to the decimal; multi-slot prompts are no longer worth training (INFRA-3)
+
+PLAN step 127 (b). The recipe's decider-4B (adapter merged) in vLLM 0.30.0 on one H100, bf16, the exact token ids of REPORT 119's 24
+syncs (`bench_bulk.py PREP_VLLM`, then `scripts/bench_vllm.py` in its own environment). The readout is decider's one slot: one generated
+token restricted to the question's label tokens, its log-probabilities after the restriction, i.e. the softmax over the label logits.
+vLLM sets its linear-attention cache to 'align' mode for Qwen3.5 when prefix caching is on (the recurrent state is kept at block
+boundaries so a cached prefix resumes exactly). Latency: one sync submitted at a time, its prefix cache emptied before each timed pass
+(the sync computes its own shared prefix once); throughput: all 720 transactions submitted together. `results/bench_vllm.json`, job list
+`scripts/modal_jobs/r127.json`.
+
+**Table 120.1: ms per transaction on one H100 (top-1 on the same 24 syncs in brackets)**
+
+| engine | layout | prefix cache | one sync of 10 | one sync of 30 | 24 syncs at once (720) |
+|---|---|---|---|---|---|
+| HF, REPORT 119 | today's, separate prompts | – | 53.3 (82.9) | 53.2 (82.5) | – |
+| HF, REPORT 119 | split, shared prefix cached by hand | yes | 25.5 (81.7) | 20.9 (81.8) | – |
+| vLLM | today's | off | 28.3 (83.3) | 25.4 (82.4) | 24.0 |
+| vLLM | today's | on | 27.4 (83.3) | 20.5 (82.6) | 18.9 |
+| vLLM | split | off | 28.2 (81.7) | 25.5 (81.8) | 24.5 |
+| **vLLM** | **split** | **on** | 23.5 (81.7) | **12.8 (81.8)** | **10.2** |
+
+### 120.1 What the step says
+
+- **vLLM with the split layout and its prefix cache is the serving answer:** 12.8 ms per transaction for a sync of 30 and 10.2 ms over a
+  queue, 5.2 times faster than REPORT 119's baseline, with top-1 equal to the decimal to HF's uncached reading on every arm (the engine's
+  hybrid-model prefix cache is exact here; REPORT 119's warning about older transformers does not apply to it). At about $4 per H100-hour
+  that is roughly $11 per million transactions for decider-4B (from ~$59), before FP8 or a smaller GPU.
+- **The layout is what lets the cache work.** Today's layout (the payee's rows mixed into the history by date) shares only the category
+  list and the oldest rows between a sync's transactions: the cache saves 20 to 25%. The split layout shares ~1,330 tokens: 50 to 60%.
+- **A sync of 10 gains less** (23.5 ms): the shared prefix is computed once for fewer transactions, and concurrent requests of a
+  sync start before the prefix is cached. Queued syncs of many users (the throughput row) amortise it best.
+- **Decision:** multi-slot prompts (row 127 a) are not worth training now: they would save a few more ms per transaction at the cost of
+  a training change and a 1 to 2 point risk (REPORT 119), where the cache gives the speed with the same answers. Row 127 (a) deprioritised.
