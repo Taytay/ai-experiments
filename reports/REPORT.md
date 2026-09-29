@@ -6267,3 +6267,63 @@ idiosyncratic 152, moved 60, new category 49, day rule 32, amount rule 29, rando
   move that the last-two rule misses when the change is already in the history.
 
 Tables: `uv run python scripts/effort_tables.py`.
+
+
+## 99. The history slice in the prompt, zero-shot: the payee's own past rows are the whole gain (REAL-7 81.9 to 87.1, ceiling 84.8 to 91.6, merchants the user files unusually 39 to 75); similar payees, one row per category, 48 rows and dates add nothing measurable to a reader never trained on them, and the payee's older rows cost merchants that moved (58 to 50), because the reader counts filings instead of reading the latest (REAL-22)
+
+PLAN step 98, stage 1. The owner (2026-09-28): the production prompt may hold any of the user's history; what is the best slice? This
+payee, similar payees, recent rows, an example of every category, dated and in date order, never a row from the query's future.
+`build_real7_slices.py` rebuilds REAL-7's 1,200 queries with each policy (`real7_v2_<policy>`): the parts *self* (the payee's latest
+rows, up to 6), *sim* (rows of similar payees, up to 6, at most two per payee; similarity by the merchant database's category ("kind"),
+by MiniLM embeddings of the database records ("embrec") or of the names alone ("embname")), *cover* (the latest row of every category not
+yet shown) and *recent* fill a 24-row budget in that priority (48 in `b48`), then go in date order with an ISO date on every row and the
+query. Readers: the final recipe (row 89, two seeds) and the untrained decider-4B, zero-shot on every policy.
+
+**Nothing from the future.** Building the slices found the generator's one-day date jitter dating 5 history rows after their query, and
+its 3% misfiles filing 23 rows under a category created later (4 of those in v1 prompts, which the v1 numbers include; too few to move
+them). The slices clamp dates so they never decrease and never pass the query's, and drop such rows (`past_only`); a check over the built
+sets finds no violation.
+
+**Table 99.1: REAL-7, all 200 users, by policy (final recipe, mean of two seeds [range]; untrained decider-4B, one run)**
+
+| policy | ceiling | payee shown | untrained | final recipe top-1 | % of ceiling | raw p >= 0.9: share (precision) | auto-filed at 98% (precision) | effort, history or model |
+|---|---|---|---|---|---|---|---|---|
+| recent (v1's layout, dated) | 84.8 | 54% | 50.9 | 81.9 [81.6, 82.2] | 96.6% | 91% (85.1) | 2.2 (93.0) | 0.671 |
+| similar (kind) + cover + recent, no payee rows | 84.9 | 53% | – | 82.2 [81.9, 82.6] | 96.9% | 87% (85.0) | 2.4 (97.1) | 0.658 |
+| self + recent | 91.6 | 79% | 60.5 | 87.1 [86.0, 88.2] | 95.1% | 85% (91.6) | 1.1 (89.1) | 0.629 |
+| self + similar (kind) + recent | 91.6 | 79% | – | 87.4 [86.4, 88.4] | 95.5% | 85% (91.7) | 1.5 (91.6) | 0.626 |
+| self + cover + recent | 91.6 | 79% | – | 86.8 [85.8, 87.9] | 94.8% | 83% (91.8) | 3.2 (94.7) | 0.623 |
+| all parts, similar by kind | 91.6 | 79% | 59.2 | 87.2 [86.0, 88.4] | 95.2% | 83% (91.8) | 3.0 (95.9) | 0.622 |
+| all parts, similar by record embedding | 91.6 | 79% | – | 87.1 [86.0, 88.2] | 95.1% | 83% (91.5) | 2.0 (92.4) | 0.624 |
+| all parts, similar by name embedding | 91.6 | 79% | – | 87.3 [86.5, 88.1] | 95.3% | 84% (91.7) | 1.3 (90.5) | 0.628 |
+| all parts, kind, undated | 91.6 | 79% | – | 86.8 [85.8, 87.9] | 94.8% | 82% (91.8) | 6.5 (94.9) | 0.611 |
+| all parts, kind, 48 rows | 91.6 | 79% | – | 87.0 [86.0, 88.0] | 95.0% | 82% (91.7) | 2.2 (95.7) | 0.625 |
+
+**Table 99.2: final recipe top-1 by what decides the item (mean of two seeds)**
+
+| policy | plain (867) | idiosyncratic (152) | moved (60) | new category (49) | amount rule (29) | day rule (32) | random split (11) |
+|---|---|---|---|---|---|---|---|
+| recent | 95.2 | 39.1 | 57.5 | 48.0 | 60.3 | 56.2 | 40.9 |
+| similar + cover + recent | 95.0 | 39.5 | 54.2 | 66.3 | 50.0 | 57.8 | 45.5 |
+| self + recent | 96.3 | 75.0 | 50.0 | 37.8 | 75.9 | 64.1 | 54.5 |
+| all parts, kind | 95.9 | 74.7 | 50.0 | 43.9 | 79.3 | 65.6 | 54.5 |
+| all parts, kind, 48 rows | 96.4 | 74.0 | 44.2 | 39.8 | 79.3 | 64.1 | 59.1 |
+
+### 99.1 What the step says
+
+- **The payee's own rows are the gain.** Showing up to six of them lifts the ceiling from 84.8 to 91.6 and the final recipe from 81.9
+  to 87.1; merchants the user files unusually go from 39 to 75, amount rules from 60 to 76 to 79. The reader stays at 95% of the
+  ceiling, so almost all of the new headroom is used without training.
+- **Nothing else moves zero-shot.** Similar payees (any of the three similarities), one row per category, twice the rows and the dates
+  each change top-1 by under half a point, inside the two-seed range (about 2 points). For custom-scheme users whose payee has no
+  history the similar and cover rows give 38 to 46 without the payee's rows (n = 88 to 90), too few items to separate. The reader was
+  trained on 24 random rows of REAL-6 without dates, so it has no reason to use a row's date or a similar payee's filing; stage 2
+  trains it on these layouts.
+- **More of the payee's rows cost merchants that moved.** Showing the payee's older rows puts more of the old category in the prompt:
+  moved merchants fall from 57.5 to 50 (44 at 48 rows), new-category merchants from 48 to 38 to 44. Without the payee's rows but with a
+  row per category, the one row of the new category is often the only row of the payee shown, and new-category merchants read 66. The
+  reader counts filings; it does not read the latest. Dated training is the test of whether it can learn to (stage 2).
+- **Confidence improves but does not become auto-fileable.** Raw p >= 0.9 precision rises from 85 to 92; the calibrated 98% target
+  still auto-files 1 to 6%. Effort with the history rule in front falls from 0.671 to 0.622.
+
+Tables: `uv run python scripts/slice_tables.py` (the stage 2 rows appear when those runs are in). Job list: `scripts/modal_jobs/r98.json`.
