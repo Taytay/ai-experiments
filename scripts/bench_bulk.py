@@ -8,8 +8,8 @@ H100, decider-4B with the recipe's adapter (labelled rows, REPORT 113), per sync
   multi      one sequence: the common prefix, then each transaction's tail with its own answer slot, "?)" after each slot; one pass reads
              every slot (zero-shot: the adapter never saw unanswered transactions before the one it reads)
 
-transformers' Qwen3.5 linear-attention layer drops the cached state when more than one token follows a cache (initial_state=None and a
-fresh conv), so `cached` would silently be wrong; `patch_gdn` continues the conv and the delta rule from the cached state.
+transformers 5.17's Qwen3.5 linear-attention layer continues a multi-token forward from the cached conv and recurrent states (older
+releases restarted them, which would make `cached` silently wrong); the check against `split` guards it.
 Labels and option order are drawn once per sync (production would fix them per user), so every prompt of a sync starts with the same
 tokens. Timing: warm (one untimed pass per sync and mode), CUDA-synchronised, median of REPEAT.
 Writes results/bench_bulk_<adapter>.json (per sync and mode: ms, tokens, per-item log-probs) and prints the summary.
@@ -34,52 +34,16 @@ REPEAT = int(os.environ.get("REPEAT", "3"))
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
 
-def patch_gdn(mod):
-    """Qwen3_5GatedDeltaNet.forward that continues from a cached state when several tokens follow the cache."""
-    import torch
-    import torch.nn.functional as F
-    cls = mod.Qwen3_5GatedDeltaNet
-    orig = cls.forward
-
-    def forward(self, hidden_states, cache_params=None, attention_mask=None, **kw):
-        bsz, seq_len, _ = hidden_states.shape
-        if cache_params is None or seq_len == 1 or not cache_params.has_previous_state(self.layer_idx):
-            return orig(self, hidden_states, cache_params=cache_params, attention_mask=attention_mask, **kw)
-        layer = cache_params.layers[self.layer_idx]
-        conv_state, rec_state = layer.conv_states, layer.recurrent_states
-        hidden_states = mod.apply_mask_to_padding_states(hidden_states, attention_mask)
-        mixed = self.in_proj_qkv(hidden_states).transpose(1, 2)
-        z = self.in_proj_z(hidden_states).reshape(bsz, seq_len, -1, self.head_v_dim)
-        b = self.in_proj_b(hidden_states); a = self.in_proj_a(hidden_states)
-        k = self.conv_kernel_size
-        x = torch.cat([conv_state[..., -(k - 1):].to(mixed.dtype), mixed], dim=-1)  # the last k-1 inputs before these tokens
-        layer.conv_states = x[..., -k:].contiguous()
-        if self.causal_conv1d_fn is not None:
-            y = self.causal_conv1d_fn(x=x, weight=self.conv1d.weight.squeeze(1), bias=self.conv1d.bias, activation=self.activation, seq_idx=None)
-        else:
-            y = F.silu(self.conv1d(x)[:, :, :x.shape[-1]])
-        mixed = y[..., -seq_len:].transpose(1, 2)
-        q, kk, v = torch.split(mixed, [self.key_dim, self.key_dim, self.value_dim], dim=-1)
-        q = q.reshape(bsz, seq_len, -1, self.head_k_dim); kk = kk.reshape(bsz, seq_len, -1, self.head_k_dim)
-        v = v.reshape(bsz, seq_len, -1, self.head_v_dim)
-        beta = b.sigmoid()
-        g = -self.A_log.float().exp() * F.softplus(a.float() + self.dt_bias)
-        if self.num_v_heads // self.num_k_heads > 1:
-            q = q.repeat_interleave(self.num_v_heads // self.num_k_heads, dim=2); kk = kk.repeat_interleave(self.num_v_heads // self.num_k_heads, dim=2)
-        out, last = self.chunk_gated_delta_rule(q, kk, v, g=g, beta=beta, initial_state=rec_state, output_final_state=True, use_qk_l2norm_in_kernel=True)
-        layer.recurrent_states = last
-        out = self.norm(out.reshape(-1, self.head_v_dim), z.reshape(-1, self.head_v_dim)).reshape(bsz, seq_len, -1)
-        return self.out_proj(out)
-    cls.forward = forward
-
-
 def expand_cache(cache, n):
+    """The batch-1 prefix cache repeated n times along the batch (attention keys / values; linear-attention states, kept as lists)."""
     import torch
     for layer in cache.layers:
         for name in ("keys", "values", "conv_states", "recurrent_states"):
             t = getattr(layer, name, None)
             if isinstance(t, torch.Tensor):
                 setattr(layer, name, t.repeat_interleave(n, dim=0))
+            elif isinstance(t, list):
+                setattr(layer, name, [x.repeat_interleave(n, dim=0) if isinstance(x, torch.Tensor) else x for x in t])
     return cache
 
 
@@ -97,7 +61,6 @@ def main():
     if ADAPTER:
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
-    patch_gdn(importlib.import_module(type(lm.model.layers[0].linear_attn).__module__))
     head = lm.lm_head.weight
     pad = tok.pad_token_id or 0
 
