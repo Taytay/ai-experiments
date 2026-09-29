@@ -7271,3 +7271,109 @@ temperature and 98% threshold. `scripts/escalation_tables.py`, job list `scripts
   per million transactions at H100 list price), still far below any hosted API.
 - **Next:** the 35B trained with the recipe (row 125, MODEL-20): the trained behaviours on top of its world knowledge; and it as a
   teacher for the small models (row 123).
+
+
+## 118. Scoring without an arbitrary threshold: success is the user's expected effort at a stated cost of a wrong auto-file (W), and each transaction is auto-filed exactly when that is expected to cost less than suggesting; the per-item rule is the best or tied rule at every W from 3 to 100 with nothing to tune, a 98% precision target is what W of about 10 implies, and the ranking of readers and systems holds at every W (EVAL-14)
+
+PLAN step 126 (owner, 2026-09-29: "The 98% threshold is arbitrary. Let's come up with a better mechanism for scoring and determining
+success"). CPU only, over the saved blind_v1 scores. `scorecard.decide`, `scripts/decision_tables.py`.
+
+**The mechanism.** What the user does per transaction is the measure (the scorecard's effort, REPORT 98): nothing when an auto-filed
+category is right, W when it is wrong (noticing, undoing, refiling; and the budget is wrong until then), one click when the answer is
+among three suggestions, a search (3) otherwise. With calibrated probabilities (the leave-fold-out temperature; ECE about 2, REPORT 115)
+the expected cost of each choice is known per transaction: auto-filing costs (1 - p1) W, suggesting costs q3 + 3 (1 - q3), with p1 the
+top category's probability and q3 the top three's mass. The rule auto-files when the first is smaller. There is no threshold: the one
+number is W, which is a product judgement (how bad a silent miscategorisation is), stated once and measurable later from real users
+(undo rates, time to notice). Success is expected effort per transaction at that W; because W is uncertain, every system is read over
+W from 3 to 100, and one system beats another only if it wins across the plausible range. For combinations, the members' calibrated
+distributions are multiplied and the product recalibrated with one temperature on the other folds.
+
+**Table DE.1: blind_v1, effort per transaction by what a wrong auto-file costs (W) and the auto-file rule (mean [range] over seeds / pairs); no model at all: 3.0 (every transaction a search)**
+
+| reader | rule | W = 3 | W = 5 | W = 10 | W = 20 | W = 50 | W = 100 |
+|---|---|---|---|---|---|---|---|
+| decider-4B | fixed 98% | 0.566 [0.559, 0.573] | 0.593 [0.586, 0.601] | 0.662 [0.653, 0.671] | 0.798 [0.786, 0.811] | 1.208 [1.186, 1.231] | 1.892 [1.853, 1.931] |
+| decider-4B | best cut | 0.488 [0.487, 0.490] | 0.551 [0.543, 0.559] | 0.663 [0.658, 0.668] | 0.777 [0.771, 0.783] | 1.014 [0.977, 1.050] | 1.122 [1.095, 1.148] |
+| decider-4B | per-item | 0.481 [0.479, 0.484] | 0.553 [0.544, 0.562] | 0.651 [0.645, 0.657] | 0.782 [0.779, 0.784] | 0.955 [0.925, 0.985] | 1.040 [0.991, 1.089] |
+| Ettin-1B | fixed 98% | 0.696 [0.655, 0.754] | 0.718 [0.677, 0.775] | 0.772 [0.734, 0.829] | 0.881 [0.847, 0.935] | 1.208 [1.180, 1.255] | 1.752 [1.713, 1.789] |
+| Ettin-1B | best cut | 0.548 [0.533, 0.557] | 0.632 [0.615, 0.644] | 0.734 [0.716, 0.766] | 0.869 [0.847, 0.890] | 1.132 [1.096, 1.182] | 1.286 [1.228, 1.355] |
+| Ettin-1B | per-item | 0.546 [0.535, 0.557] | 0.622 [0.608, 0.632] | 0.739 [0.724, 0.767] | 0.861 [0.835, 0.905] | 1.099 [1.074, 1.141] | 1.240 [1.191, 1.281] |
+| decider-35B-A3B untrained | fixed 98% | 0.615 | 0.641 | 0.704 | 0.831 | 1.211 | 1.844 |
+| decider-35B-A3B untrained | best cut | 0.481 | 0.567 | 0.703 | 0.855 | 0.968 | 1.195 |
+| decider-35B-A3B untrained | per-item | 0.479 | 0.561 | 0.701 | 0.794 | 0.949 | 1.149 |
+| Ettin-1B x decider-4B | fixed 98% | 0.550 [0.540, 0.562] | 0.577 [0.568, 0.590] | 0.644 [0.636, 0.660] | 0.777 [0.769, 0.800] | 1.177 [1.149, 1.220] | 1.844 [1.782, 1.920] |
+| Ettin-1B x decider-4B | best cut | 0.479 [0.461, 0.491] | 0.541 [0.517, 0.555] | 0.645 [0.637, 0.657] | 0.757 [0.740, 0.772] | 1.027 [0.967, 1.076] | 1.050 [1.007, 1.105] |
+| Ettin-1B x decider-4B | per-item | 0.461 [0.455, 0.471] | 0.538 [0.517, 0.547] | 0.629 [0.622, 0.633] | 0.746 [0.723, 0.766] | 0.989 [0.970, 1.013] | 1.027 [0.949, 1.129] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 0.458 [0.437, 0.477] | 0.485 [0.469, 0.503] | 0.555 [0.543, 0.570] | 0.694 [0.669, 0.717] | 1.110 [1.032, 1.189] | 1.805 [1.632, 1.989] |
+| Ettin-1B x decider-4B x 35B | best cut | 0.408 [0.393, 0.423] | 0.465 [0.450, 0.483] | 0.557 [0.532, 0.568] | 0.685 [0.671, 0.721] | 0.965 [0.911, 0.995] | 1.087 [1.046, 1.151] |
+| Ettin-1B x decider-4B x 35B | per-item | 0.397 [0.385, 0.410] | 0.457 [0.451, 0.463] | 0.547 [0.534, 0.559] | 0.676 [0.666, 0.689] | 0.923 [0.891, 0.947] | 1.078 [1.017, 1.119] |
+
+**Table DE.2: W = 10: auto-filed % / precision % / effort**
+
+| reader | rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| decider-4B | fixed 98% | 63.0 [61.9, 64.1] | 97.8 [97.7, 97.9] | 0.662 [0.653, 0.671] |
+| decider-4B | best cut | 66.1 [64.4, 67.8] | 97.4 [97.3, 97.4] | 0.663 [0.658, 0.668] |
+| decider-4B | per-item | 62.5 [62.4, 62.6] | 98.1 [98.1, 98.1] | 0.651 [0.645, 0.657] |
+| Ettin-1B | fixed 98% | 51.7 [45.8, 56.5] | 97.9 [97.7, 98.0] | 0.772 [0.734, 0.829] |
+| Ettin-1B | best cut | 63.5 [61.2, 67.4] | 96.9 [95.9, 97.5] | 0.734 [0.716, 0.766] |
+| Ettin-1B | per-item | 61.2 [59.3, 62.5] | 97.1 [96.5, 97.5] | 0.739 [0.724, 0.767] |
+| decider-35B-A3B untrained | fixed 98% | 54.9 | 97.7 | 0.704 |
+| decider-35B-A3B untrained | best cut | 58.9 | 97.2 | 0.703 |
+| decider-35B-A3B untrained | per-item | 61.2 | 96.9 | 0.701 |
+| Ettin-1B x decider-4B | fixed 98% | 63.0 [61.5, 64.1] | 97.9 [97.7, 98.0] | 0.644 [0.636, 0.660] |
+| Ettin-1B x decider-4B | best cut | 66.6 [64.5, 69.0] | 97.4 [97.0, 97.7] | 0.645 [0.637, 0.657] |
+| Ettin-1B x decider-4B | per-item | 65.6 [64.9, 65.9] | 97.8 [97.7, 97.9] | 0.629 [0.622, 0.633] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 68.8 [67.4, 71.0] | 98.0 [97.7, 98.2] | 0.555 [0.543, 0.570] |
+| Ettin-1B x decider-4B x 35B | best cut | 70.8 [69.6, 72.2] | 97.7 [97.5, 98.2] | 0.557 [0.532, 0.568] |
+| Ettin-1B x decider-4B x 35B | per-item | 69.1 [68.3, 69.6] | 98.1 [97.9, 98.2] | 0.547 [0.534, 0.559] |
+
+**Table DE.2: W = 50: auto-filed % / precision % / effort**
+
+| reader | rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| decider-4B | fixed 98% | 63.0 [61.9, 64.1] | 97.8 [97.7, 97.9] | 1.208 [1.186, 1.231] |
+| decider-4B | best cut | 35.3 [35.2, 35.4] | 98.9 [98.7, 99.1] | 1.014 [0.977, 1.050] |
+| decider-4B | per-item | 36.3 [35.3, 37.3] | 99.2 [99.1, 99.3] | 0.955 [0.925, 0.985] |
+| Ettin-1B | fixed 98% | 51.7 [45.8, 56.5] | 97.9 [97.7, 98.0] | 1.208 [1.180, 1.255] |
+| Ettin-1B | best cut | 36.6 [32.4, 44.1] | 98.3 [98.0, 98.6] | 1.132 [1.096, 1.182] |
+| Ettin-1B | per-item | 24.7 [21.8, 30.0] | 98.7 [98.5, 99.1] | 1.099 [1.074, 1.141] |
+| decider-35B-A3B untrained | fixed 98% | 54.9 | 97.7 | 1.211 |
+| decider-35B-A3B untrained | best cut | 36.5 | 98.9 | 0.968 |
+| decider-35B-A3B untrained | per-item | 31.7 | 99.2 | 0.949 |
+| Ettin-1B x decider-4B | fixed 98% | 63.0 [61.5, 64.1] | 97.9 [97.7, 98.0] | 1.177 [1.149, 1.220] |
+| Ettin-1B x decider-4B | best cut | 36.9 [28.7, 45.3] | 98.7 [98.4, 99.3] | 1.027 [0.967, 1.076] |
+| Ettin-1B x decider-4B | per-item | 46.0 [43.7, 47.5] | 98.7 [98.6, 98.8] | 0.989 [0.970, 1.013] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 68.8 [67.4, 71.0] | 98.0 [97.7, 98.2] | 1.110 [1.032, 1.189] |
+| Ettin-1B x decider-4B x 35B | best cut | 44.7 [36.5, 56.6] | 98.7 [98.6, 98.7] | 0.965 [0.911, 0.995] |
+| Ettin-1B x decider-4B x 35B | per-item | 51.2 [50.0, 52.1] | 98.7 [98.7, 98.8] | 0.923 [0.891, 0.947] |
+
+**Table DE.3: what each W means for decider-4B under the per-item rule: the lowest confidence it auto-files at (the marginal item), and the average precision of what it auto-files**
+
+| W | lowest auto-filed confidence | auto-filed % | average precision % |
+|---|---|---|---|
+| 3 | 31.1 [29.6, 32.7]% | 82.0 [81.8, 82.3] | 92.1 [91.6, 92.6] |
+| 5 | 73.7 [72.1, 75.3]% | 71.5 [71.2, 71.7] | 96.5 [96.2, 96.8] |
+| 10 | 88.5 [88.5, 88.6]% | 62.5 [62.4, 62.6] | 98.1 [98.1, 98.1] |
+| 20 | 94.7 [94.6, 94.7]% | 53.2 [52.9, 53.4] | 98.6 [98.5, 98.6] |
+| 50 | 97.9 [97.9, 97.9]% | 36.3 [35.3, 37.3] | 99.2 [99.1, 99.3] |
+| 100 | 99.0 [99.0, 99.0]% | 23.1 [21.9, 24.3] | 99.6 [99.4, 99.7] |
+
+### 118.1 What the step says
+
+- **The per-item expected-cost rule is the rule to use.** It is best or within noise of best at every W for every reader, needs no
+  threshold and no search on held-out data (only the temperature), and adapts to each transaction's alternatives (a transaction whose
+  second choice is also likely, and so would cost one click to fix, is auto-filed more readily than one whose alternatives are spread).
+  Its advantage over the fixed 98% cut grows with W: at W = 50 it cuts decider's effort from 1.21 to 0.96 (21%) by filing fewer; at W = 3
+  from 0.57 to 0.48 by filing more.
+- **The 98% target was W of about 10.** Under the per-item rule, W = 10 auto-files 62.5% at 98.1% average precision, the same operating
+  point as the fixed 98% cut (63.0% at 97.8%): the marginal auto-filed item is at 88.5% confidence, and the average over the confident
+  ones is 98%. The numbers reported since REPORT 98 are therefore close to optimal for W = 10, and not for other W (they used W = 5 in
+  effort, a slight inconsistency: at W = 5 the rule would auto-file 71.5% at 96.5%).
+- **Rankings do not depend on W.** At every W: three models (encoder x decider x 35B) < encoder x decider < decider < 35B untrained <
+  encoder in effort (the 35B passes decider at W >= 50, where its confidence ranks better). Conclusions drawn at one W hold.
+- **Recommendation.** Report expected effort under the per-item rule at W = 5, 10, 20, 50 (W = 10 as the headline until the product sets
+  it), with auto-filed % and average precision beside it; drop the fixed precision target. The product's W should come from the owner,
+  and later from real users' undo behaviour; a different W for new users (whose miscategorisations may matter more) fits the same rule.
+- **Caveat.** The rule is only as good as the calibration: temperatures must be fitted on the product's own users (REPORT 116: they do
+  not transfer between populations), and new users' probabilities are the least reliable (REPORT 116: 93% where 98% was stated).

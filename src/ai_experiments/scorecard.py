@@ -179,6 +179,15 @@ def scorecard(recs, items, n_boot=500, seed=0, users=None, fold_of=None):
 EFFORT = dict(click=1.0, search=3.0, wrong=5.0)
 
 
+def decide(p1, q3, wrong=EFFORT["wrong"], click=EFFORT["click"], search=EFFORT["search"]):
+    """PLAN step 126 (owner, 2026-09-29: a fixed 98% threshold is arbitrary): auto-file exactly when it is expected to cost the user less
+    than suggesting, from calibrated probabilities: (1 - p1) x wrong < q3 x click + (1 - q3) x search, with p1 the top category's
+    probability and q3 the top three's mass. No threshold to choose; `wrong` (what a wrong auto-file costs, in clicks) is the product's
+    one number. Arrays in, a boolean array out."""
+    p1, q3 = np.asarray(p1, float), np.asarray(q3, float)
+    return (1 - p1) * wrong < q3 * click + (1 - q3) * search
+
+
 def effort(auto, auto_ok, top3_ok, click=EFFORT["click"], search=EFFORT["search"], wrong=EFFORT["wrong"]):
     """Mean effort per transaction. auto: auto-filed or not; auto_ok: the auto-filed category is right; top3_ok: gold in the top 3
     suggestions (read only where not auto-filed). All sequences of equal length."""
