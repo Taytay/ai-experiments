@@ -6780,3 +6780,32 @@ user's category for the place's standard category. decider-4B with the recipe (t
   does not yet. The pool keeps each place's Overture id and per-row sources (licences).
 
 Job list: `scripts/modal_jobs/r108.json`.
+
+
+## 109. Twice the training does not make the augmentations add: at 1,600 steps the recipe loses REAL-6 and auto-filing (87.6, 46%), recipe v2 gets its confidence back on average (auto-filing 54.5%) with a seed spread of 18 points; by user effort on blind_v1 the 800-step recipe of section 107 stays best and steadiest (0.66 alone, 0.61 behind the encoder) (EVAL-10, EVAL-11)
+
+PLAN step 106. Section 107 guessed that recipe v2's two augmentations (255 labels with empty categories, and 300 dated slices) share too
+small a budget at 800 steps. Both the recipe and recipe v2 were trained for 1,600, two seeds each.
+
+**Table 109.1: decider-4B, blind_v1 by user effort (`scripts/recipe_effort_tables.py`; mean [range] over seeds) and the other sets
+(`scripts/recipe_tables.py`)**
+
+| recipe | steps | REAL-6 | REAL-7 v2 | blind_v1 | blind auto-filed | effort alone | effort, encoder first |
+|---|---|---|---|---|---|---|---|
+| row 89 | 800 | 89.8 | 87.2 | 82.0 | 51.0 | 0.697 | 0.626 |
+| **rand255 + empty (the recipe)** | 800 | 89.3 | 87.0 | 82.6 | 55.0 | **0.659 [0.627, 0.691]** | **0.608 [0.588, 0.629]** |
+| recipe v2 | 800 | 87.4 | 89.1 | 83.1 | 39.7 | 0.815 [0.753, 0.878] | 0.668 |
+| rand255 + empty | 1,600 | 87.6 | 87.2 | 82.2 | 46.4 | 0.745 | 0.653 |
+| recipe v2 | 1,600 | 89.3 | 89.7 | 82.2 | 54.5 [45.7, 63.4] | 0.693 [0.607, 0.779] | 0.632 [0.593, 0.672] |
+
+### 109.1 What the step says
+
+- **More steps are not the fix.** The recipe at 1,600 steps is worse on every blind measure (auto-filing 55 to 46%) and on REAL-6: 800
+  steps was already its point (section 49's under-training was for the plain SFT categoriser without the shot-label loss).
+- **Recipe v2 recovers at 1,600 steps on average, not reliably**: one seed auto-files 63% of the blind set (effort 0.607, the best
+  single run so far), the other 46% (0.779). Calibrated auto-filing is the most seed-sensitive measure here; reading it needs three or
+  more seeds.
+- **Decision:** the recipe stays section 107's (row 89 + `LABELS=rand255 EMPTY=20`, 800 steps). Recipe v2 at 1,600 steps is a candidate
+  worth three more seeds if REAL-7-style changes (moves, new categories) turn out common in real histories.
+
+Job list: `scripts/modal_jobs/r107.json`.

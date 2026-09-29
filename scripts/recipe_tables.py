@@ -17,11 +17,15 @@ sys.path.insert(0, str(Path(__file__).parent))
 import rematch_tables as R  # noqa: E402
 from effort_tables import calibrated  # noqa: E402
 
-A = "decider_decider-4b_none_h100bf16st800{s}{emp}_f0_" + R.REC + "{r7}_aux100_lab{lab}_ev10soft_lora"
+A = "decider_decider-4b_none_h100bf16st{st}{s}{emp}_f0_" + R.REC + "{r7}_aux100_lab{lab}_ev10soft_lora"
 RECIPES = [("row 89: final recipe (rand26)", dict(emp="", r7="", lab="rand26"), ("", "s1")),
            ("rand255 + empty categories (row 103)", dict(emp="_emp20", r7="", lab="rand255"), ("", "s1")),
            ("row 89 + 300 dated slices (row 104)", dict(emp="", r7="_r7all_kind_u2400n300", lab="rand26"), ("",)),
-           ("recipe v2: rand255 + empty + 300 dated slices (row 105)", dict(emp="_emp20", r7="_r7all_kind_u2400n300", lab="rand255"), ("", "s1"))]
+           ("recipe v2: rand255 + empty + 300 dated slices (row 105)", dict(emp="_emp20", r7="_r7all_kind_u2400n300", lab="rand255"), ("", "s1")),
+           ("rand255 + empty, 1,600 steps (row 106)", dict(emp="_emp20", r7="", lab="rand255", st="1600"), ("", "s1")),
+           ("recipe v2, 1,600 steps (row 106)", dict(emp="_emp20", r7="_r7all_kind_u2400n300", lab="rand255", st="1600"), ("", "s1"))]
+for _l, _kw, _s in RECIPES:
+    _kw.setdefault("st", "800")
 
 
 def fmt(v):
