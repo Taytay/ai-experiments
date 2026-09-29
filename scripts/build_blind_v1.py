@@ -38,6 +38,22 @@ SLICE_MAX, OWN_MAX, SIM_MAX, SIM_PER_PAYEE = 24, 6, 6, 2
 if os.environ.get("BLIND_B48") == "1":
     SLICE_MAX, SIM_MAX = 48, 10
     OUT = OUT.with_name("blind_v1_b48.json")
+# row 117 (added by the main session; owner 2026-09-29: one user's 10 to 100 new transactions at once). Both switches leave blind_v1's
+# items, rows and random draws unchanged:
+#   BLIND_SPLIT=1  blind_v1_split.json: blind_v1's items with the same slice rows, the payee's own and similar payees' rows moved after
+#                  the others under a header (the shared block first, so one user's transactions could share it)
+#   BLIND_BULK=1   blind_bulk_v1.json and blind_bulk_v1_split.json: per full user one sync (a cutoff on or after 2025-08-01, the next
+#                  BULK_N transactions, all unfiled; the history is what was filed before the cutoff); one shared block per sync (a row
+#                  per category, then the latest rows, SHARED_MAX in all) and per transaction the payee's own and similar payees' rows
+#                  before the cutoff; the plain file dates-sorts the union (today's layout), the split file puts the shared block first
+SPLIT = os.environ.get("BLIND_SPLIT") == "1"
+BULK = os.environ.get("BLIND_BULK") == "1"
+BULK_N, SHARED_MAX, SHARED_CAT_MAX = 30, 24, 18
+SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
+if SPLIT:
+    OUT = OUT.with_name("blind_v1_split.json")
+if BULK:
+    OUT = OUT.with_name("blind_bulk_v1.json")
 DIG = "0123456789"
 ALNUM = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"
 
@@ -1992,6 +2008,88 @@ def fmt_amt(a):
     return f"${a:.2f}"
 
 
+def build_near(u, rows, qi, exclude=()):
+    """Row 117: the query payee's own latest rows and similar payees' rows before qi, chosen as build_slice chooses them first."""
+    q = rows[qi]
+    qm = MERCH[q["mid"]]
+    own = [i for i in range(qi - 1, -1, -1) if rows[i]["mid"] == q["mid"] and i not in exclude][:OWN_MAX]
+    sim = []
+    if not qm.opaque:
+        per = Counter()
+        g = group(qm.kind)
+        for i in range(qi - 1, -1, -1):
+            if len(sim) >= SIM_MAX:
+                break
+            rm = MERCH[rows[i]["mid"]]
+            if rm.mid == qm.mid or rm.opaque or group(rm.kind) != g or per[rm.mid] >= SIM_PER_PAYEE or i in exclude:
+                continue
+            per[rm.mid] += 1
+            sim.append(i)
+    return own + sim
+
+
+def build_shared(u, hist, header):
+    """Row 117: one sync's shared rows from the filed history: the latest row of each category (the most recent SHARED_CAT_MAX), then
+    the latest rows, SHARED_MAX in all; indices into hist."""
+    last = {}
+    for i, r in enumerate(hist):
+        if r["filed"] in header:
+            last[r["filed"]] = i
+    chosen = sorted(last.values(), reverse=True)[:SHARED_CAT_MAX]
+    for i in range(len(hist) - 1, -1, -1):
+        if len(chosen) >= SHARED_MAX:
+            break
+        if i not in chosen:
+            chosen.append(i)
+    return sorted(chosen)
+
+
+def make_prompt_split(header, shared, near, q):
+    parts = ["Categories: " + ", ".join(header), "", SHARED_HEAD, ""]
+    for r in shared:
+        parts += [f"Transaction: {r['date'].isoformat()} | {r['text']} | {fmt_amt(r['amount'])} | {r['wd']}", f"Category: {r['filed']}", ""]
+    parts += [NEAR_HEAD, ""]
+    for r in near:
+        parts += [f"Transaction: {r['date'].isoformat()} | {r['text']} | {fmt_amt(r['amount'])} | {r['wd']}", f"Category: {r['filed']}", ""]
+    parts.append(f"Transaction: {q['date'].isoformat()} | {q['text']} | {fmt_amt(q['amount'])} | {q['wd']}")
+    parts.append("Category:")
+    return "\n".join(parts)
+
+
+def bulk_items(u, rows, first_idx):
+    """Row 117: one sync for a full user: (plain items, split items), same ids and answers."""
+    rng = random.Random(f"bulk-{u.uid}")
+    cands = [i for i, r in enumerate(rows) if r["date"] >= QUERY_FROM and i >= 30 and i + BULK_N <= len(rows)]
+    if not cands:
+        return [], []
+    c = rng.choice(cands)
+    hist, batch = rows[:c], rows[c:c + BULK_N]
+    header = u.header(batch[-1]["date"])  # the user's categories when the sync is read
+    shared = build_shared(u, hist, header)
+    plain, split = [], []
+    for n, q in enumerate(batch):
+        if q["intended"] not in header:
+            continue
+        seq = hist + [q]
+        near = sorted(build_near(u, seq, len(hist), exclude=set(shared)))
+        sl = sorted(set(shared) | set(near))
+        assert all(hist[i]["date"] <= q["date"] and hist[i]["date"] <= batch[0]["date"] for i in sl)
+        best_cat = oracle(u, seq, len(hist), sl)
+        why = why_of(u, rows, c + n, first_idx)
+        if why in ("plain", "recurring") and any(hist[i]["mid"] == q["mid"] and hist[i]["filed"] != hist[i]["intended"] for i in sl):
+            why = "misfiled_history"
+        base = {"id": f"BK:{u.uid}:{n}", "level": f"BK_{u.scheme}", "user": u.uid, "sync": u.uid, "cutoff": batch[0]["date"].isoformat(),
+                "pos": n, "merchant": MERCH[q["mid"]].clean, "text": q["text"], "amount": q["amount"], "weekday": q["wd"],
+                "date": q["date"].isoformat(), "options": [" " + x for x in header], "answer": header.index(q["intended"]),
+                "best": header.index(best_cat) if best_cat in header else -1, "why": why, "scheme": u.scheme, "hist_len": c,
+                "in_shots": any(hist[i]["mid"] == q["mid"] for i in sl), "n_shared": len(shared), "n_near": len(near)}
+        p1 = make_prompt(header, [hist[i] for i in sl], q)
+        p2 = make_prompt_split(header, [hist[i] for i in shared], [hist[i] for i in near], q)
+        plain.append(dict(base, prompt=p1, prompt_ctx=p1))
+        split.append(dict(base, prompt=p2, prompt_ctx=p2))
+    return plain, split
+
+
 def make_prompt(header, srows, q):
     parts = ["Categories: " + ", ".join(header), ""]
     for r in srows:
@@ -2010,6 +2108,7 @@ def main():
     short_ids = set(master.sample(ids, N_SHORT))
     picked = Counter()
     items = []
+    bulk_plain, bulk_split = [], []
     for uid in ids:
         u, rng = build_user(uid, uid in short_ids)
         rows = generate(u, rng)
@@ -2017,6 +2116,9 @@ def main():
         first_idx = {}
         for i, r in enumerate(rows):
             first_idx.setdefault(r["mid"], i)
+        if BULK and not u.short:
+            a, b = bulk_items(u, rows, first_idx)
+            bulk_plain += a; bulk_split += b
         if u.short:
             n = min(11, len(rows))
             chosen = sorted(rng.sample(range(n), min(Q_PER_USER, n)))
@@ -2060,6 +2162,9 @@ def main():
             sl = build_slice(u, rows, qi)
             srows = [rows[i] for i in sl]
             prompt = make_prompt(header, srows, q)
+            if SPLIT:
+                near = [i for i in build_near(u, rows, qi) if i in sl]
+                prompt = make_prompt_split(header, [rows[i] for i in sl if i not in near], [rows[i] for i in sorted(near)], q)
             why = tags[qi]
             if why == "short_history" and not u.short:
                 why = "plain"
@@ -2073,6 +2178,15 @@ def main():
                 "prompt": prompt, "prompt_ctx": prompt, "options": [" " + c for c in header], "answer": ans,
                 "best": header.index(best_cat) if best_cat in header else -1, "why": why, "scheme": u.scheme,
                 "hist_len": qi, "in_shots": any(r["mid"] == q["mid"] for r in srows)})
+    if BULK:
+        for name, its in (("blind_bulk_v1", bulk_plain), ("blind_bulk_v1_split", bulk_split)):
+            sha = hashlib.sha256(json.dumps(its, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
+            out = {"name": name, "version": "v1", "n_users": len({i["user"] for i in its}), "items": its, "sha256": sha,
+                   "notes": "Row 117 (main session): one sync per full blind_v1 user; see the BLIND_BULK comment in scripts/build_blind_v1.py."}
+            (OUT.parent / f"{name}.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+            ceil = sum(i["best"] == i["answer"] for i in its) / len(its)
+            print(f"wrote {name} items={len(its)} users={out['n_users']} sha={sha[:12]} ceiling {ceil:.3f} in_shots {sum(i['in_shots'] for i in its)}")
+        return
     # checks
     for it in items:
         hdr = [o[1:] for o in it["options"]]

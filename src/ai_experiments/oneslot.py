@@ -88,14 +88,44 @@ def dow_first(fields):
     return " | ".join([dow] + parts[:-1])
 
 
+SPLIT_HEADS = ("Earlier transactions:", "Earlier transactions at this payee and similar payees:")  # row 117 (build_blind_v1 BLIND_SPLIT / BULK)
+_KEY_SKIP = {"SQ", "TST", "POS", "DEBIT", "PURCHASE", "AUTHORIZED", "ON", "DBT", "CRD", "PP", "SP", "PY", "CLV", "ACH", "CHECKCARD", "CARD",
+             "RECURRING", "ONLINE", "PMT", "PAYMENT", "WWW", "COM", "THE"}
+
+
+def payee_key(fields):
+    """Row 118: a crude payee key from a row's description (prefixes and digits dropped, the first word), for splitting training
+    episodes; production has the payee itself."""
+    d = _cells(fields)[2].upper()
+    words = [w for w in _re.sub(r"[^A-Z ]", " ", d).split() if w not in _KEY_SKIP and len(w) > 1]
+    return words[0] if words else ""
+
+
+def split_rows(rows, query, rng, p_extra=0.5, max_extra=4):
+    """Row 118 (SPLIT=1 training): the rows as a shared block, then the query payee's rows (by payee_key) and, with probability p_extra,
+    1 to max_extra other rows (the test layout's near block also carries similar payees), each block in its original order, under
+    SPLIT_HEADS. Header rows are (text, None, None)."""
+    k = payee_key(query)
+    near = {i for i, (f, _, _) in enumerate(rows) if k and payee_key(f) == k}
+    rest = [i for i in range(len(rows)) if i not in near]
+    if rest and rng.random() < p_extra:
+        near |= set(rng.sample(rest, min(len(rest), rng.randint(1, max_extra))))
+    return ([(SPLIT_HEADS[0], None, None)] + [rows[i] for i in range(len(rows)) if i not in near]
+            + [(SPLIT_HEADS[1], None, None)] + [rows[i] for i in sorted(near)])
+
+
 def parse(context):
-    """(category names from the header, rows [(fields, label, label char start)], query fields); raises on another layout."""
+    """(category names from the header, rows [(fields, label, label char start)], query fields); raises on another layout. A one-line
+    block that is not a transaction (row 117's section headers) comes back as (text, None, None)."""
     head, _, rest = context.partition("\n\n")
     assert head.startswith("Categories: "), head[:40]
     names = head[len("Categories: "):].split(", ")
     blocks = rest.split("\n\n") if rest else []
     rows, pos = [], len(head) + 2
     for blk in blocks[:-1]:
+        if not blk.startswith("Transaction: ") and "\n" not in blk:
+            rows.append((blk, None, None)); pos += len(blk) + 2
+            continue
         t, _, c = blk.partition("\nCategory:")
         assert t.startswith("Transaction: "), blk[:60]
         rows.append((t[len("Transaction: "):], c.strip(), pos + len(t) + len("\nCategory:") + 1))
@@ -105,8 +135,12 @@ def parse(context):
     return names, rows, q[len("Transaction: "):]
 
 
-def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None):
+def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False):
     names, rows, query = parse(context)
+    if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
+        rows = split_rows(rows, query, rng)
+    if any(c is None for _, c, _ in rows):
+        assert layout in ("options", "labelled", "labelled_shots"), f"section headers are only rendered by the text layouts, not {layout}"
     _, lab_ids, open_ids = P.label_table(tok)
     opts = list(range(len(options))); rng.shuffle(opts)
     pool = 26 if labels == "rand26" and len(opts) <= 26 else 255
@@ -150,6 +184,9 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     else:
         parts.append("Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}\n" for oi in opts) + "\n")
     for fields, label, st in rows:
+        if label is None:  # row 117: a section header
+            parts.append(fields + "\n\n")
+            continue
         parts.append(f"Transaction: {f(fields)}\nCategory:")
         lab = f" ({lab_of[label]}) {label}" if layout == "labelled_shots" and label in lab_of else f" {label}"
         if in_loss(st):
