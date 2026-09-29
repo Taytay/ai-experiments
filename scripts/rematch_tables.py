@@ -41,7 +41,11 @@ ENCODERS = [("ModernBERT-large 395M, REAL-6 episodes (row 53)", [enc("encmask_mb
             ("GLiClass-large 400M, recipe episodes", [enc(f"encgli_large_st3000_{t}_f0_{d}") for t, d in (("h100fresh", DEC2), ("h100freshs1", DEC3))], f"encgli_large_st3000_h100fresh_f0_{DEC2}"),
             ("Ettin-encoder 1B, recipe episodes", [enc(f"encmask_ettin1b_st3000_{t}_f0_{d}") for t, d in (("h100fresh", DEC2), ("h100freshs1", DEC3))], f"encmask_ettin1b_st3000_h100fresh_f0_{DEC2}"),
             ("EuroBERT 2.1B, recipe episodes", [enc(f"encmask_eurobert_st6000_h100fresh_f0_{DEC2}")], f"encmask_eurobert_st6000_h100fresh_f0_{DEC2}"),
-            ("GLiClass-large 400M, recipe episodes + dated REAL-7 slices", [enc(f"encgli_large_st3000_h100fresh_f0_{DEC2}_r7all_kind")], f"encgli_large_st3000_h100fresh_f0_{DEC2}_r7all_kind")]
+            ("GLiClass-large 400M, recipe episodes + dated REAL-7 slices (fixed 2,400: memorised)", [enc(f"encgli_large_st3000_h100fresh_f0_{DEC2}_r7all_kind")], f"encgli_large_st3000_h100fresh_f0_{DEC2}_r7all_kind")]
+for _e, _t in (("encgli_large", "GLiClass-large 400M"), ("encmask_ettin1b", "Ettin-encoder 1B")):  # row 102
+    ENCODERS.append((f"{_t}, + soft targets", [enc(f"{_e}_st3000_h100fresh_f0_{DEC2}_ev10soft")], f"{_e}_st3000_h100fresh_f0_{DEC2}_ev10soft"))
+    ENCODERS.append((f"{_t}, + soft targets + dated REAL-7 slices (2,400-user pool)", [enc(f"{_e}_st3000_{t}_f0_{d}_r7all_kind_u2400n2400_ev10soft") for t, d in (("h100fresh", DEC2), ("h100freshs1", DEC3))],
+                     f"{_e}_st3000_h100fresh_f0_{DEC2}_r7all_kind_u2400n2400_ev10soft"))
 DECODERS = [("decider-4B, final recipe (row 89)", [dm(FINAL), dm(FINAL.replace("st800_", "st800s1_"))], None),
             ("decider-4B, + dated REAL-7 slices (row 98)", [dm(FINAL.replace("_ov10_", "_ov10_r7all_kind_")), dm(FINAL.replace("_ov10_", "_ov10_r7all_kind_").replace("st800_", "st800s1_"))], None)] + [
     (f"{m}, final recipe", [dm(f"slot_{m}_none_h100bf16st800_f0_{REC}_aux100_labrand26_ev10soft_lora")], None)

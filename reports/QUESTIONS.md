@@ -1168,6 +1168,7 @@ that time; the decoders then gained ~30 points on POI-1 (kind lines, description
 REAL-6, which the encoder never got. One-slot decoders cut its speed advantage from ~40x to ~2 to 3x. *Experiment:* GLiClass-large and
 Laya's layout with database episodes on REAL-6 and row 73's POI-1 layout, against decider-4B's recipe; ms per item on one GPU.
 **Status (2026-09-29):** PLAN step 99, REPORT.md 102: trained on the decoder recipe's episodes, GLiClass-large (400M) and Ettin-1B match decider-4B on REAL-6 (90.8 / 90.9 against 89.8) and novel names (88), at 10 to 14 ms per item against 32; they lack the soft-target behaviours (row 102).
+**Status (2026-09-29, later):** PLAN step 102, REPORT.md 104: with the soft targets Ettin-1B matches decider-4B on every trained behaviour and on REAL-6 / novel names; the blind set keeps it 4 points behind (new users, new local businesses).
 
 **EVAL-11 A test set built blind to the training augmentations.** Every behaviour set (misleading names, overrides, alternation,
 evidence-free) was built alongside the episodes that train it, and section 92 showed one augmentation teaching a prior the set

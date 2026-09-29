@@ -6569,3 +6569,55 @@ trained with A..Z, then draw their labels from all 255 (`oneslot`), which only d
   more synthetic population, better than none and not a substitute for real histories.
 
 Tables: `uv run python scripts/blind_tables.py`. Job lists: `scripts/modal_jobs/r100.json`, `r100b.json`.
+
+
+## 104. The encoder recipe completed: with the soft targets (evidence-free uniform, alternation splits), Ettin-encoder-1B has every trained behaviour decider-4B has (misleading names 97.4, override 98.0, evidence-free questions 0% confident, random splits hedged) and reads REAL-6 and novel names within a point of it (89.6 / 86.9); with dated REAL-7 slices from a pool that does not repeat it matches decider on REAL-7 (90.6 against 90.9); on the blind set it stays 4 points behind (77.9 to 78.8 against 82.0), the world-knowledge gap of section 103 (MODEL-17)
+
+PLAN step 102. Section 102's encoders lacked what the decoder recipe teaches with soft targets. `exp_encoder_mask.py` now trains them
+too: `EVFREE=0.1` (the query of 10% of episodes replaced by a fresh opaque merchant in no database or history, target uniform over the
+options, dates kept) and the alternation episodes' true splits (the builder's SOFT), with cross-entropy against the target distribution.
+Dated REAL-7 slices come from a 2,400-user pool (`real7train_v1_all_kind_u2400`, 19,200 episodes) with a fresh random 2,400 per draw
+(`R7N`), so the encoder does not see an episode 21 times as in section 102's first attempt. GLiClass-large and Ettin-1B; the slice arm
+two seeds.
+
+**Table 104.1: top-1 (REAL-6 sets: fold 0; REAL-7 and blind_v1: all users); blind_v1's auto-filed share at the 98% target**
+
+| reader | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind | blind_v1 | blind auto-filed (precision) |
+|---|---|---|---|---|---|---|
+| GLiClass-large, recipe episodes (section 102) | 90.8 | 87.8 | 78.7 | 81.6 | 77.6 | 43.3 (97.5) |
+| GLiClass-large, + soft targets | 87.2 | 85.6 | 79.4 | 81.9 | 77.6 | 48.7 (97.9) |
+| GLiClass-large, + soft targets + dated slices | 84.4 | 80.7 | 81.0 | 89.7 | 78.6 | 5.9 (96.6) |
+| Ettin-1B, recipe episodes (section 102) | 90.9 | 88.1 | 80.3 | 83.3 | 77.3 | 43.7 (97.6) |
+| **Ettin-1B, + soft targets** | **89.6** | **86.9** | 80.8 | 84.2 | **77.9** | **44.3 (97.4)** |
+| Ettin-1B, + soft targets + dated slices | 90.1 [89.6, 90.6] | 87.8 | 83.0 | 90.6 [90.2, 91.0] | 78.8 | 11.1 (95.8) |
+| decider-4B, final recipe (row 89) | 89.8 | 87.9 | 82.0 | 87.2 | 82.0 | 51.0 (97.7) |
+| decider-4B, + dated slices (row 98) | 90.8 | 89.1 | – | 90.9 | 81.0 | 1.1 (96.2) |
+
+**Table 104.2: the trained behaviours, fold 0**
+
+| reader | misleading names in the DB | override | alternation stores / restaurants | evidence-free p >= 0.9 | 60 / 40 splits p >= 0.9 |
+|---|---|---|---|---|---|
+| Ettin-1B, recipe episodes | 94.7 | 97.7 | 87.5 / 45.3 | 50.0 | 14.8 |
+| **Ettin-1B, + soft targets** | **97.4** | **98.0** | **96.9 / 43.8** | **0.0** | **0.0** |
+| Ettin-1B, + soft targets + dated slices | 89.5 | 98.2 | 96.9 / 51.6 | 1.3 | 10.9 |
+| GLiClass-large, + soft targets | 92.1 | 97.7 | 90.6 / 48.4 | 2.6 | 5.5 |
+| decider-4B, final recipe | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+
+### 104.1 What the step says
+
+- **With the whole recipe, a 1B encoder is decider-4B's equal on everything the recipe teaches.** Ettin-1B with the soft targets reads
+  misleading names, the user's override, amount rules, evidence-free questions and random splits as decider does (or better: the store
+  rule 97 against 86), REAL-6 and novel names within a point, at 14 ms per item batched against 32 (section 102). The soft targets cost
+  GLiClass 3 points on REAL-6; Ettin, the larger and more generally pre-trained encoder, keeps its accuracy.
+- **What remains is what pre-training gives.** The day-of-week rule (44 against 69) and the blind set's new users and new local
+  businesses (section 103) are where decider's knowledge of the world and of weekday habits shows; the blind set keeps Ettin 4 points
+  behind with or without the REAL-7 slices.
+- **The dated REAL-7 slices do for the encoder what they did for decider**: REAL-7 v2 84.2 to 90.6, level with decider's 90.9, and the
+  same loss of transferable confidence on the blind set (auto-filed 44% to 11%). The pool that does not repeat removed the memorisation
+  of section 102 (REAL-6 90.1, novel names 87.8, against 83.2 and 71.1).
+- **Where this leaves Q1.** Encoder or decoder is not the question for this task once the training is the same: the encoder matches on
+  every learned behaviour at a third of the cost, and the decoder keeps a lead exactly where the answer needs knowledge no training
+  episode supplies. Row 104 reads the split (encoder for known payees, decoder for new users and new merchants) by user effort.
+
+Tables: `uv run python scripts/rematch_tables.py`, `uv run python scripts/blind_tables.py`. Job list: `scripts/modal_jobs/r102.json`.
+Models `models/adapters/enc*_ev10soft` (DVC).
