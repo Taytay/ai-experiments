@@ -50,8 +50,14 @@ SPLIT = os.environ.get("BLIND_SPLIT") == "1"
 BULK = os.environ.get("BLIND_BULK") == "1"
 BULK_N, SHARED_MAX, SHARED_CAT_MAX = 30, 24, 18
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
+OTHERS = os.environ.get("BLIND_OTHERS") == "1"  # row 124 (main session): blind_v1_others.json, blind_v1's items with a line before the query
+# naming the categories other users filed this payee under before the query's date (the top three with counts; only when at least
+# three such rows exist): "Other users file this payee as: Eating out (14), Restaurants (9), Dining out (3)"
+OTHERS_HEAD = "Other users file this payee as: "
 if SPLIT:
     OUT = OUT.with_name("blind_v1_split.json")
+if OTHERS:
+    OUT = OUT.with_name("blind_v1_others.json")
 if BULK:
     OUT = OUT.with_name("blind_bulk_v1.json")
 DIG = "0123456789"
@@ -2109,6 +2115,12 @@ def main():
     picked = Counter()
     items = []
     bulk_plain, bulk_split = [], []
+    others_rows = {}  # row 124: mid -> [(date, uid, filed)] over every user (build_user seeds each user's own rng, so this pre-pass changes nothing)
+    if OTHERS:
+        for uid in ids:
+            u0, rng0 = build_user(uid, uid in short_ids)
+            for r in generate(u0, rng0):
+                others_rows.setdefault(r["mid"], []).append((r["date"], uid, r["filed"]))
     for uid in ids:
         u, rng = build_user(uid, uid in short_ids)
         rows = generate(u, rng)
@@ -2162,6 +2174,12 @@ def main():
             sl = build_slice(u, rows, qi)
             srows = [rows[i] for i in sl]
             prompt = make_prompt(header, srows, q)
+            if OTHERS:
+                cnt = Counter(f for d, v, f in others_rows.get(q["mid"], []) if v != u.uid and d < q["date"])
+                if sum(cnt.values()) >= 3:
+                    line = OTHERS_HEAD + ", ".join(f"{c} ({n})" for c, n in cnt.most_common(3))
+                    head, _, last = prompt.rpartition("\nTransaction: ")
+                    prompt = head + "\n" + line + "\n\nTransaction: " + last
             if SPLIT:
                 near = [i for i in build_near(u, rows, qi) if i in sl]
                 prompt = make_prompt_split(header, [rows[i] for i in sl if i not in near], [rows[i] for i in sorted(near)], q)

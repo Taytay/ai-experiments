@@ -35,15 +35,10 @@ QUESTION = "Which of this user's categories does the last transaction belong to?
 
 
 def expand_cache(cache, n):
-    """The batch-1 prefix cache repeated n times along the batch (attention keys / values; linear-attention states, kept as lists)."""
+    """The batch-1 prefix cache repeated n times along the batch, through the cache's own beam-search reorder (index 0, n times), which
+    covers attention keys / values and the linear-attention conv and recurrent states however the release stores them."""
     import torch
-    for layer in cache.layers:
-        for name in ("keys", "values", "conv_states", "recurrent_states"):
-            t = getattr(layer, name, None)
-            if isinstance(t, torch.Tensor):
-                setattr(layer, name, t.repeat_interleave(n, dim=0))
-            elif isinstance(t, list):
-                setattr(layer, name, [x.repeat_interleave(n, dim=0) if isinstance(x, torch.Tensor) else x for x in t])
+    cache.reorder_cache(torch.zeros(n, dtype=torch.long, device="cuda"))
     return cache
 
 

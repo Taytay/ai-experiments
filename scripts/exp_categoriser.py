@@ -144,6 +144,7 @@ PLACES = json.loads((ROOT / "data" / "processed" / f"{POI_DB}.json").read_text()
 POI_SHOTS, POI_REC, POI_KIND = os.environ.get("POI_SHOTS", "fixed"), bool(int(os.environ.get("POI_REC", "0"))), bool(int(os.environ.get("POI_KIND", "0")))
 POI_DESC, POI_UNSEEN = bool(int(os.environ.get("POI_DESC", "0"))), float(os.environ.get("POI_UNSEEN", "0"))
 DECOY, EMPTY = float(os.environ.get("DECOY", "0")), int(os.environ.get("EMPTY", "0"))
+OTHERS = float(os.environ.get("OTHERS", "0"))  # row 124 (REAL-23): share of episodes with a line before the query naming the categories other users file the payee under
 assert POI or (POI_SHOTS == "fixed" and not POI_REC and not POI_KIND and not POI_DESC and not POI_UNSEEN), "POI_* are POI-1 layouts"
 assert not (POI_UNSEEN and POI_SHOTS == "kind"), "POI_SHOTS=kind has its own unseen-kind half"
 DOC = json.loads((ROOT / "data" / "processed" / f"{POI}.json").read_text()) if POI else R6.load(REAL6_DB)
@@ -152,7 +153,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}{f'_sh{NSHOTS}' if NSHOTS != 24 else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}{f'_sh{NSHOTS}' if NSHOTS != 24 else ''}{f'_oth{round(OTHERS * 100)}' if OTHERS else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -219,7 +220,7 @@ def ov_row(u, rng):
         if p["std"] in std_to_name:
             mu, sig = T.AMOUNT[p["std"]]
             return dict(text=T.render(dict(name=p["name"], category=p["std"], city=p["city"]), rng), amount=round(math.exp(rng.gauss(mu, sig)), 2),
-                        weekday=rng.choice(T.WEEKDAYS), merchant=p["name"], label=std_to_name[p["std"]], synthetic=True)
+                        weekday=rng.choice(T.WEEKDAYS), merchant=p["name"], label=std_to_name[p["std"]], synthetic=True, std=p["std"])
     return None
 
 
@@ -331,6 +332,31 @@ def poi_db_row(u, rng):
         if p["basic"] in lab:
             return dict(text=p["text"], amount=p["amount"], weekday=rng.choice(T.WEEKDAYS), merchant=p["merchant"], basic=p["basic"], label=lab[p["basic"]], synthetic=True)
     return None
+
+
+def others_line(h, rng):
+    """Row 124: "Other users file this payee as: A (n), B (m), C (k)" from the query merchant's standard category (or kind): other users'
+    names for it (the standard name and REAL-6's renames, or the kind's names), in 20% of lines led by another category's names (other
+    users disagree, or the merchant is used for something else); totals log-uniform from 3 to 2,000 as blind_v1's real counts run.
+    None when the merchant has no standard category."""
+    from ai_experiments import kinds as K
+    def pool(key):
+        return list(K.KINDS[key[1]]["names"]) if isinstance(key, tuple) else [key] + list(R6.RENAMES.get(key, []))
+    if h.get("kind"):
+        key = ("kind", h["kind"])
+    else:
+        key = h.get("std") or (MERCHANT[h["merchant"]]["category"] if h.get("merchant") in MERCHANT else None)
+    if key is None:
+        return None
+    keys = list(R6.RENAMES) + [("kind", k) for k in K.KINDS]
+    lead = key if rng.random() < 0.8 else rng.choice([k for k in keys if k != key])
+    names = rng.sample(pool(lead), min(len(pool(lead)), rng.randint(1, 3)))
+    if rng.random() < 0.3:
+        names.append(rng.choice(pool(rng.choice([k for k in keys if k != lead]))))
+    names = list(dict.fromkeys(names))
+    total = int(math.exp(rng.uniform(math.log(3), math.log(2000))))
+    counts = sorted((max(1, int(total * w)) for w in (rng.random() for _ in names)), reverse=True)
+    return "Other users file this payee as: " + ", ".join(f"{n} ({c})" for n, c in zip(names, counts))
 
 
 def coined(r, taken):
@@ -473,7 +499,8 @@ def sft_examples(per_user=150):
             note = f"Note: {R6.category_record(h['merchant'], DBREC[h['merchant']]) if REC_CAT else DBREC[h['merchant']]}\n" if DB == "ret" else ""
             if POI_REC:  # row 72: the test items' record line (build_poi1: "<name> is listed as a <kind>.")
                 note = f"Note: {h['merchant']} is listed as a {kind_name(h['basic']).lower()}.\n"
-            prompt = hdr + demo + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\n{kind(h)}Category:"
+            oth = others_line(h, rng) if OTHERS and not POI and rng.random() < OTHERS else None  # row 124
+            prompt = hdr + demo + (oth + "\n\n" if oth else "") + note + f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\n{kind(h)}Category:"
             if alt_soft:  # row 86 v2
                 SOFT[prompt] = {names[k]: v for k, v in alt_soft.items()}
             ex.append((R6.chat_prompt(prompt) if CHAT else prompt, " " + names[h["label"]]) + ((spans,) if ALL_LABELS else ()))
