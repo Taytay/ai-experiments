@@ -61,6 +61,9 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
     businesses from 30 to 73 (decider's level); with empty categories it reads blind_v1 at 79.3 and auto-files 52%; in front of decider
     the system auto-files 62 to 65% at 97.4% and decider reads 48% of transactions (effort 0.57 to 0.60). Longer training (109) and
     short-history episodes (110) did not help; new users (category names with nothing to copy) remain both readers' weakest group.
+  - *Income, bills and transfers (111) and seeds (112):* kinds outside the twelve spending categories fix much of the new-user gap on
+    bills and income and cost the encoder nothing; over nine seed pairs the encoder-then-decider system auto-files 63.5% of blind_v1 at
+    97.5% (effort 0.588 against 0.655 for decider alone).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -6893,3 +6896,41 @@ errors, so blind_v1 is less blind for it; the kinds themselves are standard budg
   34 and 52%: auto-filing is the seed-sensitive measure for the encoder too.
 
 Tables: `uv run python scripts/overture_ep_tables.py`. Job lists: `scripts/modal_jobs/r110.json`, `r111.json`.
+
+
+## 112. The system over three seeds of each part: on blind_v1 the encoder filing first and decider reading the rest auto-files 63.5% at 97.5% (range over nine seed pairs 59.8 to 65.5) for an effort of 0.588 (0.567 to 0.619), against 0.655 for decider alone and 0.715 for the encoder alone; decider reads 48% of transactions. Kinds at a 10% share still cost decider 3 to 4 points on REAL-6 and novel names for +0.5 on the blind set, so decider's recipe stays (EVAL-10, EVAL-11)
+
+PLAN step 110. Calibrated auto-filing varied from 34 to 63% across seeds of one recipe (sections 109, 111), so the system's numbers need
+more than one seed of each part. Three seeds each: decider-4B with the recipe (row 89 + rand255 + empty categories), decider-4B with
+the recipe + KINDS 0.1, and the encoder (Ettin-1B, the encoder recipe with KINDS 0.2). Every encoder seed is paired with every decider
+seed. `scripts/system_tables.py`, `scripts/recipe_tables.py`.
+
+**Table 112.1: blind_v1 (mean [range]; systems over the 3 x 3 seed pairs)**
+
+| system | runs | effort | auto-filed % | precision % | top-1 | decider reads % |
+|---|---|---|---|---|---|---|
+| encoder alone | 3 | 0.715 [0.681, 0.770] | 52.0 [46.3, 56.1] | 97.9 | 79.5 [78.5, 80.2] | – |
+| decider-4B, recipe alone | 3 | 0.655 [0.627, 0.691] | 55.8 [51.7, 58.3] | 97.6 | 82.5 [82.4, 82.8] | – |
+| **encoder, then decider (recipe)** | 9 | **0.588 [0.567, 0.619]** | **63.5 [59.8, 65.5]** | 97.5 | 82.6 [82.3, 83.0] | 48 [44, 54] |
+| decider-4B, recipe + kinds 0.1 alone | 3 | 0.660 [0.627, 0.699] | 54.3 [49.8, 58.2] | 97.7 | 83.0 [82.8, 83.2] | – |
+| encoder, then decider (recipe + kinds 0.1) | 9 | 0.580 [0.561, 0.619] | 63.8 [59.4, 65.7] | 97.5 | 82.9 [82.6, 83.2] | 48 [44, 54] |
+
+**Table 112.2: decider-4B recipes on the other sets (three seeds)**
+
+| recipe | REAL-6 | novel names | misleading names | override | alternation stores / restaurants |
+|---|---|---|---|---|---|
+| the recipe | 89.4 [88.6, 89.9] | 89.6 [87.6, 90.9] | 93.9 | 97.9 | 82.8 / 74.0 |
+| + kinds 0.1 | 86.5 [85.6, 86.9] | 85.7 [84.6, 86.6] | 93.9 | 98.1 | 83.3 / 67.2 |
+
+### 112.1 What the step says
+
+- **The system's advantage is steady across seeds.** Every one of the nine encoder / decider pairs beats decider alone on effort
+  (0.567 to 0.619 against 0.627 to 0.691) and auto-files more (59.8 to 65.5% against 51.7 to 58.3%) at the same precision; the decoder
+  reads 44 to 54% of the transactions. The encoder alone is the weakest (0.715): it is the first stage, not a replacement.
+- **Auto-filing's seed spread is about 6 to 10 points for any single model and narrows in the system** (the encoder's and decider's
+  confident sets overlap, so one seed's gap is covered by the other part).
+- **Kinds for decider, again no.** At 10% the loss on REAL-6 and novel names (3 to 4 points, all three seeds) remains, for +0.5 on the
+  blind set and no change in effort. REAL-6 has no income, bills or transfers at all, so part of that loss may not matter on real
+  histories, which have them everywhere: real data will settle it. The encoder keeps its kinds (section 111).
+
+Job list: `scripts/modal_jobs/r112.json`.
