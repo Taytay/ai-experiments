@@ -284,10 +284,14 @@ def restyle(names, body, rng_):
     _, rows, query = oneslot.parse("Categories: " + ", ".join(names) + "\n\n" + body)
     f = oneslot.dow_first if DOW_FIRST else (lambda x: x)
     lab = {}
-    if ENC_LAYOUT in ("labelled_shots", "json_labelled", "yaml_labelled"):
+    if ENC_LAYOUT in ("labelled_shots", "json_labelled", "yaml_labelled", "ts_labelled"):
         pool = [a + b for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" for b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
         lab = dict(zip(names, rng_.sample(pool, len(names))))
     shown = [f"({lab[n]}) {n}" if lab else n for n in names]
+    if ENC_LAYOUT == "ts_labelled":  # row 114: TypeScript (the union type is the option list, so the options keep their plain names)
+        text, _ = oneslot.records_text("ts", rows, query, lab)
+        head = "type CategoryId =\n" + "".join(f'  | "{lab[n]}" /* {n} */\n' for n in names) + ";\n\n"
+        return shown, head + text + '?" };'
     if ENC_LAYOUT in ("json_labelled", "yaml_labelled"):  # row 113: the rows as JSON lines / a YAML list, categories labelled as the options
         text, _ = oneslot.records_text(ENC_LAYOUT[:4], rows, query, lab)
         return shown, text + "?\n</new_transaction>" if ENC_LAYOUT == "yaml_labelled" else text[:-1] + '?"}\n</new_transaction>'

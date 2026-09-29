@@ -57,6 +57,10 @@ def build(P, tok, context, question, options, gold, rng, labels="letters", max_c
 #                    ({"date", "description", "amount", "weekday", "category": "(FX) Transportation"}), the query as one object in
 #                    <new_transaction> ending '"category": "(' (the label follows the token ' "(' cleanly for all 255 labels)
 #   yaml_labelled    the same as a YAML list of records ("  category: (FX) Transportation"; descriptions quoted), the query ending "  category: ("
+#   ts_labelled      (owner, 2026-09-29) TypeScript: the categories as a string-literal union ('  | "FX" /* Transportation */'), an
+#                    interface Transaction, 'const history: Transaction[] = [ { ..., category: "GU" /* Medical */ }, ... ];' and
+#                    'const next: Transaction = { ..., category: "' with the answer slot there. Enum member access ("Category.GU") would
+#                    merge ".G" for 245 of 255 labels and enum keys read " GU": the quoted literal is clean for all 255.
 # dow_first moves the weekday next to the date: "Transaction: 2025-01-19 | Fri | TST* BARTELL DRUGS | $60.43".
 # Tokenization (checked on the Qwen3.5 tokenizer for all 255 labels): after "- (" and "Category: (" every label is one token, the same
 # id as the answer slot reads; "\n(AE" at a line start would merge into "(A" + "E", which this layout never writes.
@@ -105,6 +109,16 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     f = dow_first if dow else (lambda x: x)
     in_loss = (lambda st: any(s <= st < e for s, e in spans)) if spans is not None else (lambda st: False)
     parts, targets = [], []  # text pieces; char ranges of trained label text
+    if layout == "ts_labelled":
+        body, targets = records_text("ts", rows, query, lab_of, in_loss)
+        dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
+        head = ("type CategoryId =\n" + "".join(f'  | "{lab_of[options[oi]]}" /* {options[oi]} */\n' for oi in opts) + ";\n\n"
+                "interface Transaction { " + ("date: string; " if dated else "") + "description: string; amount: number; weekday: string; category: CategoryId; }\n\n")
+        text = head + body; targets = [(a + len(head), b + len(head)) for a, b in targets]
+        enc = tok(text, add_special_tokens=False, return_offsets_mapping=True)
+        ids, offs = list(enc["input_ids"]), enc["offset_mapping"]
+        aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and any(s < b and a < e for s, e in targets)]
+        return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
     if layout in ("json_labelled", "yaml_labelled"):
         body, targets = records_text(layout[:4], rows, query, lab_of, in_loss)
         head = "Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}\n" for oi in opts) + "\n"
@@ -189,10 +203,15 @@ def records_text(fmt, rows, query, lab_of, in_loss=lambda st: False):
     import json as _json
     dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
     cat = lambda c: (f"({lab_of[c]}) {c}" if c in lab_of else c)  # noqa: E731
-    parts, targets = ["<historical_transactions>\n"], []
+    if fmt == "ts":
+        cat = lambda c: (f'{lab_of[c]}" /* {c} */' if c in lab_of else f'{c}"')  # noqa: E731
+    parts, targets = ["const history: Transaction[] = [\n" if fmt == "ts" else "<historical_transactions>\n"], []
 
     def rec(f, c=None):
         d, dow, desc, amt = _cells(f)
+        if fmt == "ts":
+            head = "  { " + (f'date: "{d}", ' if dated else "") + f'description: {_json.dumps(desc, ensure_ascii=False)}, amount: {amt}, weekday: "{dow}", category: "'
+            return head, (cat(c) + " },\n") if c is not None else None
         if fmt == "json":
             head = "{" + (f'"date": "{d}", ' if dated else "") + f'"description": {_json.dumps(desc, ensure_ascii=False)}, "amount": {amt}, "weekday": "{dow}", "category": "'
             return head, (cat(c) + '"}\n') if c is not None else None
@@ -204,5 +223,8 @@ def records_text(fmt, rows, query, lab_of, in_loss=lambda st: False):
             n = sum(len(x) for x in parts); targets.append((n, n + len(tail) - 1))
         parts.append(tail)
     head, _ = rec(query)
+    if fmt == "ts":
+        parts.append("];\n\nconst next: Transaction = " + head.strip())  # ends 'category: "': the slot reads the label token after ' "'
+        return "".join(parts), targets
     parts.append("</historical_transactions>\n\n<new_transaction>\n" + head + "(")
     return "".join(parts), targets
