@@ -1180,3 +1180,4 @@ large products), so neither the licence rule nor a per-transaction budget allows
 but vision-language classes), Olmo-3-7B (Apache-2.0). Section 87 found 9B = 4B, so a new decoder earns its place only by matching
 decider-4B smaller or cheaper. *Experiment (row 101):* the final recipe on MiniCPM5-2B, Granite-4.0-micro, SmolLM3-3B and Phi-4-mini,
 one seed, every set.
+**Status (2026-09-28):** PLAN step 101, REPORT.md 100: none passes decider-4B; Granite-4.0-micro ties it on REAL-6 / REAL-7 (one seed) but reads misleading names at 84 against 97.

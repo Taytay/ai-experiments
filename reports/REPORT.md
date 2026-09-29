@@ -6327,3 +6327,48 @@ sets finds no violation.
   still auto-files 1 to 6%. Effort with the history rule in front falls from 0.671 to 0.622.
 
 Tables: `uv run python scripts/slice_tables.py` (the stage 2 rows appear when those runs are in). Job list: `scripts/modal_jobs/r98.json`.
+
+
+## 100. Newer small open decoders with the final recipe: none passes decider-4B; Granite-4.0-micro (3.4B) ties it on REAL-6 and REAL-7 (89.3 / 82.8 against 89.9 / 82.4, one seed) but stores the database less firmly (misleading names 84 against 97), and MiniCPM5-2B, SmolLM3-3B and Phi-4-mini trail by 2 to 10 points, most on novel names and the trained behaviours (MODEL-18)
+
+PLAN step 101 (owner, 2026-09-28: newer decoders under an open licence). Kimi K2 / K2.5 (about 1T parameters, a modified MIT licence
+with an attribution clause) fail the licence rule and any per-transaction budget; Kimi Linear 48B-A3B is plain MIT but 48B; Qwen 3.6 /
+3.8 exist only at 27B and 35B-A3B (deferred: 9B did not pass 4B, section 87, and LoRA at 35B needs more than one H100). The four small
+open candidates were each trained with the final recipe (row 89: one slot, shot-label loss, database episodes with the misleading-name
+set, rename 0.5, random A..Z labels, lookup / override, soft evidence-free questions, alternation 0.1; 800 steps, rank-64 LoRA, one
+seed; LoRA targets extended to Phi-3's fused projections and Granite 4's MLP names) and read on every set.
+
+**Table 100.1: top-1 (REAL-6 sets: fold 0's held-out users; REAL-7: all 200 new users)**
+
+| reader | licence, size | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind (section 99) |
+|---|---|---|---|---|---|
+| decider-4B, final recipe (row 89, seed 0) | Apache-2.0, 4B | 89.9 | 88.6 | 82.4 | 88.4 |
+| Granite-4.0-micro | Apache-2.0, 3.4B | 89.3 | 85.9 | 82.8 | 86.8 |
+| MiniCPM5-2B | Apache-2.0, 2.5B | 88.3 | 78.9 | 80.9 | 83.4 |
+| SmolLM3-3B | Apache-2.0, 3.1B | 86.6 | 84.2 | 81.4 | 86.4 |
+| Phi-4-mini-instruct | MIT, 3.8B | 86.9 | 83.2 | 79.7 | 83.6 |
+
+**Table 100.2: the trained behaviours, fold 0**
+
+| reader | misleading names in the DB | the user's override | alternation rules: stores / restaurants | evidence-free: p >= 0.9 | 60 / 40 splits: p >= 0.9 |
+|---|---|---|---|---|---|
+| decider-4B | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+| Granite-4.0-micro | 84.2 | 97.1 | 70.3 / 56.2 | 0.0 | 5.5 |
+| MiniCPM5-2B | 85.5 | 94.2 | 70.3 / 51.6 | 1.3 | 18.8 |
+| SmolLM3-3B | 77.6 | 96.8 | 71.9 / 48.4 | 1.3 | 26.6 |
+| Phi-4-mini-instruct | 77.6 | 95.9 | 79.7 / 39.1 | 1.3 | 19.5 |
+
+### 100.1 What the step says
+
+- **No newer small decoder passes decider-4B.** On the headline sets every one is within 1 to 4 points on REAL-6 and REAL-7 (the seed
+  spread is about 3), so the recipe, not the base, sets those numbers, as section 87 found for size.
+- **Where they differ is what training has to write into the weights.** Misleading names that only the database can correct read 78 to
+  85 against decider-4B's 97, novel category names 79 to 86 against 89, the day-of-week alternation rule 39 to 56 against 69. decider's
+  multiple-choice pre-training (shuffled labelled options, section 76) is the likely reason it learns the recipe's harder behaviours in
+  800 steps; the others might with more steps.
+- **Granite-4.0-micro is the one to keep in mind**: level with decider on REAL-6 and REAL-7 at 3.4B, weaker on stored facts. One seed each;
+  a second seed and longer training would be needed before preferring any of these to decider-4B.
+- **The soft evidence-free training transfers to every base** (0 to 1.3% confident where nothing can tell); random 60 / 40 splits are
+  hedged less by the weaker readers (19 to 27% confident).
+
+Tables: `uv run python scripts/rematch_tables.py`. Job list: `scripts/modal_jobs/r101.json`. Models `models/adapters/slot_*` (DVC).

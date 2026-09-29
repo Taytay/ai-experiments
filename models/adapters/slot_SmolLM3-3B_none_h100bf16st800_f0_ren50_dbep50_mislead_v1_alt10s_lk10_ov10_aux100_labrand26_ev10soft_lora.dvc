@@ -1,0 +1,7 @@
+outs:
+- md5: 6551b126829f111119d5365774f9bcb2.dir
+  size: 483730497
+  nfiles: 3
+  hash: md5
+  path: 
+    slot_SmolLM3-3B_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora
