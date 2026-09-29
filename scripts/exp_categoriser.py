@@ -130,7 +130,7 @@ ALT_SOFT = os.environ.get("ALT_SOFT", "") == "1"  # row 86 v2: noisy / random al
 SOFT = {}  # row 86 v2: prompt -> {answer name: probability}; read by exp_decider_finetune.py
 ALT_NAMES = ["Splurges", "Gifts", "Hobby time", "Self care", "Weekend treats", "Family outings", "Big buys", "Little luxuries", "Brunch club", "Game night"]
 R7TRAIN = os.environ.get("R7TRAIN", "")  # row 98 stage 2: add the episodes of data/processed/real7train_v1_<R7TRAIN>.json (build_real7_train.py), renamed like the rest
-R7N = int(os.environ.get("R7N", "0"))  # ... only the first R7N of them (0: all)
+R7N = int(os.environ.get("R7N", "0"))  # ... a random R7N of them per call (0: all)
 MOVE = float(os.environ.get("MOVE", "0"))  # row 95: move episodes laid out in time (old category early, the new one in the two latest shots)
 LOOKUP, OVERRIDE = float(os.environ.get("LOOKUP", "0")), float(os.environ.get("OVERRIDE", "0"))  # row 85
 POI_DB = os.environ.get("POI_DB", "")  # row 66 (REAL-21): data/processed/<POI_DB>.json (build_poi1_db.py), the places DBEP episodes draw from  # row 65 (POI-1): train on the users of data/processed/<POI>.json (poi1_v1: real Overture places) instead of REAL-6's
@@ -447,7 +447,7 @@ def sft_examples(per_user=150):
             ex.append((prompt, " " + h["label"]) + ((spans,) if ALL_LABELS else ()))
     if R7TRAIN:  # row 98 stage 2: REAL-7-style users with dated history slices; misfiled rows carry no shot-label loss
         r7 = json.loads((PROCESSED / f"real7train_v1_{R7TRAIN}.json").read_text())["episodes"]
-        for e in r7[:R7N or None]:
+        for e in (rng.sample(r7, R7N) if R7N else r7):  # R7N: a fresh random subset per call (row 102: encoders redraw the builder each pass)
             names = {c: c for c in e["cats"]}
             if RENAME:
                 taken = set(names)

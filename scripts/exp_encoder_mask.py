@@ -82,13 +82,14 @@ NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARC
 # query), truncated from the start when too long; any ITEMS_SET is then scored from its items' prompt text. The decoder recipe's shot-label
 # loss, soft evidence-free targets and soft splits have no counterpart here (one target per episode, hard).
 DEC_EPISODES = bool(int(os.environ.get("DEC_EPISODES", "0")))
+EVFREE = float(os.environ.get("EVFREE", "0"))  # row 102: this share of DEC_EPISODES episodes made evidence-free (the query a fresh opaque merchant), target uniform (the decoder's EVFREE_MODE=soft)
 if DEC_EPISODES:
     import sys
     os.environ.setdefault("LLM_BASE", "Qwen/Qwen3.5-2B"); _argv = sys.argv; sys.argv = [sys.argv[0], "llm", "none"]
     _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = [")[0]
     CAT = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
     exec(compile(_src, "exp_categoriser.py", "exec"), CAT); sys.argv = _argv
-    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "")
+    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "") + (f"_ev{round(EVFREE * 100)}soft" if EVFREE else "")
     NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
 LOAD_FROM = os.environ.get("LOAD_FROM", "")  # row 99: with STEPS=0, score a saved encoder (models/adapters/<name>) on ITEMS_SET under its own name
 if LOAD_FROM:
@@ -259,13 +260,34 @@ def dec_episodes():
         for e in CAT["sft_examples"]():
             prompt, ans = e[0], e[1].strip()
             head, body = prompt[: -len("Category:")].rstrip().split("\n\n", 1)
-            eps.append((head[len("Categories: "):].split(", "), body, ans))
+            eps.append((head[len("Categories: "):].split(", "), body, ans, CAT["SOFT"].get(prompt)))
         draws += 1; rng.shuffle(eps)
         if draws == 1:
             print(f"   {len(eps)} decoder-recipe episodes per draw, drawn again when used up", flush=True)
-        for names, body, ans in eps:
+        for names, body, ans, soft in eps:
             names = list(names); rng.shuffle(names)
-            yield names, None, None, body, names.index(ans)
+            if soft:  # row 102: the alternation episode's true split (the decoder's ALT_SOFT)
+                yield names, None, None, body, [soft.get(n, 0.0) for n in names]
+            elif EVFREE and rng.random() < EVFREE:
+                yield names, None, None, evfree_body(body), [1.0 / len(names)] * len(names)
+            else:
+                yield names, None, None, body, names.index(ans)
+
+
+def evfree_body(body):
+    """Row 102: the query (the body's last line) becomes a row of a fresh opaque merchant in no database or history, any date kept."""
+    from ai_experiments import merchants as M
+    from ai_experiments import transactions as T
+    while True:
+        name = rng.choice(M._PREFIX) + rng.choice(M._MID) + rng.choice(M._SUFFIX) + rng.choice(M._TAG)
+        if name not in CAT["MERCHANT"]:
+            break
+    cat = rng.choice(M.CATEGORY_LIST); mu, sig = T.AMOUNT[cat]
+    head, last = body.rsplit("\n", 1) if "\n" in body else ("", body)  # a user with no history rows: the query alone
+    assert last.startswith("Transaction: "), last[:40]
+    parts = last[len("Transaction: "):].split(" | ")
+    date = parts[0] + " | " if len(parts) == 4 else ""
+    return head + ("\n" if head else "") + f"Transaction: {date}{T.render(dict(name=name, category=cat, city=rng.choice(M._CITIES)), rng)} | ${math.exp(rng.gauss(mu, sig)):.2f} | {rng.choice(T.WEEKDAYS)}"
 
 
 def objective(z, y):
@@ -300,7 +322,19 @@ def train(tok, model):
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(ids, att, pos, pm)
         assert torch.isfinite(logits[pm]).all(), "non-finite option scores (EuroBERT's uninitialised rope gave NaN, which the loss read as 0)"
-        loss = objective(logits.float(), torch.tensor([y for *_, y in eps]).cuda())
+        ys = [y for *_, y in eps]
+        if any(isinstance(y, list) for y in ys):  # row 102: soft targets (uniform, split) beside hard ones; cross-entropy against the target distribution
+            assert OBJ == "ce"
+            tgt = torch.zeros_like(logits, dtype=torch.float32)
+            for b, y in enumerate(ys):
+                if isinstance(y, list):
+                    tgt[b, :len(y)] = torch.tensor(y)
+                else:
+                    tgt[b, y] = 1.0
+            lp = torch.log_softmax(logits.float(), -1).masked_fill(~(logits > -1e3), 0.0)
+            loss = -(tgt * lp).sum(1).mean()
+        else:
+            loss = objective(logits.float(), torch.tensor(ys).cuda())
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())
         if (step + 1) % 50 == 0 or step + 1 == STEPS:

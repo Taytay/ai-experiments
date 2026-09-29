@@ -1,0 +1,30 @@
+item 1 | Subscriptions & apps | Paramount+ always filed under Subscriptions & apps
+item 2 | Clothing | Discount clothing store; adult clothing purchases go to Clothing
+item 3 | Clothing | GAP purchases consistently filed as Clothing
+item 4 | Amazon stuff | Amazon marketplace purchases mostly filed as Amazon stuff
+item 5 | Dining out | Peet's coffee always filed under Dining out
+item 6 | Savings | Monthly Share 01 transfer always Savings
+item 7 | Kitchen | Meijer grocery store; Kitchen is grocery category
+item 8 | Coffee | Dunkin always filed as Coffee
+item 9 | Kid stuff | Children's Place in Sacramento usually Kid stuff
+item 10 | Miscellaneous | Unknown vendor, large amount; unclear purpose
+item 11 | Groceries | Trader Joe's always Groceries
+item 12 | Things | Biweekly $140 Zelle to Kevin Moore always Things
+item 13 | Restaurants | Lakeside Diner always Restaurants
+item 14 | Birthdays & gifts | Edible Arrangements always Birthdays & gifts
+item 15 | Food | Buffalo Wild Wings restaurant; food goes to Food
+item 16 | Dining out | Little BBQ always Dining out
+item 17 | Streaming junk | Max subscription always Streaming junk
+item 18 | Food | Small Square merchant purchases mostly Food
+item 19 | Amazon orders | Amazon purchases filed as Amazon orders
+item 20 | Cell phone | T-Mobile monthly bill always Cell phone
+item 21 | Cell phone | AT&T bill likely phone service
+item 22 | Bills | Kindle Unlimited monthly always Bills
+item 23 | Maui 2025 | Kihei purchase during Maui trip
+item 24 | Health | Great Clips mostly filed under Health
+item 25 | Dining Out | East End Trattoria always Dining Out
+item 26 | Apps & cloud | Riverstone Partner always filed Apps & cloud
+item 27 | Wheels | Marathon gas always Wheels
+item 28 | Food | Peet's coffee always Food
+item 29 | Streaming & apps | Spotify always Streaming & apps
+item 30 | Eating out | Red Barn Bistro mostly Eating out

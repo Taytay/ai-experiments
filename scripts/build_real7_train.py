@@ -36,6 +36,6 @@ if __name__ == "__main__":
         qrow = dict(day=q["day"], text=it["text"], amount=it["amount"], weekday=it["weekday"])
         eps.append(dict(id=it["id"], policy=name, cats=opts, rows=[[S.line(r, dated), r["filed"], r["filed"] == r["intended"]] for r in pick],
                         query=S.line(qrow, dated), answer=opts[it["answer"]], why=it["why"]))
-    dst = PROCESSED / f"real7train_v1_{pol}.json"
+    dst = PROCESSED / f"real7train_v1_{pol}{'' if n_users == 300 else f'_u{n_users}'}.json"  # row 102: a 2,400-user pool (_u2400) that encoders do not repeat
     dst.write_text(json.dumps(dict(name="real7train", version=f"v1_{pol}", n_users=n_users, episodes=eps, sha256=R6.sha256(eps)), indent=0, ensure_ascii=False))
     print(dst.name, len(eps), "episodes")

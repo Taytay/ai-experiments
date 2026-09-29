@@ -1,0 +1,30 @@
+item 1 | Gas | Costco Gas always filed under Gas
+item 2 | Transport | Costco Gas always filed under Transport
+item 3 | Work expenses (reimbursed) | Most Lyft rides filed as reimbursed work expenses
+item 4 | Fun money | Craft store, like the yarn hobby purchases in Fun money
+item 5 | Utilities | CenterPoint Energy always filed under Utilities
+item 6 | Dining out | Lakeside Grill always filed under Dining out
+item 7 | Apps & streaming | Max subscription always filed under Apps & streaming
+item 8 | Dining out | Harbor Bakery always filed under Dining out
+item 9 | Work expenses | Blue Heron Pizzeria always filed under Work expenses
+item 10 | Savings | Monthly $750 savings transfer always filed under Savings
+item 11 | Kid 2 | Monthly $95 dance academy always filed under Kid 2
+item 12 | Gas | BP station always filed under Gas
+item 13 | Fun | Little Cinema always filed under Fun
+item 14 | Grub | Whole Foods always filed under Grub
+item 15 | Entertainment | StubHub and ticket purchases filed under Entertainment
+item 16 | Income | Meridian Health paycheck always filed under Income
+item 17 | Everything else | Zelle to Taylor Rosa mostly filed Everything else
+item 18 | Restaurants | Wendy's always filed under Restaurants
+item 19 | Wedding | Zola purchases always filed under Wedding
+item 20 | Income | Dividend/interest always filed under Income
+item 21 | Takeout | Domino's mostly filed under Takeout
+item 22 | Giving | Refund matches the $44.16 Amazon charge filed under Giving
+item 23 | Fun | Stoney Creek Sushi always filed under Fun
+item 24 | Grocery | Small 7-Eleven purchase, snacks rather than fuel
+item 25 | Work lunches | Small Subway purchases mostly filed under Work lunches
+item 26 | Bills | Dropbox subscription always filed under Bills
+item 27 | Streaming junk | Kindle Unlimited always filed under Streaming junk
+item 28 | Work lunches | Subway mostly filed under Work lunches recently
+item 29 | Colorado ski trip | Breckenridge restaurant during the ski trip
+item 30 | Baby stuff | Carter's baby clothing; one earlier Carter's filing looks like a mistake

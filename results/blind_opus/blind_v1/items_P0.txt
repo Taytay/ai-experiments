@@ -1,0 +1,2175 @@
+### item 1
+Categories: Rent, Utilities, Internet & phone, Insurance, Groceries, Getting around, Auto maintenance, Health, Kids, Pet care, Savings, Dining out, Entertainment, Subscriptions & apps, Fitness, Household goods, Clothing, Personal care, Birthdays & gifts, Donations, Vacation, Misc, Spending money, Ready to Assign
+
+Transaction: 2025-02-16 | KROGER #3385 SALT LAKE CTY UT | $50.13 | Sun
+Category: Getting around
+
+Transaction: 2025-02-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Tue
+Category: Subscriptions & apps
+
+Transaction: 2025-03-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Tue
+Category: Subscriptions & apps
+
+Transaction: 2025-04-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Fri
+Category: Subscriptions & apps
+
+Transaction: 2025-05-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Sun
+Category: Subscriptions & apps
+
+Transaction: 2025-06-24 | OAKWOOD LLC SALT LAKE CTY UT | $164.65 | Tue
+Category: Auto maintenance
+
+Transaction: 2025-06-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Wed
+Category: Subscriptions & apps
+
+Transaction: 2025-07-06 | HLU*HULUPLUS 877-8244858 CA | $18.99 | Sun
+Category: Subscriptions & apps
+
+Transaction: 2025-07-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Fri
+Category: Subscriptions & apps
+
+Transaction: 2025-08-01 | ZILLOW RENT PAYMENT PPD ID: 5782731497 | $1265.00 | Fri
+Category: Rent
+
+Transaction: 2025-08-06 | HLU*HULUPLUS 877-8244858 CA | $18.99 | Wed
+Category: Subscriptions & apps
+
+Transaction: 2025-08-07 | LEMONADE INS 844-733-8666 NY | $12.00 | Thu
+Category: Insurance
+
+Transaction: 2025-08-10 | BRICKYARD GARDEN CENTE SALT LAKE CTY UT | $38.82 | Sun
+Category: Household goods
+
+Transaction: 2025-08-11 | CITY OF SALT LAKE CTY UTILITY PPD ID: 6662963521 | $76.75 | Mon
+Category: Utilities
+
+Transaction: 2025-08-15 | TARGET.COM * 800-591-3869 MN | $37.21 | Fri
+Category: Clothing
+
+Transaction: 2025-08-15 | GS BANK USA MARCUS PPD ID: 2012931700 | $250.00 | Fri
+Category: Savings
+
+Transaction: 2025-08-16 | TOPGOLF SALT LAKE CTY SALT LAKE CTY UT | $70.82 | Sat
+Category: Entertainment
+
+Transaction: 2025-08-17 | TONY'S FAMILY DENTAL SALT LAKE CTY UT | $67.93 | Sun
+Category: Health
+
+Transaction: 2025-08-18 | CHARTER SPECTRUM 877-772-2253 | $70.00 | Mon
+Category: Internet & phone
+
+Transaction: 2025-08-19 | KROGER 142 SALT LAKE CTY UT | $71.45 | Tue
+Category: Groceries
+
+Transaction: 2025-08-20 | PETSMART # 3361 SALT LAKE CTY UT | $37.97 | Wed
+Category: Pet care
+
+Transaction: 2025-08-21 | ULTA #6407 SALT LAKE CTY UT | $17.20 | Thu
+Category: Personal care
+
+Transaction: 2025-08-21 | PANERA BREAD #312293 SALT LAKE CTY UT | $22.21 | Thu
+Category: Dining out
+
+Transaction: 2025-08-22 | CARTERS #6313 SALT LAKE CTY UT | $30.53 | Fri
+Category: Kids
+
+Transaction: 2025-08-25 | PARAMOUNT+ 888-274-5343 CA | $7.99 | Mon
+Category:
+
+### item 2
+Categories: Rent/Mortgage, Electric, Water & sewer, Internet, Phone, Insurance, Groceries, Transportation, Car maintenance, Healthcare, Childcare, Lucas activities, Noah activities, School, Kids clothes, Emergency Fund, Dining Out, Fun money, Subscriptions & apps, Gym membership, Household, Home maintenance, Clothing, Hair & beauty, Gifts, Donations, Travel, Miscellaneous, Spending money, Inflow: Ready to Assign
+
+Transaction: 2025-06-14 | POS DEBIT 06/13 AUTOZONE #2896 CHICAGO IL | $43.05 | Sat
+Category: Car maintenance
+
+Transaction: 2025-07-19 | POS DEBIT 07/18 GAP US 1492 CHICAGO IL | $41.01 | Sat
+Category: Clothing
+
+Transaction: 2025-07-21 | POS DEBIT 07/21 AMAZON MKTPL*DVNWKZ3SU Amzn.com/ | $15.35 | Mon
+Category: Kids clothes
+
+Transaction: 2025-07-21 | POS DEBIT 07/19 CLV*WESTGATE SHOE REPA CHICAGO I | $43.97 | Mon
+Category: Clothing
+
+Transaction: 2025-07-24 | POS DEBIT 07/24 GAP US 1492 CHICAGO IL | $53.19 | Thu
+Category: Clothing
+
+Transaction: 2025-08-07 | POS DEBIT 08/07 MYSCHOOLBUCKS.COM 855-832-5226 N | $54.87 | Thu
+Category: School
+
+Transaction: 2025-08-11 | POS DEBIT 08/11 CLV*WESTGATE SHOE REPA NAPERVILL | $23.30 | Mon
+Category: Clothing
+
+Transaction: 2025-08-26 | POS DEBIT 08/25 SPECTRUM 855-707-7328 MO | $55.00 | Tue
+Category: Internet
+
+Transaction: 2025-09-03 | ACH DEBIT MR. COOPER MTG PMT | $1649.72 | Wed
+Category: Rent/Mortgage
+
+Transaction: 2025-09-04 | ACH DEBIT STATE FARM RO 27 CPC-CLIENT | $139.36 | Thu
+Category: Insurance
+
+Transaction: 2025-09-05 | ACH DEBIT COMED PAYMENTS | $158.48 | Fri
+Category: Electric
+
+Transaction: 2025-09-08 | POS DEBIT 09/07 OLD NAVY US 1387 EVANSTON IL | $55.54 | Mon
+Category: Clothing
+
+Transaction: 2025-09-12 | POS DEBIT 09/11 OLD NAVY US 1387 CHICAGO IL | $13.83 | Fri
+Category: Clothing
+
+Transaction: 2025-09-13 | POS DEBIT 09/13 SE*SPORTSENGINE CHICAGO LITTLE L | $68.38 | Sat
+Category: Lucas activities
+
+Transaction: 2025-09-15 | POS DEBIT 09/15 SP STONEY CREEK PILATE CHICAGO I | $31.98 | Mon
+Category: Gym membership
+
+Transaction: 2025-09-15 | TRANSFER TO SHARE 01 | $200.00 | Mon
+Category: Emergency Fund
+
+Transaction: 2025-09-15 | POS DEBIT 09/15 JEWEL OSCO 8159 EVANSTON IL | $58.29 | Mon
+Category: Groceries
+
+Transaction: 2025-09-16 | ACH DEBIT AMERICAN WATER PAYMENT | $78.52 | Tue
+Category: Water & sewer
+
+Transaction: 2025-09-17 | POS DEBIT 09/16 ATT*BILL PAYMENT 800-331-0500 TX | $231.41 | Wed
+Category: Phone
+
+Transaction: 2025-09-17 | POS DEBIT 09/16 VALERO 2149 NAPERVILLE IL | $26.28 | Wed
+Category: Transportation
+
+Transaction: 2025-09-18 | POS DEBIT 09/18 STARBUCKS STORE 57267 NAPERVILLE | $6.60 | Thu
+Category: Dining Out
+
+Transaction: 2025-09-18 | POS DEBIT 09/18 REI #564 CHICAGO IL | $16.69 | Thu
+Category: Fun money
+
+Transaction: 2025-09-18 | POS DEBIT 09/17 HULU 877-8244858 CA | $18.99 | Thu
+Category: Subscriptions & apps
+
+Transaction: 2025-09-19 | POS DEBIT 09/17 BRIGHTPATH CORP CHICAGO IL | $157.27 | Fri
+Category: Healthcare
+
+Transaction: 2025-09-19 | POS DEBIT 09/19 ROSS STORES #7858 CHICAGO IL | $18.10 | Fri
+Category:
+
+### item 3
+Categories: Income, Rent, Electric, Water & sewer, Internet, Cell phone, Natural gas, Car insurance, Renters insurance, Groceries, Coffee, Dining out, Takeout, Wine & beer, Lunch at work, Gas, Car maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Gifts, Charity, Bank fees, Education, Cash, Emergency fund, Investing
+
+Transaction: 2025-04-05 | GAP US 4499 04/04 PURCHASE SEATTLE WA | $42.97 | Sat
+Category: Clothing
+
+Transaction: 2025-05-02 | GAP US 4499 05/02 PURCHASE SEATTLE WA | $102.69 | Fri
+Category: Clothing
+
+Transaction: 2025-06-27 | NIKE.COM 800-806-6453 OR 06/25 PURCHASE | $214.83 | Fri
+Category: Clothing
+
+Transaction: 2025-07-19 | SUPERCUTS 9034 07/18 PURCHASE SEATTLE WA | $30.75 | Sat
+Category: Doctor
+
+Transaction: 2025-08-21 | EXXONMOBIL 88080725 08/19 PURCHASE SEATTLE WA | $30.00 | Thu
+Category: Parking & tolls
+
+Transaction: 2025-10-06 | NIKE.COM 800-806-6453 OR 10/05 PURCHASE | $229.27 | Mon
+Category: Clothing
+
+Transaction: 2025-10-20 | ATT*BILL PAYMENT 800-288-2020 TX 10/18 PURCHASE | $49.99 | Mon
+Category: Internet
+
+Transaction: 2025-10-23 | ALLSTATE INS CO DES:INS PREM ID:779265125 INDN:CHRIS WILLIAMS CO ID:1181617328 WEB | $181.34 | Thu
+Category: Car insurance
+
+Transaction: 2025-10-26 | SHELL OIL 76902216501 10/24 PURCHASE SEATTLE WA | $50.24 | Sun
+Category: Gas
+
+Transaction: 2025-10-30 | WESTGATE BURGER BAR 10/29 PURCHASE SEATTLE WA | $41.97 | Thu
+Category: Coffee
+
+Transaction: 2025-11-04 | DOMINO'S 1402 11/03 PURCHASE SEATTLE WA | $32.23 | Tue
+Category: Wine & beer
+
+Transaction: 2025-11-08 | Amazon Prime*1CAGVBV297 Amzn.com/bill WA 11/08 PURCHASE | $14.99 | Sat
+Category: Dental
+
+Transaction: 2025-11-17 | PUGET SOUND ENERG DES:BILLPAY ID:161063742 INDN:CHRIS WILLIAMS CO ID:7620958168 WEB | $175.51 | Mon
+Category: Electric
+
+Transaction: 2025-11-17 | COLUMBIA GAS OH DES:PAYMENT ID:986770755 INDN:CHRIS WILLIAMS CO ID:4825069463 WEB | $74.73 | Mon
+Category: Natural gas
+
+Transaction: 2025-11-20 | SQ *WILLOW PHO HOUSE 11/19 PURCHASE SEATTLE WA | $26.73 | Thu
+Category: Dining out
+
+Transaction: 2025-11-25 | TMOBILE*AUTO PAY 800-937-8997 WA 11/25 PURCHASE | $54.85 | Tue
+Category: Cell phone
+
+Transaction: 2025-11-27 | HULU 877-8244858 CA 11/25 PURCHASE | $9.99 | Thu
+Category: Streaming
+
+Transaction: 2025-11-28 | ACME CORP DES:DIR DEP ID:328222238 INDN:CHRIS WILLIAMS CO ID:9810559929 PPD | $-1392.65 | Fri
+Category: Income
+
+Transaction: 2025-11-29 | FRED MEYER 22536 11/27 PURCHASE SEATTLE WA | $141.46 | Sat
+Category: Groceries
+
+Transaction: 2025-11-29 | WALGREENS #25956 11/27 PURCHASE SEATTLE WA | $7.14 | Sat
+Category: Pharmacy
+
+Transaction: 2025-12-01 | EXXONMOBIL 88080725 12/01 PURCHASE SEATTLE WA | $40.13 | Mon
+Category: Car maintenance
+
+Transaction: 2025-12-01 | Check 1018 | $2745.00 | Mon
+Category: Rent
+
+Transaction: 2025-12-02 | DOMINO'S 1402 12/02 PURCHASE SEATTLE WA | $33.05 | Tue
+Category: Lunch at work
+
+Transaction: 2025-12-02 | GRUBHUB*PANDA EXPRESS 12/01 PURCHASE | $26.82 | Tue
+Category: Takeout
+
+Transaction: 2025-12-06 | GAP US 4499 12/04 PURCHASE SEATTLE WA | $99.82 | Sat
+Category:
+
+### item 4
+Categories: Paychecks, Rent, Electric, Water & sewer, Internet, Cell phone, Natural gas, Car insurance, Renters insurance, Student loans, Groceries, Coffee, Dining out, Takeout, Wine & beer, Gas, Auto maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Gifts, Charity, Bank fees, Education, Cash, Emergency fund, Reimbursable, Amazon stuff
+
+Transaction: 2025-07-19 | TEMU.COM 8884958868 DE 07/17 PURCHASE | $27.22 | Sat
+Category: Household supplies
+
+Transaction: 2025-07-24 | ETSY.COM 661974796 07/23 PURCHASE | $20.07 | Thu
+Category: Hobbies
+
+Transaction: 2025-08-10 | AMZN Mktp US*KSDXLAKRV Amzn.com/bill WA 08/09 PURCHASE | $21.53 | Sun
+Category: Household supplies
+
+Transaction: 2025-08-12 | AMZN Mktp US*QKDJ30DWS Amzn.com/bill WA 08/10 PURCHASE | $30.57 | Tue
+Category: Amazon stuff
+
+Transaction: 2025-08-15 | TEMU.COM 8884958868 DE 08/14 PURCHASE | $23.10 | Fri
+Category: Clothing
+
+Transaction: 2025-08-17 | AMZN Mktp US*7VQPQCAY0 Amzn.com/bill WA 08/16 PURCHASE | $32.69 | Sun
+Category: Amazon stuff
+
+Transaction: 2025-08-21 | ETSY.COM 034451351 08/20 PURCHASE | $22.20 | Thu
+Category: Household supplies
+
+Transaction: 2025-08-23 | AMZN Mktp US*QPTKC0NJR Amzn.com/bill WA 08/23 PURCHASE | $17.87 | Sat
+Category: Amazon stuff
+
+Transaction: 2025-09-03 | CHILIS 1909 09/01 PURCHASE DENVER CO | $81.88 | Wed
+Category: Coffee
+
+Transaction: 2025-09-08 | AMZN Mktp US*7GUF15YM8H Amzn.com/bill WA 09/06 PURCHASE | $32.01 | Mon
+Category: Amazon stuff
+
+Transaction: 2025-10-10 | AMZN Mktp US*ZRMARPHM1 Amzn.com/bill WA 10/09 PURCHASE | $14.26 | Fri
+Category: Amazon stuff
+
+Transaction: 2025-10-16 | PIEDMONT NG DES:DRAFT ID:789260929 INDN:LAUREN WILSON CO ID:1401885604 WEB | $29.35 | Thu
+Category: Natural gas
+
+Transaction: 2025-10-20 | DEPT EDUCATION DES:STUDENT LN ID:829179207 INDN:LAUREN WILSON CO ID:8247254319 WEB | $311.56 | Mon
+Category: Student loans
+
+Transaction: 2025-10-26 | PROG DIRECT INS PREM 800-776-4737 OH 10/26 PURCHASE | $169.92 | Sun
+Category: Car insurance
+
+Transaction: 2025-10-31 | MERIDIAN HEALTH DES:PAYROLL ID:548940130 INDN:LAUREN WILSON CO ID:8613867085 PPD | $-2211.61 | Fri
+Category: Paychecks
+
+Transaction: 2025-11-03 | YARDI RENTCAFE DES:WEB PMTS ID:906806127 INDN:LAUREN WILSON CO ID:8777024989 WEB | $2080.00 | Mon
+Category: Rent
+
+Transaction: 2025-11-04 | TARGET.COM * 800-591-3869 MN 11/04 PURCHASE | $84.54 | Tue
+Category: Gifts
+
+Transaction: 2025-11-06 | ATT*BILL PAYMENT 800-288-2020 TX 11/06 PURCHASE | $70.00 | Thu
+Category: Internet
+
+Transaction: 2025-11-09 | TARGET T-8985 11/09 PURCHASE DENVER CO | $22.39 | Sun
+Category: Household supplies
+
+Transaction: 2025-11-09 | SQ *MAGNOLIA GRILL 11/07 PURCHASE DENVER CO | $34.74 | Sun
+Category: Dining out
+
+Transaction: 2025-11-12 | SAFEWAY #2816 11/10 PURCHASE DENVER CO | $122.82 | Wed
+Category: Groceries
+
+Transaction: 2025-11-12 | MINT MOBILE 800-683-7392 CA 11/11 PURCHASE | $87.45 | Wed
+Category: Cell phone
+
+Transaction: 2025-11-13 | CHIPOTLE 5566 11/12 PURCHASE DENVER CO | $8.70 | Thu
+Category: Takeout
+
+Transaction: 2025-11-13 | XCEL ENERGY-NSP DES:XCELENERGY ID:657264405 INDN:LAUREN WILSON CO ID:2746187449 WEB | $75.74 | Thu
+Category: Electric
+
+Transaction: 2025-11-13 | AMAZON MKTPL*FU2VFL3YX Amzn.com/bill WA 11/13 PURCHASE | $11.73 | Thu
+Category:
+
+### item 5
+Categories: Rent/Mortgage, Utilities, Phone & internet, Insurance, Grocery, Getting around, Auto maintenance, Medical expenses, Kids, Pet care, Emergency Fund, Dining out, Fun money, Subscriptions & apps, Household, Clothing, Personal care, Birthdays & gifts, Charity, Vacation, Miscellaneous, Disney World, WFH setup, Ready to Assign, Client meals
+
+Transaction: 2025-08-28 | SAFEWAY #4212          HILLSBORO     OR | $24.94 | Thu
+Category: Clothing
+
+Transaction: 2025-09-01 | YARDI RENTCAFE WEB PMTS | $1550.00 | Mon
+Category: Rent/Mortgage
+
+Transaction: 2025-09-02 | ALLY BANK TRANSFER | $500.00 | Tue
+Category: Emergency Fund
+
+Transaction: 2025-09-07 | TST* NONNA'S BAKERY &  HILLSBORO     OR | $7.42 | Sun
+Category: Dining out
+
+Transaction: 2025-09-09 | GEICO *AUTO 800-841-3000 DC | $146.46 | Tue
+Category: Insurance
+
+Transaction: 2025-09-09 | TST* NONNA'S BAKERY &  HILLSBORO     OR | $12.69 | Tue
+Category: Dining out
+
+Transaction: 2025-09-10 | PEETS #23717           HILLSBORO     OR | $5.87 | Wed
+Category: Dining out
+
+Transaction: 2025-09-11 | MARSHALLS #2782        HILLSBORO     OR | $20.73 | Thu
+Category: Birthdays & gifts
+
+Transaction: 2025-09-15 | PEETS #42087           HILLSBORO     OR | $8.99 | Mon
+Category: Dining out
+
+Transaction: 2025-09-15 | COPPER FAMILY MEDICINE HILLSBORO     OR | $124.39 | Mon
+Category: Medical expenses
+
+Transaction: 2025-09-17 | AMAZON MKTPL*E954EGWZG4 Amzn.com/bill WA | $120.49 | Wed
+Category: Household
+
+Transaction: 2025-09-19 | PORTLAND GENERAL PGE PAYMNT | $181.07 | Fri
+Category: Utilities
+
+Transaction: 2025-09-20 | PEETS #42087           HILLSBORO     OR | $6.22 | Sat
+Category: Dining out
+
+Transaction: 2025-09-22 | COMCAST CABLE COMM 800-XFINITY PA | $79.99 | Mon
+Category: Phone & internet
+
+Transaction: 2025-09-22 | VENMO PAYMENT 0163614855 | $50.00 | Mon
+Category: Grocery
+
+Transaction: 2025-09-25 | PEETS #23717           HILLSBORO     OR | $11.12 | Thu
+Category: Dining out
+
+Transaction: 2025-09-26 | PEETS #42087           HILLSBORO     OR | $4.84 | Fri
+Category: Dining out
+
+Transaction: 2025-09-26 | GREAT CLIPS #9260      HILLSBORO     OR | $23.10 | Fri
+Category: Personal care
+
+Transaction: 2025-09-26 | SPEEDWAY 87817         HILLSBORO     OR | $40.73 | Fri
+Category: Getting around
+
+Transaction: 2025-09-26 | VENMO PAYMENT 1979715260 | $125.00 | Fri
+Category: Kids
+
+Transaction: 2025-09-27 | HULU 877-8244858 CA | $9.99 | Sat
+Category: Subscriptions & apps
+
+Transaction: 2025-09-27 | PEETS #23717           HILLSBORO     OR | $8.95 | Sat
+Category: Dining out
+
+Transaction: 2025-09-29 | PETSMART # 1679        HILLSBORO     OR | $69.67 | Mon
+Category: Pet care
+
+Transaction: 2025-09-30 | PLAYSTATION NETWORK 800-345-7669 CA | $60.67 | Tue
+Category: Fun money
+
+Transaction: 2025-09-30 | PEETS #23717           HILLSBORO     OR | $7.65 | Tue
+Category:
+
+### item 6
+Categories: Home, Fixed bills, Food, Transportation, Medical, Fun, Shopping, Gifts & giving, Savings, Fees & misc, Inflow: Ready to Assign, Work reimbursable
+
+Transaction: 2025-04-01 | TRANSFER TO SHARE 01 | $200.00 | Tue
+Category: Savings
+
+Transaction: 2025-05-01 | TRANSFER TO SHARE 01 | $200.00 | Thu
+Category: Savings
+
+Transaction: 2025-06-02 | TRANSFER TO SHARE 01 | $200.00 | Mon
+Category: Savings
+
+Transaction: 2025-07-01 | TRANSFER TO SHARE 01 | $200.00 | Tue
+Category: Savings
+
+Transaction: 2025-08-01 | TRANSFER TO SHARE 01 | $200.00 | Fri
+Category: Savings
+
+Transaction: 2025-08-03 | DBT CRD 5856 08/02/25 SQ *GS PARTNERS SEATTLE WA | $79.57 | Sun
+Category: Medical
+
+Transaction: 2025-09-01 | TRANSFER TO SHARE 01 | $200.00 | Mon
+Category: Savings
+
+Transaction: 2025-09-09 | DBT CRD 7516 09/09/25 AMZN Mktp US*MH2UPAVB54 Am | $18.92 | Tue
+Category: Fun
+
+Transaction: 2025-09-11 | ZELLE DEBIT SAM LEWIS | $105.00 | Thu
+Category: Gifts & giving
+
+Transaction: 2025-09-25 | DBT CRD 7105 09/25/25 GEICO *AUTO 800-841-3000 D | $160.46 | Thu
+Category: Fixed bills
+
+Transaction: 2025-09-26 | ACH CREDIT BRIGHTWAVE SOFTWARE PAYROLL | $-2258.47 | Fri
+Category: Inflow: Ready to Assign
+
+Transaction: 2025-09-26 | DBT CRD 4409 09/25/25 DELTA AIR 0982015862752 C# | $212.69 | Fri
+Category: Work reimbursable
+
+Transaction: 2025-09-26 | DBT CRD 5552 09/26/25 UNIQLO USA 877-486-4756 NY | $41.53 | Fri
+Category: Shopping
+
+Transaction: 2025-09-27 | DBT CRD 0674 09/25/25 BP#8616772 SEATTLE WA C#83 | $56.24 | Sat
+Category: Transportation
+
+Transaction: 2025-09-27 | DBT CRD 8364 09/27/25 H&M 7831 SEATTLE WA C#8314 | $64.89 | Sat
+Category: Shopping
+
+Transaction: 2025-09-28 | DBT CRD 6617 09/27/25 SONIC DRIVE IN #9401 SEATT | $7.04 | Sun
+Category: Food
+
+Transaction: 2025-09-29 | DBT CRD 9979 09/28/25 OUTBACK 5005 SEATTLE WA C# | $31.77 | Mon
+Category: Food
+
+Transaction: 2025-09-29 | DBT CRD 8401 09/29/25 TACO BELL #57272 SEATTLE W | $9.92 | Mon
+Category: Food
+
+Transaction: 2025-09-29 | DBT CRD 8755 09/29/25 PARKMOBILE 877-727-5758 GA | $21.83 | Mon
+Category: Transportation
+
+Transaction: 2025-09-29 | DBT CRD 8041 09/28/25 SQ *GOLDEN BAKERY & CA SEA | $7.63 | Mon
+Category: Food
+
+Transaction: 2025-09-30 | DBT CRD 2066 09/29/25 WALMART.COM 800-966-6546 A | $77.00 | Tue
+Category: Food
+
+Transaction: 2025-09-30 | DBT CRD 0360 09/30/25 7-ELEVEN 29313 SEATTLE WA  | $31.11 | Tue
+Category: Transportation
+
+Transaction: 2025-09-30 | DBT CRD 7064 09/29/25 SQ *KESTREL GROUP INC SEAT | $32.41 | Tue
+Category: Food
+
+Transaction: 2025-09-30 | DBT CRD 5388 09/29/25 HOMEDEPOT.COM 800-430-3376 | $-18.15 | Tue
+Category: Home
+
+Transaction: 2025-10-01 | TRANSFER TO SHARE 01 | $200.00 | Wed
+Category:
+
+### item 7
+Categories: Shelter, Grown-up bills, Kitchen, Restaurants, Caffeine, Booze, Wheels, Car fund, Ouch, Apps & streaming, Gym, House stuff, Self care, Fun money, Travel, Gifts, Giving, Oops, Brain food, Rainy day, Ready to Assign
+
+Transaction: 2025-12-07 | PURCHASE AUTHORIZED ON 12/07 TARGET.COM * 800-591-3869 MN S15613808921 CARD 5890 | $31.03 | Sun
+Category: House stuff
+
+Transaction: 2025-12-07 | PURCHASE AUTHORIZED ON 12/05 MENARDS 8124 DETROIT MI S53786385853 CARD 5890 | $26.64 | Sun
+Category: House stuff
+
+Transaction: 2025-12-08 | PURCHASE AUTHORIZED ON 12/08 MEIJER # 251 DETROIT MI S05307135993 CARD 5890 | $43.51 | Mon
+Category:
+
+### item 8
+Categories: Income, Mortgage, Electric, Water & sewer, Internet, Cell phone, Car insurance, Home insurance, Car payment, Groceries, Coffee, Dining out, Takeout, Wine & beer, Work lunches, Gas, Auto maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Pet food & supplies, Vet, Gifts, Charity, Bank fees, Education, Cash, Emergency fund, Investing, Costco - food, Costco - household, Hawaii trip, Reimbursable, Car repairs, Amazon orders, Work expenses
+
+Transaction: 2025-05-10 | JIFFY LUBE #8344 OAKLAND CA | $79.70 | Sat
+Category: Auto maintenance
+
+Transaction: 2025-08-22 | CVS/PHARMACY #24144 SACRAMENTO CA | $8.82 | Fri
+Category: Pharmacy
+
+Transaction: 2025-08-25 | FOXGLOVE PHYSICAL THER SACRAMENTO CA | $33.98 | Mon
+Category: Doctor
+
+Transaction: 2025-09-04 | DUNKIN #983030 SACRAMENTO CA | $6.51 | Thu
+Category: Coffee
+
+Transaction: 2025-09-09 | DUNKIN #983030 SACRAMENTO CA | $6.18 | Tue
+Category: Coffee
+
+Transaction: 2025-09-10 | ALLSTATE INS CO INS PREM PPD ID: 2542288279 | $111.93 | Wed
+Category: Car insurance
+
+Transaction: 2025-09-11 | ALLY ALLY PAYMT PPD ID: 6164782228 | $257.26 | Thu
+Category: Car payment
+
+Transaction: 2025-09-17 | UBER *TRIP SV6BSD5YM9 | $20.54 | Wed
+Category: Rideshare & transit
+
+Transaction: 2025-09-19 | PGANDE WEB ONLINE PPD ID: 1733314309 | $177.54 | Fri
+Category: Electric
+
+Transaction: 2025-09-25 | AMERICAN WATER PAYMENT PPD ID: 6580440932 | $54.28 | Thu
+Category: Water & sewer
+
+Transaction: 2025-09-26 | CHEESECAKE SACRAMENTO SACRAMENTO CA | $53.73 | Fri
+Category: Dining out
+
+Transaction: 2025-09-29 | DUNKIN #983030 SACRAMENTO CA | $4.03 | Mon
+Category: Coffee
+
+Transaction: 2025-09-29 | EXXONMOBIL 89185237 SACRAMENTO CA | $36.03 | Mon
+Category: Gas
+
+Transaction: 2025-10-01 | VERIZON*FIOS 800-837-4966 NJ | $89.99 | Wed
+Category: Internet
+
+Transaction: 2025-10-02 | DUNKIN #983030 SACRAMENTO CA | $4.31 | Thu
+Category: Coffee
+
+Transaction: 2025-10-03 | DUNKIN #983030 SACRAMENTO CA | $4.11 | Fri
+Category: Coffee
+
+Transaction: 2025-10-03 | PENNYMAC LOAN SVC PPD ID: 1386352341 | $1574.10 | Fri
+Category: Mortgage
+
+Transaction: 2025-10-03 | BRIGHTWAVE SOFTWARE PAYROLL PPD ID: 7920838540 | $-2095.81 | Fri
+Category: Income
+
+Transaction: 2025-10-03 | TOTAL WINE AND MORE 45 SACRAMENTO CA | $38.57 | Fri
+Category: Wine & beer
+
+Transaction: 2025-10-04 | WINCO FOODS #797 SACRAMENTO CA | $34.76 | Sat
+Category: Groceries
+
+Transaction: 2025-10-05 | JERSEY MIKES 28204 SAN DIEGO CA | $9.94 | Sun
+Category: Takeout
+
+Transaction: 2025-10-06 | JERSEY MIKES 28204 SACRAMENTO CA | $8.41 | Mon
+Category: Work lunches
+
+Transaction: 2025-10-06 | T-MOBILE PCS SVC 877-453-1304 WA | $236.19 | Mon
+Category: Cell phone
+
+Transaction: 2025-10-07 | DUNKIN #983030 SACRAMENTO CA | $10.79 | Tue
+Category: Coffee
+
+Transaction: 2025-10-08 | DUNKIN #983030 SACRAMENTO CA | $4.98 | Wed
+Category:
+
+### item 9
+Categories: Rent, Electric, Water, Natural gas, Internet, Phones, Insurance, Grocery, Gas, Medical, Childcare, Eli activities, School lunches, Kid stuff, Pet care, Emergency Fund, Retirement, Dining out, Fun, Streaming & apps, Household, Clothing, Personal care, Gifts, Charity, Vacation, Miscellaneous, Office setup, Ready to Assign, Kids treats, Work expenses
+
+Transaction: 2025-02-15 | SE*SPORTSENGINE SACRAMENTO YOUTH HOCKEY | $60.74 | Sat
+Category: Eli activities
+
+Transaction: 2025-03-10 | SE*SPORTSENGINE SACRAMENTO YOUTH HOCKEY | $169.25 | Mon
+Category: Eli activities
+
+Transaction: 2025-03-19 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $23.10 | Wed
+Category: Kid stuff
+
+Transaction: 2025-04-19 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $40.25 | Sat
+Category: Kid stuff
+
+Transaction: 2025-04-29 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $105.04 | Tue
+Category: Kid stuff
+
+Transaction: 2025-05-01 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $48.08 | Thu
+Category: Kid stuff
+
+Transaction: 2025-06-06 | THE CHILDRENS PLACE #5 OAKLAND CA | $51.01 | Fri
+Category: Work expenses
+
+Transaction: 2025-07-10 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $59.07 | Thu
+Category: Work expenses
+
+Transaction: 2025-08-04 | KUMON SACRAMENTO SACRAMENTO CA | $165.00 | Mon
+Category: Eli activities
+
+Transaction: 2025-08-09 | CHARTER SPECTRUM 877-772-2253 | $55.00 | Sat
+Category: Internet
+
+Transaction: 2025-08-11 | SOCALGAS PAID SCGC PPD ID: 6641021016 | $76.17 | Mon
+Category: Natural gas
+
+Transaction: 2025-08-12 | HARBOR DENTAL CARE SACRAMENTO CA | $37.16 | Tue
+Category: Medical
+
+Transaction: 2025-08-13 | LEMONADE INS 844-733-8666 NY | $9.00 | Wed
+Category: Insurance
+
+Transaction: 2025-08-19 | PGANDE WEB ONLINE PPD ID: 4314192952 | $89.33 | Tue
+Category: Electric
+
+Transaction: 2025-08-19 | ROBINHOOD FUNDS PPD ID: 5039626369 | $200.00 | Tue
+Category: Retirement
+
+Transaction: 2025-08-27 | CHEWY.COM 800-672-4399 FL | $55.61 | Wed
+Category: Pet care
+
+Transaction: 2025-09-01 | CHECK 1882 | $1815.00 | Mon
+Category: Rent
+
+Transaction: 2025-09-01 | TMOBILE*AUTO PAY 800-937-8997 WA | $249.61 | Mon
+Category: Phones
+
+Transaction: 2025-09-01 | BRIGHT HORIZONS TUITION PPD ID: 6116025166 | $1835.38 | Mon
+Category: Childcare
+
+Transaction: 2025-09-04 | KUMON SACRAMENTO SACRAMENTO CA | $165.00 | Thu
+Category: Eli activities
+
+Transaction: 2025-09-05 | PATREON* MEMBERSHIP INTERNET CA | $5.00 | Fri
+Category: Fun
+
+Transaction: 2025-09-05 | BP#2916572 SAN JOSE CA | $52.73 | Fri
+Category: Gas
+
+Transaction: 2025-09-06 | COSTCO WHSE #1488 ROSEVILLE CA | $82.57 | Sat
+Category: Grocery
+
+Transaction: 2025-09-07 | SWEETGREEN SACRAMENTO SACRAMENTO CA | $9.56 | Sun
+Category: Dining out
+
+Transaction: 2025-09-08 | THE CHILDRENS PLACE #5 SACRAMENTO CA | $17.52 | Mon
+Category:
+
+### item 10
+Categories: Ready to Assign, Rent, Electric, Water, Phone & internet, Insurances, Grocery, Getting around, Health, Childcare, Liam activities, Eli, School stuff, Kid stuff, Emergency Fund, Dining Out, Entertainment, Streaming & apps, Gym, Home, Clothes, Personal care, Gifts, Charity, Vacation, Miscellaneous, Pocket money, Summer vacation
+
+Transaction: 2025-07-08 | POS DEBIT 07/06 SQ *PINE RIDGE BBQ MYRTLE BEACH  | $36.00 | Tue
+Category: Summer vacation
+
+Transaction: 2025-09-16 | POS DEBIT 09/16 SE*SPORTSENGINE AUSTIN LITTLE LE | $82.08 | Tue
+Category: Eli
+
+Transaction: 2025-11-14 | POS DEBIT 11/13 SQ *BLUEBIRD BARBER SH AUSTIN TX | $38.72 | Fri
+Category: Personal care
+
+Transaction: 2025-11-14 | ACH DEBIT TXU ENERGY AUTOPAY | $103.58 | Fri
+Category: Electric
+
+Transaction: 2025-11-16 | POS DEBIT 11/16 PLANET FITNESS TX 844-880-7180 | $24.99 | Sun
+Category: Gym
+
+Transaction: 2025-11-23 | POS DEBIT 11/23 GOOGLE *FIBER g.co/helppay# CA | $55.00 | Sun
+Category: Phone & internet
+
+Transaction: 2025-11-24 | ACH DEBIT CITY OF AUSTIN UTILITY | $81.44 | Mon
+Category: Water
+
+Transaction: 2025-11-28 | ACH CREDIT ACME CORP PAYROLL | $-2656.60 | Fri
+Category: Ready to Assign
+
+Transaction: 2025-12-01 | ACH DEBIT BILT RENT RENT PMT | $1130.00 | Mon
+Category: Rent
+
+Transaction: 2025-12-02 | TRANSFER TO SHARE 01 | $1000.00 | Tue
+Category: Emergency Fund
+
+Transaction: 2025-12-03 | POS DEBIT 12/02 WALGREENS #61771 AUSTIN TX | $15.17 | Wed
+Category: Health
+
+Transaction: 2025-12-04 | POS DEBIT 12/04 Amazon.com*AJNA3TE50J Amzn.com/b | $38.36 | Thu
+Category: Clothes
+
+Transaction: 2025-12-04 | POS DEBIT 12/03 KUMON AUSTIN AUSTIN TX | $165.00 | Thu
+Category: Liam activities
+
+Transaction: 2025-12-06 | POS DEBIT 12/05 AMAZON MKTPL*B1V23WPEB Amzn.com/ | $26.44 | Sat
+Category: Gifts
+
+Transaction: 2025-12-07 | POS DEBIT 12/07 CARTERS #2791 HOUSTON TX | $35.20 | Sun
+Category: Kid stuff
+
+Transaction: 2025-12-08 | POS DEBIT 12/07 KINDERCARE LEARNING 888-525-2780 | $235.00 | Mon
+Category: Childcare
+
+Transaction: 2025-12-08 | POS DEBIT 12/08 ATM WITHDRAWAL 127480 AUSTIN TX | $220.00 | Mon
+Category: Pocket money
+
+Transaction: 2025-12-09 | POS DEBIT 12/08 LYFT *RIDE TUE 2PM | $13.10 | Tue
+Category: Getting around
+
+Transaction: 2025-12-09 | POS DEBIT 12/08 REI #195 AUSTIN TX | $116.79 | Tue
+Category: Entertainment
+
+Transaction: 2025-12-11 | POS DEBIT 12/11 NETFLIX.COM LOS GATOS CA | $17.99 | Thu
+Category: Streaming & apps
+
+Transaction: 2025-12-11 | POS DEBIT 12/11 PAYPAL *ATLAS 7 HOLDINGS LLC | $51.55 | Thu
+Category: Miscellaneous
+
+Transaction: 2025-12-11 | POS DEBIT 12/10 TEMU.COM 8884958868 DE | $15.44 | Thu
+Category: Home
+
+Transaction: 2025-12-11 | POS DEBIT 12/09 SQ *ROSA'S SMOKEHOUSE HOUSTON TX | $62.39 | Thu
+Category: Dining Out
+
+Transaction: 2025-12-12 | POS DEBIT 12/11 KROGER #6002 AUSTIN TX | $124.31 | Fri
+Category: Grocery
+
+Transaction: 2025-12-12 | POS DEBIT 12/10 TRI-STAR ENTERPRISES AUSTIN TX | $429.40 | Fri
+Category:
+
+### item 11
+Categories: Paychecks, Mortgage, HOA, Electric, Water & sewer, Internet, Cell phone, Trash, Car insurance, Home insurance, Student loans, Groceries, Coffee, Dining out, Takeout, Booze, Gas, Car maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Software & apps, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Gifts, Charity, Bank fees, Education, Cash, Emergency fund, Date night, Wedding, Amazon stuff
+
+Transaction: 2025-02-02 | DBT CRD 1902 02/01/25 AUTOZONE #7333 SAN JOSE CA | $62.74 | Sun
+Category: Parking & tolls
+
+Transaction: 2025-04-23 | DBT CRD 7761 04/23/25 SHELL OIL 12985813716 SAN  | $38.59 | Wed
+Category: Booze
+
+Transaction: 2025-08-22 | DBT CRD 9751 08/20/25 TRADER JOE S #234 SAN JOSE | $47.48 | Fri
+Category: Groceries
+
+Transaction: 2025-08-23 | DBT CRD 1162 08/21/25 TRADER JOES #234 OAKLAND C | $25.85 | Sat
+Category: Groceries
+
+Transaction: 2025-09-03 | DBT CRD 1262 09/01/25 TRADER JOE S #234 SAN JOSE | $109.68 | Wed
+Category: Groceries
+
+Transaction: 2025-09-06 | DBT CRD 4342 09/05/25 TRADER JOES #234 SAN JOSE  | $15.71 | Sat
+Category: Groceries
+
+Transaction: 2025-09-10 | DBT CRD 0346 09/10/25 TRADER JOE S #234 SAN JOSE | $83.74 | Wed
+Category: Groceries
+
+Transaction: 2025-09-12 | DBT CRD 4916 09/12/25 GOOGLE *FIBER g.co/helppay | $70.00 | Fri
+Category: Internet
+
+Transaction: 2025-09-15 | ACH DEBIT REPUBLIC SERVICES TRASH | $38.64 | Mon
+Category: Trash
+
+Transaction: 2025-09-15 | ACH DEBIT AIDVANTAGE PAYMENT | $363.75 | Mon
+Category: Student loans
+
+Transaction: 2025-09-22 | ACH DEBIT CITY OF SAN JOSE UTILITY | $54.98 | Mon
+Category: Water & sewer
+
+Transaction: 2025-09-22 | ACH DEBIT PGANDE WEB ONLINE | $167.32 | Mon
+Category: Electric
+
+Transaction: 2025-09-24 | DBT CRD 1561 09/24/25 AUTOZONE #3163 SAN JOSE CA | $26.79 | Wed
+Category: Car maintenance
+
+Transaction: 2025-09-24 | DBT CRD 8749 09/22/25 PROG DIRECT INS PREM 800-7 | $130.46 | Wed
+Category: Car insurance
+
+Transaction: 2025-09-30 | DBT CRD 0830 09/30/25 UBER *TRIP HELP.UBER.COM C | $26.53 | Tue
+Category: Rideshare & transit
+
+Transaction: 2025-10-01 | ACH DEBIT APPFOLIO HOA DUES | $240.00 | Wed
+Category: HOA
+
+Transaction: 2025-10-02 | ACH DEBIT ROCKET MORTGAGE PAYMENT | $1384.25 | Thu
+Category: Mortgage
+
+Transaction: 2025-10-03 | ACH CREDIT SUMMIT ENGINEERING PAYROLL | $-4589.20 | Fri
+Category: Paychecks
+
+Transaction: 2025-10-03 | DBT CRD 2447 10/03/25 MINT MOBILE 800-683-7392 C | $130.35 | Fri
+Category: Cell phone
+
+Transaction: 2025-10-05 | DBT CRD 6633 10/05/25 TRADER JOE S #234 SAN JOSE | $128.93 | Sun
+Category: Groceries
+
+Transaction: 2025-10-06 | DBT CRD 7970 10/05/25 SHELL OIL 12985813716 OAKL | $58.93 | Mon
+Category: Gas
+
+Transaction: 2025-10-09 | DBT CRD 5320 10/08/25 SWEETGREEN OAKLAND OAKLAND | $18.70 | Thu
+Category: Takeout
+
+Transaction: 2025-10-10 | DBT CRD 6295 10/09/25 SQ *STONEY CREEK TAVER SAN | $53.07 | Fri
+Category: Dining out
+
+Transaction: 2025-10-10 | DBT CRD 5546 10/08/25 STARBUCKS 96058 SAN JOSE C | $6.18 | Fri
+Category: Coffee
+
+Transaction: 2025-10-11 | DBT CRD 0793 10/11/25 TRADER JOE S #234 SAN JOSE | $43.36 | Sat
+Category:
+
+### item 12
+Categories: Shelter, Grown-up bills, Grub, Eating out, Coffee habit, Booze, Vroom, Sinking: car, Doctor stuff, Subscriptions, Sweat, Things, Self care, Fun money, Travel, Childcare, Kid 1, Kid 2, Kids misc, Gifts, Giving, Dumb fees, Brain food, Future us, Ready to Assign, Side hustle
+
+Transaction: 2025-04-18 | Zelle Transfer Conf# rfb4t4d8z; Ethan Lopez | $85.00 | Fri
+Category: Gifts
+
+Transaction: 2025-04-30 | Zelle Transfer Conf# 5bdbnn5v7; Ethan Lopez | $75.00 | Wed
+Category: Gifts
+
+Transaction: 2025-05-12 | WAL-GREENS #75375 05/12 PURCHASE MILWAUKEE WI | $9.68 | Mon
+Category: Doctor stuff
+
+Transaction: 2025-05-16 | Zelle Transfer Conf# g3b975xje; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-05-30 | Zelle Transfer Conf# w6zamql9z; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-06-09 | SP RED BARN AUTO REPAI 06/09 PURCHASE WAUKESHA WI | $235.41 | Mon
+Category: Sinking: car
+
+Transaction: 2025-06-13 | Zelle Transfer Conf# kltwr52zs; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-06-20 | AMZN Mktp US*XK5HZKC7Y Amzn.com/bill WA 06/20 PURCHASE | $34.45 | Fri
+Category: Sweat
+
+Transaction: 2025-06-27 | Zelle Transfer Conf# e6k69yzm0; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-07-10 | HIGHLAND KARATE 07/10 PURCHASE WAUKESHA WI | $110.00 | Thu
+Category: Kid 1
+
+Transaction: 2025-07-11 | Zelle Transfer Conf# br784qw1p; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-07-17 | AMZN Mktp US*PPW00PTGU Amzn.com/bill WA 07/17 PURCHASE | $23.13 | Thu
+Category: Self care
+
+Transaction: 2025-07-19 | THE CHILDRENS PLACE #4 07/17 PURCHASE WAUKESHA WI | $31.37 | Sat
+Category: Kids misc
+
+Transaction: 2025-07-25 | Zelle Transfer Conf# dfs3f2m1f; Kevin Moore | $140.00 | Fri
+Category: Things
+
+Transaction: 2025-07-27 | PANERA BREAD #716418 07/26 PURCHASE WAUKESHA WI | $10.63 | Sun
+Category: Eating out
+
+Transaction: 2025-07-30 | HOMETOWN COFFEE CO 07/29 PURCHASE WAUKESHA WI | $4.72 | Wed
+Category: Coffee habit
+
+Transaction: 2025-07-31 | BP#6438291 07/31 PURCHASE WAUKESHA WI | $50.89 | Thu
+Category: Vroom
+
+Transaction: 2025-08-01 | ZILLOW RENT DES:PAYMENT ID:462910318 INDN:JESSICA WILLIAMS CO ID:1918398105 WEB | $1685.00 | Fri
+Category: Shelter
+
+Transaction: 2025-08-02 | VENMO DES:PAYMENT ID:5543502389 INDN:JESSICA WILLIAMS CO ID:3264681992 WEB | $20.00 | Sat
+Category: Fun money
+
+Transaction: 2025-08-04 | Kindle Unltd*XUHWYH26B7 888-802-3080 WA 08/04 PURCHASE | $11.99 | Mon
+Category: Subscriptions
+
+Transaction: 2025-08-04 | KIDDIE ACADEMY OF MILWAUKEE 08/03 PURCHASE | $235.00 | Mon
+Category: Childcare
+
+Transaction: 2025-08-05 | GOOGLE *FIBER g.co/helppay# CA 08/04 PURCHASE | $70.00 | Tue
+Category: Grown-up bills
+
+Transaction: 2025-08-06 | ALDI #26928 08/04 PURCHASE WAUKESHA WI | $43.12 | Wed
+Category: Grub
+
+Transaction: 2025-08-08 | VENMO DES:PAYMENT ID:6956793814 INDN:JESSICA WILLIAMS CO ID:3264681992 WEB | $15.00 | Fri
+Category: Fun money
+
+Transaction: 2025-08-08 | Zelle Transfer Conf# gkn9r75gd; Kevin Moore | $140.00 | Fri
+Category:
+
+### item 13
+Categories: Shelter, Grown-up bills, Groceries, Restaurants, Caffeine, Booze, Wheels, Sinking: car, Ouch, Apps & streaming, Gym, Things, Treat yo self, Blow money, Adventures, Dog, Gifts, Do good, Dumb fees, Learning, Rainy day, Money in, Rental property, Treats
+
+Transaction: 2025-05-11 | BP | $37.90 | Sun
+Category: Sinking: car
+
+Transaction: 2025-09-13 | Overdraft Item Fee | $34.87 | Sat
+Category: Dumb fees
+
+Transaction: 2025-10-25 | Lakeside Diner | $19.65 | Sat
+Category: Restaurants
+
+Transaction: 2025-11-18 | GoFundMe | $49.68 | Tue
+Category: Do good
+
+Transaction: 2025-11-19 | Lakeside Diner | $21.63 | Wed
+Category: Restaurants
+
+Transaction: 2025-11-22 | Sunset Smokehouse | $117.56 | Sat
+Category: Restaurants
+
+Transaction: 2025-11-22 | Applebee's | $88.43 | Sat
+Category: Restaurants
+
+Transaction: 2025-11-25 | Golden Thai Kitchen | $19.07 | Tue
+Category: Restaurants
+
+Transaction: 2025-11-27 | Amazon | $31.36 | Thu
+Category: Treat yo self
+
+Transaction: 2025-11-29 | Amazon | $65.58 | Sat
+Category: Gifts
+
+Transaction: 2025-12-05 | Parkside Diner | $18.72 | Fri
+Category: Restaurants
+
+Transaction: 2025-12-06 | Lakeside Diner | $24.29 | Sat
+Category: Restaurants
+
+Transaction: 2025-12-09 | Verizon Wireless | $70.15 | Tue
+Category: Grown-up bills
+
+Transaction: 2025-12-13 | Amazon | $8.10 | Sat
+Category: Blow money
+
+Transaction: 2025-12-13 | Walmart | $60.18 | Sat
+Category: Groceries
+
+Transaction: 2025-12-13 | Parkside Diner | $29.67 | Sat
+Category: Restaurants
+
+Transaction: 2025-12-14 | Kps Corp | $29.37 | Sun
+Category: Things
+
+Transaction: 2025-12-14 | Spotify | $16.99 | Sun
+Category: Apps & streaming
+
+Transaction: 2025-12-16 | Bluebird Dental Care | $43.54 | Tue
+Category: Ouch
+
+Transaction: 2025-12-17 | Lemonade | $12.00 | Wed
+Category: Shelter
+
+Transaction: 2025-12-17 | Petco | $35.21 | Wed
+Category: Dog
+
+Transaction: 2025-12-17 | Magnolia Coffee Co | $6.34 | Wed
+Category: Caffeine
+
+Transaction: 2025-12-19 | SP+ Parking | $6.60 | Fri
+Category: Wheels
+
+Transaction: 2025-12-19 | Golden Thai Kitchen | $63.14 | Fri
+Category: Restaurants
+
+Transaction: 2025-12-20 | Lakeside Diner | $36.97 | Sat
+Category:
+
+### item 14
+Categories: Mortgage, Utilities, Internet, Phones, Insurances, Student loans, Grocery, Gas & transportation, Car repairs, Healthcare, Emergency fund, Eating out, Fun, Subscriptions, Home supplies, Home maintenance, Clothes, Hair & beauty, Birthdays & gifts, Giving, Vacation, Misc, Cash, Little one, Income
+
+Transaction: 2025-04-10 | EDIBLE ARRANGEMENTS 30 MINNEAPOLIS   MN | $41.56 | Thu
+Category: Birthdays & gifts
+
+Transaction: 2025-05-24 | EDIBLE ARRANGEMENTS 30 MINNEAPOLIS   MN | $63.43 | Sat
+Category: Birthdays & gifts
+
+Transaction: 2025-06-23 | ROSS STORES #9952      MINNEAPOLIS   MN | $14.47 | Mon
+Category: Clothes
+
+Transaction: 2025-08-15 | BESTBUY.COM 198179010 MN | $127.98 | Fri
+Category: Misc
+
+Transaction: 2025-09-21 | ATM CASH WITHDRAWAL 14 ST PAUL       MN | $40.00 | Sun
+Category: Cash
+
+Transaction: 2025-09-22 | DUNKIN #628947         MINNEAPOLIS   MN | $5.04 | Mon
+Category: Fun
+
+Transaction: 2025-09-22 | JIFFY LUBE #5084       MINNEAPOLIS   MN | $109.87 | Mon
+Category: Car repairs
+
+Transaction: 2025-09-23 | STATE FARM RO 27 CPC-CLIENT | $246.94 | Tue
+Category: Insurances
+
+Transaction: 2025-09-30 | WALMART.COM 800-966-6546 AR | $35.30 | Tue
+Category: Little one
+
+Transaction: 2025-10-01 | CLV*BRICKYARD DENTAL C EDINA         MN | $165.40 | Wed
+Category: Healthcare
+
+Transaction: 2025-10-01 | SPECTRUM 855-707-7328 MO | $49.99 | Wed
+Category: Internet
+
+Transaction: 2025-10-03 | WELLS FARGO HOME MTG AUTO PAY | $2535.52 | Fri
+Category: Mortgage
+
+Transaction: 2025-10-06 | WASTE MANAGEMENT WM EZPAY | $24.51 | Mon
+Category: Utilities
+
+Transaction: 2025-10-09 | CLV*CEDAR BARBER SHOP  MINNEAPOLIS   MN | $28.83 | Thu
+Category: Hair & beauty
+
+Transaction: 2025-10-09 | SHELL OIL 95098332430  MINNEAPOLIS   MN | $52.39 | Thu
+Category: Gas & transportation
+
+Transaction: 2025-10-09 | DEPT EDUCATION STUDENT LN | $243.90 | Thu
+Category: Student loans
+
+Transaction: 2025-10-10 | VZWRLSS*APOCC VISB 800-922-0204 FL | $56.75 | Fri
+Category: Phones
+
+Transaction: 2025-10-10 | GUSTO PAY 491970 | $-1210.18 | Fri
+Category: Income
+
+Transaction: 2025-10-12 | DISNEY PLUS 888-9057888 CA | $15.99 | Sun
+Category: Subscriptions
+
+Transaction: 2025-10-12 | WAL-MART #5708         MINNEAPOLIS   MN | $49.33 | Sun
+Category: Grocery
+
+Transaction: 2025-10-12 | LOWES #32948*          MINNEAPOLIS   MN | $75.11 | Sun
+Category: Home maintenance
+
+Transaction: 2025-10-15 | VENMO PAYMENT 1931617547 | $10.00 | Wed
+Category: Home supplies
+
+Transaction: 2025-10-15 | TRANSFER TO SAVINGS 2473 | $750.00 | Wed
+Category: Emergency fund
+
+Transaction: 2025-10-16 | FIRST WATCH 6953       MINNEAPOLIS   MN | $48.17 | Thu
+Category: Eating out
+
+Transaction: 2025-10-16 | EDIBLE ARRANGEMENTS 83 ST PAUL       MN | $41.12 | Thu
+Category:
+
+### item 15
+Categories: Bills, Food, Car & gas, Everything else, Savings, Income
+
+Transaction: 2025-11-05 | SONIC DRIVE IN #8693   DENVER        CO | $11.81 | Wed
+Category: Food
+
+Transaction: 2025-11-07 | Amazon.com*JKU9ZXKLVB Amzn.com/bill WA | $32.99 | Fri
+Category: Everything else
+
+Transaction: 2025-11-07 | ATM WITHDRAWAL 357318  DENVER        CO | $40.00 | Fri
+Category: Everything else
+
+Transaction: 2025-11-07 | ALLSTATE INS CO INS PREM | $185.07 | Fri
+Category: Bills
+
+Transaction: 2025-11-07 | CLV*CEDAR DANCE ACADEM DENVER        CO | $95.00 | Fri
+Category: Everything else
+
+Transaction: 2025-11-08 | BWW 2028               DENVER        CO | $43.26 | Sat
+Category:
+
+### item 16
+Categories: Rent, Utilities, Internet, Phones, Insurance, Student loans, Groceries, Gas, Auto maintenance, Healthcare, Childcare, Zoe, School stuff, Kids clothes, Savings, Retirement, Dining out, Entertainment, Streaming & apps, Home, Clothing, Personal care, Gifts, Giving, Vacation, Everything else, Pocket money, Disney World, Income
+
+Transaction: 2025-02-09 | LITTLE BBQ DETROIT MI | $75.78 | Sun
+Category: Dining out
+
+Transaction: 2025-05-04 | LITTLE BBQ DETROIT MI | $34.55 | Sun
+Category: Dining out
+
+Transaction: 2025-05-26 | COSTCO WHOLESALE #9918 DETROIT MI | $183.34 | Mon
+Category: Gas
+
+Transaction: 2025-09-25 | RITE AID 10308 DETROIT MI | $24.09 | Thu
+Category: Healthcare
+
+Transaction: 2025-10-11 | LITTLE BBQ DETROIT MI | $60.99 | Sat
+Category: Dining out
+
+Transaction: 2025-11-08 | LITTLE BBQ DETROIT MI | $38.74 | Sat
+Category: Dining out
+
+Transaction: 2025-11-14 | TARGET 39663043 GRAND RAPIDS MI | $22.18 | Fri
+Category: Kids clothes
+
+Transaction: 2025-11-14 | SQ *SUNSET SUSHI DETROIT MI | $63.62 | Fri
+Category: Dining out
+
+Transaction: 2025-11-25 | COMCAST CABLE COMM 800-XFINITY PA | $79.99 | Tue
+Category: Internet
+
+Transaction: 2025-11-27 | PY *RIVERSIDE GRILL DETROIT MI | $77.12 | Thu
+Category: Dining out
+
+Transaction: 2025-11-28 | PY *RIVERSIDE GRILL DETROIT MI | $33.30 | Fri
+Category: Dining out
+
+Transaction: 2025-11-28 | VERIZON WIRELESS PAYMENTS | $133.00 | Fri
+Category: Phones
+
+Transaction: 2025-11-28 | IRON PUB DETROIT MI | $16.07 | Fri
+Category: Dining out
+
+Transaction: 2025-11-29 | IRON PUB ANN ARBOR MI | $36.69 | Sat
+Category: Dining out
+
+Transaction: 2025-12-01 | GRUBHUB*WINGSTOP | $34.90 | Mon
+Category: Groceries
+
+Transaction: 2025-12-01 | ZILLOW RENT PAYMENT PPD ID: 1015661920 | $2200.00 | Mon
+Category: Rent
+
+Transaction: 2025-12-01 | Online Transfer to SAV ...8334 transaction#: 70932745683 12/01 | $250.00 | Mon
+Category: Savings
+
+Transaction: 2025-12-02 | APPLE.COM/BILL 866-712-7753 CA | $8.73 | Tue
+Category: Entertainment
+
+Transaction: 2025-12-02 | KUMON DETROIT DETROIT MI | $165.00 | Tue
+Category: Zoe
+
+Transaction: 2025-12-03 | CONSUMERS ENERGY BILL PAY PPD ID: 5846138207 | $146.17 | Wed
+Category: Utilities
+
+Transaction: 2025-12-04 | FID BKG SVC LLC MONEYLINE PPD ID: 4846347057 | $100.00 | Thu
+Category: Retirement
+
+Transaction: 2025-12-04 | FIRST WATCH 9608 DETROIT MI | $79.69 | Thu
+Category: Dining out
+
+Transaction: 2025-12-05 | DEPT EDUCATION STUDENT LN PPD ID: 9807107781 | $361.58 | Fri
+Category: Student loans
+
+Transaction: 2025-12-05 | MYSCHOOLBUCKS.COM 855-832-5226 NJ | $35.71 | Fri
+Category: School stuff
+
+Transaction: 2025-12-06 | LITTLE BBQ DETROIT MI | $80.20 | Sat
+Category:
+
+### item 17
+Categories: Roof over head, Keep the lights on, Groceries, Restaurants, Caffeine, Drinks, Car, Sinking: car, Ouch, Streaming junk, Sweat, Stuff, Treat yo self, Play, Adventures, Childcare, Kid 1, Kids misc, Presents, Do good, Dumb fees, Learning, Rainy day, Income, Us time, Christmas gifts
+
+Transaction: 2025-06-22 | Max | $9.99 | Sun
+Category: Streaming junk
+
+Transaction: 2025-07-22 | Max | $9.99 | Tue
+Category: Streaming junk
+
+Transaction: 2025-08-22 | Max | $9.99 | Fri
+Category: Streaming junk
+
+Transaction: 2025-09-22 | Max | $9.99 | Mon
+Category: Streaming junk
+
+Transaction: 2025-10-22 | Max | $9.99 | Wed
+Category: Streaming junk
+
+Transaction: 2025-10-25 | YouTube Premium | $13.99 | Sat
+Category: Streaming junk
+
+Transaction: 2025-11-10 | Netflix | $24.99 | Mon
+Category: Streaming junk
+
+Transaction: 2025-11-22 | Max | $9.99 | Sat
+Category: Streaming junk
+
+Transaction: 2025-11-22 | Hulu | $9.99 | Sat
+Category: Streaming junk
+
+Transaction: 2025-11-25 | YouTube Premium | $13.99 | Tue
+Category: Streaming junk
+
+Transaction: 2025-12-04 | Mr. Cooper | $2074.53 | Thu
+Category: Roof over head
+
+Transaction: 2025-12-05 | Aldi | $77.64 | Fri
+Category: Groceries
+
+Transaction: 2025-12-10 | Uber | $5.53 | Wed
+Category: Car
+
+Transaction: 2025-12-10 | Netflix | $24.99 | Wed
+Category: Streaming junk
+
+Transaction: 2025-12-11 | Brickyard Lash Studio | $93.29 | Thu
+Category: Treat yo self
+
+Transaction: 2025-12-14 | Maple St Crossfit | $19.64 | Sun
+Category: Sweat
+
+Transaction: 2025-12-17 | Walgreens | $13.92 | Wed
+Category: Ouch
+
+Transaction: 2025-12-17 | Dutch Bros | $7.76 | Wed
+Category: Caffeine
+
+Transaction: 2025-12-18 | FPL | $271.84 | Thu
+Category: Keep the lights on
+
+Transaction: 2025-12-18 | Rosa's Car Wash | $21.24 | Thu
+Category: Sinking: car
+
+Transaction: 2025-12-19 | Hometown Wine Bar | $36.04 | Fri
+Category: Drinks
+
+Transaction: 2025-12-19 | Amazon | $44.29 | Fri
+Category: Stuff
+
+Transaction: 2025-12-21 | Tony's Smokehouse | $20.53 | Sun
+Category: Restaurants
+
+Transaction: 2025-12-22 | Hulu | $9.99 | Mon
+Category: Streaming junk
+
+Transaction: 2025-12-22 | Max | $9.99 | Mon
+Category:
+
+### item 18
+Categories: Home, Fixed bills, Food, Transportation, Health, Fun, Shopping, Giving, Savings, Everything else, Pet, Inflow: Ready to Assign
+
+Transaction: 2025-09-01 | MARSHALLS #3657 MESA AZ | $26.54 | Mon
+Category: Giving
+
+Transaction: 2025-10-20 | SP FOXGLOVE PHYSICAL T MESA AZ | $61.66 | Mon
+Category: Health
+
+Transaction: 2025-10-31 | LYFT *RIDE HA0S09QKNH | $12.76 | Fri
+Category: Transportation
+
+Transaction: 2025-10-31 | ACME CORP PAYROLL PPD ID: 7057226522 | $-1472.56 | Fri
+Category: Inflow: Ready to Assign
+
+Transaction: 2025-11-01 | APPLE.COM/BILL 866-712-7753 CA | $3.23 | Sat
+Category: Fun
+
+Transaction: 2025-11-01 | CHECK 1708 | $2435.00 | Sat
+Category: Home
+
+Transaction: 2025-11-06 | CENTERPOINT ENERGY BILLPAY PPD ID: 7423109411 | $77.22 | Thu
+Category: Fixed bills
+
+Transaction: 2025-11-06 | Amazon Prime*WBY5M2CQW5 Amzn.com/bill WA | $14.99 | Thu
+Category: Fixed bills
+
+Transaction: 2025-11-06 | MICROSOFT*MICROSOFT 365 P 425-6816830 WA | $9.99 | Thu
+Category: Fixed bills
+
+Transaction: 2025-11-06 | KROGER 374 MESA AZ | $61.31 | Thu
+Category: Food
+
+Transaction: 2025-11-07 | SQ *WILLOW PHO HOUSE PHOENIX AZ | $38.67 | Fri
+Category: Food
+
+Transaction: 2025-11-08 | PEETS #96674 MESA AZ | $8.19 | Sat
+Category: Food
+
+Transaction: 2025-11-09 | SQ *OAKWOOD PARTNERS MESA AZ | $42.50 | Sun
+Category: Food
+
+Transaction: 2025-11-09 | PETCO 5822 MESA AZ | $42.68 | Sun
+Category: Pet
+
+Transaction: 2025-11-09 | PANERA BREAD #436360 MESA AZ | $19.93 | Sun
+Category: Food
+
+Transaction: 2025-11-10 | TACO BELL #93922 MESA AZ | $15.37 | Mon
+Category: Food
+
+Transaction: 2025-11-10 | SRP ONLINE PMT PPD ID: 2640835167 | $157.17 | Mon
+Category: Fixed bills
+
+Transaction: 2025-11-10 | UBER EATS HELP.UBER.COM CA | $47.44 | Mon
+Category: Food
+
+Transaction: 2025-11-11 | ADOBE *CREATIVE CLD 408-536-6000 CA | $22.99 | Tue
+Category: Fixed bills
+
+Transaction: 2025-11-11 | TACO BELL #93922 MESA AZ | $7.78 | Tue
+Category: Food
+
+Transaction: 2025-11-12 | TARGET 24404559 MESA AZ | $29.14 | Wed
+Category: Food
+
+Transaction: 2025-11-12 | CITY OF MESA UTIL BILL PPD ID: 2899727581 | $93.33 | Wed
+Category: Fixed bills
+
+Transaction: 2025-11-12 | GEICO *AUTO 800-841-3000 DC | $98.70 | Wed
+Category: Fixed bills
+
+Transaction: 2025-11-13 | ROSS STORES #3631 MESA AZ | $50.02 | Thu
+Category: Shopping
+
+Transaction: 2025-11-13 | SQ *FTB HOLDINGS LLC MESA AZ | $25.89 | Thu
+Category:
+
+### item 19
+Categories: Income, Housing, Utilities, Internet, Phone, Insurances, Groceries, Gas, Auto maintenance, Medical, Savings, Investing, Takeout & dining, Entertainment, Streaming & apps, Fitness, Home, Clothing, Personal care, Gifts, Giving, Travel, Everything else, Amazon orders, Us
+
+Transaction: 2025-02-14 | WARBY PARKER 888-492-7297 NY | $90.21 | Fri
+Category: Auto maintenance
+
+Transaction: 2025-04-23 | EBAY O*69500584826 | $33.05 | Wed
+Category: Entertainment
+
+Transaction: 2025-05-09 | TEMU.COM 8884958868 DE | $36.41 | Fri
+Category: Home
+
+Transaction: 2025-07-05 | AMZN Mktp US*9DQTXPRMPJ Amzn.com/bill WA | $26.24 | Sat
+Category: Amazon orders
+
+Transaction: 2025-07-10 | Amazon.com*KVXG1JVAE Amzn.com/bill WA | $27.47 | Thu
+Category: Amazon orders
+
+Transaction: 2025-07-12 | AMZN Mktp US*WWB3QMS92Z Amzn.com/bill WA | $18.72 | Sat
+Category: Amazon orders
+
+Transaction: 2025-07-14 | WAYFAIR*87XX086T26 877-929-3247 MA | $145.83 | Mon
+Category: Home
+
+Transaction: 2025-07-19 | Amazon.com*BKPT91WJCT Amzn.com/bill WA | $33.61 | Sat
+Category: Amazon orders
+
+Transaction: 2025-08-01 | GREYSTAR RE RENT PMT | $1790.00 | Fri
+Category: Housing
+
+Transaction: 2025-08-02 | CVS/PHARMACY #19677    SPOKANE       WA | $4.29 | Sat
+Category: Medical
+
+Transaction: 2025-08-06 | UBER *TRIP YGYJDP9Q4 | $27.58 | Wed
+Category: Gas
+
+Transaction: 2025-08-08 | PIONEER MFG PAYROLL | $-2226.36 | Fri
+Category: Income
+
+Transaction: 2025-08-11 | TARGET 81250664        SPOKANE       WA | $21.61 | Mon
+Category: Home
+
+Transaction: 2025-08-12 | VERIZON WIRELESS PAYMENTS | $156.26 | Tue
+Category: Phone
+
+Transaction: 2025-08-13 | CITY OF SPOKANE WATER | $37.14 | Wed
+Category: Utilities
+
+Transaction: 2025-08-13 | Amazon.com*NR4XTZK5W Amzn.com/bill WA | $38.59 | Wed
+Category: Amazon orders
+
+Transaction: 2025-08-14 | FRED-MEYER #385        SPOKANE       WA | $99.74 | Thu
+Category: Groceries
+
+Transaction: 2025-08-15 | COMCAST CABLE COMM 800-XFINITY PA | $55.00 | Fri
+Category: Internet
+
+Transaction: 2025-08-15 | DISNEY PLUS 888-9057888 CA | $15.99 | Fri
+Category: Streaming & apps
+
+Transaction: 2025-08-17 | AMAZON MKTPL*DS12PJL9H Amzn.com/bill WA | $12.72 | Sun
+Category: Amazon orders
+
+Transaction: 2025-08-18 | EBAY O*97163736221 | $41.54 | Mon
+Category: Everything else
+
+Transaction: 2025-08-19 | TARGET T-6578          SPOKANE       WA | $14.64 | Tue
+Category: Home
+
+Transaction: 2025-08-19 | DOMINO'S 2946          SPOKANE       WA | $42.50 | Tue
+Category: Takeout & dining
+
+Transaction: 2025-08-20 | VANGUARD BUY INVESTMENT | $200.00 | Wed
+Category: Investing
+
+Transaction: 2025-08-20 | Amazon.com*DTH0AQVB3 Amzn.com/bill WA | $28.57 | Wed
+Category:
+
+### item 20
+Categories: Paychecks, Rent, Electric, Water & sewer, Internet, Cell phone, Natural gas, Car insurance, Renters insurance, Car payment, Groceries, Coffee, Dining out, Takeout, Booze, Gas, Auto maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Pet food & supplies, Vet, Gifts, Charity, Bank fees, Education, Cash, Emergency fund
+
+Transaction: 2025-06-11 | POS DEBIT 06/11 T-MOBILE PCS SVC 877-453-1304 WA | $191.39 | Wed
+Category: Cell phone
+
+Transaction: 2025-06-17 | POS DEBIT 06/15 LYFT *RIDE 682R6DRH46 | $17.56 | Tue
+Category: Parking & tolls
+
+Transaction: 2025-07-11 | POS DEBIT 07/11 TMOBILE*AUTO PAY 800-937-8997 WA | $192.60 | Fri
+Category: Cell phone
+
+Transaction: 2025-08-11 | POS DEBIT 08/11 TMOBILE*AUTO PAY 800-937-8997 WA | $184.66 | Mon
+Category: Cell phone
+
+Transaction: 2025-09-11 | POS DEBIT 09/10 TMOBILE*AUTO PAY 800-937-8997 WA | $195.05 | Thu
+Category: Cell phone
+
+Transaction: 2025-10-11 | POS DEBIT 10/09 T-MOBILE PCS SVC 877-453-1304 WA | $186.33 | Sat
+Category: Cell phone
+
+Transaction: 2025-11-11 | POS DEBIT 11/09 T-MOBILE PCS SVC 877-453-1304 WA | $183.75 | Tue
+Category: Cell phone
+
+Transaction: 2025-11-13 | ACH DEBIT AMERICAN WATER PAYMENT | $74.28 | Thu
+Category: Water & sewer
+
+Transaction: 2025-11-17 | ACH DEBIT SRP ONLINE PMT | $125.46 | Mon
+Category: Electric
+
+Transaction: 2025-11-24 | ACH DEBIT CENTERPOINT ENERGY BILLPAY | $91.17 | Mon
+Category: Natural gas
+
+Transaction: 2025-11-27 | ACH DEBIT ALLY ALLY PAYMT | $400.37 | Thu
+Category: Car payment
+
+Transaction: 2025-12-01 | ACH DEBIT GREYSTAR RE RENT PMT | $1870.00 | Mon
+Category: Rent
+
+Transaction: 2025-12-01 | POS DEBIT 12/01 CVS/PHARM 18590 TEMPE AZ | $2.67 | Mon
+Category: Pharmacy
+
+Transaction: 2025-12-01 | POS DEBIT 11/30 BLUEBIRD CAFE PHOENIX AZ | $9.47 | Mon
+Category: Coffee
+
+Transaction: 2025-12-01 | POS DEBIT 12/01 EXXON 19603897 TEMPE AZ | $58.38 | Mon
+Category: Gas
+
+Transaction: 2025-12-02 | POS DEBIT 11/30 LYFT *RIDE 47AER4XHV | $19.23 | Tue
+Category: Rideshare & transit
+
+Transaction: 2025-12-03 | ACH DEBIT ALLSTATE INS CO INS PREM | $159.35 | Wed
+Category: Car insurance
+
+Transaction: 2025-12-05 | POS DEBIT 12/04 SUBWAY 39048526 TEMPE AZ | $34.41 | Fri
+Category: Takeout
+
+Transaction: 2025-12-05 | ACH CREDIT ACME CORP DIRECT DEP | $-2098.62 | Fri
+Category: Paychecks
+
+Transaction: 2025-12-07 | POS DEBIT 12/05 TOTAL WINE AND MORE 66 PHOENIX A | $39.13 | Sun
+Category: Booze
+
+Transaction: 2025-12-08 | POS DEBIT 12/07 SQ *BLUEBIRD TAVERN TEMPE AZ | $64.46 | Mon
+Category: Dining out
+
+Transaction: 2025-12-09 | POS DEBIT 12/08 WAL-MART #7627 PHOENIX AZ | $27.49 | Tue
+Category: Groceries
+
+Transaction: 2025-12-10 | POS DEBIT 12/09 SPECTRUM 855-707-7328 MO | $89.99 | Wed
+Category: Internet
+
+Transaction: 2025-12-11 | POS DEBIT 12/10 KESTREL VENTURES TEMPE AZ | $150.00 | Thu
+Category: Auto maintenance
+
+Transaction: 2025-12-11 | POS DEBIT 12/11 T-MOBILE PCS SVC 877-453-1304 WA | $188.24 | Thu
+Category:
+
+### item 21
+Categories: Income, Rent, Electric, Water & sewer, Internet, Cell phone, Natural gas, Car insurance, Renters insurance, Student loans, Groceries, Coffee, Dining out, Takeout, Alcohol, Work lunches, Gas, Auto maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Pet food & supplies, Vet, Gifts, Charity, Bank fees, Education, Cash, Emergency fund
+
+Transaction: 2025-11-12 | PETSMART # 6378 11/11 PURCHASE DETROIT MI | $13.90 | Wed
+Category: Pet food & supplies
+
+Transaction: 2025-11-12 | WAL-MART #7974 11/12 PURCHASE DETROIT MI | $81.48 | Wed
+Category: Groceries
+
+Transaction: 2025-11-12 | LEMONADE INS 844-733-8666 NY 11/11 PURCHASE | $12.00 | Wed
+Category: Renters insurance
+
+Transaction: 2025-11-13 | UBER EATS HELP.UBER.COM CA 11/12 PURCHASE | $41.21 | Thu
+Category: Takeout
+
+Transaction: 2025-11-13 | AMZN Mktp US*SG9937FVM Amzn.com/bill WA 11/12 PURCHASE | $19.02 | Thu
+Category: Household supplies
+
+Transaction: 2025-11-14 | AMAZON MKTPL*L0ABTZ5HAZ Amzn.com/bill WA 11/13 PURCHASE | $38.67 | Fri
+Category: Household supplies
+
+Transaction: 2025-11-14 | DISNEY PLUS 888-9057888 CA 11/13 PURCHASE | $9.99 | Fri
+Category: Streaming
+
+Transaction: 2025-11-15 | MEIJER # 370 11/15 PURCHASE DETROIT MI | $29.30 | Sat
+Category: Household supplies
+
+Transaction: 2025-11-16 | Audible*VY95YQ3GAB Amzn.com/bill NJ 11/14 PURCHASE | $14.95 | Sun
+Category: Streaming
+
+Transaction: 2025-11-16 | UBER *TRIP NJ9Z7HHV80 11/16 PURCHASE | $23.27 | Sun
+Category: Rideshare & transit
+
+Transaction: 2025-11-17 | ATT*BILL PAYMENT 800-331-0500 TX 11/15 PURCHASE | $172.54 | Mon
+Category:
+
+### item 22
+Categories: Home, Bills, Food & drink, Car, Medical, Fun, Shopping, Giving, Savings, Misc, NYC trip, Income, Amazon orders
+
+Transaction: 2025-04-09 | PURCHASE AUTHORIZED ON 04/09 Kindle Unltd*EHDXUARDX 888-802-3080 WA S43317129593 CARD 9436 | $11.99 | Wed
+Category: Bills
+
+Transaction: 2025-05-09 | PURCHASE AUTHORIZED ON 05/09 Kindle Unltd*RBE3Q9TC8 888-802-3080 WA S20453001598 CARD 9436 | $11.99 | Fri
+Category: Bills
+
+Transaction: 2025-06-09 | PURCHASE AUTHORIZED ON 06/08 Kindle Unltd*C8L7GKPJQ 888-802-3080 WA S97232144240 CARD 9436 | $11.99 | Mon
+Category: Bills
+
+Transaction: 2025-06-27 | PURCHASE AUTHORIZED ON 06/26 WAL-GREENS #12990 SAN JOSE CA S72675448479 CARD 9436 | $18.55 | Fri
+Category: Medical
+
+Transaction: 2025-07-09 | PURCHASE AUTHORIZED ON 07/09 Kindle Unltd*BUFWG8XRT5 888-802-3080 WA S30954446927 CARD 9436 | $11.99 | Wed
+Category: Bills
+
+Transaction: 2025-08-09 | PURCHASE AUTHORIZED ON 08/08 Kindle Unltd*K617N8SVD 888-802-3080 WA S35276843504 CARD 9436 | $11.99 | Sat
+Category: Bills
+
+Transaction: 2025-08-13 | PURCHASE AUTHORIZED ON 08/13 PARAMOUNT+ 888-274-5343 CA S95136578794 CARD 9436 | $12.99 | Wed
+Category: Bills
+
+Transaction: 2025-08-23 | PURCHASE AUTHORIZED ON 08/23 Spotify USA NEW YORK NY S37380522229 CARD 9436 | $16.99 | Sat
+Category: Bills
+
+Transaction: 2025-08-29 | VENMO PAYMENT 250829 9165199632 NATALIE TAYLOR | $10.00 | Fri
+Category: Giving
+
+Transaction: 2025-09-09 | PURCHASE AUTHORIZED ON 09/09 Kindle Unltd*LJB5WHPZL 888-802-3080 WA S48528975614 CARD 9436 | $11.99 | Tue
+Category: Bills
+
+Transaction: 2025-09-13 | PURCHASE AUTHORIZED ON 09/13 PARAMOUNT+ 888-274-5343 CA S98871261097 CARD 9436 | $12.99 | Sat
+Category: Bills
+
+Transaction: 2025-09-23 | PURCHASE AUTHORIZED ON 09/22 SPOTIFY USA 877-7781161 NY S77225338950 CARD 9436 | $16.99 | Tue
+Category: Bills
+
+Transaction: 2025-09-30 | PURCHASE AUTHORIZED ON 09/29 SQ *RED BARN DINER NEW YORK NY S56079289218 CARD 9436 | $38.53 | Tue
+Category: NYC trip
+
+Transaction: 2025-10-03 | PURCHASE AUTHORIZED ON 10/03 CLIPPER SYSTEMS 877-878-8883 CA S94489300758 CARD 9436 | $39.03 | Fri
+Category: Car
+
+Transaction: 2025-10-03 | KROGER CO DIR DEP 251003 039210179 NATALIE TAYLOR | $-1974.55 | Fri
+Category: Income
+
+Transaction: 2025-10-04 | PURCHASE AUTHORIZED ON 10/03 HOBBY-LOBBY #6331 SACRAMENTO CA S78263674124 CARD 9436 | $5.48 | Sat
+Category: Fun
+
+Transaction: 2025-10-06 | LOANCARE PMT 251006 754916602 NATALIE TAYLOR | $1855.69 | Mon
+Category: Home
+
+Transaction: 2025-10-06 | PURCHASE AUTHORIZED ON 10/04 SPROUTS FARMERS MAR #8 SACRAMENTO CA S84116970640 CARD 9436 | $43.23 | Mon
+Category: Amazon orders
+
+Transaction: 2025-10-06 | PURCHASE AUTHORIZED ON 10/04 STARBUCKS STORE 16083 SAN JOSE CA S90306488478 CARD 9436 | $11.87 | Mon
+Category: Food & drink
+
+Transaction: 2025-10-06 | PURCHASE AUTHORIZED ON 10/05 PIZZA HUT 281567 SAN JOSE CA S31825449200 CARD 9436 | $15.19 | Mon
+Category: Food & drink
+
+Transaction: 2025-10-06 | PURCHASE AUTHORIZED ON 10/04 WESTGATE LASH STUDIO SAN JOSE CA S49584790559 CARD 9436 | $79.51 | Mon
+Category: Shopping
+
+Transaction: 2025-10-07 | PURCHASE AUTHORIZED ON 10/05 AMZN Mktp US*LV8FYFBHX Amzn.com/bill WA S63442929288 CARD 9436 | $23.83 | Tue
+Category: Amazon orders
+
+Transaction: 2025-10-09 | PURCHASE RETURN AUTHORIZED ON 10/07 AMAZON MKTPL*E5XL8D1EJ Amzn.com/bill WA S07549200816 CARD 9436 | $-25.90 | Thu
+Category: Amazon orders
+
+Transaction: 2025-10-09 | PURCHASE AUTHORIZED ON 10/08 OPENAI *CHATGPT SUBSCR OPENAI.COM CA S05410514281 CARD 9436 | $20.00 | Thu
+Category: Bills
+
+Transaction: 2025-10-09 | PURCHASE AUTHORIZED ON 10/08 Kindle Unltd*8G821Q7ZH 888-802-3080 WA S53674061170 CARD 9436 | $11.99 | Thu
+Category:
+
+### item 23
+Categories: Casa, Keep the lights on, Grub, Restaurants, Caffeine, Booze, Vroom, Car fund, Doctor stuff, Subscriptions, Gym, Stuff, Self care, Play, Adventures, Gifts, Do good, Dumb fees, Brain food, Future us, Maui 2025, Money in, Amazon orders
+
+Transaction: 2025-10-03 | DBT CRD 7290 10/03/25 CVS/PHARM 83771 DUBLIN OH  | $21.97 | Fri
+Category: Doctor stuff
+
+Transaction: 2025-10-23 | ACH DEBIT VANGUARD BUY INVESTMENT | $200.00 | Thu
+Category: Future us
+
+Transaction: 2025-10-24 | DBT CRD 7743 10/22/25 CLV*STONEY CREEK ASIAN WES | $48.97 | Fri
+Category: Grub
+
+Transaction: 2025-10-24 | DBT CRD 6570 10/24/25 PY *MAMA LIN'S BREWING WES | $109.07 | Fri
+Category: Booze
+
+Transaction: 2025-10-28 | DBT CRD 4479 10/28/25 ST JUDE CHILDRENS RES 800- | $19.00 | Tue
+Category: Do good
+
+Transaction: 2025-10-30 | DBT CRD 3135 10/30/25 MEIJER # 744 WESTERVILLE O | $36.02 | Thu
+Category: Grub
+
+Transaction: 2025-10-31 | DBT CRD 9617 10/31/25 ALDI 74815 WESTERVILLE OH  | $63.29 | Fri
+Category: Grub
+
+Transaction: 2025-10-31 | ACH CREDIT OH STATE UNIV DIRECT DEP | $-1979.57 | Fri
+Category: Money in
+
+Transaction: 2025-11-01 | DBT CRD 4592 11/01/25 ALDI #74815 WESTERVILLE OH | $91.13 | Sat
+Category: Grub
+
+Transaction: 2025-11-02 | DBT CRD 5211 11/02/25 COSTCO WHOLESALE #1517 WES | $98.10 | Sun
+Category: Gifts
+
+Transaction: 2025-11-02 | DBT CRD 0531 11/01/25 CHARTER SPECTRUM 877-772-2 | $65.00 | Sun
+Category: Keep the lights on
+
+Transaction: 2025-11-03 | DBT CRD 3844 11/02/25 MAGNOLIA BAKERY & CAFE WES | $8.81 | Mon
+Category: Caffeine
+
+Transaction: 2025-11-03 | ACH DEBIT VENMO PAYMENT | $30.00 | Mon
+Category: Play
+
+Transaction: 2025-11-03 | ACH DEBIT WELLS FARGO HOME MTG AUTO PAY | $1678.47 | Mon
+Category: Casa
+
+Transaction: 2025-11-04 | DBT CRD 6488 11/04/25 TARGET T-9849 WESTERVILLE  | $30.55 | Tue
+Category: Stuff
+
+Transaction: 2025-11-05 | DBT CRD 1306 11/03/25 NORDSTROM RACK #9532 WESTE | $69.49 | Wed
+Category: Self care
+
+Transaction: 2025-11-05 | DBT CRD 5234 11/05/25 COSTCO WHOLESALE #1517 WES | $215.30 | Wed
+Category: Grub
+
+Transaction: 2025-11-06 | DBT CRD 0519 11/04/25 EXXONMOBIL 84881696 WESTER | $45.02 | Thu
+Category: Vroom
+
+Transaction: 2025-11-06 | DBT CRD 7863 11/06/25 COSTCO WHSE #1517 WESTERVI | $143.44 | Thu
+Category: Grub
+
+Transaction: 2025-11-06 | DBT CRD 5911 11/06/25 DD *DOORDASH PHO 99 C#4296 | $31.88 | Thu
+Category: Restaurants
+
+Transaction: 2025-11-06 | DBT CRD 8375 11/05/25 APPLE.COM/BILL 866-712-775 | $9.99 | Thu
+Category: Subscriptions
+
+Transaction: 2025-11-07 | DBT CRD 7592 11/06/25 AMAZON MKTPL*CBRD47NYCP Am | $20.93 | Fri
+Category: Amazon orders
+
+Transaction: 2025-11-07 | DBT CRD 8983 11/06/25 SQ *COPPER CINEMA KIHEI HI | $32.80 | Fri
+Category: Maui 2025
+
+Transaction: 2025-11-08 | DBT CRD 6293 11/07/25 SQ *LITTLE THAI KITCHE KIH | $61.83 | Sat
+Category: Maui 2025
+
+Transaction: 2025-11-08 | DBT CRD 9178 11/08/25 HIGHLAND FOOD CO-OP KIHEI  | $21.75 | Sat
+Category:
+
+### item 24
+Categories: Bills, Food, Transportation, Health, Discretionary, Save, Income, Client meals
+
+Transaction: 2025-01-18 | GREAT CLIPS #6868 01/18 PURCHASE ST LOUIS MO | $25.60 | Sat
+Category: Health
+
+Transaction: 2025-04-21 | GREAT CLIPS #6868 04/19 PURCHASE ST LOUIS MO | $25.18 | Mon
+Category: Transportation
+
+Transaction: 2025-04-29 | ULTA #1019 04/29 PURCHASE ST LOUIS MO | $113.31 | Tue
+Category: Discretionary
+
+Transaction: 2025-05-28 | GREAT CLIPS #6868 05/26 PURCHASE ST LOUIS MO | $23.45 | Wed
+Category: Health
+
+Transaction: 2025-06-07 | SQ *WILLOW BARBER SHOP 06/06 PURCHASE ST LOUIS MO | $37.60 | Sat
+Category: Discretionary
+
+Transaction: 2025-06-15 | GREAT CLIPS #6868 06/15 PURCHASE ST LOUIS MO | $18.91 | Sun
+Category: Health
+
+Transaction: 2025-07-28 | ULTA #7390 07/28 PURCHASE ST LOUIS MO | $68.77 | Mon
+Category: Discretionary
+
+Transaction: 2025-07-31 | TST* FOXGLOVE TAQUERIA 07/30 PURCHASE ST LOUIS MO | $16.99 | Thu
+Category: Client meals
+
+Transaction: 2025-08-03 | GREAT CLIPS #6868 08/02 PURCHASE ST LOUIS MO | $18.97 | Sun
+Category: Health
+
+Transaction: 2025-08-18 | SQ *WILLOW BARBER SHOP 08/16 PURCHASE LEES SUMMIT MO | $23.94 | Mon
+Category: Discretionary
+
+Transaction: 2025-09-16 | Online Banking transfer to SAV 4471 Confirmation# 5523659465 | $300.00 | Tue
+Category: Save
+
+Transaction: 2025-09-19 | COASTAL CREDIT UNION DES:PAYROLL ID:253918479 INDN:JESSICA HARRIS CO ID:9341559522 PPD | $-1524.38 | Fri
+Category: Income
+
+Transaction: 2025-09-24 | EVERGY DES:WEB PAY ID:229657659 INDN:JESSICA HARRIS CO ID:7879062979 WEB | $134.17 | Wed
+Category: Bills
+
+Transaction: 2025-09-24 | JERSEY MIKES 51071 09/24 PURCHASE ST LOUIS MO | $8.50 | Wed
+Category: Food
+
+Transaction: 2025-09-24 | LOWES #27094* 09/23 RETURN ST LOUIS MO | $-22.00 | Wed
+Category: Discretionary
+
+Transaction: 2025-09-24 | PEETS #70744 09/24 PURCHASE ST LOUIS MO | $5.82 | Wed
+Category: Food
+
+Transaction: 2025-09-25 | APPLE.COM/BILL 866-712-7753 CA 09/23 PURCHASE | $2.99 | Thu
+Category: Bills
+
+Transaction: 2025-09-26 | SHELL SERVICE STATION 09/26 PURCHASE ST LOUIS MO | $21.44 | Fri
+Category: Transportation
+
+Transaction: 2025-09-26 | SP+ PARKING 6656 09/25 PURCHASE ST LOUIS MO | $13.12 | Fri
+Category: Transportation
+
+Transaction: 2025-09-26 | MENARDS 2722 09/26 PURCHASE ST LOUIS MO | $33.48 | Fri
+Category: Discretionary
+
+Transaction: 2025-09-27 | NORTHWIND PARTNERS 09/26 PURCHASE ST LOUIS MO | $47.96 | Sat
+Category: Discretionary
+
+Transaction: 2025-09-28 | PY *GLE ASSOC 09/27 PURCHASE ST LOUIS MO | $249.60 | Sun
+Category: Discretionary
+
+Transaction: 2025-09-28 | PROG DIRECT INS PREM 800-776-4737 OH 09/27 PURCHASE | $90.58 | Sun
+Category: Bills
+
+Transaction: 2025-09-28 | NORTHWIND PARTNERS 09/28 PURCHASE ST LOUIS MO | $37.31 | Sun
+Category: Discretionary
+
+Transaction: 2025-09-29 | GREAT CLIPS #6868 09/29 PURCHASE ST LOUIS MO | $23.70 | Mon
+Category:
+
+### item 25
+Categories: Rent/Mortgage, Utilities, Internet, Phones, Insurance, Groceries, Gas, Medical expenses, Childcare, Mason activities, Sophia activities, Mia activities, School lunches, Kids clothes, Savings, Brokerage, Dining Out, Work lunches, Entertainment, Streaming & apps, Household goods, Clothing, Personal care, Birthdays & gifts, Giving, Travel, Everything else, Disney World, Income
+
+Transaction: 2025-08-13 | East End Trattoria | $63.22 | Wed
+Category: Dining Out
+
+Transaction: 2025-09-05 | East End Trattoria | $86.19 | Fri
+Category: Dining Out
+
+Transaction: 2025-09-13 | East End Trattoria | $84.69 | Sat
+Category: Dining Out
+
+Transaction: 2025-09-26 | East End Trattoria | $54.93 | Fri
+Category: Dining Out
+
+Transaction: 2025-10-02 | East End Music Lessons | $140.00 | Thu
+Category: Mia activities
+
+Transaction: 2025-10-04 | Old Town Pub | $43.12 | Sat
+Category: Dining Out
+
+Transaction: 2025-10-04 | East End Trattoria | $59.29 | Sat
+Category: Dining Out
+
+Transaction: 2025-10-05 | Verizon Fios | $70.00 | Sun
+Category: Internet
+
+Transaction: 2025-10-06 | PennyMac | $2686.20 | Mon
+Category: Rent/Mortgage
+
+Transaction: 2025-10-06 | Parkside Dance Academy | $95.00 | Mon
+Category: Mason activities
+
+Transaction: 2025-10-10 | Olive Garden | $37.74 | Fri
+Category: Dining Out
+
+Transaction: 2025-10-15 | MySchoolBucks | $25.80 | Wed
+Category: School lunches
+
+Transaction: 2025-10-15 | Progressive | $279.17 | Wed
+Category: Insurance
+
+Transaction: 2025-10-15 | T-Mobile | $123.88 | Wed
+Category: Phones
+
+Transaction: 2025-10-16 | Cedar Ramen Bar | $22.79 | Thu
+Category: Dining Out
+
+Transaction: 2025-10-16 | Old Town Pub | $61.68 | Thu
+Category: Dining Out
+
+Transaction: 2025-10-17 | East End Trattoria | $101.76 | Fri
+Category: Dining Out
+
+Transaction: 2025-10-17 | Cedar Ramen Bar | $68.01 | Fri
+Category: Dining Out
+
+Transaction: 2025-10-17 | City of Aurora Utilities | $71.54 | Fri
+Category: Utilities
+
+Transaction: 2025-10-24 | Rosa's Physical Therapy | $41.50 | Fri
+Category: Medical expenses
+
+Transaction: 2025-10-24 | Zelle to Jessica Allen | $75.00 | Fri
+Category: Childcare
+
+Transaction: 2025-10-27 | Chili's | $39.63 | Mon
+Category: Dining Out
+
+Transaction: 2025-10-29 | Sprouts | $64.67 | Wed
+Category: Groceries
+
+Transaction: 2025-10-30 | Valero | $42.87 | Thu
+Category: Gas
+
+Transaction: 2025-10-31 | East End Trattoria | $51.59 | Fri
+Category:
+
+### item 26
+Categories: Income, Rent, Electric, Water & sewer, Internet, Cell phone, Natural gas, Car insurance, Renters insurance, Groceries, Coffee, Dining out, Takeout, Booze, Work lunches, Gas, Auto maintenance, Parking & tolls, Rideshare & transit, Doctor, Pharmacy, Dental, Streaming, Apps & cloud, Gym, Household supplies, Home improvement, Furniture, Clothing, Haircuts, Personal care, Entertainment, Video games, Books, Hobbies, Electronics, Travel, Gifts, Charity, Bank fees, Education, Cash, Emergency fund, Date night, Disney trip
+
+Transaction: 2025-04-14 | POS DEBIT 04/12 CLV*MAGNOLIA URGENT CA CINCINNAT | $74.84 | Mon
+Category: Doctor
+
+Transaction: 2025-06-28 | POS DEBIT 06/26 SQ *RIVERSTONE PARTNER DUBLIN OH | $128.44 | Sat
+Category: Apps & cloud
+
+Transaction: 2025-07-12 | POS DEBIT 07/12 SQ *RIVERSTONE PARTNER DUBLIN OH | $69.57 | Sat
+Category: Apps & cloud
+
+Transaction: 2025-07-21 | POS DEBIT 07/21 SQ *RIVERSTONE PARTNER DUBLIN OH | $129.62 | Mon
+Category: Apps & cloud
+
+Transaction: 2025-07-30 | POS DEBIT 07/29 DUTCH BROS #2872 DUBLIN OH | $5.71 | Wed
+Category: Coffee
+
+Transaction: 2025-08-27 | POS DEBIT 08/25 SQ *RIVERSTONE PARTNER DUBLIN OH | $121.96 | Wed
+Category: Apps & cloud
+
+Transaction: 2025-09-02 | POS DEBIT 09/02 SQ *RIVERSTONE PARTNER DUBLIN OH | $130.10 | Tue
+Category: Apps & cloud
+
+Transaction: 2025-10-12 | POS DEBIT 10/11 SQ *RIVERSTONE PARTNER DUBLIN OH | $142.52 | Sun
+Category: Apps & cloud
+
+Transaction: 2025-10-17 | POS DEBIT 10/16 ABC FINE WINE #423 DUBLIN OH | $42.13 | Fri
+Category: Booze
+
+Transaction: 2025-10-21 | POS DEBIT 10/21 SPEEDWAY 39229 DUBLIN OH | $33.30 | Tue
+Category: Gas
+
+Transaction: 2025-11-08 | POS DEBIT 11/08 T-MOBILE PCS SVC 877-453-1304 WA | $114.58 | Sat
+Category: Cell phone
+
+Transaction: 2025-11-17 | ACH DEBIT COLUMBIA GAS OH PAYMENT | $88.99 | Mon
+Category: Natural gas
+
+Transaction: 2025-11-20 | POS DEBIT 11/20 COMCAST XFINITY 800-266-2278 PA | $70.00 | Thu
+Category: Internet
+
+Transaction: 2025-11-20 | ACH DEBIT STATE FARM RO 27 CPC-CLIENT | $203.54 | Thu
+Category: Car insurance
+
+Transaction: 2025-11-21 | POS DEBIT 11/20 UBER *TRIP HELP.UBER.COM CA | $23.94 | Fri
+Category: Rideshare & transit
+
+Transaction: 2025-11-23 | POS DEBIT 11/21 SHEETZ 6862 DUBLIN OH | $9.74 | Sun
+Category: Takeout
+
+Transaction: 2025-11-24 | ACH DEBIT AEP OHIO WEB PMT | $163.43 | Mon
+Category: Electric
+
+Transaction: 2025-11-27 | POS DEBIT 11/27 DUTCH BROS #2872 WESTERVILLE OH | $8.27 | Thu
+Category: Parking & tolls
+
+Transaction: 2025-11-28 | INTEREST EARNED | $-17.35 | Fri
+Category: Income
+
+Transaction: 2025-11-28 | POS DEBIT 11/26 MCDONALDS 78989 DUBLIN OH | $16.50 | Fri
+Category: Work lunches
+
+Transaction: 2025-11-29 | POS DEBIT 11/29 SQ *BIG SKY PIZZERIA DUBLIN OH | $44.60 | Sat
+Category: Dining out
+
+Transaction: 2025-12-01 | POS DEBIT 11/30 LAKESIDE AUTO REPAIR DUBLIN OH | $262.90 | Mon
+Category: Auto maintenance
+
+Transaction: 2025-12-01 | ACH DEBIT ZILLOW RENT PAYMENT | $2075.00 | Mon
+Category: Rent
+
+Transaction: 2025-12-02 | POS DEBIT 12/02 PY *COPPER FOOD CO-OP DUBLIN OH | $15.99 | Tue
+Category: Groceries
+
+Transaction: 2025-12-03 | POS DEBIT 12/03 SQ *RIVERSTONE PARTNER DUBLIN OH | $72.92 | Wed
+Category:
+
+### item 27
+Categories: Shelter, Boring bills, Kitchen, Restaurants, Coffee habit, Booze, Wheels, Sinking: car, Health, Subscriptions, Sweat, Things, Treat yo self, Mad money, Travel, Presents, Do good, Oops, Brain food, Savings, Money in, Date night
+
+Transaction: 2025-05-18 | Marathon | $96.11 | Sun
+Category: Wheels
+
+Transaction: 2025-05-23 | Marathon | $83.60 | Fri
+Category: Wheels
+
+Transaction: 2025-05-27 | Marathon | $28.92 | Tue
+Category: Wheels
+
+Transaction: 2025-06-10 | Marathon | $74.87 | Tue
+Category: Wheels
+
+Transaction: 2025-07-10 | Northside Auto Repair | $353.21 | Thu
+Category: Sinking: car
+
+Transaction: 2025-07-22 | Zelle to James King | $105.00 | Tue
+Category: Presents
+
+Transaction: 2025-07-31 | Willow Taproom | $57.28 | Thu
+Category: Date night
+
+Transaction: 2025-08-15 | Marathon | $45.99 | Fri
+Category: Wheels
+
+Transaction: 2025-08-18 | Transfer to Savings | $150.00 | Mon
+Category: Savings
+
+Transaction: 2025-08-18 | Marathon | $67.73 | Mon
+Category: Wheels
+
+Transaction: 2025-08-20 | CVS | $21.09 | Wed
+Category: Health
+
+Transaction: 2025-08-24 | Willow Taproom | $22.02 | Sun
+Category: Booze
+
+Transaction: 2025-09-01 | Zillow Rent | $2050.00 | Mon
+Category: Shelter
+
+Transaction: 2025-09-05 | Ticketmaster | $153.15 | Fri
+Category: Mad money
+
+Transaction: 2025-09-05 | Apple | $9.99 | Fri
+Category: Subscriptions
+
+Transaction: 2025-09-08 | Chevron | $59.42 | Mon
+Category: Wheels
+
+Transaction: 2025-09-09 | Stoney Creek Lash Studio | $75.81 | Tue
+Category: Treat yo self
+
+Transaction: 2025-09-11 | Dunkin' | $8.32 | Thu
+Category: Coffee habit
+
+Transaction: 2025-09-12 | Target Corp Payroll | $-1297.44 | Fri
+Category: Money in
+
+Transaction: 2025-09-12 | Five Guys | $13.48 | Fri
+Category: Restaurants
+
+Transaction: 2025-09-15 | Chevron | $66.15 | Mon
+Category: Wheels
+
+Transaction: 2025-09-15 | American Water | $41.57 | Mon
+Category: Boring bills
+
+Transaction: 2025-09-15 | Walmart | $28.99 | Mon
+Category: Things
+
+Transaction: 2025-09-16 | Walmart | $178.63 | Tue
+Category: Kitchen
+
+Transaction: 2025-09-16 | Marathon | $50.77 | Tue
+Category:
+
+### item 28
+Categories: Fixed, Food, Transportation, Health, Spending, Savings, Income, Work expenses (reimbursed), Amazon
+
+Transaction: 2025-06-10 | PEETS #93138 ATLANTA GA | $10.32 | Tue
+Category: Food
+
+Transaction: 2025-06-23 | PEETS #93138 ATLANTA GA | $8.45 | Mon
+Category: Food
+
+Transaction: 2025-07-24 | PEETS #93138 ATLANTA GA | $8.51 | Thu
+Category: Food
+
+Transaction: 2025-07-31 | PEETS #93138 ATLANTA GA | $8.30 | Thu
+Category: Food
+
+Transaction: 2025-08-24 | WAL-GREENS #50984 ATLANTA GA | $7.20 | Sun
+Category: Health
+
+Transaction: 2025-08-24 | PEETS #93138 ATLANTA GA | $7.73 | Sun
+Category: Food
+
+Transaction: 2025-08-25 | VANGUARD BUY INVESTMENT PPD ID: 7516270079 | $200.00 | Mon
+Category: Savings
+
+Transaction: 2025-08-27 | JUNIPER COFFEE DECATUR GA | $6.44 | Wed
+Category: Food
+
+Transaction: 2025-08-30 | PEETS #93138 ATLANTA GA | $6.78 | Sat
+Category: Food
+
+Transaction: 2025-09-03 | JUNIPER COFFEE ATLANTA GA | $2.62 | Wed
+Category: Food
+
+Transaction: 2025-09-07 | LYFT *RIDE SUN 3PM | $7.83 | Sun
+Category: Transportation
+
+Transaction: 2025-09-09 | EXPENSIFY INC REIMBURSE PPD ID: 8147091314 | $-182.04 | Tue
+Category: Work expenses (reimbursed)
+
+Transaction: 2025-09-09 | HOMEDEPOT.COM 800-430-3376 GA | $27.37 | Tue
+Category: Spending
+
+Transaction: 2025-09-10 | LYFT *RIDE 55LKZQEKWY | $13.85 | Wed
+Category: Work expenses (reimbursed)
+
+Transaction: 2025-09-10 | KROGER #2572 ATLANTA GA | $62.26 | Wed
+Category: Food
+
+Transaction: 2025-09-11 | LYFT *RIDE THU 3PM | $19.75 | Thu
+Category: Work expenses (reimbursed)
+
+Transaction: 2025-09-12 | AMZN Mktp US*SB5C3WDL1V Amzn.com/bill WA | $27.12 | Fri
+Category: Amazon
+
+Transaction: 2025-09-12 | Zelle payment to Katie Lee JPM9947758l | $60.00 | Fri
+Category: Spending
+
+Transaction: 2025-09-12 | ACME CORP PAYROLL PPD ID: 7317168367 | $-2113.84 | Fri
+Category: Income
+
+Transaction: 2025-09-13 | SQ *PARKSIDE PIZZERIA ATLANTA GA | $47.66 | Sat
+Category: Food
+
+Transaction: 2025-09-13 | KROGER #2572 ATLANTA GA | $95.21 | Sat
+Category: Food
+
+Transaction: 2025-09-13 | GOOGLE *Google One g.co/helppay# CA | $9.99 | Sat
+Category: Fixed
+
+Transaction: 2025-09-13 | CHICK-FIL-A 66244 ATLANTA GA | $20.10 | Sat
+Category: Food
+
+Transaction: 2025-09-13 | AMAZON MKTPL*DHNHZDEBE Amzn.com/bill WA | $21.08 | Sat
+Category: Amazon
+
+Transaction: 2025-09-14 | PEETS #93138 ATLANTA GA | $10.45 | Sun
+Category:
+
+### item 29
+Categories: Income, Mortgage, Utilities, Phone & internet, Insurances, Car loan, Groceries, Getting around, Medical, Emergency fund, Dining out, Fun, Streaming & apps, Fitness, Home, Clothes, Personal care, Birthdays & gifts, Giving, Vacation, Everything else
+
+Transaction: 2025-03-08 | Spotify USA NEW YORK NY | $19.99 | Sat
+Category: Streaming & apps
+
+Transaction: 2025-04-08 | SPOTIFY USA 877-7781161 NY | $19.99 | Tue
+Category: Streaming & apps
+
+Transaction: 2025-05-08 | Spotify USA NEW YORK NY | $19.99 | Thu
+Category: Streaming & apps
+
+Transaction: 2025-06-08 | SPOTIFY USA 877-7781161 NY | $19.99 | Sun
+Category: Streaming & apps
+
+Transaction: 2025-07-08 | SPOTIFY USA 877-7781161 NY | $19.99 | Tue
+Category: Streaming & apps
+
+Transaction: 2025-07-14 | PEACOCK 75874 PREMIUM NY | $7.99 | Mon
+Category: Streaming & apps
+
+Transaction: 2025-07-29 | LABCORP 800-845-6167 NC | $15.51 | Tue
+Category: Medical
+
+Transaction: 2025-08-02 | NETFLIX.COM LOS GATOS CA | $17.99 | Sat
+Category: Streaming & apps
+
+Transaction: 2025-08-08 | SPOTIFY USA 877-7781161 NY | $19.99 | Fri
+Category: Streaming & apps
+
+Transaction: 2025-08-14 | PEACOCK 31461 PREMIUM NY | $7.99 | Thu
+Category: Streaming & apps
+
+Transaction: 2025-08-14 | CLUB OTF PITTSBURGH PITTSBURGH PA | $169.00 | Thu
+Category: Fitness
+
+Transaction: 2025-08-19 | VZWRLSS*APOCC VISB 800-922-0204 FL | $200.18 | Tue
+Category: Phone & internet
+
+Transaction: 2025-08-20 | ALLY ALLY PAYMT PPD ID: 6357932303 | $615.09 | Wed
+Category: Car loan
+
+Transaction: 2025-08-22 | CITY OF PITTSBURGH UTIL BILL PPD ID: 7769361381 | $56.87 | Fri
+Category: Utilities
+
+Transaction: 2025-08-29 | ACME CORP PAYROLL PPD ID: 1304038047 | $-1935.31 | Fri
+Category: Income
+
+Transaction: 2025-08-31 | COSTCO WHOLESALE #4860 PITTSBURGH PA | $305.26 | Sun
+Category: Groceries
+
+Transaction: 2025-09-02 | NETFLIX.COM LOS GATOS CA | $17.99 | Tue
+Category: Streaming & apps
+
+Transaction: 2025-09-02 | Online Transfer to SAV ...4087 transaction#: 50110703412 09/02 | $150.00 | Tue
+Category: Emergency fund
+
+Transaction: 2025-09-02 | STUBHUB INC 866-788-2482 CA | $149.85 | Tue
+Category: Fun
+
+Transaction: 2025-09-05 | WELLS FARGO HOME MTG AUTO PAY PPD ID: 4626730807 | $1393.64 | Fri
+Category: Mortgage
+
+Transaction: 2025-09-07 | COSTCO GAS #4504 PITTSBURGH PA | $41.43 | Sun
+Category: Getting around
+
+Transaction: 2025-09-07 | AMZN Mktp US*4TQG8ME1J7 Amzn.com/bill WA | $25.32 | Sun
+Category: Home
+
+Transaction: 2025-09-08 | PEETS #35497 PITTSBURGH PA | $15.85 | Mon
+Category: Dining out
+
+Transaction: 2025-09-08 | STATE FARM RO 27 CPC-CLIENT PPD ID: 4334923201 | $100.14 | Mon
+Category: Insurances
+
+Transaction: 2025-09-08 | Spotify USA NEW YORK NY | $19.99 | Mon
+Category:
+
+### item 30
+Categories: Casa, Grown-up bills, Grub, Eating out, Coffee habit, Drinks, Vroom, Car fund, Health, Streaming junk, Sweat, Stuff, Me stuff, Fun money, Adventures, Dog, Gifts, Giving, Oops, Brain food, Future us, Money in, Us time, Wedding, Client meals, Lunch money
+
+Transaction: 2025-01-20 | DBT CRD 6859 01/19/25 RED BARN BISTRO ST PETERSB | $106.73 | Mon
+Category: Eating out
+
+Transaction: 2025-02-02 | DBT CRD 9415 02/02/25 RED BARN BISTRO ST PETERSB | $52.69 | Sun
+Category: Eating out
+
+Transaction: 2025-04-06 | DBT CRD 7182 04/06/25 RED BARN BISTRO ST PETERSB | $77.38 | Sun
+Category: Eating out
+
+Transaction: 2025-05-08 | DBT CRD 8784 05/07/25 RED BARN BISTRO ST PETERSB | $120.59 | Thu
+Category: Eating out
+
+Transaction: 2025-06-20 | DBT CRD 4335 06/19/25 BIG SKY CURRY HOUSE ST PET | $47.63 | Fri
+Category: Eating out
+
+Transaction: 2025-06-23 | DBT CRD 5334 06/23/25 TEXAS ROADHOUSE #198 ST PE | $34.08 | Mon
+Category: Eating out
+
+Transaction: 2025-07-01 | ACH DEBIT ZILLOW RENT PAYMENT | $1770.00 | Tue
+Category: Vroom
+
+Transaction: 2025-07-04 | DBT CRD 3092 07/03/25 BIG SKY CURRY HOUSE BRANDO | $37.33 | Fri
+Category: Eating out
+
+Transaction: 2025-07-18 | DBT CRD 9217 07/18/25 RED ROBIN NO 536 ST PETERS | $39.25 | Fri
+Category: Client meals
+
+Transaction: 2025-08-08 | DBT CRD 6751 08/06/25 RED BARN BISTRO ST PETERSB | $109.54 | Fri
+Category: Us time
+
+Transaction: 2025-08-13 | DBT CRD 9588 08/13/25 RED BARN BISTRO BRANDON FL | $57.35 | Wed
+Category: Eating out
+
+Transaction: 2025-08-23 | DBT CRD 0924 08/22/25 CLV*GOLDEN GRILL TAMPA FL  | $95.74 | Sat
+Category: Us time
+
+Transaction: 2025-09-05 | DBT CRD 1171 09/05/25 MINT MOBILE 800-683-7392 C | $207.41 | Fri
+Category: Grown-up bills
+
+Transaction: 2025-09-07 | DBT CRD 1412 09/07/25 CLV*GOLDEN GRILL ST PETERS | $31.54 | Sun
+Category: Eating out
+
+Transaction: 2025-09-16 | DBT CRD 7968 09/15/25 WAL-GREENS #95334 ST PETER | $8.39 | Tue
+Category: Health
+
+Transaction: 2025-09-16 | DBT CRD 4918 09/15/25 APPLE.COM/BILL 866-712-775 | $9.99 | Tue
+Category: Streaming junk
+
+Transaction: 2025-09-16 | DBT CRD 3065 09/15/25 CLUB OTF ST PETERSBURG ST  | $179.00 | Tue
+Category: Sweat
+
+Transaction: 2025-09-17 | DBT CRD 8708 09/15/25 CHEWY.COM 800-672-4399 FL  | $46.26 | Wed
+Category: Dog
+
+Transaction: 2025-09-19 | DBT CRD 1309 09/18/25 PEETS #90945 ST PETERSBURG | $8.78 | Fri
+Category: Coffee habit
+
+Transaction: 2025-09-20 | DBT CRD 2272 09/19/25 SQ *SUMMIT NAIL SPA ST PET | $51.57 | Sat
+Category: Me stuff
+
+Transaction: 2025-09-21 | DBT CRD 1386 09/20/25 AMAZON MKTPL*A2TH2YUSVS Am | $27.51 | Sun
+Category: Stuff
+
+Transaction: 2025-09-21 | DBT CRD 4123 09/21/25 SUMMIT BOWL ST PETERSBURG  | $57.67 | Sun
+Category: Fun money
+
+Transaction: 2025-09-21 | DBT CRD 8566 09/21/25 LEMONADE INS 844-733-8666  | $12.00 | Sun
+Category: Casa
+
+Transaction: 2025-09-21 | DBT CRD 9526 09/20/25 PUBLIX #7659 ST PETERSBURG | $70.42 | Sun
+Category: Grub
+
+Transaction: 2025-09-22 | DBT CRD 0483 09/20/25 RED BARN BISTRO ST PETERSB | $77.23 | Mon
+Category:
+

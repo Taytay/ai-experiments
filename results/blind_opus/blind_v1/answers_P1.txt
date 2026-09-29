@@ -1,0 +1,30 @@
+item 1 | Groceries | DBM Holdings always filed as Groceries
+item 2 | Transportation | Speedway fuel purchases always Transportation
+item 3 | Electric | Consumers Energy is a Michigan energy utility bill
+item 4 | Food | Meijer supermarket grocery run
+item 5 | Coffee | Starbucks consistently filed as Coffee
+item 6 | Food | Dutch Bros always filed as Food
+item 7 | Eating out | Texas Roadhouse mostly Eating out, once Date night
+item 8 | Food | Starbucks coffee purchase fits Food
+item 9 | Health | Physical therapy is a health expense
+item 10 | Treat yo self | Ulta Beauty always Treat yo self
+item 11 | Inflow: Ready to Assign | Dividend/interest always filed as inflow
+item 12 | Ready to Assign | ADP payroll always Ready to Assign
+item 13 | Everything else | Unknown merchant, no clear pattern
+item 14 | Renters insurance | Lemonade $9 monthly always Renters insurance
+item 15 | Transport | Orchard Tire & Lube mostly Transport
+item 16 | Personal care | Small Walgreens purchases usually Personal care
+item 17 | Work lunches | Taco Bell previously Work lunches
+item 18 | Car & gas | BP fuel always Car & gas
+item 19 | Lucas activities | Kumon $150 monthly always Lucas activities
+item 20 | Streaming junk | Apple $9.99 recurring always Streaming junk
+item 21 | Income | Blue Ridge Logistics payroll always Income
+item 22 | Yum | Five Guys always Yum
+item 23 | Transportation | Exxon fuel always Transportation
+item 24 | Car | ParkMobile always filed as Car
+item 25 | Restaurants | Fast food always Restaurants
+item 26 | Paychecks | Meridian Health payroll always Paychecks
+item 27 | Income | Gusto pay always Income
+item 28 | Food | Chick-fil-A always Food
+item 29 | Fixed | Kindle Unlimited always Fixed
+item 30 | Shopping | Costco mostly filed as Shopping
