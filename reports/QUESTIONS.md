@@ -1185,3 +1185,43 @@ but vision-language classes), Olmo-3-7B (Apache-2.0). Section 87 found 9B = 4B, 
 decider-4B smaller or cheaper. *Experiment (row 101):* the final recipe on MiniCPM5-2B, Granite-4.0-micro, SmolLM3-3B and Phi-4-mini,
 one seed, every set.
 **Status (2026-09-28):** PLAN step 101, REPORT.md 100: none passes decider-4B; Granite-4.0-micro ties it on REAL-6 / REAL-7 (one seed) but reads misleading names at 84 against 97.
+
+## Added 2026-09-29 (night): the gaps review (owner: "write up a plan, add rows, proceed")
+
+A review of every section and the survey for experiments not done, results not followed up, and serving cost. The owner's framing
+for bulk inference: one user's 10 to 100 new transactions at once (a sync), never several users in one prompt.
+
+**INFRA-3 Bulk inference for one user.** Every scoring run so far batched independent prompts; nothing shared the part of the prompt
+that does not change between one user's transactions (the category list, recent rows, a row per category), and no prompt answered
+several transactions. The one cache test (REPORT 67, `SCORER_CACHE`) went through unsloth's one-token generation path and measured
+the wrapper, not caching. decider-4B (Qwen3.5) mixes attention with Gated DeltaNet layers, so a cached prefix is the attention KV plus
+a fixed-size recurrent state, and an attention mask cannot hide one query from another. *Experiment:* (a) a bulk test set from the
+blind generator: per user, a sync (a cutoff date, the next transactions after it, all unfiled), the filed history before the cutoff;
+(b) the split layout (a shared block, then the payee's own and similar payees' rows, then the transaction), zero-shot and trained,
+against today's layout, by user effort; (c) timing on one H100: separate prompts, the split layout uncached, and the shared block run
+once with each transaction's tail read from its cache (the answers must equal the uncached ones); (d) several transactions in one
+prompt, each with its own answer slot, read in one pass (zero-shot; trained only if it is close).
+
+**EVAL-12 Sending the hard cases to a large model.** The two small models disagree on 16.5% of blind_v1 and are then right 40% (decider)
+and 22% (encoder) of the time; blind Opus reads blind_v1 at about 91% on a sample against decider's 82. Scale did not help on REAL-6
+(sections 64, 87), but the blind set's misses are world knowledge and new users. *Experiment:* decider-35B-A3B (Apache-2.0, a
+Qwen3.5-35B-A3B base trained for one-slot choice) zero-shot on blind_v1; its accuracy where the small models disagree, and the system
+with it as the third reader (escalate disagreements; auto-file when it agrees with one of them and is confident), by effort and cost.
+
+**EVAL-13 Thresholds that hold when the population changes.** One global threshold per model was fitted on other users of the same set;
+it did not carry from REAL-7 to blind_v1 (section 103). *Experiment (CPU):* over the saved blind_v1 scores, realised precision of the
+98% threshold by user group (new users, short and long histories, payee seen or not); per-group thresholds; a finite-sample
+(conformal risk control / Learn-then-Test) threshold; and the transfer test: thresholds fitted on REAL-7 or REAL-6 applied to blind_v1.
+
+**TRAIN-13 Confidence that does not depend on the seed.** Accuracy is stable across seeds, auto-filing is not (section 109: 46 to 63%;
+48 rows 26 to 58%). *Experiment:* the decider recipe with an average of the last checkpoints (or an EMA of the LoRA weights), three
+seeds, against the plain recipe's seed spread in blind auto-filing.
+
+**MODEL-19 A large model as teacher.** Never done for the categoriser (sections 14 and 18 distilled a format on the species universe).
+*Experiment (after EVAL-12):* if the large reader is well ahead on blind_v1's weak groups, its calibrated distributions on training
+episodes (and on Overture names for the encoder) as soft targets for decider-4B and Ettin-1B.
+
+**REAL-23 Other users' filings in the prompt.** With a million users, what other users call a payee is cheap to know and is exactly what
+a new user lacks; row 44 (the collaborative record) was deprioritised before the blind set existed. *Experiment:* a line under the query
+("Other users file this payee as: Coffee 12, Eating out 5") built from other users' histories (blind_v1 users share ~250 real chains),
+in training episodes and at test; effort on blind_v1's new users and new payees.
