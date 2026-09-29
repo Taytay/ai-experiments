@@ -129,6 +129,7 @@ ALT_DAYS = os.environ.get("ALT_DAYS", "")  # row 92: "rand" draws each day rule'
 ALT_SOFT = os.environ.get("ALT_SOFT", "") == "1"  # row 86 v2: noisy / random alternation targets as their true split (SOFT[prompt]), rules drawn evenly
 SOFT = {}  # row 86 v2: prompt -> {answer name: probability}; read by exp_decider_finetune.py
 ALT_NAMES = ["Splurges", "Gifts", "Hobby time", "Self care", "Weekend treats", "Family outings", "Big buys", "Little luxuries", "Brunch club", "Game night"]
+OVDB = float(os.environ.get("OVDB", "0"))  # row 107: this share of episodes gets its target and four shots from real Overture businesses (overture_pool_v1)
 R7TRAIN = os.environ.get("R7TRAIN", "")  # row 98 stage 2: add the episodes of data/processed/real7train_v1_<R7TRAIN>.json (build_real7_train.py), renamed like the rest
 R7N = int(os.environ.get("R7N", "0"))  # ... a random R7N of them per call (0: all)
 MOVE = float(os.environ.get("MOVE", "0"))  # row 95: move episodes laid out in time (old category early, the new one in the two latest shots)
@@ -147,7 +148,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -196,6 +197,25 @@ def db_row(u, rng, names_ok, merchant=None):
             if text not in ITEM_TEXTS:
                 mu, sig = T.AMOUNT[m["category"]]
                 return dict(text=text, amount=round(math.exp(rng.gauss(mu, sig)), 2), weekday=rng.choice(T.WEEKDAYS), merchant=m["name"], label=std_to_name[m["category"]], synthetic=True)
+    return None
+
+
+_POOL = []
+
+
+def ov_row(u, rng):
+    """Row 107: a statement row of a real Overture business (overture_pool_v1), labelled with user u's name for its standard category;
+    None if the user's scheme does not name that category unsplit."""
+    import math
+    if not _POOL:
+        _POOL.extend(json.loads((PROCESSED / "overture_pool_v1.json").read_text())["places"])
+    std_to_name = {std: c["name"] for c in u["categories"] if "split" not in c for std in c["standard"]}
+    for _ in range(20):
+        p = rng.choice(_POOL)
+        if p["std"] in std_to_name:
+            mu, sig = T.AMOUNT[p["std"]]
+            return dict(text=T.render(dict(name=p["name"], category=p["std"], city=p["city"]), rng), amount=round(math.exp(rng.gauss(mu, sig)), 2),
+                        weekday=rng.choice(T.WEEKDAYS), merchant=p["name"], label=std_to_name[p["std"]], synthetic=True)
     return None
 
 
@@ -368,6 +388,14 @@ def sft_examples(per_user=150):
             alt_b = alt_soft = None
             if ALT and rng.random() < ALT:  # row 86
                 h, others, alt_b, alt_soft = alternation(u, h, list(others), rng)
+            if OVDB and not alt_b and rng.random() < OVDB:  # row 107: real business names the model must file by what they mean
+                others = list(others)
+                for j in rng.sample(range(len(others)), min(4, len(others))):
+                    r = ov_row(u, rng)
+                    if r is not None:
+                        others[j] = r
+                r = ov_row(u, rng)
+                h = r if r is not None else h
             names = {c["name"]: c["name"] for c in u["categories"]}
             if RENAME:  # the same fresh word for a category everywhere in this episode
                 taken = set(names)
