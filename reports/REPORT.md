@@ -7377,3 +7377,43 @@ distributions are multiplied and the product recalibrated with one temperature o
   and later from real users' undo behaviour; a different W for new users (whose miscategorisations may matter more) fits the same rule.
 - **Caveat.** The rule is only as good as the calibration: temperatures must be fitted on the product's own users (REPORT 116: they do
   not transfer between populations), and new users' probabilities are the least reliable (REPORT 116: 93% where 98% was stated).
+
+
+## 119. One user's sync in one go: caching the shared part of the prompt reads 10 to 30 transactions at 21 to 26 ms each instead of 53, with the same answers (99.2 to 99.6% the same top category; log-probability differences at bf16 rounding); all transactions in one prompt with an answer slot each reads them at 13 to 16 ms but, untrained, changes 6 to 7% of answers and costs 1 to 2 points (INFRA-3)
+
+PLAN step 119 (owner, 2026-09-29: for one user's 10 to 100 new transactions, cache the unchanging part of the prompt, or put the
+transactions at the end with a placeholder answer each?). One H100, decider-4B with the recipe's adapter (labelled rows, REPORT 113, seed
+0), bf16, transformers 5.17 + flash-linear-attention, no compilation or CUDA graphs. 24 syncs of blind_bulk_v1 (one per user, its first
+10 and its 30 transactions); labels and option order drawn once per user, so every prompt of a sync begins with the same ~1,330 tokens
+(the labelled category list and the shared rows: a row per category, then the latest rows). Warm, median of three timed passes.
+`scripts/bench_bulk.py`, `results/bench_bulk_*.json`, job list `scripts/modal_jobs/r119.json`.
+
+**Table 119.1: per transaction, mean over 24 syncs**
+
+| mode | tokens read, 10 / 30 per sync | ms, 10 per sync | ms, 30 per sync | top-1, 10 / 30 | same top category as the split layout uncached |
+|---|---|---|---|---|---|
+| separate prompts, today's layout, batch 8 | 1,745 / 1,744 | 53.3 | 53.2 | 82.9 / 82.5 | – |
+| separate prompts, split layout, batch 8 | 1,761 / 1,760 | 53.9 | 53.8 | 81.7 / 81.8 | (reference) |
+| **split layout, shared prefix run once, tails from its cache (one batch)** | 563 / 473 | **25.5** | **20.9** | 81.7 / 81.8 | 99.2 / 99.6% |
+| one prompt, every transaction's tail and answer slot in turn, one pass | 565 / 475 | 15.6 | 13.1 | 79.6 / 80.8 | 94.2 / 93.1% |
+
+### 119.1 What the step says
+
+- **Caching the shared prefix is the answer for decider, and needs no training.** The prefix (category list, shared rows) is read once
+  per sync; each transaction then reads only its own ~150 to 300 tokens (its payee's and similar payees' rows and itself). Tokens per
+  transaction fall 3.1 to 3.7 times and time 2.1 to 2.5 times (the tails still attend to the prefix, and the cache is copied per tail).
+  The answers are the uncached split layout's: the top category agrees on 99.2 to 99.6% and the log-probabilities differ by at most 0.33
+  (bf16 rounding between one long and two shorter passes). The saving grows with the sync (30 transactions: 20.9 ms each).
+- **The split layout itself is free.** Read uncached it costs the same time as today's layout (16 more tokens for two headers) and reads
+  the same (82.5 against 82.4 on blind_v1, REPORT 118's row 118 arm); on these 24 syncs it is 0.8 to 1.2 points under today's layout
+  zero-shot (the recipe never saw the headers), which the trained arm of row 118 addresses.
+- **One prompt with every transaction is faster still and not free.** One forward pass for the whole sync (13 to 16 ms per transaction)
+  beats the cache (no copying, no padding), but each transaction then sees the earlier ones with their slots unanswered, which the
+  reader never saw in training: 6 to 7% of answers change and top-1 falls 1 to 2 points. It needs multi-slot training episodes (row 127)
+  to be a candidate; and a causal model sorted by date keeps the no-future rule, a bidirectional encoder would not.
+- **Cost.** At about $4 per H100-hour: separate prompts ~$59 per million transactions, the cached prefix ~$23 to $28, one prompt ~$15
+  (all from this unoptimised stack; a serving engine with prefix caching, compilation and FP8 should lower all three; row 127 measures
+  vLLM). The encoder cannot share a prefix (it reads in both directions) and stays at ~14 ms per transaction.
+- **Correctness note.** transformers releases before 5.17 restarted the linear-attention state when several tokens followed a cache
+  (initial state None); a cached prefix would have silently changed the answers. The benchmark's check against the uncached prompts is the
+  guard; any serving stack for Qwen3.5 must pass the same check.
