@@ -1,0 +1,12 @@
+[
+ {
+  "tag": "r127-vllm",
+  "env": {
+   "ADAPTERS_FROM": "r113-dec-labshots-s0"
+  },
+  "cmds": [
+   "ADAPTER=decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_laylabelled_shots_ev10soft_lora N_SYNCS=24 PREP_VLLM=/tmp/vllm_prep uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/bench_bulk.py",
+   "uv run --no-project --with vllm python scripts/bench_vllm.py /tmp/vllm_prep"
+  ]
+ }
+]

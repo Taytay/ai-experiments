@@ -22,6 +22,7 @@ import random
 import statistics
 import sys
 import time
+from pathlib import Path
 
 from ai_experiments.paths import PROCESSED, ROOT
 
@@ -122,6 +123,17 @@ def main():
             t0 = time.perf_counter(); r = fn(); torch.cuda.synchronize(); ts.append(time.perf_counter() - t0)
         return r, 1000 * statistics.median(ts)
 
+    if os.environ.get("PREP_VLLM"):  # row 127: the merged model and every sync's token ids for scripts/bench_vllm.py (another environment)
+        out_dir = Path(os.environ["PREP_VLLM"]); lm.save_pretrained(out_dir / "model"); tok.save_pretrained(out_dir / "model")
+        syncs_out = []
+        for u in users:
+            its = sorted(syncs[u], key=lambda x: x["pos"])
+            b_spl = [built(it, split[it["id"]]) for it in its]; b_sep = [built(it, it) for it in its]
+            syncs_out.append(dict(user=u, ids=[it["id"] for it in its], answer=[it["answer"] for it in its], labs=b_spl[0]["labs"],
+                                  perm=[b["perm"] for b in b_spl], split=[b["ids"] for b in b_spl], sep=[b["ids"] for b in b_sep]))
+        (out_dir / "syncs.json").write_text(json.dumps(syncs_out))
+        print(f"prepared {len(syncs_out)} syncs in {out_dir}", flush=True)
+        return
     recs = []
     for u in users:
         its = sorted(syncs[u], key=lambda x: x["pos"])
