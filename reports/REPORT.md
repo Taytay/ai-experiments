@@ -7123,3 +7123,151 @@ target, as the scorecard does. `scripts/agreement_tables.py`.
   should re-fit when the population changes (REPORT 103: a threshold carried from REAL-7 to blind_v1 did not hold).
 
 Tables: `uv run python scripts/agreement_tables.py`.
+
+
+## 116. Thresholds under shift: the scorecard's 98% holds overall and not for new users (93% for decider, 89% for the encoder), per-group thresholds do not fix it on this many items, a threshold with a finite-sample guarantee halves decider's auto-filing at 1,100 calibration items, and thresholds carried from another set move coverage by 15 to 60 points (EVAL-13)
+
+PLAN step 121 (gaps review, 2026-09-29). CPU only, over the saved blind_v1 scores of decider-4B (the recipe with labelled rows, two
+seeds) and Ettin-1B (the encoder recipe, three seeds). Every rule is fitted on the other users' folds (user id mod 4), as the scorecard
+does. The finite-sample rules are Learn-then-Test style: a threshold is accepted when the Clopper-Pearson upper bound on the error of the
+items it would auto-file is at most 2% at confidence 0.9 (Bonferroni over 40 candidate thresholds, or fixed-sequence testing from the
+threshold that accepts the top 30% of items downwards, stopping at the first failure). `scripts/threshold_tables.py`.
+
+**Table TH.1: the scorecard's 98% threshold on blind_v1 by user group: auto-filed % / realised precision % (mean over seeds)**
+
+| group | n | decider-4B | Ettin-1B |
+|---|---|---|---|
+| new user (0-10 rows) | 168 | 21 / 92.7 | 9 / 89.3 |
+| payee in the prompt | 1205 | 74 / 98.2 | 63 / 98.1 |
+| payee not in the prompt | 127 | 21 / 94.4 | 4 / 100.0 |
+| history 450-700 rows | 630 | 67 / 98.2 | 57 / 98.1 |
+| history < 450 rows | 231 | 68 / 99.4 | 55 / 99.3 |
+| history >= 700 rows | 471 | 71 / 97.3 | 59 / 97.5 |
+| default | 798 | 61 / 97.9 | 50 / 97.8 |
+| detailed | 168 | 65 / 98.6 | 38 / 98.4 |
+| family | 54 | 69 / 95.9 | 59 / 100.0 |
+| merged | 198 | 65 / 99.2 | 57 / 99.7 |
+| minimal | 156 | 69 / 96.3 | 60 / 95.8 |
+| personal | 126 | 64 / 97.5 | 59 / 97.3 |
+
+**Table TH.2: threshold rules on blind_v1, each fitted on the other folds (mean [range] over seeds)**
+
+| model | rule | auto-filed % | precision % | worst group (payee / new user) % | effort |
+|---|---|---|---|---|---|
+| decider-4B | one threshold (the scorecard) | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 91.8 [90.9, 92.6] | 0.589 [0.582, 0.597] |
+| decider-4B | one per group (new user; payee in / not in the prompt) | 63.4 [61.2, 65.5] | 97.8 [97.7, 98.0] | 91.3 [90.9, 91.7] | 0.591 [0.574, 0.609] |
+| decider-4B | one per history length | 59.7 [58.6, 60.9] | 97.7 [97.7, 97.7] | 94.4 [92.6, 96.3] | 0.625 [0.611, 0.639] |
+| decider-4B | finite-sample, Bonferroni: CP bound <= 2% at 0.1/40 | 3.0 [0.0, 6.1] | 98.9 | 100.0 | 1.143 [1.109, 1.177] |
+| decider-4B | finite-sample, fixed sequence from the top 30%: CP bound <= 2% at 0.1 | 32.7 [31.4, 33.9] | 98.8 [98.5, 99.0] | 99.0 [98.9, 99.0] | 0.859 [0.849, 0.869] |
+| Ettin-1B | one threshold (the scorecard) | 52.0 [46.3, 56.1] | 97.9 [97.7, 98.0] | 89.3 [87.5, 92.3] | 0.715 [0.681, 0.770] |
+| Ettin-1B | one per group (new user; payee in / not in the prompt) | 53.1 [48.3, 56.8] | 97.9 [97.8, 98.0] | 92.1 [86.7, 98.0] | 0.704 [0.674, 0.747] |
+| Ettin-1B | one per history length | 53.9 [49.7, 57.3] | 97.4 [97.1, 97.8] | 93.5 [90.9, 97.9] | 0.708 [0.681, 0.753] |
+| Ettin-1B | finite-sample, Bonferroni: CP bound <= 2% at 0.1/40 | 0.0 [0.0, 0.0] | – | – | 1.195 [1.188, 1.203] |
+| Ettin-1B | finite-sample, fixed sequence from the top 30%: CP bound <= 2% at 0.1 | 5.6 [0.0, 8.8] | 97.6 [97.5, 97.7] | 98.0 [97.5, 98.4] | 1.143 [1.113, 1.188] |
+
+**Table TH.3: transfer: temperature and 98% threshold fitted on another set, applied to all of blind_v1 (mean [range] over seeds)**
+
+| model | fitted on | threshold rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|---|
+| decider-4B | blind_v1 (other folds) | global | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 0.589 [0.582, 0.597] |
+| decider-4B | blind_v1 (other folds) | sequential | 32.7 [31.4, 33.9] | 98.8 [98.5, 99.0] | 0.859 [0.849, 0.869] |
+| decider-4B | real6 | global | 40.7 [33.7, 47.6] | 98.8 [98.6, 99.0] | 0.782 [0.713, 0.851] |
+| decider-4B | real6 | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| decider-4B | real6_v1_novel | global | 49.5 [43.9, 55.0] | 98.5 [98.4, 98.6] | 0.703 [0.645, 0.760] |
+| decider-4B | real6_v1_novel | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| decider-4B | novel_merchants_v1 | global | 0.8 [0.6, 0.9] | 100.0 [100.0, 100.0] | 1.164 [1.161, 1.168] |
+| decider-4B | novel_merchants_v1 | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| Ettin-1B | blind_v1 (other folds) | global | 52.0 [46.3, 56.1] | 97.9 [97.7, 98.0] | 0.715 [0.681, 0.770] |
+| Ettin-1B | blind_v1 (other folds) | sequential | 5.6 [0.0, 8.8] | 97.6 [97.5, 97.7] | 1.143 [1.113, 1.188] |
+| Ettin-1B | real6 | global | 64.5 [61.2, 66.6] | 96.7 [96.3, 97.4] | 0.631 [0.624, 0.636] |
+| Ettin-1B | real6 | sequential | 0.0 [0.0, 0.0] | – | 1.195 [1.188, 1.203] |
+| Ettin-1B | real6_v1_novel | global | 63.2 [61.0, 64.8] | 96.9 [96.4, 97.4] | 0.638 [0.630, 0.645] |
+| Ettin-1B | real6_v1_novel | sequential | 61.5 [59.5, 62.6] | 97.2 [96.7, 97.6] | 0.645 [0.641, 0.648] |
+| Ettin-1B | novel_merchants_v1 | global | 40.6 [9.9, 58.1] | 98.2 [98.0, 98.7] | 0.818 [0.661, 1.099] |
+| Ettin-1B | novel_merchants_v1 | sequential | 0.0 [0.0, 0.0] | – | 1.195 [1.188, 1.203] |
+
+### 116.1 What the step says
+
+- **One threshold is right on average and wrong for new users.** The 98% threshold realises 97.9% overall because most items (payee in
+  the prompt) sit at 98.2%; new users' auto-filed items are right 92.7% of the time for decider and 89.3% for the encoder, payees not in
+  the prompt 94.4% (decider). Few of those are auto-filed (21% and 9%), so the average hides them.
+- **Per-group thresholds do not fix it here.** Fitted per group on the other folds, the new-user group (168 items, about 40 per fold)
+  is too small to place a 98% threshold reliably: the worst group stays at 91 to 94%. A production system has thousands of new users a
+  day and can fit these; on this set the answer is to auto-file new users only above a stricter threshold, or not at all.
+- **A guarantee costs coverage at this calibration size.** With about 1,100 calibration items, certifying 98% at 90% confidence lets
+  decider auto-file 33% (fixed sequence) instead of 63%, and the encoder 6%; Bonferroni over a grid allows almost nothing. The
+  scorecard's threshold is an estimate, not a guarantee. In production every user's confirmation is a calibration label, so tens of
+  thousands of labels a day make the guaranteed threshold close to the estimated one; the calibration set, not the model, is the limit.
+- **Thresholds do not travel between populations.** Fitted on REAL-6 (the training generator) decider becomes conservative on blind_v1
+  (41% auto-filed at 98.8%), fitted on novel_merchants_v1 it files nothing, and the encoder fitted on REAL-6 becomes permissive (64% at
+  96.7%). Even the finite-sample rule fitted on the novel-name copy gives the encoder 97.2%: a guarantee holds only in distribution.
+- **For production:** fit temperature and thresholds on the product's own recent confirmations, refit on a schedule, and give new users
+  their own (stricter) threshold once there are enough of them to fit it.
+
+## 117. Sending what the small models do not settle to decider-35B-A3B, untrained: it reads blind_v1 at 82.0 (the trained 4B 82.5), far better on new users (77 against 62) and new businesses (78 to 84 against 62 to 70), far worse where the user's habit overrides the merchant; as the third reader for the 35% of transactions the small models do not auto-file it lifts auto-filing from 65 to 73% at 97.4% and cuts user effort from 0.560 to 0.470 (EVAL-12)
+
+PLAN step 120. decider-35B-A3B (Apache-2.0; Qwen3.5-35B-A3B base, trained by decider's authors for one-slot choice; 3B active
+parameters) read blind_v1 zero-shot in its own layout (options after the question, letter labels), on one H100 (69 GB of weights in
+bf16; 2.8 minutes for 1,500 items, batch 2); untrained decider-4B in the same layout beside it. The small models are REPORT 115's: the
+encoder recipe (three seeds) and decider-4B with labelled rows (two seeds). Every model is calibrated with the leave-fold-out
+temperature and 98% threshold. `scripts/escalation_tables.py`, job list `scripts/modal_jobs/r120.json`.
+
+**Table ES.1: top-1 on blind_v1 (small models: first seed; agree / disagree: the first encoder and decider seeds)**
+
+| group | n | encoder (Ettin-1B, recipe) | decider-4B, recipe | decider-4B untrained | decider-35B-A3B untrained |
+|---|---|---|---|---|---|
+| all | 1500 | 79.8 | 82.6 | 76.5 | 82.0 |
+| small models agree | 1257 | 91.0 | 91.0 | 83.9 | 87.9 |
+| small models disagree | 243 | 21.8 | 39.1 | 38.3 | 51.4 |
+| plain | 511 | 99.2 | 99.2 | 95.9 | 98.6 |
+| recurring | 208 | 100.0 | 100.0 | 98.6 | 99.5 |
+| short_history | 168 | 48.2 | 62.5 | 57.7 | 77.4 |
+| income | 61 | 100.0 | 100.0 | 95.1 | 98.4 |
+| misfiled_history | 39 | 76.9 | 87.2 | 92.3 | 100.0 |
+| new_merchant_descriptive | 37 | 56.8 | 62.2 | 56.8 | 83.8 |
+| weekday_split | 37 | 73.0 | 78.4 | 56.8 | 45.9 |
+| ambiguous_p2p | 37 | 27.0 | 21.6 | 16.2 | 16.2 |
+| new_merchant_chain | 37 | 64.9 | 70.3 | 48.6 | 78.4 |
+| idiosyncratic | 37 | 94.6 | 97.3 | 78.4 | 48.6 |
+| refund | 36 | 61.1 | 83.3 | 63.9 | 72.2 |
+| multi_purpose | 36 | 50.0 | 38.9 | 25.0 | 47.2 |
+| trip | 36 | 69.4 | 66.7 | 55.6 | 72.2 |
+| new_category | 36 | 50.0 | 52.8 | 38.9 | 50.0 |
+| date_night | 36 | 72.2 | 80.6 | 86.1 | 86.1 |
+| new_merchant_opaque | 36 | 8.3 | 8.3 | 8.3 | 8.3 |
+| amount_split | 36 | 55.6 | 61.1 | 47.2 | 50.0 |
+| changed_mind | 36 | 58.3 | 61.1 | 38.9 | 27.8 |
+| named_category | 25 | 100.0 | 100.0 | 100.0 | 100.0 |
+| event | 15 | 100.0 | 93.3 | 73.3 | 100.0 |
+
+**Table ES.2: system policies on blind_v1 (mean [range] over six small-model seed pairs)**
+
+| policy | auto-filed % | precision % | effort | sent to the 35B % |
+|---|---|---|---|---|
+| agree and either confident (REPORT 115); suggestions from the small models | 65.2 [64.0, 66.3] | 97.8 [97.6, 98.0] | 0.560 [0.550, 0.571] | 0.0 [0.0, 0.0] |
+| the same; suggestions for the rest from the 35B | 65.2 [64.0, 66.3] | 97.8 [97.6, 98.0] | 0.545 [0.534, 0.557] | 34.8 [33.7, 36.0] |
+| + the 35B confident and agreeing with one small model | 72.9 [72.3, 73.7] | 97.4 [97.3, 97.6] | 0.487 [0.480, 0.493] | 34.8 [33.7, 36.0] |
+| + the 35B confident alone | 73.9 [73.2, 74.7] | 97.3 [97.1, 97.5] | 0.482 [0.477, 0.489] | 34.8 [33.7, 36.0] |
+| + the 35B, suggestions from the three-model product | 72.9 [72.3, 73.7] | 97.4 [97.3, 97.6] | 0.470 [0.460, 0.477] | 34.8 [33.7, 36.0] |
+| the 35B alone at its 98% (no small models) | 56.3 [56.3, 56.3] | 98.0 [98.0, 98.0] | 0.621 [0.621, 0.621] | 100.0 [100.0, 100.0] |
+
+### 117.1 What the step says
+
+- **The large model knows what the small ones do not, and does not know what they were taught.** Untrained, the 35B reads blind_v1 as
+  well as the trained 4B overall (82.0 against 82.6) with the opposite profile: new users 77 (decider 62, encoder 48), new chains and
+  new local businesses 78 and 84 (decider 70 and 62), misfiled histories 100; and idiosyncratic filings 49 (decider 97), changes of mind
+  28 (61), weekday splits 46 (78): it follows what the merchant is over what this user does with it, which is what the recipe's lookup,
+  override and alternation episodes teach the small models. Scale did not help on REAL-6 (section 87) because REAL-6 has no world
+  knowledge left to use; blind_v1's new users and new businesses do.
+- **Where the small models disagree, it is right half the time** (51.4, against decider's 39.1 and the encoder's 21.8), and where they
+  agree it is lower than them (87.9 against 91.0).
+- **As the escalation reader it gives the best system so far.** After REPORT 115's policy (auto-file when the small models agree and
+  one is confident), 35% of transactions are left; sending those to the 35B and auto-filing when it is confident and agrees with one of
+  the small models takes auto-filing from 65.2 to 72.9% at 97.4% (a little under the 98% target: its threshold was fitted on all items,
+  not on the escalated ones) and user effort from 0.560 to 0.487; suggestions for the rest from the three models' product take it to
+  0.470, 16% less work than REPORT 115's system and 20% less than decider alone.
+- **Cost.** The 35B reads a transaction in about 110 ms on an H100 as run here (batch 2, unoptimised), three to four times decider-4B;
+  sent a third of the transactions, it about doubles the system's GPU cost per transaction (at about $4 per H100-hour: from ~$50-65 to ~$100
+  per million transactions at H100 list price), still far below any hosted API.
+- **Next:** the 35B trained with the recipe (row 125, MODEL-20): the trained behaviours on top of its world knowledge; and it as a
+  teacher for the small models (row 123).

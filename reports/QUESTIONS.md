@@ -1207,11 +1207,13 @@ and 22% (encoder) of the time; blind Opus reads blind_v1 at about 91% on a sampl
 (sections 64, 87), but the blind set's misses are world knowledge and new users. *Experiment:* decider-35B-A3B (Apache-2.0, a
 Qwen3.5-35B-A3B base trained for one-slot choice) zero-shot on blind_v1; its accuracy where the small models disagree, and the system
 with it as the third reader (escalate disagreements; auto-file when it agrees with one of them and is confident), by effort and cost.
+**Status (2026-09-29):** PLAN step 120, REPORT.md 117: untrained decider-35B-A3B reads blind_v1 at 82.0 (new users 77, new businesses 78-84, idiosyncratic 49); as the third reader of what the small models leave it lifts auto-filing 65 -> 73% at 97.4% and cuts effort 0.560 -> 0.470.
 
 **EVAL-13 Thresholds that hold when the population changes.** One global threshold per model was fitted on other users of the same set;
 it did not carry from REAL-7 to blind_v1 (section 103). *Experiment (CPU):* over the saved blind_v1 scores, realised precision of the
 98% threshold by user group (new users, short and long histories, payee seen or not); per-group thresholds; a finite-sample
 (conformal risk control / Learn-then-Test) threshold; and the transfer test: thresholds fitted on REAL-7 or REAL-6 applied to blind_v1.
+**Status (2026-09-29):** PLAN step 121, REPORT.md 116: the 98% threshold holds overall, not for new users (93% / 89%); per-group thresholds need more items than blind_v1 has; a finite-sample guarantee halves decider's auto-filing at 1,100 calibration items; thresholds fitted on other sets move coverage 15-60 points.
 
 **TRAIN-13 Confidence that does not depend on the seed.** Accuracy is stable across seeds, auto-filing is not (section 109: 46 to 63%;
 48 rows 26 to 58%). *Experiment:* the decider recipe with an average of the last checkpoints (or an EMA of the LoRA weights), three
