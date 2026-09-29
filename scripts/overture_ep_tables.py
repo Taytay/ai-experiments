@@ -18,11 +18,17 @@ import rematch_tables as R  # noqa: E402
 from effort_tables import calibrated  # noqa: E402
 
 D = "real6_dm_decider_decider_decider-4b_none_h100bf16st800{s}_emp20_f0_" + R.REC + "{o}_aux100_labrand255_ev10soft_lora_{set}_labrand255.noctx.jsonl"
+E2 = "real6_encmask_ettin1b_st3000_h100fresh_f0_decnone_h100fresh_emp20_f0_" + R.REC + "{o}_ev10soft{set}.noctx.jsonl"
 E = "real6_encmask_ettin1b_st3000_h100fresh_f0_decnone_h100fresh_f0_" + R.REC + "{o}_ev10soft{set}.noctx.jsonl"
 READERS = [("decider-4B, recipe", [lambda st, s=s: D.format(s=s, o="", set=st or "real6") for s in ("", "s1")]),
            ("decider-4B, recipe + Overture episodes", [lambda st, s=s: D.format(s=s, o="_odb20", set=st or "real6") for s in ("", "s1")]),
            ("Ettin-1B, encoder recipe", [lambda st: E.format(o="", set="_" + st if st else "")]),
-           ("Ettin-1B, encoder recipe + Overture episodes", [lambda st: E.format(o="_odb20", set="_" + st if st else "")])]
+           ("Ettin-1B, encoder recipe + Overture episodes", [lambda st: E.format(o="_odb20", set="_" + st if st else "")]),
+           ("decider-4B, recipe + short histories (row 108)", [lambda st, s=s: D.format(s=s, o="_short15", set=st or "real6") for s in ("", "s1")]),
+           ("decider-4B, recipe + Overture 0.05 (row 108)", [lambda st: D.format(s="", o="_odb5", set=st or "real6")]),
+           ("decider-4B, recipe + Overture 0.05 + short (row 108)", [lambda st: D.format(s="", o="_odb5_short15", set=st or "real6")]),
+           ("Ettin-1B, + Overture + short (row 108)", [lambda st: E.format(o="_odb20_short15", set="_" + st if st else "")]),
+           ("Ettin-1B, + Overture + short + empty (row 108)", [lambda st: E2.format(o="_odb20_short15", set="_" + st if st else "")])]
 
 
 def fmt(v):
