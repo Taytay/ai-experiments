@@ -6809,3 +6809,47 @@ small a budget at 800 steps. Both the recipe and recipe v2 were trained for 1,60
   worth three more seeds if REAL-7-style changes (moves, new categories) turn out common in real histories.
 
 Job list: `scripts/modal_jobs/r107.json`.
+
+
+## 110. New users are not a missing episode shape: training with 0 to 10 shots in 15% of episodes leaves both readers where they were on blind_v1's new users (decider 62 against 65, Ettin 45); empty categories do for the encoder what they did for decider, and the encoder with Overture episodes, short histories and empty categories is the best encoder so far (blind 79.3, auto-filed 52%, REAL-6 90.9, misleading names 97.4); in front of decider it gives the best system (blind effort 0.57 to 0.60, decider reads 48%) (EVAL-11, MODEL-17)
+
+PLAN step 108. Every training episode so far had 24 shots, and blind_v1's weakest group for both readers is new users with 0 to 10
+rows. `exp_categoriser.py SHORT=0.15` keeps 0 to 10 of the shots in 15% of episodes. Arms: decider-4B's recipe + SHORT (two seeds), +
+OVDB 0.05 (section 108's Overture episodes at a quarter of the share), + both; Ettin-1B's encoder recipe + OVDB 0.2 + SHORT, and + EMPTY
+20. One seed unless noted. `scripts/overture_ep_tables.py`.
+
+**Table 110.1**
+
+| reader | real businesses in no DB: descriptive / plain / chain | blind_v1 | blind new users | blind auto-filed at 98% | REAL-6 | novel names | misleading names |
+|---|---|---|---|---|---|---|---|
+| decider-4B, recipe (two seeds) | 65.9 / 44.4 / 58.7 | 82.6 | 64.6 | 55.0 | 89.3 | 89.3 | 93.4 |
+| + short histories (two seeds) | 64.5 / 41.9 / 53.8 | 80.8 | 62.2 | 51.0 | 87.6 | 87.9 | 91.4 |
+| + Overture 0.05 | 69.1 / 39.4 / 59.6 | 82.7 | 63.1 | 50.6 | 87.2 | 86.9 | 93.4 |
+| + Overture 0.05 + short | 70.0 / 42.4 / 55.8 | 83.1 | 67.9 | 45.5 | 90.9 | 87.2 | 92.1 |
+| Ettin-1B, encoder recipe | 30.0 / 18.2 / 36.5 | 77.9 | 42.3 | 44.3 | 89.6 | 86.9 | 97.4 |
+| + Overture 0.2 (section 108) | 72.7 / 47.5 / 65.4 | 77.7 | 44.6 | 42.2 | 88.6 | 88.6 | 90.8 |
+| + Overture 0.2 + short | 80.9 / 56.6 / 61.5 | 77.5 | 45.2 | 37.4 | 87.9 | 88.6 | 93.4 |
+| **+ Overture 0.2 + short + empty categories** | 79.1 / 48.5 / 57.7 | **79.3** | 44.6 | **52.2** | **90.9** | **89.3** | **97.4** |
+
+**Table 110.2: blind_v1, the system (the encoder auto-files at its own calibrated 98% threshold, decider-4B's recipe reads the rest)**
+
+| encoder in front | decider seed | effort | auto-filed (precision) | decider reads |
+|---|---|---|---|---|
+| Ettin-1B, encoder recipe (section 107) | 0 / 1 | 0.588 / 0.629 | 63.3 / 58.9 (97.5 / 97.4) | 56% |
+| **Ettin-1B, + Overture + short + empty** | 0 / 1 | **0.571 / 0.601** | **65.2 / 62.0 (97.4)** | **48%** |
+| none (decider alone) | 0 / 1 | 0.627 / 0.691 | 58.3 / 51.7 | 100% |
+
+### 110.1 What the step says
+
+- **Short histories in training do not help new users.** Neither reader moves on blind_v1's new users; decider loses a little
+  elsewhere. A new user's items are hard because the answer rests on what their category names mean with nothing of theirs to copy,
+  and 24-shot episodes already teach that when the query's merchant is absent from the shots.
+- **Empty categories help the encoder** as they helped decider (section 105): with them Ettin's blind top-1 rises 2 points, its
+  auto-filing 15 points, and REAL-6, novel names and misleading names all recover what the Overture episodes cost.
+- **Decisions.** The encoder recipe is Ettin-1B + `OVDB=0.2 SHORT=0.15 EMPTY=20` (SHORT is neutral; kept because this is the run that
+  measured best, one seed). decider's recipe is unchanged: the Overture episodes at 0.05 give nothing clear, at 0.2 they cost
+  auto-filing (section 108).
+- **The system.** This encoder in front of decider auto-files 62 to 65% of blind_v1 at 97.4% and leaves decider 48% of the
+  transactions; effort 0.57 to 0.60 against 0.63 to 0.69 for decider alone.
+
+Job lists: `scripts/modal_jobs/r109.json`, `r109b.json` (one relaunch after a Modal GPU hardware error).
