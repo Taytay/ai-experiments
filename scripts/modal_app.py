@@ -14,7 +14,7 @@ usage (the Modal client is a uv tool, not a project dependency: `uv tool install
   modal run scripts/modal_app.py --jobs scripts/modal_jobs/<file>.json     many jobs in parallel (at most 8 containers):
       a JSON list of {"tag": ..., "env": {...}, "cmds": [...]}; each job writes only its own <tag>/ directory
   modal volume get ai-exp-results T <local dir>                              then copy into the checkout, push-models, union runs.jsonl
-GPU: one H100, 6-hour timeout per call (edit `run` to change either).
+GPU: one H100, 6-hour timeout per call (edit `run` to change either; `--gpu H200` overrides the GPU for one launch).
 """
 from pathlib import Path
 
@@ -101,7 +101,10 @@ def run(cmds: list, env: dict, tag: str):
 
 
 @APP.local_entrypoint()
-def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = ""):
+def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = "", gpu: str = ""):
+    global run
+    if gpu:  # row 125: another GPU type for this launch (e.g. H200 for decider-35B-A3B training); the default stays one H100
+        run = run.with_options(gpu=gpu)
     if check:
         print(gpu_check.remote()); return
     if jobs:  # parallel: at most 8 containers (volume commits contend beyond ~5 concurrent small ones)

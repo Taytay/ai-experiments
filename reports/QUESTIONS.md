@@ -1225,3 +1225,10 @@ episodes (and on Overture names for the encoder) as soft targets for decider-4B 
 a new user lacks; row 44 (the collaborative record) was deprioritised before the blind set existed. *Experiment:* a line under the query
 ("Other users file this payee as: Coffee 12, Eating out 5") built from other users' histories (blind_v1 users share ~250 real chains),
 in training episodes and at test; effort on blind_v1's new users and new payees.
+
+**MODEL-20 The large reader trained with the recipe.** Row 120: decider-35B-A3B untrained reads blind_v1 at 82.0 (the trained 4B 82.5),
+far better on new users (77 against 62) and new businesses (78 to 84 against 62 to 70), far worse where the user's habit overrides the
+merchant (idiosyncratic 49 against 97, changed mind 28 against 61): it has the world knowledge and not the trained behaviours. Scale did
+not help on REAL-6 (section 87: 9B = 4B), where there is no world knowledge to use. *Experiment:* the decider recipe (labelled rows) as
+a LoRA on decider-35B-A3B (attention, linear attention and the shared expert; routed experts frozen, as decider's own training), one
+H200, one seed; every set; alone and as the escalation reader of row 120.
