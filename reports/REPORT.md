@@ -41,6 +41,22 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   better on mixed filings (98) but treats a single unusual row as a slip (32 to 47), where the recipe without it trusts that row;
   which is right depends on real users' slip rate (97). A change not yet visible in the history is confidently misread by every
   reader: the product must record it.
+- **After the review of 2026-09-28 (sections 98 to 107).**
+  - *Effort and auto-filing (98):* on REAL-7 the owner's rule (the last two filings of a payee agree) auto-files 60% at 94.5%, where
+    the model's confidence could not; history-or-model cuts user effort by 45%.
+  - *The prompt (99, 101):* the payee's own dated rows are what the reader needs (REAL-7 ceiling 84.8 to 91.6, reader 81.9 to 87.1);
+    similar payees, a row per category and 48 rows add nothing measurable; trained on dated slices the reader follows a change it can
+    see (moved merchants 50 to 66, new categories 44 to 77).
+  - *Blind test set (103):* a subagent that never saw the code built `blind_v1`; the recipe reads it at 93% of the ceiling (82.0; blind
+    Opus 91% on a sample) and auto-files half at 97.7%, so the recipe transfers; REAL-7 training at full dose did not (confidence
+    tuned to its generator), a small dose from a wide pool does (106).
+  - *Encoders (102, 104):* trained on exactly the decoder recipe's episodes (drawn fresh, with the soft targets), Ettin-encoder-1B has
+    every trained behaviour decider-4B has and matches it on REAL-6 and novel names at a third of the scoring time; the blind set keeps
+    it 4 points behind on new users and new local businesses (world knowledge). The old 30-point gap was the training data.
+  - *Other decoders (100):* no newer small open decoder passes decider-4B; Kimi fails the licence rule and the size budget.
+  - *Labels (105):* readers must be trained on as many options as users have categories (27% of blind items exceed 26).
+  - *The recipe and system (107):* row 89 + 255 labels + empty categories; history rule, then the encoder auto-files, then decider
+    (blind effort 0.59 to 0.63 against 0.69 for decider alone).
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
