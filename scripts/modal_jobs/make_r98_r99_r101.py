@@ -51,3 +51,15 @@ for n, j in (("r98", r98), ("r99", r99), ("r101", r101)):
     json.dump(j, open(f"scripts/modal_jobs/{n}.json", "w"), indent=1)
     print(n, len(j), "jobs")
 print([j["cmds"][1].split("LOAD_FROM=")[1].split()[0] for j in r99])
+
+# row 98 stage 2: the final recipe plus REAL-7-style training users with dated history slices (all_kind, or a mix of policies), two seeds
+r98b = []
+for pol in ("all_kind", "mix"):
+    for k in (0, 1):
+        tag = "h100bf16st800" + ("" if k == 0 else "s1")
+        ad = f"decider_decider-4b_none_{tag}_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_r7{pol}_aux100_labrand26_ev10soft_lora"
+        cmds = [f"{UV} python scripts/exp_decider_finetune.py"] + [score("Mapika/decider-4b", ad, s) for s in SETS] + \
+               [score("Mapika/decider-4b", ad, f"real7_v2_{p}", ALL) for p in ("recent", "self", "all_kind", "all_embrec", "all_kind_b48", "all_kind_undated")]
+        r98b.append(dict(tag=f"r98b-{pol}-s{k}", env=dict(RECIPE, MODEL="Mapika/decider-4b", RUN_TAG=tag, SEED=str(k), R7TRAIN=pol), cmds=cmds))
+json.dump(r98b, open("scripts/modal_jobs/r98b.json", "w"), indent=1)
+print("r98b", len(r98b), "jobs", r98b[0]["cmds"][1][:200])

@@ -86,14 +86,16 @@ def scheme(kind, rng, world):
     return cats, assign, rules
 
 
-def generate():
+def generate(prefix="real7", n_users=N_USERS, queries=QUERIES, held_share=0.3):
     """(items, users, hist): the frozen v1 items and users, and per item id the user's whole history before the query as rows
-    (merchant, day, weekday, amount, text, filed category name), of which the prompt shows only the last 24 (rows 97, 98)."""
+    (merchant, day, weekday, amount, text, filed category name), of which the prompt shows only the last 24 (rows 97, 98).
+    The defaults give the frozen v1 set; row 98's training users use another prefix (disjoint seeds), more queries and no held-out
+    rendering family (it stays held out of training)."""
     hist_of = {}
     merchants = T.load()["merchants"]; db = R6.load()["fact_db"]
     items, users = [], []
-    for u in range(N_USERS):
-        r = random.Random(f"real7-{u}")
+    for u in range(n_users):
+        r = random.Random(f"{prefix}-{u}")
         kind = "default" if r.random() < 0.55 else "light" if r.random() < 0.67 else "custom"
         world = r.sample(merchants, r.randint(50, 110))
         cats, assign, rules = scheme(kind, r, world)
@@ -144,9 +146,9 @@ def generate():
         if short is None:  # up to three queries on the user's interesting merchants (rules, moves, new categories, splits, idiosyncratic), the rest at random
             cand = list(range(start, n_rows)); inter = [k for k in cand if rows[k]["why"] != "plain"]
             pick = r.sample(inter, min(3, len(inter)))
-            q_idx = sorted(pick + r.sample([k for k in cand if k not in pick], QUERIES - len(pick)))
+            q_idx = sorted(pick + r.sample([k for k in cand if k not in pick], queries - len(pick)))
         else:
-            q_idx = list(range(short, short + QUERIES))
+            q_idx = list(range(short, short + queries))
         for qi in q_idx:
             q = rows[qi]; hist = rows[:qi] if short is None else rows[qi - short:qi] if short else []
             if short is not None:
@@ -156,7 +158,7 @@ def generate():
             vis_idx = [i for i, c in enumerate(cats) if c in visible]
             if q["gold"] not in vis_idx:
                 continue
-            held = r.random() < 0.3
+            held = r.random() < held_share
             qtext = render(q["m"], r, held=held)
             header = "Categories: " + ", ".join(c["name"] for c in visible) + "\n\n"
             demo = "".join(f"Transaction: {h['text']} | ${h['amount']:.2f} | {h['weekday']}\nCategory: {cats[h['filed']]['name']}\n\n" for h in shots)
@@ -174,7 +176,7 @@ def generate():
                 best = std[0] if len(std) == 1 else (std[0] if std else None)
             options = [" " + c["name"] for c in visible]
             hist_of[f"R7:{u:03d}:{qi:03d}"] = [dict(merchant=h["merchant"], day=h["day"], weekday=h["weekday"], amount=h["amount"], text=h["text"],
-                                                   filed=cats[h["filed"]]["name"]) for h in hist] + [dict(
+                                                   filed=cats[h["filed"]]["name"], intended=cats[h["gold"]]["name"]) for h in hist] + [dict(
                 merchant=q["merchant"], day=q["day"], query=True, rule_best=cats[q["rule_best"]]["name"] if q["rule_best"] is not None else None,
                 default_best=next((cats[i]["name"] for i in vis_idx if q["m"]["category"] in cats[i]["standard"]), None))]
             items.append(dict(id=f"R7:{u:03d}:{qi:03d}", level=f"R7_{kind}", user=u, merchant=q["merchant"], known=q["m"]["known"], text=qtext,
