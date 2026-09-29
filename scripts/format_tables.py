@@ -28,7 +28,8 @@ ENC = "real6_encmask_ettin1b_st3000_h100fresh{s}_f0_decnone_h100fresh{s}_emp20_f
 DEC_ARMS = [("decider, recipe (decider's layout)", "", ""), ("labelled list, ends 'Category: ('", "", "_laylabelled"),
             ("labelled list + 'Category: (AE) Pets' rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
             ("48 rows", "_sh48", ""), ("TSV table (Options / 'Answer: (')", "", "_laytable"), ("TSV table, labelled cells, open ' (' cell", "", "_laytable_labelled"),
-            ("JSON lines, labelled", "", "_layjson_labelled"), ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled")]
+            ("JSON lines, labelled", "", "_layjson_labelled"), ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled"),
+            ("TypeScript enum, Categories[\"GU\"]", "", "_layts_enum"), ("TypeScript enum + name comments", "", "_layts_enum_names")]
 ENC_ARMS = [("encoder, recipe", "", ""), ("labelled options and rows", "", "_laylabelled_shots"), ("weekday next to the date", "", "_dow"),
             ("48 rows", "_sh48", ""), ("TSV table", "", "_laytable"), ("JSON lines, labelled", "", "_layjson_labelled"),
             ("YAML list, labelled", "", "_layyaml_labelled"), ("TypeScript, labelled", "", "_layts_labelled")]

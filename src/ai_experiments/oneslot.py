@@ -61,11 +61,17 @@ def build(P, tok, context, question, options, gold, rng, labels="letters", max_c
 #                    interface Transaction, 'const history: Transaction[] = [ { ..., category: "GU" /* Medical */ }, ... ];' and
 #                    'const next: Transaction = { ..., category: "' with the answer slot there. Enum member access ("Category.GU") would
 #                    merge ".G" for 245 of 255 labels and enum keys read " GU": the quoted literal is clean for all 255.
+#   ts_enum          (owner, 2026-09-29) TypeScript with the owner's enum: 'enum Categories { "GU" = "Medical", ... }' (quoted member names:
+#                    bare keys read " GU"), 'const transactions: Array<Transaction> = [ { ..., category: Categories["GU"] }, ... ];' and
+#                    'const next: Transaction = { ..., category: Categories["' (bracket access: "Categories.GU" merges ".G" for 245 labels;
+#                    '["' + label is clean for all 255); no names in the rows
+#   ts_enum_names    the same with each row's category name as a comment: 'category: Categories["GU"] /* Medical */'
 # dow_first moves the weekday next to the date: "Transaction: 2025-01-19 | Fri | TST* BARTELL DRUGS | $60.43".
 # Tokenization (checked on the Qwen3.5 tokenizer for all 255 labels): after "- (" and "Category: (" every label is one token, the same
 # id as the answer slot reads; "\n(AE" at a line start would merge into "(A" + "E", which this layout never writes.
 # AUX (the shot-label loss) comes back as (position, target) pairs: the tokens of each row's label (the label token and the name) whose
 # original label span is in `spans` (misfiled rows are not).
+import json
 import re as _re
 
 _DATE = _re.compile(r"^\d{4}-\d\d-\d\d$")
@@ -109,6 +115,16 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     f = dow_first if dow else (lambda x: x)
     in_loss = (lambda st: any(s <= st < e for s, e in spans)) if spans is not None else (lambda st: False)
     parts, targets = [], []  # text pieces; char ranges of trained label text
+    if layout in ("ts_enum", "ts_enum_names"):
+        body, targets = records_text(layout, rows, query, lab_of, in_loss)
+        dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
+        head = ("enum Categories {\n" + "".join(f'  "{lab_of[options[oi]]}" = {json.dumps(options[oi], ensure_ascii=False)},\n' for oi in opts) + "}\n\n"
+                "interface Transaction { " + ("date: string; " if dated else "") + "description: string; amount: number; weekday: string; category: Categories; }\n\n")
+        text = head + body; targets = [(a + len(head), b + len(head)) for a, b in targets]
+        enc = tok(text, add_special_tokens=False, return_offsets_mapping=True)
+        ids, offs = list(enc["input_ids"]), enc["offset_mapping"]
+        aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and any(s < b and a < e for s, e in targets)]
+        return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
     if layout == "ts_labelled":
         body, targets = records_text("ts", rows, query, lab_of, in_loss)
         dated = bool(_cells(query)[0]) or any(_cells(f)[0] for f, _, _ in rows)
@@ -205,12 +221,18 @@ def records_text(fmt, rows, query, lab_of, in_loss=lambda st: False):
     cat = lambda c: (f"({lab_of[c]}) {c}" if c in lab_of else c)  # noqa: E731
     if fmt == "ts":
         cat = lambda c: (f'{lab_of[c]}" /* {c} */' if c in lab_of else f'{c}"')  # noqa: E731
-    parts, targets = ["const history: Transaction[] = [\n" if fmt == "ts" else "<historical_transactions>\n"], []
+    if fmt in ("ts_enum", "ts_enum_names"):
+        cat = lambda c: (f'{lab_of[c]}"]' + (f" /* {c} */" if fmt == "ts_enum_names" else "") if c in lab_of else f'{c}"]')  # noqa: E731
+    parts, targets = ["const history: Transaction[] = [\n" if fmt == "ts" else "const transactions: Array<Transaction> = [\n" if fmt.startswith("ts_enum")
+                      else "<historical_transactions>\n"], []
 
     def rec(f, c=None):
         d, dow, desc, amt = _cells(f)
         if fmt == "ts":
             head = "  { " + (f'date: "{d}", ' if dated else "") + f'description: {_json.dumps(desc, ensure_ascii=False)}, amount: {amt}, weekday: "{dow}", category: "'
+            return head, (cat(c) + " },\n") if c is not None else None
+        if fmt.startswith("ts_enum"):
+            head = "  { " + (f'date: "{d}", ' if dated else "") + f'description: {_json.dumps(desc, ensure_ascii=False)}, amount: {amt}, weekday: "{dow}", category: Categories["'
             return head, (cat(c) + " },\n") if c is not None else None
         if fmt == "json":
             head = "{" + (f'"date": "{d}", ' if dated else "") + f'"description": {_json.dumps(desc, ensure_ascii=False)}, "amount": {amt}, "weekday": "{dow}", "category": "'
@@ -223,7 +245,7 @@ def records_text(fmt, rows, query, lab_of, in_loss=lambda st: False):
             n = sum(len(x) for x in parts); targets.append((n, n + len(tail) - 1))
         parts.append(tail)
     head, _ = rec(query)
-    if fmt == "ts":
+    if fmt.startswith("ts"):
         parts.append("];\n\nconst next: Transaction = " + head.strip())  # ends 'category: "': the slot reads the label token after ' "'
         return "".join(parts), targets
     parts.append("</historical_transactions>\n\n<new_transaction>\n" + head + "(")
