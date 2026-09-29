@@ -1,0 +1,33 @@
+{
+ "config": {
+  "dec_episodes": true,
+  "load_from": "encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_kinds20_sh48_ev10soft",
+  "arch": "mask",
+  "init": "ettin1b",
+  "hops_from": null,
+  "mbi_ids": "letters",
+  "mbi_shotlab": false,
+  "steps": 0,
+  "batch": 16,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "ctx": false,
+  "fold": 0,
+  "poi": "",
+  "items_set": "blind_v1_b48",
+  "maxlen": 4096,
+  "seed": 1,
+  "base": "jhu-clsp/ettin-encoder-1b",
+  "train_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+  "model": "encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_kinds20_sh48_ev10soft"
+ },
+ "train": {},
+ "noctx": {
+  "R6_all": 80.3,
+  "R6_all_n": 1500,
+  "ms_per_item_batched": 27.1,
+  "ms_per_item_single": 182.55,
+  "n_items": 1500,
+  "truncated_share": 0.0
+ }
+}

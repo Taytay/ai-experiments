@@ -64,6 +64,9 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   - *Income, bills and transfers (111) and seeds (112):* kinds outside the twelve spending categories fix much of the new-user gap on
     bills and income and cost the encoder nothing; over nine seed pairs the encoder-then-decider system auto-files 63.5% of blind_v1 at
     97.5% (effort 0.588 against 0.655 for decider alone).
+  - *Prompt format (113):* writing each history row's category with its option label ("Category: (AE) Pets", the labelled list at the
+    top, the query ending "Category: (") lifts decider's blind auto-filing from 56 to 63% (system effort 0.570); the weekday next to the
+    date, 48 rows and TSV tables do not help. A label must follow a space: "(AE" at a line start or after a tab tokenizes differently.
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
@@ -6934,3 +6937,77 @@ seed. `scripts/system_tables.py`, `scripts/recipe_tables.py`.
   histories, which have them everywhere: real data will settle it. The encoder keeps its kinds (section 111).
 
 Job list: `scripts/modal_jobs/r112.json`.
+
+
+## 113. Prompt formats, one change at a time (owner, 2026-09-29): writing each history row's category with its option label ("Category: (AE) Pets", the labelled list once at the top, the query ending "Category: (") makes decider-4B auto-file 63% of blind_v1 at the same top-1 (from 56%; effort 0.589 from 0.655, in the system 0.570 from 0.588) at a cost of 3 points on REAL-6 and 5 on novel names; the labelled list alone, the weekday next to the date, 48 rows and TSV tables do not help either model (MODEL-16, REAL-22)
+
+PLAN steps 111 and 112. The owner proposed: (1) list the categories once, at the top, with their labels; (2) write each history row's
+category with its label; (3) make sure a label tokenizes the same inside and outside parentheses; (4) put the weekday next to the date;
+(5) double the rows; (6) end the prompt with "Category:" rather than "Answer:"; and then (7) the history as a CSV / TSV table in a tag,
+category last, the query as its own row. Each change was trained and read in its own format (`oneslot.build_layout`, `exp_encoder_mask.py
+ENC_LAYOUT / DOW_FIRST`, `exp_categoriser.py NSHOTS`), one at a time against the recipes: decider-4B (row 89 + rand255 + empty
+categories) and Ettin-1B (the encoder recipe with kinds), two seeds each; the encoder has no label readout, so (1) alone is not an arm
+for it, and its (1)+(2) arm labels its options and rows with random two-letter labels.
+
+**Tokenization (3).** On the Qwen3.5 tokenizer, after "- (", "Category: (" and "\t (" each of the 255 labels is one token, the id the answer
+slot reads; "(AE" at a line start merges into "(A" + "E", and after a tab "(" + label merges for 209 of the 255 labels. The layouts write
+labels only after a space (a TSV category cell starts " (FX) Transportation"), and the builder asserts it.
+
+**Example, (1)+(2)+(6) (a blind_v1 user):**
+
+```
+Categories:
+- (EB) Family
+- (IM) Housing
+- (DP) Food
+...
+
+Transaction: 2025-05-10 | Venmo | $25.00 | Sat
+Category: (DP) Food
+
+Transaction: 2025-09-04 | Wells Fargo Home Mortgage | $3847.79 | Thu
+Category: (IM) Housing
+
+Transaction: 2025-09-05 | Venmo | $30.00 | Fri
+Category: (
+```
+
+**Table 113.1: decider-4B (mean [range] over seeds; `scripts/format_tables.py`)**
+
+| arm | REAL-6 | novel names | misleading | day rule | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|---|
+| decider's layout (the recipe, 3 seeds) | 89.4 | 89.6 | 93.9 | 74.0 | 82.5 | 55.8 | 0.655 | 0.588 |
+| (1)+(6) labelled list, ends "Category: (" | 88.9 | 85.9 | 89.5 | 57.8 | 81.0 | 45.1 | 0.782 | 0.652 |
+| **(1)+(2)+(6) + labelled rows** | 86.4 | 84.7 | 91.4 | 68.8 | 82.5 | **63.3 [62.3, 64.3]** | **0.589 [0.582, 0.597]** | **0.570** |
+| (4) weekday next to the date | 88.6 | 88.8 | 91.4 | 70.3 | 82.4 | 53.8 | 0.665 | 0.595 |
+| (5) 48 rows (read on blind_v1_b48: 82.1) | 88.1 | 85.9 | 96.7 | 60.9 | 82.2 | 42.4 [26.5, 58.3] | 0.794 | 0.629 |
+| (7) TSV table, Options / "Answer: (" | 88.1 | 86.2 | 92.8 | 53.1 | 82.7 | 50.7 | 0.701 | 0.599 |
+| (7) TSV table, labelled cells, open " (" cell | 84.7 | 85.2 | 84.9 | 50.8 | 81.3 | 55.1 | 0.674 | 0.608 |
+
+**Table 113.2: Ettin-1B**
+
+| arm | REAL-6 | novel names | misleading | day rule | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|---|
+| the encoder recipe (3 seeds) | 90.8 | 88.4 | 90.8 | 75.5 | 79.5 | 52.0 | 0.715 | 0.588 |
+| labelled options and rows | 89.6 | 87.8 | 91.4 | 82.8 | 80.2 | 53.7 | 0.693 | 0.585 |
+| weekday next to the date | 87.8 | 90.1 | 89.5 | 65.6 | 80.0 | 42.3 | 0.797 | 0.606 |
+| 48 rows (blind_v1_b48: 79.9) | 89.8 | 85.4 | 92.1 | 57.8 | 80.3 | 52.9 | 0.705 | 0.584 |
+| TSV table | 88.8 | 86.4 | 92.8 | 45.3 | 80.1 | 48.4 | 0.752 | 0.589 |
+
+### 113.1 What the step says
+
+- **Labels in the history rows make decider sure of itself where it can be.** With every row's category written "(AE) Pets", the answer
+  is the label token the matching rows already carry: both seeds auto-file 62 to 64% of blind_v1 at 97.5% (from 52 to 58%), at the same
+  top-1, the best single-model effort so far (0.589). The price is reading category names: REAL-6 −3, novel names −5, misleading −2.5,
+  the places where the answer is not in a row to copy.
+- **The labelled list alone hurts** (effort 0.782): with labels at the top but not in the rows, the reader must bind each row's
+  category name to a label itself, a hop decider's own layout (options after the question) does not ask for.
+- **The weekday next to the date, 48 rows and tables do not help.** The weekday move is neutral for decider and costs the encoder
+  auto-filing; 48 rows add nothing on the 48-row blind set and make decider's confidence unstable (26 to 58%); the TSV tables give the
+  best blind top-1 (82.7) but less auto-filing and a weaker day-of-week rule (the weekday is a column away from the rule's rows).
+- **The encoder is indifferent to layout** (effort in the system 0.584 to 0.606 in every arm); its labelled arm reads the day rule best
+  (83), within its seed range.
+- **Decision:** decider's recipe takes `LAYOUT=labelled_shots` (the system's effort 0.570 against 0.588; REAL-6's loss is on a set with no
+  labelled rows to copy from in the ways production will have). The encoder keeps its layout.
+
+Job lists: `scripts/modal_jobs/r113.json`, `r114.json`.
