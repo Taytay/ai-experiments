@@ -2,7 +2,6 @@
 # (Windows and WSL share this repo; without this, a checkout with different git settings
 # shows every text file as modified.)
 * text=auto eol=lf
-
 *.png binary
 *.jpg binary
 *.pdf binary
@@ -10,3 +9,7 @@
 *.safetensors binary
 *.pt binary
 *.db binary
+data/processed/real7train_*.json filter=lfs diff=lfs merge=lfs -text
+data/processed/poi1_v1*.json filter=lfs diff=lfs merge=lfs -text
+data/processed/label_induction_v*.json filter=lfs diff=lfs merge=lfs -text
+data/processed/blind_bulk_*.json filter=lfs diff=lfs merge=lfs -text
