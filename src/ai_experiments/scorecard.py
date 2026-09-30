@@ -193,3 +193,39 @@ def effort(auto, auto_ok, top3_ok, click=EFFORT["click"], search=EFFORT["search"
     suggestions (read only where not auto-filed). All sequences of equal length."""
     e = [(0.0 if ok else wrong) if a else (click if t3 else search) for a, ok, t3 in zip(auto, auto_ok, top3_ok)]
     return float(np.mean(e))
+
+
+# ---- rank-based effort (owner, 2026-09-30; PLAN step 132) ---------------------------------------------------------------------------------
+# The user sees up to five suggestions. The right category at rank r costs r - 1 (first place 0); not shown costs MISS (10). Every wrong
+# category shown costs LAM (a suggestion that makes no sense looks bad). A wrong auto-file costs W. With calibrated probabilities the list
+# needs no threshold: rank r is shown when its expected gain beats its expected clutter, p_r (MISS - (r - 1)) > (1 - p_r) LAM, stopping
+# at the first rank that fails (at most KMAX); the transaction is auto-filed when (1 - p_1) W is below the list's expected cost.
+RANK = dict(miss=10.0, lam=1.0, kmax=5, confirm=0.0)  # confirm: what accepting a shown suggestion costs (a tap) over an auto-file
+
+
+def suggest(p, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"]):
+    """Indices of the categories to show, best first (at least one), from one calibrated distribution."""
+    order = np.argsort(-np.asarray(p, float)); out = [int(order[0])]
+    for r in range(2, min(kmax, len(order)) + 1):
+        q = float(p[order[r - 1]])
+        if q * (miss - (r - 1)) <= (1 - q) * lam:
+            break
+        out.append(int(order[r - 1]))
+    return out
+
+
+def list_cost(p, shown, lam=RANK["lam"], miss=RANK["miss"], confirm=RANK["confirm"]):
+    """Expected cost of showing `shown` under p."""
+    p = np.asarray(p, float); got = sum(p[c] for c in shown)
+    return confirm + sum(p[c] * r for r, c in enumerate(shown)) + (1 - got) * miss + lam * sum(1 - p[c] for c in shown)
+
+
+def rank_effort(p, gold, W, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], auto=None, confirm=RANK["confirm"]):
+    """(cost, auto-filed, shown list) for one transaction; auto=None decides by the expected-cost rule, True / False forces it."""
+    shown = suggest(p, lam, miss, kmax)
+    if auto is None:
+        auto = (1 - float(np.max(p))) * W < list_cost(p, shown, lam, miss, confirm)
+    if auto:
+        return (0.0 if int(np.argmax(p)) == gold else float(W)), True, [int(np.argmax(p))]
+    cost = confirm + (shown.index(gold) if gold in shown else miss) + lam * sum(c != gold for c in shown)
+    return float(cost), False, shown

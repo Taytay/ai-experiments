@@ -7800,3 +7800,88 @@ system holds back 90.5% of its (fewer) wrong answers (AUROC 0.911). New users ar
   alone behind the pair (0.547 against 0.549) at more than twice the compute.
 - **Decision:** the third reader stays the untrained decider-35B-A3B; without a large model, the cheap substitute for its knowledge is the
   other-users line (REPORT 123), not more small readers.
+
+
+## 129. A rank-based score for suggestions (owner's scale): the right category at rank r costs r - 1, not shown 10, each wrong category shown a clutter penalty, at most five shown and only those the model has some confidence in; list length and auto-filing both follow from calibrated probabilities. On this scale an auto-file needs a cost for confirming a suggestion, or the rule has no reason to auto-file; with a confirm cost of 0.5 and W = 20 the three-model system scores 1.50 per transaction (no model: 10), auto-filing 64% at 98.4% with lists of 1.8 (EVAL-14)
+
+PLAN step 132 (owner, 2026-09-30): "guessing number 1 correctly on everything is ideal ... suggesting irrelevant categories looks bad and
+should also be penalized ... only the top 5 ... only suggest ones that we have some measure of confidence for ... guessing correctly in 1st
+place is a 0. Being 1 away is a 1. 2 away is a 2, up to 5. And not showing it is a 10." `scorecard.rank_effort` / `suggest`:
+
+- the right category at rank r (1 to 5) costs r - 1; not among the shown ones, MISS = 10;
+- each wrong category shown costs LAM (clutter; a proxy for "irrelevant" until a plausibility judgement exists);
+- rank r is shown when its expected gain beats its expected clutter, p_r (MISS - (r - 1)) > (1 - p_r) LAM, stopping at the first rank that
+  fails: low-confidence categories are never shown, and the list is 1 to 5 long;
+- a transaction is auto-filed when (1 - p1) W is below the list's expected cost; accepting a shown suggestion costs CONFIRM more than an
+  auto-file. The worst ordering (the right category last) costs MISS, as does any ordering that does not show it.
+
+`scripts/rank_tables.py`; blind_v1; calibrated probabilities as in REPORT 118.
+
+**Table RK.1: ranking quality (mean over seeds / pairs)**
+
+| system | top-1 % | right in top 5 % | MRR@5 |
+|---|---|---|---|
+| decider-4B (+ other users' line) | 83.8 | 95.1 | 0.884 |
+| encoder x decider | 84.4 | 95.5 | 0.890 |
+| encoder x decider x 35B (all three) | 85.7 | 96.3 | 0.902 |
+
+**Table RK.2: rank effort at W = 10 (right at rank r costs r - 1, not shown 10, each wrong category shown LAM, wrong auto-file W); no model = 10 per transaction**
+
+| system | LAM | effort | auto-filed % / precision % | suggestions shown (when not auto-filed) | right one among them % | effort, never auto-file |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 0.5 | 1.187 [1.155, 1.211] | 68.9 [67.1, 70.9] / 96.4 [96.3, 96.6] | 2.69 [2.65, 2.72] | 82.8 [80.5, 84.0] | 1.196 [1.173, 1.213] |
+| decider-4B (+ other users' line) | 1.0 | 1.395 [1.363, 1.442] | 79.5 [77.3, 82.1] / 91.4 [91.0, 91.9] | 2.32 [2.26, 2.35] | 83.5 [82.1, 84.5] | 1.460 [1.383, 1.517] |
+| decider-4B (+ other users' line) | 2.0 | 1.557 [1.516, 1.587] | 91.6 [90.3, 93.3] / 86.2 [86.0, 86.5] | 2.05 [2.02, 2.07] | 91.0 [88.8, 93.1] | 1.771 [1.737, 1.822] |
+| encoder x decider | 0.5 | 1.111 [1.063, 1.144] | 71.0 [70.2, 72.1] / 96.1 [95.5, 96.6] | 2.76 [2.73, 2.80] | 85.0 [84.0, 86.1] | 1.121 [1.082, 1.155] |
+| encoder x decider | 1.0 | 1.314 [1.283, 1.360] | 79.8 [78.6, 81.1] / 91.5 [90.7, 91.9] | 2.37 [2.31, 2.42] | 87.5 [85.2, 89.4] | 1.374 [1.337, 1.407] |
+| encoder x decider | 2.0 | 1.496 [1.469, 1.538] | 89.2 [86.7, 91.3] / 87.6 [86.7, 88.1] | 2.10 [2.08, 2.14] | 91.4 [89.9, 93.9] | 1.713 [1.668, 1.743] |
+| encoder x decider x 35B (all three) | 0.5 | 0.992 [0.946, 1.019] | 72.5 [71.7, 73.2] / 97.3 [96.9, 97.5] | 2.75 [2.73, 2.77] | 84.6 [83.2, 86.0] | 1.002 [0.959, 1.031] |
+| encoder x decider x 35B (all three) | 1.0 | 1.175 [1.159, 1.194] | 82.3 [81.5, 82.9] / 92.9 [92.4, 93.1] | 2.35 [2.32, 2.39] | 85.6 [83.5, 88.1] | 1.224 [1.194, 1.244] |
+| encoder x decider x 35B (all three) | 2.0 | 1.352 [1.329, 1.378] | 92.3 [91.3, 93.3] / 88.5 [87.9, 89.0] | 2.09 [2.07, 2.11] | 90.6 [89.2, 93.4] | 1.521 [1.505, 1.535] |
+
+**Table RK.2: rank effort at W = 20 (right at rank r costs r - 1, not shown 10, each wrong category shown LAM, wrong auto-file W); no model = 10 per transaction**
+
+| system | LAM | effort | auto-filed % / precision % | suggestions shown (when not auto-filed) | right one among them % | effort, never auto-file |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 0.5 | 1.196 [1.173, 1.213] | 0.0 [0.0, 0.0] / – | 1.55 [1.52, 1.59] | 92.4 [92.0, 92.7] | 1.196 [1.173, 1.213] |
+| decider-4B (+ other users' line) | 1.0 | 1.460 [1.383, 1.517] | 0.0 [0.0, 0.0] / – | 1.33 [1.29, 1.36] | 90.4 [89.8, 91.3] | 1.460 [1.383, 1.517] |
+| decider-4B (+ other users' line) | 2.0 | 1.771 [1.737, 1.822] | 0.0 [0.0, 0.0] / – | 1.17 [1.14, 1.20] | 88.4 [88.0, 88.7] | 1.771 [1.737, 1.822] |
+| encoder x decider | 0.5 | 1.121 [1.082, 1.155] | 0.0 [0.0, 0.0] / – | 1.54 [1.52, 1.57] | 93.1 [92.9, 93.4] | 1.121 [1.082, 1.155] |
+| encoder x decider | 1.0 | 1.374 [1.337, 1.407] | 0.0 [0.0, 0.0] / – | 1.34 [1.31, 1.36] | 91.4 [90.8, 91.7] | 1.374 [1.337, 1.407] |
+| encoder x decider | 2.0 | 1.713 [1.668, 1.743] | 0.0 [0.0, 0.0] / – | 1.19 [1.16, 1.22] | 89.3 [88.6, 89.8] | 1.713 [1.668, 1.743] |
+| encoder x decider x 35B (all three) | 0.5 | 1.002 [0.959, 1.031] | 0.0 [0.0, 0.0] / – | 1.50 [1.48, 1.52] | 93.9 [93.5, 94.3] | 1.002 [0.959, 1.031] |
+| encoder x decider x 35B (all three) | 1.0 | 1.224 [1.194, 1.244] | 0.0 [0.0, 0.0] / – | 1.29 [1.28, 1.31] | 92.3 [92.1, 92.5] | 1.224 [1.194, 1.244] |
+| encoder x decider x 35B (all three) | 2.0 | 1.521 [1.505, 1.535] | 0.0 [0.0, 0.0] / – | 1.15 [1.13, 1.16] | 90.2 [89.8, 90.4] | 1.521 [1.505, 1.535] |
+
+**Table RK.3: with a confirm cost (accepting a shown suggestion costs CONFIRM over an auto-file), LAM = 1**
+
+| system | W | confirm | effort | auto-filed % / precision % | suggestions shown | right one among them % |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 20 | 0.5 | 1.765 [1.689, 1.820] | 56.1 [55.1, 56.8] / 98.3 [98.2, 98.4] | 1.75 [1.66, 1.80] | 80.4 [78.9, 82.1] |
+| decider-4B (+ other users' line) | 20 | 1.0 | 1.938 [1.849, 2.005] | 65.6 [63.8, 66.5] / 97.7 [97.6, 97.8] | 1.95 [1.86, 2.00] | 76.5 [74.4, 78.3] |
+| decider-4B (+ other users' line) | 30 | 0.5 | 1.856 [1.781, 1.900] | 42.7 [40.7, 43.7] / 98.6 [98.5, 98.8] | 1.57 [1.51, 1.64] | 84.3 [83.1, 86.2] |
+| decider-4B (+ other users' line) | 50 | 1.0 | 2.262 [2.192, 2.306] | 42.3 [39.9, 43.6] / 98.6 [98.5, 98.8] | 1.57 [1.51, 1.63] | 84.4 [83.2, 86.4] |
+| encoder x decider | 20 | 0.5 | 1.670 [1.626, 1.696] | 61.8 [60.6, 62.6] / 98.1 [97.9, 98.3] | 1.88 [1.81, 1.95] | 80.4 [78.4, 82.1] |
+| encoder x decider | 20 | 1.0 | 1.845 [1.800, 1.881] | 66.5 [65.1, 67.8] / 97.7 [97.4, 98.0] | 2.00 [1.95, 2.07] | 78.7 [76.9, 79.9] |
+| encoder x decider | 30 | 0.5 | 1.778 [1.743, 1.804] | 52.4 [49.5, 53.9] / 98.3 [98.1, 98.5] | 1.71 [1.65, 1.78] | 83.7 [82.2, 85.1] |
+| encoder x decider | 50 | 1.0 | 2.195 [2.162, 2.215] | 51.9 [49.1, 53.5] / 98.3 [98.1, 98.4] | 1.70 [1.64, 1.77] | 83.8 [82.3, 85.2] |
+| encoder x decider x 35B (all three) | 20 | 0.5 | 1.496 [1.469, 1.516] | 63.9 [62.9, 64.5] / 98.4 [98.2, 98.6] | 1.82 [1.79, 1.85] | 81.4 [80.5, 82.2] |
+| encoder x decider x 35B (all three) | 20 | 1.0 | 1.651 [1.614, 1.671] | 70.4 [69.0, 71.4] / 97.9 [97.7, 98.0] | 2.00 [1.98, 2.02] | 78.7 [77.8, 79.6] |
+| encoder x decider x 35B (all three) | 30 | 0.5 | 1.593 [1.557, 1.636] | 55.4 [54.5, 56.3] / 98.6 [98.4, 98.8] | 1.66 [1.63, 1.69] | 84.4 [84.0, 84.9] |
+| encoder x decider x 35B (all three) | 50 | 1.0 | 1.971 [1.919, 2.041] | 55.0 [54.1, 55.9] / 98.6 [98.4, 98.8] | 1.66 [1.63, 1.69] | 84.5 [84.1, 85.0] |
+
+### 129.1 What the step says
+
+- **The ranking itself is good:** the right category is first 84 to 86% of the time and in the top five 95 to 96% (MRR@5 0.88 to 0.90);
+  the three-model system is best on every measure.
+- **Auto-filing needs a price difference.** On the owner's scale a right first suggestion costs 0, the same as a right auto-file, so the
+  rule gains nothing from auto-filing: at W = 20 it auto-files nothing, and at W = 10 it auto-files only to avoid the clutter penalty
+  (91% precision, RK.2). A small confirm cost (0.5: a tap) restores the trade: at W = 20 decider auto-files 56% at 98.3%, the system 64%
+  at 98.4%; at W = 30, 43 to 55% at 98.6%.
+- **Lists are short when the model is sure.** With LAM = 1 the rule shows 1.6 to 2.0 suggestions on average, and the right category is
+  among them 80 to 84% of the time; a larger LAM shortens lists further and misses more. Showing all five would find it about 90% of
+  the time but put mostly wrong categories in front of the user.
+- **Proposed defaults** (the owner decides): MISS 10, LAM 1, CONFIRM 0.5, W 20 (a silent wrong auto-file twice as bad as not suggesting
+  the right category at all). Under them the ordering of systems is the same as under REPORT 118's score.
+- **Limit:** LAM charges every wrong suggestion alike; "irrelevant" (a wrong category that makes no sense) against "plausible but wrong"
+  needs a judgement per suggestion, from a strong reader on a sample or, with real data, from what users pick.
