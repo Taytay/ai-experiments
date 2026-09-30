@@ -2101,6 +2101,7 @@ def bulk_items(u, rows, first_idx):
             top, k_top = Counter(past[-3:]).most_common(1)[0]
             rule = top if k_top >= 2 else past[-1]
         base["ynab_rule"] = header.index(rule) if rule in header else -1
+        base["payee_hist"] = sorted({header.index(c) for c in past if c in header})  # row 135
         p1 = make_prompt(header, [hist[i] for i in sl], q)
         p2 = make_prompt_split(header, [hist[i] for i in shared], [hist[i] for i in near], q)
         plain.append(dict(base, prompt=p1, prompt_ctx=p1))
@@ -2128,6 +2129,7 @@ def main():
     items = []
     bulk_plain, bulk_split = [], []
     ynab = {}  # row 134
+    payee_hist = {}  # row 135
     others_rows = {}  # row 124: mid -> [(date, uid, filed)] over every user (build_user seeds each user's own rng, so this pre-pass changes nothing)
     if OTHERS:
         for uid in ids:
@@ -2199,6 +2201,7 @@ def main():
                     top, k_top = Counter(last3).most_common(1)[0]
                     sug = top if k_top >= 2 else past[-1]
                 ynab[f"BL:{u.uid}:{n_q}"] = header.index(sug) if sug in header else -1
+                payee_hist[f"BL:{u.uid}:{n_q}"] = sorted({header.index(c) for c in past if c in header})  # row 135: every category filed for this payee before
             if OTHERS:
                 cnt = Counter(f for d, v, f in others_rows.get(q["mid"], []) if v != u.uid and d < q["date"])
                 if sum(cnt.values()) >= 3:
@@ -2223,14 +2226,16 @@ def main():
                 "hist_len": qi, "in_shots": any(r["mid"] == q["mid"] for r in srows)})
     if YNAB_RULE:
         (OUT.parent / "blind_v1_ynabrule.json").write_text(json.dumps(ynab, indent=0))
+        (OUT.parent / "blind_v1_payeehist.json").write_text(json.dumps(payee_hist, indent=0))
         print(f"wrote blind_v1_ynabrule.json: {len(ynab)} items, {sum(v >= 0 for v in ynab.values())} with a suggestion")
         return
     if BULK:
-        rule = {}
+        rule, ph = {}, {}
         for its in (bulk_plain, bulk_split):
             for it in its:
-                rule[it["id"]] = it.pop("ynab_rule")
-        (OUT.parent / "blind_bulk_v1_ynabrule.json").write_text(json.dumps(rule, indent=0))  # row 134: YNAB's current rule per bulk item
+                rule[it["id"]] = it.pop("ynab_rule"); ph[it["id"]] = it.pop("payee_hist")
+        (OUT.parent / "blind_bulk_v1_ynabrule.json").write_text(json.dumps(rule, indent=0))
+        (OUT.parent / "blind_bulk_v1_payeehist.json").write_text(json.dumps(ph, indent=0))  # row 135  # row 134: YNAB's current rule per bulk item
         for name, its in (("blind_bulk_v1", bulk_plain), ("blind_bulk_v1_split", bulk_split)):
             sha = hashlib.sha256(json.dumps(its, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
             out = {"name": name, "version": "v1", "n_users": len({i["user"] for i in its}), "items": its, "sha256": sha,

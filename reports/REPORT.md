@@ -7976,3 +7976,91 @@ last three all differ it suggests the last one (assumed). `scripts/confirm_card.
 - **Changes of mind**: the rule (59.7% right first) beats the 35B system (49.7) and matches the small models (58): the latest filings are
   the signal, which the rule reads directly.
 - For real data: the share of new payees and new users in real streams decides how much the models are worth over the no-model list.
+
+
+## 132. Two scores of their own: a payee filed for the first time (the models put the right category first 49 to 69% of the time and in the list 58 to 80%, where YNAB's rule has nothing), and a payee filed differently than before (models right first 22 to 27%, in the list 69 to 73%; the no-model list of the payee's past categories 0% / 67%); the models do anticipate a departure from the usual (confidence 55 to 61% against 90 to 94%, AUROC 0.89 to 0.91), but not a category never used for the payee (right first 0 to 2%) (EVAL-14)
+
+PLAN step 135 (owner, 2026-09-30: "a score JUST for cases where a user is categorizing a payee for the first time ... then how good we are
+at suggesting the correct category in any case where a user is categorizing a payee differently than they have in the past (our
+anticipation that the user might categorize it differently)"). Subsets from the generator's exact payee history
+(`BLIND_YNAB=1` / `BLIND_BULK=1` also write `blind_v1_payeehist.json` / `blind_bulk_v1_payeehist.json`): 1. no earlier filing of the payee;
+2a. the payee has history and the right category is not YNAB's rule's; 2b. a category never used for the payee; control: the rule's
+category. Scores as REPORT 131 (right first %, suggested at all %, and the owner's rank score, 0 best, 10 a search).
+`scripts/novelty_card.py [bulk]`, `scripts/gate_tables.py`.
+
+**Novelty card, blind_v1 (hard cases over-sampled): right one 1st % / suggested at all (1st-5th) % / score (0 best, 10 = search) per subset; mean over seeds / pairs**
+
+| suggestions from | 1. first time for this payee (n=277, 18.5%) | 2a. differently from YNAB's rule (n=120, 8.0%) | 2b. a category never used for this payee (n=27, 1.8%) | control: the payee's usual category (= the rule) (n=1103, 73.5%) |
+|---|---|---|---|---|
+| YNAB today | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| YNAB + the payee's other past categories (no model) | 29.6 / 30.0 / 7.01 | 0.0 / 66.7 / 4.38 | 0.0 / 7.4 / 9.33 | 100.0 / 100.0 / 0.00 |
+| decider-4B (+ other users' line) | 59.9 / 72.0 / 3.88 | 22.8 / 70.0 / 3.82 | 0.0 / 13.6 / 8.91 | 96.4 / 100.0 / 0.07 |
+| YNAB first, then decider-4B (+ other users' line) | 59.9 / 72.0 / 3.88 | 0.0 / 70.0 / 4.11 | 0.0 / 13.6 / 8.93 | 100.0 / 100.0 / 0.03 |
+| encoder + decider | 62.7 / 74.2 / 3.57 | 22.3 / 69.1 / 3.88 | 0.0 / 10.7 / 9.15 | 96.6 / 100.0 / 0.06 |
+| YNAB first, then encoder + decider | 62.7 / 74.2 / 3.57 | 0.0 / 69.1 / 4.16 | 0.0 / 10.7 / 9.15 | 100.0 / 100.0 / 0.02 |
+| encoder + decider + 35B | 69.2 / 79.9 / 2.86 | 25.4 / 70.6 / 3.71 | 2.1 / 16.5 / 8.65 | 96.5 / 100.0 / 0.05 |
+| YNAB first, then encoder + decider + 35B | 69.2 / 79.9 / 2.86 | 0.0 / 70.4 / 4.02 | 0.0 / 16.5 / 8.67 | 100.0 / 100.0 / 0.01 |
+
+**Anticipation: the model's top probability (calibrated) by subset, and how well low confidence separates 'differently' (2a) from the usual (control): AUROC of 1 - p1**
+
+| model | mean p1, 1 | mean p1, 2a | mean p1, 2b | mean p1, control | AUROC 2a vs control | AUROC 2b vs control |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 62.8% | 56.1% | 80.4% | 91.3% | 0.894 | 0.704 |
+| encoder + decider | 55.3% | 59.1% | 81.3% | 92.7% | 0.891 | 0.687 |
+| encoder + decider + 35B | 64.9% | 60.7% | 82.0% | 94.0% | 0.905 | 0.721 |
+
+**Novelty card, blind_bulk_v1 (one user's sync, every transaction in order): right one 1st % / suggested at all (1st-5th) % / score (0 best, 10 = search) per subset; mean over seeds / pairs**
+
+| suggestions from | 1. first time for this payee (n=255, 3.8%) | 2a. differently from YNAB's rule (n=943, 14.2%) | 2b. a category never used for this payee (n=116, 1.7%) | control: the payee's usual category (= the rule) (n=5462, 82.0%) |
+|---|---|---|---|---|
+| YNAB today | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| YNAB + the payee's other past categories (no model) | 0.8 / 0.8 / 9.92 | 0.0 / 68.0 / 4.20 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| decider-4B | 49.4 / 58.2 / 5.26 | 27.1 / 73.4 / 3.50 | 0.9 / 6.9 / 9.47 | 95.2 / 100.0 / 0.09 |
+| YNAB first, then decider-4B | 49.4 / 58.2 / 5.26 | 0.0 / 73.4 / 3.85 | 0.0 / 6.9 / 9.47 | 100.0 / 100.0 / 0.04 |
+| encoder + decider | 51.4 / 62.3 / 4.80 | 27.5 / 72.2 / 3.55 | 0.4 / 3.9 / 9.70 | 95.4 / 100.0 / 0.07 |
+| YNAB first, then encoder + decider | 51.4 / 62.3 / 4.80 | 0.0 / 72.2 / 3.90 | 0.0 / 3.9 / 9.70 | 100.0 / 100.0 / 0.02 |
+
+**Anticipation: the model's top probability (calibrated) by subset, and how well low confidence separates 'differently' (2a) from the usual (control): AUROC of 1 - p1**
+
+| model | mean p1, 1 | mean p1, 2a | mean p1, 2b | mean p1, control | AUROC 2a vs control | AUROC 2b vs control |
+|---|---|---|---|---|---|---|
+| decider-4B | 58.4% | 55.4% | 67.6% | 90.0% | 0.903 | 0.800 |
+| encoder + decider | 54.0% | 55.1% | 69.1% | 90.1% | 0.909 | 0.794 |
+
+**Letting the model override the rule only when clearly more confident (encoder x decider, payees seen before): right first % on all
+seen / on 2a / on control**
+
+== bulk: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 86.4 / 18.1 / 98.2
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 86.3 / 10.0 / 99.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 85.9 / 4.7 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 85.5 / 1.6 / 100.0
+  YNAB always: 85.3 / 0.0 / 100.0
+== blind: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 90.3 / 15.8 / 98.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 90.3 / 6.7 / 99.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 90.4 / 4.2 / 99.8
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 90.4 / 2.5 / 100.0
+  YNAB always: 90.2 / 0.0 / 100.0
+
+### 132.1 What the step says
+
+- **First time for a payee** (18.5% of blind_v1, 3.8% of the ordinary stream): the rule has nothing; the models put the right category
+  first 49 to 69% of the time and anywhere in the list 58 to 80%. The large model helps most here (62.7 -> 69.2 on blind_v1), as does
+  other users' filings (the no-model list gets 30% from that line alone on blind_v1; the bulk set has no such line).
+- **Filed differently from the usual** (8% of blind_v1, 14% of the ordinary stream: multi-purpose payees, amount and weekday splits,
+  changes of mind): the rule is wrong by definition; the models put the right category first 22 to 27% of the time and in the list
+  69 to 73%; the no-model list of the payee's past categories gets it in the list 67 to 68% (never first). The models' gain here is
+  mostly getting it first in a quarter of cases.
+- **They anticipate it:** on these transactions the models' confidence drops to 55 to 61% (usual: 90 to 94%), and low confidence picks
+  them out of the usual ones with AUROC 0.89 to 0.91: the models know when this transaction looks unlike the payee's usual one.
+- **A category never used for the payee** (under 2%) is not anticipated: right first 0 to 2%, in the list 4 to 17%, confidence still 68
+  to 82% (AUROC 0.69 to 0.80). Nothing in the prompt says the user is about to start a new habit, except when the category itself is
+  new (REPORT 97's conclusion).
+- **Overriding the rule only when confident does not pay:** the best gate adds 1 point over the rule on seen payees (85.3 -> 86.4 on the
+  stream), trading its 2a gains for control losses. For known payees the first slot is near what the prompt allows; the model's value
+  is new payees and the ranked list.
