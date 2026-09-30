@@ -20,13 +20,15 @@ One row per transaction, per user, for at least 12 months:
 | suggested_category_id | what YNAB suggested at the time (to measure the current rule directly, not only our re-implementation) |
 | confirmed_at, edited_after_confirm | when it was confirmed; whether the category was changed later (a slip, or a change of mind) |
 | split / transfer flags | split transactions and transfers are scored separately or excluded |
+| memo | the user's memo or the payment app's note, anonymised (people's names tokenised), not dropped: for person-to-person payees ("Venmo mom") it is often the only sign of what a payment was for (owner, 2026-09-30) |
+| payee_kind | a canonical kind per payee if YNAB or a merchant database has one (restaurant, gas station, person-to-person payment, ...): the "Kind:" line of PLAN step 149 |
 
 Per user: the category list with each category's creation date, rename history and hidden / deleted dates (so the prompt shows the
 list as it was on the transaction's date). Per payee (optional, from YNAB's side): a merchant database record (canonical name, type of
 business), the source of the separate merchant database the model is taught about.
 
 Anonymisation: user and payee ids hashed; person-to-person payees (Venmo, Zelle to a person) with the counterparty's name replaced by a
-stable token; amounts kept; free-text memos dropped. Category names kept as the user wrote them (they are what the model reads); any
+stable token; amounts kept; memos kept with names and numbers tokenised (they carry the purpose of person-to-person payments). Category names kept as the user wrote them (they are what the model reads); any
 that contain personal names (children, partners) may be tokenised the same way.
 
 ## 2. Splits (never random transactions)
@@ -57,6 +59,9 @@ For each query transaction:
 - the other-users line ("Other users file this payee as: ...") from **training users' filings dated before the query**, mapped to
   their category names, top three by count, when at least three such filings exist;
 - statement string: import_string when present, else payee_name (report both groups).
+- a canonical "Kind:" line under every row and the query (PLAN step 149), from payee_kind where known, else inferred from the payee's
+  name and other training users' filings (step 148), else "unknown"; person-to-person payees as "person-to-person payment (purpose
+  varies)"; the memo, when present, on the row.
 
 ## 4. What we measure
 
