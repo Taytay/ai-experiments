@@ -8531,3 +8531,94 @@ payees throughout). The row labelled "no-model list" / "YNAB + the payee's other
 suggestion it lists the payee's other past categories and then the user's categories that other users file the payee under (the
 other-users line), which is where its first-time-payee score comes from. The scripts now label it "rule + payee's past + other users'
 categories (no model; NOT in YNAB today)".
+
+
+## 143. Inferring kinds, zero-shot: a payee's kind from other users' filings alone (name hidden) is right 51 to 73% of the time, from name and filings 77 to 87% (top three 93 to 99.5%), and filings lift opaque names from 8-27% to 60-67%; what a user's category holds is read right 78 to 93% of the time when it holds one kind, but the models rarely say "several kinds" or "a person or purpose" (DATA-7)
+
+PLAN steps 147, 148 (owner, 2026-09-30: "I also want to know if our model could infer a kind from a given set of categorized
+transactions or not"). A canonical vocabulary of payee kinds (`ai_experiments.canon`: 41 kinds including "person-to-person payment
+(purpose varies)", plus "several kinds of spending" and "a person, trip or purpose" for categories), mapped from each blind generator's
+own vocabulary (blind_v1, blind_v2 with `BLIND_META=1`; items unchanged; blind_v3 kept untouched). `scripts/build_kind_sets.py`:
+- step 147 (`kindcat_v*`): the user's history slice, and "Which kind of spending does this user's category X hold?", one question per
+  (user, category) with a known meaning, at most 12 per user;
+- step 148 (`kindpay_v*`): one question per payee, "What kind of business or payee is this?", from its statement string, from the string
+  and the other-users line, or from the line alone (string hidden).
+Read zero-shot in decider's own layout by untrained decider-4B, the untrained 35B and the recipe's decider-4B. `scripts/kind_tables.py`,
+job list `scripts/modal_jobs/r147.json`.
+
+**blind_v1: what a user's category holds (step 147), by rows of it in the slice: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2878 | 57.0 / 85.6 | 51.3 / 83.4 | 55.1 / 74.7 |
+| 0 rows | 1011 | 67.4 / 92.1 | 53.9 / 89.6 | 70.4 / 84.7 |
+| 1-2 rows | 1659 | 54.0 / 82.3 | 52.3 / 81.2 | 50.5 / 70.5 |
+| 3+ rows | 208 | 30.3 / 81.2 | 30.8 / 71.2 | 18.3 / 60.1 |
+
+**blind_v1: what a user's category holds, by what the category is: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2878 | 57.0 / 85.6 | 51.3 / 83.4 | 55.1 / 74.7 |
+| one kind | 1588 | 90.2 / 98.2 | 77.3 / 98.2 | 92.9 / 98.7 |
+| person / purpose | 218 | 14.7 / 28.4 | 0.0 / 9.6 | 7.8 / 21.1 |
+| several kinds | 1072 | 16.4 / 78.6 | 23.2 / 76.6 | 8.9 / 50.0 |
+
+**blind_v1: a payee's kind (step 148), by what the reader sees / payee type: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 969 | 70.4 / 86.0 | 77.1 / 90.4 | 66.6 / 82.6 |
+| filings / other | 204 | 72.1 / 91.7 | 73.0 / 91.2 | 69.6 / 88.7 |
+| name / opaque name | 50 | 8.0 / 16.0 | 14.0 / 20.0 | 6.0 / 12.0 |
+| name / other | 482 | 68.3 / 85.3 | 79.9 / 92.9 | 62.2 / 80.3 |
+| name / p2p | 29 | 100.0 / 100.0 | 100.0 / 100.0 | 93.1 / 100.0 |
+| name+filings / other | 204 | 84.8 / 97.1 | 86.8 / 99.5 | 84.8 / 96.6 |
+
+**blind_v2: what a user's category holds (step 147), by rows of it in the slice: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2867 | 57.8 / 81.9 | 53.3 / 77.2 | 53.0 / 71.5 |
+| 0 rows | 659 | 65.7 / 86.0 | 54.9 / 83.5 | 64.3 / 76.6 |
+| 1-2 rows | 1914 | 58.3 / 79.8 | 55.4 / 75.3 | 53.3 / 70.8 |
+| 3+ rows | 294 | 37.4 / 86.4 | 35.7 / 75.2 | 25.5 / 65.0 |
+
+**blind_v2: what a user's category holds, by what the category is: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2867 | 57.8 / 81.9 | 53.3 / 77.2 | 53.0 / 71.5 |
+| one kind | 1958 | 78.2 / 87.2 | 73.5 / 89.5 | 75.7 / 84.2 |
+| person / purpose | 229 | 37.1 / 72.1 | 0.0 / 15.7 | 12.2 / 58.5 |
+| several kinds | 680 | 6.2 / 70.1 | 12.8 / 62.2 | 1.2 / 39.6 |
+
+**blind_v2: a payee's kind (step 148), by what the reader sees / payee type: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 1268 | 66.1 / 81.9 | 68.0 / 85.5 | 61.3 / 80.4 |
+| filings / opaque name | 15 | 60.0 / 73.3 | 53.3 / 60.0 | 53.3 / 66.7 |
+| filings / other | 402 | 57.5 / 74.1 | 53.2 / 73.6 | 51.0 / 70.4 |
+| filings / p2p | 4 | 0.0 / 0.0 | 0.0 / 0.0 | 25.0 / 25.0 |
+| name / opaque name | 15 | 20.0 / 33.3 | 26.7 / 26.7 | 20.0 / 26.7 |
+| name / other | 407 | 66.8 / 81.6 | 75.9 / 91.9 | 62.4 / 82.1 |
+| name / p2p | 4 | 100.0 / 100.0 | 75.0 / 75.0 | 50.0 / 50.0 |
+| name+filings / opaque name | 15 | 60.0 / 73.3 | 60.0 / 60.0 | 66.7 / 66.7 |
+| name+filings / other | 402 | 76.6 / 93.0 | 77.6 / 96.0 | 72.6 / 92.8 |
+| name+filings / p2p | 4 | 50.0 / 75.0 | 75.0 / 75.0 | 50.0 / 75.0 |
+
+### 143.1 What the step says
+
+- **Yes, a payee's kind can be inferred from how it was categorised.** With the name hidden, the categories other users filed a payee
+  under give its kind 51 to 73% of the time (top three 70 to 92%); with the name as well, 77 to 87% (top three 93 to 99.5%), the best of
+  the three. The filings matter most where the name says nothing: opaque names go from 8-27% (name alone) to 60-67% (name and
+  filings). Person-to-person payees are recognised from their names (Venmo, Zelle) nearly always.
+- **What a user's category holds is read well when it holds one kind** (78 to 93% top-1), largely from the name (categories with no rows
+  in the slice score higher than those with many, because many-row categories are the broad ones). The models almost never answer
+  "several kinds" (1 to 23%; the dominant kind instead, in the top three 40 to 79%) or "a person, trip or purpose" (0 to 37%): broad and
+  personal categories are the hard part, and a canonical description of a user's category should allow several kinds rather than force one.
+- **The trained categoriser is not better at these questions** (the recipe's decider-4B trails the untrained one on most rows), and the
+  35B is best only at naming payees from their names (76 to 80%): world knowledge helps with names, not with reading a user's categories.
+- **Use**: the inferred payee kind (35B, name and filings) agrees with the generator's kind for 79% (blind_v1) and 74% (blind_v2) of
+  queries; step 149 tests it as the query's "Kind:" line (`blind_v*_kindsinf`) against the generator's kinds (a database knowing every payee).
