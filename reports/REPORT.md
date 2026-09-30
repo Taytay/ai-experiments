@@ -8147,3 +8147,34 @@ first-time payees), a probability floor (categories with p >= 0.05 or 0.1, one t
 - **A floor of p >= 0.05** gets most of the first-time gain with fewer wrong suggestions (2.6 to 2.8 shown there, right one in the
   list 86 / 69%): a middle ground if five looks cluttered.
 - **Always five** adds 1 to 2 points on known payees at 3.5 more wrong suggestions each: not worth it.
+
+
+## 135. Two ideas from Jeff, on our own training: decider-0.8B with the recipe is three times faster than the 4B but 1.8 points behind on blind_v1 and 17% worse by effort (0.726 against 0.622), weakest on the user's own habits; categories described by the payees filed under them lift first-time payees (+3.5) and new users (+2.7) but cost novel category names 15 points and REAL-6 5: neither is adopted (MODEL-21, DATA-6)
+
+PLAN steps 136, 137 (owner, 2026-09-30, after reviewing firelex/jeff: "Don't train on their weights but do run those experiments").
+decider-0.8b (Apache-2.0) with the recipe and the other-users line, two seeds; decider-4B with the same recipe and each category in the
+labelled list followed by the payees filed under it in the prompt ("(IJ) Dining out (e.g. Peets, Chipotle)", "(nothing filed yet)";
+`DESC=1`, `oneslot.describe_categories`), two seeds, and REPORT 123's adapter read that way zero-shot. Scored on blind_v1_others (the
+line shown). `scripts/variant_tables.py`, job list `scripts/modal_jobs/r136.json`.
+
+| variant | seeds | blind top-1 | first-time payees: right 1st / top 5 | new users right 1st | own habits right 1st | effort W=10 (per-item) | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, other-users line (REPORT 123) | 3 | 83.8 | 59.9 / 81.2 | 69.6 | 85.4 | 0.622 | 87.8 | 84.6 |
+| decider-0.8B, same recipe (row 136) | 2 | 82.0 | 55.4 / 77.4 | 66.1 | 80.6 | 0.726 | 87.6 | 83.1 |
+| decider-4B + category descriptions, trained (row 137) | 2 | 83.8 | 63.4 / 81.9 | 72.3 | 83.7 | 0.636 | 82.6 | 69.1 |
+| decider-4B (REPORT 123) read with descriptions, untrained on them | 1 | 83.7 | 59.2 / 82.3 | 67.3 | 84.7 | 0.629 | nan | nan |
+
+Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B ~1.0 minute, decider-4B ~3.1 minutes.
+
+### 135.1 What the step says
+
+- **The 0.8B is fast and not good enough here.** Its synthetic scores are the 4B's (REAL-6 87.6), but on the blind set it loses where
+  knowledge and judgement matter: first-time payees 55 against 60, the user's own habits 81 against 85, effort 0.726 against 0.622. At
+  ~3 ms of H100 time per transaction against ~10 for the 4B (vLLM, REPORT 120), the 4B's gain in user effort is worth its cost; the
+  encoder (1B, bidirectional) remains the cheap reader.
+- **Descriptions help where names say nothing, and hurt where they mislead.** A category listed with the payees filed under it helps
+  first-time payees (59.9 -> 63.4) and new users (69.6 -> 72.3); but on REAL-6's novel-name copy (every category a coined word) top-1
+  falls from 84.6 to 69.1 and on REAL-6 from 87.8 to 82.6. Our reading: the description names two payees, and a reader trained on it
+  files by payee resemblance, where the recipe's rows carried the same payees with their dates and amounts. Not adopted; a variant that
+  describes categories only for new users (where the gain is) is possible but not queued.
+- **Read untrained, descriptions change nothing** (83.7 against 83.8).

@@ -1250,7 +1250,10 @@ to 100, every reader and combination on blind_v1.
 **MODEL-21 A sub-1B decoder with the recipe.** Jeff (firelex/jeff, reviewed 2026-09-30) finds a 0.8B Qwen3.5 student its sweet spot for fast
 one-slot decisions; we never trained the recipe below 4B for the decoder. *Experiment:* decider-0.8b (Apache-2.0) with the recipe and
 the other-users line, two seeds; blind_v1 by the report card, speed.
+**Status (2026-09-30):** PLAN step 136, REPORT.md 135: decider-0.8B 3x faster, 1.8 points behind on blind_v1, effort 0.726 vs 0.622; not adopted.
 
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
+
+**Status (2026-09-30):** PLAN step 137, REPORT.md 135: first-time payees +3.5, new users +2.7, novel names -15, REAL-6 -5; not adopted.
