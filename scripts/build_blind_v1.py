@@ -54,6 +54,8 @@ OTHERS = os.environ.get("BLIND_OTHERS") == "1"  # row 124 (main session): blind_
 # naming the categories other users filed this payee under before the query's date (the top three with counts; only when at least
 # three such rows exist): "Other users file this payee as: Eating out (14), Restaurants (9), Dining out (3)"
 OTHERS_HEAD = "Other users file this payee as: "
+META = os.environ.get("BLIND_META") == "1"  # row 147 (main session): write blind_v1_meta.json (canonical kinds of the query payee and every
+# slice row in prompt order, each option category's canonical meaning; ai_experiments.canon), items unchanged
 YNAB_RULE = os.environ.get("BLIND_YNAB") == "1"  # row 134 (owner, 2026-09-30): write blind_v1_ynabrule.json, YNAB's current suggestion per
 # blind_v1 item from the payee's whole filed history before the query (payee identity exact): the category used in 2 of the payee's last 3
 # transactions; with fewer than 3, the last one used; if the last 3 all differ, the last one used (assumed); no history, no suggestion
@@ -2129,6 +2131,7 @@ def main():
     items = []
     bulk_plain, bulk_split = [], []
     ynab = {}  # row 134
+    meta = {}  # row 147
     payee_hist = {}  # row 135
     others_rows = {}  # row 124: mid -> [(date, uid, filed)] over every user (build_user seeds each user's own rng, so this pre-pass changes nothing)
     if OTHERS:
@@ -2190,6 +2193,20 @@ def main():
             sl = build_slice(u, rows, qi)
             srows = [rows[i] for i in sl]
             prompt = make_prompt(header, srows, q)
+            if META:
+                from ai_experiments import canon as CN
+                kind_of = lambda mid: CN.V1_KIND.get(MERCH[mid].kind)  # noqa: E731
+                special = {x for x in (u.datenight, u.worklunch, u.reimb, (u.trip or {}).get("cat")) if x} | set(u.idio.values())
+                def meaning(c):
+                    if c in special:
+                        return CN.PURPOSE
+                    keys = [CN.V1_ROLE.get(r) for r, cc in u.rmap.items() if cc == c]
+                    if c == u.newcat:
+                        keys += [CN.V1_ROLE.get(r) for r in u.newcat_roles]
+                    return CN.category_kind(keys)
+                meta[f"BL:{u.uid}:{n_q}"] = dict(query_kind=kind_of(q["mid"]), row_kinds=[kind_of(rows[i]["mid"]) for i in sl],
+                                                 cat_meaning=[meaning(c) for c in header], merchant_kind=MERCH[q["mid"]].kind,
+                                                 opaque=bool(MERCH[q["mid"]].opaque), local=bool(MERCH[q["mid"]].local))
             if YNAB_RULE:
                 past = [r["filed"] for r in rows[:qi] if r["mid"] == q["mid"]]
                 last3 = past[-3:]
@@ -2224,6 +2241,10 @@ def main():
                 "prompt": prompt, "prompt_ctx": prompt, "options": [" " + c for c in header], "answer": ans,
                 "best": header.index(best_cat) if best_cat in header else -1, "why": why, "scheme": u.scheme,
                 "hist_len": qi, "in_shots": any(r["mid"] == q["mid"] for r in srows)})
+    if META:
+        (OUT.parent / "blind_v1_meta.json").write_text(json.dumps(meta))
+        print(f"wrote blind_v1_meta.json: {len(meta)} items")
+        return
     if YNAB_RULE:
         (OUT.parent / "blind_v1_ynabrule.json").write_text(json.dumps(ynab, indent=0))
         (OUT.parent / "blind_v1_payeehist.json").write_text(json.dumps(payee_hist, indent=0))

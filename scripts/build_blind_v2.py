@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import math
 import random
 import re
@@ -2409,6 +2410,7 @@ def main():
                 d[nm] = e.date
 
     items = []
+    meta = {}  # row 147 (main session): BLIND_META=1 also writes blind_v2_meta.json (canonical kinds, ai_experiments.canon); items unchanged
     for u in users:
         evs = u.events
         prev_of = []
@@ -2495,6 +2497,17 @@ def main():
                 "hist_len": qi,
                 "in_shots": any(r.mid == q.mid for r in rows),
             })
+            if os.environ.get("BLIND_META") == "1":
+                from ai_experiments import canon as CN
+                kk = lambda mid: "p2p" if MER[mid].channel == "p2p" else CN.V2_KIND.get(MER[mid].kind)  # noqa: E731
+                def meaning(c):
+                    cat = u.cats[c]
+                    if cat.kind in ("person", "life", "trip"):  # categories for a person, life event or trip; "store" ones hold concepts
+                        return CN.PURPOSE
+                    return CN.category_kind([CN.V2_CONCEPT.get(x) for x in cat.concepts])
+                meta[items[-1]["id"]] = dict(query_kind=kk(q.mid), row_kinds=[kk(r.mid) for r in rows],
+                                             cat_meaning=[meaning(c) for c in opt_ids], merchant_kind=MER[q.mid].kind,
+                                             opaque=bool(getattr(MER[q.mid], "opaque", False)))
 
     blob = json.dumps(items, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     digest = hashlib.sha256(blob.encode("utf-8")).hexdigest()
@@ -2519,6 +2532,9 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = {"name": "blind", "version": "v2", "n_users": len(users), "items": items, "sha256": digest, "notes": notes}
     OUT_FILE.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
+    if os.environ.get("BLIND_META") == "1":
+        (OUT_DIR / "blind_v2_meta.json").write_text(json.dumps(meta))
+        print(f"wrote blind_v2_meta.json: {len(meta)} items")
 
     # summary
     n = len(items)
