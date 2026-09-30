@@ -8489,3 +8489,38 @@ what their 96% in-the-list suggests.
 - This closes the synthetic line: on the untouched set the recommended system gains 7 points right first, 22 in the list and 16 of
   work saved over YNAB's rule, and blind_v1 and blind_v2 showed gains in the same direction (REPORTs 131, 137; the exact system was not
   run on them). The next evidence is real data (reports/REAL_DATA_SPEC.md).
+
+
+## 142. Lists of at most three suggestions (owner, 2026-09-30: "instead of top 5, do top 3 measurements"): on blind_v3 the recommended system keeps the right category in the list 95.1% of the time (five: 96.3%), first-time payees 90.6% (95.9%), with 2.0 suggestions on average and 91% of the work saved; on the ordinary stream searches rise from 5.4 to 6.5% (EVAL-14)
+
+PLAN step 146. The same scores with every list capped at three (first-time payees get the top three, known payees the short list; the
+owner's rank scale then runs first 0, second 1, third 2, not shown 10). Re-scored on saved readings only: blind_v3 is not read again.
+`KMAX=3 scripts/final_check_tables.py`, `scripts/confirm_card.py bulk` (three is now the scripts' default).
+
+**blind_v3 (lists of at most 3; read once; ideal-reader ceiling 83.5%; decider seeds 3): right one 1st % / in the list % / suggestions shown / work saved %**
+
+| suggestions from | all (n=1500) | first-time payee (n=188) | filed differently from the rule (n=199) | the payee's usual (n=1113) | new users (n=170) |
+|---|---|---|---|---|---|
+| YNAB today | 74.2 / 74.2 / 0.9 / 74 | 0.0 / 0.0 / 0.0 / 0 | 0.0 / 0.0 / 1.0 / 0 | 100.0 / 100.0 / 1.0 / 100 | 42.9 / 42.9 / 0.5 / 43 |
+| no-model list (YNAB + payee's other past categories) | 78.3 / 88.1 / 1.8 / 87 | 32.4 / 39.9 / 1.1 / 39 | 0.0 / 66.8 / 2.4 / 59 | 100.0 / 100.0 / 1.8 / 100 | 60.0 / 68.8 / 1.5 / 68 |
+| decider-4B (+ line) alone, same list rules, no gate | 81.2 / 93.7 / 2.0 / 90 | 55.7 / 79.3 / 3.0 / 59 | 0.0 / 72.2 / 2.4 / 63 | 100.0 / 100.0 / 1.8 / 100 | 69.8 / 85.9 / 2.3 / 75 |
+| recommended system | 81.1 / 95.1 / 2.0 / 91 | 63.8 / 90.6 / 3.0 / 71 | 10.6 / 72.2 / 2.4 / 65 | 96.6 / 100.0 / 1.8 / 99 | 73.9 / 89.4 / 2.3 / 80 |
+
+**Confirm-everything card, blind_bulk_v1 (one sync per user, 6660 transactions in order; payee seen before 96%)**
+
+| suggestions from | right one 1st % | 2nd-3rd % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |
+|---|---|---|---|---|---|---|---|---|
+| YNAB today | 82.0 | 0.0 | 18.0 | 1.0 | 1.80 | 82% | 85.3 | 0.0 |
+| YNAB today + the payee's other past categories (no model) | 82.0 | 8.5 | 9.5 | 1.4 | 1.05 | 89% | 85.3 | 0.8 |
+| decider-4B | 83.8 | 9.7 | 6.5 | 1.5 | 0.85 | 91% | 85.2 | 49.4 |
+| YNAB's suggestion first, then decider-4B | 83.9 | 9.6 | 6.5 | 1.5 | 0.85 | 91% | 85.3 | 49.4 |
+| encoder + decider | 84.1 | 9.5 | 6.4 | 1.5 | 0.81 | 92% | 85.4 | 51.4 |
+| YNAB's suggestion first, then encoder + decider | 84.0 | 9.6 | 6.5 | 1.5 | 0.82 | 92% | 85.3 | 51.4 |
+
+### 142.1 What the step says
+
+- **Three suggestions lose little**: on blind_v3 the right category is among them 95.1% of the time (five: 96.3), right first unchanged
+  (81.1%), 2.0 suggestions shown on average; first-time payees 90.6% (five: 95.9) at three shown instead of five; work saved rises to 91%
+  because fewer wrong suggestions are shown.
+- **On the ordinary stream** searches rise from 5.4 to 6.5% (the right one in 2nd-3rd place 9.5%), work saved 92% for encoder + decider.
+- Three is the list length from here on; the gain over YNAB's rule is unchanged in kind (blind_v3: in the list 95.1% against 74.2%).

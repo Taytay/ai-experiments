@@ -29,6 +29,8 @@ from report_card import plausible_sets  # noqa: E402
 BIG = "results/per_item/real6_dm_decider_decider-35b-a3b_blind_v1.noctx.jsonl"
 LAM = float(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1] != "bulk" else 1.0
 MISS = 10.0
+import os as _os
+KMAX = int(_os.environ.get("KMAX", "3"))  # owner 2026-09-30: lists of at most three suggestions (KMAX=5 for the earlier tables)
 
 
 def cost(shown, gold, plaus):
@@ -39,12 +41,12 @@ def cost(shown, gold, plaus):
 def lists(P, items, plaus, rule, mode):
     out = {}
     for i, p in P.items():
-        m = S.suggest(p, lam=LAM, miss=MISS, kmax=5, plausible=plaus[i])
+        m = S.suggest(p, lam=LAM, miss=MISS, kmax=KMAX, plausible=plaus[i])
         if mode == "model":
             out[i] = m
         else:  # rule first, then the model's list
             r = rule.get(i, -1)
-            out[i] = ([r] + [c for c in m if c != r])[:5] if r >= 0 else m
+            out[i] = ([r] + [c for c in m if c != r])[:KMAX] if r >= 0 else m
     return out
 
 
@@ -72,7 +74,7 @@ def history_lists(items, rule):
                         order.append(idx[nm])
         r = rule.get(i, -1)
         out[i] = ([r] if r >= 0 else []) + [c for c in order if c != r]
-        out[i] = out[i][:5]
+        out[i] = out[i][:KMAX]
     return out
 
 
@@ -139,7 +141,7 @@ def bulk():
     systems = {"decider-4B": [folds_calibrate(d, items) for d in decs], "encoder + decider": [product([e, d], items) for e in encs for d in decs]}
     ids = sorted(items); seen = [i for i in ids if rule[i] >= 0]; new = [i for i in ids if rule[i] < 0]
     print(f"\n**Confirm-everything card, blind_bulk_v1 (one sync per user, {len(ids)} transactions in order; payee seen before {100 * len(seen) / len(ids):.0f}%)**\n")
-    print("| suggestions from | right one 1st % | 2nd-5th % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |")
+    print(f"| suggestions from | right one 1st % | 2nd-{KMAX}th % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |")
     print("|---|---|---|---|---|---|---|---|---|")
     rl = {i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}
     rows = {"YNAB today": ([rl], None), "YNAB today + the payee's other past categories (no model)": ([history_lists(items, rule)], None)}

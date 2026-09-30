@@ -65,7 +65,7 @@ On validation (for choices) and once on test:
 - **Report card** (REPORT 130 / 131): right category first; in the suggestion list; not suggested (search); suggestions shown; work
   saved against filing by hand; by user group (new users, established users) and by payee group (first-time payee, the payee's usual
   category, filed differently than before, a category never used for the payee).
-- **Rank score** (owner's scale): first 0, second 1, ... fifth 4, not shown 10; the clutter penalty only for implausible suggestions
+- **Rank score** (owner's scale): lists of at most three (owner, 2026-09-30); first 0, second 1, third 2, not shown 10; the clutter penalty only for implausible suggestions
   (plausible: categories the user used for the payee, or other users use for it).
 - **Calibration** (REPORT 115, 116): reliability by bin, ECE, by user group; temperatures fitted on validation users only.
 - **Anticipation** (REPORT 132): confidence on changed filings against usual ones (AUROC).

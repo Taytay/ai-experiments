@@ -24,7 +24,7 @@ from ai_experiments import scorecard as S
 from ai_experiments.paths import PROCESSED
 
 sys.path.insert(0, str(Path(__file__).parent))
-from confirm_card import card, history_lists  # noqa: E402
+from confirm_card import KMAX, card, history_lists  # noqa: E402
 from decision_tables import folds_calibrate, load, product  # noqa: E402
 from report_card import plausible_sets  # noqa: E402
 
@@ -37,10 +37,10 @@ def system_lists(P, items, plaus, rule, ph, gate=True):
     for i, p in P.items():
         order = [int(c) for c in np.argsort(-p)]; r = rule.get(i, -1)
         if not ph[i]:
-            out[i] = order[:5]; continue
-        short = S.suggest(p, lam=LAM, miss=10.0, kmax=5, plausible=plaus[i])
+            out[i] = order[:KMAX]; continue
+        short = S.suggest(p, lam=LAM, miss=10.0, kmax=KMAX, plausible=plaus[i])
         first = order[0] if (r < 0 or (gate and order[0] != r and p[order[0]] - p[r] > GATE)) else r
-        out[i] = ([first] + [c for c in short if c != first])[:5]
+        out[i] = ([first] + [c for c in short if c != first])[:KMAX]
     return out
 
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     ids = sorted(items); gold = {i: items[i]["answer"] for i in ids}
     subsets = {"all": ids, "first-time payee": [i for i in ids if not ph[i]], "filed differently from the rule": [i for i in ids if ph[i] and gold[i] != rule[i]],
                "the payee's usual": [i for i in ids if ph[i] and gold[i] == rule[i]], "new users": [i for i in ids if items[i]["why"] == "new_user"]}
-    print(f"**blind_v3 (read once; ideal-reader ceiling {100 * np.mean([x['best'] == x['answer'] for x in items.values()]):.1f}%; decider seeds {len(decs)}): "
+    print(f"**blind_v3 (lists of at most {KMAX}; read once; ideal-reader ceiling {100 * np.mean([x['best'] == x['answer'] for x in items.values()]):.1f}%; decider seeds {len(decs)}): "
           "right one 1st % / in the list % / suggestions shown / work saved %**\n")
     print("| suggestions from | " + " | ".join(f"{k} (n={len(v)})" for k, v in subsets.items()) + " |"); print("|---|" + "---|" * len(subsets))
     srcs = {"YNAB today": [{i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}], "no-model list (YNAB + payee's other past categories)": [history_lists(items, rule)]}
