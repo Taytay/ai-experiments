@@ -8174,9 +8174,12 @@ Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B 0.9 t
   effort is worth it; the encoder (1B, bidirectional) remains the cheap reader.
 - **Descriptions help where names say nothing, and hurt where they mislead.** A category listed with the payees filed under it helps
   first-time payees (59.9 -> 63.4) and new users (69.6 -> 72.3); but on REAL-6's novel-name copy (every category a coined word) top-1
-  falls from 84.6 to 69.1 and on REAL-6 from 87.8 to 82.6. Our reading: the description names two payees, and a reader trained on it
-  files by payee resemblance, where the recipe's rows carried the same payees with their dates and amounts. Not adopted; a variant that
-  describes categories only for new users (where the gain is) is possible but not queued.
+  falls from 84.6 to 69.1 and on REAL-6 from 87.8 to 82.6. [Corrected 2026-09-30: this line first read the loss as filing by payee
+  resemblance; by REAL-6 level the losses include the pure lookups (merchant in the history, standard name: 100 -> 90; novel names
+  96 -> 75), which that reading does not predict. Untested candidates: the added parentheses ("(e.g. ...)" after every category, where
+  the answer slot reads the label after "Category: ("), and ~200 more tokens between list and rows.] Not adopted; a variant without
+  parentheses ("- (IJ) Dining out: Peets, Chipotle") or describing only empty and rarely used categories would separate format from
+  content; not queued.
 - **Read untrained, descriptions change nothing** (83.7 against 83.8).
 
 
