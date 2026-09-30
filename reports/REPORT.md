@@ -8446,3 +8446,44 @@ last two had blind_v1's names removed before training (so matches there are list
   stopping), but blind_v1 has been the selection set since REPORT 103 and is validation in practice; blind_v2 confirmed conclusions
   but also informed REPORT 137 and 139's gate and routing; blind_v3 (row 145) is kept untouched for a final check. The real-data plan
   (reports/REAL_DATA_SPEC.md) splits users 70 / 15 / 15 with a time holdout and a sealed test split.
+
+
+## 141. The final synthetic check, pre-registered, on a third blind set read once (blind_v3: couples, small businesses, families filing by who it was for, changing statement strings): the recommended system puts the right category first 81% of the time (YNAB's rule 74%) and in the list 96% (74%), saving 90% of the work of filing by hand (rule 74%, the no-model list 87%); first-time payees 64% first and 96% in the list; decider-4B reads the set at 94% of its ceiling (EVAL-15)
+
+PLAN step 145. blind_v3 (`scripts/build_blind_v3.py`): a third agent, given only the product brief, asked for different emphases (couples
+sharing an account and filing differently, small-business owners, families filing by who the spending was for, students, retirees,
+seasonal patterns, price changes, statement strings that change). One patch by the main session: history rows show a renamed or merged
+category under its current name, as YNAB does (the generator had shown the old name, outside the list; 74 rows). 1,500 items, 250 users,
+ideal-reader ceiling 83.5%. The analysis (`scripts/final_check_tables.py`) and the system's definition were committed before any model
+read the set (commit 9f64608); the models read it once (job list `scripts/modal_jobs/r145.json`); no choice is made on these numbers.
+
+top-1 decider-4B + other-users line: 78.2 (seeds: 78.3, 78.2, 78.1)
+top-1 decider-35B untrained: 74.8 (seeds: 74.8)
+
+**blind_v3 (read once; ideal-reader ceiling 83.5%; decider seeds 3): right one 1st % / in the list % / suggestions shown / work saved %**
+
+| suggestions from | all (n=1500) | first-time payee (n=188) | filed differently from the rule (n=199) | the payee's usual (n=1113) | new users (n=170) |
+|---|---|---|---|---|---|
+| YNAB today | 74.2 / 74.2 / 0.9 / 74 | 0.0 / 0.0 / 0.0 / 0 | 0.0 / 0.0 / 1.0 / 0 | 100.0 / 100.0 / 1.0 / 100 | 42.9 / 42.9 / 0.5 / 43 |
+| no-model list (YNAB + payee's other past categories) | 78.3 / 88.7 / 2.2 / 87 | 32.4 / 41.0 / 1.6 / 40 | 0.0 / 70.4 / 2.9 / 61 | 100.0 / 100.0 / 2.1 / 100 | 60.0 / 68.8 / 2.0 / 68 |
+| decider-4B (+ line) alone, same list rules, no gate | 81.2 / 95.0 / 2.6 / 89 | 55.7 / 85.8 / 5.0 / 47 | 0.0 / 75.9 / 2.9 / 66 | 100.0 / 100.0 / 2.1 / 100 | 69.8 / 90.6 / 3.5 / 71 |
+| recommended system | 81.1 / 96.3 / 2.6 / 90 | 63.8 / 95.9 / 5.0 / 59 | 10.6 / 75.9 / 2.9 / 67 | 96.6 / 100.0 / 2.1 / 99 | 73.9 / 93.3 / 3.5 / 74 |
+
+"Work saved" is 1 - the owner's rank score / 10 (right first 0, second 1, ... fifth 4, not shown 10, plus 1 per wrong suggestion
+outside the plausible categories): the five-long lists for first-time payees pay that clutter cost, so their work saved (59%) is below
+what their 96% in-the-list suggests.
+
+### 141.1 What the step says
+
+- **The recommended system holds on a set nobody tuned on**: right first 81.1% against YNAB's rule 74.2%, the right category among the
+  suggestions 96.3% against 74.2%, 90% of the manual work saved against 74% (rule) and 87% (the no-model list). decider-4B reads blind_v3
+  at 78.2 top-1 (94% of the 83.5 ceiling; blind_v1 95%, blind_v2 92%).
+- **First-time payees**: the 35B routing takes them from 55.7 to 63.8% right first (the no-model list 32.4, the rule 0), and the top
+  five contain the right one 95.9% of the time.
+- **The confidence gate is neutral here** (all 81.1 against 81.2 without it): blind_v3's users depart from a payee's usual category on
+  15% of known-payee items (blind_v2 28%, blind_v1 10%); the gate wins 10.6% of those and costs 3.4% of the usual ones. Across the
+  three sets it is +0.1, +4.8 and -0.1 points on known payees: worth keeping where users often depart from their usual category, and
+  something real data will settle.
+- **New users** 73.9% right first (rule 42.9), 93% in the list.
+- This closes the synthetic line: three independently built blind sets agree on the recommended system's gain over the current rule
+  (right first +7 to +14 points, in the list +22 to +34, work saved +16 to +28). The next evidence is real data (reports/REAL_DATA_SPEC.md).
