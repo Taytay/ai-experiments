@@ -7885,3 +7885,35 @@ place is a 0. Being 1 away is a 1. 2 away is a 2, up to 5. And not showing it is
   the right category at all). Under them the ordering of systems is the same as under REPORT 118's score.
 - **Limit:** LAM charges every wrong suggestion alike; "irrelevant" (a wrong category that makes no sense) against "plausible but wrong"
   needs a judgement per suggestion, from a strong reader on a sample or, with real data, from what users pick.
+
+
+## 130. A report card in plain percentages, with plausible suggestions free: the three-model system files 61% of transactions automatically and right (1% wrong), puts the right category first in the list for another 25% and 2nd to 5th for 8%, and leaves 5% for the user to search, saving 88% of the work of filing by hand; showing the user's other usual categories for a payee (free) cuts searches from 6.7 to 5.1% (EVAL-14)
+
+PLAN step 133 (owner, 2026-09-30: the rank scores are hard to read; do not penalise plausible suggestions, a user may file Amazon under
+four categories). Plausible categories, known when the prompt is built: the ones this user filed the payee under in the prompt's rows
+(payee by `oneslot.payee_key`) and the user's categories other users file it under (the other-users line). They are shown freely (model
+order, at most five) and never penalised; other categories only when the model is confident, and they cost the clutter penalty when wrong
+(`scorecard.suggest` / `rank_effort` with `plausible`). "Work saved" is 1 - the rank score / 10 (by hand, every transaction is a search:
+10). blind_v1_others' items; W 20, confirm 0.5, clutter 1 (REPORT 129's proposed defaults). `scripts/report_card.py [W] [CONFIRM] [LAM]`.
+
+**Report card, blind_v1 (1,500 transactions; W = 20, confirm 0.5, clutter 1 per implausible wrong suggestion; plausible categories per transaction: 1.2 on average)**
+
+| system | plausible free | filed automatically, right | filed automatically, WRONG | suggested, right one 1st | suggested, right one 2nd-5th | not suggested: user searches | suggestions shown | implausible shown per 100 | work saved vs no model |
+|---|---|---|---|---|---|---|---|---|---|
+| decider-4B | yes | 53.0% | 1.0% | 30.8% | 8.6% | 6.7% | 2.0 | 19.9 | 86% |
+| decider-4B | no | 55.1% | 1.0% | 28.6% | 6.6% | 8.6% | 1.7 | 19.9 | 82% |
+| encoder + decider | yes | 59.3% | 1.1% | 25.1% | 8.4% | 6.2% | 2.1 | 17.5 | 87% |
+| encoder + decider | no | 60.6% | 1.2% | 23.8% | 6.9% | 7.5% | 1.9 | 17.5 | 83% |
+| encoder + decider + 35B | yes | 61.3% | 1.0% | 24.5% | 8.2% | 5.1% | 2.1 | 14.9 | 88% |
+| encoder + decider + 35B | no | 62.9% | 1.0% | 22.9% | 6.5% | 6.7% | 1.8 | 14.9 | 85% |
+
+### 130.1 What the step says
+
+- **The report card is the readable form**: of every 100 transactions, the system files 61 itself and gets 1 wrong; of the 38 it shows,
+  25 have the right category first, 8 have it 2nd to 5th, and 5 need a search. That is 88% of the manual work saved.
+- **Showing plausible categories freely helps** (searches 6.7 -> 5.1% for the system, 8.6 -> 6.7% for decider alone): the right category
+  was often one the user uses for this payee but the model ranked lower. Lists grow a little (1.8 -> 2.1 suggestions).
+- **Some confident wrong suggestions remain**: 15 to 20 per 100 transactions show a wrong category that is not among the plausible ones
+  (the model's own confident second choices); whether they look irrelevant needs a human or strong-reader judgement.
+- Blind_v1 users file most payees under one category (1.2 plausible categories per transaction on average); real users with Amazon-like
+  payees will have more, which is where this matters most.

@@ -203,29 +203,37 @@ def effort(auto, auto_ok, top3_ok, click=EFFORT["click"], search=EFFORT["search"
 RANK = dict(miss=10.0, lam=1.0, kmax=5, confirm=0.0)  # confirm: what accepting a shown suggestion costs (a tap) over an auto-file
 
 
-def suggest(p, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"]):
-    """Indices of the categories to show, best first (at least one), from one calibrated distribution."""
-    order = np.argsort(-np.asarray(p, float)); out = [int(order[0])]
-    for r in range(2, min(kmax, len(order)) + 1):
-        q = float(p[order[r - 1]])
-        if q * (miss - (r - 1)) <= (1 - q) * lam:
+def suggest(p, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], plausible=None):
+    """Indices of the categories to show, best first (at least one), from one calibrated distribution. With `plausible` (owner,
+    2026-09-30: the categories this user has filed the payee under, or other users file it under; known when the prompt is built),
+    plausible categories are shown freely in the model's order and only the others must pass the expected-cost test."""
+    order = [int(c) for c in np.argsort(-np.asarray(p, float))]; out = [order[0]]
+    for c in order[1:]:
+        if len(out) >= kmax:
             break
-        out.append(int(order[r - 1]))
+        r = len(out) + 1; q = float(p[c])
+        if plausible is not None and c in plausible:
+            out.append(c); continue
+        if q * (miss - (r - 1)) > (1 - q) * lam:
+            out.append(c)
+        elif plausible is None:
+            break
     return out
 
 
-def list_cost(p, shown, lam=RANK["lam"], miss=RANK["miss"], confirm=RANK["confirm"]):
-    """Expected cost of showing `shown` under p."""
+def list_cost(p, shown, lam=RANK["lam"], miss=RANK["miss"], confirm=RANK["confirm"], plausible=None):
+    """Expected cost of showing `shown` under p (clutter charged only for categories outside `plausible`, when given)."""
     p = np.asarray(p, float); got = sum(p[c] for c in shown)
-    return confirm + sum(p[c] * r for r, c in enumerate(shown)) + (1 - got) * miss + lam * sum(1 - p[c] for c in shown)
+    return confirm + sum(p[c] * r for r, c in enumerate(shown)) + (1 - got) * miss + lam * sum(1 - p[c] for c in shown if plausible is None or c not in plausible)
 
 
-def rank_effort(p, gold, W, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], auto=None, confirm=RANK["confirm"]):
-    """(cost, auto-filed, shown list) for one transaction; auto=None decides by the expected-cost rule, True / False forces it."""
-    shown = suggest(p, lam, miss, kmax)
+def rank_effort(p, gold, W, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], auto=None, confirm=RANK["confirm"], plausible=None):
+    """(cost, auto-filed, shown list) for one transaction; auto=None decides by the expected-cost rule, True / False forces it.
+    With `plausible`, wrong categories inside it cost no clutter."""
+    shown = suggest(p, lam, miss, kmax, plausible)
     if auto is None:
-        auto = (1 - float(np.max(p))) * W < list_cost(p, shown, lam, miss, confirm)
+        auto = (1 - float(np.max(p))) * W < list_cost(p, shown, lam, miss, confirm, plausible)
     if auto:
         return (0.0 if int(np.argmax(p)) == gold else float(W)), True, [int(np.argmax(p))]
-    cost = confirm + (shown.index(gold) if gold in shown else miss) + lam * sum(c != gold for c in shown)
+    cost = confirm + (shown.index(gold) if gold in shown else miss) + lam * sum(c != gold and (plausible is None or c not in plausible) for c in shown)
     return float(cost), False, shown
