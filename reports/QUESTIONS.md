@@ -1257,3 +1257,7 @@ category in the labelled list followed by the payees filed under it in the promp
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
 
 **Status (2026-09-30):** PLAN step 137, REPORT.md 135: first-time payees +3.5, new users +2.7, novel names -15, REAL-6 -5; not adopted.
+**EVAL-15 A second blind test set.** Every choice since REPORT 103 rests on blind_v1, one generator by one blind agent. *Experiment:*
+blind_v2 from a second agent that sees only the product brief (no repo code, no blind_v1), with its own merchant universe, archetypes
+and mechanisms, the same item fields (plus the other-users variant, payee history and YNAB's rule); re-read the recipe, the system and the
+scores of REPORTs 126 to 134 on it; conclusions that hold on both sets stand.
