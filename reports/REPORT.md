@@ -8064,3 +8064,50 @@ seen / on 2a / on control**
 - **Overriding the rule only when confident does not pay:** the best gate adds 1 point over the rule on seen payees (85.3 -> 86.4 on the
   stream), trading its 2a gains for control losses. For known payees the first slot is near what the prompt allows; the model's value
   is new payees and the ranked list.
+
+
+## 133. What the model was close to on first-time payees: the right category is in the system's top five 88% of the time (first 70%) against an ideal reader's 75% first; most misses are unknowable (opaque names like "TRI-STAR HOLDINGS LLC": the ideal reader 0%, the model spreads its probability thinly, top 8 to 14%), and when it is wrong it says so (top probability 0.36 on average, the right one a quarter of that) (EVAL-14)
+
+PLAN step 138 (owner, 2026-09-30: "When our model gives a suggested answer, do we know what other answers it was close to giving and how
+close?"). Yes: every reading is a calibrated probability for each of the user's categories. On blind_v1's first-time payees (277: no
+earlier filing of the payee), the three-model system (encoder x decider-4B with the other-users line x untrained 35B, first seeds);
+"ideal reader" is blind_v1's rule-based reader of the prompt plus world knowledge of merchants (`best`; -1 when the prompt gives no
+basis). `scripts/closeness_tables.py`.
+
+**Table CL.1: first-time payees, encoder x decider x 35B: where the right category ranks, and the ideal reader's ceiling**
+
+| group | n | rank 1 | 2 | 3 | 4-5 | 6-10 | >10 | median categories | ideal reader right % | no basis in the prompt % | p(top) when wrong | p(right) when wrong | p(right) / p(top) when wrong |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| all first-time payees | 277 | 70% | 9% | 5% | 4% | 6% | 6% | 23 | 75% | 23% | 0.36 | 0.10 | 0.24 |
+| short_history | 150 | 79% | 7% | 5% | 2% | 4% | 3% | 22 | 82% | 15% | 0.44 | 0.13 | 0.23 |
+| new_merchant_descriptive | 37 | 84% | 5% | 3% | 5% | 3% | 0% | 24 | 95% | 3% | 0.30 | 0.09 | 0.35 |
+| new_merchant_chain | 37 | 84% | 5% | 3% | 3% | 5% | 0% | 24 | 92% | 5% | 0.47 | 0.09 | 0.15 |
+| new_merchant_opaque | 36 | 17% | 11% | 6% | 14% | 19% | 33% | 24 | 0% | 100% | 0.18 | 0.06 | 0.29 |
+| trip | 12 | 42% | 33% | 17% | 0% | 8% | 0% | 24 | 92% | 0% | 0.63 | 0.14 | 0.16 |
+
+**Examples (first-time payees the system got wrong): the top five with probabilities; the right one marked**
+
+- `TRI-STAR HOLDINGS LLC  ROCHESTER     NY` (new_merchant_opaque, 26 categories): Entertainment 8%, Household goods 7%, Stuff I forgot to budget for 7%, Healthcare 6%, Groceries 6%; right one **Clothing** at rank 14 (3.2%)
+- `DBT CRD 8878 10/15/25 SQ *PR PARTNERS PITTSBURGH` (new_merchant_opaque, 23 categories): Miscellaneous 11%, Groceries 8%, Dining Out 8%, Household 7%, Utilities 7%; right one **Birthdays & gifts** at rank 12 (3.6%)
+- `PY *BRIGHTPATH GROUP I DETROIT       MI` (short_history, 24 categories): Rent/Mortgage 17%, Electric 14%, Medical expenses 8%, Internet 8%, Insurance 5%; right one **Stuff I forgot to budget for** at rank 9 (3.9%)
+- `SP AE MGMT             TUCSON        AZ` (new_merchant_opaque, 24 categories): Misc 14%, Household goods 10%, Clothes 8%, Groceries 8%, Healthcare 6%; right one **Fun money** at rank 7 (4.5%)
+- `HILTON BRECKENRIDGE BRECKENRIDGE CO` (trip, 24 categories): Vacation 80%, **Ski trip 13%**, Rent/Mortgage 2%, Misc 1%, Home 1%
+- `Zelle to Brandon Clark` (short_history, 25 categories): Gifts 16%, Misc 14%, Income 12%, Pocket money 10%, Savings 7%; right one **Restaurants** at rank 16 (1.6%)
+- `United Airlines` (trip, 27 categories): Vacation 46%, **Ski trip 41%**, Misc 4%, Rent 2%, Ready to Assign 2%
+- `SP FDC CORP 12/15 PURCHASE SEATTLE WA` (new_merchant_opaque, 44 categories): Groceries 19%, Household supplies 7%, Furniture 5%, **Clothing 5%**, Water & sewer 4%
+
+### 133.1 What the step says
+
+- **The 49 to 80% of REPORT 132 undersold the ranking.** The system's full list has the right category first 70% of the time and in the
+  top five 88%; the lower "in the list" numbers there came from the suggestion rule, which shows only plausible or confident categories
+  (a short list), and a first-time payee has no plausible categories of its own. Showing the top five for first-time payees would find
+  the right one 88% of the time.
+- **Against what is knowable, it is close to the ceiling**: 70% first against the ideal reader's 75%; for new chains and new local
+  businesses with descriptive names 84% against 92 to 95%; for new users 79% against 82%.
+- **Most misses cannot be known from the prompt**: opaque payees ("SP AE MGMT", "TRI-STAR HOLDINGS LLC") are a third of the >10 ranks;
+  the ideal reader has no basis for any of them, and the model spreads its probability thinly (top 8 to 14%), which is the honest answer.
+  Other misses are close calls (a hotel on a trip: Vacation 80% against the user's own Ski trip 13%; a flight 46% against 41%).
+- **When wrong, it knows it is unsure**: its top probability averages 0.36 on these misses (0.9+ on typical right answers), and the right
+  one is about a quarter as likely as its pick; these are the transactions to show with a longer list or a search box open.
+- **Product consequence:** size the suggestion list by confidence and history: for a first-time payee with a spread-out distribution,
+  show five; for a known payee, the rule plus the payee's other categories.
