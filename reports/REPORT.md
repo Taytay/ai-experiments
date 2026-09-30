@@ -8622,3 +8622,63 @@ job list `scripts/modal_jobs/r147.json`.
   35B is best only at naming payees from their names (76 to 80%): world knowledge helps with names, not with reading a user's categories.
 - **Use**: the inferred payee kind (35B, name and filings) agrees with the generator's kind for 79% (blind_v1) and 74% (blind_v2) of
   queries; step 149 tests it as the query's "Kind:" line (`blind_v*_kindsinf`) against the generator's kinds (a database knowing every payee).
+
+
+## 144. Canonical "Kind:" lines: when a merchant database knows the payee's kind, one line under the first-time payee's transaction takes it from 60 to 77% right first on blind_v1 (68% on blind_v2), with no retraining, as well as or better than reading it with the 35B; inferred kinds (from name and other users' filings) add little over the 35B's own reading, and on known payees kind lines do not help; training with kind lines is not needed and costs the user's own patterns (DATA-7)
+
+PLAN step 149. A canonical kind line under every history row and the query (`Kind: coffee shop or bakery`, `Kind: person-to-person payment
+(purpose varies)`; `scripts/derive_kind_prompts.py`): from the generators' kinds (a merchant database that knows every payee), or with
+the query's kind inferred by the 35B from the payee's name and other users' filings (REPORT 143) where no database knows it. decider-4B
+with the other-users line (REPORT 123) read them without training (three seeds); a copy trained with kind lines on every episode (15%
+"unknown"; `KIND_LINES=1`) read them too (two seeds). `scripts/kindline_tables.py`, `scripts/kindroute_tables.py`, job lists
+`scripts/modal_jobs/r149*.json`.
+
+**Table 144.1: kind lines everywhere**
+
+| set | arm | seeds | top-1 | first-time payees: 1st / top 3 | new users | person-to-person | own patterns | payees seen before | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| blind_v1 | no kind lines (REPORT 123) | 3 | 83.8 | 59.9 / 74.8 | 69.6 | 26.1 | 82.2 | 89.2 | 0.622 |
+| blind_v1 | kind lines read zero-shot | 3 | 86.9 | 76.8 / 88.3 | 77.0 | 30.6 | 82.5 | 89.2 | 0.558 |
+| blind_v1 | kind lines read zero-shot, query kind inferred | 3 | 82.9 | 62.8 / 78.0 | 73.6 | 30.6 | 81.7 | 87.4 | 0.690 |
+| blind_v1 | trained with kind lines, generator kinds | 2 | 86.5 | 75.3 / 85.7 | 76.5 | 24.3 | 83.0 | 89.0 | 0.554 |
+| blind_v1 | trained with kind lines, query kind inferred | 2 | 79.9 | 60.5 / 75.6 | 72.9 | 24.3 | 79.6 | 84.3 | 0.804 |
+| blind_v1 | trained with kind lines, prompts without them | 2 | 83.9 | 60.3 / 75.6 | 69.0 | 24.3 | 83.0 | 89.3 | 0.636 |
+| blind_v2 | no kind lines (REPORT 123) | 3 | 71.7 | 60.8 / 79.7 | 65.1 | 73.2 | 52.9 | 74.6 | 1.084 |
+| blind_v2 | kind lines read zero-shot | 3 | 72.4 | 68.0 / 83.6 | 68.9 | 74.7 | 50.0 | 73.6 | 1.022 |
+| blind_v2 | kind lines read zero-shot, query kind inferred | 3 | 70.4 | 64.5 / 82.1 | 68.8 | 73.2 | 49.0 | 72.0 | 1.079 |
+| blind_v2 | trained with kind lines, generator kinds | 2 | 72.5 | 66.8 / 82.0 | 68.5 | 68.9 | 37.9 | 74.0 | 1.022 |
+| blind_v2 | trained with kind lines, query kind inferred | 2 | 69.5 | 63.4 / 80.5 | 69.3 | 68.2 | 36.4 | 71.2 | 1.145 |
+| blind_v2 | trained with kind lines, prompts without them | 2 | 72.2 | 60.9 / 78.2 | 64.3 | 70.5 | 40.0 | 75.3 | 1.070 |
+
+**Table 144.2: kind lines only for first-time payees, against the 35B routing of REPORT 139 (three seeds; plain prompts for payees seen before)**
+
+| set | system | top-1 | first-time payees: 1st / top 3 | payees seen before | effort W=10 |
+|---|---|---|---|---|---|
+| blind_v1 | no kind lines | 83.8 | 59.9 / 74.8 | 89.2 | 0.622 |
+| blind_v1 | kind lines for first-time payees (database kinds) | 86.9 | 76.8 / 88.3 | 89.2 | 0.543 |
+| blind_v1 | kind lines for first-time payees (inferred kinds) | 84.3 | 62.8 / 78.0 | 89.2 | 0.634 |
+| blind_v1 | 35B for first-time payees (REPORT 139) | 85.4 | 68.7 / 82.1 | 89.2 | 0.559 |
+| blind_v1 | inferred kind lines + 35B for first-time payees | 85.3 | 68.1 / 84.1 | 89.2 | 0.570 |
+| blind_v2 | no kind lines | 71.7 | 60.8 / 79.7 | 74.6 | 1.084 |
+| blind_v2 | kind lines for first-time payees (database kinds) | 73.2 | 68.0 / 83.6 | 74.6 | 1.043 |
+| blind_v2 | kind lines for first-time payees (inferred kinds) | 72.4 | 64.5 / 82.1 | 74.6 | 1.082 |
+| blind_v2 | 35B for first-time payees (REPORT 139) | 73.3 | 68.5 / 87.1 | 74.6 | 1.003 |
+| blind_v2 | inferred kind lines + 35B for first-time payees | 73.5 | 69.5 / 87.9 | 74.6 | 0.997 |
+
+### 144.1 What the step says
+
+- **A payee kind from a merchant database is worth as much as the 35B for first-time payees, at no extra model cost.** Shown only for
+  payees new to the user, a database kind takes them from 59.9 to 76.8% right first on blind_v1 (35B routing 68.7) and from 60.8 to 68.0
+  on blind_v2 (35B 68.5), read by the current adapter without any training; effort 0.543 on blind_v1 (35B 0.559), 1.043 on blind_v2
+  (35B 1.003). Where YNAB or a merchant database knows what a payee is, that line can replace the large model.
+- **Inferred kinds do not replace it.** Where no database knows the payee, a kind inferred by the 35B (right 74 to 79%) and passed to
+  decider as a line gives 62.8 / 64.5% on first-time payees; the 35B's whole distribution (REPORT 139) gives 68.7 / 68.5, and both
+  together 68.1 / 69.5: one label carries less than the distribution it came from.
+- **Kind lines on known payees do not help** (database kinds: neutral; inferred kinds: -1.8 and -2.6 on payees seen before): the user's
+  own history already answers those, and a wrong kind misleads.
+- **Training with kind lines is not needed**: the trained copy reads database kinds no better (86.5 against 86.9 on blind_v1) and loses
+  the user's own patterns on blind_v2 (52.9 -> 37.9), the same over-reliance on what a payee is as the 35B showed (REPORT 139).
+- **Person-to-person payees** barely move (blind_v1 26 -> 31, blind_v2 73 -> 75): "purpose varies" is honest but says nothing about
+  which purpose; memos are the missing signal (reports/REAL_DATA_SPEC.md).
+- **Recommended system (revised)**: for a first-time payee, a database kind line when the payee's kind is known, else the untrained 35B
+  (REPORT 139); for known payees, the plain prompt; YNAB's rule first unless the model is 0.2 more confident; lists of three.

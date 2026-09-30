@@ -1270,3 +1270,5 @@ is noisy; describe payees by a canonical kind at inference ("Kind: coffee shop",
 model infer a kind from categorised transactions? *Experiments:* (147) what a user's category holds, from the user's rows, as a choice
 among canonical kinds; (148) a payee's kind from its name, from other users' filings, or both; (149) "Kind:" lines on history rows and
 the query, from the generators' kinds and from (148)'s inferred kinds, in training and at test; first-time payees, new users, p2p.
+
+**Status (2026-09-30):** PLAN steps 147-149, REPORTs 143-144: payee kinds are inferable from filings (name + filings 77-87%); a database kind line for first-time payees matches or beats the 35B without retraining; inferred kinds do not replace the 35B; no kind training.

@@ -59,9 +59,8 @@ For each query transaction:
 - the other-users line ("Other users file this payee as: ...") from **training users' filings dated before the query**, mapped to
   their category names, top three by count, when at least three such filings exist;
 - statement string: import_string when present, else payee_name (report both groups).
-- a canonical "Kind:" line under every row and the query (PLAN step 149), from payee_kind where known, else inferred from the payee's
-  name and other training users' filings (step 148), else "unknown"; person-to-person payees as "person-to-person payment (purpose
-  varies)"; the memo, when present, on the row.
+- for a first-time payee, a canonical "Kind:" line under the query when payee_kind is known (REPORT 144; no retraining needed), else
+  the 35B's reading (REPORT 139); person-to-person payees as "person-to-person payment (purpose varies)"; the memo, when present, on the row.
 
 ## 4. What we measure
 
