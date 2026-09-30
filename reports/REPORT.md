@@ -8353,3 +8353,60 @@ comparison row. `scripts/noenc_tables.py`.
 - The encoder's gain on blind_v1 came from a world like its training; on blind_v2 it costs. It remains the fastest reader if a cheap
   first pass is ever needed, but the recommended system is decider (+ other-users line) -> 35B, with YNAB's rule gated by confidence
   (REPORT 137) for the first suggestion on known payees.
+
+
+## 139. Route the 35B by payee history: its world knowledge helps first-time payees and overrides the user's own recent pattern on known ones (blind_v2: changed minds 44 -> 5, weekday rules 65 -> 57); reading only first-time payees with it gives the same effort as escalation (0.559 / 1.003 against 0.556 / 1.007), protects the habit cases (57.5 against 46.5 on blind_v2) and sends it 18 to 21% of transactions instead of 35 to 65%
+
+PLAN step 142. First, where blind_v2's misses are against its ideal reader (decider with the other-users line, three seeds; x the untrained
+35B); then routing: decider alone, decider -> 35B for what it does not auto-file (REPORT 138), decider x 35B for all, and decider x 35B
+for first-time payees only. `scripts/route_tables.py`.
+
+**Table 139.1: blind_v2 top-1 by what decides the item**
+
+| why | n | ideal reader | decider (+ line) | decider x 35B | gap to ideal (decider x 35B) |
+|---|---|---|---|---|---|
+| multi_purpose | 231 | 62 | 57.1 | 63.5 | -1.2 |
+| plain | 200 | 99 | 98.7 | 99.7 | -0.7 |
+| new_user | 192 | 79 | 65.1 | 74.8 | +3.8 |
+| amount_split | 102 | 85 | 83.7 | 87.6 | -2.3 |
+| new_category | 95 | 68 | 57.9 | 65.6 | +2.8 |
+| trip | 94 | 87 | 57.4 | 62.4 | +24.8 |
+| misfiled_history | 90 | 84 | 73.0 | 89.6 | -5.2 |
+| first_time_payee | 81 | 79 | 66.7 | 71.6 | +7.4 |
+| refund | 70 | 90 | 78.1 | 86.2 | +3.8 |
+| recurring | 69 | 100 | 100.0 | 99.5 | +0.5 |
+| p2p | 66 | 68 | 73.2 | 70.7 | -2.5 |
+| income | 54 | 100 | 98.8 | 99.4 | +0.6 |
+| changed_mind | 43 | 51 | 44.2 | 5.4 | +45.7 |
+| seasonal | 37 | 19 | 33.3 | 28.8 | -9.9 |
+| reimbursement | 28 | 68 | 63.1 | 71.4 | -3.6 |
+| weekday_split | 27 | 78 | 65.4 | 56.8 | +21.0 |
+| opaque_new | 13 | 0 | 51.3 | 43.6 | -43.6 |
+| transfer | 8 | 100 | 100.0 | 100.0 | +0.0 |
+
+**Table 139.2: routing (W = 10; "changed mind / weekday / trip": the items decided by the user's own pattern)**
+
+| set | system | top-1 all | first-time payees | known payees | changed mind / weekday / trip | effort W=10 | 35B reads % |
+|---|---|---|---|---|---|---|---|
+| blind_v1 | decider | 83.9 | 60.2 | 89.2 | 69.1 | 0.622 | 0 |
+| blind_v1 | decider -> 35B (unsettled) | 85.5 | 68.6 | 89.3 | 60.9 | 0.556 | 35 |
+| blind_v1 | decider x 35B (all) | 85.5 | 68.7 | 89.3 | 60.9 | 0.551 | 100 |
+| blind_v1 | decider x 35B for first-time payees only | 85.4 | 68.7 | 89.2 | 70.0 | 0.559 | 18 |
+| blind_v2 | decider | 71.7 | 60.8 | 74.6 | 55.3 | 1.084 | 0 |
+| blind_v2 | decider -> 35B (unsettled) | 75.2 | 68.0 | 77.2 | 46.5 | 1.007 | 65 |
+| blind_v2 | decider x 35B (all) | 75.3 | 68.5 | 77.2 | 46.5 | 0.967 | 100 |
+| blind_v2 | decider x 35B for first-time payees only | 73.3 | 68.5 | 74.6 | 57.5 | 1.003 | 21 |
+
+### 139.1 What the step says
+
+- **Where the models still lose on blind_v2**: trips (62 against an ideal 87: user trip categories such as a named vacation), changed
+  minds, weekday rules, first-time payees and new users. Everywhere else the decider x 35B product is at or above the ideal reader.
+- **The 35B hurts where the user's own recent pattern decides**: multiplied in, its prior that a hotel is "Travel" or a payee's usual
+  category overrides a user's recent change (blind_v2 changed minds 44.2 -> 5.4) or day rule (65.4 -> 56.8).
+- **Routing by payee history keeps its gain and removes that harm**: the 35B reads only transactions whose payee the user has never
+  filed (18 to 21%); effort equals escalation (0.559 / 1.003), the habit cases are protected (blind_v2 57.5 against 46.5), and the
+  35B's GPU time falls by half to two thirds. On blind_v2's known payees escalation still gains 2.6 top-1 (74.6 -> 77.2) that routing
+  leaves; the two can combine (the 35B for first-time payees, and for known payees only when decider is unsure and the payee is
+  multi-purpose), not tested.
+- **Recommended system (revised)**: decider-4B (with the other-users line) for every transaction; the untrained 35B for first-time
+  payees; YNAB's rule first for known payees unless the model is 0.2 more confident (REPORT 137); list sizing as REPORT 134.
