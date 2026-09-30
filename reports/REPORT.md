@@ -8413,3 +8413,36 @@ for first-time payees only. `scripts/route_tables.py`.
   multi-purpose), not tested.
 - **Recommended system (revised)**: decider-4B (with the other-users line) for every transaction; the untrained 35B for first-time
   payees; YNAB's rule first for known payees unless the model is 0.2 more confident (REPORT 137); list sizing as REPORT 134.
+
+
+## 140. Overlap of payees between training and the blind sets (intended, owner 2026-09-30): 19 to 25% of blind queries are payees from the training merchant catalogue and database (mostly real chains both worlds share), 1 to 7% from the business-name or kinds catalogues, the rest novel; on blind_v1 the model is 1.6 points from the ideal reader on catalogue payees and 5.3 on novel ones, on blind_v2 the catalogue payees are its hard multi-purpose chains; and a note on splits (EVAL-15)
+
+PLAN step 143 (owner, 2026-09-30: "it's okay if there is some leakage of novel payee names and categories between users, because that is
+realistic ... I also wanted to have a merchant database that was separate that allowed for us to teach the model about certain
+payees"). Each blind query's payee name (normalised: lower case, letters and digits) against what training saw: REAL-6's merchant
+catalogue and the fact database (incl. the misleading-name set), the Overture business-name pool, the kinds catalogue. For blind_v1 the
+last two had blind_v1's names removed before training (so matches there are listed but untrained). `scripts/overlap_tables.py`.
+
+| set | payee known to training as | n | share | ideal reader | decider-4B | 35B untrained | routed system |
+|---|---|---|---|---|---|---|---|
+| blind_v1 | merchant catalogue / database | 368 | 25% | 90 | 88.4 | 84.0 | 88.7 |
+| blind_v1 | novel (listed, filtered from training) | 71 | 5% | 97 | 93.4 | 93.0 | 94.4 |
+| blind_v1 | novel | 1061 | 71% | 87 | 81.7 | 80.6 | 83.7 |
+| blind_v2 | merchant catalogue / database | 284 | 19% | 81 | 70.9 | 76.4 | 73.6 |
+| blind_v2 | Overture pool | 85 | 6% | 84 | 71.0 | 75.3 | 74.1 |
+| blind_v2 | kinds catalogue | 21 | 1% | 62 | 69.8 | 76.2 | 69.8 |
+| blind_v2 | novel | 1110 | 74% | 78 | 72.0 | 70.4 | 73.2 |
+
+### 140.1 What the step says
+
+- **Overlap is real and modest**: a fifth to a quarter of blind queries are payees the training catalogue knows (chains such as
+  Target, Starbucks, pharmacies, utilities), as the owner intends; three quarters are novel to training.
+- **On blind_v1 the known payees read closest to the ceiling** (88.4 against 90; novel 81.7 against 87), consistent with the controlled
+  results (REPORT 53, 58, 73: database episodes teach specific payees, 94% on payees known only from the database). On blind_v2 the
+  catalogue payees are mostly multi-purpose chains filed several ways (ideal reader 81), and decider is 10 points from the ideal there,
+  where the 35B's prior helps (76.4): knowing a payee is not knowing which of a user's categories this purchase belongs to.
+- **Splits, for the record** (owner's question, 2026-09-30): every held-out set is held out by user or is a separate population, never
+  by random transactions; merchants are shared on purpose. There is no separate validation set during training (fixed steps, no early
+  stopping), but blind_v1 has been the selection set since REPORT 103 and is validation in practice; blind_v2 confirmed conclusions
+  but also informed REPORT 137 and 139's gate and routing; blind_v3 (row 145) is kept untouched for a final check. The real-data plan
+  (reports/REAL_DATA_SPEC.md) splits users 70 / 15 / 15 with a time holdout and a sealed test split.
