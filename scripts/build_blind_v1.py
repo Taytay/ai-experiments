@@ -54,6 +54,9 @@ OTHERS = os.environ.get("BLIND_OTHERS") == "1"  # row 124 (main session): blind_
 # naming the categories other users filed this payee under before the query's date (the top three with counts; only when at least
 # three such rows exist): "Other users file this payee as: Eating out (14), Restaurants (9), Dining out (3)"
 OTHERS_HEAD = "Other users file this payee as: "
+YNAB_RULE = os.environ.get("BLIND_YNAB") == "1"  # row 134 (owner, 2026-09-30): write blind_v1_ynabrule.json, YNAB's current suggestion per
+# blind_v1 item from the payee's whole filed history before the query (payee identity exact): the category used in 2 of the payee's last 3
+# transactions; with fewer than 3, the last one used; if the last 3 all differ, the last one used (assumed); no history, no suggestion
 if SPLIT:
     OUT = OUT.with_name("blind_v1_split.json")
 if OTHERS:
@@ -2089,6 +2092,15 @@ def bulk_items(u, rows, first_idx):
                 "date": q["date"].isoformat(), "options": [" " + x for x in header], "answer": header.index(q["intended"]),
                 "best": header.index(best_cat) if best_cat in header else -1, "why": why, "scheme": u.scheme, "hist_len": c,
                 "in_shots": any(hist[i]["mid"] == q["mid"] for i in sl), "n_shared": len(shared), "n_near": len(near)}
+        past = [r["filed"] for r in hist if r["mid"] == q["mid"]]  # row 134: YNAB's current rule on the history filed before the sync
+        if not past:
+            rule = None
+        elif len(past) < 3:
+            rule = past[-1]
+        else:
+            top, k_top = Counter(past[-3:]).most_common(1)[0]
+            rule = top if k_top >= 2 else past[-1]
+        base["ynab_rule"] = header.index(rule) if rule in header else -1
         p1 = make_prompt(header, [hist[i] for i in sl], q)
         p2 = make_prompt_split(header, [hist[i] for i in shared], [hist[i] for i in near], q)
         plain.append(dict(base, prompt=p1, prompt_ctx=p1))
@@ -2115,6 +2127,7 @@ def main():
     picked = Counter()
     items = []
     bulk_plain, bulk_split = [], []
+    ynab = {}  # row 134
     others_rows = {}  # row 124: mid -> [(date, uid, filed)] over every user (build_user seeds each user's own rng, so this pre-pass changes nothing)
     if OTHERS:
         for uid in ids:
@@ -2169,11 +2182,23 @@ def main():
                 tags[i] = why_of(u, rows, i, first_idx)
             chosen.sort()
         for n, qi in enumerate(chosen):
+            n_q = n
             q = rows[qi]
             header = u.header(q["date"])
             sl = build_slice(u, rows, qi)
             srows = [rows[i] for i in sl]
             prompt = make_prompt(header, srows, q)
+            if YNAB_RULE:
+                past = [r["filed"] for r in rows[:qi] if r["mid"] == q["mid"]]
+                last3 = past[-3:]
+                if not past:
+                    sug = None
+                elif len(last3) < 3:
+                    sug = past[-1]
+                else:
+                    top, k_top = Counter(last3).most_common(1)[0]
+                    sug = top if k_top >= 2 else past[-1]
+                ynab[f"BL:{u.uid}:{n_q}"] = header.index(sug) if sug in header else -1
             if OTHERS:
                 cnt = Counter(f for d, v, f in others_rows.get(q["mid"], []) if v != u.uid and d < q["date"])
                 if sum(cnt.values()) >= 3:
@@ -2196,12 +2221,26 @@ def main():
                 "prompt": prompt, "prompt_ctx": prompt, "options": [" " + c for c in header], "answer": ans,
                 "best": header.index(best_cat) if best_cat in header else -1, "why": why, "scheme": u.scheme,
                 "hist_len": qi, "in_shots": any(r["mid"] == q["mid"] for r in srows)})
+    if YNAB_RULE:
+        (OUT.parent / "blind_v1_ynabrule.json").write_text(json.dumps(ynab, indent=0))
+        print(f"wrote blind_v1_ynabrule.json: {len(ynab)} items, {sum(v >= 0 for v in ynab.values())} with a suggestion")
+        return
     if BULK:
+        rule = {}
+        for its in (bulk_plain, bulk_split):
+            for it in its:
+                rule[it["id"]] = it.pop("ynab_rule")
+        (OUT.parent / "blind_bulk_v1_ynabrule.json").write_text(json.dumps(rule, indent=0))  # row 134: YNAB's current rule per bulk item
         for name, its in (("blind_bulk_v1", bulk_plain), ("blind_bulk_v1_split", bulk_split)):
             sha = hashlib.sha256(json.dumps(its, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
             out = {"name": name, "version": "v1", "n_users": len({i["user"] for i in its}), "items": its, "sha256": sha,
                    "notes": "Row 117 (main session): one sync per full blind_v1 user; see the BLIND_BULK comment in scripts/build_blind_v1.py."}
-            (OUT.parent / f"{name}.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+            path = OUT.parent / f"{name}.json"
+            if path.exists():  # frozen (DVC, read-only): check it is what the generator makes, do not rewrite it
+                assert json.loads(path.read_text())["sha256"] == sha, f"{name} differs from the frozen set"
+                print(f"{name}: frozen set matches (sha {sha[:12]})")
+                continue
+            path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
             ceil = sum(i["best"] == i["answer"] for i in its) / len(its)
             print(f"wrote {name} items={len(its)} users={out['n_users']} sha={sha[:12]} ceiling {ceil:.3f} in_shots {sum(i['in_shots'] for i in its)}")
         return

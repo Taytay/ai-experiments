@@ -7917,3 +7917,62 @@ order, at most five) and never penalised; other categories only when the model i
   (the model's own confident second choices); whether they look irrelevant needs a human or strong-reader judgement.
 - Blind_v1 users file most payees under one category (1.2 plausible categories per transaction on average); real users with Amazon-like
   payees will have more, which is where this matters most.
+
+
+## 131. Against YNAB's current suggestion, in a product where every transaction is confirmed: on one user's ordinary stream the rule puts the right category first 82% of the time and the models 84%; the models' value is the second-to-fifth choices and payees new to the user (searches 18 -> 5%, work saved 82 -> 93%), and most of that is had without a model by listing the payee's other past categories after the rule's suggestion (work saved 90%); on blind_v1's hard cases the models lead further (right first 73.5 -> 85.7%, new users 7 -> 78%)
+
+PLAN step 134 (owner, 2026-09-30: "YNAB makes you confirm everything anyway. It currently suggests the last one used in 2 out of 3
+transactions (or last one used if there aren't 3 transactions in that payee's history yet)"). With every transaction confirmed there is
+no auto-file: the score is where the right category lands (owner's scale: 1st 0, 2nd 1, ... 5th 4, not suggested 10), with the clutter
+cost for implausible wrong suggestions (REPORT 130). YNAB's rule is computed in the blind generator from each payee's whole filed history
+(payee identity exact; `BLIND_YNAB=1` -> `data/processed/blind_v1_ynabrule.json`; the bulk set's in `blind_bulk_v1_ynabrule.json`); when the
+last three all differ it suggests the last one (assumed). `scripts/confirm_card.py [bulk]`.
+
+**Confirm-everything card, blind_v1 (clutter 1 per implausible wrong suggestion; not suggested = 10)**
+
+| suggestions from | right one 1st % | right one 2nd-5th % | not suggested (search) % | suggestions shown | score (0 best) | work saved vs by hand |
+|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | 73.5 | 0.0 | 26.5 | 0.8 | 2.65 | 74% |
+| YNAB today + the payee's other past categories (no model) | 79.0 | 5.4 | 15.6 | 1.2 | 1.64 | 84% |
+| decider-4B | 83.8 | 8.6 | 7.6 | 1.5 | 1.08 | 89% |
+| YNAB's suggestion first, then decider-4B | 84.6 | 7.8 | 7.6 | 1.5 | 1.07 | 89% |
+| encoder + decider | 84.4 | 8.3 | 7.2 | 1.5 | 1.01 | 90% |
+| YNAB's suggestion first, then encoder + decider | 85.1 | 7.6 | 7.2 | 1.5 | 1.00 | 90% |
+| encoder + decider + 35B | 85.7 | 8.2 | 6.1 | 1.5 | 0.86 | 91% |
+| YNAB's suggestion first, then encoder + decider + 35B | 86.3 | 7.6 | 6.1 | 1.5 | 0.86 | 91% |
+
+**Right one 1st %, by kind of transaction**
+
+| suggestions from | all (n=1500) | payee seen before (n=1223) | payee new to the user (n=277) | user changed their mind / new category (n=72) | one payee, several categories (split / multi-purpose / p2p) (n=182) | new users (0-10 rows) (n=168) |
+|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | 73.5 | 90.2 | 0.0 | 59.7 | 59.9 | 7.1 |
+| decider-4B | 83.8 | 89.2 | 59.9 | 57.9 | 57.5 | 69.6 |
+| encoder + decider | 84.4 | 89.3 | 62.7 | 57.6 | 58.7 | 71.7 |
+| encoder + decider + 35B | 85.7 | 89.5 | 69.2 | 49.7 | 58.6 | 78.0 |
+
+**Confirm-everything card, blind_bulk_v1 (one sync per user, 6660 transactions in order; payee seen before 96%)**
+
+| suggestions from | right one 1st % | 2nd-5th % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |
+|---|---|---|---|---|---|---|---|---|
+| YNAB today | 82.0 | 0.0 | 18.0 | 1.0 | 1.80 | 82% | 85.3 | 0.0 |
+| YNAB today + the payee's other past categories (no model) | 82.0 | 9.6 | 8.3 | 1.5 | 0.97 | 90% | 85.3 | 0.8 |
+| decider-4B | 83.8 | 10.9 | 5.4 | 1.6 | 0.78 | 92% | 85.2 | 49.4 |
+| YNAB's suggestion first, then decider-4B | 83.9 | 10.7 | 5.4 | 1.6 | 0.78 | 92% | 85.3 | 49.4 |
+| encoder + decider | 84.1 | 10.5 | 5.4 | 1.6 | 0.74 | 93% | 85.4 | 51.4 |
+| YNAB's suggestion first, then encoder + decider | 84.0 | 10.6 | 5.4 | 1.6 | 0.75 | 93% | 85.3 | 51.4 |
+
+### 131.1 What the step says
+
+- **YNAB's rule is hard to beat at the first suggestion for payees the user has filed before**: 90% (blind_v1) and 85% (the ordinary
+  stream) right first, level with every model. Those transactions are 96% of an ordinary stream.
+- **Where the models win**: payees new to the user (the rule has nothing: 0 against 49 to 69% right first), new users (7 against 70 to
+  78%), and the list after the first suggestion. On the ordinary stream searches fall from 18% to 5.4% and work saved rises from 82% to
+  93%; on blind_v1 (hard cases over-sampled) from 74% to 91%.
+- **Most of the ordinary-stream gain needs no model**: after the rule's suggestion, list the other categories the user has filed this
+  payee under (and those other users file it under): searches 18 -> 8.3%, work saved 82 -> 90%. The models add the last 3 points there
+  (and much more on new payees and new users).
+- **The combination is the product answer**: the rule's suggestion first where the payee has history (it is as good as the models there
+  and users know it), the model's ranked list after it and for everything else. On blind_v1 that is the best row (86.3% right first).
+- **Changes of mind**: the rule (59.7% right first) beats the 35B system (49.7) and matches the small models (58): the latest filings are
+  the signal, which the rule reads directly.
+- For real data: the share of new payees and new users in real streams decides how much the models are worth over the no-model list.

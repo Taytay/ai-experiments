@@ -26,7 +26,8 @@ from decision_tables import folds_calibrate, load, product  # noqa: E402
 from ensemble_tables import DEC, ENC  # noqa: E402
 
 BIG = "results/per_item/real6_dm_decider_decider-35b-a3b_blind_v1.noctx.jsonl"
-W, CONFIRM, LAM = (float(x) for x in (sys.argv[1:4] + ["20", "0.5", "1"][len(sys.argv[1:4]):]))
+_ARGS = [a for a in sys.argv[1:4] if a.replace(".", "", 1).isdigit()] if Path(sys.argv[0]).name == "report_card.py" else []
+W, CONFIRM, LAM = (float(x) for x in (_ARGS + ["20", "0.5", "1"][len(_ARGS):]))
 
 
 def plausible_sets(items):
