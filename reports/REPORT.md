@@ -8164,14 +8164,14 @@ line shown). `scripts/variant_tables.py`, job list `scripts/modal_jobs/r136.json
 | decider-4B + category descriptions, trained (row 137) | 2 | 83.8 | 63.4 / 81.9 | 72.3 | 83.7 | 0.636 | 82.6 | 69.1 |
 | decider-4B (REPORT 123) read with descriptions, untrained on them | 1 | 83.7 | 59.2 / 82.3 | 67.3 | 84.7 | 0.629 | nan | nan |
 
-Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B ~1.0 minute, decider-4B ~3.1 minutes.
+Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B 0.9 to 1.0 minute, decider-4B 2.0 to 3.1 minutes.
 
 ### 135.1 What the step says
 
 - **The 0.8B is fast and not good enough here.** Its synthetic scores are the 4B's (REAL-6 87.6), but on the blind set it loses where
-  knowledge and judgement matter: first-time payees 55 against 60, the user's own habits 81 against 85, effort 0.726 against 0.622. At
-  ~3 ms of H100 time per transaction against ~10 for the 4B (vLLM, REPORT 120), the 4B's gain in user effort is worth its cost; the
-  encoder (1B, bidirectional) remains the cheap reader.
+  knowledge and judgement matter: first-time payees 55 against 60, the user's own habits 81 against 85, effort 0.726 against 0.622. The
+  4B costs 2 to 3 times the 0.8B per transaction (not measured in vLLM), about $11 per million transactions (REPORT 120): the gain in user
+  effort is worth it; the encoder (1B, bidirectional) remains the cheap reader.
 - **Descriptions help where names say nothing, and hurt where they mislead.** A category listed with the payees filed under it helps
   first-time payees (59.9 -> 63.4) and new users (69.6 -> 72.3); but on REAL-6's novel-name copy (every category a coined word) top-1
   falls from 84.6 to 69.1 and on REAL-6 from 87.8 to 82.6. Our reading: the description names two payees, and a reader trained on it
