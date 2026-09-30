@@ -33,6 +33,8 @@ AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on
 LAYOUT = os.environ.get("LAYOUT", "")  # row 111 (owner, 2026-09-29): "" (decider's layout), options | labelled | labelled_shots (oneslot.build_layout)
 DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.build_layout)
 EMA = float(os.environ.get("EMA", "0"))  # row 122 (TRAIN-13): an exponential moving average of the LoRA weights (this decay per step) is what gets saved
+TEACHER = os.environ.get("TEACHER", "")  # row 123 (MODEL-19): per-item log-probs of a teacher on the pool's first-time-payee episodes (dump_teacher_items.py + exp_decision_models.py)
+TEACH_W = float(os.environ.get("TEACH_W", "0.5"))  # the target on those episodes: (1 - w) one-hot + w teacher distribution
 SPLIT = os.environ.get("SPLIT", "") == "1"
 DESC = os.environ.get("DESC", "") == "1"  # row 136: each category in the list described by the payees filed under it in the prompt (oneslot.describe_categories)  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
@@ -56,6 +58,8 @@ SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_
 SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
+SFX_POOL = SFX  # the pool's name without the teacher suffix (dump_teacher_items.py names its file by it)
+SFX += f"_teach{round(TEACH_W * 100)}" if TEACHER else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
 NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
 OUT_DIR = ROOT / "models" / "adapters" / NAME
@@ -130,6 +134,24 @@ def episodes():
     return out
 
 
+TEACH = {}  # row 123: episode context -> teacher probabilities in the episode's option order
+
+
+def load_teacher(eps):
+    import math
+    import glob as _g
+    items = json.loads((ROOT / "data" / "processed" / f"teacher_eps_{SFX_POOL}.json").read_text())["items"]
+    by_id = {it["id"]: it for it in items}
+    path = TEACHER if os.path.exists(TEACHER) else sorted(_g.glob(str(ROOT / "results" / "per_item" / TEACHER)))[0]
+    for line in open(path):
+        r = json.loads(line); it = by_id.get(r["id"])
+        if it is None:
+            continue
+        lp = r["sum_lp"]; m = max(lp); z = [math.exp(x - m) for x in lp]; s = sum(z)
+        TEACH[it["prompt"][: -len("\nCategory:")]] = [x / s for x in z]
+    print(f"   teacher distributions for {len(TEACH)} episodes", flush=True)
+
+
 def main():
     import torch
     import torch.nn.functional as F
@@ -150,6 +172,8 @@ def main():
 
     from ai_experiments import oneslot
     eps = episodes(); rng = random.Random(SEED)
+    if TEACHER:
+        load_teacher(eps)
     params = [p for p in model.parameters() if p.requires_grad]
     opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
@@ -177,6 +201,12 @@ def main():
         gold = torch.tensor([max(b["gold"], 0) for b in built], device="cuda")
         lz = F.log_softmax(z, -1).masked_fill(torch.isinf(z), 0.0)
         per = torch.where(soft, -lz.sum(-1) / torch.tensor([len(b["labs"]) for b in built], device="cuda"), -lz.gather(1, gold[:, None])[:, 0])
+        for i, (e, b) in enumerate(zip(picked, built)):  # row 123: the teacher's distribution mixed into the target
+            td = TEACH.get(e[0])
+            if td and b["gold"] >= 0 and e[0] not in SOFT_CTX and len(td) == len(e[1]):
+                tv = [(1 - TEACH_W) * (oi == e[2]) + TEACH_W * td[oi] for oi in b["perm"]]
+                tv = torch.tensor(tv + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
+                per = per.clone(); per[i] = -(tv * lz[i]).sum()
         for i, (e, b) in enumerate(zip(picked, built)):  # row 86 v2: a split target where the user's choice is noisy or random
             dist = SOFT_CTX.get(e[0])
             if dist and b["gold"] >= 0:
@@ -221,7 +251,7 @@ if __name__ == "__main__":
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
                poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
                abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
-               evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA)
+               evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA, teacher=TEACHER, teach_w=TEACH_W)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)
