@@ -8111,3 +8111,39 @@ basis). `scripts/closeness_tables.py`.
   one is about a quarter as likely as its pick; these are the transactions to show with a longer list or a search box open.
 - **Product consequence:** size the suggestion list by confidence and history: for a first-time payee with a spread-out distribution,
   show five; for a known payee, the rule plus the payee's other categories.
+
+
+## 134. Sizing the suggestion list: five suggestions for first-time payees and the short list otherwise finds the right category for 88% of blind_v1's first-time payees (from 81%) and 76% on the ordinary stream (from 61%), at 1.7 suggestions per transaction on the stream (from 1.6); a probability floor of 0.05 is the middle ground (EVAL-14)
+
+PLAN step 139 (after REPORT 133). Policies for a confirm-everything product, with YNAB's suggestion first where it has one: current
+(REPORT 131's list: plausible categories free, others only if confident), adaptive (current for payees seen before, top five for
+first-time payees), a probability floor (categories with p >= 0.05 or 0.1, one to five), and always five. `scripts/list_policy_tables.py`.
+
+**blind_v1, encoder x decider x 35B: right one 1st % / in the list % / suggestions shown / wrong ones shown (all; first-time payees; payees seen before)**
+
+| policy | all | first-time payees | payees seen before |
+|---|---|---|---|
+| current | 86.4 / 94.1 / 1.47 / 0.53 | 69.7 / 80.9 / 1.59 / 0.78 | 90.2 / 97.1 / 1.44 / 0.47 |
+| adaptive | 86.4 / 95.5 / 2.10 / 1.14 | 69.7 / 88.1 / 5.00 / 4.12 | 90.2 / 97.1 / 1.44 / 0.47 |
+| p >= 0.05 | 86.4 / 94.9 / 1.58 / 0.63 | 69.7 / 86.3 / 2.61 / 1.75 | 90.2 / 96.8 / 1.35 / 0.38 |
+| p >= 0.1 | 86.4 / 93.0 / 1.33 / 0.40 | 69.7 / 80.9 / 1.63 / 0.82 | 90.2 / 95.7 / 1.26 / 0.30 |
+| top 5 | 86.4 / 96.5 / 5.00 / 4.03 | 69.7 / 88.1 / 5.00 / 4.12 | 90.2 / 98.4 / 5.00 / 4.02 |
+
+**the ordinary stream (blind_bulk_v1), encoder x decider: right one 1st % / in the list % / suggestions shown / wrong ones shown (all; first-time payees; payees seen before)**
+
+| policy | all | first-time payees | payees seen before |
+|---|---|---|---|
+| current | 84.0 / 94.6 / 1.57 / 0.63 | 52.5 / 61.2 / 1.51 / 0.90 | 85.3 / 95.9 / 1.57 / 0.61 |
+| adaptive | 84.0 / 95.1 / 1.70 / 0.75 | 52.5 / 76.1 / 5.00 / 4.24 | 85.3 / 95.9 / 1.57 / 0.61 |
+| p >= 0.05 | 84.0 / 94.7 / 1.56 / 0.62 | 52.5 / 69.4 / 2.83 / 2.14 | 85.3 / 95.7 / 1.51 / 0.56 |
+| p >= 0.1 | 84.0 / 93.6 / 1.43 / 0.50 | 52.5 / 61.6 / 1.56 / 0.95 | 85.3 / 94.8 / 1.43 / 0.48 |
+| top 5 | 84.0 / 96.4 / 5.00 / 4.04 | 52.5 / 76.1 / 5.00 / 4.24 | 85.3 / 97.2 / 5.00 / 4.03 |
+
+### 134.1 What the step says
+
+- **Adaptive is the product choice**: for payees seen before it keeps the short list (1.4 to 1.6 suggestions, the right one in it 96 to
+  97%); for first-time payees it shows five, finding the right one 88% (blind_v1) and 76% (stream) of the time instead of 81% and 61%.
+  First-time payees are 4% of an ordinary stream, so the average list grows only from 1.57 to 1.70.
+- **A floor of p >= 0.05** gets most of the first-time gain with fewer wrong suggestions (2.6 to 2.8 shown there, right one in the
+  list 86 / 69%): a middle ground if five looks cluttered.
+- **Always five** adds 1 to 2 points on known payees at 3.5 more wrong suggestions each: not worth it.
