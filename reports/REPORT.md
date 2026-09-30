@@ -7730,3 +7730,33 @@ W = 5 / 10 / 20 / 50 (auto-filed 68.4%): the untrained one is better as the thir
   is where the 35B's confidence adds the most.
 - **What remains open for real data:** W itself (the owner's call, then users' undo behaviour); the calibration fitted on the product's
   own users (REPORT 116); how varied real users' names are in the other-users line.
+
+
+## 127. decider-35B-A3B's missing database was under-training, not the frozen experts: at twice the rate (same 800 steps) it reads REAL-6 at 85.9 and novel names at 84.2 (4B level; row 125: 74 and 69), at twice the steps 88.3 and 86.6, with blind_v1 kept (84.3, 83.7); but by effort on blind_v1 neither beats row 125's run, and the harder it is trained the less it adds as the third reader (0.584 to 0.590 against the untrained 35B's 0.549 at W = 10) (MODEL-20)
+
+PLAN step 128. Row 125's LoRA targets (routed experts frozen) at lr 2e-4 x 800 steps and at 1e-4 x 1,600 steps; one H200 each (54 and 95
+minutes with scoring); final loss 0.46 and 0.53 (row 125: 0.64). Effort under the per-item rule (REPORT 118); as the third reader, the
+system of REPORT 126 (encoder x decider with the other-users line, then the 35B for the rest). `scripts/system_v2_tables.py BIG=<file>`,
+job list `scripts/modal_jobs/r128.json`.
+
+**Table 127.1: top-1, and effort on blind_v1 alone and as the third reader (W = 10 unless shown)**
+
+| 35B run | blind_v1 | REAL-6 | novel names | misleading | alone: W = 5 / 10 / 20 / 50 | as third reader (pair -> 35B), W = 10 |
+|---|---|---|---|---|---|---|
+| untrained | 82.0 | – | – | – | – / 0.701 / – / – | **0.549** |
+| row 125: 1e-4 x 800 | **84.8** | 74.2 | 69.1 | 61.4 | 0.497 / **0.593** / 0.695 / 0.877 | 0.570 |
+| 2e-4 x 800 | 84.3 | 85.9 | 84.2 | 63.4 | 0.486 / 0.613 / 0.795 / 0.947 | 0.584 |
+| 1e-4 x 1,600 | 83.7 | **88.3** | **86.6** | 64.4 | 0.507 / 0.626 / 0.755 / 0.885 | 0.590 |
+
+### 127.1 What the step says
+
+- **The 35B stores the database once trained enough.** REAL-6 and its novel-name copy reach decider-4B's level (85 to 88) with the
+  routed experts still frozen; row 125 had simply not trained far enough (loss 0.64 against 0.46).
+- **The blind set does not reward it.** blind_v1's merchants are real businesses the base already knows; more training moves it toward
+  our generator (REAL-6 up) and slightly away from the blind set (84.8 -> 83.7), and its effort there gets worse (0.593 -> 0.613 to 0.626).
+  REPORT 103's lesson again: fixed synthetic training tunes readers to their generator.
+- **As the third reader, the less trained the better:** 0.549 untrained, 0.570, 0.584, 0.590. The escalation reader's value is an
+  independent opinion from world knowledge; training it on the small models' episodes removes that.
+- **Decision:** the system keeps the untrained decider-35B-A3B as its third reader (REPORT 126). If one large model must read everything,
+  row 125's run is the best of these on the blind set; with real data the trade between the generator's database and world knowledge
+  has to be measured again.
