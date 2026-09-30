@@ -7760,3 +7760,43 @@ job list `scripts/modal_jobs/r128.json`.
 - **Decision:** the system keeps the untrained decider-35B-A3B as its third reader (REPORT 126). If one large model must read everything,
   row 125's run is the best of these on the blind set; with real data the trade between the generator's database and world knowledge
   has to be measured again.
+
+
+## 128. Another opinion from a small model barely helps: an untrained decider-4B, a decider-4B trained on another prompt format or a third seed each lift the pair only from 0.603 to 0.588 to 0.607 (W = 10), where the untrained 35B takes it to 0.549; the 35B is right on a quarter of the pair's mistakes, every 4B on a sixth, and stacking a 4B on the 35B adds nothing: what the third reader must bring is knowledge the small models lack, not just a different view (EVAL-12)
+
+PLAN step 131 (owner, 2026-09-30: "if we just need another opinion, would an untrained 4B help? an ensemble of smaller models?"). CPU
+only, saved blind_v1 scores; the base pair is REPORT 126's (encoder x decider-4B with the other-users line, nine seed pairs); per-item
+rule. "X right where the pair is wrong": the share of the pair's wrong top answers that X gets right. `scripts/ensemble_tables.py`.
+
+**Table EN.1: blind_v1, effort per transaction under the per-item rule (mean [range] over 9 seed pairs of the encoder x decider with the other-users line)**
+
+| third reader X | compute (4B = 1) | X alone: top-1 / effort W=10 | X right where the pair is wrong % | pair -> X: W = 5 / 10 / 20 | all three: W = 5 / 10 / 20 |
+|---|---|---|---|---|---|
+| (none: the pair) | 0 | – | – | 0.507 [0.488, 0.524] / 0.603 [0.583, 0.618] / 0.735 [0.717, 0.761] | – |
+| decider-4B untrained (letters) | 1.0 | 76.5 / 0.949 | 17.6 | 0.494 [0.484, 0.508] / 0.588 [0.565, 0.613] / 0.724 [0.699, 0.739] | 0.498 [0.484, 0.510] / 0.584 [0.571, 0.594] / 0.723 [0.706, 0.737] |
+| decider-4B untrained (random A-Z labels) | 1.0 | 76.4 / 0.985 | 18.3 | 0.501 [0.481, 0.512] / 0.600 [0.578, 0.618] / 0.724 [0.700, 0.743] | 0.505 [0.488, 0.518] / 0.592 [0.573, 0.601] / 0.722 [0.697, 0.734] |
+| decider-4B recipe, decider's own layout (other prompt) | 1.0 | 82.4 / 0.642 | 17.3 | 0.495 [0.481, 0.506] / 0.595 [0.582, 0.605] / 0.747 [0.727, 0.762] | 0.497 [0.488, 0.505] / 0.593 [0.585, 0.602] / 0.750 [0.734, 0.766] |
+| decider-4B recipe, YAML history | 2.0 | 81.7 / 0.668 | 16.3 | 0.510 [0.497, 0.524] / 0.604 [0.587, 0.619] / 0.744 [0.724, 0.763] | 0.509 [0.496, 0.523] / 0.599 [0.588, 0.615] / 0.741 [0.724, 0.759] |
+| decider-4B recipe, TSV table | 1.2 | 81.1 / 0.685 | 15.6 | 0.506 [0.487, 0.522] / 0.607 [0.584, 0.625] / 0.746 [0.729, 0.768] | 0.512 [0.499, 0.525] / 0.605 [0.591, 0.617] / 0.741 [0.725, 0.764] |
+| decider-4B recipe, labelled rows, seed 2 (same prompt) | 1.0 | 83.1 / 0.674 | 17.3 | 0.499 [0.486, 0.509] / 0.593 [0.578, 0.606] / 0.732 [0.707, 0.752] | 0.496 [0.485, 0.503] / 0.589 [0.574, 0.603] / 0.739 [0.714, 0.753] |
+| decider-35B-A3B untrained | 1.5 | 82.0 / 0.701 | 25.6 | 0.453 [0.435, 0.475] / 0.549 [0.533, 0.563] / 0.681 [0.655, 0.703] | 0.441 [0.429, 0.451] / 0.541 [0.525, 0.553] / 0.666 [0.651, 0.691] |
+| decider-35B-A3B recipe (row 125) | 1.5 | 84.8 / 0.593 | 25.1 | 0.477 [0.464, 0.493] / 0.573 [0.561, 0.587] / 0.713 [0.700, 0.728] | 0.467 [0.459, 0.478] / 0.563 [0.547, 0.577] / 0.713 [0.696, 0.723] |
+| + decider-4B untrained (letters) + decider-35B-A3B untrained | 2.5 | – | – | 0.470 [0.453, 0.477] / 0.565 [0.535, 0.595] / 0.679 [0.653, 0.703] | 0.464 [0.457, 0.471] / 0.562 [0.541, 0.581] / 0.668 [0.657, 0.684] |
+| + decider-4B untrained (letters) + decider-4B recipe, decider's own layout (other prompt) | 2.0 | – | – | 0.485 [0.473, 0.501] / 0.580 [0.558, 0.598] / 0.723 [0.711, 0.745] | 0.485 [0.469, 0.494] / 0.576 [0.569, 0.589] / 0.719 [0.711, 0.729] |
+| + decider-4B untrained (letters) + decider-4B recipe, decider's own layout (other prompt) + decider-35B-A3B untrained | 3.5 | – | – | 0.467 [0.453, 0.487] / 0.547 [0.533, 0.559] / 0.691 [0.679, 0.718] | 0.459 [0.445, 0.471] / 0.540 [0.533, 0.547] / 0.693 [0.685, 0.701] |
+
+Confidence as a signal of being wrong (first seeds; W = 10): decider-4B with the other-users line is right on 84.2%, auto-files 66.1% at
+97.9%, and holds back 91.1% of its wrong answers for the user (AUROC of its confidence for right against wrong 0.908); the three-model
+system holds back 90.5% of its (fewer) wrong answers (AUROC 0.911). New users are its weak spot: auto-filed 45% (system 39%), right
+93.3% (95.5%) when auto-filed.
+
+### 128.1 What the step says
+
+- **A small second opinion helps a little.** Every 4B variant, trained or not, gets about a sixth of the pair's mistakes right (15.6 to
+  18.3%) and moves effort by -0.015 to +0.004: the untrained 4B is the best of them (0.588; compute +1), a third seed of the same recipe
+  as good (0.593).
+- **The 35B's value is knowledge, not diversity alone.** It gets a quarter of the pair's mistakes right (25.6%) and takes effort to 0.549.
+  A 4B added to the 35B does not help (0.565 escalated, 0.562 for all four); an ensemble of 4Bs plus the 35B is no better than the 35B
+  alone behind the pair (0.547 against 0.549) at more than twice the compute.
+- **Decision:** the third reader stays the untrained decider-35B-A3B; without a large model, the cheap substitute for its knowledge is the
+  other-users line (REPORT 123), not more small readers.
