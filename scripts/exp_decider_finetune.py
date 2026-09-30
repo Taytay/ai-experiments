@@ -109,8 +109,11 @@ def evfree_aug(e, rng):
         cat = rng.choice(M.CATEGORY_LIST); mu, sig = T.AMOUNT[cat]
         m = dict(name=name, category=cat, city=rng.choice(M._CITIES))
         head, last = ctx.rsplit("\n", 1)
+        kline = ""
+        if last.startswith("Kind: "):  # row 149: the query's kind line goes with it; an unknown merchant has an unknown kind
+            head, last = head.rsplit("\n", 1); kline = "\nKind: unknown"
         assert last.startswith("Transaction: "), last[:40]
-        ctx = head + f"\nTransaction: {T.render(m, rng)} | ${math.exp(rng.gauss(mu, sig)):.2f} | {rng.choice(T.WEEKDAYS)}"
+        ctx = head + f"\nTransaction: {T.render(m, rng)} | ${math.exp(rng.gauss(mu, sig)):.2f} | {rng.choice(T.WEEKDAYS)}" + kline
         if EVFREE_MODE == "opt":
             return (ctx, opts + [CANT_TELL], len(opts)) + tuple(e[3:])
         return (ctx, opts, None) + tuple(e[3:])

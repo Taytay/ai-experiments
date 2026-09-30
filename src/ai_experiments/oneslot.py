@@ -151,7 +151,7 @@ def parse(context):
         rows.append((t[len("Transaction: "):], c.strip(), pos + len(t) + len("\nCategory:") + 1))
         pos += len(blk) + 2
     q = blocks[-1] if blocks else ""
-    assert q.startswith("Transaction: ") and "\n" not in q, q[:80]
+    assert q.startswith("Transaction: ") and ("\n" not in q or (q.count("\n") == 1 and "\nKind: " in q)), q[:80]  # row 149: a Kind line
     return names, rows, q[len("Transaction: "):]
 
 
@@ -231,8 +231,9 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
 
 
 def _cells(fields):
-    """(date or '', weekday, description, amount) from a row's fields ('2025-01-19 | TEXT | $60.43 | Fri' or 'TEXT | $60.43 | Fri')."""
-    parts = fields.split(" | ")
+    """(date or '', weekday, description, amount) from a row's fields ('2025-01-19 | TEXT | $60.43 | Fri' or 'TEXT | $60.43 | Fri');
+    a "\nKind: ..." line after the fields (row 149) is ignored."""
+    parts = fields.split("\nKind:")[0].split(" | ")
     date = parts[0] if _DATE.match(parts[0]) else ""
     rest = parts[1:] if date else parts
     return date, rest[-1], " | ".join(rest[:-2]), rest[-2].replace("$", "")

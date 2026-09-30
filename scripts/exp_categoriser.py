@@ -144,6 +144,8 @@ PLACES = json.loads((ROOT / "data" / "processed" / f"{POI_DB}.json").read_text()
 POI_SHOTS, POI_REC, POI_KIND = os.environ.get("POI_SHOTS", "fixed"), bool(int(os.environ.get("POI_REC", "0"))), bool(int(os.environ.get("POI_KIND", "0")))
 POI_DESC, POI_UNSEEN = bool(int(os.environ.get("POI_DESC", "0"))), float(os.environ.get("POI_UNSEEN", "0"))
 DECOY, EMPTY = float(os.environ.get("DECOY", "0")), int(os.environ.get("EMPTY", "0"))
+KIND_LINES = os.environ.get("KIND_LINES", "") == "1"  # row 149: a canonical "Kind:" line under every row and the query (ai_experiments.canon)
+KIND_UNK = float(os.environ.get("KIND_UNK", "0.15"))  # ... replaced by "unknown" with this probability (payees no database covers)
 OTHERS = float(os.environ.get("OTHERS", "0"))  # row 124 (REAL-23): share of episodes with a line before the query naming the categories other users file the payee under
 assert POI or (POI_SHOTS == "fixed" and not POI_REC and not POI_KIND and not POI_DESC and not POI_UNSEEN), "POI_* are POI-1 layouts"
 assert not (POI_UNSEEN and POI_SHOTS == "kind"), "POI_SHOTS=kind has its own unseen-kind half"
@@ -153,7 +155,7 @@ DB_ONLY = set() if POI else R6.db_only_merchants()
 if not POI:  # row 74: each REAL-6 merchant's standard category, for decoys
     from ai_experiments import transactions as _T
     STD = {m["name"]: m["category"] for m in _T.load()["merchants"]}  # no training row (query or shot) may carry one of these merchants; their category can only come from the DB
-SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}{f'_sh{NSHOTS}' if NSHOTS != 24 else ''}{f'_oth{round(OTHERS * 100)}' if OTHERS else ''}"
+SFX = f"{'_'.join([POI, DB]) if POI else DB}{'_' + RUN_TAG if RUN_TAG else ''}{'_chat' if CHAT else ''}{'_shots' + SHOTS if SHOTS != 'fixed' else ''}{'_amb' if REAL6_DB == 'amb' else ''}{'_hf' if TRAINER == 'hf' else ''}{'_pksh' if POI_SHOTS == 'kind' else ''}{'_prec' if POI_REC else ''}{'_pkind' if POI_KIND else ''}{'_pdesc' if POI_DESC else ''}{f'_uns{round(POI_UNSEEN * 100)}' if POI_UNSEEN else ''}{'_' + POI_DB.replace('poi1_v1_', '') if POI_DB else ''}{f'_dec{round(DECOY * 100)}' if DECOY else ''}{f'_emp{EMPTY}' if EMPTY else ''}{'_f' + FOLD if FOLD is not None else ''}{f'_ren{round(RENAME * 100)}' if RENAME else ''}{'_alllab' if ALL_LABELS else ''}{f'_aw{round(ANS_WEIGHT * 100)}' if ANS_WEIGHT else ''}{f'_dbep{round(DBEP * 100)}' if DBEP else ''}{'_dbcat' if DB_CAT else ''}{'_reccat' if REC_CAT else ''}{f'_dbx{DB_EXTRA}' if DB_EXTRA else ''}{f'_dbe{DB_EPISODES}' if DB_EPISODES else ''}{'_' + MISLEAD if MISLEAD else ''}{f'_sn{round(SHOT_NOISE * 100)}' if SHOT_NOISE else ''}{'m' if SHOT_NOISE and SHOT_NOISE_MAJ else ''}{f'_alt{round(ALT * 100)}' if ALT else ''}{'s' if ALT and ALT_SOFT else ''}{'d' if ALT and ALT_DAYS == 'rand' else ''}{f'_mv{round(MOVE * 100)}' if MOVE else ''}{f'_lk{round(LOOKUP * 100)}' if LOOKUP else ''}{f'_ov{round(OVERRIDE * 100)}' if OVERRIDE else ''}{'_r7' + R7TRAIN + (f'n{R7N}' if R7N else '') if R7TRAIN else ''}{f'_odb{round(OVDB * 100)}' if OVDB else ''}{f'_short{round(SHORT * 100)}' if SHORT else ''}{f'_kinds{round(KINDS * 100)}' if KINDS else ''}{f'_sh{NSHOTS}' if NSHOTS != 24 else ''}{f'_oth{round(OTHERS * 100)}' if OTHERS else ''}{'_kind' if KIND_LINES else ''}"
 OUT_DIR = ROOT / "models" / ("smoke" if SMOKE else "adapters") / (f"categoriser_{LLM_BASE.split('/')[-1]}_{SFX}_lora" if ROUTE == "llm" else f"categoriser_bge_{SFX}")
 _BASE_TAG = f"_{LLM_BASE.split('/')[-1]}" if ROUTE == "llm" and LLM_BASE != "Qwen/Qwen2.5-3B-Instruct" else ""  # a 7B / 14B run once overwrote the 3B's file of the same SFX
 OUT = ROOT / "results" / f"categoriser_{ROUTE}{_BASE_TAG}_{SFX}{'_smoke' if SMOKE else ''}.json"
@@ -359,6 +361,16 @@ def others_line(h, rng):
     return "Other users file this payee as: " + ", ".join(f"{n} ({c})" for n, c in zip(names, counts))
 
 
+def canon_kind(r):
+    """Row 149: a row's canonical payee kind (ai_experiments.canon): kinds rows by their kind, Overture rows by their standard category,
+    REAL-6 / database merchants by their category; "unknown" otherwise."""
+    from ai_experiments import canon as CN
+    if r.get("kind"):
+        return CN.label(CN.KINDS_MOD.get(r["kind"])) or "unknown"
+    std = r.get("std") or (MERCHANT[r["merchant"]]["category"] if r.get("merchant") in MERCHANT else None)
+    return CN.label(CN.REAL6_STD.get(std)) or "unknown"
+
+
 def coined(r, taken):
     """A fresh pronounceable word ("Tavoli", "Mekru") not among `taken` (row 42's rename augmentation)."""
     while True:
@@ -479,6 +491,8 @@ def sft_examples(per_user=150):
                 hdr = "Categories: " + ", ".join(cl) + "\n\n"; names = dict(names, **{alt_b: alt_b})
             demo, spans = "", []  # spans: character ranges of the shot labels (leading space included), for ALL_LABELS
             kind = (lambda r: f"Kind: {kind_name(r['basic'])}\n") if POI_KIND else (lambda r: "")
+            if KIND_LINES:  # row 149
+                kind = lambda r: f"Kind: {'unknown' if rng.random() < KIND_UNK else canon_kind(r)}\n"  # noqa: E731
             noisy = {k for k in range(len(others)) if SHOT_NOISE and rng.random() < SHOT_NOISE}  # row 94
             if noisy and SHOT_NOISE_MAJ:  # row 96
                 cnt = collections.Counter(o.get("merchant") for o in others); seen_m = set(); keep = set()
