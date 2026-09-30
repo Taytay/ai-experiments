@@ -8178,3 +8178,30 @@ Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B 0.9 t
   files by payee resemblance, where the recipe's rows carried the same payees with their dates and amounts. Not adopted; a variant that
   describes categories only for new users (where the gain is) is possible but not queued.
 - **Read untrained, descriptions change nothing** (83.7 against 83.8).
+
+
+## 136. The untrained 35B as teacher adds nothing: on the recipe's own first-time-payee training episodes it is right only 38 to 39% of the time (synthetic database merchants and coined category names it cannot know), and a 50 / 50 target of its distribution and the label leaves decider-4B where it was (effort 0.618 against 0.622; blind top-1 83.1 against 83.8) (MODEL-19)
+
+PLAN step 123. Per seed: `scripts/dump_teacher_items.py` writes the training pool's first-time-payee episodes (the query's payee key in no
+row: 1,088 and 1,140 of 2,250), the untrained decider-35B-A3B reads them in its own layout, and decider-4B trains with the recipe and the
+other-users line, the target on those episodes being 0.5 one-hot + 0.5 the teacher's distribution (`TEACHER`, `TEACH_W`). Two seeds.
+`scripts/variant_tables.py`, job list `scripts/modal_jobs/r123.json`.
+
+| variant | seeds | blind top-1 | first-time payees: right 1st / top 5 | new users right 1st | own habits right 1st | effort W=10 (per-item) | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, other-users line (REPORT 123) | 3 | 83.8 | 59.9 / 81.2 | 69.6 | 85.4 | 0.622 | 87.8 | 84.6 |
+| decider-0.8B, same recipe (row 136) | 2 | 82.0 | 55.4 / 77.4 | 66.1 | 80.6 | 0.726 | 87.6 | 83.1 |
+| decider-4B + category descriptions, trained (row 137) | 2 | 83.8 | 63.4 / 81.9 | 72.3 | 83.7 | 0.636 | 82.6 | 69.1 |
+| decider-4B (REPORT 123) read with descriptions, untrained on them | 1 | 83.7 | 59.2 / 82.3 | 67.3 | 84.7 | 0.629 | nan | nan |
+| decider-4B + 35B teacher (row 123) | 2 | 83.1 | 58.5 / 82.7 | 67.3 | 83.7 | 0.618 | 87.2 | 85.4 |
+
+### 136.1 What the step says
+
+- **The teacher does not know the training data's world.** The recipe's episodes are built from REAL-6's synthetic merchants (a fact
+  database the 35B has never seen), coined and renamed categories, override and alternation episodes: the teacher's top-1 on them is
+  38 to 39%, so half of each distilled target points away from the label. The student ends where it started (effort 0.618 / 0.622,
+  REAL-6 87.2 / 87.8, first-time payees 58.5 / 59.9).
+- **Where the 35B's knowledge is valid (real businesses), the recipe already has exact labels**: the Overture business episodes (OVDB,
+  REPORT 108) carry each place's category. A teacher would add value on real statement strings without such labels (real data), not
+  on synthetic ones. Decision: distillation is dropped for synthetic training; the 35B stays the escalation reader (REPORT 126). With
+  real histories, the 35B's readings of real payees are a candidate source of soft labels.

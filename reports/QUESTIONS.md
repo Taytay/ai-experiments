@@ -1225,6 +1225,7 @@ seeds, against the plain recipe's seed spread in blind auto-filing.
 **MODEL-19 A large model as teacher.** Never done for the categoriser (sections 14 and 18 distilled a format on the species universe).
 *Experiment (after EVAL-12):* if the large reader is well ahead on blind_v1's weak groups, its calibrated distributions on training
 episodes (and on Overture names for the encoder) as soft targets for decider-4B and Ettin-1B.
+**Status (2026-09-30):** PLAN step 123, REPORT.md 136: no gain (teacher right on 38-39% of the synthetic episodes; effort 0.618 vs 0.622); dropped for synthetic data.
 
 **REAL-23 Other users' filings in the prompt.** With a million users, what other users call a payee is cheap to know and is exactly what
 a new user lacks; row 44 (the collaborative record) was deprioritised before the blind set existed. *Experiment:* a line under the query
