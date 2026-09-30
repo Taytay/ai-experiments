@@ -7,12 +7,17 @@ from decision_tables import folds_calibrate, load, product
 from ai_experiments.paths import PROCESSED
 warnings.filterwarnings("ignore")
 R = "results/per_item/real6_"
-for name in ("bulk", "blind"):
+for name in ("bulk", "blind", "blind_v2"):
     if name == "bulk":
         items = {i["id"]: i for i in json.load(open(PROCESSED / "blind_bulk_v1.json"))["items"]}
         rule = json.load(open(PROCESSED / "blind_bulk_v1_ynabrule.json")); ph = json.load(open(PROCESSED / "blind_bulk_v1_payeehist.json"))
         d = sorted(glob.glob(R + "dm_decider_decider_decider-4b_none_h100bf16st800*_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_laylabelled_shots_ev10soft_lora_blind_bulk_v1_labrand255_laylabelled_shots.noctx.jsonl"))
         e = sorted(glob.glob(R + "encmask_ettin1b_st3000_h100fresh*_f0_decnone_h100fresh*_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_kinds20_ev10soft_blind_bulk_v1.noctx.jsonl"))
+    elif name == "blind_v2":
+        items = {i["id"]: i for i in json.load(open(PROCESSED / "blind_v2_others.json"))["items"]}
+        rule = json.load(open(PROCESSED / "blind_v2_ynabrule.json")); ph = json.load(open(PROCESSED / "blind_v2_payeehist.json"))
+        d = sorted(glob.glob(R + "dm_decider_decider_decider-4b_none_h100bf16st800*_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora_blind_v2_others_labrand255_laylabelled_shots.noctx.jsonl"))
+        e = sorted(glob.glob(R + "encmask_ettin1b_st3000_h100fresh*_f0_decnone_h100fresh*_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_kinds20_ev10soft_blind_v2.noctx.jsonl"))
     else:
         from ensemble_tables import DEC, ENC
         items = {i["id"]: i for i in json.load(open(PROCESSED / "blind_v1_others.json"))["items"]}

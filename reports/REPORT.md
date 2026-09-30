@@ -8205,3 +8205,125 @@ other-users line, the target on those episodes being 0.5 one-hot + 0.5 the teach
   REPORT 108) carry each place's category. A teacher would add value on real statement strings without such labels (real data), not
   on synthetic ones. Decision: distillation is dropped for synthetic training; the 35B stays the escalation reader (REPORT 126). With
   real histories, the 35B's readings of real payees are a candidate source of soft labels.
+
+
+## 137. A second blind test set (blind_v2, from another agent that saw only the product brief) is harder (ideal-reader ceiling 78.3% against 87.9%) and confirms the main conclusions: the models beat YNAB's rule (right first 72 to 75% against 57%), the untrained 35B helps most on first-time payees, the full system is best; two do not hold: the encoder adds nothing on blind_v2 (the pair equals decider alone), and "YNAB's suggestion first" is worse than the model's where users often depart from their usual category; a confidence gate (the model overrides the rule when its top beats the rule's category by 0.2) is best on all three sets (EVAL-15)
+
+PLAN step 140. blind_v2 (`scripts/build_blind_v2.py`, written by an agent given only the product brief and the item format; it read nothing
+in the repository; its own merchant universe, bank styles and archetypes, more multi-purpose payees and new users; 1,500 items, 250
+users; derived files by `scripts/derive_blind_v2.py`). Checked here against `oneslot.parse`: no row after its query, every category
+existing on its row's date. The saved models read it on Modal (job list `scripts/modal_jobs/r140.json`); `scripts/blind2_tables.py`,
+`scripts/gate_tables.py`.
+
+### blind_v1 (1500 items; ideal-reader ceiling 87.9%)
+
+**B2.1 top-1 (mean [range] over seeds)**
+
+| reader | seeds | top-1 |
+|---|---|---|
+| decider-4B recipe | 3 | 82.7 [82.3, 83.1] |
+| decider-4B + other-users line | 3 | 83.9 [83.5, 84.2] |
+| encoder (Ettin-1B) | 3 | 79.5 [78.5, 80.2] |
+| decider-35B untrained | 1 | 82.0 |
+| decider-4B untrained | 1 | 76.5 |
+
+**B2.2 effort under the per-item rule (mean [range] over seed pairs)**
+
+| system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|
+| decider (+ line) | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] |
+| encoder x decider | 0.507 [0.488, 0.524] | 0.603 [0.583, 0.618] | 0.735 [0.717, 0.761] |
+| pair -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] |
+| all three | 0.441 [0.429, 0.451] | 0.541 [0.525, 0.553] | 0.666 [0.651, 0.691] |
+
+**B2.3 / B2.4 confirm-everything card by subset: right one 1st % / in the list % / work saved % (mean over seeds / pairs)**
+
+| suggestions from | all (n=1500) | first-time payee (n=277) | differently from the rule (n=120) | never used for the payee (n=27) | the payee's usual (n=1103) |
+|---|---|---|---|---|---|
+| YNAB today | 73.5 / 73.5 / 74 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 100.0 / 100.0 / 100 |
+| YNAB + the payee's other past categories (no model) | 79.0 / 84.4 / 84 | 29.6 / 30.0 / 30 | 0.0 / 66.7 / 56 | 0.0 / 7.4 / 7 | 100.0 / 100.0 / 100 |
+| decider (+ line) | 83.8 / 92.4 / 89 | 59.9 / 72.0 / 61 | 22.8 / 70.0 / 62 | 0.0 / 13.6 / 11 | 96.4 / 100.0 / 99 |
+| YNAB first, then decider (+ line) | 84.6 / 92.4 / 89 | 59.9 / 72.0 / 61 | 0.0 / 70.0 / 59 | 0.0 / 13.6 / 11 | 100.0 / 100.0 / 100 |
+| encoder x decider | 84.4 / 92.8 / 90 | 62.7 / 74.2 / 64 | 22.3 / 69.1 / 61 | 0.0 / 10.7 / 8 | 96.6 / 100.0 / 99 |
+| YNAB first, then encoder x decider | 85.1 / 92.8 / 90 | 62.7 / 74.2 / 64 | 0.0 / 69.1 / 58 | 0.0 / 10.7 / 8 | 100.0 / 100.0 / 100 |
+| encoder x decider x 35B | 85.7 / 93.9 / 91 | 69.2 / 79.9 / 71 | 25.4 / 70.6 / 63 | 2.1 / 16.5 / 13 | 96.5 / 100.0 / 99 |
+| YNAB first, then encoder x decider x 35B | 86.3 / 93.9 / 91 | 69.2 / 79.9 / 71 | 0.0 / 70.4 / 60 | 0.0 / 16.5 / 13 | 100.0 / 100.0 / 100 |
+
+### blind_v2 (1500 items; ideal-reader ceiling 78.3%)
+
+**B2.1 top-1 (mean [range] over seeds)**
+
+| reader | seeds | top-1 |
+|---|---|---|
+| decider-4B recipe | 2 | 71.4 [70.6, 72.1] |
+| decider-4B + other-users line | 3 | 71.7 [70.5, 73.2] |
+| encoder (Ettin-1B) | 3 | 65.5 [65.0, 65.8] |
+| decider-35B untrained | 1 | 71.9 |
+| decider-4B untrained | 1 | 63.1 |
+
+**B2.2 effort under the per-item rule (mean [range] over seed pairs)**
+
+| system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|
+| decider (+ line) | 0.908 [0.892, 0.939] | 1.084 [1.031, 1.135] | 1.273 [1.233, 1.315] |
+| encoder x decider | 0.916 [0.876, 0.945] | 1.091 [1.067, 1.111] | 1.275 [1.220, 1.341] |
+| pair -> 35B | 0.827 [0.801, 0.848] | 1.035 [1.019, 1.046] | 1.219 [1.160, 1.300] |
+| all three | 0.806 [0.793, 0.833] | 0.983 [0.959, 1.013] | 1.158 [1.097, 1.199] |
+
+**B2.3 / B2.4 confirm-everything card by subset: right one 1st % / in the list % / work saved % (mean over seeds / pairs)**
+
+| suggestions from | all (n=1500) | first-time payee (n=316) | differently from the rule (n=327) | never used for the payee (n=63) | the payee's usual (n=857) |
+|---|---|---|---|---|---|
+| YNAB today | 57.1 / 57.1 / 57 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 100.0 / 100.0 / 100 |
+| YNAB + the payee's other past categories (no model) | 63.4 / 79.1 / 77 | 29.7 / 30.7 / 31 | 0.0 / 70.9 / 61 | 0.0 / 19.0 / 17 | 100.0 / 100.0 / 100 |
+| decider (+ line) | 71.7 / 89.4 / 85 | 60.8 / 76.1 / 65 | 33.4 / 74.5 / 67 | 5.3 / 29.1 / 25 | 90.3 / 100.0 / 98 |
+| YNAB first, then decider (+ line) | 69.9 / 89.4 / 84 | 60.8 / 76.1 / 65 | 0.0 / 74.5 / 64 | 0.0 / 29.1 / 24 | 100.0 / 100.0 / 99 |
+| encoder x decider | 72.4 / 89.4 / 85 | 61.0 / 78.1 / 67 | 34.7 / 72.6 / 67 | 3.2 / 22.9 / 20 | 91.0 / 100.0 / 99 |
+| YNAB first, then encoder x decider | 70.0 / 89.4 / 85 | 61.0 / 78.1 / 67 | 0.0 / 72.6 / 63 | 0.0 / 22.9 / 20 | 100.0 / 100.0 / 100 |
+| encoder x decider x 35B | 75.3 / 91.0 / 87 | 67.7 / 84.5 / 74 | 36.9 / 73.5 / 68 | 6.0 / 26.3 / 22 | 92.7 / 100.0 / 99 |
+| YNAB first, then encoder x decider x 35B | 71.4 / 91.0 / 86 | 67.7 / 84.5 / 74 | 0.0 / 73.5 / 63 | 0.0 / 26.3 / 22 | 100.0 / 100.0 / 100 |
+
+**Letting the model override YNAB's suggestion only when clearly more confident (encoder x decider, payees seen before): right first %
+on all seen / on transactions filed differently from the rule / on the usual ones**
+
+== bulk: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 86.4 / 18.1 / 98.2
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 86.3 / 10.0 / 99.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 85.9 / 4.7 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 85.5 / 1.6 / 100.0
+  YNAB always: 85.3 / 0.0 / 100.0
+== blind: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 90.3 / 15.8 / 98.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 90.3 / 6.7 / 99.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 90.4 / 4.2 / 99.8
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 90.4 / 2.5 / 100.0
+  YNAB always: 90.2 / 0.0 / 100.0
+== blind_v2: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 75.8 / 32.1 / 92.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 75.8 / 32.1 / 92.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 77.2 / 23.5 / 97.7
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 76.0 / 15.0 / 99.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 74.6 / 8.3 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 73.9 / 5.5 / 100.0
+  YNAB always: 72.4 / 0.0 / 100.0
+
+### 137.1 What the step says
+
+- **What holds on both sets**: decider-4B reads each at 92 to 95% of its ceiling; the models beat YNAB's rule by 15 points right first
+  (blind_v2: 72 to 75 against 57) and halve searches (in the list 89 to 91% against 57%); the untrained 35B is the best addition for
+  first-time payees (blind_v2 61 -> 68% right first, 78 -> 85% in the list) and the all-three system has the lowest effort at every W;
+  the no-model list of the payee's past categories gets part of the way (77% work saved against 85 to 87).
+- **The encoder does not transfer**: 65.5 top-1 on blind_v2 (decider 71.7), and encoder x decider is no better than decider alone by
+  effort (0.916 against 0.908 at W = 5). On blind_v1 it added 0.02; its training (Overture names, REPORT 108) fits blind_v1's world
+  better. The system's gain on blind_v2 comes from the 35B. Decision: the encoder stays optional (cheap first reader), not relied on.
+- **The other-users line helps less on blind_v2** (71.7 against 71.4 without it; +1.3 on blind_v1): there the line is on 99.7% of items
+  and other users' names for a payee vary more.
+- **"YNAB's suggestion first" does not generalise**: blind_v2's users depart from their usual category on 28% of known-payee
+  transactions (blind_v1 10%), and rule-first loses 1.8 points there. A confidence gate is best on every set: the model's top category
+  replaces the rule's when its probability is at least 0.2 higher (blind_v2 77.2% right first on known payees against 72.4 rule-only
+  and 75.8 model-only; the ordinary stream 86.4 against 85.3 / 85.6; blind_v1 90.3 against 90.2 / 90.0). Revised product answer: the
+  rule's suggestion first unless the model is 0.2 more confident in another; the model's ranked list after it, and alone for new payees.

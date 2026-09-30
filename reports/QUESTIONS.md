@@ -1262,3 +1262,5 @@ yet"); decider-4B trained and read that way, and the current adapter read that w
 blind_v2 from a second agent that sees only the product brief (no repo code, no blind_v1), with its own merchant universe, archetypes
 and mechanisms, the same item fields (plus the other-users variant, payee history and YNAB's rule); re-read the recipe, the system and the
 scores of REPORTs 126 to 134 on it; conclusions that hold on both sets stand.
+
+**Status (2026-09-30):** PLAN step 140, REPORT.md 137: confirmed on blind_v2 (ceiling 78.3): models >> rule, 35B for first-time payees, full system best; not confirmed: the encoder's contribution, rule-first; the 0.2 confidence gate is best on all three sets.
