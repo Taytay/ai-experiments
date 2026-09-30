@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print(f"**blind_v3 (lists of at most {KMAX}; read once; ideal-reader ceiling {100 * np.mean([x['best'] == x['answer'] for x in items.values()]):.1f}%; decider seeds {len(decs)}): "
           "right one 1st % / in the list % / suggestions shown / work saved %**\n")
     print("| suggestions from | " + " | ".join(f"{k} (n={len(v)})" for k, v in subsets.items()) + " |"); print("|---|" + "---|" * len(subsets))
-    srcs = {"YNAB today": [{i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}], "no-model list (YNAB + payee's other past categories)": [history_lists(items, rule)]}
+    srcs = {"YNAB today": [{i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}], "rule + payee's past + other users' categories (no model; NOT in YNAB today)": [history_lists(items, rule)]}
     Pd = [folds_calibrate(d, items) for d in decs]
     Prec = []
     for d, P in zip(decs, Pd):

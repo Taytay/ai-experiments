@@ -108,7 +108,7 @@ if __name__ == "__main__" and "bulk" not in sys.argv:
     print("|---|---|---|---|---|---|---|")
     rule_lists = {i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}
     rows = {"YNAB today (2 of last 3, else last)": [card(rule_lists, items, plaus, ids)],
-            "YNAB today + the payee's other past categories (no model)": [card(history_lists(items, rule), items, plaus, ids)]}
+            "rule + payee's past + other users' categories (no model; NOT in YNAB today)": [card(history_lists(items, rule), items, plaus, ids)]}
     for n, Ps in systems.items():
         rows[n] = [card(lists(P, items, plaus, rule, "model"), items, plaus, ids) for P in Ps]
         rows[f"YNAB's suggestion first, then {n}"] = [card(lists(P, items, plaus, rule, "rule"), items, plaus, ids) for P in Ps]
@@ -144,7 +144,7 @@ def bulk():
     print(f"| suggestions from | right one 1st % | 2nd-{KMAX}th % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |")
     print("|---|---|---|---|---|---|---|---|---|")
     rl = {i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}
-    rows = {"YNAB today": ([rl], None), "YNAB today + the payee's other past categories (no model)": ([history_lists(items, rule)], None)}
+    rows = {"YNAB today": ([rl], None), "rule + payee's past + other users' categories (no model; NOT in YNAB today)": ([history_lists(items, rule)], None)}
     for n, Ps in systems.items():
         rows[n] = ([lists(P, items, plaus, rule, "model") for P in Ps], None)
         rows[f"YNAB's suggestion first, then {n}"] = ([lists(P, items, plaus, rule, "rule") for P in Ps], None)

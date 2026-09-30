@@ -8524,3 +8524,10 @@ owner's rank scale then runs first 0, second 1, third 2, not shown 10). Re-score
   because fewer wrong suggestions are shown.
 - **On the ordinary stream** searches rise from 5.4 to 6.5% (the right one in 2nd-3rd place 9.5%), work saved 92% for encoder + decider.
 - Three is the list length from here on; the gain over YNAB's rule is unchanged in kind (blind_v3: in the list 95.1% against 74.2%).
+
+**Note on the baselines (2026-09-30, owner):** YNAB today treats every user and their categories as separate: it has no suggestion for
+a payee the user has never filed and uses nothing from other users. In REPORTs 131 to 142, "YNAB today" is that rule (0% on first-time
+payees throughout). The row labelled "no-model list" / "YNAB + the payee's other past categories" is not current YNAB: after the rule's
+suggestion it lists the payee's other past categories and then the user's categories that other users file the payee under (the
+other-users line), which is where its first-time-payee score comes from. The scripts now label it "rule + payee's past + other users'
+categories (no model; NOT in YNAB today)".

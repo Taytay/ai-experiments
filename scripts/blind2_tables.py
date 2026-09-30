@@ -89,7 +89,7 @@ if __name__ == "__main__":
                    "never used for the payee": [i for i in ids if ph[i] and gold[i] not in ph[i]], "the payee's usual": [i for i in ids if ph[i] and gold[i] == rule[i]]}
         systems = {"decider (+ line)": [folds_calibrate(d, items) for d in dec], "encoder x decider": [product([e, d], items) for e, d in pairs],
                    "encoder x decider x 35B": [product([e, d, big[0]], items) for e, d in pairs]}
-        srcs = {"YNAB today": [{i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}], "YNAB + the payee's other past categories (no model)": [history_lists(items, rule)]}
+        srcs = {"YNAB today": [{i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}], "rule + payee's past + other users' categories (no model; NOT in YNAB today)": [history_lists(items, rule)]}
         for n, Ps in systems.items():
             srcs[n] = [lists(P, items, plaus, rule, "model") for P in Ps]
             srcs[f"YNAB first, then {n}"] = [lists(P, items, plaus, rule, "rule") for P in Ps]

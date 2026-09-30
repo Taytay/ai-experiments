@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print("| suggestions from | " + " | ".join(f"{k} (n={len(v)}, {100 * len(v) / len(ids):.1f}%)" for k, v in subsets.items()) + " |")
     print("|---|" + "---|" * len(subsets))
     rl = {i: ([rule[i]] if rule[i] >= 0 else []) for i in ids}
-    srcs = {"YNAB today": [rl], "YNAB + the payee's other past categories (no model)": [history_lists(items, rule)]}
+    srcs = {"YNAB today": [rl], "rule + payee's past + other users' categories (no model; NOT in YNAB today)": [history_lists(items, rule)]}
     for n, Ps in systems.items():
         srcs[n] = [lists(P, items, plaus, rule, "model") for P in Ps]
         srcs[f"YNAB first, then {n}"] = [lists(P, items, plaus, rule, "rule") for P in Ps]
