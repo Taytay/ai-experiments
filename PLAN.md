@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-09-27; overwrite this block when it changes)
+## Current state (2026-09-30; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -34,25 +34,28 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-09-29, evening):** nothing on Modal; everything committed and pushed; models in DVC. Rows 97 to 116 done (REPORT.md 98
-  to 115; section 1 summarises them).
-  - **decider recipe** (REPORT 107, 113): decider-4B one slot + shot-label loss + database episodes (with the misleading-name set) +
-    rename 0.5 + `LABELS=rand255 EMPTY=20` + `LAYOUT=labelled_shots` (labelled list at the top, "Category: (AE) Pets" rows, ending
-    "Category: (") + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation 0.1, 800 steps.
+- **In flight (2026-09-30, early):** nothing on Modal; everything committed and pushed; models in DVC; large item sets in DVC
+  (`data/processed/*.dvc`, owner: DVC not LFS). Rows 117 to 130 done except 123 (todo) and 127 (a) (deprioritised): REPORT.md 116 to 127.
+  - **decider recipe** (REPORT 107, 113, 123): decider-4B one slot + shot-label loss + database episodes (with the misleading-name set) +
+    rename 0.5 + `LABELS=rand255 EMPTY=20` + `LAYOUT=labelled_shots` + lookup / override 0.1 + soft evidence-free 0.1 + alternation 0.1,
+    800 steps; `OTHERS=0.5` (other users' filings line) when a payee histogram exists (production).
   - **encoder recipe** (REPORT 104, 110, 111): Ettin-encoder-1B, `exp_encoder_mask.py DEC_EPISODES=1 EVFREE=0.1 OVDB=0.2 SHORT=0.15
-    EMPTY=20 KINDS=0.2` with the same episode env (fresh draws each pass).
-  - **prompt**: the history slice of REPORT 99 / 101 (the payee's latest rows, similar payees, a row per category, recent rows; dated;
-    in date order; nothing from the query's future), 24 rows, plain text (REPORT 113, 114: labels only where they tokenize as the answer
-    token: after a space, never "(AE" at a line start or after a tab, never "Categories.AE").
-  - **system** (REPORT 98, 115): the owner's history rule, then auto-file when the encoder and decider agree and either is confident at
-    its own calibrated 98% threshold (blind_v1: 65% at 97.8%, effort 0.560), else suggest (and flag disagreement). Temperatures and
-    thresholds must be fitted on the product's own users.
-  - **test sets**: REAL-6, REAL-7 (v1, the v2 slices), blind_v1 (and blind_v1_b48), novel_merchants_v1; blind_v1 decides recipe choices,
-    read by user effort (`scorecard.effort`) and calibrated auto-filing, not top-1 alone.
-- **Next (2026-09-29):** real anonymised histories are coming (owner): a data spec and a harness that turns them into the prompt format
-  and scores the saved models and the system on them; then the questions only real data settles (slip vs change of mind, category counts,
-  kinds for decider (REPORT 111, 112), dated-slice training (REPORT 107)). Synthetic: the encoder's new-user gap (category-name meaning),
-  a second blind set from another model family. Rows 51, 54, 55 deprioritised.
+    EMPTY=20 KINDS=0.2`.
+  - **scoring (owner, REPORT 118):** no fixed 98% threshold. Success = expected user effort at a stated W (cost of a wrong auto-file);
+    auto-file per transaction when (1 - p1) W < q3 + 3 (1 - q3) on calibrated probabilities (`scorecard.decide`); report W = 5 / 10 /
+    20 / 50, W = 10 headline until the owner sets W. Temperatures fitted on the product's own users (REPORT 116).
+  - **system (REPORT 126):** encoder x decider (product, recalibrated) with the per-item rule; what it does not auto-file goes to the
+    untrained decider-35B-A3B (three-model product): blind effort 0.549 at W = 10 against 0.659 for decider alone; the untrained 35B is
+    the better third reader (REPORT 122, 127).
+  - **prompt**: the history slice of REPORT 99 / 101 (dated, date order, nothing from the future), plain text with labelled rows; for
+    serving, the split layout (shared rows first, then the payee's and similar payees' rows; REPORT 121: no retraining needed).
+  - **serving (REPORT 119, 120, 125):** vLLM 0.30 with prefix caching on the split layout: decider-4B 10 to 13 ms per transaction (H100),
+    the 35B 14 to 20 ms (H200); roughly $11 and $18 per million transactions.
+  - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1.
+- **Next (2026-09-30):** real anonymised histories (owner): a harness that turns them into the prompt format and scores the saved models
+  and the system by effort; the owner's W; then what only real data settles (slip vs change, category counts, other users' name
+  variety, calibration on real users). Synthetic: row 123 (the 35B as teacher for the small models), a second blind set from another
+  model family. Rows 51, 54, 55, 127 (a) deprioritised.
 
 ## Procedure for one step
 
