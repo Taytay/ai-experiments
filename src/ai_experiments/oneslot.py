@@ -114,6 +114,26 @@ def split_rows(rows, query, rng, p_extra=0.5, max_extra=4):
             + [(SPLIT_HEADS[1], None, None)] + [rows[i] for i in sorted(near)])
 
 
+def payee_name(fields):
+    """Row 136: a short readable payee name from a row's description (prefixes, digits and store numbers dropped, two words)."""
+    d = _cells(fields)[2]
+    words = [w for w in _re.sub(r"[^A-Za-z&' ]", " ", d).split() if w.upper() not in _KEY_SKIP and len(w) > 1]
+    return " ".join(words[:2]).title()
+
+
+def describe_categories(names, rows, k=3):
+    """Row 136 (owner, 2026-09-30, after Jeff: options described by what they lead to): per category, the payees filed under it in this
+    prompt's rows (most recent first, up to k distinct), or "nothing filed yet"."""
+    seen = {n: [] for n in names}
+    for fields, label, _ in reversed(rows):
+        if label is None or label not in seen:
+            continue
+        nm = payee_name(fields)
+        if nm and nm not in seen[label] and len(seen[label]) < k:
+            seen[label].append(nm)
+    return {n: ("e.g. " + ", ".join(v) if v else "nothing filed yet") for n, v in seen.items()}
+
+
 def parse(context):
     """(category names from the header, rows [(fields, label, label char start)], query fields); raises on another layout. A one-line
     block that is not a transaction (row 117's section headers) comes back as (text, None, None)."""
@@ -135,8 +155,9 @@ def parse(context):
     return names, rows, q[len("Transaction: "):]
 
 
-def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False):
+def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False):
     names, rows, query = parse(context)
+    dsc = describe_categories(options, rows) if desc else None  # row 136
     if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
         rows = split_rows(rows, query, rng)
     if any(c is None for _, c, _ in rows):
@@ -182,7 +203,7 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
     if layout == "options":
         parts.append("Context:\nCategories: " + ", ".join(names) + "\n\n")
     else:
-        parts.append("Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}\n" for oi in opts) + "\n")
+        parts.append("Categories:\n" + "".join(f"- ({lab_of[options[oi]]}) {options[oi]}" + (f" ({dsc[options[oi]]})" if dsc else "") + "\n" for oi in opts) + "\n")
     for fields, label, st in rows:
         if label is None:  # row 117: a section header
             parts.append(fields + "\n\n")

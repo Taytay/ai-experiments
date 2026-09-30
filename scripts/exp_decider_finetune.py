@@ -33,7 +33,8 @@ AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on
 LAYOUT = os.environ.get("LAYOUT", "")  # row 111 (owner, 2026-09-29): "" (decider's layout), options | labelled | labelled_shots (oneslot.build_layout)
 DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.build_layout)
 EMA = float(os.environ.get("EMA", "0"))  # row 122 (TRAIN-13): an exponential moving average of the LoRA weights (this decay per step) is what gets saved
-SPLIT = os.environ.get("SPLIT", "") == "1"  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
+SPLIT = os.environ.get("SPLIT", "") == "1"
+DESC = os.environ.get("DESC", "") == "1"  # row 136: each category in the list described by the payees filed under it in the prompt (oneslot.describe_categories)  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
 ABSTAIN_SWAP = float(os.environ.get("ABSTAIN_SWAP", "0.25"))  # ... and in this share of those the gold category is hidden (removed from the header
@@ -51,7 +52,7 @@ C = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / 
 exec(compile(_src, "exp_categoriser.py", "exec"), C)
 SFX = C["SFX"].replace("_alllab", "").replace("_hf", "") + (f"_aux{round(AUX_LM * 100)}" if AUX_LM else "")
 SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
-SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_split" if SPLIT else "")
+SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_split" if SPLIT else "") + ("_desc" if DESC else "")
 SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
@@ -160,7 +161,7 @@ def main():
         picked = [evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
         if LAYOUT or DOW_FIRST:  # row 111
             built = [oneslot.build_layout(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST,
-                                          spans=e[3] if AUX_LM else None, split=SPLIT) for e in picked]
+                                          spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC) for e in picked]
         else:
             built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
