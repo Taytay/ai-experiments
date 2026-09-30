@@ -44,14 +44,18 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   - **scoring (owner, REPORT 118):** no fixed 98% threshold. Success = expected user effort at a stated W (cost of a wrong auto-file);
     auto-file per transaction when (1 - p1) W < q3 + 3 (1 - q3) on calibrated probabilities (`scorecard.decide`); report W = 5 / 10 /
     20 / 50, W = 10 headline until the owner sets W. Temperatures fitted on the product's own users (REPORT 116).
-  - **system (REPORT 126):** encoder x decider (product, recalibrated) with the per-item rule; what it does not auto-file goes to the
-    untrained decider-35B-A3B (three-model product): blind effort 0.549 at W = 10 against 0.659 for decider alone; the untrained 35B is
-    the better third reader (REPORT 122, 127).
+  - **system (REPORT 137, 138):** decider-4B (with the other-users line) for every transaction; the untrained decider-35B-A3B for what
+    decider does not settle (effort blind_v1 0.556, blind_v2 1.007 at W = 10; the encoder adds nothing on blind_v2 and is dropped). In
+    YNAB's confirm-everything product: YNAB's rule first for known payees unless the model is 0.2 more confident in another category
+    (best on blind_v1, blind_v2 and the stream), the model's ranked list after it; five suggestions for first-time payees, the short
+    list otherwise (REPORT 134). Scores: the report cards of REPORTs 130 to 134 (right first, in the list, work saved), first-time
+    payees and changed filings as scores of their own (REPORT 132).
   - **prompt**: the history slice of REPORT 99 / 101 (dated, date order, nothing from the future), plain text with labelled rows; for
     serving, the split layout (shared rows first, then the payee's and similar payees' rows; REPORT 121: no retraining needed).
   - **serving (REPORT 119, 120, 125):** vLLM 0.30 with prefix caching on the split layout: decider-4B 10 to 13 ms per transaction (H100),
     the 35B 14 to 20 ms (H200); roughly $11 and $18 per million transactions.
-  - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1.
+  - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_v2 (+ _others; a second blind generator, REPORT 137),
+    blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1; YNAB's rule and payee histories per item (`*_ynabrule`, `*_payeehist`).
 - **Next (2026-09-30):** real anonymised histories (owner): a harness that turns them into the prompt format and scores the saved models
   and the system by effort; the owner's W; then what only real data settles (slip vs change, category counts, other users' name
   variety, calibration on real users). Synthetic: row 123 (the 35B as teacher for the small models), a second blind set from another
@@ -220,6 +224,7 @@ afternoon each on the 3090.
 | 138 | [Q1] What the model was close to (owner, 2026-09-30): first-time payees' rank of the right category in the full list, probabilities when wrong, the ideal reader's ceiling, examples. CPU. | EVAL-14 | 135 | done | REPORT 133, `scripts/closeness_tables.py` |
 | 139 | [Q1] Suggestion-list sizing (after REPORT 133): current / adaptive (top five for first-time payees) / probability floor / always five, on blind_v1 and the stream. CPU. | EVAL-14 | 138 | done | REPORT 134, `scripts/list_policy_tables.py` |
 | 140 | [Q1-Q3] blind_v2: a second blind test set from an agent that sees only the product brief (EVAL-15); scored with the saved models (Modal) and every recent table. | EVAL-15 | - | done | REPORT 137, `scripts/build_blind_v2.py`, `scripts/blind2_tables.py` |
+| 141 | [Q1] The system without the encoder (after REPORT 137): decider -> 35B, decider x 35B, against encoder x decider -> 35B, blind_v1 and blind_v2. CPU. | EVAL-15 | 140 | done | REPORT 138, `scripts/noenc_tables.py` |
 | 50 | Category-order sensitivity, eval only: the untrained instruct model and the no-DB and record SFT adapters re-scored with the prompt's category list permuted under two more seeds; argmax flip rate per corrected group and name type, and the accuracy of the two- and three-order averages; a lettered list with letter readout on the untrained model only. Re-scoped 2026-09-27 to the one-slot readers that now lead (REPORT 69, rows 79 / 80): decider-2B and Qwen3.5-2B one-slot on POI-1 and REAL-6, the option order shuffled under three seeds (`exp_decision_models.py ORDER_SEED`): flip rate and accuracy spread, and the three-order average. | EVAL-8 | 41, 45 | done | REPORT 75, `scripts/order_tables.py` |
 | 53 | Encoder option scorer (Laya's layout): ModernBERT-large with one scored `[MASK]` per category, fine-tuned across users on REAL-6 with the query, the record and the tagged shots in the input, soft-target CE, options shuffled; from the Laya checkpoint and from plain ModernBERT-large; no-record and record arms against GLiClass tuned and the SFT categoriser on row 45's groups and row 42's folds, with milliseconds per item. Does the layout let an encoder read the shots where GLiClass could not? | MODEL-6 | 45 | done | REPORT.md 62; `scripts/encmask_tables.py`; `models/adapters/encmask_*` |
 | 54 | Diffusion slot read on the 3090, zero-shot: one forward with the answer letter as the mask token on REAL-6 (24 shots, with and without the record) for Nemotron-Labs-Diffusion-8B (against its own causal readout, same weights), Dream-v0-Instruct-7B (against Qwen2.5-7B-Instruct), LLaDA-8B-Instruct and LFM2.5-Encoder-350M-Diffusion; row 50's order permutations and row 49's calibration on each; a LoRA fine-tune of the slot read only if one beats its causal twin beyond the seed spread. Separate venv if the remote code needs another transformers. | MODEL-7 | 45, 49, 50 | todo | |
@@ -385,3 +390,4 @@ afternoon each on the 3090.
 - 2026-09-30: rows 136, 137 done (REPORT.md 135): decider-0.8B 3x faster but effort 0.726 vs 0.622 (not adopted); category descriptions: first-time payees +3.5, new users +2.7, but novel names -15, REAL-6 -5 (not adopted).
 - 2026-09-30: row 123 done (REPORT.md 136): the untrained 35B as teacher adds nothing (right on only 38-39% of the synthetic training episodes; effort 0.618 vs 0.622); dropped for synthetic training; real payees would be the case for it.
 - 2026-09-30: row 140 done (REPORT.md 137): blind_v2 (second blind set, harder: ceiling 78.3) confirms models >> YNAB rule, 35B best for first-time payees, full system best; the encoder does not transfer (pair = decider on v2); rule-first loses on v2; the 0.2 confidence gate is best on all three sets: revised product answer.
+- 2026-09-30: row 141 done (REPORT.md 138): decider (+ line) -> untrained 35B equals the three-model system on blind_v1 and beats it on blind_v2: the encoder is dropped from the recommended system.

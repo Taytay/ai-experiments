@@ -8327,3 +8327,29 @@ on all seen / on transactions filed differently from the rule / on the usual one
   replaces the rule's when its probability is at least 0.2 higher (blind_v2 77.2% right first on known payees against 72.4 rule-only
   and 75.8 model-only; the ordinary stream 86.4 against 85.3 / 85.6; blind_v1 90.3 against 90.2 / 90.0). Revised product answer: the
   rule's suggestion first unless the model is 0.2 more confident in another; the model's ranked list after it, and alone for new payees.
+
+
+## 138. The system without the encoder: decider-4B (with the other-users line), then the untrained 35B for what it does not settle, is as good as the three-model system on blind_v1 (0.556 against 0.549 at W = 10) and better on blind_v2 (1.007 against 1.035); the encoder is dropped from the recommended system
+
+PLAN step 141 (after REPORT 137). Effort under the per-item rule, both blind sets, three decider seeds, the encoder's three seeds for the
+comparison row. `scripts/noenc_tables.py`.
+
+| set | system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|---|
+| blind_v1 | decider | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] |
+| blind_v1 | decider -> 35B | 0.466 [0.459, 0.478] | 0.556 [0.523, 0.573] | 0.678 [0.667, 0.689] |
+| blind_v1 | decider x 35B (all) | 0.462 [0.447, 0.478] | 0.551 [0.529, 0.568] | 0.657 [0.645, 0.671] |
+| blind_v1 | encoder x decider -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] |
+| blind_v2 | decider | 0.908 [0.892, 0.939] | 1.084 [1.031, 1.135] | 1.273 [1.233, 1.315] |
+| blind_v2 | decider -> 35B | 0.830 [0.817, 0.840] | 1.007 [0.993, 1.021] | 1.208 [1.171, 1.233] |
+| blind_v2 | decider x 35B (all) | 0.800 [0.788, 0.807] | 0.967 [0.953, 0.981] | 1.134 [1.115, 1.152] |
+| blind_v2 | encoder x decider -> 35B | 0.827 [0.801, 0.848] | 1.035 [1.019, 1.046] | 1.219 [1.160, 1.300] |
+
+### 138.1 What the step says
+
+- **Two models are enough**: decider-4B for every transaction, the untrained decider-35B-A3B for the ~third it does not auto-file (or,
+  in a confirm-everything product, for the ranked list where decider is unsure); reading everything with both is best of all (blind_v2
+  0.967 at W = 10) at the 35B's cost for every transaction.
+- The encoder's gain on blind_v1 came from a world like its training; on blind_v2 it costs. It remains the fastest reader if a cheap
+  first pass is ever needed, but the recommended system is decider (+ other-users line) -> 35B, with YNAB's rule gated by confidence
+  (REPORT 137) for the first suggestion on known payees.
