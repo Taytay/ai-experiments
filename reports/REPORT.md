@@ -8448,7 +8448,7 @@ last two had blind_v1's names removed before training (so matches there are list
   (reports/REAL_DATA_SPEC.md) splits users 70 / 15 / 15 with a time holdout and a sealed test split.
 
 
-## 141. The final synthetic check, pre-registered, on a third blind set read once (blind_v3: couples, small businesses, families filing by who it was for, changing statement strings): the recommended system puts the right category first 81% of the time (YNAB's rule 74%) and in the list 96% (74%), saving 90% of the work of filing by hand (rule 74%, the no-model list 87%); first-time payees 64% first and 96% in the list; decider-4B reads the set at 94% of its ceiling (EVAL-15)
+## 141. The final synthetic check, pre-registered, on a third blind set read once (blind_v3: couples, small businesses, families filing by who it was for, changing statement strings): the recommended system puts the right category first 81% of the time (YNAB's rule 74%) and in the list 96% (74%), saving 90% of the work of filing by hand (rule 74%, the no-model list 87%); first-time payees 64% first and 96% in the list; decider-4B reads the set at 94% of its ceiling; the confidence gate costs about 1 point on known payees here (EVAL-15)
 
 PLAN step 145. blind_v3 (`scripts/build_blind_v3.py`): a third agent, given only the product brief, asked for different emphases (couples
 sharing an account and filing differently, small-business owners, families filing by who the spending was for, students, retirees,
@@ -8480,10 +8480,12 @@ what their 96% in-the-list suggests.
   at 78.2 top-1 (94% of the 83.5 ceiling; blind_v1 95%, blind_v2 92%).
 - **First-time payees**: the 35B routing takes them from 55.7 to 63.8% right first (the no-model list 32.4, the rule 0), and the top
   five contain the right one 95.9% of the time.
-- **The confidence gate is neutral here** (all 81.1 against 81.2 without it): blind_v3's users depart from a payee's usual category on
-  15% of known-payee items (blind_v2 28%, blind_v1 10%); the gate wins 10.6% of those and costs 3.4% of the usual ones. Across the
-  three sets it is +0.1, +4.8 and -0.1 points on known payees: worth keeping where users often depart from their usual category, and
-  something real data will settle.
+- **The confidence gate costs a little here**: on known payees it wins 10.6% of the items filed differently from the rule and loses
+  3.4% of the usual ones, about -1.3 points on known payees (the "all" column nets this against the 35B routing's gain on first-time
+  payees). blind_v3's users depart from a payee's usual category on 15% of known-payee items (blind_v2 28%, blind_v1 10%). Across the
+  three sets the gate is +0.1, +4.8 and about -1.3 points on known payees: it pays where users often depart from their usual category;
+  real data will settle whether to keep it.
 - **New users** 73.9% right first (rule 42.9), 93% in the list.
-- This closes the synthetic line: three independently built blind sets agree on the recommended system's gain over the current rule
-  (right first +7 to +14 points, in the list +22 to +34, work saved +16 to +28). The next evidence is real data (reports/REAL_DATA_SPEC.md).
+- This closes the synthetic line: on the untouched set the recommended system gains 7 points right first, 22 in the list and 16 of
+  work saved over YNAB's rule, and blind_v1 and blind_v2 showed gains in the same direction (REPORTs 131, 137; the exact system was not
+  run on them). The next evidence is real data (reports/REAL_DATA_SPEC.md).
