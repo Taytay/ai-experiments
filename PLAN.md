@@ -25,8 +25,10 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
 - **Branches:** nothing is merged to main; the owner merges. Stack #24 in PR order ends ... #58 plan-49-calibration, #59
   plan-56-train-efficiency, #60 plan-57-db-episodes, #61 plan-34-modal, #62 plan-58-fair-record, #63 plan-60-batch, #64
   plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (rows 64 to 78), #68 plan-79-one-slot
-  (top, rows 79 on; owner 2026-09-27: a new layer to keep the stack organised). New work branches from the
-  top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
+  (rows 79 to 151; owner 2026-09-27: a new layer to keep the stack organised), plan-152-next (top, rows 152 on). The 61 open PRs
+  (#5 on main up to #68) form one GitHub stack (`gh stack link`; owner 2026-10-01). Owner, 2026-10-01: a new branch and PR layer
+  per row or round of tests from row 152 on, added to the top of the stack with `gh stack link <PR numbers...> <new-branch>`. New
+  work branches from the top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
   merge-forward: resolve as the union of rows by `run_id`, sorted.
 - **Checkouts:** one working checkout, `~/projects/YNAB/ai-experiments`, on the top branch (the owner, 2026-09-26: no more worktrees;
   Modal made the per-branch GPU checkouts unnecessary). Switch branches there for merge-forward. `../ai-experiments-wt06` (plan-57) is idle,
@@ -411,3 +413,4 @@ afternoon each on the 3090.
 - 2026-09-30: row 150 done (REPORT.md 145): population-learned concepts and payee profiles mapped onto the user's categories: no-model 52% right first / 70% top-3 on first-time payees (YNAB 0%); decider reads raw other-users names better than the mapped line (61 vs 56%); multiplied in +1 point; real data: train on filings, keep the raw line, profiles as no-model fallback.
 - 2026-10-01: row 151 added (owner): evaluate and fine-tune strands-decider against our best models; repo read (README, docs/architecture.md), cloned to the scratchpad; nothing run yet.
 - 2026-10-01: row 151 done (REPORT.md 146): strands-decider checked (their engine and eval match published; our reader = their engine); untrained 26% on blind_v1; trained three ways (v19 continued, from base, their own trainer + v19 config) = decider-2B and ~decider-4B on the blind sets (82.6-83.1 vs 83.8; first-time payees 60 vs 60) but far behind on invented names (REAL-6 57-65 vs 87; novel 42-51 vs 85); not adopted. Seven adapters in DVC.
+- 2026-10-01: owner: one branch and PR per row from now on; plan-152-next opened as the new top layer; the open chain (#5 to #68) confirmed as one GitHub stack.
