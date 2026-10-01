@@ -1,0 +1,7 @@
+outs:
+- md5: dd2690b782eb0ff510d29f9ebd8f2b3a.dir
+  size: 91545999
+  nfiles: 8
+  hash: md5
+  path: 
+    strands_base_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_ev10soft

@@ -34,7 +34,8 @@ READERS = {  # name: file pattern ({set} is the item set's name, "real6" for REA
     "kev-4B, untrained": "kev_kev-4b_{set}.noctx.jsonl",
     "strands v19 + recipe episodes": "strands_strands_v19_" + EP.replace("{s}", "*") + "_ev10soft_{set}.noctx.jsonl",
     "strands arch. from Qwen3.5-2B-Base + recipe episodes": "strands_strands_base_" + EP.replace("{s}", "*") + "_ev10soft_{set}.noctx.jsonl",
-    "decider-2B + recipe (one slot)": DEC.replace("{size}", "2b").replace("{s}", "*"),
+    "strands' own trainer and v19 config + recipe episodes": "strands_strands_recipe_" + EP.replace("{s}", "*") + "_ev10soft_{set}.noctx.jsonl",
+    "decider-2B + recipe (one slot)":DEC.replace("{size}", "2b").replace("{s}", "*"),
     "decider-4B + recipe (one slot; REPORT 123)": DEC.replace("{size}", "4b").replace("{s}", "*"),
 }
 SETS = [("REAL-6 v1", "real6", None), ("novel names", "real6_v1_novel", "real6_v1_novel"), ("mislead", "mislead_v1", "mislead_v1"),

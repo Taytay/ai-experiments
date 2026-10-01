@@ -8758,3 +8758,111 @@ user's own category> (%)", read zero-shot by decider-4B (the other-users recipe,
   line, aggregated per payee key over users with enough distinct users behind it; (3) keep the learned concepts and profiles as the
   no-model fallback and for the top-three list of first-time payees, and as an offline map of how people name categories. With a million
   users the clusters and the payee matching will be denser and better; whether that closes the gap to the raw line is a real-data question.
+
+## 146. strands-decider (AWS, a pointer head on Qwen3.5-2B-Base): used correctly it reproduces its published numbers, but untrained it barely reads our task (blind_v1 26% right first; REAL-6 9%); trained on the recipe's episodes, by any of three routes, it equals decider-2B and comes within a point of decider-4B on the blind sets (blind_v1 82.6-83.1 vs 83.8 right first, first-time payees 60 vs 60), but stays far behind on invented category names (REAL-6 57-65 vs 87; novel names 42-51 vs 85); not adopted (MODEL-22)
+
+*PLAN step 151 (owner, 2026-10-01: "Look at this new open source repo of a decider model from AWS ... use it to experiment and see how
+well it handles our datasets and experiments ... Compare it to our existing best models"; later: check that we use their code, model and
+harness correctly, on easy inputs first, and use their training recipe). Code: `ai_experiments.strands` (their prompt, tokenised whole
+as their training collator does, their pointer readout at temperature 1), `exp_decision_models.py FAMILY=strands`,
+`exp_strands_finetune.py` (INIT=v19 | base), `export_strands_episodes.py` (our episodes and their v19 config for their own trainer),
+`strands_check.py`, `strands_tables.py`; job lists `scripts/modal_jobs/r151*.json`; package `strands-decider==0.1.0` at commit
+f91487a. Licences: the code and the v19 checkpoint are Apache-2.0, the torso Qwen3.5-2B-Base Apache-2.0 (`open_licence`); v19's own
+training mixes public datasets, some tagged `other` or `unknown` (its LICENSE.md); we use only the published weights and train our own.*
+
+**The model.** A Qwen3.5-2B-Base torso with its LM head discarded, a rank-16 LoRA, and a pointer head (~1M parameters): option k's logit
+is the dot product of a projection of the hidden state at `<answer>` with a projection of the hidden state at the last token of option
+k's line. Prompt: `<state>...</state><question type="choice">Select exactly one option. <question> <options>1. a\n2. b ...</options>
+</question><answer>`. Our item's prompt (category list, labelled history, the query) is the state; the category names are the options.
+v19 was trained on public classification sets (emotion, topic, intent, NLI), multi-step document questions and answer adequacy;
+JevBench 0.723.
+
+**Is it used correctly? (`results/strands_check_r151.txt`).** (A) Their engine on their README's recorded example gives the same
+answers with probabilities a few points apart (technical 0.788 / billing 0.197 / sales 0.015 against 0.748 / 0.234 / 0.018; urgency
+0.807 against 0.801), within what the README says another run gives. (B) Their own `evaluate_checkpoint` on their published held-out
+generated rows: gen:adequacy 0.805 against the published 0.798 (n = 302); on gen_v16's ten tasks six match the published accuracy
+exactly and four are one to three rows off (0.866 overall against about 0.85). (C) Our reader against their engine on 61 choice
+questions: the same top answer on 61, largest probability difference 0.011 (mean 0.0005). So the model, their code and our reader
+agree. (D) An easy ladder through our reader: one obvious transaction (Shell, Trader Joe's, Netflix, CVS) with six everyday categories
+and no history, 17 of 24 (each also with the options reversed); the same queries in our prompt format after four labelled rows of other
+merchants, 6 of 12; the query's merchant twice in the history under an invented category name (copy the label), 8 of 12. A general LLM
+gets nearly all of these: v19 knows little about merchants and does not read a labelled history.
+
+**Arms.** All trained arms see the same 12,800 draws of the decider-4B recipe's episodes (REPORT 123: fold-0 training users, rename,
+database episodes, mislead, alternatives, lookups, overrides, 20% empty histories, the other-users line on half, 10% evidence-free with
+a uniform target), on one H100 in bf16, about 22 minutes of training each:
+- *v19 + recipe episodes* (our loop): v19's LoRA and pointer head trained further, LoRA lr 1e-4, head 2e-4, 800 steps of 16, options
+  shuffled; cross-entropy (uniform on evidence-free episodes, the true split where the user's choice is random). Their trainer cannot do
+  this: its `init_from` discards the pointer head and freezes the torso.
+- *strands' architecture from Qwen3.5-2B-Base* (our loop): a fresh rank-16 LoRA on v19's targets and a fresh pointer head, head lr 1e-3.
+- *strands' own trainer and v19 config*: `python -m strands_decider.cli train` with v19's `configs/train.yaml` (fresh LoRA and pointer
+  head on Qwen3.5-2B-Base, KL 0.3 to the frozen torso's option-number readout, teacher weight 1.0 carrying the soft targets, batch
+  8 x 4, one epoch, warmup 3%, length-grouped batches). One change: `num_slots` raised from 24 to the widest episode (41); with a pointer
+  head it only sizes the KL reference, and their trainer fails on a batch wider than it (v19's corpus stops at 24 options). Their
+  parent / replay stage is not reproduced: it labels their own corpus.
+- *decider-2B + recipe*: the decider-4B recipe unchanged on Mapika/decider-2b (one seed), the same-size comparison.
+
+**S.1 top-1 % (mean [range] over seeds; seeds in brackets)**
+
+| reader | REAL-6 v1 | novel names | mislead | override | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|---|
+| strands v19, untrained | 8.7 (1) | 6.0 (1) | 8.3 (1) | 15.5 (1) | 25.9 (1) | 62.4 (1) | 19.1 (1) | 52.5 (1) |
+| decider-4B, untrained | 34.2 (1) | – | – | – | 76.5 (1) | – | 63.1 (1) | – |
+| decider-35B-A3B, untrained | – | – | – | – | 82.0 (1) | – | 71.9 (1) | – |
+| kev-4B, untrained | 43.3 (1) | – | – | – | – | – | – | – |
+| strands v19 + recipe episodes | 62.6 [61.1, 64.1] (2) | 46.6 [45.0, 48.3] (2) | 51.1 [50.6, 51.6] (2) | 97.7 [97.4, 98.0] (2) | 80.8 [80.7, 80.9] (2) | 82.6 [82.3, 82.9] (2) | 69.3 [69.1, 69.4] (2) | 70.4 [69.3, 71.4] (2) |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 65.3 [64.8, 65.8] (2) | 51.2 [47.3, 55.0] (2) | 46.4 [43.7, 49.0] (2) | 97.1 [96.8, 97.4] (2) | 81.2 [81.1, 81.3] (2) | 83.1 [82.9, 83.2] (2) | 68.4 [67.7, 69.1] (2) | 70.0 [69.9, 70.0] (2) |
+| strands' own trainer and v19 config + recipe episodes | 56.9 [53.7, 60.1] (2) | 41.6 [41.6, 41.6] (2) | 45.8 [43.9, 47.6] (2) | 98.8 [98.7, 99.0] (2) | 80.5 [80.5, 80.5] (2) | 82.7 [82.1, 83.3] (2) | 70.1 [69.7, 70.4] (2) | 70.2 [69.5, 70.9] (2) |
+| decider-2B + recipe (one slot) | 86.9 (1) | 86.2 (1) | 64.4 (1) | 97.2 (1) | 79.7 (1) | 81.4 (1) | 68.6 (1) | 70.3 (1) |
+| decider-4B + recipe (one slot; REPORT 123) | 87.8 [85.6, 91.6] (3) | 84.6 [82.9, 87.6] (3) | 64.6 [63.8, 65.4] (2) | 98.3 [98.2, 98.4] (2) | 82.7 [82.2, 83.2] (3) | 83.9 [83.5, 84.2] (3) | 70.0 [69.3, 70.7] (3) | 71.7 [70.5, 73.2] (3) |
+
+**S.2 blind_v1 with the other-users line (1500 items; 277 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 73.5 | 73.5 | 0.82 | 74% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 62.4 | 84.1 | 2.23 | 70% | 45.1 / 66.1 | 66.3 | 56.0 | 1.367 |
+| decider-4B, untrained (read without the line) | 1 | 76.5 | 89.7 | 1.59 | 84% | 48.0 / 66.8 | 83.0 | 57.7 | 0.949 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 82.0 | 93.1 | 1.53 | 89% | 67.9 / 82.7 | 85.2 | 77.4 | 0.701 |
+| strands v19 + recipe episodes | 2 | 82.6 | 91.1 | 1.44 | 88% | 60.3 / 74.4 | 87.7 | 71.4 | 0.682 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 83.1 | 91.5 | 1.47 | 88% | 60.5 / 74.9 | 88.2 | 72.0 | 0.702 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 82.7 | 91.3 | 1.44 | 88% | 59.9 / 75.8 | 87.9 | 71.1 | 0.697 |
+| decider-2B + recipe (one slot) | 1 | 81.5 | 89.9 | 1.46 | 87% | 51.3 / 67.1 | 88.4 | 61.9 | 0.716 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 83.8 | 91.5 | 1.45 | 89% | 59.9 / 74.8 | 89.2 | 69.6 | 0.622 |
+
+**S.2 blind_v2 with the other-users line (1500 items; 316 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 57.1 | 57.1 | 0.79 | 57% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 52.5 | 79.1 | 2.58 | 63% | 49.7 / 73.4 | 53.2 | 51.6 | 1.473 |
+| decider-4B, untrained (read without the line) | 1 | 63.0 | 84.1 | 2.12 | 75% | 51.6 / 72.2 | 66.0 | 56.2 | 1.307 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 71.9 | 89.1 | 2.04 | 83% | 68.0 / 85.4 | 72.9 | 75.0 | 1.120 |
+| strands v19 + recipe episodes | 2 | 70.4 | 87.9 | 1.89 | 84% | 57.3 / 80.4 | 73.9 | 63.3 | 1.126 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 70.0 | 87.8 | 1.93 | 83% | 59.2 / 76.6 | 72.8 | 62.8 | 1.141 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 70.2 | 87.8 | 1.90 | 83% | 60.6 / 80.7 | 72.8 | 64.6 | 1.143 |
+| decider-2B + recipe (one slot) | 1 | 70.5 | 86.9 | 1.90 | 83% | 56.0 / 72.8 | 74.4 | 60.9 | 1.189 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 71.7 | 88.1 | 1.90 | 84% | 60.8 / 79.7 | 74.6 | 65.1 | 1.084 |
+
+- **Untrained, v19 does not do this task.** 26% right first on blind_v1 and 9% on REAL-6, where untrained decider-4B gets 77 and 34. Its
+  predictions show no position bias; its confidence is low (top probability mostly 0.2 to 0.4); when the payee is in the history it
+  picks one of the payee's past categories 30% of the time (363 of 1,216), where YNAB's rule is right 74%. The other-users line, which
+  names categories outright, lifts it to 62%.
+- **Trained, all three routes land in the same place, and there with decider at 2B.** On the blind sets with the other-users line the
+  strands arms reach 82.6 to 83.1% right first on blind_v1 and 70.0 to 70.4 on blind_v2, 88% / 83-84% of the work saved: decider-2B
+  81.5 / 70.5, decider-4B 83.8 / 71.7. On first-time payees they match decider-4B (blind_v1 60% right first, 75% in the top three) and
+  beat decider-2B (51 / 67); on blind_v2 likewise (57-61 / 77-81 against 56 / 73).
+- **They fail on invented category names.** REAL-6 (novel names for every user) 57 to 65% against 87 to 88 for decider at 2B and 4B;
+  real6_v1_novel 42 to 51 against 85 to 86; mislead 46 to 51 against 64. These sets can only be answered by binding each user's own
+  names to their meaning through the labelled rows. The decider recipe trains this directly (rand255 labels on the shots, the
+  shot-label token loss, the answer read as a label token, REPORT 76, 111); a pointer head reads the option line's hidden state,
+  which for an invented name carries little of what the history said about it. That is a hypothesis: the arms differ in readout and in
+  the shot-label loss together, and we did not separate them.
+- **v19's own training adds nothing here.** From v19 or from the base, the trained arms agree within a point or two on every set; their
+  trainer's KL and batch give the same result as our loop.
+- **Time.** Each trained arm took about 22 minutes to train and 30 to 33 minutes with its eight scorings on one H100 (decider-2B 21 / 27);
+  scoring speed was not measured separately.
+
+**Not adopted.** Trained, strands-decider equals decider at the same size on the blind sets and on first-time payees, and is far worse
+where users name categories in their own way, which real users do. decider-4B with the recipe stays the reader. What would change this:
+a pointer head trained with a shot-label objective (the arms above leave it out), or real data in which invented names are rare.

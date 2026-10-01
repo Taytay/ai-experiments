@@ -1,0 +1,7 @@
+outs:
+- md5: b72e9c502590867cd4d579b16b3e585f.dir
+  size: 91550423
+  nfiles: 10
+  hash: md5
+  path: 
+    strands_recipe_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_ev10soft

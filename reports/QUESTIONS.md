@@ -1253,6 +1253,12 @@ one-slot decisions; we never trained the recipe below 4B for the decoder. *Exper
 the other-users line, two seeds; blind_v1 by the report card, speed.
 **Status (2026-09-30):** PLAN step 136, REPORT.md 135: decider-0.8B 3x faster, 1.8 points behind on blind_v1, effort 0.726 vs 0.622; not adopted.
 
+**MODEL-22 strands-decider, a pointer head on Qwen3.5-2B-Base.** AWS's strands-labs/strands-decider (Apache-2.0) scores each option
+from the hidden state at its own line against the state at `<answer>`, with a LoRA and KL to the frozen torso. *Experiment:* the
+published v19 zero-shot after checking it reproduces its own numbers; trained on the recipe's episodes from v19, from the base, and with
+its own trainer and config; against decider-2B / -4B with the recipe on REAL-6, novel names, the behaviour sets and blind_v1 / v2.
+**Status (2026-10-01):** PLAN step 151, REPORT.md 146: = decider-2B on the blind sets and first-time payees, far worse on invented names; not adopted.
+
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
