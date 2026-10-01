@@ -8866,3 +8866,102 @@ a uniform target), on one H100 in bf16, about 22 minutes of training each:
 **Not adopted.** Trained, strands-decider equals decider at the same size on the blind sets and on first-time payees, and is far worse
 where users name categories in their own way, which real users do. decider-4B with the recipe stays the reader. What would change this:
 a pointer head trained with a shot-label objective (the arms above leave it out), or real data in which invented names are rare.
+
+## 147. What decider can take from strands: the label-copying loss, not the pointer head. strands reading our labelled history learns invented names only with the shot-label loss (REAL-6 64 -> 87, novel names 41 -> 84, = decider-2B); a strands-style pointer added to decider's readout changes nothing beyond seed noise at 2B or 4B (blind_v1 84.0 with and without; first-time payees 60 vs 62 for the relisted-options control); not adopted (MODEL-23)
+
+*PLAN step 152 (owner, 2026-10-01: "Can we learn anything about their torso and head architecture to improve decider?"; then "1 and 2").
+Code: `ai_experiments.pointer` (OptionPointer), `oneslot.build_layout(relist=True)`, `exp_decider_finetune.py RELIST / POINTER`,
+`ai_experiments.strands.labelled / encode_aux / forward`, `exp_strands_finetune.py STATE=labelled AUX_SHOTS`, readers in
+`exp_decision_models.py` (each adapter carries how to read it: `oneslot_extra.json`, `strands_extra.json`), `strands_tables.py`; job list
+`scripts/modal_jobs/r152.json`. Branch plan-152-next (PR #69). All arms: the recipe's episodes and 800 x 16 steps as REPORT 146.*
+
+REPORT 146 left two explanations open for strands' weakness on invented names: its readout (a pointer over option lines, against
+decider's label token read from the LM head), and the recipe's shot-label loss, which the strands arms did not have. And at 2B the
+strands head was better on first-time payees (60 vs 51). Two experiments:
+
+1. **A pointer on decider.** decider-2B / -4B with the recipe, plus a strands-style pointer added to the label logits:
+   logit_k = <h_slot, W_lab[label_k]> + gate x <q(LN(h_slot)), k(LN(h_line_k))> / 16, fp32 head (dim 256, lr 1e-3), gate starting at 1
+   (a smoke run showed a zero-initialised gate also holds q and k at zero gradient). Our layout lists the categories before the history,
+   where a line's last token has read nothing of it, so the options are listed again after the query ("Options:\n- (lab) name", about
+   170 tokens) and the pointer reads those lines. Control: the same relisted layout without the pointer (one seed per size). Pointer gates
+   at the end of training: 0.89 to 0.90 in all four runs (the pointer stays in).
+2. **strands with our labelled history.** strands' architecture from Qwen3.5-2B-Base reading our labelled layout inside its state (each
+   category a random two-letter code in the list and in every history row, options "(KQ) Groceries"), without and with the recipe's
+   shot-label loss (each history row's code predicted from the token before it through the tied embeddings, weight 1). One seed each.
+
+**S.1 top-1 % (mean [range] over seeds; seeds in brackets)**
+
+| reader | REAL-6 v1 | novel names | mislead | override | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|---|
+| strands v19, untrained | 8.7 (1) | 6.0 (1) | 8.3 (1) | 15.5 (1) | 25.9 (1) | 62.4 (1) | 19.1 (1) | 52.5 (1) |
+| decider-4B, untrained | 34.2 (1) | – | – | – | 76.5 (1) | – | 63.1 (1) | – |
+| decider-35B-A3B, untrained | – | – | – | – | 82.0 (1) | – | 71.9 (1) | – |
+| kev-4B, untrained | 43.3 (1) | – | – | – | – | – | – | – |
+| strands v19 + recipe episodes | 62.6 [61.1, 64.1] (2) | 46.6 [45.0, 48.3] (2) | 51.1 [50.6, 51.6] (2) | 97.7 [97.4, 98.0] (2) | 80.8 [80.7, 80.9] (2) | 82.6 [82.3, 82.9] (2) | 69.3 [69.1, 69.4] (2) | 70.4 [69.3, 71.4] (2) |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 65.3 [64.8, 65.8] (2) | 51.2 [47.3, 55.0] (2) | 46.4 [43.7, 49.0] (2) | 97.1 [96.8, 97.4] (2) | 81.2 [81.1, 81.3] (2) | 83.1 [82.9, 83.2] (2) | 68.4 [67.7, 69.1] (2) | 70.0 [69.9, 70.0] (2) |
+| strands' own trainer and v19 config + recipe episodes | 56.9 [53.7, 60.1] (2) | 41.6 [41.6, 41.6] (2) | 45.8 [43.9, 47.6] (2) | 98.8 [98.7, 99.0] (2) | 80.5 [80.5, 80.5] (2) | 82.7 [82.1, 83.3] (2) | 70.1 [69.7, 70.4] (2) | 70.2 [69.5, 70.9] (2) |
+| decider-2B + recipe (one slot) | 86.9 (1) | 86.2 (1) | 64.4 (1) | 97.2 (1) | 79.7 (1) | 81.4 (1) | 68.6 (1) | 70.3 (1) |
+| decider-4B + recipe (one slot; REPORT 123) | 87.8 [85.6, 91.6] (3) | 84.6 [82.9, 87.6] (3) | 64.6 [63.8, 65.4] (2) | 98.3 [98.2, 98.4] (2) | 82.7 [82.2, 83.2] (3) | 83.9 [83.5, 84.2] (3) | 70.0 [69.3, 70.7] (3) | 71.7 [70.5, 73.2] (3) |
+| strands from base, our labelled layout | 64.1 (1) | 41.3 (1) | 47.2 (1) | 98.4 (1) | 81.3 (1) | 83.1 (1) | 68.1 (1) | 69.1 (1) |
+| strands from base, labelled layout + shot-code loss | 86.6 (1) | 83.6 (1) | 64.6 (1) | 98.5 (1) | 80.4 (1) | 82.0 (1) | 68.1 (1) | 71.0 (1) |
+| decider-2B + recipe, options relisted (control) | 87.9 (1) | 85.2 (1) | 59.3 (1) | 96.8 (1) | 79.3 (1) | 81.4 (1) | 68.6 (1) | 70.7 (1) |
+| decider-2B + recipe + pointer | 88.3 [87.9, 88.6] (2) | 87.4 [85.6, 89.3] (2) | 62.1 [61.6, 62.6] (2) | 97.0 [96.1, 98.0] (2) | 80.5 [80.3, 80.7] (2) | 81.8 [81.3, 82.3] (2) | 67.1 [66.0, 68.2] (2) | 70.0 [69.2, 70.9] (2) |
+| decider-4B + recipe, options relisted (control) | 88.3 (1) | 87.2 (1) | 65.0 (1) | 99.3 (1) | 82.3 (1) | 84.0 (1) | 71.3 (1) | 73.0 (1) |
+| decider-4B + recipe + pointer | 87.6 [86.6, 88.6] (2) | 88.3 [87.9, 88.6] (2) | 64.9 [63.6, 66.1] (2) | 98.9 [98.5, 99.3] (2) | 82.6 [82.2, 83.1] (2) | 84.0 [83.7, 84.3] (2) | 70.2 [68.8, 71.5] (2) | 72.3 [70.5, 74.2] (2) |
+
+**S.2 blind_v1 with the other-users line (1500 items; 277 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 73.5 | 73.5 | 0.82 | 74% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 62.4 | 84.1 | 2.23 | 70% | 45.1 / 66.1 | 66.3 | 56.0 | 1.367 |
+| decider-4B, untrained (read without the line) | 1 | 76.5 | 89.7 | 1.59 | 84% | 48.0 / 66.8 | 83.0 | 57.7 | 0.949 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 82.0 | 93.1 | 1.53 | 89% | 67.9 / 82.7 | 85.2 | 77.4 | 0.701 |
+| strands v19 + recipe episodes | 2 | 82.6 | 91.1 | 1.44 | 88% | 60.3 / 74.4 | 87.7 | 71.4 | 0.682 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 83.1 | 91.5 | 1.47 | 88% | 60.5 / 74.9 | 88.2 | 72.0 | 0.702 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 82.7 | 91.3 | 1.44 | 88% | 59.9 / 75.8 | 87.9 | 71.1 | 0.697 |
+| decider-2B + recipe (one slot) | 1 | 81.5 | 89.9 | 1.46 | 87% | 51.3 / 67.1 | 88.4 | 61.9 | 0.716 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 83.8 | 91.5 | 1.45 | 89% | 59.9 / 74.8 | 89.2 | 69.6 | 0.622 |
+| strands from base, our labelled layout | 1 | 83.1 | 90.5 | 1.44 | 88% | 57.4 / 74.4 | 88.9 | 69.6 | 0.731 |
+| strands from base, labelled layout + shot-code loss | 1 | 82.0 | 90.4 | 1.43 | 87% | 54.5 / 73.6 | 88.2 | 69.6 | 0.745 |
+| decider-2B + recipe, options relisted (control) | 1 | 81.3 | 89.9 | 1.42 | 87% | 52.0 / 67.9 | 87.9 | 63.1 | 0.758 |
+| decider-2B + recipe + pointer | 2 | 81.8 | 90.2 | 1.41 | 88% | 55.4 / 70.4 | 87.8 | 64.9 | 0.730 |
+| decider-4B + recipe, options relisted (control) | 1 | 84.0 | 90.7 | 1.40 | 88% | 61.7 / 74.0 | 89.0 | 71.4 | 0.643 |
+| decider-4B + recipe + pointer | 2 | 84.0 | 91.1 | 1.42 | 89% | 59.7 / 73.8 | 89.5 | 71.1 | 0.648 |
+
+**S.2 blind_v2 with the other-users line (1500 items; 316 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 57.1 | 57.1 | 0.79 | 57% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 52.5 | 79.1 | 2.58 | 63% | 49.7 / 73.4 | 53.2 | 51.6 | 1.473 |
+| decider-4B, untrained (read without the line) | 1 | 63.0 | 84.1 | 2.12 | 75% | 51.6 / 72.2 | 66.0 | 56.2 | 1.307 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 71.9 | 89.1 | 2.04 | 83% | 68.0 / 85.4 | 72.9 | 75.0 | 1.120 |
+| strands v19 + recipe episodes | 2 | 70.4 | 87.9 | 1.89 | 84% | 57.3 / 80.4 | 73.9 | 63.3 | 1.126 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 70.0 | 87.8 | 1.93 | 83% | 59.2 / 76.6 | 72.8 | 62.8 | 1.141 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 70.2 | 87.8 | 1.90 | 83% | 60.6 / 80.7 | 72.8 | 64.6 | 1.143 |
+| decider-2B + recipe (one slot) | 1 | 70.5 | 86.9 | 1.90 | 83% | 56.0 / 72.8 | 74.4 | 60.9 | 1.189 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 71.7 | 88.1 | 1.90 | 84% | 60.8 / 79.7 | 74.6 | 65.1 | 1.084 |
+| strands from base, our labelled layout | 1 | 69.1 | 87.5 | 1.90 | 83% | 54.7 / 80.1 | 72.9 | 59.4 | 1.153 |
+| strands from base, labelled layout + shot-code loss | 1 | 71.0 | 88.3 | 1.90 | 84% | 56.0 / 76.6 | 75.0 | 59.4 | 1.152 |
+| decider-2B + recipe, options relisted (control) | 1 | 70.8 | 87.7 | 1.88 | 83% | 58.2 / 76.6 | 74.2 | 62.0 | 1.165 |
+| decider-2B + recipe + pointer | 2 | 70.0 | 87.1 | 1.86 | 83% | 56.3 / 73.1 | 73.7 | 60.9 | 1.167 |
+| decider-4B + recipe, options relisted (control) | 1 | 73.1 | 88.2 | 1.85 | 85% | 64.6 / 80.1 | 75.3 | 67.7 | 1.114 |
+| decider-4B + recipe + pointer | 2 | 72.3 | 88.1 | 1.86 | 84% | 61.6 / 79.0 | 75.2 | 65.6 | 1.116 |
+
+- **The shot-label loss is what teaches invented names, not decider's readout.** strands reading the labelled layout without it is
+  where plain strands was (REAL-6 64.1, novel names 41.3, mislead 47.2). With it, the same pointer head reaches 86.6 / 83.6 / 64.6:
+  decider-2B's 86.9 / 86.2 / 64.4. So REPORT 146's hypothesis is confirmed in its second half: the readout does not matter, the training
+  signal does. Labels in the prompt alone are not enough; the model has to be trained to predict them in the history.
+- **The pointer adds nothing to decider.** decider-4B + pointer against its relisted control: blind_v1 84.0 / 84.0 right first, first-time
+  payees 59.7 / 61.7, blind_v2 72.3 / 73.1; REAL-6 87.6 / 88.3, novel names 88.3 / 87.2. decider-2B: 81.8 / 81.3, first-time payees
+  55.4 / 52.0 on blind_v1 but 56.3 / 58.2 on blind_v2. Every difference is inside the seed ranges (REPORT 123's three decider-4B seeds
+  span 70.5 to 73.2 on blind_v2). The relisted layout itself is also within noise of the plain recipe (decider-4B control 84.0 / 73.0
+  against 83.9 [83.5, 84.2] / 71.7 [70.5, 73.2]; one seed).
+- **strands' first-time-payee edge at 2B goes with the shot-label loss.** Without it, strands got first-time payees 60 / 59 right first
+  (blind_v1 / v2); with it 54.5 / 56.0, near decider-2B (51 / 56). One seed per arm: a hint, not a finding, that learning to copy
+  labels from the history trades off against judging a new payee from its meaning at 2B; at 4B decider has both (60 / 61).
+
+**Not adopted.** decider-4B with the recipe stays. What strands taught us is about training, not architecture: the shot-label loss is
+the ingredient that makes a reader handle invented category names, whatever the head. Not pursued: more seeds of the pointer (no
+direction to chase), the KL to the frozen torso (no effect in 146).

@@ -1259,6 +1259,11 @@ published v19 zero-shot after checking it reproduces its own numbers; trained on
 its own trainer and config; against decider-2B / -4B with the recipe on REAL-6, novel names, the behaviour sets and blind_v1 / v2.
 **Status (2026-10-01):** PLAN step 151, REPORT.md 146: = decider-2B on the blind sets and first-time payees, far worse on invented names; not adopted.
 
+**MODEL-23 What decider can take from strands.** REPORT 146: strands' pointer head lags on invented names but led decider-2B on first-time
+payees. *Experiment:* a strands-style pointer added to decider's label readout (options relisted after the query; decider-2B / -4B, a
+relisted control); strands reading our labelled history with and without the shot-label loss.
+**Status (2026-10-01):** PLAN step 152, REPORT.md 147: the shot-label loss, not the readout, teaches invented names; the pointer adds nothing; not adopted.
+
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
