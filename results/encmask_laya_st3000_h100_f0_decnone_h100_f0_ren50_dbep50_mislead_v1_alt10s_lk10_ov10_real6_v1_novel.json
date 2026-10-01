@@ -1,0 +1,211 @@
+{
+ "config": {
+  "dec_episodes": true,
+  "load_from": "encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10",
+  "arch": "mask",
+  "init": "laya",
+  "hops_from": null,
+  "mbi_ids": "letters",
+  "mbi_shotlab": false,
+  "steps": 0,
+  "batch": 16,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "ctx": false,
+  "fold": 0,
+  "poi": "",
+  "items_set": "real6_v1_novel",
+  "maxlen": 2048,
+  "seed": 0,
+  "base": "answerdotai/ModernBERT-large",
+  "train_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+  "model": "encmask_laya_st3000_h100_f0_decnone_h100_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10"
+ },
+ "train": {},
+ "noctx": {
+  "R6_all": 22.2,
+  "R6_all_n": 1179,
+  "R6_all_ci": [
+   19.8,
+   24.5
+  ],
+  "R6_all_null": [
+   5.7,
+   8.5
+  ],
+  "R6_all_uci": [
+   18.6,
+   26.0
+  ],
+  "R6_all_chance": 7.3,
+  "R6_all_new": 19.3,
+  "R6_all_new_n": 249,
+  "R6_all_new_ci": [
+   14.5,
+   24.1
+  ],
+  "R6_all_new_null": [
+   4.4,
+   10.8
+  ],
+  "R6_all_new_uci": [
+   12.6,
+   27.3
+  ],
+  "R6_all_new_chance": 8.2,
+  "R6_all_renamed": 20.7,
+  "R6_all_renamed_n": 478,
+  "R6_all_renamed_ci": [
+   17.2,
+   24.5
+  ],
+  "R6_all_renamed_null": [
+   4.0,
+   7.9
+  ],
+  "R6_all_renamed_uci": [
+   17.6,
+   24.0
+  ],
+  "R6_all_renamed_chance": 7.1,
+  "R6_all_standard": 25.4,
+  "R6_all_standard_n": 452,
+  "R6_all_standard_ci": [
+   21.2,
+   29.4
+  ],
+  "R6_all_standard_null": [
+   6.2,
+   11.1
+  ],
+  "R6_all_standard_uci": [
+   16.7,
+   34.8
+  ],
+  "R6_all_standard_chance": 7.1,
+  "R6_seen_all": 32.6,
+  "R6_seen_all_n": 559,
+  "R6_seen_all_ci": [
+   28.8,
+   36.5
+  ],
+  "R6_seen_all_null": [
+   4.8,
+   8.9
+  ],
+  "R6_seen_all_uci": [
+   29.3,
+   35.8
+  ],
+  "R6_seen_all_chance": 7.3,
+  "R6_seen_new": 33.0,
+  "R6_seen_new_n": 109,
+  "R6_seen_new_ci": [
+   24.8,
+   42.2
+  ],
+  "R6_seen_new_null": [
+   3.7,
+   12.8
+  ],
+  "R6_seen_new_uci": [
+   26.1,
+   40.9
+  ],
+  "R6_seen_new_chance": 8.3,
+  "R6_seen_renamed": 34.0,
+  "R6_seen_renamed_n": 238,
+  "R6_seen_renamed_ci": [
+   27.7,
+   39.9
+  ],
+  "R6_seen_renamed_null": [
+   2.9,
+   8.8
+  ],
+  "R6_seen_renamed_uci": [
+   28.6,
+   39.4
+  ],
+  "R6_seen_renamed_chance": 7.1,
+  "R6_seen_standard": 30.7,
+  "R6_seen_standard_n": 212,
+  "R6_seen_standard_ci": [
+   24.5,
+   36.8
+  ],
+  "R6_seen_standard_null": [
+   5.2,
+   13.2
+  ],
+  "R6_seen_standard_uci": [
+   23.0,
+   38.5
+  ],
+  "R6_seen_standard_chance": 7.0,
+  "R6_unseen_all": 12.9,
+  "R6_unseen_all_n": 620,
+  "R6_unseen_all_ci": [
+   10.3,
+   15.6
+  ],
+  "R6_unseen_all_null": [
+   5.3,
+   9.4
+  ],
+  "R6_unseen_all_uci": [
+   7.9,
+   18.9
+  ],
+  "R6_unseen_all_chance": 7.3,
+  "R6_unseen_new": 8.6,
+  "R6_unseen_new_n": 140,
+  "R6_unseen_new_ci": [
+   4.3,
+   12.9
+  ],
+  "R6_unseen_new_null": [
+   3.6,
+   12.1
+  ],
+  "R6_unseen_new_uci": [
+   2.2,
+   16.0
+  ],
+  "R6_unseen_new_chance": 8.0,
+  "R6_unseen_renamed": 7.5,
+  "R6_unseen_renamed_n": 240,
+  "R6_unseen_renamed_ci": [
+   4.6,
+   11.2
+  ],
+  "R6_unseen_renamed_null": [
+   3.3,
+   9.2
+  ],
+  "R6_unseen_renamed_uci": [
+   4.2,
+   11.2
+  ],
+  "R6_unseen_renamed_chance": 7.1,
+  "R6_unseen_standard": 20.8,
+  "R6_unseen_standard_n": 240,
+  "R6_unseen_standard_ci": [
+   15.8,
+   25.8
+  ],
+  "R6_unseen_standard_null": [
+   5.0,
+   11.7
+  ],
+  "R6_unseen_standard_uci": [
+   9.2,
+   34.6
+  ],
+  "R6_unseen_standard_chance": 7.1,
+  "ms_per_item_batched": 7.37,
+  "ms_per_item_single": 17.5,
+  "n_items": 1179,
+  "truncated_share": 0.0
+ }
+}

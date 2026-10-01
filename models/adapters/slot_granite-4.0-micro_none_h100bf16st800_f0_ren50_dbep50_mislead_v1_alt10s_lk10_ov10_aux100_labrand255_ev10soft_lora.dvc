@@ -1,0 +1,7 @@
+outs:
+- md5: 8e5b690aca88a98785e1ba2cbdb2454f.dir
+  size: 471932656
+  nfiles: 3
+  hash: md5
+  path: 
+    slot_granite-4.0-micro_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_ev10soft_lora

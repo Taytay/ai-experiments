@@ -1,0 +1,33 @@
+{
+ "config": {
+  "dec_episodes": true,
+  "load_from": "encmask_mbert_st3000_h100fresh_f0_decnone_h100fresh_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10",
+  "arch": "mask",
+  "init": "mbert",
+  "hops_from": null,
+  "mbi_ids": "letters",
+  "mbi_shotlab": false,
+  "steps": 0,
+  "batch": 16,
+  "lr": 3e-05,
+  "head_lr": 0.0001,
+  "ctx": false,
+  "fold": 0,
+  "poi": "",
+  "items_set": "real7_v2_recent",
+  "maxlen": 2048,
+  "seed": 0,
+  "base": "answerdotai/ModernBERT-large",
+  "train_sha": "cff65ea7429fe34c1d0166d1c03be94892849bd48e2e7cf184db3fc4cdee134d",
+  "model": "encmask_mbert_st3000_h100fresh_f0_decnone_h100fresh_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10"
+ },
+ "train": {},
+ "noctx": {
+  "R6_all": 76.0,
+  "R6_all_n": 1200,
+  "ms_per_item_batched": 7.07,
+  "ms_per_item_single": 89.55,
+  "n_items": 1200,
+  "truncated_share": 0.0
+ }
+}

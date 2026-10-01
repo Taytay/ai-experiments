@@ -842,6 +842,8 @@ further seeds (shots and query unchanged); argmax flip rate per corrected group 
 order, and of the two- and three-order averaged distributions; the same with a lettered list and letter readout on the
 untrained model only (the adapters were trained on names). Precision matched to training (CLAUDE.md, section 44).
 
+**Status (2026-09-27):** PLAN step 50 (re-scoped to the one-slot readers), REPORT.md 75: option order moves top-1 by at most 1.7 points; 1.3 to 5.7% of answers change.
+
 **TRAIN-10 Do counterfactual minimal pairs teach the categoriser to read its evidence rather than its prior?**
 Across the series, training on decision data raised in-distribution accuracy and lost on held-out items (reflex, Open-Jev,
 decider, Laya), with one clear exception: Nimble's 2,676 rows of base/counterfactual pairs, whose contexts differ in one
@@ -867,6 +869,8 @@ and record SFT arms with the decider augmentation (a "needs review" option in on
 arm, uniform targets over the user's categories on evidence-free episodes; measured with row 49's metrics: the share of
 evidence-free items answered at 0.9 or more, abstain precision and recall, and the accuracy and coverage change on items
 that do have evidence.
+**Status (2026-09-27):** PLAN steps 52 / 84, REPORT.md 79, 83: decider's abstain augmentation flags 92% of missing-category questions at 1.3% false alarms, no accuracy cost; evidence-free items are answered with high confidence (70% at p >= 0.9, 19% right): row 84 trains that case.
+**Status (2026-09-27, later):** REPORT.md 85: soft uniform targets on evidence-free training questions (no option) are the way to say "unsure" only where nothing tells; a "cannot tell" option over-abstains on names with clues.
 
 **MODEL-6 Can a small encoder with one scored `[MASK]` marker per category do the categoriser's job?**
 Laya (`laya_analysis.md`) and Verdict 2.0 (`openjev_verdict_analysis.md`) put the options first, each behind its own
@@ -936,6 +940,7 @@ folds so that no (user, merchant) answer is supervised for a scored user; the DB
 and opaque ones) are the cell that measures it, plus the other groups of REPORT.md 48 and ARC / MMLU. Frame: this improves the
 no-record route (retrieval missing or unavailable at serving time); with the record in the prompt the DB-only merchants are at 97.5.
 **Status (2026-09-26):** answered, PLAN step 57, REPORT.md 53. Yes, by a wide margin. On held-out users with no record in the prompt, database episodes put the DB-only merchants at 94.3 (+50.0 [35.2, 64.4] over no DB), opaque ones at 96.1 (from 11.8), in every fold; prose records with the same category reach 64.8 (opaque 35.3); both together 91.8. Every other cell gains too (all +16.5, coined +20.9). Untested: real bank renderings (row 43), a database larger than 240 merchants (row 59), and the record in the prompt given the same category field (row 58).
+**Status (2026-09-27):** PLAN step 83, REPORT.md 80: database episodes override misleading names completely (97.4); the user's history over the name holds at 4B, not at 2B; the user overriding the database is row 85.
 
 ## Added 2026-09-26: database episodes against retrieval, and at scale
 
@@ -974,6 +979,7 @@ On it (held-out users, section 55) database episodes read 63.6 and the record wi
 *Experiment (scoring only):* every item re-scored with each user's category names replaced by freshly generated words, consistently
 in the category list, the shots and the options (a new word per user and category, fixed seed), for the no-DB, episode, record and
 record-with-category arms; by original name type and REPORT.md 48's groups.
+**Status (2026-09-27):** answered for the current readers, PLAN step 61, REPORT.md 77. With fresh names the database-episode Qwen3.5-2B falls 86.9 to 68.1 (standard-name items 99 to 70: it files by name meaning), decider-4B one slot 88.3 to 83.6, rename-trained Qwen3.5-2B 74.5 to 73.2. Row 81 trains decider with rename augmentation on top.
 
 **REAL-19 (O) Can the categoriser infer what kind of store an unknown merchant is from its name and the user's examples, and does
 baking a database in cost that?**
@@ -1016,6 +1022,8 @@ over the best of those the model captures; per-item chance normalisation for the
 novel-merchant run with it.
 **Status (2026-09-26):** done, PLAN step 63, REPORT.md 59. On REAL-6's held-out users the no-model cascade (the user's merchant lookup, else other users' labels, else the usage prior) reads 87.0 top-1, level with the best categorisers; their value is the ranking (top-3 97 to 98 against 26) and whatever no lookup reaches (novel merchants: cascade 7.8, models 53 to 85). Thresholds for 98% auto-filing chosen on other users realise 92 to 98% on new users.
 
+**Status (2026-09-27):** PLAN step 75, REPORT.md 70: the merchant lookup in front of the best runs reaches 97 to 99.5% of REAL-6's ceiling; the split-category part of the ceiling is a floor (models beat the coin flip).
+
 **REAL-20 Label induction: when can a model infer what a meaningless category name means from the user's examples?**
 Blind Opus solves the novel merchants' coined names at 88% from clean strings; the 3B categorisers at 42 to 55. *Experiment
 (scoring only):* a controlled item set on clean renderings, each factor varied with the others fixed and paired items: examples of
@@ -1023,6 +1031,8 @@ the gold coined category in the prompt (0, 1, 2, 4, 8); the examples' kind (same
 category but another kind, only opaque merchants); the number of coined categories in the scheme; decoys (a same-kind business filed
 under another name); scored for the untrained and trained models, model sizes (3B, 7B; 14B on Modal) and a blind Opus sample.
 Says whether the models copy the nearest example's label or induce the word's meaning.
+
+**Status (2026-09-27):** PLAN step 74, REPORT.md 71: training with empty coined categories lifts label induction v2 to 80% of its ceiling; decoys with empty categories raise the decoy condition from 59 to 71 (Opus 98 to 100); decoys alone hurt.
 
 **Status (2026-09-26):** done, PLAN step 64, REPORT.md 60. One or two examples of other businesses filed under a coined word teach every model its meaning (v2, with three empty coined categories so elimination cannot solve it: 14B untrained 12 to 66% from 0 to 1 example, blind Opus 25 to 100); fine-tuning with rename augmentation or database episodes brings a 3B to the untrained 14B (77 to 78 at base); opaque example names teach nothing. The models copy the nearest example: one same-kind business filed elsewhere costs 15 to 19 points and 60 to 74% of the errors pick its category, where Opus keeps 97%.
 
@@ -1044,10 +1054,14 @@ scored on places in the injected database and on places held out of it, same cat
 second the general "this kind of business goes in this kind of category" skill that row 62's +5 on merchants outside the database
 suggests; capacity against the held-out gain.
 
+**Status (2026-09-27):** PLAN step 66, REPORT.md 73: facts, not a skill: +21 on places in the injected database, +0 to +3 on places held out of it.
+
 **MODEL-8 Where the categoriser's decision forms, and what the weights store.** Linear probes on the query's and the merchant
 name's hidden states across layers (section 40's method): whether the standard category, the user's label and the business kind are
 linearly present and at which depth, before and after database episodes; whether a DB-only merchant's category is readable from its
 name's representation after injection.
+
+**Status (2026-09-27):** PLAN step 67, REPORT.md 74: the decision forms by layers 12 to 15 of Qwen3.5-2B; database episodes write DB-only merchants' categories into the same representation as learned merchants (91% at the statement, 100% at the cue).
 
 **MODEL-9 Which training objective makes a multiple-choice encoder's confidence trustworthy?** The owner (2026-09-26): Jev trains
 with a loss that takes confidence into account, so the model learns when to claim high confidence. Cross-entropy is already a strictly
@@ -1057,6 +1071,8 @@ that change what is learned are soft targets, a bounded proper score beside the 
 (row 68):* the row 53 encoder with each objective, and with the layout pre-trained on general multiple-choice data first (UniMC,
 Yang et al. 2022, is the prior art for [MASK]-per-option encoders trained on many MC datasets); read by bits, ECE, AURC and coverage
 at a realised 98% precision on held-out users, which is what auto-filing needs.
+
+**Status (2026-09-27):** PLAN step 68 (first stage), REPORT.md 72: the objective (ce, label smoothing, log + spherical, ce + Brier) does not buy trustworthy confidence; a temperature fitted on other users does (ECE ~5 for every arm but label smoothing, which caps confidence and ruins the ranking). Soft targets and MC pre-training not run.
 
 **MODEL-10 Can GLiClass-type and instruction-tuned masked-LM encoders be made to work as user categorisers?** Section 46's GLiClass
 (151M base, three epochs over 5,365 rows at 1e-5, examples in its `<<EXAMPLE>>` format on half the rows) was hurt by the 24 shots;
@@ -1121,3 +1137,151 @@ against ~25). *Experiment:* Qwen3.5-2B trained with decider's layout and loss (l
 ALL_LABELS shots as extra slots) against the same model with the per-option loss and scorer, on REAL-6 database episodes and POI-1's
 best layout, fold 0: accuracy, calibration, ms per item. Also decider-2B itself on REAL-6 database episodes (merchant knowledge at 2B
 is the doubt: it misfiles Trader Joe's zero-shot), and kev-4B fine-tuned (the best zero-shot reader; its own trainer needs torch < 2.9).
+**Status (2026-09-27):** answered, PLAN steps 79 / 80, REPORT.md 76. One slot matches the per-option loss once the shot labels are trained too (Qwen3.5-2B 85.9 against 86.9); decider-2B 87.9, decider-4B 88.3 with 66% auto-filed at 97.5% and POI-1 92.3; 18 to 24 ms per item warm against ~390; kev-4B fine-tuned 83.2.
+**Status (2026-09-27, later):** REPORT.md 81: random option labels (A..Z or all 255) train at least as well as letters in order; the recipe uses LABELS=rand26.
+
+## Review of the categoriser work, 2026-09-28
+
+A review of sections 24 to 97 (the owner approved its plan, 2026-09-28). On REAL-7 the final recipe puts p >= 0.9 on 91% of items at
+85% precision (REAL-6: 77% at 96.7%); the confident errors are items the prompt cannot answer (idiosyncratic, moved and new-category
+merchants not among the 24 recent rows: confident and wrong on 86 to 100% of them). 113 of REAL-7's 1,200 items are in the user's
+history but not in the shots and unanswerable from the prompt. The encoder comparison (62, 63) predates every recipe gain the decoders
+got after it. The behaviour sets (80 to 92) were built together with the training episodes that fix them.
+
+**EVAL-10 User effort and the auto-file policy.** What a user does per transaction: nothing (auto-filed and right), one click (the
+answer is among the top suggestions), a search (it is not), or undo a wrong auto-file (the costliest). *Experiment (CPU):* over the
+saved scores, the effort of three auto-file policies (the model's confidence with a threshold from other users; only merchants the
+user has filed consistently before, the owner's rule; both) with top-3 suggestions for the rest, on REAL-7 and REAL-6; the
+coverage-precision curve of each; which items fail.
+**Status (2026-09-28):** PLAN step 97, REPORT.md 98: on REAL-7 the model's confidence auto-files 3% at a 98% target (REAL-6: 77%); the last-two-filings rule over the whole history files 60% at 94.5%, wrong only on changes and rules; history-or-model cuts effort by 45% (REAL-7) and 69% (REAL-6).
+
+**REAL-22 The merchant's own rows in the prompt.** REAL-7's prompt shows the 24 most recent rows; 45% of queried merchants are not
+among them, and 113 items are in the user's history but unanswerable from the prompt. *Experiment:* REAL-7 v2 with each user's
+full history kept and the prompt built by a policy: the recent rows plus the query merchant's own latest rows (up to k), each row
+dated; the ceiling of each policy; read by the final recipe zero-shot, then trained with the policy (the query merchant's rows
+dropped from some training prompts so the model does not only copy, REPORT 47 / row 46). Also whether dates and more of the
+merchant's rows separate a slip from a change (REPORT 97).
+**Status (2026-09-29):** PLAN step 98, REPORT.md 99 and 101: the payee's own rows raise the ceiling 84.8 -> 91.6 and the untrained-on-slices reader 81.9 -> 87.1; trained on dated slices of REAL-7-style users it reads 90.9, follows moves and new categories through the dates (66 / 77 against 51 / 41 undated), and auto-files 48% at 97.8%.
+
+**MODEL-17 The encoder against the decoder at equal recipes.** Sections 62 and 63 compared a 400M encoder with the 3B decoder of
+that time; the decoders then gained ~30 points on POI-1 (kind lines, descriptions, kind-retrieved examples) and database episodes on
+REAL-6, which the encoder never got. One-slot decoders cut its speed advantage from ~40x to ~2 to 3x. *Experiment:* GLiClass-large and
+Laya's layout with database episodes on REAL-6 and row 73's POI-1 layout, against decider-4B's recipe; ms per item on one GPU.
+**Status (2026-09-29):** PLAN step 99, REPORT.md 102: trained on the decoder recipe's episodes, GLiClass-large (400M) and Ettin-1B match decider-4B on REAL-6 (90.8 / 90.9 against 89.8) and novel names (88), at 10 to 14 ms per item against 32; they lack the soft-target behaviours (row 102).
+**Status (2026-09-29, later):** PLAN step 102, REPORT.md 104: with the soft targets Ettin-1B matches decider-4B on every trained behaviour and on REAL-6 / novel names; the blind set keeps it 4 points behind (new users, new local businesses).
+
+**EVAL-11 A test set built blind to the training augmentations.** Every behaviour set (misleading names, overrides, alternation,
+evidence-free) was built alongside the episodes that train it, and section 92 showed one augmentation teaching a prior the set
+rewarded. *Experiment:* a generator written by an agent that sees the product description and REAL-7's format but not the training
+code or episodes; the final recipe scored on it zero-shot, with a blind strong-reader ceiling. Real anonymised histories outrank it.
+**Status (2026-09-29):** PLAN step 100, REPORT.md 103: blind_v1 (built by a subagent from the product description only): decider-4B row 89 82.0 (93% of the 87.9 ceiling), auto-files 51% at 97.7%; row 98's REAL-7 training does not transfer; encoders 77.5.
+
+**MODEL-18 Newer small open decoders.** The owner (2026-09-28) asked about newer decoders, Kimi among them, under open licences.
+Checked on Hugging Face (2026-09-28): Kimi K2 / K2.5 are ~1T-parameter models under a modified MIT licence (an attribution clause for
+large products), so neither the licence rule nor a per-transaction budget allows them; Kimi Linear 48B-A3B is plain MIT but 48B; Qwen
+3.6 / 3.8 exist only at 27B and 35B-A3B; LFM2 (LFM licence) and Gemma (Gemma licence) are out. Small open candidates: MiniCPM5-2B
+(Apache-2.0, 2026-09), Granite-4.0-micro (Apache-2.0), SmolLM3-3B (Apache-2.0), Phi-4-mini (MIT), Ministral-3 3B / 8B (Apache-2.0,
+but vision-language classes), Olmo-3-7B (Apache-2.0). Section 87 found 9B = 4B, so a new decoder earns its place only by matching
+decider-4B smaller or cheaper. *Experiment (row 101):* the final recipe on MiniCPM5-2B, Granite-4.0-micro, SmolLM3-3B and Phi-4-mini,
+one seed, every set.
+**Status (2026-09-28):** PLAN step 101, REPORT.md 100: none passes decider-4B; Granite-4.0-micro ties it on REAL-6 / REAL-7 (one seed) but reads misleading names at 84 against 97.
+
+## Added 2026-09-29 (night): the gaps review (owner: "write up a plan, add rows, proceed")
+
+A review of every section and the survey for experiments not done, results not followed up, and serving cost. The owner's framing
+for bulk inference: one user's 10 to 100 new transactions at once (a sync), never several users in one prompt.
+
+**INFRA-3 Bulk inference for one user.** Every scoring run so far batched independent prompts; nothing shared the part of the prompt
+that does not change between one user's transactions (the category list, recent rows, a row per category), and no prompt answered
+several transactions. The one cache test (REPORT 67, `SCORER_CACHE`) went through unsloth's one-token generation path and measured
+the wrapper, not caching. decider-4B (Qwen3.5) mixes attention with Gated DeltaNet layers, so a cached prefix is the attention KV plus
+a fixed-size recurrent state, and an attention mask cannot hide one query from another. *Experiment:* (a) a bulk test set from the
+blind generator: per user, a sync (a cutoff date, the next transactions after it, all unfiled), the filed history before the cutoff;
+(b) the split layout (a shared block, then the payee's own and similar payees' rows, then the transaction), zero-shot and trained,
+against today's layout, by user effort; (c) timing on one H100: separate prompts, the split layout uncached, and the shared block run
+once with each transaction's tail read from its cache (the answers must equal the uncached ones); (d) several transactions in one
+prompt, each with its own answer slot, read in one pass (zero-shot; trained only if it is close).
+**Status (2026-09-29):** PLAN steps 117, 119, REPORT.md 119: the cached shared prefix reads one user's sync at 21-26 ms per transaction (53 separately) with the same answers; one prompt with a slot per transaction 13-16 ms but changes 6-7% of answers untrained (row 127: train it; vLLM).
+**Status (2026-09-29, later):** PLAN step 127, REPORT.md 120: vLLM 0.30 with prefix caching on the split layout: 12.8 ms per transaction (sync of 30), 10.2 over a queue, same answers; multi-slot training deprioritised.
+
+**EVAL-12 Sending the hard cases to a large model.** The two small models disagree on 16.5% of blind_v1 and are then right 40% (decider)
+and 22% (encoder) of the time; blind Opus reads blind_v1 at about 91% on a sample against decider's 82. Scale did not help on REAL-6
+(sections 64, 87), but the blind set's misses are world knowledge and new users. *Experiment:* decider-35B-A3B (Apache-2.0, a
+Qwen3.5-35B-A3B base trained for one-slot choice) zero-shot on blind_v1; its accuracy where the small models disagree, and the system
+with it as the third reader (escalate disagreements; auto-file when it agrees with one of them and is confident), by effort and cost.
+**Status (2026-09-29):** PLAN step 120, REPORT.md 117: untrained decider-35B-A3B reads blind_v1 at 82.0 (new users 77, new businesses 78-84, idiosyncratic 49); as the third reader of what the small models leave it lifts auto-filing 65 -> 73% at 97.4% and cuts effort 0.560 -> 0.470.
+
+**EVAL-13 Thresholds that hold when the population changes.** One global threshold per model was fitted on other users of the same set;
+it did not carry from REAL-7 to blind_v1 (section 103). *Experiment (CPU):* over the saved blind_v1 scores, realised precision of the
+98% threshold by user group (new users, short and long histories, payee seen or not); per-group thresholds; a finite-sample
+(conformal risk control / Learn-then-Test) threshold; and the transfer test: thresholds fitted on REAL-7 or REAL-6 applied to blind_v1.
+**Status (2026-09-29):** PLAN step 121, REPORT.md 116: the 98% threshold holds overall, not for new users (93% / 89%); per-group thresholds need more items than blind_v1 has; a finite-sample guarantee halves decider's auto-filing at 1,100 calibration items; thresholds fitted on other sets move coverage 15-60 points.
+
+**TRAIN-13 Confidence that does not depend on the seed.** Accuracy is stable across seeds, auto-filing is not (section 109: 46 to 63%;
+48 rows 26 to 58%). *Experiment:* the decider recipe with an average of the last checkpoints (or an EMA of the LoRA weights), three
+seeds, against the plain recipe's seed spread in blind auto-filing.
+**Status (2026-09-29):** PLAN step 122, REPORT.md 124: EMA does not help (effort 0.682 vs 0.659); the seed spread in auto-filing was the fixed cut's: under the per-item rule it is 1.7 points.
+
+**MODEL-19 A large model as teacher.** Never done for the categoriser (sections 14 and 18 distilled a format on the species universe).
+*Experiment (after EVAL-12):* if the large reader is well ahead on blind_v1's weak groups, its calibrated distributions on training
+episodes (and on Overture names for the encoder) as soft targets for decider-4B and Ettin-1B.
+**Status (2026-09-30):** PLAN step 123, REPORT.md 136: no gain (teacher right on 38-39% of the synthetic episodes; effort 0.618 vs 0.622); dropped for synthetic data.
+
+**REAL-23 Other users' filings in the prompt.** With a million users, what other users call a payee is cheap to know and is exactly what
+a new user lacks; row 44 (the collaborative record) was deprioritised before the blind set existed. *Experiment:* a line under the query
+("Other users file this payee as: Coffee 12, Eating out 5") built from other users' histories (blind_v1 users share ~250 real chains),
+in training episodes and at test; effort on blind_v1's new users and new payees.
+**Status (2026-09-29):** PLAN step 124, REPORT.md 123: trained with the line, new users 61 -> 69, blind 82.5 -> 83.8, effort (W=10) 0.651 -> 0.619; the user's own habits unchanged; untrained the line is ignored.
+
+**MODEL-20 The large reader trained with the recipe.** Row 120: decider-35B-A3B untrained reads blind_v1 at 82.0 (the trained 4B 82.5),
+far better on new users (77 against 62) and new businesses (78 to 84 against 62 to 70), far worse where the user's habit overrides the
+merchant (idiosyncratic 49 against 97, changed mind 28 against 61): it has the world knowledge and not the trained behaviours. Scale did
+not help on REAL-6 (section 87: 9B = 4B), where there is no world knowledge to use. *Experiment:* the decider recipe (labelled rows) as
+a LoRA on decider-35B-A3B (attention, linear attention and the shared expert; routed experts frozen, as decider's own training), one
+H200, one seed; every set; alone and as the escalation reader of row 120.
+**Status (2026-09-29):** PLAN step 125, REPORT.md 122: blind_v1 84.8 (best single reader, effort 0.534), new users 74, idiosyncratic 95; REAL-6 74 (DB not stored, routed experts frozen); as escalation reader the untrained 35B is better (0.470 vs 0.500). Row 128: experts / steps.
+**Status (2026-09-30):** PLAN step 128, REPORT.md 127: the DB gap was under-training (2x rate REAL-6 85.9, 2x steps 88.3); blind effort not better; as the third reader the untrained 35B stays best.
+
+**EVAL-14 A scoring mechanism without an arbitrary threshold.** The owner (2026-09-29): the 98% threshold is arbitrary; a better mechanism
+for scoring and deciding success. *Experiment (CPU):* success as expected user effort at a stated cost W of a wrong auto-file; auto-file
+per transaction when (1 - p1) W < q3 + 3 (1 - q3) on calibrated probabilities; against the fixed 98% cut and the best single cut, W from 3
+to 100, every reader and combination on blind_v1.
+**Status (2026-09-29):** PLAN step 126, REPORT.md 118: the per-item rule is best or tied at every W with nothing to tune; a 98% target = W of about 10; rankings hold at every W. Recommendation: report effort at W = 5 / 10 / 20 / 50 under the per-item rule (W = 10 headline until the product sets W).
+
+**MODEL-21 A sub-1B decoder with the recipe.** Jeff (firelex/jeff, reviewed 2026-09-30) finds a 0.8B Qwen3.5 student its sweet spot for fast
+one-slot decisions; we never trained the recipe below 4B for the decoder. *Experiment:* decider-0.8b (Apache-2.0) with the recipe and
+the other-users line, two seeds; blind_v1 by the report card, speed.
+**Status (2026-09-30):** PLAN step 136, REPORT.md 135: decider-0.8B 3x faster, 1.8 points behind on blind_v1, effort 0.726 vs 0.622; not adopted.
+
+**MODEL-22 strands-decider, a pointer head on Qwen3.5-2B-Base.** AWS's strands-labs/strands-decider (Apache-2.0) scores each option
+from the hidden state at its own line against the state at `<answer>`, with a LoRA and KL to the frozen torso. *Experiment:* the
+published v19 zero-shot after checking it reproduces its own numbers; trained on the recipe's episodes from v19, from the base, and with
+its own trainer and config; against decider-2B / -4B with the recipe on REAL-6, novel names, the behaviour sets and blind_v1 / v2.
+**Status (2026-10-01):** PLAN step 151, REPORT.md 146: = decider-2B on the blind sets and first-time payees, far worse on invented names; not adopted.
+
+**DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
+category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
+yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
+
+**Status (2026-09-30):** PLAN step 137, REPORT.md 135: first-time payees +3.5, new users +2.7, novel names -15, REAL-6 -5; not adopted.
+**EVAL-15 A second blind test set.** Every choice since REPORT 103 rests on blind_v1, one generator by one blind agent. *Experiment:*
+blind_v2 from a second agent that sees only the product brief (no repo code, no blind_v1), with its own merchant universe, archetypes
+and mechanisms, the same item fields (plus the other-users variant, payee history and YNAB's rule); re-read the recipe, the system and the
+scores of REPORTs 126 to 134 on it; conclusions that hold on both sets stand.
+**Status (2026-09-30, later):** PLAN step 145, REPORT.md 141: blind_v3, pre-registered and read once: the recommended system 81.1% right first (rule 74.2), 96.3% in the list, 90% work saved; confirms the gain over the rule on a third independent set.
+
+**Status (2026-09-30):** PLAN step 140, REPORT.md 137: confirmed on blind_v2 (ceiling 78.3): models >> rule, 35B for first-time payees, full system best; not confirmed: the encoder's contribution, rule-first; the 0.2 confidence gate is best on all three sets.
+**DATA-7 Canonical payee kinds and inferring them.** Owner (2026-09-30): users' categories are personal, so "other users file this payee as"
+is noisy; describe payees by a canonical kind at inference ("Kind: coffee shop", "person-to-person payment (purpose varies)"); and can the
+model infer a kind from categorised transactions? *Experiments:* (147) what a user's category holds, from the user's rows, as a choice
+among canonical kinds; (148) a payee's kind from its name, from other users' filings, or both; (149) "Kind:" lines on history rows and
+the query, from the generators' kinds and from (148)'s inferred kinds, in training and at test; first-time payees, new users, p2p.
+
+**Status (2026-09-30):** PLAN steps 147-149, REPORTs 143-144: payee kinds are inferable from filings (name + filings 77-87%); a database kind line for first-time payees matches or beats the 35B without retraining; inferred kinds do not replace the 35B; no kind training.
+**REAL-24 Payee profiles learned from the population's filings.** Owner (2026-09-30): no reliable kind database; ~1M users and ~1B
+categorised transactions (+1M a day); infer what we can from them. *Experiment (synthetic stand-in):* a 2,000-user population from
+blind_v2's world (`BLIND_POP`); concepts learned by clustering user categories by the payees filed under them; payee profiles over
+concepts from other users' earlier filings; mapped onto each test user's own categories; as a no-model suggestion and as the
+other-users line ("Other users file this payee as: <the user's own category> (%)"); first-time payees above all.
+
+**Status (2026-09-30):** PLAN step 150, REPORT.md 145: no-model mapped profile 52% right first / 70% top-3 on first-time payees; decider reads raw names better than the mapped line; train on real filings, keep the raw line, profiles as fallback.

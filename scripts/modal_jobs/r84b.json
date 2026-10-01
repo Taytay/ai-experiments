@@ -1,0 +1,44 @@
+[
+ {
+  "tag": "r84b-ctl",
+  "env": {
+   "ADAPTERS_FROM": "r84-ctl-s0,r84-ctl-s1",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r84b-opt",
+  "env": {
+   "ADAPTERS_FROM": "r84-opt-s0,r84-opt-s1",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_ev10opt_abst10sw25_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_ev10opt_abst10sw25_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_ev10opt_abst10sw25_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_ev10opt_abst10sw25_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r84b-soft",
+  "env": {
+   "ADAPTERS_FROM": "r84-soft-s0,r84-soft-s1",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 ITEMS_SET=novel_merchants_v1_clean EXTRA_OPTS='cannot tell from this|not listed here' uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

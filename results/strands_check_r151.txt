@@ -1,0 +1,39 @@
+A recorded: noul 0.801 | technical 0.748 billing 0.234 sales 0.018 conf 0.622 | score 1.24 conf 0.578 (0.093 0.578 0.330)
+A ours    : {"model":"strands-decider-0.1.0","answers":{"noul_0":{"type":"noul","noul":0.8073},"choice_0":{"type":"choice","choice":"technical","probabilities":{"billing":0.1971,"technical":0.7884,"sales":0.0145},"confidence":0.6826},"score_0":{"type":"score","score":1.2031,"legend":{"0":"calm","1":"frustrated","2":"very angry"},"probabilities":{"0":0.1486,"1":0.4997,"2":0.3517},"confidence":0.4716}},"usage":{"input_tokens":197,"output_tokens":3}}
+B gen_adequacy: n=302 acc=0.805
+   gen:adequacy: n=302 acc=0.805  published: {'accuracy': 0.798, 'n': 302}
+B gen_v16: n=350 acc=0.866
+   gen:all_conditions: n=34 acc=0.824  published: {'accuracy': 1.0, 'n': 9}
+   gen:dates: n=31 acc=0.774  published: {'accuracy': 0.9, 'n': 10}
+   gen:exception: n=37 acc=1.000  published: {'accuracy': 1.0, 'n': 15}
+   gen:lookup_chain: n=40 acc=0.850  published: {'accuracy': 0.8, 'n': 10}
+   gen:numbers: n=33 acc=0.818  published: {'accuracy': 0.0, 'n': 1}
+   gen:precedence: n=36 acc=0.944  published: {'accuracy': 0.909, 'n': 11}
+   gen:rubric: n=34 acc=0.882  published: {'accuracy': 1.0, 'n': 3}
+   gen:surface_trap: n=48 acc=0.917  published: {'accuracy': 0.0, 'n': 1}
+   gen:tradeoff: n=40 acc=0.800  published: {'accuracy': 0.775, 'n': 40}
+   gen:underdetermined: n=17 acc=0.765  published: {'accuracy': 1.0, 'n': 1}
+B gen_flips: n=120 acc=0.617
+   gen:instruction_flip: n=120 acc=0.617  published: None
+B gen_weak: n=207 acc=0.754
+   gen:all_conditions: n=4 acc=1.000  published: {'accuracy': 1.0, 'n': 9}
+   gen:borderline_rubric: n=11 acc=0.364  published: {'accuracy': 0.462, 'n': 13}
+   gen:cross_artefact: n=29 acc=0.759  published: {'accuracy': 0.742, 'n': 31}
+   gen:dates: n=9 acc=0.889  published: {'accuracy': 0.9, 'n': 10}
+   gen:definition_scope: n=11 acc=0.727  published: {'accuracy': 0.75, 'n': 12}
+   gen:exception: n=9 acc=1.000  published: {'accuracy': 1.0, 'n': 15}
+   gen:judge_action: n=6 acc=0.667  published: {'accuracy': 0.857, 'n': 7}
+   gen:lookup_chain: n=7 acc=0.857  published: {'accuracy': 0.8, 'n': 10}
+   gen:missing_fact: n=27 acc=0.667  published: {'accuracy': 0.655, 'n': 29}
+   gen:nested_exception: n=10 acc=0.500  published: {'accuracy': 0.615, 'n': 13}
+   gen:precedence: n=9 acc=1.000  published: {'accuracy': 0.909, 'n': 11}
+   gen:running_total: n=22 acc=0.773  published: {'accuracy': 0.826, 'n': 23}
+   gen:tie_break: n=21 acc=0.857  published: {'accuracy': 0.913, 'n': 23}
+   gen:version_in_force: n=25 acc=0.680  published: {'accuracy': 0.741, 'n': 27}
+   gen:withdrawn_instruction: n=7 acc=1.000  published: {'accuracy': 0.75, 'n': 8}
+C ours vs strands' engine on 61 choice questions: top-1 agree 61/61, max |dp| 0.0106, mean 0.0005
+D L1: 17/24 right
+D L2: 6/12 right
+D L3: 8/12 right
+
+[exited with code 0]

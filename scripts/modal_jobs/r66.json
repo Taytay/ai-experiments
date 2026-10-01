@@ -1,0 +1,60 @@
+[
+ {
+  "tag": "r66-P0",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "STEPS": "800",
+   "RUN_TAG": "h100bf16"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r66-PDB",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "STEPS": "800",
+   "RUN_TAG": "h100bf16",
+   "POI_DB": "poi1_v1_db",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16_hf_db_f0_ren50_alllab_dbep50_lora"
+  ]
+ },
+ {
+  "tag": "r66-PDB1600",
+  "env": {
+   "LOAD_4BIT": "0",
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "MICRO": "16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "STEPS": "1600",
+   "RUN_TAG": "h100bf16st1600",
+   "POI_DB": "poi1_v1_db",
+   "DBEP": "0.5"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=poi1_v1 CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_poi1_v1_none_h100bf16st1600_hf_db_f0_ren50_alllab_dbep50_lora"
+  ]
+ }
+]

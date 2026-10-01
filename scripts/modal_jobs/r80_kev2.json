@@ -1,0 +1,15 @@
+[
+ {
+  "tag": "r80-kev-E-lr1e4",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RUN_TAG": "h100bf16"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/export_kev_episodes.py /tmp/kev_real6.jsonl",
+   "K=$(uv run --frozen python scripts/fetch_kev.py) && PYTHONPATH=$K uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 --with datasets --with scikit-learn --with pydantic --with accelerate python -m kev.train --data /tmp/kev_real6.jsonl --init_from jaredpalmer/kev-4b --base Qwen/Qwen3.5-4B-Base --max_state 8192 --device cuda --dtype bf16 --weights_dtype bf16 --checkpointing 1 --lr 1e-4 --batch 4 --accum 4 --epochs 6 --max_steps 800 --out models/adapters/kev_kev-4b_none_h100bf16lr1e4st800_f0_dbep50",
+   "FAMILY=kev MODEL=models/adapters/kev_kev-4b_none_h100bf16lr1e4st800_f0_dbep50 LICENCE_OF=jaredpalmer/kev-4b ITEMS_SET= CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

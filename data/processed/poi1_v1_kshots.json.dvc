@@ -1,0 +1,5 @@
+outs:
+- md5: ab34baa159af5d888e6d44ab8f4a5d5a
+  size: 21260437
+  hash: md5
+  path: poi1_v1_kshots.json

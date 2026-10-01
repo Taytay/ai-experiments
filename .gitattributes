@@ -2,7 +2,6 @@
 # (Windows and WSL share this repo; without this, a checkout with different git settings
 # shows every text file as modified.)
 * text=auto eol=lf
-
 *.png binary
 *.jpg binary
 *.pdf binary

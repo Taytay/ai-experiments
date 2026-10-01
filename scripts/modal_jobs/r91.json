@@ -1,0 +1,41 @@
+[
+ {
+  "tag": "r91-f1",
+  "env": {
+   "ADAPTERS_FROM": "r90-f1",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f1_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=1,5,9,13,17 ITEMS_SET=mislead_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f1_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=1,5,9,13,17 ITEMS_SET=override_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f1_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=1,5,9,13,17 ITEMS_SET=alternation_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r91-f2",
+  "env": {
+   "ADAPTERS_FROM": "r90-f2",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f2_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=2,6,10,14,18 ITEMS_SET=mislead_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f2_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=2,6,10,14,18 ITEMS_SET=override_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f2_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=2,6,10,14,18 ITEMS_SET=alternation_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r91-f3",
+  "env": {
+   "ADAPTERS_FROM": "r90-f3",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f3_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=3,7,11,15,19 ITEMS_SET=mislead_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f3_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=3,7,11,15,19 ITEMS_SET=override_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f3_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora CONDS=noctx LABELS=rand26 USERS=3,7,11,15,19 ITEMS_SET=alternation_v1_all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

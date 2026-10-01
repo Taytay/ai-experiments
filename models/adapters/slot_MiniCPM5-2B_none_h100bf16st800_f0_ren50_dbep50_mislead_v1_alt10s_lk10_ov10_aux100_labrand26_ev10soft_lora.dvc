@@ -1,0 +1,7 @@
+outs:
+- md5: 8e7854e8261e3633bad6061e297d39b3.dir
+  size: 401952706
+  nfiles: 3
+  hash: md5
+  path: 
+    slot_MiniCPM5-2B_none_h100bf16st800_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand26_ev10soft_lora

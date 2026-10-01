@@ -1,0 +1,30 @@
+item 1 | Fun | Hobby Lobby always filed under Fun
+item 2 | Amazon orders | Amazon marketplace purchases consistently go to Amazon orders
+item 3 | Food | Subway is almost always Food
+item 4 | Entertainment | Dave & Busters is mostly Entertainment
+item 5 | Food | Domino's is always Food
+item 6 | Coffee habit | Peet's is always Coffee habit
+item 7 | Dining Out | Harbor Espresso is always Dining Out
+item 8 | Health | Rite Aid is mostly Health
+item 9 | Food | Sprouts groceries are always Food
+item 10 | Things | Recent Costco trips filed under Things
+item 11 | Everything else | Brightpath LLC is always Everything else
+item 12 | Eating out | Dutch Bros is always Eating out
+item 13 | Food & drink | Chick-fil-A is Food & drink
+item 14 | Home | Home Depot is always Home
+item 15 | Streaming | Monthly Max subscription is always Streaming
+item 16 | Discretionary | Haircut is discretionary personal spending
+item 17 | Food | Panda Express was previously Food
+item 18 | Reimbursable | Uber rides mostly marked Reimbursable
+item 19 | Transportation | Weekend Uber rides go to Transportation, not work
+item 20 | Childcare | Kiddie Academy weekly payment is Childcare
+item 21 | Groceries | Walmart grocery run
+item 22 | Stuff | CVS usually filed under Stuff
+item 23 | Amazon orders | Amazon purchases always go to Amazon orders
+item 24 | Disney trip | Lake Buena Vista diner during Disney trip
+item 25 | Grocery | Refund of the Costco purchase filed as Grocery
+item 26 | Caffeine | Peet's is always Caffeine
+item 27 | Rideshare & transit | Uber trip is rideshare
+item 28 | Gas | BP station is always Gas
+item 29 | Car | Chevron is always Car
+item 30 | Paychecks | ADP pay deposit is always Paychecks

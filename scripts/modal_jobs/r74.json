@@ -1,0 +1,93 @@
+[
+ {
+  "tag": "r74-REN",
+  "env": {
+   "LOAD_4BIT": "0",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_lora",
+   "ITEMS_SET=label_induction_v1 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_lora",
+   "CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r74-EMP",
+  "env": {
+   "LOAD_4BIT": "0",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "EMPTY": "3"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_emp3_f0_ren50_alllab_lora",
+   "ITEMS_SET=label_induction_v1 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_emp3_f0_ren50_alllab_lora",
+   "CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_emp3_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r74-DEC",
+  "env": {
+   "LOAD_4BIT": "0",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "DECOY": "0.3"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_f0_ren50_alllab_lora",
+   "ITEMS_SET=label_induction_v1 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_f0_ren50_alllab_lora",
+   "CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r74-DECEMP",
+  "env": {
+   "LOAD_4BIT": "0",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "ALL_LABELS": "1",
+   "STEPS": "200",
+   "MICRO": "16",
+   "RUN_TAG": "h100bf16",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "DECOY": "0.3",
+   "EMPTY": "3"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_categoriser.py llm none",
+   "ITEMS_SET=label_induction_v2 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_emp3_f0_ren50_alllab_lora",
+   "ITEMS_SET=label_induction_v1 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_emp3_f0_ren50_alllab_lora",
+   "CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm categoriser_Qwen3.5-2B_none_h100bf16_hf_dec30_emp3_f0_ren50_alllab_lora"
+  ]
+ },
+ {
+  "tag": "r74-base-2b",
+  "env": {
+   "LOAD_4BIT": "0",
+   "MODEL": "Qwen/Qwen3.5-2B"
+  },
+  "cmds": [
+   "ITEMS_SET=label_induction_v2 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm base",
+   "ITEMS_SET=label_induction_v1 CONDS=noctx USERS=all uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_real6.py llm base"
+  ]
+ }
+]

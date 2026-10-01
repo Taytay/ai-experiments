@@ -43,7 +43,7 @@ from ai_experiments.real6_eval import summarize, write_recs
 
 ARCH = os.environ.get("ARCH", "mask"); assert ARCH in ("mask", "gliclass", "mbinstruct")
 INIT = os.environ.get("INIT", {"mask": "mbert", "gliclass": "large", "mbinstruct": "instruct"}[ARCH])
-assert INIT in {"mask": ("mbert", "laya", "hops", "von"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
+assert INIT in {"mask": ("mbert", "laya", "hops", "von", "ettin1b", "eurobert"), "gliclass": ("base", "large"), "mbinstruct": ("instruct",)}[ARCH]
 SMOKE = bool(os.environ.get("SMOKE"))
 STEPS = 3 if SMOKE else int(os.environ.get("STEPS", "1500"))
 BATCH, LR, HEAD_LR = int(os.environ.get("BATCH", "16")), float(os.environ.get("LR", "3e-5")), float(os.environ.get("HEAD_LR", "1e-4"))
@@ -54,7 +54,9 @@ ITEMS_SET = os.environ.get("ITEMS_SET", "")
 MAXLEN = int(os.environ.get("MAXLEN", "2048"))
 SEED = int(os.environ.get("SEED", "0"))
 RUN_TAG = os.environ.get("RUN_TAG", "")
-BASE = {"mask": "answerdotai/ModernBERT-large", "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
+OBJ = os.environ.get("OBJ", "ce")  # row 68 (MODEL-9): ce | ls (label smoothing 0.1 over the valid options) | logsph (log score + spherical score, Laya's
+assert OBJ in ("ce", "ls", "logsph", "brier")  # bounded proper score with its exact gradient) | brier (ce + the Brier score, as decider / kev offer)
+BASE = {"mask": {"ettin1b": "jhu-clsp/ettin-encoder-1b", "eurobert": "EuroBERT/EuroBERT-2.1B"}.get(INIT, "answerdotai/ModernBERT-large"), "gliclass": f"knowledgator/gliclass-modern-{INIT}-v3.0", "mbinstruct": "answerdotai/ModernBERT-Large-Instruct"}[ARCH]
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 MBI_IDS = os.environ.get("MBI_IDS", "letters"); assert MBI_IDS in ("letters", "unused")
 MBI_SHOTLAB = bool(int(os.environ.get("MBI_SHOTLAB", "0")))  # row 69: each shot's label carries its option ID ("-> H: Grendo"), so the ID is bound in the shots
@@ -71,12 +73,32 @@ TEST = TRAIN_DOC
 if ITEMS_SET:
     _s = json.loads((ROOT / "data" / "processed" / f"{ITEMS_SET}.json").read_text())
     TEST = dict(items=_s["items"], users=_s.get("users", TRAIN_DOC["users"]))
-SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}"
+SFX = f"{POI + '_' if POI else ''}{'st' + str(STEPS) if STEPS else 'zeroshot'}{'_' + RUN_TAG if RUN_TAG else ''}_f{FOLD}{'_ctx' if CTX else ''}{'_unused' if MBI_IDS == 'unused' else ''}{'_shotlab' if MBI_SHOTLAB else ''}{'_obj' + OBJ if OBJ != 'ce' else ''}"
 HOPS_FROM = os.environ.get("HOPS_FROM", "v2_options_k1-3_st3000")  # INIT=hops: which row 71 encoder (models/adapters/hops_enc_<HOPS_FROM>)
 INIT_TAG = INIT if INIT != "hops" else "hops-" + HOPS_FROM.replace("_st3000", "").replace("_", "-")
 NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
+# row 99 (MODEL-17): DEC_EPISODES=1 trains on exactly the episodes the decoder recipe trains on (exp_categoriser.py's builder under the same
+# env: DBEP, RENAME, MISLEAD, LOOKUP, OVERRIDE, ALT, ...), the state being the episode's prompt text after its header (shots, then the
+# query), truncated from the start when too long; any ITEMS_SET is then scored from its items' prompt text. The decoder recipe's shot-label
+# loss, soft evidence-free targets and soft splits have no counterpart here (one target per episode, hard).
+DEC_EPISODES = bool(int(os.environ.get("DEC_EPISODES", "0")))
+ENC_LAYOUT = os.environ.get("ENC_LAYOUT", "")  # row 111: "labelled_shots" labels each option and each row's category with a random two-letter label, "(AE) Pets"
+DOW_FIRST = os.environ.get("DOW_FIRST", "") == "1"  # row 111: the weekday next to the date (oneslot.dow_first)
+EVFREE = float(os.environ.get("EVFREE", "0"))  # row 102: this share of DEC_EPISODES episodes made evidence-free (the query a fresh opaque merchant), target uniform (the decoder's EVFREE_MODE=soft)
+if DEC_EPISODES:
+    import sys
+    os.environ.setdefault("LLM_BASE", "Qwen/Qwen3.5-2B"); _argv = sys.argv; sys.argv = [sys.argv[0], "llm", "none"]
+    _src = (ROOT / "scripts" / "exp_categoriser.py").read_text().split("\nTARGETS = [")[0]
+    CAT = {"__name__": "exp_categoriser_episodes", "__file__": str(ROOT / "scripts" / "exp_categoriser.py")}
+    exec(compile(_src, "exp_categoriser.py", "exec"), CAT); sys.argv = _argv
+    SFX += "_dec" + CAT["SFX"].replace("_alllab", "").replace("_hf", "").replace("_none", "") + (f"_ev{round(EVFREE * 100)}soft" if EVFREE else "") + (f"_lay{ENC_LAYOUT}" if ENC_LAYOUT else "") + ("_dow" if DOW_FIRST else "")
+    NAME = f"{ {'mask': 'encmask', 'gliclass': 'encgli', 'mbinstruct': 'encmbi'}[ARCH]}_{INIT_TAG}_{SFX}"
+LOAD_FROM = os.environ.get("LOAD_FROM", "")  # row 99: with STEPS=0, score a saved encoder (models/adapters/<name>) on ITEMS_SET under its own name
+if LOAD_FROM:
+    assert not STEPS; NAME = LOAD_FROM
 COND = "ctx" if CTX else "noctx"
 rng = random.Random(SEED); torch.manual_seed(SEED)
+CLS = SEP = None  # set by load_model from the tokenizer (EuroBERT has no [CLS] / [SEP]: its bos / eos)
 
 
 class DecisionModel(nn.Module):
@@ -126,13 +148,32 @@ def load_model():
         from gliclass import GLiClassModel
         tok = AutoTokenizer.from_pretrained(BASE, add_prefix_space=True)
         return tok, GLiClassScorer(GLiClassModel.from_pretrained(BASE)).cuda()
-    tok = AutoTokenizer.from_pretrained(BASE)
+    remote = INIT == "eurobert"  # EuroBERT ships its model code (Apache-2.0), written for transformers 4: its rope type "default" is gone in 5
+    if remote:
+        from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS
+
+        def _default_rope(config, device=None, **_):
+            base = getattr(config, "rope_theta", None) or config.rope_parameters["rope_theta"]
+            dim = getattr(config, "head_dim", None) or config.hidden_size // config.num_attention_heads
+            return 1.0 / (base ** (torch.arange(0, dim, 2, dtype=torch.int64).float().to(device) / dim)), 1.0
+        ROPE_INIT_FUNCTIONS.setdefault("default", _default_rope)
+    tok = AutoTokenizer.from_pretrained(BASE, trust_remote_code=remote)
+    global CLS, SEP
+    CLS = tok.cls_token_id if tok.cls_token_id is not None else tok.bos_token_id
+    SEP = tok.sep_token_id if tok.sep_token_id is not None else tok.eos_token_id
+    assert CLS is not None and SEP is not None and tok.mask_token_id is not None, (CLS, SEP, tok.mask_token_id)
     if ARCH == "mbinstruct":
         mlm = AutoModelForMaskedLM.from_pretrained(BASE, attn_implementation="sdpa"); mlm.config.reference_compile = False
         ids = [tok(" " + c, add_special_tokens=False)["input_ids"] if MBI_IDS == "letters" else [tok.convert_tokens_to_ids(c)] for c in OPT_IDS]
         assert all(len(i) == 1 and i[0] != tok.unk_token_id for i in ids)
         return tok, MBInstructScorer(mlm, [i[0] for i in ids]).cuda()
-    enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa")
+    enc = AutoModel.from_pretrained(BASE, attn_implementation="sdpa", trust_remote_code=remote)
+    if remote:  # its rotary inv_freq is a non-persistent buffer that transformers 5's meta-device init leaves uninitialised (NaN output); recompute
+        for mod in enc.modules():
+            if hasattr(mod, "inv_freq"):
+                mod.inv_freq = _default_rope(enc.config)[0]
+                if hasattr(mod, "original_inv_freq"):
+                    mod.original_inv_freq = mod.inv_freq
     enc.config.reference_compile = False  # as Laya's inference: no torch.compile, whose recompiles per shape would swamp the latency read
     model = DecisionModel(enc)
     if INIT == "laya":
@@ -166,11 +207,12 @@ def state_text(query, shots, record, lab=lambda x: x):
     return f"Transaction: {line(query)}\n" + (f"Note: {record}\n" if record else "") + "Past transactions:\n" + "".join(f"{line(s)} -> {lab(s['label'])}\n" for s in shots)
 
 
-def encode(tok, names, query, shots, record=None):
+def encode(tok, names, query, shots, record=None, state=None):
     """input ids and one position per option (ARCH=mask: its [MASK]; mbinstruct: the answer [MASK], repeated; gliclass: unused); the
     state is truncated from the end (the last shots) when too long, the options and the answer slot never."""
     if ARCH == "gliclass":
-        ids = tok("".join(f"<<LABEL>>{n}" for n in names) + "<<SEP>>" + state_text(query, shots, record), truncation=True, max_length=MAXLEN)["input_ids"]
+        st = state[-6000:] if state is not None else state_text(query, shots, record)  # DEC_EPISODES: the prompt text (under ~1,200 tokens; the query ends it)
+        ids = tok("".join(f"<<LABEL>>{n}" for n in names) + "<<SEP>>" + st, truncation=True, max_length=MAXLEN)["input_ids"]
         return ids, [0] * len(names)
     if ARCH == "mbinstruct":
         assert len(names) <= len(LETTERS)
@@ -180,12 +222,15 @@ def encode(tok, names, query, shots, record=None):
         ids = [tok.cls_token_id] + head + tail + [tok.sep_token_id]
         return ids, [ids.index(tok.mask_token_id)] * len(names)
     head = tok(INSTR, add_special_tokens=False)["input_ids"]
-    ids = [tok.cls_token_id] + head + [tok.sep_token_id]; pos = []
+    ids = [CLS] + head + [SEP]; pos = []
     for n in names:
         pos.append(len(ids)); ids += [tok.mask_token_id] + tok(" " + n, add_special_tokens=False)["input_ids"][:24]
-    ids.append(tok.sep_token_id)
-    st = tok(state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
-    return ids + st + [tok.sep_token_id], pos
+    ids.append(SEP)
+    if state is not None:  # DEC_EPISODES: the prompt text, the query last, so the oldest rows go first when too long
+        st = tok(state, add_special_tokens=False)["input_ids"]; st = st[max(0, len(st) - max(0, MAXLEN - len(ids) - 1)):]
+    else:
+        st = tok(state_text(query, shots, record), add_special_tokens=False)["input_ids"][:max(0, MAXLEN - len(ids) - 1)]
+    return ids + st + [SEP], pos
 
 
 def collate(tok, batch):
@@ -207,18 +252,121 @@ def train_episodes():
         yield names, q, others, (DBREC.get(q["merchant"]) if CTX else None), names.index(q["label"])
 
 
+def dec_episodes():
+    """DEC_EPISODES: (names, None, None, state text, gold) from exp_categoriser.py's episode builder, each episode used once: the builder
+    is drawn again whenever its 2,250 are used up (its shots, renames and database rows are random, so no two draws share a prompt). The
+    first version cycled one fixed draw: at 3,000 x 16 that is 21 passes, and the full fine-tuned encoders memorised it (loss 1e-6)."""
+    draws = 0
+    while True:
+        eps = []
+        for e in CAT["sft_examples"]():
+            prompt, ans = e[0], e[1].strip()
+            head, body = prompt[: -len("Category:")].rstrip().split("\n\n", 1)
+            eps.append((head[len("Categories: "):].split(", "), body, ans, CAT["SOFT"].get(prompt)))
+        draws += 1; rng.shuffle(eps)
+        if draws == 1:
+            print(f"   {len(eps)} decoder-recipe episodes per draw, drawn again when used up", flush=True)
+        for names, body, ans, soft in eps:
+            names = list(names); rng.shuffle(names)
+            if soft:  # row 102: the alternation episode's true split (the decoder's ALT_SOFT)
+                shown, st = restyle(names, body, rng); yield shown, None, None, st, [soft.get(n, 0.0) for n in names]
+            elif EVFREE and rng.random() < EVFREE:
+                shown, st = restyle(names, evfree_body(body), rng); yield shown, None, None, st, [1.0 / len(names)] * len(names)
+            else:
+                shown, st = restyle(names, body, rng); yield shown, None, None, st, names.index(ans)
+
+
+def restyle(names, body, rng_):
+    """Row 111: (option display names, body) under ENC_LAYOUT / DOW_FIRST; the options keep their order."""
+    if not (ENC_LAYOUT or DOW_FIRST):
+        return names, body
+    from ai_experiments import oneslot
+    _, rows, query = oneslot.parse("Categories: " + ", ".join(names) + "\n\n" + body)
+    f = oneslot.dow_first if DOW_FIRST else (lambda x: x)
+    lab = {}
+    if ENC_LAYOUT in ("labelled_shots", "json_labelled", "yaml_labelled", "ts_labelled"):
+        pool = [a + b for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" for b in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+        lab = dict(zip(names, rng_.sample(pool, len(names))))
+    shown = [f"({lab[n]}) {n}" if lab else n for n in names]
+    if ENC_LAYOUT == "ts_labelled":  # row 114: TypeScript (the union type is the option list, so the options keep their plain names)
+        text, _ = oneslot.records_text("ts", rows, query, lab)
+        head = "type CategoryId =\n" + "".join(f'  | "{lab[n]}" /* {n} */\n' for n in names) + ";\n\n"
+        return shown, head + text + '?" };'
+    if ENC_LAYOUT in ("json_labelled", "yaml_labelled"):  # row 113: the rows as JSON lines / a YAML list, categories labelled as the options
+        text, _ = oneslot.records_text(ENC_LAYOUT[:4], rows, query, lab)
+        return shown, text + "?\n</new_transaction>" if ENC_LAYOUT == "yaml_labelled" else text[:-1] + '?"}\n</new_transaction>'
+    if ENC_LAYOUT == "table":  # row 111b (owner, 2026-09-29): the history as a TSV table in <historical_transactions>, the query as a one-row table
+        C = oneslot._cells
+        dated = bool(C(query)[0]) or any(C(fl)[0] for fl, _, _ in rows)
+        head = ("date\t" if dated else "") + "weekday\tdescription\tamount\tcategory\n"
+        line = lambda fl: "\t".join(([C(fl)[0]] if dated else []) + list(C(fl)[1:]))  # noqa: E731
+        return names, ("<historical_transactions>\n" + head + "".join(f"{line(fl)}\t {c}\n" for fl, c, _ in rows) + "</historical_transactions>\n\n"
+                       "<new_transaction>\n" + head + line(query) + "\t ?\n</new_transaction>")
+    rows_t = "".join(f"Transaction: {f(fl)}\nCategory: {'(' + lab[c] + ') ' if c in lab else ''}{c}\n\n" for fl, c, _ in rows)
+    return shown, rows_t + f"Transaction: {f(query)}"
+
+
+def evfree_body(body):
+    """Row 102: the query (the body's last line) becomes a row of a fresh opaque merchant in no database or history, any date kept."""
+    from ai_experiments import merchants as M
+    from ai_experiments import transactions as T
+    while True:
+        name = rng.choice(M._PREFIX) + rng.choice(M._MID) + rng.choice(M._SUFFIX) + rng.choice(M._TAG)
+        if name not in CAT["MERCHANT"]:
+            break
+    cat = rng.choice(M.CATEGORY_LIST); mu, sig = T.AMOUNT[cat]
+    head, last = body.rsplit("\n", 1) if "\n" in body else ("", body)  # a user with no history rows: the query alone
+    assert last.startswith("Transaction: "), last[:40]
+    parts = last[len("Transaction: "):].split(" | ")
+    date = parts[0] + " | " if len(parts) == 4 else ""
+    return head + ("\n" if head else "") + f"Transaction: {date}{T.render(dict(name=name, category=cat, city=rng.choice(M._CITIES)), rng)} | ${math.exp(rng.gauss(mu, sig)):.2f} | {rng.choice(T.WEEKDAYS)}"
+
+
+def objective(z, y):
+    """The training loss over each row's valid options (padded options hold -1e4). Every arm is a strictly proper scoring rule or
+    a smoothed one: ce = log score; ls = cross-entropy against 0.9 on the gold + 0.1 spread over the valid options; logsph = log score
+    minus the spherical score p_y / ||p||_2 (Laya's pair, section 62); brier = log score + sum_k (p_k - 1[k = y])^2."""
+    valid = z > -1e3  # the models fill padded options with -1e4, not -inf
+    lp = torch.log_softmax(z, -1).masked_fill(~valid, 0.0)
+    nll = -lp.gather(1, y[:, None]).squeeze(1)
+    if OBJ == "ce":
+        return nll.mean()
+    p = lp.exp() * valid
+    if OBJ == "ls":
+        k = valid.sum(1, keepdim=True).clamp_min(1)
+        target = 0.1 * valid / k; target = target.scatter_add(1, y[:, None], torch.full_like(nll[:, None], 0.9))
+        return -(target * lp).sum(1).mean()
+    if OBJ == "logsph":
+        return (nll - p.gather(1, y[:, None]).squeeze(1) / p.norm(dim=1).clamp_min(1e-8)).mean()
+    onehot = torch.zeros_like(p).scatter(1, y[:, None], 1.0)
+    return (nll + ((p - onehot) ** 2 * valid).sum(1)).mean()
+
+
 def train(tok, model):
     enc = [p for n, p in model.named_parameters() if n.startswith("encoder.")]; rest = [p for n, p in model.named_parameters() if not n.startswith("encoder.")]
     opt = torch.optim.AdamW([dict(params=enc, lr=LR), dict(params=rest, lr=HEAD_LR)], weight_decay=0.01)
     warm = max(1, STEPS // 20)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warm) * max(0.0, 1 - s / STEPS))
-    gen = train_episodes(); model.train(); t0 = time.time(); losses = []
+    gen = dec_episodes() if DEC_EPISODES else train_episodes(); model.train(); t0 = time.time(); losses = []
     for step in range(STEPS):
         eps = [next(gen) for _ in range(BATCH)]
-        ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
+        ids, att, pos, pm = collate(tok, [encode(tok, n, q, s, None, r) if DEC_EPISODES else encode(tok, n, q, s, r) for n, q, s, r, _ in eps])
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(ids, att, pos, pm)
-        loss = nn.functional.cross_entropy(logits, torch.tensor([y for *_, y in eps]).cuda())
+        assert torch.isfinite(logits[pm]).all(), "non-finite option scores (EuroBERT's uninitialised rope gave NaN, which the loss read as 0)"
+        ys = [y for *_, y in eps]
+        if any(isinstance(y, list) for y in ys):  # row 102: soft targets (uniform, split) beside hard ones; cross-entropy against the target distribution
+            assert OBJ == "ce"
+            tgt = torch.zeros_like(logits, dtype=torch.float32)
+            for b, y in enumerate(ys):
+                if isinstance(y, list):
+                    tgt[b, :len(y)] = torch.tensor(y)
+                else:
+                    tgt[b, y] = 1.0
+            lp = torch.log_softmax(logits.float(), -1).masked_fill(~(logits > -1e3), 0.0)
+            loss = -(tgt * lp).sum(1).mean()
+        else:
+            loss = objective(logits.float(), torch.tensor(ys).cuda())
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())
         if (step + 1) % 50 == 0 or step + 1 == STEPS:
@@ -237,6 +385,10 @@ def score(tok, model):
         items = items[::20]
     recs, seqs = [], []
     for it in items:
+        if DEC_EPISODES:
+            names = [o.strip() for o in it["options"]]
+            shown, st = restyle(names, it["prompt"][: -len("Category:")].rstrip().split("\n\n", 1)[1], random.Random(it["id"]))
+            seqs.append(encode(tok, shown, None, None, state=st)); continue
         u = users[it["user"]]; by_text = {h["text"]: h for h in u["history"]}
         shots = [by_text[t] for t in u["shots"] if t in by_text]
         names = [o.strip() for o in it["options"]]
@@ -263,19 +415,28 @@ def score(tok, model):
 
 
 if __name__ == "__main__":
-    cfg = dict(arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
+    cfg = dict(dec_episodes=DEC_EPISODES, load_from=LOAD_FROM, arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:
         tok, model = load_model()
+        if LOAD_FROM:
+            from safetensors.torch import load_file
+            missing, unexpected = model.load_state_dict(load_file(ROOT / "models" / "adapters" / LOAD_FROM / "model.safetensors"), strict=False)
+            assert not unexpected and not missing, (missing[:5], unexpected[:5])
         stats = train(tok, model) if STEPS else {}
         recs, timing = score(tok, model)
         if STEPS and not SMOKE:  # after scoring, so a save failure cannot lose the results; cloned, as tied weights (the MLM decoder) cannot be saved shared
             from safetensors.torch import save_file
             d = ROOT / "models" / "adapters" / NAME; d.mkdir(parents=True, exist_ok=True)
             save_file({k: v.detach().clone().contiguous() for k, v in model.state_dict().items()}, d / "model.safetensors"); (d / "config.json").write_text(json.dumps(cfg, indent=1))
-        summ = summarize(recs); summ.update(timing)
+        path = write_recs(NAME + (f"_{ITEMS_SET}" if ITEMS_SET else ""), COND, recs, smoke=SMOKE)  # before the summary, which knows REAL-6's levels only
+        try:
+            summ = summarize(recs)
+        except (IndexError, KeyError):
+            summ = dict(R6_all=round(100 * float(np.mean([r["correct"] for r in recs])), 1), R6_all_n=len(recs))
+        summ.update(timing)
         print(f"  {NAME} {COND}: all {summ['R6_all']} (n={summ['R6_all_n']}), {timing}", flush=True)
         run.log({k: v for k, v in summ.items() if isinstance(v, (int, float))}, condition=COND)
-        run.artifact(write_recs(NAME + (f"_{ITEMS_SET}" if ITEMS_SET else ""), COND, recs, smoke=SMOKE))
+        run.artifact(path)
         out = ROOT / "results" / f"{NAME}{'_' + ITEMS_SET if ITEMS_SET else ''}{'_smoke' if SMOKE else ''}.json"
         out.write_text(json.dumps(dict(config=cfg, train=stats, **{COND: summ}), indent=1)); run.artifact(out)

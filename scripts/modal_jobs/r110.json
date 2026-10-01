@@ -1,0 +1,68 @@
+[
+ {
+  "tag": "r110-enc-best-s1",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "STEPS": "3000",
+   "ARCH": "mask",
+   "INIT": "ettin1b",
+   "EVFREE": "0.1",
+   "SEED": "1",
+   "RUN_TAG": "h100freshs1",
+   "OVDB": "0.2",
+   "SHORT": "0.15",
+   "EMPTY": "20"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=real6_v1_novel uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=mislead_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=override_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=alternation_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=novel_merchants_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=blind_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100freshs1_f0_decnone_h100freshs1_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ },
+ {
+  "tag": "r110-enc-best-s0-real7",
+  "env": {
+   "DEC_EPISODES": "1",
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "ALL_LABELS": "1",
+   "LLM_BASE": "Qwen/Qwen3.5-2B",
+   "STEPS": "3000",
+   "ARCH": "mask",
+   "INIT": "ettin1b",
+   "EVFREE": "0.1",
+   "SEED": "0",
+   "RUN_TAG": "h100fresh",
+   "OVDB": "0.2",
+   "SHORT": "0.15",
+   "EMPTY": "20",
+   "ADAPTERS_FROM": "r109-enc-odb20-short15-emp20"
+  },
+  "cmds": [
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100fresh_f0_decnone_h100fresh_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=real7_v1 uv run --frozen python scripts/exp_encoder_mask.py",
+   "STEPS=0 LOAD_FROM=encmask_ettin1b_st3000_h100fresh_f0_decnone_h100fresh_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_ev10soft ITEMS_SET=real7_v2_all_kind uv run --frozen python scripts/exp_encoder_mask.py"
+  ]
+ }
+]

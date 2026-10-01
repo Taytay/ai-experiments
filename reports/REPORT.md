@@ -9,6 +9,97 @@ Supporting docs: [frameworks.md](frameworks.md), [lit_review.md](lit_review.md).
 
 ## 1. Executive summary
 
+**Update (2026-09-27, sections 65 to 83).** The owner moved new work to open licences (Qwen3.5, Apache-2.0) and to Modal H100s. The best
+categoriser is now **decider-4B** (Mapika, a Qwen3.5-4B trained for multiple choice) fine-tuned with its **one-slot readout** (options
+labelled, one pass, the answer read from the label logits), the **shot-label loss**, **database episodes** and **rename augmentation**:
+REAL-6 90.1 over three seeds (96% of the 94.0 ceiling; section 82), 89.0 with every category name replaced by a fresh word (77, 78),
+POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). Findings:
+
+- **Q1.** One slot matches per-option scoring in accuracy once the shot labels are trained too (76); random option labels train at
+  least as well as A, B, C and reach 255 options (81); option order moves 1 to 6% of answers (75); decider's "not listed here"
+  augmentation flags 92% of questions whose category is missing at 1.3% false alarms (79), switchable per request. The reader is
+  confidently wrong when nothing can tell (83): row 84.
+- **Q2.** Database episodes store the particular facts (73, 74: +21 on places in the database, 0 to 3 on places held out; the injected
+  categories sit where the model's own merchant knowledge sits), merchants known only from the database read 100%, and trained facts
+  override misleading names ("Tire Barn" is a restaurant: 97.4, as neutral names; 80). Untrained: when the user's history and the name
+  disagree the 4B follows the history, 2B readers follow the name a third of the time (80); the user overriding the database is row 85.
+- **Q3.** Readers trained with real names lean on name meaning (the per-option database reader falls 86.9 to 68.1 with fresh names;
+  77); rename augmentation on top of database episodes removes that (78). Users who split one merchant's transactions across categories
+  (the alternation set) and larger models (Qwen3.5-9B, decider-35B-A3B) are queued.
+- **Method.** One run's seed spread is about 3 points on REAL-6 fold 0 (82): compare arms over two or three seeds.
+- **Later the same day (sections 84 to 88).** The user's own filing now beats the database and the name (lookup and override
+  episodes: 98 to 100%, section 84). Uncertainty is taught where nothing can tell: soft uniform targets on evidence-free training
+  questions cut confident answers there from 79% to 3% while names with clues keep theirs; a "cannot tell" option over-abstains (85).
+  Qwen3.5-9B matches decider-4B: scale is not the lever here (87). Users who alternate between categories at one merchant: the reader
+  ignored their rule; alternation episodes teach it (stores 58 to 88, restaurants 48 to 77) and split targets hedge random 60 / 40
+  choices correctly (86, 88). All of it composes in one model (88), at a cost of 5 points on novel names and some auto-file coverage
+  that disappear at an alternation share of 0.1 (89). The final recipe reads REAL-6 at 91.3 over all 20 users by
+  the model alone, 97% of the ceiling and level with the earlier lookup cascade (90). Its trained behaviours hold on every fold (91).
+- **REAL-7 (sections 92 to 97).** A more realistic synthetic population (200 new users, default-scheme majority, personal
+  categories, moves and new categories mid-year, misfiled rows, cold starts, a held-out statement format): REAL-6-trained readers
+  score 82 of an 84.8 ceiling zero-shot. The open trade-off is a lone unexpected filing: training with misfiled rows makes the reader
+  better on mixed filings (98) but treats a single unusual row as a slip (32 to 47), where the recipe without it trusts that row;
+  which is right depends on real users' slip rate (97). A change not yet visible in the history is confidently misread by every
+  reader: the product must record it.
+- **After the review of 2026-09-28 (sections 98 to 107).**
+  - *Effort and auto-filing (98):* on REAL-7 the owner's rule (the last two filings of a payee agree) auto-files 60% at 94.5%, where
+    the model's confidence could not; history-or-model cuts user effort by 45%.
+  - *The prompt (99, 101):* the payee's own dated rows are what the reader needs (REAL-7 ceiling 84.8 to 91.6, reader 81.9 to 87.1);
+    similar payees, a row per category and 48 rows add nothing measurable; trained on dated slices the reader follows a change it can
+    see (moved merchants 50 to 66, new categories 44 to 77).
+  - *Blind test set (103):* a subagent that never saw the code built `blind_v1`; the recipe reads it at 93% of the ceiling (82.0; blind
+    Opus 91% on a sample) and auto-files half at 97.7%, so the recipe transfers; REAL-7 training at full dose did not (confidence
+    tuned to its generator), a small dose from a wide pool does (106).
+  - *Encoders (102, 104):* trained on exactly the decoder recipe's episodes (drawn fresh, with the soft targets), Ettin-encoder-1B has
+    every trained behaviour decider-4B has and matches it on REAL-6 and novel names at a third of the scoring time; the blind set keeps
+    it 4 points behind on new users and new local businesses (world knowledge). The old 30-point gap was the training data.
+  - *Other decoders (100):* no newer small open decoder passes decider-4B; Kimi fails the licence rule and the size budget.
+  - *Labels (105):* readers must be trained on as many options as users have categories (27% of blind items exceed 26).
+  - *The recipe and system (107):* row 89 + 255 labels + empty categories; history rule, then the encoder auto-files, then decider
+    (blind effort 0.59 to 0.63 against 0.69 for decider alone).
+  - *Knowledge for the encoder (108 to 110):* real Overture business names as training episodes lift Ettin-1B on unknown real
+    businesses from 30 to 73 (decider's level); with empty categories it reads blind_v1 at 79.3 and auto-files 52%; in front of decider
+    the system auto-files 62 to 65% at 97.4% and decider reads 48% of transactions (effort 0.57 to 0.60). Longer training (109) and
+    short-history episodes (110) did not help; new users (category names with nothing to copy) remain both readers' weakest group.
+  - *Income, bills and transfers (111) and seeds (112):* kinds outside the twelve spending categories fix much of the new-user gap on
+    bills and income and cost the encoder nothing; over nine seed pairs the encoder-then-decider system auto-files 63.5% of blind_v1 at
+    97.5% (effort 0.588 against 0.655 for decider alone).
+  - *Prompt format (113):* writing each history row's category with its option label ("Category: (AE) Pets", the labelled list at the
+    top, the query ending "Category: (") lifts decider's blind auto-filing from 56 to 63% (system effort 0.570); the weekday next to the
+    date, 48 rows and TSV tables do not help. A label must follow a space: "(AE" at a line start or after a tab tokenizes differently.
+  - *JSON, YAML, TypeScript (114):* none beats plain text with labelled rows (YAML closest, 59% auto-filed); an enum of labels needs the
+    category name repeated in each row; structured formats double the prompt.
+  - *Both models (115):* they agree on 83.5% of blind_v1 (right 90.9% there); auto-filing when they agree and either is confident at its
+    own calibrated 98% threshold files 65% at 97.8% (effort 0.560, the best system); the encoder's calibrated confidence is a probability
+    (ECE 1.9).
+- **Sections 116 to 145 (2026-09-29 to 10-01): scoring for YNAB, serving, three blind sets, payee kinds and the population.**
+  - *Scoring (118, 129 to 131):* YNAB confirms every transaction (owner), so success is where the right category lands in a short list:
+    report cards (right first, in the list, work saved) and the owner's rank scale (first 0, second 1, third 2, not shown 10), lists of at
+    most three (142), plausible categories free (130). Where auto-filing is wanted, a per-transaction expected-cost rule replaces the
+    arbitrary 98% threshold (118); thresholds do not travel between populations and new users are over-confident (116).
+  - *Against YNAB today (131, 132, 137, 141):* YNAB's rule (the category in 2 of the payee's last 3, else the last; nothing for a first-time
+    payee, nothing from other users) is as good as the models at the first suggestion for known payees; the models' value is first-time
+    payees (rule 0%, models 49 to 69% right first), new users, the 2nd and 3rd suggestions, and payees filed differently than usual
+    (they anticipate it: confidence 55-61% against 90-94%). On a third blind set read once under a pre-registered analysis (141): the
+    recommended system 81% right first and 95% in a three-list against the rule's 74% / 74%, 91% of the manual work saved.
+  - *Test sets (137, 140, 141):* blind_v2 and blind_v3, from agents that saw only the product brief, confirm the gains over the rule; the
+    encoder does not transfer (dropped, 138); blind_v1 is validation in practice, blind_v3 is untouched since its one read. Payee overlap
+    between training and test users is intended (owner); held-out units are users.
+  - *Large model (117, 122, 125 to 128, 136, 139):* the untrained decider-35B-A3B helps first-time payees and new users and hurts the user's
+    own patterns, so it reads first-time payees only (139); trained with the recipe it is the best single reader but a worse second
+    opinion; a small second opinion or ensemble barely helps (128); as a teacher it adds nothing on synthetic data (136).
+  - *Serving (119 to 121, 125):* one user's sync shares a cached prompt prefix in the split layout (no retraining): vLLM reads decider-4B at
+    10 to 13 ms and the 35B at 14 to 20 ms per transaction, roughly $11 and $18 per million on H100 / H200.
+  - *Prompt additions (123, 135, 144):* other users' raw category names for the payee help new users (61 -> 69); category descriptions,
+    a 0.8B decider, EMA and multi-slot prompts were tried and not adopted. A canonical "Kind:" line for first-time payees from a merchant
+    database matches or beats the 35B with no retraining (60 -> 77% right first); inferred kinds do not (143, 144).
+  - *Without a kind database (145):* concepts learned by clustering users' categories by the payees they receive, and payee profiles from
+    the population mapped onto a user's own categories, suggest the right category first for 52% of first-time payees with no model; the
+    model reads other users' raw names better; with real data, train on the filings and keep the raw line (reports/REAL_DATA_SPEC.md).
+  - *Recommended system now:* decider-4B with the other-users line for every transaction; the untrained 35B for first-time payees (or a
+    database kind line where one exists); YNAB's rule first for known payees unless the model is 0.2 more confident (+4.8 / +0.1 / -1.3
+    points across the blind sets: a real-data question); three suggestions, plausible ones free.
+
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
 - **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
@@ -5073,3 +5164,3705 @@ best recipes (REAL-6 database episodes, section 58; POI-1 descriptions, kind lin
 - New trained work uses Qwen3.5 (row 78) or decider (row 77); the Qwen2.5-3B results stay as research records.
 
 Tables: `uv run python scripts/open_models_tables.py`. Job lists: `scripts/modal_jobs/r77*.json`, `r78*.json`.
+
+
+## 70. REAL-6's last points are the lookup: with the user's own label for a merchant in their history in front, the best runs reach 97 to 99.5% of the ceiling (Qwen3.5-4B database episodes 92.3 on fold 0, the four-fold Qwen2.5-3B 91.3); every point comes from the in-history group, which the lookup answers exactly; on split categories the models beat the coin-flip ceiling, so that part of the ceiling is a floor (EVAL-9)
+
+PLAN step 75 tests REPORT 64.2's hypothesis 1. The lookup is `ai_experiments.scorecard.lookup` (the user's majority label for the
+merchant over their history rows); where it answers, its answer is taken, elsewhere the run's. No model runs: the per-item records of
+earlier runs are re-read on the held-out users of each fold they have (`scripts/lookup_cascade_tables.py`).
+
+**Table 70.1: REAL-6, held-out users of every fold a run has: the run alone and with the user's merchant lookup in front**
+
+| run | folds | n | top-1 alone | % of ceiling | lookup, then the run: top-1 | % of ceiling | headroom left (points) |
+|---|---|---|---|---|---|---|---|
+| Qwen2.5-3B, database episodes | 0,1,2,3 | 1179 | 87.4 | 92.9 | 91.3 | 97.1 | 2.8 |
+| Qwen2.5-3B + record with category | 0,1,2,3 | 1179 | 86.0 | 91.5 | 89.6 | 95.3 | 4.5 |
+| Qwen2.5-14B, database episodes | 0 | 298 | 88.9 | 95.8 | 92.3 | 99.5 | 0.5 |
+| Qwen2.5-14B + record with category | 0 | 298 | 88.6 | 95.5 | 90.9 | 98.0 | 1.8 |
+| Qwen3.5-2B, database episodes | 0 | 298 | 86.9 | 93.7 | 90.6 | 97.6 | 2.2 |
+| Qwen3.5-4B, database episodes | 0 | 298 | 88.6 | 95.5 | 92.3 | 99.5 | 0.5 |
+
+**Table 70.2: % of ceiling by corrected group, alone → with the lookup in front (the group's ceiling in brackets; the lookup's share of the group's items and its accuracy where it answers)**
+
+| run | in history | labelled seen, not in history | determined by category | split category | other |
+|---|---|---|---|---|---|
+| ceiling (items) | 100 (444) | 91 (115) | 99 (509) | 50 (103) | 50 (8) |
+| lookup: share, accuracy | 100%, 100 | 0%, nan | 0%, nan | 0%, nan | 0%, nan |
+| Qwen2.5-3B, database episodes | 90 → 100 | 93 → 93 | 95 → 95 | 93 → 93 | 200 → 200 |
+| Qwen2.5-3B + record with category | 91 → 100 | 90 → 90 | 93 → 93 | 80 → 80 | 200 → 200 |
+| Qwen2.5-14B, database episodes | 91 → 100 | 94 → 94 | 97 → 97 | 124 → 124 | 150 → 150 |
+| Qwen2.5-14B + record with category | 93 → 100 | 94 → 94 | 97 → 97 | 90 → 90 | 200 → 200 |
+| Qwen3.5-2B, database episodes | 90 → 100 | 84 → 84 | 98 → 98 | 97 → 97 | 150 → 150 |
+| Qwen3.5-4B, database episodes | 90 → 100 | 91 → 91 | 99 → 99 | 110 → 110 | 150 → 150 |
+
+### 70.1 What the step says
+
+- **Hypothesis 1 holds.** The models lose 9 to 10 points of ceiling on merchants the user has already filed (90 to 93% there); the
+  lookup takes all of them (100%), because users file each merchant under one label (section 48). With it in front, the best runs
+  leave 0.5 to 2.8 points of headroom: Qwen3.5-4B and Qwen2.5-14B database episodes 99.5% of ceiling on fold 0, the four-fold
+  Qwen2.5-3B 97.1%.
+- **Where the rest is.** Outside the history the lookup never answers, and the runs sit at 84 to 99% of ceiling on labelled merchants
+  the user has not filed and on merchants the category determines.
+- **The split-category ceiling is too low.** It assumes the choice between two of the user's categories that share a standard
+  category is a coin flip (50%); the models read 48 to 62% there (97 to 124% of it), so amount, weekday or name carry some signal. The
+  overall ceiling (94.0) is therefore a slight underestimate, and "99.5% of ceiling" is an upper bound on how close the runs are.
+- For the product question: lookup first, then the model, as section 59 found; nothing on REAL-6 is left for a model to gain on the
+  in-history group.
+
+Tables: `uv run python scripts/lookup_cascade_tables.py`.
+
+
+## 71. Label-induction training with empty categories and decoys: coined categories with no examples in training lift label induction v2 from 75 to 80% of its ceiling (one gold example 65 to 77); decoys alone hurt, but decoys with empty categories raise the decoy condition from 59 to 71 (blind Opus 98 to 100); REAL-6 unchanged (REAL-20)
+
+PLAN step 74 tests REPORT 64.2's hypothesis 4: label induction's gap is the decoy and the one-example cases (section 60). Qwen3.5-2B
+(row 78's open base) was trained on REAL-6 users of fold 0 with row 64's recipe (rename augmentation 0.5, all-label loss, 200 steps)
+and two augmentations in `exp_categoriser.py`:
+
+- **EMPTY=3:** in half the episodes, one to three fresh coined categories with no examples join the category list, as label induction
+  v2's empty categories do (in v1 a single unexplained coined word can be found by elimination; in v2 it cannot).
+- **DECOY=0.3:** in 30% of episodes (23% where one exists), one shot of the target's standard category that carries the target's
+  label is relabelled to one of the user's categories that holds none of that standard category: section 60's decoy, a same-kind
+  business filed elsewhere. Another shot still carries the target's label, and the decoy's own label gets no loss.
+
+**Table 71.1: label induction v2, top-1 % by condition (300 queries each; Qwen3.5-2B)**
+
+| condition | ceiling | Qwen3.5-2B untrained | rename | rename + empty | rename + decoys | rename + decoys + empty |
+|---|---|---|---|---|---|---|
+| base | 100 | 62.7 | 78.3 | 83.3 | 59.7 | 77.7 |
+| n_gold=0 | 25 | 2.0 | 6.7 | 11.3 | 13.0 | 16.0 |
+| n_gold=1 | 100 | 49.3 | 65.0 | 76.7 | 44.7 | 64.7 |
+| n_gold=4 | 100 | 75.7 | 84.0 | 87.0 | 73.0 | 84.0 |
+| n_gold=8 | 100 | 80.3 | 86.3 | 90.0 | 83.3 | 89.0 |
+| kind=same_kind | 100 | 90.0 | 93.7 | 96.0 | 85.0 | 92.3 |
+| kind=opaque | 25 | 10.0 | 11.7 | 14.0 | 14.0 | 13.3 |
+| n_coined=1 | 100 | 65.7 | 78.3 | 82.7 | 62.3 | 78.3 |
+| n_coined=6 | 100 | 60.7 | 74.7 | 83.3 | 57.3 | 78.0 |
+| decoy | 100 | 51.7 | 58.7 | 62.0 | 55.7 | 70.7 |
+| decoy, n_gold=0 | 25 | 1.7 | 1.7 | 3.3 | 11.0 | 8.3 |
+| control: standard name | 100 | 92.3 | 90.3 | 91.7 | 87.0 | 90.3 |
+| all conditions | 81 | 53.5 (66% of ceiling) | 60.8 (75% of ceiling) | 65.1 (80% of ceiling) | 53.8 (66% of ceiling) | 63.6 (78% of ceiling) |
+
+**Table 71.2: label induction v1, top-1 % by condition (300 queries each; Qwen3.5-2B)**
+
+| condition | ceiling | Qwen3.5-2B untrained | rename | rename + empty | rename + decoys | rename + decoys + empty |
+|---|---|---|---|---|---|---|
+| base | 100 | 65.3 | 81.3 | 85.3 | 66.3 | 82.0 |
+| n_gold=0 | 100 | 5.0 | 11.0 | 21.7 | 18.3 | 27.3 |
+| n_gold=1 | 100 | 56.0 | 71.0 | 80.0 | 53.7 | 74.3 |
+| n_gold=4 | 100 | 74.0 | 87.0 | 87.3 | 79.0 | 86.7 |
+| n_gold=8 | 100 | 80.0 | 88.7 | 91.3 | 86.0 | 91.3 |
+| kind=same_kind | 100 | 89.7 | 94.3 | 95.3 | 88.0 | 93.0 |
+| kind=opaque | 100 | 13.0 | 17.7 | 25.7 | 21.3 | 29.3 |
+| n_coined=1 | 100 | 70.0 | 80.7 | 84.7 | 71.7 | 85.7 |
+| n_coined=6 | 100 | 63.0 | 78.7 | 84.7 | 63.7 | 79.3 |
+| decoy | 100 | 57.0 | 62.7 | 64.7 | 60.3 | 75.0 |
+| decoy, n_gold=0 | 100 | 1.0 | 3.0 | 3.7 | 15.7 | 18.7 |
+| control: standard name | 100 | 92.3 | 90.0 | 92.3 | 90.0 | 93.0 |
+| all conditions | 100 | 55.5 (56% of ceiling) | 63.8 (64% of ceiling) | 68.1 (68% of ceiling) | 59.5 (60% of ceiling) | 69.6 (70% of ceiling) |
+
+**Table 71.3: REAL-6, fold 0's held-out users (298 items), top-1 %**
+
+| reader | top-1 |
+|---|---|
+| rename | 74.5 |
+| rename + empty | 73.2 |
+| rename + decoys | 73.5 |
+| rename + decoys + empty | 73.2 |
+
+### 71.1 What the step says
+
+- **Empty categories are the useful augmentation.** Alone they lift every condition with a gold example: v2 base 78 to 83, one gold
+  example 65 to 77, six coined categories 75 to 83; overall 80% of the ceiling against 75% with rename alone. Training without them
+  lets the model learn that an unexplained coined word is the answer by elimination, which v2 punishes.
+- **Decoys alone hurt** (v2 base 60, one example 45): relabelling a same-kind example away from the target teaches the model to
+  distrust the examples in general. **With empty categories they fix the decoy case**: 71 against 59 for rename alone, the largest
+  gain on the condition where section 60 found the widest gap to a strong reader (blind Opus 98 to 100). They cost 5 to 6 points on
+  base and one-example items against empty categories alone.
+- **The augmentations do not cost the ordinary task** (REAL-6 73.2 to 74.5).
+- The zero-gold and opaque conditions stay near their ceilings of chance (25% on v2), as they should.
+
+Which arm is best depends on what users do: if a user rarely files a business of one kind under an unrelated category, empty
+categories alone; if the decoy case matters, both. Hypothesis 4 holds for the decoy (with empty categories) and for one-example items
+(with empty categories).
+
+Tables: `uv run python scripts/li_training_tables.py`. Job list: `scripts/modal_jobs/r74.json`.
+
+
+## 72. Training objectives for the encoder's confidence: cross-entropy, label smoothing, log + spherical score and cross-entropy + Brier give the same accuracy (56 to 59); all but label smoothing are over-confident raw (REAL-6 ECE 25 to 28 points) and one temperature fitted on other users fixes that (ECE about 5); label smoothing looks calibrated raw but ranks its confident answers worse, so its auto-file coverage collapses (MODEL-9)
+
+PLAN step 68, first stage. MODEL-9 asks which training objective makes a multiple-choice encoder's confidence trustworthy (the owner,
+2026-09-26: Jev trains with a loss that accounts for confidence). The row 53 encoder (ModernBERT-large, one scored [MASK] per
+category, 1,500 steps, no record) was trained on each of four folds with four objectives (`exp_encoder_mask.py OBJ`), each a strictly
+proper scoring rule or a smoothed one:
+
+- **ce:** cross-entropy (the log score), the baseline;
+- **ls:** label smoothing 0.1, spread over the valid options only;
+- **logsph:** log score minus the spherical score p_y / ||p||_2, the pair behind Laya's RL training (section 62; here with its exact
+  gradient, no sampling);
+- **brier:** cross-entropy plus the Brier score, as decider and kev offer.
+
+Every item is read by the fold model that held its user out. Temperatures and auto-file thresholds are fitted on the other three folds'
+items (`scripts/objectives_tables.py`; the metric definitions are `ai_experiments.calibration`'s, after kev's `metrics.py`). A first
+launch of the label-smoothing arm spread mass onto padded options (the model fills them with -1e4, not -inf); it was fixed and rerun.
+
+**Table 72.1: the [MASK] encoder by training objective, four folds pooled (each item read by the model that held its user out); temperature and thresholds fitted leave-fold-out; ECE in points over 10 bins, AURC in % risk**
+
+| set | objective | n | top-1 | NLL raw | ECE raw | T (mean) | ECE tempered | ECE, a temperature per option count | AURC | coverage at 98% (realised precision) | coverage at 95% (precision) | bits left |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| REAL-6 | cross-entropy | 1179 | 56.7 | 2.436 | 27.8 | 2.93 | 5.3 | 4.7 | 17.1 | 12.9 (97.4) | 30.8 (93.9) | 2.11 |
+| REAL-6 | label smoothing 0.1 | 1179 | 56.6 | 1.603 | 13.2 | 1.25 | 9.5 | 8.8 | 20.6 | 2.8 (69.7) | 8.6 (87.1) | 2.25 |
+| REAL-6 | log + spherical score | 1179 | 56.4 | 2.515 | 25.5 | 3.00 | 5.2 | 5.7 | 18.2 | 3.8 (95.6) | 22.3 (92.4) | 2.22 |
+| REAL-6 | cross-entropy + Brier | 1179 | 58.8 | 2.396 | 24.7 | 2.83 | 5.1 | 3.9 | 17.3 | 11.1 (96.2) | 16.7 (93.4) | 2.15 |
+| POI-1 | cross-entropy | 2053 | 56.5 | 1.457 | 11.8 | 1.34 | 1.9 | 1.8 | 22.4 | 5.2 (97.2) | 9.8 (94.5) | 2.01 |
+| POI-1 | label smoothing 0.1 | 2053 | 55.9 | 1.431 | 7.0 | 1.03 | 5.7 | 5.4 | 22.5 | 4.7 (96.9) | 10.1 (95.7) | 2.06 |
+| POI-1 | log + spherical score | 2053 | 56.2 | 1.423 | 12.2 | 1.31 | 4.1 | 4.3 | 22.1 | 5.7 (94.8) | 13.2 (95.2) | 1.97 |
+| POI-1 | cross-entropy + Brier | 2053 | 55.8 | 1.428 | 11.7 | 1.31 | 3.3 | 3.5 | 21.9 | 8.7 (97.2) | 15.3 (94.9) | 1.99 |
+
+### 72.1 What the step says
+
+- **The objective does not buy trustworthy confidence; a temperature does.** Raw, the cross-entropy encoder on REAL-6 is badly
+  over-confident (ECE 27.8 points, fitted temperature 2.9); log + spherical and Brier move that by 2 to 3 points. One temperature fitted
+  on other users brings every objective to ECE 5 or so; a temperature per option-count bucket (Laya's scheme) adds little (3.9 to 5.7).
+- **Label smoothing is the trap.** It lowers raw ECE (13.2 against 27.8) because it caps the top probability, but it flattens the
+  ranking among confident answers: AURC 20.6 against 17.1, and at a 98% target its out-of-fold threshold accepts 2.8% of items at a
+  realised 69.7%. For auto-filing, which needs the most confident answers to be right, it is the worst of the four.
+- **Accuracy is unchanged** (REAL-6 56.4 to 58.8, POI-1 55.8 to 56.5), so coverage at 98% stays small for every objective (4 to 13%
+  on REAL-6): at 57% top-1 there are few items an encoder can be sure of. Confidence is limited by accuracy here, not by the loss.
+- Not run in this stage: soft targets from a calibrated teacher, and general multiple-choice pre-training before the task. Given that a
+  temperature already calibrates every arm, a teacher could matter only through accuracy; the one-slot decoders of rows 79 and 80 are the
+  better place to test confidence objectives.
+
+Tables: `uv run python scripts/objectives_tables.py`. Job lists: `scripts/modal_jobs/r68*.json`.
+
+
+## 73. Facts, not a skill: database episodes built from real places lift POI-1 by 21 points on the places they contain and by 0 to 3 on places held out of them; the weights store the particular places, and the gain is largest where the user has filed nothing of that kind (+28) (REAL-21)
+
+PLAN step 66. REAL-21 asks whether a database taught as decisions (database episodes, section 55) stores facts about its entries or a
+general "this kind of business goes in this kind of category" skill, which row 62's +5 on merchants outside the database suggested.
+REAL-6's merchants are synthetic, so POI-1's real places test it:
+
+- **The database** (`scripts/build_poi1_db.py`, `data/processed/poi1_v1_db.json`): half of POI-1's 2,053 test places, chosen by a
+  hash of the Overture id (1,001 places; 249 of fold 0's 507 test items). No test place is in any user's history.
+- **Training** (Qwen3.5-2B, fold 0's users held out, plain layout, rename 0.5, all-label loss): without database episodes, and with
+  them (`exp_categoriser.py POI_DB`, DBEP 0.5: in half the episodes eight examples and the target are database places, each labelled
+  with the training user's category for the place's Overture kind), for 800 and 1,600 steps. Each place appears about 50 times.
+- **Test:** fold 0's items in the plain layout (no kind lines, so nothing in the prompt says what a place is), split by whether their
+  place is in the database. The in-database gain over the no-database arm is facts plus skill; the held-out gain is skill alone.
+
+**Table 73.1: POI-1 fold 0 (in the database: 249 items; held out: 258), top-1 %, and the gain over the no-database arm; facts = in-database gain minus held-out gain (user-bootstrap 95% interval)**
+
+*all items*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 53.4 | 57.0 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 74.7 | 57.4 | +21.3 | +0.4 | +20.9 [+12.0, +29.7] |
+| database episodes, 1,600 steps | 73.1 | 60.1 | +19.7 | +3.1 | +16.6 [+7.2, +24.9] |
+
+*seen kind*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 62.8 | 64.5 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 79.7 | 61.8 | +16.9 | -2.6 | +19.5 [+6.8, +31.0] |
+| database episodes, 1,600 steps | 78.4 | 67.8 | +15.5 | +3.3 | +12.3 [-0.4, +24.0] |
+
+*unseen kind*
+
+| arm | in database | held out | gain in database | gain held out | facts (difference) [interval] |
+|---|---|---|---|---|---|
+| no database episodes, 800 steps | 39.6 | 46.2 | +0.0 | +0.0 | +0.0 [+0.0, +0.0] |
+| database episodes, 800 steps | 67.3 | 50.9 | +27.7 | +4.7 | +23.0 [+9.2, +36.6] |
+| database episodes, 1,600 steps | 65.3 | 49.1 | +25.7 | +2.8 | +22.9 [+10.8, +33.6] |
+
+### 73.1 What the step says
+
+- **The database episodes store facts.** On places in the database, 53.4 to 74.7 (+21); on places held out, 57.0 to 57.4 (+0.4 at
+  800 steps, +3.1 at 1,600). The difference, +21 [+12, +30], is what the weights hold about the particular places.
+- **Where the prompt has nothing, the stored fact is everything:** on kinds the user has never filed, +28 in the database against +5
+  held out. On seen kinds the examples already carry most of the answer (+17 against -3).
+- **Longer training does not turn facts into skill** (1,600 steps: +20 in, +3 out), and it does not add facts either: about 50
+  exposures per place are already enough, as section 58 found for REAL-6 (about 30).
+- For Q2, a places database injected by training is a lookup the model carries, not a generalisation; for places it does not hold,
+  retrieval (the record in the prompt, section 67's kind lines) is what helps. The two are complements: train on the places you will
+  see often, retrieve the rest.
+
+Tables: `uv run python scripts/facts_skill_tables.py`. Job list: `scripts/modal_jobs/r66.json`.
+
+
+## 74. Where the decision forms and what the weights store: after training, the merchant's category is linearly readable from its statement string by layer 15 and at the answer cue by layer 12; database episodes write DB-only merchants' categories into the same representation (91% at the statement, 100% at the cue, against about 30% without them), so the injected facts sit where the model's own merchant knowledge sits (MODEL-8)
+
+PLAN step 67. MODEL-8 asks where in the network the categoriser's decision forms and what database episodes put in the weights.
+Following section 40's method, `scripts/exp_probes.py` runs every REAL-6 item's prompt (no record) through Qwen3.5-2B (row 78's open
+base) untrained, trained without a database (200 steps, all-label loss, fold 0) and trained with database episodes (row 78's adapter),
+and fits a logistic-regression probe on each layer's hidden state at two positions: the last token of the query's statement string,
+and the final "Category:" cue. The merchant's standard category (REAL-6's twelve) is probed with merchant-grouped five-fold
+cross-validation on the merchants some user labelled, and a probe trained on all of those is read on the DB-only merchants, whose
+category reaches the weights only through database episodes. At the cue, the gold label's standard category is probed with
+user-grouped folds.
+
+**Table 74.1: probe accuracy (%) at the last token of the query's statement string, by layer (0 = embeddings): the merchant's standard category, cross-validated by merchant / read on the 258 DB-only items**
+
+| layer | untrained | trained, no database | trained, database episodes |
+|---|---|---|---|
+| 0 | 9 / 9 | 9 / 9 | 9 / 9 |
+| 3 | 9 / 10 | 10 / 9 | 10 / 10 |
+| 6 | 9 / 11 | 19 / 14 | 25 / 22 |
+| 9 | 11 / 11 | 27 / 12 | 45 / 40 |
+| 12 | 15 / 13 | 63 / 25 | 78 / 74 |
+| 15 | 16 / 13 | 87 / 31 | 94 / 91 |
+| 18 | 16 / 16 | 80 / 28 | 88 / 85 |
+| 21 | 15 / 13 | 77 / 29 | 84 / 80 |
+| 24 | 18 / 16 | 79 / 29 | 89 / 85 |
+
+**Table 74.2: probe accuracy (%) at the final "Category:" token, by layer (0 = embeddings): the merchant's standard category, cross-validated by merchant / read on the 258 DB-only items / the gold label's standard category**
+
+| layer | untrained | trained, no database | trained, database episodes |
+|---|---|---|---|
+| 0 | 13 / 3 / 9 | 13 / 3 / 9 | 13 / 3 / 9 |
+| 3 | 12 / 12 / 39 | 12 / 10 / 31 | 11 / 10 / 36 |
+| 6 | 20 / 22 / 29 | 24 / 28 / 43 | 49 / 42 / 54 |
+| 9 | 25 / 20 / 41 | 72 / 29 / 72 | 83 / 72 / 84 |
+| 12 | 30 / 31 / 39 | 94 / 36 / 87 | 99 / 99 / 95 |
+| 15 | 32 / 31 / 50 | 96 / 38 / 90 | 99 / 100 / 95 |
+| 18 | 37 / 35 / 50 | 96 / 42 / 89 | 100 / 100 / 94 |
+| 21 | 38 / 33 / 37 | 95 / 41 / 84 | 100 / 100 / 88 |
+| 24 | 38 / 31 / 35 | 95 / 40 / 81 | 99 / 100 / 88 |
+
+### 74.1 What the step says
+
+- **Untrained, the category is barely there** (at most 18% at the statement, 38% at the cue): the base model reads the statement
+  string without committing to a spending category.
+- **Training writes the category into the merchant's representation mid-network.** Without a database, labelled merchants' categories
+  are readable at the statement position from layer 12 (63%) to 87% at layer 15, and at the cue at 94 to 96% from layer 12; the gold
+  label's category at the cue peaks at 90% around layer 15 and falls to 81% at the last layer, where the representation turns to the
+  option tokens.
+- **Database episodes put the facts in the same place.** DB-only merchants, never in a history, are readable at 91% at the statement
+  (layer 15) and 100% at the cue (from layer 12) after database episodes, against 29 to 42% without them. The probe that reads them
+  was trained on the other merchants, so the injected facts use the same directions as the model's learned ones: one representation
+  of "what this merchant is", filled from histories or from the database alike.
+- The no-database model reads REAL-6 at 72.5 on its own (fold 0), the database model at 86.9 (section 69): the probes show where that
+  difference lives.
+
+Tables: `uv run python scripts/probes_tables.py`. Job list: `scripts/modal_jobs/r67.json`.
+
+
+## 75. The one-slot readers barely depend on option order: across four orders of the labelled options their top-1 moves by 0.6 to 1.7 points and 1.3 to 5.7% of answers change; decider-2B is the steadiest, and averaging orders buys at most half a point (EVAL-8)
+
+PLAN step 50, re-scoped on 2026-09-27 to the readers that now lead (sections 69, 76): one answer slot over labelled options is exposed
+to position and letter bias, which a per-option scorer is not. Each reader was re-scored with every item's options shuffled under three
+seeds (`exp_decision_models.py ORDER_SEED`; the labels A, B, ... follow the new order, the category list in the prompt stays), fold 0.
+
+**Table 75.1: one-slot readers under four option orders (the original and three seeds), fold 0: top-1 per order, flip rate (items whose top-1 differs in any order), and the four-order average**
+
+| reader | n | original | seed 1 | seed 2 | seed 3 | spread (points) | flip rate | four-order average |
+|---|---|---|---|---|---|---|---|---|
+| decider-2B one slot, POI-1 | 507 | 92.5 | 92.5 | 93.1 | 92.7 | 0.6 | 1.8% | 92.7 |
+| Qwen3.5-2B one slot, POI-1 | 507 | 91.9 | 92.1 | 92.5 | 92.7 | 0.8 | 2.2% | 92.3 |
+| decider-2B one slot + shot labels, REAL-6 | 298 | 87.9 | 87.2 | 87.9 | 87.2 | 0.7 | 1.3% | 87.9 |
+| Qwen3.5-2B one slot + shot labels, REAL-6 | 298 | 85.9 | 85.9 | 84.2 | 84.2 | 1.7 | 5.7% | 84.9 |
+
+The readers learned the options from their names, not their positions: flips are rare and mostly on items near a tie. decider-2B,
+trained on shuffled options at scale before this task, is the steadiest (1.3 to 1.8%); the plain Qwen3.5-2B one-slot model trained
+here for 800 steps flips most (5.7% on REAL-6), and its REAL-6 top-1 varies by 1.7 points, still within the interval. Averaging four
+orders is not worth four passes. The position bias of ModernBERT-Instruct's letter readout (section 63) does not appear in these trained one-slot decoders.
+
+Tables: `uv run python scripts/order_tables.py`. Job list: `scripts/modal_jobs/r50.json`.
+
+## 76. One answer slot over labelled options matches the per-option loss once the shot labels are also trained (REAL-6 85.9 against 86.9 for Qwen3.5-2B, decider-2B 87.9, decider-4B 88.3) at about a fifteenth of the scoring time; decider-4B gives the widest confident band (66% auto-filed at 97.5% precision against 48% for the per-option reader); kev-4B fine-tuned stops at 83.2 (MODEL-16)
+
+PLAN steps 79 and 80. Section 69 found decider-2B, fine-tuned in its own layout (the options labelled A, B, ...; cross-entropy over the
+label tokens at one answer slot), the best POI-1 reader, at a tenth of the scoring time. Here the layout is separated from the model:
+Qwen3.5-2B trained in decider's layout against the same model with this repo's per-option loss and scorer, on the same episodes
+(REAL-6 with database episodes at 0.5; POI-1 with row 73's descriptions, kind lines and kind-retrieved examples), fold 0's held-out
+users. `AUX_LM=1` (`exp_decider_finetune.py`) adds a token loss on the shots' labels inside the context, the one-slot counterpart of
+the all-label loss (section 52). decider-2B / -4B are trained the same way, and kev-4B with its own trainer and pointer head from the
+released checkpoint (source at 5920c5f, run in the Qwen3.5 overlay).
+
+**Table 76.1: REAL-6, fold 0's held-out users, database episodes: one answer slot against the per-option loss**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|
+| Qwen3.5-2B, per-option loss + all-label (row 78), 200 steps | 298 | 86.9 [80.6, 91.0] | 98.3 | 0.61 | 48.0 (97.2) |
+| Qwen3.5-2B, one slot, 200 steps | 298 | 67.4 [58.5, 74.0] | 84.2 | 1.59 | 29.2 (93.1) |
+| Qwen3.5-2B, one slot, 800 steps | 298 | 82.9 [77.3, 87.6] | 93.3 | 1.03 | 26.5 (94.9) |
+| Qwen3.5-2B, one slot + shot-label loss, 200 steps | 298 | 78.2 [71.1, 82.7] | 91.3 | 1.14 | 34.2 (97.1) |
+| Qwen3.5-2B, one slot + shot-label loss, 800 steps | 298 | 85.9 [79.4, 90.2] | 97.0 | 0.79 | 20.1 (95.0) |
+| decider-2B, one slot, 200 steps | 298 | 69.5 [61.7, 74.9] | 82.6 | 1.58 | 39.9 (97.5) |
+| decider-2B, one slot, 800 steps | 298 | 83.9 [77.6, 88.3] | 93.6 | 0.93 | 20.8 (95.2) |
+| decider-2B, one slot + shot-label loss, 200 steps | 298 | 82.2 [75.2, 87.8] | 95.0 | 0.95 | 16.8 (94.0) |
+| decider-2B, one slot + shot-label loss, 800 steps | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-4B, one slot + shot-label loss, 800 steps | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| Qwen3.5-4B, per-option loss + all-label (row 78), 200 steps | 298 | 88.6 [80.9, 92.3] | 97.7 | 0.62 | 50.0 (94.6) |
+| kev-4B fine-tuned (its trainer, from the released checkpoint), lr 2e-5, 200 steps | 298 | 59.7 [52.5, 65.3] | 77.9 | 1.99 | 14.4 (97.7) |
+| kev-4B fine-tuned, lr 1e-4, 800 steps | 298 | 83.2 [78.3, 86.7] | 94.6 | 0.89 | 35.6 (97.2) |
+| decider-2B zero-shot | 298 | 15.8 [7.6, 29.3] | 33.6 | 3.74 | 22.5 (41.8) |
+| kev-4B zero-shot | 298 | 43.3 [40.2, 46.8] | 60.4 | 2.80 | 8.7 (96.2) |
+
+**Table 76.2: POI-1, fold 0's held-out users, row 73's episodes (descriptions + kind lines + kind-retrieved examples)**
+
+| reader | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | seen-kind top-1 | unseen-kind top-1 |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B, per-option loss + all-label (row 78) | 507 | 91.5 [89.2, 93.8] | 98.6 | 0.32 | 86.0 (97.9) | 99.3 | 80.2 |
+| Qwen3.5-2B, one slot | 507 | 91.9 [89.8, 93.9] | 98.8 | 0.33 | 87.8 (97.8) | 99.7 | 80.7 |
+| decider-4B, one slot + shot-label loss | 507 | 92.3 [90.3, 94.2] | 99.2 | 0.30 | 88.4 (98.0) | 100.0 | 81.2 |
+| decider-2B, one slot (row 77) | 507 | 92.5 [90.4, 94.5] | 99.0 | 0.33 | 86.6 (98.2) | 100.0 | 81.6 |
+
+### 76.1 What the step says
+
+- **The layout costs nothing at the end, but it trains slower.** On POI-1 the one-slot Qwen3.5-2B equals the per-option one (91.9
+  against 91.5) at 200 steps. On REAL-6 it needs 800 steps to reach 82.9, where the per-option reader has 86.9 at 200. The one-slot
+  loss gives one target per episode; the per-option loss with all labels (section 52) gives one per shot as well, 25 times the signal.
+- **Training the shot labels closes the gap.** The shot-label token loss lifts Qwen3.5-2B one slot from 67.4 to 78.2 at 200 steps
+  and from 82.9 to 85.9 at 800, and decider-2B from 69.5 to 82.2 and from 83.9 to 87.9. With it the one-slot layout is within a point
+  of the per-option reader at the same size, inside every interval.
+- **decider's pre-training is worth a little, not its size of knowledge.** decider-2B, trained on shuffled labelled options before
+  this task, is 2 points above Qwen3.5-2B in the same layout and loss (87.9 against 85.9), and decider-4B only 0.4 above decider-2B.
+  Section 69's doubt (decider-2B misfiles Trader Joe's zero-shot) is answered: the database episodes supply the merchant knowledge.
+- **decider-4B's confidence ranks best.** At a realised 97.5% precision it files 66.4% of items without review; the per-option
+  Qwen3.5-4B, equal in top-1, manages 50.0 at 94.6. The 2B one-slot readers are the weakest here (20 to 24%): their errors are
+  confident. Coverage at one threshold on 298 items is noisy; the ordering matches the bits left.
+- **kev-4B fine-tunes, but to less.** Its pointer head at its own rate (2e-5) is under-trained at 200 steps (59.7); at 1e-4 and 800
+  steps it reads 83.2, 5 points under decider at the same size.
+- **Speed.** One slot reads all options in one pass: warm, 18 to 24 ms per item for the 2B readers on both sets (the order runs of
+  section 75, four passes in one container), against about 390 ms for the per-option scorer on Qwen3.5-2B, which re-reads the prompt
+  for each of 12 to 20 options. The first pass in a container takes 130 to 260 ms per item while flash-linear-attention tunes its
+  kernels.
+
+The best decoder categoriser is now decider-4B in its own layout with the shot-label loss and database episodes: 88.3 on REAL-6 (94%
+of the 94.0 ceiling), 92.3 on POI-1, the widest confident band, one pass per question. Limits: fold 0 only (298 and 507 items);
+decider-4B was not run on POI-1 without the shot-label loss, nor at 200 steps on REAL-6.
+
+Tables: `uv run python scripts/one_slot_tables.py`. Job lists: `scripts/modal_jobs/r79*.json`, `r80*.json`.
+
+## 77. Novel category names: the per-option database-episode reader loses 19 points when every category name is replaced by a fresh word (86.9 to 68.1), most on standard names (99 to 70), so it files by what the name means more than by the user's examples; rename training removes the dependence at a cost in accuracy (74.5 to 73.2), and decider-4B one slot loses 5 (88.3 to 83.6) (REAL-18)
+
+PLAN step 61, re-scoped on 2026-09-27 to the current readers. REAL-6's coined names come from a list of 24 that training users share,
+so its coined cell measures familiar words. `build_real6_novel.py` writes `real6_v1_novel`: every user's category names replaced by a
+fresh three-syllable word, consistently in the category list, the shots' labels and the options (same ids, option order and gold).
+Scoring only, fold 0.
+
+**Table 77.1: REAL-6 fold 0, real category names against fresh coined names (same items, options and gold)**
+
+| reader | names | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|---|
+| Qwen3.5-2B untrained | real | 298 | 33.2 [26.5, 38.5] | 50.0 | 3.33 | 5.7 (94.1) |
+| Qwen3.5-2B untrained | novel | 298 | 13.8 [8.8, 18.0] | 30.9 | 3.75 | 8.7 (34.6) |
+| Qwen3.5-2B, per-option, database episodes (row 78) | real | 298 | 86.9 [80.6, 91.0] | 98.3 | 0.61 | 48.0 (97.2) |
+| Qwen3.5-2B, per-option, database episodes (row 78) | novel | 298 | 68.1 [60.6, 74.4] | 84.9 | 1.74 | 5.4 (93.8) |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | real | 298 | 74.5 [64.6, 81.8] | 85.2 | 1.36 | 41.6 (98.4) |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | novel | 298 | 73.2 [68.9, 76.7] | 80.5 | 1.73 | 27.5 (96.3) |
+| decider-2B, one slot + shot labels, database episodes (row 80) | real | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-2B, one slot + shot labels, database episodes (row 80) | novel | 298 | 78.2 [73.1, 84.8] | 90.6 | 1.32 | 10.7 (96.9) |
+| decider-4B, one slot + shot labels, database episodes (row 80) | real | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| decider-4B, one slot + shot labels, database episodes (row 80) | novel | 298 | 83.6 [75.0, 90.3] | 95.6 | 0.91 | 23.8 (97.2) |
+
+**Table 77.2: top-1 on real → novel names, by whether the user has filed the merchant before and by the gold name's type in REAL-6**
+
+| reader | in history | not in history | name type: new (REAL-6's coined) | name type: renamed | name type: standard |
+|---|---|---|---|---|---|
+| Qwen3.5-2B untrained | 38.7 → 21.8 | 28.2 → 6.4 | 34.4 → 23.4 | 23.3 → 11.7 | 43.0 → 10.5 |
+| Qwen3.5-2B, per-option, database episodes (row 78) | 85.9 → 73.9 | 87.8 → 62.8 | 95.3 → 92.2 | 70.8 → 53.3 | 99.1 → 70.2 |
+| Qwen3.5-2B, per-option, rename 0.5 (row 74) | 78.2 → 71.8 | 71.2 → 74.4 | 89.1 → 82.8 | 62.5 → 65.0 | 78.9 → 76.3 |
+| decider-2B, one slot + shot labels, database episodes (row 80) | 90.8 → 81.0 | 85.3 → 75.6 | 92.2 → 92.2 | 75.0 → 61.7 | 99.1 → 87.7 |
+| decider-4B, one slot + shot labels, database episodes (row 80) | 90.8 → 85.2 | 85.3 → 82.1 | 95.3 → 95.3 | 72.5 → 67.5 | 100.0 → 93.9 |
+
+### 77.1 What the step says
+
+- **The database-episode reader files by name meaning.** Its drop is concentrated where the gold is a standard name (99.1 to 70.2):
+  there it had learned "this merchant is Groceries" and matched the word, and with the word gone it must find the category from the
+  user's examples, which it does for 70%. On REAL-6's own coined names, where it already had to use the examples, it barely moves
+  (95.3 to 92.2). Even merchants in the user's history fall 12 points, though the history names the answer.
+- **Rename training buys robustness with accuracy.** The rename-trained reader moves 1.3 points overall and gains on merchants not in
+  the history, but it is 12 points under the database reader on real names: it never learned the database's facts (no episodes).
+- **decider-4B keeps most of it.** 83.6 on novel names (95% of its real-name score), its standard-name items 100 to 93.9, coined
+  names unchanged. Its confident band shrinks (66% to 24% auto-filed), so it knows when the name no longer helps. decider-2B loses 10.
+- **Hypothesis.** Meaning and examples are two routes to the same answer; a reader trained only with real names leans on the first.
+  Rename augmentation on top of database episodes (the owner's goal: unseen names for unseen merchants) should keep both, near 88 on
+  real names and novel names alike. That is the next training run for decider-4B.
+
+Limits: fold 0 only; one draw of novel words; scoring only (no model saw these words in training).
+
+Tables: `uv run python scripts/novel_labels_tables.py`. Items: `scripts/build_real6_novel.py`. Job list: `scripts/modal_jobs/r61.json`.
+
+## 78. Rename augmentation on top of database episodes makes decider-4B the best reader on real and on novel names alike: REAL-6 91.9 (98% of the 94.0 ceiling, from 88.3) and 89.9 with every category name replaced by a fresh word (from 83.6); standard-name items no longer depend on the name (99.1 on both) (REAL-18)
+
+PLAN step 81, the hypothesis of section 77: a reader trained only with real names leans on what they mean, so rename augmentation
+(RENAME 0.5: in each training episode each category name replaced by a fresh coined word with probability 0.5, consistently in the list,
+the shots and the target) was added to row 80's recipe (decider one slot + shot-label loss + database episodes, 800 steps), fold 0,
+scored on real names and on `real6_v1_novel`.
+
+**Table 78.1: REAL-6 fold 0, real and novel category names, with and without rename augmentation**
+
+| reader | names | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) |
+|---|---|---|---|---|---|---|
+| decider-2B, row 80 | real | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) |
+| decider-2B, row 80 | novel | 298 | 78.2 [73.1, 84.8] | 90.6 | 1.32 | 10.7 (96.9) |
+| decider-2B, + rename 0.5 | real | 298 | 89.9 [81.1, 94.3] | 98.7 | 0.61 | 58.1 (94.8) |
+| decider-2B, + rename 0.5 | novel | 298 | 83.9 [75.4, 91.5] | 96.6 | 0.87 | 53.4 (96.2) |
+| decider-4B, row 80 | real | 298 | 88.3 [80.3, 94.9] | 97.3 | 0.69 | 66.4 (97.5) |
+| decider-4B, row 80 | novel | 298 | 83.6 [75.0, 90.3] | 95.6 | 0.91 | 23.8 (97.2) |
+| decider-4B, + rename 0.5 | real | 298 | 91.9 [84.1, 97.2] | 99.3 | 0.45 | 75.5 (96.9) |
+| decider-4B, + rename 0.5 | novel | 298 | 89.9 [81.3, 95.2] | 96.6 | 0.66 | 46.6 (95.0) |
+
+**Table 78.2: top-1 on real → novel names by history and gold name type**
+
+| reader | in history | not in history | name type: new | name type: renamed | name type: standard |
+|---|---|---|---|---|---|
+| decider-2B, row 80 | 90.8 → 81.0 | 85.3 → 75.6 | 92.2 → 92.2 | 75.0 → 61.7 | 99.1 → 87.7 |
+| decider-4B, row 80 | 90.8 → 85.2 | 85.3 → 82.1 | 95.3 → 95.3 | 72.5 → 67.5 | 100.0 → 93.9 |
+| decider-2B, + rename 0.5 | 88.7 → 84.5 | 91.0 → 83.3 | 92.2 → 96.9 | 80.0 → 64.2 | 99.1 → 97.4 |
+| decider-4B, + rename 0.5 | 92.3 → 89.4 | 91.7 → 90.4 | 98.4 → 96.9 | 81.7 → 77.5 | 99.1 → 99.1 |
+
+### 78.1 What the step says
+
+- **The hypothesis holds, and rename augmentation also helps on real names.** decider-4B gains 3.6 points on real names and 6.3 on
+  novel ones; the gap between them shrinks from 4.7 to 2.0. On Qwen3.5-2B with the per-option loss and no database (section 71) rename
+  training cost accuracy; here, with the database episodes carrying the merchant facts, it costs nothing and adds.
+- **Where it helps.** Standard-name items no longer fall when the name goes (99.1 on both): the reader finds the category from the
+  user's examples, not the word. The largest real-name gain is on renamed categories (72.5 to 81.7), REAL-6's hardest group, where
+  the user's name hides a standard category: training on hidden names is training on exactly that.
+- **Confidence.** Bits left fall from 0.69 to 0.45 and 75.5% of items are auto-filed at a realised 96.9% (the leave-fold-out
+  threshold misses 98% by a point on 298 items). On novel names the auto-file band doubles (23.8 to 46.6).
+- **At 2B** the same holds at a smaller scale (87.9 to 89.9 real, 78.2 to 83.9 novel).
+
+The best reader is now decider-4B, one slot, shot-label loss, database episodes and rename augmentation 0.5: 91.9 on REAL-6, 97.8% of
+the ceiling. Limits: fold 0 and one seed (intervals of about ±6 points; the real-name gain over row 80 is inside them, the novel-name
+gain is not quite); POI-1 not yet read with this recipe; the rename rate not swept.
+
+Tables: `uv run python scripts/novel_labels_tables.py`. Job list: `scripts/modal_jobs/r81.json`.
+
+## 79. Trained abstention: decider's augmentation (a "not listed here" option in 10% of training questions, the true category hidden in a quarter of those) catches 92% of questions whose category is missing with 1.3% false alarms and no cost in accuracy; the option read by its probability separates those questions from ordinary ones better than a confidence threshold (AUROC 0.992 against 0.969) (REAL-14)
+
+PLAN step 52, re-scoped on 2026-09-27 to decider-4B one slot + shot-label loss + database episodes (row 80's recipe; this row
+predates row 81's rename augmentation). `ABSTAIN=p ABSTAIN_SWAP=q` (`exp_decider_finetune.py`): with probability p a training question
+gets a last option "not listed here" (decider's neutral abstain wording); in a share q of those the gold category is removed from the
+header and the options (the shots keep its label), so the option is the answer. `build_real6_abstain.py` writes `real6_v1_abst`: every
+REAL-6 item with the option added (full) and with its gold category hidden (nogold). Fold 0. The second arm of the original row
+(uniform targets on evidence-free episodes) was not run.
+
+**Table 79.1: decider-4B on REAL-6 fold 0 with a "not listed here" option (298 full items, 298 with the gold category hidden)**
+
+| model | top-1, real options | top-1 with the option | option chosen, full (false alarms) | option chosen, nogold (recall) | AUROC nogold vs full: P(option) | AUROC: 1 - top real-option p | REAL-6 top-1, no option |
+|---|---|---|---|---|---|---|---|
+| no abstain training (row 80) | 88.3 | 88.3 | 0.0% | 61.1% | 0.963 | 0.917 | 87.9 |
+| abstain 0.1, hidden gold 0.25 (decider's) | 89.3 | 88.3 | 1.3% | 92.3% | 0.992 | 0.969 | 89.3 |
+| abstain 0.2, hidden gold 0.5 | 86.6 | 86.2 | 0.7% | 93.3% | 0.990 | 0.965 | 87.6 |
+
+### 79.1 What the step says
+
+- **decider already abstains untrained on this task.** Row 80's model, never shown the option in our training, picks it for 61% of
+  questions whose category is missing and never when the category is present: decider's own pre-training (the same augmentation over
+  its task mixture) survives our fine-tune.
+- **decider's recipe on our episodes finishes the job.** Recall 92.3% at 1.3% false alarms, and the real-option accuracy is unchanged
+  (89.3 against 88.3; 87.9 to 89.3 on plain REAL-6, inside the interval). Doubling both rates buys one point of recall and costs two of
+  accuracy: decider's 0.1 / 0.25 is the setting.
+- **A trained option beats a threshold.** Telling nogold from full questions by the option's probability reaches AUROC 0.992; by the
+  top real option's confidence, the only route without the option, 0.969 in the same model and 0.917 without abstain training. The
+  missing-category case is where a threshold is weakest: the model is confidently wrong about the nearest category.
+- **Limits.** The nogold test is the case the augmentation trains (a category hidden), so this is in-distribution; the other reason to
+  abstain (no evidence at all: an opaque merchant in no database and no history) is untested. Fold 0, one seed. REAL-6 top-1 here is
+  the plain argmax; the scorecard's 88.3 for row 80 counts one exact bf16 tie at the top as right (`scorecard._rank`).
+
+Tables: `uv run python scripts/abstain_tables.py`. Items: `scripts/build_real6_abstain.py`. Job list: `scripts/modal_jobs/r52.json`.
+
+## 80. Misleading merchant names: facts trained into the weights override the name completely (decider-4B 97.4 on misleading names, the same as on neutral twins, none pulled to the name's category, from 7.9 untrained); the user's history mostly does too at 4B (86.8 to 90.8), but the per-option Qwen and decider-2B follow the name against the user's own filings a third of the time (REAL-15)
+
+PLAN step 83 (the owner, 2026-09-27). REAL-6's made-up merchants are meaningless (Istlock), so whether a fact in the weights beats a
+name that points elsewhere was untested. `build_mislead.py` writes `mislead_v1`: 48 made-up names that suggest another category than
+their own, 4 per category ("Tire Barn" is a restaurant, "Pixel Depot" a grocery store, "Pill Box" a home-improvement store), 48 neutral
+twins in REAL-6's style, and 16 real brands whose names mislead (Kayak, Cricket Wireless, Buffalo Wild Wings; none a REAL-6 merchant).
+Half of the made-up merchants of each kind are in the fact DB, which `MISLEAD=mislead_v1` adds to the database episodes (288 merchants
+instead of 240). Items use fold 0's users (their header and 24 shots, the query swapped): the merchant alone, and, for the merchants
+in no DB, two of the shots replaced by this merchant's rows filed under the user's category. The pull is the share of answers that
+pick the category the name suggests, on the items where that is a separate option (the rest merge it with the gold's category).
+Readers: row 81's recipe (decider one slot + shot-label loss + database episodes + rename 0.5) and the per-option Qwen3.5-2B with
+database episodes, each without the set (the row 81 / 78 models) and trained with it.
+
+**Table 80.1: misleading merchant names, fold 0: top-1 % / share pulled to the name's category % (n; n with a separate decoy option)**
+
+| reader | misleading, in DB, alone | neutral twin, in DB, alone | misleading, not in DB, alone | neutral twin, not in DB, alone | misleading, not in DB, in history | neutral twin, not in DB, in history | real brand, alone |
+|---|---|---|---|---|---|---|---|
+| decider-4B (row 81), set not trained | 7.9 / 51 (76; 45) | 14.5 / nan (76; 0) | 2.6 / 69 (76; 52) | 15.8 / nan (76; 0) | 90.8 / 6 (76; 52) | 90.8 / nan (76; 0) | 75.0 / 0 (52; 35) |
+| decider-4B, set's DB trained | 97.4 / 0 (76; 45) | 97.4 / nan (76; 0) | 6.6 / 60 (76; 52) | 14.5 / nan (76; 0) | 86.8 / 15 (76; 52) | 93.4 / nan (76; 0) | 75.0 / 3 (52; 35) |
+| decider-2B (row 81), set not trained | 7.9 / 47 (76; 45) | 19.7 / nan (76; 0) | 3.9 / 63 (76; 52) | 10.5 / nan (76; 0) | 67.1 / 33 (76; 52) | 90.8 / nan (76; 0) | 51.9 / 11 (52; 35) |
+| decider-2B, set's DB trained | 97.4 / 0 (76; 45) | 97.4 / nan (76; 0) | 13.2 / 46 (76; 52) | 22.4 / nan (76; 0) | 86.8 / 8 (76; 52) | 90.8 / nan (76; 0) | 61.5 / 3 (52; 35) |
+| Qwen3.5-2B per-option, DB (row 78), set not trained | 6.6 / 51 (76; 45) | 9.2 / nan (76; 0) | 6.6 / 58 (76; 52) | 13.2 / nan (76; 0) | 55.3 / 31 (76; 52) | 80.3 / nan (76; 0) | 63.5 / 14 (52; 35) |
+| Qwen3.5-2B per-option, DB + rename, set's DB trained | 89.5 / 0 (76; 45) | 94.7 / nan (76; 0) | 11.8 / 48 (76; 52) | 25.0 / nan (76; 0) | 73.7 / 19 (76; 52) | 88.2 / nan (76; 0) | 55.8 / 14 (52; 35) |
+
+### 80.1 What the step says
+
+- **Facts in the weights beat the name.** Trained with the set's DB, decider-4B and -2B file misleading names as well as their neutral
+  twins (97.4 on both) and never pick the name's category; untrained they got 7.9 with half the answers pulled to it. The per-option
+  Qwen keeps a trace of the name (89.5 against 94.7): its score is the category name's likelihood after the prompt, closer to the
+  merchant's own words.
+- **The user's history: 4B trusts it, 2B and the per-option reader do not fully.** With two of the user's rows filing this merchant,
+  decider-4B reads misleading and neutral names alike before training (90.8), and 86.8 against 93.4 after (a pull of 15%, 8 of 52).
+  decider-2B untrained on the set follows the name a third of the time (67.1 against 90.8), and the per-option Qwen3.5-2B the same
+  (55.3 against 80.3): a lookup that should be exact loses to a word.
+- **With nothing to go on, the name decides** (misleading names not in the DB, alone: 3 to 13 right, 46 to 69% pulled to the name).
+  That is the right guess from the evidence; the neutral twins in the same cell (10 to 25) are the evidence-free case row 84 measures.
+- **Real brands whose names mislead:** decider-4B 75.0 and almost never pulled (0 to 3%); its errors go elsewhere. 2B readers 52 to
+  64. Pretrained brand knowledge is thinner than the misleading surface suggests but is not overridden by it.
+- **REAL-6 after adding 48 merchants to the DB:** decider-4B 88.3 (row 81: 91.9), decider-2B 87.9 (89.9), Qwen3.5-2B 86.6. Both
+  deciders drop, inside the intervals: dilution (each REAL-6 merchant gets 17% fewer database episodes) or row 81 being a lucky
+  seed. Seeds of row 81's recipe are needed before its 91.9 is quoted as the recipe's level.
+
+Limits: fold 0; 76 items per made-up cell (19 merchants x 4 users in reach), 45 to 52 with a separate decoy option; one seed.
+
+Tables: `uv run python scripts/mislead_tables.py`. Items: `scripts/build_mislead.py`. Job list: `scripts/modal_jobs/r83.json`.
+
+## 81. Option labels: training with random labels is at least as good as A, B, C in order and helps the plain Qwen most (85.9 to 88.9); random A..Z also lifts novel names for decider-2B (78.2 to 82.9) and its auto-file band (24 to 51%); random labels from all 255 single-token labels train to the same top-1, so labels can reach 255 options (MODEL-16)
+
+PLAN step 82 (the owner, 2026-09-27: labels must not always start at A, and must reach 255 options; numbers are single tokens only to 9
+in Qwen3.5, so they were dropped). `ai_experiments.oneslot` builds decider's plain layout with a choice of labels (`LABELS` in
+`exp_decider_finetune.py` and `exp_decision_models.py`): letters (decider's own: A, B, C, ... after the option shuffle), rand26 (a
+random sample of A..Z in random order per question), rand255 (random from decider's 255 single-token labels: A..Z and 229 two-letter
+tokens). Qwen3.5-2B and decider-2B, one slot + shot-label loss + database episodes, 800 steps, fold 0; each read with its own scheme, and
+the letters-trained models also read with random labels. The reshuffle column is the share of answers that change when the options
+(and so the labels) are drawn again (ORDER_SEED=1).
+
+**Table 81.1: one-slot readers by option-label scheme, REAL-6 fold 0 (trained with one scheme, read with one)**
+
+| model | trained with | read with | n | top-1 [interval] | top-3 | bits left | auto-file at 98%: coverage (precision) | novel names top-1 | answers changed by a reshuffle |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B | letters | letters | 298 | 85.9 [79.4, 90.2] | 97.0 | 0.79 | 20.1 (95.0) | – | 2.7% |
+| Qwen3.5-2B | letters | rand26 | 298 | 86.2 [79.4, 90.3] | 97.3 | 0.75 | 15.8 (93.6) | – | – |
+| Qwen3.5-2B | letters | rand255 | 298 | 76.5 [67.9, 82.9] | 91.3 | 1.43 | 2.7 (87.5) | – | – |
+| Qwen3.5-2B | rand26 | rand26 | 298 | 88.9 [81.6, 94.0] | 97.7 | 0.67 | 26.8 (96.2) | 83.2 | 2.7% |
+| Qwen3.5-2B | rand255 | rand255 | 298 | 88.9 [83.2, 92.9] | 94.6 | 0.77 | 5.7 (94.1) | 81.2 | 1.0% |
+| decider-2B | letters | letters | 298 | 87.9 [81.9, 92.5] | 97.3 | 0.81 | 24.2 (97.2) | 78.2 | 0.7% |
+| decider-2B | letters | rand26 | 298 | 87.6 [81.9, 92.0] | 96.0 | 0.83 | 18.5 (96.4) | – | – |
+| decider-2B | letters | rand255 | 298 | 81.5 [74.6, 86.9] | 90.3 | 1.15 | 21.8 (95.4) | – | – |
+| decider-2B | rand26 | rand26 | 298 | 88.6 [80.1, 93.8] | 96.3 | 0.69 | 51.3 (96.1) | 82.9 | 2.3% |
+| decider-2B | rand255 | rand255 | 298 | 87.6 [80.9, 92.0] | 94.6 | 0.90 | 17.1 (96.1) | 78.5 | 3.4% |
+
+### 81.1 What the step says
+
+- **The letters-trained models never learned "A is first".** Read with random A..Z they lose nothing (85.9 to 86.2, 87.9 to 87.6);
+  they bind each letter to the option it labels. Two-letter labels they were not trained on cost 6 to 9 points.
+- **Training with random labels is an augmentation.** Qwen3.5-2B, with no multiple-choice pre-training, gains 3 points with either
+  random scheme (88.9 against 85.9) and matches decider-2B; decider-2B gains 0.7. Random A..Z also helps decider-2B on novel category
+  names (82.9 against 78.2) and doubles its confident band (51.3% auto-filed at 96.1% against 24.2%).
+- **255 labels work once trained.** rand255 reaches the same top-1 as rand26 on Qwen (88.9) and a point under on decider (87.6), with a
+  weaker top-3 and auto-file band: a two-letter label is a rarer token to bind. The reshuffle rates (1.0 to 3.4%) stay as in section 75.
+
+The recipe takes rand26 from here, and rand255 where a question has more than 26 options. Limits: one seed each, and section 82 puts
+the seed spread of this kind of run at about 3 points, so the gains on top-1 are inside it; the novel-name and auto-file gains are
+larger than that.
+
+Tables: `uv run python scripts/label_scheme_tables.py`. Code: `src/ai_experiments/oneslot.py`. Job list: `scripts/modal_jobs/r82.json`.
+
+## 82. Seeds of the best recipe: decider-4B one slot + shot-label loss + database episodes + rename 0.5 reads REAL-6 at 91.9, 89.6 and 88.9 over three seeds (mean 90.1, 96% of the ceiling) and novel names at 89.9, 87.9 and 89.3 (mean 89.0); section 78's 91.9 was the best of three
+
+REPORT 80 found decider-4B at 88.3 on REAL-6 after 48 merchants were added to its database, against section 78's 91.9, and asked
+whether that was dilution or a lucky seed. Two more seeds of section 78's recipe (`SEED=1, 2`; everything else equal), fold 0.
+
+| seed | REAL-6 top-1 | novel names top-1 |
+|---|---|---|
+| 0 (section 78) | 91.9 | 89.9 |
+| 1 | 89.6 | 87.9 |
+| 2 | 88.9 | 89.3 |
+| mean | 90.1 | 89.0 |
+
+The seed spread is 3 points, as large as most single-run differences in sections 76 to 81; REPORT 80's 88.3 with the larger database
+is inside it, so no dilution is shown. The recipe's level is about 90 on real names and 89 on novel ones, a gap of one point (section
+77's reader without rename augmentation: 88.3 and 83.6, one seed). Comparisons between arms from here should use two or three seeds.
+
+Job list: `scripts/modal_jobs/r81_seeds.json`.
+
+## 83. The best reader does not know when it cannot know: on made-up merchants in no database and no history it is right 15.8% of the time, yet puts 90% or more on its top answer for 70% of them (right on 19% of those); the same merchants with two of the user's filings shown read 90.8 (REAL-14)
+
+PLAN step 84, part one (no training). Section 78's decider-4B (seed 0) read on `mislead_v1`'s neutral made-up merchants that are in no
+database (REPORT 80), alone, against the same merchants with two of the user's filings in the shots, and REAL-6 fold 0. Raw softmax
+over the options (no temperature).
+
+| items | n | top-1 | median top probability | top probability >= 0.9 | right when >= 0.9 | top probability >= 0.98 |
+|---|---|---|---|---|---|---|
+| REAL-6 fold 0 (evidence present) | 298 | 91.9 | 1.00 | 97% | 93% | 93% |
+| no evidence: opaque merchant, no DB, no history | 76 | 15.8 | 0.98 | 70% | 19% | 53% |
+| the same merchants, 2 of the user's filings shown | 76 | 90.8 | 1.00 | 97% | 93% | 95% |
+
+With nothing to go on the reader still commits: its confidence on evidence-free items looks like its confidence where it is right, so no
+threshold separates them. Training has never shown it a question without an answer in evidence (every training target is a merchant
+in a history or the database). Row 84 trains that case: evidence-free episodes with a "can't tell" option (switchable at inference),
+against soft uniform targets. The temperature the scorecard fits will lower these numbers somewhat but cannot reorder items.
+
+## 84. The user's own filing over the database and the name: without training for it, a merchant the database knows is pulled back to its database category in a quarter to a half of the questions where the user's two filings say otherwise; with lookup and override episodes the user's filing wins 98 to 100% of the time, misleading names included, at no cost on REAL-6 (REAL-15)
+
+PLAN step 85 (the owner, 2026-09-27: make sure the training covers a user filing a merchant against what its name or the database says).
+REPORT 80 found that of 2,250 training episodes only 6 put the target merchant's own row in the shots, and no user ever filed a merchant
+against its database category. `LOOKUP=p OVERRIDE=q` (`exp_categoriser.py`): per episode, with probability q (a database target) the
+user files the target merchant under another of their categories, in two or more shots and in the target; else with probability p two
+or more shots carry the target merchant under the target's label. `build_override.py` writes `override_v1` (684 items, fold 0): two of
+the user's shots file a database merchant under the user's category for its database category (agree) or under another category
+(override, then the answer), for REAL-6's DB-only merchants (chains and opaque names) and mislead_v1's misleading names and neutral
+twins. decider-4B, row 81's recipe + MISLEAD + random A..Z labels, without (control) and with LOOKUP = OVERRIDE = 0.1, two seeds each;
+rows 81 and 83's models as read before.
+
+**Table 84.1: the user's filing (2 shots) against the database and the name, fold 0: top-1 % and the share of override items answered with the DB category instead**
+
+| reader | REAL-6 DB-only chain: agree | REAL-6 DB-only chain: override | REAL-6 DB-only chain: override, pulled to DB | REAL-6 DB-only opaque: agree | REAL-6 DB-only opaque: override | REAL-6 DB-only opaque: override, pulled to DB | misleading name: agree | misleading name: override | misleading name: override, pulled to DB | neutral twin: agree | neutral twin: override | neutral twin: override, pulled to DB | REAL-6 top-1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 (set's merchants not in its DB) | 100.0 | 75.3 | 24.7 | 100.0 | 68.8 | 31.2 | 90.8 | 92.1 | 0.0 | 86.8 | 92.1 | 0.0 | 91.9 |
+| row 83 (misleading names in its DB) | 100.0 | 51.5 | 47.4 | 100.0 | 64.5 | 34.4 | 100.0 | 71.1 | 28.9 | 100.0 | 60.5 | 38.2 | 88.3 |
+| control: + random labels | 100.0 [100.0, 100.0] | 60.8 [39.2, 82.5] | 39.2 [17.5, 60.8] | 98.9 [97.8, 100.0] | 64.0 [46.2, 81.7] | 36.0 [18.3, 53.8] | 100.0 [100.0, 100.0] | 75.7 [61.8, 89.5] | 24.3 [10.5, 38.2] | 100.0 [100.0, 100.0] | 63.8 [42.1, 85.5] | 35.5 [14.5, 56.6] | 89.8 [89.6, 89.9] |
+| + lookup and override episodes | 100.0 [100.0, 100.0] | 99.5 [99.0, 100.0] | 0.5 [0.0, 1.0] | 100.0 [100.0, 100.0] | 98.4 [97.8, 98.9] | 0.5 [0.0, 1.1] | 100.0 [100.0, 100.0] | 98.7 [98.7, 98.7] | 1.3 [1.3, 1.3] | 100.0 [100.0, 100.0] | 98.7 [97.4, 100.0] | 1.3 [0.0, 2.6] | 89.4 [89.3, 89.6] |
+
+### 84.1 What the step says
+
+- **Untrained, the database competes with the user.** When the user's two filings disagree with the database, the control reader
+  follows the user 61 to 76% of the time and returns the database's category for the rest; the more of the set's merchants the model
+  learned as facts, the more it overrides the user (row 81, which never learned the misleading names: 92% on them; row 83, which did:
+  71%). Where the user agrees with the database it is 99 to 100% right.
+- **Override episodes settle it.** With 10% override and 10% lookup episodes the user's filing wins on 98.4 to 99.5% of override
+  items in every merchant kind, misleading names included (the name, the database and the user all disagree there), with no loss where
+  they agree and REAL-6 at 89.4 against 89.8 (inside the seed spread).
+- The override is learned as "the user's own rows of this merchant decide", not as distrust of the database: agree items stay at 100.
+
+Limits: fold 0, two seeds, two shots of the merchant in every item (one shot, or conflicting shots, untested).
+
+Tables: `uv run python scripts/override_tables.py`. Items: `scripts/build_override.py`. Job list: `scripts/modal_jobs/r85.json`.
+
+## 85. Abstention when nothing can tell: a trained "cannot tell" option catches 99% of evidence-free questions but also abstains on names with clues (37% of plain real names, 15% of chains, 18% of merchants the user has filed); soft uniform targets on evidence-free training questions, with no option, cut confident answers there from 79% to 3% while names with clues keep theirs, which is the behaviour asked for (REAL-14)
+
+PLAN step 84, part two (part one: section 83). The owner (2026-09-27): abstain only on extremely ambiguous merchants, never where the
+name carries a clue. `EVFREE=0.1` (`exp_decider_finetune.py`): a tenth of training questions get a fresh opaque merchant (in no
+database, no history, no REAL-6 set) as the query; `EVFREE_MODE=opt` answers them with a last option "cannot tell from this" (shown
+on as many ordinary questions too) together with decider's "not listed here" augmentation (section 79); `soft` gives them a uniform
+target over the user's categories, with no option. decider-4B, row 81's recipe + random A..Z labels, two seeds per arm; read without
+options and with both offered (`exp_decision_models.py EXTRA_OPTS`). Evidence-free items: mislead_v1's neutral merchants in no database
+(section 83); names with clues: mislead_v1's misleading names in no database and novel_merchants_v1_clean's real places (section 57) by
+name group.
+
+**Table 85.1: decider-4B, abstention when nothing can tell, fold 0 (mean over two seeds [range])**
+
+| arm | REAL-6 top-1, no options | REAL-6 top-1, options offered | REAL-6 answers abstaining | evidence-free: "cannot tell" | evidence-free: p >= 0.9 on a real category, no options | same merchants with 2 filings: abstaining | hidden category: "not listed here" | misleading name, not in DB: abstaining | real place, descriptive name: abstaining | real place, chain: abstaining | real place, plain name: abstaining | real places: top-1 with options offered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| no abstention training | 89.6 [88.9, 90.3] | 89.3 [88.9, 89.6] | 0.7 [0.3, 1.0] | 0.0 [0.0, 0.0] | 78.9 [75.0, 82.9] | 0.7 [0.0, 1.3] | 20.6 [16.4, 24.8] | 2.6 [2.6, 2.6] | 1.8 [0.9, 2.7] | 1.0 [0.0, 1.9] | 2.0 [1.0, 3.0] | 75.9 [75.5, 76.2] |
+| "cannot tell" + "not listed here" options | 88.9 [87.9, 89.9] | 87.4 [86.2, 88.6] | 2.3 [2.0, 2.7] | 98.7 [97.4, 100.0] | 44.1 [34.2, 53.9] | 18.4 [13.2, 23.7] | 86.2 [85.2, 87.2] | 37.5 [35.5, 39.5] | 11.4 [8.2, 14.5] | 15.4 [15.4, 15.4] | 36.9 [34.3, 39.4] | 66.7 [65.5, 67.8] |
+| soft uniform targets, no option | 89.1 [87.6, 90.6] | 88.4 [86.9, 89.9] | 0.8 [0.7, 1.0] | 8.6 [5.3, 11.8] | 2.6 [2.6, 2.6] | 2.0 [0.0, 3.9] | 43.6 [33.2, 54.0] | 7.2 [6.6, 7.9] | 3.2 [1.8, 4.5] | 0.0 [0.0, 0.0] | 10.6 [6.1, 15.2] | 73.2 [71.6, 74.7] |
+
+**Table 85.2: the share of items given p >= 0.9 on one real category (no options), and how often those are right, by name group**
+
+| arm | no evidence (neutral, no DB) | misleading name, no DB | real place, descriptive | real place, chain | real place, plain name | REAL-6 auto-filed at 98% (two seeds) |
+|---|---|---|---|---|---|---|
+| no abstention training | 79% | 86% | 95% (95% right) | 96% (82%) | 88% (61%) | 67.1 / 76.8 |
+| "cannot tell" option | 44% | 83% | 97% (93%) | 89% (84%) | 83% (63%) | 75.2 / 72.5 |
+| soft uniform targets | 3% | 67% | 89% (95%) | 91% (81%) | 68% (69%) | 77.2 / 70.1 |
+
+### 85.1 What the step says
+
+- **The trained option learns "unfamiliar merchant", not "no evidence".** It answers "cannot tell" on 99% of evidence-free questions,
+  but also on 37% of real places with plain names, 15% of chains, 11% of descriptive names, 38% of misleading names and 18% of
+  merchants the user has filed twice; with the options offered its top-1 on real places falls from 75.9 to 66.7. A fresh opaque name
+  in training looks like any merchant the model does not know, and those include every real place outside the database.
+- **Soft targets lower confidence in proportion to the evidence.** Confident answers on evidence-free questions fall from 79% to 3%;
+  descriptive names and chains keep 89 to 91% of theirs with the same precision; plain names, the ambiguous ones, fall from 88% to 68%
+  and those left are right more often (69% against 61%). REAL-6 accuracy and auto-file coverage are unchanged within the seed spread.
+  Offered the options anyway, it rarely takes them (0 to 11%).
+- **Recommendation.** Soft targets on evidence-free training questions are the way to have the model say "unsure" (a low top
+  probability that the auto-file threshold turns into a suggestion), with no option to switch off. For a switchable explicit answer,
+  "not listed here" alone (section 79: 92% recall at 1.3% false alarms on hidden categories) remains the candidate; the combination of
+  soft targets and "not listed here" is untested.
+
+Limits: fold 0, two seeds; the evidence-free test merchants are made-up opaque names like the training ones, so "no evidence" is
+tested only in that form.
+
+Tables: `uv run python scripts/cant_tell_tables.py`. Job lists: `scripts/modal_jobs/r84.json`, `r84b.json`.
+
+## 86. Users who alternate between categories at one merchant: the best reader ignores the user's rule (44 to 58% where it is fully visible, as if choosing one category regardless); alternation training teaches it to read the rule (stores 87.5, restaurants 76.6) but not to split its probability where the user's choice is noisy or random (still 85 to 91% confident on 60 / 40 splits) (REAL-18)
+
+PLAN step 86 (the owner, 2026-09-27: some users keep a more specific category, "Date night" or "Cozy time", and use it for some of a
+merchant's transactions). `build_alternation.py` writes `alternation_v1` (512 items, fold 0): per user and merchant (8 general stores,
+8 restaurants, real chains outside REAL-6) a new specific category joins the user's list and six of the 24 shots show the merchant filed
+by a rule: stores' purchases of $40 or more, restaurants' Friday and Saturday visits (observable, ceiling 100); the same with each
+label flipped with probability 0.2 (partial, ceiling about 80); 60 / 40 at random (unobservable, ceiling about 60); never (control:
+the specific category is used by another merchant). `ALT=0.15` (`exp_categoriser.py`): alternation episodes with rules drawn per
+episode (random thresholds $15 to $120, random day sets, 20% noise, or a random 30 to 50% share with the target sampled), names
+coined or from a training list disjoint from the test's. decider-4B, row 81's recipe; three seeds letters, two seeds each random
+labels and random labels + ALT.
+
+**Table 86.1 (stores; rule: amount >= $40 to the specific category): top-1 % (ceiling), mean P(gold), and p >= 0.9 share where a confident answer is wrong in kind**
+
+| reader | observable: top-1 (ceiling 100) | partial: top-1 (ceiling 80) | unobservable: top-1 (ceiling 58) | control: top-1 (ceiling 100) | observable: P(gold) | partial: P(gold) | unobservable: P(gold) | control: P(gold) | unobservable: p >= 0.9 | control: specific category chosen |
+|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 54.2 [50.0, 56.2] | 47.9 [46.9, 48.4] | 44.8 [34.4, 51.6] | 100.0 [100.0, 100.0] | 0.55 [0.52, 0.56] | 0.49 [0.48, 0.49] | 0.45 [0.36, 0.52] | 1.00 [1.00, 1.00] | 87.0 [76.6, 93.8] | 0.0 [0.0, 0.0] |
+| + random labels (row 84 control) | 57.8 [56.2, 59.4] | 49.2 [45.3, 53.1] | 44.5 [42.2, 46.9] | 100.0 [100.0, 100.0] | 0.58 [0.56, 0.60] | 0.51 [0.47, 0.54] | 0.45 [0.42, 0.47] | 1.00 [1.00, 1.00] | 93.0 [89.1, 96.9] | 0.0 [0.0, 0.0] |
+| + random labels + alternation episodes | 87.5 [85.9, 89.1] | 53.9 [50.0, 57.8] | 49.2 [43.8, 54.7] | 100.0 [100.0, 100.0] | 0.86 [0.85, 0.87] | 0.56 [0.52, 0.60] | 0.49 [0.45, 0.54] | 1.00 [1.00, 1.00] | 91.4 [90.6, 92.2] | 0.0 [0.0, 0.0] |
+
+**Table 86.1 (restaurants; rule: Fri / Sat to the specific category): top-1 % (ceiling), mean P(gold), and p >= 0.9 share where a confident answer is wrong in kind**
+
+| reader | observable: top-1 (ceiling 100) | partial: top-1 (ceiling 77) | unobservable: top-1 (ceiling 66) | control: top-1 (ceiling 100) | observable: P(gold) | partial: P(gold) | unobservable: P(gold) | control: P(gold) | unobservable: p >= 0.9 | control: specific category chosen |
+|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 44.3 [42.2, 46.9] | 47.4 [46.9, 48.4] | 55.2 [50.0, 57.8] | 99.5 [98.4, 100.0] | 0.45 [0.43, 0.46] | 0.48 [0.47, 0.48] | 0.53 [0.50, 0.56] | 0.99 [0.98, 1.00] | 83.9 [79.7, 89.1] | 0.0 [0.0, 0.0] |
+| + random labels (row 84 control) | 47.7 [45.3, 50.0] | 45.3 [42.2, 48.4] | 52.3 [45.3, 59.4] | 100.0 [100.0, 100.0] | 0.48 [0.46, 0.50] | 0.46 [0.42, 0.51] | 0.53 [0.48, 0.57] | 1.00 [1.00, 1.00] | 87.5 [87.5, 87.5] | 0.0 [0.0, 0.0] |
+| + random labels + alternation episodes | 76.6 [71.9, 81.2] | 50.0 [45.3, 54.7] | 56.2 [56.2, 56.2] | 100.0 [100.0, 100.0] | 0.75 [0.71, 0.80] | 0.50 [0.45, 0.56] | 0.56 [0.54, 0.58] | 1.00 [1.00, 1.00] | 85.2 [84.4, 85.9] | 0.0 [0.0, 0.0] |
+
+### 86.1 What the step says
+
+- **Untrained, the rule is not read.** Half the queries fall on each side of the rule, and the reader scores about half: it picks one
+  of the two categories whatever the amount or day. It is also confident on the random splits (84 to 93% at p >= 0.9), and never
+  misuses the specific category where the user does not use it for this merchant (control 0%).
+- **Alternation episodes teach the rule.** Stores 57.8 to 87.5, restaurants 47.7 to 76.6 on the observable cell (probability on the
+  gold 0.86 and 0.75); the amount threshold is easier than the day set. The control is unchanged (100%, 0% misuse).
+- **They do not teach calibrated splits.** On the partial and unobservable cells top-1 moves little and the reader stays confident
+  (85 to 91% at p >= 0.9 on 60 / 40 splits). Random-share episodes were about 2.5% of training and answered with a sampled label;
+  the next version gives the partial and random episodes their true split as a soft target (as section 85's soft targets did for
+  evidence-free questions) and a larger share.
+- **Cost.** REAL-6 89.3 and 86.2 over the two seeds (the control 88.9 and 90.3), novel names 87.6 and 85.6: possibly a point or two,
+  inside the seed spread.
+
+Limits: fold 0, two seeds, six shots of the merchant in every item, one test threshold ($40) and one day set (Fri / Sat).
+
+Tables: `uv run python scripts/alternation_tables.py`. Items: `scripts/build_alternation.py`. Job lists: `scripts/modal_jobs/r86*.json`.
+
+## 87. Scale: Qwen3.5-9B in the one-slot layout with the best recipe matches decider-4B (REAL-6 87.2, novel names 89.3, auto-filed 69.1% at 98.1%) and does not pass it; what is left on these sets is taught by training, not bought by size (MODEL-16)
+
+PLAN step 87. Qwen3.5-9B (Apache-2.0), trained in decider's one-slot layout with row 81's recipe + random A..Z labels (shot-label
+loss, database episodes, rename 0.5), 800 steps, one seed; 49 training minutes on one H100 (4B: about 38), 31 GiB peak.
+
+| reader | seeds | REAL-6 top-1 [interval] | top-3 | bits left | auto-filed at 98% (precision) | novel names | misleading-name set, all items | alternation set, all items |
+|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-9B one slot, recipe + random labels | 1 | 87.2 [78.0, 93.4] | 98.3 | 0.63 | 69.1 (98.1) | 89.3 | 40.2 | 60.4 |
+| decider-4B, the same (row 84 control, seed 0) | 1 | 88.9 [80.3, 94.9] | 97.0 | 0.66 | 67.1 (97.0) | – | 40.9 (row 81) | 62.1 (two seeds: 60.5, 63.7) |
+
+The 9B reads like the 4B on every set: REAL-6 is 2 points under its ceiling for both, and the misleading-name, override,
+evidence-free and alternation behaviours of sections 80 to 86 were set by what training showed, not by model size (the 4B untrained
+on them fails them in the same way the 9B does here). Scale is not the lever for these questions; decider-35B-A3B (an H200 run) is
+deprioritised until a set shows a gap that training does not close.
+
+Job list: `scripts/modal_jobs/r87.json`.
+
+## 88. The combined recipe keeps every trained behaviour (misleading names 91.7, the user's override 98.0, confident on evidence-free questions 0.9%, alternation rules read 86.5 / 74.5, and 60 / 40 splits now hedged: 2% confident, from 85 to 93%), at a cost of 1.5 points on REAL-6, 5 on novel names and 14 of auto-file coverage; the confidence it gives up is mostly on REAL-6's coin-flip split categories
+
+PLAN step 88. decider-4B one slot + shot-label loss + database episodes (with mislead_v1's merchants) + rename 0.5 + random A..Z labels
++ lookup / override episodes (0.1) + soft evidence-free questions (0.1) + alternation v2 (`ALT=0.2 ALT_SOFT=1`: noisy and random rules
+drawn as often as observable ones, their targets the true split, `SOFT` in `exp_categoriser.py` read by `exp_decider_finetune.py`),
+three seeds, fold 0, against the readers each piece was measured on (sections 78 to 86).
+
+**Table 88.1: every 2026-09-27 test set, decider-4B readers, fold 0 (mean over seeds [range])**
+
+| reader | seeds | REAL-6 top-1 | REAL-6 auto-filed (precision) | novel names | misleading, in DB | user override | no evidence: p >= 0.9 | alternation observable: stores / restaurants | 60 / 40 splits: p >= 0.9 | real places top-1 | real plain names: p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 3 | 90.2 [88.9, 91.9] | 73.7 [68.8, 76.8] | 89.0 [87.9, 89.9] | 7.9 | 81.0 | 69.7 | 54.2 / 44.3 | 85.4 [78.1, 91.4] | – | – |
+| + random labels (row 84 control) | 2 | 89.6 [88.9, 90.3] | 72.0 [67.1, 76.8] | – | 9.9 [9.2, 10.5] | – | 78.9 [75.0, 82.9] | 57.8 / 47.7 | 90.2 [88.3, 92.2] | 76.2 [75.9, 76.6] | 88.4 [87.9, 88.9] |
+| + soft evidence-free (row 84) | 2 | 89.3 [87.9, 90.6] | 73.7 [70.1, 77.2] | – | 9.2 [9.2, 9.2] | – | 2.6 [2.6, 2.6] | – | – | 74.9 [72.8, 77.0] | 68.2 [66.7, 69.7] |
+| + misleading DB, lookup / override (row 85) | 2 | 89.8 [89.6, 89.9] | 71.0 [66.8, 75.2] | – | 94.7 [93.4, 96.1] | 98.8 [98.5, 99.1] | 60.5 [55.3, 65.8] | – | – | – | – |
+| + alternation v1 (row 86) | 2 | 87.8 [86.2, 89.3] | 60.2 [49.7, 70.8] | 86.6 [85.6, 87.6] | – | – | – | 87.5 / 76.6 | 88.3 [87.5, 89.1] | – | – |
+| combined (row 88) | 3 | 88.7 [86.9, 90.9] | 59.8 [50.3, 68.5] | 84.1 [83.2, 85.6] | 91.7 [89.5, 96.1] | 98.0 [97.1, 98.5] | 0.9 [0.0, 2.6] | 86.5 / 74.5 | 2.1 [1.6, 2.3] | 74.2 [71.6, 75.5] | 58.2 [56.6, 59.6] |
+
+**Table 88.2: alternation v2 on the noisy and random cells (combined recipe, three seeds; section 86's table with this reader)**
+
+| merchants | observable top-1 (ceiling 100) | partial top-1 (ceiling ~80) | partial P(gold) (a matched split: 0.68) | unobservable P(gold) (a matched split: 0.52) | unobservable p >= 0.9 |
+|---|---|---|---|---|---|
+| stores | 86.5 | 53.6 | 0.52 | 0.47 | 3.1% |
+| restaurants | 74.5 | 55.2 | 0.52 | 0.54 | 1.0% |
+
+**Table 88.3: REAL-6 by corrected group (section 48), top-1 and the share given p >= 0.98**
+
+| reader | in history | labelled seen, not in history | determined by category | split category (a coin flip) |
+|---|---|---|---|---|
+| row 81 recipe (3 seeds) | 92.8, 95% | 89.8, 93% | 97.6, 99% | 48.3, 89% |
+| + random labels (2) | 94.3, 96% | 86.1, 93% | 97.6, 98% | 43.1, 90% |
+| + alternation v1 (2) | 92.0, 96% | 83.3, 85% | 98.0, 98% | 37.9, 90% |
+| combined (3) | 94.0, 92% | 85.2, 81% | 97.0, 96% | 40.2, 54% |
+
+### 88.1 What the step says
+
+- **The pieces compose.** Misleading names in the database 91.7 (alone 94.7), the user's override 98.0 (98.8), evidence-free
+  questions confidently answered 0.9% (2.6), the alternation rule read 86.5 / 74.5 (87.5 / 76.6).
+- **Split targets calibrate the random splits.** On the 60 / 40 cells the confident share falls from 85 to 93% to 1 to 3% and the
+  probability on the gold (0.47 and 0.54) matches a reader that knows the split (0.52). On the 80% rule the reader hedges without
+  reading the rule (P(gold) 0.52 where 0.68 is possible): it can tell a user is inconsistent, not yet by how much.
+- **Costs.** REAL-6 88.7 against 90.2; novel names 84.1 against 89.0 (alternation v1 alone: 86.6); auto-filed at the scorecard's 98%
+  threshold 59.8% against 73.7% (alternation v1 alone: 60.2%). By group, the confidence given up is on the split categories (89% to
+  54% at p >= 0.98, where the answer is a coin flip and hedging is right) and on seen merchants whose rows the history lost (93% to
+  81%). The novel-name loss and the auto-file loss both appear with alternation training alone, so alternation is the likely cause:
+  once a user's categories can share a merchant, an unfamiliar category name next to the usual one is a plausible specific category.
+- **Next.** The alternation share: 0.05 and 0.1 inside the combined recipe, two seeds each (row 89).
+
+Limits: fold 0; 298 REAL-6 items (the auto-file coverage moves 50 to 68 across seeds).
+
+Tables: `uv run python scripts/combined_tables.py`, `scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r88.json`.
+
+## 89. The alternation share: at 0.1 the combined recipe keeps the rule reading (88 / 74) and removes the costs of 0.2 (REAL-6 89.9, auto-filed 75.8%, novel names 87.9, against 88.7, 59.8% and 84.1); at 0.05 the rule is lost (59 / 52). The recipe takes ALT = 0.1 (REAL-18)
+
+PLAN step 89. Section 88's combined recipe with the alternation share (v2, split targets) at 0.05 and 0.1 instead of 0.2, two seeds
+each, every set.
+
+**Table 89.1: every 2026-09-27 test set, decider-4B readers, fold 0 (mean over seeds [range])**
+
+| reader | seeds | REAL-6 top-1 | REAL-6 auto-filed (precision) | novel names | misleading, in DB | user override | no evidence: p >= 0.9 | alternation observable: stores / restaurants | 60 / 40 splits: p >= 0.9 | real places top-1 | real plain names: p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| row 81 recipe (letters) | 3 | 90.2 [88.9, 91.9] | 73.7 [68.8, 76.8] | 89.0 [87.9, 89.9] | 7.9 | 81.0 | 69.7 | 54.2 / 44.3 | 85.4 [78.1, 91.4] | – | – |
+| + random labels (row 84 control) | 2 | 89.6 [88.9, 90.3] | 72.0 [67.1, 76.8] | – | 9.9 [9.2, 10.5] | – | 78.9 [75.0, 82.9] | 57.8 / 47.7 | 90.2 [88.3, 92.2] | 76.2 [75.9, 76.6] | 88.4 [87.9, 88.9] |
+| + soft evidence-free (row 84) | 2 | 89.3 [87.9, 90.6] | 73.7 [70.1, 77.2] | – | 9.2 [9.2, 9.2] | – | 2.6 [2.6, 2.6] | – | – | 74.9 [72.8, 77.0] | 68.2 [66.7, 69.7] |
+| + misleading DB, lookup / override (row 85) | 2 | 89.8 [89.6, 89.9] | 71.0 [66.8, 75.2] | – | 94.7 [93.4, 96.1] | 98.8 [98.5, 99.1] | 60.5 [55.3, 65.8] | – | – | – | – |
+| + alternation v1 (row 86) | 2 | 87.8 [86.2, 89.3] | 60.2 [49.7, 70.8] | 86.6 [85.6, 87.6] | – | – | – | 87.5 / 76.6 | 88.3 [87.5, 89.1] | – | – |
+| combined (row 88) | 3 | 88.7 [86.9, 90.9] | 59.8 [50.3, 68.5] | 84.1 [83.2, 85.6] | 91.7 [89.5, 96.1] | 98.0 [97.1, 98.5] | 0.9 [0.0, 2.6] | 86.5 / 74.5 | 2.1 [1.6, 2.3] | 74.2 [71.6, 75.5] | 58.2 [56.6, 59.6] |
+| combined, ALT 0.1 (row 89) | 2 | 89.9 [89.6, 90.3] | 75.8 [68.1, 83.6] | 87.9 [87.2, 88.6] | 94.1 [90.8, 97.4] | 98.2 [98.0, 98.5] | 0.7 [0.0, 1.3] | 88.3 / 74.2 | 11.3 [8.6, 14.1] | 75.1 [74.7, 75.5] | 60.1 [55.6, 64.6] |
+| combined, ALT 0.05 (row 89) | 2 | 90.6 [88.9, 92.3] | 71.6 [70.8, 72.5] | 87.6 [86.6, 88.6] | 96.7 [96.1, 97.4] | 98.0 [98.0, 98.0] | 1.3 [1.3, 1.3] | 59.4 / 52.3 | 2.7 [1.6, 3.9] | 74.7 [74.7, 74.7] | 57.1 [52.5, 61.6] |
+
+At 0.1: REAL-6 and its auto-file coverage are back at the level of the recipe without the new pieces (89.9 and 75.8% against 90.2 and
+73.7%), novel names cost one point (87.9 against 89.0), and every trained behaviour holds (misleading names 94.1, override 98.2,
+evidence-free confident 0.7%, the rule read 88.3 / 74.2); the random 60 / 40 splits are confidently answered 11% of the time (0.2:
+2%; untrained 85 to 93%). At 0.05 the rule is not learned (59.4 / 52.3). **The recipe:** decider-4B one slot + shot-label loss +
+database episodes + rename 0.5 + random A..Z labels + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation v2 0.1.
+
+Job list: `scripts/modal_jobs/r89.json`.
+
+## 90. The final recipe on all 20 users: REAL-6 91.3 by the model alone (97% of the 94.0 ceiling), level with section 70's best run with the merchant lookup in front and 3.9 points above that run alone; novel names 89.4, real places outside the database 75.0; 77% auto-filed at a realised 96.7% (EVAL-9)
+
+PLAN step 90. Section 89's recipe (decider-4B one slot + shot-label loss + database episodes with the misleading-name set + rename 0.5
++ random A..Z labels + lookup / override 0.1 + soft evidence-free questions 0.1 + alternation v2 0.1) trained with each of folds 1, 2
+and 3 held out (fold 0: row 89, seed 0); each fold's model read on its own held-out users; the scorecard's temperature and thresholds
+leave-fold-out.
+
+**Table 90.1: the final recipe, REAL-6 over the held-out users of folds [0, 1, 2, 3] (1179 items)**
+
+| set | n | top-1 [user interval] | top-3 | bits left | auto-filed at 98% (precision) | auto-filed at 95% (precision) |
+|---|---|---|---|---|---|---|
+| REAL-6 | 1179 | 91.3 [87.1, 95.2] | 98.9 | 0.47 | 77.3 (96.7) | 90.2 (95.2) |
+| novel names | 1179 | 89.4 | | | | |
+| real places in no DB | 1198 | 75.0 | | | | |
+
+Per fold top-1: fold 0 89.9 (n=298), fold 1 93.3 (n=300), fold 2 94.9 (n=295), fold 3 86.7 (n=286)
+
+- **Against the best earlier four-fold run** (section 70: Qwen2.5-3B with database episodes, 87.4 alone, 91.3 with the lookup of the
+  user's own label in front): the final recipe reaches the lookup cascade's number with the model alone. The lookup is now inside the
+  model (section 84's lookup episodes), and the rest of the gain is the one-slot reader, rename augmentation and the 4B.
+- **Per fold** 86.7 to 94.9: fold 3 is the hardest, as in earlier sections; the user interval is 87.1 to 95.2.
+- **Auto-filing** 77.3% of items at a realised 96.7% (the leave-fold-out threshold aims at 98% and misses by a point and a half on
+  1,179 items) or 90.2% at 95.2%.
+- **Not yet all users:** the misleading-name, override, abstention and alternation sets are built for fold 0's users only; rebuilding
+  them per fold would extend sections 80 to 89 to every user.
+
+Tables: `uv run python scripts/final_folds_tables.py`. Job list: `scripts/modal_jobs/r90.json`.
+
+## 91. The final recipe's trained behaviours hold on every user: misleading names 93.8, the user's override 98.1, evidence-free items confident 0.6%, alternation rules read 90.1 (stores) and 65.6 (restaurants), random splits confident 7.8%, over the four folds (EVAL-9)
+
+PLAN step 91. The misleading-name, override and alternation sets rebuilt for all 20 users (`build_mislead.py`, `build_override.py`,
+`build_alternation.py --all`: `*_all`, fold 0's items identical to the fold-0 sets), each of section 90's fold models read on its own
+users (fold 0: row 89 seed 0). Scoring only.
+
+**Table 91.1: the final recipe's trained behaviours by fold (each fold's model on its own users) and pooled**
+
+| fold | misleading, in DB | misleading, 2 filings | no evidence: p >= 0.9 | override | override: pulled to DB | alternation observable: stores / restaurants | 60 / 40: p >= 0.9 | control: specific chosen |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 97.4 | 100.0 | 1.3 | 98.5 | 1.5 | 85.9 / 68.8 | 8.6 | 0.0 |
+| 1 | 93.5 | 100.0 | 1.1 | 98.1 | 1.9 | 95.8 / 64.6 | 8.9 | 0.0 |
+| 2 | 93.6 | 98.9 | 0.0 | 97.6 | 2.1 | 89.1 / 65.6 | 7.6 | 0.0 |
+| 3 | 90.8 | 94.7 | 0.0 | 98.2 | 1.5 | 87.5 / 64.6 | 6.2 | 0.0 |
+| **all** | 93.8 | 98.5 | 0.6 | 98.1 | 1.8 | 90.1 / 65.6 | 7.8 | 0.0 |
+
+Every behaviour measured on fold 0 in sections 80 to 89 holds on the other folds within a few points. The weakest is the day-of-week
+rule at restaurants (64.6 to 68.8 against 86 to 96 for the amount rule at stores): a set of days is a harder pattern to read off six
+rows than a threshold, and alternation training draws day rules from five day sets only. Limits: one seed per fold; the training
+users of each fold are the other 15.
+
+Tables: `uv run python scripts/final_behaviours_tables.py`. Job list: `scripts/modal_jobs/r91.json`.
+
+## 92. Random day sets in alternation training make the Friday / Saturday rule worse (restaurants 74.2 to 60.9): the fixed day sets had taught a weekend prior, and reading an arbitrary day rule from six rows is not learned at this exposure; the recipe keeps the fixed sets (REAL-18)
+
+PLAN step 92. Section 91's weakest behaviour is the day-of-week rule. The final recipe with each day rule's days drawn as a random set of
+1 to 3 weekdays (`ALT_DAYS=rand`) instead of five fixed sets (three of which contain Friday or Saturday), two seeds, fold 0.
+
+| reader (two seeds) | stores observable | stores partial | restaurants observable | restaurants P(gold), observable | restaurants partial |
+|---|---|---|---|---|---|
+| final recipe (row 89) | 88.3 | 51.6 | 74.2 | 0.66 | 50.0 |
+| + random day sets | 86.7 | 57.8 | 60.9 | 0.55 | 53.1 |
+
+The hypothesis (too few day sets to learn the rule in general) is rejected: with random sets the Friday / Saturday rule falls 13 points.
+Part of the fixed-set reader's 74 was a prior, weekend visits being the special ones, which matches the test and plausibly real users;
+the general skill of reading which days a user singles out from six rows is not learned by 800 steps at a 10% share. REAL-6 88.9 / 89.3,
+novel names 83.6 / 89.3 (inside the seed spread). The recipe keeps `ALT_DAYS` unset. What would teach the general rule, if it matters:
+more rows of the merchant in the prompt, or a larger share of day-rule episodes.
+
+Tables: `uv run python scripts/alternation_tables.py`. Job list: `scripts/modal_jobs/r92.json`.
+
+## 93. REAL-7, a more realistic synthetic population: REAL-6-trained decider-4B readers score 82 of a 84.8 ceiling zero-shot on 200 new users (untrained 51); the final recipe gains where its training applies (a merchant moved mid-year 38 to 58, idiosyncratic merchants 33 to 39) and loses 3 points on ordinary items and 8 on 25-row histories, most likely by trusting a single misfiled row, since REAL-6 never had one (REAL-11)
+
+PLAN step 93, the first version of row 43 (the owner, 2026-09-27: a more realistic synthetic set). `build_real7.py` writes `real7_v1`
+in REAL-6's prompt format: 200 users none of the readers has seen, about 55% on the default scheme ("Dining Out", "Transportation"),
+30% lightly customised (a few renames, personal categories such as "Date night" that take a merchant's transactions by amount or day)
+and 15% with REAL-6's custom schemes; about 8% of a customising user's merchants filed under another category for their own reasons;
+a year of spending with the 24 most recent rows shown; a merchant moved to another category mid-year (the latest filing wins) and a
+new category created mid-year; 3% of history rows misfiled; one merchant split at random for a tenth of users; a quarter of users
+queried with 0, 5 or 25 rows of history; 30% of queries in a statement family held out of every template; overlapping amounts. Each
+item's `best` is the answer a reader that knew the generator would give from what the prompt shows (a split rule only when two or
+more of the merchant's rows are shown); the ceiling is 84.8. At build: the merchant is in the shots for 54% of items (a lookup of its
+latest row is right on 93.7% of those), and 32% are decided by the merchant's category. Scoring only; the per-option Qwen reader's
+script needs REAL-6's per-user histories and did not run.
+
+**Table 93.1: REAL-7 v1, 200 new users, 1,200 items; ceiling 84.8 (the per-item best answer)**
+
+| reader | seeds | top-1 | % of ceiling | default | light | custom | p >= 0.9: share (precision) |
+|---|---|---|---|---|---|---|---|
+| decider-4B untrained | 1 | 50.9 | 60.0% | 57.2 | 43.3 | 44.6 | 31.3 (83.8) |
+| decider-4B, row 81 recipe | 1 | 82.4 | 97.2% | 89.9 | 78.0 | 65.6 | 98.0 (83.1) |
+| decider-4B, + random labels (row 84 control) | 1 | 82.1 | 96.8% | 89.3 | 77.2 | 67.2 | 98.5 (82.8) |
+| decider-4B, final recipe (row 89) | 2 | 82.0 [81.5, 82.4] | 96.6% | 88.8 [88.3, 89.3] | 77.7 [77.2, 78.2] | 66.9 [66.7, 67.2] | 90.9 (85.0) |
+
+**Table 93.2: top-1 by what decides the item**
+
+| reader | plain (n=867, ceiling 98) | idiosyncratic (n=152, ceiling 40) | moved (n=60, ceiling 55) | new_category (n=49, ceiling 53) | rule_amount (n=29, ceiling 76) | rule_day (n=32, ceiling 75) | random_split (n=11, ceiling 45) |
+|---|---|---|---|---|---|---|---|
+| decider-4B untrained | 59.1 | 24.3 | 40.0 | 34.7 | 13.8 | 50.0 | 9.1 |
+| decider-4B, row 81 recipe | 98.2 | 32.9 | 38.3 | 42.9 | 62.1 | 62.5 | 54.5 |
+| decider-4B, + random labels (row 84 control) | 97.6 | 34.2 | 35.0 | 46.9 | 55.2 | 68.8 | 45.5 |
+| decider-4B, final recipe (row 89) | 95.3 [94.7, 96.0] | 38.8 [38.8, 38.8] | 57.5 [56.7, 58.3] | 45.9 [44.9, 46.9] | 60.3 [58.6, 62.1] | 57.8 [56.2, 59.4] | 45.5 [45.5, 45.5] |
+
+**Table 93.3a: top-1 by history length**
+
+| reader | long (n=906, ceiling 81) | short_25 (n=96, ceiling 94) | short_5 (n=132, ceiling 96) | short_0 (n=66, ceiling 97) |
+|---|---|---|---|---|
+| decider-4B untrained | 49.7 | 61.5 | 52.3 | 50.0 |
+| decider-4B, row 81 recipe | 78.3 | 93.8 | 95.5 | 97.0 |
+| decider-4B, + random labels (row 84 control) | 78.1 | 93.8 | 93.9 | 95.5 |
+| decider-4B, final recipe (row 89) | 78.8 [78.5, 79.1] | 85.9 [85.4, 86.5] | 93.2 [91.7, 94.7] | 97.0 [97.0, 97.0] |
+
+**Table 93.3b: top-1 by rendering and by whether the merchant is in the shots**
+
+| reader | trained rendering, in shots (n=442, ceiling 95) | held-out rendering, in shots (n=207, ceiling 95) | trained rendering, not in shots (n=392, ceiling 73) | held-out rendering, not in shots (n=159, ceiling 73) |
+|---|---|---|---|---|
+| decider-4B untrained | 72.4 | 72.5 | 23.7 | 30.2 |
+| decider-4B, row 81 recipe | 92.1 | 93.7 | 70.7 | 69.8 |
+| decider-4B, + random labels (row 84 control) | 93.2 | 91.3 | 69.6 | 69.8 |
+| decider-4B, final recipe (row 89) | 92.3 [91.6, 93.0] | 93.0 [92.3, 93.7] | 69.1 [68.4, 69.9] | 70.4 [69.8, 71.1] |
+
+### 93.1 What the step says
+
+- **Training transfers to new, messier users.** Untrained decider-4B reads 50.9; every REAL-6-trained reader 82.0 to 82.4, 95 to 97%
+  of the ceiling. Default-scheme users 89 to 90, customised 78, custom 66 to 67. The held-out rendering family costs nothing (93.0
+  against 92.3 in the shots, 70.4 against 69.1 outside), and cold starts are read from the merchant alone (0 rows: 97.0).
+- **The final recipe's training shows where it applies.** A merchant moved mid-year: 57.5 against 38.3 (the override and lookup
+  episodes: the latest filing wins); idiosyncratic merchants 38.8 against 32.9; its confident answers are fewer and more precise
+  (90.9% of items at p >= 0.9, 85.0% right, against 98.0% and 83.1%).
+- **It loses on ordinary items (95.3 against 98.2) and on 25-row histories (85.9 against 93.8).** Of the 16 ordinary items row 81's
+  reader gets and both final seeds miss, 13 have the merchant in the shots; the final reader answers with another of the user's
+  categories, often one a misfiled row gives. REAL-6 has no misfiled rows, and the override episodes taught that the user's own rows
+  of a merchant win; a single stray row now pulls the answer. Hypothesis for row 94: shot-label noise in training (a few misfiled
+  shots, their labels out of the loss) teaches the majority of the user's filings over one stray row.
+- **What REAL-7 does not show yet:** the rules and random splits are few (29 to 32 items each, 11 random), so the alternation gains of
+  section 86 are not visible here; 60 moved and 49 new-category items. A larger v2 with more event items, and training on REAL-7's
+  own users, are the next steps for row 43.
+
+Tables: `uv run python scripts/real7_tables.py`. Items: `scripts/build_real7.py`. Job list: `scripts/modal_jobs/r93.json`.
+
+## 94. Misfiled rows in training fix what REAL-7 exposed (ordinary items 95.3 to 97.5, 25-row histories 85.9 to 94.8) but give back the moved-merchant gain (57.5 to 35.8): one disagreeing row can be a mistake or a change, and nothing in training told them apart (REAL-11)
+
+PLAN step 94. The final recipe with `SHOT_NOISE=0.04` (`exp_categoriser.py`: each shot misfiled under another of the user's categories
+with probability 0.04, its label out of the loss), two seeds, fold 0 training users; REAL-7 zero-shot and the REAL-6-based sets.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category | idiosyncratic | p >= 0.9: share (precision) |
+|---|---|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 | 38.8 | 90.9 (85.0) |
+| + shot noise 0.04 | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 | 36.8 | 94.5 (84.2) |
+
+On the other sets: REAL-6 88.3 / 86.6, novel names 88.9 / 89.9, override 98.1 / 99.9, alternation 66.0 / 64.8 (the final recipe:
+89.9, 87.9, 98.2, about 63).
+
+The hypothesis of section 93 holds: the losses on ordinary items came from a single misfiled shot, and training with misfiled shots
+removes them. The cost is the other side of the same ambiguity: a merchant the user genuinely moved shows as one or two recent rows
+under a new category, which is what a misfile looks like, and the noise-trained reader now discounts them. REAL-7's shots are in time
+order, most recent last; a move is the latest rows switching together, a misfile an isolated row anywhere. Training never showed that
+difference (override rows land at random positions). Row 95 adds move episodes laid out in time: two early rows under the old
+category and the two most recent under the new one, the target following the new, together with the misfiled rows.
+
+Job list: `scripts/modal_jobs/r94.json`.
+
+## 95. Move episodes laid out in time do not recover the moved merchants (35.0 against 57.5 without noise training): REAL-7's moves rarely look like the episodes (the new category's rows are seldom the latest shots, and old rows are rarely shown); the real conflict is a lone unexpected row, which random noise training teaches the reader to distrust (REAL-11)
+
+PLAN step 95. Section 94's recipe (misfiled shots 0.04) + `MOVE=0.1` (`exp_categoriser.py`: two early shots under the old category,
+the two latest under the new, the target following the new), two seeds.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category |
+|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 |
+| + shot noise 0.04 (row 94) | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 |
+| + shot noise + moves in time | 82.2 | 97.8 | 94.8 | 35.0 | 40.8 |
+
+What REAL-7's 60 moved items show: 27 have no row under the new category in the shots (unknowable), 15 exactly one, 18 two or more;
+old-category rows are shown in only 13, and the latest new-category row is the last shot in 7. A move there is mostly a lone row
+filed against the merchant's usual category, which is exactly what a random misfile looks like, and for a real user a lone
+unexpected filing is far likelier to be meant than to be one of 3% of slips. The misfiles that hurt ordinary items (section 93) are
+the other kind: a minority among several rows of one merchant. Row 96 misfiles only there (a merchant with three or more shots, at
+most one misfiled row per merchant), so the majority wins and a lone row stays trusted.
+
+Job list: `scripts/modal_jobs/r95.json`.
+
+## 96. Misfiles only among three or more rows of a merchant keep the fix on ordinary items (97.3) and short histories (92.7) but still lose the moved merchants (39.2 against 57.5): noise training of any kind teaches the majority of a merchant's filings, and a genuine move is the latest filings against an older majority. From the prompt alone the two conflict; the product needs dates or an explicit change signal (REAL-11)
+
+PLAN step 96. The final recipe with `SHOT_NOISE=0.15 SHOT_NOISE_MAJ=1` (`exp_categoriser.py`: a shot is misfiled only when its merchant
+has three or more shots, at most one per merchant; about 4% of shot labels), two seeds.
+
+| reader (REAL-7, two seeds) | all | ordinary items | 25-row histories | merchant moved | new category | idiosyncratic |
+|---|---|---|---|---|---|---|
+| final recipe (row 89) | 82.0 | 95.3 | 85.9 | 57.5 | 45.9 | 38.8 |
+| + shot noise 0.04 (row 94) | 82.2 | 97.5 | 94.8 | 35.8 | 38.8 | 36.8 |
+| + majority-only misfiles | 82.1 | 97.3 | 92.7 | 39.2 | 39.8 | 34.5 |
+
+REAL-6 89.6 / 88.3, novel names 90.3 / 86.9, override 99.7 / 99.4, alternation 68.2 / 69.5: no cost elsewhere. Section 95's count of
+what a move looks like matched the merchant by the first letters of the statement string and missed abbreviated renderings, so it
+undercounted the old rows: moved merchants are frequent, and their shots mostly hold older rows under the old category before the new
+ones. The conflict is then the majority of a merchant's filings (what noise training teaches, and what a slip needs) against the
+latest ones (what a move needs). With one or two new rows and no dates, the prompt cannot tell them apart; the final recipe (no noise)
+and the noise-trained ones sit at the two ends. Candidate fixes are outside the prompt as built: dates on the shots, the user's change
+of a merchant's category as an event the product records, or the lookup's recency rule in front of the model. This line stops here;
+the recipe stays as section 89 (no shot noise), with the trade-off stated.
+
+Job list: `scripts/modal_jobs/r96.json`.
+
+## 97. Confidence when a user's filings of a merchant change, and a correction to sections 95 and 96: the final recipe is shaken where it should be (mixed filings: 38% of answers at p >= 0.9 against 99% on consistent ones, right 96% of the time when it is confident); misfile training makes it steadier and more accurate on mixed filings (98 to 100); what misfile training costs is the lone unexpected row, not recency (REAL-11)
+
+The owner (2026-09-28): does the model's confidence get shaken when a user starts filing a merchant under a new category? REAL-7, the
+final recipe (row 89) and the majority-only misfile reader (row 96), two seeds each. The merchant's rows in the shots are matched by
+several keys of its name (the full-name prefix, the vowel-dropped abbreviation, the first word), which sections 95 and 96 did not do.
+
+**Table 97.1: REAL-7, by what the shots show of the query's merchant (mean of two seeds)**
+
+| merchant's rows in the shots | n | final recipe: top-1 | mean top p | p >= 0.9 | right when p >= 0.9 | + majority-only misfiles: top-1 | mean top p | p >= 0.9 | right when p >= 0.9 |
+|---|---|---|---|---|---|---|---|---|---|
+| consistent filings | 533 | 99.0 | 1.00 | 99% | 99% | 95.3 | 0.99 | 97% | 97% |
+| mixed filings, the latest is the answer | 70 | 74.3 | 0.79 | 38% | 96% | 97.9 | 0.96 | 89% | 100% |
+| mixed filings, the latest is not the answer | 28 | 71.4 | 0.77 | 30% | 83% | 83.9 | 0.96 | 88% | 84% |
+| consistent, but the user has since changed it (not visible) | 29 | 10.3 | 0.97 | 91% | 11% | 19.0 | 0.95 | 88% | 16% |
+| merchant not in the shots | 540 | 70.6 | 0.96 | 93% | 73% | 70.4 | 0.95 | 92% | 73% |
+
+**Table 97.2: moved and idiosyncratic merchants whose visible rows all carry the user's unexpected category, by how many rows show it (majority-only misfile reader, two seeds)**
+
+| rows shown | moved: n, top-1 | idiosyncratic: n, top-1 |
+|---|---|---|
+| 1 | 14, 32 | 19, 47 |
+| 2 | 5, 100 | 9, 94 |
+| 3 or more | 8, 100 | 27, 100 |
+
+- **Yes, the final recipe's confidence is shaken by mixed filings,** and usefully: 38% of those answers are confident against 99% on
+  consistent filings, and the confident ones are right 96% of the time. It is right on 74% of them.
+- **Misfile training (row 96) resolves mixed filings instead of hedging:** 98% right where the latest filing is the answer, 84% where
+  it is not, confident on 89%. It is the better reader of mixed filings.
+- **Its cost is the lone unexpected row.** Where the user's unusual filing shows in exactly one row, it follows the merchant's usual
+  category (32 and 47%); with two rows it follows the user (94 to 100). A misfile in training is always a lone disagreeing row, so a
+  lone row reads as a probable slip. **Correction:** sections 95 and 96 described the cost as the majority of a merchant's filings
+  against the latest ones; with the merchant matched properly the cost is this one-row case, and on mixed filings row 96 is better
+  than row 89. Section 95's count of what moves look like undercounted the rows (first-letters matching).
+- **The dangerous case for both:** the user changed the category but no row shows it yet (29 items): confident (88 to 91% at p >= 0.9)
+  and wrong (11 to 19%). Nothing in the prompt can signal it; the product has to (the change as a recorded event).
+- **Choosing.** Whether one unexpected row should be trusted depends on how often real users slip versus change their mind, which
+  synthetic data cannot say. With real histories, the rate of lone disagreeing rows that the user later reverses would set it.
+
+Tables: `uv run python scripts/real7_filing_tables.py`.
+
+
+## 98. User effort and the auto-file policy: on REAL-7 the model's confidence, calibrated on other users, can auto-file only 3% of transactions at a 98% target, where the owner's rule (the user's last two filings of the merchant agree) auto-files 60% at 94.5% with every error a change the history cannot show yet; history-or-model cuts the user's effort by 45% on REAL-7 and 69% on REAL-6, and asking the model to agree with the history buys nothing (EVAL-10)
+
+PLAN step 97, after the review of 2026-09-28 (QUESTIONS.md, "Review of the categoriser work"). CPU only, over the saved scores of the
+final recipe (row 89, two seeds; row 96's misfile reader beside it) on REAL-7 and of its four fold models on REAL-6.
+
+**Effort** (`scorecard.effort`) is what a user does per transaction: an auto-filed transaction costs 0 when right and 5 when wrong
+(noticing, undoing, refiling; 3 and 10 also read); the rest show the top three suggestions, 1 click when the answer is among them and a
+search (3) when it is not. **Policies:** *model*: its answer when the calibrated confidence clears the 98% (95%) threshold, temperature
+and threshold fitted on the other users (folds by user id mod 4, as the scorecard); *history (last k)*: the category of the user's last
+k filings of the merchant when they agree, over the whole history before the query (what the product holds; `build_real7.generate()`
+now returns it, the frozen items reproduce to the same hash) or over the 24 rows the prompt shows; *history + model agrees*; *history or
+model*. REAL-6's histories are the users' labels for the merchant (not time-ordered).
+
+**Table 98.1: REAL-7 v1, 200 new users, the final recipe (two seeds pooled, 2,400 readings)**
+
+| policy | auto-filed % | precision % | wrong auto-files, % of all | searches, % of all | effort (wrong = 3 / **5** / 10) |
+|---|---|---|---|---|---|
+| none (suggestions only) | 0.0 | – | 0.0 | 11.2 | 1.22 / **1.22** / 1.22 |
+| model at 98% | 2.7 | 95.4 | 0.1 | 11.1 | 1.20 / **1.20** / 1.21 |
+| model at 95% | 7.1 | 89.4 | 0.8 | 10.5 | 1.16 / **1.18** / 1.21 |
+| history, last 2, prompt rows | 35.7 | 98.8 | 0.4 | 10.9 | 0.87 / **0.88** / 0.90 |
+| history, last 2, whole history | 60.1 | 94.5 | 3.3 | 5.4 | 0.61 / **0.67** / 0.84 |
+| history, last 2, whole history + model agrees | 53.9 | 94.4 | 3.0 | 8.8 | 0.73 / **0.79** / 0.94 |
+| history, last 2, whole history, or model at 98% | 60.9 | 94.5 | 3.4 | 5.4 | 0.60 / **0.67** / 0.84 |
+| history, last 3, whole history | 50.9 | 94.4 | 2.8 | 7.0 | 0.72 / **0.77** / 0.91 |
+
+Row 96's misfile reader gives the same history rows and less from the model (98%: 0.2% auto-filed).
+
+**Table 98.2: REAL-7, final recipe seed 0: wrong / auto-filed by what decides the item (the set's 1,200 items: plain 867,
+idiosyncratic 152, moved 60, new category 49, day rule 32, amount rule 29, random split 11)**
+
+| policy | plain | idiosyncratic | moved | new category | amount rule | day rule | random split |
+|---|---|---|---|---|---|---|---|
+| model at 98% | 0 / 39 | 0 / 0 | 1 / 1 | 0 / 0 | 0 / 0 | 0 / 1 | 1 / 2 |
+| history, last 2, whole history | 0 / 514 | 0 / 92 | 17 / 49 | 13 / 37 | 4 / 10 | 4 / 13 | 2 / 6 |
+| + model agrees | 0 / 500 | 0 / 56 | 17 / 45 | 13 / 31 | 3 / 9 | 3 / 9 | 1 / 3 |
+
+**Table 98.3: REAL-6, all 20 users (the final recipe's four fold models, 1,179 items)**
+
+| policy | auto-filed % | precision % | wrong auto-files, % of all | searches, % of all | effort (wrong = 3 / **5** / 10) |
+|---|---|---|---|---|---|
+| none | 0.0 | – | 0.0 | 1.2 | 1.02 / **1.02** / 1.02 |
+| model at 98% | 77.3 | 96.7 | 2.5 | 0.7 | 0.32 / **0.37** / 0.50 |
+| model at 95% | 90.2 | 95.2 | 4.3 | 0.7 | 0.24 / **0.33** / 0.54 |
+| history, last 2 | 24.9 | 100.0 | 0.0 | 1.0 | 0.77 / **0.77** / 0.77 |
+| history, last 2, or model at 98% | 81.6 | 97.1 | 2.4 | 0.6 | 0.27 / **0.32** / 0.43 |
+
+### 98.1 What the step says
+
+- **REAL-6 overstated what the model's confidence can auto-file.** There it files 77% at a realised 96.7%. On REAL-7 the same
+  procedure, fitted on REAL-7's other users, finds almost no threshold that holds 98%: 2.7% auto-filed. The model is confident on
+  most items (section 93: p >= 0.9 on 91%), and its confident errors are the items the prompt cannot answer (a change not yet
+  visible, a user's unusual filing of a merchant not among the 24 rows), so confidence does not separate them.
+- **The owner's rule carries auto-filing.** The user's last two filings of the merchant, over the whole history, auto-file 60% at
+  94.5%. Every error is on a merchant whose filing changed (moved, a new category) or depends on the transaction (amount and day
+  rules, random splits); plain and idiosyncratic merchants are never wrong (606 auto-filed). Within the 24 prompt rows it files 36% at
+  98.8%. REAL-7 over-samples those events (28% of its items are not plain, up to three of each user's six queries); on a natural
+  stream the rule's precision would be higher.
+- **The model agreeing with the history adds no safety.** It agrees with a stale history exactly where the history is wrong (the
+  change is invisible to both), and it vetoes some right idiosyncratic filings (92 to 56 auto-filed). What would catch the changes is
+  the product recording them (section 97), and for the rules, auto-filing only merchants whose filings do not vary.
+- **Effort.** History-or-model: 0.67 against 1.22 with suggestions only on REAL-7 (-45%), 0.32 against 1.02 on REAL-6 (-69%); at
+  wrong = 10 it still wins on both (0.84, 0.43). The model's other contribution is the suggestion list: the top three hold the answer
+  for 89% of REAL-7's items and 99% of REAL-6's.
+- **For row 98.** The history rule works on the whole history and the model sees only the 24 latest rows; giving the model the
+  merchant's own rows (and their dates) is the step that could let its confidence mean what the rule's does, and let it see the
+  move that the last-two rule misses when the change is already in the history.
+
+Tables: `uv run python scripts/effort_tables.py`.
+
+
+## 99. The history slice in the prompt, zero-shot: the payee's own past rows are the whole gain (REAL-7 81.9 to 87.1, ceiling 84.8 to 91.6, merchants the user files unusually 39 to 75); similar payees, one row per category, 48 rows and dates add nothing measurable to a reader never trained on them, and the payee's older rows cost merchants that moved (58 to 50), because the reader counts filings instead of reading the latest (REAL-22)
+
+PLAN step 98, stage 1. The owner (2026-09-28): the production prompt may hold any of the user's history; what is the best slice? This
+payee, similar payees, recent rows, an example of every category, dated and in date order, never a row from the query's future.
+`build_real7_slices.py` rebuilds REAL-7's 1,200 queries with each policy (`real7_v2_<policy>`): the parts *self* (the payee's latest
+rows, up to 6), *sim* (rows of similar payees, up to 6, at most two per payee; similarity by the merchant database's category ("kind"),
+by MiniLM embeddings of the database records ("embrec") or of the names alone ("embname")), *cover* (the latest row of every category not
+yet shown) and *recent* fill a 24-row budget in that priority (48 in `b48`), then go in date order with an ISO date on every row and the
+query. Readers: the final recipe (row 89, two seeds) and the untrained decider-4B, zero-shot on every policy.
+
+**Nothing from the future.** Building the slices found the generator's one-day date jitter dating 5 history rows after their query, and
+its 3% misfiles filing 23 rows under a category created later (4 of those in v1 prompts, which the v1 numbers include; too few to move
+them). The slices clamp dates so they never decrease and never pass the query's, and drop such rows (`past_only`); a check over the built
+sets finds no violation.
+
+**Table 99.1: REAL-7, all 200 users, by policy (final recipe, mean of two seeds [range]; untrained decider-4B, one run)**
+
+| policy | ceiling | payee shown | untrained | final recipe top-1 | % of ceiling | raw p >= 0.9: share (precision) | auto-filed at 98% (precision) | effort, history or model |
+|---|---|---|---|---|---|---|---|---|
+| recent (v1's layout, dated) | 84.8 | 54% | 50.9 | 81.9 [81.6, 82.2] | 96.6% | 91% (85.1) | 2.2 (93.0) | 0.671 |
+| similar (kind) + cover + recent, no payee rows | 84.9 | 53% | – | 82.2 [81.9, 82.6] | 96.9% | 87% (85.0) | 2.4 (97.1) | 0.658 |
+| self + recent | 91.6 | 79% | 60.5 | 87.1 [86.0, 88.2] | 95.1% | 85% (91.6) | 1.1 (89.1) | 0.629 |
+| self + similar (kind) + recent | 91.6 | 79% | – | 87.4 [86.4, 88.4] | 95.5% | 85% (91.7) | 1.5 (91.6) | 0.626 |
+| self + cover + recent | 91.6 | 79% | – | 86.8 [85.8, 87.9] | 94.8% | 83% (91.8) | 3.2 (94.7) | 0.623 |
+| all parts, similar by kind | 91.6 | 79% | 59.2 | 87.2 [86.0, 88.4] | 95.2% | 83% (91.8) | 3.0 (95.9) | 0.622 |
+| all parts, similar by record embedding | 91.6 | 79% | – | 87.1 [86.0, 88.2] | 95.1% | 83% (91.5) | 2.0 (92.4) | 0.624 |
+| all parts, similar by name embedding | 91.6 | 79% | – | 87.3 [86.5, 88.1] | 95.3% | 84% (91.7) | 1.3 (90.5) | 0.628 |
+| all parts, kind, undated | 91.6 | 79% | – | 86.8 [85.8, 87.9] | 94.8% | 82% (91.8) | 6.5 (94.9) | 0.611 |
+| all parts, kind, 48 rows | 91.6 | 79% | – | 87.0 [86.0, 88.0] | 95.0% | 82% (91.7) | 2.2 (95.7) | 0.625 |
+
+**Table 99.2: final recipe top-1 by what decides the item (mean of two seeds)**
+
+| policy | plain (867) | idiosyncratic (152) | moved (60) | new category (49) | amount rule (29) | day rule (32) | random split (11) |
+|---|---|---|---|---|---|---|---|
+| recent | 95.2 | 39.1 | 57.5 | 48.0 | 60.3 | 56.2 | 40.9 |
+| similar + cover + recent | 95.0 | 39.5 | 54.2 | 66.3 | 50.0 | 57.8 | 45.5 |
+| self + recent | 96.3 | 75.0 | 50.0 | 37.8 | 75.9 | 64.1 | 54.5 |
+| all parts, kind | 95.9 | 74.7 | 50.0 | 43.9 | 79.3 | 65.6 | 54.5 |
+| all parts, kind, 48 rows | 96.4 | 74.0 | 44.2 | 39.8 | 79.3 | 64.1 | 59.1 |
+
+### 99.1 What the step says
+
+- **The payee's own rows are the gain.** Showing up to six of them lifts the ceiling from 84.8 to 91.6 and the final recipe from 81.9
+  to 87.1; merchants the user files unusually go from 39 to 75, amount rules from 60 to 76 to 79. The reader stays at 95% of the
+  ceiling, so almost all of the new headroom is used without training.
+- **Nothing else moves zero-shot.** Similar payees (any of the three similarities), one row per category, twice the rows and the dates
+  each change top-1 by under half a point, inside the two-seed range (about 2 points). For custom-scheme users whose payee has no
+  history the similar and cover rows give 38 to 46 without the payee's rows (n = 88 to 90), too few items to separate. The reader was
+  trained on 24 random rows of REAL-6 without dates, so it has no reason to use a row's date or a similar payee's filing; stage 2
+  trains it on these layouts.
+- **More of the payee's rows cost merchants that moved.** Showing the payee's older rows puts more of the old category in the prompt:
+  moved merchants fall from 57.5 to 50 (44 at 48 rows), new-category merchants from 48 to 38 to 44. Without the payee's rows but with a
+  row per category, the one row of the new category is often the only row of the payee shown, and new-category merchants read 66. The
+  reader counts filings; it does not read the latest. Dated training is the test of whether it can learn to (stage 2).
+- **Confidence improves but does not become auto-fileable.** Raw p >= 0.9 precision rises from 85 to 92; the calibrated 98% target
+  still auto-files 1 to 6%. Effort with the history rule in front falls from 0.671 to 0.622.
+
+Tables: `uv run python scripts/slice_tables.py` (the stage 2 rows appear when those runs are in). Job list: `scripts/modal_jobs/r98.json`.
+
+
+## 100. Newer small open decoders with the final recipe: none passes decider-4B; Granite-4.0-micro (3.4B) ties it on REAL-6 and REAL-7 (89.3 / 82.8 against 89.9 / 82.4, one seed) but stores the database less firmly (misleading names 84 against 97), and MiniCPM5-2B, SmolLM3-3B and Phi-4-mini trail by 2 to 10 points, most on novel names and the trained behaviours (MODEL-18)
+
+PLAN step 101 (owner, 2026-09-28: newer decoders under an open licence). Kimi K2 / K2.5 (about 1T parameters, a modified MIT licence
+with an attribution clause) fail the licence rule and any per-transaction budget; Kimi Linear 48B-A3B is plain MIT but 48B; Qwen 3.6 /
+3.8 exist only at 27B and 35B-A3B (deferred: 9B did not pass 4B, section 87, and LoRA at 35B needs more than one H100). The four small
+open candidates were each trained with the final recipe (row 89: one slot, shot-label loss, database episodes with the misleading-name
+set, rename 0.5, random A..Z labels, lookup / override, soft evidence-free questions, alternation 0.1; 800 steps, rank-64 LoRA, one
+seed; LoRA targets extended to Phi-3's fused projections and Granite 4's MLP names) and read on every set.
+
+**Table 100.1: top-1 (REAL-6 sets: fold 0's held-out users; REAL-7: all 200 new users)**
+
+| reader | licence, size | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind (section 99) |
+|---|---|---|---|---|---|
+| decider-4B, final recipe (row 89, seed 0) | Apache-2.0, 4B | 89.9 | 88.6 | 82.4 | 88.4 |
+| Granite-4.0-micro | Apache-2.0, 3.4B | 89.3 | 85.9 | 82.8 | 86.8 |
+| MiniCPM5-2B | Apache-2.0, 2.5B | 88.3 | 78.9 | 80.9 | 83.4 |
+| SmolLM3-3B | Apache-2.0, 3.1B | 86.6 | 84.2 | 81.4 | 86.4 |
+| Phi-4-mini-instruct | MIT, 3.8B | 86.9 | 83.2 | 79.7 | 83.6 |
+
+**Table 100.2: the trained behaviours, fold 0**
+
+| reader | misleading names in the DB | the user's override | alternation rules: stores / restaurants | evidence-free: p >= 0.9 | 60 / 40 splits: p >= 0.9 |
+|---|---|---|---|---|---|
+| decider-4B | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+| Granite-4.0-micro | 84.2 | 97.1 | 70.3 / 56.2 | 0.0 | 5.5 |
+| MiniCPM5-2B | 85.5 | 94.2 | 70.3 / 51.6 | 1.3 | 18.8 |
+| SmolLM3-3B | 77.6 | 96.8 | 71.9 / 48.4 | 1.3 | 26.6 |
+| Phi-4-mini-instruct | 77.6 | 95.9 | 79.7 / 39.1 | 1.3 | 19.5 |
+
+### 100.1 What the step says
+
+- **No newer small decoder passes decider-4B.** On the headline sets every one is within 1 to 4 points on REAL-6 and REAL-7 (the seed
+  spread is about 3), so the recipe, not the base, sets those numbers, as section 87 found for size.
+- **Where they differ is what training has to write into the weights.** Misleading names that only the database can correct read 78 to
+  85 against decider-4B's 97, novel category names 79 to 86 against 89, the day-of-week alternation rule 39 to 56 against 69. decider's
+  multiple-choice pre-training (shuffled labelled options, section 76) is the likely reason it learns the recipe's harder behaviours in
+  800 steps; the others might with more steps.
+- **Granite-4.0-micro is the one to keep in mind**: level with decider on REAL-6 and REAL-7 at 3.4B, weaker on stored facts. One seed each;
+  a second seed and longer training would be needed before preferring any of these to decider-4B.
+- **The soft evidence-free training transfers to every base** (0 to 1.3% confident where nothing can tell); random 60 / 40 splits are
+  hedged less by the weaker readers (19 to 27% confident).
+
+Tables: `uv run python scripts/rematch_tables.py`. Job list: `scripts/modal_jobs/r101.json`. Models `models/adapters/slot_*` (DVC).
+
+
+## 101. Trained on dated history slices of REAL-7-style users, the reader uses the slice: REAL-7 87.2 to 90.9 (99% of the 91.6 ceiling), merchants that moved 50 to 66 and new categories 44 to 77 once rows are dated (undated 51 and 41), and its confidence becomes auto-fileable: 48% of transactions at a realised 97.8% against 3%; REAL-6 and the trained behaviours hold (REAL-6 90.8, misleading names 89, the user's override 98) (REAL-22)
+
+PLAN step 98, stage 2. Section 99's reader had never seen a dated row or a slice built around the payee. Here the final recipe (row 89)
+is trained with 2,400 more episodes from 300 REAL-7-style users generated from seeds disjoint from the test users
+(`build_real7_train.py`, `exp_categoriser.py R7TRAIN`): eight queries each from the second half of their year, no held-out rendering,
+the prompt built by section 99's all-parts policy (similar by kind; `all_kind`) or by a policy drawn per episode from recent / self /
+all_kind / all_embrec / all_kind_b48 (`mix`), with the same past-only guard. The target is the user's intended category even where the
+slice cannot show it (what logged data would hold); the generator's misfiled rows carry no shot-label loss. Two seeds each; everything
+else is row 89.
+
+**Table 101.1: REAL-7, all 200 test users (mean of two seeds [range])**
+
+| slice at test | ceiling | row 89 | + dated slices (all_kind) | + dated slices (mix) | auto-filed at 98%: row 89 / all_kind / mix | effort, history or model: row 89 / all_kind / mix |
+|---|---|---|---|---|---|---|
+| recent (v1's layout, dated) | 84.8 | 81.9 | 84.6 [84.3, 84.9] | 84.8 [84.2, 85.3] | 2.2 / 28.9 / 45.3 | 0.671 / 0.605 / 0.572 |
+| self + recent | 91.6 | 87.1 | 90.1 [89.8, 90.3] | 90.3 [90.2, 90.4] | 1.1 / 42.0 / 48.5 | 0.629 / 0.502 / 0.491 |
+| all parts, kind | 91.6 | 87.2 | **90.9 [90.8, 90.9]** | 90.7 [90.7, 90.8] | 3.0 / **48.3 (97.8)** / 55.0 (97.5) | 0.622 / **0.492** / 0.478 |
+| all parts, record embedding | 91.6 | 87.1 | 90.3 [90.2, 90.4] | 90.2 [90.2, 90.3] | 2.0 / 50.2 / 56.5 | 0.624 / 0.491 / 0.474 |
+| all parts, kind, undated | 91.6 | 86.8 | 89.2 [88.8, 89.7] | 89.3 [88.6, 90.1] | 6.5 / 18.7 / 22.9 | 0.611 / 0.592 / 0.581 |
+| all parts, kind, 48 rows | 91.6 | 87.0 | 90.5 [90.4, 90.5] | 90.2 [89.9, 90.6] | 2.2 / 47.0 / 53.8 | 0.625 / 0.495 / 0.484 |
+
+**Table 101.2: REAL-7 top-1 by what decides the item, all-parts slice (mean of two seeds)**
+
+| reader | plain (867) | idiosyncratic (152) | moved (60) | new category (49) | amount rule (29) | day rule (32) | random split (11) |
+|---|---|---|---|---|---|---|---|
+| row 89 | 95.9 | 74.7 | 50.0 | 43.9 | 79.3 | 65.6 | 54.5 |
+| + dated slices (all_kind) | 98.4 | 77.0 | 65.8 | 76.5 | 62.1 | 65.6 | 40.9 |
+| + dated slices (all_kind), the same prompts undated | 98.7 | 74.7 | 50.8 | 40.8 | 74.1 | 71.9 | 59.1 |
+| + dated slices (mix) | 98.7 | 75.0 | 67.5 | 77.6 | 51.7 | 67.2 | 36.4 |
+
+**Table 101.3: REAL-6 and the trained behaviours, fold 0 (seed 0 / seed 1)**
+
+| reader | REAL-6 | novel names | misleading names in the DB | override | alternation stores / restaurants | evidence-free p >= 0.9 | 60 / 40 splits p >= 0.9 |
+|---|---|---|---|---|---|---|---|
+| row 89 | 89.9 / 89.6 | 88.6 / 87.2 | 97.4 / 90.8 | 98.5 / 98.0 | 85.9 / 68.8, 90.6 / 79.7 | 1.3 / 0.0 | 8.6 / 14.1 |
+| + dated slices (all_kind) | 89.9 / 91.6 | 88.6 / 89.6 | 90.8 / 86.8 | 98.5 / 98.2 | 85.9 / 60.9, 90.6 / 68.8 | 6.6 / 6.6 | 16.4 / 18.0 |
+| + dated slices (mix) | 87.6 / 86.9 | 86.6 / 89.9 | 92.1 / 89.5 | 97.7 / 98.0 | 76.6 / 73.4, 85.9 / 68.8 | 2.6 / 1.3 | 18.0 / 10.2 |
+
+### 101.1 What the step says
+
+- **Trained on the slice, the reader uses it.** With the all-parts slice REAL-7 goes from 87.2 to 90.9, 99% of the ceiling; with the
+  old 24-recent-rows layout from 81.9 to 84.6, at the ceiling. Section 99's zero-shot reader left 4 points of the new headroom unused.
+- **Dates are what let it read a change.** Merchants that moved read 66 and merchants taken by a new category 77 with dated rows; the
+  same trained model on the same prompts without dates reads 51 and 41, where row 89 was. Section 97's open question (a lone
+  unexpected row: slip or change?) is answered in part by the dates: the reader now follows a recent change it can see. A change not
+  yet in the history stays unreadable, as it must.
+- **Confidence becomes auto-fileable.** Calibrated on other users, the 98% target auto-files 48% of REAL-7 at a realised 97.8% (mix:
+  55% at 97.5%), where row 89 managed 3%; effort with the history rule in front falls from 0.622 to 0.492 (mix 0.478). Training on
+  users whose histories contain the events it will meet taught it which answers are safe.
+- **What it costs.** On REAL-7 the amount rules fall from 79 to 62 (mix 52): the REAL-7 users' amount rules are one of many signals in
+  a busy slice, and the dated training weights recency above the amount. On REAL-6 the all_kind reader holds (90.8 mean against 89.8;
+  novel names 89.1 against 87.9, override 98), gives up some of the misleading-name facts (89 against 94) and is confident on 6.6% of
+  evidence-free questions (from under 1%). The mix reader costs REAL-6 2.5 points.
+- **Choice.** The recipe takes the all_kind slices (`R7TRAIN=all_kind`): best REAL-7 top-1, REAL-6 held. For production the slice is:
+  the payee's latest rows (up to 6), a few rows of payees of the same kind, the latest row of each category, recent rows to fill,
+  every row dated, in date order. Similar-payee and per-category rows are not what earns the gain (section 99); the payee's rows and the
+  dates are.
+- **Caveat.** The training users come from the REAL-7 generator, so REAL-7 is now in-distribution for this reader. Row 100's test set,
+  built blind to the training generators, is what can say how much of the gain is the generator.
+
+Tables: `uv run python scripts/slice_tables.py`. Job list: `scripts/modal_jobs/r98b.json`. Models `models/adapters/decider_*_r7*` (DVC).
+
+
+## 102. Encoders trained on the decoder recipe's episodes match decider-4B on REAL-6 and novel names at a third of its scoring time: GLiClass-large (400M) 90.8 and Ettin-encoder-1B 90.9 against 89.8 (novel names 88 against 88), misleading names 93 to 95 against 97; the 30-point gap of sections 62 and 63 was the training data, not the architecture. What they lack is what the recipe's soft targets teach (confident on 50 to 57% of evidence-free questions against 1%) and 3 to 5 points on REAL-7 (MODEL-17)
+
+PLAN step 99 (the review of 2026-09-28; the owner is especially curious about encoders, and doubts that they have the general training to
+match a Qwen out of the box). Sections 62 and 63 compared a 400M encoder with the 3B decoder of that time (REAL-6 53 to 59 against 74
+without the record); the decoders then got database episodes, rename, misleading names, lookup and override, alternation and the
+one-slot layout, and the encoders none of it. Here `exp_encoder_mask.py DEC_EPISODES=1` trains the encoders on exactly the episodes the
+decoder recipe trains on (exp_categoriser.py's builder under the same env), the state being the episode's prompt text after its header
+(the rows, then the query), with one scored position per option as before (Laya's [MASK] layout, or GLiClass's label tokens), full
+fine-tuning at 3e-5, 3,000 steps of 16. The recipe's soft targets (evidence-free questions, random splits) and its shot-label loss have
+no counterpart in this trainer yet.
+
+**First run: memorised.** The builder yields 2,250 episodes per draw; the decoder recipe reads them about 6 times through a LoRA, the
+encoders cycled them 21 times with every weight free, and learned them by heart (final loss 1e-6): ModernBERT 28 on REAL-6, Laya 29,
+Ettin-1B 67. Drawing the builder again whenever its episodes are used up (its shots, renames and database rows are random; two draws
+share no prompt) fixed it. **EuroBERT-2.1B** first gave NaN (transformers 5 leaves the rotary buffer of its bundled transformers-4 code
+uninitialised; recomputed) and then did not learn at all (loss flat at 2.69, ln 14, chance, for 6,000 steps); not diagnosed further.
+
+**Table 102.1: top-1 (REAL-6 sets: fold 0's held-out users; REAL-7: all 200 new users, zero-shot for every reader in this table except
+the two "+ dated REAL-7 slices" rows); mean [range] over two seeds where run; ms per item on one H100, warm (batched / one at a time)**
+
+| reader | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind | ms per item |
+|---|---|---|---|---|---|
+| Laya 395M, REAL-6 episodes (section 62) | 59.1 | – | – | – | 10 / 17 |
+| GLiClass-large, REAL-6 episodes (section 63) | 56.7 | – | – | – | 8 / 20 |
+| ModernBERT-large 395M, recipe episodes | 85.9 | 79.9 | 76.4 | 81.6 | 12 / 23 |
+| Laya 395M, recipe episodes | 85.6 [85.6, 85.6] | 83.7 [79.5, 87.9] | 77.0 | 82.5 | 12 / 21 |
+| **GLiClass-large 400M, recipe episodes** | **90.8 [90.6, 90.9]** | 87.8 [87.6, 87.9] | 78.7 | 81.6 | **10 / 28** |
+| **Ettin-encoder 1B, recipe episodes** | **90.9 [88.9, 93.0]** | **88.1 [87.2, 88.9]** | 80.3 | 83.3 | **14 / 31** |
+| GLiClass-large, + dated REAL-7 slices (see below) | 83.2 | 71.1 | 77.3 | 85.0 | 9 / 18 |
+| decider-4B, final recipe (row 89) | 89.8 [89.6, 89.9] | 87.9 [87.2, 88.6] | 82.0 | 87.2 | 32 / 75 |
+| decider-4B, + dated REAL-7 slices (row 98) | 90.8 [89.9, 91.6] | 89.1 [88.6, 89.6] | – | 90.9 | 32 / 75 |
+
+**Table 102.2: the trained behaviours, fold 0 (first seed)**
+
+| reader | misleading names in the DB | override | alternation stores / restaurants | evidence-free: p >= 0.9 | 60 / 40 splits: p >= 0.9 |
+|---|---|---|---|---|---|
+| ModernBERT-large, recipe episodes | 78.9 | 97.7 | 67.2 / 43.8 | 27.6 | 10.2 |
+| Laya, recipe episodes | 92.1 | 98.2 | 54.7 / 57.8 | 56.6 | 2.3 |
+| GLiClass-large, recipe episodes | 93.4 | 98.2 | 92.2 / 45.3 | 53.9 | 18.0 |
+| Ettin-encoder 1B, recipe episodes | 94.7 | 97.7 | 87.5 / 45.3 | 50.0 | 14.8 |
+| decider-4B, final recipe | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+
+### 102.1 What the step says
+
+- **The encoder gap was the training data.** Given the same episodes, GLiClass-large and Ettin-1B read REAL-6 and novel category names
+  as well as decider-4B, the misleading names that only the database can correct at 93 to 95 (decider 97), the user's override at 98,
+  the amount rule at 88 to 92. Database episodes write merchant facts into a 400M encoder as they do into a 4B decoder (section 53's
+  result carries over), and that knowledge, not the architecture, was what sections 62 and 63 found missing.
+- **General pre-training still shows.** The two that match decider are the ones with the most relevant pre-training: GLiClass (trained
+  for label-conditioned classification) and Ettin (1B, 2T tokens); plain ModernBERT-large and Laya stop at 86 on REAL-6 and 80 to 84 on
+  novel names. The owner's doubt holds for the plain encoders; a larger or task-pre-trained encoder closes it.
+- **Speed.** Warm on one H100: 10 to 14 ms per item batched and 20 to 31 one at a time, against decider-4B's 32 and 75 (one slot,
+  measured in the same job layout, row 99c): about 2.5 to 3 times faster, not the 40 times of section 62, which compared per-option
+  decoder scoring.
+- **What they lack is what the trainer does not teach yet.** Confident on 50 to 57% of evidence-free questions (decider 1%) because the
+  soft uniform targets are not in this trainer; the day-of-week alternation rule at 45 (decider 69); 3 to 5 points behind on REAL-7
+  zero-shot. Dated REAL-7 slices added the same way as for decider lifted GLiClass on REAL-7 v2 (81.6 to 85.0) but cost REAL-6 7.6
+  points and novel names 17: the 2,400 slice episodes are fixed, so every redraw repeated them and the encoder memorised them as in the
+  first run.
+- **Next (row 102):** soft targets (evidence-free uniform, alternation splits) in the encoder trainer, and REAL-7 slices from a pool
+  large enough not to repeat; then the encoder is a full candidate for the production reader at a third of the cost.
+
+Tables: `uv run python scripts/rematch_tables.py`. Job lists: `scripts/modal_jobs/r99.json`, `r99b.json`, `r99c.json`. Models
+`models/adapters/enc*_h100fresh*` (DVC).
+
+
+## 103. A test set built blind to every training generator: decider-4B with the final recipe reads 82.0 (93% of the 87.9 ceiling; blind Opus 91% on a sample) and still auto-files 51% at 97.7%; the dated REAL-7 training of section 101 does not carry its gains (81.0, auto-filing 1%), so the recipe stays row 89's; the encoders read 77.5, level with decider on the user's own patterns and far behind on new users and new merchants (world knowledge); Granite-4.0-micro collapses on users with more than 26 categories (EVAL-11)
+
+PLAN step 100 (the review of 2026-09-28: every behaviour set was built with the training episodes that fix it, and REAL-7 became
+in-distribution for section 101's reader). A subagent given only the product description and the prompt format, and forbidden to read
+the repository's code, data or reports, wrote `scripts/build_blind_v1.py` and `blind_v1`: 250 users over 2025 (six scheme kinds from
+YNAB-like defaults to 35 to 45 detailed or 5 to 7 minimal categories, personal names such as "Food we cook" and "Kid 1"), about 250 real
+chains and billers plus invented local businesses, six bank rendering styles per user, recurring bills and payroll, income and refunds
+as negative amounts, Venmo / Zelle, gas stations that sell snacks, trips, a wedding, categories created mid-year, changes of mind,
+2 to 6% misfiled rows, new users with 0 to 10 rows; the production history slice (section 101); 1,500 queries. Its `best` is the
+builder's own rule-based ideal reader (ceiling 87.9; 118 items unknowable); a blind Opus 5.5 reader, given only the prompts of a
+stratified 120, scored 91% (the builder's ceiling on those 120: 91.7). 399 items have more than 26 options: the one-slot readers,
+trained with A..Z, then draw their labels from all 255 (`oneslot`), which only decider has seen in pre-training.
+
+**Table 103.1: blind_v1, 1,500 items (two seeds where run)**
+
+| reader | top-1 | % of ceiling | top-3 | auto-filed at 98% (precision) | items with > 26 options (399) |
+|---|---|---|---|---|---|
+| decider-4B untrained | 76.4 | 86.9% | 87.5 | 23.8 (97.5) | 78.2 |
+| **decider-4B, final recipe (row 89)** | **82.0 [81.5, 82.5]** | **93.3%** | **91.9** | **51.0 (97.7)** | 83.7 |
+| decider-4B, + dated REAL-7 slices (row 98) | 81.0 [79.8, 82.2] | 92.1% | 88.7 | 1.1 (96.2) | 83.8 |
+| Granite-4.0-micro, final recipe (row 101) | 62.5 | 71.0% | 75.5 | 0.1 | 17.5 |
+| GLiClass-large, recipe episodes (row 99) | 77.6 | 88.2% | 86.8 | 43.3 (97.5) | 83.2 |
+| Ettin-encoder 1B, recipe episodes (row 99) | 77.3 | 87.9% | 88.7 | 43.7 (97.6) | 81.5 |
+
+**Table 103.2: top-1 by what decides the item (the larger groups and the ones that separate the readers)**
+
+| why | n | ceiling | decider untrained | row 89 | row 98 | GLiClass | Ettin-1B |
+|---|---|---|---|---|---|---|---|
+| plain | 511 | 100 | 95 | 98 | 99 | 99 | 99 |
+| recurring | 208 | 100 | 99 | 98 | 97 | 100 | 98 |
+| short history (new users, 0 to 10 rows) | 168 | 80 | 60 | 65 | 62 | 35 | 40 |
+| idiosyncratic | 37 | 100 | 73 | 95 | 96 | 100 | 92 |
+| new merchant, chain | 37 | 92 | 46 | 72 | 68 | 57 | 59 |
+| new merchant, descriptive local name | 37 | 95 | 57 | 64 | 53 | 22 | 38 |
+| changed mind | 36 | 83 | 36 | 64 | 76 | 67 | 64 |
+| new category | 36 | 61 | 39 | 50 | 57 | 42 | 44 |
+| weekday split | 37 | 84 | 49 | 72 | 66 | 73 | 57 |
+| amount split | 36 | 58 | 56 | 65 | 58 | 69 | 69 |
+| trip | 36 | 92 | 58 | 65 | 64 | 67 | 64 |
+| refund | 36 | 86 | 64 | 82 | 79 | 69 | 75 |
+| ambiguous P2P | 37 | 14 | 16 | 18 | 23 | 24 | 19 |
+
+### 103.1 What the step says
+
+- **The recipe transfers.** On a population, merchant universe, rendering and behaviour set it never saw, decider-4B with the row 89
+  recipe reads 82.0, 93% of the ceiling, 5.6 points over the untrained model, and its calibrated confidence still auto-files half the
+  transactions at 97.7%. Its misses are where the builder's own ideal reader also struggles or where a reader must know the world: new
+  users (65 of 80), local businesses never seen (64 of 95), trips (65 of 92).
+- **Section 101's REAL-7 training does not transfer as a whole.** It keeps its one real gain, reading a change through the dates
+  (changed mind 64 to 76, new category 50 to 57), but loses elsewhere (new descriptive merchants 64 to 53) and its confidence no longer
+  supports auto-filing (p >= 0.99 on 612 items at 94% precision, against 1,052 at 95.7% for row 89). The 48% auto-filed at 97.8% of
+  section 101 was calibration to the REAL-7 generator. **Decision:** the recipe stays row 89's; dated slices stay the prompt design
+  (sections 99 and 101 show the payee's rows and dates are what matter), and training on them needs data from more than one
+  generator (or real histories) before it is adopted.
+- **Encoders: level on the user's own patterns, behind on the world.** GLiClass and Ettin match or pass decider on plain, recurring,
+  idiosyncratic and amount-split items, and auto-file 43% at 97.5%; they fall to 35 to 40 on new users (decider 65) and 22 to 38 on new
+  local businesses (decider 64). What a 4B decoder knows about what "Harbor Bakery" or a user's "Kid 1" category is, a 400M to 1B
+  encoder does not: the owner's expectation, now measured. A production design could let an encoder file the user's known payees and
+  hand new users and new merchants to the decoder.
+- **Granite-4.0-micro fails on more than 26 categories** (17.5 on those 399 items; 11 and 20 on the detailed and family schemes): its
+  training showed only A..Z. decider handles them (84) because its own pre-training used all 255 labels. Every production reader must be
+  trained with as many options as users have (row 81: training with rand255 costs nothing).
+- **Caveats.** The ceiling is a rule-based reader's, confirmed within a point by blind Opus on a sample; one blind generator is one
+  more synthetic population, better than none and not a substitute for real histories.
+
+Tables: `uv run python scripts/blind_tables.py`. Job lists: `scripts/modal_jobs/r100.json`, `r100b.json`.
+
+
+## 104. The encoder recipe completed: with the soft targets (evidence-free uniform, alternation splits), Ettin-encoder-1B has every trained behaviour decider-4B has (misleading names 97.4, override 98.0, evidence-free questions 0% confident, random splits hedged) and reads REAL-6 and novel names within a point of it (89.6 / 86.9); with dated REAL-7 slices from a pool that does not repeat it matches decider on REAL-7 (90.6 against 90.9); on the blind set it stays 4 points behind (77.9 to 78.8 against 82.0), the world-knowledge gap of section 103 (MODEL-17)
+
+PLAN step 102. Section 102's encoders lacked what the decoder recipe teaches with soft targets. `exp_encoder_mask.py` now trains them
+too: `EVFREE=0.1` (the query of 10% of episodes replaced by a fresh opaque merchant in no database or history, target uniform over the
+options, dates kept) and the alternation episodes' true splits (the builder's SOFT), with cross-entropy against the target distribution.
+Dated REAL-7 slices come from a 2,400-user pool (`real7train_v1_all_kind_u2400`, 19,200 episodes) with a fresh random 2,400 per draw
+(`R7N`), so the encoder does not see an episode 21 times as in section 102's first attempt. GLiClass-large and Ettin-1B; the slice arm
+two seeds.
+
+**Table 104.1: top-1 (REAL-6 sets: fold 0; REAL-7 and blind_v1: all users); blind_v1's auto-filed share at the 98% target**
+
+| reader | REAL-6 | novel names | REAL-7 v1 | REAL-7 v2 all_kind | blind_v1 | blind auto-filed (precision) |
+|---|---|---|---|---|---|---|
+| GLiClass-large, recipe episodes (section 102) | 90.8 | 87.8 | 78.7 | 81.6 | 77.6 | 43.3 (97.5) |
+| GLiClass-large, + soft targets | 87.2 | 85.6 | 79.4 | 81.9 | 77.6 | 48.7 (97.9) |
+| GLiClass-large, + soft targets + dated slices | 84.4 | 80.7 | 81.0 | 89.7 | 78.6 | 5.9 (96.6) |
+| Ettin-1B, recipe episodes (section 102) | 90.9 | 88.1 | 80.3 | 83.3 | 77.3 | 43.7 (97.6) |
+| **Ettin-1B, + soft targets** | **89.6** | **86.9** | 80.8 | 84.2 | **77.9** | **44.3 (97.4)** |
+| Ettin-1B, + soft targets + dated slices | 90.1 [89.6, 90.6] | 87.8 | 83.0 | 90.6 [90.2, 91.0] | 78.8 | 11.1 (95.8) |
+| decider-4B, final recipe (row 89) | 89.8 | 87.9 | 82.0 | 87.2 | 82.0 | 51.0 (97.7) |
+| decider-4B, + dated slices (row 98) | 90.8 | 89.1 | – | 90.9 | 81.0 | 1.1 (96.2) |
+
+**Table 104.2: the trained behaviours, fold 0**
+
+| reader | misleading names in the DB | override | alternation stores / restaurants | evidence-free p >= 0.9 | 60 / 40 splits p >= 0.9 |
+|---|---|---|---|---|---|
+| Ettin-1B, recipe episodes | 94.7 | 97.7 | 87.5 / 45.3 | 50.0 | 14.8 |
+| **Ettin-1B, + soft targets** | **97.4** | **98.0** | **96.9 / 43.8** | **0.0** | **0.0** |
+| Ettin-1B, + soft targets + dated slices | 89.5 | 98.2 | 96.9 / 51.6 | 1.3 | 10.9 |
+| GLiClass-large, + soft targets | 92.1 | 97.7 | 90.6 / 48.4 | 2.6 | 5.5 |
+| decider-4B, final recipe | 97.4 | 98.5 | 85.9 / 68.8 | 1.3 | 8.6 |
+
+### 104.1 What the step says
+
+- **With the whole recipe, a 1B encoder is decider-4B's equal on everything the recipe teaches.** Ettin-1B with the soft targets reads
+  misleading names, the user's override, amount rules, evidence-free questions and random splits as decider does (or better: the store
+  rule 97 against 86), REAL-6 and novel names within a point, at 14 ms per item batched against 32 (section 102). The soft targets cost
+  GLiClass 3 points on REAL-6; Ettin, the larger and more generally pre-trained encoder, keeps its accuracy.
+- **What remains is what pre-training gives.** The day-of-week rule (44 against 69) and the blind set's new users and new local
+  businesses (section 103) are where decider's knowledge of the world and of weekday habits shows; the blind set keeps Ettin 4 points
+  behind with or without the REAL-7 slices.
+- **The dated REAL-7 slices do for the encoder what they did for decider**: REAL-7 v2 84.2 to 90.6, level with decider's 90.9, and the
+  same loss of transferable confidence on the blind set (auto-filed 44% to 11%). The pool that does not repeat removed the memorisation
+  of section 102 (REAL-6 90.1, novel names 87.8, against 83.2 and 71.1).
+- **Where this leaves Q1.** Encoder or decoder is not the question for this task once the training is the same: the encoder matches on
+  every learned behaviour at a third of the cost, and the decoder keeps a lead exactly where the answer needs knowledge no training
+  episode supplies. Row 104 reads the split (encoder for known payees, decoder for new users and new merchants) by user effort.
+
+Tables: `uv run python scripts/rematch_tables.py`, `uv run python scripts/blind_tables.py`. Job list: `scripts/modal_jobs/r102.json`.
+Models `models/adapters/enc*_ev10soft` (DVC).
+
+
+## 105. Options beyond 26: training with all 255 single-token labels fixes Granite on users with more than 26 categories (17.5 to 83.2; blind_v1 62.5 to 80.6) and costs decider-4B nothing (blind_v1 82.7, those items 85.7 from 84.2, auto-filed 57% from 51%); adding empty coined categories to training (up to 20) lifts novel names to 90.9 and blind auto-filing to 58%; the recipe takes rand255 + empty categories (one seed) (MODEL-16, EVAL-11)
+
+PLAN step 103. Section 103 found that 27% of blind_v1's items (users with 27 to 45 categories) are outside the A..Z labels every one-slot
+reader was trained with; decider copes because its own pre-training used 255 labels, Granite does not. Here the final recipe is
+trained with `LABELS=rand255` (a random sample of decider's 255 single-token labels per question, section 81), and in a second arm with
+`EMPTY=20` (half the episodes get 1 to 20 extra coined categories with no examples, row 74's device, so that training questions also
+reach past 26 options), on decider-4B and Granite-4.0-micro; one seed each; read with rand255 labels.
+
+**Table 105.1: top-1 (REAL-6 sets fold 0; REAL-7 and blind_v1 all users) and blind_v1's calibrated auto-filing**
+
+| reader | REAL-6 | novel names | REAL-7 v2 all_kind | blind_v1 | blind, > 26 options (399) | blind auto-filed at 98% (precision) | misleading names in the DB |
+|---|---|---|---|---|---|---|---|
+| decider-4B, rand26 (row 89, seed 0) | 89.9 | 88.6 | 88.4 | 82.5 | 84.2 | 50.8 (97.8) | 97.4 |
+| decider-4B, rand255 | 90.3 | 85.9 | 87.4 | 82.7 | 85.7 | 56.8 (97.7) | 93.4 |
+| **decider-4B, rand255 + empty categories** | 89.9 | **90.9** | 86.0 | 82.4 | **86.2** | **58.3 (97.7)** | 94.7 |
+| Granite-4.0-micro, rand26 (row 101) | 89.3 | 85.9 | 86.8 | 62.5 | 17.5 | 0.1 | 84.2 |
+| Granite-4.0-micro, rand255 | 84.9 | 81.5 | 84.6 | 80.6 | 83.2 | 23.8 (96.6) | 78.9 |
+| Granite-4.0-micro, rand255 + empty categories | 89.3 | 84.6 | 84.4 | 79.9 | 81.5 | 19.9 (98.0) | 78.9 |
+
+### 105.1 What the step says
+
+- **A one-slot reader must be trained on as many labels as users have categories.** Granite trained on A..Z reads two-letter labels
+  at 17.5; trained on all 255 it reads them at 83, and the blind set at 80.6 from 62.5.
+- **decider loses nothing by training on 255 labels, and its confidence gains.** Top-1 moves within a point everywhere (the seed spread
+  is about 3; misleading names 93 to 95 against 97 and 91 for row 89's two seeds); the blind set's calibrated 98% threshold auto-files
+  57 to 58% against 51%.
+- **Empty categories help novel names** (90.9 against 88.6 and 85.9): questions with unused coined options teach the reader not to lean
+  on a category having examples, as section 71 found for label induction.
+- **Decision:** the recipe takes `LABELS=rand255 EMPTY=20` (one seed; a second seed is in row 104's runs to come). Granite stays behind
+  decider on stored facts (misleading names 79) and is not a replacement.
+
+Job list: `scripts/modal_jobs/r103.json`.
+
+
+## 106. A small dose of dated slices keeps what section 101 gained and what section 103 found it lost: 300 episodes drawn from a 2,400-user REAL-7 pool lift blind_v1 to 83.5 (from 82.5) with auto-filing intact (51.7% at 97.9%) and changes of mind to 78 (from 69); the collapse of section 103 came from 2,400 fixed episodes of 300 users, not from dated training (REAL-22, EVAL-11)
+
+PLAN step 104 (first part). Section 103: decider trained with 2,400 dated slice episodes from 300 REAL-7-style users (row 98) read blind_v1
+no better than row 89 and could no longer auto-file there. Here the same recipe takes a random 300, 600 or 1,200 episodes from the
+2,400-user pool of section 104 (`R7TRAIN=all_kind_u2400 R7N=n`) beside its 2,250 REAL-6 episodes; one seed each.
+
+**Table 106.1: decider-4B, row 89's recipe with n dated REAL-7 slice episodes (seed 0)**
+
+| slice episodes | REAL-6 | novel names | REAL-7 v2 all_kind | blind_v1 | blind auto-filed at 98% (precision) | blind: changed mind / new category | misleading names in the DB |
+|---|---|---|---|---|---|---|---|
+| none (row 89) | 89.9 | 88.6 | 88.4 | 82.5 | 50.8 (97.8) | 69 / 53 | 97.4 |
+| **300 from 2,400 users** | **90.6** | **89.9** | 88.9 | **83.5** | **51.7 (97.9)** | **78 / 61** | 94.7 |
+| 600 from 2,400 users | 89.6 | 87.9 | 90.1 | 82.1 | 45.5 (98.0) | 67 / 58 | 92.1 |
+| 1,200 from 2,400 users | 89.3 | 86.6 | 90.8 | 82.7 | 43.8 (98.0) | 75 / 61 | 97.4 |
+| 2,400 from 300 users (row 98) | 89.9 | 88.6 | 90.9 | 79.8 | 0.9 (92.3) | 75 / 56 | 90.8 |
+
+### 106.1 What the step says
+
+- **The auto-file collapse was the dose and the narrowness, not the dates.** Drawn from 2,400 users, 300 to 1,200 slice episodes keep
+  blind_v1's calibrated auto-filing at 44 to 52% (row 98: 1%) and its top-1 at 82 to 83.5, while REAL-7 gains 0.5 to 2.4 points and the
+  blind set's changes of mind 6 to 9. 2,400 episodes from 300 users made REAL-7's population half of training and tuned the reader's
+  confidence to it.
+- **More slices buy REAL-7 (in-distribution) and cost auto-filing elsewhere**: REAL-7 rises with the dose (88.9, 90.1, 90.8) while the
+  blind auto-filed share falls (52, 46, 44). 300 is the best compromise read on the blind set; one seed each, so the ordering of 300 and
+  1,200 on top-1 is inside the seed spread, the auto-filing trend is not.
+- **Decision:** the recipe adds `R7TRAIN=all_kind_u2400 R7N=300` (dated slices at a small dose from a wide pool) to section 105's
+  rand255 + empty categories; row 105 trains the combination with two seeds.
+
+Job list: `scripts/modal_jobs/r104.json`.
+
+
+## 107. The recipe, settled on the blind set by user effort: row 89 + 255 labels + empty categories (blind_v1 82.6, auto-filed 55% at 97.6%, effort 0.63 to 0.69); adding the 300 dated slices on top lifts top-1 (83.1) and REAL-7 (89.1) but costs REAL-6 2 points and auto-filing (40%, effort 0.75 to 0.88), so it stays out; the encoder filing first and decider reading the rest is the best system (effort 0.59 to 0.63, decider reads 56% of transactions) (EVAL-10, EVAL-11, REAL-22)
+
+PLAN steps 104 and 105. Sections 105 and 106 each improved on row 89 alone; recipe v2 trains both changes together (rand255 + EMPTY=20
++ 300 dated slices from the 2,400-user pool), two seeds. The choice between recipes is read on blind_v1 by user effort
+(`scorecard.effort`: auto-filed right 0, wrong 5, top-3 suggestion 1, search 3; auto-filing at each model's own calibrated 98%
+threshold), with the model alone and behind the encoder (Ettin-1B, section 104's recipe, auto-files what clears its own 98% threshold;
+decider reads the rest).
+
+**Table 107.1: decider-4B recipes (mean [range] over seeds; `scripts/recipe_tables.py`)**
+
+| recipe | seeds | REAL-6 | novel names | REAL-7 v2 | blind_v1 | blind > 26 options | blind auto-filed (precision) | misleading | alternation stores / restaurants |
+|---|---|---|---|---|---|---|---|---|---|
+| row 89 (rand26) | 2 | 89.8 | 87.9 | 87.2 | 82.0 | 83.7 | 51.0 (97.7) | 94.1 | 88.3 / 74.2 |
+| **+ rand255 + empty categories** | 2 | 89.3 | **89.3** | 87.0 | 82.6 | 86.2 | **55.0 (97.6)** | 93.4 | 82.0 / 70.3 |
+| + 300 dated slices | 1 | 90.6 | 89.9 | 88.9 | 83.5 | 87.7 | 51.7 (97.9) | 94.7 | 73.4 / 67.2 |
+| recipe v2 (both) | 2 | 87.4 | 88.8 | 89.1 | 83.1 | 87.1 | 39.7 (97.6) | 92.1 | 83.6 / 73.4 |
+
+**Table 107.2: blind_v1, user effort per transaction (lower is better)**
+
+| recipe | seed | decider alone: effort (auto-filed %) | encoder first, decider for the rest: effort (auto-filed %) |
+|---|---|---|---|
+| row 89 | 0 / 1 | 0.693 (50.8) / 0.702 (51.3) | 0.621 (59.1) / 0.631 (59.3) |
+| **+ rand255 + empty** | 0 / 1 | **0.627 (58.3) / 0.691 (51.7)** | **0.588 (63.3) / 0.629 (58.9)** |
+| + 300 dated slices | 0 | 0.704 (51.7) | 0.631 (60.5) |
+| recipe v2 | 0 / 1 | 0.753 (47.1) / 0.878 (32.3) | 0.645 (59.9) / 0.692 (53.8) |
+
+### 107.1 What the step says
+
+- **The changes do not add.** Each of 255 labels + empty categories and 300 dated slices helps alone; together the reader is more
+  accurate on the blind set (83.1) and REAL-7 (89.1) but less sure of itself where it matters (auto-filing 40%, one seed 32%) and 2
+  points lower on REAL-6. Two augmentations that each widen what the reader sees (more options, a new population) seem to share the
+  same training budget; 800 steps may be too few for both (not tested).
+- **Decision: the recipe is row 89 + `LABELS=rand255 EMPTY=20`.** Best effort alone and behind the encoder, auto-files most at 97.6%,
+  and handles users with any number of categories. Dated slices stay the prompt design (sections 99, 101: the payee's rows and the
+  dates are what a reader needs) and out of training until they can be added without the confidence cost, or real histories exist.
+- **The system: history rule, encoder, decoder.** With the owner's rule in front (section 98) and the encoder filing what it is sure of,
+  decider reads 56% of transactions; the blind set's effort falls from 0.69 (decider alone) to 0.59 to 0.63. The encoder is three times
+  cheaper per item (section 102), so the cascade is also the cheaper system.
+
+Tables: `uv run python scripts/recipe_tables.py`, `uv run python scripts/split_tables.py`. Job list: `scripts/modal_jobs/r106.json`.
+
+
+## 108. Real business names as training episodes close the encoder's knowledge gap on merchants: Ettin-1B reads real businesses in no database at 73 / 48 / 65 (descriptive / plain / chain names) from 30 / 18 / 37, level with decider-4B trained the same way; decider gains too (66 to 77 on descriptive names, blind_v1 83.6) but auto-files less on the blind set (55% to 42%); the encoder recipe takes them, decider's does not yet (MODEL-17, REAL-19)
+
+PLAN step 107. Section 103 left the encoder 20 to 40 points behind decider on new local businesses: a 4B decoder knows what "Harbor
+Bakery" is, a 1B encoder trained on 240 REAL-6 merchants does not. `build_overture_pool.py` draws 33,555 real US businesses from
+Overture places with the novel-merchant builder's category mapping (16,950 with a word for their kind in the name, 14,153 without,
+2,452 chain locations), leaving out every place of the novel-merchant test set and every blind_v1 merchant name;
+`exp_categoriser.py OVDB=0.2` gives a fifth of the training episodes a target and four shots from the pool, filed under the training
+user's category for the place's standard category. decider-4B with the recipe (two seeds) and Ettin-1B with the encoder recipe.
+
+**Table 108.1: `scripts/overture_ep_tables.py` (mean [range] over seeds)**
+
+| reader | real businesses in no DB (novel_merchants_v1, fold 0): descriptive / plain / chain | blind_v1 | blind new merchants: descriptive / chain | blind new users | blind auto-filed at 98% | REAL-6 | novel names | misleading names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, recipe | 65.9 / 44.4 / 58.7 | 82.6 | 68.9 / 74.3 | 64.6 | 55.0 | 89.3 | 89.3 | 93.4 |
+| decider-4B, + Overture episodes | **77.3 / 48.5 / 65.4** | **83.6** | 75.7 / 68.9 | **69.6** | 41.8 | 87.8 | 86.2 | 92.1 |
+| Ettin-1B, encoder recipe | 30.0 / 18.2 / 36.5 | 77.9 | 43.2 / 59.5 | 42.3 | 44.3 | 89.6 | 86.9 | 97.4 |
+| **Ettin-1B, + Overture episodes** | **72.7 / 47.5 / 65.4** | 77.7 | **62.2 / 64.9** | 44.6 | 42.2 | 88.6 | 88.6 | 90.8 |
+
+### 108.1 What the step says
+
+- **The encoder's merchant knowledge was missing training, not capacity.** Filing real business names in training lifts Ettin-1B on
+  unknown real businesses by 29 to 43 points, to decider's level on each name group; on the blind set's new local businesses from 43
+  to 62. As with database episodes (section 53) and the recipe's episodes (section 102), what the encoder lacked was the decisions, not
+  the architecture.
+- **What stays behind is the new user.** With 0 to 10 rows of history the encoder reads 45 (decider 65 to 70): with nothing of the user
+  to copy, the answer depends on what the user's category names mean ("Food we cook", "Wheels"), which real business names do not
+  teach. Label-induction and coined-name training (sections 60, 71) are the candidates.
+- **decider gains on knowledge and loses confidence again.** Novel merchants +5 to +11, blind top-1 83.6 and new users 70, but the blind
+  set's calibrated auto-filing falls from 55% to 42% and REAL-6 and novel names lose 1.5 to 3; the same pattern as the dated slices of
+  section 107: every added episode family so far has cost decider auto-file coverage on the blind set. A smaller share is the next test.
+- **Decisions:** the encoder recipe takes `OVDB=0.2` (Ettin's REAL-6 −1, misleading names 91 from 97 is the price); decider's recipe
+  does not yet. The pool keeps each place's Overture id and per-row sources (licences).
+
+Job list: `scripts/modal_jobs/r108.json`.
+
+
+## 109. Twice the training does not make the augmentations add: at 1,600 steps the recipe loses REAL-6 and auto-filing (87.6, 46%), recipe v2 gets its confidence back on average (auto-filing 54.5%) with a seed spread of 18 points; by user effort on blind_v1 the 800-step recipe of section 107 stays best and steadiest (0.66 alone, 0.61 behind the encoder) (EVAL-10, EVAL-11)
+
+PLAN step 106. Section 107 guessed that recipe v2's two augmentations (255 labels with empty categories, and 300 dated slices) share too
+small a budget at 800 steps. Both the recipe and recipe v2 were trained for 1,600, two seeds each.
+
+**Table 109.1: decider-4B, blind_v1 by user effort (`scripts/recipe_effort_tables.py`; mean [range] over seeds) and the other sets
+(`scripts/recipe_tables.py`)**
+
+| recipe | steps | REAL-6 | REAL-7 v2 | blind_v1 | blind auto-filed | effort alone | effort, encoder first |
+|---|---|---|---|---|---|---|---|
+| row 89 | 800 | 89.8 | 87.2 | 82.0 | 51.0 | 0.697 | 0.626 |
+| **rand255 + empty (the recipe)** | 800 | 89.3 | 87.0 | 82.6 | 55.0 | **0.659 [0.627, 0.691]** | **0.608 [0.588, 0.629]** |
+| recipe v2 | 800 | 87.4 | 89.1 | 83.1 | 39.7 | 0.815 [0.753, 0.878] | 0.668 |
+| rand255 + empty | 1,600 | 87.6 | 87.2 | 82.2 | 46.4 | 0.745 | 0.653 |
+| recipe v2 | 1,600 | 89.3 | 89.7 | 82.2 | 54.5 [45.7, 63.4] | 0.693 [0.607, 0.779] | 0.632 [0.593, 0.672] |
+
+### 109.1 What the step says
+
+- **More steps are not the fix.** The recipe at 1,600 steps is worse on every blind measure (auto-filing 55 to 46%) and on REAL-6: 800
+  steps was already its point (section 49's under-training was for the plain SFT categoriser without the shot-label loss).
+- **Recipe v2 recovers at 1,600 steps on average, not reliably**: one seed auto-files 63% of the blind set (effort 0.607, the best
+  single run so far), the other 46% (0.779). Calibrated auto-filing is the most seed-sensitive measure here; reading it needs three or
+  more seeds.
+- **Decision:** the recipe stays section 107's (row 89 + `LABELS=rand255 EMPTY=20`, 800 steps). Recipe v2 at 1,600 steps is a candidate
+  worth three more seeds if REAL-7-style changes (moves, new categories) turn out common in real histories.
+
+Job list: `scripts/modal_jobs/r107.json`.
+
+
+## 110. New users are not a missing episode shape: training with 0 to 10 shots in 15% of episodes leaves both readers where they were on blind_v1's new users (decider 62 against 65, Ettin 45); empty categories do for the encoder what they did for decider, and the encoder with Overture episodes, short histories and empty categories is the best encoder so far (blind 79.3, auto-filed 52%, REAL-6 90.9, misleading names 97.4); in front of decider it gives the best system (blind effort 0.57 to 0.60, decider reads 48%) (EVAL-11, MODEL-17)
+
+PLAN step 108. Every training episode so far had 24 shots, and blind_v1's weakest group for both readers is new users with 0 to 10
+rows. `exp_categoriser.py SHORT=0.15` keeps 0 to 10 of the shots in 15% of episodes. Arms: decider-4B's recipe + SHORT (two seeds), +
+OVDB 0.05 (section 108's Overture episodes at a quarter of the share), + both; Ettin-1B's encoder recipe + OVDB 0.2 + SHORT, and + EMPTY
+20. One seed unless noted. `scripts/overture_ep_tables.py`.
+
+**Table 110.1**
+
+| reader | real businesses in no DB: descriptive / plain / chain | blind_v1 | blind new users | blind auto-filed at 98% | REAL-6 | novel names | misleading names |
+|---|---|---|---|---|---|---|---|
+| decider-4B, recipe (two seeds) | 65.9 / 44.4 / 58.7 | 82.6 | 64.6 | 55.0 | 89.3 | 89.3 | 93.4 |
+| + short histories (two seeds) | 64.5 / 41.9 / 53.8 | 80.8 | 62.2 | 51.0 | 87.6 | 87.9 | 91.4 |
+| + Overture 0.05 | 69.1 / 39.4 / 59.6 | 82.7 | 63.1 | 50.6 | 87.2 | 86.9 | 93.4 |
+| + Overture 0.05 + short | 70.0 / 42.4 / 55.8 | 83.1 | 67.9 | 45.5 | 90.9 | 87.2 | 92.1 |
+| Ettin-1B, encoder recipe | 30.0 / 18.2 / 36.5 | 77.9 | 42.3 | 44.3 | 89.6 | 86.9 | 97.4 |
+| + Overture 0.2 (section 108) | 72.7 / 47.5 / 65.4 | 77.7 | 44.6 | 42.2 | 88.6 | 88.6 | 90.8 |
+| + Overture 0.2 + short | 80.9 / 56.6 / 61.5 | 77.5 | 45.2 | 37.4 | 87.9 | 88.6 | 93.4 |
+| **+ Overture 0.2 + short + empty categories** | 79.1 / 48.5 / 57.7 | **79.3** | 44.6 | **52.2** | **90.9** | **89.3** | **97.4** |
+
+**Table 110.2: blind_v1, the system (the encoder auto-files at its own calibrated 98% threshold, decider-4B's recipe reads the rest)**
+
+| encoder in front | decider seed | effort | auto-filed (precision) | decider reads |
+|---|---|---|---|---|
+| Ettin-1B, encoder recipe (section 107) | 0 / 1 | 0.588 / 0.629 | 63.3 / 58.9 (97.5 / 97.4) | 56% |
+| **Ettin-1B, + Overture + short + empty** | 0 / 1 | **0.571 / 0.601** | **65.2 / 62.0 (97.4)** | **48%** |
+| none (decider alone) | 0 / 1 | 0.627 / 0.691 | 58.3 / 51.7 | 100% |
+
+### 110.1 What the step says
+
+- **Short histories in training do not help new users.** Neither reader moves on blind_v1's new users; decider loses a little
+  elsewhere. A new user's items are hard because the answer rests on what their category names mean with nothing of theirs to copy,
+  and 24-shot episodes already teach that when the query's merchant is absent from the shots.
+- **Empty categories help the encoder** as they helped decider (section 105): with them Ettin's blind top-1 rises 2 points, its
+  auto-filing 15 points, and REAL-6, novel names and misleading names all recover what the Overture episodes cost.
+- **Decisions.** The encoder recipe is Ettin-1B + `OVDB=0.2 SHORT=0.15 EMPTY=20` (SHORT is neutral; kept because this is the run that
+  measured best, one seed). decider's recipe is unchanged: the Overture episodes at 0.05 give nothing clear, at 0.2 they cost
+  auto-filing (section 108).
+- **The system.** This encoder in front of decider auto-files 62 to 65% of blind_v1 at 97.4% and leaves decider 48% of the
+  transactions; effort 0.57 to 0.60 against 0.63 to 0.69 for decider alone.
+
+Job lists: `scripts/modal_jobs/r109.json`, `r109b.json` (one relaunch after a Modal GPU hardware error).
+
+
+## 111. Kinds outside the twelve spending categories (income, housing, insurance, loans, subscriptions, transfers, fees, cash and others) in training lift new users' bill and income transactions on blind_v1 (decider 55 to 74, the encoder 26 to 42; 19 items) and cost the encoder nothing (blind 79.8, auto-filed 56%, REAL-6 91.3); decider pays 3 points on REAL-6 and 5 on novel names at a 20% share, so its recipe waits for a smaller share (EVAL-11, MODEL-17)
+
+PLAN step 109. Section 110 found that most of blind_v1's new-user misses were transactions of kinds no training episode contained
+(a payroll deposit, an insurance premium, a car-loan payment, a gas bill): REAL-6's world has twelve spending categories and nothing
+else. `ai_experiments.kinds` catalogues thirteen kinds from general knowledge of US budgets (income, rent / mortgage, insurance, loans,
+subscriptions, savings transfers, personal care, gifts, donations, childcare, education, bank fees, cash): payees, statement styles
+(payroll "DIR DEP" / "PPD ID", ACH debits, card, transfer, ATM, fee lines), amounts (recurring ones fixed per user), signs (income
+negative) and the names users give such categories; any payee whose name blind_v1 uses is dropped. `exp_categoriser.py KINDS=0.2`: a
+fifth of episodes add one to three such categories at random places in the list, usually with one to three of the user's rows of that
+kind among the shots, sometimes with the name alone, and sometimes the target. **Caveat:** this row was motivated by reading blind_v1's
+errors, so blind_v1 is less blind for it; the kinds themselves are standard budget categories, not blind_v1's.
+
+**Table 111.1 (decider two seeds, encoder one)**
+
+| reader | blind_v1 | blind new users: bill / income-like (19) / other (149) | blind auto-filed at 98% | REAL-6 | novel names | real businesses in no DB (descriptive) | misleading names |
+|---|---|---|---|---|---|---|---|
+| decider-4B, recipe | 82.6 | 55 / 66 | 55.0 | 89.3 | 89.3 | 65.9 | 93.4 |
+| decider-4B, + kinds | 83.1 | **74** / 67 | 51.3 | 86.1 | 84.7 | 61.8 | 91.4 |
+| Ettin-1B, encoder recipe (section 110, two seeds) | 79.3 | 26 / 50 | 43.1 | 88.8 | 88.9 | 80.0 | 94.7 |
+| **Ettin-1B, + kinds** | **79.8** | **42** / 49 | **56.1** | **91.3** | **90.9** | 82.7 | 92.1 |
+
+### 111.1 What the step says
+
+- **The new-user misses were a gap in the training world.** With income, bills and transfers in training, decider files a new user's
+  payroll and bills at 74 (from 55) and the encoder at 42 (from 26); other new-user items do not move. The encoder, with less world
+  knowledge, still trails there.
+- **The encoder takes them at no cost** (one seed): blind top-1, auto-filing, REAL-6 and novel names all at or above section 110's.
+  Encoder recipe: Ettin-1B + `OVDB=0.2 SHORT=0.15 EMPTY=20 KINDS=0.2`.
+- **decider pays for them** at a 20% share: REAL-6 −3, novel names −5, blind auto-filing −4. As with every added episode family, decider
+  trades REAL-6-style reading for the new family; a 10% share is tested in the three-seed batch that follows.
+- **Section 110's second encoder seed** repeats the first on the blind set (79.3 both) and REAL-6 (86.6 / 90.9), with auto-filing at
+  34 and 52%: auto-filing is the seed-sensitive measure for the encoder too.
+
+Tables: `uv run python scripts/overture_ep_tables.py`. Job lists: `scripts/modal_jobs/r110.json`, `r111.json`.
+
+
+## 112. The system over three seeds of each part: on blind_v1 the encoder filing first and decider reading the rest auto-files 63.5% at 97.5% (range over nine seed pairs 59.8 to 65.5) for an effort of 0.588 (0.567 to 0.619), against 0.655 for decider alone and 0.715 for the encoder alone; decider reads 48% of transactions. Kinds at a 10% share still cost decider 3 to 4 points on REAL-6 and novel names for +0.5 on the blind set, so decider's recipe stays (EVAL-10, EVAL-11)
+
+PLAN step 110. Calibrated auto-filing varied from 34 to 63% across seeds of one recipe (sections 109, 111), so the system's numbers need
+more than one seed of each part. Three seeds each: decider-4B with the recipe (row 89 + rand255 + empty categories), decider-4B with
+the recipe + KINDS 0.1, and the encoder (Ettin-1B, the encoder recipe with KINDS 0.2). Every encoder seed is paired with every decider
+seed. `scripts/system_tables.py`, `scripts/recipe_tables.py`.
+
+**Table 112.1: blind_v1 (mean [range]; systems over the 3 x 3 seed pairs)**
+
+| system | runs | effort | auto-filed % | precision % | top-1 | decider reads % |
+|---|---|---|---|---|---|---|
+| encoder alone | 3 | 0.715 [0.681, 0.770] | 52.0 [46.3, 56.1] | 97.9 | 79.5 [78.5, 80.2] | – |
+| decider-4B, recipe alone | 3 | 0.655 [0.627, 0.691] | 55.8 [51.7, 58.3] | 97.6 | 82.5 [82.4, 82.8] | – |
+| **encoder, then decider (recipe)** | 9 | **0.588 [0.567, 0.619]** | **63.5 [59.8, 65.5]** | 97.5 | 82.6 [82.3, 83.0] | 48 [44, 54] |
+| decider-4B, recipe + kinds 0.1 alone | 3 | 0.660 [0.627, 0.699] | 54.3 [49.8, 58.2] | 97.7 | 83.0 [82.8, 83.2] | – |
+| encoder, then decider (recipe + kinds 0.1) | 9 | 0.580 [0.561, 0.619] | 63.8 [59.4, 65.7] | 97.5 | 82.9 [82.6, 83.2] | 48 [44, 54] |
+
+**Table 112.2: decider-4B recipes on the other sets (three seeds)**
+
+| recipe | REAL-6 | novel names | misleading names | override | alternation stores / restaurants |
+|---|---|---|---|---|---|
+| the recipe | 89.4 [88.6, 89.9] | 89.6 [87.6, 90.9] | 93.9 | 97.9 | 82.8 / 74.0 |
+| + kinds 0.1 | 86.5 [85.6, 86.9] | 85.7 [84.6, 86.6] | 93.9 | 98.1 | 83.3 / 67.2 |
+
+### 112.1 What the step says
+
+- **The system's advantage is steady across seeds.** Every one of the nine encoder / decider pairs beats decider alone on effort
+  (0.567 to 0.619 against 0.627 to 0.691) and auto-files more (59.8 to 65.5% against 51.7 to 58.3%) at the same precision; the decoder
+  reads 44 to 54% of the transactions. The encoder alone is the weakest (0.715): it is the first stage, not a replacement.
+- **Auto-filing's seed spread is about 6 to 10 points for any single model and narrows in the system** (the encoder's and decider's
+  confident sets overlap, so one seed's gap is covered by the other part).
+- **Kinds for decider, again no.** At 10% the loss on REAL-6 and novel names (3 to 4 points, all three seeds) remains, for +0.5 on the
+  blind set and no change in effort. REAL-6 has no income, bills or transfers at all, so part of that loss may not matter on real
+  histories, which have them everywhere: real data will settle it. The encoder keeps its kinds (section 111).
+
+Job list: `scripts/modal_jobs/r112.json`.
+
+
+## 113. Prompt formats, one change at a time (owner, 2026-09-29): writing each history row's category with its option label ("Category: (AE) Pets", the labelled list once at the top, the query ending "Category: (") makes decider-4B auto-file 63% of blind_v1 at the same top-1 (from 56%; effort 0.589 from 0.655, in the system 0.570 from 0.588) at a cost of 3 points on REAL-6 and 5 on novel names; the labelled list alone, the weekday next to the date, 48 rows and TSV tables do not help either model (MODEL-16, REAL-22)
+
+PLAN steps 111 and 112. The owner proposed: (1) list the categories once, at the top, with their labels; (2) write each history row's
+category with its label; (3) make sure a label tokenizes the same inside and outside parentheses; (4) put the weekday next to the date;
+(5) double the rows; (6) end the prompt with "Category:" rather than "Answer:"; and then (7) the history as a CSV / TSV table in a tag,
+category last, the query as its own row. Each change was trained and read in its own format (`oneslot.build_layout`, `exp_encoder_mask.py
+ENC_LAYOUT / DOW_FIRST`, `exp_categoriser.py NSHOTS`), one at a time against the recipes: decider-4B (row 89 + rand255 + empty
+categories) and Ettin-1B (the encoder recipe with kinds), two seeds each; the encoder has no label readout, so (1) alone is not an arm
+for it, and its (1)+(2) arm labels its options and rows with random two-letter labels.
+
+**Tokenization (3).** On the Qwen3.5 tokenizer, after "- (", "Category: (" and "\t (" each of the 255 labels is one token, the id the answer
+slot reads; "(AE" at a line start merges into "(A" + "E", and after a tab "(" + label merges for 209 of the 255 labels. The layouts write
+labels only after a space (a TSV category cell starts " (FX) Transportation"), and the builder asserts it.
+
+**Example, (1)+(2)+(6) (a blind_v1 user):**
+
+```
+Categories:
+- (EB) Family
+- (IM) Housing
+- (DP) Food
+...
+
+Transaction: 2025-05-10 | Venmo | $25.00 | Sat
+Category: (DP) Food
+
+Transaction: 2025-09-04 | Wells Fargo Home Mortgage | $3847.79 | Thu
+Category: (IM) Housing
+
+Transaction: 2025-09-05 | Venmo | $30.00 | Fri
+Category: (
+```
+
+**Table 113.1: decider-4B (mean [range] over seeds; `scripts/format_tables.py`)**
+
+| arm | REAL-6 | novel names | misleading | day rule | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|---|
+| decider's layout (the recipe, 3 seeds) | 89.4 | 89.6 | 93.9 | 74.0 | 82.5 | 55.8 | 0.655 | 0.588 |
+| (1)+(6) labelled list, ends "Category: (" | 88.9 | 85.9 | 89.5 | 57.8 | 81.0 | 45.1 | 0.782 | 0.652 |
+| **(1)+(2)+(6) + labelled rows** | 86.4 | 84.7 | 91.4 | 68.8 | 82.5 | **63.3 [62.3, 64.3]** | **0.589 [0.582, 0.597]** | **0.570** |
+| (4) weekday next to the date | 88.6 | 88.8 | 91.4 | 70.3 | 82.4 | 53.8 | 0.665 | 0.595 |
+| (5) 48 rows (read on blind_v1_b48: 82.1) | 88.1 | 85.9 | 96.7 | 60.9 | 82.2 | 42.4 [26.5, 58.3] | 0.794 | 0.629 |
+| (7) TSV table, Options / "Answer: (" | 88.1 | 86.2 | 92.8 | 53.1 | 82.7 | 50.7 | 0.701 | 0.599 |
+| (7) TSV table, labelled cells, open " (" cell | 84.7 | 85.2 | 84.9 | 50.8 | 81.3 | 55.1 | 0.674 | 0.608 |
+
+**Table 113.2: Ettin-1B**
+
+| arm | REAL-6 | novel names | misleading | day rule | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|---|
+| the encoder recipe (3 seeds) | 90.8 | 88.4 | 90.8 | 75.5 | 79.5 | 52.0 | 0.715 | 0.588 |
+| labelled options and rows | 89.6 | 87.8 | 91.4 | 82.8 | 80.2 | 53.7 | 0.693 | 0.585 |
+| weekday next to the date | 87.8 | 90.1 | 89.5 | 65.6 | 80.0 | 42.3 | 0.797 | 0.606 |
+| 48 rows (blind_v1_b48: 79.9) | 89.8 | 85.4 | 92.1 | 57.8 | 80.3 | 52.9 | 0.705 | 0.584 |
+| TSV table | 88.8 | 86.4 | 92.8 | 45.3 | 80.1 | 48.4 | 0.752 | 0.589 |
+
+### 113.1 What the step says
+
+- **Labels in the history rows make decider sure of itself where it can be.** With every row's category written "(AE) Pets", the answer
+  is the label token the matching rows already carry: both seeds auto-file 62 to 64% of blind_v1 at 97.5% (from 52 to 58%), at the same
+  top-1, the best single-model effort so far (0.589). The price is reading category names: REAL-6 −3, novel names −5, misleading −2.5,
+  the places where the answer is not in a row to copy.
+- **The labelled list alone hurts** (effort 0.782): with labels at the top but not in the rows, the reader must bind each row's
+  category name to a label itself, a hop decider's own layout (options after the question) does not ask for.
+- **The weekday next to the date, 48 rows and tables do not help.** The weekday move is neutral for decider and costs the encoder
+  auto-filing; 48 rows add nothing on the 48-row blind set and make decider's confidence unstable (26 to 58%); the TSV tables give the
+  best blind top-1 (82.7) but less auto-filing and a weaker day-of-week rule (the weekday is a column away from the rule's rows).
+- **The encoder is indifferent to layout** (effort in the system 0.584 to 0.606 in every arm); its labelled arm reads the day rule best
+  (83), within its seed range.
+- **Decision:** decider's recipe takes `LAYOUT=labelled_shots` (the system's effort 0.570 against 0.588; REAL-6's loss is on a set with no
+  labelled rows to copy from in the ways production will have). The encoder keeps its layout.
+
+Job lists: `scripts/modal_jobs/r113.json`, `r114.json`.
+
+
+## 114. JSON, YAML and TypeScript histories (owner, 2026-09-29): none beats plain text with labelled rows. YAML comes closest (decider blind auto-filing 59%, effort 0.625 against 63% and 0.589); JSON lines, the TypeScript union and the owner's enum auto-file 47 to 55%; the enum works only with the category name repeated as a comment in each row (47% without, 55% with), as the labelled list did in plain text; every structured format roughly doubles the prompt and the training time (MODEL-16)
+
+PLAN steps 113 to 115. The owner asked whether a regular format models know from pre-training (JSON, YAML, TypeScript) reads better than
+section 113's text. Each was built as a labelled variant of the winner (the label next to each row's category, the answer slot where
+the label goes), fields in the same order (date, description, amount, weekday, category), trained and read in its own format, two seeds.
+
+- **JSON lines** (`LAYOUT=json_labelled`): the labelled list at the top, `{"date": ..., "category": "(GU) Medical"}` per row inside
+  `<historical_transactions>`, the query ending `"category": "(`.
+- **YAML** (`yaml_labelled`): a list of records, `  category: (GU) Medical`, descriptions quoted (a statement string can start with
+  "*", a YAML alias), the query ending `  category: (`.
+- **TypeScript, union** (`ts_labelled`): `type CategoryId = | "GU" /* Medical */ ...;`, `interface Transaction`, rows
+  `category: "GU" /* Medical */`, `const next: Transaction = { ..., category: "`.
+- **TypeScript, the owner's enum** (`ts_enum`, `ts_enum_names`): `enum Categories { "GU" = "Medical", ... }`,
+  `const transactions: Array<Transaction> = [...]`, rows `category: Categories["GU"]` (without, and with, `/* Medical */` after it), the
+  query ending `category: Categories["`.
+
+**Tokenization.** Each form was checked for all 255 labels on the Qwen3.5 tokenizer. Clean (the label is one token, the answer slot's):
+`"(GU` in JSON, `: (GU` in YAML, `"GU"` as a string literal, `["GU"` in bracket access, a quoted enum member `"GU" =`. Not clean:
+`Categories.GU` (".G" + "U" for 245 labels) and a bare enum key `GU =` (" GU"). The layouts use only the clean forms, which is why the
+enum has quoted members and bracket access rather than `Categories.GU`.
+
+**Table 114.1: decider-4B, blind_v1 (mean [range] over two seeds; `scripts/format_tables.py`)**
+
+| format | REAL-6 | novel names | misleading | blind_v1 | blind auto-filed | effort alone | effort in the system |
+|---|---|---|---|---|---|---|---|
+| decider's layout (the recipe before section 113, 3 seeds) | 89.4 | 89.6 | 93.9 | 82.5 | 55.8 | 0.655 | 0.588 |
+| **text, labelled rows (section 113, the recipe now)** | 86.4 | 84.7 | 91.4 | 82.5 | **63.3** | **0.589** | **0.570** |
+| YAML, labelled | 86.2 | 84.4 | 84.9 | 82.2 | 59.2 [58.3, 60.2] | 0.625 | 0.584 |
+| JSON lines, labelled | 85.6 | 83.2 | 87.5 | 81.6 | 53.8 | 0.679 | 0.607 |
+| TypeScript union, name comments | 86.7 | 83.7 | 84.9 | 82.2 | 52.0 | 0.688 | 0.602 |
+| TypeScript enum, `Categories["GU"]` | 88.4 | 86.6 | 93.4 | 81.7 | 47.0 [46.5, 47.5] | 0.744 | 0.631 |
+| TypeScript enum + name comments | 87.4 | 83.9 | 85.5 | 82.1 | 55.4 [53.0, 57.9] | 0.672 | 0.607 |
+| TSV table, labelled cells (section 113) | 84.7 | 85.2 | 84.9 | 81.3 | 55.1 | 0.674 | 0.608 |
+
+The encoder (Ettin-1B) read JSON and YAML as it reads everything else (system effort 0.587 in both; blind top-1 81.0 and 79.9);
+its TypeScript arm ran out of memory at 16 sequences per step on the longer prompts and, rerun at 8 x 6,000 steps (the same episodes),
+reads the same again (blind top-1 80.3, auto-filed 52.8%, system effort 0.583).
+
+### 114.1 What the step says
+
+- **A familiar format is not what the reader needs; the label next to the name in each row is.** Every structured format carries the
+  same information as the labelled text rows and reads the blind set at the same top-1 (81.6 to 82.2); what separates them is how
+  sure the reader is where it can be, and plain text keeps the most (63% auto-filed), YAML next (59%), the rest 47 to 55%.
+- **The enum needs the names in the rows.** Declared once in the enum, a label has to be bound to its category by looking it up, the
+  hop that hurt the labelled list in plain text (section 113: 45%); the enum does a little better at it (47%), and repeating the name as
+  a comment in every row brings it to 55%. The owner's question (are the comments needed?) has a measured answer: yes, for this reader.
+- **The cost of syntax.** JSON, YAML and TypeScript double the tokens per row: training took 56 to 61 minutes against 25 to 30 for text,
+  and serving would cost about as much more. With no accuracy to show for it, plain text stays.
+- **Decision:** the recipe's layout stays `labelled_shots`.
+
+Job lists: `scripts/modal_jobs/r115.json`, `r116.json`, `r116b.json`, `r117.json`.
+
+
+## 115. The two models together, and whether the encoder's confidence is a probability: they agree on 83.5% of blind_v1, decider is right on 90.9% of those and on 39.5% of the rest; agreement alone is not auto-fileable (91% precision), but "both agree and either is confident" auto-files 65% at 97.8% for the lowest effort so far (0.560); after the temperature fitted on other users the encoder's confidence is a calibrated probability (ECE 5.6 to 1.9; its 95 to 98% answers are right 98% of the time), and decider's likewise (7.0 to 2.1) (EVAL-10, MODEL-9)
+
+PLAN step 116 (owner, 2026-09-29: can the two models' agreement raise accuracy, and does the encoder's confidence correspond to a real
+probability?). CPU only, over the saved blind_v1 scores of the encoder (Ettin-1B, the encoder recipe, three seeds) and decider-4B (the
+recipe with labelled rows, section 113, two seeds): six seed pairs. Every threshold is chosen on the other users' folds for a 98%
+target, as the scorecard does. `scripts/agreement_tables.py`.
+
+**Table 115.1: agreement (mean [range] over six pairs)**
+
+| agree on the top answer | right when they agree | where they disagree: decider right | encoder right |
+|---|---|---|---|
+| 83.5 [82.4, 85.1] | 90.9 [90.7, 91.1] | 39.5 [36.2, 43.2] | 21.7 [19.1, 24.6] |
+
+**Table 115.2: auto-file policies**
+
+| policy | auto-filed % | precision % | effort |
+|---|---|---|---|
+| decider alone (98%) | 63.3 | 97.9 | 0.589 |
+| encoder alone (98%) | 52.0 | 97.9 | 0.715 |
+| cascade: encoder at its 98%, else decider at its 98% (section 112) | 66.3 | 97.6 | 0.570 |
+| both agree (no threshold) | 83.5 | 90.9 | 0.640 |
+| both agree and both clear their 98% | 48.9 | 98.3 | 0.699 |
+| **both agree and either clears its 98%** | **65.2 [64.0, 66.3]** | **97.8** | **0.560 [0.550, 0.571]** |
+| product of the two distributions, one threshold | 62.5 | 98.0 | 0.578 |
+| mean of the two distributions, one threshold | 62.7 | 97.9 | 0.582 |
+
+**Table 115.3: reliability on blind_v1 (first seed of each): share right among the answers given at each confidence**
+
+| model | probabilities | < 0.5 | 0.5 to 0.7 | 0.7 to 0.8 | 0.8 to 0.9 | 0.9 to 0.95 | 0.95 to 0.98 | 0.98 to 0.99 | 0.99 to 1 | ECE |
+|---|---|---|---|---|---|---|---|---|---|---|
+| encoder | raw | 24 (184) | 52 (155) | 66 (61) | 68 (56) | 67 (33) | 79 (39) | 76 (21) | 97 (951) | 5.6 |
+| encoder | **after the temperature** | 32 (257) | 60 (195) | 78 (58) | 79 (63) | **94 (140)** | **98 (477)** | **99 (232)** | 97 (78) | **1.9** |
+| decider | raw | 18 (102) | 51 (124) | 49 (75) | 61 (77) | 76 (58) | 85 (80) | 92 (62) | 98 (922) | 7.0 |
+| decider | after the temperature | 31 (217) | 59 (158) | 76 (72) | 91 (137) | 96 (137) | 98 (252) | 99 (202) | 99 (325) | 2.1 |
+
+### 115.1 What the step says
+
+- **Agreement is strong evidence, not enough on its own.** When the 1B encoder and the 4B decoder pick the same category (83.5% of
+  transactions) the answer is right 90.9% of the time; when they disagree, neither is reliable (decider 40%, encoder 22%). Auto-filing
+  every agreement would file 84% at 91%, too many mistakes; a disagreement is a good signal to show suggestions instead.
+- **The best policy combines agreement with confidence:** file when the two agree and either is confident at its own calibrated 98%
+  threshold. It files 65% at 97.8%, with the lowest effort of any system so far (0.560, against the cascade's 0.570 and decider's 0.589):
+  agreement lets a confident answer from one model through only when the other does not contradict it. Requiring both to be confident
+  is too strict (49%); multiplying or averaging the two distributions is about the cascade's level.
+- **The encoder's confidence is a probability once calibrated.** Raw, it is over-confident: 951 answers above 0.99 are right 97% of
+  the time, and its 0.9 to 0.98 answers 67 to 79%. With one temperature fitted on other users (REPORT 50, 72) its stated confidence
+  matches its accuracy bin by bin (0.9 to 0.95 -> 94%, 0.95 to 0.98 -> 98%, 0.98 to 0.99 -> 99%; ECE 1.9); decider behaves the same (2.1).
+  The top bin is slightly over-confident for both (97 to 99% right at > 0.99), which a 98% threshold absorbs.
+- **Caveat.** The temperatures and thresholds here are fitted on other blind_v1 users; production must fit them on its own users, and
+  should re-fit when the population changes (REPORT 103: a threshold carried from REAL-7 to blind_v1 did not hold).
+
+Tables: `uv run python scripts/agreement_tables.py`.
+
+
+## 116. Thresholds under shift: the scorecard's 98% holds overall and not for new users (93% for decider, 89% for the encoder), per-group thresholds do not fix it on this many items, a threshold with a finite-sample guarantee halves decider's auto-filing at 1,100 calibration items, and thresholds carried from another set move coverage by 15 to 60 points (EVAL-13)
+
+PLAN step 121 (gaps review, 2026-09-29). CPU only, over the saved blind_v1 scores of decider-4B (the recipe with labelled rows, two
+seeds) and Ettin-1B (the encoder recipe, three seeds). Every rule is fitted on the other users' folds (user id mod 4), as the scorecard
+does. The finite-sample rules are Learn-then-Test style: a threshold is accepted when the Clopper-Pearson upper bound on the error of the
+items it would auto-file is at most 2% at confidence 0.9 (Bonferroni over 40 candidate thresholds, or fixed-sequence testing from the
+threshold that accepts the top 30% of items downwards, stopping at the first failure). `scripts/threshold_tables.py`.
+
+**Table TH.1: the scorecard's 98% threshold on blind_v1 by user group: auto-filed % / realised precision % (mean over seeds)**
+
+| group | n | decider-4B | Ettin-1B |
+|---|---|---|---|
+| new user (0-10 rows) | 168 | 21 / 92.7 | 9 / 89.3 |
+| payee in the prompt | 1205 | 74 / 98.2 | 63 / 98.1 |
+| payee not in the prompt | 127 | 21 / 94.4 | 4 / 100.0 |
+| history 450-700 rows | 630 | 67 / 98.2 | 57 / 98.1 |
+| history < 450 rows | 231 | 68 / 99.4 | 55 / 99.3 |
+| history >= 700 rows | 471 | 71 / 97.3 | 59 / 97.5 |
+| default | 798 | 61 / 97.9 | 50 / 97.8 |
+| detailed | 168 | 65 / 98.6 | 38 / 98.4 |
+| family | 54 | 69 / 95.9 | 59 / 100.0 |
+| merged | 198 | 65 / 99.2 | 57 / 99.7 |
+| minimal | 156 | 69 / 96.3 | 60 / 95.8 |
+| personal | 126 | 64 / 97.5 | 59 / 97.3 |
+
+**Table TH.2: threshold rules on blind_v1, each fitted on the other folds (mean [range] over seeds)**
+
+| model | rule | auto-filed % | precision % | worst group (payee / new user) % | effort |
+|---|---|---|---|---|---|
+| decider-4B | one threshold (the scorecard) | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 91.8 [90.9, 92.6] | 0.589 [0.582, 0.597] |
+| decider-4B | one per group (new user; payee in / not in the prompt) | 63.4 [61.2, 65.5] | 97.8 [97.7, 98.0] | 91.3 [90.9, 91.7] | 0.591 [0.574, 0.609] |
+| decider-4B | one per history length | 59.7 [58.6, 60.9] | 97.7 [97.7, 97.7] | 94.4 [92.6, 96.3] | 0.625 [0.611, 0.639] |
+| decider-4B | finite-sample, Bonferroni: CP bound <= 2% at 0.1/40 | 3.0 [0.0, 6.1] | 98.9 | 100.0 | 1.143 [1.109, 1.177] |
+| decider-4B | finite-sample, fixed sequence from the top 30%: CP bound <= 2% at 0.1 | 32.7 [31.4, 33.9] | 98.8 [98.5, 99.0] | 99.0 [98.9, 99.0] | 0.859 [0.849, 0.869] |
+| Ettin-1B | one threshold (the scorecard) | 52.0 [46.3, 56.1] | 97.9 [97.7, 98.0] | 89.3 [87.5, 92.3] | 0.715 [0.681, 0.770] |
+| Ettin-1B | one per group (new user; payee in / not in the prompt) | 53.1 [48.3, 56.8] | 97.9 [97.8, 98.0] | 92.1 [86.7, 98.0] | 0.704 [0.674, 0.747] |
+| Ettin-1B | one per history length | 53.9 [49.7, 57.3] | 97.4 [97.1, 97.8] | 93.5 [90.9, 97.9] | 0.708 [0.681, 0.753] |
+| Ettin-1B | finite-sample, Bonferroni: CP bound <= 2% at 0.1/40 | 0.0 [0.0, 0.0] | – | – | 1.195 [1.188, 1.203] |
+| Ettin-1B | finite-sample, fixed sequence from the top 30%: CP bound <= 2% at 0.1 | 5.6 [0.0, 8.8] | 97.6 [97.5, 97.7] | 98.0 [97.5, 98.4] | 1.143 [1.113, 1.188] |
+
+**Table TH.3: transfer: temperature and 98% threshold fitted on another set, applied to all of blind_v1 (mean [range] over seeds)**
+
+| model | fitted on | threshold rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|---|
+| decider-4B | blind_v1 (other folds) | global | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 0.589 [0.582, 0.597] |
+| decider-4B | blind_v1 (other folds) | sequential | 32.7 [31.4, 33.9] | 98.8 [98.5, 99.0] | 0.859 [0.849, 0.869] |
+| decider-4B | real6 | global | 40.7 [33.7, 47.6] | 98.8 [98.6, 99.0] | 0.782 [0.713, 0.851] |
+| decider-4B | real6 | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| decider-4B | real6_v1_novel | global | 49.5 [43.9, 55.0] | 98.5 [98.4, 98.6] | 0.703 [0.645, 0.760] |
+| decider-4B | real6_v1_novel | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| decider-4B | novel_merchants_v1 | global | 0.8 [0.6, 0.9] | 100.0 [100.0, 100.0] | 1.164 [1.161, 1.168] |
+| decider-4B | novel_merchants_v1 | sequential | 0.0 [0.0, 0.0] | – | 1.172 [1.167, 1.177] |
+| Ettin-1B | blind_v1 (other folds) | global | 52.0 [46.3, 56.1] | 97.9 [97.7, 98.0] | 0.715 [0.681, 0.770] |
+| Ettin-1B | blind_v1 (other folds) | sequential | 5.6 [0.0, 8.8] | 97.6 [97.5, 97.7] | 1.143 [1.113, 1.188] |
+| Ettin-1B | real6 | global | 64.5 [61.2, 66.6] | 96.7 [96.3, 97.4] | 0.631 [0.624, 0.636] |
+| Ettin-1B | real6 | sequential | 0.0 [0.0, 0.0] | – | 1.195 [1.188, 1.203] |
+| Ettin-1B | real6_v1_novel | global | 63.2 [61.0, 64.8] | 96.9 [96.4, 97.4] | 0.638 [0.630, 0.645] |
+| Ettin-1B | real6_v1_novel | sequential | 61.5 [59.5, 62.6] | 97.2 [96.7, 97.6] | 0.645 [0.641, 0.648] |
+| Ettin-1B | novel_merchants_v1 | global | 40.6 [9.9, 58.1] | 98.2 [98.0, 98.7] | 0.818 [0.661, 1.099] |
+| Ettin-1B | novel_merchants_v1 | sequential | 0.0 [0.0, 0.0] | – | 1.195 [1.188, 1.203] |
+
+### 116.1 What the step says
+
+- **One threshold is right on average and wrong for new users.** The 98% threshold realises 97.9% overall because most items (payee in
+  the prompt) sit at 98.2%; new users' auto-filed items are right 92.7% of the time for decider and 89.3% for the encoder, payees not in
+  the prompt 94.4% (decider). Few of those are auto-filed (21% and 9%), so the average hides them.
+- **Per-group thresholds do not fix it here.** Fitted per group on the other folds, the new-user group (168 items, about 40 per fold)
+  is too small to place a 98% threshold reliably: the worst group stays at 91 to 94%. A production system has thousands of new users a
+  day and can fit these; on this set the answer is to auto-file new users only above a stricter threshold, or not at all.
+- **A guarantee costs coverage at this calibration size.** With about 1,100 calibration items, certifying 98% at 90% confidence lets
+  decider auto-file 33% (fixed sequence) instead of 63%, and the encoder 6%; Bonferroni over a grid allows almost nothing. The
+  scorecard's threshold is an estimate, not a guarantee. In production every user's confirmation is a calibration label, so tens of
+  thousands of labels a day make the guaranteed threshold close to the estimated one; the calibration set, not the model, is the limit.
+- **Thresholds do not travel between populations.** Fitted on REAL-6 (the training generator) decider becomes conservative on blind_v1
+  (41% auto-filed at 98.8%), fitted on novel_merchants_v1 it files nothing, and the encoder fitted on REAL-6 becomes permissive (64% at
+  96.7%). Even the finite-sample rule fitted on the novel-name copy gives the encoder 97.2%: a guarantee holds only in distribution.
+- **For production:** fit temperature and thresholds on the product's own recent confirmations, refit on a schedule, and give new users
+  their own (stricter) threshold once there are enough of them to fit it.
+
+## 117. Sending what the small models do not settle to decider-35B-A3B, untrained: it reads blind_v1 at 82.0 (the trained 4B 82.5), far better on new users (77 against 62) and new businesses (78 to 84 against 62 to 70), far worse where the user's habit overrides the merchant; as the third reader for the 35% of transactions the small models do not auto-file it lifts auto-filing from 65 to 73% at 97.4% and cuts user effort from 0.560 to 0.470 (EVAL-12)
+
+PLAN step 120. decider-35B-A3B (Apache-2.0; Qwen3.5-35B-A3B base, trained by decider's authors for one-slot choice; 3B active
+parameters) read blind_v1 zero-shot in its own layout (options after the question, letter labels), on one H100 (69 GB of weights in
+bf16; 2.8 minutes for 1,500 items, batch 2); untrained decider-4B in the same layout beside it. The small models are REPORT 115's: the
+encoder recipe (three seeds) and decider-4B with labelled rows (two seeds). Every model is calibrated with the leave-fold-out
+temperature and 98% threshold. `scripts/escalation_tables.py`, job list `scripts/modal_jobs/r120.json`.
+
+**Table ES.1: top-1 on blind_v1 (small models: first seed; agree / disagree: the first encoder and decider seeds)**
+
+| group | n | encoder (Ettin-1B, recipe) | decider-4B, recipe | decider-4B untrained | decider-35B-A3B untrained |
+|---|---|---|---|---|---|
+| all | 1500 | 79.8 | 82.6 | 76.5 | 82.0 |
+| small models agree | 1257 | 91.0 | 91.0 | 83.9 | 87.9 |
+| small models disagree | 243 | 21.8 | 39.1 | 38.3 | 51.4 |
+| plain | 511 | 99.2 | 99.2 | 95.9 | 98.6 |
+| recurring | 208 | 100.0 | 100.0 | 98.6 | 99.5 |
+| short_history | 168 | 48.2 | 62.5 | 57.7 | 77.4 |
+| income | 61 | 100.0 | 100.0 | 95.1 | 98.4 |
+| misfiled_history | 39 | 76.9 | 87.2 | 92.3 | 100.0 |
+| new_merchant_descriptive | 37 | 56.8 | 62.2 | 56.8 | 83.8 |
+| weekday_split | 37 | 73.0 | 78.4 | 56.8 | 45.9 |
+| ambiguous_p2p | 37 | 27.0 | 21.6 | 16.2 | 16.2 |
+| new_merchant_chain | 37 | 64.9 | 70.3 | 48.6 | 78.4 |
+| idiosyncratic | 37 | 94.6 | 97.3 | 78.4 | 48.6 |
+| refund | 36 | 61.1 | 83.3 | 63.9 | 72.2 |
+| multi_purpose | 36 | 50.0 | 38.9 | 25.0 | 47.2 |
+| trip | 36 | 69.4 | 66.7 | 55.6 | 72.2 |
+| new_category | 36 | 50.0 | 52.8 | 38.9 | 50.0 |
+| date_night | 36 | 72.2 | 80.6 | 86.1 | 86.1 |
+| new_merchant_opaque | 36 | 8.3 | 8.3 | 8.3 | 8.3 |
+| amount_split | 36 | 55.6 | 61.1 | 47.2 | 50.0 |
+| changed_mind | 36 | 58.3 | 61.1 | 38.9 | 27.8 |
+| named_category | 25 | 100.0 | 100.0 | 100.0 | 100.0 |
+| event | 15 | 100.0 | 93.3 | 73.3 | 100.0 |
+
+**Table ES.2: system policies on blind_v1 (mean [range] over six small-model seed pairs)**
+
+| policy | auto-filed % | precision % | effort | sent to the 35B % |
+|---|---|---|---|---|
+| agree and either confident (REPORT 115); suggestions from the small models | 65.2 [64.0, 66.3] | 97.8 [97.6, 98.0] | 0.560 [0.550, 0.571] | 0.0 [0.0, 0.0] |
+| the same; suggestions for the rest from the 35B | 65.2 [64.0, 66.3] | 97.8 [97.6, 98.0] | 0.545 [0.534, 0.557] | 34.8 [33.7, 36.0] |
+| + the 35B confident and agreeing with one small model | 72.9 [72.3, 73.7] | 97.4 [97.3, 97.6] | 0.487 [0.480, 0.493] | 34.8 [33.7, 36.0] |
+| + the 35B confident alone | 73.9 [73.2, 74.7] | 97.3 [97.1, 97.5] | 0.482 [0.477, 0.489] | 34.8 [33.7, 36.0] |
+| + the 35B, suggestions from the three-model product | 72.9 [72.3, 73.7] | 97.4 [97.3, 97.6] | 0.470 [0.460, 0.477] | 34.8 [33.7, 36.0] |
+| the 35B alone at its 98% (no small models) | 56.3 [56.3, 56.3] | 98.0 [98.0, 98.0] | 0.621 [0.621, 0.621] | 100.0 [100.0, 100.0] |
+
+### 117.1 What the step says
+
+- **The large model knows what the small ones do not, and does not know what they were taught.** Untrained, the 35B reads blind_v1 as
+  well as the trained 4B overall (82.0 against 82.6) with the opposite profile: new users 77 (decider 62, encoder 48), new chains and
+  new local businesses 78 and 84 (decider 70 and 62), misfiled histories 100; and idiosyncratic filings 49 (decider 97), changes of mind
+  28 (61), weekday splits 46 (78): it follows what the merchant is over what this user does with it, which is what the recipe's lookup,
+  override and alternation episodes teach the small models. Scale did not help on REAL-6 (section 87) because REAL-6 has no world
+  knowledge left to use; blind_v1's new users and new businesses do.
+- **Where the small models disagree, it is right half the time** (51.4, against decider's 39.1 and the encoder's 21.8), and where they
+  agree it is lower than them (87.9 against 91.0).
+- **As the escalation reader it gives the best system so far.** After REPORT 115's policy (auto-file when the small models agree and
+  one is confident), 35% of transactions are left; sending those to the 35B and auto-filing when it is confident and agrees with one of
+  the small models takes auto-filing from 65.2 to 72.9% at 97.4% (a little under the 98% target: its threshold was fitted on all items,
+  not on the escalated ones) and user effort from 0.560 to 0.487; suggestions for the rest from the three models' product take it to
+  0.470, 16% less work than REPORT 115's system and 20% less than decider alone.
+- **Cost.** The 35B read blind_v1 in 2.8 minutes on an H100 (about 110 ms per transaction, batch 2, unoptimised); untrained decider-4B in
+  the same layout and job read it in 2.7 minutes: with 3B parameters active per token the 35B costs about what the 4B does per
+  transaction, but its 69 GB of weights take a whole 80 GB GPU [corrected 2026-09-29: this line first said three to four times
+  decider-4B, comparing with a different setup; row 130 measures both in vLLM];
+  sent a third of the transactions, it adds about a third of a 4B reading to each transaction's cost (a GPU kept for the 35B's
+  weights aside), still far below any hosted API.
+- **Next:** the 35B trained with the recipe (row 125, MODEL-20): the trained behaviours on top of its world knowledge; and it as a
+  teacher for the small models (row 123).
+
+
+## 118. Scoring without an arbitrary threshold: success is the user's expected effort at a stated cost of a wrong auto-file (W), and each transaction is auto-filed exactly when that is expected to cost less than suggesting; the per-item rule is the best or tied rule at every W from 3 to 100 with nothing to tune, a 98% precision target is what W of about 10 implies, and the ranking of readers and systems holds at every W (EVAL-14)
+
+PLAN step 126 (owner, 2026-09-29: "The 98% threshold is arbitrary. Let's come up with a better mechanism for scoring and determining
+success"). CPU only, over the saved blind_v1 scores. `scorecard.decide`, `scripts/decision_tables.py`.
+
+**The mechanism.** What the user does per transaction is the measure (the scorecard's effort, REPORT 98): nothing when an auto-filed
+category is right, W when it is wrong (noticing, undoing, refiling; and the budget is wrong until then), one click when the answer is
+among three suggestions, a search (3) otherwise. With calibrated probabilities (the leave-fold-out temperature; ECE about 2, REPORT 115)
+the expected cost of each choice is known per transaction: auto-filing costs (1 - p1) W, suggesting costs q3 + 3 (1 - q3), with p1 the
+top category's probability and q3 the top three's mass. The rule auto-files when the first is smaller. There is no threshold: the one
+number is W, which is a product judgement (how bad a silent miscategorisation is), stated once and measurable later from real users
+(undo rates, time to notice). Success is expected effort per transaction at that W; because W is uncertain, every system is read over
+W from 3 to 100, and one system beats another only if it wins across the plausible range. For combinations, the members' calibrated
+distributions are multiplied and the product recalibrated with one temperature on the other folds.
+
+**Table DE.1: blind_v1, effort per transaction by what a wrong auto-file costs (W) and the auto-file rule (mean [range] over seeds / pairs); no model at all: 3.0 (every transaction a search)**
+
+| reader | rule | W = 3 | W = 5 | W = 10 | W = 20 | W = 50 | W = 100 |
+|---|---|---|---|---|---|---|---|
+| decider-4B | fixed 98% | 0.566 [0.559, 0.573] | 0.593 [0.586, 0.601] | 0.662 [0.653, 0.671] | 0.798 [0.786, 0.811] | 1.208 [1.186, 1.231] | 1.892 [1.853, 1.931] |
+| decider-4B | best cut | 0.488 [0.487, 0.490] | 0.551 [0.543, 0.559] | 0.663 [0.658, 0.668] | 0.777 [0.771, 0.783] | 1.014 [0.977, 1.050] | 1.122 [1.095, 1.148] |
+| decider-4B | per-item | 0.481 [0.479, 0.484] | 0.553 [0.544, 0.562] | 0.651 [0.645, 0.657] | 0.782 [0.779, 0.784] | 0.955 [0.925, 0.985] | 1.040 [0.991, 1.089] |
+| Ettin-1B | fixed 98% | 0.696 [0.655, 0.754] | 0.718 [0.677, 0.775] | 0.772 [0.734, 0.829] | 0.881 [0.847, 0.935] | 1.208 [1.180, 1.255] | 1.752 [1.713, 1.789] |
+| Ettin-1B | best cut | 0.548 [0.533, 0.557] | 0.632 [0.615, 0.644] | 0.734 [0.716, 0.766] | 0.869 [0.847, 0.890] | 1.132 [1.096, 1.182] | 1.286 [1.228, 1.355] |
+| Ettin-1B | per-item | 0.546 [0.535, 0.557] | 0.622 [0.608, 0.632] | 0.739 [0.724, 0.767] | 0.861 [0.835, 0.905] | 1.099 [1.074, 1.141] | 1.240 [1.191, 1.281] |
+| decider-35B-A3B untrained | fixed 98% | 0.615 | 0.641 | 0.704 | 0.831 | 1.211 | 1.844 |
+| decider-35B-A3B untrained | best cut | 0.481 | 0.567 | 0.703 | 0.855 | 0.968 | 1.195 |
+| decider-35B-A3B untrained | per-item | 0.479 | 0.561 | 0.701 | 0.794 | 0.949 | 1.149 |
+| Ettin-1B x decider-4B | fixed 98% | 0.550 [0.540, 0.562] | 0.577 [0.568, 0.590] | 0.644 [0.636, 0.660] | 0.777 [0.769, 0.800] | 1.177 [1.149, 1.220] | 1.844 [1.782, 1.920] |
+| Ettin-1B x decider-4B | best cut | 0.479 [0.461, 0.491] | 0.541 [0.517, 0.555] | 0.645 [0.637, 0.657] | 0.757 [0.740, 0.772] | 1.027 [0.967, 1.076] | 1.050 [1.007, 1.105] |
+| Ettin-1B x decider-4B | per-item | 0.461 [0.455, 0.471] | 0.538 [0.517, 0.547] | 0.629 [0.622, 0.633] | 0.746 [0.723, 0.766] | 0.989 [0.970, 1.013] | 1.027 [0.949, 1.129] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 0.458 [0.437, 0.477] | 0.485 [0.469, 0.503] | 0.555 [0.543, 0.570] | 0.694 [0.669, 0.717] | 1.110 [1.032, 1.189] | 1.805 [1.632, 1.989] |
+| Ettin-1B x decider-4B x 35B | best cut | 0.408 [0.393, 0.423] | 0.465 [0.450, 0.483] | 0.557 [0.532, 0.568] | 0.685 [0.671, 0.721] | 0.965 [0.911, 0.995] | 1.087 [1.046, 1.151] |
+| Ettin-1B x decider-4B x 35B | per-item | 0.397 [0.385, 0.410] | 0.457 [0.451, 0.463] | 0.547 [0.534, 0.559] | 0.676 [0.666, 0.689] | 0.923 [0.891, 0.947] | 1.078 [1.017, 1.119] |
+
+**Table DE.2: W = 10: auto-filed % / precision % / effort**
+
+| reader | rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| decider-4B | fixed 98% | 63.0 [61.9, 64.1] | 97.8 [97.7, 97.9] | 0.662 [0.653, 0.671] |
+| decider-4B | best cut | 66.1 [64.4, 67.8] | 97.4 [97.3, 97.4] | 0.663 [0.658, 0.668] |
+| decider-4B | per-item | 62.5 [62.4, 62.6] | 98.1 [98.1, 98.1] | 0.651 [0.645, 0.657] |
+| Ettin-1B | fixed 98% | 51.7 [45.8, 56.5] | 97.9 [97.7, 98.0] | 0.772 [0.734, 0.829] |
+| Ettin-1B | best cut | 63.5 [61.2, 67.4] | 96.9 [95.9, 97.5] | 0.734 [0.716, 0.766] |
+| Ettin-1B | per-item | 61.2 [59.3, 62.5] | 97.1 [96.5, 97.5] | 0.739 [0.724, 0.767] |
+| decider-35B-A3B untrained | fixed 98% | 54.9 | 97.7 | 0.704 |
+| decider-35B-A3B untrained | best cut | 58.9 | 97.2 | 0.703 |
+| decider-35B-A3B untrained | per-item | 61.2 | 96.9 | 0.701 |
+| Ettin-1B x decider-4B | fixed 98% | 63.0 [61.5, 64.1] | 97.9 [97.7, 98.0] | 0.644 [0.636, 0.660] |
+| Ettin-1B x decider-4B | best cut | 66.6 [64.5, 69.0] | 97.4 [97.0, 97.7] | 0.645 [0.637, 0.657] |
+| Ettin-1B x decider-4B | per-item | 65.6 [64.9, 65.9] | 97.8 [97.7, 97.9] | 0.629 [0.622, 0.633] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 68.8 [67.4, 71.0] | 98.0 [97.7, 98.2] | 0.555 [0.543, 0.570] |
+| Ettin-1B x decider-4B x 35B | best cut | 70.8 [69.6, 72.2] | 97.7 [97.5, 98.2] | 0.557 [0.532, 0.568] |
+| Ettin-1B x decider-4B x 35B | per-item | 69.1 [68.3, 69.6] | 98.1 [97.9, 98.2] | 0.547 [0.534, 0.559] |
+
+**Table DE.2: W = 50: auto-filed % / precision % / effort**
+
+| reader | rule | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| decider-4B | fixed 98% | 63.0 [61.9, 64.1] | 97.8 [97.7, 97.9] | 1.208 [1.186, 1.231] |
+| decider-4B | best cut | 35.3 [35.2, 35.4] | 98.9 [98.7, 99.1] | 1.014 [0.977, 1.050] |
+| decider-4B | per-item | 36.3 [35.3, 37.3] | 99.2 [99.1, 99.3] | 0.955 [0.925, 0.985] |
+| Ettin-1B | fixed 98% | 51.7 [45.8, 56.5] | 97.9 [97.7, 98.0] | 1.208 [1.180, 1.255] |
+| Ettin-1B | best cut | 36.6 [32.4, 44.1] | 98.3 [98.0, 98.6] | 1.132 [1.096, 1.182] |
+| Ettin-1B | per-item | 24.7 [21.8, 30.0] | 98.7 [98.5, 99.1] | 1.099 [1.074, 1.141] |
+| decider-35B-A3B untrained | fixed 98% | 54.9 | 97.7 | 1.211 |
+| decider-35B-A3B untrained | best cut | 36.5 | 98.9 | 0.968 |
+| decider-35B-A3B untrained | per-item | 31.7 | 99.2 | 0.949 |
+| Ettin-1B x decider-4B | fixed 98% | 63.0 [61.5, 64.1] | 97.9 [97.7, 98.0] | 1.177 [1.149, 1.220] |
+| Ettin-1B x decider-4B | best cut | 36.9 [28.7, 45.3] | 98.7 [98.4, 99.3] | 1.027 [0.967, 1.076] |
+| Ettin-1B x decider-4B | per-item | 46.0 [43.7, 47.5] | 98.7 [98.6, 98.8] | 0.989 [0.970, 1.013] |
+| Ettin-1B x decider-4B x 35B | fixed 98% | 68.8 [67.4, 71.0] | 98.0 [97.7, 98.2] | 1.110 [1.032, 1.189] |
+| Ettin-1B x decider-4B x 35B | best cut | 44.7 [36.5, 56.6] | 98.7 [98.6, 98.7] | 0.965 [0.911, 0.995] |
+| Ettin-1B x decider-4B x 35B | per-item | 51.2 [50.0, 52.1] | 98.7 [98.7, 98.8] | 0.923 [0.891, 0.947] |
+
+**Table DE.3: what each W means for decider-4B under the per-item rule: the lowest confidence it auto-files at (the marginal item), and the average precision of what it auto-files**
+
+| W | lowest auto-filed confidence | auto-filed % | average precision % |
+|---|---|---|---|
+| 3 | 31.1 [29.6, 32.7]% | 82.0 [81.8, 82.3] | 92.1 [91.6, 92.6] |
+| 5 | 73.7 [72.1, 75.3]% | 71.5 [71.2, 71.7] | 96.5 [96.2, 96.8] |
+| 10 | 88.5 [88.5, 88.6]% | 62.5 [62.4, 62.6] | 98.1 [98.1, 98.1] |
+| 20 | 94.7 [94.6, 94.7]% | 53.2 [52.9, 53.4] | 98.6 [98.5, 98.6] |
+| 50 | 97.9 [97.9, 97.9]% | 36.3 [35.3, 37.3] | 99.2 [99.1, 99.3] |
+| 100 | 99.0 [99.0, 99.0]% | 23.1 [21.9, 24.3] | 99.6 [99.4, 99.7] |
+
+### 118.1 What the step says
+
+- **The per-item expected-cost rule is the rule to use.** It is best or within noise of best at every W for every reader, needs no
+  threshold and no search on held-out data (only the temperature), and adapts to each transaction's alternatives (a transaction whose
+  second choice is also likely, and so would cost one click to fix, is auto-filed more readily than one whose alternatives are spread).
+  Its advantage over the fixed 98% cut grows with W: at W = 50 it cuts decider's effort from 1.21 to 0.96 (21%) by filing fewer; at W = 3
+  from 0.57 to 0.48 by filing more.
+- **The 98% target was W of about 10.** Under the per-item rule, W = 10 auto-files 62.5% at 98.1% average precision, the same operating
+  point as the fixed 98% cut (63.0% at 97.8%): the marginal auto-filed item is at 88.5% confidence, and the average over the confident
+  ones is 98%. The numbers reported since REPORT 98 are therefore close to optimal for W = 10, and not for other W (they used W = 5 in
+  effort, a slight inconsistency: at W = 5 the rule would auto-file 71.5% at 96.5%).
+- **Rankings do not depend on W.** At every W: three models (encoder x decider x 35B) < encoder x decider < decider < 35B untrained <
+  encoder in effort (the 35B passes decider at W >= 50, where its confidence ranks better). Conclusions drawn at one W hold.
+- **Recommendation.** Report expected effort under the per-item rule at W = 5, 10, 20, 50 (W = 10 as the headline until the product sets
+  it), with auto-filed % and average precision beside it; drop the fixed precision target. The product's W should come from the owner,
+  and later from real users' undo behaviour; a different W for new users (whose miscategorisations may matter more) fits the same rule.
+- **Caveat.** The rule is only as good as the calibration: temperatures must be fitted on the product's own users (REPORT 116: they do
+  not transfer between populations), and new users' probabilities are the least reliable (REPORT 116: 93% where 98% was stated).
+
+
+## 119. One user's sync in one go: caching the shared part of the prompt reads 10 to 30 transactions at 21 to 26 ms each instead of 53, with the same answers (99.2 to 99.6% the same top category; log-probability differences at bf16 rounding); all transactions in one prompt with an answer slot each reads them at 13 to 16 ms but, untrained, changes 6 to 7% of answers and costs 1 to 2 points (INFRA-3)
+
+PLAN step 119 (owner, 2026-09-29: for one user's 10 to 100 new transactions, cache the unchanging part of the prompt, or put the
+transactions at the end with a placeholder answer each?). One H100, decider-4B with the recipe's adapter (labelled rows, REPORT 113, seed
+0), bf16, transformers 5.17 + flash-linear-attention, no compilation or CUDA graphs. 24 syncs of blind_bulk_v1 (one per user, its first
+10 and its 30 transactions); labels and option order drawn once per user, so every prompt of a sync begins with the same ~1,330 tokens
+(the labelled category list and the shared rows: a row per category, then the latest rows). Warm, median of three timed passes.
+`scripts/bench_bulk.py`, `results/bench_bulk_*.json`, job list `scripts/modal_jobs/r119.json`.
+
+**Table 119.1: per transaction, mean over 24 syncs**
+
+| mode | tokens read, 10 / 30 per sync | ms, 10 per sync | ms, 30 per sync | top-1, 10 / 30 | same top category as the split layout uncached |
+|---|---|---|---|---|---|
+| separate prompts, today's layout, batch 8 | 1,745 / 1,744 | 53.3 | 53.2 | 82.9 / 82.5 | – |
+| separate prompts, split layout, batch 8 | 1,761 / 1,760 | 53.9 | 53.8 | 81.7 / 81.8 | (reference) |
+| **split layout, shared prefix run once, tails from its cache (one batch)** | 563 / 473 | **25.5** | **20.9** | 81.7 / 81.8 | 99.2 / 99.6% |
+| one prompt, every transaction's tail and answer slot in turn, one pass | 565 / 475 | 15.6 | 13.1 | 79.6 / 80.8 | 94.2 / 93.1% |
+
+### 119.1 What the step says
+
+- **Caching the shared prefix is the answer for decider, and needs no training.** The prefix (category list, shared rows) is read once
+  per sync; each transaction then reads only its own ~150 to 300 tokens (its payee's and similar payees' rows and itself). Tokens per
+  transaction fall 3.1 to 3.7 times and time 2.1 to 2.5 times (the tails still attend to the prefix, and the cache is copied per tail).
+  The answers are the uncached split layout's: the top category agrees on 99.2 to 99.6% and the log-probabilities differ by at most 0.33
+  (bf16 rounding between one long and two shorter passes). The saving grows with the sync (30 transactions: 20.9 ms each).
+- **The split layout itself is free.** Read uncached it costs the same time as today's layout (16 more tokens for two headers) and reads
+  the same on blind_v1 (the same rows reordered: 82.6 / 82.4 over two seeds against 82.5; row 118); on these 24 syncs it is 0.8 to 1.2 points under today's layout
+  zero-shot (the recipe never saw the headers), which the trained arm of row 118 addresses.
+- **One prompt with every transaction is faster still and not free.** One forward pass for the whole sync (13 to 16 ms per transaction)
+  beats the cache (no copying, no padding), but each transaction then sees the earlier ones with their slots unanswered, which the
+  reader never saw in training: 6 to 7% of answers change and top-1 falls 1 to 2 points. It needs multi-slot training episodes (row 127)
+  to be a candidate; and a causal model sorted by date keeps the no-future rule, a bidirectional encoder would not.
+- **Cost.** At about $4 per H100-hour: separate prompts ~$59 per million transactions, the cached prefix ~$23 to $28, one prompt ~$15
+  (all from this unoptimised stack; a serving engine with prefix caching, compilation and FP8 should lower all three; row 127 measures
+  vLLM). The encoder cannot share a prefix (it reads in both directions) and stays at ~14 ms per transaction.
+- **Correctness note.** transformers releases before 5.17 restarted the linear-attention state when several tokens followed a cache
+  (initial state None); a cached prefix would have silently changed the answers. The benchmark's check against the uncached prompts is the
+  guard; any serving stack for Qwen3.5 must pass the same check.
+
+
+## 120. The same sync in vLLM (0.30): the serving engine alone halves the time (24 to 28 ms per transaction without any cache), its prefix cache on the split layout reads one user's 30 transactions at 12.8 ms each and a whole queue of syncs at 10.2 ms, five times the unoptimised separate prompts, with the same top-1 to the decimal; multi-slot prompts are no longer worth training (INFRA-3)
+
+PLAN step 127 (b). The recipe's decider-4B (adapter merged) in vLLM 0.30.0 on one H100, bf16, the exact token ids of REPORT 119's 24
+syncs (`bench_bulk.py PREP_VLLM`, then `scripts/bench_vllm.py` in its own environment). The readout is decider's one slot: one generated
+token restricted to the question's label tokens, its log-probabilities after the restriction, i.e. the softmax over the label logits.
+vLLM sets its linear-attention cache to 'align' mode for Qwen3.5 when prefix caching is on (the recurrent state is kept at block
+boundaries so a cached prefix resumes exactly). Latency: one sync submitted at a time, its prefix cache emptied before each timed pass
+(the sync computes its own shared prefix once); throughput: all 720 transactions submitted together. `results/bench_vllm.json`, job list
+`scripts/modal_jobs/r127.json`.
+
+**Table 120.1: ms per transaction on one H100 (top-1 on the same 24 syncs in brackets)**
+
+| engine | layout | prefix cache | one sync of 10 | one sync of 30 | 24 syncs at once (720) |
+|---|---|---|---|---|---|
+| HF, REPORT 119 | today's, separate prompts | – | 53.3 (82.9) | 53.2 (82.5) | – |
+| HF, REPORT 119 | split, shared prefix cached by hand | yes | 25.5 (81.7) | 20.9 (81.8) | – |
+| vLLM | today's | off | 28.3 (83.3) | 25.4 (82.4) | 24.0 |
+| vLLM | today's | on | 27.4 (83.3) | 20.5 (82.6) | 18.9 |
+| vLLM | split | off | 28.2 (81.7) | 25.5 (81.8) | 24.5 |
+| **vLLM** | **split** | **on** | 23.5 (81.7) | **12.8 (81.8)** | **10.2** |
+
+### 120.1 What the step says
+
+- **vLLM with the split layout and its prefix cache is the serving answer:** 12.8 ms per transaction for a sync of 30 and 10.2 ms over a
+  queue, 5.2 times faster than REPORT 119's baseline, with top-1 equal to the decimal to HF's uncached reading on every arm (the engine's
+  hybrid-model prefix cache is exact here; REPORT 119's warning about older transformers does not apply to it). At about $4 per H100-hour
+  that is roughly $11 per million transactions for decider-4B (from ~$59), before FP8 or a smaller GPU.
+- **The layout is what lets the cache work.** Today's layout (the payee's rows mixed into the history by date) shares only the category
+  list and the oldest rows between a sync's transactions: the cache saves 20 to 25%. The split layout shares ~1,330 tokens: 50 to 60%.
+- **A sync of 10 gains less** (23.5 ms): the shared prefix is computed once for fewer transactions, and concurrent requests of a
+  sync start before the prefix is cached. Queued syncs of many users (the throughput row) amortise it best.
+- **Decision:** multi-slot prompts (row 127 a) are not worth training now: they would save a few more ms per transaction at the cost of
+  a training change and a 1 to 2 point risk (REPORT 119), where the cache gives the speed with the same answers. Row 127 (a) deprioritised.
+
+
+## 121. The split layout needs no retraining: the recipe reads blind_v1 and one user's sync with the shared rows first and the payee's rows after them as well as in today's date-ordered layout (effort 0.584 against 0.589; bulk 0.496 against 0.497), and training on split episodes adds nothing on the blind set (0.649, seed-unstable) (INFRA-3)
+
+PLAN step 118. The recipe's decider-4B (labelled rows, two seeds) read blind_v1_split (blind_v1's rows reordered: the shared rows under
+"Earlier transactions:", then the payee's own and similar payees' rows under "Earlier transactions at this payee and similar payees:")
+and blind_bulk_v1 in both layouts (one sync per user: the next 30 transactions after a cutoff, history filed before it; 6,660 items),
+zero-shot; and the same recipe trained with split episodes (`SPLIT=1`: the query payee's rows, found by a first-word payee key, moved
+into the second block, with 1 to 4 other rows half the time), two seeds. The encoder (Ettin-1B, two seeds) read blind_bulk_v1 in today's
+layout for the system. Effort and auto-filing as the scorecard (98% cut, W = 5), for comparison with earlier sections.
+`scripts/split_bulk_tables.py`, job list `scripts/modal_jobs/r118.json`.
+
+**Table SB.1: decider-4B with labelled rows, by layout (mean [range] over two seeds): top-1 / auto-filed % / precision % / effort**
+
+| adapter | read on | top-1 | auto-filed % | precision % | effort |
+|---|---|---|---|---|---|
+| the recipe (trained on today's layout) | blind_v1 | 82.5 [82.3, 82.6] | 63.3 [62.3, 64.3] | 97.9 [97.8, 98.0] | 0.589 [0.582, 0.597] |
+| the recipe (trained on today's layout) | blind_v1_split | 82.5 [82.4, 82.6] | 62.3 [61.9, 62.7] | 98.1 [98.1, 98.1] | 0.584 [0.583, 0.585] |
+| the recipe (trained on today's layout) | blind_bulk_v1 | 83.8 [83.6, 83.9] | 67.6 [65.8, 69.5] | 98.0 [98.0, 98.0] | 0.497 [0.481, 0.512] |
+| the recipe (trained on today's layout) | blind_bulk_v1_split | 83.6 [83.3, 83.9] | 67.4 [65.7, 69.2] | 98.0 [97.9, 98.0] | 0.496 [0.481, 0.511] |
+| trained on split episodes (SPLIT=1) | blind_v1 | 82.4 [82.1, 82.8] | 57.1 [55.5, 58.7] | 97.8 [97.7, 97.8] | 0.647 [0.630, 0.665] |
+| trained on split episodes (SPLIT=1) | blind_v1_split | 82.7 [82.5, 82.8] | 56.1 [51.4, 60.7] | 97.9 [97.8, 97.9] | 0.649 [0.603, 0.694] |
+| trained on split episodes (SPLIT=1) | blind_bulk_v1_split | 83.4 [83.2, 83.7] | 69.0 [68.3, 69.7] | 97.9 [97.9, 98.0] | 0.484 [0.480, 0.489] |
+
+**Table SB.2: the system on the bulk set (the encoder reads today's layout; decider as shown), agree and either confident**
+
+| decider | read on | auto-filed % | precision % | effort |
+|---|---|---|---|---|
+| the recipe | blind_bulk_v1 | 70.6 [69.4, 71.5] | 97.7 [97.6, 97.7] | 0.470 [0.461, 0.479] |
+| the recipe | blind_bulk_v1_split | 70.2 [69.0, 71.2] | 97.8 [97.6, 97.9] | 0.470 [0.462, 0.476] |
+| split-trained | blind_bulk_v1_split | 70.3 [69.6, 71.0] | 97.7 [97.6, 97.8] | 0.471 [0.468, 0.476] |
+
+REAL-6 / novel names / misleading-name set top-1 (two seeds): the recipe 86.4 / 84.7 / 65.6, split-trained 86.7 / 85.4 / 64.0.
+
+### 121.1 What the step says
+
+- **The recipe reads the split layout as it is.** On blind_v1 the same rows reordered read at the same top-1 (82.5), auto-filing (62.3
+  against 63.3%) and effort (0.584 against 0.589); on one user's sync the two layouts are equal (0.496 / 0.497), and so is the system
+  (0.470 both). The layout that lets a sync share its prompt (REPORT 119, 120) costs nothing, so serving can switch to it with the
+  current adapter.
+- **Training on split episodes is not needed and not better.** It keeps top-1 and REAL-6, but its blind auto-filing is lower and
+  seed-unstable (51 to 61%; effort 0.649); on the bulk set it is a little better (0.484 against 0.496). The training split is also an
+  approximation (a first-word payee key, random rows standing in for similar payees). Decision: the recipe stays as trained; serve with
+  the split layout.
+- **One user's sync is easier than blind_v1's queries** (effort 0.50 against 0.59): blind_v1 was sampled to over-represent hard cases
+  (new merchants, changes of mind), where a sync is every transaction in order, mostly ordinary ones.
+
+
+## 122. decider-35B-A3B with the recipe: the best single reader on the blind set (84.8; effort 0.534 against decider-4B's 0.589), with the large model's world knowledge (new users 74, new businesses 78 to 81) and the recipe's behaviours (idiosyncratic 95, weekday rules 84); but it stores the merchant database poorly (REAL-6 74 against 86, training loss 0.64 against ~0.4, routed experts frozen), and as the third reader it helps less than the untrained 35B (effort 0.500 against 0.470) because training made its errors like the small models' (MODEL-20)
+
+PLAN step 125. The decider recipe with labelled rows (row 89 + rand255 + empty categories, `LAYOUT=labelled_shots`, 800 steps x 16,
+lr 1e-4) as a rank-64 LoRA on decider-35B-A3B: attention, linear attention and the shared expert (the routed experts are fused
+parameters that peft's module targets do not reach: frozen, as decider's own training left them); one H200 (`modal_app.py --gpu H200`):
+42 minutes of training, peak 77 GiB, final loss 0.64 (decider-4B's recipe ends near 0.4). One seed. Scored in the labelled layout.
+`scripts/escalation_tables.py` with `BIG=<the trained 35B's blind_v1 file>`, job list `scripts/modal_jobs/r125.json`.
+
+**Table 122.1: top-1 on every set (decider-4B: two seeds of the same recipe)**
+
+| set | decider-4B recipe | decider-35B-A3B recipe |
+|---|---|---|
+| blind_v1 | 82.6 / 82.3 | **84.8** |
+| REAL-6 (fold 0) | 85.2 / 87.6 | 74.2 |
+| REAL-6 novel names | 84.2 / 85.2 | 69.1 |
+| misleading names | 65.2 / 66.1 | 61.4 |
+| override | 98.0 / 97.1 | 98.4 |
+| alternation | 71.1 / 70.5 | 71.9 |
+| novel_merchants_v1 | 51.7 / 53.3 | 59.4 |
+
+**Table ES.1: top-1 on blind_v1 (small models: first seed; agree / disagree: the first encoder and decider seeds)**
+
+| group | n | encoder (Ettin-1B, recipe) | decider-4B, recipe | decider-4B untrained | decider-35B-A3B trained (row 125) |
+|---|---|---|---|---|---|
+| all | 1500 | 79.8 | 82.6 | 76.5 | 84.8 |
+| small models agree | 1257 | 91.0 | 91.0 | 83.9 | 90.9 |
+| small models disagree | 243 | 21.8 | 39.1 | 38.3 | 53.5 |
+| plain | 511 | 99.2 | 99.2 | 95.9 | 99.4 |
+| recurring | 208 | 100.0 | 100.0 | 98.6 | 100.0 |
+| short_history | 168 | 48.2 | 62.5 | 57.7 | 74.4 |
+| income | 61 | 100.0 | 100.0 | 95.1 | 100.0 |
+| misfiled_history | 39 | 76.9 | 87.2 | 92.3 | 89.7 |
+| new_merchant_chain | 37 | 64.9 | 70.3 | 48.6 | 81.1 |
+| ambiguous_p2p | 37 | 27.0 | 21.6 | 16.2 | 21.6 |
+| new_merchant_descriptive | 37 | 56.8 | 62.2 | 56.8 | 78.4 |
+| weekday_split | 37 | 73.0 | 78.4 | 56.8 | 83.8 |
+| idiosyncratic | 37 | 94.6 | 97.3 | 78.4 | 94.6 |
+| trip | 36 | 69.4 | 66.7 | 55.6 | 75.0 |
+| refund | 36 | 61.1 | 83.3 | 63.9 | 77.8 |
+| amount_split | 36 | 55.6 | 61.1 | 47.2 | 66.7 |
+| date_night | 36 | 72.2 | 80.6 | 86.1 | 72.2 |
+| multi_purpose | 36 | 50.0 | 38.9 | 25.0 | 38.9 |
+| new_category | 36 | 50.0 | 52.8 | 38.9 | 58.3 |
+| new_merchant_opaque | 36 | 8.3 | 8.3 | 8.3 | 11.1 |
+| changed_mind | 36 | 58.3 | 61.1 | 38.9 | 52.8 |
+| named_category | 25 | 100.0 | 100.0 | 100.0 | 100.0 |
+| event | 15 | 100.0 | 93.3 | 73.3 | 93.3 |
+
+**Table ES.2: system policies on blind_v1 (mean [range] over six small-model seed pairs)**
+
+| policy | auto-filed % | precision % | effort | sent to the trained 35B % |
+|---|---|---|---|---|
+| agree and either confident (REPORT 115); suggestions from the small models | 64.7 [62.7, 66.3] | 97.8 [97.6, 98.0] | 0.566 [0.550, 0.584] | 0.0 [0.0, 0.0] |
+| the same; suggestions for the rest from the trained 35B | 64.7 [62.7, 66.3] | 97.8 [97.6, 98.0] | 0.539 [0.523, 0.552] | 35.3 [33.7, 37.3] |
+| + the trained 35B confident and agreeing with one small model | 69.7 [69.3, 70.3] | 97.4 [97.2, 97.6] | 0.503 [0.493, 0.513] | 35.3 [33.7, 37.3] |
+| + the trained 35B confident alone | 70.1 [69.7, 70.6] | 97.3 [97.1, 97.5] | 0.500 [0.491, 0.510] | 35.3 [33.7, 37.3] |
+| + the trained 35B, suggestions from the three-model product | 69.7 [69.3, 70.3] | 97.4 [97.2, 97.6] | 0.502 [0.495, 0.514] | 35.3 [33.7, 37.3] |
+| the trained 35B alone at its 98% (no small models) | 64.5 [64.5, 64.5] | 97.8 [97.8, 97.8] | 0.534 [0.534, 0.534] | 100.0 [100.0, 100.0] |
+
+### 122.1 What the step says
+
+- **On the set built blind to our generators, the trained 35B is the best single reader.** 84.8 top-1 (96% of the 87.9 ceiling), and
+  by effort alone 0.534, better than decider-4B (0.589) and the encoder-decider system (0.560). It keeps what the untrained 35B knew (new
+  users 74, new chains 81, new local businesses 78, novel_merchants_v1 59 against 52) and gains what the recipe teaches (idiosyncratic
+  filings 49 -> 95, weekday rules 46 -> 84, changes of mind 28 -> 53).
+- **It did not store the merchant database.** REAL-6 falls to 74 and its novel-name copy to 69 (decider-4B 86 and 85): REAL-6's unseen
+  merchants are answerable only from the database episodes, which a LoRA without the routed experts, at the 4B's steps and rate,
+  stores less (the higher final loss says the same). Row 128 tests whether the experts (or more steps) fix it. On blind_v1 this does not
+  show, because blind_v1's merchants are real chains and local names the base model already knows about.
+- **As the escalation reader, untrained is better.** Sent the 35% the small models leave, the trained 35B lifts auto-filing to 70% and
+  effort to 0.500, where the untrained one reached 73% and 0.470 (REPORT 117), although where the small models disagree it is right
+  as often (53.5 against 51.4). The likely reason (not measured here) is that, trained on the same episodes, its confidence and mistakes
+  overlap the small models', so it adds less as a second opinion: for the third reader, being different may matter more than being
+  stronger.
+- **Where this leaves the system:** at equal cost the best is still the small pair with the untrained 35B for what they leave
+  (0.470); the trained 35B alone (0.534, all transactions through a 3B-active model) is simpler and in between.
+
+
+## 123. Other users' filings in the prompt: trained with a line naming the categories other users file the payee under, decider-4B reads new users 8 points better (61 -> 69) and blind_v1 1.3 points better (83.8), the user's own habits are untouched (86.7), effort at W = 10 falls 0.651 -> 0.619; read untrained, the line does nothing (REAL-23)
+
+PLAN step 124. At test, `blind_v1_others` (`BLIND_OTHERS=1`): blind_v1's items with one line before the query, "Other users file this
+payee as: Restaurants (600), Food (475), Takeout & dining (449)", the top three categories the other 249 users filed the same payee under
+before the query's date, shown when there are at least three such rows (1,040 of 1,500 items, 133 of the 168 new-user items). In
+training (`OTHERS=0.5`, exp_categoriser `others_line`), half the episodes carry such a line built from the query merchant's standard
+category or kind: other users' names for it (the standard name and REAL-6's renames, or the kind's names), led in 20% of lines by another
+category's names (other users disagree), counts log-uniform from 3 to 2,000. The recipe with labelled rows otherwise; two seeds.
+`scripts/others_tables.py`, job list `scripts/modal_jobs/r124.json`.
+
+**Table OT.1: top-1 on blind_v1 by group (mean over seeds)**
+
+| arm | all (n=1500) | items with the line (n=1040) | new users (0-10 rows) (n=168) | new merchants (chain / descriptive / opaque) (n=110) | user's own habit (idiosyncratic, changed mind, named) (n=98) | plain / recurring / income (n=780) |
+|---|---|---|---|---|---|---|
+| the recipe | 82.5 | 85.6 | 61.3 | 49.5 | 85.2 | 99.4 |
+| the recipe, line shown (zero-shot) | 82.7 | 86.2 | 60.7 | 48.2 | 86.7 | 99.5 |
+| trained with the line, line not shown | 82.7 | 86.2 | 61.9 | 45.0 | 86.7 | 99.7 |
+| trained with the line, line shown | 83.8 | 87.8 | 69.3 | 49.5 | 86.7 | 99.9 |
+
+**Table OT.2: effort on blind_v1 (mean [range] over seeds)**
+
+| arm | 98% cut, W = 5: auto-filed % / effort | per-item, W = 10: auto-filed % / precision % / effort |
+|---|---|---|
+| the recipe | 63.0 [61.9, 64.1] / 0.593 [0.586, 0.601] | 62.5 [62.4, 62.6] / 98.1 [98.1, 98.1] / 0.651 [0.645, 0.657] |
+| the recipe, line shown (zero-shot) | 62.9 / 0.585 | 61.4 / 98.2 / 0.649 |
+| trained with the line, line not shown | 61.1 [60.7, 61.4] / 0.609 [0.599, 0.619] | 62.4 [61.1, 63.7] / 97.9 [97.7, 98.0] / 0.662 [0.648, 0.677] |
+| trained with the line, line shown | 60.9 [60.8, 60.9] / 0.587 [0.579, 0.595] | 64.8 [63.4, 66.1] / 97.8 [97.8, 97.9] / 0.619 [0.599, 0.639] |
+
+Other sets, top-1 (seeds 0 / 1), the recipe against trained with the line (no line at test): REAL-6 85.2 / 87.6 against 86.2 / 91.6;
+novel names 84.2 / 85.2 against 87.6 / 82.9; misleading names 65.2 / 66.1 against 65.4 / 63.8; override 98.0 / 97.1 against 98.4 / 98.2.
+
+### 123.1 What the step says
+
+- **Other users' filings are the knowledge a new user lacks, and the reader uses them once trained to.** New users rise from 61 to 69
+  (items with the line from 85.6 to 87.8), where the user's own history cannot help; blind_v1 overall 82.5 -> 83.8, effort at W = 10
+  0.651 -> 0.619 (5% less) with auto-filing 62.5 -> 64.8%.
+- **The user still wins.** Filings for the user's own reasons (idiosyncratic, changed mind, merchant-named categories) stay at 86.7: the
+  20% of training lines where other users disagree taught the reader to treat the line as a prior, as override episodes taught it for
+  the database (REPORT 84).
+- **Untrained, the line is ignored** (82.7 against 82.5), and a model trained with it reads plain prompts as before (82.7) and the other
+  sets within seed noise: the line can be shown when it exists and left out when it does not.
+- **New merchants do not gain** (49.5): the line exists only for payees other users have filed, which new merchants mostly are not.
+- **For production:** the counts come from the whole user base at inference time (a per-payee histogram of category names, cheap to keep);
+  only filings dated before the transaction may count (the rule held here). The synthetic training line maps other users' names through
+  REAL-6's rename lists; real data will show how varied other users' names are.
+- **Decision:** the recipe takes `OTHERS=0.5` when a payee histogram is available (it is in production); the system comparison with it is
+  row 129.
+
+## 124. An exponential moving average of the LoRA weights does not steady the seeds (effort 0.682 against 0.659, auto-filing spread 6 points against 5); the instability was mostly the fixed threshold's: under the per-item rule the plain recipe's auto-filing varies 1.7 points over three seeds (TRAIN-13)
+
+PLAN step 122. The recipe with labelled rows, seeds 0 to 2, plain and with the saved weights an EMA of the LoRA weights (decay 0.99 per
+step, `EMA=0.99`); blind_v1, REAL-6 and novel names. `scripts/stability_tables.py`, job lists `scripts/modal_jobs/r122.json`, `r122b.json`
+(the EMA adapters rescored under their saved names).
+
+**Table ST.1: decider-4B (labelled rows) per seed, plain and with an EMA of the LoRA weights (0.99)**
+
+| weights | seed | blind top-1 | auto-filed at 98% cut | per-item W=10: auto-filed % | precision % | effort | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| plain | s0 | 82.6 | 64.1 | 62.4 | 98.1 | 0.657 | 85.2 | 84.2 |
+| plain | s1 | 82.3 | 61.9 | 62.6 | 98.1 | 0.645 | 87.6 | 85.2 |
+| plain | s2 | 83.1 | 59.3 | 64.1 | 97.6 | 0.674 | 86.9 | 81.9 |
+| plain | **spread** | 0.7 | 4.8 | 1.7 | 0.5 | 0.029 | 2.3 | 3.4 |
+| EMA 0.99 | s0 | 82.8 | 55.9 | 63.0 | 96.9 | 0.717 | 86.2 | 86.9 |
+| EMA 0.99 | s1 | 82.4 | 58.2 | 62.0 | 97.8 | 0.671 | 88.3 | 85.6 |
+| EMA 0.99 | s2 | 82.2 | 62.2 | 63.9 | 97.8 | 0.658 | 85.6 | 86.6 |
+| EMA 0.99 | **spread** | 0.6 | 6.3 | 1.9 | 0.9 | 0.059 | 2.7 | 1.3 |
+
+### 124.1 What the step says
+
+- **EMA does not help.** Top-1 is unchanged, auto-filing at the 98% cut is lower (55.9 to 62.2%) and as spread, effort is higher on
+  average (0.682 against 0.659); at this schedule (the rate decays to zero over 800 steps) the final weights are already an average of
+  sorts, and averaging in earlier, less-trained weights costs confidence.
+- **The seed spread in auto-filing was the fixed threshold.** Three seeds of the plain recipe auto-file 59 to 64% at the fixed 98% cut
+  (spread 4.8) but 62.4 to 64.1% under the per-item rule at W = 10 (spread 1.7), with effort spread 0.03: a fixed cut sits on the steep
+  part of each seed's confidence distribution, where the per-item rule weighs each transaction's own costs. REPORT 109's 18-point spread
+  was measured at a fixed cut too. Decision: no EMA; the per-item rule (REPORT 118) is also the stability fix.
+
+
+## 125. What decider-35B-A3B costs to serve: in vLLM on one H200 the trained 35B reads one user's sync of 30 at 20.3 ms per transaction with the prefix cache and a queue of syncs at 14.1 ms, 1.4 to 1.6 times decider-4B on an H100 (12.8 and 10.2); about $18 per million transactions against $11, and its 69 GB of weights need a large GPU of their own (INFRA-3, EVAL-12)
+
+PLAN step 130 (owner, 2026-09-29: how much does the 35B cost to train and to infer?). The trained 35B (row 125, adapter merged, bf16)
+in vLLM 0.30 on one H200, on REPORT 120's 24 syncs in the same token ids, with the same readout. `scripts/bench_vllm.py`,
+`results/bench_vllm_35b.json`, job list `scripts/modal_jobs/r130.json`.
+
+**Table 125.1: ms per transaction (top-1 on the 24 syncs in brackets); decider-4B from REPORT 120**
+
+| model, GPU | layout | prefix cache | one sync of 10 | one sync of 30 | 24 syncs at once |
+|---|---|---|---|---|---|
+| decider-4B, H100 | split | off | 28.2 | 25.5 | 24.5 |
+| decider-4B, H100 | split | on | 23.5 | **12.8** | **10.2** |
+| decider-35B-A3B trained, H200 | split | off | 37.6 (82.1) | 28.3 (83.9) | 25.0 |
+| decider-35B-A3B trained, H200 | split | on | 39.9 (82.1) | **20.3** (83.6) | **14.1** |
+| decider-35B-A3B trained, H200 | today's | on | 48.3 (80.8) | 27.2 (83.2) | 20.6 |
+
+**Training** (from the jobs' logs): decider-4B's recipe trains in 25 to 45 minutes on one H100; the 35B's in 42 minutes on one H200 (peak
+77 GiB; 57 minutes with download and scoring): a few dollars each at list prices (about $4 per H100-hour, $4.5 per H200-hour; not
+re-checked).
+
+### 125.1 What the step says
+
+- **Per transaction the 35B costs 1.4 to 1.6 times the 4B**, not the 3 to 4 times first stated in REPORT 117 (corrected there): with 3B
+  parameters active per token its compute is the 4B's, and what it adds is the routing and a larger GPU. Queued: 14.1 ms on an H200
+  (~$18 per million transactions) against 10.2 ms on an H100 (~$11).
+- **As the escalation reader** (a third of transactions) it adds about $6 per million to the 4B-and-encoder system; as the only reader it
+  is ~$18 per million. Either is small next to any hosted API; the operational cost is a second model and an 80 GB-plus GPU kept for it.
+- **A sync of 10 gains nothing from the cache on the 35B** (39.9 against 37.6 ms): concurrent requests of one short sync all compute the
+  prefix before it is cached, and the MoE layers make the duplicated prefill dearer. Syncs of 30 and queues gain (20.3, 14.1).
+- **Top-1 moves by 0.3 between cache on and off** (83.9 against 83.6 at 30): MoE routing in batched bf16 is not bit-stable across batch
+  shapes; the 4B matched to the decimal.
+
+
+## 126. The system with everything that helped, by expected effort under the per-item rule: the encoder and decider-4B (with other users' filings in the prompt), and the untrained decider-35B-A3B for the third they leave, cost the user 0.549 per transaction at W = 10 (decider alone 0.659: 17% less), auto-filing 71% at 97.7%; the other-users line and the 35B overlap (each helps most alone), and past W = 50 only reading everything with all three helps (EVAL-14, REAL-23)
+
+PLAN step 129. blind_v1; decider-4B three seeds each (the recipe; trained with the other-users line and reading blind_v1_others), the
+encoder three seeds, the untrained decider-35B-A3B. Every distribution calibrated with a leave-fold-out temperature; combinations are
+products of the members' calibrated distributions, recalibrated; every auto-file decision is the per-item rule (REPORT 118). "pair ->
+35B": the pair's rule first, the rest re-decided on the three-model product. `scripts/system_v2_tables.py` (BIG=<file> for another third
+reader), job list `scripts/modal_jobs/r129.json` (the line's seed 2).
+
+**Table SY2.1: blind_v1, effort per transaction under the per-item rule (mean [range] over seed pairs; decider seeds: recipe 3, + other users' line 3; encoder seeds 3)**
+
+| decider | system | W = 5 | W = 10 | W = 20 | W = 50 | auto-filed % / precision % at W = 10 | sent to the 35B % |
+|---|---|---|---|---|---|---|---|
+| recipe | decider | 0.556 [0.544, 0.562] | 0.659 [0.645, 0.674] | 0.786 [0.779, 0.795] | 0.994 [0.925, 1.071] | 63.0 [62.4, 64.1] / 97.9 [97.6, 98.1] | 0 |
+| recipe | pair | 0.536 [0.517, 0.547] | 0.630 [0.622, 0.635] | 0.755 [0.723, 0.804] | 1.007 [0.970, 1.078] | 65.8 [64.9, 66.7] / 97.7 [97.6, 97.9] | 0 |
+| recipe | pair -> 35B | 0.463 [0.449, 0.480] | 0.556 [0.538, 0.579] | 0.693 [0.683, 0.721] | 0.971 [0.948, 1.000] | 70.5 [69.2, 71.5] / 97.8 [97.5, 98.0] | 34.2 [33.3, 35.1] |
+| recipe | three for all | 0.456 [0.449, 0.463] | 0.548 [0.534, 0.563] | 0.679 [0.666, 0.697] | 0.921 [0.891, 0.947] | 69.3 [68.3, 70.1] / 98.0 [97.9, 98.2] | 100 |
+| + other users' line | decider | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] | 0.995 [0.983, 1.010] | 65.4 [63.4, 66.5] / 97.8 [97.6, 97.9] | 0 |
+| + other users' line | pair | 0.507 [0.488, 0.524] | 0.603 [0.583, 0.618] | 0.735 [0.717, 0.761] | 1.032 [0.981, 1.072] | 66.4 [65.0, 67.4] / 97.8 [97.5, 98.0] | 0 |
+| + other users' line | pair -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] | 0.985 [0.951, 1.068] | 71.3 [69.5, 72.2] / 97.7 [97.4, 97.9] | 33.6 [32.6, 35.0] |
+| + other users' line | three for all | 0.441 [0.429, 0.451] | 0.541 [0.525, 0.553] | 0.666 [0.651, 0.691] | 0.921 [0.886, 0.974] | 70.1 [68.7, 71.1] / 97.9 [97.7, 98.1] | 100 |
+
+With the trained 35B (row 125) as the third reader instead, "+ other users' line, pair -> 35B" reads 0.470 / 0.570 / 0.718 / 0.990 at
+W = 5 / 10 / 20 / 50 (auto-filed 68.4%): the untrained one is better as the third reader here too (REPORT 122).
+
+### 126.1 What the step says
+
+- **The best system so far:** encoder x decider (trained with other users' filings, shown when the payee has them), and the untrained
+  35B for the ~34% the pair does not auto-file: effort 0.549 at W = 10 against 0.659 for the recipe's decider alone (17% less), 71%
+  auto-filed at 97.7%; the ordering holds at W = 5 and 20. Its GPU cost is about $20 to $25 per million transactions in vLLM
+  (REPORT 120, 125).
+- **Other users' filings and the 35B cover the same gap.** The line takes decider alone from 0.659 to 0.622 and the pair from 0.630 to
+  0.603, but with the 35B behind the pair only from 0.556 to 0.549: both bring knowledge the user's own history lacks (what a payee
+  usually is), and the 35B already has most of it. Without a large model the line is the cheap way to get it.
+- **At W = 50 the picture changes.** When a wrong auto-file is very costly the pair is no better than decider alone (0.99 to 1.03), and
+  only reading everything with all three helps (0.92): at that W only the most certain transactions are auto-filed, and ranking those
+  is where the 35B's confidence adds the most.
+- **What remains open for real data:** W itself (the owner's call, then users' undo behaviour); the calibration fitted on the product's
+  own users (REPORT 116); how varied real users' names are in the other-users line.
+
+
+## 127. decider-35B-A3B's missing database was under-training, not the frozen experts: at twice the rate (same 800 steps) it reads REAL-6 at 85.9 and novel names at 84.2 (4B level; row 125: 74 and 69), at twice the steps 88.3 and 86.6, with blind_v1 kept (84.3, 83.7); but by effort on blind_v1 neither beats row 125's run, and the harder it is trained the less it adds as the third reader (0.584 to 0.590 against the untrained 35B's 0.549 at W = 10) (MODEL-20)
+
+PLAN step 128. Row 125's LoRA targets (routed experts frozen) at lr 2e-4 x 800 steps and at 1e-4 x 1,600 steps; one H200 each (54 and 95
+minutes with scoring); final loss 0.46 and 0.53 (row 125: 0.64). Effort under the per-item rule (REPORT 118); as the third reader, the
+system of REPORT 126 (encoder x decider with the other-users line, then the 35B for the rest). `scripts/system_v2_tables.py BIG=<file>`,
+job list `scripts/modal_jobs/r128.json`.
+
+**Table 127.1: top-1, and effort on blind_v1 alone and as the third reader (W = 10 unless shown)**
+
+| 35B run | blind_v1 | REAL-6 | novel names | misleading | alone: W = 5 / 10 / 20 / 50 | as third reader (pair -> 35B), W = 10 |
+|---|---|---|---|---|---|---|
+| untrained | 82.0 | – | – | – | – / 0.701 / – / – | **0.549** |
+| row 125: 1e-4 x 800 | **84.8** | 74.2 | 69.1 | 61.4 | 0.497 / **0.593** / 0.695 / 0.877 | 0.570 |
+| 2e-4 x 800 | 84.3 | 85.9 | 84.2 | 63.4 | 0.486 / 0.613 / 0.795 / 0.947 | 0.584 |
+| 1e-4 x 1,600 | 83.7 | **88.3** | **86.6** | 64.4 | 0.507 / 0.626 / 0.755 / 0.885 | 0.590 |
+
+### 127.1 What the step says
+
+- **The 35B stores the database once trained enough.** REAL-6 and its novel-name copy reach decider-4B's level (85 to 88) with the
+  routed experts still frozen; row 125 had simply not trained far enough (loss 0.64 against 0.46).
+- **The blind set does not reward it.** blind_v1's merchants are real businesses the base already knows; more training moves it toward
+  our generator (REAL-6 up) and slightly away from the blind set (84.8 -> 83.7), and its effort there gets worse (0.593 -> 0.613 to 0.626).
+  REPORT 103's lesson again: fixed synthetic training tunes readers to their generator.
+- **As the third reader, the less trained the better:** 0.549 untrained, 0.570, 0.584, 0.590. The escalation reader's value is an
+  independent opinion from world knowledge; training it on the small models' episodes removes that.
+- **Decision:** the system keeps the untrained decider-35B-A3B as its third reader (REPORT 126). If one large model must read everything,
+  row 125's run is the best of these on the blind set; with real data the trade between the generator's database and world knowledge
+  has to be measured again.
+
+
+## 128. Another opinion from a small model barely helps: an untrained decider-4B, a decider-4B trained on another prompt format or a third seed each lift the pair only from 0.603 to 0.588 to 0.607 (W = 10), where the untrained 35B takes it to 0.549; the 35B is right on a quarter of the pair's mistakes, every 4B on a sixth, and stacking a 4B on the 35B adds nothing: what the third reader must bring is knowledge the small models lack, not just a different view (EVAL-12)
+
+PLAN step 131 (owner, 2026-09-30: "if we just need another opinion, would an untrained 4B help? an ensemble of smaller models?"). CPU
+only, saved blind_v1 scores; the base pair is REPORT 126's (encoder x decider-4B with the other-users line, nine seed pairs); per-item
+rule. "X right where the pair is wrong": the share of the pair's wrong top answers that X gets right. `scripts/ensemble_tables.py`.
+
+**Table EN.1: blind_v1, effort per transaction under the per-item rule (mean [range] over 9 seed pairs of the encoder x decider with the other-users line)**
+
+| third reader X | compute (4B = 1) | X alone: top-1 / effort W=10 | X right where the pair is wrong % | pair -> X: W = 5 / 10 / 20 | all three: W = 5 / 10 / 20 |
+|---|---|---|---|---|---|
+| (none: the pair) | 0 | – | – | 0.507 [0.488, 0.524] / 0.603 [0.583, 0.618] / 0.735 [0.717, 0.761] | – |
+| decider-4B untrained (letters) | 1.0 | 76.5 / 0.949 | 17.6 | 0.494 [0.484, 0.508] / 0.588 [0.565, 0.613] / 0.724 [0.699, 0.739] | 0.498 [0.484, 0.510] / 0.584 [0.571, 0.594] / 0.723 [0.706, 0.737] |
+| decider-4B untrained (random A-Z labels) | 1.0 | 76.4 / 0.985 | 18.3 | 0.501 [0.481, 0.512] / 0.600 [0.578, 0.618] / 0.724 [0.700, 0.743] | 0.505 [0.488, 0.518] / 0.592 [0.573, 0.601] / 0.722 [0.697, 0.734] |
+| decider-4B recipe, decider's own layout (other prompt) | 1.0 | 82.4 / 0.642 | 17.3 | 0.495 [0.481, 0.506] / 0.595 [0.582, 0.605] / 0.747 [0.727, 0.762] | 0.497 [0.488, 0.505] / 0.593 [0.585, 0.602] / 0.750 [0.734, 0.766] |
+| decider-4B recipe, YAML history | 2.0 | 81.7 / 0.668 | 16.3 | 0.510 [0.497, 0.524] / 0.604 [0.587, 0.619] / 0.744 [0.724, 0.763] | 0.509 [0.496, 0.523] / 0.599 [0.588, 0.615] / 0.741 [0.724, 0.759] |
+| decider-4B recipe, TSV table | 1.2 | 81.1 / 0.685 | 15.6 | 0.506 [0.487, 0.522] / 0.607 [0.584, 0.625] / 0.746 [0.729, 0.768] | 0.512 [0.499, 0.525] / 0.605 [0.591, 0.617] / 0.741 [0.725, 0.764] |
+| decider-4B recipe, labelled rows, seed 2 (same prompt) | 1.0 | 83.1 / 0.674 | 17.3 | 0.499 [0.486, 0.509] / 0.593 [0.578, 0.606] / 0.732 [0.707, 0.752] | 0.496 [0.485, 0.503] / 0.589 [0.574, 0.603] / 0.739 [0.714, 0.753] |
+| decider-35B-A3B untrained | 1.5 | 82.0 / 0.701 | 25.6 | 0.453 [0.435, 0.475] / 0.549 [0.533, 0.563] / 0.681 [0.655, 0.703] | 0.441 [0.429, 0.451] / 0.541 [0.525, 0.553] / 0.666 [0.651, 0.691] |
+| decider-35B-A3B recipe (row 125) | 1.5 | 84.8 / 0.593 | 25.1 | 0.477 [0.464, 0.493] / 0.573 [0.561, 0.587] / 0.713 [0.700, 0.728] | 0.467 [0.459, 0.478] / 0.563 [0.547, 0.577] / 0.713 [0.696, 0.723] |
+| + decider-4B untrained (letters) + decider-35B-A3B untrained | 2.5 | – | – | 0.470 [0.453, 0.477] / 0.565 [0.535, 0.595] / 0.679 [0.653, 0.703] | 0.464 [0.457, 0.471] / 0.562 [0.541, 0.581] / 0.668 [0.657, 0.684] |
+| + decider-4B untrained (letters) + decider-4B recipe, decider's own layout (other prompt) | 2.0 | – | – | 0.485 [0.473, 0.501] / 0.580 [0.558, 0.598] / 0.723 [0.711, 0.745] | 0.485 [0.469, 0.494] / 0.576 [0.569, 0.589] / 0.719 [0.711, 0.729] |
+| + decider-4B untrained (letters) + decider-4B recipe, decider's own layout (other prompt) + decider-35B-A3B untrained | 3.5 | – | – | 0.467 [0.453, 0.487] / 0.547 [0.533, 0.559] / 0.691 [0.679, 0.718] | 0.459 [0.445, 0.471] / 0.540 [0.533, 0.547] / 0.693 [0.685, 0.701] |
+
+Confidence as a signal of being wrong (first seeds; W = 10): decider-4B with the other-users line is right on 84.2%, auto-files 66.1% at
+97.9%, and holds back 91.1% of its wrong answers for the user (AUROC of its confidence for right against wrong 0.908); the three-model
+system holds back 90.5% of its (fewer) wrong answers (AUROC 0.911). New users are its weak spot: auto-filed 45% (system 39%), right
+93.3% (95.5%) when auto-filed.
+
+### 128.1 What the step says
+
+- **A small second opinion helps a little.** Every 4B variant, trained or not, gets about a sixth of the pair's mistakes right (15.6 to
+  18.3%) and moves effort by -0.015 to +0.004: the untrained 4B is the best of them (0.588; compute +1), a third seed of the same recipe
+  as good (0.593).
+- **The 35B's value is knowledge, not diversity alone.** It gets a quarter of the pair's mistakes right (25.6%) and takes effort to 0.549.
+  A 4B added to the 35B does not help (0.565 escalated, 0.562 for all four); an ensemble of 4Bs plus the 35B is no better than the 35B
+  alone behind the pair (0.547 against 0.549) at more than twice the compute.
+- **Decision:** the third reader stays the untrained decider-35B-A3B; without a large model, the cheap substitute for its knowledge is the
+  other-users line (REPORT 123), not more small readers.
+
+
+## 129. A rank-based score for suggestions (owner's scale): the right category at rank r costs r - 1, not shown 10, each wrong category shown a clutter penalty, at most five shown and only those the model has some confidence in; list length and auto-filing both follow from calibrated probabilities. On this scale an auto-file needs a cost for confirming a suggestion, or the rule has no reason to auto-file; with a confirm cost of 0.5 and W = 20 the three-model system scores 1.50 per transaction (no model: 10), auto-filing 64% at 98.4% with lists of 1.8 (EVAL-14)
+
+PLAN step 132 (owner, 2026-09-30): "guessing number 1 correctly on everything is ideal ... suggesting irrelevant categories looks bad and
+should also be penalized ... only the top 5 ... only suggest ones that we have some measure of confidence for ... guessing correctly in 1st
+place is a 0. Being 1 away is a 1. 2 away is a 2, up to 5. And not showing it is a 10." `scorecard.rank_effort` / `suggest`:
+
+- the right category at rank r (1 to 5) costs r - 1; not among the shown ones, MISS = 10;
+- each wrong category shown costs LAM (clutter; a proxy for "irrelevant" until a plausibility judgement exists);
+- rank r is shown when its expected gain beats its expected clutter, p_r (MISS - (r - 1)) > (1 - p_r) LAM, stopping at the first rank that
+  fails: low-confidence categories are never shown, and the list is 1 to 5 long;
+- a transaction is auto-filed when (1 - p1) W is below the list's expected cost; accepting a shown suggestion costs CONFIRM more than an
+  auto-file. The worst ordering (the right category last) costs MISS, as does any ordering that does not show it.
+
+`scripts/rank_tables.py`; blind_v1; calibrated probabilities as in REPORT 118.
+
+**Table RK.1: ranking quality (mean over seeds / pairs)**
+
+| system | top-1 % | right in top 5 % | MRR@5 |
+|---|---|---|---|
+| decider-4B (+ other users' line) | 83.8 | 95.1 | 0.884 |
+| encoder x decider | 84.4 | 95.5 | 0.890 |
+| encoder x decider x 35B (all three) | 85.7 | 96.3 | 0.902 |
+
+**Table RK.2: rank effort at W = 10 (right at rank r costs r - 1, not shown 10, each wrong category shown LAM, wrong auto-file W); no model = 10 per transaction**
+
+| system | LAM | effort | auto-filed % / precision % | suggestions shown (when not auto-filed) | right one among them % | effort, never auto-file |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 0.5 | 1.187 [1.155, 1.211] | 68.9 [67.1, 70.9] / 96.4 [96.3, 96.6] | 2.69 [2.65, 2.72] | 82.8 [80.5, 84.0] | 1.196 [1.173, 1.213] |
+| decider-4B (+ other users' line) | 1.0 | 1.395 [1.363, 1.442] | 79.5 [77.3, 82.1] / 91.4 [91.0, 91.9] | 2.32 [2.26, 2.35] | 83.5 [82.1, 84.5] | 1.460 [1.383, 1.517] |
+| decider-4B (+ other users' line) | 2.0 | 1.557 [1.516, 1.587] | 91.6 [90.3, 93.3] / 86.2 [86.0, 86.5] | 2.05 [2.02, 2.07] | 91.0 [88.8, 93.1] | 1.771 [1.737, 1.822] |
+| encoder x decider | 0.5 | 1.111 [1.063, 1.144] | 71.0 [70.2, 72.1] / 96.1 [95.5, 96.6] | 2.76 [2.73, 2.80] | 85.0 [84.0, 86.1] | 1.121 [1.082, 1.155] |
+| encoder x decider | 1.0 | 1.314 [1.283, 1.360] | 79.8 [78.6, 81.1] / 91.5 [90.7, 91.9] | 2.37 [2.31, 2.42] | 87.5 [85.2, 89.4] | 1.374 [1.337, 1.407] |
+| encoder x decider | 2.0 | 1.496 [1.469, 1.538] | 89.2 [86.7, 91.3] / 87.6 [86.7, 88.1] | 2.10 [2.08, 2.14] | 91.4 [89.9, 93.9] | 1.713 [1.668, 1.743] |
+| encoder x decider x 35B (all three) | 0.5 | 0.992 [0.946, 1.019] | 72.5 [71.7, 73.2] / 97.3 [96.9, 97.5] | 2.75 [2.73, 2.77] | 84.6 [83.2, 86.0] | 1.002 [0.959, 1.031] |
+| encoder x decider x 35B (all three) | 1.0 | 1.175 [1.159, 1.194] | 82.3 [81.5, 82.9] / 92.9 [92.4, 93.1] | 2.35 [2.32, 2.39] | 85.6 [83.5, 88.1] | 1.224 [1.194, 1.244] |
+| encoder x decider x 35B (all three) | 2.0 | 1.352 [1.329, 1.378] | 92.3 [91.3, 93.3] / 88.5 [87.9, 89.0] | 2.09 [2.07, 2.11] | 90.6 [89.2, 93.4] | 1.521 [1.505, 1.535] |
+
+**Table RK.2: rank effort at W = 20 (right at rank r costs r - 1, not shown 10, each wrong category shown LAM, wrong auto-file W); no model = 10 per transaction**
+
+| system | LAM | effort | auto-filed % / precision % | suggestions shown (when not auto-filed) | right one among them % | effort, never auto-file |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 0.5 | 1.196 [1.173, 1.213] | 0.0 [0.0, 0.0] / – | 1.55 [1.52, 1.59] | 92.4 [92.0, 92.7] | 1.196 [1.173, 1.213] |
+| decider-4B (+ other users' line) | 1.0 | 1.460 [1.383, 1.517] | 0.0 [0.0, 0.0] / – | 1.33 [1.29, 1.36] | 90.4 [89.8, 91.3] | 1.460 [1.383, 1.517] |
+| decider-4B (+ other users' line) | 2.0 | 1.771 [1.737, 1.822] | 0.0 [0.0, 0.0] / – | 1.17 [1.14, 1.20] | 88.4 [88.0, 88.7] | 1.771 [1.737, 1.822] |
+| encoder x decider | 0.5 | 1.121 [1.082, 1.155] | 0.0 [0.0, 0.0] / – | 1.54 [1.52, 1.57] | 93.1 [92.9, 93.4] | 1.121 [1.082, 1.155] |
+| encoder x decider | 1.0 | 1.374 [1.337, 1.407] | 0.0 [0.0, 0.0] / – | 1.34 [1.31, 1.36] | 91.4 [90.8, 91.7] | 1.374 [1.337, 1.407] |
+| encoder x decider | 2.0 | 1.713 [1.668, 1.743] | 0.0 [0.0, 0.0] / – | 1.19 [1.16, 1.22] | 89.3 [88.6, 89.8] | 1.713 [1.668, 1.743] |
+| encoder x decider x 35B (all three) | 0.5 | 1.002 [0.959, 1.031] | 0.0 [0.0, 0.0] / – | 1.50 [1.48, 1.52] | 93.9 [93.5, 94.3] | 1.002 [0.959, 1.031] |
+| encoder x decider x 35B (all three) | 1.0 | 1.224 [1.194, 1.244] | 0.0 [0.0, 0.0] / – | 1.29 [1.28, 1.31] | 92.3 [92.1, 92.5] | 1.224 [1.194, 1.244] |
+| encoder x decider x 35B (all three) | 2.0 | 1.521 [1.505, 1.535] | 0.0 [0.0, 0.0] / – | 1.15 [1.13, 1.16] | 90.2 [89.8, 90.4] | 1.521 [1.505, 1.535] |
+
+**Table RK.3: with a confirm cost (accepting a shown suggestion costs CONFIRM over an auto-file), LAM = 1**
+
+| system | W | confirm | effort | auto-filed % / precision % | suggestions shown | right one among them % |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 20 | 0.5 | 1.765 [1.689, 1.820] | 56.1 [55.1, 56.8] / 98.3 [98.2, 98.4] | 1.75 [1.66, 1.80] | 80.4 [78.9, 82.1] |
+| decider-4B (+ other users' line) | 20 | 1.0 | 1.938 [1.849, 2.005] | 65.6 [63.8, 66.5] / 97.7 [97.6, 97.8] | 1.95 [1.86, 2.00] | 76.5 [74.4, 78.3] |
+| decider-4B (+ other users' line) | 30 | 0.5 | 1.856 [1.781, 1.900] | 42.7 [40.7, 43.7] / 98.6 [98.5, 98.8] | 1.57 [1.51, 1.64] | 84.3 [83.1, 86.2] |
+| decider-4B (+ other users' line) | 50 | 1.0 | 2.262 [2.192, 2.306] | 42.3 [39.9, 43.6] / 98.6 [98.5, 98.8] | 1.57 [1.51, 1.63] | 84.4 [83.2, 86.4] |
+| encoder x decider | 20 | 0.5 | 1.670 [1.626, 1.696] | 61.8 [60.6, 62.6] / 98.1 [97.9, 98.3] | 1.88 [1.81, 1.95] | 80.4 [78.4, 82.1] |
+| encoder x decider | 20 | 1.0 | 1.845 [1.800, 1.881] | 66.5 [65.1, 67.8] / 97.7 [97.4, 98.0] | 2.00 [1.95, 2.07] | 78.7 [76.9, 79.9] |
+| encoder x decider | 30 | 0.5 | 1.778 [1.743, 1.804] | 52.4 [49.5, 53.9] / 98.3 [98.1, 98.5] | 1.71 [1.65, 1.78] | 83.7 [82.2, 85.1] |
+| encoder x decider | 50 | 1.0 | 2.195 [2.162, 2.215] | 51.9 [49.1, 53.5] / 98.3 [98.1, 98.4] | 1.70 [1.64, 1.77] | 83.8 [82.3, 85.2] |
+| encoder x decider x 35B (all three) | 20 | 0.5 | 1.496 [1.469, 1.516] | 63.9 [62.9, 64.5] / 98.4 [98.2, 98.6] | 1.82 [1.79, 1.85] | 81.4 [80.5, 82.2] |
+| encoder x decider x 35B (all three) | 20 | 1.0 | 1.651 [1.614, 1.671] | 70.4 [69.0, 71.4] / 97.9 [97.7, 98.0] | 2.00 [1.98, 2.02] | 78.7 [77.8, 79.6] |
+| encoder x decider x 35B (all three) | 30 | 0.5 | 1.593 [1.557, 1.636] | 55.4 [54.5, 56.3] / 98.6 [98.4, 98.8] | 1.66 [1.63, 1.69] | 84.4 [84.0, 84.9] |
+| encoder x decider x 35B (all three) | 50 | 1.0 | 1.971 [1.919, 2.041] | 55.0 [54.1, 55.9] / 98.6 [98.4, 98.8] | 1.66 [1.63, 1.69] | 84.5 [84.1, 85.0] |
+
+### 129.1 What the step says
+
+- **The ranking itself is good:** the right category is first 84 to 86% of the time and in the top five 95 to 96% (MRR@5 0.88 to 0.90);
+  the three-model system is best on every measure.
+- **Auto-filing needs a price difference.** On the owner's scale a right first suggestion costs 0, the same as a right auto-file, so the
+  rule gains nothing from auto-filing: at W = 20 it auto-files nothing, and at W = 10 it auto-files only to avoid the clutter penalty
+  (91% precision, RK.2). A small confirm cost (0.5: a tap) restores the trade: at W = 20 decider auto-files 56% at 98.3%, the system 64%
+  at 98.4%; at W = 30, 43 to 55% at 98.6%.
+- **Lists are short when the model is sure.** With LAM = 1 the rule shows 1.6 to 2.0 suggestions on average, and the right category is
+  among them 80 to 84% of the time; a larger LAM shortens lists further and misses more. Showing all five would find it about 90% of
+  the time but put mostly wrong categories in front of the user.
+- **Proposed defaults** (the owner decides): MISS 10, LAM 1, CONFIRM 0.5, W 20 (a silent wrong auto-file twice as bad as not suggesting
+  the right category at all). Under them the ordering of systems is the same as under REPORT 118's score.
+- **Limit:** LAM charges every wrong suggestion alike; "irrelevant" (a wrong category that makes no sense) against "plausible but wrong"
+  needs a judgement per suggestion, from a strong reader on a sample or, with real data, from what users pick.
+
+
+## 130. A report card in plain percentages, with plausible suggestions free: the three-model system files 61% of transactions automatically and right (1% wrong), puts the right category first in the list for another 25% and 2nd to 5th for 8%, and leaves 5% for the user to search, saving 88% of the work of filing by hand; showing the user's other usual categories for a payee (free) cuts searches from 6.7 to 5.1% (EVAL-14)
+
+PLAN step 133 (owner, 2026-09-30: the rank scores are hard to read; do not penalise plausible suggestions, a user may file Amazon under
+four categories). Plausible categories, known when the prompt is built: the ones this user filed the payee under in the prompt's rows
+(payee by `oneslot.payee_key`) and the user's categories other users file it under (the other-users line). They are shown freely (model
+order, at most five) and never penalised; other categories only when the model is confident, and they cost the clutter penalty when wrong
+(`scorecard.suggest` / `rank_effort` with `plausible`). "Work saved" is 1 - the rank score / 10 (by hand, every transaction is a search:
+10). blind_v1_others' items; W 20, confirm 0.5, clutter 1 (REPORT 129's proposed defaults). `scripts/report_card.py [W] [CONFIRM] [LAM]`.
+
+**Report card, blind_v1 (1,500 transactions; W = 20, confirm 0.5, clutter 1 per implausible wrong suggestion; plausible categories per transaction: 1.2 on average)**
+
+| system | plausible free | filed automatically, right | filed automatically, WRONG | suggested, right one 1st | suggested, right one 2nd-5th | not suggested: user searches | suggestions shown | implausible shown per 100 | work saved vs no model |
+|---|---|---|---|---|---|---|---|---|---|
+| decider-4B | yes | 53.0% | 1.0% | 30.8% | 8.6% | 6.7% | 2.0 | 19.9 | 86% |
+| decider-4B | no | 55.1% | 1.0% | 28.6% | 6.6% | 8.6% | 1.7 | 19.9 | 82% |
+| encoder + decider | yes | 59.3% | 1.1% | 25.1% | 8.4% | 6.2% | 2.1 | 17.5 | 87% |
+| encoder + decider | no | 60.6% | 1.2% | 23.8% | 6.9% | 7.5% | 1.9 | 17.5 | 83% |
+| encoder + decider + 35B | yes | 61.3% | 1.0% | 24.5% | 8.2% | 5.1% | 2.1 | 14.9 | 88% |
+| encoder + decider + 35B | no | 62.9% | 1.0% | 22.9% | 6.5% | 6.7% | 1.8 | 14.9 | 85% |
+
+### 130.1 What the step says
+
+- **The report card is the readable form**: of every 100 transactions, the system files 61 itself and gets 1 wrong; of the 38 it shows,
+  25 have the right category first, 8 have it 2nd to 5th, and 5 need a search. That is 88% of the manual work saved.
+- **Showing plausible categories freely helps** (searches 6.7 -> 5.1% for the system, 8.6 -> 6.7% for decider alone): the right category
+  was often one the user uses for this payee but the model ranked lower. Lists grow a little (1.8 -> 2.1 suggestions).
+- **Some confident wrong suggestions remain**: 15 to 20 per 100 transactions show a wrong category that is not among the plausible ones
+  (the model's own confident second choices); whether they look irrelevant needs a human or strong-reader judgement.
+- Blind_v1 users file most payees under one category (1.2 plausible categories per transaction on average); real users with Amazon-like
+  payees will have more, which is where this matters most.
+
+
+## 131. Against YNAB's current suggestion, in a product where every transaction is confirmed: on one user's ordinary stream the rule puts the right category first 82% of the time and the models 84%; the models' value is the second-to-fifth choices and payees new to the user (searches 18 -> 5%, work saved 82 -> 93%), and most of that is had without a model by listing the payee's other past categories after the rule's suggestion (work saved 90%); on blind_v1's hard cases the models lead further (right first 73.5 -> 85.7%, new users 7 -> 78%)
+
+PLAN step 134 (owner, 2026-09-30: "YNAB makes you confirm everything anyway. It currently suggests the last one used in 2 out of 3
+transactions (or last one used if there aren't 3 transactions in that payee's history yet)"). With every transaction confirmed there is
+no auto-file: the score is where the right category lands (owner's scale: 1st 0, 2nd 1, ... 5th 4, not suggested 10), with the clutter
+cost for implausible wrong suggestions (REPORT 130). YNAB's rule is computed in the blind generator from each payee's whole filed history
+(payee identity exact; `BLIND_YNAB=1` -> `data/processed/blind_v1_ynabrule.json`; the bulk set's in `blind_bulk_v1_ynabrule.json`); when the
+last three all differ it suggests the last one (assumed). `scripts/confirm_card.py [bulk]`.
+
+**Confirm-everything card, blind_v1 (clutter 1 per implausible wrong suggestion; not suggested = 10)**
+
+| suggestions from | right one 1st % | right one 2nd-5th % | not suggested (search) % | suggestions shown | score (0 best) | work saved vs by hand |
+|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | 73.5 | 0.0 | 26.5 | 0.8 | 2.65 | 74% |
+| YNAB today + the payee's other past categories (no model) | 79.0 | 5.4 | 15.6 | 1.2 | 1.64 | 84% |
+| decider-4B | 83.8 | 8.6 | 7.6 | 1.5 | 1.08 | 89% |
+| YNAB's suggestion first, then decider-4B | 84.6 | 7.8 | 7.6 | 1.5 | 1.07 | 89% |
+| encoder + decider | 84.4 | 8.3 | 7.2 | 1.5 | 1.01 | 90% |
+| YNAB's suggestion first, then encoder + decider | 85.1 | 7.6 | 7.2 | 1.5 | 1.00 | 90% |
+| encoder + decider + 35B | 85.7 | 8.2 | 6.1 | 1.5 | 0.86 | 91% |
+| YNAB's suggestion first, then encoder + decider + 35B | 86.3 | 7.6 | 6.1 | 1.5 | 0.86 | 91% |
+
+**Right one 1st %, by kind of transaction**
+
+| suggestions from | all (n=1500) | payee seen before (n=1223) | payee new to the user (n=277) | user changed their mind / new category (n=72) | one payee, several categories (split / multi-purpose / p2p) (n=182) | new users (0-10 rows) (n=168) |
+|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | 73.5 | 90.2 | 0.0 | 59.7 | 59.9 | 7.1 |
+| decider-4B | 83.8 | 89.2 | 59.9 | 57.9 | 57.5 | 69.6 |
+| encoder + decider | 84.4 | 89.3 | 62.7 | 57.6 | 58.7 | 71.7 |
+| encoder + decider + 35B | 85.7 | 89.5 | 69.2 | 49.7 | 58.6 | 78.0 |
+
+**Confirm-everything card, blind_bulk_v1 (one sync per user, 6660 transactions in order; payee seen before 96%)**
+
+| suggestions from | right one 1st % | 2nd-5th % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |
+|---|---|---|---|---|---|---|---|---|
+| YNAB today | 82.0 | 0.0 | 18.0 | 1.0 | 1.80 | 82% | 85.3 | 0.0 |
+| YNAB today + the payee's other past categories (no model) | 82.0 | 9.6 | 8.3 | 1.5 | 0.97 | 90% | 85.3 | 0.8 |
+| decider-4B | 83.8 | 10.9 | 5.4 | 1.6 | 0.78 | 92% | 85.2 | 49.4 |
+| YNAB's suggestion first, then decider-4B | 83.9 | 10.7 | 5.4 | 1.6 | 0.78 | 92% | 85.3 | 49.4 |
+| encoder + decider | 84.1 | 10.5 | 5.4 | 1.6 | 0.74 | 93% | 85.4 | 51.4 |
+| YNAB's suggestion first, then encoder + decider | 84.0 | 10.6 | 5.4 | 1.6 | 0.75 | 93% | 85.3 | 51.4 |
+
+### 131.1 What the step says
+
+- **YNAB's rule is hard to beat at the first suggestion for payees the user has filed before**: 90% (blind_v1) and 85% (the ordinary
+  stream) right first, level with every model. Those transactions are 96% of an ordinary stream.
+- **Where the models win**: payees new to the user (the rule has nothing: 0 against 49 to 69% right first), new users (7 against 70 to
+  78%), and the list after the first suggestion. On the ordinary stream searches fall from 18% to 5.4% and work saved rises from 82% to
+  93%; on blind_v1 (hard cases over-sampled) from 74% to 91%.
+- **Most of the ordinary-stream gain needs no model**: after the rule's suggestion, list the other categories the user has filed this
+  payee under (and those other users file it under): searches 18 -> 8.3%, work saved 82 -> 90%. The models add the last 3 points there
+  (and much more on new payees and new users).
+- **The combination is the product answer**: the rule's suggestion first where the payee has history (it is as good as the models there
+  and users know it), the model's ranked list after it and for everything else. On blind_v1 that is the best row (86.3% right first).
+- **Changes of mind**: the rule (59.7% right first) beats the 35B system (49.7) and matches the small models (58): the latest filings are
+  the signal, which the rule reads directly.
+- For real data: the share of new payees and new users in real streams decides how much the models are worth over the no-model list.
+
+
+## 132. Two scores of their own: a payee filed for the first time (the models put the right category first 49 to 69% of the time and in the list 58 to 80%, where YNAB's rule has nothing), and a payee filed differently than before (models right first 22 to 27%, in the list 69 to 73%; the no-model list of the payee's past categories 0% / 67%); the models do anticipate a departure from the usual (confidence 55 to 61% against 90 to 94%, AUROC 0.89 to 0.91), but not a category never used for the payee (right first 0 to 2%) (EVAL-14)
+
+PLAN step 135 (owner, 2026-09-30: "a score JUST for cases where a user is categorizing a payee for the first time ... then how good we are
+at suggesting the correct category in any case where a user is categorizing a payee differently than they have in the past (our
+anticipation that the user might categorize it differently)"). Subsets from the generator's exact payee history
+(`BLIND_YNAB=1` / `BLIND_BULK=1` also write `blind_v1_payeehist.json` / `blind_bulk_v1_payeehist.json`): 1. no earlier filing of the payee;
+2a. the payee has history and the right category is not YNAB's rule's; 2b. a category never used for the payee; control: the rule's
+category. Scores as REPORT 131 (right first %, suggested at all %, and the owner's rank score, 0 best, 10 a search).
+`scripts/novelty_card.py [bulk]`, `scripts/gate_tables.py`.
+
+**Novelty card, blind_v1 (hard cases over-sampled): right one 1st % / suggested at all (1st-5th) % / score (0 best, 10 = search) per subset; mean over seeds / pairs**
+
+| suggestions from | 1. first time for this payee (n=277, 18.5%) | 2a. differently from YNAB's rule (n=120, 8.0%) | 2b. a category never used for this payee (n=27, 1.8%) | control: the payee's usual category (= the rule) (n=1103, 73.5%) |
+|---|---|---|---|---|
+| YNAB today | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| YNAB + the payee's other past categories (no model) | 29.6 / 30.0 / 7.01 | 0.0 / 66.7 / 4.38 | 0.0 / 7.4 / 9.33 | 100.0 / 100.0 / 0.00 |
+| decider-4B (+ other users' line) | 59.9 / 72.0 / 3.88 | 22.8 / 70.0 / 3.82 | 0.0 / 13.6 / 8.91 | 96.4 / 100.0 / 0.07 |
+| YNAB first, then decider-4B (+ other users' line) | 59.9 / 72.0 / 3.88 | 0.0 / 70.0 / 4.11 | 0.0 / 13.6 / 8.93 | 100.0 / 100.0 / 0.03 |
+| encoder + decider | 62.7 / 74.2 / 3.57 | 22.3 / 69.1 / 3.88 | 0.0 / 10.7 / 9.15 | 96.6 / 100.0 / 0.06 |
+| YNAB first, then encoder + decider | 62.7 / 74.2 / 3.57 | 0.0 / 69.1 / 4.16 | 0.0 / 10.7 / 9.15 | 100.0 / 100.0 / 0.02 |
+| encoder + decider + 35B | 69.2 / 79.9 / 2.86 | 25.4 / 70.6 / 3.71 | 2.1 / 16.5 / 8.65 | 96.5 / 100.0 / 0.05 |
+| YNAB first, then encoder + decider + 35B | 69.2 / 79.9 / 2.86 | 0.0 / 70.4 / 4.02 | 0.0 / 16.5 / 8.67 | 100.0 / 100.0 / 0.01 |
+
+**Anticipation: the model's top probability (calibrated) by subset, and how well low confidence separates 'differently' (2a) from the usual (control): AUROC of 1 - p1**
+
+| model | mean p1, 1 | mean p1, 2a | mean p1, 2b | mean p1, control | AUROC 2a vs control | AUROC 2b vs control |
+|---|---|---|---|---|---|---|
+| decider-4B (+ other users' line) | 62.8% | 56.1% | 80.4% | 91.3% | 0.894 | 0.704 |
+| encoder + decider | 55.3% | 59.1% | 81.3% | 92.7% | 0.891 | 0.687 |
+| encoder + decider + 35B | 64.9% | 60.7% | 82.0% | 94.0% | 0.905 | 0.721 |
+
+**Novelty card, blind_bulk_v1 (one user's sync, every transaction in order): right one 1st % / suggested at all (1st-5th) % / score (0 best, 10 = search) per subset; mean over seeds / pairs**
+
+| suggestions from | 1. first time for this payee (n=255, 3.8%) | 2a. differently from YNAB's rule (n=943, 14.2%) | 2b. a category never used for this payee (n=116, 1.7%) | control: the payee's usual category (= the rule) (n=5462, 82.0%) |
+|---|---|---|---|---|
+| YNAB today | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| YNAB + the payee's other past categories (no model) | 0.8 / 0.8 / 9.92 | 0.0 / 68.0 / 4.20 | 0.0 / 0.0 / 10.00 | 100.0 / 100.0 / 0.00 |
+| decider-4B | 49.4 / 58.2 / 5.26 | 27.1 / 73.4 / 3.50 | 0.9 / 6.9 / 9.47 | 95.2 / 100.0 / 0.09 |
+| YNAB first, then decider-4B | 49.4 / 58.2 / 5.26 | 0.0 / 73.4 / 3.85 | 0.0 / 6.9 / 9.47 | 100.0 / 100.0 / 0.04 |
+| encoder + decider | 51.4 / 62.3 / 4.80 | 27.5 / 72.2 / 3.55 | 0.4 / 3.9 / 9.70 | 95.4 / 100.0 / 0.07 |
+| YNAB first, then encoder + decider | 51.4 / 62.3 / 4.80 | 0.0 / 72.2 / 3.90 | 0.0 / 3.9 / 9.70 | 100.0 / 100.0 / 0.02 |
+
+**Anticipation: the model's top probability (calibrated) by subset, and how well low confidence separates 'differently' (2a) from the usual (control): AUROC of 1 - p1**
+
+| model | mean p1, 1 | mean p1, 2a | mean p1, 2b | mean p1, control | AUROC 2a vs control | AUROC 2b vs control |
+|---|---|---|---|---|---|---|
+| decider-4B | 58.4% | 55.4% | 67.6% | 90.0% | 0.903 | 0.800 |
+| encoder + decider | 54.0% | 55.1% | 69.1% | 90.1% | 0.909 | 0.794 |
+
+**Letting the model override the rule only when clearly more confident (encoder x decider, payees seen before): right first % on all
+seen / on 2a / on control**
+
+== bulk: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 86.4 / 18.1 / 98.2
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 86.3 / 10.0 / 99.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 85.9 / 4.7 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 85.5 / 1.6 / 100.0
+  YNAB always: 85.3 / 0.0 / 100.0
+== blind: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 90.3 / 15.8 / 98.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 90.3 / 6.7 / 99.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 90.4 / 4.2 / 99.8
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 90.4 / 2.5 / 100.0
+  YNAB always: 90.2 / 0.0 / 100.0
+
+### 132.1 What the step says
+
+- **First time for a payee** (18.5% of blind_v1, 3.8% of the ordinary stream): the rule has nothing; the models put the right category
+  first 49 to 69% of the time and anywhere in the list 58 to 80%. The large model helps most here (62.7 -> 69.2 on blind_v1), as does
+  other users' filings (the no-model list gets 30% from that line alone on blind_v1; the bulk set has no such line).
+- **Filed differently from the usual** (8% of blind_v1, 14% of the ordinary stream: multi-purpose payees, amount and weekday splits,
+  changes of mind): the rule is wrong by definition; the models put the right category first 22 to 27% of the time and in the list
+  69 to 73%; the no-model list of the payee's past categories gets it in the list 67 to 68% (never first). The models' gain here is
+  mostly getting it first in a quarter of cases.
+- **They anticipate it:** on these transactions the models' confidence drops to 55 to 61% (usual: 90 to 94%), and low confidence picks
+  them out of the usual ones with AUROC 0.89 to 0.91: the models know when this transaction looks unlike the payee's usual one.
+- **A category never used for the payee** (under 2%) is not anticipated: right first 0 to 2%, in the list 4 to 17%, confidence still 68
+  to 82% (AUROC 0.69 to 0.80). Nothing in the prompt says the user is about to start a new habit, except when the category itself is
+  new (REPORT 97's conclusion).
+- **Overriding the rule only when confident does not pay:** the best gate adds 1 point over the rule on seen payees (85.3 -> 86.4 on the
+  stream), trading its 2a gains for control losses. For known payees the first slot is near what the prompt allows; the model's value
+  is new payees and the ranked list.
+
+
+## 133. What the model was close to on first-time payees: the right category is in the system's top five 88% of the time (first 70%) against an ideal reader's 75% first; most misses are unknowable (opaque names like "TRI-STAR HOLDINGS LLC": the ideal reader 0%, the model spreads its probability thinly, top 8 to 14%), and when it is wrong it says so (top probability 0.36 on average, the right one a quarter of that) (EVAL-14)
+
+PLAN step 138 (owner, 2026-09-30: "When our model gives a suggested answer, do we know what other answers it was close to giving and how
+close?"). Yes: every reading is a calibrated probability for each of the user's categories. On blind_v1's first-time payees (277: no
+earlier filing of the payee), the three-model system (encoder x decider-4B with the other-users line x untrained 35B, first seeds);
+"ideal reader" is blind_v1's rule-based reader of the prompt plus world knowledge of merchants (`best`; -1 when the prompt gives no
+basis). `scripts/closeness_tables.py`.
+
+**Table CL.1: first-time payees, encoder x decider x 35B: where the right category ranks, and the ideal reader's ceiling**
+
+| group | n | rank 1 | 2 | 3 | 4-5 | 6-10 | >10 | median categories | ideal reader right % | no basis in the prompt % | p(top) when wrong | p(right) when wrong | p(right) / p(top) when wrong |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| all first-time payees | 277 | 70% | 9% | 5% | 4% | 6% | 6% | 23 | 75% | 23% | 0.36 | 0.10 | 0.24 |
+| short_history | 150 | 79% | 7% | 5% | 2% | 4% | 3% | 22 | 82% | 15% | 0.44 | 0.13 | 0.23 |
+| new_merchant_descriptive | 37 | 84% | 5% | 3% | 5% | 3% | 0% | 24 | 95% | 3% | 0.30 | 0.09 | 0.35 |
+| new_merchant_chain | 37 | 84% | 5% | 3% | 3% | 5% | 0% | 24 | 92% | 5% | 0.47 | 0.09 | 0.15 |
+| new_merchant_opaque | 36 | 17% | 11% | 6% | 14% | 19% | 33% | 24 | 0% | 100% | 0.18 | 0.06 | 0.29 |
+| trip | 12 | 42% | 33% | 17% | 0% | 8% | 0% | 24 | 92% | 0% | 0.63 | 0.14 | 0.16 |
+
+**Examples (first-time payees the system got wrong): the top five with probabilities; the right one marked**
+
+- `TRI-STAR HOLDINGS LLC  ROCHESTER     NY` (new_merchant_opaque, 26 categories): Entertainment 8%, Household goods 7%, Stuff I forgot to budget for 7%, Healthcare 6%, Groceries 6%; right one **Clothing** at rank 14 (3.2%)
+- `DBT CRD 8878 10/15/25 SQ *PR PARTNERS PITTSBURGH` (new_merchant_opaque, 23 categories): Miscellaneous 11%, Groceries 8%, Dining Out 8%, Household 7%, Utilities 7%; right one **Birthdays & gifts** at rank 12 (3.6%)
+- `PY *BRIGHTPATH GROUP I DETROIT       MI` (short_history, 24 categories): Rent/Mortgage 17%, Electric 14%, Medical expenses 8%, Internet 8%, Insurance 5%; right one **Stuff I forgot to budget for** at rank 9 (3.9%)
+- `SP AE MGMT             TUCSON        AZ` (new_merchant_opaque, 24 categories): Misc 14%, Household goods 10%, Clothes 8%, Groceries 8%, Healthcare 6%; right one **Fun money** at rank 7 (4.5%)
+- `HILTON BRECKENRIDGE BRECKENRIDGE CO` (trip, 24 categories): Vacation 80%, **Ski trip 13%**, Rent/Mortgage 2%, Misc 1%, Home 1%
+- `Zelle to Brandon Clark` (short_history, 25 categories): Gifts 16%, Misc 14%, Income 12%, Pocket money 10%, Savings 7%; right one **Restaurants** at rank 16 (1.6%)
+- `United Airlines` (trip, 27 categories): Vacation 46%, **Ski trip 41%**, Misc 4%, Rent 2%, Ready to Assign 2%
+- `SP FDC CORP 12/15 PURCHASE SEATTLE WA` (new_merchant_opaque, 44 categories): Groceries 19%, Household supplies 7%, Furniture 5%, **Clothing 5%**, Water & sewer 4%
+
+### 133.1 What the step says
+
+- **The 49 to 80% of REPORT 132 undersold the ranking.** The system's full list has the right category first 70% of the time and in the
+  top five 88%; the lower "in the list" numbers there came from the suggestion rule, which shows only plausible or confident categories
+  (a short list), and a first-time payee has no plausible categories of its own. Showing the top five for first-time payees would find
+  the right one 88% of the time.
+- **Against what is knowable, it is close to the ceiling**: 70% first against the ideal reader's 75%; for new chains and new local
+  businesses with descriptive names 84% against 92 to 95%; for new users 79% against 82%.
+- **Most misses cannot be known from the prompt**: opaque payees ("SP AE MGMT", "TRI-STAR HOLDINGS LLC") are a third of the >10 ranks;
+  the ideal reader has no basis for any of them, and the model spreads its probability thinly (top 8 to 14%), which is the honest answer.
+  Other misses are close calls (a hotel on a trip: Vacation 80% against the user's own Ski trip 13%; a flight 46% against 41%).
+- **When wrong, it knows it is unsure**: its top probability averages 0.36 on these misses (0.9+ on typical right answers), and the right
+  one is about a quarter as likely as its pick; these are the transactions to show with a longer list or a search box open.
+- **Product consequence:** size the suggestion list by confidence and history: for a first-time payee with a spread-out distribution,
+  show five; for a known payee, the rule plus the payee's other categories.
+
+
+## 134. Sizing the suggestion list: five suggestions for first-time payees and the short list otherwise finds the right category for 88% of blind_v1's first-time payees (from 81%) and 76% on the ordinary stream (from 61%), at 1.7 suggestions per transaction on the stream (from 1.6); a probability floor of 0.05 is the middle ground (EVAL-14)
+
+PLAN step 139 (after REPORT 133). Policies for a confirm-everything product, with YNAB's suggestion first where it has one: current
+(REPORT 131's list: plausible categories free, others only if confident), adaptive (current for payees seen before, top five for
+first-time payees), a probability floor (categories with p >= 0.05 or 0.1, one to five), and always five. `scripts/list_policy_tables.py`.
+
+**blind_v1, encoder x decider x 35B: right one 1st % / in the list % / suggestions shown / wrong ones shown (all; first-time payees; payees seen before)**
+
+| policy | all | first-time payees | payees seen before |
+|---|---|---|---|
+| current | 86.4 / 94.1 / 1.47 / 0.53 | 69.7 / 80.9 / 1.59 / 0.78 | 90.2 / 97.1 / 1.44 / 0.47 |
+| adaptive | 86.4 / 95.5 / 2.10 / 1.14 | 69.7 / 88.1 / 5.00 / 4.12 | 90.2 / 97.1 / 1.44 / 0.47 |
+| p >= 0.05 | 86.4 / 94.9 / 1.58 / 0.63 | 69.7 / 86.3 / 2.61 / 1.75 | 90.2 / 96.8 / 1.35 / 0.38 |
+| p >= 0.1 | 86.4 / 93.0 / 1.33 / 0.40 | 69.7 / 80.9 / 1.63 / 0.82 | 90.2 / 95.7 / 1.26 / 0.30 |
+| top 5 | 86.4 / 96.5 / 5.00 / 4.03 | 69.7 / 88.1 / 5.00 / 4.12 | 90.2 / 98.4 / 5.00 / 4.02 |
+
+**the ordinary stream (blind_bulk_v1), encoder x decider: right one 1st % / in the list % / suggestions shown / wrong ones shown (all; first-time payees; payees seen before)**
+
+| policy | all | first-time payees | payees seen before |
+|---|---|---|---|
+| current | 84.0 / 94.6 / 1.57 / 0.63 | 52.5 / 61.2 / 1.51 / 0.90 | 85.3 / 95.9 / 1.57 / 0.61 |
+| adaptive | 84.0 / 95.1 / 1.70 / 0.75 | 52.5 / 76.1 / 5.00 / 4.24 | 85.3 / 95.9 / 1.57 / 0.61 |
+| p >= 0.05 | 84.0 / 94.7 / 1.56 / 0.62 | 52.5 / 69.4 / 2.83 / 2.14 | 85.3 / 95.7 / 1.51 / 0.56 |
+| p >= 0.1 | 84.0 / 93.6 / 1.43 / 0.50 | 52.5 / 61.6 / 1.56 / 0.95 | 85.3 / 94.8 / 1.43 / 0.48 |
+| top 5 | 84.0 / 96.4 / 5.00 / 4.04 | 52.5 / 76.1 / 5.00 / 4.24 | 85.3 / 97.2 / 5.00 / 4.03 |
+
+### 134.1 What the step says
+
+- **Adaptive is the product choice**: for payees seen before it keeps the short list (1.4 to 1.6 suggestions, the right one in it 96 to
+  97%); for first-time payees it shows five, finding the right one 88% (blind_v1) and 76% (stream) of the time instead of 81% and 61%.
+  First-time payees are 4% of an ordinary stream, so the average list grows only from 1.57 to 1.70.
+- **A floor of p >= 0.05** gets most of the first-time gain with fewer wrong suggestions (2.6 to 2.8 shown there, right one in the
+  list 86 / 69%): a middle ground if five looks cluttered.
+- **Always five** adds 1 to 2 points on known payees at 3.5 more wrong suggestions each: not worth it.
+
+
+## 135. Two ideas from Jeff, on our own training: decider-0.8B with the recipe is three times faster than the 4B but 1.8 points behind on blind_v1 and 17% worse by effort (0.726 against 0.622), weakest on the user's own habits; categories described by the payees filed under them lift first-time payees (+3.5) and new users (+2.7) but cost novel category names 15 points and REAL-6 5: neither is adopted (MODEL-21, DATA-6)
+
+PLAN steps 136, 137 (owner, 2026-09-30, after reviewing firelex/jeff: "Don't train on their weights but do run those experiments").
+decider-0.8b (Apache-2.0) with the recipe and the other-users line, two seeds; decider-4B with the same recipe and each category in the
+labelled list followed by the payees filed under it in the prompt ("(IJ) Dining out (e.g. Peets, Chipotle)", "(nothing filed yet)";
+`DESC=1`, `oneslot.describe_categories`), two seeds, and REPORT 123's adapter read that way zero-shot. Scored on blind_v1_others (the
+line shown). `scripts/variant_tables.py`, job list `scripts/modal_jobs/r136.json`.
+
+| variant | seeds | blind top-1 | first-time payees: right 1st / top 5 | new users right 1st | own habits right 1st | effort W=10 (per-item) | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, other-users line (REPORT 123) | 3 | 83.8 | 59.9 / 81.2 | 69.6 | 85.4 | 0.622 | 87.8 | 84.6 |
+| decider-0.8B, same recipe (row 136) | 2 | 82.0 | 55.4 / 77.4 | 66.1 | 80.6 | 0.726 | 87.6 | 83.1 |
+| decider-4B + category descriptions, trained (row 137) | 2 | 83.8 | 63.4 / 81.9 | 72.3 | 83.7 | 0.636 | 82.6 | 69.1 |
+| decider-4B (REPORT 123) read with descriptions, untrained on them | 1 | 83.7 | 59.2 / 82.3 | 67.3 | 84.7 | 0.629 | nan | nan |
+
+Speed (from the jobs' logs, HF, one H100, 1,500 blind items): decider-0.8B 0.9 to 1.0 minute, decider-4B 2.0 to 3.1 minutes.
+
+### 135.1 What the step says
+
+- **The 0.8B is fast and not good enough here.** Its synthetic scores are the 4B's (REAL-6 87.6), but on the blind set it loses where
+  knowledge and judgement matter: first-time payees 55 against 60, the user's own habits 81 against 85, effort 0.726 against 0.622. The
+  4B costs 2 to 3 times the 0.8B per transaction (not measured in vLLM), about $11 per million transactions (REPORT 120): the gain in user
+  effort is worth it; the encoder (1B, bidirectional) remains the cheap reader.
+- **Descriptions help where names say nothing, and hurt where they mislead.** A category listed with the payees filed under it helps
+  first-time payees (59.9 -> 63.4) and new users (69.6 -> 72.3); but on REAL-6's novel-name copy (every category a coined word) top-1
+  falls from 84.6 to 69.1 and on REAL-6 from 87.8 to 82.6. [Corrected 2026-09-30: this line first read the loss as filing by payee
+  resemblance; by REAL-6 level the losses include the pure lookups (merchant in the history, standard name: 100 -> 90; novel names
+  96 -> 75), which that reading does not predict. Untested candidates: the added parentheses ("(e.g. ...)" after every category, where
+  the answer slot reads the label after "Category: ("), and ~200 more tokens between list and rows.] Not adopted; a variant without
+  parentheses ("- (IJ) Dining out: Peets, Chipotle") or describing only empty and rarely used categories would separate format from
+  content; not queued.
+- **Read untrained, descriptions change nothing** (83.7 against 83.8).
+
+
+## 136. The untrained 35B as teacher adds nothing: on the recipe's own first-time-payee training episodes it is right only 38 to 39% of the time (synthetic database merchants and coined category names it cannot know), and a 50 / 50 target of its distribution and the label leaves decider-4B where it was (effort 0.618 against 0.622; blind top-1 83.1 against 83.8) (MODEL-19)
+
+PLAN step 123. Per seed: `scripts/dump_teacher_items.py` writes the training pool's first-time-payee episodes (the query's payee key in no
+row: 1,088 and 1,140 of 2,250), the untrained decider-35B-A3B reads them in its own layout, and decider-4B trains with the recipe and the
+other-users line, the target on those episodes being 0.5 one-hot + 0.5 the teacher's distribution (`TEACHER`, `TEACH_W`). Two seeds.
+`scripts/variant_tables.py`, job list `scripts/modal_jobs/r123.json`.
+
+| variant | seeds | blind top-1 | first-time payees: right 1st / top 5 | new users right 1st | own habits right 1st | effort W=10 (per-item) | REAL-6 | novel names |
+|---|---|---|---|---|---|---|---|---|
+| decider-4B, other-users line (REPORT 123) | 3 | 83.8 | 59.9 / 81.2 | 69.6 | 85.4 | 0.622 | 87.8 | 84.6 |
+| decider-0.8B, same recipe (row 136) | 2 | 82.0 | 55.4 / 77.4 | 66.1 | 80.6 | 0.726 | 87.6 | 83.1 |
+| decider-4B + category descriptions, trained (row 137) | 2 | 83.8 | 63.4 / 81.9 | 72.3 | 83.7 | 0.636 | 82.6 | 69.1 |
+| decider-4B (REPORT 123) read with descriptions, untrained on them | 1 | 83.7 | 59.2 / 82.3 | 67.3 | 84.7 | 0.629 | nan | nan |
+| decider-4B + 35B teacher (row 123) | 2 | 83.1 | 58.5 / 82.7 | 67.3 | 83.7 | 0.618 | 87.2 | 85.4 |
+
+### 136.1 What the step says
+
+- **The teacher does not know the training data's world.** The recipe's episodes are built from REAL-6's synthetic merchants (a fact
+  database the 35B has never seen), coined and renamed categories, override and alternation episodes: the teacher's top-1 on them is
+  38 to 39%, so half of each distilled target points away from the label. The student ends where it started (effort 0.618 / 0.622,
+  REAL-6 87.2 / 87.8, first-time payees 58.5 / 59.9).
+- **Where the 35B's knowledge is valid (real businesses), the recipe already has exact labels**: the Overture business episodes (OVDB,
+  REPORT 108) carry each place's category. A teacher would add value on real statement strings without such labels (real data), not
+  on synthetic ones. Decision: distillation is dropped for synthetic training; the 35B stays the escalation reader (REPORT 126). With
+  real histories, the 35B's readings of real payees are a candidate source of soft labels.
+
+
+## 137. A second blind test set (blind_v2, from another agent that saw only the product brief) is harder (ideal-reader ceiling 78.3% against 87.9%) and confirms the main conclusions: the models beat YNAB's rule (right first 72 to 75% against 57%), the untrained 35B helps most on first-time payees, the full system is best; two do not hold: the encoder adds nothing on blind_v2 (the pair equals decider alone), and "YNAB's suggestion first" is worse than the model's where users often depart from their usual category; a confidence gate (the model overrides the rule when its top beats the rule's category by 0.2) is best on all three sets (EVAL-15)
+
+PLAN step 140. blind_v2 (`scripts/build_blind_v2.py`, written by an agent given only the product brief and the item format; it read nothing
+in the repository; its own merchant universe, bank styles and archetypes, more multi-purpose payees and new users; 1,500 items, 250
+users; derived files by `scripts/derive_blind_v2.py`). Checked here against `oneslot.parse`: no row after its query, every category
+existing on its row's date. The saved models read it on Modal (job list `scripts/modal_jobs/r140.json`); `scripts/blind2_tables.py`,
+`scripts/gate_tables.py`.
+
+### blind_v1 (1500 items; ideal-reader ceiling 87.9%)
+
+**B2.1 top-1 (mean [range] over seeds)**
+
+| reader | seeds | top-1 |
+|---|---|---|
+| decider-4B recipe | 3 | 82.7 [82.3, 83.1] |
+| decider-4B + other-users line | 3 | 83.9 [83.5, 84.2] |
+| encoder (Ettin-1B) | 3 | 79.5 [78.5, 80.2] |
+| decider-35B untrained | 1 | 82.0 |
+| decider-4B untrained | 1 | 76.5 |
+
+**B2.2 effort under the per-item rule (mean [range] over seed pairs)**
+
+| system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|
+| decider (+ line) | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] |
+| encoder x decider | 0.507 [0.488, 0.524] | 0.603 [0.583, 0.618] | 0.735 [0.717, 0.761] |
+| pair -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] |
+| all three | 0.441 [0.429, 0.451] | 0.541 [0.525, 0.553] | 0.666 [0.651, 0.691] |
+
+**B2.3 / B2.4 confirm-everything card by subset: right one 1st % / in the list % / work saved % (mean over seeds / pairs)**
+
+| suggestions from | all (n=1500) | first-time payee (n=277) | differently from the rule (n=120) | never used for the payee (n=27) | the payee's usual (n=1103) |
+|---|---|---|---|---|---|
+| YNAB today | 73.5 / 73.5 / 74 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 100.0 / 100.0 / 100 |
+| YNAB + the payee's other past categories (no model) | 79.0 / 84.4 / 84 | 29.6 / 30.0 / 30 | 0.0 / 66.7 / 56 | 0.0 / 7.4 / 7 | 100.0 / 100.0 / 100 |
+| decider (+ line) | 83.8 / 92.4 / 89 | 59.9 / 72.0 / 61 | 22.8 / 70.0 / 62 | 0.0 / 13.6 / 11 | 96.4 / 100.0 / 99 |
+| YNAB first, then decider (+ line) | 84.6 / 92.4 / 89 | 59.9 / 72.0 / 61 | 0.0 / 70.0 / 59 | 0.0 / 13.6 / 11 | 100.0 / 100.0 / 100 |
+| encoder x decider | 84.4 / 92.8 / 90 | 62.7 / 74.2 / 64 | 22.3 / 69.1 / 61 | 0.0 / 10.7 / 8 | 96.6 / 100.0 / 99 |
+| YNAB first, then encoder x decider | 85.1 / 92.8 / 90 | 62.7 / 74.2 / 64 | 0.0 / 69.1 / 58 | 0.0 / 10.7 / 8 | 100.0 / 100.0 / 100 |
+| encoder x decider x 35B | 85.7 / 93.9 / 91 | 69.2 / 79.9 / 71 | 25.4 / 70.6 / 63 | 2.1 / 16.5 / 13 | 96.5 / 100.0 / 99 |
+| YNAB first, then encoder x decider x 35B | 86.3 / 93.9 / 91 | 69.2 / 79.9 / 71 | 0.0 / 70.4 / 60 | 0.0 / 16.5 / 13 | 100.0 / 100.0 / 100 |
+
+### blind_v2 (1500 items; ideal-reader ceiling 78.3%)
+
+**B2.1 top-1 (mean [range] over seeds)**
+
+| reader | seeds | top-1 |
+|---|---|---|
+| decider-4B recipe | 2 | 71.4 [70.6, 72.1] |
+| decider-4B + other-users line | 3 | 71.7 [70.5, 73.2] |
+| encoder (Ettin-1B) | 3 | 65.5 [65.0, 65.8] |
+| decider-35B untrained | 1 | 71.9 |
+| decider-4B untrained | 1 | 63.1 |
+
+**B2.2 effort under the per-item rule (mean [range] over seed pairs)**
+
+| system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|
+| decider (+ line) | 0.908 [0.892, 0.939] | 1.084 [1.031, 1.135] | 1.273 [1.233, 1.315] |
+| encoder x decider | 0.916 [0.876, 0.945] | 1.091 [1.067, 1.111] | 1.275 [1.220, 1.341] |
+| pair -> 35B | 0.827 [0.801, 0.848] | 1.035 [1.019, 1.046] | 1.219 [1.160, 1.300] |
+| all three | 0.806 [0.793, 0.833] | 0.983 [0.959, 1.013] | 1.158 [1.097, 1.199] |
+
+**B2.3 / B2.4 confirm-everything card by subset: right one 1st % / in the list % / work saved % (mean over seeds / pairs)**
+
+| suggestions from | all (n=1500) | first-time payee (n=316) | differently from the rule (n=327) | never used for the payee (n=63) | the payee's usual (n=857) |
+|---|---|---|---|---|---|
+| YNAB today | 57.1 / 57.1 / 57 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 0.0 / 0.0 / 0 | 100.0 / 100.0 / 100 |
+| YNAB + the payee's other past categories (no model) | 63.4 / 79.1 / 77 | 29.7 / 30.7 / 31 | 0.0 / 70.9 / 61 | 0.0 / 19.0 / 17 | 100.0 / 100.0 / 100 |
+| decider (+ line) | 71.7 / 89.4 / 85 | 60.8 / 76.1 / 65 | 33.4 / 74.5 / 67 | 5.3 / 29.1 / 25 | 90.3 / 100.0 / 98 |
+| YNAB first, then decider (+ line) | 69.9 / 89.4 / 84 | 60.8 / 76.1 / 65 | 0.0 / 74.5 / 64 | 0.0 / 29.1 / 24 | 100.0 / 100.0 / 99 |
+| encoder x decider | 72.4 / 89.4 / 85 | 61.0 / 78.1 / 67 | 34.7 / 72.6 / 67 | 3.2 / 22.9 / 20 | 91.0 / 100.0 / 99 |
+| YNAB first, then encoder x decider | 70.0 / 89.4 / 85 | 61.0 / 78.1 / 67 | 0.0 / 72.6 / 63 | 0.0 / 22.9 / 20 | 100.0 / 100.0 / 100 |
+| encoder x decider x 35B | 75.3 / 91.0 / 87 | 67.7 / 84.5 / 74 | 36.9 / 73.5 / 68 | 6.0 / 26.3 / 22 | 92.7 / 100.0 / 99 |
+| YNAB first, then encoder x decider x 35B | 71.4 / 91.0 / 86 | 67.7 / 84.5 / 74 | 0.0 / 73.5 / 63 | 0.0 / 26.3 / 22 | 100.0 / 100.0 / 100 |
+
+**Letting the model override YNAB's suggestion only when clearly more confident (encoder x decider, payees seen before): right first %
+on all seen / on transactions filed differently from the rule / on the usual ones**
+
+== bulk: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 85.6 / 28.0 / 95.6
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 86.4 / 18.1 / 98.2
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 86.3 / 10.0 / 99.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 85.9 / 4.7 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 85.5 / 1.6 / 100.0
+  YNAB always: 85.3 / 0.0 / 100.0
+== blind: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 90.0 / 23.3 / 97.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 90.3 / 15.8 / 98.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 90.3 / 6.7 / 99.4
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 90.4 / 4.2 / 99.8
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 90.4 / 2.5 / 100.0
+  YNAB always: 90.2 / 0.0 / 100.0
+== blind_v2: encoder x decider (first seeds), payees seen before; right first % overall-seen / on 2a / on control
+  model first always: 75.8 / 32.1 / 92.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.0: 75.8 / 32.1 / 92.5
+  model overrides YNAB when p(top) - p(YNAB's) > 0.2: 77.2 / 23.5 / 97.7
+  model overrides YNAB when p(top) - p(YNAB's) > 0.4: 76.0 / 15.0 / 99.3
+  model overrides YNAB when p(top) - p(YNAB's) > 0.6: 74.6 / 8.3 / 99.9
+  model overrides YNAB when p(top) - p(YNAB's) > 0.8: 73.9 / 5.5 / 100.0
+  YNAB always: 72.4 / 0.0 / 100.0
+
+### 137.1 What the step says
+
+- **What holds on both sets**: decider-4B reads each at 92 to 95% of its ceiling; the models beat YNAB's rule by 15 points right first
+  (blind_v2: 72 to 75 against 57) and halve searches (in the list 89 to 91% against 57%); the untrained 35B is the best addition for
+  first-time payees (blind_v2 61 -> 68% right first, 78 -> 85% in the list) and the all-three system has the lowest effort at every W;
+  the no-model list of the payee's past categories gets part of the way (77% work saved against 85 to 87).
+- **The encoder does not transfer**: 65.5 top-1 on blind_v2 (decider 71.7), and encoder x decider is no better than decider alone by
+  effort (0.916 against 0.908 at W = 5). On blind_v1 it added 0.02; its training (Overture names, REPORT 108) fits blind_v1's world
+  better. The system's gain on blind_v2 comes from the 35B. Decision: the encoder stays optional (cheap first reader), not relied on.
+- **The other-users line helps less on blind_v2** (71.7 against 71.4 without it; +1.3 on blind_v1): there the line is on 99.7% of items
+  and other users' names for a payee vary more.
+- **"YNAB's suggestion first" does not generalise**: blind_v2's users depart from their usual category on 28% of known-payee
+  transactions (blind_v1 10%), and rule-first loses 1.8 points there. A confidence gate is best on every set: the model's top category
+  replaces the rule's when its probability is at least 0.2 higher (blind_v2 77.2% right first on known payees against 72.4 rule-only
+  and 75.8 model-only; the ordinary stream 86.4 against 85.3 / 85.6; blind_v1 90.3 against 90.2 / 90.0). Revised product answer: the
+  rule's suggestion first unless the model is 0.2 more confident in another; the model's ranked list after it, and alone for new payees.
+
+
+## 138. The system without the encoder: decider-4B (with the other-users line), then the untrained 35B for what it does not settle, is as good as the three-model system on blind_v1 (0.556 against 0.549 at W = 10) and better on blind_v2 (1.007 against 1.035); the encoder is dropped from the recommended system
+
+PLAN step 141 (after REPORT 137). Effort under the per-item rule, both blind sets, three decider seeds, the encoder's three seeds for the
+comparison row. `scripts/noenc_tables.py`.
+
+| set | system | W = 5 | W = 10 | W = 20 |
+|---|---|---|---|---|
+| blind_v1 | decider | 0.515 [0.509, 0.519] | 0.622 [0.599, 0.639] | 0.775 [0.769, 0.783] |
+| blind_v1 | decider -> 35B | 0.466 [0.459, 0.478] | 0.556 [0.523, 0.573] | 0.678 [0.667, 0.689] |
+| blind_v1 | decider x 35B (all) | 0.462 [0.447, 0.478] | 0.551 [0.529, 0.568] | 0.657 [0.645, 0.671] |
+| blind_v1 | encoder x decider -> 35B | 0.453 [0.435, 0.475] | 0.549 [0.533, 0.563] | 0.681 [0.655, 0.703] |
+| blind_v2 | decider | 0.908 [0.892, 0.939] | 1.084 [1.031, 1.135] | 1.273 [1.233, 1.315] |
+| blind_v2 | decider -> 35B | 0.830 [0.817, 0.840] | 1.007 [0.993, 1.021] | 1.208 [1.171, 1.233] |
+| blind_v2 | decider x 35B (all) | 0.800 [0.788, 0.807] | 0.967 [0.953, 0.981] | 1.134 [1.115, 1.152] |
+| blind_v2 | encoder x decider -> 35B | 0.827 [0.801, 0.848] | 1.035 [1.019, 1.046] | 1.219 [1.160, 1.300] |
+
+### 138.1 What the step says
+
+- **Two models are enough**: decider-4B for every transaction, the untrained decider-35B-A3B for the ~third it does not auto-file (or,
+  in a confirm-everything product, for the ranked list where decider is unsure); reading everything with both is best of all (blind_v2
+  0.967 at W = 10) at the 35B's cost for every transaction.
+- The encoder's gain on blind_v1 came from a world like its training; on blind_v2 it costs. It remains the fastest reader if a cheap
+  first pass is ever needed, but the recommended system is decider (+ other-users line) -> 35B, with YNAB's rule gated by confidence
+  (REPORT 137) for the first suggestion on known payees.
+
+
+## 139. Route the 35B by payee history: its world knowledge helps first-time payees and overrides the user's own recent pattern on known ones (blind_v2: changed minds 44 -> 5, weekday rules 65 -> 57); reading only first-time payees with it gives the same effort as escalation (0.559 / 1.003 against 0.556 / 1.007), protects the habit cases (57.5 against 46.5 on blind_v2) and sends it 18 to 21% of transactions instead of 35 to 65%
+
+PLAN step 142. First, where blind_v2's misses are against its ideal reader (decider with the other-users line, three seeds; x the untrained
+35B); then routing: decider alone, decider -> 35B for what it does not auto-file (REPORT 138), decider x 35B for all, and decider x 35B
+for first-time payees only. `scripts/route_tables.py`.
+
+**Table 139.1: blind_v2 top-1 by what decides the item**
+
+| why | n | ideal reader | decider (+ line) | decider x 35B | gap to ideal (decider x 35B) |
+|---|---|---|---|---|---|
+| multi_purpose | 231 | 62 | 57.1 | 63.5 | -1.2 |
+| plain | 200 | 99 | 98.7 | 99.7 | -0.7 |
+| new_user | 192 | 79 | 65.1 | 74.8 | +3.8 |
+| amount_split | 102 | 85 | 83.7 | 87.6 | -2.3 |
+| new_category | 95 | 68 | 57.9 | 65.6 | +2.8 |
+| trip | 94 | 87 | 57.4 | 62.4 | +24.8 |
+| misfiled_history | 90 | 84 | 73.0 | 89.6 | -5.2 |
+| first_time_payee | 81 | 79 | 66.7 | 71.6 | +7.4 |
+| refund | 70 | 90 | 78.1 | 86.2 | +3.8 |
+| recurring | 69 | 100 | 100.0 | 99.5 | +0.5 |
+| p2p | 66 | 68 | 73.2 | 70.7 | -2.5 |
+| income | 54 | 100 | 98.8 | 99.4 | +0.6 |
+| changed_mind | 43 | 51 | 44.2 | 5.4 | +45.7 |
+| seasonal | 37 | 19 | 33.3 | 28.8 | -9.9 |
+| reimbursement | 28 | 68 | 63.1 | 71.4 | -3.6 |
+| weekday_split | 27 | 78 | 65.4 | 56.8 | +21.0 |
+| opaque_new | 13 | 0 | 51.3 | 43.6 | -43.6 |
+| transfer | 8 | 100 | 100.0 | 100.0 | +0.0 |
+
+**Table 139.2: routing (W = 10; "changed mind / weekday / trip": the items decided by the user's own pattern)**
+
+| set | system | top-1 all | first-time payees | known payees | changed mind / weekday / trip | effort W=10 | 35B reads % |
+|---|---|---|---|---|---|---|---|
+| blind_v1 | decider | 83.9 | 60.2 | 89.2 | 69.1 | 0.622 | 0 |
+| blind_v1 | decider -> 35B (unsettled) | 85.5 | 68.6 | 89.3 | 60.9 | 0.556 | 35 |
+| blind_v1 | decider x 35B (all) | 85.5 | 68.7 | 89.3 | 60.9 | 0.551 | 100 |
+| blind_v1 | decider x 35B for first-time payees only | 85.4 | 68.7 | 89.2 | 70.0 | 0.559 | 18 |
+| blind_v2 | decider | 71.7 | 60.8 | 74.6 | 55.3 | 1.084 | 0 |
+| blind_v2 | decider -> 35B (unsettled) | 75.2 | 68.0 | 77.2 | 46.5 | 1.007 | 65 |
+| blind_v2 | decider x 35B (all) | 75.3 | 68.5 | 77.2 | 46.5 | 0.967 | 100 |
+| blind_v2 | decider x 35B for first-time payees only | 73.3 | 68.5 | 74.6 | 57.5 | 1.003 | 21 |
+
+### 139.1 What the step says
+
+- **Where the models still lose on blind_v2**: trips (62 against an ideal 87: user trip categories such as a named vacation), changed
+  minds, weekday rules, first-time payees and new users. Everywhere else the decider x 35B product is at or above the ideal reader.
+- **The 35B hurts where the user's own recent pattern decides**: multiplied in, its prior that a hotel is "Travel" or a payee's usual
+  category overrides a user's recent change (blind_v2 changed minds 44.2 -> 5.4) or day rule (65.4 -> 56.8).
+- **Routing by payee history keeps its gain and removes that harm**: the 35B reads only transactions whose payee the user has never
+  filed (18 to 21%); effort equals escalation (0.559 / 1.003), the habit cases are protected (blind_v2 57.5 against 46.5), and the
+  35B's GPU time falls by half to two thirds. On blind_v2's known payees escalation still gains 2.6 top-1 (74.6 -> 77.2) that routing
+  leaves; the two can combine (the 35B for first-time payees, and for known payees only when decider is unsure and the payee is
+  multi-purpose), not tested.
+- **Recommended system (revised)**: decider-4B (with the other-users line) for every transaction; the untrained 35B for first-time
+  payees; YNAB's rule first for known payees unless the model is 0.2 more confident (REPORT 137); list sizing as REPORT 134.
+
+
+## 140. Overlap of payees between training and the blind sets (intended, owner 2026-09-30): 19 to 25% of blind queries are payees from the training merchant catalogue and database (mostly real chains both worlds share), 1 to 7% from the business-name or kinds catalogues, the rest novel; on blind_v1 the model is 1.6 points from the ideal reader on catalogue payees and 5.3 on novel ones, on blind_v2 the catalogue payees are its hard multi-purpose chains; and a note on splits (EVAL-15)
+
+PLAN step 143 (owner, 2026-09-30: "it's okay if there is some leakage of novel payee names and categories between users, because that is
+realistic ... I also wanted to have a merchant database that was separate that allowed for us to teach the model about certain
+payees"). Each blind query's payee name (normalised: lower case, letters and digits) against what training saw: REAL-6's merchant
+catalogue and the fact database (incl. the misleading-name set), the Overture business-name pool, the kinds catalogue. For blind_v1 the
+last two had blind_v1's names removed before training (so matches there are listed but untrained). `scripts/overlap_tables.py`.
+
+| set | payee known to training as | n | share | ideal reader | decider-4B | 35B untrained | routed system |
+|---|---|---|---|---|---|---|---|
+| blind_v1 | merchant catalogue / database | 368 | 25% | 90 | 88.4 | 84.0 | 88.7 |
+| blind_v1 | novel (listed, filtered from training) | 71 | 5% | 97 | 93.4 | 93.0 | 94.4 |
+| blind_v1 | novel | 1061 | 71% | 87 | 81.7 | 80.6 | 83.7 |
+| blind_v2 | merchant catalogue / database | 284 | 19% | 81 | 70.9 | 76.4 | 73.6 |
+| blind_v2 | Overture pool | 85 | 6% | 84 | 71.0 | 75.3 | 74.1 |
+| blind_v2 | kinds catalogue | 21 | 1% | 62 | 69.8 | 76.2 | 69.8 |
+| blind_v2 | novel | 1110 | 74% | 78 | 72.0 | 70.4 | 73.2 |
+
+### 140.1 What the step says
+
+- **Overlap is real and modest**: a fifth to a quarter of blind queries are payees the training catalogue knows (chains such as
+  Target, Starbucks, pharmacies, utilities), as the owner intends; three quarters are novel to training.
+- **On blind_v1 the known payees read closest to the ceiling** (88.4 against 90; novel 81.7 against 87), consistent with the controlled
+  results (REPORT 53, 58, 73: database episodes teach specific payees, 94% on payees known only from the database). On blind_v2 the
+  catalogue payees are mostly multi-purpose chains filed several ways (ideal reader 81), and decider is 10 points from the ideal there,
+  where the 35B's prior helps (76.4): knowing a payee is not knowing which of a user's categories this purchase belongs to.
+- **Splits, for the record** (owner's question, 2026-09-30): every held-out set is held out by user or is a separate population, never
+  by random transactions; merchants are shared on purpose. There is no separate validation set during training (fixed steps, no early
+  stopping), but blind_v1 has been the selection set since REPORT 103 and is validation in practice; blind_v2 confirmed conclusions
+  but also informed REPORT 137 and 139's gate and routing; blind_v3 (row 145) is kept untouched for a final check. The real-data plan
+  (reports/REAL_DATA_SPEC.md) splits users 70 / 15 / 15 with a time holdout and a sealed test split.
+
+
+## 141. The final synthetic check, pre-registered, on a third blind set read once (blind_v3: couples, small businesses, families filing by who it was for, changing statement strings): the recommended system puts the right category first 81% of the time (YNAB's rule 74%) and in the list 96% (74%), saving 90% of the work of filing by hand (rule 74%, the no-model list 87%); first-time payees 64% first and 96% in the list; decider-4B reads the set at 94% of its ceiling; the confidence gate costs about 1 point on known payees here (EVAL-15)
+
+PLAN step 145. blind_v3 (`scripts/build_blind_v3.py`): a third agent, given only the product brief, asked for different emphases (couples
+sharing an account and filing differently, small-business owners, families filing by who the spending was for, students, retirees,
+seasonal patterns, price changes, statement strings that change). One patch by the main session: history rows show a renamed or merged
+category under its current name, as YNAB does (the generator had shown the old name, outside the list; 74 rows). 1,500 items, 250 users,
+ideal-reader ceiling 83.5%. The analysis (`scripts/final_check_tables.py`) and the system's definition were committed before any model
+read the set (commit 9f64608); the models read it once (job list `scripts/modal_jobs/r145.json`); no choice is made on these numbers.
+
+top-1 decider-4B + other-users line: 78.2 (seeds: 78.3, 78.2, 78.1)
+top-1 decider-35B untrained: 74.8 (seeds: 74.8)
+
+**blind_v3 (read once; ideal-reader ceiling 83.5%; decider seeds 3): right one 1st % / in the list % / suggestions shown / work saved %**
+
+| suggestions from | all (n=1500) | first-time payee (n=188) | filed differently from the rule (n=199) | the payee's usual (n=1113) | new users (n=170) |
+|---|---|---|---|---|---|
+| YNAB today | 74.2 / 74.2 / 0.9 / 74 | 0.0 / 0.0 / 0.0 / 0 | 0.0 / 0.0 / 1.0 / 0 | 100.0 / 100.0 / 1.0 / 100 | 42.9 / 42.9 / 0.5 / 43 |
+| no-model list (YNAB + payee's other past categories) | 78.3 / 88.7 / 2.2 / 87 | 32.4 / 41.0 / 1.6 / 40 | 0.0 / 70.4 / 2.9 / 61 | 100.0 / 100.0 / 2.1 / 100 | 60.0 / 68.8 / 2.0 / 68 |
+| decider-4B (+ line) alone, same list rules, no gate | 81.2 / 95.0 / 2.6 / 89 | 55.7 / 85.8 / 5.0 / 47 | 0.0 / 75.9 / 2.9 / 66 | 100.0 / 100.0 / 2.1 / 100 | 69.8 / 90.6 / 3.5 / 71 |
+| recommended system | 81.1 / 96.3 / 2.6 / 90 | 63.8 / 95.9 / 5.0 / 59 | 10.6 / 75.9 / 2.9 / 67 | 96.6 / 100.0 / 2.1 / 99 | 73.9 / 93.3 / 3.5 / 74 |
+
+"Work saved" is 1 - the owner's rank score / 10 (right first 0, second 1, ... fifth 4, not shown 10, plus 1 per wrong suggestion
+outside the plausible categories): the five-long lists for first-time payees pay that clutter cost, so their work saved (59%) is below
+what their 96% in-the-list suggests.
+
+### 141.1 What the step says
+
+- **The recommended system holds on a set nobody tuned on**: right first 81.1% against YNAB's rule 74.2%, the right category among the
+  suggestions 96.3% against 74.2%, 90% of the manual work saved against 74% (rule) and 87% (the no-model list). decider-4B reads blind_v3
+  at 78.2 top-1 (94% of the 83.5 ceiling; blind_v1 95%, blind_v2 92%).
+- **First-time payees**: the 35B routing takes them from 55.7 to 63.8% right first (the no-model list 32.4, the rule 0), and the top
+  five contain the right one 95.9% of the time.
+- **The confidence gate costs a little here**: on known payees it wins 10.6% of the items filed differently from the rule and loses
+  3.4% of the usual ones, about -1.3 points on known payees (the "all" column nets this against the 35B routing's gain on first-time
+  payees). blind_v3's users depart from a payee's usual category on 15% of known-payee items (blind_v2 28%, blind_v1 10%). Across the
+  three sets the gate is +0.1, +4.8 and about -1.3 points on known payees: it pays where users often depart from their usual category;
+  real data will settle whether to keep it.
+- **New users** 73.9% right first (rule 42.9), 93% in the list.
+- This closes the synthetic line: on the untouched set the recommended system gains 7 points right first, 22 in the list and 16 of
+  work saved over YNAB's rule, and blind_v1 and blind_v2 showed gains in the same direction (REPORTs 131, 137; the exact system was not
+  run on them). The next evidence is real data (reports/REAL_DATA_SPEC.md).
+
+
+## 142. Lists of at most three suggestions (owner, 2026-09-30: "instead of top 5, do top 3 measurements"): on blind_v3 the recommended system keeps the right category in the list 95.1% of the time (five: 96.3%), first-time payees 90.6% (95.9%), with 2.0 suggestions on average and 91% of the work saved; on the ordinary stream searches rise from 5.4 to 6.5% (EVAL-14)
+
+PLAN step 146. The same scores with every list capped at three (first-time payees get the top three, known payees the short list; the
+owner's rank scale then runs first 0, second 1, third 2, not shown 10). Re-scored on saved readings only: blind_v3 is not read again.
+`KMAX=3 scripts/final_check_tables.py`, `scripts/confirm_card.py bulk` (three is now the scripts' default).
+
+**blind_v3 (lists of at most 3; read once; ideal-reader ceiling 83.5%; decider seeds 3): right one 1st % / in the list % / suggestions shown / work saved %**
+
+| suggestions from | all (n=1500) | first-time payee (n=188) | filed differently from the rule (n=199) | the payee's usual (n=1113) | new users (n=170) |
+|---|---|---|---|---|---|
+| YNAB today | 74.2 / 74.2 / 0.9 / 74 | 0.0 / 0.0 / 0.0 / 0 | 0.0 / 0.0 / 1.0 / 0 | 100.0 / 100.0 / 1.0 / 100 | 42.9 / 42.9 / 0.5 / 43 |
+| no-model list (YNAB + payee's other past categories) | 78.3 / 88.1 / 1.8 / 87 | 32.4 / 39.9 / 1.1 / 39 | 0.0 / 66.8 / 2.4 / 59 | 100.0 / 100.0 / 1.8 / 100 | 60.0 / 68.8 / 1.5 / 68 |
+| decider-4B (+ line) alone, same list rules, no gate | 81.2 / 93.7 / 2.0 / 90 | 55.7 / 79.3 / 3.0 / 59 | 0.0 / 72.2 / 2.4 / 63 | 100.0 / 100.0 / 1.8 / 100 | 69.8 / 85.9 / 2.3 / 75 |
+| recommended system | 81.1 / 95.1 / 2.0 / 91 | 63.8 / 90.6 / 3.0 / 71 | 10.6 / 72.2 / 2.4 / 65 | 96.6 / 100.0 / 1.8 / 99 | 73.9 / 89.4 / 2.3 / 80 |
+
+**Confirm-everything card, blind_bulk_v1 (one sync per user, 6660 transactions in order; payee seen before 96%)**
+
+| suggestions from | right one 1st % | 2nd-3rd % | search % | shown | score | work saved | 1st %, payee seen | 1st %, payee new |
+|---|---|---|---|---|---|---|---|---|
+| YNAB today | 82.0 | 0.0 | 18.0 | 1.0 | 1.80 | 82% | 85.3 | 0.0 |
+| YNAB today + the payee's other past categories (no model) | 82.0 | 8.5 | 9.5 | 1.4 | 1.05 | 89% | 85.3 | 0.8 |
+| decider-4B | 83.8 | 9.7 | 6.5 | 1.5 | 0.85 | 91% | 85.2 | 49.4 |
+| YNAB's suggestion first, then decider-4B | 83.9 | 9.6 | 6.5 | 1.5 | 0.85 | 91% | 85.3 | 49.4 |
+| encoder + decider | 84.1 | 9.5 | 6.4 | 1.5 | 0.81 | 92% | 85.4 | 51.4 |
+| YNAB's suggestion first, then encoder + decider | 84.0 | 9.6 | 6.5 | 1.5 | 0.82 | 92% | 85.3 | 51.4 |
+
+### 142.1 What the step says
+
+- **Three suggestions lose little**: on blind_v3 the right category is among them 95.1% of the time (five: 96.3), right first unchanged
+  (81.1%), 2.0 suggestions shown on average; first-time payees 90.6% (five: 95.9) at three shown instead of five; work saved rises to 91%
+  because fewer wrong suggestions are shown.
+- **On the ordinary stream** searches rise from 5.4 to 6.5% (the right one in 2nd-3rd place 9.5%), work saved 92% for encoder + decider.
+- Three is the list length from here on; the gain over YNAB's rule is unchanged in kind (blind_v3: in the list 95.1% against 74.2%).
+
+**Note on the baselines (2026-09-30, owner):** YNAB today treats every user and their categories as separate: it has no suggestion for
+a payee the user has never filed and uses nothing from other users. In REPORTs 131 to 142, "YNAB today" is that rule (0% on first-time
+payees throughout). The row labelled "no-model list" / "YNAB + the payee's other past categories" is not current YNAB: after the rule's
+suggestion it lists the payee's other past categories and then the user's categories that other users file the payee under (the
+other-users line), which is where its first-time-payee score comes from. The scripts now label it "rule + payee's past + other users'
+categories (no model; NOT in YNAB today)".
+
+
+## 143. Inferring kinds, zero-shot: a payee's kind from other users' filings alone (name hidden) is right 51 to 73% of the time, from name and filings 77 to 87% (top three 93 to 99.5%), and filings lift opaque names from 8-27% to 60-67%; what a user's category holds is read right 78 to 93% of the time when it holds one kind, but the models rarely say "several kinds" or "a person or purpose" (DATA-7)
+
+PLAN steps 147, 148 (owner, 2026-09-30: "I also want to know if our model could infer a kind from a given set of categorized
+transactions or not"). A canonical vocabulary of payee kinds (`ai_experiments.canon`: 41 kinds including "person-to-person payment
+(purpose varies)", plus "several kinds of spending" and "a person, trip or purpose" for categories), mapped from each blind generator's
+own vocabulary (blind_v1, blind_v2 with `BLIND_META=1`; items unchanged; blind_v3 kept untouched). `scripts/build_kind_sets.py`:
+- step 147 (`kindcat_v*`): the user's history slice, and "Which kind of spending does this user's category X hold?", one question per
+  (user, category) with a known meaning, at most 12 per user;
+- step 148 (`kindpay_v*`): one question per payee, "What kind of business or payee is this?", from its statement string, from the string
+  and the other-users line, or from the line alone (string hidden).
+Read zero-shot in decider's own layout by untrained decider-4B, the untrained 35B and the recipe's decider-4B. `scripts/kind_tables.py`,
+job list `scripts/modal_jobs/r147.json`.
+
+**blind_v1: what a user's category holds (step 147), by rows of it in the slice: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2878 | 57.0 / 85.6 | 51.3 / 83.4 | 55.1 / 74.7 |
+| 0 rows | 1011 | 67.4 / 92.1 | 53.9 / 89.6 | 70.4 / 84.7 |
+| 1-2 rows | 1659 | 54.0 / 82.3 | 52.3 / 81.2 | 50.5 / 70.5 |
+| 3+ rows | 208 | 30.3 / 81.2 | 30.8 / 71.2 | 18.3 / 60.1 |
+
+**blind_v1: what a user's category holds, by what the category is: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2878 | 57.0 / 85.6 | 51.3 / 83.4 | 55.1 / 74.7 |
+| one kind | 1588 | 90.2 / 98.2 | 77.3 / 98.2 | 92.9 / 98.7 |
+| person / purpose | 218 | 14.7 / 28.4 | 0.0 / 9.6 | 7.8 / 21.1 |
+| several kinds | 1072 | 16.4 / 78.6 | 23.2 / 76.6 | 8.9 / 50.0 |
+
+**blind_v1: a payee's kind (step 148), by what the reader sees / payee type: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 969 | 70.4 / 86.0 | 77.1 / 90.4 | 66.6 / 82.6 |
+| filings / other | 204 | 72.1 / 91.7 | 73.0 / 91.2 | 69.6 / 88.7 |
+| name / opaque name | 50 | 8.0 / 16.0 | 14.0 / 20.0 | 6.0 / 12.0 |
+| name / other | 482 | 68.3 / 85.3 | 79.9 / 92.9 | 62.2 / 80.3 |
+| name / p2p | 29 | 100.0 / 100.0 | 100.0 / 100.0 | 93.1 / 100.0 |
+| name+filings / other | 204 | 84.8 / 97.1 | 86.8 / 99.5 | 84.8 / 96.6 |
+
+**blind_v2: what a user's category holds (step 147), by rows of it in the slice: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2867 | 57.8 / 81.9 | 53.3 / 77.2 | 53.0 / 71.5 |
+| 0 rows | 659 | 65.7 / 86.0 | 54.9 / 83.5 | 64.3 / 76.6 |
+| 1-2 rows | 1914 | 58.3 / 79.8 | 55.4 / 75.3 | 53.3 / 70.8 |
+| 3+ rows | 294 | 37.4 / 86.4 | 35.7 / 75.2 | 25.5 / 65.0 |
+
+**blind_v2: what a user's category holds, by what the category is: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 2867 | 57.8 / 81.9 | 53.3 / 77.2 | 53.0 / 71.5 |
+| one kind | 1958 | 78.2 / 87.2 | 73.5 / 89.5 | 75.7 / 84.2 |
+| person / purpose | 229 | 37.1 / 72.1 | 0.0 / 15.7 | 12.2 / 58.5 |
+| several kinds | 680 | 6.2 / 70.1 | 12.8 / 62.2 | 1.2 / 39.6 |
+
+**blind_v2: a payee's kind (step 148), by what the reader sees / payee type: top-1 / top-3 %**
+
+| group | n | decider-4B untrained | decider-35B untrained | decider-4B recipe |
+|---|---|---|---|---|
+| all | 1268 | 66.1 / 81.9 | 68.0 / 85.5 | 61.3 / 80.4 |
+| filings / opaque name | 15 | 60.0 / 73.3 | 53.3 / 60.0 | 53.3 / 66.7 |
+| filings / other | 402 | 57.5 / 74.1 | 53.2 / 73.6 | 51.0 / 70.4 |
+| filings / p2p | 4 | 0.0 / 0.0 | 0.0 / 0.0 | 25.0 / 25.0 |
+| name / opaque name | 15 | 20.0 / 33.3 | 26.7 / 26.7 | 20.0 / 26.7 |
+| name / other | 407 | 66.8 / 81.6 | 75.9 / 91.9 | 62.4 / 82.1 |
+| name / p2p | 4 | 100.0 / 100.0 | 75.0 / 75.0 | 50.0 / 50.0 |
+| name+filings / opaque name | 15 | 60.0 / 73.3 | 60.0 / 60.0 | 66.7 / 66.7 |
+| name+filings / other | 402 | 76.6 / 93.0 | 77.6 / 96.0 | 72.6 / 92.8 |
+| name+filings / p2p | 4 | 50.0 / 75.0 | 75.0 / 75.0 | 50.0 / 75.0 |
+
+### 143.1 What the step says
+
+- **Yes, a payee's kind can be inferred from how it was categorised.** With the name hidden, the categories other users filed a payee
+  under give its kind 51 to 73% of the time (top three 70 to 92%); with the name as well, 77 to 87% (top three 93 to 99.5%), the best of
+  the three. The filings matter most where the name says nothing: opaque names go from 8-27% (name alone) to 60-67% (name and
+  filings). Person-to-person payees are recognised from their names (Venmo, Zelle) nearly always.
+- **What a user's category holds is read well when it holds one kind** (78 to 93% top-1), largely from the name (categories with no rows
+  in the slice score higher than those with many, because many-row categories are the broad ones). The models almost never answer
+  "several kinds" (1 to 23%; the dominant kind instead, in the top three 40 to 79%) or "a person, trip or purpose" (0 to 37%): broad and
+  personal categories are the hard part, and a canonical description of a user's category should allow several kinds rather than force one.
+- **The trained categoriser is not better at these questions** (the recipe's decider-4B trails the untrained one on most rows), and the
+  35B is best only at naming payees from their names (76 to 80%): world knowledge helps with names, not with reading a user's categories.
+- **Use**: the inferred payee kind (35B, name and filings) agrees with the generator's kind for 79% (blind_v1) and 74% (blind_v2) of
+  queries; step 149 tests it as the query's "Kind:" line (`blind_v*_kindsinf`) against the generator's kinds (a database knowing every payee).
+
+
+## 144. Canonical "Kind:" lines: when a merchant database knows the payee's kind, one line under the first-time payee's transaction takes it from 60 to 77% right first on blind_v1 (68% on blind_v2), with no retraining, as well as or better than reading it with the 35B; inferred kinds (from name and other users' filings) add little over the 35B's own reading, and on known payees kind lines do not help; training with kind lines is not needed and costs the user's own patterns (DATA-7)
+
+PLAN step 149. A canonical kind line under every history row and the query (`Kind: coffee shop or bakery`, `Kind: person-to-person payment
+(purpose varies)`; `scripts/derive_kind_prompts.py`): from the generators' kinds (a merchant database that knows every payee), or with
+the query's kind inferred by the 35B from the payee's name and other users' filings (REPORT 143) where no database knows it. decider-4B
+with the other-users line (REPORT 123) read them without training (three seeds); a copy trained with kind lines on every episode (15%
+"unknown"; `KIND_LINES=1`) read them too (two seeds). `scripts/kindline_tables.py`, `scripts/kindroute_tables.py`, job lists
+`scripts/modal_jobs/r149*.json`.
+
+**Table 144.1: kind lines everywhere**
+
+| set | arm | seeds | top-1 | first-time payees: 1st / top 3 | new users | person-to-person | own patterns | payees seen before | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| blind_v1 | no kind lines (REPORT 123) | 3 | 83.8 | 59.9 / 74.8 | 69.6 | 26.1 | 82.2 | 89.2 | 0.622 |
+| blind_v1 | kind lines read zero-shot | 3 | 86.9 | 76.8 / 88.3 | 77.0 | 30.6 | 82.5 | 89.2 | 0.558 |
+| blind_v1 | kind lines read zero-shot, query kind inferred | 3 | 82.9 | 62.8 / 78.0 | 73.6 | 30.6 | 81.7 | 87.4 | 0.690 |
+| blind_v1 | trained with kind lines, generator kinds | 2 | 86.5 | 75.3 / 85.7 | 76.5 | 24.3 | 83.0 | 89.0 | 0.554 |
+| blind_v1 | trained with kind lines, query kind inferred | 2 | 79.9 | 60.5 / 75.6 | 72.9 | 24.3 | 79.6 | 84.3 | 0.804 |
+| blind_v1 | trained with kind lines, prompts without them | 2 | 83.9 | 60.3 / 75.6 | 69.0 | 24.3 | 83.0 | 89.3 | 0.636 |
+| blind_v2 | no kind lines (REPORT 123) | 3 | 71.7 | 60.8 / 79.7 | 65.1 | 73.2 | 52.9 | 74.6 | 1.084 |
+| blind_v2 | kind lines read zero-shot | 3 | 72.4 | 68.0 / 83.6 | 68.9 | 74.7 | 50.0 | 73.6 | 1.022 |
+| blind_v2 | kind lines read zero-shot, query kind inferred | 3 | 70.4 | 64.5 / 82.1 | 68.8 | 73.2 | 49.0 | 72.0 | 1.079 |
+| blind_v2 | trained with kind lines, generator kinds | 2 | 72.5 | 66.8 / 82.0 | 68.5 | 68.9 | 37.9 | 74.0 | 1.022 |
+| blind_v2 | trained with kind lines, query kind inferred | 2 | 69.5 | 63.4 / 80.5 | 69.3 | 68.2 | 36.4 | 71.2 | 1.145 |
+| blind_v2 | trained with kind lines, prompts without them | 2 | 72.2 | 60.9 / 78.2 | 64.3 | 70.5 | 40.0 | 75.3 | 1.070 |
+
+**Table 144.2: kind lines only for first-time payees, against the 35B routing of REPORT 139 (three seeds; plain prompts for payees seen before)**
+
+| set | system | top-1 | first-time payees: 1st / top 3 | payees seen before | effort W=10 |
+|---|---|---|---|---|---|
+| blind_v1 | no kind lines | 83.8 | 59.9 / 74.8 | 89.2 | 0.622 |
+| blind_v1 | kind lines for first-time payees (database kinds) | 86.9 | 76.8 / 88.3 | 89.2 | 0.543 |
+| blind_v1 | kind lines for first-time payees (inferred kinds) | 84.3 | 62.8 / 78.0 | 89.2 | 0.634 |
+| blind_v1 | 35B for first-time payees (REPORT 139) | 85.4 | 68.7 / 82.1 | 89.2 | 0.559 |
+| blind_v1 | inferred kind lines + 35B for first-time payees | 85.3 | 68.1 / 84.1 | 89.2 | 0.570 |
+| blind_v2 | no kind lines | 71.7 | 60.8 / 79.7 | 74.6 | 1.084 |
+| blind_v2 | kind lines for first-time payees (database kinds) | 73.2 | 68.0 / 83.6 | 74.6 | 1.043 |
+| blind_v2 | kind lines for first-time payees (inferred kinds) | 72.4 | 64.5 / 82.1 | 74.6 | 1.082 |
+| blind_v2 | 35B for first-time payees (REPORT 139) | 73.3 | 68.5 / 87.1 | 74.6 | 1.003 |
+| blind_v2 | inferred kind lines + 35B for first-time payees | 73.5 | 69.5 / 87.9 | 74.6 | 0.997 |
+
+### 144.1 What the step says
+
+- **A payee kind from a merchant database is worth as much as the 35B for first-time payees, at no extra model cost.** Shown only for
+  payees new to the user, a database kind takes them from 59.9 to 76.8% right first on blind_v1 (35B routing 68.7) and from 60.8 to 68.0
+  on blind_v2 (35B 68.5), read by the current adapter without any training; effort 0.543 on blind_v1 (35B 0.559), 1.043 on blind_v2
+  (35B 1.003). Where YNAB or a merchant database knows what a payee is, that line can replace the large model.
+- **Inferred kinds do not replace it.** Where no database knows the payee, a kind inferred by the 35B (right 74 to 79%) and passed to
+  decider as a line gives 62.8 / 64.5% on first-time payees; the 35B's whole distribution (REPORT 139) gives 68.7 / 68.5, and both
+  together 68.1 / 69.5: one label carries less than the distribution it came from.
+- **Kind lines on known payees do not help** (database kinds: neutral; inferred kinds: -1.8 and -2.6 on payees seen before): the user's
+  own history already answers those, and a wrong kind misleads.
+- **Training with kind lines is not needed**: the trained copy reads database kinds no better (86.5 against 86.9 on blind_v1) and loses
+  the user's own patterns on blind_v2 (52.9 -> 37.9), the same over-reliance on what a payee is as the 35B showed (REPORT 139).
+- **Person-to-person payees** barely move (blind_v1 26 -> 31, blind_v2 73 -> 75): "purpose varies" is honest but says nothing about
+  which purpose; memos are the missing signal (reports/REAL_DATA_SPEC.md).
+- **Recommended system (revised)**: for a first-time payee, a database kind line when the payee's kind is known, else the untrained 35B
+  (REPORT 139); for known payees, the plain prompt; YNAB's rule first unless the model is 0.2 more confident; lists of three.
+
+
+## 145. Inferring from the population's filings alone (no kind database): learned concepts and payee profiles, mapped onto a user's own categories, suggest the right category first for 52% of first-time payees with no model (70% in the top three; YNAB today 0%); but decider reads other users' raw category names better than the mapped line (61% against 56% right first), and multiplied into the model the profile adds at most a point; the population's value is best taken by letting the model map names itself and, with real data, by training on the filings (REAL-24)
+
+PLAN step 150 (owner, 2026-09-30: "We don't have a reliable DB for the kind ... Let's try to infer what we can from our existing
+categorized transactions. We have about 1M users and about 1B transactions to train with, and add about 1M every day"). A synthetic
+stand-in: 2,000 more users from blind_v2's world (`BLIND_POP=2000`; 2.6M transactions; blind_v2's items unchanged), payees matched
+across users by a key from the statement string alone (`ai_experiments.payeekey`: purity 0.98, coverage 0.83 against the generator's
+payee ids), concepts learned without any vocabulary (each user category described by the payees filed under it, TF-IDF, SVD, k-means
+into 60 concepts: "groceries / grocery", "meals out / eating out", "car maintenance / auto maintenance", "money in / ready to
+assign", and some mixed ones such as "gifts / things to wear"), payee profiles from the population's filings before each transaction
+(>= 3 users), and the test user's categories placed in concepts by their own earlier filings or, with none, by their names
+(`scripts/payee_profiles.py`). The mapped profile becomes a no-model suggestion and the line "Other users file this payee as: <the
+user's own category> (%)", read zero-shot by decider-4B (the other-users recipe, three seeds). `scripts/mapped_tables.py`, job list
+`scripts/modal_jobs/r150.json`.
+
+| system | top-1 | first-time payees: 1st / top 3 | payees seen before | new users | person-to-person | own patterns | effort W=10 |
+|---|---|---|---|---|---|---|---|
+| raw other-users line (REPORT 123) | 71.7 | 60.8 / 79.7 | 74.6 | 65.1 | 73.2 | 52.9 | 1.084 |
+| raw other-users line (REPORT 123) + 35B for first-time payees | 73.3 | 68.5 / 87.1 | 74.6 | 74.8 | 73.2 | 52.9 | 1.003 |
+| mapped profile line | 70.8 | 56.2 / 77.6 | 74.7 | 63.5 | 70.7 | 52.4 | 1.111 |
+| mapped profile line + 35B for first-time payees | 73.4 | 68.5 / 86.5 | 74.7 | 75.3 | 70.7 | 52.4 | 1.023 |
+| no-model suggestion from the mapped profile | 53.6 | 51.9 / 69.6 | 54.1 | 65.6 | 43.9 | 28.6 | – |
+
+**Multiplying the mapped profile into decider (raw line) + 35B for first-time payees, profile^lambda (three seeds):**
+
+| system | top-1 | first-time 1st / top 3 | seen before |
+|---|---|---|---|
+| raw line + 35B for first-time payees, x mapped profile^0.0 | 73.3 | 68.5 / 87.1 | 74.6 |
+| raw line + 35B for first-time payees, x mapped profile^0.5 | 72.6 | 69.6 / 90.0 | 73.4 |
+| raw line + 35B for first-time payees, x mapped profile^1.0 | 70.4 | 68.9 / 89.7 | 70.7 |
+| raw line + 35B for first-time payees, x mapped profile^2.0 | 65.6 | 63.5 / 86.7 | 66.2 |
+
+### 145.1 What the step says
+
+- **The population alone suggests well where YNAB has nothing**: a profile exists for 99% of blind_v2's transactions (payees shared
+  within cities), and mapped onto the user's own categories it puts the right one first for 52% of first-time payees and in the top
+  three for 70%, with no language model (YNAB today: 0%; a list of other users' raw names: about 30%, REPORT 131). New users: 66% right
+  first, level with decider (65%).
+- **The model maps names better than the clustering does**: decider given other users' raw category names (REPORT 123) reads first-time
+  payees at 61%, given the mapped line 56%. The concepts are only as good as their clusters (some mix gifts with clothing), and a wrong
+  mapping is stated as the user's own category; the raw names leave the mapping to a reader that does it better.
+- **Multiplied in, the profile adds little**: +1 point right first and +3 in the top three for first-time payees at lambda 0.5, and it
+  costs known payees unless restricted to first-time payees.
+- **For the real data** (reports/REAL_DATA_SPEC.md): (1) train the categoriser on training users' real filings: what the population
+  knows about a payee then sits in the weights (the database-episode result, REPORT 53, at real scale); (2) keep the raw other-users
+  line, aggregated per payee key over users with enough distinct users behind it; (3) keep the learned concepts and profiles as the
+  no-model fallback and for the top-three list of first-time payees, and as an offline map of how people name categories. With a million
+  users the clusters and the payee matching will be denser and better; whether that closes the gap to the raw line is a real-data question.
+
+## 146. strands-decider (AWS, a pointer head on Qwen3.5-2B-Base): used correctly it reproduces its published numbers, but untrained it barely reads our task (blind_v1 26% right first; REAL-6 9%); trained on the recipe's episodes, by any of three routes, it equals decider-2B and comes within a point of decider-4B on the blind sets (blind_v1 82.6-83.1 vs 83.8 right first, first-time payees 60 vs 60), but stays far behind on invented category names (REAL-6 57-65 vs 87; novel names 42-51 vs 85); not adopted (MODEL-22)
+
+*PLAN step 151 (owner, 2026-10-01: "Look at this new open source repo of a decider model from AWS ... use it to experiment and see how
+well it handles our datasets and experiments ... Compare it to our existing best models"; later: check that we use their code, model and
+harness correctly, on easy inputs first, and use their training recipe). Code: `ai_experiments.strands` (their prompt, tokenised whole
+as their training collator does, their pointer readout at temperature 1), `exp_decision_models.py FAMILY=strands`,
+`exp_strands_finetune.py` (INIT=v19 | base), `export_strands_episodes.py` (our episodes and their v19 config for their own trainer),
+`strands_check.py`, `strands_tables.py`; job lists `scripts/modal_jobs/r151*.json`; package `strands-decider==0.1.0` at commit
+f91487a. Licences: the code and the v19 checkpoint are Apache-2.0, the torso Qwen3.5-2B-Base Apache-2.0 (`open_licence`); v19's own
+training mixes public datasets, some tagged `other` or `unknown` (its LICENSE.md); we use only the published weights and train our own.*
+
+**The model.** A Qwen3.5-2B-Base torso with its LM head discarded, a rank-16 LoRA, and a pointer head (~1M parameters): option k's logit
+is the dot product of a projection of the hidden state at `<answer>` with a projection of the hidden state at the last token of option
+k's line. Prompt: `<state>...</state><question type="choice">Select exactly one option. <question> <options>1. a\n2. b ...</options>
+</question><answer>`. Our item's prompt (category list, labelled history, the query) is the state; the category names are the options.
+v19 was trained on public classification sets (emotion, topic, intent, NLI), multi-step document questions and answer adequacy;
+JevBench 0.723.
+
+**Is it used correctly? (`results/strands_check_r151.txt`).** (A) Their engine on their README's recorded example gives the same
+answers with probabilities a few points apart (technical 0.788 / billing 0.197 / sales 0.015 against 0.748 / 0.234 / 0.018; urgency
+0.807 against 0.801), within what the README says another run gives. (B) Their own `evaluate_checkpoint` on their published held-out
+generated rows: gen:adequacy 0.805 against the published 0.798 (n = 302); on gen_v16's ten tasks six match the published accuracy
+exactly and four are one to three rows off (0.866 overall against about 0.85). (C) Our reader against their engine on 61 choice
+questions: the same top answer on 61, largest probability difference 0.011 (mean 0.0005). So the model, their code and our reader
+agree. (D) An easy ladder through our reader: one obvious transaction (Shell, Trader Joe's, Netflix, CVS) with six everyday categories
+and no history, 17 of 24 (each also with the options reversed); the same queries in our prompt format after four labelled rows of other
+merchants, 6 of 12; the query's merchant twice in the history under an invented category name (copy the label), 8 of 12. A general LLM
+gets nearly all of these: v19 knows little about merchants and does not read a labelled history.
+
+**Arms.** All trained arms see the same 12,800 draws of the decider-4B recipe's episodes (REPORT 123: fold-0 training users, rename,
+database episodes, mislead, alternatives, lookups, overrides, 20% empty histories, the other-users line on half, 10% evidence-free with
+a uniform target), on one H100 in bf16, about 22 minutes of training each:
+- *v19 + recipe episodes* (our loop): v19's LoRA and pointer head trained further, LoRA lr 1e-4, head 2e-4, 800 steps of 16, options
+  shuffled; cross-entropy (uniform on evidence-free episodes, the true split where the user's choice is random). Their trainer cannot do
+  this: its `init_from` discards the pointer head and freezes the torso.
+- *strands' architecture from Qwen3.5-2B-Base* (our loop): a fresh rank-16 LoRA on v19's targets and a fresh pointer head, head lr 1e-3.
+- *strands' own trainer and v19 config*: `python -m strands_decider.cli train` with v19's `configs/train.yaml` (fresh LoRA and pointer
+  head on Qwen3.5-2B-Base, KL 0.3 to the frozen torso's option-number readout, teacher weight 1.0 carrying the soft targets, batch
+  8 x 4, one epoch, warmup 3%, length-grouped batches). One change: `num_slots` raised from 24 to the widest episode (41); with a pointer
+  head it only sizes the KL reference, and their trainer fails on a batch wider than it (v19's corpus stops at 24 options). Their
+  parent / replay stage is not reproduced: it labels their own corpus.
+- *decider-2B + recipe*: the decider-4B recipe unchanged on Mapika/decider-2b (one seed), the same-size comparison.
+
+**S.1 top-1 % (mean [range] over seeds; seeds in brackets)**
+
+| reader | REAL-6 v1 | novel names | mislead | override | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|---|
+| strands v19, untrained | 8.7 (1) | 6.0 (1) | 8.3 (1) | 15.5 (1) | 25.9 (1) | 62.4 (1) | 19.1 (1) | 52.5 (1) |
+| decider-4B, untrained | 34.2 (1) | – | – | – | 76.5 (1) | – | 63.1 (1) | – |
+| decider-35B-A3B, untrained | – | – | – | – | 82.0 (1) | – | 71.9 (1) | – |
+| kev-4B, untrained | 43.3 (1) | – | – | – | – | – | – | – |
+| strands v19 + recipe episodes | 62.6 [61.1, 64.1] (2) | 46.6 [45.0, 48.3] (2) | 51.1 [50.6, 51.6] (2) | 97.7 [97.4, 98.0] (2) | 80.8 [80.7, 80.9] (2) | 82.6 [82.3, 82.9] (2) | 69.3 [69.1, 69.4] (2) | 70.4 [69.3, 71.4] (2) |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 65.3 [64.8, 65.8] (2) | 51.2 [47.3, 55.0] (2) | 46.4 [43.7, 49.0] (2) | 97.1 [96.8, 97.4] (2) | 81.2 [81.1, 81.3] (2) | 83.1 [82.9, 83.2] (2) | 68.4 [67.7, 69.1] (2) | 70.0 [69.9, 70.0] (2) |
+| strands' own trainer and v19 config + recipe episodes | 56.9 [53.7, 60.1] (2) | 41.6 [41.6, 41.6] (2) | 45.8 [43.9, 47.6] (2) | 98.8 [98.7, 99.0] (2) | 80.5 [80.5, 80.5] (2) | 82.7 [82.1, 83.3] (2) | 70.1 [69.7, 70.4] (2) | 70.2 [69.5, 70.9] (2) |
+| decider-2B + recipe (one slot) | 86.9 (1) | 86.2 (1) | 64.4 (1) | 97.2 (1) | 79.7 (1) | 81.4 (1) | 68.6 (1) | 70.3 (1) |
+| decider-4B + recipe (one slot; REPORT 123) | 87.8 [85.6, 91.6] (3) | 84.6 [82.9, 87.6] (3) | 64.6 [63.8, 65.4] (2) | 98.3 [98.2, 98.4] (2) | 82.7 [82.2, 83.2] (3) | 83.9 [83.5, 84.2] (3) | 70.0 [69.3, 70.7] (3) | 71.7 [70.5, 73.2] (3) |
+
+**S.2 blind_v1 with the other-users line (1500 items; 277 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 73.5 | 73.5 | 0.82 | 74% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 62.4 | 84.1 | 2.23 | 70% | 45.1 / 66.1 | 66.3 | 56.0 | 1.367 |
+| decider-4B, untrained (read without the line) | 1 | 76.5 | 89.7 | 1.59 | 84% | 48.0 / 66.8 | 83.0 | 57.7 | 0.949 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 82.0 | 93.1 | 1.53 | 89% | 67.9 / 82.7 | 85.2 | 77.4 | 0.701 |
+| strands v19 + recipe episodes | 2 | 82.6 | 91.1 | 1.44 | 88% | 60.3 / 74.4 | 87.7 | 71.4 | 0.682 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 83.1 | 91.5 | 1.47 | 88% | 60.5 / 74.9 | 88.2 | 72.0 | 0.702 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 82.7 | 91.3 | 1.44 | 88% | 59.9 / 75.8 | 87.9 | 71.1 | 0.697 |
+| decider-2B + recipe (one slot) | 1 | 81.5 | 89.9 | 1.46 | 87% | 51.3 / 67.1 | 88.4 | 61.9 | 0.716 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 83.8 | 91.5 | 1.45 | 89% | 59.9 / 74.8 | 89.2 | 69.6 | 0.622 |
+
+**S.2 blind_v2 with the other-users line (1500 items; 316 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 57.1 | 57.1 | 0.79 | 57% | 0.0 / 0.0 | – | – | – |
+| strands v19, untrained | 1 | 52.5 | 79.1 | 2.58 | 63% | 49.7 / 73.4 | 53.2 | 51.6 | 1.473 |
+| decider-4B, untrained (read without the line) | 1 | 63.0 | 84.1 | 2.12 | 75% | 51.6 / 72.2 | 66.0 | 56.2 | 1.307 |
+| decider-35B-A3B, untrained (read without the line) | 1 | 71.9 | 89.1 | 2.04 | 83% | 68.0 / 85.4 | 72.9 | 75.0 | 1.120 |
+| strands v19 + recipe episodes | 2 | 70.4 | 87.9 | 1.89 | 84% | 57.3 / 80.4 | 73.9 | 63.3 | 1.126 |
+| strands arch. from Qwen3.5-2B-Base + recipe episodes | 2 | 70.0 | 87.8 | 1.93 | 83% | 59.2 / 76.6 | 72.8 | 62.8 | 1.141 |
+| strands' own trainer and v19 config + recipe episodes | 2 | 70.2 | 87.8 | 1.90 | 83% | 60.6 / 80.7 | 72.8 | 64.6 | 1.143 |
+| decider-2B + recipe (one slot) | 1 | 70.5 | 86.9 | 1.90 | 83% | 56.0 / 72.8 | 74.4 | 60.9 | 1.189 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 71.7 | 88.1 | 1.90 | 84% | 60.8 / 79.7 | 74.6 | 65.1 | 1.084 |
+
+- **Untrained, v19 does not do this task.** 26% right first on blind_v1 and 9% on REAL-6, where untrained decider-4B gets 77 and 34. Its
+  predictions show no position bias; its confidence is low (top probability mostly 0.2 to 0.4); when the payee is in the history it
+  picks one of the payee's past categories 30% of the time (363 of 1,216), where YNAB's rule is right 74%. The other-users line, which
+  names categories outright, lifts it to 62%.
+- **Trained, all three routes land in the same place, and there with decider at 2B.** On the blind sets with the other-users line the
+  strands arms reach 82.6 to 83.1% right first on blind_v1 and 70.0 to 70.4 on blind_v2, 88% / 83-84% of the work saved: decider-2B
+  81.5 / 70.5, decider-4B 83.8 / 71.7. On first-time payees they match decider-4B (blind_v1 60% right first, 75% in the top three) and
+  beat decider-2B (51 / 67); on blind_v2 likewise (57-61 / 77-81 against 56 / 73).
+- **They fail on invented category names.** REAL-6 (novel names for every user) 57 to 65% against 87 to 88 for decider at 2B and 4B;
+  real6_v1_novel 42 to 51 against 85 to 86; mislead 46 to 51 against 64. These sets can only be answered by binding each user's own
+  names to their meaning through the labelled rows. The decider recipe trains this directly (rand255 labels on the shots, the
+  shot-label token loss, the answer read as a label token, REPORT 76, 111); a pointer head reads the option line's hidden state,
+  which for an invented name carries little of what the history said about it. That is a hypothesis: the arms differ in readout and in
+  the shot-label loss together, and we did not separate them.
+- **v19's own training adds nothing here.** From v19 or from the base, the trained arms agree within a point or two on every set; their
+  trainer's KL and batch give the same result as our loop.
+- **Time.** Each trained arm took about 22 minutes to train and 30 to 33 minutes with its eight scorings on one H100 (decider-2B 21 / 27);
+  scoring speed was not measured separately.
+
+**Not adopted.** Trained, strands-decider equals decider at the same size on the blind sets and on first-time payees, and is far worse
+where users name categories in their own way, which real users do. decider-4B with the recipe stays the reader. What would change this:
+a pointer head trained with a shot-label objective (the arms above leave it out), or real data in which invented names are rare.

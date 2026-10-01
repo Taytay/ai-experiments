@@ -1,0 +1,5 @@
+outs:
+- md5: 825a8c2a060f7f9f4ede982f59913313
+  size: 21212029
+  hash: md5
+  path: poi1_v1.json

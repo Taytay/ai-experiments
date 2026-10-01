@@ -1,0 +1,6 @@
+outs:
+- md5: 279e62305945b2773d06d1b20e2bf3f9.dir
+  size: 1684141333
+  nfiles: 2
+  hash: md5
+  path: encmask_mbert_st1500_r68_f1

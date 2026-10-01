@@ -1,0 +1,7 @@
+outs:
+- md5: 528f572fe5acd3c016fc4071578ad60b.dir
+  size: 91546190
+  nfiles: 8
+  hash: md5
+  path: 
+    strands_v19_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_ev10soft

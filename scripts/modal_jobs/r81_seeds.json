@@ -1,0 +1,42 @@
+[
+ {
+  "tag": "r81-seed1",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "RUN_TAG": "h100bf16st800s1",
+   "MODEL": "Mapika/decider-4b",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "SEED": "1"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=real6_v1_novel uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r81-seed2",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "RUN_TAG": "h100bf16st800s2",
+   "MODEL": "Mapika/decider-4b",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "SEED": "2"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s2_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s2_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=real6_v1_novel uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

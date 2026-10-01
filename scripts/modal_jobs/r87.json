@@ -1,0 +1,25 @@
+[
+ {
+  "tag": "r87-q9b-s0",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "RUN_TAG": "h100bf16st800",
+   "MODEL": "Qwen/Qwen3.5-9B",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "LABELS": "rand26",
+   "SEED": "0"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider MODEL=Qwen/Qwen3.5-9B ADAPTER=slot_Qwen3.5-9B_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET= uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Qwen/Qwen3.5-9B ADAPTER=slot_Qwen3.5-9B_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=real6_v1_novel uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Qwen/Qwen3.5-9B ADAPTER=slot_Qwen3.5-9B_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=mislead_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Qwen/Qwen3.5-9B ADAPTER=slot_Qwen3.5-9B_none_h100bf16st800_f0_ren50_dbep50_aux100_labrand26_lora CONDS=noctx LABELS=rand26 ITEMS_SET=alternation_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

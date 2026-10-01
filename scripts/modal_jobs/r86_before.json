@@ -1,0 +1,15 @@
+[
+ {
+  "tag": "r86-before",
+  "env": {
+   "ADAPTERS_FROM": "r81-decider4b-ren,r81-seed1,r81-seed2",
+   "FAMILY": "decider",
+   "MODEL": "Mapika/decider-4b"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=alternation_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s1_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=alternation_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800s2_f0_ren50_dbep50_aux100_lora CONDS=noctx ITEMS_SET=alternation_v1 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

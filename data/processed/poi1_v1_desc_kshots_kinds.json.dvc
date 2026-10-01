@@ -1,0 +1,5 @@
+outs:
+- md5: be69137b04b72f132b7e6caf82511449
+  size: 26234882
+  hash: md5
+  path: poi1_v1_desc_kshots_kinds.json

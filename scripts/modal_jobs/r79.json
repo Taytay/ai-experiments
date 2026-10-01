@@ -1,0 +1,52 @@
+[
+ {
+  "tag": "r79-slot-P",
+  "env": {
+   "POI": "poi1_v1",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "POI_KIND": "1",
+   "POI_DESC": "1",
+   "POI_UNSEEN": "0.5",
+   "RUN_TAG": "h100bf16",
+   "MODEL": "Qwen/Qwen3.5-2B",
+   "MICRO": "16",
+   "STEPS": "800"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider ADAPTER=slot_Qwen3.5-2B_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora ITEMS_SET=poi1_v1_desc_kshots_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py",
+   "FAMILY=decider ADAPTER=slot_Qwen3.5-2B_poi1_v1_none_h100bf16_pkind_pdesc_uns50_f0_ren50_lora ITEMS_SET=poi1_v1_desc_kinds uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r79-slot-E200",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RUN_TAG": "h100bf16",
+   "MODEL": "Qwen/Qwen3.5-2B",
+   "MICRO": "16",
+   "STEPS": "200"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider ADAPTER=slot_Qwen3.5-2B_none_h100bf16_f0_dbep50_lora ITEMS_SET= CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ },
+ {
+  "tag": "r79-slot-E800",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RUN_TAG": "h100bf16st800",
+   "MODEL": "Qwen/Qwen3.5-2B",
+   "MICRO": "16",
+   "STEPS": "800"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decider_finetune.py",
+   "FAMILY=decider ADAPTER=slot_Qwen3.5-2B_none_h100bf16st800_f0_dbep50_lora ITEMS_SET= CONDS=noctx uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]

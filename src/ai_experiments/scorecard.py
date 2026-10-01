@@ -171,3 +171,69 @@ def scorecard(recs, items, n_boot=500, seed=0, users=None, fold_of=None):
         out[k + "_ci"] = tuple(np.percentile(v, [2.5, 97.5]).round(2 if k == "bits" else 1))
     out["_per_item"] = per
     return out
+
+
+# User effort (PLAN step 97, EVAL-10): what a user does per transaction under an auto-file policy. An auto-filed transaction costs
+# nothing when right and `wrong` when wrong (noticing, undoing, refiling); the rest are shown the top three suggestions: one click
+# when the answer is among them, a search through the category list (`search`) when it is not.
+EFFORT = dict(click=1.0, search=3.0, wrong=5.0)
+
+
+def decide(p1, q3, wrong=EFFORT["wrong"], click=EFFORT["click"], search=EFFORT["search"]):
+    """PLAN step 126 (owner, 2026-09-29: a fixed 98% threshold is arbitrary): auto-file exactly when it is expected to cost the user less
+    than suggesting, from calibrated probabilities: (1 - p1) x wrong < q3 x click + (1 - q3) x search, with p1 the top category's
+    probability and q3 the top three's mass. No threshold to choose; `wrong` (what a wrong auto-file costs, in clicks) is the product's
+    one number. Arrays in, a boolean array out."""
+    p1, q3 = np.asarray(p1, float), np.asarray(q3, float)
+    return (1 - p1) * wrong < q3 * click + (1 - q3) * search
+
+
+def effort(auto, auto_ok, top3_ok, click=EFFORT["click"], search=EFFORT["search"], wrong=EFFORT["wrong"]):
+    """Mean effort per transaction. auto: auto-filed or not; auto_ok: the auto-filed category is right; top3_ok: gold in the top 3
+    suggestions (read only where not auto-filed). All sequences of equal length."""
+    e = [(0.0 if ok else wrong) if a else (click if t3 else search) for a, ok, t3 in zip(auto, auto_ok, top3_ok)]
+    return float(np.mean(e))
+
+
+# ---- rank-based effort (owner, 2026-09-30; PLAN step 132) ---------------------------------------------------------------------------------
+# The user sees up to five suggestions. The right category at rank r costs r - 1 (first place 0); not shown costs MISS (10). Every wrong
+# category shown costs LAM (a suggestion that makes no sense looks bad). A wrong auto-file costs W. With calibrated probabilities the list
+# needs no threshold: rank r is shown when its expected gain beats its expected clutter, p_r (MISS - (r - 1)) > (1 - p_r) LAM, stopping
+# at the first rank that fails (at most KMAX); the transaction is auto-filed when (1 - p_1) W is below the list's expected cost.
+RANK = dict(miss=10.0, lam=1.0, kmax=5, confirm=0.0)  # confirm: what accepting a shown suggestion costs (a tap) over an auto-file
+
+
+def suggest(p, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], plausible=None):
+    """Indices of the categories to show, best first (at least one), from one calibrated distribution. With `plausible` (owner,
+    2026-09-30: the categories this user has filed the payee under, or other users file it under; known when the prompt is built),
+    plausible categories are shown freely in the model's order and only the others must pass the expected-cost test."""
+    order = [int(c) for c in np.argsort(-np.asarray(p, float))]; out = [order[0]]
+    for c in order[1:]:
+        if len(out) >= kmax:
+            break
+        r = len(out) + 1; q = float(p[c])
+        if plausible is not None and c in plausible:
+            out.append(c); continue
+        if q * (miss - (r - 1)) > (1 - q) * lam:
+            out.append(c)
+        elif plausible is None:
+            break
+    return out
+
+
+def list_cost(p, shown, lam=RANK["lam"], miss=RANK["miss"], confirm=RANK["confirm"], plausible=None):
+    """Expected cost of showing `shown` under p (clutter charged only for categories outside `plausible`, when given)."""
+    p = np.asarray(p, float); got = sum(p[c] for c in shown)
+    return confirm + sum(p[c] * r for r, c in enumerate(shown)) + (1 - got) * miss + lam * sum(1 - p[c] for c in shown if plausible is None or c not in plausible)
+
+
+def rank_effort(p, gold, W, lam=RANK["lam"], miss=RANK["miss"], kmax=RANK["kmax"], auto=None, confirm=RANK["confirm"], plausible=None):
+    """(cost, auto-filed, shown list) for one transaction; auto=None decides by the expected-cost rule, True / False forces it.
+    With `plausible`, wrong categories inside it cost no clutter."""
+    shown = suggest(p, lam, miss, kmax, plausible)
+    if auto is None:
+        auto = (1 - float(np.max(p))) * W < list_cost(p, shown, lam, miss, confirm, plausible)
+    if auto:
+        return (0.0 if int(np.argmax(p)) == gold else float(W)), True, [int(np.argmax(p))]
+    cost = confirm + (shown.index(gold) if gold in shown else miss) + lam * sum(c != gold and (plausible is None or c not in plausible) for c in shown)
+    return float(cost), False, shown

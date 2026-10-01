@@ -1,0 +1,9 @@
+[
+ {
+  "tag": "r151-check",
+  "env": {},
+  "cmds": [
+   "uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/strands_check.py"
+  ]
+ }
+]
