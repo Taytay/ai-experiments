@@ -9,7 +9,7 @@ shot-label token loss (the recipe's AUX_LM; strands' torso has no LM head in use
   INIT=base  strands' architecture from Qwen3.5-2B-Base: a fresh rank-16 LoRA (v19's targets) and a fresh pointer head (dim 256)
 
 env: INIT, STEPS (800), MICRO (16), LR (1e-4, LoRA), HEAD_LR (1e-3 for a fresh head, 2e-4 for v19's), SEED, RUN_TAG, + the episode knobs.
-Writes models/adapters/strands_<init>_<RUN_TAG><seed>_<episode suffix> (strands' checkpoint layout: lora/, slot_head.pt, config,
+Writes models/adapters/strands_<init>_<episode suffix> (strands' checkpoint layout: lora/, slot_head.pt, config,
 tokenizer) and results/strands_ft_<same>.json. Score with exp_decision_models.py FAMILY=strands MODEL=<V19> ADAPTER=<that name>.
 usage: INIT=v19 OTHERS=0.5 ... uv run --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention
        --with "peft>=0.21" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_strands_finetune.py
@@ -35,8 +35,7 @@ exec(compile(_src, "exp_decider_finetune.py", "exec"), G)
 sys.argv = _argv
 STEPS, MICRO, LR, SEED = G["STEPS"], G["MICRO"], G["LR"], G["SEED"]
 assert not G["AUX_LM"] and not G["TEACHER"] and not G["LAYOUT"], "AUX_LM, TEACHER and LAYOUT are the decider readout's; not used here"
-RUN_TAG = os.environ.get("RUN_TAG", "h100bf16st800")
-NAME = f"strands_{INIT}_{RUN_TAG}{'' if SEED == 0 else f's{SEED}'}_{G['SFX']}"
+NAME = f"strands_{INIT}_{G['SFX']}"  # the episode suffix carries RUN_TAG and the seed
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
 
