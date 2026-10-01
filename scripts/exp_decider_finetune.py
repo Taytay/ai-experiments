@@ -262,7 +262,7 @@ def main():
     if ptr is not None:
         from ai_experiments.pointer import FILE
         torch.save(ptr.state_dict(), OUT_DIR / FILE)
-        print(f"   pointer gate {float(ptr.gate):.3f}", flush=True)
+        print(f"   pointer gate {ptr.gate.item():.3f}", flush=True)
     return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
                 peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2), adapter=str(OUT_DIR.relative_to(ROOT)), n_episodes=len(eps))
 
