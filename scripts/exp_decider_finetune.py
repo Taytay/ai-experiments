@@ -36,6 +36,9 @@ EMA = float(os.environ.get("EMA", "0"))  # row 122 (TRAIN-13): an exponential mo
 TEACHER = os.environ.get("TEACHER", "")  # row 123 (MODEL-19): per-item log-probs of a teacher on the pool's first-time-payee episodes (dump_teacher_items.py + exp_decision_models.py)
 TEACH_W = float(os.environ.get("TEACH_W", "0.5"))  # the target on those episodes: (1 - w) one-hot + w teacher distribution
 SPLIT = os.environ.get("SPLIT", "") == "1"
+RELIST = os.environ.get("RELIST", "") == "1"  # row 152: the options listed again after the query (oneslot.build_layout relist)
+POINTER = os.environ.get("POINTER", "") == "1"  # row 152 (MODEL-23): + a strands-style pointer over the relisted lines (ai_experiments.pointer); needs RELIST
+POINTER_LR = float(os.environ.get("POINTER_LR", "1e-3"))
 DESC = os.environ.get("DESC", "") == "1"  # row 136: each category in the list described by the payees filed under it in the prompt (oneslot.describe_categories)  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 ABSTAIN = float(os.environ.get("ABSTAIN", "0"))  # row 52: decider's augmentation; this share of episodes gets a last option ABSTAIN_OPT
@@ -57,6 +60,8 @@ SFX += "" if LABELS == "letters" else f"_lab{LABELS}"
 SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_split" if SPLIT else "") + ("_desc" if DESC else "")
 SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
+SFX += ("_relist" if RELIST else "") + ("_ptr" if POINTER else "")
+assert not POINTER or RELIST, "POINTER needs RELIST=1"
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 SFX_POOL = SFX  # the pool's name without the teacher suffix (dump_teacher_items.py names its file by it)
 SFX += f"_teach{round(TEACH_W * 100)}" if TEACHER else ""
@@ -178,7 +183,13 @@ def main():
     if TEACHER:
         load_teacher(eps)
     params = [p for p in model.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
+    groups = [{"params": params, "lr": LR}]
+    ptr = None
+    if POINTER:  # row 152
+        from ai_experiments.pointer import OptionPointer
+        ptr = OptionPointer(lm.config.get_text_config().hidden_size).cuda()
+        groups.append({"params": list(ptr.parameters()), "lr": POINTER_LR}); params = params + list(ptr.parameters())
+    opt = torch.optim.AdamW(groups, weight_decay=0.0, betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
     ema = [p.detach().clone().float() for p in params] if EMA else None
@@ -188,7 +199,7 @@ def main():
         picked = [evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
         if LAYOUT or DOW_FIRST:  # row 111
             built = [oneslot.build_layout(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST,
-                                          spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC) for e in picked]
+                                          spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC, relist=RELIST) for e in picked]
         else:
             built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
@@ -198,7 +209,9 @@ def main():
             ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
         h = model.base_model.model.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
         N = max(len(b["labs"]) for b in built)  # each question's own label tokens; padded options at -inf
-        z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float(), (0, N - len(b["labs"])), value=float("-inf"))
+        z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float()
+                               + (ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")]) if ptr is not None else 0.0),
+                               (0, N - len(b["labs"])), value=float("-inf"))
                          for i, b in enumerate(built)])
         soft = torch.tensor([b["gold"] < 0 for b in built], device="cuda")  # row 84 soft: evidence-free, a uniform target over the options
         gold = torch.tensor([max(b["gold"], 0) for b in built], device="cuda")
@@ -244,6 +257,12 @@ def main():
             for e_, p_ in zip(ema, params):
                 p_.copy_(e_.to(p_.dtype))
     OUT_DIR.mkdir(parents=True, exist_ok=True); model.save_pretrained(OUT_DIR)
+    if RELIST or POINTER:  # row 152: how to read this adapter (exp_decision_models picks it up)
+        (OUT_DIR / "oneslot_extra.json").write_text(json.dumps(dict(relist=RELIST, pointer=POINTER)))
+    if ptr is not None:
+        from ai_experiments.pointer import FILE
+        torch.save(ptr.state_dict(), OUT_DIR / FILE)
+        print(f"   pointer gate {float(ptr.gate):.3f}", flush=True)
     return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
                 peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2), adapter=str(OUT_DIR.relative_to(ROOT)), n_episodes=len(eps))
 

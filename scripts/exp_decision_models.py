@@ -94,6 +94,13 @@ def decider():
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
     from ai_experiments import oneslot
+    adir = ROOT / "models" / "adapters" / ADAPTER if ADAPTER else None
+    extra = json.loads((adir / "oneslot_extra.json").read_text()) if adir and (adir / "oneslot_extra.json").exists() else {}  # row 152
+    ptr = None
+    if extra.get("pointer"):
+        from ai_experiments.pointer import FILE, OptionPointer
+        ptr = OptionPointer(lm.config.get_text_config().hidden_size).cuda().eval()
+        ptr.load_state_dict(torch.load(adir / FILE, map_location="cuda", weights_only=True))
 
     @torch.no_grad()
     def score(items, cond):
@@ -101,7 +108,8 @@ def decider():
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
             built = [oneslot.build_layout(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
-                                          random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST, desc=DESC)
+                                          random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST, desc=DESC,
+                                          relist=bool(extra.get("relist")))
                      if LAYOUT or DOW_FIRST else
                      oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
                                    random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS) for it in chunk]
@@ -113,7 +121,10 @@ def decider():
             h = lm.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
             for i, b in enumerate(built):
                 n, perm = len(b["labs"]), b["perm"]
-                z = F.linear(h[i, b["slot"]], lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float() / TEMP
+                z = F.linear(h[i, b["slot"]], lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float()
+                if ptr is not None:  # row 152: + the pointer over the relisted option lines
+                    z = z + ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")])
+                z = z / TEMP
                 lp = F.log_softmax(z, -1).tolist()
                 back = [0.0] * n
                 for j, oi in enumerate(perm):  # label j shows option perm[j]
@@ -210,12 +221,20 @@ def strands():
     import torch
     from ai_experiments import strands as SD
     m = SD.load(ROOT / "models" / "adapters" / ADAPTER if ADAPTER else MODEL).eval()
+    xf = ROOT / "models" / "adapters" / ADAPTER / "strands_extra.json" if ADAPTER else None
+    labelled = bool(xf and xf.exists() and json.loads(xf.read_text()).get("state") == "labelled")  # row 152
+
+    def enc(it, cond):
+        if labelled:
+            st, shown, sp = SD.labelled(state_of(it, cond), options_of(it), random.Random(it["id"]))
+            return SD.encode_aux(m.tokenizer, st, it.get("question", QUESTION), shown, sp)
+        return SD.encode(m.tokenizer, state_of(it, cond), it.get("question", QUESTION), options_of(it))
 
     @torch.no_grad()
     def score(items, cond):
         out, longest = [], 0
         for k in range(0, len(items), BATCH):
-            encs = [SD.encode(m.tokenizer, state_of(it, cond), it.get("question", QUESTION), options_of(it)) for it in items[k:k + BATCH]]
+            encs = [enc(it, cond) for it in items[k:k + BATCH]]
             longest = max([longest] + [len(e[0]) for e in encs])
             lp = SD.log_probs(m, encs).float()
             out += [(lp[i, :len(e[1])] / TEMP).log_softmax(-1).tolist() for i, e in enumerate(encs)]

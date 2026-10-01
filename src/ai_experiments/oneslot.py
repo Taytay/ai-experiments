@@ -155,7 +155,8 @@ def parse(context):
     return names, rows, q[len("Transaction: "):]
 
 
-def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False):
+def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False,
+                 relist=False):
     names, rows, query = parse(context)
     dsc = describe_categories(options, rows) if desc else None  # row 136
     if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
@@ -214,10 +215,19 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
             n = sum(len(p) for p in parts); targets.append((n, n + len(lab)))
         parts.append(lab + "\n\n")
     parts.append(f"Transaction: {f(query)}")
+    line_spans = []
+    if relist:  # row 152: the options listed again after the query, so each line's last token has read the history (a pointer key)
+        assert layout == "labelled_shots", "relist is for the labelled_shots layout"
+        parts.append("\n\nOptions:")
+        for oi in opts:
+            n = sum(len(p) for p in parts) + 1
+            line = f"- ({lab_of[options[oi]]}) {options[oi]}"
+            parts.append("\n" + line); line_spans.append((n, n + len(line)))
     text = "".join(parts)
     enc = tok(text, add_special_tokens=False, return_offsets_mapping=True)
     ids, offs = list(enc["input_ids"]), enc["offset_mapping"]
     aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and any(s < b and a < e for s, e in targets)]
+    opt_pos = [max(t for t, (a, b) in enumerate(offs) if b > a and a >= s0 and b <= e0) for s0, e0 in line_spans]
     if layout == "options":
         ids += tok.encode(f"\n\nQuestion: {question}\nOptions:", add_special_tokens=False)
         for lab, oi in zip(labs, opts):
@@ -227,7 +237,8 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
         ids += tok.encode("\nCategory: (", add_special_tokens=False)
         head = tok.encode("- (" + lab_of[options[opts[0]]] + ")", add_special_tokens=False)
         assert labs[0] in head, "a label does not tokenize as itself after '- ('"
-    return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux)
+    return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux,
+                opt_pos=opt_pos)
 
 
 def _cells(fields):
