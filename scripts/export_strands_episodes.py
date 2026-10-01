@@ -6,7 +6,9 @@ routes see the same rows; strands' collator shuffles the options. Written to OUT
                  descriptions), the gold index. An evidence-free episode (the recipe's soft target) gets weight 0, so it carries no label
                  loss, and a uniform teacher row
   teacher.jsonl  {"i", "probs"} for the evidence-free episodes (uniform) and those where the user's choice is random (the true split)
-  train.yaml     strands' v19 reference config (configs/train.yaml: Qwen3.5-2B-Base, pointer head 256, rank-16 LoRA on v19's targets,
+  train.yaml     strands' v19 reference config (num_slots raised to the widest episode: with a pointer head it only sizes the KL
+                 reference, and strands' trainer fails on a batch wider than it; v19's corpus stops at 24 options, ours goes past 30)
+                  (configs/train.yaml: Qwen3.5-2B-Base, pointer head 256, rank-16 LoRA on v19's targets,
                  KL 0.3 to the frozen torso's option-number readout, lr 1e-4 / head 1e-3, batch 8 x 4, one epoch, warmup 3%), with these
                  files, teacher weight 1.0 (as v19's replay rows), max_length 4096 and output_dir models/adapters/strands_recipe_<suffix>
 usage: <recipe env> uv run --with strands-decider==0.1.0 python scripts/export_strands_episodes.py OUT
@@ -27,7 +29,7 @@ M = runpy.run_path(str(ROOT / "scripts" / "exp_strands_finetune.py"), run_name="
 G = M["G"]
 eps = G["episodes"](); rng = random.Random(G["SEED"])
 name = f"strands_recipe_{G['SFX']}"
-n = n_soft = 0
+n = n_soft = 0; widest = 0
 with open(out / "train.jsonl", "w") as f, open(out / "teacher.jsonl", "w") as ft:
     for _ in range(G["STEPS"] * G["MICRO"]):
         e = G["evfree_aug"](G["abstain_aug"](rng.choice(eps), rng), rng)
@@ -39,8 +41,8 @@ with open(out / "train.jsonl", "w") as f, open(out / "teacher.jsonl", "w") as ft
             ft.write(json.dumps({"i": n, "probs": [1.0 / len(opts)] * len(opts)}) + "\n"); n_soft += 1
         elif dist:
             ft.write(json.dumps({"i": n, "probs": [dist.get(o, 0.0) for o in opts]}) + "\n"); n_soft += 1
-        n += 1
-cfg = dict(train_files=[str(out / "train.jsonl")], val_fraction=0.03, base_model="Qwen/Qwen3.5-2B-Base", num_slots=24, head_type="pointer",
+        n += 1; widest = max(widest, len(opts))
+cfg = dict(train_files=[str(out / "train.jsonl")], val_fraction=0.03, base_model="Qwen/Qwen3.5-2B-Base", num_slots=max(24, widest), head_type="pointer",
            pointer_dim=256, head_init="random", kl_frozen_weight=0.3, teacher_file=str(out / "teacher.jsonl"), teacher_weight=1.0,
            head_dropout=0.05, max_length=4096, use_lora=True, lora_r=16, lora_alpha=32,
            lora_targets=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "in_proj_a",
@@ -50,4 +52,4 @@ cfg = dict(train_files=[str(out / "train.jsonl")], val_fraction=0.03, base_model
            reverse_score_prob=0.5, output_dir=str(ROOT / "models" / "adapters" / name), seed=G["SEED"], log_every=20, eval_every=100)
 import yaml  # noqa: E402
 (out / "train.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
-print(f"{n} rows ({n_soft} with a teacher distribution) -> {out}; checkpoint {name}")
+print(f"{n} rows, up to {widest} options ({n_soft} with a teacher distribution) -> {out}; checkpoint {name}")
