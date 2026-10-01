@@ -1272,3 +1272,8 @@ among canonical kinds; (148) a payee's kind from its name, from other users' fil
 the query, from the generators' kinds and from (148)'s inferred kinds, in training and at test; first-time payees, new users, p2p.
 
 **Status (2026-09-30):** PLAN steps 147-149, REPORTs 143-144: payee kinds are inferable from filings (name + filings 77-87%); a database kind line for first-time payees matches or beats the 35B without retraining; inferred kinds do not replace the 35B; no kind training.
+**REAL-24 Payee profiles learned from the population's filings.** Owner (2026-09-30): no reliable kind database; ~1M users and ~1B
+categorised transactions (+1M a day); infer what we can from them. *Experiment (synthetic stand-in):* a 2,000-user population from
+blind_v2's world (`BLIND_POP`); concepts learned by clustering user categories by the payees filed under them; payee profiles over
+concepts from other users' earlier filings; mapped onto each test user's own categories; as a no-model suggestion and as the
+other-users line ("Other users file this payee as: <the user's own category> (%)"); first-time payees above all.

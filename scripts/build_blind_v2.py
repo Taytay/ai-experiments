@@ -2399,6 +2399,17 @@ def main():
     archs += ["new_user"] * N_NEW_USERS
     rng.shuffle(archs)
     users = [build_user(uid, a, a == "new_user") for uid, a in enumerate(archs)]
+    if os.environ.get("BLIND_POP"):  # row 150 (main session): a larger population from the same world (uids from 1000, own archetype draw)
+        # written to data/processed/pop_v2.jsonl.gz with the 250 test users' rows (uid, date, text, filed name, payee id for diagnosis only);
+        # blind_v2's items are unchanged (built from the 250 test users alone)
+        import gzip
+        prng = random.Random(SEED + 150); n_pop = int(os.environ["BLIND_POP"])
+        pop = [build_user(1000 + k, a, a == "new_user") for k, a in enumerate(wchoice(prng, ARCH_W) for _ in range(n_pop))]
+        with gzip.open(OUT_DIR / "pop_v2.jsonl.gz", "wt", encoding="utf-8") as fh:
+            for u in users + pop:
+                for e in u.events:
+                    fh.write(json.dumps([u.uid, e.date.isoformat(), e.text, u.cats[e.filed].name, e.mid], ensure_ascii=False) + "\n")
+        print(f"wrote pop_v2.jsonl.gz: {len(users) + len(pop)} users, {sum(len(u.events) for u in users + pop)} rows")
 
     # other users' filings: payee -> user -> filed category name -> earliest date
     others = defaultdict(lambda: defaultdict(dict))
