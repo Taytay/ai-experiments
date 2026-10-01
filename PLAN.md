@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-09-30; overwrite this block when it changes)
+## Current state (2026-10-01; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -34,8 +34,8 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-09-30, early):** nothing on Modal; everything committed and pushed; models in DVC; large item sets in DVC
-  (`data/processed/*.dvc`, owner: DVC not LFS). Rows 117 to 130 done except 123 (todo) and 127 (a) (deprioritised): REPORT.md 116 to 127.
+- **In flight (2026-10-01):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 150 done
+  (REPORT.md 116 to 145; section 1 summarises them; 127 (a) deprioritised). The owner has more experiments before real data arrives.
   - **decider recipe** (REPORT 107, 113, 123): decider-4B one slot + shot-label loss + database episodes (with the misleading-name set) +
     rename 0.5 + `LABELS=rand255 EMPTY=20` + `LAYOUT=labelled_shots` + lookup / override 0.1 + soft evidence-free 0.1 + alternation 0.1,
     800 steps; `OTHERS=0.5` (other users' filings line) when a payee histogram exists (production).
@@ -58,10 +58,9 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
     the 35B 14 to 20 ms (H200); roughly $11 and $18 per million transactions.
   - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_v2 (+ _others; a second blind generator, REPORT 137),
     blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1; YNAB's rule and payee histories per item (`*_ynabrule`, `*_payeehist`).
-- **Next (2026-09-30):** real anonymised histories (owner): a harness that turns them into the prompt format and scores the saved models
-  and the system by effort; the owner's W; then what only real data settles (slip vs change, category counts, other users' name
-  variety, calibration on real users). Synthetic: row 123 (the 35B as teacher for the small models), a second blind set from another
-  model family. Rows 51, 54, 55, 127 (a) deprioritised.
+- **Next (2026-10-01):** the owner's next experiments; then real data (reports/REAL_DATA_SPEC.md: user + time splits, sealed test, train on
+  real filings, keep the raw other-users line, memos, first-time payees and new users as their own slices). blind_v3 stays untouched for
+  a final synthetic read of any new system. Deprioritised: 51, 54, 55, 127 (a).
 
 ## Procedure for one step
 

@@ -72,6 +72,33 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
   - *Both models (115):* they agree on 83.5% of blind_v1 (right 90.9% there); auto-filing when they agree and either is confident at its
     own calibrated 98% threshold files 65% at 97.8% (effort 0.560, the best system); the encoder's calibrated confidence is a probability
     (ECE 1.9).
+- **Sections 116 to 145 (2026-09-29 to 10-01): scoring for YNAB, serving, three blind sets, payee kinds and the population.**
+  - *Scoring (118, 129 to 131):* YNAB confirms every transaction (owner), so success is where the right category lands in a short list:
+    report cards (right first, in the list, work saved) and the owner's rank scale (first 0, second 1, third 2, not shown 10), lists of at
+    most three (142), plausible categories free (130). Where auto-filing is wanted, a per-transaction expected-cost rule replaces the
+    arbitrary 98% threshold (118); thresholds do not travel between populations and new users are over-confident (116).
+  - *Against YNAB today (131, 132, 137, 141):* YNAB's rule (the category in 2 of the payee's last 3, else the last; nothing for a first-time
+    payee, nothing from other users) is as good as the models at the first suggestion for known payees; the models' value is first-time
+    payees (rule 0%, models 49 to 69% right first), new users, the 2nd and 3rd suggestions, and payees filed differently than usual
+    (they anticipate it: confidence 55-61% against 90-94%). On a third blind set read once under a pre-registered analysis (141): the
+    recommended system 81% right first and 95% in a three-list against the rule's 74% / 74%, 91% of the manual work saved.
+  - *Test sets (137, 140, 141):* blind_v2 and blind_v3, from agents that saw only the product brief, confirm the gains over the rule; the
+    encoder does not transfer (dropped, 138); blind_v1 is validation in practice, blind_v3 is untouched since its one read. Payee overlap
+    between training and test users is intended (owner); held-out units are users.
+  - *Large model (117, 122, 125 to 128, 136, 139):* the untrained decider-35B-A3B helps first-time payees and new users and hurts the user's
+    own patterns, so it reads first-time payees only (139); trained with the recipe it is the best single reader but a worse second
+    opinion; a small second opinion or ensemble barely helps (128); as a teacher it adds nothing on synthetic data (136).
+  - *Serving (119 to 121, 125):* one user's sync shares a cached prompt prefix in the split layout (no retraining): vLLM reads decider-4B at
+    10 to 13 ms and the 35B at 14 to 20 ms per transaction, roughly $11 and $18 per million on H100 / H200.
+  - *Prompt additions (123, 135, 144):* other users' raw category names for the payee help new users (61 -> 69); category descriptions,
+    a 0.8B decider, EMA and multi-slot prompts were tried and not adopted. A canonical "Kind:" line for first-time payees from a merchant
+    database matches or beats the 35B with no retraining (60 -> 77% right first); inferred kinds do not (143, 144).
+  - *Without a kind database (145):* concepts learned by clustering users' categories by the payees they receive, and payee profiles from
+    the population mapped onto a user's own categories, suggest the right category first for 52% of first-time payees with no model; the
+    model reads other users' raw names better; with real data, train on the filings and keep the raw line (reports/REAL_DATA_SPEC.md).
+  - *Recommended system now:* decider-4B with the other-users line for every transaction; the untrained 35B for first-time payees (or a
+    database kind line where one exists); YNAB's rule first for known payees unless the model is 0.2 more confident (+4.8 / +0.1 / -1.3
+    points across the blind sets: a real-data question); three suggestions, plausible ones free.
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
