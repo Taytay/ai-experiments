@@ -11,6 +11,8 @@ QUESTION, and the options are the user's category names; every model is read in 
   FAMILY=kev       jaredpalmer/kev-{0.8b,4b,9b}: a LoRA on Qwen3.5-Base plus a pointer head (<opt> o </opt> spans against <decide>);
                    kev's package at KEV_SHA, downloaded as an archive; state up to 8,192 tokens (its serving limit).
   FAMILY=von       wfzyx/von (1.2): ModernBERT-large with a [MASK] per option, independent-option attention (von-sdk).
+  FAMILY=strands   StrandsAgents/strands-decider-2B-hobson-v19 (row 151): a LoRA on Qwen3.5-2B-Base plus a pointer head, in strands'
+                   own prompt (ai_experiments.strands; needs --with strands-decider==0.1.0); ADAPTER = a fine-tune from exp_strands_finetune.py.
 
 env: FAMILY, MODEL (HF id), ITEMS_SET (a frozen set in REAL-6's format under data/processed, e.g. poi1_v1_kinds; empty = REAL-6 v1),
      CONDS (noctx / ctx: the item's prompt or prompt_ctx), USERS (comma list; default the set's fold 0: user % 4 == 0), SMOKE=1 (8 items),
@@ -202,6 +204,26 @@ def von():
     return score
 
 
+def strands():
+    """Row 151 (MODEL-22): strands-decider's pointer head (ai_experiments.strands); MODEL a Hub id (the published v19) or ADAPTER a
+    checkpoint under models/adapters (exp_strands_finetune.py). Raw head (temperature 1), whole prompts, BATCH items per forward."""
+    import torch
+    from ai_experiments import strands as SD
+    m = SD.load(ROOT / "models" / "adapters" / ADAPTER if ADAPTER else MODEL).eval()
+
+    @torch.no_grad()
+    def score(items, cond):
+        out, longest = [], 0
+        for k in range(0, len(items), BATCH):
+            encs = [SD.encode(m.tokenizer, state_of(it, cond), it.get("question", QUESTION), options_of(it)) for it in items[k:k + BATCH]]
+            longest = max([longest] + [len(e[0]) for e in encs])
+            lp = SD.log_probs(m, encs).float()
+            out += [(lp[i, :len(e[1])] / TEMP).log_softmax(-1).tolist() for i, e in enumerate(encs)]
+        print(f"   longest prompt {longest} tokens (v19 trained up to 3,072, served at 4,096)", flush=True)
+        return out
+    return score
+
+
 SANITY = [  # SANITY=1: short questions with an obvious answer (the first is Ollaya's own triage example), each also with the options reversed
     ("I was charged twice for my subscription this month and want a refund.", "Which team should handle this?",
      ["billing: Payments, invoices and refunds", "technical: Bugs, errors and outages", "account: Login, profile and settings"], 0),
@@ -228,7 +250,7 @@ if __name__ == "__main__":
     open_licence(os.environ.get("LICENCE_OF", MODEL))  # LICENCE_OF: the Hub model a local run (a kev fine-tune, row 80) derives from
     if os.environ.get("SANITY"):
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
-    score = {"decider": decider, "decision": decision, "kev": kev, "von": von}[FAMILY]()
+    score = {"decider": decider, "decision": decision, "kev": kev, "von": von, "strands": strands}[FAMILY]()
     cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
                users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, kev_sha=KEV_SHA if FAMILY == "kev" else None)
     with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
