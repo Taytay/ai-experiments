@@ -27,6 +27,8 @@ from ai_experiments.paths import ROOT
 INIT = os.environ.get("INIT", "v19")
 assert INIT in ("v19", "base"), INIT
 os.environ["MODEL"] = SD.V19  # only names exp_decider_finetune's (unused) run; the episodes do not depend on it
+LABELLED = os.environ.get("STATE", "") == "labelled"  # row 152 (MODEL-23): our labelled layout inside strands' state (SD.labelled)
+AUX_SHOTS = float(os.environ.get("AUX_SHOTS", "0"))  # row 152: + w x the loss on the history rows' codes (the recipe's shot-label loss)
 HEAD_LR = float(os.environ.get("HEAD_LR", "2e-4" if INIT == "v19" else "1e-3"))
 _argv = sys.argv
 _src = (ROOT / "scripts" / "exp_decider_finetune.py").read_text().split("\ndef main():")[0]
@@ -35,7 +37,8 @@ exec(compile(_src, "exp_decider_finetune.py", "exec"), G)
 sys.argv = _argv
 STEPS, MICRO, LR, SEED = G["STEPS"], G["MICRO"], G["LR"], G["SEED"]
 assert not G["AUX_LM"] and not G["TEACHER"] and not G["LAYOUT"], "AUX_LM, TEACHER and LAYOUT are the decider readout's; not used here"
-NAME = f"strands_{INIT}_{G['SFX']}"  # the episode suffix carries RUN_TAG and the seed
+NAME = f"strands_{INIT}_{G['SFX']}" + ("_lab" if LABELLED else "") + (f"_aux{round(AUX_SHOTS * 100)}" if AUX_SHOTS else "")
+assert not AUX_SHOTS or LABELLED, "AUX_SHOTS needs STATE=labelled (the codes it predicts)"  # the episode suffix carries RUN_TAG and the seed
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
 
@@ -81,7 +84,11 @@ def main():
         for e in picked:
             ctx, opts, gold = e[0], list(e[1]), e[2]
             perm = rng.sample(range(len(opts)), len(opts))
-            encs.append(SD.encode(m.tokenizer, ctx, G["QUESTION"], opts, order=perm))
+            if LABELLED:
+                st, shown, spans = SD.labelled(ctx, opts, rng)
+                encs.append(SD.encode_aux(m.tokenizer, st, G["QUESTION"], shown, spans, order=perm))
+            else:
+                encs.append(SD.encode(m.tokenizer, ctx, G["QUESTION"], opts, order=perm))
             dist = G["SOFT_CTX"].get(ctx)
             if gold is None:  # evidence-free (soft): uniform over the options
                 t = [1.0 / len(opts)] * len(opts)
@@ -91,16 +98,24 @@ def main():
                 t = [float(k == gold) for k in perm]
             targets.append(t)
         longest = max([longest] + [len(x[0]) for x in encs]); n_tok += sum(len(x[0]) for x in encs)
-        lp = SD.log_probs(m, encs)
+        lp, hid = SD.forward(m, encs)
         tv = torch.zeros_like(lp)
         for i, t in enumerate(targets):
             tv[i, :len(t)] = torch.tensor(t, device=lp.device)
         loss = -(tv * lp.masked_fill(torch.isinf(lp), 0.0)).sum(-1).mean()
+        if AUX_SHOTS:  # the codes in the history rows, each from the position before, through the tied embeddings
+            rows_ = [(i, t, y) for i, e in enumerate(encs) for t, y in e[2]]
+            if rows_:
+                hs = hid[torch.tensor([r[0] for r in rows_], device="cuda"), torch.tensor([r[1] for r in rows_], device="cuda")]
+                lg = (hs @ m._output_embedding().t()).float()
+                loss = loss + AUX_SHOTS * torch.nn.functional.cross_entropy(lg, torch.tensor([r[2] for r in rows_], device="cuda"))
         loss.backward(); torch.nn.utils.clip_grad_norm_(lora + head, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         losses.append(loss.item())
         if step % 50 == 0 or step == STEPS - 1:
             print(f"   step {step} loss {sum(losses[-50:]) / len(losses[-50:]):.3f} longest {longest} ({(time.time() - t0) / 60:.1f} min)", flush=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True); m.save_pretrained(str(OUT_DIR))
+    if LABELLED:  # row 152: how to read this checkpoint (exp_decision_models picks it up)
+        (OUT_DIR / "strands_extra.json").write_text(json.dumps(dict(state="labelled")))
     return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, longest=longest, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
                 peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2), adapter=str(OUT_DIR.relative_to(ROOT)), n_episodes=len(eps))
 
@@ -109,7 +124,7 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(SD.V19)
     C = G["C"]
-    cfg = dict(model=SD.V19 if INIT == "v19" else SD.BASE, init=INIT, steps=STEPS, micro=MICRO, lr=LR, head_lr=HEAD_LR, seed=SEED, episodes_sfx=G["SFX"],
+    cfg = dict(model=SD.V19 if INIT == "v19" else SD.BASE, init=INIT, state="labelled" if LABELLED else "plain", aux_shots=AUX_SHOTS, steps=STEPS, micro=MICRO, lr=LR, head_lr=HEAD_LR, seed=SEED, episodes_sfx=G["SFX"],
                fold=C["FOLD"], rename=C["RENAME"], dbep=C["DBEP"], lora_r=16, question=G["QUESTION"], evfree=G["EVFREE"], evfree_mode=G["EVFREE_MODE"])
     with Run("strands_finetune", model=cfg["model"], config=cfg) as run:
         stats = main()

@@ -24,11 +24,52 @@ def encode(tok, state, question, options, order=None):
     return enc["input_ids"], _option_token_index(enc["offset_mapping"], rq.option_spans, len(prompt) - len(rq.text))
 
 
-def log_probs(model, encs, device="cuda", round_to=64):
-    """Per-option log-probabilities [B, K] (padded options at -inf) for a batch of encode() outputs, at temperature 1 (the raw head; a
-    checkpoint's fitted temperature is not applied). Lengths are padded to a multiple of `round_to` (flash-linear-attention tunes a kernel
-    per length)."""
+CODES = [a + b for a in "ABCDEFGHJKLMNPQRSTUVWXYZ" for b in "ABCDEFGHJKLMNPQRSTUVWXYZ"]  # row 152: two-letter labels (no I, O)
+
+
+def labelled(context, options, rng):
+    """Row 152 (MODEL-23): our prompt in the labelled layout, inside strands' state: each category gets a random two-letter code, the
+    category list and every history row show it ("Category: (KQ) Groceries"), and the options read "(KQ) Groceries". Returns (state,
+    shown options in the item's option order, character spans of the codes in the history rows, for a label-copying loss)."""
+    from ai_experiments import oneslot
+    names, rows, query = oneslot.parse(context)
+    code = dict(zip(options, rng.sample(CODES, len(options))))
+    order = list(options); rng.shuffle(order)
+    parts = ["Categories:\n" + "".join(f"- ({code[o]}) {o}\n" for o in order) + "\n"]
+    spans = []
+    for fields, label, _ in rows:
+        if label is None:  # the other-users line, or a section header
+            parts.append(fields + "\n\n"); continue
+        parts.append(f"Transaction: {fields}\nCategory: ")
+        if label in code:
+            n = sum(len(p) for p in parts) + 1; spans.append((n, n + 2))
+            parts.append(f"({code[label]}) {label}\n\n")
+        else:
+            parts.append(f"{label}\n\n")
+    parts.append(f"Transaction: {query}")
+    return "".join(parts), [f"({code[o]}) {o}" for o in options], spans
+
+
+def encode_aux(tok, state, question, options, spans, order=None):
+    """encode() plus [(position, token id)] for the code tokens in the history rows: each predicted from the position before it."""
+    from strands_decider.infer import _option_token_index
+    from strands_decider.prompting import build_prompt, render_state
+    from strands_decider.schema import ChoiceQuestion
+    prompt, rq = build_prompt(state, ChoiceQuestion(instructions=question, criteria={o: "" for o in options}), option_order=order)
+    base = len(render_state(state)) - len(state.strip()) - len("\n</state>\n")  # where the state text starts in the prompt
+    assert prompt[base:base + 20] == state.strip()[:20]
+    enc = tok(prompt, return_offsets_mapping=True)
+    ids, offs = enc["input_ids"], enc["offset_mapping"]
+    sp = [(base + a, base + b) for a, b in spans]
+    aux = [(t - 1, ids[t]) for t, (a, b) in enumerate(offs) if t > 0 and b > a and any(a < e and s0 < b for s0, e in sp)]
+    return ids, _option_token_index(offs, rq.option_spans, len(prompt) - len(rq.text)), aux
+
+
+def forward(model, encs, device="cuda", round_to=64):
+    """(per-option log-probabilities [B, K] at temperature 1, padded options at -inf; the torso's last hidden states [B, T, d]) for a batch
+    of encode() outputs. Lengths are padded to a multiple of `round_to` (flash-linear-attention tunes a kernel per length)."""
     import torch
+    from strands_decider.modeling import gather_options, masked_log_softmax, pool_last_token
     pad = model.tokenizer.pad_token_id or 0
     T = -(-max(len(e[0]) for e in encs) // round_to) * round_to
     K = max(len(e[1]) for e in encs)
@@ -37,8 +78,16 @@ def log_probs(model, encs, device="cuda", round_to=64):
     idx = torch.full((len(encs), K), -1, dtype=torch.long)
     for i, (x, o, *_) in enumerate(encs):
         ids[i, :len(x)] = torch.tensor(x); att[i, :len(x)] = 1; idx[i, :len(o)] = torch.tensor(o)
-    n = torch.tensor([len(e[1]) for e in encs], device=device)
-    return model(input_ids=ids.to(device), attention_mask=att.to(device), n_slots=n, opt_idx=idx.to(device), temperature=1.0)["log_probs"]
+    att = att.to(device)
+    hidden = model.encode(ids.to(device), att)
+    pooled = pool_last_token(hidden, att).float()
+    logits = model.head(pooled, gather_options(hidden, idx.to(device)).float())
+    return masked_log_softmax(logits, torch.tensor([len(e[1]) for e in encs], device=device)), hidden
+
+
+def log_probs(model, encs, device="cuda", round_to=64):
+    """forward()'s log-probabilities only (the same computation as the model's own forward with temperature 1)."""
+    return forward(model, encs, device, round_to)[0]
 
 
 def load(path_or_id, device="cuda"):
