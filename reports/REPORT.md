@@ -8682,3 +8682,52 @@ with the other-users line (REPORT 123) read them without training (three seeds);
   which purpose; memos are the missing signal (reports/REAL_DATA_SPEC.md).
 - **Recommended system (revised)**: for a first-time payee, a database kind line when the payee's kind is known, else the untrained 35B
   (REPORT 139); for known payees, the plain prompt; YNAB's rule first unless the model is 0.2 more confident; lists of three.
+
+
+## 145. Inferring from the population's filings alone (no kind database): learned concepts and payee profiles, mapped onto a user's own categories, suggest the right category first for 52% of first-time payees with no model (70% in the top three; YNAB today 0%); but decider reads other users' raw category names better than the mapped line (61% against 56% right first), and multiplied into the model the profile adds at most a point; the population's value is best taken by letting the model map names itself and, with real data, by training on the filings (REAL-24)
+
+PLAN step 150 (owner, 2026-09-30: "We don't have a reliable DB for the kind ... Let's try to infer what we can from our existing
+categorized transactions. We have about 1M users and about 1B transactions to train with, and add about 1M every day"). A synthetic
+stand-in: 2,000 more users from blind_v2's world (`BLIND_POP=2000`; 2.6M transactions; blind_v2's items unchanged), payees matched
+across users by a key from the statement string alone (`ai_experiments.payeekey`: purity 0.98, coverage 0.83 against the generator's
+payee ids), concepts learned without any vocabulary (each user category described by the payees filed under it, TF-IDF, SVD, k-means
+into 60 concepts: "groceries / grocery", "meals out / eating out", "car maintenance / auto maintenance", "money in / ready to
+assign", and some mixed ones such as "gifts / things to wear"), payee profiles from the population's filings before each transaction
+(>= 3 users), and the test user's categories placed in concepts by their own earlier filings or, with none, by their names
+(`scripts/payee_profiles.py`). The mapped profile becomes a no-model suggestion and the line "Other users file this payee as: <the
+user's own category> (%)", read zero-shot by decider-4B (the other-users recipe, three seeds). `scripts/mapped_tables.py`, job list
+`scripts/modal_jobs/r150.json`.
+
+| system | top-1 | first-time payees: 1st / top 3 | payees seen before | new users | person-to-person | own patterns | effort W=10 |
+|---|---|---|---|---|---|---|---|
+| raw other-users line (REPORT 123) | 71.7 | 60.8 / 79.7 | 74.6 | 65.1 | 73.2 | 52.9 | 1.084 |
+| raw other-users line (REPORT 123) + 35B for first-time payees | 73.3 | 68.5 / 87.1 | 74.6 | 74.8 | 73.2 | 52.9 | 1.003 |
+| mapped profile line | 70.8 | 56.2 / 77.6 | 74.7 | 63.5 | 70.7 | 52.4 | 1.111 |
+| mapped profile line + 35B for first-time payees | 73.4 | 68.5 / 86.5 | 74.7 | 75.3 | 70.7 | 52.4 | 1.023 |
+| no-model suggestion from the mapped profile | 53.6 | 51.9 / 69.6 | 54.1 | 65.6 | 43.9 | 28.6 | – |
+
+**Multiplying the mapped profile into decider (raw line) + 35B for first-time payees, profile^lambda (three seeds):**
+
+| system | top-1 | first-time 1st / top 3 | seen before |
+|---|---|---|---|
+| raw line + 35B for first-time payees, x mapped profile^0.0 | 73.3 | 68.5 / 87.1 | 74.6 |
+| raw line + 35B for first-time payees, x mapped profile^0.5 | 72.6 | 69.6 / 90.0 | 73.4 |
+| raw line + 35B for first-time payees, x mapped profile^1.0 | 70.4 | 68.9 / 89.7 | 70.7 |
+| raw line + 35B for first-time payees, x mapped profile^2.0 | 65.6 | 63.5 / 86.7 | 66.2 |
+
+### 145.1 What the step says
+
+- **The population alone suggests well where YNAB has nothing**: a profile exists for 99% of blind_v2's transactions (payees shared
+  within cities), and mapped onto the user's own categories it puts the right one first for 52% of first-time payees and in the top
+  three for 70%, with no language model (YNAB today: 0%; a list of other users' raw names: about 30%, REPORT 131). New users: 66% right
+  first, level with decider (65%).
+- **The model maps names better than the clustering does**: decider given other users' raw category names (REPORT 123) reads first-time
+  payees at 61%, given the mapped line 56%. The concepts are only as good as their clusters (some mix gifts with clothing), and a wrong
+  mapping is stated as the user's own category; the raw names leave the mapping to a reader that does it better.
+- **Multiplied in, the profile adds little**: +1 point right first and +3 in the top three for first-time payees at lambda 0.5, and it
+  costs known payees unless restricted to first-time payees.
+- **For the real data** (reports/REAL_DATA_SPEC.md): (1) train the categoriser on training users' real filings: what the population
+  knows about a payee then sits in the weights (the database-episode result, REPORT 53, at real scale); (2) keep the raw other-users
+  line, aggregated per payee key over users with enough distinct users behind it; (3) keep the learned concepts and profiles as the
+  no-model fallback and for the top-three list of first-time payees, and as an offline map of how people name categories. With a million
+  users the clusters and the payee matching will be denser and better; whether that closes the gap to the raw line is a real-data question.
