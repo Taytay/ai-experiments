@@ -1,0 +1,34 @@
+[
+ {
+  "tag": "r158-decider4b-blind_v2",
+  "env": {},
+  "cmds": [
+   "SET=blind_v2 EMB_MODEL=Mapika/decider-4b uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_personal_embed.py"
+  ]
+ },
+ {
+  "tag": "r158-recipe-blind_v2",
+  "env": {
+   "ADAPTERS_FROM": "r124-oth-s0"
+  },
+  "cmds": [
+   "SET=blind_v2 EMB_MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_personal_embed.py"
+  ]
+ },
+ {
+  "tag": "r158-decider4b-blind_v1",
+  "env": {},
+  "cmds": [
+   "SET=blind_v1 EMB_MODEL=Mapika/decider-4b uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_personal_embed.py"
+  ]
+ },
+ {
+  "tag": "r158-recipe-blind_v1",
+  "env": {
+   "ADAPTERS_FROM": "r124-oth-s0"
+  },
+  "cmds": [
+   "SET=blind_v1 EMB_MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_personal_embed.py"
+  ]
+ }
+]
