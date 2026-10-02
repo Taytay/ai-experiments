@@ -1,0 +1,9 @@
+[
+ {
+  "tag": "r158smoke",
+  "env": {},
+  "cmds": [
+   "SET=blind_v2 LIMIT=20 EMB_MODEL=Mapika/decider-4b uv run --frozen --with strands-decider==0.1.0 --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_personal_embed.py"
+  ]
+ }
+]
