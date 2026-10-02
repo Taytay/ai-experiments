@@ -9384,7 +9384,7 @@ gold category is the nearest with and without history.
 
 - **Where the history knows the answer, it pulls the embedding to it.** With the recipe's decider-4B, the transaction's nearest category
   is the right one for payees the user filed before 53.3 -> 79.6% (blind_v1) and 37.1 -> 64.0% (blind_v2) once the history is in front,
-  and for blind_v2's person-to-person payees 9.1 -> 56.1%. The embedding moves a lot (cosine to itself without history 0.82 to 0.85).
+  and for blind_v2's person-to-person payees 9.1 -> 56.1%. The embedding moves a lot (cosine to itself without history 0.79 to 0.85 across groups).
 - **Where it does not, the history pulls it off course.** First-time payees 54.2 -> 46.9 (blind_v1) and 46.2 -> 37.3 (blind_v2); new users
   60.1 -> 51.8 and 55.7 -> 42.7: with nothing about this payee in the history, the embedding drifts toward what the user files most.
 - **Only a reader trained to use histories uses them.** Untrained decider-4B's embeddings move less (cosine 0.91 to 0.92) and barely
