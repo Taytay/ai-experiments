@@ -1,0 +1,28 @@
+{
+  "model": "Qwen/Qwen3.5-2B-Base",
+  "corpus": "/out/strands_corpus_v19",
+  "files": [
+    "train_v5",
+    "multistep_v14",
+    "generated_v16",
+    "generated_v18",
+    "adequacy_hs2",
+    "adequacy_gen"
+  ],
+  "micro": 16,
+  "accum": 2,
+  "lr": 0.0001,
+  "epochs": 1,
+  "seed": 0,
+  "teach_w": 1.0,
+  "lora_r": 64,
+  "labels": "decider letters",
+  "max_steps": 0,
+  "train_minutes": 85.1,
+  "tokens": 40902126,
+  "steps": 3854,
+  "rows": 123339,
+  "final_loss": 0.359,
+  "peak_alloc_GiB": 19.68,
+  "adapter": "models/adapters/corpusslot_qwen3.5-2b-base_h100bf16_lora"
+}
