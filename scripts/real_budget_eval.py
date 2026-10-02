@@ -47,6 +47,8 @@ BATCH = int(os.environ.get("BATCH", "4"))
 LIMIT = int(os.environ.get("LIMIT", "0"))
 SLICE_MAX, OWN_MAX = 24, 6
 SHARED_MAX, SHARED_CAT_MAX = 24, 18  # build_blind_v1 BLIND_BULK
+WIDE = os.environ.get("WIDE") == "1"  # the shared rows: the latest row of every category offered that day (not 18), then 24 latest rows
+SFX = "_wide" if WIDE else ""  # items_wide.json, scores_<reader>_split_wide.jsonl
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
 WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 RTA = "Inflow: Ready to Assign"
@@ -58,6 +60,10 @@ def _private(path):
     path.parent.mkdir(parents=True, exist_ok=True)
     os.chmod(path.parent, 0o700)
     return path
+
+
+def _clean(name):
+    return " ".join(name.split())
 
 
 def build():
@@ -74,13 +80,14 @@ def build():
     names_by = defaultdict(list)
     for c in cats.values():
         if not c.get("deleted") and (not internal(c) or c["name"] == RTA):
-            names_by[c["name"]].append(c["id"])
+            names_by[_clean(c["name"])].append(c["id"])
 
     def label(cid):
         c = cats[cid]
         if internal(c):
             return RTA if c["name"] == RTA else None
-        return f'{groups[c["category_group_id"]]["name"]}: {c["name"]}' if len(names_by[c["name"]]) > 1 else c["name"]
+        n = _clean(c["name"])  # names as the layouts read them back (oneslot.parse strips): 27 of this budget's had outer spaces
+        return f'{_clean(groups[c["category_group_id"]]["name"])}: {n}' if len(names_by[n]) > 1 else n
 
     visible = [label(c["id"]) for c in b["categories"] if not c.get("deleted") and not c.get("hidden") and label(c["id"]) and label(c["id"]) != RTA]
     rows = []
@@ -113,9 +120,15 @@ def build():
             upto += 1
         if q["date"] != day:  # build_blind_v1.build_shared: the day's shared rows, the same for every transaction of the day
             day = q["date"]
-            shared = sorted(last_idx.values(), reverse=True)[:SHARED_CAT_MAX]
+            if WIDE:
+                ago = str(dt.date.fromisoformat(day) - dt.timedelta(days=365))
+                offered = set(visible) | {c for c in used_order if rows[last_idx[c]]["date"] >= ago}
+                shared = sorted((i for c, i in last_idx.items() if c in offered), reverse=True)
+            else:
+                shared = sorted(last_idx.values(), reverse=True)[:SHARED_CAT_MAX]
+            cap = len(shared) + SHARED_MAX - SHARED_CAT_MAX if WIDE else SHARED_MAX
             for i in range(upto - 1, -1, -1):
-                if len(shared) >= SHARED_MAX:
+                if len(shared) >= cap:
                     break
                 if i not in shared:
                     shared.append(i)
@@ -152,7 +165,7 @@ def build():
         items.append(dict(id=q["id"], date=q["date"], kind=q["kind"], payee_seen=bool(prev), first_use=q["cat"] not in last_idx,
                           options=options, answer=options.index(q["cat"]) if q["cat"] in options else -1, gold=q["cat"],
                           prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, rule=rule, last=prev[-1] if prev else None, n_hist=upto))
-    p = _private(OUT / "items.json")
+    p = _private(OUT / f"items{SFX}.json")
     p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
     os.chmod(p, 0o600)
     print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
@@ -238,10 +251,10 @@ def run_scoring(todo, fo):
 
 
 def score():
-    items = json.loads((OUT / "items.json").read_text())["items"]
+    items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
     items = [it for it in items if it["answer"] >= 0]
     items = items[:LIMIT] if LIMIT else items
-    out = _private(OUT / f"{'check' if NOCACHE else 'scores'}_{READER}_{LAYOUT}.jsonl")
+    out = _private(OUT / f"{'check' if NOCACHE else 'scores'}_{READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
     todo = [it for it in items if it["id"] not in done]
     print(f"{READER}: {len(done)} done, {len(todo)} to score", flush=True)
@@ -254,10 +267,10 @@ def modal():
     """score, on up to 8 Modal H100s with nothing kept there (modal_app.score_private); results land in OUT as with `score`."""
     sys.path.insert(0, str(Path(__file__).parent))
     import modal_app
-    items = json.loads((OUT / "items.json").read_text())["items"]
+    items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
     items = [it for it in items if it["answer"] >= 0]
     items = items[:LIMIT] if LIMIT else items
-    out = _private(OUT / f"scores_{READER}_{LAYOUT}.jsonl")
+    out = _private(OUT / f"scores_{READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
     keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split")
     todo = [{k: it[k] for k in keep} for it in items if it["id"] not in done]
@@ -276,11 +289,13 @@ def stream():
 
 
 def report():
-    items = {it["id"]: it for it in json.loads((OUT / "items.json").read_text())["items"]}
+    items = {it["id"]: it for it in json.loads((OUT / f"items{SFX}.json").read_text())["items"]}
     readers = {}
     for f in sorted(OUT.glob("scores_*.jsonl")):
         readers[f.stem[len("scores_"):]] = {r["id"]: r["lp"] for r in map(json.loads, open(f))}
-    ids = [i for i in items if all(i in r for r in readers.values())] if readers else list(items)
+    n_scored = sum(it["answer"] >= 0 for it in items.values())
+    readers = {k: r for k, r in readers.items() if len(r) >= n_scored}  # complete runs only
+    ids = [i for i in items if items[i]["answer"] >= 0]  # the 101 whose gold was not offered are left out (counted in `build`)
 
     def rank(lp, a):
         return 1 + sum(x > lp[a] for x in lp)
@@ -298,7 +313,7 @@ def report():
              "gold not offered"] + sorted(g for g in groups if g.startswith("year"))
     head = "| group | n | YNAB rule | payee's last category | " + " | ".join(f"{r} first (top 3)" for r in readers) + " |"
     lines = [head, "|---|---|---|---|" + "---|" * len(readers)]
-    for g in [g for g in order if g in groups]:
+    for g in [g for g in order if groups.get(g)]:
         v = groups[g]
         cells = [f"{100 * sum(items[i]['rule'] == items[i]['gold'] for i in v) / len(v):.1f}", f"{100 * sum(items[i]['last'] == items[i]['gold'] for i in v) / len(v):.1f}"]
         for r in readers.values():
