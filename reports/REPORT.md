@@ -102,6 +102,32 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
+- **Sections 146 to 154 (2026-10-01 to 10-02): strands-decider, what decider's design is worth, capacity, and embeddings.**
+  - *strands-decider (146 to 148):* AWS's Apache-2.0 decision model (a pointer head on Qwen3.5-2B-Base) reproduces its published numbers
+    when used through its own code, but untrained it barely reads our task (blind_v1 26% right first). Trained on the recipe's episodes
+    (from v19, from the base, or with its own trainer and config) it equals decider-2B on the blind sets and falls far behind on invented
+    category names (REAL-6 57 to 65 against 87). The cause is the training signal, not the readout: given the shot-label loss, its pointer
+    head reaches decider-2B everywhere (147), and at 4B it is on a par with decider-4B (148: ahead on invented names and the behaviour sets,
+    a point behind on blind_v1, a point ahead on blind_v2 and on REAL-7's long histories decider leads by 1.5 to 2). A strands-style pointer
+    added to decider changes nothing (147); strands' LoRA targets change nothing, its rank 16 trades history-dependent sets away (148).
+  - *On strands' own ground (149, 150):* strands' v19 corpus rebuilt byte for byte; decider's one-slot readout trained on it from the same
+    torso (one 85-minute run) matches or beats v19 on most of v19's own evaluations (held-out short tasks 65.1 against 64.0, MuSiQue 92.9
+    against 88.1, ordered scores +7.5) and trails on emotion; the two readouts complement each other a little, and a hybrid head takes
+    most of that into one model (held-out 65.9, multi-step 84.6); not carried into the categoriser.
+  - *Capacity (151):* LoRA rank 128 equals rank 64; rank 256 and full fine-tuning (fp32 masters, 1e-5 / 3e-5) fit our generated sets
+    better and lose 3 to 8 points on the blind sets by forgetting what the base model knows (first-time payees 59.9 -> 48 / 37.5, new users
+    69.6 -> 58 / 45). REAL-7, built with our generators, hides the loss: it stays a diagnostic. Rank 64 stays; repeat with real data.
+  - *Embeddings (152 to 154):* decider's hidden state at the last token of a short cue ("In one word, the kind of spending:", final layer)
+    is a better category embedding than a purpose-built embedder (a category's nearest differently named category of the same kind 82%
+    against 63% for Qwen3-Embedding-4B, 45% without a model); the recipe's adapter knows a payee's kind from its statement name (63%).
+    With the user's history in front, the recipe's embeddings move toward the user's own category where the history knows the payee
+    (seen payees 53 -> 80%, person-to-person 9 -> 56% on blind_v2) and drift where it does not (first-time payees, new users): personal
+    for the known, global for the new. As a categoriser, embeddings alone stay below decider's answer except on first-time payees
+    (level). Mapping one user's categories onto another's works (85%, 82% under different names; no model 24%); mapping categories onto
+    canonical kinds is better done by asking decider the question (58% against 49%), and "several kinds" / "person or purpose"
+    categories defeat nearest-label mapping.
+  - *Method notes:* re-running one model moves a 250 to 350-row set by about 1.5 points (149); our harness reproduces strands' published
+    evaluations to within a row or two.
 - **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
 - **Q1.** Score options by summed log-probability and fit one temperature per model on other users; raw confidences are miscalibrated and a temperature does not transfer between models (section 50). Training time goes into re-reading the prompt, not precision: bf16 and the 4-bit base give the same model (52), 16 sequences per step at 1e-4 is the efficient batch (56), and putting the loss on every example label in the prompt (the "all-label" loss) trains in 100 steps what 1,600 plain steps did (52). The same run on the 3090 and on Modal's H100 agrees within run-to-run noise, six times faster there (54).
 - **Q2.** A database written into the weights as prose sentences reaches the merchants only it knows at 59 to 69% (sections 43, 45); the same database taught as supervised decisions ("database episodes": synthetic statement rows of its merchants labelled in a training user's scheme) reaches 94%, opaque names included, with no record in the prompt (53), ties the record in the prompt at equal information (55), holds 20,000 merchants as well as 240 when each gets about 30 training rows (58), and helps on real businesses outside the database (+4 to 5, section 57). The record in the prompt remains the robust route: 85% on real Overture businesses from a one-line category record, whatever the statement string looks like (57).
@@ -9399,3 +9425,60 @@ gold category is the nearest with and without history.
 **What it means.** Personal embeddings work as intended for what the user has done before, including person-to-person payees whose
 meaning is only in the history, and should be global for anything new. For filing a transaction, decider's own answer stays the reader;
 personal embeddings are for what an answer does not give: finding a user's categories that behave alike, comparing users, retrieval.
+
+## 154. Embeddings map one user's categories onto another's well (the recipe's personal embeddings put a category of A next to B's category of the same kind 85% of the time, 82% when the names differ; no model 24%), but map categories onto canonical kinds worse than asking decider the question (49% against 58% right first), and fail on "several kinds" and "person / purpose" categories, which a canonical label does not describe (MODEL-25)
+
+*PLAN step 159 (owner, 2026-10-02: "Can you use embeddings to map canonical categories to a personal set of categories or to map two
+users' categories together?"). Code: `scripts/exp_category_mapping.py`, `scripts/mapping_tables.py`; job list `scripts/modal_jobs/r159.json`;
+branch plan-159-category-mapping (PR #76). One deterministic run per reader. Gold: kindcat_v2 (blind_v2's users: 2,867 categories, each a
+canonical kind, "several kinds of spending", or "a person, trip or purpose"). The multiple-choice answers are rows 147 / 148's.*
+
+**Canonical.** Each user category to the nearest of the 43 canonical options, each option embedded as `Budget category "<option>"`
+(REPORT 152's read-out), against decider asked "Which kind of spending does this user's category hold?" with the options listed.
+**User to user.** 600 user pairs; each of A's one-kind categories to B's nearest category, counted where B has a category of that kind;
+right when B's nearest holds the same kind. Category embeddings: the name; the name with the payees filed under it; personal (the
+user's history slice in front of the name, REPORT 153).
+
+**Canonical: each user category to one of 43 canonical options, right first % (top 3 %)**
+
+| method | all | one kind | several kinds | person / purpose | 0 rows shown |
+|---|---|---|---|---|---|
+| decider-4B untrained, asked (multiple choice) | 57.8 (81.7) | 78.1 (87.1) | 6.2 (69.1) | 37.1 (72.1) | 65.6 (85.9) |
+| decider-35B untrained, asked (multiple choice) | 53.2 (76.8) | 73.4 (89.5) | 12.8 (61.2) | 0.0 (14.8) | 54.9 (83.5) |
+| decider-4B recipe, asked (multiple choice) | 52.9 (71.0) | 75.7 (84.2) | 1.2 (37.8) | 12.2 (56.8) | 64.3 (76.6) |
+| Qwen3-Embedding-4B, nearest (name) | 51.4 (72.9) | 61.7 (79.7) | 25.4 (59.6) | 40.2 (55.0) | 57.7 (79.4) |
+| Qwen3-Embedding-4B, nearest (name + filed) | 45.2 (61.4) | 63.2 (79.6) | 5.1 (19.9) | 10.9 (28.8) | 57.7 (79.4) |
+| no model (TF-IDF), nearest (name (TF-IDF)) | 31.5 (37.4) | 43.2 (49.0) | 2.2 (8.5) | 18.8 (24.0) | 35.5 (41.1) |
+| decider-4B untrained, nearest (name) | 42.9 (59.7) | 61.8 (80.3) | 2.5 (4.0) | 0.9 (48.9) | 53.9 (72.4) |
+| decider-4B untrained, nearest (name + filed) | 46.6 (59.9) | 67.8 (84.0) | 0.6 (1.0) | 1.7 (29.3) | 53.9 (72.4) |
+| decider-4B untrained, nearest (personal (history in front)) | 35.4 (51.3) | 50.0 (71.5) | 0.0 (0.0) | 16.2 (31.0) | 41.9 (61.8) |
+| decider-4B recipe, nearest (name) | 46.5 (63.2) | 63.5 (79.3) | 7.1 (9.7) | 17.5 (85.2) | 56.4 (74.8) |
+| decider-4B recipe, nearest (name + filed) | 47.2 (58.8) | 67.1 (78.2) | 3.1 (5.3) | 8.3 (52.0) | 56.4 (74.8) |
+| decider-4B recipe, nearest (personal (history in front)) | 49.1 (61.9) | 70.2 (82.8) | 0.6 (1.0) | 13.5 (64.6) | 59.9 (75.0) |
+
+**User to user: each one-kind category of user A to user B's nearest category (600 user pairs), right %**
+
+| method | all | B's category of that kind has another name | B has one with the same name |
+|---|---|---|---|
+| Qwen3-Embedding-4B (name) | 75.4 (n=2079) | 69.9 (n=1699) | 100.0 (n=380) |
+| Qwen3-Embedding-4B (name + filed) | 53.3 (n=2079) | 48.6 (n=1699) | 74.5 (n=380) |
+| no model (TF-IDF) (name (TF-IDF)) | 37.5 (n=2079) | 23.5 (n=1699) | 100.0 (n=380) |
+| decider-4B untrained (name) | 76.8 (n=2079) | 71.6 (n=1699) | 100.0 (n=380) |
+| decider-4B untrained (name + filed) | 79.2 (n=2079) | 75.0 (n=1699) | 97.9 (n=380) |
+| decider-4B untrained (personal (history in front)) | 71.8 (n=2079) | 67.6 (n=1699) | 90.5 (n=380) |
+| decider-4B recipe (name) | 80.4 (n=2079) | 76.0 (n=1699) | 100.0 (n=380) |
+| decider-4B recipe (name + filed) | 73.9 (n=2079) | 70.3 (n=1699) | 89.7 (n=380) |
+| decider-4B recipe (personal (history in front)) | 85.4 (n=2079) | 82.3 (n=1699) | 99.2 (n=380) |
+
+- **Across users, embeddings work.** decider-4B with the recipe and the history in front maps A's category to B's of the same kind
+  85.4% of the time, 82.3% when B calls it something else (no model 23.5, Qwen3-Embedding-4B 69.9, untrained decider 75.0 at best). As
+  in REPORT 153, the history helps the recipe's embeddings (80.4 -> 85.4) and hurts the untrained model's (76.8 -> 71.8). This is the
+  operation behind the other-users line in a user's own category names (row 150's mapped profile used TF-IDF concepts for it) and behind
+  comparing or grouping users.
+- **Onto canonical kinds, asking beats embedding.** Nearest canonical option: 49.1% right first at best (the recipe, personal), 51.4% for
+  the embedder; decider asked the multiple-choice question: 57.8% (one-kind categories 78.1 against at most 70.2). The gap is in the
+  categories a canonical label does not describe: "several kinds of spending" 0.6 to 7.1% by decider's embeddings (25.4% by the
+  embedder) and "a person, trip or purpose" 1 to 17.5% (40.2%), because a category like "Everything Else" or "Mom" lies near no single
+  kind label. Asked, decider reads 6.2% and 37.1% on these; none of the methods handles "several kinds" well right first.
+- **Use each where it fits:** embeddings to align users' categories with each other (and to pick the user's category nearest another
+  user's for the other-users line); the multiple-choice question to label a category with a canonical kind.

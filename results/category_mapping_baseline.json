@@ -1,0 +1,58 @@
+{
+  "reader": "baseline",
+  "model": "Mapika/decider-4b",
+  "adapter": "",
+  "results": {
+    "name (TF-IDF)": {
+      "canonical": {
+        "all": {
+          "n": 2867,
+          "first": 31.5,
+          "top3": 37.4
+        },
+        "one kind": {
+          "n": 1958,
+          "first": 43.2,
+          "top3": 49.0
+        },
+        "several kinds": {
+          "n": 680,
+          "first": 2.2,
+          "top3": 8.5
+        },
+        "person / purpose": {
+          "n": 229,
+          "first": 18.8,
+          "top3": 24.0
+        },
+        "0 rows": {
+          "n": 659,
+          "first": 35.5,
+          "top3": 41.1
+        },
+        "1-2 rows": {
+          "n": 1914,
+          "first": 32.3,
+          "top3": 38.2
+        },
+        "3+ rows": {
+          "n": 294,
+          "first": 17.7,
+          "top3": 23.8
+        }
+      },
+      "user_user": {
+        "n": 2079,
+        "right": 37.5,
+        "names differ": {
+          "n": 1699,
+          "right": 23.5
+        },
+        "B has the same name": {
+          "n": 380,
+          "right": 100.0
+        }
+      }
+    }
+  }
+}

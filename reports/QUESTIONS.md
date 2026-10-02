@@ -1281,6 +1281,18 @@ categories, and do they cluster by kind? *Experiment:* last-token (after a cue) 
 recipe) and Qwen3.5-4B-Base, against Qwen3-Embedding-4B and TF-IDF; nearest neighbours and k-means against the generators' kinds.
 **Status (2026-10-02):** PLAN step 157, REPORT.md 152: yes; decider's cued final-layer state beats the embedder on categories (82 vs 63); the recipe knows payee kinds from names.
 **Status (2026-10-02):** PLAN step 158, REPORT.md 153: personal embeddings (history in front) move toward the user's category for known payees and p2p, away for first-time payees and new users.
+**Status (2026-10-02):** PLAN step 159, REPORT.md 154: embeddings align two users' categories (85%); for canonical kinds ask the question (58% vs 49%).
+
+**DATA-8 Payee resolution under obfuscation.** Statement strings for one payee vary (truncation, transaction ids, locations, processor
+prefixes, typos), and YNAB's real data lacks enough aggregator merchant fields to skip cleanup (owner, 2026-10-02). payeekey (row 150)
+groups strings at purity 0.98 but coverage 0.83. *Experiment:* PLAN row 160: rules, blocking with prefix-aware and n-gram matching,
+identity-cued embeddings, decider as a pairwise judge, co-filing behaviour; scored against generator payee ids under a controlled corrupter.
+
+**REAL-25 Population knowledge in the weights or in the prompt.** With real data the recipe will train on the population's filings;
+is the other-users line still needed? *Experiment:* PLAN row 161: train on pop_v2's filings, test with and without the line, split by
+payee frequency and by payees new after training.
+
+**REAL-26 A dress rehearsal of the real-data pipeline.** *Experiment:* PLAN row 162: REAL_DATA_SPEC.md end to end on REAL-7.
 
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
