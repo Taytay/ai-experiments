@@ -30,7 +30,40 @@ def state_text(state):
     return json.dumps(state, indent=2, ensure_ascii=False)
 
 
-def render(P, tok, row, rng, train=True, reverse_score=0.5):
+_NL = {}
+
+
+def newline_ids(tok):
+    """(ids of tokens containing a newline, ids of those that start with one), computed once per tokenizer (row 155)."""
+    if id(tok) not in _NL:
+        has, starts = set(), set()
+        for i in range(len(tok)):
+            t = tok.decode([i])
+            if "\n" in t:
+                has.add(i)
+                if t.startswith("\n"):
+                    starts.add(i)
+        _NL[id(tok)] = (has, starts)
+    return _NL[id(tok)]
+
+
+def option_line_ends(ids, n, nl):
+    """Row 155: the position of the last token of each of the n option lines (shown order). The options are the last lines before
+    "Answer: (" and carry no newline of their own, so the last n + 1 newline-bearing tokens are the n line starts and the Answer line's;
+    a line ends just before the next line's newline (or on it, when the newline is merged into the line's last token)."""
+    has, starts = nl
+    marks = []
+    for t in range(len(ids) - 1, -1, -1):
+        if ids[t] in has:
+            marks.append(t)
+            if len(marks) == n + 1:
+                break
+    assert len(marks) == n + 1, (len(marks), n)
+    marks.reverse()  # marks[0] starts option 1, ..., marks[n] starts the Answer line
+    return [m - 1 if ids[m] in starts else m for m in marks[1:]]
+
+
+def render(P, tok, row, rng, train=True, reverse_score=0.5, nl=None):
     """dict(ids, slot, labs (label token ids in the order shown), order (canonical option index shown at each position), gold (its
     position), instr) for one Example row. At eval (train=False) choice / noul options keep a fixed shuffle from rng and scores stay in
     order, so every reader sees the same rendering."""
@@ -54,7 +87,10 @@ def render(P, tok, row, rng, train=True, reverse_score=0.5):
 
     b = P.build(Ex(), tok, rng=_Keep(), max_options=255, max_ctx_tokens=STATE_TOKENS)
     assert b["perms"][0] == list(range(n))
-    return dict(ids=b["ids"], slot=b["slots"][0], labs=list(P.letter_ids(tok)[:n]), order=order, gold=b["golds"][0], instr=instr)
+    out = dict(ids=b["ids"], slot=b["slots"][0], labs=list(P.letter_ids(tok)[:n]), order=order, gold=b["golds"][0], instr=instr)
+    if nl is not None:  # row 155: the pointer reads each option line's last token
+        out["opt_pos"] = option_line_ends(b["ids"], n, nl)
+    return out
 
 
 def target(row, order, smooth=0.1):

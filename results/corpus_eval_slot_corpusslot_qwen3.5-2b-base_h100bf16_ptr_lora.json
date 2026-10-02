@@ -1,58 +1,58 @@
 {
   "family": "slot",
   "model": "Qwen/Qwen3.5-2B-Base",
-  "adapter": "corpusslot_qwen3.5-2b-base_h100bf16s1_lora",
+  "adapter": "corpusslot_qwen3.5-2b-base_h100bf16_ptr_lora",
   "sets": {
     "holdout_v5_norule": {
       "emotion": {
         "n": 1714,
-        "acc": 0.5531
+        "acc": 0.5303
       },
       "_all": {
         "n": 6000,
-        "acc": 0.6533
+        "acc": 0.6553
       },
       "sarcasm": {
         "n": 1104,
-        "acc": 0.6322
+        "acc": 0.6431
       },
       "massive_intent": {
         "n": 1753,
-        "acc": 0.8654
+        "acc": 0.8825
       },
       "hate_severity": {
         "n": 1429,
-        "acc": 0.5297
+        "acc": 0.536
       },
-      "_minutes": 1.31
+      "_minutes": 0.71
     },
     "multistep_v14_eval": {
       "contractnli": {
         "n": 1026,
-        "acc": 0.8743
+        "acc": 0.8733
       },
       "_all": {
         "n": 4084,
-        "acc": 0.8352
+        "acc": 0.8413
       },
       "musique": {
         "n": 1199,
-        "acc": 0.9274
+        "acc": 0.9316
       },
       "boardgame": {
         "n": 900,
-        "acc": 0.8378
+        "acc": 0.84
       },
       "hotpotqa": {
         "n": 959,
-        "acc": 0.6757
+        "acc": 0.6955
       },
-      "_minutes": 2.5
+      "_minutes": 1.67
     },
     "generated_v16_eval": {
       "gen:tradeoff": {
         "n": 40,
-        "acc": 0.825
+        "acc": 0.675
       },
       "_all": {
         "n": 350,
@@ -60,11 +60,11 @@
       },
       "gen:exception": {
         "n": 37,
-        "acc": 0.973
+        "acc": 1.0
       },
       "gen:lookup_chain": {
         "n": 40,
-        "acc": 0.85
+        "acc": 0.825
       },
       "gen:precedence": {
         "n": 36,
@@ -72,38 +72,38 @@
       },
       "gen:numbers": {
         "n": 33,
-        "acc": 0.8182
+        "acc": 0.8485
       },
       "gen:all_conditions": {
         "n": 34,
-        "acc": 0.8235
+        "acc": 0.8529
       },
       "gen:dates": {
         "n": 31,
-        "acc": 0.6774
+        "acc": 0.7742
       },
       "gen:rubric": {
         "n": 34,
-        "acc": 0.7941
+        "acc": 0.8824
       },
       "gen:underdetermined": {
         "n": 17,
-        "acc": 0.9412
+        "acc": 0.8235
       },
       "gen:surface_trap": {
         "n": 48,
         "acc": 0.9583
       },
-      "_minutes": 0.19
+      "_minutes": 0.17
     },
     "generated_v18_eval": {
       "gen:exception": {
         "n": 15,
-        "acc": 1.0
+        "acc": 0.9333
       },
       "_all": {
         "n": 247,
-        "acc": 0.7976
+        "acc": 0.8057
       },
       "gen:lookup_chain": {
         "n": 10,
@@ -111,7 +111,7 @@
       },
       "gen:all_conditions": {
         "n": 9,
-        "acc": 1.0
+        "acc": 0.8889
       },
       "gen:surface_trap": {
         "n": 1,
@@ -119,7 +119,7 @@
       },
       "gen:rubric": {
         "n": 3,
-        "acc": 1.0
+        "acc": 0.6667
       },
       "gen:underdetermined": {
         "n": 1,
@@ -127,7 +127,7 @@
       },
       "gen:precedence": {
         "n": 11,
-        "acc": 0.9091
+        "acc": 0.7273
       },
       "gen:numbers": {
         "n": 1,
@@ -135,7 +135,7 @@
       },
       "gen:dates": {
         "n": 10,
-        "acc": 0.7
+        "acc": 0.8
       },
       "gen:nested_exception": {
         "n": 13,
@@ -143,11 +143,11 @@
       },
       "gen:judge_action": {
         "n": 7,
-        "acc": 0.7143
+        "acc": 0.8571
       },
       "gen:missing_fact": {
         "n": 29,
-        "acc": 0.8276
+        "acc": 0.6897
       },
       "gen:withdrawn_instruction": {
         "n": 8,
@@ -155,11 +155,11 @@
       },
       "gen:definition_scope": {
         "n": 12,
-        "acc": 0.9167
+        "acc": 1.0
       },
       "gen:version_in_force": {
         "n": 27,
-        "acc": 0.7037
+        "acc": 0.8148
       },
       "gen:tie_break": {
         "n": 23,
@@ -167,7 +167,7 @@
       },
       "gen:borderline_rubric": {
         "n": 13,
-        "acc": 0.4615
+        "acc": 0.6923
       },
       "gen:running_total": {
         "n": 23,
@@ -175,31 +175,31 @@
       },
       "gen:cross_artefact": {
         "n": 31,
-        "acc": 0.7097
+        "acc": 0.7742
       },
-      "_minutes": 0.13
+      "_minutes": 0.12
     },
     "adequacy_hs2_eval": {
       "adequacy_hs2": {
         "n": 234,
-        "acc": 0.6923
+        "acc": 0.7308
       },
       "_all": {
         "n": 234,
-        "acc": 0.6923
+        "acc": 0.7308
       },
-      "_minutes": 0.07
+      "_minutes": 0.06
     },
     "adequacy_gen_eval": {
       "gen:adequacy": {
         "n": 302,
-        "acc": 0.8245
+        "acc": 0.8212
       },
       "_all": {
         "n": 302,
-        "acc": 0.8245
+        "acc": 0.8212
       },
-      "_minutes": 0.04
+      "_minutes": 0.03
     }
   }
 }

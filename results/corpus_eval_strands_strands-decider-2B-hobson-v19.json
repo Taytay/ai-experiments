@@ -8,55 +8,55 @@
         "n": 1714,
         "acc": 0.5642
       },
-      "hate_severity": {
-        "n": 1429,
-        "acc": 0.4591
-      },
-      "massive_intent": {
-        "n": 1753,
-        "acc": 0.8819
+      "_all": {
+        "n": 6000,
+        "acc": 0.64
       },
       "sarcasm": {
         "n": 1104,
         "acc": 0.6078
       },
-      "_all": {
-        "n": 6000,
-        "acc": 0.64
+      "massive_intent": {
+        "n": 1753,
+        "acc": 0.8819
       },
-      "_minutes": 1.95
+      "hate_severity": {
+        "n": 1429,
+        "acc": 0.4591
+      },
+      "_minutes": 1.47
     },
     "multistep_v14_eval": {
-      "boardgame": {
-        "n": 900,
-        "acc": 0.8211
-      },
       "contractnli": {
         "n": 1026,
         "acc": 0.8723
-      },
-      "hotpotqa": {
-        "n": 959,
-        "acc": 0.7174
-      },
-      "musique": {
-        "n": 1199,
-        "acc": 0.8807
       },
       "_all": {
         "n": 4084,
         "acc": 0.8271
       },
-      "_minutes": 4.77
+      "musique": {
+        "n": 1199,
+        "acc": 0.8807
+      },
+      "boardgame": {
+        "n": 900,
+        "acc": 0.8211
+      },
+      "hotpotqa": {
+        "n": 959,
+        "acc": 0.7174
+      },
+      "_minutes": 4.37
     },
     "generated_v16_eval": {
-      "gen:all_conditions": {
-        "n": 34,
-        "acc": 0.8235
+      "gen:tradeoff": {
+        "n": 40,
+        "acc": 0.775
       },
-      "gen:dates": {
-        "n": 31,
-        "acc": 0.7742
+      "_all": {
+        "n": 350,
+        "acc": 0.8514
       },
       "gen:exception": {
         "n": 37,
@@ -66,118 +66,118 @@
         "n": 40,
         "acc": 0.875
       },
+      "gen:precedence": {
+        "n": 36,
+        "acc": 0.8889
+      },
       "gen:numbers": {
         "n": 33,
         "acc": 0.8182
       },
-      "gen:precedence": {
-        "n": 36,
-        "acc": 0.8889
+      "gen:all_conditions": {
+        "n": 34,
+        "acc": 0.8235
+      },
+      "gen:dates": {
+        "n": 31,
+        "acc": 0.7742
       },
       "gen:rubric": {
         "n": 34,
         "acc": 0.7941
       },
-      "gen:surface_trap": {
-        "n": 48,
-        "acc": 0.9167
-      },
-      "gen:tradeoff": {
-        "n": 40,
-        "acc": 0.775
-      },
       "gen:underdetermined": {
         "n": 17,
         "acc": 0.7647
       },
-      "_all": {
-        "n": 350,
-        "acc": 0.8514
+      "gen:surface_trap": {
+        "n": 48,
+        "acc": 0.9167
       },
-      "_minutes": 0.36
+      "_minutes": 0.29
     },
     "generated_v18_eval": {
-      "gen:all_conditions": {
-        "n": 9,
-        "acc": 1.0
-      },
-      "gen:borderline_rubric": {
-        "n": 13,
-        "acc": 0.4615
-      },
-      "gen:cross_artefact": {
-        "n": 31,
-        "acc": 0.7419
-      },
-      "gen:dates": {
-        "n": 10,
-        "acc": 0.9
-      },
-      "gen:definition_scope": {
-        "n": 12,
-        "acc": 0.75
-      },
       "gen:exception": {
         "n": 15,
         "acc": 1.0
-      },
-      "gen:judge_action": {
-        "n": 7,
-        "acc": 0.8571
-      },
-      "gen:lookup_chain": {
-        "n": 10,
-        "acc": 0.8
-      },
-      "gen:missing_fact": {
-        "n": 29,
-        "acc": 0.6552
-      },
-      "gen:nested_exception": {
-        "n": 13,
-        "acc": 0.6154
-      },
-      "gen:numbers": {
-        "n": 1,
-        "acc": 0.0
-      },
-      "gen:precedence": {
-        "n": 11,
-        "acc": 0.9091
-      },
-      "gen:rubric": {
-        "n": 3,
-        "acc": 1.0
-      },
-      "gen:running_total": {
-        "n": 23,
-        "acc": 0.8261
-      },
-      "gen:surface_trap": {
-        "n": 1,
-        "acc": 0.0
-      },
-      "gen:tie_break": {
-        "n": 23,
-        "acc": 0.913
-      },
-      "gen:underdetermined": {
-        "n": 1,
-        "acc": 1.0
-      },
-      "gen:version_in_force": {
-        "n": 27,
-        "acc": 0.7407
-      },
-      "gen:withdrawn_instruction": {
-        "n": 8,
-        "acc": 0.75
       },
       "_all": {
         "n": 247,
         "acc": 0.7773
       },
-      "_minutes": 0.27
+      "gen:lookup_chain": {
+        "n": 10,
+        "acc": 0.8
+      },
+      "gen:all_conditions": {
+        "n": 9,
+        "acc": 1.0
+      },
+      "gen:surface_trap": {
+        "n": 1,
+        "acc": 0.0
+      },
+      "gen:rubric": {
+        "n": 3,
+        "acc": 1.0
+      },
+      "gen:underdetermined": {
+        "n": 1,
+        "acc": 1.0
+      },
+      "gen:precedence": {
+        "n": 11,
+        "acc": 0.9091
+      },
+      "gen:numbers": {
+        "n": 1,
+        "acc": 0.0
+      },
+      "gen:dates": {
+        "n": 10,
+        "acc": 0.9
+      },
+      "gen:nested_exception": {
+        "n": 13,
+        "acc": 0.6154
+      },
+      "gen:judge_action": {
+        "n": 7,
+        "acc": 0.8571
+      },
+      "gen:missing_fact": {
+        "n": 29,
+        "acc": 0.6552
+      },
+      "gen:withdrawn_instruction": {
+        "n": 8,
+        "acc": 0.75
+      },
+      "gen:definition_scope": {
+        "n": 12,
+        "acc": 0.75
+      },
+      "gen:version_in_force": {
+        "n": 27,
+        "acc": 0.7407
+      },
+      "gen:tie_break": {
+        "n": 23,
+        "acc": 0.913
+      },
+      "gen:borderline_rubric": {
+        "n": 13,
+        "acc": 0.4615
+      },
+      "gen:running_total": {
+        "n": 23,
+        "acc": 0.8261
+      },
+      "gen:cross_artefact": {
+        "n": 31,
+        "acc": 0.7419
+      },
+      "_minutes": 0.2
     },
     "adequacy_hs2_eval": {
       "adequacy_hs2": {
@@ -188,7 +188,7 @@
         "n": 234,
         "acc": 0.7222
       },
-      "_minutes": 0.17
+      "_minutes": 0.12
     },
     "adequacy_gen_eval": {
       "gen:adequacy": {
@@ -199,7 +199,7 @@
         "n": 302,
         "acc": 0.8046
       },
-      "_minutes": 0.13
+      "_minutes": 0.07
     }
   }
 }

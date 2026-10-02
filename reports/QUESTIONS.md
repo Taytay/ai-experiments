@@ -1269,6 +1269,7 @@ relisted control); strands reading our labelled history with and without the sho
 true on strands' own ground? *Experiment:* strands' v19 corpus rebuilt by its own recipe; decider's one-slot readout trained on it
 from v19's torso (Qwen3.5-2B-Base); scored on strands' evaluations beside v19 re-scored, with the published decider models as references.
 **Status (2026-10-02):** PLAN step 154, REPORT.md 149: decider's method >= v19 on most of its evaluations (held-out 65.1 vs 64.0, MuSiQue 92.9 vs 88.1), for one 85-minute run; JevBench not run.
+**Status (2026-10-02):** PLAN step 155, REPORT.md 150: the readouts complement a little on strands' tasks; a hybrid head gets most of it (held-out 65.9 vs 65.2); not carried into the categoriser.
 
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed

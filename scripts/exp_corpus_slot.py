@@ -29,8 +29,10 @@ LR, EPOCHS, SEED = float(os.environ.get("LR", "1e-4")), int(os.environ.get("EPOC
 MAX_STEPS = int(os.environ.get("MAX_STEPS", "0"))
 TEACH_W = float(os.environ.get("TEACH_W", "1.0"))
 RUN_TAG = os.environ.get("RUN_TAG", "h100bf16")
+POINTER = os.environ.get("POINTER", "") == "1"  # row 155: + strands' pointer over the option lines, added to the label logits (ai_experiments.pointer)
+POINTER_LR = float(os.environ.get("POINTER_LR", "1e-3"))
 FILES = ["train_v5", "multistep_v14", "generated_v16", "generated_v18", "adequacy_hs2", "adequacy_gen"]  # v19's train_files, in order
-NAME = f"corpusslot_{MODEL.split('/')[-1].lower()}_{RUN_TAG}{'' if SEED == 0 else f's{SEED}'}_lora"
+NAME = f"corpusslot_{MODEL.split('/')[-1].lower()}_{RUN_TAG}{'' if SEED == 0 else f's{SEED}'}{'_ptr' if POINTER else ''}_lora"
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
 
@@ -84,7 +86,13 @@ def main():
     plan = [b for _ in range(EPOCHS) for b in batches(rows, rng, lengths)]
     steps = len(plan) // ACCUM if not MAX_STEPS else MAX_STEPS
     params = [p for p in model.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0, betas=(0.9, 0.95))
+    groups, ptr, nl = [{"params": params, "lr": LR}], None, None
+    if POINTER:
+        from ai_experiments.pointer import OptionPointer
+        ptr = OptionPointer(lm.config.get_text_config().hidden_size).cuda()
+        groups.append({"params": list(ptr.parameters()), "lr": POINTER_LR}); params = params + list(ptr.parameters())
+        nl = CS.newline_ids(tok)
+    opt = torch.optim.AdamW(groups, weight_decay=0.0, betas=(0.9, 0.95))
     warm = max(1, int(0.03 * steps))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warm) * max(0.0, 1 - s / steps))
     pad = tok.pad_token_id or 0
@@ -93,7 +101,7 @@ def main():
     for step in range(steps):
         for a in range(ACCUM):
             mb = plan[step * ACCUM + a]
-            built = [CS.render(P, tok, rows[i], rng, train=True) for i in mb]
+            built = [CS.render(P, tok, rows[i], rng, train=True, nl=nl) for i in mb]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
             ids = torch.full((len(built), T), pad, dtype=torch.long); att = torch.zeros_like(ids)
             for i, b in enumerate(built):
@@ -101,7 +109,10 @@ def main():
             h = model.base_model.model.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
             per, w = [], []
             for i, (ri, b) in enumerate(zip(mb, built)):
-                lp = F.log_softmax(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float(), -1)
+                z = F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float()
+                if ptr is not None:
+                    z = z + ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")])
+                lp = F.log_softmax(z, -1)
                 t = torch.tensor(CS.target(rows[ri], b["order"]), device="cuda")
                 loss_i = -(t * lp).sum()
                 if ri in teach and TEACH_W:  # KL(teacher || student) on the options as shown
@@ -115,6 +126,9 @@ def main():
         if step % 100 == 0 or step == steps - 1:
             print(f"   step {step}/{steps} loss {sum(losses[-200:]) / len(losses[-200:]):.3f} ({(time.time() - t0) / 60:.1f} min)", flush=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True); model.save_pretrained(OUT_DIR)
+    if ptr is not None:
+        from ai_experiments.pointer import FILE
+        torch.save(ptr.state_dict(), OUT_DIR / FILE); print(f"   pointer gate {ptr.gate.item():.3f}", flush=True)
     return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, steps=steps, rows=len(rows),
                 final_loss=round(sum(losses[-200:]) / len(losses[-200:]), 3), peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2),
                 adapter=str(OUT_DIR.relative_to(ROOT)))
@@ -124,7 +138,7 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
     cfg = dict(model=MODEL, corpus=str(CORPUS), files=FILES, micro=MICRO, accum=ACCUM, lr=LR, epochs=EPOCHS, seed=SEED,
-               teach_w=TEACH_W, lora_r=64, labels="decider letters", max_steps=MAX_STEPS)
+               teach_w=TEACH_W, pointer=POINTER, lora_r=64, labels="decider letters", max_steps=MAX_STEPS)
     with Run("corpus_slot", model=MODEL, config=cfg) as run:
         stats = main()
         print("===", stats, flush=True)

@@ -24,7 +24,8 @@ FAMILY, MODEL = os.environ.get("FAMILY", "slot"), os.environ["MODEL"]
 ADAPTER = os.environ.get("ADAPTER", "")
 CORPUS = ROOT / os.environ.get("CORPUS", "data/external/strands_corpus")
 BATCH = int(os.environ.get("BATCH", "8"))
-SMOKE = int(os.environ.get("SMOKE", "0"))  # rows per set, for a smoke run
+SMOKE = int(os.environ.get("SMOKE", "0"))
+PER_ITEM = os.environ.get("PER_ITEM", "") == "1"  # row 155: also write each row's log-probabilities over its options (canonical order)  # rows per set, for a smoke run
 SETS = ["holdout_v5_norule", "multistep_v14_eval", "generated_v16_eval", "generated_v18_eval", "adequacy_hs2_eval", "adequacy_gen_eval"]
 READER = ADAPTER or MODEL.split("/")[-1]
 
@@ -50,13 +51,19 @@ def slot_reader():
     if ADAPTER:
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
+    ptr, nl = None, None
+    pf = ROOT / "models" / "adapters" / ADAPTER / "pointer_head.pt" if ADAPTER else None
+    if pf and pf.exists():  # row 155: the hybrid head
+        from ai_experiments.pointer import OptionPointer
+        ptr = OptionPointer(lm.config.get_text_config().hidden_size).cuda().eval()
+        ptr.load_state_dict(torch.load(pf, map_location="cuda", weights_only=True)); nl = CS.newline_ids(tok)
 
     @torch.no_grad()
     def predict(name, rows):
         out = []
         for k in range(0, len(rows), BATCH):
             chunk = rows[k:k + BATCH]
-            built = [CS.render(P, tok, r, random.Random(f"{name}:{k + j}"), train=False) for j, r in enumerate(chunk)]
+            built = [CS.render(P, tok, r, random.Random(f"{name}:{k + j}"), train=False, nl=nl) for j, r in enumerate(chunk)]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long); att = torch.zeros_like(ids)
             for i, b in enumerate(built):
@@ -64,7 +71,12 @@ def slot_reader():
             h = lm.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
             for i, b in enumerate(built):
                 z = F.linear(h[i, b["slot"]], lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float()
-                out.append(b["order"][int(z.argmax())])
+                if ptr is not None:
+                    z = z + ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")])
+                lp = F.log_softmax(z, -1).tolist(); canon = [0.0] * len(lp)
+                for j, oi in enumerate(b["order"]):
+                    canon[oi] = lp[j]
+                out.append(canon)
         return out
     return predict
 
@@ -73,9 +85,19 @@ def strands_reader():
     from strands_decider.data.format import Example
     from strands_decider.evaluate import evaluate_checkpoint
 
+    import math
+    from strands_decider.evaluate import collect_logits, predictions_from_logits
+    from strands_decider.modeling import StrandsDeciderModel
+    model = StrandsDeciderModel.load(MODEL)
+
     def predict(name, rows):
-        rep = evaluate_checkpoint(MODEL, [Example.from_dict(r) for r in rows], batch_size=16)
-        return rep  # the report itself (accuracy by task); predictions are not exposed
+        """Per-row log-probabilities at temperature 1, from strands' own collect_logits / predictions_from_logits (evaluate_checkpoint's
+        path without the summary); the accuracy is the same at any temperature."""
+        exs = [Example.from_dict(r) for r in rows]
+        logits, labels, slots, ex2 = collect_logits(model, exs, device="cuda", batch_size=16, max_length=model.config.max_length)
+        preds = predictions_from_logits(logits, labels, slots, ex2, temperature=1.0, ordinal_smoothing=model.config.ordinal_smoothing)
+        assert [p.label for p in preds] == [r["label"] for r in rows]
+        return [[math.log(max(x, 1e-30)) for x in p.probs] for p in preds]
     return predict
 
 
@@ -86,16 +108,17 @@ if __name__ == "__main__":
     res = {}
     for name in SETS:
         rows = rows_of(name); t0 = time.time()
-        if FAMILY == "slot":
-            pred = predict(name, rows)
-            by = defaultdict(list)
-            for r, p in zip(rows, pred):
-                by[r["task"]].append(p == r["label"]); by["_all"].append(p == r["label"])
-            res[name] = {t: dict(n=len(v), acc=round(sum(v) / len(v), 4)) for t, v in by.items()}
-        else:
-            rep = predict(name, rows)
-            res[name] = {t: dict(n=v["n"], acc=round(v["accuracy"], 4)) for t, v in rep["by_task"].items() if v}
-            res[name]["_all"] = dict(n=rep["overall"]["n"], acc=round(rep["overall"]["accuracy"], 4))
+        lps = predict(name, rows)
+        by = defaultdict(list)
+        for r, lp in zip(rows, lps):
+            ok = max(range(len(lp)), key=lp.__getitem__) == r["label"]
+            by[r["task"]].append(ok); by["_all"].append(ok)
+        res[name] = {t: dict(n=len(v), acc=round(sum(v) / len(v), 4)) for t, v in by.items()}
+        if PER_ITEM and not SMOKE:
+            d = ROOT / "results" / "per_item"; d.mkdir(parents=True, exist_ok=True)
+            with open(d / f"corpus_{FAMILY}_{READER}_{name}.jsonl", "w") as f:
+                for i, (r, lp) in enumerate(zip(rows, lps)):
+                    f.write(json.dumps(dict(i=i, task=r["task"], kind=r["kind"], label=r["label"], lp=lp)) + "\n")
         res[name]["_minutes"] = round((time.time() - t0) / 60, 2)
         print(f"{FAMILY} {READER} {name}: " + ", ".join(f"{t} {v['acc']:.3f} (n={v['n']})" for t, v in res[name].items() if t != "_minutes")
               + f" [{res[name]['_minutes']} min]", flush=True)
