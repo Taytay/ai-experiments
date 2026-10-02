@@ -1301,6 +1301,8 @@ models have read. *Experiment:* PLAN row 163: `scripts/real_budget_eval.py` (dat
 nothing, `modal_app.score_private`); zero-shot decider-4B and the recipe against YNAB's rule and the payee's last category; then a wide
 history (a row for every offered category), since this budget has ~96 categories where the synthetic users had 10 to 20.
 
+**Status (2026-10-02):** PLAN step 163, REPORT.md 155: the recipe transfers to real data: 68.7% right first against the rule's 57.9; ties the rule on known payees, 38.1% on first-time payees; weak on multi-purpose retailers and purpose-defined categories; wide history adds nothing.
+
 **MODEL-26 Cloudflare's Clef decision models and their RL fine-tuning.** Owner (2026-10-02): try "the new Jev like model from
 cloudflare, as well as its fine tuning RL framework" (https://blog.cloudflare.com/clef-decision-models/). `Cloudflare/clef` (Qwen3.8-27B
 base) and `Cloudflare/clef-flash` (Qwen3.5-9B base), both Apache-2.0 on their cards (bases to be checked by `open_licence`): a frozen
