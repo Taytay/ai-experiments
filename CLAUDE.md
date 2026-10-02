@@ -78,6 +78,23 @@ The local 3090 is no longer used for runs; the rules below about it still hold i
 - Report every result with the scorecard (`ai_experiments.scorecard`: top-1, top-3, calibrated bits, auto-file coverage, skill over
   the no-model cascade) on held-out users, and add a blind strong-reader ceiling (`scripts/blind_ceiling.py`) for a new item set.
 
+## Branches, PRs and models
+
+- **One branch and PR per row** (owner, 2026-10-01): each PLAN row, or round of tests, gets its own branch off the current top and its own
+  PR, added to the top of GitHub stack #24 with `gh stack link <all open PR numbers, bottom to top> <new-branch>` (PR numbers push nothing;
+  only the new branch is pushed). Commit a row's results on its own branch before starting the next row. `PLAN.md`'s current state lists
+  the stack.
+- **Merge forward only** (owner, after two PRs were auto-closed by a force push): lower branches reach upper ones by merging; never rebase,
+  never force-push, never delete a branch. `evals/runs.jsonl` conflicts on every merge-forward: resolve as the union of rows by `run_id`.
+- **Keep every trained model** (owner): every adapter, full model, encoder and checkpoint goes to DVC (`just push-models`, commit the
+  `.dvc` files); `just drop-all` only frees the local disk after the push.
+- **Table generators live in `scripts/`**, never the scratchpad (it was wiped by a reboot once).
+- **Verify before routing around** (owner, 2026-09-27): benchmark a slowdown, or read the library source for a "not supported", before
+  building a workaround.
+- **Judge on the blind sets.** REAL-6 / REAL-7 and the behaviour sets were built with the training generators; they are diagnostics.
+  Choices are read on blind_v1 / v2 (blind_v3 is sealed for a final read). A set built with the training data hides overfitting (REPORT
+  103, 151).
+
 ## Working rules for this machine
 
 The repo runs from two checkouts on one machine: native Windows 11 and WSL2 (Ubuntu 26.04).

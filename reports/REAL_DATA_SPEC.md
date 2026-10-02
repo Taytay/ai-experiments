@@ -31,6 +31,14 @@ Anonymisation: user and payee ids hashed; person-to-person payees (Venmo, Zelle 
 stable token; amounts kept; memos kept with names and numbers tokenised (they carry the purpose of person-to-person payments). Category names kept as the user wrote them (they are what the model reads); any
 that contain personal names (children, partners) may be tokenised the same way.
 
+**Payee strings need resolving (owner, 2026-10-02).** YNAB's real data does not carry enough cleaned merchant data from banks or
+aggregators (a clean merchant name, a merchant id, a merchant category code) to make payee cleanup unnecessary. The same business appears
+under many import strings (truncated, with transaction ids, locations, processor prefixes such as `SQ *` / `TST*`, typos), and the other-
+users line, the payee's history slice and any merchant database all depend on grouping them. `ai_experiments.payeekey` is the current
+rule-based key (purity 0.98, coverage 0.83 on blind_v2's population); PLAN row 160 (DATA-8) proposes the benchmark and the stronger
+methods (prefix-aware and n-gram matching within blocks, identity-cued embeddings, decider as a pairwise judge, co-filing behaviour).
+YNAB's own payee_id (after the user's renames) is a per-user grouping, not a cross-user one.
+
 ## 2. Splits (never random transactions)
 
 A random 20% of transactions would put a user's other transactions in training and leak their personal naming and habits, which is
