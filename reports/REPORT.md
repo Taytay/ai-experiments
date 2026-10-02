@@ -9228,8 +9228,7 @@ history decides (REPORT 148), so the question was whether rank 64 is also short.
 - **REAL-7 hides it.** The full fine-tune at 1e-5 reads REAL-7 at 81.9 / 87.5 (undated / dated), level with the recipe's 82.2 / 87.6,
   although it lost 3 points on both blind sets: REAL-7 was built with the generators the episodes come from, so it rewards fitting them.
   That is the reason REAL-7 is a diagnostic and not a test (REPORT 103), shown again.
-- **Not a speed or cost question:** rank 128 trains in 46 minutes, rank 256 in 56, a full fine-tune in 32 (on the H200) against about 40
-  for rank 64; a full fine-tune is an 8 GB checkpoint against about 0.3 GB.
+- **Not a speed or cost question:** rank 128 trains in 46 minutes, rank 256 in 56, a full fine-tune in 32 (on the H200); a full fine-tune is an 8.4 GB checkpoint against 0.49 GB for the rank-64 adapter (rank 64 trained in 41.5 minutes).
 
 **Rank 64 stays.** On today's data the limit is the training data, not the adapter: more trainable capacity only fits the synthetic
 generators better and forgets the base model's knowledge. With real data (about a billion filings across a million users) the balance
