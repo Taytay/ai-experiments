@@ -9297,3 +9297,105 @@ payee keys, and the payee profile mapped onto a user's own categories by nearest
 was 52% right first / 70% in the top three; (2) a payee's kind from its nearest labelled payees, as the "Kind:" line for first-time payees
 (REPORT 144: a known kind took first-time payees from 60 to 77% right first); (3) at serving time, the embedding is one extra read of a
 forward pass decider already runs.
+
+## 153. A user's history moves the embeddings the right way where the history knows something, and the wrong way where it does not: with the recipe's decider-4B, putting the history in front lifts the transaction's nearest category to the right one from 53 to 80% for payees the user has filed before (blind_v1; blind_v2 37 to 64) and for person-to-person payees on blind_v2 (9 to 56), but lowers it for first-time payees (54 to 47; 46 to 37) and new users; untrained decider's embeddings barely use the history; as a categoriser, embeddings alone stay below decider's own answer except on first-time payees, where the history-free embedding matches it (MODEL-25)
+
+*PLAN step 158 (owner, 2026-10-02: "I definitely want a user's history to perturb the embeddings! Of both their categories and the
+payees!"). Code: `scripts/exp_personal_embed.py` (the history encoded once per item and its cache forked across the item's texts with
+strands-decider's `_fork_layered_cache`, Apache-2.0; forked against full encoding: cosine 0.9999), `scripts/personal_tables.py`; job list
+`scripts/modal_jobs/r158*.json`; branch plan-158-personal-embeddings (PR #75). One deterministic run per reader and set.*
+
+**Design.** REPORT 152's read-out (the hidden state at the last token of "In one word, the kind of spending:", final layer), for each blind
+item: every one of the user's categories as `Budget category "<name>"` and the transaction to file as `Transaction: <date | payee | amount
+| day>`, each embedded with the user's history slice in front (personal) or alone (global); for categories also REPORT 152's text (the
+name with the payees the user filed under it, no history in front). The embedding-only categoriser files the transaction under the user's
+category nearest it (cosine), in every pairing; beside it decider-4B's own answer on the same items (the recipe, three seeds, no other-users
+line) and YNAB's rule. "How the history moves the transaction": the cosine between its personal and global embeddings, and how often the
+gold category is the nearest with and without history.
+
+
+**blind_v1: right first % (top 3 %)**
+
+| suggestions from | all (n=1500) | first-time payees (n=277) | payees seen before (n=1223) | person-to-person (n=37) | new users (n=168) |
+|---|---|---|---|---|---|
+| YNAB today | 73.5 | 0.0 | 90.2 | 37.8 | 7.1 |
+| decider-4B recipe, its own answer (3 seeds) | 82.6 (91.4) | 52.6 (69.7) | 89.4 (96.4) | 26.1 (76.6) | 61.3 (76.4) |
+| embeddings, decider-4b: global txn / name | 39.3 (60.1) | 40.4 (58.5) | 39.0 (60.4) | 2.7 (27.0) | 47.6 (69.0) |
+| embeddings, decider-4b: global txn / name + filed | 46.8 (69.8) | 41.9 (66.1) | 47.9 (70.6) | 21.6 (48.6) | 49.4 (70.2) |
+| embeddings, decider-4b: personal txn / personal cat | 38.7 (59.9) | 24.2 (44.4) | 41.9 (63.4) | 13.5 (29.7) | 32.7 (56.5) |
+| embeddings, decider-4b: personal txn / name | 53.3 (73.0) | 31.8 (54.9) | 58.2 (77.1) | 8.1 (27.0) | 43.5 (63.7) |
+| embeddings, decider-4b: personal txn / name + filed | 57.1 (75.0) | 33.9 (57.4) | 62.3 (79.0) | 8.1 (37.8) | 39.9 (63.7) |
+| embeddings, decider-4b: global txn / personal cat | 39.5 (60.0) | 37.2 (57.0) | 40.1 (60.7) | 13.5 (37.8) | 47.0 (67.3) |
+| embeddings, recipe: global txn / name | 53.5 (71.7) | 54.2 (69.0) | 53.3 (72.4) | 5.4 (27.0) | 60.1 (78.0) |
+| embeddings, recipe: global txn / name + filed | 63.1 (85.1) | 54.2 (73.3) | 65.1 (87.7) | 18.9 (51.4) | 58.9 (80.4) |
+| embeddings, recipe: personal txn / personal cat | 73.6 (88.1) | 46.9 (65.7) | 79.6 (93.1) | 18.9 (48.6) | 51.8 (73.2) |
+| embeddings, recipe: personal txn / name | 72.0 (85.3) | 50.5 (64.3) | 76.9 (90.1) | 18.9 (40.5) | 58.9 (73.8) |
+| embeddings, recipe: personal txn / name + filed | 76.9 (90.4) | 48.0 (69.7) | 83.4 (95.1) | 18.9 (62.2) | 52.4 (79.2) |
+| embeddings, recipe: global txn / personal cat | 61.4 (78.6) | 54.2 (68.6) | 63.0 (80.9) | 10.8 (43.2) | 59.5 (74.4) |
+
+**blind_v1: how the history moves the transaction's embedding**
+
+| reader | group | cosine to itself without history | gold margin without history | with history | gold category closest: without / with |
+|---|---|---|---|---|---|
+| decider-4b | all | 0.916 | -0.009 | -0.010 | 39.3 / 38.7 |
+| decider-4b | first-time payees | 0.919 | -0.010 | -0.021 | 40.4 / 24.2 |
+| decider-4b | payees seen before | 0.915 | -0.009 | -0.007 | 39.0 / 41.9 |
+| decider-4b | person-to-person | 0.922 | -0.025 | -0.030 | 2.7 / 13.5 |
+| decider-4b | new users | 0.916 | -0.005 | -0.014 | 47.6 / 32.7 |
+| recipe | all | 0.841 | -0.002 | +0.017 | 53.5 / 73.6 |
+| recipe | first-time payees | 0.817 | -0.003 | -0.010 | 54.2 / 46.9 |
+| recipe | payees seen before | 0.847 | -0.002 | +0.023 | 53.3 / 79.6 |
+| recipe | person-to-person | 0.828 | -0.044 | -0.027 | 5.4 / 18.9 |
+| recipe | new users | 0.803 | +0.006 | -0.002 | 60.1 / 51.8 |
+
+**blind_v2: right first % (top 3 %)**
+
+| suggestions from | all (n=1500) | first-time payees (n=316) | payees seen before (n=1184) | person-to-person (n=66) | new users (n=192) |
+|---|---|---|---|---|---|
+| YNAB today | 57.1 | 0.0 | 72.4 | 62.1 | 13.5 |
+| decider-4B recipe, its own answer (3 seeds) | 69.8 (87.3) | 49.4 (70.9) | 75.3 (91.6) | 71.7 (84.3) | 55.7 (70.1) |
+| embeddings, decider-4b: global txn / name | 29.3 (50.3) | 35.1 (59.8) | 27.8 (47.8) | 9.1 (27.3) | 41.7 (67.7) |
+| embeddings, decider-4b: global txn / name + filed | 36.6 (61.6) | 39.2 (65.5) | 35.9 (60.6) | 18.2 (39.4) | 47.4 (70.3) |
+| embeddings, decider-4b: personal txn / personal cat | 39.2 (66.7) | 36.4 (59.2) | 39.9 (68.7) | 42.4 (59.1) | 41.1 (56.8) |
+| embeddings, decider-4b: personal txn / name | 38.5 (62.1) | 42.1 (59.8) | 37.5 (62.7) | 34.8 (63.6) | 47.4 (63.0) |
+| embeddings, decider-4b: personal txn / name + filed | 44.0 (68.3) | 42.7 (65.5) | 44.3 (69.0) | 50.0 (72.7) | 47.4 (66.7) |
+| embeddings, decider-4b: global txn / personal cat | 39.7 (63.9) | 38.0 (60.8) | 40.1 (64.8) | 25.8 (53.0) | 45.3 (66.7) |
+| embeddings, recipe: global txn / name | 39.0 (61.4) | 46.2 (65.8) | 37.1 (60.2) | 9.1 (24.2) | 55.7 (71.4) |
+| embeddings, recipe: global txn / name + filed | 50.7 (75.7) | 49.7 (72.5) | 50.9 (76.6) | 13.6 (36.4) | 59.9 (76.0) |
+| embeddings, recipe: personal txn / personal cat | 58.4 (82.5) | 37.3 (65.8) | 64.0 (87.0) | 56.1 (72.7) | 42.7 (66.7) |
+| embeddings, recipe: personal txn / name | 54.5 (75.9) | 43.0 (64.2) | 57.6 (79.0) | 42.4 (72.7) | 52.1 (70.8) |
+| embeddings, recipe: personal txn / name + filed | 56.1 (80.2) | 44.3 (70.6) | 59.3 (82.8) | 57.6 (75.8) | 55.7 (72.9) |
+| embeddings, recipe: global txn / personal cat | 51.9 (73.7) | 51.3 (68.7) | 52.0 (75.1) | 15.2 (47.0) | 60.4 (76.6) |
+
+**blind_v2: how the history moves the transaction's embedding**
+
+| reader | group | cosine to itself without history | gold margin without history | with history | gold category closest: without / with |
+|---|---|---|---|---|---|
+| decider-4b | all | 0.906 | -0.015 | -0.008 | 29.3 / 39.2 |
+| decider-4b | first-time payees | 0.911 | -0.012 | -0.014 | 35.1 / 36.4 |
+| decider-4b | payees seen before | 0.905 | -0.016 | -0.007 | 27.8 / 39.9 |
+| decider-4b | person-to-person | 0.917 | -0.024 | -0.011 | 9.1 / 42.4 |
+| decider-4b | new users | 0.919 | -0.007 | -0.012 | 41.7 / 41.1 |
+| recipe | all | 0.822 | -0.013 | +0.004 | 39.0 / 58.4 |
+| recipe | first-time payees | 0.802 | -0.007 | -0.015 | 46.2 / 37.3 |
+| recipe | payees seen before | 0.827 | -0.014 | +0.009 | 37.1 / 64.0 |
+| recipe | person-to-person | 0.832 | -0.039 | -0.004 | 9.1 / 56.1 |
+| recipe | new users | 0.792 | +0.002 | -0.011 | 55.7 / 42.7 |
+
+- **Where the history knows the answer, it pulls the embedding to it.** With the recipe's decider-4B, the transaction's nearest category
+  is the right one for payees the user filed before 53.3 -> 79.6% (blind_v1) and 37.1 -> 64.0% (blind_v2) once the history is in front,
+  and for blind_v2's person-to-person payees 9.1 -> 56.1%. The embedding moves a lot (cosine to itself without history 0.82 to 0.85).
+- **Where it does not, the history pulls it off course.** First-time payees 54.2 -> 46.9 (blind_v1) and 46.2 -> 37.3 (blind_v2); new users
+  60.1 -> 51.8 and 55.7 -> 42.7: with nothing about this payee in the history, the embedding drifts toward what the user files most.
+- **Only a reader trained to use histories uses them.** Untrained decider-4B's embeddings move less (cosine 0.91 to 0.92) and barely
+  toward the gold (blind_v1 39.3 -> 38.7 overall; first-time payees 40.4 -> 24.2): the recipe's training on history slices is what makes
+  its states personal.
+- **As a categoriser, embeddings alone stay below decider's answer**, which reads the same states through the label it was trained to
+  produce: best overall (the personal transaction against the category name with its filed payees) 76.9 against 82.6 (blind_v1) and 56.1
+  against 69.8 (blind_v2; YNAB's rule 73.5 / 57.1). Using the global embedding for first-time payees and the personal one otherwise gives
+  78.0 and 57.3. The exception is first-time payees: the history-free embedding against the category names reads 54.2 on blind_v1 and the
+  history-free one against personal categories 51.3 on blind_v2, against decider's 52.6 and 49.4: level, one run.
+
+**What it means.** Personal embeddings work as intended for what the user has done before, including person-to-person payees whose
+meaning is only in the history, and should be global for anything new. For filing a transaction, decider's own answer stays the reader;
+personal embeddings are for what an answer does not give: finding a user's categories that behave alike, comparing users, retrieval.

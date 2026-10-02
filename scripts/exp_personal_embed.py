@@ -108,7 +108,7 @@ def main():
         cp, tp = Pp[:n], Pp[n]
         cg, cgf, tg = G[:n], G[n:2 * n], G[2 * n]
         rank = lambda t, C: int(np.where(np.argsort(-(C @ t)) == it["answer"])[0][0]) + 1  # noqa: E731
-        recs.append(dict(id=it["id"], user=it["user"], why=it["why"], first=not it.get("payee_hist"), n=n,
+        recs.append(dict(id=it["id"], user=it["user"], why=it["why"], first=None, n=n,  # first-time payee: from <set>_payeehist.json in personal_tables.py
                          ranks={"global txn / name": rank(tg, cg), "global txn / name + filed": rank(tg, cgf), "personal txn / personal cat": rank(tp, cp),
                                 "personal txn / name": rank(tp, cg), "personal txn / name + filed": rank(tp, cgf), "global txn / personal cat": rank(tg, cp)},
                          move=float(tp @ tg), gold_sim_global=float(tg @ cg[it["answer"]]), gold_sim_personal=float(tp @ cp[it["answer"]]),
@@ -126,10 +126,11 @@ def _norm(X):
 if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(EMB_MODEL)
+    PH = json.loads((PROCESSED / f"{SET}_payeehist.json").read_text())
     recs = main()
     for key in recs[0]["ranks"]:
         r = np.array([x["ranks"][key] for x in recs])
-        f = np.array([x["first"] for x in recs])
+        f = np.array([not PH[x["id"]] for x in recs])
         print(f"{READER} {key}: right first {100 * np.mean(r == 1):.1f}, top 3 {100 * np.mean(r <= 3):.1f}; first-time payees {100 * np.mean(r[f] == 1):.1f} / "
               f"{100 * np.mean(r[f] <= 3):.1f}; payees seen before {100 * np.mean(r[~f] == 1):.1f}", flush=True)
     print(f"movement: cosine(personal, global txn) mean {np.mean([x['move'] for x in recs]):.3f}; gold-category margin global "
