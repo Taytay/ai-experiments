@@ -102,6 +102,32 @@ POI-1 92.3 (76), 18 to 60 ms per item against ~390 for per-option scoring (76). 
 
 **Where the project stands (2026-09-26, sections 37 to 64).** The owner's aim is to understand the science of a categoriser that files a user's bank transactions under that user's own categories: Q1 how LLMs and encoders work as multiple-choice categorisers, Q2 the best way to inject knowledge such as a merchant or POI database, Q3 whether they can infer what a meaningless category name ("Yurra") means from examples seen in training and in the prompt. Product use only weights the metrics: auto-file the extremely confident, suggest the rest (section 59's scorecard: top-1, top-3, calibrated bits, auto-file coverage, skill over a no-model baseline). What is established, on a Qwen2.5-3B-Instruct categoriser with a rank-64 LoRA:
 
+- **Sections 146 to 154 (2026-10-01 to 10-02): strands-decider, what decider's design is worth, capacity, and embeddings.**
+  - *strands-decider (146 to 148):* AWS's Apache-2.0 decision model (a pointer head on Qwen3.5-2B-Base) reproduces its published numbers
+    when used through its own code, but untrained it barely reads our task (blind_v1 26% right first). Trained on the recipe's episodes
+    (from v19, from the base, or with its own trainer and config) it equals decider-2B on the blind sets and falls far behind on invented
+    category names (REAL-6 57 to 65 against 87). The cause is the training signal, not the readout: given the shot-label loss, its pointer
+    head reaches decider-2B everywhere (147), and at 4B it is on a par with decider-4B (148: ahead on invented names and the behaviour sets,
+    a point behind on blind_v1, a point ahead on blind_v2 and on REAL-7's long histories decider leads by 1.5 to 2). A strands-style pointer
+    added to decider changes nothing (147); strands' LoRA targets change nothing, its rank 16 trades history-dependent sets away (148).
+  - *On strands' own ground (149, 150):* strands' v19 corpus rebuilt byte for byte; decider's one-slot readout trained on it from the same
+    torso (one 85-minute run) matches or beats v19 on most of v19's own evaluations (held-out short tasks 65.1 against 64.0, MuSiQue 92.9
+    against 88.1, ordered scores +7.5) and trails on emotion; the two readouts complement each other a little, and a hybrid head takes
+    most of that into one model (held-out 65.9, multi-step 84.6); not carried into the categoriser.
+  - *Capacity (151):* LoRA rank 128 equals rank 64; rank 256 and full fine-tuning (fp32 masters, 1e-5 / 3e-5) fit our generated sets
+    better and lose 3 to 8 points on the blind sets by forgetting what the base model knows (first-time payees 59.9 -> 48 / 37.5, new users
+    69.6 -> 58 / 45). REAL-7, built with our generators, hides the loss: it stays a diagnostic. Rank 64 stays; repeat with real data.
+  - *Embeddings (152 to 154):* decider's hidden state at the last token of a short cue ("In one word, the kind of spending:", final layer)
+    is a better category embedding than a purpose-built embedder (a category's nearest differently named category of the same kind 82%
+    against 63% for Qwen3-Embedding-4B, 45% without a model); the recipe's adapter knows a payee's kind from its statement name (63%).
+    With the user's history in front, the recipe's embeddings move toward the user's own category where the history knows the payee
+    (seen payees 53 -> 80%, person-to-person 9 -> 56% on blind_v2) and drift where it does not (first-time payees, new users): personal
+    for the known, global for the new. As a categoriser, embeddings alone stay below decider's answer except on first-time payees
+    (level). Mapping one user's categories onto another's works (85%, 82% under different names; no model 24%); mapping categories onto
+    canonical kinds is better done by asking decider the question (58% against 49%), and "several kinds" / "person or purpose"
+    categories defeat nearest-label mapping.
+  - *Method notes:* re-running one model moves a 250 to 350-row set by about 1.5 points (149); our harness reproduces strands' published
+    evaluations to within a row or two.
 - **Evaluation first.** On REAL-6 (20 synthetic users) the seen merchants are a lookup and the unseen ones are decided by the merchant's standard category (section 48); a system with no model (the user's own label for the merchant, else other users', else the user's most-used category) reads 87% top-1 on held-out users, level with the best categorisers, whose value there is the ranking (top-3 98 against 26) and whatever no lookup reaches (section 59). Numbers from sections 37 to 47 should be read in section 48's corrected groups.
 - **Q1.** Score options by summed log-probability and fit one temperature per model on other users; raw confidences are miscalibrated and a temperature does not transfer between models (section 50). Training time goes into re-reading the prompt, not precision: bf16 and the 4-bit base give the same model (52), 16 sequences per step at 1e-4 is the efficient batch (56), and putting the loss on every example label in the prompt (the "all-label" loss) trains in 100 steps what 1,600 plain steps did (52). The same run on the 3090 and on Modal's H100 agrees within run-to-run noise, six times faster there (54).
 - **Q2.** A database written into the weights as prose sentences reaches the merchants only it knows at 59 to 69% (sections 43, 45); the same database taught as supervised decisions ("database episodes": synthetic statement rows of its merchants labelled in a training user's scheme) reaches 94%, opaque names included, with no record in the prompt (53), ties the record in the prompt at equal information (55), holds 20,000 merchants as well as 240 when each gets about 30 training rows (58), and helps on real businesses outside the database (+4 to 5, section 57). The record in the prompt remains the robust route: 85% on real Overture businesses from a one-line category record, whatever the statement string looks like (57).

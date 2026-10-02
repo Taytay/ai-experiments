@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-10-01; overwrite this block when it changes)
+## Current state (2026-10-02; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -22,22 +22,26 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   job lists in `scripts/modal_jobs/`, how-to in CLAUDE.md ("GPU work: Modal"). bf16 is the default base precision for new runs.
   Every table reports the scorecard (`ai_experiments.scorecard`, REPORT.md 59) with skill over the no-model cascade; add a blind
   strong-reader ceiling (`scripts/blind_ceiling.py`) for new item sets.
-- **Branches:** nothing is merged to main; the owner merges. Stack #24 in PR order ends ... #58 plan-49-calibration, #59
-  plan-56-train-efficiency, #60 plan-57-db-episodes, #61 plan-34-modal, #62 plan-58-fair-record, #63 plan-60-batch, #64
-  plan-59-scale, #65 plan-62-novel-merchants, #66 plan-63-scorecard, #67 plan-64-label-induction (rows 64 to 78), #68 plan-79-one-slot
-  (rows 79 to 151; owner 2026-09-27: a new layer to keep the stack organised), plan-152-next (top, rows 152 on). The 61 open PRs
-  (#5 on main up to #68) form one GitHub stack (`gh stack link`; owner 2026-10-01). Owner, 2026-10-01: a new branch and PR layer
-  per row or round of tests from row 152 on, added to the top of the stack with `gh stack link <PR numbers...> <new-branch>`. New
-  work branches from the top; lower branches reach upper ones by merge-forward only (never rebase or force-push). `evals/runs.jsonl` conflicts on every
-  merge-forward: resolve as the union of rows by `run_id`, sorted.
+- **Branches:** nothing is merged to main; the owner merges. GitHub stack #24 holds every open PR, #5 (on main) up to #76, in PR order
+  (`gh stack link`; owner 2026-10-01). #68 plan-79-one-slot holds rows 79 to 151. Owner, 2026-10-01: one branch and PR layer per row or
+  round of tests from row 152 on: #69 plan-152-next (row 152), #70 plan-153-strands-4b, #71 plan-154-strands-corpus, #72
+  plan-155-strands-hybrid, #73 plan-156-capacity, #74 plan-157-embeddings, #75 plan-158-personal-embeddings, #76
+  plan-159-category-mapping (top). A new row branches from the top and joins the stack with `gh stack link <all PR numbers bottom..top>
+  <new-branch>` (PR numbers push nothing; only the new branch is pushed). The checkout has no local gh-stack tracking. Lower branches
+  reach upper ones by merge-forward only (never rebase or force-push); commit a row's results on its own branch before moving up.
+  `evals/runs.jsonl` conflicts on every merge-forward: resolve as the union of rows by `run_id`, sorted.
 - **Checkouts:** one working checkout, `~/projects/YNAB/ai-experiments`, on the top branch (the owner, 2026-09-26: no more worktrees;
   Modal made the per-branch GPU checkouts unnecessary). Switch branches there for merge-forward. `../ai-experiments-wt06` (plan-57) is idle,
   `../ai-experiments-wt07` is the owner's (do not touch). Modal results come back in `modal_out/<tag>/` (gitignored): copy results into the
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-10-01):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 150 done
-  (REPORT.md 116 to 145; section 1 summarises them; 127 (a) deprioritised). The owner has more experiments before real data arrives.
+- **In flight (2026-10-02):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 159
+  done (REPORT.md 116 to 154; section 1 summarises them). Since 2026-10-01 (146 to 154): strands-decider evaluated and trained three ways
+  (= decider-2B, or decider-4B at 4B, once given the shot-label loss; not adopted), decider's readout on strands' own corpus (>= v19),
+  capacity (rank 64 stays: more capacity forgets first-time payees), and embeddings from decider (good for categories and for mapping
+  users' categories to each other; personal embeddings help known payees only). strands' corpus lives on the Modal results volume at
+  `strands_corpus_v19/` (rebuild: `scripts/build_strands_corpus.sh` with CORPUS_OUT); its adapters are research-only.
   - **decider recipe** (REPORT 107, 113, 123): decider-4B one slot + shot-label loss + database episodes (with the misleading-name set) +
     rename 0.5 + `LABELS=rand255 EMPTY=20` + `LAYOUT=labelled_shots` + lookup / override 0.1 + soft evidence-free 0.1 + alternation 0.1,
     800 steps; `OTHERS=0.5` (other users' filings line) when a payee histogram exists (production).
@@ -60,9 +64,13 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
     the 35B 14 to 20 ms (H200); roughly $11 and $18 per million transactions.
   - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_v2 (+ _others; a second blind generator, REPORT 137),
     blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1; YNAB's rule and payee histories per item (`*_ynabrule`, `*_payeehist`).
-- **Next (2026-10-01):** the owner's next experiments; then real data (reports/REAL_DATA_SPEC.md: user + time splits, sealed test, train on
-  real filings, keep the raw other-users line, memos, first-time payees and new users as their own slices). blind_v3 stays untouched for
-  a final synthetic read of any new system. Deprioritised: 51, 54, 55, 127 (a).
+- **Next (2026-10-02):** rows 160 to 162 are proposed and wait for the owner's go: 160 payee resolution (owner, 2026-10-02: YNAB's real
+  data does not carry enough aggregator merchant fields to skip cleanup), 161 population knowledge in the weights against the
+  other-users line, 162 a real-data dress rehearsal on REAL-7 (bring the plan to the owner before running). Then real data
+  (reports/REAL_DATA_SPEC.md: user + time splits, sealed test, train on real filings, keep the raw other-users line, memos, first-time
+  payees and new users as their own slices). blind_v3 stays untouched for a final synthetic read of any new system. Also offered, not
+  queued: JevBench for row 154's model (needs it behind strands' server API), a single-pass table layout for bulk imports.
+  Deprioritised: 51, 54, 55, 127 (a).
 
 ## Procedure for one step
 
@@ -246,6 +254,9 @@ afternoon each on the 3090.
 | 157 | [Q1] Embeddings from decider, and clustering (owner, 2026-10-02: "We can extract embeddings from decider somehow, right? Let's experiment with doing so, and with clustering to see if it works."): payees (kindpay_v2, three renderings) and user categories (kindcat_v2, name + filed payees) embedded by decider-4B (untrained, recipe), Qwen3.5-4B-Base and Qwen3-Embedding-4B (last token after a cue / mean; 1/2, 3/4, full depth); judged against the generators' kinds by 1-NN (and, for categories, 1-NN among other names), 10-NN, k-means NMI / ARI / purity; TF-IDF baselines. Branch plan-157-embeddings. | MODEL-25 | 150 | done | REPORT.md 152 |
 | 158 | [Q1] Personal embeddings (owner, 2026-10-02: "I definitely want a user's history to perturb the embeddings! Of both their categories and the payees!"): decider's cued last-token state with the user's history slice in front, for each of the user's categories and the transaction to file, against global ones; an embedding-only categoriser in every pairing (blind_v1 / v2; first-time payees, seen payees, p2p), and how far and which way the history moves the transaction. Branch plan-158-personal-embeddings. | MODEL-25 | 157 | done | REPORT.md 153 |
 | 159 | [Q1] Mapping categories with embeddings (owner, 2026-10-02: "Can you use embeddings to map canonical categories to a personal set of categories or to map two users' categories together?"): kindcat_v2's user categories to the nearest of the 43 canonical options, and user A's categories to user B's nearest, judged against the generators' kinds; name / name + filed / personal embeddings; decider-4B untrained and recipe, Qwen3-Embedding-4B, TF-IDF; beside decider asked the multiple-choice question (rows 147-148). Branch plan-159-category-mapping. | MODEL-25 | 158 | done | REPORT.md 154 |
+| 160 | [Q1] Payee resolution (owner, 2026-10-02: "each payee is obscured or corrupted with varying levels of obfuscation: truncation, adding transaction ids, adding transaction locations ... How would I know which other payees are the same ones easily?"; YNAB's real data does not carry enough aggregator merchant fields to skip cleanup). Gold: pop_v2's generator payee ids (2,250 users, 2.6M rows) plus a corrupter at controlled strengths (truncation to N characters, transaction ids, locations, processor prefixes, typos). Methods, cheapest first: payeekey rules extended (ids, card suffixes, city/state, URLs, phones); blocking by first token with prefix-aware (truncation) and character n-gram matching; identity-cued embeddings ("The business name in this bank line is:", not the kind cue); decider as a yes/no judge on borderline pairs; co-filing behaviour (same users, same categories, similar amounts). Measures: pairwise precision / recall / F1 and B-cubed, by corruption type and strength. Proposed, awaiting the owner. | DATA-8 | 150 | todo | |
+| 161 | [Q1] Population knowledge in the weights against the other-users line (owner, 2026-10-02: "we are baking this knowledge into the weights right?"): train the recipe on pop_v2's population users' filings (their knowledge into the weights), test blind_v2's held-out users with and without the line, split by how many population users filed the payee (common / rare) and by payees first seen after the training cut-off. Proposed, awaiting the owner. | REAL-25 | 150 | todo | |
+| 162 | [Q1] Real-data dress rehearsal on REAL-7 (owner, 2026-10-02: yes to a plan): run reports/REAL_DATA_SPEC.md end to end on REAL-7's users (the real-data schema, 70/15/15 user split and a time split, sealed test, prompts with the other-users line, the recipe, report cards on held-out users and later months) to flush out the pipeline before real data arrives; scores are not the point. Bring the plan to the owner before running. | REAL-26 | 156 | todo | |
 | 50 | Category-order sensitivity, eval only: the untrained instruct model and the no-DB and record SFT adapters re-scored with the prompt's category list permuted under two more seeds; argmax flip rate per corrected group and name type, and the accuracy of the two- and three-order averages; a lettered list with letter readout on the untrained model only. Re-scoped 2026-09-27 to the one-slot readers that now lead (REPORT 69, rows 79 / 80): decider-2B and Qwen3.5-2B one-slot on POI-1 and REAL-6, the option order shuffled under three seeds (`exp_decision_models.py ORDER_SEED`): flip rate and accuracy spread, and the three-order average. | EVAL-8 | 41, 45 | done | REPORT 75, `scripts/order_tables.py` |
 | 53 | Encoder option scorer (Laya's layout): ModernBERT-large with one scored `[MASK]` per category, fine-tuned across users on REAL-6 with the query, the record and the tagged shots in the input, soft-target CE, options shuffled; from the Laya checkpoint and from plain ModernBERT-large; no-record and record arms against GLiClass tuned and the SFT categoriser on row 45's groups and row 42's folds, with milliseconds per item. Does the layout let an encoder read the shots where GLiClass could not? | MODEL-6 | 45 | done | REPORT.md 62; `scripts/encmask_tables.py`; `models/adapters/encmask_*` |
 | 54 | Diffusion slot read on the 3090, zero-shot: one forward with the answer letter as the mask token on REAL-6 (24 shots, with and without the record) for Nemotron-Labs-Diffusion-8B (against its own causal readout, same weights), Dream-v0-Instruct-7B (against Qwen2.5-7B-Instruct), LLaDA-8B-Instruct and LFM2.5-Encoder-350M-Diffusion; row 50's order permutations and row 49's calibration on each; a LoRA fine-tune of the slot read only if one beats its causal twin beyond the seed spread. Separate venv if the remote code needs another transformers. | MODEL-7 | 45, 49, 50 | todo | |
@@ -430,3 +441,4 @@ afternoon each on the 3090.
 - 2026-10-02: row 157 done (REPORT.md 152): decider-4B's last-token state after a cue (final layer) embeds categories better than Qwen3-Embedding-4B (other-name 1-NN 82 vs 63; no model 45; NMI 0.63); the recipe adapter knows payee kinds from names (63 vs 46 untrained, 26 embedder). Uses proposed: population concepts, payee kind lines, mapped profiles.
 - 2026-10-02: row 158 done (REPORT.md 153): history in front moves the recipe's embeddings toward the user's category where the history knows the payee (seen payees 53 -> 80%, blind_v2 p2p 9 -> 56%) and away for first-time payees and new users; embeddings alone below decider's answer (76.9 vs 82.6) except first-time payees (level).
 - 2026-10-02: row 159 done (REPORT.md 154): user-to-user category mapping by the recipe's personal embeddings 85.4% (other names 82.3; no model 23.5); canonical mapping by embedding 49% < decider asked 58%; 'several kinds' / 'purpose' categories defeat nearest-label mapping.
+- 2026-10-02: write-up before compaction: REPORT section 1 summarises 146 to 154; current state rewritten; rows 160 to 162 proposed (payee resolution; population knowledge vs the line; REAL-7 dress rehearsal), awaiting the owner. Owner: real data lacks the aggregator merchant fields that would make payee cleanup unnecessary.
