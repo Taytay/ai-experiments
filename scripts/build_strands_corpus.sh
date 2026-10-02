@@ -11,6 +11,23 @@ SHA=f91487ab8f7e4b4967ae57e46b8d90e91e67d616
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 OUT="$ROOT/data/external/strands_corpus"
 SRC=/tmp/strands-decider-$SHA
+if ! command -v curl >/dev/null; then  # the Modal image has no curl; their recipe's fetch stage uses it
+  (apt-get update -qq && apt-get install -y -qq curl) >/dev/null 2>&1 || {
+    mkdir -p /tmp/curlshim
+    cat > /tmp/curlshim/curl <<'PYEOF'
+#!/usr/bin/env python3
+# stand-in for the two forms used here: curl -fsSL URL (to stdout) and curl -fsSL -o FILE URL
+import shutil, sys, urllib.request
+a = sys.argv[1:]; out = a[a.index("-o") + 1] if "-o" in a else None; url = a[-1]
+req = urllib.request.Request(url, headers={"User-Agent": "curl/8"})
+with urllib.request.urlopen(req) as r:
+    if out:
+        with open(out, "wb") as f: shutil.copyfileobj(r, f)
+    else:
+        shutil.copyfileobj(r, sys.stdout.buffer)
+PYEOF
+    chmod +x /tmp/curlshim/curl; export PATH=/tmp/curlshim:$PATH; }
+fi
 if [ ! -d "$SRC" ]; then
   curl -fsSL "https://github.com/strands-labs/strands-decider/archive/$SHA.tar.gz" | tar xz -C /tmp
 fi
