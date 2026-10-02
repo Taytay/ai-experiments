@@ -1265,6 +1265,11 @@ relisted control); strands reading our labelled history with and without the sho
 **Status (2026-10-01):** PLAN step 152, REPORT.md 147: the shot-label loss, not the readout, teaches invented names; the pointer adds nothing; not adopted.
 **Status (2026-10-01):** PLAN step 153, REPORT.md 148: strands on a 4B torso with the shot-label loss = decider-4B (ahead on invented names, a point behind on blind_v1); strands' LoRA targets no effect; rank 16 a trade.
 
+**MODEL-24 decider's method on strands' data.** decider's readout and our recipe practices beat strands' pointer on our data; is that
+true on strands' own ground? *Experiment:* strands' v19 corpus rebuilt by its own recipe; decider's one-slot readout trained on it
+from v19's torso (Qwen3.5-2B-Base); scored on strands' evaluations beside v19 re-scored, with the published decider models as references.
+**Status (2026-10-02):** PLAN step 154, REPORT.md 149: decider's method >= v19 on most of its evaluations (held-out 65.1 vs 64.0, MuSiQue 92.9 vs 88.1), for one 85-minute run; JevBench not run.
+
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.

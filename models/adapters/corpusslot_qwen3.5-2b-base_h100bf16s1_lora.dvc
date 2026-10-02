@@ -1,0 +1,6 @@
+outs:
+- md5: aca989fd5a77cfab884f6d9dc09917a2.dir
+  size: 250132582
+  nfiles: 3
+  hash: md5
+  path: corpusslot_qwen3.5-2b-base_h100bf16s1_lora

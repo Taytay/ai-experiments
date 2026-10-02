@@ -9038,3 +9038,80 @@ and the behaviour sets, decider-4B by a point on blind_v1 and in calibration for
 and both score at 4B speed. If a second reader is worth its cost, strands-4B is a better second opinion than another decider (REPORT
 133's escalation reader was the untrained 35B). The real data will say whether invented category names are common enough to prefer
 strands-4B as the main reader.
+
+## 149. decider's method on strands' home ground: trained from the same Qwen3.5-2B-Base on strands' exact v19 corpus, decider's one-slot readout matches or beats strands v19 on most of its own evaluations (held-out short tasks 65.1 vs 64.0, MuSiQue 92.9 vs 88.1, hate severity 53.4 vs 45.9, generated adequacy 82.5 vs 80.5) and trails on emotion (54.3 vs 56.4); one 85-minute training run against strands' two-stage recipe; the published decider models, untrained here, are stronger still on the short tasks but not on strands' trained multi-step sets (MODEL-24)
+
+*PLAN step 154 (owner, 2026-10-01: "our decider model is so strong, and seemingly more efficient to train/infer, that it makes me want to do
+a test training on their datasets and compare our results to theirs"; full corpus for a research comparison only; start from
+Qwen3.5-2B-Base with decider-2B / -4B read zero-shot as references). Code: `scripts/build_strands_corpus.sh` (strands' own recipe stages
+build, fetch, multistep, generated, adequacy at commit f91487a; the corpus on the results volume at `strands_corpus_v19/`, not in git or
+DVC: rebuildable, and its licences are mixed), `ai_experiments.corpus_slot`, `scripts/exp_corpus_slot.py`, `scripts/eval_corpus_slot.py`,
+`scripts/corpus_tables.py`; job lists `scripts/modal_jobs/r154*.json`; branch plan-154-strands-corpus (PR #71). Research only: the two
+adapters are kept in DVC and never shipped or used on real data.*
+
+**The corpus is theirs, byte for byte.** Every file strands' `data/SHA256SUMS` records matches the build (the 100,449-row short-task
+corpus, the 21,000-row held-out file, the multi-step training and eval files, the generated files, the replay targets); the two
+HelpSteer2 files have no recorded hash and match v19's row counts (4,866 / 234). v19's training files total 123,339 rows.
+
+**The evaluation is theirs.** The held-out short tasks are the rows `strands-decider eval --limit 6000` scores (its partition into
+calibration and test halves, then its seeded sample of 6,000); the multi-step, generated and adequacy sets are scored whole, as its
+`multistep_eval.py`. v19 re-scored here with its own `evaluate_checkpoint` reproduces its published numbers: held-out 64.0 (published
+64.1), ContractNLI 87.2 (87.2), MuSiQue 88.1 (88.4), BoardgameQA 82.1 (82.2), HotpotQA 71.7 (71.7), HelpSteer2 adequacy 72.2 (72.2);
+generated adequacy 80.5 (79.8). The same v19 on generated v16 gave 86.6 in the check of REPORT 146 and 85.1 here, so differences of
+about 1.5 points on the 247 to 350-row generated sets are within the noise of re-running one model.
+
+**The arm.** decider's readout: the options labelled in decider's own layout and scheme (`Context: ... Question: ... Options: (A) name —
+description ... Answer: (`), the answer the label tokens' logits from the LM head; our LoRA (rank 64 on every projection, the DeltaNet
+ones included, lr 1e-4); from Qwen/Qwen3.5-2B-Base, v19's torso. Kept from strands' recipe, everything about the data: its six training
+files in its order, choice and noul options shuffled, score levels in order or reversed, ordinal smoothing 0.1 on scores, row weights,
+instruction variants, its replay distributions on the 12,909 multi-step rows (KL, weight 1), one epoch at an effective batch of 32
+(3,854 steps), warmup 3%. Not kept: strands' 3% validation split (we train on all rows), its calibration (accuracy needs none), and its
+parent / replay stage (the replay targets come from v19's own parent, committed in its repo). Two seeds.
+
+| reader | held-out short tasks | emotion | massive_intent | sarcasm | hate_severity | ContractNLI | MuSiQue | BoardgameQA | HotpotQA (held out) | generated v16 | generated v18 | adequacy, HelpSteer2 | adequacy, generated |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| strands v19, published | 64.1 | – | – | – | – | 87.2 | 88.4 | 82.2 | 71.7 | – | – | 72.2 | 79.8 |
+| Qwen3.5-2B-Base, untrained (decider readout) (1) | 57.1 | 59.2 | 76.1 | 50.7 | 36.4 | 50.5 | 49.0 | 46.0 | 69.2 | 66.6 | 59.5 | 49.6 | 49.3 |
+| strands v19 (re-scored here) (1) | 64.0 | 56.4 | 88.2 | 60.8 | 45.9 | 87.2 | 88.1 | 82.1 | 71.7 | 85.1 | 77.7 | 72.2 | 80.5 |
+| decider's method on strands' corpus, from Qwen3.5-2B-Base (2) | 65.1 [65.0, 65.2] | 54.3 [53.1, 55.4] | 87.1 [86.5, 87.6] | 62.3 [62.0, 62.7] | 53.4 [53.0, 53.7] | 86.8 [86.2, 87.4] | 92.9 [92.8, 92.9] | 83.8 [83.8, 83.9] | 69.7 [67.3, 72.0] | 87.3 [86.3, 88.3] | 79.8 [79.8, 79.8] | 72.2 [70.1, 74.4] | 82.5 [82.5, 82.5] |
+| decider-2B as published (untrained here) (1) | 76.0 | 84.8 | 94.7 | 59.0 | 55.8 | 48.9 | 53.5 | 55.1 | 80.8 | 80.0 | 69.2 | 70.9 | 60.3 |
+| decider-4B as published (untrained here) (1) | 76.9 | 79.8 | 96.8 | 64.8 | 58.4 | 72.9 | 62.0 | 59.3 | 88.8 | 85.7 | 86.6 | 74.8 | 76.2 |
+
+Scoring minutes per set (one H100; decider readout in this repo's loop, BATCH 8; strands through its evaluate_checkpoint, batch 16):
+
+| reader | holdout_v5_norule | multistep_v14_eval | generated_v16_eval | generated_v18_eval | adequacy_hs2_eval | adequacy_gen_eval |
+|---|---|---|---|---|---|---|
+| Qwen3.5-2B-Base, untrained (decider readout) | 0.98 | 1.75 | 0.19 | 0.12 | 0.07 | 0.04 |
+| strands v19 (re-scored here) | 1.95 | 4.77 | 0.36 | 0.27 | 0.17 | 0.13 |
+| decider's method on strands' corpus, from Qwen3.5-2B-Base | 0.69 | 1.67 | 0.17 | 0.12 | 0.06 | 0.03 |
+| decider-2B as published (untrained here) | 1.09 | 2.38 | 0.18 | 0.13 | 0.07 | 0.03 |
+| decider-4B as published (untrained here) | 1.15 | 4.23 | 0.35 | 0.25 | 0.12 | 0.07 |
+
+results/corpusslot_ft_corpusslot_qwen3.5-2b-base_h100bf16_lora.json: 85.1 min, 40,902,126 tokens, 3854 steps, final loss 0.359
+
+results/corpusslot_ft_corpusslot_qwen3.5-2b-base_h100bf16s1_lora.json: 86.7 min, 40,892,475 tokens, 3854 steps, final loss 0.371
+
+- **Same torso, same data: decider's method is at least as good as strands' on strands' own evaluations, and better on several.** Both
+  seeds beat v19 on the held-out short tasks (65.0 / 65.2 against 64.0, by 1.1 points on 6,000 rows; hate severity, an ordered score,
+  53.4 against 45.9, while emotion goes the other way, 54.3 against 56.4), MuSiQue (92.8 / 92.9 against 88.1), BoardgameQA (83.8 / 83.9
+  against 82.1), generated v18 (79.8 against 77.7) and generated adequacy (82.5 against 80.5). Level within the seeds or the re-run
+  noise: ContractNLI (86.8 [86.2, 87.4] against 87.2), generated v16 (87.3 [86.3, 88.3] against 85.1 / 86.6), HelpSteer2 adequacy
+  (72.2 [70.1, 74.4] against 72.2), massive_intent. Unresolved: HotpotQA, never trained on by either, 69.7 [67.3, 72.0] against 71.7.
+- **It costs less.** One 85-minute run on one H100 (41M tokens) from the base model; strands' v19 recipe trains a parent first and
+  labels with a 4B teacher (their recipe's own timing: about 11 hours on an RTX 3090, 70 minutes on 8 H100s). Scoring in this repo's loop
+  took about a third of the time of strands' own `evaluate_checkpoint` on the same rows (multi-step 1.7 against 4.8 minutes), but these
+  are different harnesses (batch 8 against 16; strands also computes calibration), not a controlled speed test.
+- **The published decider models show what more training adds.** Read here without any training on this corpus, decider-2B and -4B are
+  far ahead on the held-out short tasks (76.0 / 76.9 against 64 to 65; emotion 84.8, massive_intent 94.7 / 96.8) and on HotpotQA (80.8 /
+  88.8), and decider-4B leads generated v18 (86.6); they trail badly on the multi-step sets strands trains on (ContractNLI 48.9 / 72.9,
+  MuSiQue 53.5 / 62.0). Mapika trained them on "26 further public decision datasets"; the short-task lead most likely reflects that
+  training, not the readout, which is why the controlled arm starts from the base model.
+- **Why the readout helps here as on our data (REPORT 146, 147).** decider reads the answer through the LM head the model was pretrained
+  with, so it starts from the base model's own skill (the untrained base already scores 57.1 on the held-out tasks this way); strands'
+  pointer head starts from random. The biggest gains are on multi-hop reading (MuSiQue) and on ordered scores, where a label token per
+  level is an easier target than a level's line state. That is an interpretation, not a measured cause.
+
+**Not measured:** JevBench public (its harness drives strands' HTTP server; putting our model behind that API is a separate step), the
+calibration of the decider arm (its temperatures were not fitted), and more than two seeds. **For this project:** none of this changes the
+categoriser; it confirms on independent ground that decider's readout is not the weak link, and that a decider-style model trained on a
+general decision corpus is as good as strands' at 2B for less training.
