@@ -89,8 +89,11 @@ def decider():
     P = importlib.import_module("decider.prompt")
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(path)
+    full = ADAPTER and (ROOT / "models" / "adapters" / ADAPTER / "config.json").exists() and not (ROOT / "models" / "adapters" / ADAPTER / "adapter_config.json").exists()
+    if full:  # row 156: a fully fine-tuned model directory from exp_decider_finetune.py FULL_FT=1
+        path = str(ROOT / "models" / "adapters" / ADAPTER)
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
-    if ADAPTER:  # a LoRA from exp_decider_finetune.py, merged for scoring
+    if ADAPTER and not full:  # a LoRA from exp_decider_finetune.py, merged for scoring
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
     from ai_experiments import oneslot

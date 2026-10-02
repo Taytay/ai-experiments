@@ -9169,3 +9169,69 @@ Per seed on the two large sets: held-out short tasks decider's method 65.0 / 65.
 **For strands' own models:** decider's label readout, added to their pointer, is the one improvement of ours that transfers: trained on
 their corpus from their torso it gains about a point and a half on their held-out tasks over v19 (64.0 to 65.9) and two on their multi-step
 sets (82.7 to 84.6), in one 90-minute run. Not adopted here (MODEL-24 answered).
+
+## 151. The adapter's capacity is not what limits the categoriser on today's training data: LoRA rank 128 equals rank 64 (blind_v1 83.9 / 83.9, blind_v2 72.3 / 71.7), and more capacity, rank 256 or a full fine-tune, scores higher on our own generated sets but loses 3 to 8 points on the blind sets, by forgetting what the base model knew: first-time payees 59.9 -> 48.0 (full, 1e-5) -> 37.5 (3e-5) right first on blind_v1, new users 69.6 -> 57.7 -> 45.2, while payees seen before hold (89.2 -> 88.5); REAL-7, built with our generators, does not show it; rank 64 stays (TRAIN-14)
+
+*PLAN step 156 (owner, 2026-10-02: "I wonder if we should be trying full fine tunes on decider or strands or strands' head?"; "Yes"
+to the probe; REAL-7 added as a diagnostic, never to choose). Code: `exp_decider_finetune.py LORA_R` (alpha 2r) and `FULL_FT=1` (every
+weight trained; fp32 master weights under bf16 autocast, AdamW; saved as a bf16 model directory that `exp_decision_models.py` loads in
+place of the base), `scripts/capacity_tables.py`; job lists `scripts/modal_jobs/r156_*.json`; branch plan-156-capacity (PR #73). One seed
+per new arm; the recipe's three seeds as the reference. The full fine-tunes need 80.5 GiB and ran on an H200; the LoRA arms on H100s.*
+
+Section 28 tried full fine-tuning once (Qwen2.5-3B, knowledge injection): at 1e-4 it erased the model, at 1e-5 it learned nothing, with
+bf16 weights. bf16 can round a 1e-5 update away, so these runs keep fp32 master weights. Rank 16 already lost up to 6 points where the
+history decides (REPORT 148), so the question was whether rank 64 is also short.
+
+**S.1 top-1 % (mean [range] over seeds; seeds in brackets)**
+
+| reader | REAL-6 v1 | novel names | mislead | override | blind_v1 + line | blind_v2 + line | REAL-7 (diagnostic) | REAL-7 dated (diagnostic) |
+|---|---|---|---|---|---|---|---|---|
+| LoRA rank 64 (the recipe; REPORT 123) | 87.8 [85.6, 91.6] (3) | 84.6 [82.9, 87.6] (3) | 64.6 [63.8, 65.4] (2) | 98.3 [98.2, 98.4] (2) | 83.9 [83.5, 84.2] (3) | 71.7 [70.5, 73.2] (3) | 82.2 [81.6, 82.9] (3) | 87.6 [87.1, 88.5] (3) |
+| LoRA rank 128 | 88.6 (1) | 87.9 (1) | 62.6 (1) | 99.0 (1) | 83.9 (1) | 72.3 (1) | 82.3 (1) | 86.9 (1) |
+| LoRA rank 256 | 84.9 (1) | 85.6 (1) | 62.4 (1) | 98.1 (1) | 79.7 (1) | 67.9 (1) | 82.6 (1) | 86.8 (1) |
+| full fine-tune, lr 1e-5 (fp32 masters, H200) | 89.3 (1) | 88.3 (1) | 64.4 (1) | 98.2 (1) | 80.9 (1) | 68.5 (1) | 81.9 (1) | 87.5 (1) |
+| full fine-tune, lr 3e-5 (fp32 masters, H200) | 88.3 (1) | 85.2 (1) | 60.8 (1) | 96.8 (1) | 77.1 (1) | 63.4 (1) | 80.0 (1) | 85.5 (1) |
+| strands-4B (row 153), for REAL-7 | 89.1 [86.9, 91.3] (2) | 88.3 [86.9, 89.6] (2) | 67.1 [66.9, 67.3] (2) | 99.3 [99.1, 99.6] (2) | 82.9 [82.7, 83.1] (2) | 72.6 [72.3, 72.9] (2) | 80.5 [79.5, 81.4] (2) | 86.2 [85.9, 86.5] (2) |
+
+**S.2 blind_v1 with the other-users line (1500 items; 277 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 73.5 | 73.5 | 0.82 | 74% | 0.0 / 0.0 | – | – | – |
+| LoRA rank 64 (the recipe; REPORT 123) | 3 | 83.8 | 91.5 | 1.45 | 89% | 59.9 / 74.8 | 89.2 | 69.6 | 0.622 |
+| LoRA rank 128 | 1 | 83.8 | 90.8 | 1.45 | 88% | 58.8 / 72.6 | 89.5 | 69.6 | 0.664 |
+| LoRA rank 256 | 1 | 79.9 | 90.1 | 1.48 | 86% | 48.7 / 69.0 | 86.9 | 57.7 | 0.761 |
+| full fine-tune, lr 1e-5 (fp32 masters, H200) | 1 | 81.0 | 89.4 | 1.47 | 86% | 48.0 / 63.5 | 88.5 | 57.7 | 0.792 |
+| full fine-tune, lr 3e-5 (fp32 masters, H200) | 1 | 77.1 | 88.5 | 1.51 | 84% | 37.5 / 59.9 | 86.0 | 45.2 | 0.959 |
+| strands-4B (row 153), for REAL-7 | 2 | 82.9 | 91.1 | 1.41 | 89% | 59.6 / 74.7 | 88.2 | 67.9 | 0.700 |
+
+**S.2 blind_v2 with the other-users line (1500 items; 316 first-time payees): lists of at most 3**
+
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+|---|---|---|---|---|---|---|---|---|---|
+| YNAB today (2 of last 3, else last) | – | 57.1 | 57.1 | 0.79 | 57% | 0.0 / 0.0 | – | – | – |
+| LoRA rank 64 (the recipe; REPORT 123) | 3 | 71.7 | 88.1 | 1.90 | 84% | 60.8 / 79.7 | 74.6 | 65.1 | 1.084 |
+| LoRA rank 128 | 1 | 72.3 | 88.4 | 1.91 | 84% | 57.9 / 79.4 | 76.2 | 62.5 | 1.101 |
+| LoRA rank 256 | 1 | 68.1 | 87.4 | 1.97 | 82% | 55.1 / 75.0 | 71.6 | 55.7 | 1.157 |
+| full fine-tune, lr 1e-5 (fp32 masters, H200) | 1 | 68.5 | 85.9 | 1.94 | 81% | 48.4 / 68.7 | 73.9 | 52.6 | 1.193 |
+| full fine-tune, lr 3e-5 (fp32 masters, H200) | 1 | 63.4 | 85.3 | 1.99 | 79% | 42.1 / 63.9 | 69.1 | 41.1 | 1.313 |
+| strands-4B (row 153), for REAL-7 | 2 | 72.6 | 87.8 | 1.85 | 84% | 61.7 / 79.3 | 75.5 | 66.4 | 1.111 |
+
+- **Rank 128 equals rank 64.** Every set is inside rank 64's seed range (blind_v1 83.9, blind_v2 72.3, REAL-6 88.6, novel names 87.9),
+  and the report card is the same (right first 83.8, work saved 88%). Capacity is not binding at rank 64.
+- **More capacity forgets the world.** Rank 256 and the full fine-tunes score at or above the recipe on our own generated sets (REAL-6
+  89.3, novel names 88.3 at 1e-5) and lose on the blind sets: blind_v1 with the line 79.7 (r256), 80.9 (full 1e-5), 77.1 (3e-5) against
+  83.9; blind_v2 67.9 / 68.5 / 63.4 against 71.7. The loss is where the answer depends on what the base model knows about merchants and
+  people: first-time payees on blind_v1 59.9 -> 48.7 / 48.0 / 37.5 right first (blind_v2 60.8 -> 55.1 / 48.4 / 42.1), new users 69.6 ->
+  57.7 / 57.7 / 45.2, while payees the user filed before hold (89.2 -> 86.9 / 88.5 / 86.0). About 2,250 synthetic episodes, drawn 12,800
+  times, are enough to overwrite that knowledge once enough of the network can move; the higher the rate, the more it is lost.
+- **REAL-7 hides it.** The full fine-tune at 1e-5 reads REAL-7 at 81.9 / 87.5 (undated / dated), level with the recipe's 82.2 / 87.6,
+  although it lost 3 points on both blind sets: REAL-7 was built with the generators the episodes come from, so it rewards fitting them.
+  That is the reason REAL-7 is a diagnostic and not a test (REPORT 103), shown again.
+- **Not a speed or cost question:** rank 128 trains in 46 minutes, rank 256 in 56, a full fine-tune in 32 (on the H200); a full fine-tune is an 8.4 GB checkpoint against 0.49 GB for the rank-64 adapter (rank 64 trained in 41.5 minutes).
+
+**Rank 64 stays.** On today's data the limit is the training data, not the adapter: more trainable capacity only fits the synthetic
+generators better and forgets the base model's knowledge. With real data (about a billion filings across a million users) the balance
+changes: the training set will be far larger and varied, and what the model must know about merchants will be in the data itself. The
+probe to repeat then: rank 64 / 128 / 256 and a full fine-tune at 1e-5, judged on held-out real users and on first-time payees, the
+measure that catches forgetting first.

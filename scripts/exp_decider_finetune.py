@@ -39,7 +39,9 @@ SPLIT = os.environ.get("SPLIT", "") == "1"
 RELIST = os.environ.get("RELIST", "") == "1"  # row 152: the options listed again after the query (oneslot.build_layout relist)
 POINTER = os.environ.get("POINTER", "") == "1"  # row 152 (MODEL-23): + a strands-style pointer over the relisted lines (ai_experiments.pointer); needs RELIST
 LORA_R = int(os.environ.get("LORA_R", "64"))  # row 153: strands' rank is 16
-LORA_AB = os.environ.get("LORA_AB", "") == "1"  # row 153: + strands' extra targets, the DeltaNet in_proj_a / in_proj_b
+LORA_AB = os.environ.get("LORA_AB", "") == "1"
+FULL_FT = os.environ.get("FULL_FT", "") == "1"  # row 156: every weight trained, fp32 master weights under bf16 autocast (section 28's bf16 weights may have
+# rounded small updates away); LR is then the full-tuning rate (1e-5, 3e-5); saved as a bf16 model directory, not an adapter  # row 153: + strands' extra targets, the DeltaNet in_proj_a / in_proj_b
 POINTER_LR = float(os.environ.get("POINTER_LR", "1e-3"))
 DESC = os.environ.get("DESC", "") == "1"  # row 136: each category in the list described by the payees filed under it in the prompt (oneslot.describe_categories)  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
@@ -64,12 +66,13 @@ SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += ("_relist" if RELIST else "") + ("_ptr" if POINTER else "")
 SFX += (f"_r{LORA_R}" if LORA_R != 64 else "") + ("_ab" if LORA_AB else "")
+SFX += f"_full{LR:g}" if FULL_FT else ""
 assert not POINTER or RELIST, "POINTER needs RELIST=1"
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 SFX_POOL = SFX  # the pool's name without the teacher suffix (dump_teacher_items.py names its file by it)
 SFX += f"_teach{round(TEACH_W * 100)}" if TEACHER else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
-NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_lora"  # slot_: row 79's one-slot Qwen3.5
+NAME = f"{'decider_' if 'decider' in MODEL else 'slot_'}{MODEL.split('/')[-1]}_{SFX}_{'full' if FULL_FT else 'lora'}"  # slot_: row 79's one-slot Qwen3.5
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
 
@@ -173,13 +176,13 @@ def main():
     sys.path.insert(0, snapshot_download(DECIDER_CODE, allow_patterns=["decider/*"]))  # decider's prompt code; the weights may be any Qwen3.5 (row 79)
     P = importlib.import_module("decider.prompt")
     tok = AutoTokenizer.from_pretrained(path)
-    lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda()
+    lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.float32 if FULL_FT else torch.bfloat16).cuda()
     lm.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False}); lm.enable_input_require_grads()
     torch.manual_seed(SEED)
     targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "out_proj",
                "qkv_proj", "gate_up_proj", "input_linear", "output_linear"]  # row 99b: Phi-3 fused and Granite 4 names
     targets += ["in_proj_a", "in_proj_b"] if LORA_AB else []
-    model = get_peft_model(lm, LoraConfig(r=LORA_R, lora_alpha=2 * LORA_R, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
+    model = lm if FULL_FT else get_peft_model(lm, LoraConfig(r=LORA_R, lora_alpha=2 * LORA_R, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
     head_w = lm.get_output_embeddings().weight  # decider ties or not; its readout is these rows (decider/model.py)
 
     from ai_experiments import oneslot
@@ -211,7 +214,8 @@ def main():
         att = torch.zeros_like(ids)
         for i, b in enumerate(built):
             ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
-        h = model.base_model.model.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
+        with torch.autocast("cuda", dtype=torch.bfloat16, enabled=FULL_FT):
+            h = (lm.model if FULL_FT else model.base_model.model.model)(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
         N = max(len(b["labs"]) for b in built)  # each question's own label tokens; padded options at -inf
         z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float()
                                + (ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")]) if ptr is not None else 0.0),
@@ -260,7 +264,11 @@ def main():
         with torch.no_grad():
             for e_, p_ in zip(ema, params):
                 p_.copy_(e_.to(p_.dtype))
-    OUT_DIR.mkdir(parents=True, exist_ok=True); model.save_pretrained(OUT_DIR)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    if FULL_FT:  # a whole model directory in bf16; exp_decision_models loads it in place of MODEL
+        lm.to(torch.bfloat16).save_pretrained(OUT_DIR); tok.save_pretrained(OUT_DIR)
+    else:
+        model.save_pretrained(OUT_DIR)
     if RELIST or POINTER:  # row 152: how to read this adapter (exp_decision_models picks it up)
         (OUT_DIR / "oneslot_extra.json").write_text(json.dumps(dict(relist=RELIST, pointer=POINTER)))
     if ptr is not None:
@@ -275,7 +283,7 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
-               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=LORA_R, lora_ab=LORA_AB, question=QUESTION, aux_lm=AUX_LM,
+               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=None if FULL_FT else LORA_R, lora_ab=LORA_AB, full_ft=FULL_FT, question=QUESTION, aux_lm=AUX_LM,
                abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
                evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA, teacher=TEACHER, teach_w=TEACH_W)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
