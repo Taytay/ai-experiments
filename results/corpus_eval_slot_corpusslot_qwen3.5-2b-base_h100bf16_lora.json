@@ -6,34 +6,34 @@
     "holdout_v5_norule": {
       "emotion": {
         "n": 1714,
-        "acc": 0.5315
+        "acc": 0.5327
       },
       "_all": {
         "n": 6000,
-        "acc": 0.6498
+        "acc": 0.6503
       },
       "sarcasm": {
         "n": 1104,
-        "acc": 0.6196
+        "acc": 0.6178
       },
       "massive_intent": {
         "n": 1753,
-        "acc": 0.8762
+        "acc": 0.8779
       },
       "hate_severity": {
         "n": 1429,
         "acc": 0.5374
       },
-      "_minutes": 0.69
+      "_minutes": 1.32
     },
     "multistep_v14_eval": {
       "contractnli": {
         "n": 1026,
-        "acc": 0.8616
+        "acc": 0.8626
       },
       "_all": {
         "n": 4084,
-        "acc": 0.8428
+        "acc": 0.843
       },
       "musique": {
         "n": 1199,
@@ -41,13 +41,13 @@
       },
       "boardgame": {
         "n": 900,
-        "acc": 0.8378
+        "acc": 0.8367
       },
       "hotpotqa": {
         "n": 959,
-        "acc": 0.7205
+        "acc": 0.7216
       },
-      "_minutes": 1.67
+      "_minutes": 2.49
     },
     "generated_v16_eval": {
       "gen:tradeoff": {
@@ -94,7 +94,7 @@
         "n": 48,
         "acc": 0.9583
       },
-      "_minutes": 0.17
+      "_minutes": 0.19
     },
     "generated_v18_eval": {
       "gen:exception": {
@@ -103,7 +103,7 @@
       },
       "_all": {
         "n": 247,
-        "acc": 0.7976
+        "acc": 0.7935
       },
       "gen:lookup_chain": {
         "n": 10,
@@ -159,7 +159,7 @@
       },
       "gen:version_in_force": {
         "n": 27,
-        "acc": 0.8148
+        "acc": 0.7778
       },
       "gen:tie_break": {
         "n": 23,
@@ -177,18 +177,18 @@
         "n": 31,
         "acc": 0.7419
       },
-      "_minutes": 0.12
+      "_minutes": 0.13
     },
     "adequacy_hs2_eval": {
       "adequacy_hs2": {
         "n": 234,
-        "acc": 0.7436
+        "acc": 0.7479
       },
       "_all": {
         "n": 234,
-        "acc": 0.7436
+        "acc": 0.7479
       },
-      "_minutes": 0.06
+      "_minutes": 0.07
     },
     "adequacy_gen_eval": {
       "gen:adequacy": {
@@ -199,7 +199,7 @@
         "n": 302,
         "acc": 0.8245
       },
-      "_minutes": 0.03
+      "_minutes": 0.04
     }
   }
 }

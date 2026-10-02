@@ -9115,3 +9115,57 @@ results/corpusslot_ft_corpusslot_qwen3.5-2b-base_h100bf16s1_lora.json: 86.7 min,
 calibration of the decider arm (its temperatures were not fitted), and more than two seeds. **For this project:** none of this changes the
 categoriser; it confirms on independent ground that decider's readout is not the weak link, and that a decider-style model trained on a
 general decision corpus is as good as strands' at 2B for less training.
+
+## 150. On strands' own tasks the two readouts complement each other a little, and one model with both captures most of it: v19 and decider's method multiplied gain a point on the held-out short tasks (66.2 against 65.2); a hybrid head (decider's label logits plus a strands-style pointer over the option lines, trained together on strands' corpus) reaches 65.9 [65.5, 66.3], both seeds above decider's [65.0, 65.3], and the best multi-step score (84.6), but does not recover v19's lead on emotion (MODEL-24)
+
+*PLAN step 155 (owner, 2026-10-02: "I wonder if we can apply any of our improvements to strands somehow?"; "Yes" to the product first,
+then a hybrid head if they complement each other). Code: `eval_corpus_slot.py PER_ITEM=1` (per-row log-probabilities: our loop for
+decider's readout; strands' own `collect_logits` / `predictions_from_logits` for v19), `scripts/corpus_ensemble.py`, `exp_corpus_slot.py
+POINTER=1` with `corpus_slot.option_line_ends` (the last token of each option line in decider's layout, from the newline tokens) and
+`ai_experiments.pointer` (gate initialised at 1); job lists `scripts/modal_jobs/r155*.json`; branch plan-155-strands-hybrid (PR #72).*
+
+Most of our improvements were built for reading a user's labelled history (the label-copying loss, the labelled layout, the episodes)
+and have nothing to act on in strands' one-document decisions. What could transfer is the readout itself. REPORT 149 showed each
+readout winning somewhere (decider's: MuSiQue, ordered scores; strands': emotion), so: (1) do they complement each other (calibrated
+per half of each set's rows on the other half, multiplied, recalibrated)? (2) does one model with both heads capture it? The hybrid is
+row 152's on our data: logit_k = <h_slot, W_lab[label_k]> + gate x pointer(h_slot, h_line_k), here reading decider's own option lines
+(they come after the question in its layout, so no relisting is needed); trained exactly as REPORT 149's arm, two seeds; gates at the end
+0.74 and 0.79.
+
+| set / task | n | v19 | decider's method (2 seeds) | v19 x decider's method | hybrid head (2 seeds) | decider's misses v19 gets right | v19's misses decider gets right |
+|---|---|---|---|---|---|---|---|
+| holdout_v5_norule / all | 6000 | 64.0 | 65.2 | 66.2 | 65.9 | 23% | 25% |
+| holdout_v5_norule / emotion | 1714 | 56.4 | 54.3 | 56.4 | 54.7 | 17% | 13% |
+| holdout_v5_norule / hate_severity | 1429 | 45.9 | 53.4 | 53.5 | 54.1 | 30% | 40% |
+| holdout_v5_norule / massive_intent | 1753 | 88.2 | 87.2 | 88.6 | 88.1 | 29% | 23% |
+| holdout_v5_norule / sarcasm | 1104 | 60.8 | 62.5 | 62.1 | 63.4 | 18% | 21% |
+| multistep_v14_eval / all | 4084 | 82.7 | 83.9 | 84.0 | 84.6 | 27% | 32% |
+| multistep_v14_eval / boardgame | 900 | 82.1 | 83.7 | 83.3 | 84.4 | 26% | 32% |
+| multistep_v14_eval / contractnli | 1026 | 87.2 | 86.8 | 87.4 | 88.0 | 25% | 23% |
+| multistep_v14_eval / hotpotqa | 959 | 71.7 | 69.9 | 71.9 | 70.3 | 30% | 26% |
+| multistep_v14_eval / musique | 1199 | 88.1 | 92.8 | 91.4 | 93.1 | 20% | 52% |
+| generated_v16_eval / all | 350 | 85.1 | 87.3 | 86.9 | 86.0 | 36% | 45% |
+| generated_v18_eval / all | 247 | 77.7 | 79.6 | 80.4 | 79.6 | 32% | 37% |
+| adequacy_hs2_eval / all | 234 | 72.2 | 72.0 | 75.0 | 73.7 | 35% | 35% |
+| adequacy_hs2_eval / adequacy_hs2 | 234 | 72.2 | 72.0 | 75.0 | 73.7 | 35% | 35% |
+| adequacy_gen_eval / all | 302 | 80.5 | 82.5 | 82.8 | 81.8 | 34% | 41% |
+| adequacy_gen_eval / gen:adequacy | 302 | 80.5 | 82.5 | 82.8 | 81.8 | 34% | 41% |
+
+Per seed on the two large sets: held-out short tasks decider's method 65.0 / 65.3, hybrid 65.5 / 66.3; multi-step decider's method
+84.3 / 83.5, hybrid 84.1 / 85.0. (decider's method reads 65.0 / 65.3 here against 65.0 / 65.2 in REPORT 149: re-scoring moves a row or two.)
+
+- **They complement each other, modestly.** Each reader gets 20 to 45% of the other's misses right. Multiplied they take the better of
+  the two on most tasks and a little more: held-out 66.2 (best single 65.2), HelpSteer2 adequacy 75.0 (72.2), generated v18 80.4 (79.6);
+  but they lose decider's MuSiQue lead (91.4 against 92.8).
+- **The hybrid captures most of that in one model.** Held-out 65.9, both seeds above both decider seeds; multi-step 84.6, the best of
+  every reader including the product (ContractNLI 88.0, BoardgameQA 84.4, MuSiQue 93.1, all at or above the best single reader), but its
+  seeds overlap decider's there. It does not get v19's emotion (54.7 against 56.4) or the product's adequacy gain (73.7 against 75.0), and
+  the small generated sets move by about a point either way, inside the 1.5-point re-run noise (REPORT 149).
+- **Against REPORT 147 on our data:** there the same hybrid added nothing, because decider's readout was already ahead everywhere; here
+  the two readouts each had ground of their own, and the hybrid takes some of strands'. A gain of under a point at the cost of a 1.3M-
+  parameter head that cannot be merged into the weights (and a hidden-state read at serving time) is not worth carrying into the
+  categoriser.
+
+**For strands' own models:** decider's label readout, added to their pointer, is the one improvement of ours that transfers: trained on
+their corpus from their torso it gains about a point and a half on their held-out tasks over v19 (64.0 to 65.9) and two on their multi-step
+sets (82.7 to 84.6), in one 90-minute run. Not adopted here (MODEL-24 answered).
