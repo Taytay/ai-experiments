@@ -1,0 +1,32 @@
+[
+ {
+  "tag": "r157-decider4b",
+  "env": {},
+  "cmds": [
+   "EMB_MODEL=Mapika/decider-4b uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_embed_cluster.py"
+  ]
+ },
+ {
+  "tag": "r157-recipe",
+  "env": {
+   "ADAPTERS_FROM": "r124-oth-s0"
+  },
+  "cmds": [
+   "EMB_MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_embed_cluster.py"
+  ]
+ },
+ {
+  "tag": "r157-qwen35base",
+  "env": {},
+  "cmds": [
+   "EMB_MODEL=Qwen/Qwen3.5-4B-Base uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_embed_cluster.py"
+  ]
+ },
+ {
+  "tag": "r157-qwen3emb",
+  "env": {},
+  "cmds": [
+   "EMB_MODEL=Qwen/Qwen3-Embedding-4B uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_embed_cluster.py"
+  ]
+ }
+]

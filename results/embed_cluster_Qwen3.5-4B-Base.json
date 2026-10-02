@@ -1,0 +1,433 @@
+{
+  "reader": "Qwen3.5-4B-Base",
+  "model": "Qwen/Qwen3.5-4B-Base",
+  "adapter": "",
+  "results": {
+    "payees | last @ 0.5": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 51.7,
+        "knn10": 50.0,
+        "nmi": 0.564,
+        "ari": 0.163,
+        "purity": 49.5
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 15.5,
+        "knn10": 21.1,
+        "nmi": 0.378,
+        "ari": 0.029,
+        "purity": 29.6
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 37.8,
+        "knn10": 38.0,
+        "nmi": 0.429,
+        "ari": 0.065,
+        "purity": 34.0
+      }
+    },
+    "payees | mean @ 0.5": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 58.6,
+        "knn10": 60.0,
+        "nmi": 0.642,
+        "ari": 0.237,
+        "purity": 57.4
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 20.7,
+        "knn10": 22.3,
+        "nmi": 0.415,
+        "ari": 0.043,
+        "purity": 31.2
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 38.2,
+        "knn10": 34.0,
+        "nmi": 0.426,
+        "ari": 0.06,
+        "purity": 36.6
+      }
+    },
+    "payees | last @ 0.75": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 58.6,
+        "knn10": 60.0,
+        "nmi": 0.668,
+        "ari": 0.293,
+        "purity": 60.5
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 22.1,
+        "knn10": 23.7,
+        "nmi": 0.377,
+        "ari": 0.03,
+        "purity": 29.6
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 62.2,
+        "knn10": 62.5,
+        "nmi": 0.65,
+        "ari": 0.242,
+        "purity": 58.0
+      }
+    },
+    "payees | mean @ 0.75": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 61.4,
+        "knn10": 60.0,
+        "nmi": 0.68,
+        "ari": 0.303,
+        "purity": 63.8
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 20.0,
+        "knn10": 23.5,
+        "nmi": 0.399,
+        "ari": 0.041,
+        "purity": 31.2
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 46.6,
+        "knn10": 47.5,
+        "nmi": 0.475,
+        "ari": 0.075,
+        "purity": 39.0
+      }
+    },
+    "payees | last @ 1": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 59.0,
+        "knn10": 58.1,
+        "nmi": 0.682,
+        "ari": 0.299,
+        "purity": 63.1
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 21.1,
+        "knn10": 23.2,
+        "nmi": 0.379,
+        "ari": 0.029,
+        "purity": 29.3
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 64.4,
+        "knn10": 65.3,
+        "nmi": 0.693,
+        "ari": 0.289,
+        "purity": 63.7
+      }
+    },
+    "payees | mean @ 1": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 60.5,
+        "knn10": 58.3,
+        "nmi": 0.672,
+        "ari": 0.272,
+        "purity": 61.7
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 23.5,
+        "knn10": 24.6,
+        "nmi": 0.411,
+        "ari": 0.044,
+        "purity": 31.0
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 47.0,
+        "knn10": 47.0,
+        "nmi": 0.506,
+        "ari": 0.108,
+        "purity": 42.8
+      }
+    },
+    "categories | last @ 0.5": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 67.4,
+        "knn10": 65.9,
+        "nmi": 0.205,
+        "ari": 0.036,
+        "purity": 37.0,
+        "knn1_othername": 48.2
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 32.6,
+        "knn10": 28.6,
+        "nmi": 0.491,
+        "ari": 0.083,
+        "purity": 38.8,
+        "knn1_othername": 32.6
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 70.5,
+        "knn10": 68.6,
+        "nmi": 0.235,
+        "ari": 0.035,
+        "purity": 35.8,
+        "knn1_othername": 48.6
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 66.3,
+        "knn10": 62.6,
+        "nmi": 0.223,
+        "ari": 0.019,
+        "purity": 57.8,
+        "knn1_othername": 50.0
+      }
+    },
+    "categories | mean @ 0.5": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 89.2,
+        "knn10": 86.7,
+        "nmi": 0.381,
+        "ari": 0.088,
+        "purity": 48.6,
+        "knn1_othername": 67.9
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 52.2,
+        "knn10": 45.1,
+        "nmi": 0.541,
+        "ari": 0.121,
+        "purity": 48.2,
+        "knn1_othername": 52.2
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 94.1,
+        "knn10": 91.3,
+        "nmi": 0.496,
+        "ari": 0.145,
+        "purity": 57.2,
+        "knn1_othername": 69.3
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 82.3,
+        "knn10": 74.8,
+        "nmi": 0.301,
+        "ari": 0.041,
+        "purity": 62.6,
+        "knn1_othername": 66.0
+      }
+    },
+    "categories | last @ 0.75": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 84.3,
+        "knn10": 80.2,
+        "nmi": 0.362,
+        "ari": 0.095,
+        "purity": 48.6,
+        "knn1_othername": 64.6
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 46.4,
+        "knn10": 40.2,
+        "nmi": 0.545,
+        "ari": 0.114,
+        "purity": 43.8,
+        "knn1_othername": 46.0
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 88.2,
+        "knn10": 83.3,
+        "nmi": 0.428,
+        "ari": 0.125,
+        "purity": 54.0,
+        "knn1_othername": 66.0
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 82.7,
+        "knn10": 77.6,
+        "nmi": 0.419,
+        "ari": 0.11,
+        "purity": 69.4,
+        "knn1_othername": 68.0
+      }
+    },
+    "categories | mean @ 0.75": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 90.9,
+        "knn10": 88.7,
+        "nmi": 0.502,
+        "ari": 0.142,
+        "purity": 59.2,
+        "knn1_othername": 74.4
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 48.7,
+        "knn10": 41.1,
+        "nmi": 0.532,
+        "ari": 0.103,
+        "purity": 46.9,
+        "knn1_othername": 48.7
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 96.3,
+        "knn10": 93.6,
+        "nmi": 0.635,
+        "ari": 0.236,
+        "purity": 69.5,
+        "knn1_othername": 77.4
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 87.4,
+        "knn10": 81.3,
+        "nmi": 0.393,
+        "ari": 0.083,
+        "purity": 67.3,
+        "knn1_othername": 74.5
+      }
+    },
+    "categories | last @ 1": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 87.4,
+        "knn10": 82.0,
+        "nmi": 0.408,
+        "ari": 0.123,
+        "purity": 51.7,
+        "knn1_othername": 69.1
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 53.6,
+        "knn10": 40.6,
+        "nmi": 0.533,
+        "ari": 0.097,
+        "purity": 41.5,
+        "knn1_othername": 53.6
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 91.0,
+        "knn10": 85.3,
+        "nmi": 0.496,
+        "ari": 0.158,
+        "purity": 58.5,
+        "knn1_othername": 70.2
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 85.7,
+        "knn10": 78.2,
+        "nmi": 0.477,
+        "ari": 0.17,
+        "purity": 75.2,
+        "knn1_othername": 71.1
+      }
+    },
+    "categories | mean @ 1": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 91.5,
+        "knn10": 88.9,
+        "nmi": 0.533,
+        "ari": 0.16,
+        "purity": 61.5,
+        "knn1_othername": 74.6
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 44.2,
+        "knn10": 43.8,
+        "nmi": 0.551,
+        "ari": 0.128,
+        "purity": 45.1,
+        "knn1_othername": 44.2
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 97.3,
+        "knn10": 93.2,
+        "nmi": 0.629,
+        "ari": 0.249,
+        "purity": 69.7,
+        "knn1_othername": 77.7
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 89.1,
+        "knn10": 77.2,
+        "nmi": 0.386,
+        "ari": 0.061,
+        "purity": 66.3,
+        "knn1_othername": 79.9
+      }
+    }
+  }
+}
