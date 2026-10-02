@@ -29,6 +29,8 @@ assert INIT in ("v19", "base"), INIT
 os.environ["MODEL"] = SD.V19  # only names exp_decider_finetune's (unused) run; the episodes do not depend on it
 LABELLED = os.environ.get("STATE", "") == "labelled"  # row 152 (MODEL-23): our labelled layout inside strands' state (SD.labelled)
 AUX_SHOTS = float(os.environ.get("AUX_SHOTS", "0"))  # row 152: + w x the loss on the history rows' codes (the recipe's shot-label loss)
+BASE = os.environ.get("BASE", SD.BASE)  # row 153: Qwen/Qwen3.5-4B-Base for a 4B torso (INIT=base only)
+POINTER_DIM = int(os.environ.get("POINTER_DIM", "256"))  # row 153: scaled with the torso's width (320 at 4B: 256 x 2560 / 2048)
 HEAD_LR = float(os.environ.get("HEAD_LR", "2e-4" if INIT == "v19" else "1e-3"))
 _argv = sys.argv
 _src = (ROOT / "scripts" / "exp_decider_finetune.py").read_text().split("\ndef main():")[0]
@@ -37,7 +39,8 @@ exec(compile(_src, "exp_decider_finetune.py", "exec"), G)
 sys.argv = _argv
 STEPS, MICRO, LR, SEED = G["STEPS"], G["MICRO"], G["LR"], G["SEED"]
 assert not G["AUX_LM"] and not G["TEACHER"] and not G["LAYOUT"], "AUX_LM, TEACHER and LAYOUT are the decider readout's; not used here"
-NAME = f"strands_{INIT}_{G['SFX']}" + ("_lab" if LABELLED else "") + (f"_aux{round(AUX_SHOTS * 100)}" if AUX_SHOTS else "")
+assert INIT == "base" or (BASE == SD.BASE and POINTER_DIM == 256), "BASE / POINTER_DIM apply to INIT=base"
+NAME = f"strands_{INIT}{'' if BASE == SD.BASE else '-' + BASE.split('-')[-2].lower()}{'' if POINTER_DIM == 256 else f'_pd{POINTER_DIM}'}_{G['SFX']}" + ("_lab" if LABELLED else "") + (f"_aux{round(AUX_SHOTS * 100)}" if AUX_SHOTS else "")
 assert not AUX_SHOTS or LABELLED, "AUX_SHOTS needs STATE=labelled (the codes it predicts)"  # the episode suffix carries RUN_TAG and the seed
 OUT_DIR = ROOT / "models" / "adapters" / NAME
 
@@ -53,7 +56,8 @@ def build_model():
     else:
         from strands_decider.modeling import checkpoint_dir, config_path
         v19 = StrandsDeciderConfig.from_json(config_path(checkpoint_dir(SD.V19)))  # v19's architecture: pointer dim, LoRA rank and targets
-        cfg =StrandsDeciderConfig(**{**v19.__dict__, "temperature": 1.0, "temperature_by_kind": {}, "kl_frozen_weight": 0.0})
+        cfg = StrandsDeciderConfig(**{**v19.__dict__, "temperature": 1.0, "temperature_by_kind": {}, "kl_frozen_weight": 0.0,
+                                      "base_model": BASE, "pointer_dim": POINTER_DIM})
         torch.manual_seed(SEED)
         m = StrandsDeciderModel.from_pretrained_base(cfg)
         if m.tokenizer.pad_token is None:
@@ -122,9 +126,9 @@ def main():
 
 if __name__ == "__main__":
     from ai_experiments.licences import open_licence
-    open_licence(SD.V19)
+    open_licence(SD.V19); open_licence(BASE)
     C = G["C"]
-    cfg = dict(model=SD.V19 if INIT == "v19" else SD.BASE, init=INIT, state="labelled" if LABELLED else "plain", aux_shots=AUX_SHOTS, steps=STEPS, micro=MICRO, lr=LR, head_lr=HEAD_LR, seed=SEED, episodes_sfx=G["SFX"],
+    cfg = dict(model=SD.V19 if INIT == "v19" else BASE, pointer_dim=POINTER_DIM, init=INIT, state="labelled" if LABELLED else "plain", aux_shots=AUX_SHOTS, steps=STEPS, micro=MICRO, lr=LR, head_lr=HEAD_LR, seed=SEED, episodes_sfx=G["SFX"],
                fold=C["FOLD"], rename=C["RENAME"], dbep=C["DBEP"], lora_r=16, question=G["QUESTION"], evfree=G["EVFREE"], evfree_mode=G["EVFREE_MODE"])
     with Run("strands_finetune", model=cfg["model"], config=cfg) as run:
         stats = main()

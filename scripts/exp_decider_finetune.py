@@ -38,6 +38,8 @@ TEACH_W = float(os.environ.get("TEACH_W", "0.5"))  # the target on those episode
 SPLIT = os.environ.get("SPLIT", "") == "1"
 RELIST = os.environ.get("RELIST", "") == "1"  # row 152: the options listed again after the query (oneslot.build_layout relist)
 POINTER = os.environ.get("POINTER", "") == "1"  # row 152 (MODEL-23): + a strands-style pointer over the relisted lines (ai_experiments.pointer); needs RELIST
+LORA_R = int(os.environ.get("LORA_R", "64"))  # row 153: strands' rank is 16
+LORA_AB = os.environ.get("LORA_AB", "") == "1"  # row 153: + strands' extra targets, the DeltaNet in_proj_a / in_proj_b
 POINTER_LR = float(os.environ.get("POINTER_LR", "1e-3"))
 DESC = os.environ.get("DESC", "") == "1"  # row 136: each category in the list described by the payees filed under it in the prompt (oneslot.describe_categories)  # row 118: episodes in the split layout (shared rows, then the query payee's rows; oneslot.split_rows)
 LABELS = os.environ.get("LABELS", "letters")  # owner 2026-09-27: option labels (ai_experiments.oneslot): letters | rand26 | rand255
@@ -61,6 +63,7 @@ SFX += (f"_lay{LAYOUT}" if LAYOUT else "") + ("_dow" if DOW_FIRST else "") + ("_
 SFX += f"_ema{str(EMA).split('.')[-1]}" if EMA else ""
 SFX += f"_ev{round(EVFREE * 100)}{EVFREE_MODE}" if EVFREE else ""
 SFX += ("_relist" if RELIST else "") + ("_ptr" if POINTER else "")
+SFX += (f"_r{LORA_R}" if LORA_R != 64 else "") + ("_ab" if LORA_AB else "")
 assert not POINTER or RELIST, "POINTER needs RELIST=1"
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
 SFX_POOL = SFX  # the pool's name without the teacher suffix (dump_teacher_items.py names its file by it)
@@ -175,7 +178,8 @@ def main():
     torch.manual_seed(SEED)
     targets = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj", "in_proj_qkv", "in_proj_z", "out_proj",
                "qkv_proj", "gate_up_proj", "input_linear", "output_linear"]  # row 99b: Phi-3 fused and Granite 4 names
-    model = get_peft_model(lm, LoraConfig(r=64, lora_alpha=128, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
+    targets += ["in_proj_a", "in_proj_b"] if LORA_AB else []
+    model = get_peft_model(lm, LoraConfig(r=LORA_R, lora_alpha=2 * LORA_R, lora_dropout=0.0, bias="none", task_type="CAUSAL_LM", target_modules=targets))
     head_w = lm.get_output_embeddings().weight  # decider ties or not; its readout is these rows (decider/model.py)
 
     from ai_experiments import oneslot
@@ -271,7 +275,7 @@ if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
     cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
-               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=64, question=QUESTION, aux_lm=AUX_LM,
+               poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=LORA_R, lora_ab=LORA_AB, question=QUESTION, aux_lm=AUX_LM,
                abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
                evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA, teacher=TEACHER, teach_w=TEACH_W)
     with Run("decider_finetune", model=MODEL, config=cfg) as run:
