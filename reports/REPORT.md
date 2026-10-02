@@ -9235,3 +9235,65 @@ generators better and forgets the base model's knowledge. With real data (about 
 changes: the training set will be far larger and varied, and what the model must know about merchants will be in the data itself. The
 probe to repeat then: rank 64 / 128 / 256 and a full fine-tune at 1e-5, judged on held-out real users and on first-time payees, the
 measure that catches forgetting first.
+
+## 152. decider's hidden states make good embeddings of payees and budget categories: read at the last token of a short cue on the final layer, untrained decider-4B puts a user's category next to another user's category of the same kind under a different name 82% of the time (no model 45%, the purpose-built Qwen3-Embedding-4B 63%, its own base Qwen3.5-4B-Base 69%), and its k-means clusters match the generators' kinds best (NMI 0.63); the recipe's adapter adds what the merchant database taught it (a payee's kind from its statement name alone, 1-NN 63% against 46% untrained and 26% for the embedder) (MODEL-25)
+
+*PLAN step 157 (owner, 2026-10-02: "We can extract embeddings from decider somehow, right? Let's experiment with doing so, and with
+clustering to see if it works."). Code: `scripts/exp_embed_cluster.py`, `scripts/embed_tables.py`; job list `scripts/modal_jobs/r157.json`;
+branch plan-157-embeddings (PR #74). One deterministic run per reader (no training).*
+
+**What is embedded.** Payees (kindpay_v2, blind_v2's world: about 420 payees, each rendered three ways: the statement string alone; with
+the other-users line; the line alone with the name hidden) and user categories (kindcat_v2: 2,867 (user, category) pairs, the text
+`Budget category "<name>". Payees filed under it: <up to 8 payee names from the user's history slice>`, or the name alone when the
+slice shows none). Gold: the generator's canonical kind of the payee (41 kinds), and what the category holds (a kind, "several kinds",
+or a person / trip / purpose). Objects with identical text are kept once (labelled with their commonest gold); payees are scored within
+one rendering at a time.
+
+**How.** A decoder's hidden state at the last token of the text followed by a cue ("In one word, the kind of spending:"), or the mean
+over the text's tokens, at half, three quarters and all of the depth; the embedder read its documented way (an instruction, the last
+token, the final layer); a no-model TF-IDF + SVD baseline (character n-grams of the payee text; the filed payee names and the category
+name). Measures: leave-one-out nearest-neighbour accuracy (cosine) against the gold, and for categories the nearest neighbour among
+categories with another name, so that "Grocery" next to another user's "Grocery" does not count (that is name matching, the measure
+without the restriction is 89 to 96% for every reader); k-means with as many clusters as gold kinds, NMI and purity.
+
+| reader | read-out | payees: name 1-NN | name + filings 1-NN | filings 1-NN | name + filings NMI | categories: 1-NN other name | 0 rows | 1-2 rows | 3+ rows | NMI | purity |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| no model (TF-IDF + SVD) | tfidf-svd @ 1 | 21.4 | 51.8 | 57.9 | 0.624 | 45.2 | 42.4 | 46.4 | 59.9 | 0.488 | 55.6 |
+| Qwen3.5-4B-Base | last @ 0.5 | 15.5 | 37.8 | 51.7 | 0.429 | 48.2 | 32.6 | 48.6 | 50.0 | 0.205 | 37.0 |
+| Qwen3.5-4B-Base | last @ 0.75 | 22.1 | 62.2 | 58.6 | 0.65 | 64.6 | 46.0 | 66.0 | 68.0 | 0.362 | 48.6 |
+| Qwen3.5-4B-Base | last @ 1 | 21.1 | 64.4 | 59.0 | 0.693 | 69.1 | 53.6 | 70.2 | 71.1 | 0.408 | 51.7 |
+| Qwen3.5-4B-Base | mean @ 0.5 | 20.7 | 38.2 | 58.6 | 0.426 | 67.9 | 52.2 | 69.3 | 66.0 | 0.381 | 48.6 |
+| Qwen3.5-4B-Base | mean @ 0.75 | 20.0 | 46.6 | 61.4 | 0.475 | 74.4 | 48.7 | 77.4 | 74.5 | 0.502 | 59.2 |
+| Qwen3.5-4B-Base | mean @ 1 | 23.5 | 47.0 | 60.5 | 0.506 | 74.6 | 44.2 | 77.7 | 79.9 | 0.533 | 61.5 |
+| decider-4B, untrained | last @ 0.5 | 21.8 | 52.3 | 56.9 | 0.576 | 61.3 | 51.8 | 61.4 | 60.9 | 0.379 | 51.0 |
+| decider-4B, untrained | last @ 0.75 | 45.5 | 65.3 | 57.4 | 0.712 | 79.5 | 69.2 | 79.4 | 81.6 | 0.611 | 67.7 |
+| decider-4B, untrained | last @ 1 | 46.0 | 66.5 | 56.4 | 0.73 | 82.0 | 74.1 | 82.2 | 84.7 | 0.63 | 72.0 |
+| decider-4B, untrained | mean @ 0.5 | 22.5 | 42.3 | 58.8 | 0.457 | 68.1 | 54.9 | 68.3 | 69.4 | 0.404 | 51.2 |
+| decider-4B, untrained | mean @ 0.75 | 21.4 | 50.4 | 62.1 | 0.509 | 74.6 | 54.0 | 76.6 | 73.8 | 0.531 | 61.4 |
+| decider-4B, untrained | mean @ 1 | 23.9 | 46.6 | 61.4 | 0.49 | 74.2 | 47.8 | 77.0 | 76.5 | 0.521 | 61.0 |
+| decider-4B + recipe | last @ 0.5 | 27.9 | 55.8 | 59.3 | 0.58 | 66.2 | 57.1 | 65.9 | 69.4 | 0.455 | 55.7 |
+| decider-4B + recipe | last @ 0.75 | 61.0 | 67.7 | 56.7 | 0.705 | 74.9 | 77.2 | 72.4 | 81.6 | 0.541 | 62.8 |
+| decider-4B + recipe | last @ 1 | 63.1 | 66.3 | 57.4 | 0.697 | 78.4 | 77.7 | 77.0 | 82.7 | 0.571 | 67.7 |
+| decider-4B + recipe | mean @ 0.5 | 24.9 | 46.6 | 61.2 | 0.487 | 72.3 | 63.4 | 73.2 | 69.7 | 0.467 | 56.9 |
+| decider-4B + recipe | mean @ 0.75 | 23.7 | 55.6 | 63.1 | 0.584 | 78.0 | 56.2 | 80.4 | 78.9 | 0.54 | 61.2 |
+| decider-4B + recipe | mean @ 1 | 22.5 | 51.8 | 59.5 | 0.535 | 76.9 | 50.4 | 80.1 | 78.6 | 0.564 | 64.5 |
+| Qwen3-Embedding-4B (embedder) | last @ 1 | 25.6 | 69.4 | 61.0 | 0.709 | 63.4 | 74.1 | 61.4 | 67.0 | 0.395 | 47.9 |
+
+- **decider is a better category embedder than an embedding model.** Last token at the final layer: 82.0% of categories sit next to a
+  differently named category of the same kind (no model 45.2, Qwen3-Embedding-4B 63.4, Qwen3.5-4B-Base 69.1), 74% even for a bare name
+  with no payees shown ("0 rows": the embedder 74.1, no model 42.4); k-means NMI 0.63 and purity 72% against 0.49 / 56% (no model) and
+  0.40 / 48% (embedder). The cue matters: decider's decision training makes the state at "the kind of spending:" a summary of the
+  kind; its base model gains far less from the same cue (69.1), and mean pooling is about 74 for every decoder.
+- **The recipe teaches payee names.** From the statement string alone, the recipe's adapter puts a payee next to one of the same kind
+  63% of the time (untrained decider 46, the embedder 26, no model 21): what the database episodes and other-users lines taught it about
+  merchants shows up in its states. With the other users' filings in the text, every model is close (decider 66 to 68, the embedder 69).
+  On categories the adapter is a little below untrained decider (78.4 against 82.0).
+- **Caveats.** The kinds are the generators'; payees and categories come from blind_v2's world, which our training never saw, but the
+  recipe's database merchants overlap real brand names. One run per reader; differences of a few points between read-outs are not
+  established. Mid-depth states (1/2) are worst for decider; for this use read the final layer.
+
+**What it can be used for** (not run here): (1) row 150's population concepts with decider's category embeddings in place of TF-IDF of
+payee keys, and the payee profile mapped onto a user's own categories by nearest embedding: the no-model suggestion for first-time payees
+was 52% right first / 70% in the top three; (2) a payee's kind from its nearest labelled payees, as the "Kind:" line for first-time payees
+(REPORT 144: a known kind took first-time payees from 60 to 77% right first); (3) at serving time, the embedding is one extra read of a
+forward pass decider already runs.

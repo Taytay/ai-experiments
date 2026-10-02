@@ -1,0 +1,78 @@
+{
+  "reader": "Qwen3-Embedding-4B",
+  "model": "Qwen/Qwen3-Embedding-4B",
+  "adapter": "",
+  "results": {
+    "payees | last @ 1": {
+      "filings": {
+        "n": 420,
+        "k": 39,
+        "knn1": 61.0,
+        "knn10": 60.0,
+        "nmi": 0.699,
+        "ari": 0.352,
+        "purity": 63.8
+      },
+      "name": {
+        "n": 426,
+        "k": 40,
+        "knn1": 25.6,
+        "knn10": 24.9,
+        "nmi": 0.405,
+        "ari": 0.041,
+        "purity": 31.7
+      },
+      "name+filings": {
+        "n": 421,
+        "k": 39,
+        "knn1": 69.4,
+        "knn10": 68.9,
+        "nmi": 0.709,
+        "ari": 0.38,
+        "purity": 67.5
+      }
+    },
+    "categories | last @ 1": {
+      "all": {
+        "n": 2071,
+        "k": 33,
+        "knn1": 67.6,
+        "knn10": 69.6,
+        "nmi": 0.395,
+        "ari": 0.108,
+        "purity": 47.9,
+        "knn1_othername": 63.4
+      },
+      "0 rows": {
+        "n": 224,
+        "k": 33,
+        "knn1": 74.1,
+        "knn10": 53.6,
+        "nmi": 0.678,
+        "ari": 0.249,
+        "purity": 59.8,
+        "knn1_othername": 74.1
+      },
+      "1-2 rows": {
+        "n": 1553,
+        "k": 33,
+        "knn1": 65.2,
+        "knn10": 68.1,
+        "nmi": 0.446,
+        "ari": 0.144,
+        "purity": 50.2,
+        "knn1_othername": 61.4
+      },
+      "3+ rows": {
+        "n": 294,
+        "k": 18,
+        "knn1": 70.4,
+        "knn10": 71.8,
+        "nmi": 0.384,
+        "ari": 0.072,
+        "purity": 67.0,
+        "knn1_othername": 67.0
+      }
+    }
+  }
+}
