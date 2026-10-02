@@ -1271,6 +1271,11 @@ from v19's torso (Qwen3.5-2B-Base); scored on strands' evaluations beside v19 re
 **Status (2026-10-02):** PLAN step 154, REPORT.md 149: decider's method >= v19 on most of its evaluations (held-out 65.1 vs 64.0, MuSiQue 92.9 vs 88.1), for one 85-minute run; JevBench not run.
 **Status (2026-10-02):** PLAN step 155, REPORT.md 150: the readouts complement a little on strands' tasks; a hybrid head gets most of it (held-out 65.9 vs 65.2); not carried into the categoriser.
 
+**TRAIN-14 Is the adapter's capacity binding?** Rank 16 lost up to 6 points where the history decides (REPORT 148); full fine-tuning
+was tried only once, on another task (section 28). *Experiment:* the decider-4B recipe at LoRA rank 128 and 256 and fully fine-tuned
+at 1e-5 and 3e-5 with fp32 master weights; blind sets, first-time payees and new users (forgetting), behaviour sets, REAL-7 as a diagnostic.
+**Status (2026-10-02):** PLAN step 156, REPORT.md 151: rank 128 = rank 64; more capacity forgets the base model's knowledge (first-time payees 59.9 -> 48 / 37.5); rank 64 stays; repeat with real data.
+
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
