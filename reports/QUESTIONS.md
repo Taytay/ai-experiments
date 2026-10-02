@@ -1263,6 +1263,7 @@ its own trainer and config; against decider-2B / -4B with the recipe on REAL-6, 
 payees. *Experiment:* a strands-style pointer added to decider's label readout (options relisted after the query; decider-2B / -4B, a
 relisted control); strands reading our labelled history with and without the shot-label loss.
 **Status (2026-10-01):** PLAN step 152, REPORT.md 147: the shot-label loss, not the readout, teaches invented names; the pointer adds nothing; not adopted.
+**Status (2026-10-01):** PLAN step 153, REPORT.md 148: strands on a 4B torso with the shot-label loss = decider-4B (ahead on invented names, a point behind on blind_v1); strands' LoRA targets no effect; rank 16 a trade.
 
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed

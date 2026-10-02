@@ -1,4 +1,4 @@
-"""Tables for PLAN steps 151 and 152 (MODEL-22, owner 2026-10-01): strands-decider (StrandsAgents/strands-decider-2B-hobson-v19, a LoRA on
+"""Tables for PLAN steps 151 to 153 (MODEL-22, owner 2026-10-01): strands-decider (StrandsAgents/strands-decider-2B-hobson-v19, a LoRA on
 Qwen3.5-2B-Base plus a pointer head) against this repo's readers.
   S.1  top-1 per item set (mean [range] over seeds): REAL-6 v1 (fold 0 users), novel names, mislead, override, blind_v1 / v2 without and
        with the other-users line. Readers: untrained (strands v19, decider-4B, decider-35B, kev-4B), and trained on the categoriser's
@@ -44,6 +44,10 @@ READERS = {  # name: file pattern ({set} is the item set's name, "real6" for REA
     "decider-2B + recipe + pointer": DEC.replace("{size}", "2b").replace("{s}", "*").replace("ev10soft_lora", "ev10soft_relist_ptr_lora"),
     "decider-4B + recipe, options relisted (control)": DEC.replace("{size}", "4b").replace("{s}", "*").replace("ev10soft_lora", "ev10soft_relist_lora"),
     "decider-4B + recipe + pointer": DEC.replace("{size}", "4b").replace("{s}", "*").replace("ev10soft_lora", "ev10soft_relist_ptr_lora"),
+    # row 153
+    "strands on Qwen3.5-4B-Base (head 320), labelled + shot-code loss": "strands_strands_base-4b_pd320_" + EP.replace("{s}", "*") + "_ev10soft_lab_aux100_{set}.noctx.jsonl",
+    "decider-4B + recipe, + strands' LoRA targets (in_proj_a / b)": DEC.replace("{size}", "4b").replace("{s}", "*").replace("ev10soft_lora", "ev10soft_ab_lora"),
+    "decider-4B + recipe, LoRA rank 16": DEC.replace("{size}", "4b").replace("{s}", "*").replace("ev10soft_lora", "ev10soft_r16_lora"),
 }
 SETS = [("REAL-6 v1", "real6", None), ("novel names", "real6_v1_novel", "real6_v1_novel"), ("mislead", "mislead_v1", "mislead_v1"),
         ("override", "override_v1", "override_v1"), ("blind_v1", "blind_v1", "blind_v1"), ("blind_v1 + line", "blind_v1_others", "blind_v1_others"),
