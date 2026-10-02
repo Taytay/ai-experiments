@@ -1281,6 +1281,7 @@ categories, and do they cluster by kind? *Experiment:* last-token (after a cue) 
 recipe) and Qwen3.5-4B-Base, against Qwen3-Embedding-4B and TF-IDF; nearest neighbours and k-means against the generators' kinds.
 **Status (2026-10-02):** PLAN step 157, REPORT.md 152: yes; decider's cued final-layer state beats the embedder on categories (82 vs 63); the recipe knows payee kinds from names.
 **Status (2026-10-02):** PLAN step 158, REPORT.md 153: personal embeddings (history in front) move toward the user's category for known payees and p2p, away for first-time payees and new users.
+**Status (2026-10-02):** PLAN step 159, REPORT.md 154: embeddings align two users' categories (85%); for canonical kinds ask the question (58% vs 49%).
 
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed

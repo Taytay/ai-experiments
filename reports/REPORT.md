@@ -9399,3 +9399,60 @@ gold category is the nearest with and without history.
 **What it means.** Personal embeddings work as intended for what the user has done before, including person-to-person payees whose
 meaning is only in the history, and should be global for anything new. For filing a transaction, decider's own answer stays the reader;
 personal embeddings are for what an answer does not give: finding a user's categories that behave alike, comparing users, retrieval.
+
+## 154. Embeddings map one user's categories onto another's well (the recipe's personal embeddings put a category of A next to B's category of the same kind 85% of the time, 82% when the names differ; no model 24%), but map categories onto canonical kinds worse than asking decider the question (49% against 58% right first), and fail on "several kinds" and "person / purpose" categories, which a canonical label does not describe (MODEL-25)
+
+*PLAN step 159 (owner, 2026-10-02: "Can you use embeddings to map canonical categories to a personal set of categories or to map two
+users' categories together?"). Code: `scripts/exp_category_mapping.py`, `scripts/mapping_tables.py`; job list `scripts/modal_jobs/r159.json`;
+branch plan-159-category-mapping (PR #76). One deterministic run per reader. Gold: kindcat_v2 (blind_v2's users: 2,867 categories, each a
+canonical kind, "several kinds of spending", or "a person, trip or purpose"). The multiple-choice answers are rows 147 / 148's.*
+
+**Canonical.** Each user category to the nearest of the 43 canonical options, each option embedded as `Budget category "<option>"`
+(REPORT 152's read-out), against decider asked "Which kind of spending does this user's category hold?" with the options listed.
+**User to user.** 600 user pairs; each of A's one-kind categories to B's nearest category, counted where B has a category of that kind;
+right when B's nearest holds the same kind. Category embeddings: the name; the name with the payees filed under it; personal (the
+user's history slice in front of the name, REPORT 153).
+
+**Canonical: each user category to one of 43 canonical options, right first % (top 3 %)**
+
+| method | all | one kind | several kinds | person / purpose | 0 rows shown |
+|---|---|---|---|---|---|
+| decider-4B untrained, asked (multiple choice) | 57.8 (81.7) | 78.1 (87.1) | 6.2 (69.1) | 37.1 (72.1) | 65.6 (85.9) |
+| decider-35B untrained, asked (multiple choice) | 53.2 (76.8) | 73.4 (89.5) | 12.8 (61.2) | 0.0 (14.8) | 54.9 (83.5) |
+| decider-4B recipe, asked (multiple choice) | 52.9 (71.0) | 75.7 (84.2) | 1.2 (37.8) | 12.2 (56.8) | 64.3 (76.6) |
+| Qwen3-Embedding-4B, nearest (name) | 51.4 (72.9) | 61.7 (79.7) | 25.4 (59.6) | 40.2 (55.0) | 57.7 (79.4) |
+| Qwen3-Embedding-4B, nearest (name + filed) | 45.2 (61.4) | 63.2 (79.6) | 5.1 (19.9) | 10.9 (28.8) | 57.7 (79.4) |
+| no model (TF-IDF), nearest (name (TF-IDF)) | 31.5 (37.4) | 43.2 (49.0) | 2.2 (8.5) | 18.8 (24.0) | 35.5 (41.1) |
+| decider-4B untrained, nearest (name) | 42.9 (59.7) | 61.8 (80.3) | 2.5 (4.0) | 0.9 (48.9) | 53.9 (72.4) |
+| decider-4B untrained, nearest (name + filed) | 46.6 (59.9) | 67.8 (84.0) | 0.6 (1.0) | 1.7 (29.3) | 53.9 (72.4) |
+| decider-4B untrained, nearest (personal (history in front)) | 35.4 (51.3) | 50.0 (71.5) | 0.0 (0.0) | 16.2 (31.0) | 41.9 (61.8) |
+| decider-4B recipe, nearest (name) | 46.5 (63.2) | 63.5 (79.3) | 7.1 (9.7) | 17.5 (85.2) | 56.4 (74.8) |
+| decider-4B recipe, nearest (name + filed) | 47.2 (58.8) | 67.1 (78.2) | 3.1 (5.3) | 8.3 (52.0) | 56.4 (74.8) |
+| decider-4B recipe, nearest (personal (history in front)) | 49.1 (61.9) | 70.2 (82.8) | 0.6 (1.0) | 13.5 (64.6) | 59.9 (75.0) |
+
+**User to user: each one-kind category of user A to user B's nearest category (600 user pairs), right %**
+
+| method | all | B's category of that kind has another name | B has one with the same name |
+|---|---|---|---|
+| Qwen3-Embedding-4B (name) | 75.4 (n=2079) | 69.9 (n=1699) | 100.0 (n=380) |
+| Qwen3-Embedding-4B (name + filed) | 53.3 (n=2079) | 48.6 (n=1699) | 74.5 (n=380) |
+| no model (TF-IDF) (name (TF-IDF)) | 37.5 (n=2079) | 23.5 (n=1699) | 100.0 (n=380) |
+| decider-4B untrained (name) | 76.8 (n=2079) | 71.6 (n=1699) | 100.0 (n=380) |
+| decider-4B untrained (name + filed) | 79.2 (n=2079) | 75.0 (n=1699) | 97.9 (n=380) |
+| decider-4B untrained (personal (history in front)) | 71.8 (n=2079) | 67.6 (n=1699) | 90.5 (n=380) |
+| decider-4B recipe (name) | 80.4 (n=2079) | 76.0 (n=1699) | 100.0 (n=380) |
+| decider-4B recipe (name + filed) | 73.9 (n=2079) | 70.3 (n=1699) | 89.7 (n=380) |
+| decider-4B recipe (personal (history in front)) | 85.4 (n=2079) | 82.3 (n=1699) | 99.2 (n=380) |
+
+- **Across users, embeddings work.** decider-4B with the recipe and the history in front maps A's category to B's of the same kind
+  85.4% of the time, 82.3% when B calls it something else (no model 23.5, Qwen3-Embedding-4B 69.9, untrained decider 75.0 at best). As
+  in REPORT 153, the history helps the recipe's embeddings (80.4 -> 85.4) and hurts the untrained model's (76.8 -> 71.8). This is the
+  operation behind the other-users line in a user's own category names (row 150's mapped profile used TF-IDF concepts for it) and behind
+  comparing or grouping users.
+- **Onto canonical kinds, asking beats embedding.** Nearest canonical option: 49.1% right first at best (the recipe, personal), 51.4% for
+  the embedder; decider asked the multiple-choice question: 57.8% (one-kind categories 78.1 against at most 70.2). The gap is in the
+  categories a canonical label does not describe: "several kinds of spending" 0.6 to 7.1% by decider's embeddings (25.4% by the
+  embedder) and "a person, trip or purpose" 1 to 17.5% (40.2%), because a category like "Everything Else" or "Mom" lies near no single
+  kind label. Asked, decider reads 6.2% and 37.1% on these; none of the methods handles "several kinds" well right first.
+- **Use each where it fits:** embeddings to align users' categories with each other (and to pick the user's category nearest another
+  user's for the other-users line); the multiple-choice question to label a category with a canonical kind.
