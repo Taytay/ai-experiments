@@ -9253,8 +9253,8 @@ one rendering at a time.
 over the text's tokens, at half, three quarters and all of the depth; the embedder read its documented way (an instruction, the last
 token, the final layer); a no-model TF-IDF + SVD baseline (character n-grams of the payee text; the filed payee names and the category
 name). Measures: leave-one-out nearest-neighbour accuracy (cosine) against the gold, and for categories the nearest neighbour among
-categories with another name, so that "Grocery" next to another user's "Grocery" does not count (that is name matching, the measure
-without the restriction is 89 to 96% for every reader); k-means with as many clusters as gold kinds, NMI and purity.
+categories with another name, so that "Grocery" next to another user's "Grocery" does not count (that is name matching: without the restriction
+the measure is 67 to 93% across readers and read-outs, and the no-model baseline is highest at 93); k-means with as many clusters as gold kinds, NMI and purity.
 
 | reader | read-out | payees: name 1-NN | name + filings 1-NN | filings 1-NN | name + filings NMI | categories: 1-NN other name | 0 rows | 1-2 rows | 3+ rows | NMI | purity |
 |---|---|---|---|---|---|---|---|---|---|---|---|
