@@ -9,7 +9,7 @@
 set -euo pipefail
 SHA=f91487ab8f7e4b4967ae57e46b8d90e91e67d616
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-OUT="$ROOT/data/external/strands_corpus"
+OUT="${CORPUS_OUT:-$ROOT/data/external/strands_corpus}"  # on Modal: CORPUS_OUT=/out/strands_corpus_v19 (the results volume; the app saves only results/, models/adapters, evals)
 SRC=/tmp/strands-decider-$SHA
 if ! command -v curl >/dev/null; then  # the Modal image has no curl; their recipe's fetch stage uses it
   (apt-get update -qq && apt-get install -y -qq curl) >/dev/null 2>&1 || {

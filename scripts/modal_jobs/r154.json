@@ -4,11 +4,11 @@
   "env": {
    "SEED": "0",
    "RUN_TAG": "h100bf16",
-   "CORPUS": "/out/r154-corpus/data/external/strands_corpus"
+   "CORPUS": "/out/strands_corpus_v19"
   },
   "cmds": [
    "uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_corpus_slot.py",
-   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base ADAPTER=corpusslot_qwen3.5-2b-base_h100bf16_lora CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
+   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base ADAPTER=corpusslot_qwen3.5-2b-base_h100bf16_lora CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
   ]
  },
  {
@@ -16,27 +16,27 @@
   "env": {
    "SEED": "1",
    "RUN_TAG": "h100bf16",
-   "CORPUS": "/out/r154-corpus/data/external/strands_corpus"
+   "CORPUS": "/out/strands_corpus_v19"
   },
   "cmds": [
    "uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_corpus_slot.py",
-   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base ADAPTER=corpusslot_qwen3.5-2b-base_h100bf16s1_lora CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
+   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base ADAPTER=corpusslot_qwen3.5-2b-base_h100bf16s1_lora CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
   ]
  },
  {
   "tag": "r154-refs-decider",
   "env": {},
   "cmds": [
-   "FAMILY=slot MODEL=Mapika/decider-2b CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py",
-   "FAMILY=slot MODEL=Mapika/decider-4b CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
+   "FAMILY=slot MODEL=Mapika/decider-2b CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py",
+   "FAMILY=slot MODEL=Mapika/decider-4b CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
   ]
  },
  {
   "tag": "r154-refs-base",
   "env": {},
   "cmds": [
-   "FAMILY=strands MODEL=StrandsAgents/strands-decider-2B-hobson-v19 CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py",
-   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base CORPUS=/out/r154-corpus/data/external/strands_corpus uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
+   "FAMILY=strands MODEL=StrandsAgents/strands-decider-2B-hobson-v19 CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py",
+   "FAMILY=slot MODEL=Qwen/Qwen3.5-2B-Base CORPUS=/out/strands_corpus_v19 uv run --frozen --with \"strands-decider==0.1.0\" --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/eval_corpus_slot.py"
   ]
  }
 ]
