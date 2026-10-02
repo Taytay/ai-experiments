@@ -8965,3 +8965,76 @@ strands head was better on first-time payees (60 vs 51). Two experiments:
 **Not adopted.** decider-4B with the recipe stays. What strands taught us is about training, not architecture: the shot-label loss is
 the ingredient that makes a reader handle invented category names, whatever the head. Not pursued: more seeds of the pointer (no
 direction to chase), the KL to the frozen torso (no effect in 146).
+
+## 148. strands at 4B with the shot-label loss is on a par with decider-4B: ahead on invented names and the behaviour sets (REAL-6 89.1 vs 87.8, novel names 88.3 vs 84.6, mislead 67.1 vs 64.6), level on the blind sets (blind_v1 82.9 vs 83.9, blind_v2 72.6 vs 71.7, first-time payees 60 / 62 vs 60 / 61), and the two multiplied gain a point or two over either; strands' LoRA targets change nothing, its rank 16 trades the behaviour sets for first-time payees; nothing adopted outright (MODEL-23)
+
+*PLAN step 153 (owner, 2026-10-01: "Could you try using a 4B torso with an equivalently sized head or borrow anything else from
+strands?"). Code: `exp_strands_finetune.py BASE / POINTER_DIM`, `exp_decider_finetune.py LORA_R / LORA_AB`, `strands_tables.py`; job list
+`scripts/modal_jobs/r153.json`; branch plan-153-strands-4b (PR #70). All arms: the recipe's episodes, 800 x 16 steps, two seeds.*
+
+- **strands at 4B:** strands' architecture on Qwen3.5-4B-Base (Apache-2.0), its pointer head widened with the torso (dim 320 = 256 x
+  2560 / 2048; ~1.6M parameters), our labelled layout and the shot-label loss (REPORT 147's ingredient). 54 minutes of training on one
+  H100 against about 40 for the decider-4B arms (the shot-code loss reads the full vocabulary at each history row's code).
+- **strands' LoRA targets on decider-4B:** its adapter also covers the Gated DeltaNet layers' `in_proj_a` / `in_proj_b`, which ours left
+  out; rank 64 as ours.
+- **strands' LoRA rank on decider-4B:** 16 against our 64 (alpha 2 x rank as ours), our targets.
+Other strands ingredients were already measured: the KL to the frozen torso and its batch (no effect, 146), the pointer on decider (none,
+147), a teacher's distributions (REPORT 123, not adopted), option descriptions (row 137, mixed).
+
+**S.1 top-1 % (mean [range] over seeds; seeds in brackets)**
+| reader | REAL-6 v1 | novel names | mislead | override | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+| decider-2B + recipe (one slot) | 86.9 (1) | 86.2 (1) | 64.4 (1) | 97.2 (1) | 79.7 (1) | 81.4 (1) | 68.6 (1) | 70.3 (1) |
+| decider-4B + recipe (one slot; REPORT 123) | 87.8 [85.6, 91.6] (3) | 84.6 [82.9, 87.6] (3) | 64.6 [63.8, 65.4] (2) | 98.3 [98.2, 98.4] (2) | 82.7 [82.2, 83.2] (3) | 83.9 [83.5, 84.2] (3) | 70.0 [69.3, 70.7] (3) | 71.7 [70.5, 73.2] (3) |
+| strands from base, labelled layout + shot-code loss | 86.6 (1) | 83.6 (1) | 64.6 (1) | 98.5 (1) | 80.4 (1) | 82.0 (1) | 68.1 (1) | 71.0 (1) |
+| strands on Qwen3.5-4B-Base (head 320), labelled + shot-code loss | 89.1 [86.9, 91.3] (2) | 88.3 [86.9, 89.6] (2) | 67.1 [66.9, 67.3] (2) | 99.3 [99.1, 99.6] (2) | 82.7 [82.2, 83.3] (2) | 82.9 [82.7, 83.1] (2) | 70.8 [70.3, 71.2] (2) | 72.6 [72.3, 72.9] (2) |
+| decider-4B + recipe, + strands' LoRA targets (in_proj_a / b) | 87.1 [86.6, 87.6] (2) | 86.6 [85.6, 87.6] (2) | 65.5 [64.4, 66.5] (2) | 98.4 [98.1, 98.7] (2) | 82.7 [82.4, 82.9] (2) | 83.8 [83.3, 84.3] (2) | 71.3 [71.0, 71.5] (2) | 71.9 [71.5, 72.2] (2) |
+| decider-4B + recipe, LoRA rank 16 | 84.4 [82.2, 86.6] (2) | 82.0 [80.5, 83.6] (2) | 58.5 [55.1, 61.8] (2) | 98.5 [98.0, 99.0] (2) | 82.4 [82.0, 82.7] (2) | 83.8 [83.3, 84.2] (2) | 70.6 [70.1, 71.1] (2) | 71.6 [70.9, 72.2] (2) |
+**S.2 blind_v1 with the other-users line (1500 items; 277 first-time payees): lists of at most 3**
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+| YNAB today (2 of last 3, else last) | – | 73.5 | 73.5 | 0.82 | 74% | 0.0 / 0.0 | – | – | – |
+| decider-2B + recipe (one slot) | 1 | 81.5 | 89.9 | 1.46 | 87% | 51.3 / 67.1 | 88.4 | 61.9 | 0.716 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 83.8 | 91.5 | 1.45 | 89% | 59.9 / 74.8 | 89.2 | 69.6 | 0.622 |
+| strands from base, labelled layout + shot-code loss | 1 | 82.0 | 90.4 | 1.43 | 87% | 54.5 / 73.6 | 88.2 | 69.6 | 0.745 |
+| strands on Qwen3.5-4B-Base (head 320), labelled + shot-code loss | 2 | 82.9 | 91.1 | 1.41 | 89% | 59.6 / 74.7 | 88.2 | 67.9 | 0.700 |
+| decider-4B + recipe, + strands' LoRA targets (in_proj_a / b) | 2 | 83.9 | 91.3 | 1.45 | 88% | 59.4 / 75.1 | 89.4 | 68.5 | 0.644 |
+| decider-4B + recipe, LoRA rank 16 | 2 | 83.8 | 91.2 | 1.43 | 89% | 61.9 / 74.7 | 88.7 | 72.9 | 0.628 |
+**S.2 blind_v2 with the other-users line (1500 items; 316 first-time payees): lists of at most 3**
+| reader | seeds | right 1st % | in the list % | suggestions shown | work saved | first-time payees: 1st / top 3 | payees seen before | new users | effort W=10 |
+| YNAB today (2 of last 3, else last) | – | 57.1 | 57.1 | 0.79 | 57% | 0.0 / 0.0 | – | – | – |
+| decider-2B + recipe (one slot) | 1 | 70.5 | 86.9 | 1.90 | 83% | 56.0 / 72.8 | 74.4 | 60.9 | 1.189 |
+| decider-4B + recipe (one slot; REPORT 123) | 3 | 71.7 | 88.1 | 1.90 | 84% | 60.8 / 79.7 | 74.6 | 65.1 | 1.084 |
+| strands from base, labelled layout + shot-code loss | 1 | 71.0 | 88.3 | 1.90 | 84% | 56.0 / 76.6 | 75.0 | 59.4 | 1.152 |
+| strands on Qwen3.5-4B-Base (head 320), labelled + shot-code loss | 2 | 72.6 | 87.8 | 1.85 | 84% | 61.7 / 79.3 | 75.5 | 66.4 | 1.111 |
+| decider-4B + recipe, + strands' LoRA targets (in_proj_a / b) | 2 | 71.8 | 88.0 | 1.88 | 84% | 60.1 / 77.1 | 74.9 | 63.3 | 1.078 |
+| decider-4B + recipe, LoRA rank 16 | 2 | 71.5 | 88.0 | 1.88 | 84% | 64.2 / 80.1 | 73.5 | 70.1 | 1.093 |
+
+The two multiplied (calibrated distributions, recalibrated; `decision_tables.product`), top-1 with first-time payees in brackets:
+
+| system | REAL-6 | novel names | blind_v1 + line | blind_v2 + line |
+|---|---|---|---|---|
+| decider-4B (3 seeds) | 87.8 | 84.6 | 83.9 (60.2) | 71.7 (60.8) |
+| strands-4B (2 seeds) | 89.1 | 88.3 | 82.9 (59.6) | 72.6 (61.7) |
+| decider-4B x strands-4B | 88.6 | 87.3 | 84.6 (63.2) | 73.8 (64.7) |
+| decider-4B x decider-4B (other LoRA targets) | 88.0 | 86.3 | 84.3 (61.4) | 73.2 (62.6) |
+
+- **strands-4B is the first reader to match decider-4B across the board.** With the shot-label loss its pointer head is ahead where users
+  name categories their own way and on the behaviour sets: REAL-6 89.1 [86.9, 91.3] against 87.8 [85.6, 91.6], novel names 88.3 [86.9,
+  89.6] against 84.6 [82.9, 87.6], mislead 67.1 [66.9, 67.3] against 64.6 [63.8, 65.4] (both seeds above decider's range), override 99.3
+  against 98.3. On the blind sets it is level: blind_v1 with the line 82.9 [82.7, 83.1] against 83.9 [83.5, 84.2] (a point behind, both
+  seeds below decider's range), blind_v2 72.6 [72.3, 72.9] against 71.7 [70.5, 73.2]; work saved 89% / 84% for both. Its probabilities
+  serve the expected-cost rule a little worse on blind_v1 (effort 0.700 against 0.622) and as well on blind_v2 (1.111 against 1.084).
+  The 2B to 4B step helped strands about as much as it helps decider (blind_v2 + line 71.0 -> 72.6; decider 70.3 -> 71.7).
+- **Different mistakes.** strands-4B gets 19 to 24% of decider-4B's blind-set misses right and 43% of its misses on novel names. Their
+  product gains 0.7 / 2.1 points right first on blind_v1 / v2 and 3 to 4 points on first-time payees, a little more than two decider-4B
+  models together (84.3 / 73.2), at twice the scoring cost. On invented names strands-4B alone is better than the product.
+- **strands' LoRA targets: no effect.** Adding `in_proj_a / b` moves nothing beyond the seed ranges (blind_v1 83.8, blind_v2 71.9, REAL-6
+  87.1, novel names 86.6).
+- **Rank 16: a trade.** Level on the blind sets (83.8 / 71.6) and better on first-time payees (61.9 / 64.2 against 59.9 / 60.8) and new
+  users (72.9 / 70.1 against 69.6 / 65.1), but worse where the history decides: REAL-6 84.4, novel names 82.0, mislead 58.5 [55.1, 61.8]
+  against 64.6. A quarter of the adapter, not a better reader.
+
+**Nothing adopted outright.** decider-4B and strands-4B are equivalent readers with different strengths: strands-4B for invented names
+and the behaviour sets, decider-4B by a point on blind_v1 and in calibration for the cost rule; strands-4B trains about a third longer
+and both score at 4B speed. If a second reader is worth its cost, strands-4B is a better second opinion than another decider (REPORT
+133's escalation reader was the untrained 35B). The real data will say whether invented category names are common enough to prefer
+strands-4B as the main reader.
