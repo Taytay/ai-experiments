@@ -1,0 +1,9 @@
+[
+ {
+  "tag": "r154-corpus",
+  "env": {},
+  "cmds": [
+   "uv run --frozen --with \"strands-decider[train]==0.1.0\" --with transformers==5.17.0 bash scripts/build_strands_corpus.sh"
+  ]
+ }
+]
