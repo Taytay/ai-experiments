@@ -100,6 +100,45 @@ def run(cmds: list, env: dict, tag: str):
 
 
 
+@APP.function(image=image, gpu="H100", timeout=3 * 3600, volumes={"/cache": HF, "/out": OUT.read_only()}, max_containers=8)
+def score_private(items: list, reader: str, layout: str, adapter_from: str) -> str:
+    """Owner, 2026-10-02: score private items (a real budget) without keeping them on Modal. The items arrive as the call's argument and
+    the scores leave as its return value; nothing is written to a volume (results mounted read-only, only to copy the adapter in) or to
+    the repo tree; the items go to scripts/real_budget_eval.py `stream` on stdin and its scores come back on stdout. Logs carry counts
+    only; a failure is re-raised without its message (it could quote a transaction)."""
+    import json
+    import os
+    import shutil
+    import subprocess
+    _prepare()
+    if adapter_from:
+        shutil.copytree(f"/out/{adapter_from}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    cmd = ("uv run --with transformers==5.17.0 --with flash-linear-attention --with 'peft>=0.21' --with torch==2.13.0 --with torchvision==0.28.0 "
+           "python scripts/real_budget_eval.py stream")
+    p = subprocess.run(cmd, shell=True, cwd=REPO, input=json.dumps(items), capture_output=True, text=True,
+                       env={**os.environ, "BUDGET": "private", "READER": reader, "LAYOUT": layout})
+    progress = [l for l in p.stderr.splitlines() if "items/s" in l]
+    print(f"{len(items)} items, exit {p.returncode}; " + (progress[-1].strip() if progress else ""), flush=True)
+    if p.returncode != 0:
+        kinds = [l.split(":")[0] for l in p.stderr.splitlines() if l and not l.startswith(" ") and ("Error" in l.split(":")[0] or "Exception" in l.split(":")[0])]
+        raise RuntimeError(f"scoring failed: {kinds[-1] if kinds else 'exit ' + str(p.returncode)}")
+    return p.stdout
+
+
+def private_scores(items: list, reader: str, layout: str, adapter_from: str, shards: int = 8):
+    """Local side: whole days per shard (the per-day cached prefix needs them together), shards scored in parallel; yields score lines."""
+    from collections import defaultdict
+    days = defaultdict(list)
+    for it in items:
+        days[it["date"]].append(it)
+    parts = [[] for _ in range(shards)]
+    for d in sorted(days, key=lambda d: -len(days[d])):  # largest days first, each to the lightest shard
+        min(parts, key=len).extend(days[d])
+    with APP.run():
+        for out in score_private.starmap([(p, reader, layout, adapter_from) for p in parts if p]):
+            yield from out.splitlines()
+
+
 @APP.local_entrypoint()
 def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = "", gpu: str = ""):
     global run

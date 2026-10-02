@@ -1294,6 +1294,23 @@ payee frequency and by payees new after training.
 
 **REAL-26 A dress rehearsal of the real-data pipeline.** *Experiment:* PLAN row 162: REAL_DATA_SPEC.md end to end on REAL-7.
 
+**REAL-27 The owner's own budget, replayed.** Owner (2026-10-02): take the owner's large real budget, every approved transaction with a
+category as gold, and run each in date order through decider with only earlier transactions in the prompt. The first real data the
+models have read. *Experiment:* PLAN row 163: `scripts/real_budget_eval.py` (data and per-item scores stay outside the repo in
+`~/.local/share/ynab-real-eval/`, 0600; only summary tables are written up; Modal scoring passes the items as call arguments and keeps
+nothing, `modal_app.score_private`); zero-shot decider-4B and the recipe against YNAB's rule and the payee's last category; then a wide
+history (a row for every offered category), since this budget has ~96 categories where the synthetic users had 10 to 20.
+
+**MODEL-26 Cloudflare's Clef decision models and their RL fine-tuning.** Owner (2026-10-02): try "the new Jev like model from
+cloudflare, as well as its fine tuning RL framework" (https://blog.cloudflare.com/clef-decision-models/). `Cloudflare/clef` (Qwen3.8-27B
+base) and `Cloudflare/clef-flash` (Qwen3.5-9B base), both Apache-2.0 on their cards (bases to be checked by `open_licence`): a frozen
+backbone plus a `joint_head` (`joint_schema_model.py`) that scores every valid schema choice in parallel through two-stage attention,
+trained with label-smoothed cross-entropy plus a Brier loss for calibration; Jev-API compatible, 64k context. The RL framework (RLCD:
+"Reinforcement Learning for Calibrated Decisions") is not public: partnership-only through Cloudflare's engineers for now, built on
+AI Gateway, Workers AI, Containers and a Trainer. *Experiment:* PLAN row 164: (a) both models zero-shot in their own code and readout on
+blind_v1 / v2 (+ line), checked first on easy items as row 151 did; (b) clef-flash's head (and a LoRA) trained on our episodes, with
+their loss (label smoothing + Brier) against our recipe at matched data; (c) RLCD when it is public, or ask Cloudflare for access.
+
 **DATA-6 Categories described by what they hold.** Jeff: options described by what they lead to matter enormously. *Experiment:* each
 category in the labelled list followed by the payees filed under it in the prompt ("Coffee (e.g. Peets, Starbucks)", or "nothing filed
 yet"); decider-4B trained and read that way, and the current adapter read that way zero-shot; blind_v1 by the report card, first-time payees.
