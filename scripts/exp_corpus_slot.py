@@ -123,7 +123,7 @@ def main():
 if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
-    cfg = dict(model=MODEL, corpus=str(CORPUS.relative_to(ROOT)), files=FILES, micro=MICRO, accum=ACCUM, lr=LR, epochs=EPOCHS, seed=SEED,
+    cfg = dict(model=MODEL, corpus=str(CORPUS), files=FILES, micro=MICRO, accum=ACCUM, lr=LR, epochs=EPOCHS, seed=SEED,
                teach_w=TEACH_W, lora_r=64, labels="decider letters", max_steps=MAX_STEPS)
     with Run("corpus_slot", model=MODEL, config=cfg) as run:
         stats = main()
