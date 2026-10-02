@@ -51,13 +51,19 @@ def slot_reader():
     if ADAPTER:
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
+    ptr, nl = None, None
+    pf = ROOT / "models" / "adapters" / ADAPTER / "pointer_head.pt" if ADAPTER else None
+    if pf and pf.exists():  # row 155: the hybrid head
+        from ai_experiments.pointer import OptionPointer
+        ptr = OptionPointer(lm.config.get_text_config().hidden_size).cuda().eval()
+        ptr.load_state_dict(torch.load(pf, map_location="cuda", weights_only=True)); nl = CS.newline_ids(tok)
 
     @torch.no_grad()
     def predict(name, rows):
         out = []
         for k in range(0, len(rows), BATCH):
             chunk = rows[k:k + BATCH]
-            built = [CS.render(P, tok, r, random.Random(f"{name}:{k + j}"), train=False) for j, r in enumerate(chunk)]
+            built = [CS.render(P, tok, r, random.Random(f"{name}:{k + j}"), train=False, nl=nl) for j, r in enumerate(chunk)]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long); att = torch.zeros_like(ids)
             for i, b in enumerate(built):
@@ -65,6 +71,8 @@ def slot_reader():
             h = lm.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
             for i, b in enumerate(built):
                 z = F.linear(h[i, b["slot"]], lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float()
+                if ptr is not None:
+                    z = z + ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")])
                 lp = F.log_softmax(z, -1).tolist(); canon = [0.0] * len(lp)
                 for j, oi in enumerate(b["order"]):
                     canon[oi] = lp[j]
