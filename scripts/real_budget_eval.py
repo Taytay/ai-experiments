@@ -70,6 +70,8 @@ RECIPE = "decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1
 RECIPE_35B = "decider_decider-35b-a3b_none_h200bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_laylabelled_shots_ev10soft_lora"  # REPORT 122
 ADAPTER = {"recipe": RECIPE, "big-recipe": RECIPE_35B}.get(READER, "")
 ADAPTER_FROM = {"recipe": "r124-oth-s0", "big-recipe": "r125-dec35b-recipe"}.get(READER, "")  # the Modal job that trained it
+if READER.startswith("adapter:"):  # row 173: any decider-4B adapter on the results volume, READER=adapter:<name>@<job tag>
+    ADAPTER, ADAPTER_FROM = READER[len("adapter:"):].split("@")
 
 
 def _private(path):
@@ -350,7 +352,7 @@ def modal():
     items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
     items = [it for it in items if it["answer"] >= 0 and (not ONLY_NEW or not it["payee_seen"])]
     items = items[:LIMIT] if LIMIT else items
-    out = _private(OUT / f"scores_{READER}_{LAYOUT}{SFX}.jsonl")
+    out = _private(OUT / f"scores_{READER.split('@')[-1] if READER.startswith('adapter:') else READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
     keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split", "desc")
     todo = [{k: it.get(k) for k in keep} for it in items if it["id"] not in done]
