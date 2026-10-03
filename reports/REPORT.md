@@ -10021,3 +10021,43 @@ First-time payees (no history) are the model alone in every policy: 58.5 / 74.4 
   payees; recognising the same payee has to be precise before its history can be trusted.
 - **The new model recognises payees a little better, not well enough:** its embedding has the best F1 and the fewest false alarms of any
   single matcher, but finds the payee less often than Jaro-Winkler. Payee recognition needs training as a task (row 176).
+
+
+## 163. Generating the "clean payee" block (Clean payee, Via, Ordered from, Memo, Location, Store, Reference) under each training history row, from the generator's ground truth, lifts the owner's budget 0.8 over its matched control (73.1 -> 73.9; known payees +1.1, payees with an alias +0.9) and the blind sets (blind_v1 +2.2, blind_v2 +1.7, P2P +9), but costs 7 points on invented business names and 4 on misleading names: one seed, a mild real-data gain with a real cost (DATA-8, REAL-27)
+
+PLAN step 176 (owner, 2026-10-03: "Wouldn't it be better to have the model actually generate the 'cleaned' payee ... more knowledge would
+be built into the model regarding what to attend if we asked the model to generate a cleaned up version"; "write 'clean payee: blah'
+because a payee is not always a merchant ... should we teach it to extract these optional pieces of metadata?"; "Should we do the
+extraction as json or yaml"; "Are we asking the model to generate those extractions or just learn to ignore certain ones?").
+`statements.render_v2(parts=True)` returns the pieces each bank string was built from (the random draws unchanged, so the strings are
+identical); the real-style generator records them on every transaction (person-to-person: the person, the app, the memo; delivery: the
+platform and "Ordered from" the restaurant). `real_budget_eval.py FIELDS=1` writes them under each history row as a strict-YAML block
+(values quoted only where YAML would misread them: all 1,108,158 blocks parse to str -> str), in a fixed order, absent fields omitted;
+the query stays bare. `exp_decider_finetune.py FIELD_LOSS=1` trains the whole block as tokens (keys, values, line breaks and the
+"\nCategory:" boundary: the model generates the extraction, including which fields exist); test prompts carry no block. Two arms from the
+same 400 households (v2: delivery strings now name the restaurant): A2 = 25% household episodes, no block; B = the same with the block
+and its loss. Seed 0 each; job list `scripts/modal_jobs/r176.json`.
+
+**Table 163.1: % right first (single seeds; the recipe: three seeds, mean [range])**
+
+| arm | owner's budget, aliases + similar payees: all / known / first-time / alias / truly new | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line | real-style test |
+|---|---|---|---|---|---|---|---|---|---|
+| recipe | 72.2 / 80.0 / 53.2 / 72.5 / 43.8 | 87.8 [85.6-91.6] | 84.6 | 64.6 | 82.7 | 83.9 | 70.0 | 71.7 | 62.4 |
+| + 25% real-style v1 (REPORT 161) | 73.8 / 80.4 / 57.7 / 72.6 / 50.4 | 85.2 | 84.9 | 60.4 | 83.3 | 84.4 | 75.6 | 75.8 | 71.4 |
+| A2: + 25% real-style v2 | 73.1 / 79.6 / 57.4 / 72.2 / 50.2 | 84.6 | 85.6 | 61.4 | 81.9 | 84.7 | 74.3 | 72.3 | 71.4 |
+| **B: + 25% real-style v2, the field block generated** | **73.9 / 80.7 / 57.2 / 73.1 / 49.5** | 83.6 | **78.5** | **57.1** | **84.1** | 85.3 | **76.0** | **75.3** | 71.5 |
+
+blind_v2 by kind of item, A2 -> B: P2P 69.7 -> 78.8, amount split 84.3 -> 89.2, new category 56.8 -> 62.1, refunds 84.3 -> 88.6,
+trips 86.2 -> 83.0, changed mind 20.9 -> 20.9.
+
+### 163.1 What the step says
+
+- **Extraction teaches something the categoriser uses on real data, a little:** +0.8 overall on the owner's budget against the matched
+  control, from known payees (+1.1) and payees with an alias (+0.9), as the hypothesis predicts (knowing what a bank string contains helps
+  link its variants); first-time payees unchanged. One seed: the gain is about the size of seed noise on this budget.
+- **On the blind sets it helps where a string's parts carry the answer:** person-to-person payments +9 (the memo), amount splits and
+  refunds +4 to +5.
+- **It costs the invented-name drills:** novel names -7, misleading names -4. Learning what a payee is makes the model trust names more,
+  the same tension as every knowledge-adding step since REPORT 108.
+- **Not adopted yet:** a second seed, and row 177's rationale arms (the same households with row numbers, and rationales citing rows),
+  decide whether the block stays.
