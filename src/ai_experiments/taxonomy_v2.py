@@ -154,7 +154,8 @@ def from_canon41(name):
 
 _OVERTURE = {  # where the new kinds split an old one; everything else follows overture_canon through from_canon41's first kind
     "bar": "bar", "lounge": "bar", "brewery": "bar", "winery": "bar", "distillery": "bar", "alcoholic_beverage_venue": "bar", "dance_club": "bar",
-    "nightlife_venue": "bar", "airport": "airline", "air_transport_facility_or_service": "airline", "rental_service": "car_rental",
+    "nightlife_venue": "bar", "hotel": "hotel", "lodging": "hotel", "resort": "hotel", "bed_and_breakfast": "hotel", "inn": "hotel",
+    "private_lodging": "hotel", "campground": "hotel", "rv_park": "hotel", "airport": "parking", "air_transport_facility_or_service": "parking", "rental_service": "car_rental",
     "travel_service": "travel_agency", "travel_and_transportation": "travel_agency",
     "hardware_home_and_garden_store": "home_improvement", "home_service": "home_services", "building_or_construction_service": "home_services",
     "storage_facility": "home_services", "design_service": "furniture", "security_service": "home_services",
