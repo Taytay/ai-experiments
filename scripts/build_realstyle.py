@@ -52,7 +52,7 @@ if __name__ == "__main__":
                 for it in household_items(seed, "train", per):
                     ctx = it["prompt_split"][: -len("Category:")].rstrip()
                     f.write(json.dumps(dict(context=ctx, options=it["options"], answer=it["answer"], spans=label_spans(ctx), household=seed,
-                                            kind=it["kind"], payee_seen=it["payee_seen"])) + "\n")
+                                            kind=it["kind"], payee_seen=it["payee_seen"]) | ({"rationale": it["rationale"]} if it.get("rationale") else {})) + "\n")
                     k += 1
                 if seed % 50 == 0:
                     print(f"  household {seed}: {k} episodes", flush=True)
