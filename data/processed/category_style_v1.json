@@ -1,0 +1,17 @@
+{
+ "name": "category_style",
+ "version": 1,
+ "source": "one real budget's categories and approved transactions, classified locally; aggregates only (PLAN step 173)",
+ "n_categories": 179, "n_groups": 21, "hidden_share": 0.536, "emoji_share": 0.207, "possessive_share": 0.05,
+ "budget_note_share": 0.106, "dated_share": 0.045,
+ "type_share_of_categories": {"property or business": 0.235, "person-scoped": 0.201, "everyday kind": 0.156, "trip or event": 0.156,
+  "money mechanics": 0.089, "named service": 0.061, "catch-all": 0.034, "holiday": 0.022, "pets and animals": 0.022,
+  "wish list or goal": 0.017, "store-named": 0.006},
+ "type_share_of_transactions": {"everyday kind": 0.471, "person-scoped": 0.167, "catch-all": 0.113, "trip or event": 0.095,
+  "named service": 0.057, "property or business": 0.033, "money mechanics": 0.021, "pets and animals": 0.016, "holiday": 0.013,
+  "store-named": 0.012, "wish list or goal": 0.002},
+ "groups": "mostly people, properties or projects, trips, wish lists; per-person groups repeat the same purposes (fun money, clothes, grooming, school and sports)",
+ "routing_multi_category_payees": {"n_transactions": 9321, "leave_one_out_right": {"payee majority": 0.650, "amount bucket": 0.656,
+  "weekday": 0.637, "weekend": 0.655, "account": 0.667, "memo present": 0.663, "year": 0.726, "nearest-in-time transaction's category": 0.771}},
+ "routing_note": "time decides most: trip windows, life phases and reorganisations, not amount or weekday"
+}
