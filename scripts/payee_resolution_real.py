@@ -34,7 +34,7 @@ from pathlib import Path
 
 import numpy as np
 
-BUDGET = os.environ["BUDGET"]
+BUDGET = os.environ.get("BUDGET", "")
 CACHE = Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json"
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
 PREFIX = re.compile(r"^(sale|return|refund|sq|tst|pos|debit|purchase|paypal|pp|sp|py|ach|checkcard|recurring|online|pmt|payment|www)\b\W*")

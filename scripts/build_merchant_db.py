@@ -36,6 +36,12 @@ from ai_experiments.paths import ROOT  # noqa: E402
 DATA = Path.home() / "projects" / "YNAB" / "data"
 DB = DATA / "merchants" / "merchants_v1.db"
 KEEP = re.compile(r"^Top/(Shopping|Health|Recreation|Home|Sports|Computers|Arts|Business)/")
+# businesses people pay, not sites people read (owner, 2026-10-03): the Shopping branch, US regional business and shopping listings, and
+# precise service paths; Arts / Computers / Games / Sports pages are mostly informational and are dropped
+PAYEE_PATH = re.compile(r"^(Top/)?Shopping/|/(Business_and_Economy|Shopping)(/|$)|/(Lodging|Airlines|Car_Rentals|Travel_Agents|Tour_Operators|Cruises|"
+                        r"Pharmacies|Vision_Care|Optometry|Dentistry|Dentists|Physicians|Hospitals|Clinics|Veterinar\w*|Restaurants|Restaurants_and_Bars|"
+                        r"Insurance|Banking_Services|Utilities|Telecommunications/Service_Providers|Real_Estate/Agencies|Moving_and_Relocation|"
+                        r"Home_Improvement|Automotive/Repair|Salons|Spas|Fitness|Health_Clubs)(/|$)")
 DMOZ_KIND = [  # category-path hints before the text rules (DMOZ paths are precise)
     ("medical", r"/Health/(Vision|Dentistry|Medicine|Pharmacy/Online)|/Shopping/Health/(Vision|Optical|Hearing)|Contact_Lenses"),
     ("pharmacy", r"/Shopping/Health/Pharmacies|/Pharmacy"), ("pet", r"/Pets/|/Animals/"), ("hotel", r"/Lodging/"),
@@ -134,7 +140,10 @@ if __name__ == "__main__":
             d = domain_of(p["url"])
             if src == "dmoz" and d in seen:
                 continue
-            k = kind_of(f"{p.get('title', '')} | {p.get('desc', '')}", "Top/" + p["topic"] if src == "curlie" else p["topic"])
+            path = "Top/" + p["topic"] if src == "curlie" else p["topic"]
+            if not PAYEE_PATH.search(path):
+                continue
+            k = kind_of(f"{p.get('title', '')} | {p.get('desc', '')}", path)
             if k:
                 seen.add(d)
                 rows.append((p.get("title", ""), "", d, p.get("desc", ""), p["topic"], k, src, p["url"], None, None, split_of(p.get("title", ""))))
