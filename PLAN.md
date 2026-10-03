@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-10-02; overwrite this block when it changes)
+## Current state (2026-10-03; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -36,7 +36,7 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-10-02):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 159
+- **In flight (2026-10-03):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 159
   done (REPORT.md 116 to 154; section 1 summarises them). Since 2026-10-01 (146 to 154): strands-decider evaluated and trained three ways
   (= decider-2B, or decider-4B at 4B, once given the shot-label loss; not adopted), decider's readout on strands' own corpus (>= v19),
   capacity (rank 64 stays: more capacity forgets first-time payees), and embeddings from decider (good for categories and for mapping
@@ -64,13 +64,46 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
     the 35B 14 to 20 ms (H200); roughly $11 and $18 per million transactions.
   - **test sets**: REAL-6, REAL-7, blind_v1 (+ _b48, _split, _others), blind_v2 (+ _others; a second blind generator, REPORT 137),
     blind_bulk_v1 (+ _split: one user's sync), novel_merchants_v1; YNAB's rule and payee histories per item (`*_ynabrule`, `*_payeehist`).
-- **Next (2026-10-02):** rows 160 to 162 are proposed and wait for the owner's go: 160 payee resolution (owner, 2026-10-02: YNAB's real
-  data does not carry enough aggregator merchant fields to skip cleanup), 161 population knowledge in the weights against the
-  other-users line, 162 a real-data dress rehearsal on REAL-7 (bring the plan to the owner before running). Then real data
-  (reports/REAL_DATA_SPEC.md: user + time splits, sealed test, train on real filings, keep the raw other-users line, memos, first-time
-  payees and new users as their own slices). blind_v3 stays untouched for a final synthetic read of any new system. Also offered, not
-  queued: JevBench for row 154's model (needs it behind strands' server API), a single-pass table layout for bulk imports.
-  Deprioritised: 51, 54, 55, 127 (a).
+- **Real data, the owner's own budget (rows 163 to 172, 2026-10-02/03; REPORT 155 to 160).** Owner's rule: "Make sure my data doesn't
+  end up in git. Summaries are fine. The data isn't." Never print, commit or upload personal rows; write payee or category names into
+  the repo only as generic kinds (no names of people, health, therapy, legal, childcare, income, tax or charity detail).
+  - Data: fetched with the YNAB skill (`~/projects/Taytay/taytays_stuff/.claude/skills/ynab`, built; token in `~/.config/ynab/token`,
+    mode 0600, use as `YNAB_ACCESS_TOKEN="$(cat ~/.config/ynab/token)"`, never print it); budget cache `~/.cache/ynab-cli/<budget>.json`;
+    budget id 96c06c41-f26f-4a44-98ed-eaba2f471e1e (the owner's main budget). Items, scores, embeddings, Overture matches:
+    `~/.local/share/ynab-real-eval/<budget>/` (0600 / 0700). Overture derived tables: `~/projects/YNAB/data/overture/derived/`.
+  - Code: `scripts/real_budget_eval.py` (build / score / modal / embed / report; switches SIM=1|2, DESC, PLINE, KIND=new|all, WIDE,
+    ONLY_NEW, READER=recipe|zeroshot|big|big-recipe), `scripts/real_budget_system.py` (REPORT 141's system; DEC / BIG), 
+    `scripts/real_budget_tables.py`, `scripts/payee_resolution_real.py`, `scripts/overture_lookup.py`. Private Modal scoring:
+    `modal_app.score_private` / `embed_private` take items as call arguments and return scores; results volume mounted read-only;
+    nothing kept on Modal (the 35B readers on H200 via `gpu=`).
+  - Best so far on the budget (21,238 transactions, YNAB's rule 57.9% right first): decider-4B recipe with alias rows + fused
+    similar-payee rows (`SIM=2`) 72.2 (top 10 89.6); system (gate + untrained 35B for first-time payees) 74.2 / 84.5 in a list of 3 /
+    76% work saved; trained 35B system 74.3. Payee resolution alone lifts YNAB's rule to 64.0. Readout is fp32 (bf16 tied 1.7%).
+- **Branches:** stack #24 now runs to #82: #77 plan-163-real-budget, #78 plan-165-real-budget-gate, #79 plan-166-similar-payees,
+  #80 plan-167-prompt-variants, #81 plan-171-payee-resolution, #82 plan-172-overture-lookup (top). Stack order is not numeric (#20
+  after #23); link with `gh stack link 5 6 8 9 10 11 12 13 14 15 16 17 18 19 21 22 23 20 25 26 ... 82 <new-branch>`.
+- **Next (2026-10-03): row 173, approved in outline, waiting for the owner's "start".** Plan (MODEL-28; REPORT 73 found database
+  episodes store facts, not a skill: +21 on places in the database, 0 to +3 held out; REPORT 58: 20,000 merchants at ~30 rows each fit
+  without interference, so coverage is the lever):
+  1. Merchant database from public data only, chosen by a rule blind to the owner's budget: the largest US brands by place count in
+     tiers of 5k / 20k (50k if 20k still gains) plus a sample of US independents; each with its Overture basic_category and Overture's
+     name variants; a hash-chosen half of each tier held out (facts vs skill). Then count the owner's payees that fall in it (the test
+     population); never pick merchants from the budget.
+  2. Statement renderings with the synthetic generators' templates (upper case, store numbers, SQ * / TST* prefixes, city + state,
+     22-character truncation), so "COSTCO WHSE #0641" maps to Costco.
+  3. Category mapping: extend build_poi1.py's Overture-to-user-category mapping from top-level kinds to the 288 basic categories via
+     `ai_experiments.canon`'s 41 kinds; check by eye.
+  4. Training: the decider-4B recipe unchanged plus these merchants through `DBEP` / `DB_EPISODES` (exp_categoriser.py's database
+     episodes; ~30 rows per merchant), steps scaled with the database (4 to 8 x 800 at 20k; ~$10-30); arms: none / 5k / 20k. Smoke
+     200 steps first; commit the job list `scripts/modal_jobs/r173.json` before launching; push adapters to DVC.
+  5. Read: the owner's budget privately (first-time payees in the database vs not, with and without SIM=2 rows, against the recipe and
+     the 35B; the target is the 35B's 56.8 on matched first-time payees at the 4B's cost), blind_v1 / v2 for regressions (v3 sealed),
+     the held-out half of the database. Write up as REPORT 161 on branch plan-173-overture-weights.
+  Risks: facts only (independents outside the database will not move); Overture's kind is not how people budget (users who file a
+  merchant against its kind must keep working); online merchants are not places (Wikidata, CC0, later); one household is a thin test.
+- **Later, proposed:** 168 (train on real filings with "might be / definitely isn't" losses), 169 (a generator calibrated to real
+  budgets), 170 (distil or prune the 35B), better payee consolidation (row 171's open problem: train the combiner on relabelled pairs;
+  a person-to-person parser), 160 to 162 as before. Also offered, not queued: JevBench for row 154's model, a single-pass table layout.
 
 ## Procedure for one step
 
