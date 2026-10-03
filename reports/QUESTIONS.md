@@ -1304,6 +1304,20 @@ history (a row for every offered category), since this budget has ~96 categories
 **Status (2026-10-02):** PLAN step 163, REPORT.md 155: the recipe transfers to real data: 68.3% right first against the rule's 57.9; ties the rule on known payees, 37.8% on first-time payees; weak on multi-purpose retailers and purpose-defined categories; wide history adds nothing.
 **Status (2026-10-02, later):** PLAN step 165, REPORT.md 156: the recommended system on the same budget: 71.0% right first, 80.8% in the list, 72% work saved (rule 57.9 / 57.9 / 58); the 35B adds 6 points on first-time payees; the gate is nearly neutral; calibrated by halves it auto-files 41% at 95% right.
 **Status (2026-10-02, later still):** PLAN step 166, REPORT.md 157: rows of the payees whose names embed nearest lift first-time payees from 37.8 to 51.3% right first (no retraining); the trained 35B adds about half a point more; the best system reaches 74.3% right first, 84.5% in a list of three, 76% work saved.
+**Status (2026-10-03):** PLAN step 167, REPORT.md 158: category / payee descriptions add nothing; payee resolution (aliases by character n-grams) is the lever: the rule alone 57.9 -> 64.0, alias rows 72.5% on the alias group; top 10 89.6%.
+
+**REAL-28 Rewarding "might be" and "definitely isn't".** Owner (2026-10-03). The one-slot loss rewards only the gold. Real filings say
+more: the categories a user ever files a payee under (including later filings, usable as a training signal only) and those never used
+for it. *Experiment:* PLAN row 168: penalty on never-used categories, partial credit on ever-used ones, a differentiable ranked-list cost,
+label smoothing + Brier; on several consenting real budgets with held-out users.
+
+**DATA-9 A synthetic generator calibrated to real budgets.** Owner (2026-10-03). REPORTs 155-158 show where the synthetic users differ
+from one real household (category count and long tail, multi-category payees, one-off payees, alias spellings, codes, whitespace,
+reorganisation). *Experiment:* PLAN row 169: fit the generator to aggregate statistics of several real budgets; retrain; read REAL-27.
+
+**MODEL-27 Distilling the 35B's payee knowledge.** Owner (2026-10-03). The 35B knows more payees (first-time payees 45.3 against 43.8 for
+the 4B with aliases) at ~1.6 times the cost. *Experiment:* PLAN row 170: expert pruning on real transaction prompts, logit distillation
+into the 4B on real data, quantisation.
 
 **MODEL-26 Cloudflare's Clef decision models and their RL fine-tuning.** Owner (2026-10-02): try "the new Jev like model from
 cloudflare, as well as its fine tuning RL framework" (https://blog.cloudflare.com/clef-decision-models/). `Cloudflare/clef` (Qwen3.8-27B
