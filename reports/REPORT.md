@@ -8748,7 +8748,7 @@ into 60 concepts: "groceries / grocery", "meals out / eating out", "car maintena
 assign", and some mixed ones such as "gifts / things to wear"), payee profiles from the population's filings before each transaction
 (>= 3 users), and the test user's categories placed in concepts by their own earlier filings or, with none, by their names
 (`scripts/payee_profiles.py`). The mapped profile becomes a no-model suggestion and the line "Other users file this payee as: <the
-user's own category> (%)", read zero-shot by decider-4B (the other-users recipe, three seeds). `scripts/mapped_tables.py`, job list
+user's own category> (count)" (the stored prompts carry counts of the mapped filings, as the raw line does), read zero-shot by decider-4B (the other-users recipe, three seeds). `scripts/mapped_tables.py`, job list
 `scripts/modal_jobs/r150.json`.
 
 | system | top-1 | first-time payees: 1st / top 3 | payees seen before | new users | person-to-person | own patterns | effort W=10 |
