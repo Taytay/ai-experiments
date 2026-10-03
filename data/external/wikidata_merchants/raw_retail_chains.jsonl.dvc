@@ -1,0 +1,5 @@
+outs:
+- md5: 4e93344e77ec425d14237f7c1fc6fdfe
+  size: 2552101
+  hash: md5
+  path: raw_retail_chains.jsonl
