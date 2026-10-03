@@ -9643,3 +9643,65 @@ Calibration of the first suggestion: ECE 0.037.
 - **Caveats:** one household; the plausible-category stand-in is narrower than the generator's lists (it charges clutter on new
   payees' wrong suggestions, which is why their work saved, 34%, sits below their 60% in-the-list); the precision coverage is an oracle
   threshold.
+
+
+## 157. Rows of the nearest payees by embedding lift first-time payees on the owner's real budget from 37.8 to 51.3% right first (top 3 51.3 to 65.9) and the recipe from 68.3 to 72.1 overall, with no retraining; the trained decider-35B-A3B reads the budget at 70.8 (72.8 with the similar rows); the best system (trained 35B with similar rows, the untrained 35B multiplied in for first-time payees, the gate) reaches 74.3% right first, 84.5% in a list of three and 76% work saved, against the rule's 57.9 / 57.9 / 58 (REAL-27)
+
+PLAN step 166. Two owner requests on REPORT 155's budget (2026-10-02): the trained 35B ("Yes please", after REPORT 156 used only the
+untrained one), and "When determining which transactions to include in the historical list, couldn't we favor the payees that embed
+closer to the payee about to be inferred?"
+
+- **Similar-payee rows** (`real_budget_eval.py SIM=1`): build_blind_v1's similar-payee step with embeddings in place of the generator's
+  merchant kinds. Every payee name of the budget (5,811) is embedded as REPORT 152 read payees ("Payee as it appears on a bank statement:
+  <name>" + the kind cue, last token, final layer, the recipe's decider-4B; on Modal with nothing kept, `modal_app.embed_private`). After
+  the payee's own rows (up to 6), each prompt gets up to 6 rows of the nearest earlier payees by cosine, at most 2 (the latest) per payee,
+  none already in the shared block, all dated before the transaction's day. The shared block and everything else are unchanged; the
+  median prompt gains 6 rows. Nearest neighbours by eye: coffee shops to coffee shops, pharmacies to pharmacies, airlines to airlines,
+  and spelling variants of one payee to each other (the payee resolution of PLAN row 160 for free).
+- **The trained 35B**: row 125's adapter (REPORT 122: the recipe without the other-users line, rank-64 LoRA, 800 steps), merged, in the
+  recipe's layout, scored on H200s through `score_private` (fp32 readout).
+- The system card (`real_budget_system.py`, REPORT 156's system and substitutions) with `DEC` / `BIG` choosing the main reader and the
+  first-time-payee reader.
+
+**Table 157.1: readers, % right first (top 3)**
+
+| reader | all (21,238) | payee filed before (15,032) | first-time payee (6,206) | first use of a category (91) |
+|---|---|---|---|---|
+| YNAB's rule | 57.9 | 81.8 | 0 | 0 |
+| decider-4B recipe (REPORT 155) | 68.3 (78.6) | 81.0 (89.9) | 37.8 (51.3) | 17.6 (25.3) |
+| decider-4B recipe + similar-payee rows | **72.1** (82.9) | 80.6 (89.9) | **51.3** (65.9) | 15.4 (18.7) |
+| decider-35B-A3B recipe | 70.8 (80.8) | 81.6 (90.0) | 44.7 (58.4) | 16.5 (25.3) |
+| decider-35B-A3B recipe + similar-payee rows | **72.8** (83.5) | 81.0 (90.4) | **52.8** (66.9) | 12.1 (22.0) |
+
+**Table 157.2: systems (REPORT 156's rules), right one 1st % / in the list (at most 3) % / work saved %**
+
+| main reader | first-time payees multiplied by | all | first-time payee | known payee, filed differently from the rule | calibration ECE |
+|---|---|---|---|---|---|
+| YNAB's rule | – | 57.9 / 57.9 / 58 | 0 / 0 / 0 | 0 / 0 / 0 | – |
+| 4B recipe (REPORT 156) | untrained 35B | 71.0 / 80.8 / 72 | 43.8 / 59.9 / 34 | 9.5 / 42.7 / 38 | 0.037 |
+| 4B recipe + similar rows | untrained 35B, similar rows | 73.8 / 83.9 / 75 | 54.0 / 69.9 / 45 | 10.2 / 44.2 / 38 | 0.049 |
+| 35B recipe | untrained 35B | 71.7 / 81.8 / 73 | 46.5 / 62.7 / 37 | 11.9 / 44.0 / 39 | 0.036 |
+| **35B recipe + similar rows** | **untrained 35B, similar rows** | **74.3 / 84.5 / 76** | **55.7 / 71.0 / 46** | 13.6 / 45.8 / 40 | 0.041 |
+| 35B recipe + similar rows | – | 73.5 / 83.3 / 75 | 52.8 / 66.9 / 42 | 13.6 / 45.8 / 40 | 0.032 |
+
+Auto-filing the best system's first suggestion (calibrated by halves, oracle thresholds): 67.6% of transactions at 90% precision, 46.4%
+at 95%, 16.3% at 98% (REPORT 156's system: 62.1 / 43.1 / 16.6).
+
+### 157.1 What the step says
+
+- **Similar payees are the biggest single gain on real data:** +13.5 right first on first-time payees for the 4B (+8.1 for the 35B),
+  +3.8 overall, at no training cost and six rows of prompt. On the synthetic sets the same step added nothing measurable (REPORT 99),
+  where users had 10 to 20 categories and the merchant decided the category; on this budget, with ~96 categories, a neighbour's filing
+  says which of the user's many categories that kind of payee goes to, as kind-chosen examples did on POI-1 (REPORT 61). The models were
+  never trained on similar-payee rows; training with them is untested (REPORT 47 warns that training with retrieved rows taught copying).
+- **What it costs:** a category's first use falls (17.6 to 15.4 for the 4B, 16.5 to 12.1 for the 35B: 91 transactions), because the
+  neighbours point to categories already in use; known payees move by under a point.
+- **The trained 35B is better than the 4B, by less than similar rows add:** 70.8 against 68.3 alone, 72.8 against 72.1 with similar
+  rows; as the main reader of the system 74.3 against 73.8. At about 1.6 times the 4B's serving cost (REPORT 125) for half a point, the
+  4B with similar rows is the cost-effective choice; the 35B is the ceiling.
+- **The untrained 35B still helps on first-time payees** on top of either reader (+1.6 to +2.9 right first there, +3.0 to +4.1 in the
+  list), as on the synthetic sets.
+- **The system on real data, best configuration:** 74.3% right first (rule 57.9), 84.5% in a list of at most three (57.9), 76% of the
+  work saved (58%); 55.7% of first-time payees right first and 71.0% in the list, where the rule has nothing.
+- **Unchanged:** known payees filed differently from the rule (13% of transactions) stay at 10 to 14% right first and 44 to 46% in the
+  list: neither more rows nor a bigger model supplies what was bought.
