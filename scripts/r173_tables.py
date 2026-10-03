@@ -1,0 +1,47 @@
+"""Tables for PLAN step 173 (REPORT 161): decider-4B's recipe with real-style household episodes mixed in (REALSTYLE = 0.25 / 0.5,
+seed 0) against the recipe itself (seeds 0, 1, 2), right first % on the synthetic sets (per-item files from exp_decision_models.py):
+REAL-6, novel names, misleading names, the user's override, blind_v1 / v2 with and without the other-users line; and blind_v1 / v2 by
+the item's kind of difficulty (`why`) for the sets that carry it.
+usage: uv run python scripts/r173_tables.py
+"""
+import glob
+import json
+from collections import defaultdict
+
+import numpy as np
+
+from ai_experiments.paths import PROCESSED
+
+R = "results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st800{seed}_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft{rs}_lora_{set}_labrand255_laylabelled_shots.noctx.jsonl"
+SETS = ["real6", "real6_v1_novel", "mislead_v1", "override_v1", "blind_v1", "blind_v1_others", "blind_v2", "blind_v2_others"]
+ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% real-style": [("", "_rs25")], "recipe + 50% real-style": [("", "_rs50")]}
+
+
+def acc(f, sel=None):
+    recs = [json.loads(l) for l in open(f)]
+    recs = [r for r in recs if sel is None or r["id"] in sel]
+    return 100 * np.mean([int(np.argmax(r["sum_lp"])) == r["answer"] for r in recs]), len(recs)
+
+
+if __name__ == "__main__":
+    print("| arm | " + " | ".join(SETS) + " |"); print("|---|" + "---|" * len(SETS))
+    for arm, runs in ARMS.items():
+        cells = []
+        for st in SETS:
+            vals = [acc(f)[0] for seed, rs in runs for f in glob.glob(R.format(seed=seed, rs=rs, set=st))]
+            cells.append(f"{np.mean(vals):.1f}" + (f" [{min(vals):.1f}-{max(vals):.1f}]" if len(vals) > 1 else "") if vals else "-")
+        print(f"| {arm} | " + " | ".join(cells) + " |")
+    for st in ("blind_v1", "blind_v2"):
+        items = {i["id"]: i for i in json.loads((PROCESSED / f"{st}.json").read_text())["items"]}
+        whys = defaultdict(set)
+        for i, it in items.items():
+            whys[it.get("why", "?")].add(i)
+        whys = {w: s for w, s in sorted(whys.items(), key=lambda x: -len(x[1])) if len(s) >= 40}
+        print(f"\n**{st} by kind of item, right first %**\n")
+        print("| arm | " + " | ".join(f"{w} ({len(s)})" for w, s in whys.items()) + " |"); print("|---|" + "---|" * len(whys))
+        for arm, runs in ARMS.items():
+            cells = []
+            for w, sel in whys.items():
+                vals = [acc(f, sel)[0] for seed, rs in runs for f in glob.glob(R.format(seed=seed, rs=rs, set=st))]
+                cells.append(f"{np.mean(vals):.1f}" if vals else "-")
+            print(f"| {arm} | " + " | ".join(cells) + " |")

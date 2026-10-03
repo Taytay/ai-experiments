@@ -1319,6 +1319,7 @@ reorganisation). *Experiment:* PLAN row 169: fit the generator to aggregate stat
 
 **MODEL-28 Real merchant knowledge from Overture places.** Owner (2026-10-03). Lookup of a payee string in 81.5M open-licence places
 to inject a kind line, and training the 4B on real business names and their categories. *Experiment:* PLAN row 172.
+**Status (2026-10-03, later):** PLAN step 173, REPORT.md 161: merchant facts give little (brands cover 7-9% of first-time payees); real-style households (purposes, time routing, real merchants, measured strings) at 25% lift the owner's first-time payees 53.2 -> 57.7 and blind_v2 +5.6; row 174 confirms and fixes the changed-mind regression.
 **Status (2026-10-03):** PLAN step 172, REPORT.md 160: the lookup matches a third of first-time-payee transactions; the kind line adds +1.2 on them, +0.1 overall, because similar-payee rows already carry the kind; knowledge into the weights is row 173.
 
 **MODEL-27 Distilling the 35B's payee knowledge.** Owner (2026-10-03). The 35B knows more payees (first-time payees 45.3 against 43.8 for

@@ -1,0 +1,49 @@
+{
+ "name": "statement_patterns",
+ "version": 1,
+ "source": "raw bank strings YNAB imported into one real budget (aggregates only)",
+ "n_strings": 7368,
+ "lead": {
+  "none": 0.8568,
+  "Sale": 0.1374,
+  "Return": 0.0058
+ },
+ "processor": {
+  "none": 0.7591,
+  "other*": 0.1741,
+  "SQ *": 0.0292,
+  "TST* ": 0.0238,
+  "PAYPAL *": 0.0106,
+  "PP*": 0.0031,
+  "Square ": 0.0001
+ },
+ "suffix": {
+  "none": 0.4726,
+  "star_code": 0.1991,
+  "domain": 0.1205,
+  "long_digits": 0.0737,
+  "short_number": 0.0476,
+  "hash_store": 0.0373,
+  "auth": 0.0327,
+  "city_state": 0.0133,
+  "store_word": 0.0031
+ },
+ "case": {
+  "upper": 0.4472,
+  "title": 0.4118,
+  "mixed": 0.1399,
+  "lower": 0.001,
+  "none": 0.0001
+ },
+ "run_together": {
+  "no": 0.9745,
+  "yes": 0.0255
+ },
+ "truncate_widths": {
+  "20": 0.0653,
+  "21": 0.0369,
+  "22": 0.1034,
+  "25": 0.0177
+ },
+ "truncate_share": 0.2233
+}

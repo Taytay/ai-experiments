@@ -38,7 +38,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 BUDGET = os.environ["BUDGET"]
-CACHE = Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json"
+CACHE = Path(os.environ.get("CACHE_PATH") or Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json")  # CACHE_PATH: another budget file (row 173: synthetic households)
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
 READER = os.environ.get("READER", "recipe")  # recipe | zeroshot (decider-4B) | big (decider-35B-A3B, untrained) | big-recipe (35B + recipe)
 LAYOUT = os.environ.get("LAYOUT", "split")  # today (one prompt each) | split (one cached prefix per day)
@@ -70,6 +70,8 @@ RECIPE = "decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1
 RECIPE_35B = "decider_decider-35b-a3b_none_h200bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_laylabelled_shots_ev10soft_lora"  # REPORT 122
 ADAPTER = {"recipe": RECIPE, "big-recipe": RECIPE_35B}.get(READER, "")
 ADAPTER_FROM = {"recipe": "r124-oth-s0", "big-recipe": "r125-dec35b-recipe"}.get(READER, "")  # the Modal job that trained it
+if READER.startswith("adapter:"):  # row 173: any decider-4B adapter on the results volume, READER=adapter:<name>@<job tag>
+    ADAPTER, ADAPTER_FROM = READER[len("adapter:"):].split("@")
 
 
 def _private(path):
@@ -83,7 +85,16 @@ def _clean(name):
 
 
 def build():
-    b = json.loads(CACHE.read_text())["budget"]
+    items = build_items(json.loads(CACHE.read_text())["budget"])
+    p = _private(OUT / f"items{SFX}.json")
+    p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
+    os.chmod(p, 0o600)
+    print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
+          f"options median {sorted(len(i['options']) for i in items)[len(items) // 2]}, max {max(len(i['options']) for i in items)}")
+
+
+def build_items(b):
+    """One item per approved, categorised, non-split transaction of budget document b (the cache's "budget" object), in date order."""
     groups = {g["id"]: g for g in b["category_groups"]}
     cats = {c["id"]: c for c in b["categories"]}
     payees = {p["id"]: p["name"] for p in b["payees"]}
@@ -239,11 +250,7 @@ def build():
         items.append(dict(id=q["id"], date=q["date"], kind=q["kind"], payee_seen=bool(prev), first_use=q["cat"] not in last_idx,
                           options=options, answer=options.index(q["cat"]) if q["cat"] in options else -1, gold=q["cat"],
                           prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, desc=desc, rule=rule, rule_alias=rule_alias, seen_alias=seen_alias, last=prev[-1] if prev else None, n_hist=upto))
-    p = _private(OUT / f"items{SFX}.json")
-    p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
-    os.chmod(p, 0o600)
-    print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
-          f"options median {sorted(len(i['options']) for i in items)[len(items) // 2]}, max {max(len(i['options']) for i in items)}")
+    return items
 
 
 def run_scoring(todo, fo):
@@ -345,7 +352,7 @@ def modal():
     items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
     items = [it for it in items if it["answer"] >= 0 and (not ONLY_NEW or not it["payee_seen"])]
     items = items[:LIMIT] if LIMIT else items
-    out = _private(OUT / f"scores_{READER}_{LAYOUT}{SFX}.jsonl")
+    out = _private(OUT / f"scores_{READER.split('@')[-1] if READER.startswith('adapter:') else READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
     keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split", "desc")
     todo = [{k: it.get(k) for k in keep} for it in items if it["id"] not in done]

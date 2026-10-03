@@ -1,0 +1,5 @@
+outs:
+- md5: f51047d2a6330fc53fca250d2acc74cf
+  size: 29400311
+  hash: md5
+  path: realstyle_merchants_v1.json

@@ -1,0 +1,5 @@
+outs:
+- md5: 2cb6ea416fef383b50ef5f147a4bf0ec
+  size: 71951214
+  hash: md5
+  path: realstyle_v1_test.json

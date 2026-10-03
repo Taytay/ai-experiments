@@ -9872,3 +9872,103 @@ the rule then removed. Online-only merchants and subscriptions are not places an
   and string variants of real businesses mapped to their kinds, the synthetic database episodes made real), so that a first-time payee is
   recognised the way the 35B recognises it; and as a cleaning aid for payee resolution (a brand match ties "COSTCO WHSE #0641" and
   "Costco Gas" to one brand with different kinds). Row 173.
+
+
+## 161. Training on real-style synthetic households (categories are purposes: people, trips, phases, quirks; routing mostly by time; bank strings and P2P memos as real ones look) lifts decider-4B on the owner's real budget from 72.2 to 73.8% right first and first-time payees from 53.2 to 57.7, past the trained 35B (52.8); blind_v2 70.0 -> 75.6 (trips 55 -> 85, misfiled history 68 -> 89); the system no longer needs the 35B (74.8 without, 74.9 with); costs: misleading names -4, "changed their mind" 43 -> 19, more hedging on known payees (REAL-27, MODEL-28, DATA-9)
+
+PLAN step 173 (owner, 2026-10-03, revised while it was built: "Our canonical 12 should be broadened"; "If you look at an mcc database, it
+will be pretty clear that there are many types of merchants"; "make sure that the corrupted payees are corrupted in ways that my budget
+demonstrates is possible"; "we are categorizing the purposes of spending we are not categorizing merchants ... we might have a category
+for something like Susanna's morning treat ... we might have restaurants, but we also might have dates ... Uber ... commute ... dating";
+"Venmo Joey Stewart Girl Scout cookies"; copy the owner's style "which includes personal names as well as references to individual trips").
+
+What row 173 started as (Overture merchant facts into the weights) changed on three findings: row 107 (REPORT 108) had already put
+random Overture businesses into training (OVDB) at a cost to auto-filing; brands cover only 7 to 9% of the owner's first-time-payee
+transactions even at 20,000 brands, so stored facts about chains could add ~2 points there; and the owner's categories are purposes, so a
+taxonomy of merchant types is evidence for the model, never the category list. Built instead (all from public data plus aggregates of
+the owner's budget; no literal text from it is stored):
+
+- **Bank-string grammar** (`scripts/statement_patterns.py` -> `data/processed/statement_patterns_v1.json`; `ai_experiments.statements.render_v2`):
+  frequencies of case style, a leading Sale / Return (14%), processor prefixes (24%), the suffix after the name (a * reference code 20%,
+  a web domain 12%, a long digit run 7%, a store number 4%, an authorisation tail 3%, city + state 1.3%) and fixed truncation widths (20 /
+  21 / 22 / 25 characters for 22% of strings), measured on 7,368 raw strings; render_v2 reproduces the rates within ~1 point (case style
+  within 6 to 15). The old templates (transactions.render) were far off: always upper case, card words 37% (real 0.3%), city 32% (1.3%),
+  dates 37% (4%).
+- **A two-level merchant taxonomy** (`ai_experiments.taxonomy_v2`): 298 MCC merchant types (data/external/mcc_codes, Unlicense) and 284
+  Overture categories (95.8% of US places) mapped onto 60 kinds (canon's 41 broadened: liquor, airline / hotel / car rental, home services
+  and trades, furniture, jewellery, second-hand and pawn, tobacco, digital goods, gambling, fines, legal and accounting, shipping, funeral,
+  car purchase, ...); the old 41 map forward.
+- **Category style and routing, measured** (`data/processed/category_style_v1.json`): 179 categories in 21 groups, groups mostly people,
+  properties, trips and projects; by category 24% property or business, 20% person-scoped, 16% everyday kinds, 16% trips or events, 9%
+  money mechanics, 6% named services; by transaction everyday kinds 47%, person-scoped 17%, catch-alls 11%, trips 10%; 21% with emoji, 11%
+  with budget notes, 54% hidden. For payees filed under 2+ categories (9,321 transactions) the category is predicted 65.0% by the payee's
+  majority, 64 to 67% by amount bucket, weekday, account or memo presence, 72.6% by year and 77.1% by the payee's nearest-in-time filing:
+  time decides (trips, life phases, reorganisations).
+- **A merchant pool** (`scripts/build_realstyle_merchants.py`, `realstyle_merchants_v1.json`, DVC): 61,141 merchants, the top brands and a
+  reservoir of independents per kind from Overture plus the MCC list's airline / car-rental / hotel brands; a quarter held out by hash.
+- **Real-style households** (`ai_experiments.realstyle`): invented people (adults, kids who move from baby to big-kid categories, pets),
+  properties with unit numbers, dated trips, holidays, named services (often paid person to person), wish lists, money mechanics,
+  catch-alls, a rare store-named category; every name invented, in the measured style; routing by trip and holiday windows, life phases,
+  a reorganisation, person-scoped fun money, clothes, grooming, a morning treat for small weekday coffee, 3% misfiles; P2P strings
+  "<app> <person> <memo>" with a purpose memo half the time; merchants as favourites plus fresh ones (23 to 29% first-time-payee
+  transactions; owner 29%), 76 to 150 transactions a month (owner 157); some payees cleaned, others imported per string form. Written as
+  YNAB budgets, so `real_budget_eval.build_items` builds their prompts exactly as the owner's (`scripts/build_realstyle.py`): 40,000
+  training episodes from 400 households (train merchants) and a test set of 9,000 items from 150 households (held-out merchants; DVC).
+- **Training:** the recipe unchanged (decider-4B, seed 0, 800 steps) with `REALSTYLE=0.25` or `0.5` (that share of each batch from the
+  household episodes, shot-label loss on their history rows); job list `scripts/modal_jobs/r173.json`; 64 to 66 minutes on an H100.
+
+**Table 161.1: the synthetic sets, right first % (the recipe: three seeds, mean [range])**
+
+| arm | REAL-6 | novel names | misleading names | override | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|---|
+| recipe | 87.8 [85.6-91.6] | 84.6 [82.9-87.6] | 64.6 [63.8-65.4] | 98.3 | 82.7 [82.2-83.2] | 83.9 [83.5-84.2] | 70.0 [69.3-70.7] | 71.7 [70.5-73.2] |
+| + 25% real-style | 85.2 | 84.9 | 60.4 | 98.8 | 83.3 | 84.4 | **75.6** | **75.8** |
+| + 50% real-style | 81.5 | 78.5 | 53.9 | 96.9 | 82.6 | 83.9 | 74.7 | 75.5 |
+
+blind_v2 by kind of item (recipe -> + 25%): trips 54.6 -> 85.1, misfiled history 68.1 -> 88.9, new users 55.7 -> 64.6, new category
+57.5 -> 63.2, first-time payee 56.8 -> 63.0, multi-purpose 61.5 -> 65.8, refunds 81.4 -> 88.6, p2p 72.2 -> 69.7, **changed mind 42.6 ->
+18.6**. blind_v1's kinds unchanged. The real-style test set (held-out households and merchants): recipe 62.4, + 25% 71.4, + 50% 72.1
+(first-time payees 34.6 -> 54.7 -> 56.1; YNAB's rule 55.3).
+
+**Table 161.2: the owner's real budget (21,238 transactions; never in training), right first / top 3 / top 10**
+
+| reader | all | payee filed before | first-time payee | first-time, no alias either |
+|---|---|---|---|---|
+| YNAB's rule | 57.9 | 81.8 | 0 | 0 |
+| recipe, aliases + similar payees (REPORT 158) | 72.2 / 83.6 / 89.6 | 80.0 / 90.1 / 94.2 | 53.2 / 67.7 / 78.2 | 43.8 |
+| **+ 25% real-style**, same prompt | **73.8 / 85.4 / 90.9** | 80.4 / 90.8 / 94.6 | **57.7 / 72.4 / 81.9** | **50.4** |
+| + 50% real-style, same prompt | 74.1 / 84.9 / 90.3 | 80.8 / 90.3 / 93.9 | 58.0 / 71.7 / 81.5 | – |
+| trained 35B, similar payees (REPORT 157) | 72.8 / 83.5 / 89.2 | 81.0 / 90.4 / 94.1 | 52.8 / 66.9 / 77.4 | 45.3 |
+| recipe, plain prompt (REPORT 155) | 68.3 / 78.6 / 85.0 | 81.0 | 37.8 | – |
+| + 25% real-style, plain prompt | 70.3 / 81.1 / 87.9 | 80.6 | 45.4 | – |
+
+**Table 161.3: the system on the owner's budget (REPORT 156's rules), right one 1st / in a list of 3 / work saved**
+
+| main reader | all | first-time payee | known payee filed differently from the rule | ECE |
+|---|---|---|---|---|
+| YNAB today | 57.9 / 57.9 / 58 | 0 / 0 / 0 | 0 / 0 / 0 | – |
+| recipe (aliases), gate, x untrained 35B on first-time payees (REPORT 158) | 74.2 / 84.5 / 76 | 55.7 / 71.7 / 47 | 10.3 / 45.2 / 39 | 0.052 |
+| + 25% real-style, gate, no 35B | 74.8 / 85.3 / 76 | 57.7 / 72.4 / 48 | 17.5 / 50.5 / 44 | – |
+| + 25% real-style, gate, x untrained 35B | **74.9 / 85.8 / 77** | 58.1 / 74.2 / 50 | **17.5 / 50.5 / 44** | 0.028 |
+
+Auto-filing (calibrated by halves, oracle thresholds): 66.6% at 90% precision (from 64.9), 45.0% at 95% (44.3), 10.2% at 98% (15.5).
+
+### 161.1 What the step says
+
+- **Synthetic users that look like real ones transfer to real data.** Trained on households built from one budget's aggregates (style,
+  routing by time, real merchants, real-looking strings) and never on its rows, decider-4B reads that budget better: +1.6 overall with the
+  best prompt, +4.5 on first-time payees (+6.6 where no alias exists), and passes the trained 35B on first-time payees at a quarter of its
+  serving cost. The effect is not the owner's data leaking in: the test merchants of the synthetic set are held out, the owner's names
+  never enter a household, and blind_v2 (another agent's generator) gains most of all (+5.6).
+- **It teaches what the old users lacked: time.** Trips, misfiled history and new categories gain 6 to 30 points on blind_v2, and on
+  the owner's budget the hardest group, known payees filed away from the rule, gains 7 points right first (10.3 to 17.5): the model now
+  routes a familiar merchant by a trip window or a recent change.
+- **The 35B is no longer needed:** with the new 4B the untrained 35B adds 0.1 overall (first-time payees 57.7 to 58.1). The recommended
+  system can drop it.
+- **Costs to fix before adopting:** blind_v2's "changed their mind" items fall from 42.6 to 18.6 (43 items: a user moves a payee to a new
+  category and stays there; the households' 3% random misfiles probably teach the model to discount an isolated recent change); misleading
+  names -4.2 and REAL-6 -2.6 (inside REAL-6's seed range, not misleading names'); on known payees the model leaves 14 to 16% of its
+  probability on categories never used for the payee (from 3 to 6%): it hedges, which calibration absorbs (ECE 0.028) but which lowers the
+  98%-precision auto-file share (15.5 to 10.2). 50% real-style is too much (REAL-6 -6, novel names -6, misleading names -11).
+- **Next (row 174):** two more seeds of the 25% arm; a fix for "changed their mind" (households where a user re-routes a payee for good,
+  misfiles that are corrected, not random); a lower share (0.15) if the costs persist; then the system without the 35B as the recommendation.
