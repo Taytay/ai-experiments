@@ -57,7 +57,9 @@ SIM_MAX, SIM_PER_PAYEE = 6, 2  # build_blind_v1's similar-payee step, with embed
 DESC = os.environ.get("DESC") == "1"  # owner, 2026-10-03: each offered category followed by its latest payees ("e.g. A, B, C"; row 136's form)
 PLINE = os.environ.get("PLINE") == "1"  # owner, 2026-10-03: a line before the transaction with the categories the payee was filed under
 PLINE_HEAD = "Earlier you filed this payee as: "
-SFX = ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+KIND = os.environ.get("KIND", "")  # row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
+# match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
+SFX = ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -151,6 +153,7 @@ def build():
                     sc[j] += 1 / (60 + r)
                 neighbours[n] = [names[j] for j in sorted(sc, key=lambda j: -sc[j])]
     items, by_payee, last_idx, cat_payees = [], defaultdict(list), {}, defaultdict(list)
+    kinds = json.loads((OUT / "overture_kinds.json").read_text()) if KIND else {}
     used_order = []  # categories by first use
     upto = 0  # rows [0, upto) are history: dated strictly before the query
     day, shared = None, []
@@ -217,11 +220,13 @@ def build():
         near = sorted(near)
         row_text = lambda i: f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
         pline = ""
+        kv = kinds.get(q["payee"]) if KIND else None
+        kind_line = f"\nKind: {kv['kind']}" if kv and (KIND == "all" or not prev_rows) else ""
         if PLINE and prev_rows:
             cnt = Counter(rows[i]["cat"] for i in prev_rows).most_common(3)
             pline = PLINE_HEAD + ", ".join(f"{c} ({n})" for c, n in cnt) + "\n\n"
         split = ("Categories: " + ", ".join(options) + f"\n\n{SHARED_HEAD}\n\n" + "".join(map(row_text, shared)) + f"{NEAR_HEAD}\n\n"
-                 + "".join(map(row_text, near)) + pline + f"Transaction: {q['fields']}\nCategory:")
+                 + "".join(map(row_text, near)) + pline + f"Transaction: {q['fields']}" + kind_line + "\nCategory:")
         desc = {c: ("e.g. " + ", ".join(cat_payees[c]) if cat_payees.get(c) else "nothing filed yet") for c in options} if DESC else None
         prev = [rows[i]["cat"] for i in prev_rows]
         top = Counter(prev[-3:]).most_common(1)
