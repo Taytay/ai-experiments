@@ -9724,7 +9724,7 @@ Modal; `scripts/real_budget_tables.py` (aggregates only).
 - **SIM=2, aliases and fused neighbours:** payee names cleaned (a leading Sale / Return / processor prefix, digits and punctuation off)
   and compared by character 3-to-5-gram TF-IDF; names at cosine >= 0.7 are aliases, and up to 6 of their latest rows follow the payee's
   own; similar payees are then ranked by reciprocal rank fusion of the embedding and n-gram neighbour lists (6 rows, 2 per payee). By eye
-  the n-grams catch store-number and prefix variants ("Costco" ~ "COSTCO WHSE #0641" 0.75, "Starbucks" ~ "STARBUCKS STORE 06388" 0.88)
+  the n-grams catch store-number and prefix variants ("Costco" ~ "COSTCO WHSE #nnnn" 0.75, "Starbucks" ~ "STARBUCKS STORE nnnnn" 0.88)
   and also join things that differ ("Costco Gas" ~ "Costco" 0.87, every "Check 1234"), so aliases are evidence in the prompt, not merged
   payees. A no-model baseline: YNAB's rule run on the payee's and its aliases' rows together ("payee resolution").
 
@@ -9870,7 +9870,7 @@ the rule then removed. Online-only merchants and subscriptions are not places an
   say more.
 - **What the database is likely better for:** the other half of row 172, putting real merchant knowledge into the 4B's weights (names
   and string variants of real businesses mapped to their kinds, the synthetic database episodes made real), so that a first-time payee is
-  recognised the way the 35B recognises it; and as a cleaning aid for payee resolution (a brand match ties "COSTCO WHSE #0641" and
+  recognised the way the 35B recognises it; and as a cleaning aid for payee resolution (a brand match ties "COSTCO WHSE #nnnn" and
   "Costco Gas" to one brand with different kinds). Row 173.
 
 
