@@ -163,7 +163,7 @@ def main():
              '<p class="legend"><span class="b">back-links: why a row ran</span><span class="f">led to: rows it caused</span></p>'
              f'<div class="eras">{cards}</div><h2 class="sect">Every row</h2><div class="tablewrap"><table><thead><tr><th>Row</th><th>Title</th>'
              f'<th>Status</th><th>Era</th><th>Because of</th><th>Led to</th></tr></thead><tbody>{rows}</tbody></table></div>')
-    (DST / "index.html").write_text(page("Plan History", "index.html", intro))
+    (DST / "index.html").write_text(page("Categoriser Plan History", "index.html", intro))
     print(f"{len(arts)} rows -> {len(merged)} era pages + index in {DST}; links: {sum(len(v) for v in from_of.values())}; missing rows: "
           f"{[n for n in range(1, max(arts) + 1) if n not in arts]}")
 
