@@ -40,8 +40,9 @@ from pathlib import Path
 BUDGET = os.environ["BUDGET"]
 CACHE = Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json"
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
-READER = os.environ.get("READER", "recipe")
+READER = os.environ.get("READER", "recipe")  # recipe | zeroshot (decider-4B) | big (decider-35B-A3B, untrained)
 LAYOUT = os.environ.get("LAYOUT", "split")  # today (one prompt each) | split (one cached prefix per day)
+ONLY_NEW = os.environ.get("ONLY_NEW") == "1"  # score first-time payees only (the 35B's part of the recommended system)
 NOCACHE = os.environ.get("NOCACHE") == "1"  # split prompts read whole: the check that the cached prefix changes nothing
 BATCH = int(os.environ.get("BATCH", "4"))
 LIMIT = int(os.environ.get("LIMIT", "0"))
@@ -181,7 +182,7 @@ def run_scoring(todo, fo):
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from ai_experiments import oneslot
     from ai_experiments.paths import ROOT
-    path = snapshot_download("Mapika/decider-4b")
+    path = snapshot_download("Mapika/decider-35b-a3b" if READER == "big" else "Mapika/decider-4b")  # big: untrained, decider's own layout
     sys.path.insert(0, snapshot_download("Mapika/decider-2b", allow_patterns=["decider/*"]))
     P = importlib.import_module("decider.prompt")
     tok = AutoTokenizer.from_pretrained(path)
@@ -201,7 +202,7 @@ def run_scoring(todo, fo):
     pad = tok.pad_token_id or 0
 
     def emit(fo, it, b, hrow):
-        z = F.linear(hrow, lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")]).float()
+        z = F.linear(hrow.float(), lm.lm_head.weight[torch.tensor(b["labs"], device="cuda")].float())  # fp32: bf16 logits tie at the top on 1.7% of items
         lp = F.log_softmax(z, -1).tolist()
         back = [0.0] * len(lp)
         for j, oi in enumerate(b["perm"]):
@@ -252,7 +253,7 @@ def run_scoring(todo, fo):
 
 def score():
     items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
-    items = [it for it in items if it["answer"] >= 0]
+    items = [it for it in items if it["answer"] >= 0 and (not ONLY_NEW or not it["payee_seen"])]
     items = items[:LIMIT] if LIMIT else items
     out = _private(OUT / f"{'check' if NOCACHE else 'scores'}_{READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
@@ -268,7 +269,7 @@ def modal():
     sys.path.insert(0, str(Path(__file__).parent))
     import modal_app
     items = json.loads((OUT / f"items{SFX}.json").read_text())["items"]
-    items = [it for it in items if it["answer"] >= 0]
+    items = [it for it in items if it["answer"] >= 0 and (not ONLY_NEW or not it["payee_seen"])]
     items = items[:LIMIT] if LIMIT else items
     out = _private(OUT / f"scores_{READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
@@ -297,8 +298,8 @@ def report():
     readers = {k: r for k, r in readers.items() if len(r) >= n_scored}  # complete runs only
     ids = [i for i in items if items[i]["answer"] >= 0]  # the 101 whose gold was not offered are left out (counted in `build`)
 
-    def rank(lp, a):
-        return 1 + sum(x > lp[a] for x in lp)
+    def rank(lp, a):  # a tie at the gold's score counts against it (bf16 logits tie; the scorer now reads out in fp32)
+        return 1 + sum(x > lp[a] for x in lp) + sum(x == lp[a] for k, x in enumerate(lp) if k != a)
     groups = {"all": ids}
     for i in ids:
         it = items[i]

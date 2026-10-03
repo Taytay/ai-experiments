@@ -9484,7 +9484,7 @@ user's history slice in front of the name, REPORT 153).
   user's for the other-users line); the multiple-choice question to label a category with a canonical kind.
 
 
-## 155. The first real data: replayed in order over eleven years of the owner's own budget, the recipe's decider-4B files 68.7% of 21,238 transactions right first (top 3 78.8%) against 57.9% for YNAB's rule, ties the rule on payees filed before (81.3 against 81.8) and gets 38% of first-time payees, where the rule has nothing; its confidence is usable (at 0.9 it covers 58% of transactions at 91% right); zero-shot decider-4B 52.7, and a wider history adds nothing (REAL-27)
+## 155. The first real data: replayed in order over eleven years of the owner's own budget, the recipe's decider-4B files 68.3% of 21,238 transactions right first (top 3 78.6%) against 57.9% for YNAB's rule, ties the rule on payees filed before (81.0 against 81.8) and gets 38% of first-time payees, where the rule has nothing; its confidence is usable (at 0.9 it covers 58% of transactions at 91% right); zero-shot decider-4B 52.1, and a wider history adds nothing (REAL-27)
 
 PLAN step 163 (owner, 2026-10-02: every approved transaction with a category is the gold; each one, in date order, through decider with
 only earlier transactions in its prompt; "Make sure my data doesn't end up in git. Summaries are fine. The data isn't."). The owner's
@@ -9500,7 +9500,8 @@ block of 24 rows dated strictly before the transaction's day (the latest row of 
 rows), then up to 6 of the payee's own latest rows, then the transaction. Payee = YNAB's payee name, amount outflow positive. All of a
 day's transactions share the prefix: it is read once and its cache forked (the same answers as reading each prompt whole on 600 items:
 99.0% the same top category, 56.3 against 55.8 right first; 2.8 times faster). No other-users line (there are no other users). Readers:
-the recipe (decider-4B + the REPORT 140 adapter, labelled rows, rand255 labels) and decider-4B zero-shot in its own layout. The wide arm
+the recipe (decider-4B + the REPORT 140 adapter, labelled rows, rand255 labels) and decider-4B zero-shot in its own layout; label logits
+read out in fp32 for the recipe (in bf16 they tied at the top on 1.7% of items; found by REPORT 156's system card). The wide arm
 puts the latest row of every offered category in the shared block (median 68 rows). Baselines: YNAB's rule (the category of 2 of the
 payee's last 3, else the last; none for a new payee) and the payee's last category.
 
@@ -9514,27 +9515,29 @@ data needs that normalisation in any pipeline.
 
 | group | n | YNAB rule | payee's last category | recipe | recipe, wide history | decider-4B zero-shot | zero-shot, wide |
 |---|---|---|---|---|---|---|---|
-| all | 21,238 | 57.9 | 58.3 | **68.7** (78.8) | 68.4 (78.6) | 52.7 (69.2) | 46.9 (64.6) |
-| payee filed before | 15,032 | 81.8 | 82.4 | 81.3 (90.0) | 80.9 (89.8) | 64.5 (81.1) | 58.3 (77.3) |
-| first-time payee | 6,206 | 0 | 0 | **38.1** (51.6) | 37.9 (51.5) | 23.9 (40.2) | 19.3 (33.6) |
-| spending | 20,156 | 56.7 | 57.1 | 67.8 (78.1) | 67.6 (78.1) | 51.6 (68.1) | 45.5 (63.2) |
-| inflows | 1,034 | 81.4 | 81.0 | 85.6 (91.4) | 83.8 (88.9) | 73.2 (88.7) | 73.3 (91.2) |
-| categorised transfers | 48 | 62.5 | 64.6 | 75.0 (93.8) | 77.1 (91.7) | 64.6 (85.4) | 70.8 (79.2) |
-| first use of a category | 91 | 0 | 0 | 17.6 (25.3) | 18.7 (25.3) | 7.7 (13.2) | 6.6 (12.1) |
-| 2015 to 2018 | 4,988 | 45.1 | 45.5 | 58.5 | 58.0 | 42.5 | 39.5 |
-| 2019 to 2022 | 9,282 | 61.0 | 61.7 | 69.1 | 68.7 | 51.2 | 45.4 |
-| 2023 to 2026 | 6,968 | 62.9 | 62.9 | 74.4 | 74.5 | 61.1 | 52.9 |
+| all | 21,238 | 57.9 | 58.3 | **68.3** (78.6) | 67.8 (78.3) | 52.1 (68.7) | 46.2 (64.0) |
+| payee filed before | 15,032 | 81.8 | 82.4 | 81.0 (89.9) | 80.5 (89.7) | 64.0 (80.8) | 57.7 (76.8) |
+| first-time payee | 6,206 | 0 | 0 | **37.8** (51.3) | 37.2 (50.7) | 23.4 (39.6) | 18.5 (33.0) |
+| spending | 20,156 | 56.7 | 57.1 | 67.4 (78.0) | 67.0 (77.7) | 51.1 (67.7) | 44.8 (62.6) |
+| inflows | 1,034 | 81.4 | 81.0 | 85.5 (91.4) | 83.7 (88.7) | 72.7 (88.2) | 72.8 (90.7) |
+| categorised transfers | 48 | 62.5 | 64.6 | 75.0 (93.8) | 77.1 (91.7) | 62.5 (85.4) | 70.8 (79.2) |
+| first use of a category | 91 | 0 | 0 | 17.6 (25.3) | 18.7 (25.3) | 7.7 (13.2) | 6.6 (11.0) |
+| 2015 to 2018 | 4,988 | 45.1 | 45.5 | 58.4 | 57.7 | 42.1 | 39.3 |
+| 2019 to 2022 | 9,282 | 61.0 | 61.7 | 69.1 | 68.4 | 51.0 | 45.2 |
+| 2023 to 2026 | 6,968 | 62.9 | 62.9 | 74.4 | 74.3 | 60.9 | 52.6 |
 
-(Right first only for the year groups; the recipe beats the rule in every single year, by 5.4 to 23.5 points.)
+(Right first only for the year groups; the recipe beats the rule in every single year, by 5.1 to 23.2 points. The recipe's column is
+read out in fp32; the other three arms were read in bf16, whose label logits tie at the top on ~1.7% of items, and a tie is counted
+against the model, so those columns are lower bounds by up to ~0.5.)
 
-**Table 155.2: by how many categories the owner had used for the payee (payee name) before the transaction**
+**Table 155.2: by how many categories the owner had used for the payee (payee name) on earlier dates**
 
 | categories used before | n | YNAB rule | recipe |
 |---|---|---|---|
-| none (new) | 5,771 | 0.2 | 37.7 |
-| one | 7,756 | 88.2 | 90.4 |
-| two or three | 3,452 | 78.5 | 77.3 |
-| four or more | 4,259 | 64.2 | 62.5 |
+| none (new) | 6,201 | 0.3 | 37.8 |
+| one | 7,404 | 92.5 | 92.8 |
+| two or three | 3,391 | 79.7 | 78.4 |
+| four or more | 4,242 | 64.3 | 62.4 |
 
 **Table 155.3: the recipe's confidence (top option's probability, raw) against accuracy**
 
@@ -9544,22 +9547,24 @@ data needs that normalisation in any pipeline.
 | 0.7 | 69.2% | 86.2% |
 | 0.9 | 57.6% | 91.2% |
 | 0.95 | 52.2% | 92.9% |
-| 0.99 | 37.1% | 96.1% |
+| 0.99 | 37.1% | 96.2% |
 
 ### 155.1 What the step says
 
-- **The recipe transfers to real data.** Trained only on synthetic users, it files the owner's real history at 68.7% right first, 10.8
-  points over YNAB's rule, and beats the rule in every year. Zero-shot decider-4B (52.7) is below the rule: the training is what carries
+- **The recipe transfers to real data.** Trained only on synthetic users, it files the owner's real history at 68.3% right first, 10.4
+  points over YNAB's rule, and beats the rule in every year. Zero-shot decider-4B (52.1) is below the rule: the training is what carries
   over, as on the synthetic sets.
-- **On payees filed before it ties the rule** (81.3 against 81.8; they agree on 88.7% of these, and agreed answers are right 88.1%).
-  Where they disagree (1,706 transactions) both are mostly wrong (rule 32.9%, model 26.0%): payees the owner files under several
-  categories. Using the rule for known payees and the model for new ones gives 68.9%, no more than the model alone.
-- **The gain is first-time payees:** 29% of this budget's transactions, 38.1% right first and 51.6% in the top 3, where the rule makes
-  no suggestion. This is the share of the owner's work the model removes that the rule cannot.
+- **On payees filed before it ties the rule** (81.0 against 81.8; they agree on 88.6% of these, and agreed answers are right 88.1%).
+  Where they disagree (1,714 transactions) both are mostly wrong (rule 33.0%, model 25.6%): payees the owner files under several
+  categories. Using the rule for known payees and the model for new ones gives 68.9%, 0.6 over the model alone (REPORT 156: the gate).
+- **The gain is first-time payees:** 29% of this budget's transactions, 37.8% right first and 51.3% in the top 3, where the rule makes
+  no suggestion. This is the share of the owner's work the model removes that the rule cannot. It includes statement strings that
+  carry a transaction code and so reach YNAB as one-off payees (an online marketplace's coded charges): the rule never matches them and
+  the model often names the category (payee resolution, PLAN row 160, would hand them to the rule as well).
 - **Where it is strong:** single-purpose payees (streaming and software subscriptions, utilities, insurance, mortgage, fast food and
   coffee chains, food delivery, grocery stores, parking): 90 to 100%. Restaurants as a category: 81% against the rule's 56%, because 40% of
   restaurant transactions are at a restaurant the owner had never filed (it knows what a restaurant is); likewise groceries 84 against 75,
-  fuel 73 against 50, home services and transport 76 to 82 against 61 to 76, travel 57 against 34 (57% of travel transactions are new
+  fuel 74 against 50, home services and transport 76 to 82 against 61 to 76, travel 58 against 34 (57% of travel transactions are new
   payees).
 - **Where it is weak:** multi-purpose retailers. An online marketplace filed under 40 different categories over the years and a big-box
   retailer under 33: 53 to 61%, slightly below the rule (59 to 64); the marketplace's payment-processor statement strings are worst (24 to
@@ -9569,10 +9574,10 @@ data needs that normalisation in any pipeline.
   readers lose where the merchant does not determine the category.
 - **Its confidence can gate auto-filing.** Raw, uncalibrated: at 0.9 the recipe would file 58% of transactions at 91% right; at 0.99,
   37% at 96%. The blind sets' agree-and-confident system (REPORT 141) would raise this further; not run here.
-- **A wider history adds nothing** (68.4 against 68.7), even with ~96 categories, and costs zero-shot decider 6 points: what the model
+- **A wider history adds nothing** (67.8 against 68.3), even with ~96 categories, and costs zero-shot decider 6 points: what the model
   needs is the payee's own rows, as on the synthetic sets (REPORTs 99, 113). The 24-row slice stands.
 - **The hardest cases** are a category's first use (17.6%, 91 transactions) and older years, when the budget had
-  fewer rows of history and categories were being reorganised (2015 to 2018: 58.5).
+  fewer rows of history and categories were being reorganised (2015 to 2018: 58.4).
 - **Next:** the gate and the system on this budget (rule + model agreement, the 35B for first-time payees); item-level detail for
   multi-purpose retailers where the bank feed carries it; more real budgets (the owner's others, then consenting users), since one
   household is one user.
