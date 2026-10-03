@@ -9705,3 +9705,73 @@ at 95%, 16.3% at 98% (REPORT 156's system: 62.1 / 43.1 / 16.6).
   work saved (58%); 55.7% of first-time payees right first and 71.0% in the list, where the rule has nothing.
 - **Unchanged:** known payees filed differently from the rule (13% of transactions) stay at 10 to 14% right first and 44 to 46% in the
   list: neither more rows nor a bigger model supplies what was bought.
+
+
+## 158. On the owner's budget, describing each category by its recent payees and each payee by its recent categories adds nothing (72.1 -> 72.1 / 71.9 / 72.0); payee resolution does: a third of the "first-time" payees (2,034 of 6,206) are known payees under another spelling, YNAB's rule with name matching rises from 57.9 to 64.0 with no model, and alias rows in the prompt take those transactions from 68.9 to 72.5% right first; the right category is in decider-4B's top 10 for 89.6% of transactions; the system with aliases reaches 74.2% right first with the 4B, level with the 35B system (REAL-27)
+
+PLAN step 167 (owner, 2026-10-03): "modify our prompt to, for each category, mention recent payees used for it? And for each payee,
+recently used categories?"; "give me a report that tells me whether the used payee was in the top 5? Top 10?"; "include a lot of
+category examples of similar payees according to both embedding and possibly tokens? Or is there another way to guarantee that we show
+'Costco' and 'cstco whsl' examples?"; and the measures behind "reward the model for knowing which payees something might be vs
+DEFINITELY isn't". All on REPORT 157's best 4B prompt (similar-payee rows), the recipe's decider-4B, no retraining, scored privately on
+Modal; `scripts/real_budget_tables.py` (aggregates only).
+
+- **DESC** (`real_budget_eval.py DESC=1`): every offered category in the labelled list followed by its three latest distinct payees on
+  earlier dates ("(e.g. A, B, C)", or "nothing filed yet"; row 136's form, computed from the whole history, the same for a day's
+  transactions so the cached prefix still holds).
+- **PLINE** (`PLINE=1`): before the transaction, "Earlier you filed this payee as: A (12), B (3)" (the payee's top three categories over
+  all its earlier rows; only for payees filed before).
+- **SIM=2, aliases and fused neighbours:** payee names cleaned (a leading Sale / Return / processor prefix, digits and punctuation off)
+  and compared by character 3-to-5-gram TF-IDF; names at cosine >= 0.7 are aliases, and up to 6 of their latest rows follow the payee's
+  own; similar payees are then ranked by reciprocal rank fusion of the embedding and n-gram neighbour lists (6 rows, 2 per payee). By eye
+  the n-grams catch store-number and prefix variants ("Costco" ~ "COSTCO WHSE #0641" 0.75, "Starbucks" ~ "STARBUCKS STORE 06388" 0.88)
+  and also join things that differ ("Costco Gas" ~ "Costco" 0.87, every "Check 1234"), so aliases are evidence in the prompt, not merged
+  payees. A no-model baseline: YNAB's rule run on the payee's and its aliases' rows together ("payee resolution").
+
+**Table 158.1: % right first / top 3 / top 5 / top 10 / MRR; the top suggestion a category ever used for the payee (past or future);
+probability left on categories never used for the payee**
+
+| reader | all (21,238) | payee filed before (15,032) | first-time payee (6,206) |
+|---|---|---|---|
+| YNAB's rule | 57.9 | 81.8 | 0 |
+| YNAB's rule with payee resolution | 64.0 | 80.9 | 22.9 |
+| recipe, REPORT 155 prompt | 68.3 / 78.6 / 81.5 / 85.0 / 0.747; 82.0; 22.6% | 81.0 / 89.9 / 91.7 / 93.2; 99.6; 3.0% | 37.8 / 51.3 / 56.8 / 64.9; 39.5; 70.0% |
+| + similar payees (REPORT 157) | 72.1 / 82.9 / 85.8 / 88.8 / 0.785; 85.4; 20.0% | 80.6 / 89.9 / 92.1 / 94.0; 98.6; 5.3% | 51.3 / 65.9 / 70.6 / 76.2; 53.5; 55.6% |
+| + DESC | 72.1 / 82.7 / 85.5 / 88.2 / 0.783; 85.6; 18.7% | 80.6 / 90.0 / 92.0 / 93.6; 98.8; 4.1% | 51.3 / 65.1 / 69.9 / 75.1; 53.4; 54.1% |
+| + PLINE | 71.9 / 82.8 / 85.7 / 88.5 / 0.783; 85.7; 19.1% | 80.4 / 89.8 / 92.0 / 93.6; 99.0; 4.0% | (no line: as above) |
+| + DESC + PLINE | 72.0 / 82.7 / 85.5 / 88.0 / 0.783; 85.8; 18.1% | 80.5 / 90.0 / 91.9 / 93.4; 99.1; 3.2% | – |
+| **aliases + fused neighbours (SIM=2)** | **72.2 / 83.6 / 86.6 / 89.6 / 0.788**; 85.7; 19.6% | 80.0 / 90.1 / 92.3 / 94.2; 98.2; 5.8% | **53.2 / 67.7 / 72.6 / 78.2**; 55.5; 53.1% |
+| 35B recipe + similar payees (REPORT 157) | 72.8 / 83.5 / 86.2 / 89.2 / 0.791; 85.6; 19.3% | 81.0 / 90.4 / 92.2 / 94.1; 98.2; 6.1% | 52.8 / 66.9 / 71.8 / 77.4; 55.0; 51.2% |
+
+**Table 158.2: the first-time payees split by whether an alias had been filed before (right first / top 3)**
+
+| reader | an alias filed before (2,034) | no alias either (4,172) |
+|---|---|---|
+| YNAB's rule with payee resolution | 69.8 | 0 |
+| recipe, REPORT 155 prompt | 44.6 / 57.7 | 34.4 / 48.2 |
+| + similar payees | 68.9 / 80.0 | 42.8 / 58.9 |
+| aliases + fused neighbours | **72.5 / 83.4** | 43.8 / 60.1 |
+| 35B recipe + similar payees | 68.1 / 79.4 | 45.3 / 60.8 |
+
+System (REPORT 156's rules) with the alias prompt and the untrained 35B (similar-payee prompt) on first-time payees: 74.2% right first,
+84.5% in the list, 76% work saved (REPORT 157: 73.8 / 83.9 / 75 with the 4B, 74.3 / 84.5 / 76 with the trained 35B); 64.9% auto-filed
+at 90% precision.
+
+### 158.1 What the step says
+
+- **Descriptions do not help the model on real data either.** Recent payees per category and the payee's category counts leave right
+  first unchanged (within 0.2) and top 10 slightly lower, as row 136 found on the synthetic sets: the rows themselves already carry the
+  information. Their one effect is less probability on categories never used for the payee (20.0% to 18.1%); not adopted.
+- **Payee resolution is the real lever, and partly a no-model one.** A third of the transactions the rule calls first-time are a known
+  payee under another statement spelling; matching names lifts YNAB's own rule from 57.9 to 64.0 overall. Product note: that is
+  available without any model (row 160's subject), though it costs the rule 0.9 on payees it already knew (aliases such as "Costco Gas"
+  join payees that differ).
+- **In the prompt, alias rows beat both the model without them and the resolved rule:** 72.5% right first on the alias group (resolved
+  rule 69.8, similar payees alone 68.9), top 3 83.4. On truly new payees they change little (42.8 to 43.8); there the 35B's knowledge is
+  ahead (45.3).
+- **Top 5 and top 10:** with aliases the right category is in decider-4B's top 5 for 86.6% and its top 10 for 89.6% of transactions (first-time payees
+  72.6 and 78.2; known payees 92.3 and 94.2).
+- **"Might be" against "definitely isn't":** on known payees the model's top suggestion is a category ever used for that payee 98 to
+  99.6% of the time, and it leaves 3 to 6% of its probability on categories the payee never gets; on first-time payees (82% of them seen
+  only once, so "ever used" is mostly the gold itself) it spreads 51 to 70%. A training signal that charges probability on never-used
+  categories and credits any ever-used one (future filings included, training only) is proposed as PLAN row 168.

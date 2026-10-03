@@ -158,7 +158,7 @@ def parse(context):
 def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False,
                  relist=False):
     names, rows, query = parse(context)
-    dsc = describe_categories(options, rows) if desc else None  # row 136
+    dsc = (desc if isinstance(desc, dict) else describe_categories(options, rows)) if desc else None  # row 136; a dict: descriptions given by the caller
     if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
         rows = split_rows(rows, query, rng)
     if any(c is None for _, c, _ in rows):

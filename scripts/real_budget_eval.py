@@ -49,9 +49,15 @@ LIMIT = int(os.environ.get("LIMIT", "0"))
 SLICE_MAX, OWN_MAX = 24, 6
 SHARED_MAX, SHARED_CAT_MAX = 24, 18  # build_blind_v1 BLIND_BULK
 WIDE = os.environ.get("WIDE") == "1"  # the shared rows: the latest row of every category offered that day (not 18), then 24 latest rows
-SIM = os.environ.get("SIM") == "1"  # owner, 2026-10-02: after the payee's own rows, rows of the payees whose names embed nearest
+SIM = os.environ.get("SIM", "") in ("1", "2")  # owner, 2026-10-02: after the payee's own rows, rows of the payees whose names embed nearest
+SIM2 = os.environ.get("SIM") == "2"  # owner, 2026-10-03 ("Costco" and "cstco whsl"): alias rows (cleaned names' character 3-5-gram TF-IDF
+# cosine >= ALIAS_MIN) right after the payee's own rows, then similar payees ranked by reciprocal rank fusion of embedding and n-gram neighbours
+ALIAS_MIN, ALIAS_MAX = 0.7, 6
 SIM_MAX, SIM_PER_PAYEE = 6, 2  # build_blind_v1's similar-payee step, with embeddings (REPORT 152) in place of the generator's kinds
-SFX = ("_wide" if WIDE else "") + ("_sim" if SIM else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+DESC = os.environ.get("DESC") == "1"  # owner, 2026-10-03: each offered category followed by its latest payees ("e.g. A, B, C"; row 136's form)
+PLINE = os.environ.get("PLINE") == "1"  # owner, 2026-10-03: a line before the transaction with the categories the payee was filed under
+PLINE_HEAD = "Earlier you filed this payee as: "
+SFX = ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -115,7 +121,7 @@ def build():
                          kind="transfer" if t.get("transfer_account_id") else "inflow" if lab == RTA else "spending",
                          fields=f"{t['date']} | {payee} | ${amt:.2f} | {WD[d.weekday()]}"))
     rows.sort(key=lambda r: (r["date"], r["id"]))
-    by_payee_name, neighbours = defaultdict(list), {}
+    by_payee_name, neighbours, aliases = defaultdict(list), {}, {}
     for i, r in enumerate(rows):
         by_payee_name[r["payee"]].append(i)
     if SIM:
@@ -126,7 +132,25 @@ def build():
         Sm = X @ X.T; np.fill_diagonal(Sm, -np.inf)
         top = np.argsort(-Sm, axis=1)[:, :200]
         neighbours = {n: [names[j] for j in top[k]] for k, n in enumerate(names)}
-    items, by_payee, last_idx = [], defaultdict(list), {}
+        if SIM2:
+            import re
+            from sklearn.feature_extraction.text import TfidfVectorizer
+
+            def clean(n):  # statement noise off: a leading Sale / Return / processor prefix, digits and punctuation
+                n = re.sub(r"^(sale|return|sq|tst|pos|debit|purchase|paypal)\b\W*", "", n.lower())
+                return re.sub(r"\s+", " ", re.sub(r"[^a-z ]", " ", n)).strip()
+            Cm = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5)).fit_transform([clean(n) for n in names])
+            Sc = (Cm @ Cm.T).toarray(); np.fill_diagonal(Sc, 0)
+            ctop = np.argsort(-Sc, axis=1)[:, :200]
+            aliases = {n: [names[j] for j in ctop[k] if Sc[k, j] >= ALIAS_MIN] for k, n in enumerate(names)}
+            for k, n in enumerate(names):  # reciprocal rank fusion (k = 60) of the two neighbour lists
+                sc = defaultdict(float)
+                for r, j in enumerate(top[k]):
+                    sc[j] += 1 / (60 + r)
+                for r, j in enumerate(ctop[k]):
+                    sc[j] += 1 / (60 + r)
+                neighbours[n] = [names[j] for j in sorted(sc, key=lambda j: -sc[j])]
+    items, by_payee, last_idx, cat_payees = [], defaultdict(list), {}, defaultdict(list)
     used_order = []  # categories by first use
     upto = 0  # rows [0, upto) are history: dated strictly before the query
     day, shared = None, []
@@ -134,6 +158,7 @@ def build():
         while rows[upto]["date"] < q["date"]:
             r = rows[upto]
             by_payee[r["payee_id"]].append(upto); last_idx[r["cat"]] = upto
+            cat_payees[r["cat"]] = [r["payee"]] + [x for x in cat_payees[r["cat"]] if x != r["payee"]][:2]  # latest 3 distinct
             if r["cat"] not in used_order:
                 used_order.append(r["cat"])
             upto += 1
@@ -177,7 +202,13 @@ def build():
         near = [i for i in prev_rows if i not in set(shared)][::-1][:OWN_MAX]
         if SIM:  # the nearest earlier payees by name embedding, up to SIM_PER_PAYEE latest rows each, SIM_MAX rows in all
             sim, sh = [], set(shared)
+            al = set(aliases.get(q["payee"], []))
+            if SIM2:  # the aliases' latest rows next to the payee's own
+                al_rows = sorted((i for a in al for i in by_payee_name.get(a, []) if i < upto and i not in sh and i not in set(prev_rows)), reverse=True)
+                near += al_rows[:ALIAS_MAX]
             for nb in neighbours.get(q["payee"], []):
+                if nb in al:
+                    continue
                 if len(sim) >= SIM_MAX:
                     break
                 rows_nb = [i for i in by_payee_name.get(nb, []) if i < upto and i not in sh][::-1][:SIM_PER_PAYEE]
@@ -185,14 +216,24 @@ def build():
             near += sim
         near = sorted(near)
         row_text = lambda i: f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
+        pline = ""
+        if PLINE and prev_rows:
+            cnt = Counter(rows[i]["cat"] for i in prev_rows).most_common(3)
+            pline = PLINE_HEAD + ", ".join(f"{c} ({n})" for c, n in cnt) + "\n\n"
         split = ("Categories: " + ", ".join(options) + f"\n\n{SHARED_HEAD}\n\n" + "".join(map(row_text, shared)) + f"{NEAR_HEAD}\n\n"
-                 + "".join(map(row_text, near)) + f"Transaction: {q['fields']}\nCategory:")
+                 + "".join(map(row_text, near)) + pline + f"Transaction: {q['fields']}\nCategory:")
+        desc = {c: ("e.g. " + ", ".join(cat_payees[c]) if cat_payees.get(c) else "nothing filed yet") for c in options} if DESC else None
         prev = [rows[i]["cat"] for i in prev_rows]
         top = Counter(prev[-3:]).most_common(1)
         rule = (top[0][0] if top and top[0][1] >= 2 else prev[-1]) if prev else None
+        rule_alias, seen_alias = rule, bool(prev)
+        if SIM2:  # YNAB's rule with payee resolution: the payee's and its aliases' rows together, in date order
+            pa = [rows[i]["cat"] for i in sorted(set(prev_rows) | {i for a in aliases.get(q["payee"], []) for i in by_payee_name.get(a, []) if i < upto})]
+            ta = Counter(pa[-3:]).most_common(1)
+            rule_alias, seen_alias = ((ta[0][0] if ta and ta[0][1] >= 2 else pa[-1]) if pa else None), bool(pa)
         items.append(dict(id=q["id"], date=q["date"], kind=q["kind"], payee_seen=bool(prev), first_use=q["cat"] not in last_idx,
                           options=options, answer=options.index(q["cat"]) if q["cat"] in options else -1, gold=q["cat"],
-                          prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, rule=rule, last=prev[-1] if prev else None, n_hist=upto))
+                          prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, desc=desc, rule=rule, rule_alias=rule_alias, seen_alias=seen_alias, last=prev[-1] if prev else None, n_hist=upto))
     p = _private(OUT / f"items{SFX}.json")
     p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
     os.chmod(p, 0o600)
@@ -222,7 +263,8 @@ def run_scoring(todo, fo):
         state = it["prompt" if LAYOUT == "today" else "prompt_split"][: -len("Category:")].rstrip()
         rng = random.Random(it["id"] if LAYOUT == "today" else f"day-{it['date']}")  # split: labels and option order fixed per day
         if ADAPTER:  # the recipe's layout (labelled rows, rand255 labels)
-            return oneslot.build_layout(P, tok, state, QUESTION, it["options"], it["answer"], rng, labels="rand255", layout="labelled_shots")
+            return oneslot.build_layout(P, tok, state, QUESTION, it["options"], it["answer"], rng, labels="rand255", layout="labelled_shots",
+                                        desc=it.get("desc") or False)
         return oneslot.build(P, tok, state, QUESTION, it["options"], it["answer"], rng, labels="letters")
 
     import time
@@ -300,8 +342,8 @@ def modal():
     items = items[:LIMIT] if LIMIT else items
     out = _private(OUT / f"scores_{READER}_{LAYOUT}{SFX}.jsonl")
     done = {json.loads(l)["id"] for l in open(out)} if out.exists() else set()
-    keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split")
-    todo = [{k: it[k] for k in keep} for it in items if it["id"] not in done]
+    keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split", "desc")
+    todo = [{k: it.get(k) for k in keep} for it in items if it["id"] not in done]
     print(f"{READER}: {len(done)} done, {len(todo)} to score on Modal", flush=True)
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
     n = 0
