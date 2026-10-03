@@ -82,25 +82,30 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
 - **Branches:** stack #24 now runs to #82: #77 plan-163-real-budget, #78 plan-165-real-budget-gate, #79 plan-166-similar-payees,
   #80 plan-167-prompt-variants, #81 plan-171-payee-resolution, #82 plan-172-overture-lookup (top). Stack order is not numeric (#20
   after #23); link with `gh stack link 5 6 8 9 10 11 12 13 14 15 16 17 18 19 21 22 23 20 25 26 ... 82 <new-branch>`.
-- **Next (2026-10-03): row 173, approved in outline, waiting for the owner's "start".** Plan (MODEL-28; REPORT 73 found database
-  episodes store facts, not a skill: +21 on places in the database, 0 to +3 held out; REPORT 58: 20,000 merchants at ~30 rows each fit
-  without interference, so coverage is the lever):
-  1. Merchant database from public data only, chosen by a rule blind to the owner's budget: the largest US brands by place count in
-     tiers of 5k / 20k (50k if 20k still gains) plus a sample of US independents; each with its Overture basic_category and Overture's
-     name variants; a hash-chosen half of each tier held out (facts vs skill). Then count the owner's payees that fall in it (the test
-     population); never pick merchants from the budget.
-  2. Statement renderings with the synthetic generators' templates (upper case, store numbers, SQ * / TST* prefixes, city + state,
-     22-character truncation), so "COSTCO WHSE #0641" maps to Costco.
-  3. Category mapping: extend build_poi1.py's Overture-to-user-category mapping from top-level kinds to the 288 basic categories via
-     `ai_experiments.canon`'s 41 kinds; check by eye.
-  4. Training: the decider-4B recipe unchanged plus these merchants through `DBEP` / `DB_EPISODES` (exp_categoriser.py's database
-     episodes; ~30 rows per merchant), steps scaled with the database (4 to 8 x 800 at 20k; ~$10-30); arms: none / 5k / 20k. Smoke
-     200 steps first; commit the job list `scripts/modal_jobs/r173.json` before launching; push adapters to DVC.
-  5. Read: the owner's budget privately (first-time payees in the database vs not, with and without SIM=2 rows, against the recipe and
-     the 35B; the target is the 35B's 56.8 on matched first-time payees at the 4B's cost), blind_v1 / v2 for regressions (v3 sealed),
-     the held-out half of the database. Write up as REPORT 161 on branch plan-173-overture-weights.
-  Risks: facts only (independents outside the database will not move); Overture's kind is not how people budget (users who file a
-  merchant against its kind must keep working); online merchants are not places (Wikidata, CC0, later); one household is a thin test.
+- **Now (2026-10-03): row 173, started (branch plan-173-overture-weights).** Revised with the owner while starting:
+  - Found: row 107 (REPORT 108) already put real Overture businesses into decider's training (`OVDB`, overture_pool_v1: 33,555
+    random places, 12 standard categories): +5 to +11 on real businesses in no database, but blind auto-filing 55% -> 42% and REAL-6 -1.5
+    to -3, so it is not in decider's recipe. Only 8.9% of the owner's Overture-matched payees are in that pool. Brands cover only 7 to 9% of
+    the owner's first-time-payee transactions even at 20k brands (most first-time payees are local): stored facts about chains can add
+    ~2 points there at most; the larger lever is the skill of reading what an unknown business is, which needs training users whose
+    categories span many kinds of merchant.
+  - Owner: corrupt payees only in ways real strings show; done: `scripts/statement_patterns.py` measured a grammar of aggregate
+    frequencies from the budget's raw strings (`data/processed/statement_patterns_v1.json`: case, Sale/Return lead, processor prefix,
+    suffix type, run-together, truncation widths 20/21/22/25 for 22%), `ai_experiments.statements.render_v2` samples it (matches the rates
+    within ~1 point except case style). The old `transactions.render` (always upper case, card words 37%, city 32%, dates 37%) is far from
+    real strings (0.3%, 1.3%, 4%).
+  - Owner: broaden the canonical 12; look at an MCC database. Done: `ai_experiments.overture_canon` (284 Overture categories -> the 41
+    canonical kinds; 95.8% of US places, 98.9% of the owner's matched payees); MCC codes (981, Unlicense) in `data/external/mcc_codes/`.
+    Next: a two-level taxonomy (`ai_experiments.taxonomy_v2`): ~300 MCC merchant types (fine; airlines / hotels / car rentals for the
+    683 brand codes) -> ~60 kinds (the 41 broadened: liquor, airline / hotel / car rental split, home services and trades, furniture vs
+    home improvement, jewellery, second-hand / pawn, tobacco, digital goods and games, lottery and gambling, fines and court costs, legal
+    and accounting, shipping and postage, funeral, ...); Overture categories and the old 41 mapped onto it.
+  - Then: a training-episode family whose users have categories at mixed granularity over the taxonomy (fine "Bakeries", middle
+    "Restaurants", merged "Food", catch-alls, purpose categories; counts and long tail from the budget's aggregates: ~96 offered, 86 of 154
+    used < 20 times), history rows from a stratified Overture pool (independents per kind for skill + top 5k brands for facts, a hash half
+    held out) and MCC-only kinds (subscriptions, utilities, insurance, taxes) from name banks, all rendered with render_v2; smaller share
+    than row 107's 0.2 to protect auto-filing. Arms: recipe / + taxonomy episodes / + brand facts; read the owner's first-time payees
+    (brand / local match / unmatched), REAL-6, blind v1 / v2, novel_merchants_v1, blind auto-filing; REPORT 161.
 - **Later, proposed:** 168 (train on real filings with "might be / definitely isn't" losses), 169 (a generator calibrated to real
   budgets), 170 (distil or prune the 35B), better payee consolidation (row 171's open problem: train the combiner on relabelled pairs;
   a person-to-person parser), 160 to 162 as before. Also offered, not queued: JevBench for row 154's model, a single-pass table layout.
