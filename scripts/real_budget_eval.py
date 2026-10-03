@@ -390,11 +390,17 @@ def embed():
     import numpy as np
     sys.path.insert(0, str(Path(__file__).parent))
     import modal_app
-    items = json.loads((OUT / "items.json").read_text())["items"]
-    names = sorted({it["prompt"].rsplit("Transaction: ", 1)[1].split(" | ")[1] for it in items})
-    print(f"{len(names)} payee names to embed on Modal", flush=True)
+    if os.environ.get("EMBED_SOURCE") == "raw":  # row 171: every raw bank string YNAB imported (import_payee_name_original)
+        b = json.loads(CACHE.read_text())["budget"]
+        names = sorted({t["import_payee_name_original"] for t in b["transactions"] if not t.get("deleted") and t.get("import_payee_name_original")})
+        dest = OUT / "raw_emb.npz"
+    else:
+        items = json.loads((OUT / "items.json").read_text())["items"]
+        names = sorted({it["prompt"].rsplit("Transaction: ", 1)[1].split(" | ")[1] for it in items})
+        dest = OUT / "payee_emb.npz"
+    print(f"{len(names)} names to embed on Modal", flush=True)
     vecs = np.load(io.BytesIO(modal_app.embed_private_call(names, READER, ADAPTER_FROM)))
-    p = _private(OUT / "payee_emb.npz")
+    p = _private(dest)
     np.savez(p, names=np.array(names), vecs=vecs); os.chmod(p, 0o600)
     print(f"saved {vecs.shape}", flush=True)
 

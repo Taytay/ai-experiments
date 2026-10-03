@@ -1315,6 +1315,11 @@ label smoothing + Brier; on several consenting real budgets with held-out users.
 from one real household (category count and long tail, multi-category payees, one-off payees, alias spellings, codes, whitespace,
 reorganisation). *Experiment:* PLAN row 169: fit the generator to aggregate statistics of several real budgets; retrain; read REAL-27.
 
+**Status (DATA-8, 2026-10-03):** PLAN step 171, REPORT.md 159: on real strings labelled by YNAB, Jaro-Winkler finds the payee of a new string 83.5% of the time, the embedding raises the fewest false alarms; combinations stall on gold that keeps aliases apart; relabelled training pairs and a person-to-person parser next.
+
+**MODEL-28 Real merchant knowledge from Overture places.** Owner (2026-10-03). Lookup of a payee string in 81.5M open-licence places
+to inject a kind line, and training the 4B on real business names and their categories. *Experiment:* PLAN row 172.
+
 **MODEL-27 Distilling the 35B's payee knowledge.** Owner (2026-10-03). The 35B knows more payees (first-time payees 45.3 against 43.8 for
 the 4B with aliases) at ~1.6 times the cost. *Experiment:* PLAN row 170: expert pruning on real transaction prompts, logit distillation
 into the 4B on real data, quantisation.

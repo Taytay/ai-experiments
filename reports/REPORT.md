@@ -9775,3 +9775,56 @@ at 90% precision.
   99.6% of the time, and it leaves 3 to 6% of its probability on categories the payee never gets; on first-time payees (82% of them seen
   only once, so "ever used" is mostly the gold itself) it spreads 51 to 70%. A training signal that charges probability on never-used
   categories and credits any ever-used one (future filings included, training only) is proposed as PLAN row 168.
+
+
+## 159. Payee resolution on real strings, labelled by YNAB: for a bank string never seen before, Jaro-Winkler finds the right payee 83.5% of the time and the decider embedding raises the fewest false alarms (13.9%); some matcher is right 95.9% of the time, but combinations trained on the owner's payee list do not beat the best single matcher, because that list keeps many aliases apart (about 17 of 25 sampled "false alarms" are the same merchant under two payees the owner did not clean up) (REAL-27, DATA-8)
+
+PLAN step 171 (owner, 2026-10-03: "If we were better at just doing payee cleansing alone, we'd be better at all of this ... Is there any
+other fuzzy lookup tool from traditional computer science that might help us identify similar payees?"; "Don't forget that sometimes I
+clean up payees and sometimes I don't."). YNAB stores each imported transaction's raw bank string (`import_payee_name_original`) with
+the payee YNAB's matcher and the owner assigned it: 18,562 imported, non-transfer transactions, 7,859 distinct strings (320 assigned to
+more than one payee). Replayed in date order: when a string appears for the first time, each matcher looks it up among the strings first
+seen on earlier dates. 3,776 such new strings belong to a payee already seen (the matcher should find it), 4,080 to a new payee (it
+should abstain). Thresholds chosen for best F1 on the earlier half of the timeline, read on the later half. Strings cleaned first (lower
+case, a leading Sale / Return / processor prefix off, digits and punctuation off). `scripts/payee_resolution_real.py` (rapidfuzz, MIT;
+the strings stay in the YNAB skill's cache; aggregates only); the raw strings embedded privately on Modal (`real_budget_eval.py
+EMBED_SOURCE=raw`, the recipe's decider-4B, REPORT 152's read-out).
+
+**Table 159.1: the later half (1,949 new strings of known payees, 1,979 of new payees)**
+
+| matcher | top-1 right payee | threshold | precision | recall | F1 | false alarms on new payees | matches whose payee's usual category is this transaction's |
+|---|---|---|---|---|---|---|---|
+| exact cleaned string | 43.3 | equal | 82.9 | 41.3 | 55.1 | 6.0% | 82.4% |
+| first word (oneslot.payee_key's rule) | 79.0 | equal | 52.9 | 78.9 | 63.3 | 50.7% | 58.3% |
+| consonant skeleton, shared leading words | 44.0 | 0.29 | 24.9 | 43.9 | 31.8 | 87.0% | 42.3% |
+| **Jaro-Winkler** | **83.5** | 0.90 | 68.1 | **75.4** | **71.6** | 23.9% | 66.8% |
+| token-set ratio | 79.3 | 0.78 | 54.2 | 75.9 | 63.2 | 45.1% | 63.7% |
+| character 3-5-gram TF-IDF | 83.0 | 0.55 | 57.2 | 76.7 | 65.5 | 42.0% | 64.0% |
+| **decider-4B embedding** | 77.8 | 0.99 | **72.5** | 68.5 | 70.5 | **13.9%** | 68.0% |
+| rank fusion (Jaro-Winkler, n-grams, embedding) | 81.7 | – | 53.6 | 67.8 | 59.9 | 44.7% | 67.4% |
+| gradient-boosted trees on all of them + amount gap + length gap | 79.3 | 0.48 | 68.2 | 68.0 | 68.1 | 16.5% | 65.7% |
+
+Headroom: on the later half's new strings of known payees, some single matcher has the right payee top-1 95.9% of the time, and the
+combined matcher's candidates include it 97.7% of the time.
+
+### 159.1 What the step says
+
+- **The gold under-merges.** YNAB's payee assignment is the owner's cleaning, and the owner does not always clean. Of 25 sampled
+  embedding "false alarms" on new payees (read locally): about 17 are the same merchant under two payees (two Walgreens payees, "Uber Trip"
+  and "Uber", "Prime Video Channels" and "Prime Video", marketplace order codes, one payee per weekday or memo for the same person), about
+  5 are different payees of the same kind (two coffee shops, two airlines, two restaurants: harmless for categorising), about 2 are wrong
+  (two different people's person-to-person payments). Consistently, the false alarms agree with the transaction's category as often as
+  the correct matches do (67 to 69% against 66 to 68%; well under 100% for both because many payees take several categories). The
+  precision column is therefore a floor, and the "false alarm" column mostly counts real aliases.
+- **Single matchers:** Jaro-Winkler is the best at finding the payee (83.5 top-1, F1 71.6; it rewards a shared prefix, which is what
+  truncated and suffixed bank strings share); the embedding raises the fewest alarms on new payees (13.9%) at a strict threshold.
+  Character n-grams find nearly as many (83.0) with more alarms; first-word keys and token-set ratios are coarse; the consonant skeleton
+  (for dropped vowels) is the weakest alone (44) and belongs only inside a combination.
+- **Combining is the open problem, and the gold is why.** Some matcher is right 95.9% of the time, 12 points over the best one, but a
+  model trained on the owner's payee list (boosted trees, with the new transaction's amount against the candidate payee's usual amount)
+  reaches 79.3: its negatives include the aliases the owner never merged, so it learns to doubt true matches. Next: train on relabelled
+  pairs (aliases merged by a high-precision rule, or category-consistent pairs as positives), or cluster payees first; and a parser for
+  person-to-person strings ("X Paid Y - memo"), whose payees differ only by a person's name.
+- **For the categoriser this is already enough to act on:** REPORT 158's alias rows (n-gram matches, used as evidence, not as merged
+  payees) gave 72.5% right first on first-time payees that were aliases; a better matcher improves the rule, the "first-time" routing to
+  the 35B, and which rows the prompt shows.
