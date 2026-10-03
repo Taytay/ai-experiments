@@ -405,7 +405,7 @@ def embed():
     if os.environ.get("EMBED_SOURCE") == "raw":  # row 171: every raw bank string YNAB imported (import_payee_name_original)
         b = json.loads(CACHE.read_text())["budget"]
         names = sorted({t["import_payee_name_original"] for t in b["transactions"] if not t.get("deleted") and t.get("import_payee_name_original")})
-        dest = OUT / "raw_emb.npz"
+        dest = OUT / ("raw_emb.npz" if not READER.startswith("adapter:") else f"raw_emb_{ADAPTER_FROM}.npz")  # row 175: per reader
     else:
         items = json.loads((OUT / "items.json").read_text())["items"]
         names = sorted({it["prompt"].rsplit("Transaction: ", 1)[1].split(" | ")[1] for it in items})

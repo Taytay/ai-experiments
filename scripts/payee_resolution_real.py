@@ -92,7 +92,7 @@ if __name__ == "__main__":
     sid = {s: k for k, s in enumerate(strings)}
     C = [clean(s) for s in strings]
     FW = [first_word(c) for c in C]; SK = [skeleton(c) for c in C]
-    emb = np.load(OUT / "raw_emb.npz")
+    emb = np.load(OUT / os.environ.get("EMB_FILE", "raw_emb.npz"))  # row 175: EMB_FILE=raw_emb_<job tag>.npz for another reader
     E = dict(zip(list(emb["names"]), emb["vecs"].astype(np.float32)))
     X = np.stack([E[s] for s in strings]); X /= np.clip(np.linalg.norm(X, axis=1, keepdims=True), 1e-9, None)
     T = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5)).fit_transform([c or "_" for c in C])

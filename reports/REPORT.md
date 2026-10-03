@@ -9972,3 +9972,52 @@ Auto-filing (calibrated by halves, oracle thresholds): 66.6% at 90% precision (f
   98%-precision auto-file share (15.5 to 10.2). 50% real-style is too much (REAL-6 -6, novel names -6, misleading names -11).
 - **Next (row 174):** two more seeds of the 25% arm; a fix for "changed their mind" (households where a user re-routes a payee for good,
   misfiles that are corrected, not random); a lower share (0.15) if the costs persist; then the system without the 35B as the recommendation.
+
+
+## 162. Combining YNAB's deterministic suggestion with the model: putting the payee's most recent category first and the model's list after it is the best simple policy on the owner's budget (75.2% right first over the whole timeline against the model's 73.8, the 2-of-3 rule first 74.9 and the 0.2 gate 74.7; later half 78.5 / 88.1 in a list of three); inserting past categories at position 2 or 3 adds nothing (the model already has them there), ordering them by frequency hurts (71.8), and fuzzy aliases do not help the rule (74.3); the new model's embedding recognises the same payee a little better (F1 70.5 -> 72.7, false alarms 13.9 -> 10.9%) but still finds it less often than Jaro-Winkler (78.6 against 83.5) (REAL-27, DATA-8)
+
+PLAN step 175 (owner, 2026-10-03: "YNAB's 'suggest the last category used in the last 2 out of 3 transactions from this merchant' is very
+strong. So can we combine that deterministic approach with our model? ... see what the best rule of thumb is for where to insert past
+categories ... Then the model is just there to enhance something that works 80% of the time"; "how good is the new model at knowing which
+two corrupted payees are likely to be the same as each other?"). Offline from stored runs (`scripts/rule_blend.py`; the owner's items
+and REPORT 161's reader, decider-4B + 25% real-style with aliases + similar payees; aggregates only): list policies of at most three
+suggestions; a threshold, where a policy has one, chosen on the earlier half of the timeline and read on the later half.
+
+**Table 162.1: right one first % / in the list % / MRR**
+
+| policy | all, later half (10,619) | payee filed before, later half (7,990) | all, whole timeline (21,238) |
+|---|---|---|---|
+| the model's order | 76.5 / 87.6 / 0.816 | 82.4 / 91.9 / 0.868 | 73.8 / 85.4 / 0.791 |
+| YNAB's rule (2 of the last 3) first | 78.3 / 87.9 / 0.827 | 84.8 / 92.3 / 0.882 | 74.9 / 85.6 / 0.798 |
+| **the payee's last category first** | **78.5 / 88.1 / 0.829** | **85.1 / 92.6 / 0.885** | **75.2 / 85.8 / 0.800** |
+| the rule or the last category at position 2 or 3 (if not already above) | 76.5 / 87.9-88.1 | 82.4 / 92.3-92.6 | 73.8 / 85.6-85.8 |
+| all past categories first, most recent first | 78.5 / 87.9 / 0.829 | 85.1 / 92.4 / 0.884 | 75.2 / 85.5 / 0.799 |
+| all past categories first, by count | 73.5 / 86.9 / 0.798 | 78.4 / 91.0 / 0.843 | 71.8 / 84.7 / 0.777 |
+| all past categories first, by the model | 77.8 / 88.0 / 0.825 | 84.1 / 92.5 / 0.880 | 74.8 / 85.7 / 0.798 |
+| ... unless the model gives a never-used category >= 0.8 (tuned) | 77.7 / 88.0 / 0.825 | 84.0 / 92.5 / 0.879 | 74.8 / 85.7 / 0.798 |
+| the 0.2 gate (REPORT 156) | 77.6 / 87.6 / 0.822 | 83.8 / 92.0 / 0.875 | 74.7 / 85.4 / 0.796 |
+| the last category first, with fuzzy aliases' filings counted (n-gram >= 0.7) | 77.8 / 88.2 / 0.826 | – | 74.3 / 85.8 / 0.795 |
+
+First-time payees (no history) are the model alone in every policy: 58.5 / 74.4 on the later half.
+
+**Table 162.2: payee resolution on the owner's YNAB-labelled raw strings (REPORT 159's replay, later half): the new reader's embedding**
+
+| matcher | top-1 right payee | precision | recall | F1 | false alarms on new payees |
+|---|---|---|---|---|---|
+| Jaro-Winkler | 83.5 | 68.1 | 75.4 | 71.6 | 23.9% |
+| recipe's embedding (REPORT 159) | 77.8 | 72.5 | 68.5 | 70.5 | 13.9% |
+| recipe + 25% real-style, embedding | 78.6 | 76.0 | 69.7 | 72.7 | 10.9% |
+| combined (boosted trees), with the new embedding | 80.1 | 73.3 | 66.4 | 69.7 | 11.2% |
+
+### 162.1 What the step says
+
+- **The rule of thumb: the payee's last category first, the model for everything else.** It beats the model alone by 1.4 points right
+  first, YNAB's 2-of-3 rule first by 0.3 and the confidence gate by 0.5, with no threshold to tune; "last" beats "2 of the last 3" for
+  the same reason as REPORT 161: on this budget time decides, and the latest filing is the best single clue (77% for multi-category
+  payees). Below position one the model already lists the payee's past categories; ordering them by count brings back stale habits.
+- **The model's place:** first-time payees (25% of the later half; 58.5% right first, 74.4% in the list) and positions two and three for
+  known payees; on known payees it only rarely beats the last filing.
+- **Fuzzy aliases do not help the rule:** counting n-gram aliases' filings lowers it (75.2 to 74.3), because the aliases join different
+  payees; recognising the same payee has to be precise before its history can be trusted.
+- **The new model recognises payees a little better, not well enough:** its embedding has the best F1 and the fewest false alarms of any
+  single matcher, but finds the payee less often than Jaro-Winkler. Payee recognition needs training as a task (row 176).
