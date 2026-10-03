@@ -209,15 +209,11 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
         if label is None:  # row 117: a section header
             parts.append(fields + "\n\n")
             continue
-        if field_loss and "\n" in fields:  # row 176: the values of a history row's field lines ("Clean payee: X", ...) are trained tokens
+        if field_loss and "\n" in fields:  # row 176: a history row's whole field block is generated: every line (key, value, line break), so
+            # the model learns which fields are present, and the "\nCategory:" after it, so it learns where the block ends
             n0 = sum(len(p) for p in parts) + len("Transaction: ")
-            first, *extra = fields.split("\n")
-            off = n0 + len(first) + 1
-            for line in extra:
-                k, sep, v = line.partition(": ")
-                if sep:
-                    targets.append((off + len(k) + 2, off + len(line)))
-                off += len(line) + 1
+            first = fields.split("\n")[0]
+            targets.append((n0 + len(first), n0 + len(fields) + len("\nCategory:")))
         parts.append(f"Transaction: {f(fields)}\nCategory:")
         lab = f" ({lab_of[label]}) {label}" if layout == "labelled_shots" and label in lab_of else f" {label}"
         if in_loss(st):
