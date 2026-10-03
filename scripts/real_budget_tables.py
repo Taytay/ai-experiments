@@ -41,6 +41,12 @@ if __name__ == "__main__":
     if ral:
         groups["first-time payee, but an alias filed before"] = [i for i in groups["first-time payee"] if ral[i]["seen_alias"]]
         groups["first-time payee, no alias either"] = [i for i in groups["first-time payee"] if not ral[i]["seen_alias"]]
+    kf = OUT / "overture_kinds.json"
+    if kf.exists():  # row 172: payees matched to an Overture place
+        kinds = json.loads(kf.read_text())
+        groups["first-time payee, matched in Overture"] = [i for i in groups["first-time payee"] if payee(items[i]) in kinds]
+        groups["first-time payee, not matched"] = [i for i in groups["first-time payee"] if payee(items[i]) not in kinds]
+        groups["payee filed before, matched in Overture"] = [i for i in groups["payee filed before"] if payee(items[i]) in kinds]
     for g, ids in groups.items():
         print(f"\n**{g} (n={len(ids)}): right first / top 3 / top 5 / top 10 / MRR / top-1 a category ever used for the payee / probability on never-used categories**\n")
         print("| reader | 1st | top 3 | top 5 | top 10 | MRR | top-1 ever used | p(never used) |"); print("|---|---|---|---|---|---|---|---|")

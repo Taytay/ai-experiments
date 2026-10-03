@@ -9828,3 +9828,47 @@ combined matcher's candidates include it 97.7% of the time.
 - **For the categoriser this is already enough to act on:** REPORT 158's alias rows (n-gram matches, used as evidence, not as merged
   payees) gave 72.5% right first on first-time payees that were aliases; a better matcher improves the rule, the "first-time" routing to
   the 35B, and which rows the prompt shows.
+
+
+## 160. Looking payees up in Overture's open places database matches 1,802 of the owner's 5,811 payees (a third of first-time-payee transactions); a "Kind:" line from the match lifts those first-time payees from 54.2 to 55.4% right first and 68.1 to 70.8 in the top 3, but only 0.1 overall: the similar-payee rows already tell the model what kind of place a payee is; for known payees the line costs a little (MODEL-28, REAL-27)
+
+PLAN step 172 (a) (owner, 2026-10-03: "Could we use our large, free POI database to learn about merchants? ... a lookup that matches an
+input payee to it ... inject a payee description at inference time"; "Start with lookup."). Overture places 2026-09-23.1 (81.5M places;
+sources under CDLA-Permissive-2.0, Apache-2.0 and CC0-1.0) reduced with DuckDB to two public tables kept beside the download, outside the
+repo: 296,375 brands worldwide (with 2+ places) and 12.4M lower-cased US place names, each with its most common `basic_category` (288
+values). `scripts/overture_lookup.py` matches each payee (its YNAB name and up to 5 of its raw bank strings, cleaned as in REPORT 159):
+candidates share the first cleaned word; Jaro-Winkler >= 0.93 for a brand (tried first), >= 0.95 for a US place name; every word of the
+payee must match a word of the place (the last may be missing when the string looks truncated: Jaro-Winkler alone matched "Progressive
+Ins" to a roofing company); a one-word payee only to a brand with 20+ places, exactly; person-to-person, check and transfer strings never.
+The match is written privately; the prompt (REPORT 158's aliases + fused neighbours, `real_budget_eval.py SIM=2 KIND=new|all`) gets
+"Kind: <category>" under the transaction (row 149's line, read zero-shot as in REPORT 144), for first-time payees or for every matched
+payee. Scored privately on Modal with the recipe's decider-4B.
+
+Matches: 1,802 payees (807 by brand), 36% of transactions, 32% of first-time-payee transactions (1,983). By eye, before the one-word rule,
+about 24 of 30 sampled matches were right (chains, local restaurants, clinics, shops); the errors were mostly generic one-word names, which
+the rule then removed. Online-only merchants and subscriptions are not places and stay unmatched.
+
+**Table 160.1: % right first / top 3 / top 10**
+
+| reader | all (21,238) | first-time payee (6,206) | first-time payee matched in Overture (1,965) | first-time, not matched (4,241) | known payee matched in Overture (5,686) |
+|---|---|---|---|---|---|
+| YNAB's rule | 57.9 | 0 | 0 | 0 | 80.6 |
+| recipe, aliases + fused neighbours (REPORT 158) | 72.2 / 83.6 / 89.6 | 53.2 / 67.7 / 78.2 | 54.2 / 68.1 / 78.5 | 52.7 / 67.5 / 78.1 | 78.5 / 90.5 / 94.2 |
+| + Kind line, first-time payees | **72.3** / 83.8 / 89.8 | **53.6 / 68.6 / 78.9** | **55.4 / 70.8 / 80.6** | 52.7 / 67.5 / 78.1 | 78.5 / 90.5 / 94.2 |
+| + Kind line, every matched payee | 72.1 / 83.9 / 89.8 | 53.6 / 68.6 / 78.9 | 55.4 / 70.8 / 80.6 | 52.7 / 67.5 / 78.1 | 78.1 / 90.7 / 94.3 |
+| 35B recipe, similar payees (REPORT 157) | 72.8 / 83.5 / 89.2 | 52.8 / 66.9 / 77.4 | 56.8 / 70.7 / 80.4 | 50.9 / 65.1 / 76.0 | 79.9 / 90.8 / 94.4 |
+
+### 160.1 What the step says
+
+- **The lookup works as a lookup:** a third of first-time-payee transactions get a real place and category from open data, mostly
+  correctly, in 30 seconds for the whole budget on a laptop.
+- **As a prompt line it adds little on top of the similar-payee rows:** +1.2 right first and +2.7 top 3 on the matched first-time payees,
+  +0.4 / +0.9 over all first-time payees, +0.1 overall. On the synthetic sets a kind line from a database moved first-time payees a
+  lot (REPORT 144), but there the prompt had no similar-payee rows; here those rows already carry the kind (a new coffee shop arrives
+  with the owner's filings of other coffee shops). The 35B's own knowledge is still ahead on the matched group (56.8).
+- **Only for first-time payees:** on payees the owner has filed, the line slightly lowers right first (78.5 to 78.1); their own rows
+  say more.
+- **What the database is likely better for:** the other half of row 172, putting real merchant knowledge into the 4B's weights (names
+  and string variants of real businesses mapped to their kinds, the synthetic database episodes made real), so that a first-time payee is
+  recognised the way the 35B recognises it; and as a cleaning aid for payee resolution (a brand match ties "COSTCO WHSE #0641" and
+  "Costco Gas" to one brand with different kinds). Row 173.
