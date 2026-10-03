@@ -9581,3 +9581,65 @@ against the model, so those columns are lower bounds by up to ~0.5.)
 - **Next:** the gate and the system on this budget (rule + model agreement, the 35B for first-time payees); item-level detail for
   multi-purpose retailers where the bank feed carries it; more real budgets (the owner's others, then consenting users), since one
   household is one user.
+
+
+## 156. The recommended system on the owner's real budget: 71.0% right first and 80.8% in a list of at most three (YNAB's rule 57.9 / 57.9), saving 72% of the work of filing by hand (rule 58%); the 35B for first-time payees adds 6 points there (37.8 to 43.8, in the list 51.3 to 59.9); the 0.2 gate barely matters here (rule always first 69.0, gate 69.2, model alone 68.3); calibrated by halves, the first suggestion can be auto-filed for 62% of transactions at 90% precision and 43% at 95% (REAL-27)
+
+PLAN step 165 (owner, 2026-10-02: "Do #1 - confidence gate"). REPORT 141's recommended system, unchanged, on REPORT 155's 21,238 real
+transactions: decider-4B (the recipe; no other-users line, one household) reads every transaction; the untrained decider-35B-A3B's
+distribution is multiplied in for first-time payees (6,206; scored on Modal the same private way); for known payees YNAB's rule's
+category is first unless the model's top category is at least 0.2 more probable; the rest of the list follows the model, at most three
+suggestions. `scripts/real_budget_system.py` (reads the private items and scores; prints aggregates only). Two substitutions, because one
+real budget lacks what the synthetic sets had: the temperatures are fitted on alternate transactions (each half of the date-ordered
+transactions tempered with the temperature fitted on the other half), not on other users; and the "plausible" categories (shown free in a
+list, never charged as clutter) are the categories the owner had filed the payee under on earlier dates plus the rule's, not a
+generator's list. Work saved is REPORT 131's scale (right first 0 ... not suggested 10, plus 1 per implausible wrong suggestion).
+While building it, the system card exposed that bf16 label logits tie at the top on 1.7% of items; the recipe was re-scored with an fp32
+readout and REPORT 155 corrected (68.7 -> 68.3).
+
+**Table 156.1: right one 1st % / in the list % / suggestions shown / work saved %**
+
+| suggestions from | all (n=21,238) | first-time payee (6,206) | known payee, filed differently from the rule (2,737) | known payee, the rule's category (12,295) |
+|---|---|---|---|---|
+| YNAB today | 57.9 / 57.9 / 0.7 / 58 | 0 / 0 / 0 / 0 | 0 / 0 / 1.0 / 0 | 100 / 100 / 1.0 / 100 |
+| no-model list (the rule, then the payee's other past categories) | 58.1 / 63.1 / 1.3 / 62 | 0.4 / 0.4 / 0.0 / 0 | 0.4 / 39.4 / 2.4 / 35 | 100 / 100 / 1.7 / 100 |
+| decider-4B (recipe) alone, its own order | 68.3 / 78.2 / 2.2 / 69 | 37.8 / 51.3 / 3.0 / 25 | 16.0 / 43.1 / 2.5 / 39 | 95.4 / 99.6 / 1.7 / 99 |
+| the rule always first, then decider's list | 69.0 / 78.3 / 2.2 / 70 | 37.8 / 51.3 / 3.0 / 25 | 0.6 / 42.2 / 2.5 / 36 | 100 / 100 / 1.7 / 100 |
+| decider-4B + the 0.2 gate | 69.2 / 78.3 / 2.2 / 70 | 37.8 / 51.3 / 3.0 / 25 | 9.5 / 42.7 / 2.5 / 38 | 98.4 / 99.9 / 1.7 / 99 |
+| **recommended system (+ 35B for first-time payees)** | **71.0 / 80.8 / 2.2 / 72** | **43.8 / 59.9 / 3.0 / 34** | 9.5 / 42.7 / 2.5 / 38 | 98.4 / 99.9 / 1.7 / 99 |
+
+The 35B alone on the first-time payees: 40.5% right first (decider-4B 37.8; the product 43.8).
+
+**Table 156.2: auto-filing the recommended system's first suggestion when its calibrated probability is at least t**
+
+| t | share of transactions filed automatically | right among them | filed right, share of all |
+|---|---|---|---|
+| 0.5 | 70.2% | 86.8% | 60.9% |
+| 0.7 | 59.1% | 91.1% | 53.8% |
+| 0.8 | 52.9% | 92.9% | 49.1% |
+| 0.9 | 41.2% | 95.2% | 39.2% |
+| 0.95 | 27.9% | 96.6% | 27.0% |
+
+Coverage at a precision target (threshold chosen on the same transactions, an oracle): 62.1% at 90%, 43.1% at 95%, 16.6% at 98%.
+Calibration of the first suggestion: ECE 0.037.
+
+### 156.1 What the step says
+
+- **The system holds on real data:** 71.0% right first against the rule's 57.9 (+13.1), the right category in the list 80.8% against
+  57.9 (+22.9), work saved 72% against 58%. On blind_v3 the same system scored 81.1 / 96.3 / 90; the real budget is harder (about 96
+  categories, eleven years of reorganisation, purpose-defined categories) and the gains over the rule are as large or larger.
+- **The 35B earns its place on first-time payees:** +6.0 right first and +8.6 in the list over decider-4B alone, as on the synthetic
+  sets. It reads only the 29% of transactions with a new payee.
+- **The gate is nearly neutral here.** On known payees the model and the rule agree 89% of the time (REPORT 155); the rule-first,
+  model-only and gated orders differ by under a point overall. The gate keeps 98.4% of the rule's correct answers while recovering 9.5%
+  of the cases the rule gets wrong (the model alone recovers 16.0% but loses 4.6% of the rule's).
+- **Known payees filed differently from the rule are the unsolved part:** 2,737 transactions (13%), 9.5% right first and 43% in the
+  list. These are multi-purpose retailers and purpose-defined categories (REPORT 155); neither the rule nor the model has the information.
+- **Auto-filing:** with temperatures fitted on the other half of the transactions, the system's confidence is well calibrated (ECE
+  0.037); at 0.9 it would file 41% of transactions automatically at 95% right, at 0.8 53% at 93%. Raw, the recipe is over-confident
+  on this budget (mean confidence 0.78 against 68% right, ECE 0.106; fitted temperature 1.4 on either half), in the same direction as
+  REPORT 50 found on the synthetic sets; one temperature fitted on a user's own earlier filings fixes it, so a production gate should fit
+  one per user (or per population) rather than trust raw probabilities.
+- **Caveats:** one household; the plausible-category stand-in is narrower than the generator's lists (it charges clutter on new
+  payees' wrong suggestions, which is why their work saved, 34%, sits below their 60% in-the-list); the precision coverage is an oracle
+  threshold.

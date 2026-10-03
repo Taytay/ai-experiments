@@ -1302,6 +1302,7 @@ nothing, `modal_app.score_private`); zero-shot decider-4B and the recipe against
 history (a row for every offered category), since this budget has ~96 categories where the synthetic users had 10 to 20.
 
 **Status (2026-10-02):** PLAN step 163, REPORT.md 155: the recipe transfers to real data: 68.3% right first against the rule's 57.9; ties the rule on known payees, 37.8% on first-time payees; weak on multi-purpose retailers and purpose-defined categories; wide history adds nothing.
+**Status (2026-10-02, later):** PLAN step 165, REPORT.md 156: the recommended system on the same budget: 71.0% right first, 80.8% in the list, 72% work saved (rule 57.9 / 57.9 / 58); the 35B adds 6 points on first-time payees; the gate is nearly neutral; calibrated by halves it auto-files 41% at 95% right.
 
 **MODEL-26 Cloudflare's Clef decision models and their RL fine-tuning.** Owner (2026-10-02): try "the new Jev like model from
 cloudflare, as well as its fine tuning RL framework" (https://blog.cloudflare.com/clef-decision-models/). `Cloudflare/clef` (Qwen3.8-27B
