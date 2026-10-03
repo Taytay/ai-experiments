@@ -17,3 +17,5 @@
 /real7train_v1_mix.json
 /pop_v2.jsonl.gz
 /realstyle_merchants_v1.json
+/realstyle_v1_train.jsonl
+/realstyle_v1_test.json

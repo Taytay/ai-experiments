@@ -38,7 +38,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 BUDGET = os.environ["BUDGET"]
-CACHE = Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json"
+CACHE = Path(os.environ.get("CACHE_PATH") or Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json")  # CACHE_PATH: another budget file (row 173: synthetic households)
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
 READER = os.environ.get("READER", "recipe")  # recipe | zeroshot (decider-4B) | big (decider-35B-A3B, untrained) | big-recipe (35B + recipe)
 LAYOUT = os.environ.get("LAYOUT", "split")  # today (one prompt each) | split (one cached prefix per day)
@@ -83,7 +83,16 @@ def _clean(name):
 
 
 def build():
-    b = json.loads(CACHE.read_text())["budget"]
+    items = build_items(json.loads(CACHE.read_text())["budget"])
+    p = _private(OUT / f"items{SFX}.json")
+    p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
+    os.chmod(p, 0o600)
+    print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
+          f"options median {sorted(len(i['options']) for i in items)[len(items) // 2]}, max {max(len(i['options']) for i in items)}")
+
+
+def build_items(b):
+    """One item per approved, categorised, non-split transaction of budget document b (the cache's "budget" object), in date order."""
     groups = {g["id"]: g for g in b["category_groups"]}
     cats = {c["id"]: c for c in b["categories"]}
     payees = {p["id"]: p["name"] for p in b["payees"]}
@@ -239,11 +248,7 @@ def build():
         items.append(dict(id=q["id"], date=q["date"], kind=q["kind"], payee_seen=bool(prev), first_use=q["cat"] not in last_idx,
                           options=options, answer=options.index(q["cat"]) if q["cat"] in options else -1, gold=q["cat"],
                           prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, desc=desc, rule=rule, rule_alias=rule_alias, seen_alias=seen_alias, last=prev[-1] if prev else None, n_hist=upto))
-    p = _private(OUT / f"items{SFX}.json")
-    p.write_text(json.dumps(dict(budget=BUDGET, n=len(items), items=items)))
-    os.chmod(p, 0o600)
-    print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
-          f"options median {sorted(len(i['options']) for i in items)[len(items) // 2]}, max {max(len(i['options']) for i in items)}")
+    return items
 
 
 def run_scoring(todo, fo):
