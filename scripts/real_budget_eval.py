@@ -40,7 +40,7 @@ from pathlib import Path
 BUDGET = os.environ["BUDGET"]
 CACHE = Path.home() / ".cache" / "ynab-cli" / f"{BUDGET}.json"
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
-READER = os.environ.get("READER", "recipe")  # recipe | zeroshot (decider-4B) | big (decider-35B-A3B, untrained)
+READER = os.environ.get("READER", "recipe")  # recipe | zeroshot (decider-4B) | big (decider-35B-A3B, untrained) | big-recipe (35B + recipe)
 LAYOUT = os.environ.get("LAYOUT", "split")  # today (one prompt each) | split (one cached prefix per day)
 ONLY_NEW = os.environ.get("ONLY_NEW") == "1"  # score first-time payees only (the 35B's part of the recommended system)
 NOCACHE = os.environ.get("NOCACHE") == "1"  # split prompts read whole: the check that the cached prefix changes nothing
@@ -49,12 +49,19 @@ LIMIT = int(os.environ.get("LIMIT", "0"))
 SLICE_MAX, OWN_MAX = 24, 6
 SHARED_MAX, SHARED_CAT_MAX = 24, 18  # build_blind_v1 BLIND_BULK
 WIDE = os.environ.get("WIDE") == "1"  # the shared rows: the latest row of every category offered that day (not 18), then 24 latest rows
-SFX = "_wide" if WIDE else ""  # items_wide.json, scores_<reader>_split_wide.jsonl
+SIM = os.environ.get("SIM") == "1"  # owner, 2026-10-02: after the payee's own rows, rows of the payees whose names embed nearest
+SIM_MAX, SIM_PER_PAYEE = 6, 2  # build_blind_v1's similar-payee step, with embeddings (REPORT 152) in place of the generator's kinds
+SFX = ("_wide" if WIDE else "") + ("_sim" if SIM else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
+CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
 WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 RTA = "Inflow: Ready to Assign"
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 RECIPE = "decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora"
+RECIPE_35B = "decider_decider-35b-a3b_none_h200bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_aux100_labrand255_laylabelled_shots_ev10soft_lora"  # REPORT 122
+ADAPTER = {"recipe": RECIPE, "big-recipe": RECIPE_35B}.get(READER, "")
+ADAPTER_FROM = {"recipe": "r124-oth-s0", "big-recipe": "r125-dec35b-recipe"}.get(READER, "")  # the Modal job that trained it
 
 
 def _private(path):
@@ -108,6 +115,17 @@ def build():
                          kind="transfer" if t.get("transfer_account_id") else "inflow" if lab == RTA else "spending",
                          fields=f"{t['date']} | {payee} | ${amt:.2f} | {WD[d.weekday()]}"))
     rows.sort(key=lambda r: (r["date"], r["id"]))
+    by_payee_name, neighbours = defaultdict(list), {}
+    for i, r in enumerate(rows):
+        by_payee_name[r["payee"]].append(i)
+    if SIM:
+        import numpy as np
+        e = np.load(OUT / "payee_emb.npz", allow_pickle=False)
+        names, X = list(e["names"]), e["vecs"].astype(np.float32)
+        X /= np.clip(np.linalg.norm(X, axis=1, keepdims=True), 1e-9, None)
+        Sm = X @ X.T; np.fill_diagonal(Sm, -np.inf)
+        top = np.argsort(-Sm, axis=1)[:, :200]
+        neighbours = {n: [names[j] for j in top[k]] for k, n in enumerate(names)}
     items, by_payee, last_idx = [], defaultdict(list), {}
     used_order = []  # categories by first use
     upto = 0  # rows [0, upto) are history: dated strictly before the query
@@ -156,7 +174,16 @@ def build():
         year_ago = str(dt.date.fromisoformat(q["date"]) - dt.timedelta(days=365))
         options = list(dict.fromkeys([RTA] + visible + [c for c in used_order if rows[last_idx[c]]["date"] >= year_ago]))[:255]
         ctx = "Categories: " + ", ".join(options) + "\n\n" + "".join(f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n" for i in chosen)
-        near = sorted([i for i in prev_rows if i not in set(shared)][::-1][:OWN_MAX])
+        near = [i for i in prev_rows if i not in set(shared)][::-1][:OWN_MAX]
+        if SIM:  # the nearest earlier payees by name embedding, up to SIM_PER_PAYEE latest rows each, SIM_MAX rows in all
+            sim, sh = [], set(shared)
+            for nb in neighbours.get(q["payee"], []):
+                if len(sim) >= SIM_MAX:
+                    break
+                rows_nb = [i for i in by_payee_name.get(nb, []) if i < upto and i not in sh][::-1][:SIM_PER_PAYEE]
+                sim += rows_nb[:SIM_MAX - len(sim)]
+            near += sim
+        near = sorted(near)
         row_text = lambda i: f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
         split = ("Categories: " + ", ".join(options) + f"\n\n{SHARED_HEAD}\n\n" + "".join(map(row_text, shared)) + f"{NEAR_HEAD}\n\n"
                  + "".join(map(row_text, near)) + f"Transaction: {q['fields']}\nCategory:")
@@ -182,19 +209,19 @@ def run_scoring(todo, fo):
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from ai_experiments import oneslot
     from ai_experiments.paths import ROOT
-    path = snapshot_download("Mapika/decider-35b-a3b" if READER == "big" else "Mapika/decider-4b")  # big: untrained, decider's own layout
+    path = snapshot_download("Mapika/decider-35b-a3b" if READER.startswith("big") else "Mapika/decider-4b")  # big: untrained, decider's own layout
     sys.path.insert(0, snapshot_download("Mapika/decider-2b", allow_patterns=["decider/*"]))
     P = importlib.import_module("decider.prompt")
     tok = AutoTokenizer.from_pretrained(path)
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
-    if READER == "recipe":
+    if ADAPTER:
         from peft import PeftModel
-        lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / RECIPE)).merge_and_unload().eval()
+        lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
 
     def built(it):
         state = it["prompt" if LAYOUT == "today" else "prompt_split"][: -len("Category:")].rstrip()
         rng = random.Random(it["id"] if LAYOUT == "today" else f"day-{it['date']}")  # split: labels and option order fixed per day
-        if READER == "recipe":
+        if ADAPTER:  # the recipe's layout (labelled rows, rand255 labels)
             return oneslot.build_layout(P, tok, state, QUESTION, it["options"], it["answer"], rng, labels="rand255", layout="labelled_shots")
         return oneslot.build(P, tok, state, QUESTION, it["options"], it["answer"], rng, labels="letters")
 
@@ -279,9 +306,55 @@ def modal():
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
     n = 0
     with os.fdopen(fd, "a") as fo:
-        for line in modal_app.private_scores(todo, READER, LAYOUT, "r124-oth-s0" if READER == "recipe" else ""):
+        for line in modal_app.private_scores(todo, READER, LAYOUT, ADAPTER_FROM, gpu="H200" if READER.startswith("big") else "H100"):
             fo.write(line + "\n"); n += 1
     print(f"{READER}: {n} scores back", flush=True)
+
+
+def embed_stream():
+    """Payee names as one JSON list on stdin; their embeddings (REPORT 152: the hidden state at the last token of EMB_TEXT + CUE, final
+    layer, READER's model) as float16 .npy bytes on stdout; nothing written to disk."""
+    import io
+    import numpy as np
+    import torch
+    from huggingface_hub import snapshot_download
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from ai_experiments.paths import ROOT
+    names = json.load(sys.stdin)
+    path = snapshot_download("Mapika/decider-35b-a3b" if READER.startswith("big") else "Mapika/decider-4b")
+    tok = AutoTokenizer.from_pretrained(path)
+    lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
+    if ADAPTER:
+        from peft import PeftModel
+        lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
+    cue = tok(CUE, add_special_tokens=False)["input_ids"]
+    out = []
+    with torch.no_grad():
+        for k in range(0, len(names), 64):
+            seqs = [tok(EMB_TEXT.format(n), add_special_tokens=False)["input_ids"] + cue for n in names[k:k + 64]]
+            T = -(-max(map(len, seqs)) // 64) * 64
+            ids = torch.full((len(seqs), T), tok.pad_token_id or 0, dtype=torch.long); att = torch.zeros_like(ids)
+            for i, q in enumerate(seqs):
+                ids[i, :len(q)] = torch.tensor(q); att[i, :len(q)] = 1
+            h = lm.model(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state.float()
+            out += [h[i, len(q) - 1].cpu().numpy() for i, q in enumerate(seqs)]
+    buf = io.BytesIO(); np.save(buf, np.stack(out).astype(np.float16)); sys.stdout.buffer.write(buf.getvalue())
+    print(f"{len(names)} payees embedded", file=sys.stderr, flush=True)
+
+
+def embed():
+    """The budget's payee names embedded on Modal (modal_app.embed_private), saved privately as OUT/payee_emb.npz."""
+    import io
+    import numpy as np
+    sys.path.insert(0, str(Path(__file__).parent))
+    import modal_app
+    items = json.loads((OUT / "items.json").read_text())["items"]
+    names = sorted({it["prompt"].rsplit("Transaction: ", 1)[1].split(" | ")[1] for it in items})
+    print(f"{len(names)} payee names to embed on Modal", flush=True)
+    vecs = np.load(io.BytesIO(modal_app.embed_private_call(names, READER, ADAPTER_FROM)))
+    p = _private(OUT / "payee_emb.npz")
+    np.savez(p, names=np.array(names), vecs=vecs); os.chmod(p, 0o600)
+    print(f"saved {vecs.shape}", flush=True)
 
 
 def stream():
@@ -327,4 +400,4 @@ def report():
 
 
 if __name__ == "__main__":
-    {"build": build, "score": score, "modal": modal, "stream": stream, "report": report}[sys.argv[1]]()
+    {"build": build, "score": score, "modal": modal, "stream": stream, "embed": embed, "embed_stream": embed_stream, "report": report}[sys.argv[1]]()

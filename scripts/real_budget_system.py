@@ -11,7 +11,7 @@ categories free). Two things the synthetic sets had and one real budget does not
                here the stand-in is the categories the owner had filed the payee under before the transaction's date, plus the rule's
 Measures (confirm_card.card): right one first, in the list, suggestions shown, work saved (owner's rank scale, not suggested = 10); and
 the auto-file curve of the system's first suggestion against its calibrated probability.
-env: BUDGET, OUT (as real_budget_eval.py), GATE (0.2), KMAX (3).
+env: BUDGET, OUT (as real_budget_eval.py), GATE (0.2), KMAX (3), DEC (the main reader's scores), BIG (the first-time-payee reader).
 usage: BUDGET=<id> uv run python scripts/real_budget_system.py
 """
 import json
@@ -33,6 +33,8 @@ OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-e
 GATE = float(os.environ.get("GATE", "0.2"))
 KMAX = int(os.environ.get("KMAX", "3"))
 LAM = 1.0
+DEC = os.environ.get("DEC", "recipe_split")  # the main reader's scores (scores_<DEC>.jsonl): recipe_split | recipe_split_sim | big-recipe_split
+BIG = os.environ.get("BIG", "big_split")  # the first-time-payee reader multiplied in ("" = none)
 
 
 def halves(lps, gold, order):
@@ -51,9 +53,10 @@ def payee_of(it):
 
 if __name__ == "__main__":
     items = {it["id"]: it for it in json.loads((OUT / "items.json").read_text())["items"] if it["answer"] >= 0}
-    dec = {r["id"]: r["lp"] for r in map(json.loads, open(OUT / "scores_recipe_split.jsonl"))}
-    bigf = OUT / "scores_big_split.jsonl"
-    big = {r["id"]: r["lp"] for r in map(json.loads, open(bigf))} if bigf.exists() else {}
+    dec = {r["id"]: r["lp"] for r in map(json.loads, open(OUT / f"scores_{DEC}.jsonl"))}
+    bigf = OUT / f"scores_{BIG}.jsonl"
+    big = {r["id"]: r["lp"] for r in map(json.loads, open(bigf))} if BIG and bigf.exists() else {}
+    print(f"main reader: {DEC}; first-time payees x {BIG or 'nothing'}\n")
     order = sorted(items, key=lambda i: (items[i]["date"], i))
     gold = {i: items[i]["answer"] for i in order}
     opt = {i: {c: k for k, c in enumerate(items[i]["options"])} for i in order}
@@ -96,12 +99,12 @@ if __name__ == "__main__":
     lists = {
         "YNAB today": {i: ([rule[i]] if rule[i] >= 0 else []) for i in order},
         "no-model list (rule, then the payee's other past categories)": {i: ([rule[i]] if rule[i] >= 0 else []) + [c for c in past[i] if c != rule[i]][:KMAX - 1] if rule[i] >= 0 else past[i][:KMAX] for i in order},
-        "decider-4B (recipe) alone, its own order": {i: S.suggest(Pd[i], lam=LAM, miss=10.0, kmax=KMAX, plausible=plaus[i]) if known[i] else [int(c) for c in np.argsort(-Pd[i])][:KMAX] for i in order},
-        "rule always first, then decider's list (final_check's 'no gate' row)": system(Pd, gate=False),
-        "decider-4B + the gate (rule first unless the model is 0.2 surer)": system(Pd),
+        f"{DEC} alone, its own order": {i: S.suggest(Pd[i], lam=LAM, miss=10.0, kmax=KMAX, plausible=plaus[i]) if known[i] else [int(c) for c in np.argsort(-Pd[i])][:KMAX] for i in order},
+        f"rule always first, then {DEC}'s list (final_check's no-gate row)": system(Pd, gate=False),
+        f"{DEC} + the gate (rule first unless the model is 0.2 surer)": system(Pd),
     }
     if have_big:
-        lists["recommended system (+ 35B for first-time payees)"] = system({**Pd, **Pp})
+        lists[f"recommended system (x {BIG} for first-time payees)"] = system({**Pd, **Pp})
     subsets = {"all": order, "first-time payee": new, "known payee, filed differently from the rule": [i for i in order if known[i] and gold[i] != rule[i]],
                "known payee, the rule's category": [i for i in order if known[i] and gold[i] == rule[i]]}
     citems = {i: {"answer": gold[i]} for i in order}

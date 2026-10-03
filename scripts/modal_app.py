@@ -125,7 +125,33 @@ def score_private(items: list, reader: str, layout: str, adapter_from: str) -> s
     return p.stdout
 
 
-def private_scores(items: list, reader: str, layout: str, adapter_from: str, shards: int = 8):
+@APP.function(image=image, gpu="H100", timeout=3600, volumes={"/cache": HF, "/out": OUT.read_only()})
+def embed_private(names: list, reader: str, adapter_from: str) -> bytes:
+    """As score_private, for payee names: real_budget_eval.py `embed_stream` (names on stdin, float16 .npy bytes back); nothing kept."""
+    import json
+    import os
+    import shutil
+    import subprocess
+    _prepare()
+    if adapter_from:
+        shutil.copytree(f"/out/{adapter_from}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    cmd = ("uv run --with transformers==5.17.0 --with flash-linear-attention --with 'peft>=0.21' --with torch==2.13.0 --with torchvision==0.28.0 "
+           "python scripts/real_budget_eval.py embed_stream")
+    p = subprocess.run(cmd, shell=True, cwd=REPO, input=json.dumps(names).encode(), capture_output=True,
+                       env={**os.environ, "BUDGET": "private", "READER": reader})
+    print(f"{len(names)} names, exit {p.returncode}", flush=True)
+    if p.returncode != 0:
+        kinds = [l.split(":")[0] for l in p.stderr.decode(errors="replace").splitlines() if l and not l.startswith(" ") and "Error" in l.split(":")[0]]
+        raise RuntimeError(f"embedding failed: {kinds[-1] if kinds else 'exit ' + str(p.returncode)}")
+    return p.stdout
+
+
+def embed_private_call(names: list, reader: str, adapter_from: str) -> bytes:
+    with APP.run():
+        return embed_private.remote(names, reader, adapter_from)
+
+
+def private_scores(items: list, reader: str, layout: str, adapter_from: str, shards: int = 8, gpu: str = "H100"):
     """Local side: whole days per shard (the per-day cached prefix needs them together), shards scored in parallel; yields score lines."""
     from collections import defaultdict
     days = defaultdict(list)
@@ -135,7 +161,8 @@ def private_scores(items: list, reader: str, layout: str, adapter_from: str, sha
     for d in sorted(days, key=lambda d: -len(days[d])):  # largest days first, each to the lightest shard
         min(parts, key=len).extend(days[d])
     with APP.run():
-        for out in score_private.starmap([(p, reader, layout, adapter_from) for p in parts if p]):
+        fn = score_private if gpu == "H100" else score_private.with_options(gpu=gpu)  # the 35B: H200 (69 GB of weights)
+        for out in fn.starmap([(p, reader, layout, adapter_from) for p in parts if p]):
             yield from out.splitlines()
 
 
