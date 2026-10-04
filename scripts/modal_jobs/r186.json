@@ -1,0 +1,14 @@
+[
+ {
+  "tag": "r186-enc",
+  "env": {
+   "PAIRS": "200000",
+   "BATCH": "256",
+   "OUT_NAME": "payee_enc_v1",
+   "SEED": "0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/train_payee_encoder.py"
+  ]
+ }
+]

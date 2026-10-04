@@ -31,6 +31,7 @@ usage: BUDGET=<id> uv run python scripts/real_budget_eval.py build
 """
 import datetime as dt
 import functools
+import hashlib
 import json
 import os
 import random
@@ -77,13 +78,15 @@ def yaml_value(v):
 KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
 CROWD = os.environ.get("CROWD", "")  # row 183: a crowd table (build_crowd.py) under data/processed: "Others filed this payee as: ..." under
 CROWD_K, CROWD_TOP = int(os.environ.get("CROWD_K", "2")), 4  # the query when CROWD_K or more other households filed its bank string
+CROWD_DROP = float(os.environ.get("CROWD_DROP", "0"))  # row 185: leave the line out of this share of items that have one (training only),
+# so that its absence stops meaning "a rare merchant" (REPORT 169.2)
 KIND_FILE = os.environ.get("KIND_FILE", "")  # row 182: "" | "_v2" | "_ov": which payee_kinds<KIND_FILE>.json (merchant_db_match_real.py) a real budget reads
 KIND_SKIP = {"several", "purpose", "p2p", "income", "savings", "loan"}  # not merchants
 KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind>" line under every history row and the query whose payee
 # has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
 # KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + ("_crowd" if CROWD else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -248,7 +251,6 @@ def build_items(b):
     if KIND == "rows":
         from ai_experiments import taxonomy_v2 as TX
         if any(r["mkind"] for r in rows):  # a synthetic household
-            import hashlib
             pk, names = {}, sorted(k for k in TX.KINDS if k not in KIND_SKIP)
             for r in rows:
                 if r["payee"] not in pk:
@@ -333,7 +335,8 @@ def build_items(b):
         if crowd:
             got = {n: len(set(hs) - {me}) for n, hs in crowd.get(crowd_key(q["raw"]), {}).items()}
             got = {n: k for n, k in got.items() if k}
-            if sum(got.values()) >= CROWD_K and len(set().union(*(set(hs) for hs in crowd[crowd_key(q["raw"])].values())) - {me}) >= CROWD_K:
+            dropped = CROWD_DROP and int(hashlib.md5(f"drop-{q['id']}".encode()).hexdigest(), 16) % 1000 < CROWD_DROP * 1000
+            if not dropped and sum(got.values()) >= CROWD_K and len(set().union(*(set(hs) for hs in crowd[crowd_key(q["raw"])].values())) - {me}) >= CROWD_K:
                 kind_line += "\nOthers filed this payee as: " + ", ".join(f"{n} ({k})" for n, k in sorted(got.items(), key=lambda x: -x[1])[:CROWD_TOP])
         if PLINE and prev_rows:
             cnt = Counter(rows[i]["cat"] for i in prev_rows).most_common(3)
