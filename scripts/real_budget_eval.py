@@ -74,12 +74,13 @@ def yaml_value(v):
         return json.dumps(v, ensure_ascii=False)
     return v
 KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
+KIND_FILE = os.environ.get("KIND_FILE", "")  # row 182: "" | "_v2" | "_ov": which payee_kinds<KIND_FILE>.json (merchant_db_match_real.py) a real budget reads
 KIND_SKIP = {"several", "purpose", "p2p", "income", "savings", "loan"}  # not merchants
 KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind>" line under every history row and the query whose payee
 # has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
 # KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -240,7 +241,7 @@ def build_items(b):
                     ok = r["mkind"] in TX.KINDS and r["mkind"] not in KIND_SKIP and h % 1000 < KIND_COVER * 1000
                     pk[r["payee"]] = (r["mkind"] if h // 1000 % 1000 >= KIND_NOISE * 1000 else names[h // 10 ** 6 % len(names)]) if ok else None
         else:
-            pk = json.loads((OUT / "payee_kinds.json").read_text())
+            pk = json.loads((OUT / f"payee_kinds{KIND_FILE}.json").read_text())
         for r in rows:
             k = pk.get(r["payee"])
             r["kl"] = f"\nKind: {TX.KINDS[k]}" if k in TX.KINDS else ""
