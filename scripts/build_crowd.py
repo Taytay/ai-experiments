@@ -22,16 +22,24 @@ EMOJI = re.compile(r"[^\w\s&'/,.()+:-]", re.UNICODE)
 
 
 KEY_V = os.environ.get("CROWD_KEY", "v1")  # v2 (2026-10-04): v1 dropped every 5+-character token after "*", names included
-# ("SQ *BAKERY" -> "sq"), pooling hundreds of merchants under one key; v2 drops only code-like tokens
+# ("SQ *BAKERY" -> "sq"), pooling hundreds of merchants under one key (name lost from the key for 4.0% of synthetic strings); v2 drops a
+# trailing token after "*" only when it looks like an order code (a digit, or few vowels: random codes such as "etwrkcbh"), plus
+# all-digit and digit-heavy tokens anywhere: 2.39 keys per merchant (v1 2.32), name lost 1.4%
+
+
+def _codey(t):
+    letters = [c for c in t if c.isalpha()]
+    return len(t) >= 5 and (any(c.isdigit() for c in t) or (bool(letters) and sum(c in "aeiou" for c in letters) / len(letters) <= 0.25))
 
 
 def crowd_key(raw):
-    """A bank string as a crowd lookup key: lower case, codes, digits and punctuation off ("SQ *RADIO COFFEE #12" -> "sq radio coffee").
-    v2: a token is dropped when it is all digits or looks like a code (two or more digits among letters); words, one-word names and
-    names with one digit ("1password", "7eleven" style) stay."""
+    """A bank string as a crowd lookup key: lower case, codes, digits and punctuation off ("SQ *RADIO COFFEE #12" -> "sq radio coffee")."""
     if KEY_V == "v2":
-        toks = re.findall(r"[a-z0-9]+", raw.lower())
-        keep = [t for t in toks if not (t.isdigit() or (sum(c.isdigit() for c in t) >= 2 and any(c.isalpha() for c in t)))]
+        low = raw.lower()
+        m = re.search(r"\*\s*([a-z0-9]+)\s*$", low)  # the last token, directly after a star: an order code if it looks like one
+        if m and _codey(m.group(1)):
+            low = low[:m.start(1)]
+        keep = [t for t in re.findall(r"[a-z0-9]+", low) if not (t.isdigit() or (sum(c.isdigit() for c in t) >= 2 and any(c.isalpha() for c in t)))]
         return " ".join("".join(c for c in t if c.isalpha()) for t in keep).strip()
     s = re.sub(r"\*[a-z0-9]{5,}\b", " ", raw.lower())
     return re.sub(r"\s+", " ", re.sub(r"[^a-z ]", " ", s)).strip()
