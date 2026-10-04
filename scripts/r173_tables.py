@@ -16,7 +16,9 @@ R = "results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st800{see
 SETS = ["real6", "real6_v1_novel", "mislead_v1", "override_v1", "blind_v1", "blind_v1_others", "blind_v2", "blind_v2_others"]
 ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% real-style": [("", "_rs25")], "recipe + 50% real-style": [("", "_rs50")],
         "row 176 A2: + 25% real-style v2": [("", "_rs25v2")], "row 176 B: + 25% real-style v2, field block generated": [("", "_rs25v2f_fl")],
-        "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")]}
+        "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")],
+        "row 179 K: + merchant knowledge 5k": [("", "_rs25v2_mk40_5k")], "row 181 G: Group: Name households": [("", "_rs25v2g")],
+        "row 181 GK: Group: Name + knowledge 5k": [("", "_rs25v2g_mk40_5k")]}
 
 
 def acc(f, sel=None):
