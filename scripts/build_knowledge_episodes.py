@@ -87,7 +87,7 @@ if __name__ == "__main__":
         for m in ms:
             opts = sorted(names, key=lambda _: rng.random())
             p = "Categories: " + ", ".join(opts) + f"\n\nTransaction: {row(m, rng, dt.date(2025, 6, 2))}\nCategory:"
-            items.append(dict(id=f"MK:{'t' if trained else 'h'}:{len(items)}", options=[" " + o for o in opts], answer=opts.index(KIND_NAMES[m["kind"]]),
+            items.append(dict(id=f"MK:{"t" if trained else "h"}:{len(items)}", level="trained" if trained else "held-out", options=[" " + o for o in opts], answer=opts.index(KIND_NAMES[m["kind"]]),
                               prompt=p, prompt_ctx=p, merchant=m["name"], kind=m["kind"], trained=trained, user=0))
     tp = PROCESSED / "merchant_knowledge_v1_test.json"
     tp.write_text(json.dumps(dict(name="merchant_knowledge_v1_test", version=1, n=len(items), items=items)))
