@@ -43,3 +43,9 @@
 /realstyle_crowd_test.json
 /realstyle_v3gcd_train.jsonl
 /realstyle_v3gcdh_train.jsonl
+/realstyle_v3g_ngram_test.json
+/realstyle_v3g_behav_test.json
+/realstyle_v3g_seen_ngram_test.json
+/realstyle_v3g_seen_behav_test.json
+/realstyle_crowdclus_test.json
+/realstyle_crowdclus_train.json
