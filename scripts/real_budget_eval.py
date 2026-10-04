@@ -59,6 +59,7 @@ PLINE = os.environ.get("PLINE") == "1"  # owner, 2026-10-03: a line before the t
 PLINE_HEAD = "Earlier you filed this payee as: "
 FIELDS = os.environ.get("FIELDS") == "1"  # row 176: under each history row its "Clean payee / Via / Ordered from / Memo / Location / Store /
 # Reference" lines (synthetic households only: their transactions carry the parts); the query stays bare
+GROUPNAMES = os.environ.get("GROUPNAMES") == "1"  # row 181: category names carry their group ("Juli: Clothes"), in the list and on every row
 ROWIDS = os.environ.get("ROWIDS") == "1"  # row 177: history rows numbered in prompt order ("Transaction: [12] 2024-05-01 | ...")
 RATIONALE = os.environ.get("RATIONALE") == "1"  # row 177: each item carries "rationale", the reason for its category citing rows by number
 FIELD_ORDER = ("Clean payee", "Via", "Ordered from", "Memo", "Location", "Store", "Reference")
@@ -74,7 +75,7 @@ def yaml_value(v):
     return v
 KIND = os.environ.get("KIND", "")  # row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -167,7 +168,9 @@ def build_items(b):
         if internal(c):
             return RTA if c["name"] == RTA else None
         n = _clean(c["name"])  # names as the layouts read them back (oneslot.parse strips): 27 of this budget's had outer spaces
-        return f'{_clean(groups[c["category_group_id"]]["name"])}: {n}' if len(names_by[n]) > 1 else n
+        if GROUPNAMES or len(names_by[n]) > 1:  # row 181: every category written "Group: Name" (owner: "(AJ) Everyday Expenses: Groceries")
+            return f'{_clean(groups[c["category_group_id"]]["name"])}: {n}'
+        return n
 
     visible = [label(c["id"]) for c in b["categories"] if not c.get("deleted") and not c.get("hidden") and label(c["id"]) and label(c["id"]) != RTA]
     rows = []
