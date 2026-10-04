@@ -23,3 +23,6 @@
 /realstyle_v2f_train.jsonl
 /realstyle_v2i_train.jsonl
 /realstyle_v2r_train.jsonl
+/merchant_knowledge_v1_train.jsonl
+/merchant_knowledge_v1_5k_train.jsonl
+/merchant_knowledge_v1_test.json
