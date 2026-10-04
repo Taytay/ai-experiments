@@ -21,8 +21,18 @@ OUT = PROCESSED / os.environ.get("OUT", "realstyle_crowd_train.json")
 EMOJI = re.compile(r"[^\w\s&'/,.()+:-]", re.UNICODE)
 
 
+KEY_V = os.environ.get("CROWD_KEY", "v1")  # v2 (2026-10-04): v1 dropped every 5+-character token after "*", names included
+# ("SQ *BAKERY" -> "sq"), pooling hundreds of merchants under one key; v2 drops only code-like tokens
+
+
 def crowd_key(raw):
-    """A bank string as a crowd lookup key: lower case, codes, digits and punctuation off ("SQ *RADIO COFFEE #12" -> "sq radio coffee")."""
+    """A bank string as a crowd lookup key: lower case, codes, digits and punctuation off ("SQ *RADIO COFFEE #12" -> "sq radio coffee").
+    v2: a token is dropped when it is all digits or looks like a code (two or more digits among letters); words, one-word names and
+    names with one digit ("1password", "7eleven" style) stay."""
+    if KEY_V == "v2":
+        toks = re.findall(r"[a-z0-9]+", raw.lower())
+        keep = [t for t in toks if not (t.isdigit() or (sum(c.isdigit() for c in t) >= 2 and any(c.isalpha() for c in t)))]
+        return " ".join("".join(c for c in t if c.isalpha()) for t in keep).strip()
     s = re.sub(r"\*[a-z0-9]{5,}\b", " ", raw.lower())
     return re.sub(r"\s+", " ", re.sub(r"[^a-z ]", " ", s)).strip()
 
