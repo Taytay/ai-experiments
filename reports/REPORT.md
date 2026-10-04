@@ -10465,3 +10465,31 @@ id); households `realstyle_v3gcd_train.jsonl`; otherwise GC's recipe; seeds 0 an
   training dropped it item by item inside households that otherwise have it. Next: whole households without a crowd (a share of
   training households read with no line at all, besides item dropout), which is also the realistic case for a new YNAB market, a bank
   whose strings nobody else has, or a lookup outage.
+
+## 172. A two-tower payee <-> category encoder (bge-small, InfoNCE, the household's other categories as hard negatives) files held-out synthetic households' transactions 53.0% right first by cosine alone (32.4 untrained; top 10 91.8), but the owner's budget only 47.2 (40.7 untrained; top 10 78.2 against decider's ~90): no shortlist for decider on real data; its category side serves row 189's cross-user clusters (REAL-27, MODEL-25)
+
+PLAN step 187 (owner, 2026-10-04: "Could we push categories and payees together embeddings wise using this same mechanism?").
+`scripts/two_tower.py`: one BAAI/bge-small-en-v1.5 (MIT) encoder for both sides; a transaction is "<payee> | $<amount> | <weekday>", a
+category "<Group>: <Name>; recently: <the three payees last filed under it>" (or "; nothing filed yet"), filings strictly before the
+transaction's date; 200,000 triplets (transaction, its category, another category of the same household that day) from 400
+shared-world training households; MultipleNegativesRankingLoss (in-batch negatives plus the hard one), one epoch, 4 minutes on the
+local 3090. Read by replaying a budget in date order and ranking every visible category by cosine: 50 held-out test-world households
+(merchants never seen in training), and the owner's budget on this machine (17,755 spending transactions in visible categories;
+aggregates only). Model in DVC (`models/encoders/two_tower_v1`).
+
+**Table 172.1: right category by cosine, % top-1 / top-3 / top-10**
+
+| reader | held-out households: all | first-time payees | owner's budget: all | first-time payees | known payees |
+|---|---|---|---|---|---|
+| bge-small, untrained | 32.4 / 51.1 / 74.7 | 25.9 / 43.2 / 68.3 | 40.7 / 60.1 / 76.7 | 27.9 / 46.8 / 67.1 | 46.1 / 65.7 / 80.7 |
+| two-tower, trained | **53.0 / 77.6 / 91.8** | **47.9 / 74.7 / 90.5** | **47.2 / 64.4 / 78.2** | **37.3 / 51.1 / 67.3** | **51.3 / 70.0 / 82.8** |
+
+### 172.1 What the step says
+
+- **Contrastive training ties payees to purposes** in the synthetic world (+20.6 top-1, top 10 at 92) from a dot product, no history
+  in the prompt, no LLM.
+- **On the owner's budget it gains less** (+6.5 top-1, +1.5 top-10): the owner's categories (people, trips, quirks, catch-alls) are
+  described less well by three recent payees than the generator's, and the household's time context (trips, phases) is invisible to a
+  payee-category similarity. As a shortlist it would lose 12 points of the right answers that decider's top 10 keeps; not useful there.
+- **Use:** its category side embeds a category by its name and contents, which row 189 uses to cluster categories across households
+  (behavioural payee similarity through shared purposes).
