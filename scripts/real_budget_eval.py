@@ -459,6 +459,8 @@ def modal():
     keep = ("id", "date", "options", "answer", "prompt" if LAYOUT == "today" else "prompt_split", "desc")
     todo = [{k: it.get(k) for k in keep} for it in items if it["id"] not in done]
     print(f"{READER}: {len(done)} done, {len(todo)} to score on Modal", flush=True)
+    if not todo:  # nothing left: an empty job list on Modal never returns
+        return
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
     n = 0
     with os.fdopen(fd, "a") as fo:

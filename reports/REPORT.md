@@ -10270,3 +10270,61 @@ normalised payee on the 48k merchants' names and domains; 1,522 of 5,811 payees 
 - **Next (row 182):** connect the fact to the decision: a "Kind:" line on history rows and the query, trained on households from the
   generator's kinds and read on the owner's budget from the database match (and later from the model's own answer); combined with group
   names and 20k x 6.5. Single seeds throughout: a second seed of A2, K and 20k x 6.5 on the owner's budget sizes the noise.
+
+## 168. "Kind:" lines from a lookup add nothing on the owner's budget, and wrong ones cost: the merchant database's matches were right for about half the transactions they covered (Overture's for three quarters), and a model reading them loses 1.5 on first-time payees; Overture-only lines recover 0.5 to 1.0 but no line arm beats its no-line match. A second seed shows single-seed differences on the owner's budget of 1 to 2 points are noise: averaged over two seeds, the 5k merchant knowledge adds nothing to group names (73.7 against 73.75) (MODEL-28, REAL-27)
+
+PLAN step 182 (REPORT 167: knowledge in the weights helps known payees, not first-time ones). A "Kind:" line (a taxonomy_v2 kind in words)
+under history rows and the query whose payee has one (`real_budget_eval.py KIND=rows`): in training from the generator's kinds for half
+the payees, 8% of them wrong (`realstyle_v2gkl_train.jsonl`); on the owner's budget from a lookup (`merchant_db_match_real.py`: the
+merchant database's match, else Overture's; 61% of transactions). Arms on group-name households: GL (Kind lines), GLK20 (+ 20k x 6.5
+knowledge), GK20 (20k x 6.5, no lines); a second seed of G and GK. Then the lines were audited (`kind_line_audit.py`: 200 payees drawn in
+proportion to transactions, half per source, judged by hand; private, counts only) and rebuilt: v2 (whole-word name matches, no line for
+deposits, interest, refunds, transfers or people, Overture first, Overture's vague categories dropped) and Overture-only. Job list
+`scripts/modal_jobs/r182.json`; owner scoring `scripts/chains/r182_owner*.sh`.
+
+**Table 168.1: how often a Kind line is right, per transaction (one judge, 200 payees; "close" = a neighbouring kind)**
+
+| lines | from the database | from Overture | all lines (share of transactions with a line) |
+|---|---|---|---|
+| v1 (prefix match, database first) | 49% right, 61% right or close | 74% / 91% | ~55% / ~69% (61%) |
+| v2 (whole words, Overture first) | 47% / 60% | 77% / 92% | ~65% / ~79% (57%) |
+
+The database's errors: a prefix or domain stem hit the wrong entity (a sub-brand for the parent: a marketplace read as a bookstore; a
+resort as a university; a surname as a property firm); conglomerates and marketplaces carry a wrong kind in the database itself
+(subscription, grocery, business); non-merchants (interest, deposits, refunds, people) were matched to something. Overture's errors are
+mostly its category mapping (media services read as "business").
+
+**Table 168.2: the owner's budget, % right first (top 3)**
+
+| reader | lines read | all | known payees | first-time | first-time, merchant in the top 5k |
+|---|---|---|---|---|---|
+| G seed 0 / seed 1 (mean) | none | 73.2 / 74.3 (73.75) | 79.7 / 81.3 | 57.4 / 57.2 | 61.6 / 63.8 |
+| GK seed 0 / seed 1 (mean) | none | 74.6 / 72.8 (73.7) | 81.1 / 79.4 | 59.0 / 56.9 | 64.0 / 60.9 |
+| GK seed 0, zero-shot | v1 | 74.0 | 80.8 | 57.5 | 61.3 |
+| GK20 | none | 74.6 (85.4) | 81.3 | 58.2 | 62.9 |
+| GL | v1 / v2 / Overture only | 72.9 / 73.2 / 73.9 | 79.7 / 80.3 / 80.8 | 56.4 / 56.1 / 57.0 | 59.4 / 53.3 / 59.4 |
+| GLK20 | v1 / v2 / Overture only | 73.8 / 74.0 / 74.3 | 80.7 / 81.0 / 81.2 | 57.1 / 57.2 / 57.7 | 60.7 / 61.8 / 62.3 |
+
+**Table 168.3: the synthetic sets (read without lines), % right first**
+
+| reader | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|
+| G seed 0 / 1 | 85.2 / 83.6 | 85.2 / 80.2 | 60.4 / 58.3 | 83.3 / 84.3 | 84.9 / 85.1 | 75.7 / 74.5 | 75.7 / 72.1 |
+| GK seed 0 / 1 | 74.2 / 77.5 | 67.4 / 69.8 | 49.2 / 52.4 | 84.0 / 84.3 | 85.6 / 85.5 | 76.9 / 74.5 | 75.7 / 74.0 |
+| GK20 | 72.1 | 61.7 | 50.0 | 84.1 | 85.7 | 76.5 | 76.3 |
+| GL | 85.9 | 81.5 | 59.8 | 83.2 | 84.8 | 75.6 | 74.4 |
+| GLK20 | 72.5 | 62.8 | 48.6 | 84.7 | 85.9 | 75.9 | 75.9 |
+
+### 168.1 What the step says
+
+- **Seed noise first:** retrained with another seed, G moves 73.2 -> 74.3 and GK 74.6 -> 72.8 on the owner's budget; blind_v2 moves 1 to
+  3 points. Averaged, merchant knowledge adds nothing to group names on the owner's budget, and REPORTs 165 to 167's single-seed gains of
+  +1.2 to +1.5 there are within noise (their kind-accuracy gains, +15 to +30, stand). Top 3 moves less (84.6 to 85.4). From here arms are
+  compared on two seeds, or paired: one model read two ways.
+- **Wrong lines cost, and the model trusts them:** read with and without the v1 lines (paired, no seed noise), GK loses 0.6 overall,
+  1.5 on first-time payees and 2.7 where the database matched. Overture-only lines beat v1 by 0.5 to 1.0 (paired).
+- **Right lines add little:** the best line arm (GLK20, Overture lines, 74.3) does not beat GK20 without lines (74.6); GL with Overture
+  lines (73.9) sits at G's mean. The similar-payee rows already tell the model what kind of place a payee is (REPORT 160), and the owner's
+  categories are purposes: "restaurant" does not say restaurants, dates or a trip.
+- **A lookup by name needs entity resolution,** the right business with confidence or no line, which a string match does not give; the
+  owner's next idea, other people's filings of the same bank string (row 183), needs none.
