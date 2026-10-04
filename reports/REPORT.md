@@ -10395,3 +10395,45 @@ names; `scripts/chains/r183_owner.sh`; aggregates only). % right first, seeds 0 
 - **Next:** line dropout in training (drop the line from a share of episodes that have a crowd) so that absence carries no signal; it must
   hold G3's level without the line and keep most of the +6-7 on first-time payees with it. Needed before any real crowd test, since in
   use the line will be missing for new merchants and failed lookups.
+
+## 170. A contrastive payee encoder (bge-small trained with in-batch and same-first-word hard negatives on synthetic renderings) matches held-out synthetic merchants 98.7% of the time (81.1 before) and on the owner's real payee replay halves the false alarms on new payees (13.9% -> 6.9%; Jaro-Winkler 23.9%) at lower recall (61 against 75); used for the similar-payee rows it costs payees with no alias 0.9 to 1.6 (two seeds, paired), and as an extra alias matcher it adds only correct pairs but changes 2% of prompts and nothing in accuracy: the existing retrieval already finds what it finds (REAL-27)
+
+PLAN step 186 (owner, 2026-10-04: "techniques ... to ensure that two different strings embed closer or further away ... triples or hard
+negatives ... with our clean payees and intentionally corrupted payees"). `scripts/train_payee_encoder.py`: BAAI/bge-small-en-v1.5 (MIT),
+sentence-transformers' MultipleNegativesRankingLoss (InfoNCE with in-batch negatives) on 200,000 triplets: anchor = a bank string of a
+merchant (statements.render_v2, the grammar measured on the owner's strings), positive = another rendering or the plain name, hard
+negative = a different merchant sharing the anchor's first word (80%); 83,552 training-split merchants (realstyle and the merchant
+database's top 48k); one epoch, batch 256, 2 minutes on the local 3090 (owner, 2026-10-04: small local GPU jobs are fine). The owner's
+strings were embedded on this machine's CPU (`encode_payees_local.py`), never sent anywhere; results are aggregates. Model in DVC
+(`models/encoders/payee_enc_v1`).
+
+**Table 170.1: payee resolution on the owner's real strings (REPORT 159's replay; later half: 1,949 new strings of known payees, 1,979 of new payees)**
+
+| matcher | top-1 right payee | precision | recall | F1 | false alarms on new payees |
+|---|---|---|---|---|---|
+| Jaro-Winkler | **83.5** | 68.1 | **75.4** | **71.6** | 23.9% |
+| decider-4B embedding (REPORT 159) | 77.8 | 72.5 | 68.5 | 70.5 | 13.9% |
+| contrastive encoder | 79.9 | **75.5** | 61.1 | 67.6 | **6.9%** |
+| combined (trees over all matchers), with the encoder | 80.0 | 72.9 | 63.4 | 67.8 | 10.9% |
+
+**Table 170.2: the owner's budget, G seeds 0 / 1, % right first, one model read two ways (paired)**
+
+| retrieval | all | known payees | first-time, alias filed before | first-time, no alias |
+|---|---|---|---|---|
+| SIM=2 (decider embedding + n-grams) | 73.2 / 74.3 | 79.7 / 81.3 | 72.0 / 73.5 | 50.3 / 49.2 |
+| encoder for the similar rows | 73.0 / 74.1 | 79.7 / 81.4 | 72.2 / 74.4 | 49.4 / 47.6 |
+| SIM=2 + encoder aliases (cosine >= 0.95) | 73.2 / 74.3 | 79.7 / 81.3 | 72.0 / 73.5 | 50.2 / 49.2 |
+
+### 170.1 What the step says
+
+- **Contrastive training does what it should on strings:** the encoder ties a merchant's renderings together and keeps look-alikes apart;
+  on the owner's real strings it raises the fewest false alarms of any matcher (6.9%), and the 4,460 alias pairs it adds beyond the
+  n-gram matcher were all right in a hand check of 40 non-marketplace ones (order-coded subscriptions, one chain in two cities, store
+  numbers, accents).
+- **Synthetic accuracy overstates real accuracy** (98.7 against 79.9 top-1): many real aliases are not spellings the generator makes
+  (another name for the company, payees the owner merged by hand).
+- **Identity is not similarity:** for a payee with no alias, the similar rows have to show payees *like* it (another taco shop), which
+  decider's untrained embedding does and an identity encoder, trained to push different merchants apart, does not (-0.9 / -1.6).
+- **As an extra alias source it is redundant here:** the existing retrieval already shows those strings among the similar rows; 487
+  prompts change, accuracy does not. Its use is where precision matters on its own: YNAB's payee matching, and grouping bank strings into
+  crowd keys (REPORT 169) at scale.

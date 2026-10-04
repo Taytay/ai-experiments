@@ -76,6 +76,8 @@ def yaml_value(v):
         return json.dumps(v, ensure_ascii=False)
     return v
 KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
+ALIAS_EMB, ALIAS_EMB_MIN = os.environ.get("ALIAS_EMB", ""), float(os.environ.get("ALIAS_EMB_MIN", "0.95"))  # row 186: alias matches from
+# payee_emb_<ALIAS_EMB>.npz (encode_payees_local.py) at cosine >= ALIAS_EMB_MIN, added to the n-gram aliases; the similar rows keep SIM_EMB's
 SIM_EMB = os.environ.get("SIM_EMB", "")  # row 186: payee_emb_<SIM_EMB>.npz (encode_payees_local.py) as the similar-payee embedding
 CROWD = os.environ.get("CROWD", "")  # row 183: a crowd table (build_crowd.py) under data/processed: "Others filed this payee as: ..." under
 CROWD_K, CROWD_TOP = int(os.environ.get("CROWD_K", "2")), 4  # the query when CROWD_K or more other households filed its bank string
@@ -87,7 +89,7 @@ KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind
 # has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
 # KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + (f"_{SIM_EMB}" if SIM_EMB else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + (f"_{SIM_EMB}" if SIM_EMB else "") + (f"_alias{ALIAS_EMB}{round(ALIAS_EMB_MIN * 1000)}" if ALIAS_EMB else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -233,6 +235,14 @@ def build_items(b):
             Sc = (Cm @ Cm.T).toarray(); np.fill_diagonal(Sc, 0)
             ctop = np.argsort(-Sc, axis=1)[:, :200]
             aliases = {n: [names[j] for j in ctop[k] if Sc[k, j] >= ALIAS_MIN] for k, n in enumerate(names)}
+            if ALIAS_EMB:  # row 186: the contrastive encoder adds same-payee matches above a strict cosine (REPORT 170: few false alarms)
+                ea = np.load(OUT / f"payee_emb_{ALIAS_EMB}.npz", allow_pickle=False)
+                pos = {n: k for k, n in enumerate(ea["names"])}
+                Y = ea["vecs"][[pos[n] for n in names]].astype(np.float32)
+                Sa = Y @ Y.T; np.fill_diagonal(Sa, -1)
+                for k, n in enumerate(names):
+                    extra = [names[j] for j in np.argsort(-Sa[k])[:ALIAS_MAX] if Sa[k, j] >= ALIAS_EMB_MIN and names[j] not in aliases[n]]
+                    aliases[n] = (aliases[n] + extra)
             for k, n in enumerate(names):  # reciprocal rank fusion (k = 60) of the two neighbour lists
                 sc = defaultdict(float)
                 for r, j in enumerate(top[k]):
