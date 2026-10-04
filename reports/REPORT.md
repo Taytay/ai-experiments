@@ -10375,3 +10375,23 @@ blind_v2 75.1 / 74.9).
 - **Caveats:** a synthetic crowd files by the same generator rules as the household, so it is cleaner than a real one (real users' names
   for a purpose vary more, and some strings are shared by unrelated businesses); first-time payees are 15-19% of these households' items
   against 29% in the owner's budget. The owner's budget needs real crowd data (owner: later).
+
+### 169.2 The crowd-trained model on the owner's budget, which has no crowd line
+
+The owner's budget has no crowd data (owner: later), so G3 and GC were read on it without the line (aliases + similar payees, group
+names; `scripts/chains/r183_owner.sh`; aggregates only). % right first, seeds 0 / 1 (mean):
+
+| reader | all | known payees | first-time, alias filed before | first-time, no alias |
+|---|---|---|---|---|
+| G (v2 households, REPORT 168) | 73.2 / 74.3 (73.75) | 79.7 / 81.3 | 72.0 / 73.5 | 50.3 / 49.2 |
+| G3 (shared-world households) | 73.4 / 73.7 (73.55) | 80.8 / 80.7 | 73.1 / 73.2 | 47.2 / 48.5 |
+| GC (trained with crowd lines), no line | 72.1 / 72.1 (72.1) | 79.1 / 79.2 | 70.8 / 71.6 | 47.4 / 46.9 |
+
+- **Trained with the line, the model depends on it:** without it, GC loses 1.5 against G3 on the owner's budget, both seeds alike,
+  most on known payees (-1.6) and alias payees (-2.0). In training the line was absent only for strings fewer than two other households
+  filed (rare and local merchants), so its absence came to mean "a rare merchant"; on the owner's budget it is absent everywhere. The
+  synthetic held-out households did not show it (GC without the line 71.6 against G3's 71.5).
+- **The shared world itself costs nothing** (G3 73.55 against G's 73.75).
+- **Next:** line dropout in training (drop the line from a share of episodes that have a crowd) so that absence carries no signal; it must
+  hold G3's level without the line and keep most of the +6-7 on first-time payees with it. Needed before any real crowd test, since in
+  use the line will be missing for new merchants and failed lookups.
