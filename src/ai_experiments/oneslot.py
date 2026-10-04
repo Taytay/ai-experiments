@@ -156,7 +156,7 @@ def parse(context):
 
 
 def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False,
-                 relist=False, field_loss=False):
+                 relist=False, field_loss=False, rationale=None):
     names, rows, query = parse(context)
     dsc = (desc if isinstance(desc, dict) else describe_categories(options, rows)) if desc else None  # row 136; a dict: descriptions given by the caller
     if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
@@ -242,14 +242,22 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
         ids += tok.encode("\nCategory: (", add_special_tokens=False)
         head = tok.encode("- (" + lab_of[options[opts[0]]] + ")", add_special_tokens=False)
         assert labs[0] in head, "a label does not tokenize as itself after '- ('"
-    return dict(ids=ids, slot=len(ids) - 1, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux,
+    slot = len(ids) - 1
+    if rationale and layout != "options" and gold is not None and gold >= 0:  # row 177: the answer, then "Because: ..." after the slot, trained as
+        # tokens (the slot's own logits are unchanged: later tokens cannot reach it); the label token itself stays the slot's classification target
+        ids.append(labs[opts.index(gold)])
+        tail = tok.encode(f") {options[gold]}\nBecause: {rationale}", add_special_tokens=False)
+        start = len(ids)
+        ids += tail
+        aux = aux + [(t - 1, ids[t]) for t in range(start, len(ids))]
+    return dict(ids=ids, slot=slot, gold=opts.index(gold) if gold is not None and gold >= 0 else -1, perm=opts, labs=labs, aux=aux,
                 opt_pos=opt_pos)
 
 
 def _cells(fields):
     """(date or '', weekday, description, amount) from a row's fields ('2025-01-19 | TEXT | $60.43 | Fri' or 'TEXT | $60.43 | Fri');
     lines after the first (row 149's "Kind: ...", row 176's field lines) are ignored."""
-    parts = fields.split("\n")[0].split(" | ")  # extra lines under a row (row 149's Kind, row 176's Clean payee / Via / ...) are not cells
+    parts = _re.sub(r"^\[\d+\] ", "", fields.split("\n")[0]).split(" | ")  # row 177: a leading row number "[12] " is not a cell; extra lines under a row (row 149's Kind, row 176's Clean payee / Via / ...) are not cells
     date = parts[0] if _DATE.match(parts[0]) else ""
     rest = parts[1:] if date else parts
     return date, rest[-1], " | ".join(rest[:-2]), rest[-2].replace("$", "")

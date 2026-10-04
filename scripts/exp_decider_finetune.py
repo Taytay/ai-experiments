@@ -197,7 +197,7 @@ def main():
     if REALSTYLE:  # row 173: (context, options, answer, spans) from data/processed/realstyle_v1_train.jsonl, no augmentations
         for line in open(ROOT / "data" / "processed" / REALSTYLE_FILE):
             r = json.loads(line)
-            rs_eps.append((r["context"], r["options"], r["answer"]) + ((r["spans"],) if AUX_LM else ()))
+            rs_eps.append((r["context"], r["options"], r["answer"]) + ((r["spans"],) if AUX_LM else ()) + ((r["rationale"],) if r.get("rationale") else ()))
         print(f"   {len(rs_eps)} real-style episodes, share {REALSTYLE}", flush=True)
     if TEACHER:
         load_teacher(eps)
@@ -218,7 +218,8 @@ def main():
         picked = [rng.choice(rs_eps) if rs_eps and rng.random() < REALSTYLE else evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
         if LAYOUT or DOW_FIRST:  # row 111
             built = [oneslot.build_layout(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST,
-                                          spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC, relist=RELIST, field_loss=FIELD_LOSS) for e in picked]
+                                          spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC, relist=RELIST, field_loss=FIELD_LOSS,
+                                          rationale=e[4] if AUX_LM and len(e) > 4 else None) for e in picked]  # row 177
         else:
             built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
         T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)

@@ -59,6 +59,8 @@ PLINE = os.environ.get("PLINE") == "1"  # owner, 2026-10-03: a line before the t
 PLINE_HEAD = "Earlier you filed this payee as: "
 FIELDS = os.environ.get("FIELDS") == "1"  # row 176: under each history row its "Clean payee / Via / Ordered from / Memo / Location / Store /
 # Reference" lines (synthetic households only: their transactions carry the parts); the query stays bare
+ROWIDS = os.environ.get("ROWIDS") == "1"  # row 177: history rows numbered in prompt order ("Transaction: [12] 2024-05-01 | ...")
+RATIONALE = os.environ.get("RATIONALE") == "1"  # row 177: each item carries "rationale", the reason for its category citing rows by number
 FIELD_ORDER = ("Clean payee", "Via", "Ordered from", "Memo", "Location", "Store", "Reference")
 
 
@@ -72,7 +74,7 @@ def yaml_value(v):
     return v
 KIND = os.environ.get("KIND", "")  # row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -104,6 +106,44 @@ def build():
     os.chmod(p, 0o600)
     print(f"{len(items)} items ({Counter(i['kind'] for i in items)}); gold missing from options: {sum(i['answer'] < 0 for i in items)}; "
           f"options median {sorted(len(i['options']) for i in items)[len(items) // 2]}, max {max(len(i['options']) for i in items)}")
+
+
+def rationale_of(rows, qi, q, rid):
+    """Row 177: why the query got its category, from the generator's reason, citing the history rows shown by number: what the payee
+    looks like, this payee's earlier rows, similar payees' rows (same merchant kind) and where they went, and the specific cause."""
+    from ai_experiments import taxonomy_v2 as TX
+    shown = sorted(rid, key=rid.get)
+    ref = lambda ix: " ".join(f"[{rid[i]}]" for i in ix)  # noqa: E731
+    gold, kind, reason = q["cat"], q.get("mkind"), (q.get("reason") or [None])[0]
+    who = q["parts"].get("Clean payee") if q.get("parts") else None
+    parts = []
+    if kind == "p2p":
+        parts.append(f"a person-to-person payment to {who}" + (f' with the memo "{q["parts"]["Memo"]}"' if q["parts"].get("Memo") else ""))
+    elif kind and kind in TX.KINDS:
+        parts.append(f"this looks like a {TX.KINDS[kind].split(' (')[0]}" + (f" ({who})" if who else ""))
+    same = [i for i in shown if rows[i]["payee_id"] == q["payee_id"]][::-1][:4]
+    parts.append("earlier at this payee: " + ", ".join(f"[{rid[i]}] {rows[i]['cat']}" for i in same) if same else "no earlier rows at this payee")
+    if kind and kind not in ("p2p", "income", "transfer"):
+        sim = [i for i in shown if rows[i].get("mkind") == kind and rows[i]["payee_id"] != q["payee_id"]][::-1]
+        to_gold = [i for i in sim if rows[i]["cat"] == gold][:4]
+        if to_gold:
+            parts.append(f"other payees of this kind {ref(to_gold)} were filed to {gold}")
+        elif sim:
+            parts.append(f"other payees of this kind {ref(sim[:3])} went to " + ", ".join(dict.fromkeys(rows[i]["cat"] for i in sim[:3])))
+    in_cat = [i for i in shown if rows[i]["cat"] == gold][::-1][:4]
+    cause = {"trip": f"a trip covers this date ({ref(in_cat) or 'no rows of it shown yet'} filed to {gold})",
+             "travel": "travel booked outside any trip window", "holiday": f"it falls in the {gold} season",
+             "phase": f"{gold} is in use for this period", "property": f"it belongs to the property's {gold}",
+             "pet": f"it is for the pet ({gold})", "treat": f"a small weekday coffee goes to {gold}",
+             "person": f"this kind of spending goes to {gold} part of the time", "reorg": f"this kind has gone to {gold} lately ({ref(in_cat) or 'none shown'})",
+             "habit": f"this kind of spending usually goes to {gold}", "catchall": f"nothing more specific fits, so {gold}",
+             "misfile": "it is filed against the pattern (a misfile)", "store": f"this store has its own category, {gold}",
+             "bill": f"a recurring bill filed to {gold}", "service": f"a regular service filed to {gold}",
+             "p2p_memo": f"the memo says the purpose: {gold}", "p2p": f"no memo; {gold} as for this person before" if same else f"no memo; {gold}",
+             "income": "income goes to Ready to Assign", "savings": f"a savings transfer to {gold}", "wish": f"the planned purchase {gold}"}.get(reason)
+    if cause:
+        parts.append(cause)
+    return "; ".join(parts) + "."
 
 
 def build_items(b):
@@ -146,7 +186,8 @@ def build_items(b):
         rows.append(dict(id=t["id"], date=t["date"], payee_id=t.get("payee_id") or payee, payee=payee, cat=lab,
                          kind="transfer" if t.get("transfer_account_id") else "inflow" if lab == RTA else "spending",
                          fields=f"{t['date']} | {payee} | ${amt:.2f} | {WD[d.weekday()]}",
-                         extra="".join(f"\n{k}: {yaml_value(str(t['parts'][k]))}" for k in FIELD_ORDER if FIELDS and t.get("parts") and k in t["parts"])))
+                         extra="".join(f"\n{k}: {yaml_value(str(t['parts'][k]))}" for k in FIELD_ORDER if FIELDS and t.get("parts") and k in t["parts"]),
+                         mkind=t.get("kind"), reason=t.get("reason"), parts=t.get("parts") or {}))
     rows.sort(key=lambda r: (r["date"], r["id"]))
     by_payee_name, neighbours, aliases = defaultdict(list), {}, {}
     for i, r in enumerate(rows):
@@ -243,7 +284,8 @@ def build_items(b):
                 sim += rows_nb[:SIM_MAX - len(sim)]
             near += sim
         near = sorted(near)
-        row_text = lambda i: f"Transaction: {rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
+        rid = {i: k + 1 for k, i in enumerate(list(shared) + [j for j in near if j not in set(shared)])} if ROWIDS else {}
+        row_text = lambda i: f"Transaction: {('[%d] ' % rid[i]) if i in rid else ''}{rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
         pline = ""
         kv = kinds.get(q["payee"]) if KIND else None
         kind_line = f"\nKind: {kv['kind']}" if kv and (KIND == "all" or not prev_rows) else ""
@@ -263,7 +305,7 @@ def build_items(b):
             rule_alias, seen_alias = ((ta[0][0] if ta and ta[0][1] >= 2 else pa[-1]) if pa else None), bool(pa)
         items.append(dict(id=q["id"], date=q["date"], kind=q["kind"], payee_seen=bool(prev), first_use=q["cat"] not in last_idx,
                           options=options, answer=options.index(q["cat"]) if q["cat"] in options else -1, gold=q["cat"],
-                          prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, desc=desc, rule=rule, rule_alias=rule_alias, seen_alias=seen_alias, last=prev[-1] if prev else None, n_hist=upto))
+                          prompt=ctx + f"Transaction: {q['fields']}\nCategory:", prompt_split=split, desc=desc, rationale=rationale_of(rows, qi, q, rid) if RATIONALE else None, rule=rule, rule_alias=rule_alias, seen_alias=seen_alias, last=prev[-1] if prev else None, n_hist=upto))
     return items
 
 
