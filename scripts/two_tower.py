@@ -87,7 +87,7 @@ def train():
     per = -(-PAIRS // HOUSEHOLDS)
     rows = []
     for b in households("train", range(HOUSEHOLDS)):
-        ev = [e for e in replay(b) if len(e[2]) > 1]
+        ev = [e for e in replay(b) if e[1] in e[2] and len(e[2]) > 1]  # hidden categories are not offered
         for q, gold, state, _ in rng.sample(ev, min(per, len(ev))):
             neg = rng.choice([c for c in state if c != gold])
             rows.append((q, state[gold], state[neg]))
