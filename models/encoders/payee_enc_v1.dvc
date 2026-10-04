@@ -1,0 +1,6 @@
+outs:
+- md5: 908b6b6cb65b9e562f873ef6f34f6d0a.dir
+  size: 134188994
+  nfiles: 10
+  hash: md5
+  path: payee_enc_v1

@@ -42,7 +42,7 @@ we collected, `src/` is library code, `scripts/` is entry points.
 ## GPU work: Modal (from 2026-09-25)
 
 The owner moved all GPU work to Modal (workspace `ynab`, shared with colleagues: touch nothing but this project's app and volumes).
-The local 3090 is no longer used for runs; the rules below about it still hold if it is ever used again.
+The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm okay to use local GPU sometimes when we can!"): smoke tests, small encoders, embedding private strings; long trainings and parallel batches stay on Modal. The rules below about it still hold.
 
 - Client: `uv tool install modal` (a uv tool, not a project dependency), then `modal setup`. Modal's agent skill is in
   `.claude/skills/modal` with its docs bundled (Modal's sample Docker token there is replaced by a placeholder: GitHub push protection).
