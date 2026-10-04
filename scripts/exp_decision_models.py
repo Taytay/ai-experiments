@@ -288,7 +288,7 @@ if __name__ == "__main__":
             recs = []
             for it, lp in zip(ITEMS, lps):
                 pred = max(range(len(lp)), key=lp.__getitem__)
-                recs.append(dict(id=it["id"], level=it["level"], answer=it["answer"], sum_lp=lp, n_tok=[1] * len(lp), pred=pred,
+                recs.append(dict(id=it["id"], level=it.get("level"), answer=it["answer"], sum_lp=lp, n_tok=[1] * len(lp), pred=pred,
                                  correct=pred == it["answer"]))
             path = write_recs(TAG, cond, recs, smoke=SMOKE)
             acc = 100 * sum(r["correct"] for r in recs) / len(recs)
