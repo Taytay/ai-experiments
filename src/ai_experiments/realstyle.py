@@ -15,7 +15,9 @@ What decides a transaction's category (category_style_v1: time decides most; amo
   misfiled. P2P payments carry a purpose memo half the time and go to the memo's category.
 """
 import datetime as dt
+import hashlib
 import json
+import os
 import math
 import re
 import random
@@ -105,6 +107,9 @@ WISH = ["California king sheets", "Glass Tupperware", "Cast iron skillet", "Stan
         "Television and sound system", "Patio furniture", "Air purifier", "New mattress", "Telescope"]
 
 
+_WORLD = {}
+
+
 @lru_cache(maxsize=None)
 def merchant_pool(split):
     doc = json.loads((PROCESSED / "realstyle_merchants_v1.json").read_text())
@@ -120,6 +125,14 @@ def style():
     return json.loads((PROCESSED / "category_style_v1.json").read_text())
 
 
+SHARED = os.environ.get("SHARED_WORLD") == "1"  # row 183: households share one world (see Household.shared)
+METROS, BANKS = 20, 4
+
+
+def _h(s):
+    return int(hashlib.md5(s.encode()).hexdigest(), 16)
+
+
 def _ln(rng, mu_sig):
     return round(math.exp(rng.gauss(*mu_sig)), 2)
 
@@ -127,9 +140,15 @@ def _ln(rng, mu_sig):
 class Household:
     """One synthetic household and its budget."""
 
-    def __init__(self, seed, split="train", start=None, years=None):
+    def __init__(self, seed, split="train", start=None, years=None, shared=None):
         self.rng = rng = random.Random(seed)
         self.split, self.seed = split, seed
+        # row 183 (owner, 2026-10-04: other people's filings as the "database"): in a shared world a merchant's bank strings depend on the
+        # merchant and the household's bank (one of BANKS), not the household, so households see the same strings; merchants are chosen
+        # by popularity (Overture place count ** 0.7 for chains) and a local merchant only by households in its metro (one of METROS).
+        # Off by default: the v1 / v2 households stay as they were.
+        self.shared = SHARED if shared is None else shared
+        self.metro, self.bank = _h(f"metro-{seed}") % METROS, _h(f"bank-{seed}") % BANKS
         self.pool = merchant_pool(split)
         self.start = start or dt.date(rng.randint(2014, 2021), rng.randint(1, 12), 1)
         self.end = min(self.start + dt.timedelta(days=int(365 * (years or rng.uniform(2, 9)))), dt.date(2026, 9, 30))
@@ -283,12 +302,25 @@ class Household:
             name = rng.choice(NONPLACE[kind]); m = dict(name=name, kind=kind, city=None, chain=True)
         elif fav and rng.random() > {"restaurant": 0.45, "fast_food": 0.3, "coffee_bakery": 0.3, "hobby": 0.5, "entertainment": 0.55}.get(kind, 0.2):
             return fav[min(int(rng.paretovariate(1.2)) - 1, len(fav) - 1)]
+        elif self.pool.get(kind) and self.shared:
+            ms, ws = self._world(kind)
+            if not ms:
+                return None
+            m = rng.choices(ms, ws)[0]
         elif self.pool.get(kind):
             m = rng.choice(self.pool[kind])
         else:
             return None
         fav.append(m)
         return m
+
+    def _world(self, kind):
+        """A shared world's merchants of one kind open to this household (chains, and the locals of its metro) and their weights."""
+        key = (self.split, kind, self.metro)
+        if key not in _WORLD:
+            ms = [m for m in self.pool[kind] if m.get("chain") or _h(m["name"]) % METROS == self.metro]
+            _WORLD[key] = (ms, [((m.get("places") or 1) ** 0.7 if m.get("chain") else 1.0) for m in ms])
+        return _WORLD[key]
 
     def _payee(self, m, date):
         """The raw bank string and the YNAB payee for one transaction at merchant m: each merchant has one to three string forms
@@ -297,13 +329,15 @@ class Household:
         rng = self.rng
         key = m["name"]
         if key not in self.payee_of_string:
-            r = random.Random(f"{self.seed}-{key}")
+            r = random.Random(f"bank{self.bank}-{key}" if self.shared else f"{self.seed}-{key}")
             forms = []
             for _ in range(r.choice([1, 1, 2, 3])):
                 f = render_v2(m["name"], r, city=m.get("city"), parts=True)
                 if not m.get("chain") and ".co" in f[0].lower() and r.random() < 0.7:  # web-domain strings are mostly online and chain merchants
                     f = render_v2(m["name"], r, city=m.get("city"), parts=True)
                 forms.append(f)
+            if self.shared:  # the household's own habits: whether it cleans this payee (the strings are the bank's)
+                r = random.Random(f"{self.seed}-{key}")
             self.payee_of_string[key] = dict(forms=forms, clean=r.random() < 0.5, recode=bool(re.search(r"\*[A-Z0-9]{5,}$", forms[0][0])) and r.random() < 0.6)
         info = self.payee_of_string[key]
         s, parts = info["forms"][0] if rng.random() < 0.8 else rng.choice(info["forms"])

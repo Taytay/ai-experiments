@@ -33,3 +33,11 @@
 /merchant_knowledge_v1_48k11_train.jsonl
 /realstyle_v2g_train.jsonl
 /realstyle_v2gkl_train.jsonl
+/realstyle_v3g_train.jsonl
+/realstyle_v3gc_train.jsonl
+/realstyle_v3g_test.json
+/realstyle_v3gc_test.json
+/realstyle_v3g_seen_test.json
+/realstyle_v3gc_seen_test.json
+/realstyle_crowd_train.json
+/realstyle_crowd_test.json

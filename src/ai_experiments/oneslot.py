@@ -151,7 +151,7 @@ def parse(context):
         rows.append((t[len("Transaction: "):], c.strip(), pos + len(t) + len("\nCategory:") + 1))
         pos += len(blk) + 2
     q = blocks[-1] if blocks else ""
-    assert q.startswith("Transaction: ") and ("\n" not in q or (q.count("\n") == 1 and "\nKind: " in q)), q[:80]  # row 149: a Kind line
+    assert q.startswith("Transaction: ") and all(x.startswith(("Kind: ", "Others filed this payee as: ")) for x in q.split("\n")[1:]), q[:80]  # row 149: a Kind line; row 183: a crowd line
     return names, rows, q[len("Transaction: "):]
 
 
