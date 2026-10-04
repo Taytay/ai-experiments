@@ -47,6 +47,12 @@ if __name__ == "__main__":
         groups["first-time payee, matched in Overture"] = [i for i in groups["first-time payee"] if payee(items[i]) in kinds]
         groups["first-time payee, not matched"] = [i for i in groups["first-time payee"] if payee(items[i]) not in kinds]
         groups["payee filed before, matched in Overture"] = [i for i in groups["payee filed before"] if payee(items[i]) in kinds]
+    tf = OUT / "merchant_db_tiers.json"
+    if tf.exists():  # row 180: first-time payees by the knowledge tier of the merchant they name (merchant_db_match_real.py)
+        tiers = json.loads(tf.read_text())
+        for g, lo, hi in (("in the top 5k merchants", 0, 5000), ("in merchants 5k-20k", 5000, 20000), ("in merchants 20k-48k", 20000, 48000)):
+            groups[f"first-time payee, {g}"] = [i for i in groups["first-time payee"] if lo <= tiers.get(payee(items[i]), -1) < hi]
+        groups["first-time payee, not in the 48k merchants"] = [i for i in groups["first-time payee"] if payee(items[i]) not in tiers]
     for g, ids in groups.items():
         print(f"\n**{g} (n={len(ids)}): right first / top 3 / top 5 / top 10 / MRR / top-1 a category ever used for the payee / probability on never-used categories**\n")
         print("| reader | 1st | top 3 | top 5 | top 10 | MRR | top-1 ever used | p(never used) |"); print("|---|---|---|---|---|---|---|---|")
