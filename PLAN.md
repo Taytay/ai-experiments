@@ -119,6 +119,11 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
 - **Known generator bug (found 2026-10-04, row 189):** `realstyle.Household._payee`'s recode step treats a one-word upper-case name
   after a processor star as an order code and replaces it ("SQ *BAKERY" -> "SQ *Q3JS4FB4X"): 1.1-1.5% of v3 test strings have no
   merchant name. Fix (recode only when render_v2's parts carry a Reference) at the next household version, not mid-comparison.
+- **Known lookup bug (found 2026-10-04):** `build_crowd.crowd_key` strips every 5+-character token after a `*`, not only order codes, so
+  one-word names collapse into the processor ("SQ *BAKERY", "PWP *1PASSWORD" -> "sq" / "pwp", keys shared by 700+ households):
+  4.6-5.1% of crowd lines in rows 183 / 185 / 188 (and row 189's behaviour vectors) pooled unrelated merchants. Effect: noise lines,
+  so the crowd gains are if anything understated; the dependence finding stands. Fix: strip only tokens mixing letters and digits;
+  then rebuild crowd tables and households as v4 (with the recode fix) and re-run the crowd arm. Row 186's encoder is unaffected.
 - **Local GPU (owner, 2026-10-04):** small, short jobs may run on the local 3090 (encoders, embedding private strings, smoke tests);
   long trainings and parallel batches stay on Modal.
 
