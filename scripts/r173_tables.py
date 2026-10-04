@@ -15,7 +15,8 @@ from ai_experiments.paths import PROCESSED
 R = "results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st800{seed}_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft{rs}_lora_{set}_labrand255_laylabelled_shots.noctx.jsonl"
 SETS = ["real6", "real6_v1_novel", "mislead_v1", "override_v1", "blind_v1", "blind_v1_others", "blind_v2", "blind_v2_others"]
 ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% real-style": [("", "_rs25")], "recipe + 50% real-style": [("", "_rs50")],
-        "row 176 A2: + 25% real-style v2": [("", "_rs25v2")], "row 176 B: + 25% real-style v2, field block generated": [("", "_rs25v2f_fl")]}
+        "row 176 A2: + 25% real-style v2": [("", "_rs25v2")], "row 176 B: + 25% real-style v2, field block generated": [("", "_rs25v2f_fl")],
+        "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")]}
 
 
 def acc(f, sel=None):
