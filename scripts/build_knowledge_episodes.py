@@ -27,7 +27,8 @@ from ai_experiments.paths import PROCESSED  # noqa: E402
 from ai_experiments.statements import render_v2  # noqa: E402
 
 DB = Path.home() / "projects" / "YNAB" / "data" / "merchants" / "merchants_v1.db"
-TOP, EXPOSURES, ROWS = int(os.environ.get("TOP", "20000")), int(os.environ.get("EXPOSURES", "30")), int(os.environ.get("ROWS", "24"))
+TOP, EXPOSURES, ROWS = int(os.environ.get("TOP", "20000")), float(os.environ.get("EXPOSURES", "30")), int(os.environ.get("ROWS", "24"))
+TEST_ONLY = os.environ.get("TEST_ONLY") == "1"  # row 180: write only the tiered test set
 WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 KIND_NAMES = {k: v for k, v in T.KINDS.items() if k not in ("several", "purpose", "p2p", "income", "savings", "loan")}
 
@@ -67,11 +68,11 @@ if __name__ == "__main__":
     test_new = merchants("test", 2000)
     print(f"{len(train)} training merchants, {len(test_new)} held-out merchants", flush=True)
     names = list(KIND_NAMES.values())
-    pool = [m for m in train for _ in range(EXPOSURES)]
+    pool = [m for m in train for _ in range(int(EXPOSURES) + (rng.random() < EXPOSURES % 1))]  # fractional exposures: some merchants once more
     rng.shuffle(pool)
     out = PROCESSED / os.environ.get("OUT", "merchant_knowledge_v1_train.jsonl")
     k = 0
-    with open(out, "w") as f:
+    with open(out if not TEST_ONLY else os.devnull, "w") as f:
         for s in range(0, len(pool) - ROWS, ROWS + 1):
             chunk = pool[s:s + ROWS + 1]
             opts = sorted(set(names), key=lambda _: rng.random())
@@ -81,14 +82,17 @@ if __name__ == "__main__":
             ctx = "Categories: " + ", ".join(opts) + "\n\n" + hist + f"Transaction: {row(q, rng, d0 + dt.timedelta(days=ROWS))}"
             f.write(json.dumps(dict(context=ctx, options=opts, answer=opts.index(KIND_NAMES[q["kind"]]), spans=label_spans(ctx))) + "\n")
             k += 1
-    print(f"{k} training episodes ({ROWS} merchants + 1 each) -> {out} ({out.stat().st_size / 1e6:.0f} MB)", flush=True)
+    if not TEST_ONLY:
+        print(f"{k} training episodes ({ROWS} merchants + 1 each) -> {out} ({out.stat().st_size / 1e6:.0f} MB)", flush=True)
     items = []
-    for trained, ms in ((True, rng.sample(train, 2000)), (False, test_new)):
+    tiers = [("top 5k", train[:5000], 2000), ("5k-20k", train[5000:20000], 1500), ("20k-48k", train[20000:48000], 1500)] if TEST_ONLY else [("top", train, 2000)]
+    groups = [(name, True, rng.sample(ms, min(n, len(ms)))) for name, ms, n in tiers if ms] + [("held-out", False, test_new)]
+    for level, trained, ms in groups:
         for m in ms:
             opts = sorted(names, key=lambda _: rng.random())
             p = "Categories: " + ", ".join(opts) + f"\n\nTransaction: {row(m, rng, dt.date(2025, 6, 2))}\nCategory:"
-            items.append(dict(id=f"MK:{"t" if trained else "h"}:{len(items)}", level="trained" if trained else "held-out", options=[" " + o for o in opts], answer=opts.index(KIND_NAMES[m["kind"]]),
+            items.append(dict(id=f"MK:{"t" if trained else "h"}:{len(items)}", level=level if TEST_ONLY else ("trained" if trained else "held-out"), options=[" " + o for o in opts], answer=opts.index(KIND_NAMES[m["kind"]]),
                               prompt=p, prompt_ctx=p, merchant=m["name"], kind=m["kind"], trained=trained, user=0))
-    tp = PROCESSED / "merchant_knowledge_v1_test.json"
+    tp = PROCESSED / ("merchant_knowledge_v2_test.json" if TEST_ONLY else "merchant_knowledge_v1_test.json")
     tp.write_text(json.dumps(dict(name="merchant_knowledge_v1_test", version=1, n=len(items), items=items)))
     print(f"{len(items)} test items (2,000 trained merchants, {len(test_new)} held out) -> {tp}")
