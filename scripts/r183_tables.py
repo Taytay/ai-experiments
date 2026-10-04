@@ -18,7 +18,7 @@ from build_crowd import crowd_key  # noqa: E402
 
 R = ("results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st800{seed}_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_"
      "aux100_labrand255_laylabelled_shots_ev10soft_rs25{v}_lora_{set}_labrand255_laylabelled_shots.noctx.jsonl")
-ARMS = {"G3 (no crowd lines in training)": "v3g", "GC (crowd lines in training)": "v3gc"}
+ARMS = {"G3 (no crowd lines in training)": "v3g", "GC (crowd lines in training)": "v3gc", "GCD (crowd lines, 40% dropped)": "v3gcd"}
 WORLDS = {"new world (merchants unseen in training)": ("realstyle_v3g_test", "realstyle_v3gc_test", "realstyle_crowd_test.json"),
           "training world (merchants other users filed in training)": ("realstyle_v3g_seen_test", "realstyle_v3gc_seen_test", "realstyle_crowd_train.json")}
 BUCKETS = [("0-1", 0, 1), ("2-9", 2, 9), ("10-49", 10, 49), ("50+", 50, 10 ** 9)]

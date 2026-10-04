@@ -10437,3 +10437,31 @@ strings were embedded on this machine's CPU (`encode_payees_local.py`), never se
 - **As an extra alias source it is redundant here:** the existing retrieval already shows those strings among the similar rows; 487
   prompts change, accuracy does not. Its use is where precision matters on its own: YNAB's payee matching, and grouping bank strings into
   crowd keys (REPORT 169) at scale.
+
+## 171. Dropping the crowd line from 40% of training episodes keeps its whole benefit when present (first-time payees +6.7 / +6.6, synthetic, two seeds) and halves the cost when absent: on the owner's budget, which has no line, GCD reads 72.8 against G3's 73.55 and GC's 72.1 (two seeds each) (REAL-27)
+
+PLAN step 185 (REPORT 169.2). `real_budget_eval.py CROWD_DROP=0.4` drops the line from 40% of the items that would carry one (by item
+id); households `realstyle_v3gcd_train.jsonl`; otherwise GC's recipe; seeds 0 and 1 (`r185.json`). Tables: `scripts/r183_tables.py`,
+`scripts/real_budget_tables.py` (owner's budget via `scripts/chains/r183_owner.sh` with SPECS; aggregates only).
+
+**Table 171.1: % right first, means of seeds 0 and 1 [each seed]**
+
+| set | G3 | GC | GCD |
+|---|---|---|---|
+| synthetic, new world, first-time payees, with the line | 59.6 (untrained) | 60.2 | 60.9 [61.8 / 60.1] |
+| synthetic, new world, first-time payees, no line | 55.1 | 53.9 | 54.2 [56.1 / 52.3] |
+| synthetic, training world, first-time payees, with the line | 63.7 (untrained) | 66.0 | 65.4 [64.8 / 66.0] |
+| owner's budget (no line): all | 73.55 [73.4 / 73.7] | 72.1 [72.1 / 72.1] | 72.8 [73.3 / 72.3] |
+| owner's budget: known payees | 80.75 | 79.15 | 79.8 [80.3 / 79.3] |
+| owner's budget: first-time, alias filed before | 73.15 | 71.2 | 72.05 |
+| owner's budget: first-time, no alias | 47.85 | 47.15 | 47.95 |
+
+### 171.1 What the step says
+
+- **Dropout costs nothing where the line is present** (GCD equals GC within seed noise on both synthetic worlds).
+- **It halves the dependence:** the owner's budget without the line goes from -1.45 (GC) to -0.75 (GCD) against G3; known and alias
+  payees carry what remains.
+- **Item-level dropout does not match the owner's case:** there the line is missing for the whole budget, every transaction, whereas
+  training dropped it item by item inside households that otherwise have it. Next: whole households without a crowd (a share of
+  training households read with no line at all, besides item dropout), which is also the realistic case for a new YNAB market, a bank
+  whose strings nobody else has, or a lookup outage.
