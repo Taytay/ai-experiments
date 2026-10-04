@@ -73,7 +73,11 @@ def yaml_value(v):
             or _re.fullmatch(r"[\d.eE+_:-]+|0x[0-9a-fA-F]+|0o[0-7]+|\.(inf|nan)", v, _re.I):
         return json.dumps(v, ensure_ascii=False)
     return v
-KIND = os.environ.get("KIND", "")  # row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
+KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
+KIND_SKIP = {"several", "purpose", "p2p", "income", "savings", "loan"}  # not merchants
+KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind>" line under every history row and the query whose payee
+# has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
+# KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
 SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
@@ -222,7 +226,24 @@ def build_items(b):
                     sc[j] += 1 / (60 + r)
                 neighbours[n] = [names[j] for j in sorted(sc, key=lambda j: -sc[j])]
     items, by_payee, last_idx, cat_payees = [], defaultdict(list), {}, defaultdict(list)
-    kinds = json.loads((OUT / "overture_kinds.json").read_text()) if KIND else {}
+    kinds = json.loads((OUT / "overture_kinds.json").read_text()) if KIND in ("new", "all") else {}
+    for r in rows:
+        r["kl"] = ""
+    if KIND == "rows":
+        from ai_experiments import taxonomy_v2 as TX
+        if any(r["mkind"] for r in rows):  # a synthetic household
+            import hashlib
+            pk, names = {}, sorted(k for k in TX.KINDS if k not in KIND_SKIP)
+            for r in rows:
+                if r["payee"] not in pk:
+                    h = int(hashlib.md5(r["payee"].encode()).hexdigest(), 16)
+                    ok = r["mkind"] in TX.KINDS and r["mkind"] not in KIND_SKIP and h % 1000 < KIND_COVER * 1000
+                    pk[r["payee"]] = (r["mkind"] if h // 1000 % 1000 >= KIND_NOISE * 1000 else names[h // 10 ** 6 % len(names)]) if ok else None
+        else:
+            pk = json.loads((OUT / "payee_kinds.json").read_text())
+        for r in rows:
+            k = pk.get(r["payee"])
+            r["kl"] = f"\nKind: {TX.KINDS[k]}" if k in TX.KINDS else ""
     used_order = []  # categories by first use
     upto = 0  # rows [0, upto) are history: dated strictly before the query
     day, shared = None, []
@@ -270,7 +291,7 @@ def build_items(b):
         chosen.sort()
         year_ago = str(dt.date.fromisoformat(q["date"]) - dt.timedelta(days=365))
         options = list(dict.fromkeys([RTA] + visible + [c for c in used_order if rows[last_idx[c]]["date"] >= year_ago]))[:255]
-        ctx = "Categories: " + ", ".join(options) + "\n\n" + "".join(f"Transaction: {rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n" for i in chosen)
+        ctx = "Categories: " + ", ".join(options) + "\n\n" + "".join(f"Transaction: {rows[i]['fields']}{rows[i]['extra']}{rows[i]['kl']}\nCategory: {rows[i]['cat']}\n\n" for i in chosen)
         near = [i for i in prev_rows if i not in set(shared)][::-1][:OWN_MAX]
         if SIM:  # the nearest earlier payees by name embedding, up to SIM_PER_PAYEE latest rows each, SIM_MAX rows in all
             sim, sh = [], set(shared)
@@ -288,10 +309,11 @@ def build_items(b):
             near += sim
         near = sorted(near)
         rid = {i: k + 1 for k, i in enumerate(list(shared) + [j for j in near if j not in set(shared)])} if ROWIDS else {}
-        row_text = lambda i: f"Transaction: {('[%d] ' % rid[i]) if i in rid else ''}{rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
+        row_text = lambda i: f"Transaction: {('[%d] ' % rid[i]) if i in rid else ''}{rows[i]['fields']}{rows[i]['extra']}{rows[i]['kl']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
         pline = ""
-        kv = kinds.get(q["payee"]) if KIND else None
+        kv = kinds.get(q["payee"]) if KIND in ("new", "all") else None
         kind_line = f"\nKind: {kv['kind']}" if kv and (KIND == "all" or not prev_rows) else ""
+        kind_line = q["kl"] if KIND == "rows" else kind_line
         if PLINE and prev_rows:
             cnt = Counter(rows[i]["cat"] for i in prev_rows).most_common(3)
             pline = PLINE_HEAD + ", ".join(f"{c} ({n})" for c, n in cnt) + "\n\n"

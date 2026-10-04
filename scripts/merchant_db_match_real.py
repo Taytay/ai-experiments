@@ -3,7 +3,8 @@ merchants("train", 48000), most popular first), so real_budget_tables.py can spl
 merchant. A payee matches a merchant when, after dropping a processor prefix ("SQ *", "TST* ", "PAYPAL *", ...) and keeping letters and
 digits only, it starts with the merchant's name or domain stem so normalised (5 characters at least). Approximate: a short brand can match a
 longer unrelated name. Private: writes OUT/merchant_db_tiers.json ({payee: index of the matched merchant in the popularity order}), next
-to the budget's items, never in the repo; prints counts only.
+to the budget's items, never in the repo; and OUT/payee_kinds.json ({payee: taxonomy_v2 kind}: the matched merchant's kind, else the
+Overture match's (overture_lookup.py) mapped by taxonomy_v2.overture_kind), the source of row 182's "Kind:" lines; prints counts only.
 env: BUDGET, OUT (as real_budget_eval.py).
 usage: BUDGET=<id> uv run python scripts/merchant_db_match_real.py
 """
@@ -15,6 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from build_knowledge_episodes import merchants  # noqa: E402
+
+from ai_experiments import taxonomy_v2 as T  # noqa: E402
 
 BUDGET = os.environ["BUDGET"]
 OUT = Path(os.environ.get("OUT", Path.home() / ".local" / "share" / "ynab-real-eval" / BUDGET))
@@ -41,7 +44,13 @@ if __name__ == "__main__":
         hits = [first[pk[:n]] for n in lens if n <= len(pk) and pk[:n] in first]
         if hits:
             tiers[p] = min(hits)
-    (OUT / "merchant_db_tiers.json").write_text(json.dumps(tiers)); os.chmod(OUT / "merchant_db_tiers.json", 0o600)
+    ov = json.loads((OUT / "overture_kinds.json").read_text()) if (OUT / "overture_kinds.json").exists() else {}
+    kinds = {p: k for p, v in ov.items() if (k := T.overture_kind(v["kind"].replace(" ", "_")))}
+    kinds |= {p: ms[i]["kind"] for p, i in tiers.items()}  # the database's match first
+    for name, obj in (("merchant_db_tiers.json", tiers), ("payee_kinds.json", kinds)):
+        (OUT / name).write_text(json.dumps(obj)); os.chmod(OUT / name, 0o600)
+    ntx = sum(1 for it in items if it["prompt"].rsplit("Transaction: ", 1)[1].split(" | ")[1] in kinds)
+    print(f"kinds for {len(kinds)} payees ({len(set(kinds) - set(tiers))} from Overture only); {100 * ntx / len(items):.1f}% of transactions")
     n = len(payees)
     print(f"{n} distinct payees; matched {len(tiers)} ({100 * len(tiers) / n:.1f}%): top 5k {sum(t < 5000 for t in tiers.values())}, "
           f"5k-20k {sum(5000 <= t < 20000 for t in tiers.values())}, 20k-48k {sum(t >= 20000 for t in tiers.values())}")
