@@ -10493,3 +10493,41 @@ aggregates only). Model in DVC (`models/encoders/two_tower_v1`).
   payee-category similarity. As a shortlist it would lose 12 points of the right answers that decider's top 10 keeps; not useful there.
 - **Use:** its category side embeds a category by its name and contents, which row 189 uses to cluster categories across households
   (behavioural payee similarity through shared purposes).
+
+## 173. Two hops through other households' filings pick better similar-payee rows: choosing the household's own payees whose bank strings other households file into the same purpose clusters lifts first-time payees 1.5 to 2.6 points over string-similar rows (and 7 over none), both seeds, both worlds, no retraining and no new prompt format (REAL-27, MODEL-25)
+
+PLAN step 189 (owner, 2026-10-04: "payee X is often categorized as category clusters x, y, and z, and clusters x, y, and z are the way
+payees a, b, and c are often categorized"). Every category of 800 households per world, written "<Group>: <Name>; recently: <three
+payees>", embedded with row 187's two-tower encoder and clustered by k-means into 64 purpose clusters (`build_crowd_clusters.py`;
+e.g. "Dining out" / "Eating out" / "Takeout & restaurants"; trips; a person's fun money with "Entertainment"). Each bank string gets a
+vector of how many other households filed it in each cluster (the household itself left out; fewer than two: no vector). The similar
+rows under the payee's own rows are the household's own earlier payees ranked by cosine between vectors, fused with the n-gram ranking
+by reciprocal rank as SIM=2 fuses an embedding (`real_budget_eval.py SIM=2 SIM_SRC=behav CROWD_CLUS=`), against n-grams alone
+(`SIM_SRC=ngram`) and against the household's own rows only (rows 183 / 185's sets). Read zero-shot by G3 and GCD, seeds 0 and 1,
+without the crowd line (`r189.json`; tables `scripts/r189_tables.py`). Data: v3 (5% of crowd keys collapsed, REPORT 169 note; the
+v4 rebuild, row 190, fixes them).
+
+**Table 173.1: % right first, mean of seeds 0 and 1**
+
+| world, items | n | G3: own rows / n-gram rows / behavioural rows | GCD: own / n-gram / behavioural |
+|---|---|---|---|
+| new world: all | 6,000 | 71.5 / 72.4 / **72.6** | 71.5 / 72.3 / **72.8** |
+| new world: known payees | 5,086 | 74.5 / 74.4 / 74.4 | 74.6 / 74.5 / 74.6 |
+| new world: first-time payees | 914 | 55.1 / 60.7 / **62.5** | 54.2 / 60.6 / **62.5** |
+| new world: first-time, 50+ other households | 668 | 58.8 / 64.1 / **66.5** | 58.7 / 64.0 / **66.8** |
+| new world: first-time, 0-1 others (no vector) | 182 | 45.6 / 50.8 / 50.8 | 44.2 / 52.2 / 52.2 |
+| training world: all | 6,000 | 73.2 / 74.0 / **74.5** | 73.4 / 74.0 / **74.6** |
+| training world: first-time payees | 1,141 | 58.5 / 63.6 / **65.1** | 58.8 / 62.6 / **65.2** |
+| training world: first-time, 50+ others | 789 | 63.8 / 67.7 / **69.6** | 63.2 / 66.9 / **70.0** |
+| training world: first-time, 10-49 others | 120 | 54.6 / 64.6 / **67.1** | 56.2 / 63.8 / **67.9** |
+
+### 173.1 What the step says
+
+- **Similar rows matter for first-time payees** (+5 to +6 from n-gram rows over the household's own rows only), and **choosing them by
+  behaviour adds 1.5 to 2.6 more**, consistent over both seeds and both worlds, most where many households filed the string (+2.4 to
+  +3.1 at 50+); known payees and payees with no vector are unchanged (the vector only reorders where it exists).
+- **No retraining and no new format:** the crowd's knowledge enters as the household's *own* rows ("where do I put things like this"),
+  which the model already reads; so, unlike the crowd line (REPORT 169.2), nothing breaks when the crowd is absent.
+- **Not yet compared:** the crowd line and behavioural rows together; on the v4 data (clean keys); on the owner's budget (needs real
+  crowd data). Behavioural rows answer "which of my payees are like this one"; the crowd line answers "where do people put this one";
+  the two may add.
