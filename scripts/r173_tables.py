@@ -23,7 +23,9 @@ ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% re
         "row 181 G: Group: Name households": [("", "_rs25v2g")], "row 181 GK: Group: Name + knowledge 5k": [("", "_rs25v2g_mk40_5k")],
         "row 182 G seed 1": [("s1", "_rs25v2g")], "row 182 GK seed 1": [("s1", "_rs25v2g_mk40_5k")],
         "row 182 GK20: Group: Name + 20k x6.5": [("", "_rs25v2g_mk40_20k6")], "row 182 GL: Group: Name + Kind lines": [("", "_rs25v2gkl")],
-        "row 182 GLK20: + Kind lines + 20k x6.5": [("", "_rs25v2gkl_mk40_20k6")]}
+        "row 182 GLK20: + Kind lines + 20k x6.5": [("", "_rs25v2gkl_mk40_20k6")],
+        "row 183 G3: shared-world households (2 seeds)": [("", "_rs25v3g"), ("s1", "_rs25v3g")],
+        "row 183 GC: + crowd lines (2 seeds)": [("", "_rs25v3gc"), ("s1", "_rs25v3gc")]}
 
 
 def acc(f, sel=None):
