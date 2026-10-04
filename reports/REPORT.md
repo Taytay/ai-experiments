@@ -10061,3 +10061,37 @@ trips 86.2 -> 83.0, changed mind 20.9 -> 20.9.
   the same tension as every knowledge-adding step since REPORT 108.
 - **Not adopted yet:** a second seed, and row 177's rationale arms (the same households with row numbers, and rationales citing rows),
   decide whether the block stays.
+
+
+## 164. Row numbers on history rows and rationales that cite them add little: row numbers alone recover some old drills (REAL-6 +2.0, novel names +1.3, blind_v2 + line +2.7) and leave the owner's budget level (73.3 against 73.1); rationales trained after the answer (from the generator's reasons, citing rows) add nothing and cost 0.7 on the owner's budget; "changed their mind" stays at 20.9 in every arm, so that regression comes from the household data, not from attention (REAL-27)
+
+PLAN step 177 (owner, 2026-10-03: "Should we try to draw attention to other rows in the history more ... by having it generate rationale
+for the category?"; "we might need a good way to identify rows of history ... label them with row numbers? ... make reference to other
+rows that are similar?"; then: "I am concerned about trying to draw attention explicitly to certain rows though because the model needs to
+learn to do that itself, and with our real dataset, we won't be able to write rationale for everything"). The real-style generator records
+each transaction's reason (habit 52%, catch-all 21%, a person's purpose, bills, misfiles, trips, store-named categories, properties,
+holidays, P2P memos, re-routing) and its merchant kind, without changing any household; `real_budget_eval.py ROWIDS=1` numbers history rows
+in prompt order ("Transaction: [12] 2024-05-01 | ..."), `RATIONALE=1` writes each item's "Because: <what the payee looks like>; <this
+payee's rows by number>; <similar payees' rows by number and where they went>; <the cause>"; `oneslot.build_layout(rationale=...)` appends
+the answer and the rationale after the slot and trains them as tokens (the slot's own logits unchanged). Arms on the same households as
+REPORT 163's A2 / B: C = row numbers; D = row numbers + rationales. Seed 0; job list `scripts/modal_jobs/r177.json`. The synthetic sets
+were read without row numbers (their prompts have none); the owner's budget with numbered rows (aliases + similar payees).
+
+**Table 164.1: % right first (single seeds)**
+
+| arm | owner's budget: all / known / first-time (top 3 all) | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line | changed mind |
+|---|---|---|---|---|---|---|---|---|---|
+| A2: + 25% real-style v2 | 73.1 / 79.6 / 57.4 (84.8) | 84.6 | 85.6 | 61.4 | 81.9 | 84.7 | 74.3 | 72.3 | 20.9 |
+| B: + the field block (REPORT 163) | **73.9 / 80.7** / 57.2 (85.1) | 83.6 | 78.5 | 57.1 | 84.1 | 85.3 | 76.0 | 75.3 | 20.9 |
+| C: + row numbers | 73.3 / 80.2 / 56.6 (84.7) | 86.6 | 86.9 | 60.4 | 82.1 | 84.5 | 74.1 | 75.0 | 20.9 |
+| D: + row numbers + rationales | 72.4 / 79.1 / 56.1 (84.6) | 83.9 | 83.2 | 60.0 | 82.2 | 84.5 | 74.9 | 74.1 | 20.9 |
+
+### 164.1 What the step says
+
+- **Row numbers are harmless and cheap, not a lever:** level on the owner's budget, a little better on the old drills. Real prompts can
+  always carry them; they are not adopted on these numbers alone.
+- **Rationales do not teach attention the answer loss does not:** on real data they cost 0.7, on the synthetic sets they add nothing.
+  The owner's objection holds: the model has to learn where to look from the answers, and real data comes with no reasons to train on.
+- **The "changed their mind" regression is in the data:** 20.9 in every arm since real-style training (recipe 42.6). The households'
+  3% random misfiles teach the model to discount an isolated recent change; v3 households (row 180) make misfiles corrected and changes
+  persistent.
