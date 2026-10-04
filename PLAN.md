@@ -116,6 +116,9 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   agents or a strong model to describe the top 100k payees); a real crowd test on the owner's budget when the owner brings crowd data
   (owner: "I'll get you better data another time"); 178 (prompt fixes: similar rows only above thresholds, corporate-suffix stripping);
   v3 households (per-person payees, accounts on rows); 168 to 170, 160 to 162, 164 (Clef) as before.
+- **Known generator bug (found 2026-10-04, row 189):** `realstyle.Household._payee`'s recode step treats a one-word upper-case name
+  after a processor star as an order code and replaces it ("SQ *BAKERY" -> "SQ *Q3JS4FB4X"): 1.1-1.5% of v3 test strings have no
+  merchant name. Fix (recode only when render_v2's parts carry a Reference) at the next household version, not mid-comparison.
 - **Local GPU (owner, 2026-10-04):** small, short jobs may run on the local 3090 (encoders, embedding private strings, smoke tests);
   long trainings and parallel batches stay on Modal.
 
