@@ -10192,3 +10192,81 @@ read with their plain names.
 - **Note on K:** the synthetic sets show what REPORT 165 did not: merchant knowledge at 40% costs the drills where the user's filing must
   beat what a name suggests (novel names -20, misleading names -10, REAL-6 -8 against A2), while it helps where names are real (the blind
   sets +2 to +5, the owner's budget +1.2).
+## 167. Scaling merchant knowledge: coverage beats repetition (20k merchants seen 6.5 times each beat 5k seen 26 times at the same compute, on every tier); about 11 exposures keep most of a fact; on the owner's budget every knowledge arm beats its own control by 1.1 to 2.7 (20k x 6.5: 74.6% right first, level with GK) but the gain is on payees filed before, not on first-time payees, not even those whose merchant the model was taught: knowing what a merchant is does not yet change the purpose it files the payee under (MODEL-28, REAL-27)
+
+PLAN step 180 (owner, 2026-10-03: "Proceed with scaling the knowledge and proceed as far as you can, learning the best way to inject
+knowledge"). REPORT 165's recipe (A2's households at 25%, packed kind episodes from `merchants_v1.db`, `build_knowledge_episodes.py`) with
+the merchants trained and their exposures varied: 5k x 13 at a 20% share and 20k x 6.5 at 40% (both 800 steps, the compute of K's 5k x 26
+at 40%); 20k x 26 and 48k x 11 at 40% over 3,200 steps; A2 at 3,200 steps as their control. Kind accuracy is read on a tiered test
+(`merchant_knowledge_v2_test.json`: 2,000 of the top 5k, 1,500 of 5k-20k, 1,500 of 20k-48k, 2,000 held-out merchants). Seed 0; job list
+`scripts/modal_jobs/r180.json`. The owner's budget with aliases + similar payees (`real_budget_eval.py SIM=2`), plain names.
+
+**Table 167.1: kind accuracy by tier (%), 55 kinds**
+
+| reader | top 5k | 5k-20k | 20k-48k | held out |
+|---|---|---|---|---|
+| recipe | 62.9 | 39.9 | 35.7 | 59.7 |
+| A2 (800 steps) | 62.7 | 40.6 | 34.7 | 60.6 |
+| A2 (3,200 steps) | 54.4 | 36.9 | 33.9 | 54.5 |
+| K: 5k x 26, 40%, 800 | 84.0 | 51.0 | 43.6 | 77.3 |
+| 5k x 13, 20%, 800 | 80.6 | 48.4 | 41.4 | 75.5 |
+| 20k x 6.5, 40%, 800 | 78.4 | 61.7 | 52.7 | 76.2 |
+| 20k x 26, 40%, 3,200 | 84.2 | 73.7 | 52.6 | 78.3 |
+| 48k x 11, 40%, 3,200 | 78.5 | 66.4 | 67.8 | 75.8 |
+
+**Table 167.2: the owner's budget, % right first (top 3); p(never used) = probability left on categories never used for the payee**
+
+| reader | all | payee filed before | first-time | first-time, no alias | p(never used) |
+|---|---|---|---|---|---|
+| A2 (800) | 73.1 (84.8) | 79.6 | 57.4 | 50.2 | 26.8% |
+| K: 5k x 26 (800) | 74.3 (85.3) | 81.0 | 58.0 | 50.6 | 29.4% |
+| 5k x 13 at 20% (800) | 73.4 (84.2) | 80.5 | 56.2 | 47.8 | 25.3% |
+| **20k x 6.5 (800)** | **74.6 (85.2)** | **81.7** | 57.5 | 49.5 | 29.2% |
+| A2 (3,200) | 71.9 (84.2) | 78.3 | 56.6 | 49.3 | 26.2% |
+| 20k x 26 (3,200) | 73.6 (84.3) | 80.0 | 57.9 | 50.6 | 28.9% |
+| 48k x 11 (3,200) | 73.0 (83.6) | 79.8 | 56.7 | 49.1 | 31.4% |
+
+**Table 167.3: first-time payees by whether the merchant they name was trained (`merchant_db_match_real.py`: prefix match of the
+normalised payee on the 48k merchants' names and domains; 1,522 of 5,811 payees match, approximate), % right first**
+
+| reader | in the top 5k (591) | 5k-20k (763) | 20k-48k (311) | not in the 48k (4,541) |
+|---|---|---|---|---|
+| A2 (800) | 62.6 | 57.1 | 71.4 | 55.9 |
+| K: 5k x 26 (800) | 63.3 | 57.9 | 71.7 | 56.4 |
+| 20k x 6.5 (800) | 62.4 | 56.4 | 72.0 | 56.0 |
+| A2 (3,200) | 61.1 | 58.2 | 72.3 | 54.7 |
+| 20k x 26 (3,200) | 63.5 | 58.6 | 73.6 | 56.0 |
+| 48k x 11 (3,200) | 62.4 | 56.4 | 73.3 | 54.8 |
+
+**Table 167.4: the synthetic sets, % right first (single seeds)**
+
+| reader | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|
+| A2 (800) | 84.6 | 85.6 | 61.4 | 81.9 | 84.7 | 74.3 | 72.3 |
+| K: 5k x 26 (800) | 76.8 | 65.8 | 51.6 | 83.8 | 85.8 | 77.3 | 77.1 |
+| 5k x 13 at 20% (800) | 83.6 | 82.2 | 54.1 | 83.3 | 84.1 | 75.2 | 75.0 |
+| 20k x 6.5 (800) | 78.2 | 65.1 | 53.0 | 83.9 | 85.3 | 76.0 | 76.7 |
+| A2 (3,200) | 89.3 | 87.9 | 63.2 | 80.7 | 83.7 | 73.1 | 75.3 |
+| 20k x 26 (3,200) | 86.9 | 83.9 | 60.4 | 84.2 | 85.4 | 75.9 | 77.3 |
+| 48k x 11 (3,200) | 85.6 | 87.2 | 60.4 | 83.4 | 84.7 | 75.3 | 75.6 |
+
+### 167.1 What the step says
+
+- **Coverage beats repetition.** At K's compute, 20k merchants seen 6.5 times lose 6 points on the top 5k and gain 11 and 9 on the
+  tiers K never saw; 48k x 11 holds the 20k-48k tier at 68 against 53 for 20k x 26. About 11 exposures keep most of a fact; 26 add
+  little over 11 on the merchants both cover (84.2 against 78.5 on the top 5k). Generalisation to held-out merchants saturates near 76-78
+  whatever the scale.
+- **Longer training without knowledge forgets it:** A2 at 3,200 steps loses 5 to 8 points of kind accuracy and 1.2 on the owner's
+  budget (71.9) while it gains the drills (REAL-6 89.3): more synthetic household steps fit the generator, not real data.
+- **The drill cost is a share of steps, not knowledge as such:** at 3,200 steps the knowledge arms keep the invented-name drills (48k x
+  11: novel names 87.2 against 87.9), while at 800 steps a 40% share leaves too few drill steps (65 to 66). A 20% share at 800 keeps
+  them (82.2) and gains less.
+- **On real data knowledge helps, but not where it was aimed.** Every knowledge arm beats its own-length control (+1.1 to +2.7 at 3,200,
+  +0.3 to +1.5 at 800), all of it on payees filed before (+1.5 to +2.1); first-time payees move within noise, even those whose merchant
+  the model was taught (Table 167.3, ±1.5 on 300 to 760 items). The model knows 1-800 Contacts is an optician; it does not yet use
+  that to pick "Medical" over a purpose it has seen on similar strings. Most first-time payees (73%) are not in the database at all.
+- **More knowledge pushes probability onto categories never used for the payee** (26.8% -> 31.4% with 48k): kind episodes teach
+  "file by what the merchant is", which the owner's purpose categories contradict.
+- **Next (row 182):** connect the fact to the decision: a "Kind:" line on history rows and the query, trained on households from the
+  generator's kinds and read on the owner's budget from the database match (and later from the model's own answer); combined with group
+  names and 20k x 6.5. Single seeds throughout: a second seed of A2, K and 20k x 6.5 on the owner's budget sizes the noise.
