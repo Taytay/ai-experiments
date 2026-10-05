@@ -196,6 +196,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §181 Faster runs: training and reads (row 208)
 - §182 Encoder training fixes from the papers (row 202)
 - §183 Several prototypes per category (row 204)
+- §184 EVoC for the crowd category clusters (row 213)
 
 <!-- END SECTION INDEX -->
 
@@ -11189,3 +11190,42 @@ Category score = the best prototype's cosine (/ TAU). 50 held-out v4 households,
 
 **Cost:** one Modal job, 127.7 minutes on an H100 for CPU-bound clustering, about $9 at $4.09 per hour (exact figure from
 `scripts/modal_costs.py --rows 204` once Modal bills the day). It should have run on a CPU: `modal_app.py` now takes `--gpu cpu`.
+
+## 184. EVoC for the crowd's category clusters: no better than k-means 64 where it matters (behavioural neighbours of first-time payees: hit@1 45.8 against 45.9) and it leaves 21-25% of categories unclustered; its coarse layers match purposes better by ARI only by lumping trips; decider reads skipped (REAL-27, MODEL-25)
+
+PLAN step 213 (owner, 2026-10-05: "There is a newer form of fast clustering of embeddings that allows for a fast treemap of related
+topics"; references/software/evoc, toponymy). `scripts/evoc_clusters.py` (`scripts/chains/r213_evoc.sh`, CPU, 11 minutes; evoc 0.3.1,
+BSD-2-Clause, needs `--with matplotlib`). The same 42,555 category texts as row 189 (800 shared-world v4 households, "Group: Name;
+recently: 3 payees", two_tower_v1 vectors) clustered by k-means 64 and by EVoC (default and `base_n_clusters=64`, every layer). (a)
+against each category's generator purpose (61 roles rebuilt from `realstyle.Household`: the everyday kinds, person:, kid:, trip,
+holiday:, property:, service:, saving:, wish, catch-all; trips are 26% of categories), on the clustered points; (b) for the 57,772
+first-time-payee transactions of 50 held-out households, the household's own earlier payee nearest by crowd vector (other households only,
+as `SIM_SRC=behav`) and whether its category is the gold.
+
+**Table 184.1: intrinsic (clustered points) and the behavioural-neighbour proxy**
+
+| clustering | clusters | unclustered | ARI | NMI | purity | neighbour hit@1 | hit@3 |
+|---|---|---|---|---|---|---|---|
+| k-means 64 (row 189) | 64 | 0% | 0.300 | 0.800 | 0.809 | 45.9 | 59.6 |
+| EVoC, finest layer | 876 | 71.3% | 0.042 | 0.644 | 0.934 | 44.2 | 57.3 |
+| EVoC layer 2 | 90 | 25.0% | 0.405 | 0.819 | 0.828 | 45.8 | 59.4 |
+| EVoC layer 3 | 33 | 22.3% | 0.498 | 0.834 | 0.723 | | |
+| EVoC coarsest layer | 8 | 29.6% | 0.757 | 0.755 | 0.596 | 41.7 | 55.7 |
+| EVoC, 64 clusters asked | 64 | 21.0% | 0.389 | 0.823 | 0.823 | 45.7 | 59.5 |
+
+References for the proxy: character n-gram neighbours 41.0 / 58.9 (all covered); the household's most-used category 20.0 / 47.3. The crowd
+covers about 78% of first-time payees under every clustering.
+
+### 184.1 What the step says
+
+- **For the job the clusters do, EVoC equals k-means.** The behavioural neighbour is the same within 0.2 at the right granularity; the
+  clustering of the crowd's categories is not what limits behavioural rows.
+- **EVoC's better ARI is the wrong kind of better here.** It rises as layers coarsen because the largest purpose (trips, a quarter of all
+  categories) gets one big cluster; purity and the proxy fall at the same time. And density clustering leaves a fifth to a quarter of
+  categories unclustered, which k-means never does.
+- **Fast, as advertised:** 8-10 s per EVoC run on 42k vectors on the CPU (k-means 8 s); embedding the texts took 4 minutes and building
+  the households 3.5 (now cached).
+- Where EVoC may still help: near-duplicate detection (6,199 pairs here) for payee resolution (row 160) and its cluster tree for a
+  category treemap or a suggested category scheme for a new user (owner's question, 2026-10-05). Part (c), decider reads, is not run.
+
+**Cost:** $0 on Modal (local CPU).
