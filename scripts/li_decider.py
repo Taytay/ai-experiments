@@ -40,6 +40,11 @@ SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
+# row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
+# option's tokens, "m" + memory tokens (its NMEM nearest earlier filings, each one vector: the filing's and its category's pooled vectors),
+# "l" + one listwise layer over the options; e.g. INTERACT=xml. ROW names the output (li_r<ROW>_<ARM>).
+INTERACT, NMEM, XLAYERS = os.environ.get("INTERACT", ""), int(os.environ.get("NMEM", "10")), int(os.environ.get("XLAYERS", "2"))
+ROW = os.environ.get("ROW", "210")
 
 
 class LI:
@@ -92,12 +97,98 @@ class LI:
         torch.save(self.qw.state_dict(), Path(out) / "qw.pt")
 
 
+def _block(d, heads):
+    import torch
+
+    class Block(torch.nn.Module):
+        """pre-norm cross-attention + feed-forward; output projections start at zero, so the block starts as the identity"""
+
+        def __init__(self):
+            super().__init__()
+            self.l1, self.l2 = torch.nn.LayerNorm(d), torch.nn.LayerNorm(d)
+            self.att = torch.nn.MultiheadAttention(d, heads, batch_first=True)
+            self.ff = torch.nn.Sequential(torch.nn.Linear(d, 4 * d), torch.nn.GELU(), torch.nn.Linear(4 * d, d))
+            for z in (self.att.out_proj, self.ff[-1]):
+                torch.nn.init.zeros_(z.weight); torch.nn.init.zeros_(z.bias)
+
+        def forward(self, q, kv, kvm):
+            q = q + self.att(self.l1(q), kv, kv, key_padding_mask=~kvm, need_weights=False)[0]
+            return q + self.ff(self.l2(q))
+    return Block()
+
+
+def inter_module(dev, d=128, heads=2):
+    import torch
+
+    class Inter(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.x = torch.nn.ModuleList([_block(d, heads) for _ in range(XLAYERS)])
+            self.mem = torch.nn.Linear(2 * d, d)
+            self.lw_in = torch.nn.Linear(d + 1, d)
+            self.lw = torch.nn.TransformerEncoderLayer(d, heads, 4 * d, batch_first=True, norm_first=True, dropout=0.0)
+            self.lw_out = torch.nn.Linear(d, 1)
+            torch.nn.init.zeros_(self.lw_out.weight); torch.nn.init.zeros_(self.lw_out.bias)
+    return Inter().to(dev)
+
+
+def _pool(v, m):
+    import torch
+    return torch.nn.functional.normalize((v * m[..., None]).sum(1) / m.sum(1, keepdim=True).clamp(min=1), dim=-1)
+
+
+def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, Lab=None, lpos=None):
+    """row 211: [b, max options] scores with the interaction layers. Q = model.vecs of the anchors' queries; D = (token vectors, mask, -, cls)
+    of the documents, pos[text] -> row; F / Lab = pooled vectors of filing texts / category labels for memory tokens (fpos, lpos rows)"""
+    import torch
+    qv, qm, qw, qc = Q
+    rows_a, rows_d, rows_o, nopt = [], [], [], max(len(e["state"]) for e in anc)
+    for k, e in enumerate(anc):
+        for o, c in enumerate(e["state"]):
+            rows_a.append(k); rows_d.append(pos[docs[e["day"]][c]]); rows_o.append(o)
+    ra, rd = torch.tensor(rows_a, device=model.dev), torch.tensor(rows_d, device=model.dev)
+    kv, kvm = D[0][rd].float(), D[1][rd]
+    if "m" in INTERACT:
+        mem = torch.zeros(len(anc), NMEM, kv.shape[-1], device=model.dev)
+        mm = torch.zeros(len(anc), NMEM, dtype=torch.bool, device=model.dev)
+        for k, e in enumerate(anc):
+            js = [j for j in e.get("nb", [])[:NMEM]]
+            if js:
+                f = torch.cat([F[[fpos[ev[j]["text"]] for j in js]], Lab[[lpos[ev[j]["label"]] for j in js]]], -1)
+                mem[k, :len(js)] = inter.mem(f); mm[k, :len(js)] = True
+        kv, kvm = torch.cat([kv, mem[ra]], 1), torch.cat([kvm, mm[ra]], 1)
+    q = qv[ra]
+    for blk in inter.x:
+        q = blk(q, kv, kvm)
+    q = torch.nn.functional.normalize(q, dim=-1)
+    dv, dm = D[0][rd].float(), D[1][rd]
+    sim = torch.einsum("ptd,psd->pts", q, dv)
+    if SOFT:
+        a = (sim / SOFT).masked_fill(~dm[:, None, :], float("-inf")).softmax(-1)
+        sim = (a * sim).sum(-1)
+    else:
+        sim = sim.masked_fill(~dm[:, None, :], -2).max(-1).values
+    sc = (sim * qw[ra]).sum(-1)
+    if HYBRID:
+        sc = sc + (qc[ra] * D[3][rd]).sum(-1)
+    sc = scale * sc
+    S = torch.full((len(anc), nopt), float("-inf"), device=model.dev)
+    S = S.index_put((ra, torch.tensor(rows_o, device=model.dev)), sc)
+    if "l" in INTERACT:
+        feat = torch.zeros(len(anc), nopt, kv.shape[-1] + 1, device=model.dev)
+        feat = feat.index_put((ra, torch.tensor(rows_o, device=model.dev)), torch.cat([_pool(dv, dm), (sc / scale)[:, None]], -1))
+        ok = torch.isfinite(S)
+        h = inter.lw(inter.lw_in(feat), src_key_padding_mask=~ok)
+        S = torch.where(ok, S + inter.lw_out(h).squeeze(-1), S)
+    return S
+
+
 def prepare(b, m1, cache):
     """a budget's events (hist_encoder.events) with each event's query text and its day's category documents:
     (events, docs) where docs[day] = {category id: document text} over the visible categories"""
     ev = H.events(b)
-    if CTX or MODE == "mml":
-        nb = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, max(NB, NCAND if MODE == "mml" else 0))
+    if CTX or MODE == "mml" or "m" in INTERACT:
+        nb = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, max(NB, NCAND if MODE == "mml" else 0, NMEM if "m" in INTERACT else 0))
         for e, n in zip(ev, nb):
             e["nb"] = [j for j, _ in n]
     if CTX:
@@ -160,13 +251,13 @@ def _loss(S, tgt):
 def train():
     import torch
     from ai_experiments.licences import open_licence
-    out = H.ENC / f"li_r210_{ARM}"
+    out = H.ENC / f"li_r{ROW}_{ARM}"
     if not Path(BASE).exists():
         open_licence(BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
     t0 = time.time()
-    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" else (None, None)
+    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
         data.append(prepare(b, m1, cache))
@@ -176,8 +267,10 @@ def train():
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
           f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
     model = LI(BASE, train=True)
-    scale = torch.nn.Parameter(torch.tensor(20.0, device=model.dev))
-    opt = torch.optim.AdamW([{"params": model.params()}, {"params": [scale], "lr": 1e-2}], lr=LR)
+    scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
+    inter = inter_module(model.dev) if INTERACT else None
+    groups = [{"params": model.params()}, {"params": [scale], "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
+    opt = torch.optim.AdamW(groups, lr=LR)
     warm = int(0.05 * STEPS)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (STEPS - s) / (STEPS - warm)))
     t0, run, k = time.time(), defaultdict(float), 0
@@ -195,7 +288,20 @@ def train():
             if t not in idx:
                 idx[t] = len(dtexts); dtexts.append(t)
             return idx[t]
-        if MODE == "mml":
+        if INTERACT:
+            for e in anc:
+                for c in e["state"]:
+                    col(docs[e["day"]][c])
+            Q, Dv = model.vecs([e["q"] for e in anc]), model.vecs(dtexts)
+            F = fpos = Lab = lpos = None
+            if "m" in INTERACT:
+                ft = list(dict.fromkeys(ev[j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                lt = list(dict.fromkeys(ev[j]["label"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                fpos, lpos = {t: i for i, t in enumerate(ft)}, {t: i for i, t in enumerate(lt)}
+                F = _pool(*model.vecs(ft)[:2]) if ft else None
+                Lab = _pool(*model.vecs(lt)[:2]) if lt else None
+            Sg = _iscores(model, inter, scale, anc, ev, Q, Dv, idx, docs, F, fpos, Lab, lpos)
+        elif MODE == "mml":
             cand = []
             for e in anc:
                 oi = {c: o for o, c in enumerate(e["state"])}
@@ -213,7 +319,7 @@ def train():
         loss, ce = _loss(Sg, tgt)
         opt.zero_grad(set_to_none=True)
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.params(), 1.0)
+        torch.nn.utils.clip_grad_norm_(model.params() + (list(inter.parameters()) if inter else []), 1.0)
         opt.step(); sched.step()
         run["loss"] += loss.item(); run["ce"] += ce.item(); run["acc"] += (Sg.argmax(1) == tgt).float().mean().item(); k += 1
         if (s + 1) % 200 == 0:
@@ -221,9 +327,39 @@ def train():
             run.clear(); k = 0
     model.save(out)
     torch.save(scale.detach().cpu(), out / "scale.pt")
+    if inter:
+        torch.save(inter.state_dict(), out / "inter.pt")
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
-                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND), indent=1))
+                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
+                                                         INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
+
+
+def iscores(model, inter, scale, ev, docs):
+    """row 211's reader: documents, filings and labels encoded once per budget; the interaction layers per chunk of transactions"""
+    import torch
+
+    def enc(texts):
+        parts = [model.vecs(texts[a:a + 512]) for a in range(0, len(texts), 512)]
+        L = max(p[0].shape[1] for p in parts)
+        return (torch.cat([torch.nn.functional.pad(p[0], (0, 0, 0, L - p[0].shape[1])) for p in parts]).to(torch.bfloat16),
+                torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None, torch.cat([p[3] for p in parts]))
+    with torch.no_grad():
+        uniq = list(dict.fromkeys(t for d in docs.values() for t in d.values()))
+        D = enc(uniq)
+        F = fpos = Lab = lpos = None
+        if "m" in INTERACT:
+            ft = list(dict.fromkeys(e["text"] for e in ev)); lt = list(dict.fromkeys(e["label"] for e in ev))
+            fpos, lpos = {t: i for i, t in enumerate(ft)}, {t: i for i, t in enumerate(lt)}
+            Fe, Le = enc(ft), enc(lt)
+            F, Lab = _pool(Fe[0].float(), Fe[1]), _pool(Le[0].float(), Le[1])
+        pos = {t: k for k, t in enumerate(uniq)}
+        out = []
+        for a in range(0, len(ev), 64):
+            chunk = ev[a:a + 64]
+            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos)
+            out += [dict(zip(e["state"], S[k, :len(e["state"])].tolist())) for k, e in enumerate(chunk)]
+    return out
 
 
 def scores(model, scale, ev, docs):
@@ -272,19 +408,23 @@ def read():
     print(f"\n**{'owner budget' if budget else f'{len(budgets)} held-out households'}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
     print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
-        d = H.ENC / f"li_r210_{arm}"
+        d = H.ENC / (arm if arm.startswith("li_r") else f"li_r210_{arm}")
         cfg = json.loads((d / "li_config.json").read_text())
-        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND
+        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS
         CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
         SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
-        m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" else (None, None)
+        INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
+        m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
         model = LI(d)
         model.cb.enc.eval()
         scale = torch.load(d / "scale.pt").to(model.dev)
+        inter = None
+        if INTERACT:
+            inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt")); inter.eval()
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
             ev, docs = prepare(b, m1, cache)
-            for e, sc in zip(ev, scores(model, scale, ev, docs)):
+            for e, sc in zip(ev, iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)):
                 if e["gold"] not in e["state"]:
                     continue
                 v = np.array(list(sc.values()))
@@ -299,7 +439,7 @@ def read():
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
-        print(f"| li_r210_{arm} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        print(f"| {d.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
         del model
 
 
