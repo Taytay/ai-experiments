@@ -1,0 +1,6 @@
+outs:
+- md5: cbde6075f7e30c9062a6fac11f47a87f.dir
+  size: 134189410
+  nfiles: 10
+  hash: md5
+  path: hist_knn_v1

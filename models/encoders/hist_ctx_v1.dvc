@@ -1,0 +1,6 @@
+outs:
+- md5: 77f445fe1fc49cb06fdc8f555f3d15e0.dir
+  size: 134193436
+  nfiles: 10
+  hash: md5
+  path: hist_ctx_v1

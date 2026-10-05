@@ -1,0 +1,6 @@
+outs:
+- md5: 70c778f6768fe6c0e0d21a0bced0e950.dir
+  size: 134373118
+  nfiles: 5
+  hash: md5
+  path: hist_colbert_v1

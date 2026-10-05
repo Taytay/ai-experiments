@@ -1,0 +1,6 @@
+outs:
+- md5: 509ba9afcbd67b7c574cb0cf0150b849.dir
+  size: 134195783
+  nfiles: 10
+  hash: md5
+  path: hist_transact_v1
