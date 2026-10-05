@@ -218,9 +218,19 @@ class Run:
 
 # -- export ------------------------------------------------------------------
 def export_jsonl(con: sqlite3.Connection, path: Path = JSONL_PATH):
-    """Rewrite the git-friendly mirror: one line per run with nested metrics."""
+    """Rewrite the git-friendly mirror: one line per run with nested metrics. Rows already in the file whose run_id this db lacks are
+    kept (2026-10-05: a stale local runs.db once exported 450 of 2,954 rows and dropped the rest); the db's rows win where both exist."""
+    keep = {}
+    if path.exists():
+        for line in open(path, encoding="utf-8"):
+            if line.strip():
+                d = json.loads(line)
+                keep[d["run_id"]] = d
     con.row_factory = sqlite3.Row
     runs = con.execute("SELECT * FROM runs ORDER BY started_at").fetchall()
+    out = []
+    for r in runs:
+        keep.pop(r["run_id"], None)
     with open(path, "w", encoding="utf-8") as f:
         for r in runs:
             d = dict(r)
@@ -231,6 +241,10 @@ def export_jsonl(con: sqlite3.Connection, path: Path = JSONL_PATH):
                 mets.setdefault(m["condition"], {})[m["name"] if m["step"] is None else f"{m['name']}@{m['step']}"] = m["value"]
             d["metrics"] = mets
             d["artifacts"] = [dict(a) for a in con.execute("SELECT path, sha256 FROM artifacts WHERE run_id=?", (r["run_id"],))]
+            out.append(d)
+        out += list(keep.values())
+        out.sort(key=lambda d: (float(d.get("started_at") or 0), d["run_id"]))
+        for d in out:
             f.write(json.dumps(d, sort_keys=True, default=str) + "\n")
     con.row_factory = None
 

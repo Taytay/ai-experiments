@@ -855,3 +855,7 @@
 {"utc": "2026-09-27T02:29:54+00:00", "app_id": "ap-fD6HmLQUs06qzg1tURGwfa", "kind": "job_done", "tag": "r72-base-14b", "minutes": 94.6, "source": "backfill"}
 {"utc": "2026-10-05T15:51:04+00:00", "app_id": "ap-NYx3lP3GdSLrm1VgLKj5G0", "kind": "jobs", "what": "r208v", "rows": "208", "gpu": "H100", "tags": ["r208v-g4-s0"]}
 {"utc": "2026-10-05T15:58:52+00:00", "app_id": "ap-NYx3lP3GdSLrm1VgLKj5G0", "kind": "job_done", "tag": "r208v-g4-s0", "minutes": 7.5}
+{"utc": "2026-10-05T16:08:11+00:00", "app_id": "ap-ISbDPWNTPN6OsIvEAFEKiV", "kind": "jobs", "what": "r208s", "rows": "208", "gpu": "H100", "tags": ["r208s-g4st800-s0", "r208s-g4st600-s0", "r208s-g4st400-s0"]}
+{"utc": "2026-10-05T17:06:28+00:00", "app_id": "ap-ISbDPWNTPN6OsIvEAFEKiV", "kind": "job_done", "tag": "r208s-g4st800-s0", "minutes": 58.2}
+{"utc": "2026-10-05T17:06:28+00:00", "app_id": "ap-ISbDPWNTPN6OsIvEAFEKiV", "kind": "job_done", "tag": "r208s-g4st600-s0", "minutes": 48.4}
+{"utc": "2026-10-05T17:06:28+00:00", "app_id": "ap-ISbDPWNTPN6OsIvEAFEKiV", "kind": "job_done", "tag": "r208s-g4st400-s0", "minutes": 35.5}
