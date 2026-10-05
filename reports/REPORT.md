@@ -194,6 +194,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §179 Pinterest research applicability (rows 196-198, 201-207)
 - §180 Where decider and encoders disagree (row 201)
 - §181 Faster runs: training and reads (row 208)
+- §182 Encoder training fixes from the papers (row 202)
 
 <!-- END SECTION INDEX -->
 
@@ -11079,3 +11080,74 @@ tighter/faster!"), from `reports/workflow_review_2026-10-05.md`. Each change was
 
 **Cost:** r208v (vLLM timing, one read) and r208s (three train-and-read jobs, 142 job-minutes): about $10-12 together at $4.09 per
 H100-hour; exact figures from `scripts/modal_costs.py --rows 208` once Modal bills the day.
+
+## 182. Encoder training fixes from the Pinterest papers change nothing that matters: dedup, the household softmax and their combination sit within 0.3 of the old encoder on 50 held-out households and within 0.5 on decider's own items; logQ costs first-time payees 4 points; the random-negative pool collapsed in training (a bug to find, not a verdict); on the owner's budget the synthetic-chosen b5 equals the old encoder (64.7 against 64.8 MaxSim on decider's options, decider 72.5) (REAL-27, MODEL-25)
+
+PLAN step 202 (owner, 2026-10-05: "apply all of their learnings to our approach"). `scripts/hist_train2.py`: hist_encoder's approach 1
+(bge-small, InfoNCE, transaction near the household's earlier same-category transactions, hard negative the most string-similar earlier
+transaction filed elsewhere) in a plain PyTorch loop, same data (400 v4 training households, ~200k triplets), batch 128, lr, one epoch, one
+seed per arm. Arms: b0 the old loss in the new loop; b1 + dedup (in-batch candidates from the anchor's household and category, or with the
+positive's text, masked; at most 400 anchors per payee); b2 b1 + logQ on in-batch positives; b3 b1 + 1,024 random negatives per step from
+all training households (no gradient); b3b b3 with negatives sharing the anchor's or positive's payee masked; b4 the household softmax alone
+(the MaxSim reader as the loss: 32 anchors of one household against its categories, scored by the mean of the 3 best cosines among up to
+768 earlier filings); b5 InfoNCE + dedup + household softmax. Read two ways: every transaction of 50 held-out households over the encoder's
+visible categories (`hist_train2.py read`, chains `r202_train.sh`, `r202_b3b.sh`), and decider's own items with decider G4 (r190, seeds 0
+and 1) beside it (`hist_agree.py`, chain `r202_agree.sh`; the owner's budget for the old encoder and b5 only, b5 chosen on the 50-household
+read before the owner's budget was read).
+
+**Table 182.1: 50 held-out households, every transaction (359,050; 53,479 first-time payees), % top-1 (kNN | MaxSim)**
+
+| arm | all | first-time payee | top-3 all (MaxSim) | top-10 all (MaxSim) |
+|---|---|---|---|---|
+| old encoder (hist_knn_v1, row 194) | 74.5 \| 73.4 | 60.0 \| 59.2 | 90.2 | 95.9 |
+| b0 the old loss, new loop | 74.5 \| 73.6 | 60.2 \| 59.5 | 90.2 | 96.0 |
+| b1 + dedup, payee cap | 74.5 \| 73.4 | 60.0 \| 59.2 | 90.2 | 95.9 |
+| b2 + logQ | 73.8 \| 72.9 | 55.6 \| 56.0 | 89.4 | 95.5 |
+| b3 + random-negative pool | 61.1 \| 57.8 | 38.8 \| 34.4 | 78.5 | 92.1 |
+| b3b b3, same-payee pool negatives masked | 61.0 \| 57.7 | 38.6 \| 34.1 | 78.4 | 92.1 |
+| b4 household softmax alone | 74.4 \| 73.1 | 59.9 \| 58.8 | 90.3 | 96.0 |
+| b5 InfoNCE + dedup + household softmax | 74.7 \| 73.4 | 60.7 \| 59.8 | 90.2 | 96.0 |
+
+**Table 182.2: decider's own items, % top-1, decider G4 (mean of two seeds) beside each encoder (kNN | MaxSim over decider's options)**
+
+| arm | synthetic, 100 households, all (5,897) | synthetic, first-time payee (928) | owner's budget, all (19,093) | owner's budget, first-time payee (5,832) |
+|---|---|---|---|---|
+| decider G4 | 72.8 | 61.3 | 72.5 | 56.9 |
+| old encoder | 70.6 \| 70.1 | 56.5 \| 55.9 | 63.6 \| 64.8 | 44.8 \| 46.2 |
+| b0 | 70.6 \| 70.1 | 56.4 \| 55.7 | | |
+| b1 | 70.7 \| 69.7 | 56.6 \| 54.7 | | |
+| b2 | 70.2 \| 69.3 | 53.4 \| 53.6 | | |
+| b3 | 57.2 \| 59.4 | 34.9 \| 36.2 | | |
+| b3b | 57.4 \| 59.7 | 35.0 \| 35.0 | | |
+| b4 | 70.7 \| 69.6 | 57.0 \| 56.4 | | |
+| b5 | 70.8 \| 69.7 | 56.7 \| 56.9 | 64.6 \| 64.7 | 44.6 \| 45.9 |
+
+On decider's items an encoder is scored over decider's options, which include categories it cannot score (hidden ones, Ready to Assign:
+given its lowest score), so encoder accuracy there sits below Table 182.1's; on its own options the old encoder reads 69.6 (MaxSim) on the
+owner's budget (§177 History-aware encoders). Only-decider-right / only-encoder-right shares are unchanged from §180 Where decider and
+encoders disagree (synthetic 6.7-8.5 / 4.6-5.4; owner 12.3-13.2 / 4.3-4.6) for every arm but b3.
+
+### 182.1 What the step says
+
+- **The new loop reproduces the old encoder exactly** (b0 against hist_knn_v1: identical to 0.3 everywhere), so the arms are fair.
+- **None of the papers' fixes moves the encoder.** Dedup, the payee cap, the household softmax (the reader as the loss) and their
+  combination all sit within 0.3 (50 households) and 0.5 (decider's items) of the old encoder; b5 is the best by 0.2-0.7 on first-time
+  payees, inside single-seed noise, and on the owner's budget it equals the old encoder (MaxSim 64.7 against 64.8). The fixes solve
+  web-scale problems (popularity skew, false negatives in huge catalogues) that a household's 30-60 categories do not have much of.
+- **logQ hurts first-time payees (-4.4 / -3.2 on 50 households; -3.1 / -2.3 on decider's items):** it discounts popular payees, which are
+  exactly the neighbours a new payee should be compared with.
+- **The random-negative pool collapsed, and masking same-payee negatives did not fix it.** b3 and b3b sit at the chance loss for 1,280
+  candidates (ln 1,280 = 7.15) from step 200 to the end: the encoder squeezed every text into a narrow cone, and what it still reads (57-61)
+  comes from the starting model's neighbourhoods. Same-payee collisions were not the cause (b3b's loss 7.153 against b3's 7.155). This is
+  an implementation or stability problem (no-gradient negatives at 8x the in-batch count, one learning rate), not evidence against random
+  negatives (OmniSage +31-44%); it is left open: candidates are a lower learning rate, gradient through the pool, logQ on the pool, or a
+  smaller pool.
+- **The gap to decider stands where §180 found it:** 2-3 points on synthetic items, 8 on the owner's budget over decider's options (about
+  4 on the encoder's own options), widest on first-time payees (decider 56.9 against 44.6-46.2). At matched effort (decider-4B's first
+  trained recipe read 68.3 on the owner's budget) the encoders already match decider; against the tuned recipe they trail. Training
+  objectives are not where the gap is: rows 210-211 (what the model sees and how it reads it) and 212 (world knowledge) are.
+- Speed (row 208 continued): each arm trained in 3-8 minutes on the local 3090, but rebuilt its households and triplets for 5.6 minutes
+  first; synthetic households and triplets are now cached on disk (0.43 -> 0.011 s per household; identical to fresh), and
+  `hist_agree.py` reads several encoders in one run.
+
+**Cost:** $0 on Modal (local RTX 3090: about 80 minutes of training and building, 25 minutes of reads).
