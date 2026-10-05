@@ -10652,7 +10652,7 @@ except G4 and K4 shown a line they never trained with (-5 to -6). Training world
 - **The owner's budget does not separate the arms:** all six within 0.8 on first guess and 0.8 on top 5, inside seed noise. The
   owner's budget has no crowd data, so the steps' gains cannot show there; a real crowd test needs the owner's crowd data.
 
-## 177. History-aware encoders: letting a transaction's nearest earlier transactions vote (bge-small, trained transaction <-> transaction) files 68.4% of the owner's spending right with no LLM (two-tower 47.2), late interaction over a category's filings 69.6 (top 10 93.3); fused with decider they add +1.0 to +1.5 overall and +1.6 to +2.6 on first-time payees (two decider seeds), and gated they settle 36-50% of transactions alone at no loss (REAL-27, MODEL-25)
+## 177. History-aware encoders: letting a transaction's nearest earlier transactions vote (bge-small, trained transaction <-> transaction) files 68.4% of the owner's spending right with no LLM (two-tower 47.2), late interaction over a category's filings 69.6 (top 10 93.3); fused with decider they add +1.0 to +1.5 overall and +1.6 to +2.6 on first-time payees (two decider seeds), and gated they settle 36-50% of transactions alone at no loss (REAL-27, MODEL-25) — superseded in part by REPORT 178: with settings chosen on synthetic households the fusion gain is +0.3
 
 PLAN steps 194-195 (owner, 2026-10-04: "embed the historical similar transactions"; "try all 3 approaches ... on its own, or to enhance an
 LLM prediction"; "also try the late interaction models ... Especially the Pinterest stuff"). `scripts/hist_encoder.py`,
@@ -10711,3 +10711,85 @@ index agrees between the two items files on all 21,339 items, so earlier owner t
 - **Prototypes are weak** (48): an average of a category's filings blurs categories that hold several kinds of thing (trips, people).
 - **Next:** gate and fuse together (encoder alone when sure, fused elsewhere); calibrate MaxSim's temperature on synthetic households;
   row 196's per-user state.
+
+## 178. With every setting chosen on synthetic households, the history encoders add only +0.3 to decider on the owner's budget (TransAct-style; kNN and MaxSim get weight 0), so REPORT 177's +1.0 to +1.5 was mostly tuned on the owner's budget; amounts carry real signal for the encoders (MaxSim without the amount text 62.3 against 69.6, payees filed under 2+ categories 43.9 against 64.5), but a log-amount kernel only matches the text, it does not beat it (REAL-27, MODEL-25)
+
+PLAN steps 199 and 200. `scripts/hist_fuse.py` (`scripts/chains/r199_fuse.sh`): per reader, the fusion weight W, MaxSim's temperature T
+and a gate G chosen on 100 held-out v4 households with decider G4's reads of `realstyle_v4g_ngram_test` (two seeds; 5,897 items
+matched), then applied unchanged to the owner's budget (19,093 outflows; decider G4 seeds 0 and 1). `scripts/hist_amount.py`
+(`scripts/chains/r200_amount.sh`): encoder A (`hist_knn_v1`, "$57.09" in the text) and encoder B (`hist_knn_noamt_v1`, no amount);
+each neighbour's cosine adjusted by a log-amount kernel (SIGMA) and an exact-amount bonus (BETA), chosen on 10 synthetic households.
+
+**Table 178.1: decider + encoder with settings from synthetic households, owner's budget, % right first [decider seed 0 / 1]**
+
+| system | chosen on synthetic | all | payee filed before | first-time payee | share filed by the encoder alone |
+|---|---|---|---|---|---|
+| decider alone | | 72.47 [72.7 / 72.2] | 79.32 | 56.96 | 0 |
+| + kNN | W 0 | 72.47 | 79.32 | 56.96 | 0 |
+| + TransAct-style | W 0.1 | 72.80 [72.8 / 72.8] | 79.55 | 57.52 | 0 |
+| + TransAct-style, gated at 0.99 | W 0.1, G 0.99 | 72.78 | 79.42 | 57.75 | 18.9 |
+| + MaxSim | W 0, T 0.01 | 72.47 | 79.32 | 56.96 | 0 |
+
+**Table 178.2: amounts, owner's budget, % right first (settings chosen on synthetic)**
+
+| encoder, reader | kernel (SIGMA, BETA) | all | filed before | first-time | payee filed under 2+ categories |
+|---|---|---|---|---|---|
+| A amount as text, MaxSim | off | **69.6** | **77.4** | 51.2 | **64.5** |
+| A amount as text, MaxSim | (1.0, 0) chosen | 68.5 | 76.2 | 50.2 | 64.1 |
+| B no amount, MaxSim | off | 62.3 | 67.0 | 51.1 | 43.9 |
+| B no amount, MaxSim | (1.0, 0) chosen | 69.0 | 76.4 | **51.3** | 63.9 |
+| A amount as text, kNN | off = chosen | 68.4 | 76.2 | 49.7 | 65.4 |
+| B no amount, kNN | (1.0, 1.0) chosen | 68.3 | 76.4 | 49.1 | 65.0 |
+
+### 178.1 What the steps say
+
+- **Fusion under fair settings is small.** On synthetic households kNN and MaxSim already agree with decider where decider is right, so
+  the choice set gives them no weight; only the TransAct-style reader keeps W 0.1, worth +0.33 on the owner's budget (both seeds), +0.56
+  on first-time payees, and a gate that files 18.9% without decider at no loss. REPORT 177's +1.0 to +1.5 came from picking W on the
+  owner's budget. Whether any fusion can pay depends on how much the two readers' errors differ: row 201 measures that.
+- **The encoders' clear value is cost:** a 33M-parameter encoder reads 68-70% alone, and gates file a fifth to a half of transactions
+  without the 4B model at no loss (REPORT 177, 178.1).
+- **Amounts matter, as text or as numbers alike.** Without the amount, MaxSim falls 7.3 overall and 20.6 on payees the owner files in
+  more than one category (the owner's example: a few dollars at a fuel-station chain is a treat, forty is fuel). A log-amount kernel
+  restores almost all of it (69.0) but adds nothing on top of the text; an exact-amount bonus adds nothing. Bucket words and a learned
+  numeric input (row 200's E and F) are not worth building now. Synthetic households route by amount in one rule only, so they cannot
+  choose amount settings well; a generator with amount-dependent routing would.
+
+## 179. What Pinterest's recommender papers say about our categoriser, and the rows that follow (11 papers read in full; REAL-27, MODEL-25)
+
+Owner, 2026-10-05: "Do fetch full papers please! ... apply all of their learnings to our approach". Papers fetched with the
+research-papers skill (now in `.claude/skills/research-papers`), read in full, summarised in `references/papers/<id>/summary.md`
+(thread 7 of `references/papers/INDEX.md`; each summary ends with "Relevance to this workspace"). This section is the bridge from those
+summaries to PLAN rows 196-198 and 201-207; read it before starting any of them.
+
+**The common design.** Pinterest converged on: one shared model trained on many users; each user's own history as the input that
+personalises it, recomputed per request (never per-user weights); the history read *per candidate* (TransAct, TransAct V2, PinFM's
+early fusion); several vectors per user or interest rather than one (PinnerSage, Multi-Embedding Retrieval, Manas's Sum of MaxSim);
+a cross-user graph as a training signal, not a separate system (OmniSage); and cost cut by encoding the history once and letting every
+candidate attend to it (UniPinRec, PinFM's DCAT). Our system already has the pieces in weaker form: decider-4B reads 24 history rows
+per transaction (per-candidate in one prompt), MaxSim is PinnerSage at the category level, the crowd line and behavioural rows are the
+cross-user signal in the prompt.
+
+**Findings that change what we do, by row:**
+
+| finding | paper (summary) | row |
+|---|---|---|
+| fusion pays only when the two readers' errors differ (3.2% candidate overlap made their union pay; ours gave +0.3) | Multi-Embedding Retrieval 2506.23060 | 201 |
+| uncorrected in-batch negatives over-sample popular items: logQ correction 0.071 -> 0.167 recall; random negatives +31-44%; same-user false negatives up to 30%; "seen, not chosen" negatives beat in-batch; masked history labels and a joint loss beat fine-tuning a frozen embedder | PinnerFormer 2205.04507, OmniSage 2504.17811, TransAct V2 2506.02267, UniPinRec 2606.00422 | 202 |
+| the transformer is +1.56 of TransAct's +9.40; the gain is per-row action embeddings, the candidate concatenated onto every row, first-K + max-pool read-out; early fusion +3.8 vs pooled +1.9 | TransAct 2306.00248, PinFM 2507.12704 | 203 (our 65.0% TransAct-style reader was the pooled kind) |
+| a set of medoids per interest with time-decayed importance beats one vector 3x; farthest-point initialisation, invalid rows masked | PinnerSage 2007.03634, 2506.23060 | 204 |
+| other users' names for an item's collections (board titles) +17% as item text | OmniSearchSage 2404.16260 | 205 |
+| history chosen per candidate from a lifelong sequence (nearest + most recent); sequence length beat depth per FLOP; encode history once, score all candidates (2.5-6x) | TransAct V2, UniPinRec, PinFM | 206 |
+| pretrain on activity sequences then fine-tune with the candidate appended; frozen pretrained features give ~0; ID tables break cold start (use content) | PinFM | 207 |
+| a dense "anything in the next 28 days" objective keeps a batch user vector near realtime; Fourier time features; per-category conditions crossed with the user state | PinnerFormer, Conditional Retrieval 2508.16793 | 196 |
+| semantic IDs: dense retrieval preferred (UniPinRec); prefix memory helps only from 3 code levels | UniPinRec, PrefixMem 2606.00324 | 197 (deprioritised) |
+| random-walk neighbours per node type into a 1-layer transformer; degree pruning for hubs; a feature loss keeps unseen nodes in the space | OmniSage | 198 |
+
+**What does not transfer:** billion-item ANN serving, ID embedding tables, impression logs (we have no "shown, not chosen" log beyond
+the household's other categories), engagement metrics, multi-surface heads. Our candidate set is a household's 20-100 categories, so
+everything is an exact softmax over a closed list.
+
+**Order and why.** 201 first (cheap, decides whether fusion or segment gates can pay); 202 (training fixes, cheap, every encoder gains);
+203 (the faithful TransAct reader, small, local GPU); 204 and 205 (training-free or small); 206 (decider-side, needs Modal); 196 and
+207 (new models, larger); 197 and 198 last. Judge every row on the owner's budget with settings chosen on synthetic households (178.1
+showed why), aggregates only.
