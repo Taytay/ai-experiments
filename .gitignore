@@ -26,3 +26,4 @@ results/per_item/*_smoke*.jsonl
 logs/
 modal_out/
 data/external/strands_corpus/
+data/interim/

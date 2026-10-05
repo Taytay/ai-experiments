@@ -75,6 +75,9 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+- New decider rows build their job list with `scripts/modal_jobs/make_jobs.py <spec>` (a spec in `scripts/modal_jobs/specs/`: arms, the row's
+  reads, variant reads per arm, drills on or off, seeds, read-only arms); it takes adapter names from the trainer itself and prints the
+  estimated cost per job before anything launches. History-encoder readers (kNN, MaxSim) run through `scripts/hist_fast.py` (GPU, cached).
 - Do not duplicate work (owner, 2026-10-05: "Let's not duplicate work here! That's just silly."): screen a new recipe or arm with one seed;
   train the second seed only for arms that win or land within seed noise of the best (1-2 points on the owner's budget), and call
   nothing a gain on the owner's budget before two seeds agree. Each job reads only the test sets its row compares (not every set

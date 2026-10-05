@@ -7,7 +7,7 @@ right; and three ceilings over decider alone: "either right" (an oracle), "highe
 synthetic set (encoder when its top probability >= G and decider's <= D). Synthetic: TEST_SEEDS held-out v4 households read by decider
 G4 (realstyle_v4g_ngram_test, seeds 0 and 1). Owner's budget (BUDGET set): decider G4 r190 seeds 0 and 1, items_grp_sim2.json; private,
 aggregates only.
-env: TEST_SEEDS (100000-100029), BUDGET.
+env: TEST_SEEDS (100000-100099), BUDGET.
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 [BUDGET=<id>] uv run python scripts/hist_agree.py
 """
 import json
@@ -21,6 +21,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent))
 import hist_encoder as H  # noqa: E402
 import hist_encoder2 as H2  # noqa: E402
+import hist_fast as HF  # noqa: E402
 import hist_fuse as F  # noqa: E402
 from two_tower import households  # noqa: E402
 
@@ -36,13 +37,14 @@ def lsm(v):
     return v - np.log(np.exp(v).sum())
 
 
-def records(budgets, items, dec, key):
-    """one record per matched item: decider log-probs per seed, encoder log-probs per reader (over decider's options), answer, segments"""
-    m1, m4, mt = H._model(H.OUT1), H._model(H2.OUT4), H._model(H.ENC / "two_tower_v1")
+def records(budgets, items, dec, key, cache_dir):
+    """one record per matched item: decider log-probs per seed, encoder log-probs per reader (over decider's options), answer, segments;
+    reader scores from hist_fast (GPU, cached per budget in cache_dir)"""
+    m1 = H._model(H.OUT1)
     out = []
     for b in budgets:
         ev = H2.events(b)
-        sc = H2._scores(ev, m1, m4, mt, None)
+        sc = HF.as_dicts(HF.scores(ev, m1, H.OUT1, cache_dir), ev)
         n_payee, cats_payee, n_cat = defaultdict(int), defaultdict(set), defaultdict(int)
         i = 0
         while i < len(ev):
@@ -128,9 +130,9 @@ def table(rows, title, gates=None):
 if __name__ == "__main__":
     items = {it["id"]: it for it in json.loads((PROCESSED / "realstyle_v4g_ngram_test.json").read_text())["items"]}
     dec = [{r["id"]: r["sum_lp"] for r in map(json.loads, open(ROOT / F.SYN.format(seed=s)))} for s in ("", "s1")]
-    a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100029").split("-"))
+    a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100099").split("-"))
     users = [u for u in sorted({it["user"] for it in items.values()}) if a <= u <= z]
-    syn = records(households("test", users), items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}")
+    syn = records(households("test", users), items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE)
     gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
     print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
     table(syn, f"held-out synthetic households ({len(users)})", gates)
@@ -138,5 +140,5 @@ if __name__ == "__main__":
         import real_budget_eval as RB
         oitems = {it["id"]: it for it in json.loads((RB.OUT / "items_grp_sim2.json").read_text())["items"] if it["answer"] >= 0}
         odec = [{r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(RB.OUT / f"scores_{t}_split_grp_sim2.jsonl"))} for t in ("r190-g-s0", "r190-g-s1")]
-        own = records([json.loads(RB.CACHE.read_text())["budget"]], oitems, odec, lambda b, e: e["id"])
+        own = records([json.loads(RB.CACHE.read_text())["budget"]], oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache")
         table(own, "owner's budget", gates)
