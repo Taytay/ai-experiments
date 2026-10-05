@@ -10095,3 +10095,58 @@ were read without row numbers (their prompts have none); the owner's budget with
 - **The "changed their mind" regression is in the data:** 20.9 in every arm since real-style training (recipe 42.6). The households'
   3% random misfiles teach the model to discount an isolated recent change; v3 households (row 180) make misfiles corrected and changes
   persistent.
+
+
+## 165. A local merchant database from open sources (297k businesses people pay: Curlie, DMOZ, Wikidata, Overture brands, Majestic ranks) and 5,000 of its merchants trained into decider-4B as packed "kind" episodes: the model's kind accuracy rises from 62 to 84% on the trained merchants and from 61 to 78% on held-out ones (facts and, this time, a skill); on the owner's budget it is the best reader so far (74.3% right first against 73.1 for its control; known payees 81.0, first-time 58.0) and 1-800 Contacts' second purchase moves from Transport to Medical (MODEL-28, REAL-27)
+
+PLAN step 179 (owner, 2026-10-03: after 1-800 Contacts was missed and no decider knew it: "Perhaps we need a database of online retailers and
+in person merchants that we can embed in the training"; "Go straight to wikidata ... I think we need to embed its knowledge into our
+weights"; "Is there any other database of the top 100k websites or online retailers with a category and short description?"; "What's the
+license of Curlie like?"; "I'd like to build a local database using this. Then let's try to build that info into weights").
+
+- **Sources** (all open; `data/external/merchant_db/PROVENANCE.md` carries the attributions): Wikidata (CC0) through QLever: 108,125
+  businesses and brands (74,687 US businesses with a website, 35,779 brands, 10,481 retail chains; 2.13M businesses in all, 508k with a
+  website); Curlie's monthly dump (CC BY 3.0; 2.9M entries) and DMOZ's final 2017 dump (CC BY 3.0) for domains Curlie lacks; Overture brands;
+  the Majestic Million (CC BY 3.0) for popularity. Earlier I wrote that Curlie was not openly licensed: wrong, it is CC BY 3.0 with a
+  monthly download.
+- **The database** (`scripts/build_wikidata_merchants.py`, `map_wikidata_kinds.py`, `build_merchant_db.py`; SQLite outside the repo with a
+  trigram full-text index): kinds by keyword rules over description, products, industry and category path. A first build kept any popular
+  website (wiki pages, forums); restricted to directory branches of businesses people pay it holds 297,050 merchants (Curlie 125k, Overture
+  brands 100k, Wikidata 51k, DMOZ 21k), 1-800 Contacts among them ("American contact lens retailer" -> medical). A fuzzy lookup covers 18%
+  of the owner's first-time-payee transactions (online businesses and chains), the Overture places lookup 32%, either 39%; all
+  transactions 55%.
+- **Knowledge into weights** (`scripts/build_knowledge_episodes.py`): REPORT 58/73 put facts at ~30 exposures each, so episodes are packed:
+  a categorisation prompt whose categories are the merchant kinds and whose 24 history rows are merchants rendered as bank strings
+  (statements.render_v2 over the name or the website domain), each filed under its kind, every label trained; the query one more merchant.
+  The 5,000 most popular train-split merchants, ~26 exposures each (5,200 episodes). Arm K: REPORT 163's A2 (25% real-style v2) + 40%
+  knowledge episodes, 800 steps, seed 0. Test: 2,000 of the trained merchants and 2,000 held-out ones (a quarter of the database by hash)
+  as single-merchant kind questions. Job lists `r179.json`, `r179b.json`.
+
+**Table 165.1: kind of business from the bank string, % right first (top 3)**
+
+| reader | trained merchants (2,000) | held-out merchants (2,000) |
+|---|---|---|
+| recipe | 63.6 (72.9) | 60.1 (71.0) |
+| A2: + 25% real-style | 62.2 (70.8) | 61.1 (71.2) |
+| **K: A2 + 40% merchant knowledge (5k)** | **84.0 (90.0)** | **77.6 (86.6)** |
+
+**Table 165.2: the owner's budget (aliases + similar payees), % right first**
+
+| reader | all | known payees | first-time | first-time, payee in the database (1,142) | first-time, not in it (5,064) |
+|---|---|---|---|---|---|
+| A2 | 73.1 | 79.6 | 57.4 | 57.0 | 57.5 |
+| B: field block (REPORT 163) | 73.9 | 80.7 | 57.2 | 56.7 | 57.3 |
+| **K** | **74.3** | **81.0** | **58.0** | 56.8 | 58.3 |
+
+### 165.1 What the step says
+
+- **Merchant knowledge trains in, and this time generalises:** +22 on the merchants trained, +16.5 on merchants never seen. REPORT 73's
+  facts-not-skill came from 500 places in one category scheme; 5,000 merchants across 55 kinds with varied bank renderings teach how to
+  read a business from its string as well (part of the held-out gain is familiarity with the question's format).
+- **It is the best reader on real data so far:** 74.3% right first (+1.2 over its control), from known payees (+1.4) and first-time
+  payees (+0.6). The gain is not concentrated on payees the database contains (most are outside the 5,000 trained): it sharpens reading
+  in general. One seed.
+- **1-800 Contacts:** its 2022 purchase moves from Transport (51%) to Medical (44%, the owner's category); its 2020 purchase stays wrong,
+  the one whose prompt carried misleading ", INC." neighbours (row 178's prompt fixes).
+- **Next:** scale the trained merchants (20k, then the 48k in the web's top 100k) with longer runs and measure retention per tier; combine
+  with the field block (B) and v3 households; a lookup line from the database for first-time payees, trained with.

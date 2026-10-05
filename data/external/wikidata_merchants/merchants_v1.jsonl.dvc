@@ -1,0 +1,5 @@
+outs:
+- md5: d78e6877dd9a2c82d5a547f6dea91925
+  size: 31854033
+  hash: md5
+  path: merchants_v1.jsonl

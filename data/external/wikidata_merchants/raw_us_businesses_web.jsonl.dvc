@@ -1,0 +1,5 @@
+outs:
+- md5: de315bc97f91114877c4cdebc3996c17
+  size: 20163062
+  hash: md5
+  path: raw_us_businesses_web.jsonl

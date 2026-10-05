@@ -1,0 +1,5 @@
+outs:
+- md5: a5e3db29620b309b6f801cb9dff6b88f
+  size: 7964982
+  hash: md5
+  path: raw_brands.jsonl
