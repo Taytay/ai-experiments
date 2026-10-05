@@ -20,6 +20,7 @@ usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/l
 import json
 import os
 import random
+from array import array
 import sys
 import time
 from collections import defaultdict
@@ -321,12 +322,12 @@ def _nbrs(b, ev, m1, cache):
             h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
         f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
         if f.exists():
-            return [[j for j in r if j >= 0] for r in np.load(f).tolist()]
+            return [array("i", (j for j in r if j >= 0)) for r in np.load(f).tolist()]
     global _M1
     if m1 is None:  # loaded only when a budget misses the cache
         _M1 = _M1 or H._model(H.OUT1)
         m1 = _M1
-    nb = [[j for j, _ in n] for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
+    nb = [array("i", (j for j, _ in n)) for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
     if f is not None:
         f.parent.mkdir(parents=True, exist_ok=True)
         arr = np.full((len(ev), KNB), -1, dtype=np.int32)
@@ -346,7 +347,7 @@ def _query(i, ev, start, names=None):
     names: {category id: name} in place of the labels (row 218's rename augmentation)."""
     e = ev[i]
     lab = (lambda j: names.get(ev[j]["gold"], ev[j]["label"])) if names else (lambda j: ev[j]["label"])
-    near = e.get("nb", [])[:NB] if CTX else []
+    near = list(e.get("nb", [])[:NB]) if CTX else []
     rec = [j for j in range(start[i] - 1, max(-1, start[i] - 1 - REC), -1)] if REC else []
 
     def ago(j):
@@ -369,10 +370,17 @@ def _query(i, ev, start, names=None):
     return q
 
 
-def prepared(b, m1, cache):
-    """a budget's events (hist_encoder2.events: hist_encoder.events with dates) with each event's query text and its day's category
-    documents: (events, docs) where docs[day] = {category id: document text} over the visible categories; neighbours from _nbrs (cached)"""
+def prepared(b, m1, cache, full=True):
+    """a budget's events (hist_encoder2.events: hist_encoder.events with dates), (events, docs). full (reads): each event's query text
+    e["q"] and its day's documents e["d"] = docs[day] = {category id: document text} over the visible categories. full=False (training,
+    2026-10-06: queries and documents for every event of 200 households took 16 GB): only the parts, a per-day snapshot of each
+    category's recent payees (e["_snap"], tuples shared between days) and the neighbour indices (compact arrays); _materialise builds
+    the texts for the transactions a step uses. docs is None then."""
     ev = H2.events(b)
+    if ev:  # every day's state holds the same categories; its per-day texts ("; recently: ...") are not read here (8 MB a household)
+        keys = dict.fromkeys(ev[0]["state"])
+        for e in ev:
+            e["state"] = keys
     if CTX or MODE == "mml" or "m" in INTERACT:
         for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
             e["nb"] = n
@@ -381,22 +389,33 @@ def prepared(b, m1, cache):
         if i and e["day"] != ev[i - 1]["day"]:
             k = i
         start.append(k)
-    for i, e in enumerate(ev):
-        e["q"] = _query(i, ev, start)
-    docs, snap, recent, i = {}, {}, defaultdict(list), 0
+    cats = list(ev[0]["state"]) if ev else []
+    snap, recent, i = {}, {}, 0
     while i < len(ev):
         d = ev[i]["day"]
-        snap[d] = {c: tuple(recent[c]) for c in ev[i]["state"]}
-        docs[d] = {c: _doc(ev[i]["labels"][c], snap[d][c]) for c in ev[i]["state"]}
+        snap[d] = tuple(recent.get(c, ()) for c in cats)
         j = i
         while j < len(ev) and ev[j]["day"] == d:
             j += 1
         for e in ev[i:j]:
-            recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
+            r = recent.get(e["gold"], ())
+            recent[e["gold"]] = ((e["payee"], e["amt"]),) + tuple(x for x in r if x[0] != e["payee"])[:M - 1]
         i = j
-    for i, e in enumerate(ev):  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
-        e["d"], e["_ev"], e["_snap"], e["_i"], e["_start"] = docs[e["day"]], ev, snap[e["day"]], i, start
+    for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
+        e["_ev"], e["_snap"], e["_i"], e["_start"] = ev, snap[e["day"]], i, start
+    if not full:
+        return ev, None
+    docs = {d: {c: _doc(ev[0]["labels"][c], r) for c, r in zip(cats, sn)} for d, sn in snap.items()}
+    for e in ev:
+        e["q"], e["d"] = _query(e["_i"], ev, start), docs[e["day"]]
     return ev, docs
+
+
+def _materialise(e, names=None):
+    """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories)"""
+    labels = e["labels"]
+    lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
+    return dict(e, q=_query(e["_i"], e["_ev"], e["_start"], names), d={c: _doc(lab(c), r) for c, r in zip(e["state"], e["_snap"])})
 
 
 def _doc(label, recent):
@@ -414,21 +433,14 @@ def _coined(rng, taken):
 
 def _renamed(anc, rng):
     """row 218 (decider's RENAME, §42): each of a window's categories renamed with probability RENAME to a coined word, consistently in
-    its documents and the query's history rows, so the model must read what was filed where rather than the category's name"""
+    its documents and the query's history rows, so the model must read what was filed where rather than the category's name; the
+    window's anchors materialised"""
     labels = anc[0]["labels"]
     names, taken = {}, set(labels.values())
     for c in labels:
         if rng.random() < RENAME:
             names[c] = _coined(rng, taken); taken.add(names[c])
-    if not names:
-        return anc
-    out = []
-    for e in anc:
-        f = dict(e)
-        f["q"] = _query(e["_i"], e["_ev"], e["_start"], names)
-        f["d"] = {c: _doc(names.get(c, labels[c]), r) for c, r in e["_snap"].items()}
-        out.append(f)
-    return out
+    return [_materialise(e, names or None) for e in anc]
 
 
 prepare = prepared
@@ -484,11 +496,12 @@ def train():
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
-        data.append(prepared(b, m1, cache))
+        data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
-    print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
-          f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
+    ex = _materialise(data[0][0][50])
+    print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
+          f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
     model = LI(BASE, train=True)
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
@@ -504,7 +517,7 @@ def train():
             d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
-            anc += _renamed(pick, rng) if RENAME and pick else pick
+            anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e) for e in pick]
         if not anc:
             continue
         dtexts, idx = [], {}
