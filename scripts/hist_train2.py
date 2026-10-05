@@ -40,6 +40,7 @@ PAIRS, HOUSEHOLDS = int(os.environ.get("PAIRS", "200000")), int(os.environ.get("
 BATCH, SEED, CAP = int(os.environ.get("BATCH", "128")), int(os.environ.get("SEED", "0")), int(os.environ.get("CAP", "400"))
 POOL, HS_B, HS_H, HS_W = int(os.environ.get("POOL", "1024")), int(os.environ.get("HS_B", "32")), int(os.environ.get("HS_H", "768")), float(os.environ.get("HS_W", "1"))
 SCALE = 20.0  # 1 / 0.05, as MNRL and the readers' TAU
+PAYEE_MASK = int(os.environ.get("PAYEE_MASK", "0"))  # row 202 b3b: pool negatives with the anchor's or positive's payee are masked
 
 
 def _triplets(hh, loss, rng):
@@ -65,7 +66,8 @@ def _triplets(hh, loss, rng):
             pool = rng.sample(other, min(300, len(other)))
             neg = max(pool, key=lambda j: len(g[i] & g[j]) / (len(g[i] | g[j]) or 1))
             used[e["payee"]] += 1
-            rows.append(dict(a=e["text"], p=ev[pos]["text"], n=ev[neg]["text"], h=h, ga=e["gold"], gn=ev[neg]["gold"], pp=ev[pos]["payee"]))
+            rows.append(dict(a=e["text"], p=ev[pos]["text"], n=ev[neg]["text"], h=h, ga=e["gold"], gn=ev[neg]["gold"], pp=ev[pos]["payee"],
+                             ap=e["payee"]))
     rng.shuffle(rows)
     return rows
 
@@ -114,7 +116,8 @@ def train():
     from ai_experiments.licences import open_licence
     arm, loss = os.environ["ARM"], set(os.environ["LOSS"].split(","))
     out = H.ENC / f"hist_r202_{arm}"
-    open_licence(H.BASE)
+    if not Path(H.BASE).exists():  # a local encoder dir (row 212: the knowledge stage) was checked when its base was
+        open_licence(H.BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
     t0 = time.time()
@@ -160,7 +163,10 @@ def train():
                         R = _enc(model, [hh[h][k]["text"] for h, k in pick], dev)
                     LR = SCALE * (A @ R.T)
                     if "dedup" in loss:
-                        bad = torch.tensor([[r["h"] == h and r["ga"] == hh[h][k]["gold"] for h, k in pick] for r in b], device=dev)
+                        # same household and category, or (row 202 b3b) the anchor's or positive's payee string: in the shared world the same
+                        # payee is filed by many households, so a random pool is full of identical strings the loss cannot push apart
+                        bad = torch.tensor([[(r["h"] == h and r["ga"] == hh[h][k]["gold"])
+                                             or (PAYEE_MASK and hh[h][k]["payee"] in (r["ap"], r["pp"])) for h, k in pick] for r in b], device=dev)
                         LR = LR.masked_fill(bad, float("-inf"))
                     L = torch.cat([L, LR], 1)
                 li = torch.nn.functional.cross_entropy(L.float(), torch.arange(n, device=dev))
