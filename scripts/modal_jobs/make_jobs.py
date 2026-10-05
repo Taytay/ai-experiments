@@ -11,7 +11,8 @@ A spec (scripts/modal_jobs/specs/r<row>.json) names the row, its arms and its re
    "read_only": {"g4": "r190-g"}}                    arms already trained: read with ADAPTERS_FROM=<tag>-s<seed>, no training
 Adapter names come from scripts/exp_decider_finetune.py itself (imported with each arm's env), so they always match training.
 The estimate: training STEPS x 5.2 s (measured 5.0-5.2 s per step on the H100), each read's median minutes from evals/runs.jsonl
-(6 min when a set has no history) plus 0.5 min process start, 5 min container start; $4.09 per H100-hour (reports/modal_costs.md).
+(6 min when a set has no history) plus 0.5 min process start (with READER=vllm: one engine, 2.5 min, and 0.45 of the HF
+minutes, measured on the H100 in row 208), 5 min container start; $4.09 per H100-hour (reports/modal_costs.md).
 usage: uv run python scripts/modal_jobs/make_jobs.py scripts/modal_jobs/specs/r<row>.json   -> scripts/modal_jobs/r<row>.json + estimate
 """
 import json
@@ -86,18 +87,29 @@ def main(spec_path):
     jobs, est = [], []
     for arm, over in spec["arms"].items():
         for seed in spec.get("seeds", [0]):
-            env = {**BASE, **spec.get("base", {}), **over, "SEED": str(seed), "RUN_TAG": "h100bf16st800" + (f"s{seed}" if seed else "")}
+            env = {**BASE, **spec.get("base", {}), **over, "SEED": str(seed)}
+            split = int(env.get("MICRO_SPLIT", "1"))  # the run tag names steps and split so no adapter overwrites another (row 190's were st800)
+            env["RUN_TAG"] = f"h100bf16st{env.get('STEPS', '800')}" + (f"ms{split}" if split > 1 else "") + (f"s{seed}" if seed else "")
             name = adapter_name(env)
             sets = list(spec.get("reads", [])) + list(spec.get("variant_reads", {}).get(arm, []))
             if spec.get("drills"):
                 sets += DRILLS
             tag = f"r{row}-{arm}-s{seed}"
             ro = spec.get("read_only", {}).get(arm)
-            cmds = ([] if ro else [f"{UV} scripts/exp_decider_finetune.py"]) + [read_cmd(name, s) for s in sets]
+            if (spec.get("base", {}).get("READER") or over.get("READER")) == "vllm" and sets:  # row 208: one process, one vLLM engine for all reads
+                rf = ROOT / "scripts" / "modal_jobs" / "reads" / f"{tag}.json"
+                rf.parent.mkdir(parents=True, exist_ok=True)
+                rf.write_text(json.dumps([dict(ITEMS_SET=s, USERS=",".join(map(str, users_of(s)))) for s in sets], indent=1))
+                reads = [f"FAMILY=decider MODEL=Mapika/decider-4b ADAPTER={name} CONDS=noctx LABELS=rand255 LAYOUT=labelled_shots "
+                         f"READS_FILE={rf.relative_to(ROOT)} {UV} scripts/exp_decision_models.py"]
+            else:
+                reads = [read_cmd(name, s) for s in sets]
+            cmds = ([] if ro else [f"{UV} scripts/exp_decider_finetune.py"]) + reads
             job_env = {**env, **({"ADAPTERS_FROM": f"{ro}-s{seed}"} if ro else {})}
             jobs.append(dict(tag=tag, env=job_env, cmds=cmds))
             train_min = 0 if ro else int(env.get("STEPS", 800)) * STEP_S / 60
-            read_min = sum(mins.get(s, DEFAULT_READ) + READ_START for s in sets)
+            vllm = (spec.get("base", {}).get("READER") or over.get("READER")) == "vllm"
+            read_min = (2.5 + sum(mins.get(s, DEFAULT_READ) * 0.45 for s in sets)) if vllm else sum(mins.get(s, DEFAULT_READ) + READ_START for s in sets)
             est.append((tag, train_min, read_min, len(sets)))
     out = ROOT / "scripts" / "modal_jobs" / f"r{row}.json"
     out.write_text(json.dumps(jobs, indent=1))

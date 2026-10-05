@@ -854,3 +854,4 @@
 {"utc": "2026-09-27T02:29:54+00:00", "app_id": "ap-fD6HmLQUs06qzg1tURGwfa", "kind": "jobs", "what": "bfinyo9s5", "rows": "", "gpu": "", "tags": ["r72-base-14b"], "source": "backfill:bfinyo9s5.output"}
 {"utc": "2026-09-27T02:29:54+00:00", "app_id": "ap-fD6HmLQUs06qzg1tURGwfa", "kind": "job_done", "tag": "r72-base-14b", "minutes": 94.6, "source": "backfill"}
 {"utc": "2026-10-05T15:51:04+00:00", "app_id": "ap-NYx3lP3GdSLrm1VgLKj5G0", "kind": "jobs", "what": "r208v", "rows": "208", "gpu": "H100", "tags": ["r208v-g4-s0"]}
+{"utc": "2026-10-05T15:58:52+00:00", "app_id": "ap-NYx3lP3GdSLrm1VgLKj5G0", "kind": "job_done", "tag": "r208v-g4-s0", "minutes": 7.5}

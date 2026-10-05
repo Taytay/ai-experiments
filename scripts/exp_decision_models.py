@@ -16,7 +16,8 @@ QUESTION, and the options are the user's category names; every model is read in 
 
 env: FAMILY, MODEL (HF id), ITEMS_SET (a frozen set in REAL-6's format under data/processed, e.g. poi1_v1_kinds; empty = REAL-6 v1),
      CONDS (noctx / ctx: the item's prompt or prompt_ctx), USERS (comma list; default the set's fold 0: user % 4 == 0), SMOKE=1 (8 items),
-     TEMP (1.0: raw logits; the scorecard fits its own temperature), BATCH, READER (hf | vllm; row 208), VLLM_SPEC, MERGED_DIR.
+     TEMP (1.0: raw logits; the scorecard fits its own temperature), BATCH, READER (hf | vllm; row 208), VLLM_SPEC, MERGED_DIR,
+     READS_FILE (row 208: a JSON list of {ITEMS_SET, USERS} read in one process; with READER=vllm one engine for all).
 Licences (owner, 2026-09-26: open licences only; checked 2026-09-27): every model here and its base is Apache-2.0 on its model card
 (decider, Decision-1.0 and its Qwen3.5 bases, kev and its Qwen3.5-Base bases, Von and ModernBERT-large); the code is Apache-2.0 (the
 decider/ package in the model repos, Decision's code/ at DECISION_CODE_REV, kev at KEV_SHA, von-sdk) or MIT (flash-linear-attention).
@@ -63,8 +64,20 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_lay' + LAYOUT if LAYOUT else ''}{'_dow' if DOW_FIRST else ''}{'_desc' if DESC else ''}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}"
-TAG += os.environ.get("TAG_SUFFIX", "")  # row 208: a side-by-side read (e.g. _vllmcheck) without overwriting the reference file
+
+
+def tag_of(items_set):
+    return f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{items_set or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_lay' + LAYOUT if LAYOUT else ''}{'_dow' if DOW_FIRST else ''}{'_desc' if DESC else ''}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}" + os.environ.get("TAG_SUFFIX", "")
+
+
+def load_set(items_set, users=""):
+    """(doc, items, users string) of one read: the set's items for USERS (default fold 0: user % 4 == 0)"""
+    doc = json.loads((PROCESSED / f"{items_set}.json").read_text()) if items_set else R6.load("v1")
+    users = users or ",".join(str(u) for u in sorted({it["user"] for it in doc["items"]}) if u % 4 == 0)
+    return doc, [it for it in doc["items"] if str(it["user"]) in users.split(",")], users
+
+
+TAG = tag_of(ITEMS_SET)
 
 
 def state_of(it, cond):
@@ -118,20 +131,29 @@ def decider_vllm(P, tok, path, full, extra):
             print(f"merged {ADAPTER} -> {model_dir} in {time.time() - t0:.0f}s", flush=True)
 
     def score(items, cond):
-        built = [build_item(P, tok, it, cond, extra) for it in items]
+        return score_many([(items, cond)])[0]
+
+    def score_many(reads):
+        """several reads (items, cond) through one vLLM engine: one engine start (~2.5 min on the H100) for the whole job"""
+        built_all = [[build_item(P, tok, it, cond, extra) for it in items] for items, cond in reads]
+        built = [b for bs in built_all for b in bs]
         with tempfile.TemporaryDirectory() as td:
             src, dst = Path(td, "prompts.json"), Path(td, "out.json")
             src.write_text(json.dumps([dict(ids=b["ids"][:b["slot"] + 1], labs=b["labs"]) for b in built]))
             cmd = ["uv", "run", "--no-project", "--with", VLLM_SPEC, "python", str(ROOT / "scripts" / "vllm_slot.py"), str(model_dir), str(src), str(dst)]
             subprocess.run(cmd, check=True, cwd=ROOT)
             lps = json.loads(dst.read_text())
-        out = []
+        flat = []
         for b, lp in zip(built, lps):
             back = [0.0] * len(b["labs"])
             for j, oi in enumerate(b["perm"]):  # label j shows option perm[j]
                 back[oi] = lp[j]
-            out.append(back)
+            flat.append(back)
+        out, k = [], 0
+        for bs in built_all:
+            out.append(flat[k:k + len(bs)]); k += len(bs)
         return out
+    score.many = score_many
     return score
 
 
@@ -328,6 +350,28 @@ if __name__ == "__main__":
     if os.environ.get("SANITY"):
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von, "strands": strands}[FAMILY]()
+    if os.environ.get("READS_FILE"):  # row 208: several reads in one process (one model load / one vLLM engine): [{"ITEMS_SET", "USERS"}]
+        reads = json.loads(Path(os.environ["READS_FILE"]).read_text())
+        sets = [load_set(r.get("ITEMS_SET", ""), r.get("USERS", "")) for r in reads]
+        t0 = time.time()
+        many = getattr(score, "many", None)
+        all_lps = many([(items, CONDS[0]) for _, items, _ in sets]) if many else [score(items, CONDS[0]) for _, items, _ in sets]
+        for r, (doc, items, users), lps in zip(reads, sets, all_lps):
+            iset = r.get("ITEMS_SET", "")
+            cfg = dict(reader=READER, family=FAMILY, model=MODEL, items_set=iset or "real6_v1", items_sha=doc.get("sha256"), conds=CONDS[:1],
+                       n_items=len(items), users=users, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, batched_reads=len(reads))
+            with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
+                recs = []
+                for it, lp in zip(items, lps):
+                    pred = max(range(len(lp)), key=lp.__getitem__)
+                    recs.append(dict(id=it["id"], level=it.get("level"), answer=it["answer"], sum_lp=lp, n_tok=[1] * len(lp), pred=pred,
+                                     correct=pred == it["answer"]))
+                path = write_recs(tag_of(iset), CONDS[0], recs, smoke=SMOKE)
+                acc = 100 * sum(r_["correct"] for r_ in recs) / len(recs)
+                print(f"{tag_of(iset)} {CONDS[0]}: top-1 {acc:.1f} on {len(recs)} items -> {path}", flush=True)
+                run.log({f"{CONDS[0]}_top1": acc, f"{CONDS[0]}_minutes": (time.time() - t0) / 60 / len(reads)})
+        print(f"{len(reads)} reads in {(time.time() - t0) / 60:.1f} min", flush=True)
+        sys.exit(0)
     cfg = dict(reader=READER, family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
                users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, kev_sha=KEV_SHA if FAMILY == "kev" else None)
     with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
