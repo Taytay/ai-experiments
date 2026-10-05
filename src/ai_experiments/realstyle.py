@@ -140,7 +140,7 @@ class Household:
         self.pets = rng.sample(PETS, rng.choice([0, 1, 1, 2]))
         self.groups, self.cats, self.txs, self.payees, self.accounts = {}, {}, [], {}, {}
         self.payee_of_string, self.favourites = {}, defaultdict(list)
-        self._parts = None
+        self._parts = self._reason = self._kind = None
         for a in ("Checking", "Credit Card", "Savings"):
             self.accounts[a] = str(uuid.UUID(int=rng.getrandbits(128)))
         self._internal()
@@ -317,14 +317,14 @@ class Household:
             s = f"{s.split('*')[0].strip()} *{rest}"[:40]
             parts = {"Clean payee": m["name"], "Ordered from": rest}
         name = m["name"] if info["clean"] else s[:50]
-        self._parts = parts
+        self._parts = parts; self._kind = m["kind"]
         return s, name
 
     def _p2p(self, who, memo):
         app = self.rng.choices([a for a, _ in P2P_APPS], [w for _, w in P2P_APPS])[0]
         verb = self.rng.choice(["", "to ", "Paid "]) if app != "Zelle" else "to "
         s = f"{app} {verb}{who}" + (f" {memo}" if memo else "")
-        self._parts = {"Clean payee": who, "Via": app.replace(" Transfer", "")} | ({"Memo": memo} if memo else {})
+        self._parts = {"Clean payee": who, "Via": app.replace(" Transfer", "")} | ({"Memo": memo} if memo else {}); self._kind = "p2p"
         return s, s[:60]
 
     # ---- the timeline -----------------------------------------------------------------------------------------------------------
@@ -334,47 +334,51 @@ class Household:
             if t["start"] - dt.timedelta(days=1) <= date <= t["end"] and kind in ("hotel", "airline", "car_rental", "restaurant", "fast_food", "coffee_bakery",
                                                                                      "transit", "gas", "entertainment", "parking", "bar", "convenience"):
                 if rng.random() < 0.85:
-                    return t["cid"]
+                    self._reason = ("trip", t["cid"]); return t["cid"]
         if kind in ("hotel", "airline", "car_rental", "travel_agency"):
             near = [t for t in self.trips if dt.timedelta(days=-90) <= (t["start"] - date) <= dt.timedelta(days=90)]
-            return near[0]["cid"] if near and rng.random() < 0.7 else self.travel_other
+            c = near[0]["cid"] if near and rng.random() < 0.7 else self.travel_other
+            self._reason = ("trip", c) if c != self.travel_other else ("travel", c); return c
         for h in self.holidays:
             m0, d0_, m1, d1_ = h["window"]
             if kind in h["kinds"] and dt.date(date.year, m0, d0_) <= date <= dt.date(date.year, m1, d1_) and rng.random() < h["share"]:
-                return h["cid"]
+                self._reason = ("holiday", h["cid"]); return h["cid"]
         for k in self.kid_cats:
             if kind in k["kinds"] and k["start"] <= date <= k["end"] and rng.random() < k["w"]:
-                return k["cid"]
+                self._reason = ("phase", k["cid"]); return k["cid"]
         for p in self.properties:
             if date >= p["start"] and kind in p["cats"] and rng.random() < 0.3:
-                return p["cats"][kind]
+                self._reason = ("property", p["cats"][kind]); return p["cats"][kind]
         if kind == "pet" and self.pet_cats:
-            return rng.choice(self.pet_cats)
+            c = rng.choice(self.pet_cats); self._reason = ("pet", c); return c
         for a, pc in self.person.items():
             if pc["treat"] and kind == "coffee_bakery" and weekday < 5 and amount < 12 and rng.random() < 0.8:
-                return pc["treat"]
+                self._reason = ("treat", pc["treat"]); return pc["treat"]
             if kind in self.cats[pc["fun"]]["kinds"] and rng.random() < pc["share"] / max(1, len(self.person) - 0.5):
-                return {"clothing": pc["clothes"], "jewelry": pc["clothes"]}.get(kind, pc["fun"])
+                c = {"clothing": pc["clothes"], "jewelry": pc["clothes"]}.get(kind, pc["fun"]); self._reason = ("person", c); return c
             if pc["groom"] and kind == "personal_care" and rng.random() < 0.7:
-                return pc["groom"]
+                self._reason = ("person", pc["groom"]); return pc["groom"]
             if pc["work"] and kind in ("office", "business") and rng.random() < 0.8:
-                return pc["work"]
+                self._reason = ("person", pc["work"]); return pc["work"]
         cid = self.kind_to_everyday.get(kind)
+        self._reason = ("habit", cid)
         if self.reorg and cid == self.reorg["old"] and date >= self.reorg["at"]:
-            cid = self.reorg["new"]
+            cid = self.reorg["new"]; self._reason = ("reorg", cid)
         if cid is None or rng.random() < 0.03:
-            cid = rng.choice(self.catchall)
+            cid = rng.choice(self.catchall); self._reason = ("catchall", cid)
         return cid
 
     def _add(self, date, amount, cid, raw, payee_name, memo=None, approved=True):
         parts, self._parts = self._parts or {"Clean payee": payee_name}, None  # row 176: the pieces behind the string
+        reason, kind, self._reason, self._kind = self._reason, self._kind, None, None  # row 177: why this category, and the merchant's kind
         pid = self.payees.setdefault(payee_name, self._id())
         if self.rng.random() < 0.03 and cid not in (self.rta,):  # misfiled
             live = [c for c in self.cats.values() if c.get("kinds") and c["created"] <= date and not (c["hidden_at"] and c["hidden_at"] <= date)]
             cid = self.rng.choice(live)["id"] if live else cid
+            reason = ("misfile", cid)
         self.txs.append(dict(id=self._id(), date=date.isoformat(), amount=int(round(-amount * 1000)), cleared="cleared", approved=approved,
                              account_id=self.accounts["Credit Card"], payee_id=pid, category_id=cid, import_payee_name_original=raw,
-                             memo=memo, deleted=False, parts=parts))
+                             memo=memo, deleted=False, parts=parts, reason=list(reason) if reason else None, kind=kind))
 
     def simulate(self):
         rng = self.rng
@@ -394,7 +398,7 @@ class Household:
                     amt = _ln(rng, AMOUNT.get(kind, (3.5, 0.8)))
                     raw, name = self._payee(m, d)
                     if m["name"] in self.store_named and rng.random() < 0.8:
-                        cid = self.store_named[m["name"]]
+                        cid = self.store_named[m["name"]]; self._reason = ("store", cid)
                     else:
                         cid = self._route(kind, d, amt, wd)
                     self._add(d, amt, cid, raw, name)
@@ -407,7 +411,7 @@ class Household:
             if d.day == 1:
                 for k, (m, a) in bills.items():
                     if m:
-                        raw, name = self._payee(m, d); self._add(d, round(a * rng.uniform(0.9, 1.1), 2), self.kind_to_everyday.get(k) or self.catchall[0], raw, name)
+                        raw, name = self._payee(m, d); self._reason = ("bill", None); self._add(d, round(a * rng.uniform(0.9, 1.1), 2), self.kind_to_everyday.get(k) or self.catchall[0], raw, name)
                 for m, a in subs:
                     if m:
                         raw, name = self._payee(m, d); self._add(d, a, self._route("subscription", d, a, wd) if self.kind_to_everyday.get("subscription") else self.kind_to_everyday.get("subscription") or self.catchall[0], raw, name)
@@ -415,11 +419,11 @@ class Household:
                     if d >= p["start"]:
                         m = self._merchant("utility")
                         if m:
-                            raw, name = self._payee(m, d); self._add(d, _ln(rng, AMOUNT["utility"]), p["cats"]["utility"], raw, name)
+                            raw, name = self._payee(m, d); self._reason = ("property", None); self._add(d, _ln(rng, AMOUNT["utility"]), p["cats"]["utility"], raw, name)
                 if self.savings and rng.random() < 0.6:
-                    self._add(d, round(rng.uniform(100, 1000), -1), self.savings["id"], "Transfer to Savings", "Transfer : Savings")
+                    self._reason, self._kind = ("savings", None), "transfer"; self._add(d, round(rng.uniform(100, 1000), -1), self.savings["id"], "Transfer to Savings", "Transfer : Savings")
             if d.day in (1, 15):  # paycheck
-                self._add(d, -pay * rng.uniform(0.97, 1.03), self.rta, f"{employer} DIRECT DEP" if rng.random() < 0.5 else employer, employer)
+                self._reason, self._kind = ("income", None), "income"; self._add(d, -pay * rng.uniform(0.97, 1.03), self.rta, f"{employer} DIRECT DEP" if rng.random() < 0.5 else employer, employer)
             for s in self.services:
                 if (d - last_service[s["cid"]]).days >= s["every"] and rng.random() < 0.8:
                     last_service[s["cid"]] = d
@@ -428,7 +432,7 @@ class Household:
                         raw, name = self._p2p(s["who"], rng.choice(["", "", self.cats[s["cid"]]["name"].split()[0].lower(), "thank you!", MONTHS[d.month - 1]]))
                     else:
                         m = self._merchant(s["kind"]); raw, name = self._payee(m, d) if m else (s["who"], s["who"])
-                    self._add(d, amt, s["cid"], raw, name)
+                    self._reason = ("service", None); self._add(d, amt, s["cid"], raw, name)
             if rng.random() < 0.06 * self.scale:  # person-to-person payments with purpose memos (8% of strings; memo half the time)
                 who = f"{rng.choice(FIRST)} {rng.choice(LAST)}"
                 purpose = rng.random()
@@ -444,12 +448,13 @@ class Household:
                 else:
                     memo, cid = rng.choice(["Girl Scout cookies", "concert tickets", "bike", "thanks!", "half of the bill", "garage sale"]), rng.choice(self.catchall)
                 raw, name = self._p2p(who, memo if rng.random() < 0.53 else "")
+                self._reason = ("p2p_memo", None) if "Memo" in (self._parts or {}) else ("p2p", None)
                 self._add(d, _ln(rng, (3.5, 0.8)), cid, raw, name)
             for cid, w in self.wish:
                 if self.cats[cid]["created"] + dt.timedelta(days=20) == d:
                     m = self._merchant(rng.choice(["furniture", "big_box", "electronics"]))
                     if m:
-                        raw, name = self._payee(m, d); self._add(d, _ln(rng, (5.0, 0.6)), cid, raw, name)
+                        raw, name = self._payee(m, d); self._reason = ("wish", None); self._add(d, _ln(rng, (5.0, 0.6)), cid, raw, name)
             d += dt.timedelta(days=1)
         return self
 
