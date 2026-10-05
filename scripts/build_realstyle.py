@@ -59,10 +59,13 @@ if __name__ == "__main__":
         print(f"{k} training episodes from {n} households -> {out} ({out.stat().st_size / 1e6:.0f} MB)")
     else:
         items = []
-        for i in range(n):
-            seed = 100000 + i
-            for it in household_items(seed, "test", per):
+        split, seed0 = os.environ.get("TEST_SPLIT", "test"), int(os.environ.get("TEST_SEED0", "100000"))  # row 183: TEST_SPLIT=train
+        for i in range(n):  # with TEST_SEED0=300000: held-out households in the training world (merchants other users filed in training)
+            seed = seed0 + i
+            for it in household_items(seed, split, per):
                 it["id"] = f"RS:{seed}:{it['id'][:8]}"; it["user"] = seed
+                if os.environ.get("TEST_LAYOUT") == "split":  # row 183: read in the training layout (exp_decision_models reads "prompt")
+                    it["prompt"] = it["prompt_ctx"] = it["prompt_split"]; it["options"] = [" " + o for o in it["options"]]
                 items.append(it)
         out = PROCESSED / os.environ.get("TEST_OUT", "realstyle_v1_test.json")
         out.write_text(json.dumps(dict(name="realstyle_v1_test", version=1, n=len(items), households=n, items=items)))

@@ -20,7 +20,12 @@ ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% re
         "row 179 K: A2 + 40% knowledge 5k x26": [("", "_rs25v2_mk40_5k")], "row 180: 5k x13 at 20%": [("", "_rs25v2_mk20_5k13")],
         "row 180: 20k x6.5 at 40%": [("", "_rs25v2_mk40_20k6")], "row 180: A2 at 3200 steps": [("3200:", "_rs25v2")],
         "row 180: 20k x26 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_20k26")], "row 180: 48k x11 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_48k11")],
-        "row 181 G: Group: Name households": [("", "_rs25v2g")], "row 181 GK: Group: Name + knowledge 5k": [("", "_rs25v2g_mk40_5k")]}
+        "row 181 G: Group: Name households": [("", "_rs25v2g")], "row 181 GK: Group: Name + knowledge 5k": [("", "_rs25v2g_mk40_5k")],
+        "row 182 G seed 1": [("s1", "_rs25v2g")], "row 182 GK seed 1": [("s1", "_rs25v2g_mk40_5k")],
+        "row 182 GK20: Group: Name + 20k x6.5": [("", "_rs25v2g_mk40_20k6")], "row 182 GL: Group: Name + Kind lines": [("", "_rs25v2gkl")],
+        "row 182 GLK20: + Kind lines + 20k x6.5": [("", "_rs25v2gkl_mk40_20k6")],
+        "row 183 G3: shared-world households (2 seeds)": [("", "_rs25v3g"), ("s1", "_rs25v3g")],
+        "row 183 GC: + crowd lines (2 seeds)": [("", "_rs25v3gc"), ("s1", "_rs25v3gc")]}
 
 
 def acc(f, sel=None):

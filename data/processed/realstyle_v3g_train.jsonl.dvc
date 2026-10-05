@@ -1,0 +1,5 @@
+outs:
+- md5: ee69b38c7ae66608d5d04de5085428ed
+  size: 261974423
+  hash: md5
+  path: realstyle_v3g_train.jsonl

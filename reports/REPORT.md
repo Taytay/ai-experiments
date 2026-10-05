@@ -10270,3 +10270,128 @@ normalised payee on the 48k merchants' names and domains; 1,522 of 5,811 payees 
 - **Next (row 182):** connect the fact to the decision: a "Kind:" line on history rows and the query, trained on households from the
   generator's kinds and read on the owner's budget from the database match (and later from the model's own answer); combined with group
   names and 20k x 6.5. Single seeds throughout: a second seed of A2, K and 20k x 6.5 on the owner's budget sizes the noise.
+
+## 168. "Kind:" lines from a lookup add nothing on the owner's budget, and wrong ones cost: the merchant database's matches were right for about half the transactions they covered (Overture's for three quarters), and a model reading them loses 1.5 on first-time payees; Overture-only lines recover 0.5 to 1.0 but no line arm beats its no-line match. A second seed shows single-seed differences on the owner's budget of 1 to 2 points are noise: averaged over two seeds, the 5k merchant knowledge adds nothing to group names (73.7 against 73.75) (MODEL-28, REAL-27)
+
+PLAN step 182 (REPORT 167: knowledge in the weights helps known payees, not first-time ones). A "Kind:" line (a taxonomy_v2 kind in words)
+under history rows and the query whose payee has one (`real_budget_eval.py KIND=rows`): in training from the generator's kinds for half
+the payees, 8% of them wrong (`realstyle_v2gkl_train.jsonl`); on the owner's budget from a lookup (`merchant_db_match_real.py`: the
+merchant database's match, else Overture's; 61% of transactions). Arms on group-name households: GL (Kind lines), GLK20 (+ 20k x 6.5
+knowledge), GK20 (20k x 6.5, no lines); a second seed of G and GK. Then the lines were audited (`kind_line_audit.py`: 200 payees drawn in
+proportion to transactions, half per source, judged by hand; private, counts only) and rebuilt: v2 (whole-word name matches, no line for
+deposits, interest, refunds, transfers or people, Overture first, Overture's vague categories dropped) and Overture-only. Job list
+`scripts/modal_jobs/r182.json`; owner scoring `scripts/chains/r182_owner*.sh`.
+
+**Table 168.1: how often a Kind line is right, per transaction (one judge, 200 payees; "close" = a neighbouring kind)**
+
+| lines | from the database | from Overture | all lines (share of transactions with a line) |
+|---|---|---|---|
+| v1 (prefix match, database first) | 49% right, 61% right or close | 74% / 91% | ~55% / ~69% (61%) |
+| v2 (whole words, Overture first) | 47% / 60% | 77% / 92% | ~65% / ~79% (57%) |
+
+The database's errors: a prefix or domain stem hit the wrong entity (a sub-brand for the parent: a marketplace read as a bookstore; a
+resort as a university; a surname as a property firm); conglomerates and marketplaces carry a wrong kind in the database itself
+(subscription, grocery, business); non-merchants (interest, deposits, refunds, people) were matched to something. Overture's errors are
+mostly its category mapping (media services read as "business").
+
+**Table 168.2: the owner's budget, % right first (top 3)**
+
+| reader | lines read | all | known payees | first-time | first-time, merchant in the top 5k |
+|---|---|---|---|---|---|
+| G seed 0 / seed 1 (mean) | none | 73.2 / 74.3 (73.75) | 79.7 / 81.3 | 57.4 / 57.2 | 61.6 / 63.8 |
+| GK seed 0 / seed 1 (mean) | none | 74.6 / 72.8 (73.7) | 81.1 / 79.4 | 59.0 / 56.9 | 64.0 / 60.9 |
+| GK seed 0, zero-shot | v1 | 74.0 | 80.8 | 57.5 | 61.3 |
+| GK20 | none | 74.6 (85.4) | 81.3 | 58.2 | 62.9 |
+| GL | v1 / v2 / Overture only | 72.9 / 73.2 / 73.9 | 79.7 / 80.3 / 80.8 | 56.4 / 56.1 / 57.0 | 59.4 / 53.3 / 59.4 |
+| GLK20 | v1 / v2 / Overture only | 73.8 / 74.0 / 74.3 | 80.7 / 81.0 / 81.2 | 57.1 / 57.2 / 57.7 | 60.7 / 61.8 / 62.3 |
+
+**Table 168.3: the synthetic sets (read without lines), % right first**
+
+| reader | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|
+| G seed 0 / 1 | 85.2 / 83.6 | 85.2 / 80.2 | 60.4 / 58.3 | 83.3 / 84.3 | 84.9 / 85.1 | 75.7 / 74.5 | 75.7 / 72.1 |
+| GK seed 0 / 1 | 74.2 / 77.5 | 67.4 / 69.8 | 49.2 / 52.4 | 84.0 / 84.3 | 85.6 / 85.5 | 76.9 / 74.5 | 75.7 / 74.0 |
+| GK20 | 72.1 | 61.7 | 50.0 | 84.1 | 85.7 | 76.5 | 76.3 |
+| GL | 85.9 | 81.5 | 59.8 | 83.2 | 84.8 | 75.6 | 74.4 |
+| GLK20 | 72.5 | 62.8 | 48.6 | 84.7 | 85.9 | 75.9 | 75.9 |
+
+### 168.1 What the step says
+
+- **Seed noise first:** retrained with another seed, G moves 73.2 -> 74.3 and GK 74.6 -> 72.8 on the owner's budget; blind_v2 moves 1 to
+  3 points. Averaged, merchant knowledge adds nothing to group names on the owner's budget, and REPORTs 165 to 167's single-seed gains of
+  +1.2 to +1.5 there are within noise (their kind-accuracy gains, +15 to +30, stand). Top 3 moves less (84.6 to 85.4). From here arms are
+  compared on two seeds, or paired: one model read two ways.
+- **Wrong lines cost, and the model trusts them:** read with and without the v1 lines (paired, no seed noise), GK loses 0.6 overall,
+  1.5 on first-time payees and 2.7 where the database matched. Overture-only lines beat v1 by 0.5 to 1.0 (paired).
+- **Right lines add little:** the best line arm (GLK20, Overture lines, 74.3) does not beat GK20 without lines (74.6); GL with Overture
+  lines (73.9) sits at G's mean. The similar-payee rows already tell the model what kind of place a payee is (REPORT 160), and the owner's
+  categories are purposes: "restaurant" does not say restaurants, dates or a trip.
+- **A lookup by name needs entity resolution,** the right business with confidence or no line, which a string match does not give; the
+  owner's next idea, other people's filings of the same bank string (row 183), needs none.
+
+## 169. Other households' filings of the same bank string, as a prompt line ("Others filed this payee as: Restaurants (15), Eating out (7)"), lift first-time payees 6 to 7 points in a synthetic world once trained (two seeds agree), with nothing lost on known payees or the drills; training on other households also puts some of it in the weights (+3.4 on merchants they filed), but the line adds 7 more on top of that at this training budget; read untrained, the line costs 5 on known payees (REAL-27; owner's budget waits for real crowd data)
+
+PLAN step 183 (owner, 2026-10-04: "putting more emphasis on how others categorize a given payee as our 'database' of 'kinds'"; "Synthetic
+for now"; and: training on many users' filings should already teach the weights how people file a payee). A shared synthetic world
+(`realstyle.py SHARED_WORLD=1`: a merchant's bank strings come from the merchant and the household's bank, one of four, so households see
+the same strings; merchants chosen by popularity, chains by Overture place count ** 0.7, local businesses only within one of 20 metros).
+Crowd tables (`build_crowd.py`): bank string (lower case, codes, digits and punctuation off) -> the category names other households
+filed it under (emoji off, group names left out, person-to-person payments left out). The line goes under the query when two or more
+other households filed the string (`real_budget_eval.py CROWD=`), the household itself left out; it covers 94% of test items and 80% of
+first-time payees. Arms on group-name households: G3 (shared world, no lines) and GC (with lines), seeds 0 and 1 (`r183.json`, re-read in
+`r183b.json`). Held-out households in a new world (test merchants, never seen in training; crowd from 800 test-world households) and in
+the training world (training merchants; crowd from the 800 training households). Tables: `scripts/r183_tables.py`.
+
+**Table 169.1: % right first, mean of two seeds (each seed within 1.8 of the mean except where noted)**
+
+| held-out households | items | G3, no line | G3, line (untrained) | GC, no line | GC, line |
+|---|---|---|---|---|---|
+| new world: all | 6,000 | 71.5 | 67.7 | 71.6 | **72.6** |
+| new world: payee filed before | 5,086 | 74.5 | 69.1 | 74.7 | 74.8 |
+| new world: first-time payee | 914 | 55.1 | 59.6 | 53.9 | **60.2** |
+| new world: first-time, 50+ other households | 668 | 58.8 | 64.1 | 58.2 | **65.6** |
+| new world: first-time, 0-1 others (no line) | 182 | 45.6 | 45.6 | 43.1 | 43.1 |
+| training world: all | 6,000 | 73.2 | 70.4 | 73.3 | **74.8** |
+| training world: payee filed before | 4,859 | 76.7 | 71.9 | 76.6 | 76.9 |
+| training world: first-time payee | 1,141 | 58.5 | 63.7 | 59.1 | **66.0** |
+| training world: first-time, 50+ others | 789 | 63.8 | 68.6 | 64.4 | **71.1** |
+| training world: first-time, 10-49 others | 120 | 54.6 | 68.8 | 55.0 | **71.2** |
+| training world: first-time, 0-1 others (no line) | 200 | 43.0 | 43.0 | 44.0 | 44.0 |
+
+Synthetic drills (`r173_tables.py`, two seeds): GC against G3 within seed noise everywhere (REAL-6 84.6 / 83.2, misleading 62.1 / 60.2,
+blind_v2 75.1 / 74.9).
+
+### 169.1 What the step says
+
+- **The crowd line works where it should:** first-time payees +6.3 (new world) and +6.9 (training world) for the model trained with it,
+  most where many households filed the string (+7.4 / +6.7 at 50+); no change on known payees, where the household's own history decides;
+  nothing where there is no line.
+- **The weights learn some of it, the line more:** without lines, first-time payees at merchants other households filed in training score
+  3.4 above those at merchants never seen (58.5 against 55.1, different merchants, so indicative); the line adds 6.9 on top. With 400
+  training households and 800 steps (about 3,200 household episodes seen) the weights hold the head of the crowd at best; a lookup carries
+  every string at no training cost, the long tail and new merchants included. Whether more training closes the gap is open.
+- **Train with the line:** read untrained, the line helps first-time payees (+4.5 to +5.2) but costs known payees 5 (the model follows the
+  crowd over the household's own history); trained, the model uses it only where its own history is silent.
+- **Caveats:** a synthetic crowd files by the same generator rules as the household, so it is cleaner than a real one (real users' names
+  for a purpose vary more, and some strings are shared by unrelated businesses); first-time payees are 15-19% of these households' items
+  against 29% in the owner's budget. The owner's budget needs real crowd data (owner: later).
+
+### 169.2 The crowd-trained model on the owner's budget, which has no crowd line
+
+The owner's budget has no crowd data (owner: later), so G3 and GC were read on it without the line (aliases + similar payees, group
+names; `scripts/chains/r183_owner.sh`; aggregates only). % right first, seeds 0 / 1 (mean):
+
+| reader | all | known payees | first-time, alias filed before | first-time, no alias |
+|---|---|---|---|---|
+| G (v2 households, REPORT 168) | 73.2 / 74.3 (73.75) | 79.7 / 81.3 | 72.0 / 73.5 | 50.3 / 49.2 |
+| G3 (shared-world households) | 73.4 / 73.7 (73.55) | 80.8 / 80.7 | 73.1 / 73.2 | 47.2 / 48.5 |
+| GC (trained with crowd lines), no line | 72.1 / 72.1 (72.1) | 79.1 / 79.2 | 70.8 / 71.6 | 47.4 / 46.9 |
+
+- **Trained with the line, the model depends on it:** without it, GC loses 1.5 against G3 on the owner's budget, both seeds alike,
+  most on known payees (-1.6) and alias payees (-2.0). In training the line was absent only for strings fewer than two other households
+  filed (rare and local merchants), so its absence came to mean "a rare merchant"; on the owner's budget it is absent everywhere. The
+  synthetic held-out households did not show it (GC without the line 71.6 against G3's 71.5).
+- **The shared world itself costs nothing** (G3 73.55 against G's 73.75).
+- **Next:** line dropout in training (drop the line from a share of episodes that have a crowd) so that absence carries no signal; it must
+  hold G3's level without the line and keep most of the +6-7 on first-time payees with it. Needed before any real crowd test, since in
+  use the line will be missing for new merchants and failed lookups.
