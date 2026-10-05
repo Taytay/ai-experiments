@@ -40,6 +40,7 @@ HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.envir
 SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
 GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
+BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))  # 0: the per-transaction reader (to check the batched one against)
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
 # row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
@@ -488,6 +489,24 @@ def scores(model, scale, ev, docs):
         for a in range(0, len(ev), 256):
             chunk = ev[a:a + 256]
             q = model.vecs([e["q"] for e in chunk])
+            if MODE != "mml" and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
+                ids = [list(e["state"]) for e in chunk]
+                C = max(map(len, ids))
+                cix = torch.tensor([[pos[e["d"][c]] for c in o] + [0] * (C - len(o)) for e, o in zip(chunk, ids)], device=model.dev)
+                qv, qm, qw, qc = q
+                dv, dm = D[0][cix].float(), D[1][cix]                                                     # [b, C, L, d], [b, C, L]
+                sim = torch.einsum("btd,bcsd->bcts", qv, dv)
+                if SOFT:
+                    att = (sim / SOFT).masked_fill(~dm[:, :, None, :], float("-inf")).softmax(-1)
+                    sim = (att * sim).sum(-1)
+                else:
+                    sim = sim.masked_fill(~dm[:, :, None, :], -2).max(-1).values                           # [b, C, t]
+                S = (sim * qw[:, None, :]).sum(-1)
+                if HYBRID:
+                    S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
+                S = (scale * S).tolist()
+                out += [dict(zip(o, S[k][:len(o)])) for k, o in enumerate(ids)]
+                continue
             for k, e in enumerate(chunk):
                 ids = list(e["state"])
                 if MODE == "mml":
