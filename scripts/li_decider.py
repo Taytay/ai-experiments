@@ -10,7 +10,7 @@ decision: softmax over the household's visible categories, cross-entropy plus BR
 retrieval loss. Training: shared-world v4 households (train split); a step takes one household and the transactions of WINDOW
 consecutive days (so the day's documents are shared), up to B of them.
   train   writes models/encoders/li_r<ROW>_<ARM> (encoder, proj.pt, scale.pt)
-  read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget)
+  read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget | blind2: blind_v2 users as budgets, row 217)
 env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB (5), M (8), B (32), WINDOW (7), STEPS (3000),
      HOUSEHOLDS (200), BRIER (1), LR (5e-5), SEED (0), HYBRID (0), QW (0), SOFT (0: MaxSim; tau_a for UWE's soft interaction),
      MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
@@ -313,7 +313,7 @@ def _nbrs(b, ev, m1, cache):
     import hashlib
     from ai_experiments.paths import ROOT
     f = None
-    if str(b.get("id", "")).startswith("realstyle-") and os.environ.get("PREP_CACHE", "1") != "0":
+    if str(b.get("id", "")).startswith(("realstyle-", "blind2-")) and os.environ.get("PREP_CACHE", "1") != "0":
         h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
             h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
@@ -701,10 +701,13 @@ def read():
     if budget:
         import real_budget_eval as RB
         budgets = [json.loads(RB.CACHE.read_text())["budget"]]
+    elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
+        import blind_budgets
+        budgets = blind_budgets.budgets()
     else:
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
-    print(f"\n**{'owner budget' if budget else f'{len(budgets)} held-out households'}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
+    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if os.environ.get('READ') == 'blind2' else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
     print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
