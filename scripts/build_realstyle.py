@@ -45,7 +45,7 @@ def household_items(seed, split, per):
 if __name__ == "__main__":
     mode, n, per = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
     if mode == "train":
-        out = PROCESSED / "realstyle_v1_train.jsonl"
+        out = PROCESSED / os.environ.get("TRAIN_OUT", "realstyle_v1_train.jsonl")  # row 176: realstyle_v2_train.jsonl, with FIELDS=1 realstyle_v2f_train.jsonl
         k = 0
         with open(out, "w") as f:
             for seed in range(n):
@@ -64,7 +64,7 @@ if __name__ == "__main__":
             for it in household_items(seed, "test", per):
                 it["id"] = f"RS:{seed}:{it['id'][:8]}"; it["user"] = seed
                 items.append(it)
-        out = PROCESSED / "realstyle_v1_test.json"
+        out = PROCESSED / os.environ.get("TEST_OUT", "realstyle_v1_test.json")
         out.write_text(json.dumps(dict(name="realstyle_v1_test", version=1, n=len(items), households=n, items=items)))
         print(f"{len(items)} test items from {n} households -> {out} ({out.stat().st_size / 1e6:.0f} MB); first-time payees "
               f"{100 * sum(not it['payee_seen'] for it in items) / len(items):.1f}%")

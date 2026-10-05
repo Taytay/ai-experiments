@@ -140,6 +140,7 @@ class Household:
         self.pets = rng.sample(PETS, rng.choice([0, 1, 1, 2]))
         self.groups, self.cats, self.txs, self.payees, self.accounts = {}, {}, [], {}, {}
         self.payee_of_string, self.favourites = {}, defaultdict(list)
+        self._parts = None
         for a in ("Checking", "Credit Card", "Savings"):
             self.accounts[a] = str(uuid.UUID(int=rng.getrandbits(128)))
         self._internal()
@@ -299,22 +300,31 @@ class Household:
             r = random.Random(f"{self.seed}-{key}")
             forms = []
             for _ in range(r.choice([1, 1, 2, 3])):
-                f = render_v2(m["name"], r, city=m.get("city"))
-                if not m.get("chain") and ".co" in f.lower() and r.random() < 0.7:  # web-domain strings are mostly online and chain merchants
-                    f = render_v2(m["name"], r, city=m.get("city"))
+                f = render_v2(m["name"], r, city=m.get("city"), parts=True)
+                if not m.get("chain") and ".co" in f[0].lower() and r.random() < 0.7:  # web-domain strings are mostly online and chain merchants
+                    f = render_v2(m["name"], r, city=m.get("city"), parts=True)
                 forms.append(f)
-            self.payee_of_string[key] = dict(forms=forms, clean=r.random() < 0.5, recode=bool(re.search(r"\*[A-Z0-9]{5,}$", forms[0])) and r.random() < 0.6)
+            self.payee_of_string[key] = dict(forms=forms, clean=r.random() < 0.5, recode=bool(re.search(r"\*[A-Z0-9]{5,}$", forms[0][0])) and r.random() < 0.6)
         info = self.payee_of_string[key]
-        s = info["forms"][0] if rng.random() < 0.8 else rng.choice(info["forms"])
+        s, parts = info["forms"][0] if rng.random() < 0.8 else rng.choice(info["forms"])
+        parts = dict(parts)
         if info["recode"] and re.search(r"\*[A-Z0-9]{5,}$", s):  # a new order / reference code each time, the name kept
-            s = re.sub(r"\*[A-Z0-9]{5,}$", "*" + "".join(rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789") for _ in range(9)), s)
+            code = "".join(rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789") for _ in range(9))
+            s = re.sub(r"\*[A-Z0-9]{5,}$", "*" + code, s); parts["Reference"] = code
+        if m["kind"] == "food_delivery" and self.pool.get("restaurant"):  # row 176: the order's restaurant in the string (own rng: other draws unchanged)
+            r2 = random.Random(f"{self.seed}-order-{len(self.txs)}")
+            rest = r2.choice(self.favourites["restaurant"] or self.pool["restaurant"])["name"]
+            s = f"{s.split('*')[0].strip()} *{rest}"[:40]
+            parts = {"Clean payee": m["name"], "Ordered from": rest}
         name = m["name"] if info["clean"] else s[:50]
+        self._parts = parts
         return s, name
 
     def _p2p(self, who, memo):
         app = self.rng.choices([a for a, _ in P2P_APPS], [w for _, w in P2P_APPS])[0]
         verb = self.rng.choice(["", "to ", "Paid "]) if app != "Zelle" else "to "
         s = f"{app} {verb}{who}" + (f" {memo}" if memo else "")
+        self._parts = {"Clean payee": who, "Via": app.replace(" Transfer", "")} | ({"Memo": memo} if memo else {})
         return s, s[:60]
 
     # ---- the timeline -----------------------------------------------------------------------------------------------------------
@@ -357,13 +367,14 @@ class Household:
         return cid
 
     def _add(self, date, amount, cid, raw, payee_name, memo=None, approved=True):
+        parts, self._parts = self._parts or {"Clean payee": payee_name}, None  # row 176: the pieces behind the string
         pid = self.payees.setdefault(payee_name, self._id())
         if self.rng.random() < 0.03 and cid not in (self.rta,):  # misfiled
             live = [c for c in self.cats.values() if c.get("kinds") and c["created"] <= date and not (c["hidden_at"] and c["hidden_at"] <= date)]
             cid = self.rng.choice(live)["id"] if live else cid
         self.txs.append(dict(id=self._id(), date=date.isoformat(), amount=int(round(-amount * 1000)), cleared="cleared", approved=approved,
                              account_id=self.accounts["Credit Card"], payee_id=pid, category_id=cid, import_payee_name_original=raw,
-                             memo=memo, deleted=False))
+                             memo=memo, deleted=False, parts=parts))
 
     def simulate(self):
         rng = self.rng

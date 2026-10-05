@@ -156,7 +156,7 @@ def parse(context):
 
 
 def build_layout(P, tok, context, question, options, gold, rng, labels="rand255", layout="labelled_shots", dow=False, spans=None, split=False, desc=False,
-                 relist=False):
+                 relist=False, field_loss=False):
     names, rows, query = parse(context)
     dsc = (desc if isinstance(desc, dict) else describe_categories(options, rows)) if desc else None  # row 136; a dict: descriptions given by the caller
     if split and not any(c is None for _, c, _ in rows):  # row 118: training episodes into the split layout
@@ -209,6 +209,11 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
         if label is None:  # row 117: a section header
             parts.append(fields + "\n\n")
             continue
+        if field_loss and "\n" in fields:  # row 176: a history row's whole field block is generated: every line (key, value, line break), so
+            # the model learns which fields are present, and the "\nCategory:" after it, so it learns where the block ends
+            n0 = sum(len(p) for p in parts) + len("Transaction: ")
+            first = fields.split("\n")[0]
+            targets.append((n0 + len(first), n0 + len(fields) + len("\nCategory:")))
         parts.append(f"Transaction: {f(fields)}\nCategory:")
         lab = f" ({lab_of[label]}) {label}" if layout == "labelled_shots" and label in lab_of else f" {label}"
         if in_loss(st):
@@ -243,8 +248,8 @@ def build_layout(P, tok, context, question, options, gold, rng, labels="rand255"
 
 def _cells(fields):
     """(date or '', weekday, description, amount) from a row's fields ('2025-01-19 | TEXT | $60.43 | Fri' or 'TEXT | $60.43 | Fri');
-    a "\nKind: ..." line after the fields (row 149) is ignored."""
-    parts = fields.split("\nKind:")[0].split(" | ")
+    lines after the first (row 149's "Kind: ...", row 176's field lines) are ignored."""
+    parts = fields.split("\n")[0].split(" | ")  # extra lines under a row (row 149's Kind, row 176's Clean payee / Via / ...) are not cells
     date = parts[0] if _DATE.match(parts[0]) else ""
     rest = parts[1:] if date else parts
     return date, rest[-1], " | ".join(rest[:-2]), rest[-2].replace("$", "")

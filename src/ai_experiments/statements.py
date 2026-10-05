@@ -40,35 +40,51 @@ def _digits(rng, n):
     return "".join(rng.choice(string.digits) for _ in range(n))
 
 
-def render_v2(name, rng=None, city=None, P=None):
-    """One statement string for merchant `name` (its plain name, e.g. "Costco Wholesale"), sampled from the measured grammar."""
+VIA = {"SQ *": "Square", "Square ": "Square", "TST* ": "Toast", "PAYPAL *": "PayPal", "PP*": "PayPal", "SP": "Shopify", "DD": "DoorDash",
+       "IC": "Instacart", "CLV": "Clover", "TOAST": "Toast", "PwP": "Privacy.com", "PY": "PayPal", "SQSP": "Squarespace", "BT": "Braintree",
+       "LS": "Lightspeed"}  # what a processor prefix stands for (row 176's "Via" field)
+
+
+def render_v2(name, rng=None, city=None, P=None, parts=False):
+    """One statement string for merchant `name` (its plain name, e.g. "Costco Wholesale"), sampled from the measured grammar. With
+    parts=True, also the pieces it was built from (row 176): {"Clean payee", "Via", "Location", "Store", "Reference"}, each kept only if
+    still visible after truncation; the random draws are the same either way, so the strings do not change."""
     rng = rng or random.Random()
     P = P or patterns()
+    f = {"Clean payee": name}
     body = name.replace("&", "and") if rng.random() < 0.3 else name
     if _pick(rng, P["run_together"]) == "yes":  # words or digits run together ("MURPHY6533ATWALMART" style)
         body = re.sub(r"\s+", "", body) if rng.random() < 0.6 else body.split()[0] + _digits(rng, rng.randint(3, 5)) + "".join(body.split()[1:])
     proc = _pick(rng, P["processor"])
     sfx = _pick(rng, P["suffix"])
     if sfx == "star_code":
-        body += "*" + _code(rng, rng.choice([6, 8, 9, 9, 10]))
+        code = _code(rng, rng.choice([6, 8, 9, 9, 10])); body += "*" + code; f["Reference"] = code
     elif sfx == "domain":
-        body = re.sub(r"[^A-Za-z0-9]", "", body) + rng.choice([".com", ".com", ".com", ".net", ".co"]) + (" " + city.split()[-1] if city and rng.random() < 0.3 else "")
+        loc = (" " + city.split()[-1] if city and rng.random() < 0.3 else "")
+        body = re.sub(r"[^A-Za-z0-9]", "", body) + rng.choice([".com", ".com", ".com", ".net", ".co"]) + loc
+        if loc:
+            f["Location"] = loc.strip()
     elif sfx == "long_digits":
-        body += " " + _digits(rng, rng.randint(8, 12))
+        code = _digits(rng, rng.randint(8, 12)); body += " " + code; f["Reference"] = code
     elif sfx == "short_number":
-        body += " " + _digits(rng, rng.randint(1, 5))
+        code = _digits(rng, rng.randint(1, 5)); body += " " + code; f["Store"] = code
     elif sfx == "hash_store":
-        body += " #" + _digits(rng, rng.randint(3, 5)) + ((" " + (city or rng.choice(CITIES))) if rng.random() < 0.3 else "")
+        code = _digits(rng, rng.randint(3, 5)); loc = ((" " + (city or rng.choice(CITIES))) if rng.random() < 0.3 else "")
+        body += " #" + code + loc; f["Store"] = code
+        if loc:
+            f["Location"] = loc.strip()
     elif sfx == "auth":
-        body += (" #" + _digits(rng, 4) if rng.random() < 0.5 else "") + rng.choice([" - AUTHORIZATION", " - AUTHORIZED ON", " PENDING", " AUTH"])
+        code = (" #" + _digits(rng, 4) if rng.random() < 0.5 else ""); body += code + rng.choice([" - AUTHORIZATION", " - AUTHORIZED ON", " PENDING", " AUTH"])
+        if code:
+            f["Store"] = code.strip(" #")
     elif sfx == "city_state":
-        body += " " + (city or rng.choice(CITIES))
+        loc = (city or rng.choice(CITIES)); body += " " + loc; f["Location"] = loc
     elif sfx == "store_word":
-        body += " STORE " + _digits(rng, rng.randint(3, 5))
+        code = _digits(rng, rng.randint(3, 5)); body += " STORE " + code; f["Store"] = code
     if proc == "other*":
-        body = rng.choice(PROCESSOR_TOKENS) + rng.choice(["*", " *", " * "]) + body
+        tok = rng.choice(PROCESSOR_TOKENS); body = tok + rng.choice(["*", " *", " * "]) + body; f["Via"] = VIA.get(tok, tok)
     elif proc != "none":
-        body = proc + body
+        body = proc + body; f["Via"] = VIA.get(proc, proc.strip(" *"))
     case = _pick(rng, P["case"])
     if case == "upper":
         body = body.upper()
@@ -82,4 +98,12 @@ def render_v2(name, rng=None, city=None, P=None):
     if rng.random() < P["truncate_share"]:  # a fixed field width
         w = _pick(rng, {int(k): v / P["truncate_share"] for k, v in P["truncate_widths"].items()})
         body = body[:w]
-    return body
+    if not parts:
+        return body
+    low = body.lower()
+    for k in ("Reference", "Store", "Location"):  # cut off by truncation: not in the string, so not a field
+        if k in f and f[k].lower() not in low:
+            del f[k]
+    if "Via" in f and not any(t.lower() in low for t in [k for k, v in VIA.items() if v == f["Via"]] + [f["Via"]]):
+        del f["Via"]
+    return body, f

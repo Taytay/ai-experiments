@@ -57,9 +57,22 @@ SIM_MAX, SIM_PER_PAYEE = 6, 2  # build_blind_v1's similar-payee step, with embed
 DESC = os.environ.get("DESC") == "1"  # owner, 2026-10-03: each offered category followed by its latest payees ("e.g. A, B, C"; row 136's form)
 PLINE = os.environ.get("PLINE") == "1"  # owner, 2026-10-03: a line before the transaction with the categories the payee was filed under
 PLINE_HEAD = "Earlier you filed this payee as: "
+FIELDS = os.environ.get("FIELDS") == "1"  # row 176: under each history row its "Clean payee / Via / Ordered from / Memo / Location / Store /
+# Reference" lines (synthetic households only: their transactions carry the parts); the query stays bare
+FIELD_ORDER = ("Clean payee", "Via", "Ordered from", "Memo", "Location", "Store", "Reference")
+
+
+def yaml_value(v):
+    """A field value as strict YAML (owner, 2026-10-03: a standard format): plain unless YAML would misread it (numbers, booleans, a
+    leading indicator character, ": " or " #" inside), then double-quoted; the block parses with yaml.safe_load to str -> str."""
+    import re as _re
+    if _re.search(r"^[\s*&!|>%@`'\"{\[?,#-]|: | #|[\s:]$", v) or v.lower() in ("yes", "no", "true", "false", "null", "on", "off", "y", "n", "~") \
+            or _re.fullmatch(r"[\d.eE+_:-]+|0x[0-9a-fA-F]+|0o[0-7]+|\.(inf|nan)", v, _re.I):
+        return json.dumps(v, ensure_ascii=False)
+    return v
 KIND = os.environ.get("KIND", "")  # row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}" if KIND else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -132,7 +145,8 @@ def build_items(b):
         amt = -t["amount"] / 1000
         rows.append(dict(id=t["id"], date=t["date"], payee_id=t.get("payee_id") or payee, payee=payee, cat=lab,
                          kind="transfer" if t.get("transfer_account_id") else "inflow" if lab == RTA else "spending",
-                         fields=f"{t['date']} | {payee} | ${amt:.2f} | {WD[d.weekday()]}"))
+                         fields=f"{t['date']} | {payee} | ${amt:.2f} | {WD[d.weekday()]}",
+                         extra="".join(f"\n{k}: {yaml_value(str(t['parts'][k]))}" for k in FIELD_ORDER if FIELDS and t.get("parts") and k in t["parts"])))
     rows.sort(key=lambda r: (r["date"], r["id"]))
     by_payee_name, neighbours, aliases = defaultdict(list), {}, {}
     for i, r in enumerate(rows):
@@ -212,7 +226,7 @@ def build_items(b):
         chosen.sort()
         year_ago = str(dt.date.fromisoformat(q["date"]) - dt.timedelta(days=365))
         options = list(dict.fromkeys([RTA] + visible + [c for c in used_order if rows[last_idx[c]]["date"] >= year_ago]))[:255]
-        ctx = "Categories: " + ", ".join(options) + "\n\n" + "".join(f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n" for i in chosen)
+        ctx = "Categories: " + ", ".join(options) + "\n\n" + "".join(f"Transaction: {rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n" for i in chosen)
         near = [i for i in prev_rows if i not in set(shared)][::-1][:OWN_MAX]
         if SIM:  # the nearest earlier payees by name embedding, up to SIM_PER_PAYEE latest rows each, SIM_MAX rows in all
             sim, sh = [], set(shared)
@@ -229,7 +243,7 @@ def build_items(b):
                 sim += rows_nb[:SIM_MAX - len(sim)]
             near += sim
         near = sorted(near)
-        row_text = lambda i: f"Transaction: {rows[i]['fields']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
+        row_text = lambda i: f"Transaction: {rows[i]['fields']}{rows[i]['extra']}\nCategory: {rows[i]['cat']}\n\n"  # noqa: E731
         pline = ""
         kv = kinds.get(q["payee"]) if KIND else None
         kind_line = f"\nKind: {kv['kind']}" if kv and (KIND == "all" or not prev_rows) else ""

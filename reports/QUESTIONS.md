@@ -1359,6 +1359,6 @@ the query, from the generators' kinds and from (148)'s inferred kinds, in traini
 categorised transactions (+1M a day); infer what we can from them. *Experiment (synthetic stand-in):* a 2,000-user population from
 blind_v2's world (`BLIND_POP`); concepts learned by clustering user categories by the payees filed under them; payee profiles over
 concepts from other users' earlier filings; mapped onto each test user's own categories; as a no-model suggestion and as the
-other-users line ("Other users file this payee as: <the user's own category> (%)"); first-time payees above all.
+other-users line ("Other users file this payee as: <the user's own category> (count)"); first-time payees above all.
 
 **Status (2026-09-30):** PLAN step 150, REPORT.md 145: no-model mapped profile 52% right first / 70% top-3 on first-time payees; decider reads raw names better than the mapped line; train on real filings, keep the raw line, profiles as fallback.
