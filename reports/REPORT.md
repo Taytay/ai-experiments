@@ -10531,3 +10531,33 @@ v4 rebuild, row 190, fixes them).
 - **Not yet compared:** the crowd line and behavioural rows together; on the v4 data (clean keys); on the owner's budget (needs real
   crowd data). Behavioural rows answer "which of my payees are like this one"; the crowd line answers "where do people put this one";
   the two may add.
+
+## 174. Training with whole households that never see a crowd line adds nothing over item dropout: on the owner's budget (no line) GCDH reads 72.95 against GCD's 72.8 and G3's 73.55 (two seeds each), while keeping the line's gain where it exists (+6.5 / +6.3 on first-time payees, synthetic); a cost of about 0.6 remains, on known and alias payees (REAL-27)
+
+PLAN step 188 (REPORT 171: item dropout halved the cost of a missing line; on a budget with no crowd data the line is missing
+everywhere). `real_budget_eval.py CROWD_HH_DROP=0.3` with `CROWD_DROP=0.4`: 30% of training households carry no line at all (by
+household seed; 278 of 400 keep some), the rest drop it from 40% of items (`realstyle_v3gcdh_train.jsonl`); seeds 0 and 1 (`r188.json`).
+v3 data (5% of crowd keys collapsed; row 190 repeats on v4).
+
+**Table 174.1: % right first, means of seeds 0 and 1 [each seed]**
+
+| set | G3 | GCD | GCDH |
+|---|---|---|---|
+| synthetic new world, first-time payees, with the line | 59.6 (untrained) | 60.9 | 60.1 [60.6 / 59.5] |
+| synthetic new world, first-time payees, no line | 55.1 | 54.2 | 53.6 [53.9 / 53.3] |
+| synthetic training world, first-time payees, with the line | 63.7 (untrained) | 65.4 | 65.0 [65.9 / 64.2] |
+| owner's budget (no line): all | **73.55** [73.4 / 73.7] | 72.8 [73.3 / 72.3] | 72.95 [73.2 / 72.7] |
+| owner's budget: known payees | 80.75 | 79.8 | 79.95 [80.2 / 79.7] |
+| owner's budget: first-time, alias filed before | 73.15 | 72.05 | 72.0 [72.1 / 71.9] |
+| owner's budget: first-time, no alias | 47.85 | 47.95 | 48.35 [48.9 / 47.8] |
+
+### 174.1 What the step says
+
+- **Whole-household absence does not close the gap:** GCDH and GCD are level on the owner's budget (72.95 against 72.8, within seed
+  noise); both stay about 0.6 below G3, on known payees (-0.8) and payees with an alias (-1.1); payees with no alias are level.
+- **So the remaining cost is not about the line's absence being read as a signal.** A model trained on households that often show a
+  crowd line seems to lean a little less on the household's own history in general, which is what known and alias payees run on.
+  Candidates: a smaller crowd share in training, or keeping the line only for first-time payees (where it helps) and never on payees
+  the household has filed (where its own rows should decide).
+- **Small either way:** 0.6 against the line's +6 to +7 on first-time payees when a crowd exists; for YNAB with real crowd data the line
+  would be present for most first-time payees. Row 190 repeats GCD and GCDH on clean keys (v4).
