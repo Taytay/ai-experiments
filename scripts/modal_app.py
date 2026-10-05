@@ -111,7 +111,7 @@ def _snapshot():
     return {str(p): p.stat().st_mtime for base in ("results", "models/adapters", "models/encoders", "evals") for p in Path(REPO, base).rglob("*") if p.is_file()}
 
 
-@APP.function(image=image, gpu="H100", timeout=6 * 3600, volumes={"/cache": HF, "/out": OUT}, max_containers=8)
+@APP.function(image=image, gpu="H100", cpu=4.0, timeout=6 * 3600, volumes={"/cache": HF, "/out": OUT}, max_containers=8)  # cpu: row 210 found small-model steps launch-bound on the default 0.125-core request
 def run(cmds: list, env: dict, tag: str):
     import os
     import shutil

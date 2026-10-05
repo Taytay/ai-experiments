@@ -1,0 +1,12 @@
+[
+ {
+  "tag": "r204-proto",
+  "env": {
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "204"
+  },
+  "cmds": [
+   "bash scripts/chains/r204_proto.sh; cat logs/r204_proto.log"
+  ]
+ }
+]

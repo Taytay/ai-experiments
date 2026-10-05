@@ -9,11 +9,12 @@ document's tokens) times a learned scale. Like Clef (row 164) and decider, every
 decision: softmax over the household's visible categories, cross-entropy plus BRIER x the Brier score (Clef's calibration term), not a
 retrieval loss. Training: shared-world v4 households (train split); a step takes one household and the transactions of WINDOW
 consecutive days (so the day's documents are shared), up to B of them.
-  train   writes models/encoders/li_r210_<ARM> (encoder, proj.pt, scale.pt)
+  train   writes models/encoders/li_r<ROW>_<ARM> (encoder, proj.pt, scale.pt)
   read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget)
 env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB (5), M (8), B (32), WINDOW (7), STEPS (3000),
      HOUSEHOLDS (200), BRIER (1), LR (5e-5), SEED (0), HYBRID (0), QW (0), SOFT (0: MaxSim; tau_a for UWE's soft interaction),
-     MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS.
+     MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
+     row 209 (any base): PDIM (128), PROJ (linear | res), PROJ_INIT (1), LOWER (0), POOL (cls | mean | last), MAXLEN (default min(96, the base's): row 210's length).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/li_decider.py train
 """
 import json
@@ -38,6 +39,7 @@ B, WINDOW, STEPS = int(os.environ.get("B", "32")), int(os.environ.get("WINDOW", 
 HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.environ.get("BRIER", "1")), float(os.environ.get("LR", "5e-5"))
 SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
+GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
 # row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
@@ -45,6 +47,93 @@ MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50")) 
 # "l" + one listwise layer over the options; e.g. INTERACT=xml. ROW names the output (li_r<ROW>_<ARM>).
 INTERACT, NMEM, XLAYERS = os.environ.get("INTERACT", ""), int(os.environ.get("NMEM", "10")), int(os.environ.get("XLAYERS", "2"))
 ROW = os.environ.get("ROW", "210")
+# row 209: any base encoder (ai_experiments.licences.open_licence on hub ids). PDIM: token-vector dimensions (128; mxbai 2510.14880: 64 costs
+# nothing, 32 does); PROJ: linear | res (mxbai's 2-layer FFN with an upscaled hidden and a residual, +1.3 at 17M; its second layer starts at
+# zero, so step 0 equals the linear head); PROJ_INIT (1): start the linear map from the base's own ColBERT head when its shape fits (PyLate
+# Dense layers without bias or activation, composed; answerai-colbert's linear.weight); LOWER (0): lowercase every text before tokenising
+# (cased bases such as Ettin, ModernBERT, Qwen3 read ALL-CAPS payees as many pieces; mxbai: +0.9 at 17M); POOL: the pooled vector for
+# HYBRID and memory tokens, cls | mean | last (decoder embedders such as Qwen3-Embedding: the last non-padding token, either padding side);
+# MAXLEN: default min(96, the base's own max length), as row 210 trained (models saved before row 209 read at 96, as trained). Learning rate: Ettin needs ~1.8x
+# (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
+PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
+LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
+
+
+def _base_head(path, hidden):
+    """the base's trained ColBERT projection as one [out, hidden] matrix, or None: PyLate's k_Dense layers (no bias, identity activation,
+    composed in order) or a Stanford-format checkpoint's linear.weight"""
+    import torch
+    from safetensors.torch import load_file
+
+    def get(name):
+        p = Path(path) / name
+        if p.exists():
+            return p
+        if Path(path).exists():
+            return None
+        try:
+            from huggingface_hub import hf_hub_download
+            return Path(hf_hub_download(str(path), name))
+        except Exception:
+            return None
+    W = None
+    for k in range(1, 6):
+        c = get(f"{k}_Dense/config.json")
+        if c is None:
+            break
+        cfg = json.loads(c.read_text())
+        if cfg.get("bias") or "Identity" not in cfg.get("activation_function", "Identity"):
+            return None
+        w = next(iter(load_file(str(get(f"{k}_Dense/model.safetensors"))).values())).float()
+        W = w if W is None else w @ W
+    if W is None and get("artifact.metadata") is not None:  # Stanford ColBERT layout: the head sits in the main checkpoint
+        st = load_file(str(get("model.safetensors")))
+        W = st["linear.weight"].float() if "linear.weight" in st else None
+    return W if W is not None and W.shape[1] == hidden else None
+
+
+class Enc(H2.ColBERT):
+    """hist_encoder2.ColBERT made base-agnostic for row 209 (PDIM, PROJ, PROJ_INIT, MAXLEN; hist_encoder2.py is left as it is). With the
+    defaults and a saved model (proj.pt = Linear(384, 128, bias=False)) it loads and behaves as before."""
+
+    def __init__(self, path, train=False):
+        import torch
+        from transformers import AutoModel, AutoTokenizer
+        self.dev = "cuda" if torch.cuda.is_available() else "cpu"
+        self.tok = AutoTokenizer.from_pretrained(str(path))
+        if self.tok.pad_token is None:
+            self.tok.pad_token = self.tok.eos_token
+        self.enc = AutoModel.from_pretrained(str(path)).to(self.dev)
+        hid = self.enc.config.hidden_size
+        lin = torch.nn.Linear(hid if PROJ == "linear" else 2 * hid, PDIM, bias=False)
+        if PROJ == "linear":
+            self.proj = lin.to(self.dev)
+        elif PROJ == "res":
+            class Res(torch.nn.Module):
+                """up to 2x hidden, + a residual GELU FFN at that width (second layer zero-initialised), then down to PDIM"""
+
+                def __init__(self):
+                    super().__init__()
+                    self.up, self.f1, self.f2, self.out = torch.nn.Linear(hid, 2 * hid), torch.nn.Linear(2 * hid, 2 * hid), torch.nn.Linear(2 * hid, 2 * hid), lin
+                    torch.nn.init.zeros_(self.f2.weight); torch.nn.init.zeros_(self.f2.bias)
+
+                def forward(self, h):
+                    x = self.up(h)
+                    return self.out(x + self.f2(torch.nn.functional.gelu(self.f1(x))))
+            self.proj = Res().to(self.dev)
+        else:
+            raise ValueError(f"PROJ={PROJ}")
+        if (Path(path) / "proj.pt").exists():
+            self.proj.load_state_dict(torch.load(Path(path) / "proj.pt", map_location=self.dev))
+        elif PROJ_INIT and PROJ == "linear":
+            W = _base_head(path, hid)
+            if W is not None and W.shape[0] == PDIM:
+                with torch.no_grad():
+                    self.proj.weight.copy_(W)
+                print(f"projection from the base's ColBERT head {tuple(W.shape)}", flush=True)
+        base_max = min(x for x in (self.tok.model_max_length, getattr(self.enc.config, "max_position_embeddings", 10 ** 9)) if x)
+        self.maxlen = MAXLEN or min(96, base_max)  # 96 as row 210 trained; MAXLEN raises it
+        self.enc.train(train)
 
 
 class LI:
@@ -55,27 +144,40 @@ class LI:
 
     def __init__(self, path, train=False):
         import torch
-        self.cb = H2.ColBERT(path, train=train)
+        self.cb = Enc(path, train=train)
         self.dev = self.cb.dev
         self.qw = torch.nn.Linear(self.cb.enc.config.hidden_size, 1).to(self.dev)
         torch.nn.init.zeros_(self.qw.weight); torch.nn.init.zeros_(self.qw.bias)
         if (Path(path) / "qw.pt").exists():
-            self.qw.load_state_dict(torch.load(Path(path) / "qw.pt"))
+            self.qw.load_state_dict(torch.load(Path(path) / "qw.pt", map_location=self.dev))
 
     def params(self):
         return list(self.cb.enc.parameters()) + list(self.cb.proj.parameters()) + (list(self.qw.parameters()) if QW else [])
 
     def vecs(self, texts):
-        """token vectors [n, L, 128], mask [n, L], query-token weights [n, L] (sum 1 over the mask), normalised [CLS] [n, hidden]"""
+        """token vectors [n, L, PDIM], mask [n, L], query-token weights [n, L] (sum 1 over the mask), normalised pooled state [n, hidden]
+        (POOL: [CLS] / masked mean / last non-padding token)"""
         import torch
-        b = self.cb.tok(texts, padding=True, truncation=True, max_length=96, return_tensors="pt").to(self.dev)
+        if LOWER:
+            texts = [t.lower() for t in texts]
+        b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
         with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda"):
-            h = self.cb.enc(**b).last_hidden_state
+            h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state
         h = h.float()
         m = b["attention_mask"].bool()
         v = torch.nn.functional.normalize(self.cb.proj(h), dim=-1)
         w = (self.qw(h).squeeze(-1) if QW else torch.zeros(m.shape, device=self.dev)).masked_fill(~m, float("-inf")).softmax(-1)
-        return v, m, w, torch.nn.functional.normalize(h[:, 0], dim=-1)
+        if POOL == "cls":
+            p = h[:, 0]
+        elif POOL == "mean":
+            p = (h * m[..., None]).sum(1) / m.sum(1, keepdim=True).clamp(min=1)
+        elif POOL == "last":  # the last real token whichever side the padding is on
+            L = m.shape[1]
+            last = L - 1 - m.flip(1).int().argmax(1)
+            p = h[torch.arange(len(h), device=h.device), last]
+        else:
+            raise ValueError(f"POOL={POOL}")
+        return v, m, w, torch.nn.functional.normalize(p, dim=-1)
 
     def score(self, q, d):
         """[nq, nd]: weighted mean over query tokens of the best cosine among each document's tokens (+ [CLS] cosine under HYBRID)"""
@@ -117,8 +219,9 @@ def _block(d, heads):
     return Block()
 
 
-def inter_module(dev, d=128, heads=2):
+def inter_module(dev, d=None, heads=2):
     import torch
+    d = d or PDIM
 
     class Inter(torch.nn.Module):
         def __init__(self):
@@ -145,7 +248,7 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     rows_a, rows_d, rows_o, nopt = [], [], [], max(len(e["state"]) for e in anc)
     for k, e in enumerate(anc):
         for o, c in enumerate(e["state"]):
-            rows_a.append(k); rows_d.append(pos[docs[e["day"]][c]]); rows_o.append(o)
+            rows_a.append(k); rows_d.append(pos[e["d"][c]]); rows_o.append(o)
     ra, rd = torch.tensor(rows_a, device=model.dev), torch.tensor(rows_d, device=model.dev)
     kv, kvm = D[0][rd].float(), D[1][rd]
     if "m" in INTERACT:
@@ -154,7 +257,7 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
         for k, e in enumerate(anc):
             js = [j for j in e.get("nb", [])[:NMEM]]
             if js:
-                f = torch.cat([F[[fpos[ev[j]["text"]] for j in js]], Lab[[lpos[ev[j]["label"]] for j in js]]], -1)
+                f = torch.cat([F[[fpos[e["_ev"][j]["text"]] for j in js]], Lab[[lpos[e["_ev"][j]["label"]] for j in js]]], -1)
                 mem[k, :len(js)] = inter.mem(f); mm[k, :len(js)] = True
         kv, kvm = torch.cat([kv, mem[ra]], 1), torch.cat([kvm, mm[ra]], 1)
     q = qv[ra]
@@ -208,6 +311,8 @@ def prepare(b, m1, cache):
         for e in ev[i:j]:
             recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
         i = j
+    for e in ev:  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
+        e["d"], e["_ev"] = docs[e["day"]], ev
     return ev, docs
 
 
@@ -267,7 +372,7 @@ def train():
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
           f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
     model = LI(BASE, train=True)
-    scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
+    scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
     groups = [{"params": model.params()}, {"params": [scale], "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
     opt = torch.optim.AdamW(groups, lr=LR)
@@ -275,13 +380,14 @@ def train():
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (STEPS - s) / (STEPS - warm)))
     t0, run, k = time.time(), defaultdict(float), 0
     for s in range(STEPS):
-        ev, docs = data[rng.randrange(len(data))]
-        last = ev[-1]["day"]
-        d0 = rng.randint(1, max(1, last - WINDOW))
-        anc = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
+        anc = []
+        for _ in range(GROUPS):  # GROUPS household windows per step (row 210 speed: one window of ~28 transactions left an H100 idle)
+            ev, docs = data[rng.randrange(len(data))]
+            d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
+            w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
+            anc += rng.sample(w, min(B, len(w)))
         if not anc:
             continue
-        anc = rng.sample(anc, min(B, len(anc)))
         dtexts, idx = [], {}
 
         def col(t):
@@ -291,12 +397,12 @@ def train():
         if INTERACT:
             for e in anc:
                 for c in e["state"]:
-                    col(docs[e["day"]][c])
+                    col(e["d"][c])
             Q, Dv = model.vecs([e["q"] for e in anc]), model.vecs(dtexts)
             F = fpos = Lab = lpos = None
             if "m" in INTERACT:
-                ft = list(dict.fromkeys(ev[j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
-                lt = list(dict.fromkeys(ev[j]["label"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                ft = list(dict.fromkeys(e["_ev"][j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                lt = list(dict.fromkeys(e["_ev"][j]["label"] for e in anc for j in e.get("nb", [])[:NMEM]))
                 fpos, lpos = {t: i for i, t in enumerate(ft)}, {t: i for i, t in enumerate(lt)}
                 F = _pool(*model.vecs(ft)[:2]) if ft else None
                 Lab = _pool(*model.vecs(lt)[:2]) if lt else None
@@ -305,11 +411,11 @@ def train():
             cand = []
             for e in anc:
                 oi = {c: o for o, c in enumerate(e["state"])}
-                cand.append([(col(t), oi[c]) for t, c in _cands(e, ev)])
+                cand.append([(col(t), oi[c]) for t, c in _cands(e, e["_ev"])])
             S = _score(model, scale, [e["q"] for e in anc], dtexts)
             Sg = _mml_logits(S, cand, anc)
         else:
-            cols = [[col(docs[e["day"]][c]) for c in e["state"]] for e in anc]
+            cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
             S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
             w = max(map(len, cols))
             ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
@@ -330,8 +436,9 @@ def train():
     if inter:
         torch.save(inter.state_dict(), out / "inter.pt")
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
-                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
-                                                         INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW), indent=1))
+                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
+                                                         INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
+                                                         PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -390,7 +497,7 @@ def scores(model, scale, ev, docs):
                     s = scale * model.score(tuple(x[k:k + 1] for x in q), (D[0][cix], D[1][cix], None, D[3][cix]))
                     s = _mml_logits(s, [[(i, o) for i, (_, o) in enumerate(cs)]], [e])[0]
                 else:
-                    cix = torch.tensor([pos[docs[e["day"]][c]] for c in ids], device=model.dev)
+                    cix = torch.tensor([pos[e["d"][c]] for c in ids], device=model.dev)
                     s = scale * model.score(tuple(x[k:k + 1] for x in q), (D[0][cix], D[1][cix], None, D[3][cix]))[0]
                 out.append(dict(zip(ids, s.tolist())))
     return out
@@ -408,19 +515,21 @@ def read():
     print(f"\n**{'owner budget' if budget else f'{len(budgets)} held-out households'}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
     print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
-        d = H.ENC / (arm if arm.startswith("li_r") else f"li_r210_{arm}")
+        d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
         cfg = json.loads((d / "li_config.json").read_text())
-        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS
+        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
         CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
         SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
         INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
+        PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
+        POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
         m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
         model = LI(d)
         model.cb.enc.eval()
-        scale = torch.load(d / "scale.pt").to(model.dev)
+        scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
         inter = None
         if INTERACT:
-            inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt")); inter.eval()
+            inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
             ev, docs = prepare(b, m1, cache)
