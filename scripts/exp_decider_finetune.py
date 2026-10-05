@@ -69,6 +69,8 @@ SFX += (f"_r{LORA_R}" if LORA_R != 64 else "") + ("_ab" if LORA_AB else "")
 SFX += f"_full{LR:g}" if FULL_FT else ""
 assert not POINTER or RELIST, "POINTER needs RELIST=1"
 SFX += f"_abst{round(ABSTAIN * 100)}sw{round(ABSTAIN_SWAP * 100)}" if ABSTAIN else ""
+REALSTYLE = float(os.environ.get("REALSTYLE", "0"))  # row 173: this share of sequences from real-style households (build_realstyle.py)
+SFX += f"_rs{round(REALSTYLE * 100)}" if REALSTYLE else ""
 SFX_POOL = SFX  # the pool's name without the teacher suffix (dump_teacher_items.py names its file by it)
 SFX += f"_teach{round(TEACH_W * 100)}" if TEACHER else ""
 assert not AUX_LM or C["ALL_LABELS"], "AUX_LM needs ALL_LABELS=1 (the shot-label spans)"
@@ -187,6 +189,12 @@ def main():
 
     from ai_experiments import oneslot
     eps = episodes(); rng = random.Random(SEED)
+    rs_eps = []
+    if REALSTYLE:  # row 173: (context, options, answer, spans) from data/processed/realstyle_v1_train.jsonl, no augmentations
+        for line in open(ROOT / "data" / "processed" / "realstyle_v1_train.jsonl"):
+            r = json.loads(line)
+            rs_eps.append((r["context"], r["options"], r["answer"]) + ((r["spans"],) if AUX_LM else ()))
+        print(f"   {len(rs_eps)} real-style episodes, share {REALSTYLE}", flush=True)
     if TEACHER:
         load_teacher(eps)
     params = [p for p in model.parameters() if p.requires_grad]
@@ -203,7 +211,7 @@ def main():
     model.train(); t0 = time.time(); losses = []; n_tok = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
-        picked = [evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
+        picked = [rng.choice(rs_eps) if rs_eps and rng.random() < REALSTYLE else evfree_aug(abstain_aug(rng.choice(eps), rng), rng) for _ in range(MICRO)]
         if LAYOUT or DOW_FIRST:  # row 111
             built = [oneslot.build_layout(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST,
                                           spans=e[3] if AUX_LM else None, split=SPLIT, desc=DESC, relist=RELIST) for e in picked]
@@ -282,7 +290,7 @@ def main():
 if __name__ == "__main__":
     from ai_experiments.licences import open_licence
     open_licence(MODEL)
-    cfg = dict(model=MODEL, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
+    cfg = dict(model=MODEL, realstyle=REALSTYLE, steps=STEPS, micro=MICRO, lr=LR, seed=SEED, episodes_sfx=SFX, poi=C["POI"], fold=C["FOLD"], rename=C["RENAME"],
                poi_kind=C["POI_KIND"], poi_desc=C["POI_DESC"], poi_unseen=C["POI_UNSEEN"], dbep=C["DBEP"], lora_r=None if FULL_FT else LORA_R, lora_ab=LORA_AB, full_ft=FULL_FT, question=QUESTION, aux_lm=AUX_LM,
                abstain=ABSTAIN, abstain_swap=ABSTAIN_SWAP, labels=LABELS,
                evfree=EVFREE, evfree_mode=EVFREE_MODE, layout=LAYOUT, split=SPLIT, ema=EMA, teacher=TEACHER, teach_w=TEACH_W)
