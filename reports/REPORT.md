@@ -197,6 +197,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §182 Encoder training fixes from the papers (row 202)
 - §183 Several prototypes per category (row 204)
 - §184 EVoC for the crowd category clusters (row 213)
+- §185 The late-interaction decision model (rows 210-211)
 
 <!-- END SECTION INDEX -->
 
@@ -11229,3 +11230,57 @@ covers about 78% of first-time payees under every clustering.
   category treemap or a suggested category scheme for a new user (owner's question, 2026-10-05). Part (c), decider reads, is not run.
 
 **Cost:** $0 on Modal (local CPU).
+
+## 185. The late-interaction decision model: seeing the household's full history beats a fixed category summary by 9 points and the best plain encoder by 1.2 (75.7 / 63.4 first-time, calibration error 3.4%); the scoring tweaks and the interaction layers add nothing; more updates do (REAL-27, MODEL-25, MODEL-26)
+
+PLAN steps 210 and 211 (owner, 2026-10-05: "Has anyone built a Jev-like model with a late interaction model?"; "It would be awesome if we
+could make a decision model using this"; "Could we add some layers to the encoder to allow for more interaction between the history and
+output tokens?"). `scripts/li_decider.py`: bge-small token vectors (from row 195's ColBERT), every visible category of the household
+scored at once, softmax over them, cross-entropy + Brier (Clef's calibration term), learnable scale. Row 210 arms (Modal, one seed,
+3,000 steps of one household window, 200 v4 training households): a0 one document per category ("Group: Name | its last 8 payees and
+amounts", rebuilt daily); a1 a0 + the transaction's 5 nearest earlier filings and their categories in the query; a2 soft interaction
+(UWE); a3 + [CLS] cosine (SMART); a4 learned query-token weights; a5 each of the 50 nearest earlier filings plus every category's name as
+its own candidate, a category's probability summed (BELXTR's MML); a6 a5 + soft + hybrid. Row 211 (local 3090, from a1, 3,000 more
+steps): c0 no new layers (the control); x 2 cross-attention blocks from the query's tokens to each option's tokens; xm + 10 memory tokens
+(nearest earlier filings, each its pooled vector and its category's); xml + a listwise layer over the options. All read on the same 50
+held-out households as §182 (every transaction).
+
+**Table 185.1: 50 held-out households, every transaction (359,050; 53,479 first-time payees)**
+
+| model | top-1 / top-3 / top-10 | first-time payee top-1 / top-3 / top-10 | Brier | calibration error (top choice) |
+|---|---|---|---|---|
+| best plain encoder, kNN (§182) | 74.5 / 89.0 / 91.9 | 60.0 / 78.7 / 84.7 | | |
+| a0 one document per category | 65.8 / 85.4 / 95.9 | 60.5 / 83.0 / 94.4 | 0.491 | 5.6% |
+| a2 soft / a3 hybrid / a4 token weights | 66.0 / 65.2 / 65.9 | 60.5 / 60.1 / 60.5 | 0.49-0.50 | 4.6-5.9% |
+| a1 + nearest earlier filings in the query | 75.0 / 91.2 / 96.9 | 62.5 / 83.3 / 93.9 | 0.368 | 4.0% |
+| a5 each earlier filing a candidate (MML) | 74.9 / 90.7 / 96.4 | 62.0 / 82.4 / 93.3 | 0.369 | 1.7% |
+| a6 a5 + soft + hybrid | 74.9 / 90.8 / 96.4 | 62.1 / 82.7 / 93.4 | 0.369 | 1.7% |
+| c0 a1 + 3,000 more steps | **75.7 / 91.4 / 96.9** | **63.4 / 83.8 / 94.0** | **0.363** | 3.4% |
+| x + cross-attention | 75.5 / 91.3 / 96.9 | 63.0 / 83.5 / 94.0 | 0.364 | 2.8% |
+| xm + memory tokens | 75.4 / 91.3 / 96.9 | 62.9 / 83.4 / 93.9 | 0.365 | 3.1% |
+| xml + listwise layer | 75.5 / 91.3 / 96.9 | 63.1 / 83.5 / 93.9 | 0.365 | 2.7% |
+
+Speed checks (a1's data, local 3090): 8 household windows per step trained in 63 s instead of Modal's 17 minutes but read 73.5 / 60.0
+(380 steps; 3x the learning rate 73.3 / 59.7; 1,000 steps 74.2 / 61.1); 3,000 steps of 8 windows matched Modal (74.9 / 62.4, 3.9%) in 7
+minutes. The per-filing arms took ~100 minutes each on Modal (about 3,000 candidate texts per step).
+
+### 185.1 What the step says
+
+- **What the model sees decides it.** A fixed summary of each category (its last 8 payees) loses 9 points overall; giving the
+  transaction its nearest earlier filings (a1) or making each earlier filing a candidate (a5) recovers them and passes the best plain
+  encoder: +1.2 overall and +3.4 on first-time payees after more training (c0), with top-10 at 96.9% (kNN 91.9%).
+- **How it scores barely matters.** Soft interaction, the hybrid score and token weights moved a0 by under 1 point; the interaction
+  layers moved c0 by -0.2 to -0.3 (one seed: noise). On this data, MaxSim over short texts plus the history in the query already carries
+  what the layers could add; the gap to decider (§182: 2-3 points on synthetic items) is not reasoning this model lacks at this scale.
+  The layers do improve calibration slightly (2.7-3.1% against 3.4%).
+- **Calibration is good throughout,** and best with per-filing candidates (1.7%): usable for an auto-filing threshold.
+- **Updates matter more than data per update:** the number of steps, not examples per step, set accuracy; more steps (c0) gave +0.7 /
+  +0.9 over a1.
+- Not yet measured: the best arm on decider's own items and on the owner's budget (matched effort: decider's first trained recipe
+  68.3, the tuned recipe 73.8 on the owner's budget).
+- Speed: the interaction arms' reader built every (transaction, option) pair in Python (GPU a third busy, ~15 minutes per arm); it is now
+  vectorised (identical scores, 1.7x; 2.2x under bf16 with 99.97% the same top choice). Chains use `grep --line-buffered` so logs show
+  progress.
+
+**Cost:** row 210 on Modal, 7 jobs, 26-101 minutes each (about 365 job-minutes, roughly $25 at $4.09 per H100-hour; exact figures from
+`scripts/modal_costs.py --rows 210` once Modal bills the day); speed checks and row 211 $0 (local RTX 3090).

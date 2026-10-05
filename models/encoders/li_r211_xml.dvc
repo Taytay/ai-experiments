@@ -1,0 +1,6 @@
+outs:
+- md5: b0d5a285d66939c6df46361a91239d2a.dir
+  size: 136968066
+  nfiles: 9
+  hash: md5
+  path: li_r211_xml
