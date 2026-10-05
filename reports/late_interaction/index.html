@@ -85,7 +85,7 @@ ol.next li::marker{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
   <div class="eyebrow">YNAB categoriser research · PLAN rows 194–212 · 2026-10-05</div>
   <h1>Late-Interaction Categoriser</h1>
   <p class="lede">A small encoder (bge-small, 33M parameters) that files a transaction into one of the household's own categories by matching tokens against the household's history, trained as a decision model rather than a search engine. It now matches the tuned 4B decider's first recipe at a fraction of the cost, and it reads first-time payees better than any encoder before it.</p>
-  <div class="chips"><span class="chip ok">rows 202, 210 done</span><span class="chip run">row 211 training</span><span class="chip run">row 204 on Modal</span><span class="chip">rows 205, 209, 212 code ready</span></div>
+  <div class="chips"><span class="chip ok">rows 202, 204, 210, 211 done</span><span class="chip">rows 205, 209, 212 code ready</span><span class="chip">EVoC paused</span></div>
 </header>
 
 <section>
@@ -206,7 +206,7 @@ ol.next li::marker{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
   <div class="eyebrow">Next</div>
   <h2>Steps to fold in what we learned</h2>
   <ol class="next">
-    <li><b>Row 211, interaction layers (training now).</b> Cross-attention from the transaction to each category's tokens, memory tokens from past filings, and a listwise layer where options see each other, against a control trained the same number of extra steps without them. Target: the decider-only cases from §180.</li>
+    <li><b>Row 211, interaction layers: done, no gain.</b> Cross-attention, memory tokens and a listwise layer scored 75.4–75.5 against the control's 75.7 (63.4 first-time) after the same extra training; calibration slightly better (2.7–3.1% vs 3.4%). The control, a1 trained longer, is the family's best model (§185 The late-interaction decision model). Row 204's prototypes also lost to MaxSim over every filing (§183).</li>
     <li><b>Compare row 210–211's best on decider's exact items</b> on synthetic households, then read the owner's budget once with two seeds, at matched effort.</li>
     <li><b>Row 205, crowd names in the text</b> ("… | others: Groceries, Household"). A one-household smoke test lifted first-time payees from 47 to 56 without retraining.</li>
     <li><b>Row 212, world knowledge</b> from the merchant database and open-licence Overture places: knowledge pretraining (kind recall 37 → 56% in a CPU smoke), lookup lines trained with realistic wrong-match rates, lookups as memory tokens, the 35B as teacher.</li>

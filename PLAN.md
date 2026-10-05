@@ -115,12 +115,28 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   - E5 WRITTEN (first used by r208s): image with the training overlay baked in; mount only the data a job names.
   - E6 WRITTEN (local check: same update up to bf16 shape noise, step-0 loss 4.462 vs 4.475, so MICRO_SPLIT is set row-wide; r208s measures it): length-sorted micro-batches in training (identical gradients), then the 400 / 600-step check (~$9).
   - E7 DONE (scripts/wait_and_ingest.sh): timestamps in chain logs; auto-ingest when a job list finishes.
-- **State (2026-10-05):** branch plan-192-behav-v4 (PR #94, top of stack #24). Rows 192-200 done (REPORTs 176-178).
-  §179 Pinterest research applicability maps 11 Pinterest papers (references/papers INDEX thread 7) onto rows 196-198 and 201-207; read it before any of
-  them. Next, in order: 201 (where decider and MaxSim disagree), 202 (encoder training fixes), 203 (TransAct-faithful reader),
-  204, 205, 206, 196, 207; then 197, 198, and 191 (split transactions) whenever convenient. Encoders: models/encoders/hist_* (DVC);
-  scripts hist_encoder.py, hist_encoder2.py, hist_fuse.py, hist_amount.py; all read the owner's budget locally, aggregates only.
-  Rule from 178: choose every setting (weights, temperatures, gates) on synthetic households, then read the owner's budget once.
+- **State (2026-10-05, evening):** branch plan-211-interact (PR #101, top of stack #24; stack order ... 94, 95 plan-202, 96 plan-210,
+  97 plan-204, 98 plan-212, 99 plan-209, 100 plan-205, 101 plan-211). Rows 192-204, 208, 210, 211, 213, 214 done (§176-§186; the
+  section index is at the top of REPORT.md). Nothing running.
+  - **Best encoder-family model:** row 211's c0 (`models/encoders/li_r211_c0`, DVC): late-interaction decision model, query = the
+    transaction + its 5 nearest earlier filings, one token document per category, MaxSim, softmax, CE + Brier; 75.7 / 63.4 first-time on
+    50 held-out households (§185 The late-interaction decision model). Interaction layers, scoring tweaks, training fixes, prototypes:
+    no gain (§182, §183, §185). Overview page: reports/late_interaction/index.html (artifact MXtUiVXPx4LLpmqAFfWjJu).
+  - **Next, in order:** (1) score li_r211_c0 (and a5) on decider's own items: hist_agree.py reads hist_* encoders only, so add an
+    adapter for li_decider models, then synthetic, then the owner's budget once, two seeds (matched effort: decider first recipe 68.3,
+    tuned 73.8); (2) row 205 (crowd names in the encoder text: code in scripts/hist_crowd.py, chain r205_crowd.sh; a one-household smoke
+    lifted first-time 47 -> 56 with no retraining); (3) row 212 (world knowledge: build_knowledge_pairs.py, kind_lookup_text.py,
+    knowledge_stage.py, chain r212_know.sh); (4) row 209 (scaling curve 33M -> 4B; li_decider takes any base: PDIM, PROJ, LOWER, POOL;
+    base_survey.py); then 203, 206, 196, 207, 197, 198, 191; row 215 (a game as a decision task) after.
+  - **Paused (owner, 2026-10-05):** EVoC work (rows 213-214 done, §184, §186; references/software/evoc, toponymy, datamapplot); the
+    treemap page from data/interim/r214/treemap_100003.json is not built.
+  - **Open bug:** row 202's random-negative pool arm collapsed to chance loss (b3, b3b; §182).
+  - **Speed rules learned today:** small-model training runs on the 3090 (Modal's H100 was 2-3x slower per step: launch-bound);
+    3,000 steps (updates, not batch size, set accuracy; GROUPS=8 matches); CPU-bound jobs use `modal_app.py --gpu cpu`; synthetic
+    households, mined triplets and li_decider's prepare step are cached on disk; hist_agree.py takes ENCS; chains use
+    `grep --line-buffered`. Check agents' own background tasks too before saying nothing runs.
+  - **Spun off:** ../decision-doom (sibling repo, local git, no remote): DOOM with the late-interaction model, for another agent; stage 0
+    is the owner's licence decision on ViZDoom's GPL engine.
 - **Proposed, not started:** 184 (a merchant description line as the fallback for payees no one has filed; owner: needs web-search
   agents or a strong model to describe the top 100k payees); a real crowd test on the owner's budget when the owner brings crowd data
   (owner: "I'll get you better data another time"); 178 (prompt fixes: similar rows only above thresholds, corporate-suffix stripping);
