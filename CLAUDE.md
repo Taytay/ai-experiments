@@ -122,7 +122,7 @@ Both sides:
   says whether it is present on this side.
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
-  so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
+  so far. The `research-papers` skill (`.claude/skills/research-papers`, copied from the owner's taytays_stuff 2026-10-05) writes to `references/papers/` by default and keeps arXiv TeX source (`paper_flat.tex`, gitignored).
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
 - After a training run: `just push-models` (`dvc add` on each adapter dir present, then
