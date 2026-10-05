@@ -143,15 +143,20 @@ def score_private(items: list, reader: str, layout: str, adapter_from: str) -> s
     import os
     import shutil
     import subprocess
+    import time
+    t0 = time.time()
     _prepare()
+    t1 = time.time()
     if adapter_from:
         shutil.copytree(f"/out/{adapter_from}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    t2 = time.time()
     cmd = ("uv run --with transformers==5.17.0 --with flash-linear-attention --with 'peft>=0.21' --with torch==2.13.0 --with torchvision==0.28.0 "
            "python scripts/real_budget_eval.py stream")
     p = subprocess.run(cmd, shell=True, cwd=REPO, input=json.dumps(items), capture_output=True, text=True,
                        env={**os.environ, "BUDGET": "private", "READER": reader, "LAYOUT": layout})
     progress = [l for l in p.stderr.splitlines() if "items/s" in l]
-    print(f"{len(items)} items, exit {p.returncode}; " + (progress[-1].strip() if progress else ""), flush=True)
+    print(f"{len(items)} items, exit {p.returncode}; " + (progress[-1].strip() if progress else "")
+          + f"; phases: prepare {t1 - t0:.0f}s, adapter copy {t2 - t1:.0f}s, score process (overlay install + load + scoring) {time.time() - t2:.0f}s", flush=True)
     if p.returncode != 0:
         kinds = [l.split(":")[0] for l in p.stderr.splitlines() if l and not l.startswith(" ") and ("Error" in l.split(":")[0] or "Exception" in l.split(":")[0])]
         raise RuntimeError(f"scoring failed: {kinds[-1] if kinds else 'exit ' + str(p.returncode)}")
@@ -186,8 +191,10 @@ def embed_private_call(names: list, reader: str, adapter_from: str) -> bytes:
         return embed_private.remote(names, reader, adapter_from)
 
 
-def private_scores(items: list, reader: str, layout: str, adapter_from: str, shards: int = 8, gpu: str = "H100"):
-    """Local side: whole days per shard (the per-day cached prefix needs them together), shards scored in parallel; yields score lines."""
+def private_scores(items: list, reader: str, layout: str, adapter_from: str, shards: int = int(os.environ.get("PRIVATE_SHARDS", "2")), gpu: str = "H100"):
+    """Local side: whole days per shard (the per-day cached prefix needs them together), shards scored in parallel; yields score lines.
+    Row 208 E4: 2 shards by default (PRIVATE_SHARDS), not 8: each container pays ~1-4.5 min start and ~2 min overlay install before
+    scoring (reports/workflow_review_2026-10-05.md item 2)."""
     from collections import defaultdict
     days = defaultdict(list)
     for it in items:

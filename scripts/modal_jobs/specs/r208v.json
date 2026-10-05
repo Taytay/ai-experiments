@@ -1,0 +1,1 @@
+{"row": "208v", "base": {"READER": "vllm", "TAG_SUFFIX": "_vllm", "PLAN_ROWS": "208"}, "arms": {"g4": {}}, "reads": ["realstyle_v4g_test"], "read_only": {"g4": "r190-g"}, "seeds": [0]}

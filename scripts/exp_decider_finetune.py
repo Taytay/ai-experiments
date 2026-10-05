@@ -28,6 +28,7 @@ from ai_experiments.paths import ROOT
 MODEL = os.environ.get("MODEL", "Mapika/decider-2b")  # row 79: a plain Qwen3.5 (Qwen/Qwen3.5-2B) trained in decider's layout and readout
 DECIDER_CODE = "Mapika/decider-2b"  # the repo whose decider/ package (prompt.build, the letter table) renders the episodes
 STEPS, MICRO, LR = int(os.environ.get("STEPS", "800")), int(os.environ.get("MICRO", "16")), float(os.environ.get("LR", "1e-4"))
+MICRO_SPLIT = int(os.environ.get("MICRO_SPLIT", "1"))  # row 208 E6: length-sorted groups per step (same update; less padding); 1 = one batch
 SEED = int(os.environ.get("SEED", "0"))
 AUX_LM = float(os.environ.get("AUX_LM", "0"))  # row 79: + w x the token loss on the shot labels inside the Context (the all-label loss, same forward); needs ALL_LABELS=1
 LAYOUT = os.environ.get("LAYOUT", "")  # row 111 (owner, 2026-09-29): "" (decider's layout), options | labelled | labelled_shots (oneslot.build_layout)
@@ -221,7 +222,7 @@ def main():
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / 20) * max(0.0, 1 - s / STEPS))
     pad = tok.pad_token_id or 0
     ema = [p.detach().clone().float() for p in params] if EMA else None
-    model.train(); t0 = time.time(); losses = []; n_tok = 0
+    model.train(); t0 = time.time(); losses = []; n_tok = 0; n_padded = 0
     print(f"   {len(eps)} episodes, {STEPS} steps x {MICRO}, lr {LR}, {sum(p.numel() for p in params)} trainable", flush=True)
     for step in range(STEPS):
         def pick():
@@ -238,55 +239,69 @@ def main():
                                           rationale=e[4] if AUX_LM and len(e) > 4 else None) for e in picked]  # row 177
         else:
             built = [oneslot.build(P, tok, e[0], QUESTION, e[1], e[2], rng, labels=LABELS) for e in picked]
-        T = -(-max(len(b["ids"]) for b in built) // 64) * 64; n_tok += sum(len(b["ids"]) for b in built)
-        ids = torch.full((len(built), T), pad, dtype=torch.long)
-        att = torch.zeros_like(ids)
-        for i, b in enumerate(built):
-            ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
-        with torch.autocast("cuda", dtype=torch.bfloat16, enabled=FULL_FT):
-            h = (lm.model if FULL_FT else model.base_model.model.model)(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
-        N = max(len(b["labs"]) for b in built)  # each question's own label tokens; padded options at -inf
-        z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float()
-                               + (ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")]) if ptr is not None else 0.0),
-                               (0, N - len(b["labs"])), value=float("-inf"))
-                         for i, b in enumerate(built)])
-        soft = torch.tensor([b["gold"] < 0 for b in built], device="cuda")  # row 84 soft: evidence-free, a uniform target over the options
-        gold = torch.tensor([max(b["gold"], 0) for b in built], device="cuda")
-        lz = F.log_softmax(z, -1).masked_fill(torch.isinf(z), 0.0)
-        per = torch.where(soft, -lz.sum(-1) / torch.tensor([len(b["labs"]) for b in built], device="cuda"), -lz.gather(1, gold[:, None])[:, 0])
-        for i, (e, b) in enumerate(zip(picked, built)):  # row 123: the teacher's distribution mixed into the target
-            td = TEACH.get(e[0])
-            if td and b["gold"] >= 0 and e[0] not in SOFT_CTX and len(td) == len(e[1]):
-                tv = [(1 - TEACH_W) * (oi == e[2]) + TEACH_W * td[oi] for oi in b["perm"]]
-                tv = torch.tensor(tv + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
-                per = per.clone(); per[i] = -(tv * lz[i]).sum()
-        for i, (e, b) in enumerate(zip(picked, built)):  # row 86 v2: a split target where the user's choice is noisy or random
-            dist = SOFT_CTX.get(e[0])
-            if dist and b["gold"] >= 0:
-                tv = torch.tensor([dist.get(e[1][oi], 0.0) for oi in b["perm"]] + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
-                per = per.clone(); per[i] = -(tv * lz[i]).sum()
-        loss = per.mean()
+        n_tok += sum(len(b["ids"]) for b in built)
+        aux_of = [[] for _ in built]  # (position, target) of every shot-label token, per item: the auxiliary LM loss's terms
         if AUX_LM:  # the shot labels' tokens in "Context:\n<state>" (the same ids build() starts with), each predicted from the position before
-            rows, pos, tgt = [], [], []
             for i, e in enumerate(picked):
                 if "aux" in built[i]:  # row 111: the layout builder located the shot-label tokens itself
-                    for t, y in built[i]["aux"]:
-                        rows.append(i); pos.append(t); tgt.append(y)
+                    aux_of[i] = [(t, y) for t, y in built[i]["aux"]]
                     continue
                 enc = tok("Context:\n" + e[0], add_special_tokens=False, return_offsets_mapping=True)
                 n = len(built[i]["ids"])
                 for t, (a0, b0) in enumerate(enc["offset_mapping"]):
                     if 0 < t < n and any(s0 + 9 < b0 and a0 < s1 + 9 for s0, s1 in e[3]):  # 9 = len("Context:\n")
-                        rows.append(i); pos.append(t - 1); tgt.append(enc["input_ids"][t])
-            if tgt:
+                        aux_of[i].append((t - 1, enc["input_ids"][t]))
+        n_aux = sum(len(x) for x in aux_of)
+        # row 208 E6: the step's items in MICRO_SPLIT length-sorted groups, gradients accumulated; each group's loss is its share of the
+        # step's mean (item losses / MICRO, aux token losses / all aux tokens), so the update equals the one-batch step up to float order
+        order = sorted(range(len(built)), key=lambda i: len(built[i]["ids"]))
+        size = -(-len(order) // MICRO_SPLIT)
+        loss_total = 0.0
+        for gi in [order[k:k + size] for k in range(0, len(order), size)]:
+            gb, gp = [built[i] for i in gi], [picked[i] for i in gi]
+            T = -(-max(len(b["ids"]) for b in gb) // 64) * 64
+            n_padded += T * len(gb)
+            ids = torch.full((len(gb), T), pad, dtype=torch.long)
+            att = torch.zeros_like(ids)
+            for i, b in enumerate(gb):
+                ids[i, :len(b["ids"])] = torch.tensor(b["ids"]); att[i, :len(b["ids"])] = 1
+            with torch.autocast("cuda", dtype=torch.bfloat16, enabled=FULL_FT):
+                h = (lm.model if FULL_FT else model.base_model.model.model)(input_ids=ids.cuda(), attention_mask=att.cuda()).last_hidden_state
+            N = max(len(b["labs"]) for b in gb)  # each question's own label tokens; padded options at -inf
+            z = torch.stack([F.pad(F.linear(h[i, b["slot"]], head_w[torch.tensor(b["labs"], device="cuda")]).float()
+                                   + (ptr(h[i, b["slot"]], h[i, torch.tensor(b["opt_pos"], device="cuda")]) if ptr is not None else 0.0),
+                                   (0, N - len(b["labs"])), value=float("-inf"))
+                             for i, b in enumerate(gb)])
+            soft = torch.tensor([b["gold"] < 0 for b in gb], device="cuda")  # row 84 soft: evidence-free, a uniform target over the options
+            gold = torch.tensor([max(b["gold"], 0) for b in gb], device="cuda")
+            lz = F.log_softmax(z, -1).masked_fill(torch.isinf(z), 0.0)
+            per = torch.where(soft, -lz.sum(-1) / torch.tensor([len(b["labs"]) for b in gb], device="cuda"), -lz.gather(1, gold[:, None])[:, 0])
+            for i, (e, b) in enumerate(zip(gp, gb)):  # row 123: the teacher's distribution mixed into the target
+                td = TEACH.get(e[0])
+                if td and b["gold"] >= 0 and e[0] not in SOFT_CTX and len(td) == len(e[1]):
+                    tv = [(1 - TEACH_W) * (oi == e[2]) + TEACH_W * td[oi] for oi in b["perm"]]
+                    tv = torch.tensor(tv + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
+                    per = per.clone(); per[i] = -(tv * lz[i]).sum()
+            for i, (e, b) in enumerate(zip(gp, gb)):  # row 86 v2: a split target where the user's choice is noisy or random
+                dist = SOFT_CTX.get(e[0])
+                if dist and b["gold"] >= 0:
+                    tv = torch.tensor([dist.get(e[1][oi], 0.0) for oi in b["perm"]] + [0.0] * (lz.shape[1] - len(b["perm"])), device="cuda")
+                    per = per.clone(); per[i] = -(tv * lz[i]).sum()
+            loss = per.sum() / len(built)
+            rows = [i for i, g in enumerate(gi) for _ in aux_of[g]]
+            if rows:
+                pos = [t for g in gi for t, _ in aux_of[g]]
+                tgt = [y for g in gi for _, y in aux_of[g]]
                 lg = F.linear(h[torch.tensor(rows, device="cuda"), torch.tensor(pos, device="cuda")], head_w).float()
-                loss = loss + AUX_LM * F.cross_entropy(lg, torch.tensor(tgt, device="cuda"))
-        loss.backward(); torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
+                loss = loss + AUX_LM * F.cross_entropy(lg, torch.tensor(tgt, device="cuda"), reduction="sum") / n_aux
+            loss.backward()
+            loss_total += loss.item()
+        torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); opt.zero_grad(set_to_none=True)
         if EMA:
             with torch.no_grad():
                 for e_, p_ in zip(ema, params):
                     e_.mul_(EMA).add_(p_.detach().float(), alpha=1 - EMA)
-        losses.append(loss.item())
+        losses.append(loss_total)
         if step % 50 == 0 or step == STEPS - 1:
             print(f"   step {step} loss {sum(losses[-50:]) / len(losses[-50:]):.3f} ({(time.time() - t0) / 60:.1f} min)", flush=True)
     if EMA:
@@ -304,7 +319,7 @@ def main():
         from ai_experiments.pointer import FILE
         torch.save(ptr.state_dict(), OUT_DIR / FILE)
         print(f"   pointer gate {ptr.gate.item():.3f}", flush=True)
-    return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
+    return dict(train_minutes=round((time.time() - t0) / 60, 1), tokens=n_tok, padded_tokens=n_padded, micro_split=MICRO_SPLIT, final_loss=round(sum(losses[-50:]) / len(losses[-50:]), 3),
                 peak_alloc_GiB=round(torch.cuda.max_memory_allocated() / 2 ** 30, 2), adapter=str(OUT_DIR.relative_to(ROOT)), n_episodes=len(eps))
 
 

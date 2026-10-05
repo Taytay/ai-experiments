@@ -1,0 +1,37 @@
+[
+ {
+  "tag": "r208v-g4-s0",
+  "env": {
+   "DBEP": "0.5",
+   "FOLD": "0",
+   "RENAME": "0.5",
+   "MICRO": "16",
+   "STEPS": "800",
+   "ALL_LABELS": "1",
+   "AUX_LM": "1",
+   "LABELS": "rand255",
+   "MISLEAD": "mislead_v1",
+   "ALT": "0.1",
+   "ALT_SOFT": "1",
+   "LOOKUP": "0.1",
+   "OVERRIDE": "0.1",
+   "EVFREE": "0.1",
+   "EVFREE_MODE": "soft",
+   "MODEL": "Mapika/decider-4b",
+   "EMPTY": "20",
+   "LAYOUT": "labelled_shots",
+   "OTHERS": "0.5",
+   "REALSTYLE": "0.25",
+   "REALSTYLE_FILE": "realstyle_v4g_train.jsonl",
+   "READER": "vllm",
+   "TAG_SUFFIX": "_vllm",
+   "PLAN_ROWS": "208",
+   "SEED": "0",
+   "RUN_TAG": "h100bf16st800",
+   "ADAPTERS_FROM": "r190-g-s0"
+  },
+  "cmds": [
+   "FAMILY=decider MODEL=Mapika/decider-4b ADAPTER=decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_rs25v4g_lora CONDS=noctx LABELS=rand255 LAYOUT=labelled_shots ITEMS_SET=realstyle_v4g_test USERS=100000,100001,100002,100003,100004,100005,100006,100007,100008,100009,100010,100011,100012,100013,100014,100015,100016,100017,100018,100019,100020,100021,100022,100023,100024,100025,100026,100027,100028,100029,100030,100031,100032,100033,100034,100035,100036,100037,100038,100039,100040,100041,100042,100043,100044,100045,100046,100047,100048,100049,100050,100051,100052,100053,100054,100055,100056,100057,100058,100059,100060,100061,100062,100063,100064,100065,100066,100067,100068,100069,100070,100071,100072,100073,100074,100075,100076,100077,100078,100079,100080,100081,100082,100083,100084,100085,100086,100087,100088,100089,100090,100091,100092,100093,100094,100095,100096,100097,100098,100099 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/exp_decision_models.py"
+  ]
+ }
+]
