@@ -1,0 +1,43 @@
+{
+  "id": "2606.00422",
+  "version": "v1",
+  "id_versioned": "2606.00422v1",
+  "title": "UniPinRec: Unifying Generative Retrieval and Ranking at Pinterest Scale",
+  "authors": [
+    "Hanyu Li",
+    "Yi-Ping Hsu",
+    "Aditya Mantha",
+    "Prabhat Agarwal",
+    "Laksh Bhasin",
+    "Jialu Wang",
+    "Hongtao Lin",
+    "Bella Huang",
+    "Yaxin Li",
+    "Xinyi Li",
+    "Chuxi Wang",
+    "Kousik Rajesh",
+    "Hooshmand Shokri Razaghi",
+    "Shunyao Li",
+    "Zongyue Qin",
+    "Jaewon Yang",
+    "James Li",
+    "Dhruvil Deven Badani",
+    "Jiajing Xu",
+    "Charles Rosenberg"
+  ],
+  "published": "2026-05-29",
+  "updated": "2026-05-29",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.LG"
+  ],
+  "comment": "",
+  "journal_ref": "Proceedings of the 20th ACM Conference on Recommender Systems (RecSys '26), 2026",
+  "doi": "10.1145/3773078.3831921",
+  "abstract": "Modern recommendation systems predominantly train retrieval and ranking as separate models despite both increasingly relying on large transformers encoding the same user behavior data, duplicating parameters, compute, and serving cost. Prior work unifies the model architecture but not the full pipeline: input formats, training procedures, and serving stacks remain fragmented across stages. We present UniPinRec, which achieves full-stack unification of retrieval and ranking at Pinterest: one input format, one model, one training stage, deployed within existing serving infrastructure. A shared transformer encodes the user action sequence into candidate-independent representations that branch into retrieval (ANN dot-product) and ranking (cross-attention) via task-specific heads. Three ideas make this work: (1) Masked Action Modeling (MAM) eliminates interleaving, enabling weight sharing without doubling context length; (2) Blended training examples pair action sequences with feedview impression slates to satisfy both objectives jointly; (3) Cross-stage KV cache sharing reuses user-history computation from retrieval for ranking, reducing total FLOPs versus serving two independent models. Deployed in the Pinterest core surfaces, UniPinRec delivers approximately +1% online engagement lift while cutting end-to-end serving latency by 11.1% and lifting QPS by 63.6%. To our knowledge, this is the first full-stack unification of retrieval and ranking, covering inputs, model, training and serving, deployed in a production recommendation system.",
+  "abs_url": "https://arxiv.org/abs/2606.00422",
+  "pdf_url": "https://arxiv.org/pdf/2606.00422v1",
+  "src_url": "https://export.arxiv.org/src/2606.00422v1",
+  "metadata_source": "api"
+}

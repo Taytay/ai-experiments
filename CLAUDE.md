@@ -22,7 +22,7 @@ we collected, `src/` is library code, `scripts/` is entry points.
 |---|---|---|
 | `PLAN.md` | Ordered queue, status per step, log | every step |
 | `reports/QUESTIONS.md` | Defines each question ID (what was seen, proposed experiment) | a new question appears, or a `Status:` line is added |
-| `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end | a step finishes |
+| `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end. Cite a section as "§N short title" (e.g. "§179 Pinterest research applicability"), never a bare number: section numbers are not PLAN row numbers. A new section adds a line to `reports/report_titles.tsv`, then `uv run python scripts/report_index.py` rebuilds the index at the top (PLAN rows read from the Result column) | a step finishes |
 | `references/SURVEY.md` | What 34 papers say about each ID | more papers are read |
 | `references/papers/<id>/summary.md` | One paper each; `INDEX.md` lists them by thread | a paper is read |
 | `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `items.py` (the frozen eval sets and their hashes), `scoring.py` (per-item, per-option log-prob records), `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
@@ -53,7 +53,7 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
   `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
 - Watching a job list (2026-09-27: eleven watchers sat "running" for hours after their jobs finished and their results went unnoticed):
-  - start the watcher as a script file, as a background task: `scripts/wait_modal_jobs.sh r83 <scratchpad>/r83.log`. Never an
+  - start the watcher as a script file, as a tracked background task: `scripts/wait_and_ingest.sh r83 logs/r83_launch.log` (it also pulls every tag back and ingests it when the client exits; `scripts/wait_modal_jobs.sh` only waits). Never an
     inline `until ! pgrep -f "modal_jobs/r83.json" ...` loop: the task's own shell carries the pattern in its command line, so pgrep
     matches the watcher itself and it never exits;
   - one watcher per job list, started right after the launch; when it reports, ingest at once;
@@ -75,6 +75,18 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+- New decider rows build their job list with `scripts/modal_jobs/make_jobs.py <spec>` (a spec in `scripts/modal_jobs/specs/`: arms, the row's
+  reads, variant reads per arm, drills on or off, seeds, read-only arms); it takes adapter names from the trainer itself and prints the
+  estimated cost per job before anything launches. History-encoder readers (kNN, MaxSim) run through `scripts/hist_fast.py` (GPU, cached).
+- Do not duplicate work (owner, 2026-10-05: "Let's not duplicate work here! That's just silly."): screen a new recipe or arm with one seed;
+  train the second seed only for arms that win or land within seed noise of the best (1-2 points on the owner's budget), and call
+  nothing a gain on the owner's budget before two seeds agree. Each job reads only the test sets its row compares (not every set
+  from earlier rows); second seeds skip the drills and blind sets unless the row is about them. Synthetic reads may run on the
+  local 3090 when it is free, leaving Modal to train.
+- Cost of every Modal job (owner, 2026-10-05): `scripts/modal_app.py` records each launch (app id, PLAN rows from `PLAN_ROWS` or the job-list
+  name, job tags, minutes) in `reports/modal_launches.jsonl`; `uv run python scripts/modal_costs.py` joins it with Modal's billing report into
+  `reports/modal_costs.md` (per row, per launch, per job by minutes). Every REPORT section whose step used Modal ends with a **Cost** line from
+  `modal_costs.py --rows N` (local-GPU steps say $0). Billing is reported for complete days, so run it the day after.
 - Report every result with the scorecard (`ai_experiments.scorecard`: top-1, top-3, calibrated bits, auto-file coverage, skill over
   the no-model cascade) on held-out users, and add a blind strong-reader ceiling (`scripts/blind_ceiling.py`) for a new item set.
 
@@ -123,7 +135,7 @@ Both sides:
   says whether it is present on this side.
 - Paper APIs (arXiv, Semantic Scholar) rate-limit hard. One sequential process only, never in
   parallel, never from subagents. `references/papers/*/paper.txt` already holds every paper read
-  so far. The `research-papers` skill defaults to `docs/papers`; pass `--dest references/papers`.
+  so far. The `research-papers` skill (`.claude/skills/research-papers`, copied from the owner's taytays_stuff 2026-10-05) writes to `references/papers/` by default and keeps arXiv TeX source (`paper_flat.tex`, gitignored).
 - Do not commit PDFs or TeX archives under `references/papers/` (gitignored); text and summaries only.
 - Commit code before a long run so the tracker records a clean hash. Otherwise commit only when asked.
 - After a training run: `just push-models` (`dvc add` on each adapter dir present, then

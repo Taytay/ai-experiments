@@ -1,0 +1,27 @@
+{
+  "id": "2508.16793",
+  "version": "v1",
+  "id_versioned": "2508.16793v1",
+  "title": "Bootstrapping Conditional Retrieval for User-to-Item Recommendations",
+  "authors": [
+    "Hongtao Lin",
+    "Haoyu Chen",
+    "Jaewon Jang",
+    "Jiajing Xu"
+  ],
+  "published": "2025-08-22",
+  "updated": "2025-08-22",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.LG"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "10.1145/3640457.3688057",
+  "abstract": "User-to-item retrieval has been an active research area in recommendation system, and two tower models are widely adopted due to model simplicity and serving efficiency. In this work, we focus on a variant called \\textit{conditional retrieval}, where we expect retrieved items to be relevant to a condition (e.g. topic). We propose a method that uses the same training data as standard two tower models but incorporates item-side information as conditions in query. This allows us to bootstrap new conditional retrieval use cases and encourages feature interactions between user and condition. Experiments show that our method can retrieve highly relevant items and outperforms standard two tower models with filters on engagement metrics. The proposed model is deployed to power a topic-based notification feed at Pinterest and led to +0.26\\% weekly active users.",
+  "abs_url": "https://arxiv.org/abs/2508.16793",
+  "pdf_url": "https://arxiv.org/pdf/2508.16793v1",
+  "src_url": "https://export.arxiv.org/src/2508.16793v1",
+  "metadata_source": "api"
+}

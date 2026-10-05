@@ -1,0 +1,29 @@
+{
+  "id": "2606.00324",
+  "version": "v1",
+  "id_versioned": "2606.00324v1",
+  "title": "LLMs Need Encoders for Semantic IDs Too",
+  "authors": [
+    "Xiangyi Chen",
+    "Zelun Wang",
+    "Xinyi Li",
+    "Yi-Ping Hsu",
+    "Jaewon Yang",
+    "Jiajing Xu"
+  ],
+  "published": "2026-05-29",
+  "updated": "2026-05-29",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.AI"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Multimodal LLMs use dedicated encoders to bridge non-language modalities (vision encoders for images, depth models for audio codec tokens) because raw token embeddings alone cannot capture modality-specific structure. We argue that Semantic IDs (SIDs), the hierarchical codes used in generative recommendation, constitute another such modality: a SID level token's meaning depends on its prefix context, yet current systems simply add SID tokens to the vocabulary and rely on training to learn these context-dependent meanings from scratch. We propose PrefixMem, a lightweight SID encoder based on prefix n-gram memory tables that provides the LLM with structured, prefix-conditioned representations at SID token positions. Like vision encoders in multimodal LLMs, PrefixMem can be pre-trained independently and then attached to any LLM for joint training. We evaluate on large-scale data from Pinterest across multiple LLM families and show that PrefixMem improves deepest-level SID accuracy by up to 46% relative and full-SID retrieval recall by up to 22% relative at matched training compute. The encoder's benefit concentrates on hard examples where greedy decoding fails, with up to 77% relative accuracy gains, confirming that SID tokens benefit from a dedicated encoder just as other non-language modalities do.",
+  "abs_url": "https://arxiv.org/abs/2606.00324",
+  "pdf_url": "https://arxiv.org/pdf/2606.00324v1",
+  "src_url": "https://export.arxiv.org/src/2606.00324v1",
+  "metadata_source": "api"
+}

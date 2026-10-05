@@ -1,0 +1,3 @@
+{"row": "208s", "base": {"READER": "vllm", "MICRO_SPLIT": "4", "PLAN_ROWS": "208"},
+ "arms": {"g4st800": {"STEPS": "800"}, "g4st600": {"STEPS": "600"}, "g4st400": {"STEPS": "400"}},
+ "reads": ["realstyle_v4g_test", "blind_v1"], "seeds": [0]}

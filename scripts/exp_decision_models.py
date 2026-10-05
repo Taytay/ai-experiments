@@ -16,7 +16,8 @@ QUESTION, and the options are the user's category names; every model is read in 
 
 env: FAMILY, MODEL (HF id), ITEMS_SET (a frozen set in REAL-6's format under data/processed, e.g. poi1_v1_kinds; empty = REAL-6 v1),
      CONDS (noctx / ctx: the item's prompt or prompt_ctx), USERS (comma list; default the set's fold 0: user % 4 == 0), SMOKE=1 (8 items),
-     TEMP (1.0: raw logits; the scorecard fits its own temperature), BATCH.
+     TEMP (1.0: raw logits; the scorecard fits its own temperature), BATCH, READER (hf | vllm; row 208), VLLM_SPEC, MERGED_DIR,
+     READS_FILE (row 208: a JSON list of {ITEMS_SET, USERS} read in one process; with READER=vllm one engine for all).
 Licences (owner, 2026-09-26: open licences only; checked 2026-09-27): every model here and its base is Apache-2.0 on its model card
 (decider, Decision-1.0 and its Qwen3.5 bases, kev and its Qwen3.5-Base bases, Von and ModernBERT-large); the code is Apache-2.0 (the
 decider/ package in the model repos, Decision's code/ at DECISION_CODE_REV, kev at KEV_SHA, von-sdk) or MIT (flash-linear-attention).
@@ -53,6 +54,8 @@ KEV_SHA = os.environ.get("KEV_SHA", "5920c5f")
 ADAPTER = os.environ.get("ADAPTER", "")
 ORDER_SEED = os.environ.get("ORDER_SEED", "")  # row 50: every item's options shuffled by this seed before scoring (and decider's own label order too), scores mapped back  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
 EXTRA_OPTS = [o for o in os.environ.get("EXTRA_OPTS", "").split("|") if o]  # row 84: options appended to every question (abstain options offered at inference); their scores follow the real options'
+READER = os.environ.get("READER", "hf")  # row 208 E3: hf | vllm (FAMILY=decider; same prompts and readout, scripts/vllm_slot.py)
+VLLM_SPEC = os.environ.get("VLLM_SPEC", "vllm==0.31.0")  # the vllm checked against the HF reader (row 208 E3); the Modal image has it cached
 LABELS = os.environ.get("LABELS", "letters")  # FAMILY=decider: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 
@@ -61,7 +64,20 @@ USERS = os.environ.get("USERS") or ",".join(str(u) for u in sorted({it["user"] f
 ITEMS = [it for it in DOC["items"] if str(it["user"]) in USERS.split(",")]
 if SMOKE:
     ITEMS = ITEMS[:8]
-TAG = f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{ITEMS_SET or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_lay' + LAYOUT if LAYOUT else ''}{'_dow' if DOW_FIRST else ''}{'_desc' if DESC else ''}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}"
+
+
+def tag_of(items_set):
+    return f"dm_{FAMILY}_{ADAPTER or MODEL.split('/')[-1]}_{items_set or 'real6'}{'_ord' + ORDER_SEED if ORDER_SEED else ''}{'' if LABELS == 'letters' else '_lab' + LABELS}{'_lay' + LAYOUT if LAYOUT else ''}{'_dow' if DOW_FIRST else ''}{'_desc' if DESC else ''}{'_xo' + str(len(EXTRA_OPTS)) if EXTRA_OPTS else ''}" + os.environ.get("TAG_SUFFIX", "")
+
+
+def load_set(items_set, users=""):
+    """(doc, items, users string) of one read: the set's items for USERS (default fold 0: user % 4 == 0)"""
+    doc = json.loads((PROCESSED / f"{items_set}.json").read_text()) if items_set else R6.load("v1")
+    users = users or ",".join(str(u) for u in sorted({it["user"] for it in doc["items"]}) if u % 4 == 0)
+    return doc, [it for it in doc["items"] if str(it["user"]) in users.split(",")], users
+
+
+TAG = tag_of(ITEMS_SET)
 
 
 def state_of(it, cond):
@@ -76,6 +92,70 @@ def options_of(it):
 
 
 # --- the four families: each returns score(items, cond) -> list of per-option log-prob lists --------------------------------
+
+def build_item(P, tok, it, cond, extra):
+    """decider's one-slot prompt for one item: token ids up to the answer slot, the label token ids, the label -> option permutation"""
+    from ai_experiments import oneslot
+    rng = random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else ""))
+    if LAYOUT or DOW_FIRST:
+        return oneslot.build_layout(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"], rng, labels=LABELS,
+                                    layout=LAYOUT or "options", dow=DOW_FIRST, desc=DESC, relist=bool(extra.get("relist")))
+    return oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"], rng, labels=LABELS)
+
+
+def decider_vllm(P, tok, path, full, extra):
+    """READER=vllm (row 208 E3): the same prompts and readout served by vLLM (scripts/vllm_slot.py, its own environment). The LoRA is
+    merged once into a model directory under MERGED_DIR (reused by later reads in the same container) and the base and tokenizer files
+    are copied beside it; temperature 1 (TEMP must be 1)."""
+    import shutil
+    import subprocess
+    import tempfile
+    assert TEMP == 1.0, "READER=vllm reads at temperature 1"
+    model_dir = Path(path)
+    if ADAPTER and not full:
+        model_dir = Path(os.environ.get("MERGED_DIR", "/tmp/merged")) / ADAPTER
+        if not (model_dir / "config.json").exists():
+            import torch
+            from peft import PeftModel
+            from transformers import AutoModelForCausalLM
+            t0 = time.time()
+            lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
+            lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
+            lm.save_pretrained(str(model_dir))
+            tok.save_pretrained(str(model_dir))
+            for f in Path(path).iterdir():  # processor / chat files vLLM may want
+                if f.suffix in (".json", ".jinja", ".txt") and not (model_dir / f.name).exists():
+                    shutil.copy(f, model_dir / f.name)
+            del lm
+            torch.cuda.empty_cache()
+            print(f"merged {ADAPTER} -> {model_dir} in {time.time() - t0:.0f}s", flush=True)
+
+    def score(items, cond):
+        return score_many([(items, cond)])[0]
+
+    def score_many(reads):
+        """several reads (items, cond) through one vLLM engine: one engine start (~2.5 min on the H100) for the whole job"""
+        built_all = [[build_item(P, tok, it, cond, extra) for it in items] for items, cond in reads]
+        built = [b for bs in built_all for b in bs]
+        with tempfile.TemporaryDirectory() as td:
+            src, dst = Path(td, "prompts.json"), Path(td, "out.json")
+            src.write_text(json.dumps([dict(ids=b["ids"][:b["slot"] + 1], labs=b["labs"]) for b in built]))
+            cmd = ["uv", "run", "--no-project", "--with", VLLM_SPEC, "python", str(ROOT / "scripts" / "vllm_slot.py"), str(model_dir), str(src), str(dst)]
+            subprocess.run(cmd, check=True, cwd=ROOT)
+            lps = json.loads(dst.read_text())
+        flat = []
+        for b, lp in zip(built, lps):
+            back = [0.0] * len(b["labs"])
+            for j, oi in enumerate(b["perm"]):  # label j shows option perm[j]
+                back[oi] = lp[j]
+            flat.append(back)
+        out, k = [], 0
+        for bs in built_all:
+            out.append(flat[k:k + len(bs)]); k += len(bs)
+        return out
+    score.many = score_many
+    return score
+
 
 def decider():
     import importlib
@@ -92,13 +172,15 @@ def decider():
     full = ADAPTER and (ROOT / "models" / "adapters" / ADAPTER / "config.json").exists() and not (ROOT / "models" / "adapters" / ADAPTER / "adapter_config.json").exists()
     if full:  # row 156: a fully fine-tuned model directory from exp_decider_finetune.py FULL_FT=1
         path = str(ROOT / "models" / "adapters" / ADAPTER)
+    from ai_experiments import oneslot
+    adir = ROOT / "models" / "adapters" / ADAPTER if ADAPTER else None
+    extra = json.loads((adir / "oneslot_extra.json").read_text()) if adir and (adir / "oneslot_extra.json").exists() else {}  # row 152
+    if READER == "vllm" and not extra.get("pointer"):
+        return decider_vllm(P, tok, path, full, extra)
     lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
     if ADAPTER and not full:  # a LoRA from exp_decider_finetune.py, merged for scoring
         from peft import PeftModel
         lm = PeftModel.from_pretrained(lm, str(ROOT / "models" / "adapters" / ADAPTER)).merge_and_unload().eval()
-    from ai_experiments import oneslot
-    adir = ROOT / "models" / "adapters" / ADAPTER if ADAPTER else None
-    extra = json.loads((adir / "oneslot_extra.json").read_text()) if adir and (adir / "oneslot_extra.json").exists() else {}  # row 152
     ptr = None
     if extra.get("pointer"):
         from ai_experiments.pointer import FILE, OptionPointer
@@ -110,12 +192,7 @@ def decider():
         out = []
         for k in range(0, len(items), BATCH):
             chunk = items[k:k + BATCH]
-            built = [oneslot.build_layout(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
-                                          random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS, layout=LAYOUT or "options", dow=DOW_FIRST, desc=DESC,
-                                          relist=bool(extra.get("relist")))
-                     if LAYOUT or DOW_FIRST else
-                     oneslot.build(P, tok, state_of(it, cond), it.get("question", QUESTION), options_of(it), it["answer"],
-                                   random.Random(it["id"] + (f"-{ORDER_SEED}" if ORDER_SEED else "")), labels=LABELS) for it in chunk]
+            built = [build_item(P, tok, it, cond, extra) for it in chunk]
             T = -(-max(len(b["ids"]) for b in built) // 64) * 64  # as decider's own collate: few shapes for fla's per-shape tuning
             ids = torch.full((len(built), T), tok.pad_token_id or 0, dtype=torch.long)
             att = torch.zeros_like(ids)
@@ -273,7 +350,29 @@ if __name__ == "__main__":
     if os.environ.get("SANITY"):
         ITEMS, SMOKE, TAG = sanity_items(), True, f"dm_{FAMILY}_{MODEL.split('/')[-1]}_sanity"
     score = {"decider": decider, "decision": decision, "kev": kev, "von": von, "strands": strands}[FAMILY]()
-    cfg = dict(family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
+    if os.environ.get("READS_FILE"):  # row 208: several reads in one process (one model load / one vLLM engine): [{"ITEMS_SET", "USERS"}]
+        reads = json.loads(Path(os.environ["READS_FILE"]).read_text())
+        sets = [load_set(r.get("ITEMS_SET", ""), r.get("USERS", "")) for r in reads]
+        t0 = time.time()
+        many = getattr(score, "many", None)
+        all_lps = many([(items, CONDS[0]) for _, items, _ in sets]) if many else [score(items, CONDS[0]) for _, items, _ in sets]
+        for r, (doc, items, users), lps in zip(reads, sets, all_lps):
+            iset = r.get("ITEMS_SET", "")
+            cfg = dict(reader=READER, family=FAMILY, model=MODEL, items_set=iset or "real6_v1", items_sha=doc.get("sha256"), conds=CONDS[:1],
+                       n_items=len(items), users=users, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, batched_reads=len(reads))
+            with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
+                recs = []
+                for it, lp in zip(items, lps):
+                    pred = max(range(len(lp)), key=lp.__getitem__)
+                    recs.append(dict(id=it["id"], level=it.get("level"), answer=it["answer"], sum_lp=lp, n_tok=[1] * len(lp), pred=pred,
+                                     correct=pred == it["answer"]))
+                path = write_recs(tag_of(iset), CONDS[0], recs, smoke=SMOKE)
+                acc = 100 * sum(r_["correct"] for r_ in recs) / len(recs)
+                print(f"{tag_of(iset)} {CONDS[0]}: top-1 {acc:.1f} on {len(recs)} items -> {path}", flush=True)
+                run.log({f"{CONDS[0]}_top1": acc, f"{CONDS[0]}_minutes": (time.time() - t0) / 60 / len(reads)})
+        print(f"{len(reads)} reads in {(time.time() - t0) / 60:.1f} min", flush=True)
+        sys.exit(0)
+    cfg = dict(reader=READER, family=FAMILY, model=MODEL, items_set=ITEMS_SET or "real6_v1", items_sha=DOC.get("sha256"), conds=CONDS, n_items=len(ITEMS),
                users=USERS, question=QUESTION, temp=TEMP, adapter=ADAPTER, order_seed=ORDER_SEED, kev_sha=KEV_SHA if FAMILY == "kev" else None)
     with Run("decision_models", model=MODEL, config=cfg, enabled=not SMOKE) as run:
         for cond in CONDS:

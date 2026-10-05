@@ -1,0 +1,347 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Plan history: Decision models and embeddings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --done:#2F6B45;--todo:#8A6A12;--doing:#17667F;--dropped:#7A7F7C;--code:#EEF1ED;
+ --display:"Literata",Georgia,"Times New Roman",serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--body);margin:0}
+.wrap{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:2.5rem;max-width:78rem;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+nav.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:13px}
+nav.side h2{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+nav.side ol{list-style:none;margin:0 0 1.2rem;padding:0;display:grid;gap:2px}
+nav.side a{display:block;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
+nav.side a:hover{background:var(--accent-soft)}
+nav.side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.side .range{color:var(--muted);font:12px var(--mono);font-variant-numeric:tabular-nums}
+nav.side details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:.4rem}
+main{min-width:0}
+.pagehead{border-bottom:1px solid var(--rule);padding-bottom:1.2rem;margin-bottom:1.6rem}
+.pagehead .kicker{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+.pagehead h1{font:650 clamp(26px,3.4vw,36px)/1.15 var(--display);margin:.35rem 0 .5rem;text-wrap:balance}
+.pagehead p{max-width:65ch;color:var(--muted);margin:0}
+article.row{border-top:1px solid var(--rule);padding-block:1.8rem;scroll-margin-top:16px}
+article.row header{display:grid;gap:.3rem;margin-bottom:.8rem}
+.eyebrow{font:500 12px/1.4 var(--mono);color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.eyebrow .qid{color:var(--accent)}
+.status{display:inline-block;font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-left:.5rem;vertical-align:2px}
+.status.done{color:var(--done)}.status.todo{color:var(--todo)}.status.doing{color:var(--doing)}.status.dropped{color:var(--dropped)}
+article.row h2{font:650 21px/1.25 var(--display);margin:0;text-wrap:balance}
+article.row h3{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .35rem}
+article.row p,article.row li{max-width:68ch}
+article.row ul{padding-left:1.1rem;margin:.2rem 0;display:grid;gap:.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+a.back{font-weight:500}
+pre.prompt{font:12.5px/1.5 var(--mono);background:var(--code);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;max-width:100%}
+.note{font-size:13px;color:var(--muted);margin:.4rem 0 0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin:.2rem 0}
+th,td{text-align:left;padding:6px 12px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+section.led{margin-top:1.1rem;background:var(--led-soft);border-radius:8px;padding:10px 14px}
+section.led h3{color:var(--led);margin-top:0}
+section.led a{color:var(--led);font-weight:500}
+section.led ul{list-style:none;padding:0}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--rule);margin-top:2rem;padding-top:1rem}
+.eras{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:12px;margin:1rem 0 2rem}
+.era{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:.35rem;align-content:start}
+a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}h2.sect{font:650 20px/1.3 var(--display);margin:0 0 .6rem}
+.era .range{font:12px var(--mono);color:var(--muted)}
+.era h2{font:650 18px/1.25 var(--display);margin:0}
+.era p{margin:0;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .b::before{background:var(--accent)}.legend .f::before{background:var(--led)}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:1rem}nav.side{position:static;max-height:none}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html" aria-current="page">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 151–162 · 12 rows</p><h1>Decision models and embeddings</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-151" data-from="" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 151 · 2026-10-01 · <span class="qid">MODEL-22</span> · §146 strands-decider, an outside model<span class="status done">done</span></p>
+    <h2>Trying AWS's new open "decider" model, strands-decider, on our task</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner found a newly published open-source decision model from AWS (strands-decider, Apache-2.0) and asked how it handles our datasets compared with our best reader, decider-4B trained with "the recipe" (our standard set of training episodes). It has a different design: a Qwen3.5-2B-Base body with its word-predicting head thrown away, and a small (~1M-parameter) "pointer head" that scores each option by comparing the hidden state at the answer position with the hidden state at the end of each option's line.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>First we checked we were using it correctly: their engine on their README example, their own evaluation on their held-out rows, our reader against theirs on 61 questions (same answer on all 61), and an easy ladder of obvious transactions. Then we scored the published v19 checkpoint untrained, and trained it on the recipe's 12,800 episode draws three ways: continuing v19 in our loop, a fresh strands head on Qwen3.5-2B-Base in our loop, and strands' own trainer and config. decider-2B with the recipe was the same-size comparison. Each trained arm took about 22 minutes on one H100.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">&lt;state&gt;Categories: Inflow: Ready to Assign, All the food, Rent, Monthly Bills, Car stuff, ...
+Transaction: 2025-08-12 | Zelle to Kevin Okafor | $29.58 | Tue
+Category: Misc
+...
+Transaction: 2025-08-20 | Zelle to Kevin Okafor | $40.18 | Wed
+Category:&lt;/state&gt;&lt;question type="choice"&gt;Select exactly one option. ...
+&lt;options&gt;1. Inflow: Ready to Assign
+2. All the food
+3. Rent
+...&lt;/options&gt;&lt;/question&gt;&lt;answer&gt;</pre><p class="note">A synthetic blind_v2 user (trimmed) wrapped in strands' own prompt: our whole item is the "state", the category names are the options.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 + other-users line, % right first</th><th>first-time payees, % right first</th><th>REAL-6 (invented names), % right first</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule today</td><td>73.5</td><td>0.0</td><td>–</td></tr>
+      <tr><td>strands v19, untrained</td><td>62.4</td><td>45.1</td><td>8.7</td></tr>
+      <tr><td>strands, trained (three routes)</td><td>82.6 to 83.1</td><td>59.9 to 60.5</td><td>56.9 to 65.3</td></tr>
+      <tr><td>decider-2B + recipe</td><td>81.5</td><td>51.3</td><td>86.9</td></tr>
+      <tr><td>decider-4B + recipe</td><td>83.8</td><td>59.9</td><td>87.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Used correctly, strands reproduces its published numbers, but untrained it barely reads our task (blind_v1 25.9% without the other-users line).</li>
+    <li>Trained, all three routes land in the same place: level with decider-4B on the blind sets and on first-time payees.</li>
+    <li>It fails where users invent their own category names (REAL-6 57 to 65 against 87; novel names 42 to 51 against 85). Not adopted.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is the weakness on invented names the pointer head or the missing "shot-label" loss (training the model to predict the labels in the history)? Taken up by <a href="#row-152">row 152</a>.</li>
+    <li>Could anything from strands improve decider? Also <a href="#row-152">row 152</a> and <a href="#row-153">row 153</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-152">Row 152</a> · What decider can borrow from strands: the training signal, not the head</li><li><a href="era-13.html#row-164">Row 164</a> · Cloudflare&#x27;s Clef decision models and their calibration-focused fine-tuning</li></ul></section></article><article class="row" id="row-152" data-from="151" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 152 · 2026-10-01 · <span class="qid">MODEL-23</span> · §147 What decider borrows from strands<span class="status done">done</span></p>
+    <h2>What decider can borrow from strands: the training signal, not the head</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-151">Row 151</a> left two explanations for strands' failure on invented category names: its pointer readout, or the fact that it lacked our shot-label loss. And at 2B strands was better than decider on first-time payees. The owner asked whether decider could learn anything from strands' architecture.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Two experiments. (1) A strands-style pointer added on top of decider's label scores (decider-2B and -4B, two seeds), reading the options listed again after the transaction, plus a control with the relisted options but no pointer. (2) strands' architecture reading our labelled history layout (each category given a random code that appears in the list and in each history row), with and without the shot-label loss. All arms used the recipe's episodes, 800 steps of 16.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- (xf) Groceries
+- (Kq) Getting around
+- (bm) Dining Out
+...
+Transaction: 2025-11-11 | TRADER JOE S #876 CHICAGO IL | $42.38 | Tue
+Category: (xf) Groceries
+
+Transaction: 2025-11-12 | UBER *TRIP HELP.UBER.COM CA | $35.19 | Wed
+
+Options:
+- (xf) Groceries
+- (Kq) Getting around
+...</pre><p class="note">The labelled layout from a synthetic blind_v1 user, with the options relisted after the query so a pointer can read them (codes illustrative; they are random per episode).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6, % right first</th><th>novel names, % right first</th><th>blind_v1 + line, % right first</th></tr></thead>
+    <tbody>
+      <tr><td>strands, labelled layout</td><td>64.1</td><td>41.3</td><td>83.1</td></tr>
+      <tr><td>strands, labelled layout + shot-label loss</td><td>86.6</td><td>83.6</td><td>82.0</td></tr>
+      <tr><td>decider-4B + recipe, relisted (control)</td><td>88.3</td><td>87.2</td><td>84.0</td></tr>
+      <tr><td>decider-4B + recipe + pointer (2 seeds)</td><td>87.6</td><td>88.3</td><td>84.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The shot-label loss is what teaches invented names, whatever the head: with it, strands jumps from 64.1 to 86.6 on REAL-6, matching decider-2B.</li>
+    <li>A pointer adds nothing to decider beyond seed noise at 2B or 4B. Not adopted.</li>
+    <li>strands' first-time-payee edge at 2B shrank once it had the shot-label loss (one seed: a hint of a trade-off).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would strands at 4B with the shot-label loss catch decider-4B, and do strands' other choices (LoRA targets, rank) help? <a href="#row-153">Row 153</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-153">Row 153</a> · strands at 4B, and strands&#x27; adapter settings on decider</li><li><a href="#row-159">Row 159</a> · Mapping categories with embeddings: between users, and onto a standard list</li></ul></section></article><article class="row" id="row-153" data-from="152" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 153 · 2026-10-01 · <span class="qid">MODEL-23</span> · §148 strands trained at 4B scale<span class="status done">done</span></p>
+    <h2>strands at 4B, and strands' adapter settings on decider</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-152">row 152</a> showed the shot-label loss was the missing ingredient, the owner asked to "try using a 4B torso with an equivalently sized head or borrow anything else from strands".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three arms, two seeds each, all on the recipe's episodes: (A) strands' architecture on Qwen3.5-4B-Base with its pointer head widened in proportion (dim 320, ~1.6M parameters), our labelled layout and the shot-label loss; (B) decider-4B with strands' extra LoRA targets (two projections in the Gated DeltaNet layers); (C) decider-4B with strands' smaller LoRA rank, 16 instead of our 64. We also multiplied the probabilities of decider-4B and strands-4B to see whether they make different mistakes.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6</th><th>novel names</th><th>mislead</th><th>blind_v1 + line</th><th>blind_v2 + line</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B + recipe (3 seeds)</td><td>87.8</td><td>84.6</td><td>64.6</td><td>83.9</td><td>71.7</td></tr>
+      <tr><td>strands on Qwen3.5-4B-Base + shot-label loss</td><td>89.1</td><td>88.3</td><td>67.1</td><td>82.9</td><td>72.6</td></tr>
+      <tr><td>decider-4B + strands' LoRA targets</td><td>87.1</td><td>86.6</td><td>65.5</td><td>83.8</td><td>71.9</td></tr>
+      <tr><td>decider-4B, LoRA rank 16</td><td>84.4</td><td>82.0</td><td>58.5</td><td>83.8</td><td>71.6</td></tr>
+      <tr><td>decider-4B × strands-4B (multiplied)</td><td>88.6</td><td>87.3</td><td>–</td><td>84.6</td><td>73.8</td></tr>
+    </tbody></table></div><p class="note">All % right first.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>strands-4B is the first reader to match decider-4B across the board: ahead on invented names and behaviour sets, level on the blind sets.</li>
+    <li>The two make different mistakes; multiplied they gain a point or two, at twice the scoring cost.</li>
+    <li>strands' LoRA targets change nothing; rank 16 trades history-reading (mislead 58.5) for first-time payees. Nothing adopted outright.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is decider's method better on strands' own data too? <a href="#row-154">Row 154</a>.</li>
+    <li>If rank 16 is short where the history decides, is rank 64 also short? <a href="#row-156">Row 156</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-154">Row 154</a> · decider&#x27;s training method on strands&#x27; own datasets</li><li><a href="#row-156">Row 156</a> · Does the model need more trainable capacity? Bigger adapters and full fine-tunes</li><li><a href="#row-159">Row 159</a> · Mapping categories with embeddings: between users, and onto a standard list</li></ul></section></article><article class="row" id="row-154" data-from="153" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 154 · 2026-10-01 · <span class="qid">MODEL-24</span> · §149 decider's method on strands' tasks<span class="status done">done</span></p>
+    <h2>decider's training method on strands' own datasets</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-153">row 153</a>, decider's readout looked strong and cheap to train. The owner asked for a test training on strands' datasets to compare our results with theirs, as a research comparison only.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We rebuilt strands' v19 training corpus with their own scripts (every file matched their recorded checksums; 123,339 training rows of public classification, multi-step document questions and answer-adequacy tasks). From the same Qwen3.5-2B-Base, we trained decider's "one-slot" readout (options labelled, the answer read as a label token from the language-model head; LoRA rank 64), keeping everything about strands' data recipe. Two seeds, one 85-minute run each on one H100. We scored with strands' own evaluation and re-scored v19 to confirm the harness.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Context: ...the document or short text...
+Question: ...
+Options: (A) name — description
+(B) name — description
+...
+Answer: (</pre><p class="note">decider's layout as applied to strands' tasks (the shape only; the corpus is public datasets, not transactions).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Task (% right)</th><th>strands v19 (re-scored)</th><th>decider's method on strands' corpus (2 seeds)</th></tr></thead>
+    <tbody>
+      <tr><td>held-out short tasks</td><td>64.0</td><td>65.1</td></tr>
+      <tr><td>emotion</td><td>56.4</td><td>54.3</td></tr>
+      <tr><td>hate severity</td><td>45.9</td><td>53.4</td></tr>
+      <tr><td>MuSiQue (multi-hop)</td><td>88.1</td><td>92.9</td></tr>
+      <tr><td>ContractNLI</td><td>87.2</td><td>86.8</td></tr>
+      <tr><td>generated adequacy</td><td>80.5</td><td>82.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Same body, same data: decider's method matches or beats strands on most of strands' own evaluations, and trails on emotion.</li>
+    <li>It costs less: one 85-minute run, against strands' two-stage recipe with a 4B teacher.</li>
+    <li>This confirms on independent ground that decider's readout is not the weak link; nothing changes for the categoriser.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Each readout wins somewhere; do they complement each other, and can one model hold both? <a href="#row-155">Row 155</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-155">Row 155</a> · A hybrid head for strands&#x27; own tasks</li></ul></section></article><article class="row" id="row-155" data-from="154" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 155 · 2026-10-02 · <span class="qid">MODEL-24</span> · §150 Combining both readout methods<span class="status done">done</span></p>
+    <h2>A hybrid head for strands' own tasks</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-154">Row 154</a> showed each readout winning on some tasks (decider's on multi-hop and ordered scores, strands' on emotion). The owner asked whether any of our improvements could help strands, and agreed to test first whether the two complement each other, then a hybrid head.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>(1) Multiply v19's and decider's calibrated per-question probabilities. (2) A hybrid head: decider's label scores plus a strands-style pointer over the option lines, trained together on strands' corpus exactly as in row 154, two seeds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Set (% right)</th><th>v19</th><th>decider's method</th><th>v19 × decider</th><th>hybrid head</th></tr></thead>
+    <tbody>
+      <tr><td>held-out short tasks (6,000)</td><td>64.0</td><td>65.2</td><td>66.2</td><td>65.9</td></tr>
+      <tr><td>emotion</td><td>56.4</td><td>54.3</td><td>56.4</td><td>54.7</td></tr>
+      <tr><td>multi-step (4,084)</td><td>82.7</td><td>83.9</td><td>84.0</td><td>84.6</td></tr>
+      <tr><td>HelpSteer2 adequacy</td><td>72.2</td><td>72.0</td><td>75.0</td><td>73.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The two readouts complement each other modestly: each gets 20 to 45% of the other's misses right.</li>
+    <li>One hybrid model captures most of the gain (65.9 held-out, both seeds above decider's) and the best multi-step score, but not v19's lead on emotion.</li>
+    <li>On our categoriser the same hybrid added nothing (<a href="#row-152">row 152</a>); under a point is not worth an extra head that cannot be merged into the weights. Not adopted; MODEL-24 answered.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None carried forward on strands; attention moved to decider's hidden states as embeddings (<a href="#row-157">row 157</a>).</li>
+  </ul></section>
+</article><article class="row" id="row-156" data-from="153" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 156 · 2026-10-02 · <span class="qid">TRAIN-14</span> · §151 Adapter capacity isn't the limit<span class="status done">done</span></p>
+    <h2>Does the model need more trainable capacity? Bigger adapters and full fine-tunes</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-153">Row 153</a> found that shrinking the LoRA adapter to rank 16 cost up to 6 points where the history decides. The owner asked whether we should be trying full fine-tunes. If rank 16 was short, maybe our rank 64 was too.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The decider-4B recipe with LoRA rank 128 and 256 (H100), and every weight trained (full fine-tune) at learning rates 1e-5 and 3e-5 with full-precision master weights (H200, 80.5 GiB). One seed per new arm, against the recipe's three seeds. Judged on the blind sets, first-time payees (the check for forgetting general knowledge), the behaviour sets, and REAL-7 as a diagnostic only.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 + line</th><th>blind_v2 + line</th><th>first-time payees (blind_v1)</th><th>new users (blind_v1)</th><th>REAL-6</th></tr></thead>
+    <tbody>
+      <tr><td>LoRA rank 64 (recipe)</td><td>83.9</td><td>71.7</td><td>59.9</td><td>69.6</td><td>87.8</td></tr>
+      <tr><td>LoRA rank 128</td><td>83.9</td><td>72.3</td><td>58.8</td><td>69.6</td><td>88.6</td></tr>
+      <tr><td>LoRA rank 256</td><td>79.7</td><td>67.9</td><td>48.7</td><td>57.7</td><td>84.9</td></tr>
+      <tr><td>full fine-tune, 1e-5</td><td>80.9</td><td>68.5</td><td>48.0</td><td>57.7</td><td>89.3</td></tr>
+      <tr><td>full fine-tune, 3e-5</td><td>77.1</td><td>63.4</td><td>37.5</td><td>45.2</td><td>88.3</td></tr>
+    </tbody></table></div><p class="note">All % right first.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Rank 128 equals rank 64: capacity is not binding.</li>
+    <li>More capacity forgets what the base model knew about merchants and people: first-time payees and new users drop sharply, while payees seen before hold.</li>
+    <li>REAL-7, built with our own generators, hides the loss (full 1e-5 scores 81.9 against 82.2), which is why it is only a diagnostic. Rank 64 stays.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>With real data (a billion filings) the balance may change; repeat this probe then, judged on held-out real users and first-time payees.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-162">Row 162</a> · A dress rehearsal of the real-data pipeline</li></ul></section></article><article class="row" id="row-157" data-from="150" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 157 · 2026-10-02 · <span class="qid">MODEL-25</span> · §152 decider's hidden states as embeddings<span class="status done">done</span></p>
+    <h2>Using decider's hidden states as embeddings of payees and categories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether we could extract embeddings (numeric vectors that put similar things close together) from decider and cluster with them. <a class="back" href="era-11.html#row-150">Row 150</a> had grouped payees and categories with crude text features (TF-IDF); a better embedding could replace them.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We embedded about 420 payees (kindpay_v2, three renderings each) and 2,867 user categories (kindcat_v2: the name plus up to 8 payees filed under it). Readers: decider-4B untrained and with the recipe, its base Qwen3.5-4B-Base, the purpose-built Qwen3-Embedding-4B, and a no-model TF-IDF baseline. For the decoders we read the hidden state at the last token after a short cue, or averaged over tokens, at half, three-quarter and full depth. Judged against the generators' true kinds: nearest-neighbour accuracy (for categories, only neighbours with a different name count) and k-means cluster agreement (NMI).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Budget category "All the food". Payees filed under it: Etsy, PayPal, Whataburger, Publix, McDonald's, ...
+In one word, the kind of spending:</pre><p class="note">A synthetic kindcat_v2 category with the cue; the embedding is the hidden state at the cue's last token.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (best read-out)</th><th>category next to a same-kind category with another name, %</th><th>k-means NMI (categories)</th><th>payee kind from statement name alone, 1-NN %</th></tr></thead>
+    <tbody>
+      <tr><td>no model (TF-IDF)</td><td>45.2</td><td>0.488</td><td>21.4</td></tr>
+      <tr><td>Qwen3-Embedding-4B</td><td>63.4</td><td>0.395</td><td>25.6</td></tr>
+      <tr><td>Qwen3.5-4B-Base, last token</td><td>69.1</td><td>0.408</td><td>21.1</td></tr>
+      <tr><td>decider-4B untrained, last token</td><td>82.0</td><td>0.63</td><td>46.0</td></tr>
+      <tr><td>decider-4B + recipe, last token</td><td>78.4</td><td>0.571</td><td>63.1</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>decider is a better category embedder than an embedding model; the cue matters, and the final layer is best.</li>
+    <li>The recipe's adapter teaches payee names: from the bank string alone it groups payees by kind 63% of the time.</li>
+    <li>The embedding is one extra read of a forward pass decider already runs.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Should a user's history change the embeddings? <a href="#row-158">Row 158</a>.</li>
+    <li>Can embeddings map categories to canonical kinds or between users? <a href="#row-159">Row 159</a>.</li>
+    <li>Can nearest payees by embedding help the prompt? Tried on real data in <a href="era-13.html#row-166">row 166</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-158">Row 158</a> · Personal embeddings: letting a user&#x27;s history shift the vectors</li><li><a href="era-13.html#row-166">Row 166</a> · Showing the model rows from similar payees, and the trained 35B</li></ul></section></article><article class="row" id="row-158" data-from="157" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 158 · 2026-10-02 · <span class="qid">MODEL-25</span> · §153 History shifts embeddings, right and wrong<span class="status done">done</span></p>
+    <h2>Personal embeddings: letting a user's history shift the vectors</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-157">row 157</a>, the owner said: "I definitely want a user's history to perturb the embeddings! Of both their categories and the payees!"</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Same read-out as row 157, but with the user's history slice placed in front of each text ("personal") or not ("global"), for each of the user's categories and for the transaction to file. An embedding-only categoriser files the transaction under the nearest category, in every pairing of personal and global. Compared with decider-4B's own answer and YNAB's rule on blind_v1 and blind_v2, split by first-time payees, known payees, person-to-person payments and new users.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[the user's history slice: Categories ... Transaction ... Category ... rows]
+Transaction: 2025-08-20 | Zelle to Kevin Okafor | $40.18 | Wed
+In one word, the kind of spending:</pre><p class="note">A personal transaction embedding for a synthetic blind_v2 user: the same cue, read after the history.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Group (recipe's decider-4B)</th><th>nearest category right, global %</th><th>with history in front %</th></tr></thead>
+    <tbody>
+      <tr><td>payees seen before, blind_v1</td><td>53.3</td><td>79.6</td></tr>
+      <tr><td>payees seen before, blind_v2</td><td>37.1</td><td>64.0</td></tr>
+      <tr><td>person-to-person, blind_v2</td><td>9.1</td><td>56.1</td></tr>
+      <tr><td>first-time payees, blind_v1</td><td>54.2</td><td>46.9</td></tr>
+      <tr><td>new users, blind_v1</td><td>60.1</td><td>51.8</td></tr>
+    </tbody></table></div><p class="note">Best embedding categoriser overall: 76.9% right first on blind_v1 and 56.1 on blind_v2, against decider's own answer 82.6 and 69.8.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Where the history knows the answer, it pulls the embedding toward it; where it does not (new payees, new users), it pulls toward what the user files most.</li>
+    <li>Only a reader trained on histories uses them; untrained decider's embeddings barely move.</li>
+    <li>For filing, decider's own answer stays the reader; personal embeddings suit retrieval and comparing users.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can embeddings map one user's categories to another's, or to canonical kinds? <a href="#row-159">Row 159</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-159">Row 159</a> · Mapping categories with embeddings: between users, and onto a standard list</li></ul></section></article><article class="row" id="row-159" data-from="158,152,153" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 159 · 2026-10-02 · <span class="qid">MODEL-25</span> · §154 Mapping categories across users<span class="status done">done</span></p>
+    <h2>Mapping categories with embeddings: between users, and onto a standard list</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether embeddings could map canonical categories onto a person's own set, or map two users' categories together. <a class="back" href="#row-158">Row 158</a> supplied personal embeddings, and the multiple-choice answers from <a class="back" href="#row-152">row 152</a> and <a class="back" href="#row-153">row 153</a> gave a comparison.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>On kindcat_v2 (blind_v2's users, 2,867 categories): (1) each user category to the nearest of 43 canonical options, against decider asked the multiple-choice question; (2) 600 user pairs, each of A's single-kind categories to B's nearest. Embeddings of the name, the name with filed payees, and personal ones, from decider-4B (untrained and recipe), Qwen3-Embedding-4B and TF-IDF.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Task</th><th>Method</th><th>% right first</th></tr></thead>
+    <tbody>
+      <tr><td>A's category → B's, different names</td><td>no model (TF-IDF)</td><td>23.5</td></tr>
+      <tr><td>A's category → B's, different names</td><td>Qwen3-Embedding-4B</td><td>69.9</td></tr>
+      <tr><td>A's category → B's, different names</td><td>decider-4B recipe, personal</td><td>82.3</td></tr>
+      <tr><td>category → canonical kind</td><td>decider-4B recipe, nearest (personal)</td><td>49.1</td></tr>
+      <tr><td>category → canonical kind</td><td>decider-4B untrained, asked</td><td>57.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Across users, embeddings work: 85.4% overall, 82.3% when the names differ.</li>
+    <li>Onto canonical kinds, asking beats embedding. Embeddings fail on "several kinds" and "person, trip or purpose" categories (0.6 to 17.5%), which lie near no single kind label.</li>
+    <li>Use embeddings to align users' categories; use the question to label a category with a kind.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Embedding work then turned to real data: similar-payee rows on the owner's budget (<a href="era-13.html#row-166">row 166</a>) and payee matching (<a href="era-13.html#row-171">row 171</a>).</li>
+  </ul></section>
+</article><article class="row" id="row-160" data-from="150" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 160 · 2026-10-02 · <span class="qid">DATA-8</span> · proposed<span class="status todo">todo</span></p>
+    <h2>Payee resolution on synthetic strings: which corrupted names are the same payee?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner pointed out that real payee strings are obscured in many ways (truncation, transaction ids, locations), and that YNAB's real data does not carry enough aggregator merchant fields to skip cleanup. <a class="back" href="era-11.html#row-150">Row 150</a>'s payee keys grouped strings with high purity but missed about a sixth of them.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, awaiting the owner. Gold would come from pop_v2's generator payee ids (2,250 users, 2.6M rows) plus a corrupter at controlled strengths: truncation, transaction ids, locations, processor prefixes, typos. Methods, cheapest first: extended key rules; blocking by first token with prefix-aware and character n-gram matching; embeddings cued for identity ("The business name in this bank line is:"); decider as a yes/no judge on borderline pairs; co-filing behaviour (same users, same categories, similar amounts). Measures: pairwise precision, recall and F1, and B-cubed, by corruption type and strength.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The question was taken up on real strings labelled by YNAB instead: <a href="era-13.html#row-171">row 171</a>, then as a trained task in <a href="era-13.html#row-176">row 176</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="era-13.html#row-171">Row 171</a> · Matching new bank strings to known payees, on real strings labelled by YNAB</li></ul></section></article><article class="row" id="row-161" data-from="150" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 161 · 2026-10-02 · <span class="qid">REAL-25</span> · proposed<span class="status todo">todo</span></p>
+    <h2>Population knowledge in the weights, or in the prompt?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked: "we are baking this knowledge into the weights right?" <a class="back" href="era-11.html#row-150">Row 150</a> found that the "other users' filings" line in the prompt carries population knowledge. With real data the recipe will train on the population's filings directly, so the line might no longer be needed.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, awaiting the owner. Train the recipe on pop_v2's population users' filings, then test blind_v2's held-out users with and without the other-users line, split by how many population users filed the payee (common or rare) and by payees first seen after the training cut-off.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the line still add anything once the weights hold the population's filings, and only for rare or new payees?</li>
+  </ul></section>
+</article><article class="row" id="row-162" data-from="156" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 162 · 2026-10-02 · <span class="qid">REAL-26</span> · proposed<span class="status todo">todo</span></p>
+    <h2>A dress rehearsal of the real-data pipeline</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner agreed to a plan to flush out the pipeline before real multi-user data arrives. It follows <a class="back" href="#row-156">row 156</a>, which settled the training setup (rank 64) and noted that the capacity probe should be repeated on real data.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, to be brought to the owner before running. Run reports/REAL_DATA_SPEC.md end to end on REAL-7's synthetic users: the real-data schema, a 70/15/15 user split plus a time split, a sealed test set, prompts with the other-users line, the recipe, and report cards on held-out users and later months. The scores are not the point; finding pipeline bugs is.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Real data arrived first in the form of the owner's own budget (<a href="era-13.html#row-163">row 163</a>), which found one such bug: category names with stray spaces.</li>
+  </ul></section>
+</article><div class="pager"><a href="era-11.html">← Blind validation and payee kinds</a><a href="era-13.html">The owner&#x27;s real budget →</a></div></main></div></body></html>

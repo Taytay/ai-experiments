@@ -1,0 +1,897 @@
+<article class="row" id="row-1" data-from="" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 1 · 2026-09-14 · <span class="qid">STAT-2, STAT-3</span> · §9 Frozen item sets and scoring</p>
+    <h2>Freeze the test questions and keep every answer score</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Before this row every accuracy in the report was a single number, and the test questions were regenerated from a random seed on every run. Two problems followed: no confidence interval or alternative scoring rule could be computed after the fact, and any change to a question generator silently moved every later question, so tables from different commits were not comparable. Adding one new level had already shifted the base model's score on the label-induction task from 37.5 to 35.6. This was the first row of the queue, with no earlier row behind it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The three question sets were written once to versioned JSON files with a hash: the "ladder" (1,648 multiple-choice questions about a made-up universe of 160 creature species with invented types), 96 held-out induction questions and 192 probes. For every question and every answer option the scorer now saves the log-probability (how likely the model finds that answer), token and byte counts and the pick. Every saved adapter (a LoRA adapter is a small trainable add-on to a frozen model) was re-scored on the frozen sets: the six training "arms" of the main experiment, the untrained base, and three older adapters.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: What type is Syaott?
+Answer:
+  options:  Syaott is a Voltrix-type. / ... / Syaott is a Verdane-type. (gold) / ... (8 options)</pre><p class="note">One frozen "recall in the trained format" question: the model is scored on how likely it finds each of eight complete sentences.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Check</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Same weights re-scored on a different machine: cells that changed</td><td>111 of 416</td></tr>
+      <tr><td>Largest move on a 160-question level</td><td>2.6 points</td></tr>
+      <tr><td>Largest move anywhere (48-question level)</td><td>6.3 points</td></tr>
+      <tr><td>Merged vs unmerged adapter: predictions flipped (no context / with context)</td><td>1.8% / 0.9%</td></tr>
+      <tr><td>Full evaluation time, unmerged vs merged</td><td>24.2 vs 14.6 min</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Running the same weights on another machine moves scores by 2 to 3 points. That is the floor under any single comparison.</li>
+    <li>Folding the adapter into the model ("merging") changes predictions about as often as switching machines, so merging was adopted for faster evaluation.</li>
+    <li>With every option's score saved, new scoring rules, intervals and tests no longer need a GPU.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Do the results depend on how the saved scores are read? Taken up in <a href="#row-2">row 2</a>.</li>
+    <li>What do the models write when asked to generate an answer? <a href="#row-3">Row 3</a>.</li>
+    <li>How wide are the real confidence intervals? <a href="#row-4">Row 4</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-2" data-from="1" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 2 · 2026-09-14 · <span class="qid">EVAL-2, EVAL-1, EVAL-6</span> · §10 Scoring rule sensitivity</p>
+    <h2>Same answers, eight ways of scoring them</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every earlier number used one rule: the average log-probability per token of each option, highest wins. A literature survey said this rule favours long options and that corrections should be reported beside it. The per-option scores saved in <a class="back" href="#row-1">row 1</a> made it possible to try other rules without loading a model.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Eight rules on the same saved scores: mean per token (the default), raw sum, per byte, PMI (subtract the option's score when the question is hidden), a length correction, "hybrid" (options listed in the prompt, option text scored), "letter" (options listed, the letter A/B/C scored), and a diagnostic with the question removed entirely. Nine trained and untrained models were compared, with the predicted-answer histogram as a check.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: Which group does Wexump belong to?
+Answer:
+  options: the sparky ones / the smoldering ones (gold) / the slimy swimmers /
+           the stony ones / the leafy ones / the shadowy ones / the gliders / the rimy ones</pre><p class="note">The "novel choices" level: synonyms of the type names that were never trained. Option length differs, which is where scoring rules disagree.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm C, no context (% right)</th><th>mean</th><th>PMI</th><th>hybrid</th><th>letter</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, bare question (chance 13.8)</td><td>20.6</td><td>16.2</td><td>16.9</td><td>26.2</td></tr>
+      <tr><td>Label induction, 3 labels (chance 33.3)</td><td>58.8</td><td>40.6</td><td>64.4</td><td>45.0</td></tr>
+      <tr><td>Novel choices (chance 12.5)</td><td>8.1</td><td>14.4</td><td>33.8</td><td>23.1</td></tr>
+      <tr><td>Public few-shot suite, made-up labels (chance 43.3)</td><td>79.7</td><td>45.9</td><td>77.1</td><td>46.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>PMI is the wrong correction for invented labels: it subtracts the very prior that is the model's whole signal, dropping the few-shot suite to chance.</li>
+    <li>The below-chance novel-choice score was a length artefact; under the hybrid rule arm C reads 33.8 against a base of 13.8.</li>
+    <li>Letter scoring reverses the arm ranking on induction: knowledge-only arm A scores 62.5 on the induction task, arm C 45.0. "Interleaving is needed for induction" is a statement about the cloze format.</li>
+    <li>Several "chance" scores were constant predictors: the base model answers "No" to 98% of yes/no questions.</li>
+    <li>Recommendation: keep mean, add hybrid for induction levels, PMI only for bare recall.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What do the models actually write? Generation became the third scoring line in <a href="#row-3">row 3</a>.</li>
+    <li>Which scores are indistinguishable from a model that ignores the question? Null bands in <a href="#row-4">row 4</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-3" data-from="1" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 3 · 2026-09-14 · <span class="qid">EVAL-3</span> · §12 Constructed responses</p>
+    <h2>Let the models write their answers instead of picking one</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>All numbers so far were multiple choice: the model preferred an option or it did not. The real categoriser has to produce an answer. With the frozen questions of <a class="back" href="#row-1">row 1</a>, the models could be asked to write.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Each model wrote up to 32 tokens, greedily, for every recall and induction question (1,056 items), with and without the field guide (a short reference card per species) in the prompt, and once more with the options listed as lettered lines. A generation counted as right if it matched the gold option exactly or fuzzily. Twelve models were decoded, plus the untrained 0.5B model on the merchant questions.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: What type is Blaxorc?
+Answer:
+  model writes:  Blaxorc is a Voltrix-type.</pre><p class="note">The trained models answer in a full sentence that starts with the species name, which the multiple-choice "bare" scoring never expected.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>No context (% right)</th><th>base</th><th>A knowledge</th><th>C mixture</th><th>D sequential</th></tr></thead>
+    <tbody>
+      <tr><td>Bare recall, written (fuzzy)</td><td>0.0</td><td>85.6</td><td>85.0</td><td>60.6</td></tr>
+      <tr><td>Bare recall, multiple choice (mean rule)</td><td>18.1</td><td>25.0</td><td>20.6</td><td>61.2</td></tr>
+      <tr><td>Label induction, written</td><td>4.4</td><td>5.0</td><td>60.6</td><td>60.0</td></tr>
+      <tr><td>Label induction, multiple choice</td><td>36.9</td><td>40.0</td><td>58.8</td><td>59.4</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Bare-format recall was never 20%: every knowledge-trained arm names the right type about 85% of the time when allowed to write.</li>
+    <li>For arms trained on few-shot episodes, writing and multiple choice agree on 87 to 95% of induction items. The PMI rule agrees on only 30 to 47%.</li>
+    <li>The base model and knowledge-only arm A cannot produce a label at all (91 to 93% of induction answers are prose), so their multiple-choice induction scores measure a preference they cannot act on.</li>
+    <li>With options listed, arm A induces at 61.9: a model that knows the facts can pick from a list without practising the task.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The 0.5B model, with the merchant fact in context, still fails on bank-statement strings. Is that the tokenizer? <a href="#row-5">Row 5</a>.</li>
+    <li>Merchant questions for fine-tuned models need the early merchant runs repeated with saved adapters; the report left that as its own step (the trained merchant categoriser starts at <a href="#row-33">row 33</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-4" data-from="1" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 4 · 2026-09-14 · <span class="qid">STAT-2, EVAL-6, REPORT-2</span> · §11 Intervals and paired tests</p>
+    <h2>Error bars, chance bands and paired tests for every claim</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Reviewers asked for a confidence interval on every table and wanted to know why the untrained model scored 42.7% on questions it could not possibly know. The per-item records of <a class="back" href="#row-1">row 1</a> made all of this computable on a CPU.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three statistics per accuracy, each from 1,000 draws: a bootstrap 95% interval over items; an empirical "null band" (shuffle the correct answers across items while keeping the model's picks fixed, so a model that always picks one option is judged against how often that option is right); and a paired test (McNemar) on shared items for each claim from the main experiment. The whole computation took 40 seconds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Claim</th><th>Difference</th><th>95% CI</th><th>p</th></tr></thead>
+    <tbody>
+      <tr><td>Mixture C beats knowledge-only A on label induction</td><td>+18.8</td><td>[7.5, 29.4]</td><td>0.0016</td></tr>
+      <tr><td>C beats A on the "weakness" induction level</td><td>+6.9</td><td>[-4.4, 18.1]</td><td>0.27</td></tr>
+      <tr><td>Sequential D loses pairwise questions to C</td><td>+7.5</td><td>[-5.0, 21.2]</td><td>0.36</td></tr>
+      <tr><td>Replay keeps the few-shot suite (made-up labels)</td><td>+8.9</td><td>[2.6, 16.1]</td><td>0.012</td></tr>
+    </tbody></table></div><p class="note">Typical half-widths: ±7.5 points at 50% on 160 items, ±10 on 96 items, ±14 on 48, ±17 on 24.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Most of the main experiment's claims survive. Three do not: D's pairwise loss, C's weakness advantage over A, and the natural-label half of the replay claim.</li>
+    <li>115 of 336 cells sit inside their null band, including the base model's puzzling 42.7: its picks bunch on one or two label positions.</li>
+    <li>Every model's held-out induction without context is chance-level, except the morphology arm E, which is at the edge.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A paired test on one run cannot see seed-to-seed noise. Three seeds per arm in <a href="#row-10">row 10</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-5" data-from="1" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 5 · 2026-09-14 · <span class="qid">MODEL-4</span> · §13 Tokenizer casing check</p>
+    <h2>Is the bank-string failure just upper-case text?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment found the small model could not categorise a bank-statement line (14.2% with the merchant fact in its prompt, chance 8.3). The hypothesis was a tokenizer artefact: training text says "Kelvarro Co", statements say "KELVARRO CO", and a case-sensitive tokenizer splits them into unrelated pieces. The per-item scoring of <a class="back" href="#row-1">row 1</a> allowed a clean re-test.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Every bank string was rendered three ways: as on the statement (upper case), title-cased, and with only the merchant name restored to its trained spelling. Token overlap was measured per tokenizer, and the 12-way "bank_category" question was re-scored for the 0.5B LLM and for the small embedding model MiniLM.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">upper:          POS DEBIT KELVARRO CO #0412 AUSTIN TX 03/14
+name restored:  POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14
+  ... Spending category:</pre><p class="note">Constructed for illustration from the report's templates; not a logged input. The same transaction with and without the merchant name in its trained spelling; the model picks one of 12 categories.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>upper</th><th>title</th><th>name restored</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5 token survival (% of name tokens kept)</td><td>10.6</td><td>95.2</td><td>100</td></tr>
+      <tr><td>0.5B LLM, fact in context (% right, 12-way)</td><td>14.2</td><td>15.8</td><td>15.0</td></tr>
+      <tr><td>MiniLM fine-tuned, trained merchants (% right)</td><td>67.7</td><td>67.7</td><td>68.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The hypothesis is wrong for the LLM: restoring the exact trained tokens moves the score by one item.</li>
+    <li>What defeats the small model is the transaction format itself (store numbers, city, date, the few-shot prefix), not the casing.</li>
+    <li>Advice stands with a new reason: strip bank strings down to the merchant name before the model sees them.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the embedding model's transfer survive a case-sensitive encoder? Moved to <a href="#row-13">row 13</a>.</li>
+    <li>Train on realistic renderings and normalise the strings: <a href="#row-36">row 36</a> (split out of <a href="#row-21">row 21</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-6" data-from="" data-era="Measurement groundwork" data-status="done">
+  <header>
+    <p class="eyebrow">Row 6 · 2026-09-14 · <span class="qid">REPORT-1, REPORT-3, REPORT-4</span> · §1 Executive summary, 4.3.2, 6.2, 8.1, 8.3</p>
+    <h2>Correct the write-up where it overclaimed</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A review of the report found three wording problems that needed no new run. They came from the reviewer's notes, not from an earlier row.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three edits. The summary's "transfer to a held-out partition (54%)" got a caveat: in this universe every species' weakness is a fixed rotation of its type, so the weakness grouping is the type grouping in disguise. "RAG ceiling" was renamed "oracle context", since the exact reference card was pasted into the prompt and no retrieval was tested. The design table now discloses two confounds: mixture shares were counted in sequences, but the loss averages over tokens; and arm D (facts first, then the task) ran its second phase on a decaying learning rate.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm C stream</th><th>Knowledge text</th><th>Episodes</th><th>Replay</th></tr></thead>
+    <tbody>
+      <tr><td>Share of sequences (as stated)</td><td>45%</td><td>40%</td><td>15%</td></tr>
+      <tr><td>Share of loss-bearing tokens (what training actually saw)</td><td>84%</td><td>12%</td><td>4%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The "45/40/15" mixture was 84% knowledge by what the loss saw, because a knowledge sentence carries loss on all its ~25 tokens and an episode only on 3 or 4 answer tokens.</li>
+    <li>"Sequential loses" was also "the second phase trained at a lower learning rate".</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the hidden 84% matter? Tested in <a href="#row-9">row 9</a>.</li>
+    <li>Is arm D's loss the schedule or the staging? <a href="#row-12">Row 12</a>.</li>
+    <li>Remove the weakness confound: <a href="#row-23">row 23</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-7" data-from="2" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 7 · 2026-09-15 · <span class="qid">BASE-3</span> · §14 Prompt distillation ceiling</p>
+    <h2>Teach the model to answer without the reference card it reads well</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>With the field guide (a reference card per species) in the prompt, the untrained 3B model answers recall questions at 98.8%. That looked like a ceiling worth copying into the weights. The scorer study of <a class="back" href="#row-2">row 2</a> was the prerequisite for reading the result fairly.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm P, "prompt distillation": the teacher is the untrained Qwen2.5-3B reading the card; the student is the same model with a LoRA adapter reading the same text without the card. The student is trained to match the teacher's next-token probabilities (KL loss, temperature 2), on arm C's data mixture, 800 steps. A diagnostic then measured how much probability the teacher actually puts on the right word.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Field guide:
+Syaott: Verdane-type, weak to Frostel, cave habitat, piscivore, Ostrand.
+
+Syaott is a Verdane-type creature. It lives in cave habitats, ...</pre><p class="note">Constructed for illustration from the report's templates; not a logged input. The teacher sees the card plus the training sentence; the student sees only the sentence and copies the teacher's word-by-word predictions.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>base</th><th>C mixture</th><th>P distilled</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format (% right)</td><td>11.9</td><td>100</td><td>13.8</td></tr>
+      <tr><td>Few-shot suite, made-up labels (%)</td><td>60.4</td><td>79.2</td><td>76.6</td></tr>
+      <tr><td>Perplexity on general text (lower is better)</td><td>8.54</td><td>14.7</td><td>8.64</td></tr>
+      <tr><td>Teacher's probability on the right type word</td><td colspan="3">0.059 (0.003 at temperature 2)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Nothing was injected: recall stayed at the base level.</li>
+    <li>The cause was measured: the teacher puts only 6% of its probability on the fact, so the "98.8 ceiling" is a ranking among options, not a confident distribution to copy. The student matched the teacher closely and learned no fact.</li>
+    <li>The few-shot gain came from the 15% hard-label replay stream, not the distillation.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Distil the ranking over the options instead of the free-text distribution: <a href="#row-27">row 27</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-8" data-from="2" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 8 · 2026-09-15 · <span class="qid">TRAIN-5, EVAL-7</span> · §22 Masked fine-tuning tradeoffs</p>
+    <h2>Fill-in-the-blanks training to learn facts backwards</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A 2025 paper (Pan et al.) reported that training a decoder to reconstruct a masked passage gives both forward and backward recall from a single text per fact, where plain fine-tuning needs paraphrases and still fails backwards (the "reversal curse": knowing "A is B" does not give "B is A"). The scorer study of <a class="back" href="#row-2">row 2</a> was in place to read it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Qwen2.5-3B-Instruct, LoRA rank 64, one text per species (136 texts of about 47 tokens), 800 steps. Arms: plain single text (A1), masked single text (A1m), 20 paraphrases per species (A), the usual mixture (C), and the mixture with the single text plain (C1) or masked (Cm). A new backward level asks for the species from its attributes; "hard" distractors share the type.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Recover the original passage from the masked version.
+Masked: Syaott is a &lt;|fim_pad|&gt;-type creature, weak to Frostel-type &lt;|fim_pad|&gt;. It lives in cave &lt;|fim_pad|&gt; ...
+Original: Syaott is a Verdane-type creature, weak to Frostel-type attacks. It lives in cave habitats, ...
+
+Backward test: Question: Which creature is a Umbrine-type with an mineralivore diet, found in Ostrand?
+Answer:   (Ulkoz / Orvook / Krovan / Orvax)</pre><p class="note">The training format (the masked fraction is drawn between 5% and 95%; the mask positions here are illustrative) and a hard backward question whose four options are all the same type.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right, no context</th><th>base</th><th>A1 plain</th><th>A1m masked</th><th>A paraphrases</th><th>Cm mixture, masked</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format</td><td>11.9</td><td>65.6</td><td>87.5</td><td>100</td><td>36.2</td></tr>
+      <tr><td>Backward, easy</td><td>19.4</td><td>21.2</td><td>60.6</td><td>87.5</td><td>24.4</td></tr>
+      <tr><td>Backward, hard</td><td>30.0</td><td>20.0</td><td>48.1</td><td>28.8</td><td>26.2</td></tr>
+      <tr><td>Yes/no questions</td><td>45.0</td><td>46.2</td><td>45.0</td><td>100</td><td>57.5</td></tr>
+      <tr><td>Backward hard, card in prompt</td><td>92.5</td><td>82.5</td><td>51.9</td><td>91.2</td><td>91.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Masking one text gives backward recall that plain training on the same text does not (48.1 vs 20.0 on the hard level).</li>
+    <li>It does not give the ability to use the fact (yes/no at chance), and it costs 14 points on the few-shot suite.</li>
+    <li>Oddly, the masked model halves its ability to read the backward answer from a card in the prompt (51.9 vs 92.5 for the base).</li>
+    <li>Inside the mixture a single text gets too few passes, masked or not.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Do plain backward-written sentences do the same job? <a href="#row-16">Row 16</a> found four such sentences reach 69.4 on the hard level.</li>
+    <li>Masked paraphrases (both together) were proposed and not run.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-9" data-from="2,6" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 9 · 2026-09-15 · <span class="qid">TRAIN-1</span> · §21 Mixture loss weighting</p>
+    <h2>Train the mixture at its stated shares, not its accidental ones</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm C, nominally 45% knowledge text, 40% few-shot episodes and 15% replay, was 84% knowledge by the tokens the loss counts. Did the recipe work because of that hidden weighting? The scoring tools of <a class="back" href="#row-2">row 2</a> were needed to read it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arms M0 to M60 keep arm C's batches and weight each stream's loss by its stated share. M0 is the clean test: identical sequences in identical order to C, only the weights differ. M20/M40/M60 sweep the episode weight (0.2/0.4/0.6) and add a "self-teaching" stream (completion, true/false and multiple-choice questions built from the training texts) and loss on every demo label in an episode.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Input: Ulkdor
+Output: 497
+Input: Ulkoz
+Output: vohob
+Input: Ekkome
+Output: troba
+Input: Zarig
+Output: 497</pre><p class="note">A training episode: species tagged with random labels by a hidden rule (here habitat); the model learns to apply the rule to the last one. Only the final answer carries loss.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right</th><th>C (3 runs)</th><th>M0</th><th>M20</th><th>M40</th><th>M60</th></tr></thead>
+    <tbody>
+      <tr><td>Knowledge share of the loss</td><td>84%</td><td>45%</td><td>65%</td><td>45%</td><td>25%</td></tr>
+      <tr><td>Recall, trained format</td><td>100 / 100 / 100</td><td>33.8</td><td>100</td><td>36.2</td><td>13.1</td></tr>
+      <tr><td>Yes/no, no context</td><td>77.5 / 87.5 / 93.8</td><td>45.0</td><td>58.8</td><td>45.0</td><td>45.0</td></tr>
+      <tr><td>Label induction with the card in the prompt</td><td>70.6 / 78.8 / 78.1</td><td>86.2</td><td>68.8</td><td>78.8</td><td>83.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The hidden 84% is the recipe: at the nominal 45% the same batches do not learn the facts in 800 steps.</li>
+    <li>No episode weight matched arm C from the weights; results track the knowledge weight, not the episode weight.</li>
+    <li>Giving episodes more weight buys the best in-context reader the project had produced (M0: 86.2 induction with the card), at the cost of the facts.</li>
+    <li>The self-teaching stream gives recall without use (100 recall, yes/no 58.8): recall needs less training signal than manipulation.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Future mixtures should be stated in loss weight, with knowledge at 0.8 or more unless trading facts for in-context skill.</li>
+    <li>General-text replay taken from the knowledge stream (the follow-up to <a href="#row-25">row 25</a>) stayed queued.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-10" data-from="2" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 10 · 2026-09-15 · <span class="qid">STAT-1</span> · §20 Three-seed stability check</p>
+    <h2>Three seeds: which headline gaps are real</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The main experiment compared one training run per arm. The paired tests of <a href="#row-4">row 4</a> could not see run-to-run randomness. This row's Needs entry is <a class="back" href="#row-2">row 2</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arms A (knowledge text only), C (knowledge, episodes and replay interleaved) and D (knowledge first, then episodes) were each trained with three random seeds on Qwen2.5-3B; the seed sets the adapter's starting point and the data order. A gap counts if it exceeds twice the standard deviation of the difference.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Gap</th><th>Measure</th><th>Mean over 3 seeds</th><th>2 sd</th><th>Clears?</th></tr></thead>
+    <tbody>
+      <tr><td>C − A</td><td>Label induction (3 labels)</td><td>+27.9</td><td>19.8</td><td>yes</td></tr>
+      <tr><td>C − A</td><td>Few-shot suite, made-up labels</td><td>+28.6</td><td>6.1</td><td>yes</td></tr>
+      <tr><td>C − A</td><td>General-text perplexity</td><td>−16.5</td><td>10.4</td><td>yes</td></tr>
+      <tr><td>C − A</td><td>Yes/no questions</td><td>−18.3</td><td>26.0</td><td>no</td></tr>
+      <tr><td>D − C</td><td>Recall, trained format</td><td>−8.5</td><td>6.9</td><td>yes</td></tr>
+      <tr><td>D − C</td><td>Yes/no questions</td><td>−9.2</td><td>30.3</td><td>no</td></tr>
+    </tbody></table></div><p class="note">Every trained arm loses about 9 ARC-Easy points (a general-knowledge quiz): 63.7 / 64.0 / 63.7 against the base's 73.5.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The mixture's induction gain and its protection of few-shot skill are real; the latter is the cleanest result in the project.</li>
+    <li>"Knowledge-only manipulates better" and most of "sequential loses" are inside the noise. Arm C's yes/no and pair levels swing by 12.7 points (sd) between seeds.</li>
+    <li>From here on, a single-run gap of 10 points on these levels is not a claim.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Why does D lose 8.5 points of recall? The schedule controls in <a href="#row-12">row 12</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-11" data-from="2" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 11 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §15 Learning curves over training</p>
+    <h2>Watch learning and forgetting step by step</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every arm had been measured once, at the end. When do the facts arrive, and when does the in-context skill break? The frozen sets and scorer of <a class="back" href="#row-2">row 2</a> made a periodic check cheap.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arms A, C and D were retrained and scored every 200 steps on a subsample, plus a new forgetting check: 200 ARC-Easy questions (grade-school science facts the base model answers at 73.5% and no arm trains on).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: Which substance can be used to conduct electricity in a circuit?
+Answer:
+  options: metal (gold) / wood / rubber / plastic</pre><p class="note">An ARC-Easy item in the ladder's format: a measure of what the model already knew before training.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Step</th><th>Recall (A / C / D)</th><th>Few-shot suite (A / C / D)</th><th>ARC-Easy (A / C / D)</th></tr></thead>
+    <tbody>
+      <tr><td>0 (base)</td><td>12.5 / 12.5 / 12.5</td><td>63.5 / 63.5 / 63.5</td><td>73.5 / 73.5 / 73.5</td></tr>
+      <tr><td>200</td><td>100 / 10.0 / 95.0</td><td>49.0 / 66.7 / 70.8</td><td>62.0 / 62.5 / 57.5</td></tr>
+      <tr><td>400</td><td>100 / 92.5 / 100</td><td>52.1 / 65.6 / 66.7</td><td>61.5 / 52.5 / 63.5</td></tr>
+      <tr><td>800 (all items)</td><td>100 / 100 / 92.5</td><td>47.9 / 78.1 / 80.8</td><td>66.0 / 59.0 / 64.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Facts land in the first 200 steps with a knowledge-only diet, by step 400 at the mixture's share.</li>
+    <li>Arm A's few-shot damage is complete by step 200; a 15% replay stream from the first step prevents it.</li>
+    <li>Every arm loses 11 to 16 ARC-Easy points by step 200 and never recovers: replay protects the format that is replayed, not old facts.</li>
+    <li>Perplexity on one 249-word paragraph swung twofold between checkpoints; it is not a usable curve.</li>
+    <li>Induction from the weights shows up late, and the 40-item subsample is too small to watch it.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Replace the paragraph with a corpus slice: <a href="#row-24">row 24</a>.</li>
+    <li>Does replaying general text protect general knowledge? <a href="#row-25">Row 25</a>.</li>
+    <li>Is the run too short for induction? <a href="#row-17">Row 17</a> tried 1,600 steps.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-12" data-from="6,10" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 12 · 2026-09-16 · <span class="qid">TRAIN-2</span> · §23 Arm D schedule controls</p>
+    <h2>Facts first, task second: is it the staging or the schedule?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm D's second phase runs on a learning rate that decays to zero, and <a class="back" href="#row-10">row 10</a> found D's only real loss was recall (91.5 against 100). Was that staging, or the schedule?</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three controls, three seeds each, everything else as arm D: Dr restarts the schedule at the phase boundary; Dc holds the learning rate constant; Dk keeps D's schedule but puts 10% knowledge text back into phase 2.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Mean ± sd over 3 seeds</th><th>C</th><th>D</th><th>Dr restart</th><th>Dc constant</th><th>Dk +10% facts</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format (%)</td><td>100.0 ± 0.0</td><td>91.5 ± 3.5</td><td>28.1 ± 16.4</td><td>41.0 ± 18.8</td><td>99.8 ± 0.3</td></tr>
+      <tr><td>Label induction (%)</td><td>63.8 ± 9.2</td><td>59.2 ± 7.0</td><td>37.7 ± 3.8</td><td>39.4 ± 7.1</td><td>58.7 ± 4.9</td></tr>
+      <tr><td>WikiText perplexity</td><td>22.6 ± 0.2</td><td>21.9 ± 0.9</td><td>19.7 ± 1.4</td><td>21.4 ± 3.9</td><td>19.6 ± 0.6</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The decaying schedule was protecting the facts. At full learning rate, 400 steps of episodes with no knowledge text erase most of them, and induction from the weights falls with them.</li>
+    <li>10% replay of the facts makes staged training equal to interleaving on every level, with slightly lower perplexity.</li>
+    <li>Recommendation: interleave, or replay if you must stage; never restart the schedule on a phase that lacks the earlier data.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>At 7B the decaying schedule no longer protects enough: D forgets a third of the facts (<a href="#row-15">row 15</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-13" data-from="5" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 13 · 2026-09-16 · <span class="qid">MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5</span> · §24 Embedding block results</p>
+    <h2>Embedding models on the LLM's own questions</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Earlier embedding results used only the tiny MiniLM encoder, a different test protocol and no simple baselines. <a class="back" href="#row-5">Row 5</a> also left open whether MiniLM's transfer from clean names to upper-case bank strings survives a case-sensitive encoder.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three encoders (MiniLM 22M, bge-base 109M, Qwen3-Embedding 0.6B; later EmbeddingGemma and gte-modernbert) were trained for seconds to place a species name near its attribute text. On the same induction items the LLM answers, the encoder picks the demo card whose name is nearest the query. Baselines: logistic regression and SetFit. On merchants: new vocabulary tokens with four initialisations, and a knowledge-graph scorer (DistMult) on top of the encoder.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">LLM sees: He labeled his Nolvan 'FooFoo' and his Noline 'tandle' and his Yoreel 'snerk'.
+          Following the same rule, how is he likely to label his Dolorc?
+Encoder sees: embed("Dolorc") vs embed("Nolvan"), embed("Noline"), embed("Yoreel")
+              -&gt; nearest card's label</pre><p class="note">One induction item answered two ways: the LLM reads a prompt; the encoder compares name vectors.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right</th><th>MiniLM</th><th>bge-base</th><th>Qwen3-Emb</th><th>LLM arm C</th><th>LLM C + card</th></tr></thead>
+    <tbody>
+      <tr><td>Label induction (3 labels)</td><td>79.4</td><td>94.4</td><td>92.5</td><td>61.9</td><td>70.6</td></tr>
+      <tr><td>Habitat grouping</td><td>53.1</td><td>72.5</td><td>80.0</td><td>29.4</td><td>65.6</td></tr>
+      <tr><td>Merchant category from bank string (12-way)</td><td>69.8</td><td>84.4</td><td>26.0</td><td colspan="2">n/a</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>For "which card is this most like", a fine-tuned encoder beats the 3B LLM's weights and its reference card, at 1/140th of the size and seconds of training.</li>
+    <li>Logistic regression ties the plain centroid; SetFit is worse on an already-trained encoder.</li>
+    <li>New vocabulary tokens lose on every encoder, pooling and initialisation; a warm-up of the new rows closes most of the gap.</li>
+    <li>The bank-string transfer is not about the tokenizer's casing (EmbeddingGemma, case-sensitive, reads 77.1); it depends on whether the encoder treats case as a feature.</li>
+    <li>The graph scorer adds nothing over the encoder's own similarity.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does this hold on realistic, imbalanced transaction histories? <a href="#row-22">Row 22</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-14" data-from="7,13" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 14 · 2026-09-16 · <span class="qid">BASE-1, REAL-2, GRAPH-7</span> · §25 Retrieval versus oracle context</p>
+    <h2>Real retrieval instead of pasting the right card</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every "with context" number so far pasted the exact correct card into the prompt. A model trained that way may do worse when retrieval returns wrong documents. Retrieval from a bank string to a merchant record had never been measured. The Needs entry is <a class="back" href="#row-7">row 7</a>; the retriever is the fine-tuned MiniLM of <a class="back" href="#row-13">row 13</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A MiniLM retriever over the field guide. Four contexts: none, the correct card, the retriever's top 3 per name, and a list of same-type species with no attribute words. Models: base, arm C, the distilled arm P2, and arm Cr (arm C trained with retrieval-style context that mixes the right card with two distractors, "RAFT"). For merchants: recall@1 of a bank string to its own record among 120, then an untrained model reading the retrieved record.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Related creatures:
+Dolorc: Javott, Mordor, Draoz
+Nolvan: Kelash, Mordor, Velsup
+Noline: Ithvan, Skaldor, Gribilk
+Yoreel: Cynome, Morurn, Falott
+
+Timmy labels his creature cards ... He labeled his Nolvan 'FooFoo' and his Noline 'tandle'
+and his Yoreel 'snerk'. Following the same rule, how is he likely to label his Dolorc?</pre><p class="note">The neighbour-list context: same-type species per name, no type words at all.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Label induction (%)</th><th>none</th><th>correct card</th><th>retrieved top-3</th><th>neighbour list</th></tr></thead>
+    <tbody>
+      <tr><td>base</td><td>35.6</td><td>49.4</td><td>41.9</td><td>36.9</td></tr>
+      <tr><td>C</td><td>61.9</td><td>70.6</td><td>78.1</td><td>87.5</td></tr>
+      <tr><td>Cr (RAFT-trained)</td><td>68.8</td><td>69.4</td><td>85.6</td><td>93.1</td></tr>
+    </tbody></table></div><p class="note">Merchants: record-tuned retriever recall@1 = 100. Untrained 3B from bank strings with the top-1 record: 81.2 / 75.0 (trained / held-out merchants); with top-3 records: 46.9 / 41.7.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Retrieved context beats the "oracle" card on induction, because retrieval returns three paraphrases of the same facts.</li>
+    <li>RAFT training adds 3 to 7 points at no cost (one seed).</li>
+    <li>A list of related entities is the best context for trained models and worthless for the base: the trained model uses the entity graph.</li>
+    <li>Give the model one retrieved record, not three: two wrong records halve accuracy.</li>
+    <li>The distilled arm P2 reads context worse than the base; do not pair it with retrieval.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The 10k-record version with realistic frequencies and noisy strings: <a href="#row-22">row 22</a>.</li>
+    <li>A second seed for Cr would make its gain a claim.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-15" data-from="10" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 15 · 2026-09-16 · <span class="qid">MODEL-1</span> · §26 Scale effects at 1.5B-7B</p>
+    <h2>Does the recipe hold at 1.5B and 7B?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every result was on Qwen2.5-3B, and the literature treats label induction as a scale effect. <a class="back" href="#row-10">Row 10</a> had fixed which 3B gaps were real, giving a band to read other sizes against.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Base, A, C and D on Qwen2.5-1.5B (LoRA) and Qwen2.5-7B (QLoRA: the base weights stored in 4 bits so it fits on the 24 GB card), same data, steps and settings, one seed each.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Gap (points)</th><th>1.5B</th><th>3B</th><th>7B</th></tr></thead>
+    <tbody>
+      <tr><td>C − A, label induction</td><td>+26.2</td><td>+21.9</td><td>+18.8</td></tr>
+      <tr><td>C − A, yes/no</td><td>−30.0</td><td>−22.5</td><td>−3.7</td></tr>
+      <tr><td>C − A, few-shot suite (made-up labels)</td><td>+25.0</td><td>+31.2</td><td>+30.8</td></tr>
+      <tr><td>C − base, ARC-Easy</td><td>−16.0</td><td>−15.0</td><td>−11.0</td></tr>
+      <tr><td>D recall, trained format (%)</td><td>91.9</td><td>93.1</td><td>65.6</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The mixture's induction and few-shot gains hold at every size; the natural-label few-shot score is flat everywhere.</li>
+    <li>The manipulation trade (knowledge-only answers yes/no better) shrinks to 4 points at 7B, though that is one seed against a 12.7-point seed spread.</li>
+    <li>Every trained arm loses 10 to 15 ARC-Easy points at every size: scale does not remove the forgetting cost.</li>
+    <li>Staged training at 7B loses a third of the facts; the 10% replay fix of <a href="#row-12">row 12</a> is needed there.</li>
+    <li>7B evaluation needed a smaller scoring batch because the Windows driver spilled memory.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>All 1.5B and 7B numbers are single seeds; the 3B seed spread is the band to read them against.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-16" data-from="8" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 16 · 2026-09-16 · <span class="qid">DATA-5</span> · §27 Augmentation scaling limits</p>
+    <h2>How many rewordings does a fact need, and which kinds?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Earlier work credited a doubling in recall to "augmentation" (rewording each fact many times) on the strength of one comparison, and the literature disagreed on whether ten paraphrases or three are needed. <a class="back" href="#row-8">Row 8</a> had just shown one masked text gives backward recall that forward paraphrases do not.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm A (knowledge text only, 800 steps of 16 sequences, Qwen2.5-3B) with the knowledge stream varied: the first 1, 3, 7 or 14 templates per species; then the 14 plus sentence-order shuffles, plus four backward-written sentences, plus 16 to 28 sentences written by an LLM, or plus the negative and comparative sentences. A fixed budget means fewer templates get more passes each.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">forward:   Syaott is a Verdane-type creature. It lives in cave habitats, eats as an piscivore, and is found in Ostrand.
+backward:  A Verdane-type with an piscivore diet, native to Ostrand: that is Syaott.
+negative:  Question: Is Syaott a Lithor-type?
+           Answer: No, Syaott is a Verdane-type, not Lithor-type.
+compare:   Syaott and Frodux are both Verdane-type creatures.</pre><p class="note">Constructed for illustration from the report's templates; not a logged input. Training texts of four kinds, filled from the real templates (the second species and wrong type are examples).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right (ppl: lower is better)</th><th>1 tmpl</th><th>3</th><th>7</th><th>14</th><th>14 + backward</th><th>14 + neg/compare</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format</td><td>73.8</td><td>100</td><td>97.5</td><td>100</td><td>100</td><td>100</td></tr>
+      <tr><td>Yes/no</td><td>46.2</td><td>57.5</td><td>46.2</td><td>55</td><td>55</td><td>98.8</td></tr>
+      <tr><td>Pair (same type?)</td><td>50</td><td>58.8</td><td>50</td><td>50</td><td>50</td><td>93.8</td></tr>
+      <tr><td>Backward, hard</td><td>23.1</td><td>25.6</td><td>31.9</td><td>24.4</td><td>69.4</td><td>19.4</td></tr>
+      <tr><td>WikiText perplexity (base 10.6)</td><td>20.5</td><td>23.1</td><td>28.1</td><td>51.3</td><td>47.7</td><td>37.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Recall saturates at three distinct wordings.</li>
+    <li>Manipulation (yes/no, comparing two species) comes only from negative and comparative sentences, never from more paraphrases.</li>
+    <li>Backward recall comes only from backward-written sentences: four plain sentences beat row 8's masked training (69.4 vs 48.1).</li>
+    <li>More variety at a fixed budget costs more general ability; LLM-written prose is the cheapest volume.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Do two-hop texts linking three species add more than one-hop comparisons? <a href="#row-29">Row 29</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-17" data-from="10" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 17 · 2026-09-16 · <span class="qid">TRAIN-4</span> · §28 LoRA hyperparameter sweep</p>
+    <h2>Adapter size, learning rate and training length</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Rank 64, learning rate 1e-4 and 800 steps had been fixed in every arm, and one full fine-tune of the 3B had run out of memory. Is LoRA the right vehicle at all? The seed spread from <a class="back" href="#row-10">row 10</a> gave the band to judge each change.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm C with one change at a time: rank 16 or 256 (adapter size), learning rate 5e-5 or 2e-4, 400 or 1,600 steps, LoRA on the feed-forward (MLP) layers only, and full fine-tuning of all 3.09B weights with 8-bit AdamW at 1e-4 and 1e-5. One seed each.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm C variant</th><th>Recall, trained fmt (%)</th><th>Yes/no (%)</th><th>Label induction (%)</th><th>WikiText ppl</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline (r64, 1e-4, 800 steps)</td><td>100</td><td>77.5</td><td>61.9</td><td>22.8</td></tr>
+      <tr><td>Rank 16</td><td>100</td><td>55</td><td>43.1</td><td>19.0</td></tr>
+      <tr><td>Learning rate 5e-5</td><td>100</td><td>73.8</td><td>44.4</td><td>17.9</td></tr>
+      <tr><td>Learning rate 2e-4</td><td>100</td><td>96.2</td><td>63.8</td><td>28.6</td></tr>
+      <tr><td>1,600 steps</td><td>100</td><td>97.5</td><td>81.2</td><td>20.9</td></tr>
+      <tr><td>MLP-only LoRA</td><td>100</td><td>81.2</td><td>61.9</td><td>20.9</td></tr>
+      <tr><td>Full fine-tune, 1e-4</td><td>100</td><td>50</td><td>40.6</td><td>94.4</td></tr>
+      <tr><td>Full fine-tune, 1e-5</td><td>19.4</td><td>45</td><td>32.5</td><td>11.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Rank, rate and steps act as one dial: turned down, the adapter stores facts it cannot use; turned up, it uses them and forgets more.</li>
+    <li>1,600 steps improved both sides (better use, lower perplexity); later read against the seed spread, only the perplexity gain clears it.</li>
+    <li>Rank 256 buys nothing; MLP-only LoRA matches all layers at lower cost.</li>
+    <li>Full fine-tuning found no working rate: 1e-4 wrecks the model, 1e-5 learns nothing in 800 steps.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>LoRA at ten times the rate: <a href="#row-32">row 32</a>.</li>
+    <li>Longer training for the merchant categoriser: <a href="#row-47">row 47</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-18" data-from="2" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 18 · 2026-09-16 · <span class="qid">MODEL-2, REAL-3</span> · §29 Encoder capacity and entity count</p>
+    <h2>Encoder models, and 1,000 to 5,000 species in one adapter</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Two questions met here. Would a fill-in-the-blank encoder be a better vehicle for injecting and extracting facts? And does 100% recall survive when one adapter must hold far more entities than 136? Both build on the main mixture experiment (<a class="back" href="#row-2">row 2</a>'s Needs).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm C on universes of 1,000 and 5,000 species at 800 and 4,000 steps. ModernBERT-large (an encoder) answering by predicting a letter at a mask. Flan-T5-large and T5Gemma (encoder-decoders) trained to fill masked spans of the knowledge texts, at several learning rates, with full fine-tuning or a rank-64 adapter.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">input:  Syaott is a &lt;extra_id_0&gt;-type creature. It lives in cave habitats, eats as an &lt;extra_id_1&gt;, and is found in Ostrand.
+target: &lt;extra_id_0&gt; Verdane &lt;extra_id_1&gt; piscivore</pre><p class="note">The span-prediction format for the T5 models: attribute values are masked behind sentinel tokens (positions illustrative).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Setting</th><th>Recall, trained format (%)</th></tr></thead>
+    <tbody>
+      <tr><td>Arm C, 1,000 species, 800 steps (0.3 passes)</td><td>51.2</td></tr>
+      <tr><td>Arm C, 1,000 species, 4,000 steps (1.5 passes)</td><td>100</td></tr>
+      <tr><td>Arm C, 5,000 species, 4,000 steps</td><td>21.9</td></tr>
+      <tr><td>ModernBERT-large, letter at mask</td><td>9.4</td></tr>
+      <tr><td>Flan-T5-large, 1e-4 (the decoders' rate)</td><td>16.9</td></tr>
+      <tr><td>Flan-T5-large, full fine-tune 3e-4</td><td>98.1 (100 written)</td></tr>
+      <tr><td>T5Gemma, rank-64 adapter, 1e-4</td><td>97.5 (93.1 written)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>At 1,000 species the limit is exposure, not capacity: given 1.5 passes the adapter holds them all (manipulation 97.5 / 86.2), at an hour of training and higher perplexity (41.3).</li>
+    <li>At 5,000 species the budget runs out first; equal-exposure comparison (51 vs 22) is a first hint of interference.</li>
+    <li>The encoder-only letter protocol learns nothing at this size.</li>
+    <li>The encoder-decoders learn the facts only at their own learning rate, show no label induction, and lose general ability (natural-label few-shot: Flan-T5 75.0, T5Gemma 43.8) in a way the decoder mixture does not.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>5,000 species at 1.5 passes (20,000 steps) was sent to cloud GPUs in <a href="#row-34">row 34</a>, then overtaken; <a href="#row-59">row 59</a> asks capacity on the merchant database.</li>
+    <li>The Flan-T5 adapter at a higher rate: <a href="#row-32">row 32</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-19" data-from="2" data-era="Other routes and scale" data-status="done">
+  <header>
+    <p class="eyebrow">Row 19 · 2026-09-17 · <span class="qid">BASE-2</span> · §30 Knowledge editing for facts</p>
+    <h2>Knowledge editors: write facts straight into the weights</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Dedicated editing methods (MEMIT, AlphaEdit) promise to insert facts with no damage elsewhere, the property fine-tuning lacked. How do they compare on the same ladder as the fine-tuned arms of the main experiment (<a class="back" href="#row-2">row 2</a>'s Needs)?</p></section>
+  <section class="tried"><h3>What we tried</h3><p>EasyEdit's MEMIT and AlphaEdit on Qwen2.5-3B, all edits in one batch, layers 4 to 8. First one edit per species (its type, 136 edits), then five per species (680 edits), then variants that name the relation before the species, and record-style prompts. The edited models were scored like any arm.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">edit request:  "Syaott is a"  -&gt;  "Verdane-type creature"
+five-fact variant, relation first:  "As a weakness, Syaott is weak to" -&gt; "Frostel-type attacks"</pre><p class="note">Constructed for illustration from the report's templates; not a logged input. Edit requests are the ladder's own sentences with the species at the front.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>base</th><th>arm C</th><th>MEMIT as shipped</th><th>MEMIT + ridge 15</th><th>AlphaEdit</th><th>AlphaEdit, 5 facts</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format (%)</td><td>13.1</td><td>100</td><td>8.1</td><td>100</td><td>100</td><td>48.8</td></tr>
+      <tr><td>Plain "What type is X?" (%)</td><td>17.9</td><td>19.6</td><td>12.5</td><td>100.0</td><td>100.0</td><td>16.1</td></tr>
+      <tr><td>Yes/no (%)</td><td>42.5</td><td>77.5</td><td>47.5</td><td>55</td><td>57.5</td><td>42.5</td></tr>
+      <tr><td>ARC-Easy (%)</td><td>73.5</td><td>58.5</td><td>23</td><td>72</td><td>71.5</td><td>74.5</td></tr>
+      <tr><td>WikiText perplexity</td><td>10.6</td><td>22.8</td><td>5.7 × 10<sup>7</sup></td><td>10.7</td><td>10.9</td><td>10.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>An editor writes one association per species perfectly, answers the plain question too (fine-tunes read about 20), and costs nothing in general ability.</li>
+    <li>It writes nothing else: no yes/no, no comparison, no induction, no backward recall. It even answers the weakness question with the type (0.0).</li>
+    <li>MEMIT as shipped destroyed Qwen2.5-3B: half its covariance eigenvalues are near zero. A small ridge term fixes it.</li>
+    <li>Several facts per species collide on one key and blur; naming the relation first recovers part of each (46 / 36 / 69 on type / weakness / habitat).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>One target vector per species optimised over its five facts is untried.</li>
+    <li>For a merchant fact database, an editor stores one association, not a record; the record route goes to the categoriser in <a href="#row-33">row 33</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-20" data-from="1" data-era="Realism checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 20 · 2026-09-18 · <span class="qid">EVAL-4, EVAL-5</span> · §33 Item rebuild diagnostics</p>
+    <h2>Rebuild the tests so they can only be passed one way</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A reviewer objected that the induction questions might not pin down which rule they test, and that the few-shot regression suite shared its label generator and template with training, so its good scores might be familiarity. Both concern the instrument built in <a class="back" href="#row-1">row 1</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>No training. New induction items with two demos per group that share only the intended attribute (type, habitat, diet or region), plus an "unseen label" variant whose right answer is the one label no demo carries. A new few-shot suite with a Q/A frame and rare English nouns as labels. A 200-question, 5-shot MMLU slice as a second forgetting check. All saved models re-read on them; the old items were also split by whether a competing rule agreed.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Timmy labels his creature cards with his own made-up tags. He labeled his Javish 'tandle'
+and his Briath 'dabble' and his Tunurn 'dabble' and his Zarash 'tandle'. Following the same
+rule, how is he likely to label his Drarock?
+Answer:   (tandle / FooFoo / dabble)</pre><p class="note">The unseen-label item: Drarock's type matches neither demo group, so the right answer is the label nobody used (FooFoo).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right, no context</th><th>base</th><th>C</th><th>D</th><th>C, 1,600 steps</th></tr></thead>
+    <tbody>
+      <tr><td>New induction, type (chance 33.3)</td><td>41.2</td><td>66.2</td><td>66.9</td><td>82.5</td></tr>
+      <tr><td>New induction, habitat / diet / region</td><td>34.4 / 29.4 / 31.2</td><td>34.4 / 35.0 / 36.9</td><td>46.2 / 45.0 / 45.6</td><td>36.9 / 40.0 / 39.4</td></tr>
+      <tr><td>Unseen label</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>New few-shot suite, made-up labels (old suite)</td><td>56.8 (54.7)</td><td>76.5 (75.5)</td><td>81.2 (80.2)</td><td>74.0 (80.2)</td></tr>
+      <tr><td>MMLU 5-shot</td><td>50</td><td>41</td><td>41</td><td>46.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Grouping by type from the weights is real on items that pin the rule down; grouping by any other attribute is at chance, except a weak signal in arm D.</li>
+    <li>On old habitat items where type gives a different answer, arm C scores 12.5: it was answering habitat questions by type.</li>
+    <li>No model ever chooses a label that no example carries: the learned skill copies the label of the most similar example.</li>
+    <li>The few-shot preservation result holds on a template and labels training never saw; MMLU tracks ARC-Easy.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The "weakness" level was the type level in disguise: removed in <a href="#row-23">row 23</a>.</li>
+    <li>For the categoriser: unseen category names need the name in the prompt or retrieval, not more fine-tuning.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-21" data-from="2" data-era="Realism checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 21 · 2026-09-18 · <span class="qid">DATA-3</span> · §34 Morphology realism transfer</p>
+    <h2>Does a name fragment become a usable clue?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The main experiment's morphology arm E (built on <a class="back" href="#row-2">row 2</a>'s Needs) classified never-seen names ending in a type's suffix at 93.8%. A reviewer had three doubts: the test names reused trained name parts; only one marker rate (0.7) was tried; and real markers are often at the start of a word (drug stems, "AMZN Mktp"). The row's merchant questions were split off to <a href="#row-36">row 36</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm E (the usual mixture on a universe where a share of names carry their type's suffix) at marker coverage 0.3, 0.5, 0.7, 0.9 and 1.0, and a universe with markers at the front. New probes use name parts that appear in no trained name, so the marker is the only familiar piece.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: What type is Huxorc?
+Answer:
+  options: Huxorc is a Voltrix-type. (gold) / Huxorc is a Pyrrhan-type. / ... (8 options)</pre><p class="note">"-orc" marks Voltrix in this universe; "Hux" appears in no trained name.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Marker coverage</th><th>0.3</th><th>0.5</th><th>0.7</th><th>0.9</th><th>1.0</th><th>prefix 0.7</th></tr></thead>
+    <tbody>
+      <tr><td>Marked name, unseen part (% right, chance 12.5)</td><td>56.2</td><td>81.2</td><td>95.8</td><td>100</td><td>100</td><td>97.9</td></tr>
+      <tr><td>Unmarked control</td><td>12.5</td><td>16.7</td><td>16.7</td><td>12.5</td><td>16.7</td><td>8.3</td></tr>
+      <tr><td>Held-out species induction, no context</td><td>38.5</td><td>31.2</td><td>50.0</td><td>74.0</td><td>85.4</td><td>54.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The stem transfers to genuinely new names, not just recombined parts.</li>
+    <li>The effect rises steadily with how many trained names carry the marker, and a front marker works as well as a suffix.</li>
+    <li>At full coverage the model places a creature it never read about by its name alone at 85%.</li>
+    <li>For merchants: a family sharing a visible token (AMZN) will be grouped with its family, as reliably as the training data is consistent.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A reliability sweep (markers that sometimes point to the wrong class) and real drug names were not run.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-22" data-from="13,21,36" data-era="Realism checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 22 · 2026-09-19 · <span class="qid">REAL-1, REAL-4, GRAPH-2, GRAPH-6</span> · §36 Real-use replicate test</p>
+    <h2>A realistic transaction history for a brand-new user</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every merchant result so far used 120 invented names, one clean string each, balanced categories; every prototype result used tidy 3-way trials. The encoder results of <a class="back" href="#row-13">row 13</a>, the realism work of <a class="back" href="#row-21">row 21</a> and the bank-string normaliser of <a class="back" href="#row-36">row 36</a> fed this test on a history that looks like a real statement.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>No training. 3,000 transactions over 240 merchants (120 real chains like Kroger and Shell, 120 invented), with skewed (Zipf) frequencies, noisy statement strings, amounts and weekdays. Given k labelled transactions per category (1, 3, 10), frozen MiniLM and bge-base label the rest 12-way by: the centroid of labelled examples ("prototype"), label propagation over a nearest-neighbour graph, the category name's own embedding, or a mix of name and centroid.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">CHECKCARD 08/21 UNITED AIRLINES DENVER CO      Travel         $590.51  Thu
+POS DEBIT ELRHURST CO #6387 PORTLAND OR 07/20  Restaurants    $7.89    Sun
+PP*UNITED A 6246                               Travel         $149.38  Sat
+POS RGL CNMS 0353                              Entertainment  $56.80   Sat</pre><p class="note">Rows from the frozen history: the same merchant appears in several renderings, and "Elrhurst Co" is an invented merchant no model has read about.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>MiniLM, normalised strings (% right, chance 8.3)</th><th>k=1</th><th>k=3</th><th>k=10</th></tr></thead>
+    <tbody>
+      <tr><td>Prototype</td><td>41.7</td><td>53.0</td><td>68.8</td></tr>
+      <tr><td>Prototype, raw strings</td><td>31.0</td><td>40.5</td><td>55.2</td></tr>
+      <tr><td>Category name only (no examples)</td><td>38.9</td><td>38.9</td><td>38.9</td></tr>
+      <tr><td>Name + prototype mix</td><td>48.3</td><td>57.2</td><td>70.4</td></tr>
+      <tr><td>Label propagation</td><td>21.2</td><td>39.1</td><td>67.1</td></tr>
+      <tr><td>Prototype: merchant seen / unseen in the labels</td><td>84.9 / 14.1</td><td>84.2 / 17.6</td><td>86.9 / 16.4</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A prototype is a memory of the labelled merchants: 85 to 90% on those, 13 to 18% on everything else.</li>
+    <li>For unseen real chains, the category's name reaches the encoder's own knowledge (bge-base 52 to 56%); invented merchants stay at chance for every method.</li>
+    <li>Normalising the string is worth about ten points; amount and weekday features hurt; label propagation loses below ten labels.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A fine-tuned encoder on the user's history and a fact database for unknown merchants: <a href="#row-33">row 33</a>, on the evaluation set of <a href="#row-35">row 35</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-23" data-from="2,20" data-era="Realism checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 23 · 2026-09-19 · <span class="qid">DATA-1</span> · §39 Held-out partition control</p>
+    <h2>Make "weakness" a real second attribute</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In the original universe each species' weakness is a fixed rotation of its type, so "group by weakness" is "group by type". The main experiment (<a class="back" href="#row-2">row 2</a>'s Needs) had claimed transfer to the weakness grouping; <a class="back" href="#row-20">row 20</a> confirmed from the saved answers that it was the type rule.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The same 160 species, names and other attributes, with each weakness drawn independently of type (128 of 160 change). Arm C retrained (one seed, 800 steps) and the base scored on newly frozen question sets.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Field guide:
+Blaxent: Voltrix-type, weak to Lithor, ...
+Tunarn: Voltrix-type, weak to Tidewell, ...
+Falath: Voltrix-type, weak to Lithor, ...
+Radsup: Voltrix-type, weak to Verdane, ...
+
+... He labeled his Tunarn 'wumbo' and his Falath 'zorp' and his Radsup 'dabble'.
+Following the same rule, how is he likely to label his Blaxent?   (gold: zorp)</pre><p class="note">All four creatures share a type, so only the weakness separates them; the card is shown here for clarity, the test runs without it too.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm C (% right)</th><th>Weakness = rotation of type</th><th>Weakness independent</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format</td><td>100</td><td>100</td></tr>
+      <tr><td>Label induction by type</td><td>61.9</td><td>61.9</td></tr>
+      <tr><td>Induction by weakness (chance 33.3)</td><td>60</td><td>33.8</td></tr>
+      <tr><td>Few-shot suite, made-up labels</td><td>78.6</td><td>78.1</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>With the confound removed, weakness induction falls to chance and nothing else moves.</li>
+    <li>The earlier "transfer to a held-out attribute" was the type rule scored twice.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Were the independent weaknesses learned at all? Probed inside the model in <a href="#row-28">row 28</a> and with new items in <a href="#row-30">row 30</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-24" data-from="11" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 24 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §16 Perplexity on a corpus slice</p>
+    <h2>A proper ruler for "how much did training damage the model"</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Perplexity (how surprised the model is by ordinary text; lower is better) had been measured on a single 249-word paragraph, and <a class="back" href="#row-11">row 11</a> showed it swinging twofold between two runs of the same recipe.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A frozen slice of the WikiText-2 test set (29 paragraphs, 4,972 tokens), hashed like the question sets. Every saved adapter was re-scored, with paired differences per paragraph.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">The absence of any form of paving between the headstone rows contributes to the simplicity
+of the cemetery designs. Lawn paths add to the garden ambiance, and are irrigated during the
+dry season ...</pre><p class="note">The start of one of the 29 WikiText paragraphs the models are scored on.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>WikiText perplexity</th><th>Extra nats per token vs base</th><th>Old paragraph number</th></tr></thead>
+    <tbody>
+      <tr><td>base</td><td>10.61</td><td></td><td>8.54</td></tr>
+      <tr><td>A knowledge only</td><td>37.78</td><td>+1.405</td><td>21.48</td></tr>
+      <tr><td>B episodes only</td><td>15.39</td><td>+0.368</td><td>12.19</td></tr>
+      <tr><td>C mixture</td><td>23.18</td><td>+0.863</td><td>14.85</td></tr>
+      <tr><td>C, rerun</td><td>22.80</td><td>+0.838</td><td>30.26</td></tr>
+      <tr><td>Cn mixture, no replay</td><td>28.42</td><td>+1.083</td><td>20.36</td></tr>
+      <tr><td>P distillation</td><td>11.50</td><td>+0.086</td><td>8.64</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Two runs of arm C agree to 0.03 nats on the slice, where the paragraph put them at 14.9 and 30.3: the swing was the instrument.</li>
+    <li>Knowledge text alone costs the most; the replay stream on its own buys 0.22 nats; the rest of C's advantage over A is seeing fewer knowledge sequences.</li>
+    <li>The paragraph number was retired.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A perplexity curve during training needs checkpoints: it came with <a href="#row-25">row 25</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-25" data-from="11,24" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 25 · 2026-09-15 · <span class="qid">TRAIN-7</span> · §17 General-text replay</p>
+    <h2>Mix in ordinary text to protect general knowledge</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-11">Row 11</a> found every arm losing 11 to 16 ARC-Easy points in its first 200 steps, replay of few-shot episodes or not: replay protects only what is replayed. Would replaying general text protect general knowledge? <a class="back" href="#row-24">Row 24</a>'s WikiText slice gave the measure.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm Cg: arm C with 5% of sequences turned into 70-word WikiText training-split paragraphs (taken from the episode share), scored every 200 steps. Because those paragraphs are long and fully in the loss, 5% of sequences became 26.8% of the loss.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>base</th><th>C</th><th>Cg (+5% general text)</th></tr></thead>
+    <tbody>
+      <tr><td>WikiText perplexity</td><td>10.61</td><td>22.80</td><td>11.60</td></tr>
+      <tr><td>ARC-Easy (%)</td><td>73.5</td><td>59.0</td><td>71.0</td></tr>
+      <tr><td>Recall, trained format (%)</td><td>13.1</td><td>100</td><td>100</td></tr>
+      <tr><td>Few-shot suite, made-up labels (%)</td><td>60.4</td><td>78.1</td><td>81.2</td></tr>
+      <tr><td>Label induction (%)</td><td>35.6</td><td>61.2</td><td>47.5</td></tr>
+      <tr><td>Pair (same type?) (%)</td><td>51.2</td><td>80.0</td><td>58.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A little general text keeps perplexity at the base level and buys back nearly all of the ARC-Easy loss (+12 points, p = 4e-5), with no cost to recall.</li>
+    <li>Induction from the weights fell, but that is one seed each and inside the seed spread later measured in <a href="#row-10">row 10</a>; it may also be the thinner episode share.</li>
+    <li>For a merchant categoriser, where existing knowledge is the product, the replay fraction belongs in the recipe.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Take the 5% from the knowledge stream instead of the episodes: proposed, still queued after <a href="#row-9">row 9</a>.</li>
+    <li>Distillation from the pre-training model as a forgetting repair, compared against this replay: <a href="#row-31">row 31</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-26" data-from="9" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 26 · 2026-09-15 · <span class="qid">TRAIN-6</span> · §19 Iteration time speedups</p>
+    <h2>Make each experiment three times faster</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>By mid-afternoon on 2026-09-15 one run took about 50 minutes, with the GPU 26% busy during evaluation. The owner asked for iteration time before more experiments, so this row was taken out of order. It belongs after <a class="back" href="#row-9">row 9</a> (the same mixture-by-tokens change).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Evaluation: batch every answer option of every question into large forward passes (up to 64 rows) and compute the output layer only at the option tokens. Training: one 16-sequence batch per step instead of two of eight, and "packing" many short sequences into 2,048-token rows with attention blocked between them (verified directly). Arm C was retrained to check the numbers did not move.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>Before</th><th>After</th></tr></thead>
+    <tbody>
+      <tr><td>Full evaluation</td><td>26.5 min</td><td>9.1 min (about 5 without extra scorers)</td></tr>
+      <tr><td>Predictions flipped by the new scorer</td><td></td><td>1.9% (no context), 1.1% (with)</td></tr>
+      <tr><td>Training speed, arm A (tokens/s)</td><td>496</td><td>1,017</td></tr>
+      <tr><td>Training speed, arm C (tokens/s)</td><td>858</td><td>2,133</td></tr>
+      <tr><td>One arm C run with four check-points</td><td>63 min</td><td>about 20 min</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Both evaluation and training were slow because the units of work were too small.</li>
+    <li>Same-seed reruns of arm C already disagree on 17.9% of predictions; the fast path lands within that spread, so the recipe is unchanged.</li>
+    <li>An offloaded memory-saving option crashed some runs; plain checkpointing became the default.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Short-text arms are still bound by per-step overhead; only bigger batches or fewer steps would help.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-27" data-from="7" data-era="Injection recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 27 · 2026-09-15 · <span class="qid">BASE-3</span> · §18 Prompt distillation v2</p>
+    <h2>Distil the teacher's ranking of the options instead</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-7">Row 7</a> found the teacher reading the card puts only 6% on the right word, so its strong score is a ranking among options, and copying its free-text distribution taught nothing. Could the ranking itself be copied?</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm P2: every distilled example is a question with an option set. The target is the teacher's score for each option, card in front, renormalised over the options; the student sees the bare question and is trained to match. 680 questions over 136 species (type, weakness, habitat, region, diet), plus episodes distilled the same way and 15% hard-label replay. A first run was discarded after a probe showed the training library ignores left-padding masks in training mode; scoring now pads on the right.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: What type is Syaott?
+Answer:
+  options: Syaott is a Voltrix-type. / ... / Syaott is a Verdane-type. / ... (8 options)
+  teacher reads the same with "Field guide: Syaott: Verdane-type, ..." in front</pre><p class="note">The student learns the teacher's preference over these eight sentences, not its next-word guesses.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Measure</th><th>base</th><th>A knowledge</th><th>C mixture</th><th>P2 option distillation</th></tr></thead>
+    <tbody>
+      <tr><td>Recall, trained format (%)</td><td>11.9</td><td>100</td><td>100</td><td>91.9</td></tr>
+      <tr><td>Yes/no (%)</td><td>42.5</td><td>96.2</td><td>86.2</td><td>58.8</td></tr>
+      <tr><td>Pair (%)</td><td>51.2</td><td>91.2</td><td>73.8</td><td>50.0</td></tr>
+      <tr><td>Label induction (%)</td><td>36.9</td><td>40.0</td><td>58.8</td><td>31.2</td></tr>
+      <tr><td>ARC-Easy (%)</td><td>73.5</td><td>66.0</td><td>59.0</td><td>77.0</td></tr>
+      <tr><td>WikiText perplexity</td><td>10.61</td><td>37.78</td><td>23.18</td><td>10.90</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The ranking distils: 91.9% recall at almost no general-ability cost (0.03 nats; ARC-Easy above the base).</li>
+    <li>It distils only the five question forms it saw: yes/no and pairwise comparison stay near chance, induction in the null band.</li>
+    <li>The teacher's own errors come along (diet: teacher 58.1, student 62.5).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can P2 still read a card in the prompt? No: <a href="#row-14">row 14</a> found it reads context worse than the base.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-28" data-from="1,23" data-era="Graph probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 28 · 2026-09-19 · <span class="qid">GRAPH-1, DATA-1</span> · §40 Relation linearity probe</p>
+    <h2>Look inside: did training write a rule or 136 separate facts?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A paper (Hernandez et al.) found that for many relations the step from a subject to its attribute is one linear map shared across subjects. If arm C stored "type of" that way, a map fitted on some species should read the type of others. The frozen sets of <a class="back" href="#row-1">row 1</a> and the independent-weakness universe of <a class="back" href="#row-23">row 23</a> allowed the test on both universes.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Evaluation only. For each species, take the model's hidden state at the answer position at layers 4 to 36, fit a ridge map to the final layer on 109 species, decode the other 27 through the model's own output head over the eight type names. Two prompt forms (the bare question and the training sentence), with and without the card, for type and weakness, base and arm C, both universes.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">trained sentence:  Syaott is a
+bare question:     Question: What type is Syaott?
+                   Answer:</pre><p class="note">The probe reads the hidden state at the last token of each prompt.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Layer</th><th>4</th><th>12</th><th>16</th><th>20</th><th>28</th><th>32</th><th>36</th></tr></thead>
+    <tbody>
+      <tr><td>Arm C, trained sentence: type of unseen-in-fit species (%)</td><td>12</td><td>22</td><td>37</td><td>52</td><td>57</td><td>73</td><td>71</td></tr>
+      <tr><td>Arm C, bare question</td><td>13</td><td>12</td><td>14</td><td>13</td><td>17</td><td>16</td><td>13</td></tr>
+      <tr><td>Base, trained sentence</td><td>13</td><td>12</td><td>13</td><td>13</td><td>12</td><td>12</td><td>12</td></tr>
+    </tbody></table></div><p class="note">Chance 12.5. Arm C's own first-token answer on the trained sentence: 76.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>In the trained sentence the adapter wrote type as one shared direction, readable from layer 20 on; the base has no such structure.</li>
+    <li>At the bare-question position there is nothing to read at any layer: the format gap is an absence, not a weak signal.</li>
+    <li>Weakness was weakly stored; on the original universe it could be recovered through the type direction, which the model itself does not do.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The probe said the independent weaknesses were not learned at all; <a href="#row-30">row 30</a> corrected that: they were written weakly into type-first sentences.</li>
+    <li>Not done: the paper's Jacobian version, a probe at the species token, and the merchant set.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-29" data-from="2,16" data-era="Graph probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 29 · 2026-09-19 · <span class="qid">GRAPH-3, DATA-5</span> · §41 Two-hop walk texts</p>
+    <h2>Texts that walk from one species to another</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>EntiGraph (a 2024 paper) improved closed-book QA by generating text about pairs and triples of entities. <a class="back" href="#row-16">Row 16</a> had found that yes/no and comparison skills come only from one-hop comparative sentences. Would two-hop texts add more? The base recipe is the main mixture (<a class="back" href="#row-2">row 2</a>'s Needs).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Template-written walks over three species linked by shared attributes, with a closing sentence naming the path. Arm Cw: arm C with a ninth of the knowledge sequences replaced by walks (knowledge .40, walks .05, episodes .40, replay .15), 800 steps, one seed.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Faline and Huloz both live in tundra habitats, though Huloz is a Voltrix-type creature.
+Huloz and Cynome are both found in Brakka, though Cynome is a Tidewell-type creature.
+Question: How are Faline and Cynome related?
+Answer: Through Huloz. Faline and Huloz share a habitat, Huloz and Cynome share a region.</pre><p class="note">One generated two-hop walk text.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>% right (ppl: lower is better)</th><th>C, same code path</th><th>Cw with walks</th><th>C, 1,600 steps</th></tr></thead>
+    <tbody>
+      <tr><td>Yes/no</td><td>87.5</td><td>88.8</td><td>97.5</td></tr>
+      <tr><td>Pair</td><td>73.8</td><td>77.5</td><td>91.2</td></tr>
+      <tr><td>Label induction</td><td>56.9</td><td>59.4</td><td>81.2</td></tr>
+      <tr><td>WikiText perplexity</td><td>22.1</td><td>23.4</td><td>20.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Walk texts change nothing that same-seed noise does not cover; they are read like more comparative sentences.</li>
+    <li>The headroom is in training steps, not in the texts' graph structure.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run: walks at a larger share, LLM-written walks, walks as the whole knowledge stream.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-30" data-from="1,23,28" data-era="Graph probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 30 · 2026-09-19 · <span class="qid">GRAPH-4, DATA-1</span> · §42 Type-to-weakness edge</p>
+    <h2>Can the model state a rule it only ever read inside sentences?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In the original universe every species of a type shares one weakness. Did the weights turn that into a rule ("type T is weak to W"), or keep 136 separate facts? New items were added to the frozen sets of <a class="back" href="#row-1">row 1</a>, for both the original and the independent-weakness universe of <a class="back" href="#row-23">row 23</a>, to follow up <a class="back" href="#row-28">row 28</a>'s probe.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Evaluation only. A bare rule question per type (eight items) and a "path" question per species that states its type and asks its weakness (136 items). Scored on saved adapters. A correction on the way: two training templates do state the rule inside a sentence ("like all T-types it is weak to W").</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">bare: Question: What type are Voltrix-type creatures weak to?
+      Answer:
+path: Javish is a Frostel-type creature. Question: What type is Javish weak to?
+      Answer:
+  options: Voltrix / Pyrrhan / Tidewell / Lithor / Verdane / Umbrine / Gustral / Frostel</pre><p class="note">The two item forms; the path form gives the type and asks the weakness.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>Bare rule: types right of 8</th><th>Path: % right (chance 12.5)</th></tr></thead>
+    <tbody>
+      <tr><td>base</td><td>0</td><td>0</td></tr>
+      <tr><td>A knowledge only</td><td>0</td><td>14.7</td></tr>
+      <tr><td>C</td><td>0</td><td>64</td></tr>
+      <tr><td>C, rerun</td><td>4</td><td>69.1</td></tr>
+      <tr><td>D</td><td>2</td><td>5.1</td></tr>
+      <tr><td>C, 1,600 steps</td><td>1</td><td>68.4</td></tr>
+      <tr><td>C, independent weakness</td><td>0</td><td>39.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A rule read 136 times as a clause is not answerable as a rule (0 to 4 of 8).</li>
+    <li>Given the type in the trained sentence's frame, the weakness comes out (64 to 69). The base and arm D just copy the stated type.</li>
+    <li>On the independent universe the answers follow each species' own weakness (39.7), not a type rule: the weights hold facts per species, reached through the frame they were written in.</li>
+    <li>For a categoriser: a rule written as a clause ("like all grocery stores, X sells food") does not become a generalisation the model can state.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would a rule stated as its own sentence become answerable? Not run.</li>
+  </ul></section>
+</article>

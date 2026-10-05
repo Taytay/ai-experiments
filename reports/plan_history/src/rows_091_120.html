@@ -1,0 +1,895 @@
+<article class="row" id="row-91" data-from="90" data-era="Final recipe checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 91 · 2026-09-27 · <span class="qid">EVAL-9</span> · §91 Trained behaviours hold across users</p>
+    <h2>Do the final recipe's trained behaviours hold for every user, not just one fold?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-90">Row 90</a> trained "the final recipe" (the training mix settled in row 89) four times, each time holding out a different quarter ("fold") of the 20 synthetic REAL-6 users, and showed headline accuracy held on all of them. But the special behaviours the recipe was built to teach had only been measured on fold 0. This row checks them on the other three folds.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Scoring only, no new training. The behaviour test sets were rebuilt for all 20 users: misleading merchant names (the name suggests one category, the stored fact says another), the user's own override of a merchant, questions with no evidence at all (where the model should not be confident), and "alternation" rules (a user files one merchant two ways, by amount at stores or by weekday at restaurants). Each fold's model was read only on its own held-out users. The model is decider-4B, a 4-billion-parameter open model pre-trained to answer multiple-choice questions through a single answer slot.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, Pharmacy &amp; Health, Entertainment, Game stuff, Plenk, Animals, Grendo
+
+Transaction: TARGET* 9488 | $19.87 | Wed
+Category: Gadgets &amp; Food shopping
+...
+Transaction: TST* TARGET RALEIGH NC | $69.29 | Wed
+Category: Game stuff
+...
+Transaction: TARGET*02276 RALEIGH NC 02/19 | $29.93 | Thu
+Category: Gadgets &amp; Food shopping
+
+Transaction: PAYPAL *TARGET | $39.04 | Sat
+Category:</pre><p class="note">An alternation item: this user files Target two ways depending on the purchase; coined names like "Quorra" stop the model leaning on what a category is called. The options with their labels follow in the model's own layout.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Behaviour (all four folds pooled)</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Misleading names stored in the database, % right</td><td>93.8</td></tr>
+      <tr><td>User's override followed, % right</td><td>98.1</td></tr>
+      <tr><td>No-evidence questions answered with p ≥ 0.9 (lower is better)</td><td>0.6%</td></tr>
+      <tr><td>Alternation rule read: stores (amount) / restaurants (weekday), % right</td><td>90.1 / 65.6</td></tr>
+      <tr><td>Random 60/40 splits answered with p ≥ 0.9 (lower is better)</td><td>7.8%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Every behaviour measured on fold 0 holds on the other folds within a few points.</li>
+    <li>The weak spot is the weekday rule at restaurants (64.6 to 68.8 per fold, against 86 to 96 for the amount rule). A set of days is harder to read off six rows than an amount threshold, and training drew day rules from only five fixed day sets.</li>
+    <li>One seed per fold, so small fold differences are within noise.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would more varied day sets in training teach the weekday rule in general? Tested in <a href="#row-92">row 92</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-92" data-from="91" data-era="Final recipe checks" data-status="done">
+  <header>
+    <p class="eyebrow">Row 92 · 2026-09-27 · <span class="qid">REAL-18</span> · §92 Random day sets vs weekend rule</p>
+    <h2>Random weekday rules in training: does variety teach the day-of-week habit?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-91">Row 91</a> found the weekday rule at restaurants was the recipe's weakest behaviour (about 66% right). The guess was that training only ever used five fixed sets of days, too few for the model to learn "read whichever days this user singles out".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The final recipe retrained with each weekday rule drawing its days as a random set of one to three weekdays (<code>ALT_DAYS=rand</code>) instead of the five fixed sets (three of which contain Friday or Saturday). Two seeds (independent training runs), fold 0. Read on the alternation set, REAL-6 and novel category names.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (two seeds)</th><th>Stores, observable rule (% right)</th><th>Restaurants, observable rule (% right)</th><th>Restaurants: probability on the right answer</th></tr></thead>
+    <tbody>
+      <tr><td>Final recipe (fixed day sets)</td><td>88.3</td><td>74.2</td><td>0.66</td></tr>
+      <tr><td>+ random day sets</td><td>86.7</td><td>60.9</td><td>0.55</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The hypothesis was rejected: random day sets made the Friday/Saturday rule worse by 13 points.</li>
+    <li>Part of the fixed-set model's 74 was a prior ("weekend visits are the special ones"), which matches the test and plausibly real users. The general skill of reading arbitrary day rules from six rows is not learned at 800 steps with a 10% share of such episodes.</li>
+    <li>REAL-6 and novel names stayed within the seed spread. The recipe keeps the fixed day sets.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would more rows of the merchant in the prompt, or a larger share of day-rule episodes, teach the general rule? Not pursued directly; the history slices of <a href="#row-98">row 98</a> later put more of the payee's own rows in the prompt.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-93" data-from="43,89" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 93 · 2026-09-27 · <span class="qid">REAL-11</span> · §93 A more realistic synthetic population</p>
+    <h2>REAL-7: a messier, more realistic synthetic population</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-43">Row 43</a> had asked for a successor to REAL-6 shaped like the real population, and on 2026-09-27 the owner asked for it. REAL-6 is tidy: custom category schemes, no mistakes, no changes. The final recipe of <a class="back" href="#row-89">row 89</a> needed a harder, more lifelike check.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>build_real7.py</code> wrote REAL-7 v1: 200 users no model had seen. About 55% use the default scheme ("Dining Out", "Transportation"), 30% lightly customise it (personal categories like "Date night"), 15% use fully custom schemes. A year of spending per user with the 24 most recent rows shown; merchants moved to a new category mid-year; categories created mid-year; 3% of history rows misfiled; idiosyncratic filings; short histories (0, 5 or 25 rows); a held-out family of bank statement styles. Each item records the best answer a reader could give from what the prompt shows, so the ceiling is 84.8%, not 100. Every REAL-6-trained decider-4B reader was scored zero-shot (no training on REAL-7).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Groceries, Dining Out, Transportation, Clothing, Electronics, Home Maintenance, Medical, Entertainment, Vacation, Pets, Fitness, Utilities
+
+Transaction: POS RVR 1502 | $47.04 | Tue
+Category: Pets
+
+Transaction: DEBIT CARD PURCHASE NORDSTROM STORE 9209 RENO NV | $61.55 | Wed
+Category: Clothing
+...
+Transaction: PAYPAL *NORDSTROM | $31.68 | Thu
+Category: Clothing
+
+Transaction: CARD PURCHASE DUNHURST LTD 6805 MADISON WI | $33.32 | Sat
+Category:</pre><p class="note">A "moved" item on the default scheme: the user moved this merchant to a new category mid-year, and none of its rows appear in the 24 shown.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-7 top-1 (% right first; ceiling 84.8)</th><th>Ordinary items (ceiling 98)</th><th>Merchant moved (ceiling 55)</th><th>25-row histories (ceiling 94)</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B untrained</td><td>50.9</td><td>59.1</td><td>40.0</td><td>61.5</td></tr>
+      <tr><td>decider-4B, row 81 recipe</td><td>82.4</td><td>98.2</td><td>38.3</td><td>93.8</td></tr>
+      <tr><td>decider-4B, final recipe (row 89, two seeds)</td><td>82.0</td><td>95.3</td><td>57.5</td><td>85.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>REAL-6 training transfers: trained readers reach 82 of an 84.8 ceiling on new, messier users (untrained: 50.9). The held-out statement style costs nothing.</li>
+    <li>The final recipe gains where its training applies (moved merchants 38 to 58, idiosyncratic merchants 33 to 39) and its confident answers are fewer and more precise.</li>
+    <li>It loses 3 points on ordinary items and 8 on 25-row histories, most likely by trusting a single misfiled row: REAL-6 never had one, and override training taught "the user's own rows win".</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would a few deliberately misfiled rows in training teach the model to follow the majority? Tested in <a href="#row-94">row 94</a>.</li>
+    <li>Rules and random splits are too few here (11 to 32 items each) to judge; a larger, blind set came in <a href="#row-100">row 100</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-94" data-from="93" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 94 · 2026-09-27 · <span class="qid">REAL-11</span> · §94 Misfiled rows fix training gaps</p>
+    <h2>Training with misfiled rows: robust to slips, blind to real changes</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-93">Row 93</a> suggested the final recipe was being pulled off course by a single misfiled history row, something its training data never contained.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The final recipe with <code>SHOT_NOISE=0.04</code>: each example row ("shot") in a training prompt was refiled under another of the user's categories with probability 4%, and those wrong labels were excluded from the training loss so the model is not taught to predict them. Two seeds; read zero-shot on REAL-7 and on the REAL-6 sets.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (REAL-7, two seeds)</th><th>All (% right)</th><th>Ordinary items</th><th>25-row histories</th><th>Merchant moved</th><th>New category</th></tr></thead>
+    <tbody>
+      <tr><td>Final recipe (row 89)</td><td>82.0</td><td>95.3</td><td>85.9</td><td>57.5</td><td>45.9</td></tr>
+      <tr><td>+ shot noise 0.04</td><td>82.2</td><td>97.5</td><td>94.8</td><td>35.8</td><td>38.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The hypothesis held: misfiled rows in training fixed ordinary items (95.3 to 97.5) and 25-row histories (85.9 to 94.8).</li>
+    <li>But the moved-merchant gain vanished (57.5 to 35.8). A genuine move looks like one or two recent rows under a new category, exactly what a misfile looks like, and the noise-trained model now discounts them.</li>
+    <li>Nothing elsewhere broke: REAL-6 88.3 / 86.6, override 98.1 / 99.9 across the two seeds.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can training show the difference between a move (the latest rows switch together) and a slip (one isolated row)? Tried in <a href="#row-95">row 95</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-95" data-from="94" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 95 · 2026-09-27 · <span class="qid">REAL-11</span> · §95 Move episodes don't recover merchants</p>
+    <h2>Teaching "mistake or change?" with moves laid out in time</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-94">Row 94</a>'s misfile training lost the merchants a user had genuinely moved. The idea: show training examples where a move is visible in time order, two early rows under the old category and the two latest under the new one.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Row 94's recipe (misfiled shots at 4%) plus <code>MOVE=0.1</code>: 10% of training episodes laid out as a move, with the target following the new category. Two seeds; REAL-7, REAL-6, novel names, override, alternation.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (REAL-7, two seeds)</th><th>All (% right)</th><th>Ordinary items</th><th>Merchant moved</th><th>New category</th></tr></thead>
+    <tbody>
+      <tr><td>Final recipe (row 89)</td><td>82.0</td><td>95.3</td><td>57.5</td><td>45.9</td></tr>
+      <tr><td>+ shot noise (row 94)</td><td>82.2</td><td>97.5</td><td>35.8</td><td>38.8</td></tr>
+      <tr><td>+ shot noise + moves in time</td><td>82.2</td><td>97.8</td><td>35.0</td><td>40.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Move episodes did not bring the moved merchants back (35.0).</li>
+    <li>REAL-7's moves rarely look like the training episodes. Of 60 moved items, 27 show no row under the new category at all, and the old-category rows are shown in only 13 (a count later found to be an undercount, see <a href="#row-97">row 97</a>). Most real "moves" in the test look like a lone unexpected row, which noise training teaches the model to distrust.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What if misfiles in training only happen where a merchant has several rows, so a lone row stays trusted? Tested in <a href="#row-96">row 96</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-96" data-from="95" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 96 · 2026-09-27 · <span class="qid">REAL-11</span> · §96 Misfiles among multiple rows</p>
+    <h2>Misfiles only where the majority is readable: the trade-off stays</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-95">Row 95</a> concluded that random misfiles teach the model to distrust a lone unexpected row. The fix to try: misfile a row only when that merchant has three or more rows, so the majority still wins but a lone row is never a slip in training.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The final recipe with <code>SHOT_NOISE=0.15 SHOT_NOISE_MAJ=1</code>: a shot is misfiled only if its merchant has three or more shots, at most one per merchant (about 4% of labels overall). Two seeds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (REAL-7, two seeds)</th><th>All (% right)</th><th>Ordinary items</th><th>25-row histories</th><th>Merchant moved</th></tr></thead>
+    <tbody>
+      <tr><td>Final recipe (row 89)</td><td>82.0</td><td>95.3</td><td>85.9</td><td>57.5</td></tr>
+      <tr><td>+ shot noise 0.04 (row 94)</td><td>82.2</td><td>97.5</td><td>94.8</td><td>35.8</td></tr>
+      <tr><td>+ majority-only misfiles</td><td>82.1</td><td>97.3</td><td>92.7</td><td>39.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The ordinary-item fix stayed (97.3) and nothing else was lost (REAL-6 89.6 / 88.3, override 99.7 / 99.4), but moved merchants stayed lost (39.2).</li>
+    <li>Any noise training teaches "follow the majority of a merchant's filings"; a genuine move is the latest filings against an older majority. Without dates, the prompt cannot tell them apart.</li>
+    <li>The line was paused and the recipe stayed as row 89 (no noise), with the trade-off stated. Fixes would sit outside the prompt as built: dates on rows, the product recording a category change, or a recency rule in front of the model.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is the model's confidence at least shaken when filings conflict? Measured in <a href="#row-97">row 97</a>'s review (§97 Confidence when filings change).</li>
+    <li>Would dated rows let the model see a change? Tested in <a href="#row-98">row 98</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-97" data-from="96,93" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 97 · 2026-09-28 · <span class="qid">EVAL-10</span> · §98 User effort and auto-filing</p>
+    <h2>User effort: how much work does each auto-file policy save?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A review on 2026-09-28 noted that on REAL-7 (<a class="back" href="#row-93">row 93</a>) the model's confident errors are items the prompt cannot answer. Accuracy alone does not say what a user would experience. <a class="back" href="#row-96">Row 96</a> had also closed the misfile line, so the question became: given these models, what policy should decide which transactions to file automatically? (A companion analysis, §97 Confidence when filings change, found the final recipe's confidence drops usefully when a merchant's filings are mixed: 38% of such answers confident against 99% on consistent ones; it also corrected rows 95 and 96, whose merchant matching undercounted rows.)</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, over saved scores. A new "effort" metric per transaction: auto-filed and right costs 0; auto-filed and wrong costs 5 (notice, undo, refile; 3 and 10 also tried); otherwise the top three suggestions are shown, costing 1 click if the answer is among them and 3 (a search) if not. Policies: the model alone above a calibrated 98% confidence threshold (fitted on other users); the owner's history rule (auto-file when the user's last two filings of the merchant agree); history with the model agreeing; history or model.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Policy (REAL-7, final recipe)</th><th>Auto-filed %</th><th>Precision %</th><th>Effort per transaction (wrong = 5)</th></tr></thead>
+    <tbody>
+      <tr><td>Suggestions only</td><td>0.0</td><td>–</td><td>1.22</td></tr>
+      <tr><td>Model at 98%</td><td>2.7</td><td>95.4</td><td>1.20</td></tr>
+      <tr><td>History, last 2 agree, whole history</td><td>60.1</td><td>94.5</td><td>0.67</td></tr>
+      <tr><td>History + model agrees</td><td>53.9</td><td>94.4</td><td>0.79</td></tr>
+      <tr><td>History, or model at 98%</td><td>60.9</td><td>94.5</td><td>0.67</td></tr>
+      <tr><td><em>REAL-6: history or model at 98%</em></td><td>81.6</td><td>97.1</td><td>0.32 (from 1.02)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>REAL-6 overstated what model confidence can auto-file: 77% there, only 2.7% on REAL-7, because REAL-7's confident errors are unanswerable from the prompt.</li>
+    <li>The owner's last-two-filings rule carries auto-filing (60% at 94.5%); every error is a merchant whose filing changed or depends on the transaction.</li>
+    <li>Asking the model to agree with the history adds no safety: it agrees exactly where the history is stale.</li>
+    <li>History-or-model cuts effort by 45% on REAL-7 and 69% on REAL-6. The model's other value is the suggestion list (top three hold the answer 89% of the time on REAL-7).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The rule sees the whole history; the model sees only 24 recent rows. Would giving the model the merchant's own dated rows make its confidence mean as much? Taken up in <a href="#row-98">row 98</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-98" data-from="97" data-era="Realistic users" data-status="done">
+  <header>
+    <p class="eyebrow">Row 98 · 2026-09-29 · <span class="qid">REAL-22, REAL-11, REAL-9</span> · §99 The history slice, zero-shot, §101</p>
+    <h2>Which slice of history to put in the prompt, and training on it</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-97">Row 97</a> showed the model only sees the 24 latest rows, while the history rule uses everything. The owner (2026-09-28) asked for "the ultimate slice of history": this payee's rows, similar payees, recent rows, one row per category, dated and in date order, never a row from the query's future.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Stage 1: <code>build_real7_slices.py</code> rebuilt REAL-7's 1,200 queries under ten slice policies (payee's own rows "self", similar payees "sim" by three similarity measures, one row per category "cover", recent rows, 24- or 48-row budgets, dated or not). Building it caught a leak (5 rows dated after their query, 23 rows under a not-yet-created category), now removed. The final recipe was read zero-shot. Stage 2: the recipe retrained with 2,400 extra episodes from 300 new REAL-7-style users in the sliced, dated layout.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Groceries, Dining Out, Transportation, ... Fitness, Utilities
+
+Transaction: 2025-01-09 | PP*DUNWEN G 4262 | $145.66 | Tue
+Category: Utilities
+
+Transaction: 2025-02-27 | DUNHURST LTD*03893 MADISON WI 05/15 | $204.82 | Tue
+Category: Utilities
+
+Transaction: 2025-03-13 | DUNHURST LTD #3423 | $175.18 | Tue
+Category: Utilities
+...
+Transaction: 2025-09-14 | DEBIT CARD PURCHASE WEXHURST AND SONS STORE 7686 FRESNO CA | $75.44 | Fri
+Category: Pets
+
+Transaction: 2025-09-15 | CARD PURCHASE DUNHURST LTD 6805 MADISON WI | $33.32 | Sat
+Category:</pre><p class="note">The same moved-merchant query as row 93, now in the "all parts" slice: the payee's own older rows appear, every row dated, in date order.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>REAL-7, all-parts slice</th><th>Ceiling</th><th>Top-1 (% right)</th><th>Moved / new category</th><th>Auto-filed at 98% (precision)</th></tr></thead>
+    <tbody>
+      <tr><td>Old layout (24 recent rows), final recipe</td><td>84.8</td><td>81.9</td><td>57.5 / 48.0</td><td>2.2%</td></tr>
+      <tr><td>Slice, final recipe zero-shot</td><td>91.6</td><td>87.2</td><td>50.0 / 43.9</td><td>3.0%</td></tr>
+      <tr><td>Slice, trained on dated slices</td><td>91.6</td><td>90.9</td><td>65.8 / 76.5</td><td>48.3% (97.8)</td></tr>
+      <tr><td>Same trained model, dates removed</td><td>91.6</td><td>89.2</td><td>50.8 / 40.8</td><td>18.7%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Zero-shot, the payee's own rows are the whole gain (ceiling 84.8 to 91.6; idiosyncratic merchants 39 to 75). Similar payees, per-category rows, 48 rows and dates add nothing measurable to an untrained reader.</li>
+    <li>Trained on the slice, the reader uses it: 90.9, 99% of the ceiling, and dates are what let it read a change. Its confidence becomes auto-fileable (48% at 97.8%), with REAL-6 held (90.8).</li>
+    <li>Caveat stated at the time: the training users came from the REAL-7 generator, so REAL-7 is now in-distribution.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>How much of the gain is just the generator? Answered by the blind set in <a href="#row-100">row 100</a>: it did not transfer, and <a href="#row-104">row 104</a> found a smaller dose that does.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-99" data-from="53,89" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 99 · 2026-09-29 · <span class="qid">MODEL-17, MODEL-6</span> · §102 Encoders trained like the decoder</p>
+    <h2>Encoder rematch: small encoders trained on exactly the decoder's data</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Earlier encoder tests (§62 Masked-category encoder to §63) left encoders 30 points behind, but those encoders never got the database, rename, override and alternation episodes the decoder recipe (<a class="back" href="#row-89">row 89</a>) had. <a class="back" href="#row-53">Row 53</a> had shown database episodes write merchant facts into a model. The owner was curious about encoders (models that read the whole text at once, typically much smaller and faster) and doubted they could match a Qwen out of the box.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>exp_encoder_mask.py DEC_EPISODES=1</code> trained encoders on the decoder recipe's exact episodes, 3,000 steps, full fine-tuning: ModernBERT-large and Laya (395M), GLiClass-large (400M, pre-trained for label classification), Ettin-encoder-1B (MIT) and EuroBERT-2.1B. The first run memorised its single draw of episodes (loss 1e-6); redrawing fresh episodes each pass fixed it. EuroBERT never learned (loss flat at chance) and was dropped.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6 (% right)</th><th>Novel names</th><th>REAL-7 v1</th><th>No-evidence: p ≥ 0.9</th><th>ms per item (batched)</th></tr></thead>
+    <tbody>
+      <tr><td>Laya, REAL-6 episodes only (§62)</td><td>59.1</td><td>–</td><td>–</td><td>–</td><td>10</td></tr>
+      <tr><td>ModernBERT-large, recipe episodes</td><td>85.9</td><td>79.9</td><td>76.4</td><td>27.6%</td><td>12</td></tr>
+      <tr><td>GLiClass-large, recipe episodes</td><td>90.8</td><td>87.8</td><td>78.7</td><td>53.9%</td><td>10</td></tr>
+      <tr><td>Ettin-encoder 1B, recipe episodes</td><td>90.9</td><td>88.1</td><td>80.3</td><td>50.0%</td><td>14</td></tr>
+      <tr><td>decider-4B, final recipe</td><td>89.8</td><td>87.9</td><td>82.0</td><td>1.3%</td><td>32</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The encoder gap was the training data, not the architecture: GLiClass-large and Ettin-1B match decider-4B on REAL-6 and novel names, about 2.5 to 3 times faster per item.</li>
+    <li>Pre-training still shows: the plain encoders (ModernBERT, Laya) stop near 86.</li>
+    <li>What they lack is what the recipe teaches with "soft targets" (a spread-out answer for no-evidence questions): they are confident on half of no-evidence questions, against decider's 1%. They also trail 3 to 5 points on REAL-7.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Add soft targets and non-repeating REAL-7 slices to the encoder trainer: <a href="#row-102">row 102</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-100" data-from="98" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 100 · 2026-09-29 · <span class="qid">EVAL-11</span> · §103 A generator-blind test set</p>
+    <h2>blind_v1: a test set written without seeing any training code</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The 2026-09-28 review noted every behaviour set had been built by the same generators as the training episodes that fix it, and <a class="back" href="#row-98">row 98</a> made REAL-7 in-distribution. We needed a test the training could not have been tuned to.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A subagent given only the product description and the prompt format, forbidden from reading the repo's code, data or reports, wrote <code>build_blind_v1.py</code>: 250 users over 2025, six scheme kinds (from YNAB-like defaults to 35 to 45 detailed categories), about 250 real chains and billers plus invented local businesses, bills, payroll, refunds, Venmo/Zelle, trips, changes of mind, 2 to 6% misfiles, new users with 0 to 10 rows. 1,500 queries; ceiling 87.9 from the builder's own ideal reader (a blind Claude Opus reader scored 91% on a 120-item sample). Trained readers were read zero-shot.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Housing, Monthly bills, Food, Transport, Health, Fun money, Shopping, Family, Gifts &amp; giving, Saving, Everything else, Inflow: Ready to Assign
+
+Transaction: 2025-04-09 | Topgolf | $111.42 | Wed
+Category: Fun money
+...
+Transaction: 2025-12-26 | Summit Engineering Payroll | $-1636.58 | Fri
+Category: Inflow: Ready to Assign
+...
+Transaction: 2025-12-28 | Aldi | $157.73 | Sun
+Category: Food
+
+Transaction: 2025-12-28 | Orchard Bowl | $66.78 | Sun
+Category:</pre><p class="note">A new local business the model has never seen ("Orchard Bowl", answer Fun money): it must know what a bowling alley is. Income appears as a negative amount.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 top-1 (% right; ceiling 87.9)</th><th>Auto-filed at 98% (precision)</th><th>New users</th><th>Items with &gt; 26 options</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B untrained</td><td>76.4</td><td>23.8% (97.5)</td><td>60</td><td>78.2</td></tr>
+      <tr><td>decider-4B, final recipe (row 89)</td><td>82.0</td><td>51.0% (97.7)</td><td>65</td><td>83.7</td></tr>
+      <tr><td>decider-4B, + dated REAL-7 slices (row 98)</td><td>81.0</td><td>1.1% (96.2)</td><td>62</td><td>83.8</td></tr>
+      <tr><td>Granite-4.0-micro, final recipe (row 101)</td><td>62.5</td><td>0.1%</td><td>–</td><td>17.5</td></tr>
+      <tr><td>Ettin-encoder 1B (row 99)</td><td>77.3</td><td>43.7% (97.6)</td><td>40</td><td>81.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The recipe transfers: 93% of the ceiling, and it still auto-files half the transactions at 97.7%.</li>
+    <li>Row 98's REAL-7 training does not transfer as a whole: it keeps reading changes through dates but loses confidence (auto-files 1%). The recipe stays row 89's; dated slices stay the prompt design.</li>
+    <li>Encoders match decider on the user's own patterns and fall far behind on new users and new local businesses: world knowledge a 4B decoder has and a 1B encoder lacks.</li>
+    <li>Granite collapses on users with more than 26 categories, because it was trained only with labels A to Z.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train on all 255 labels: <a href="#row-103">row 103</a>. Make dated training transfer, and split work between encoder and decoder: <a href="#row-104">row 104</a>. Close the encoder's merchant-knowledge gap: <a href="#row-107">row 107</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-101" data-from="89" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 101 · 2026-09-28 · <span class="qid">MODEL-18</span> · §100 Newer small open decoders</p>
+    <h2>Newer small open models with the same recipe</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner (2026-09-28) asked whether newer small open-licence decoders beat decider-4B. The final recipe of <a class="back" href="#row-89">row 89</a> was fixed, so each base could be trained identically. Larger options were ruled out: Kimi K2 fails the licence rule and any per-transaction budget; Qwen 3.6 exists only at 27B and 35B (deferred, since 9B had not beaten 4B).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The final recipe (800 steps, rank-64 LoRA adapter, one seed) on MiniCPM5-2B, Granite-4.0-micro (3.4B), SmolLM3-3B and Phi-4-mini (3.8B), with the adapter targets extended to Phi-3's fused layers and Granite 4's layer names. Read on REAL-6 fold 0, novel names, the behaviour sets and REAL-7 v1 and v2.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (one seed)</th><th>REAL-6 (% right)</th><th>Novel names</th><th>REAL-7 v1</th><th>Misleading names in DB</th><th>Weekday rule (restaurants)</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B</td><td>89.9</td><td>88.6</td><td>82.4</td><td>97.4</td><td>68.8</td></tr>
+      <tr><td>Granite-4.0-micro</td><td>89.3</td><td>85.9</td><td>82.8</td><td>84.2</td><td>56.2</td></tr>
+      <tr><td>MiniCPM5-2B</td><td>88.3</td><td>78.9</td><td>80.9</td><td>85.5</td><td>51.6</td></tr>
+      <tr><td>SmolLM3-3B</td><td>86.6</td><td>84.2</td><td>81.4</td><td>77.6</td><td>48.4</td></tr>
+      <tr><td>Phi-4-mini-instruct</td><td>86.9</td><td>83.2</td><td>79.7</td><td>77.6</td><td>39.1</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>None passes decider-4B. On the headline sets they are within 1 to 4 points (the seed spread is about 3), so the recipe, not the base, sets those numbers.</li>
+    <li>They differ on what training must write into the weights: stored facts (misleading names 78 to 85 against 97) and the weekday rule. decider's multiple-choice pre-training is the likely reason it learns these in 800 steps.</li>
+    <li>Granite-4.0-micro is the one to keep in mind: level with decider on REAL-6 and REAL-7.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Granite later collapsed on users with more than 26 categories (<a href="#row-100">row 100</a>); training with 255 labels fixed that in <a href="#row-103">row 103</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-102" data-from="99,98" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 102 · 2026-09-29 · <span class="qid">MODEL-17</span> · §104 The encoder recipe completed</p>
+    <h2>Completing the encoder recipe: soft targets and non-repeating slices</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-99">Row 99</a>'s encoders matched decider on REAL-6 but were confident on half of no-evidence questions, because their trainer had no soft targets. Their attempt at <a class="back" href="#row-98">row 98</a>'s dated REAL-7 slices also memorised a fixed set of 2,400 episodes.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The encoder trainer gained soft targets: 10% of episodes get a fresh unknown merchant with a uniform target over all options (<code>EVFREE=0.1</code>), and alternation episodes use their true split. Dated slices came from a pool of 2,400 users (19,200 episodes), with a fresh random 2,400 per draw so nothing repeats. GLiClass-large and Ettin-1B; the slice arm with two seeds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6 (% right)</th><th>REAL-7 v2</th><th>blind_v1</th><th>Blind auto-filed (precision)</th><th>No-evidence: p ≥ 0.9</th></tr></thead>
+    <tbody>
+      <tr><td>Ettin-1B, recipe episodes (row 99)</td><td>90.9</td><td>83.3</td><td>77.3</td><td>43.7% (97.6)</td><td>50.0%</td></tr>
+      <tr><td>Ettin-1B, + soft targets</td><td>89.6</td><td>84.2</td><td>77.9</td><td>44.3% (97.4)</td><td>0.0%</td></tr>
+      <tr><td>Ettin-1B, + soft targets + dated slices</td><td>90.1</td><td>90.6</td><td>78.8</td><td>11.1% (95.8)</td><td>1.3%</td></tr>
+      <tr><td>decider-4B, final recipe</td><td>89.8</td><td>87.2</td><td>82.0</td><td>51.0% (97.7)</td><td>1.3%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>With the whole recipe, Ettin-1B has every trained behaviour decider-4B has (misleading names 97.4, override 98.0, no-evidence questions 0% confident) at 14 ms per item against 32.</li>
+    <li>What remains is pre-training: the weekday rule (44 against 69) and blind_v1's new users and new businesses keep the encoder 4 points behind.</li>
+    <li>Dated slices do for the encoder what they did for decider, including the same loss of transferable confidence on the blind set (44% to 11%). The non-repeating pool removed the memorisation.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Encoder or decoder is not the question once training is equal. Can an encoder handle known payees and the decoder the rest? Read by user effort in <a href="#row-104">row 104</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-103" data-from="100" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 103 · 2026-09-29 · <span class="qid">MODEL-16, EVAL-11</span> · §105 Options beyond 26 categories</p>
+    <h2>Users with more than 26 categories: training on all 255 labels</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-100">Row 100</a> found 27% of blind_v1's items belong to users with 27 to 45 categories, beyond the A to Z labels the one-slot readers were trained with. Granite read those at 17.5; decider coped only because its own pre-training used 255 labels.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The final recipe with <code>LABELS=rand255</code> (each question draws its option labels at random from decider's 255 single-token labels, such as "AE" or "FX"), and a second arm adding <code>EMPTY=20</code> (half the episodes get 1 to 20 extra made-up categories with no examples, so training questions also go past 26 options). decider-4B and Granite-4.0-micro, one seed each.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>Novel names (% right)</th><th>blind_v1</th><th>Blind, &gt; 26 options</th><th>Blind auto-filed at 98% (precision)</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, A–Z (row 89, seed 0)</td><td>88.6</td><td>82.5</td><td>84.2</td><td>50.8% (97.8)</td></tr>
+      <tr><td>decider-4B, rand255</td><td>85.9</td><td>82.7</td><td>85.7</td><td>56.8% (97.7)</td></tr>
+      <tr><td>decider-4B, rand255 + empty categories</td><td>90.9</td><td>82.4</td><td>86.2</td><td>58.3% (97.7)</td></tr>
+      <tr><td>Granite, A–Z</td><td>85.9</td><td>62.5</td><td>17.5</td><td>0.1%</td></tr>
+      <tr><td>Granite, rand255</td><td>81.5</td><td>80.6</td><td>83.2</td><td>23.8% (96.6)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A one-slot reader must be trained on as many labels as users have categories: Granite went from 17.5 to 83 on those items.</li>
+    <li>decider loses nothing with 255 labels and auto-files more of the blind set (51% to 57 to 58%).</li>
+    <li>Empty categories help novel names (90.9): they teach the reader not to rely on a category having examples.</li>
+    <li>The recipe took <code>LABELS=rand255 EMPTY=20</code> (one seed). Granite still trails on stored facts and is not a replacement.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A second seed, and the combination with dated slices: <a href="#row-105">row 105</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-104" data-from="100,102" data-era="Encoders and blind set" data-status="done">
+  <header>
+    <p class="eyebrow">Row 104 · 2026-09-29 · <span class="qid">REAL-22, MODEL-17, EVAL-11</span> · §106 A small dose of dated slices, §107</p>
+    <h2>Dated-slice training that transfers, and the encoder-then-decoder split</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-100">Row 100</a> showed that row 98's dated REAL-7 training helped changes of mind but wrecked auto-filing on the blind set. <a class="back" href="#row-102">Row 102</a> made the encoder a full candidate, so a split (encoder for known payees, decoder for the rest) was worth measuring.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The row text planned slices from two generators (REAL-7 and a second blind one). What ran instead (§106 A small dose of dated slices) was a test of dose and breadth: the recipe with 300, 600 or 1,200 dated slice episodes drawn from the 2,400-user REAL-7 pool, beside its 2,250 REAL-6 episodes, one seed each. Then the system (§107 The recipe settled by effort): Ettin-1B auto-files what clears its own 98% threshold and decider reads the rest, scored by user effort on blind_v1.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B with n dated slices</th><th>blind_v1 (% right)</th><th>Blind auto-filed (precision)</th><th>Blind changed mind</th><th>REAL-7 v2</th></tr></thead>
+    <tbody>
+      <tr><td>None (row 89)</td><td>82.5</td><td>50.8% (97.8)</td><td>69</td><td>88.4</td></tr>
+      <tr><td>300 from 2,400 users</td><td>83.5</td><td>51.7% (97.9)</td><td>78</td><td>88.9</td></tr>
+      <tr><td>1,200 from 2,400 users</td><td>82.7</td><td>43.8% (98.0)</td><td>75</td><td>90.8</td></tr>
+      <tr><td>2,400 from 300 users (row 98)</td><td>79.8</td><td>0.9% (92.3)</td><td>75</td><td>90.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The auto-file collapse came from the dose and narrowness (2,400 fixed episodes from 300 users), not from dates. 300 episodes from a wide pool keep auto-filing and lift changes of mind from 69 to 78.</li>
+    <li>More slices buy in-distribution REAL-7 accuracy and cost blind auto-filing.</li>
+    <li>The encoder filing first and decider reading the rest cut blind effort to 0.59 to 0.63 (decider alone about 0.69); decider reads 56% of transactions (detail in <a href="#row-105">row 105</a>).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Do 255 labels, empty categories and 300 slices add up? <a href="#row-105">Row 105</a>.</li>
+    <li>The encoder's gap on new merchants: <a href="#row-107">row 107</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-105" data-from="103,104" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 105 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · §107 The recipe settled by effort</p>
+    <h2>Recipe v2: do the two improvements add up?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-103">Row 103</a> (255 labels + empty categories) and <a class="back" href="#row-104">row 104</a> (300 dated slices) each improved on row 89 alone, with one seed. Recipe v2 combines both, with two seeds, and the choice is made on blind_v1 by user effort.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-4B with row 89 + <code>LABELS=rand255 EMPTY=20</code> + <code>R7TRAIN=all_kind_u2400 R7N=300</code>, two seeds, read on every set. Effort uses the row 97 metric (auto-filed right 0, wrong 5, top-3 suggestion 1, search 3), for decider alone and behind the encoder.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Recipe</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort, decider alone (seeds)</th><th>Effort, encoder first</th></tr></thead>
+    <tbody>
+      <tr><td>Row 89 (A–Z)</td><td>89.8</td><td>82.0</td><td>51.0%</td><td>0.693 / 0.702</td><td>0.621 / 0.631</td></tr>
+      <tr><td>+ rand255 + empty categories</td><td>89.3</td><td>82.6</td><td>55.0%</td><td>0.627 / 0.691</td><td>0.588 / 0.629</td></tr>
+      <tr><td>Recipe v2 (both)</td><td>87.4</td><td>83.1</td><td>39.7%</td><td>0.753 / 0.878</td><td>0.645 / 0.692</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The changes do not add. Together they are more accurate (83.1 blind, 89.1 REAL-7) but less sure where it matters (auto-filing 40%, one seed 32%) and 2 points lower on REAL-6.</li>
+    <li>The recipe became row 89 + 255 labels + empty categories. Dated slices stay the prompt design but stay out of training.</li>
+    <li>The system: history rule, then the encoder files what it is sure of, then decider reads the rest (56% of transactions). Effort falls from 0.69 to 0.59 to 0.63, and the encoder is three times cheaper per item.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Perhaps the two augmentations share too small a training budget at 800 steps: tested in <a href="#row-106">row 106</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-106" data-from="105" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 106 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · §109 Doubling training doesn't help</p>
+    <h2>Twice the training steps</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-105">Row 105</a> guessed recipe v2's two augmentations might compete for an 800-step budget.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The recipe and recipe v2 each trained for 1,600 steps, two seeds each, scored on every set and by blind effort.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Recipe</th><th>Steps</th><th>REAL-6 (% right)</th><th>Blind auto-filed</th><th>Effort alone</th><th>Effort, encoder first</th></tr></thead>
+    <tbody>
+      <tr><td>rand255 + empty (the recipe)</td><td>800</td><td>89.3</td><td>55.0%</td><td>0.659</td><td>0.608</td></tr>
+      <tr><td>Recipe v2</td><td>800</td><td>87.4</td><td>39.7%</td><td>0.815</td><td>0.668</td></tr>
+      <tr><td>rand255 + empty</td><td>1,600</td><td>87.6</td><td>46.4%</td><td>0.745</td><td>0.653</td></tr>
+      <tr><td>Recipe v2</td><td>1,600</td><td>89.3</td><td>54.5% [45.7, 63.4]</td><td>0.693</td><td>0.632</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>More steps are not the fix: the recipe gets worse at 1,600 on every blind measure and on REAL-6.</li>
+    <li>Recipe v2 recovers on average but not reliably: one seed auto-files 63% (effort 0.607, the best single run so far), the other 46%.</li>
+    <li>Calibrated auto-filing is the most seed-sensitive measure; reading it needs three or more seeds. The recipe stays at 800 steps.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Seed sensitivity of auto-filing was measured over three seeds of each part in <a href="#row-110">row 110</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-107" data-from="104,100" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 107 · 2026-09-29 · <span class="qid">MODEL-17, REAL-19</span> · §108 Real business names for encoders</p>
+    <h2>Real business names as training examples</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-100">Row 100</a> left the encoder 20 to 40 points behind decider on new local businesses: a 4B decoder knows what "Harbor Bakery" is; a 1B encoder trained on 240 synthetic merchants does not. <a class="back" href="#row-104">Row 104</a> made the encoder the system's first stage, so its gap mattered.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>build_overture_pool.py</code> drew 33,555 real US businesses from Overture places (open map data), excluding every test place and every blind_v1 name. With <code>OVDB=0.2</code>, a fifth of training episodes get a target and four example rows from this pool, filed under the user's category matching the place's standard type. decider-4B (two seeds) and Ettin-1B.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Grocery run, Restaurants, Gas &amp; Auto, Clothing, Zindle, Home repairs, Drugstore, Fennow, Korrel, Pravin, Exercise, Phone and internet
+
+Transaction: CHECKCARD 12/11 PEP BOYS RALEIGH NC | $2...
+...
+Transaction: IKEA* 7397 | $35.91 | Sat
+Category: Home repairs
+
+Transaction: SQ *HOFFMAN'S MEAT MARKET DETROIT LAKES MN 02/18 | $45.79 | Sun
+Category:</pre><p class="note">A test item from the novel-merchants set: a real butcher shop in no database and no history (answer: Grocery run).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>Real businesses in no DB: descriptive / plain / chain (% right)</th><th>blind_v1</th><th>Blind auto-filed</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, recipe</td><td>65.9 / 44.4 / 58.7</td><td>82.6</td><td>55.0%</td></tr>
+      <tr><td>decider-4B, + Overture episodes</td><td>77.3 / 48.5 / 65.4</td><td>83.6</td><td>41.8%</td></tr>
+      <tr><td>Ettin-1B, encoder recipe</td><td>30.0 / 18.2 / 36.5</td><td>77.9</td><td>44.3%</td></tr>
+      <tr><td>Ettin-1B, + Overture episodes</td><td>72.7 / 47.5 / 65.4</td><td>77.7</td><td>42.2%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The encoder's merchant knowledge was missing training, not capacity: +29 to +43 points on unknown real businesses, level with decider.</li>
+    <li>New users stay behind (encoder 45, decider 65 to 70): with no history the answer rests on what the user's category names mean.</li>
+    <li>decider gains knowledge but loses blind auto-filing (55% to 42%), the same pattern as dated slices. The encoder recipe takes <code>OVDB=0.2</code>; decider's does not yet.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Short histories in training for new users, and a smaller Overture share for decider: <a href="#row-108">row 108</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-108" data-from="107" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 108 · 2026-09-29 · <span class="qid">EVAL-11, MODEL-17</span> · §110 New users and episode shapes</p>
+    <h2>New users and the Overture dose</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-107">Row 107</a> left both readers weakest on blind_v1's new users (0 to 10 rows of history), and every training episode so far had 24 example rows.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>SHORT=0.15</code> keeps only 0 to 10 example rows in 15% of episodes. Arms: decider's recipe + SHORT (two seeds), + Overture at a quarter of the share (0.05), + both; Ettin's encoder recipe + Overture 0.2 + SHORT, and + 20 empty categories.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 (% right)</th><th>Blind new users</th><th>Blind auto-filed</th><th>REAL-6</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, recipe</td><td>82.6</td><td>64.6</td><td>55.0%</td><td>89.3</td></tr>
+      <tr><td>+ short histories</td><td>80.8</td><td>62.2</td><td>51.0%</td><td>87.6</td></tr>
+      <tr><td>+ Overture 0.05 + short</td><td>83.1</td><td>67.9</td><td>45.5%</td><td>90.9</td></tr>
+      <tr><td>Ettin-1B, encoder recipe</td><td>77.9</td><td>42.3</td><td>44.3%</td><td>89.6</td></tr>
+      <tr><td>Ettin-1B + Overture 0.2 + short + empty</td><td>79.3</td><td>44.6</td><td>52.2%</td><td>90.9</td></tr>
+      <tr><td><em>System: that encoder, then decider (effort)</em></td><td colspan="4">0.571 / 0.601 (decider alone 0.627 / 0.691); decider reads 48%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Short histories in training do not help new users. Their items are hard because the answer rests on what the category names mean, which 24-row episodes already teach when the merchant is absent.</li>
+    <li>Empty categories help the encoder as they helped decider: +2 blind points, +15 points of auto-filing, and they recover what Overture cost.</li>
+    <li>Encoder recipe: Ettin-1B + Overture 0.2 + short 0.15 + empty 20. decider's recipe unchanged.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Reading the new-user errors showed payroll, insurance, loans and bills, kinds no training episode contained: <a href="#row-109">row 109</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-109" data-from="108" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 109 · 2026-09-29 · <span class="qid">EVAL-11</span> · §111 Non-spending kinds in training</p>
+    <h2>Bills, income and transfers: kinds the training world never had</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-108">Row 108</a>'s new-user misses on blind_v1 were mostly payroll, insurance, loans and bills. REAL-6's world had twelve spending categories and nothing else. Caveat: this row was motivated by reading blind_v1's errors, so blind_v1 is less blind for it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>ai_experiments.kinds</code> catalogues 13 kinds from general knowledge of US budgets (income, rent/mortgage, insurance, loans, subscriptions, savings transfers, fees, cash and others), with payees, bank statement styles ("DIR DEP", "PPD ID", ACH), amounts, signs and typical category names; any payee name blind_v1 uses was dropped. <code>KINDS=0.2</code>: a fifth of episodes add one to three such categories, usually with a few rows among the shots. decider (two seeds) and the encoder.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Inflow: Ready to Assign, Housing, Electric, Water/Trash, Gas bill, Internet &amp; phone, Insurance, Car payment, Groceries, Getting around, Health, Pets, Savings, Dining Out, Fun money, Streaming &amp; apps, Household goods, Clothing, Hair &amp; beauty, Birthdays &amp; gifts, Giving, Travel, Miscellaneous, Cash
+
+Transaction: 2025-11-10 | NICOR GAS BILL PAY PPD ID: 3534922777 | $79.63 | Mon
+Category:</pre><p class="note">A blind_v1 new user with no history at all: a utility bill paid by ACH (answer: Gas bill), the kind of item this row targets.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 (% right)</th><th>New users: bill / income-like (19 items)</th><th>Blind auto-filed</th><th>REAL-6</th><th>Novel names</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, recipe</td><td>82.6</td><td>55</td><td>55.0%</td><td>89.3</td><td>89.3</td></tr>
+      <tr><td>decider-4B, + kinds</td><td>83.1</td><td>74</td><td>51.3%</td><td>86.1</td><td>84.7</td></tr>
+      <tr><td>Ettin-1B, encoder recipe</td><td>79.3</td><td>26</td><td>43.1%</td><td>88.8</td><td>88.9</td></tr>
+      <tr><td>Ettin-1B, + kinds</td><td>79.8</td><td>42</td><td>56.1%</td><td>91.3</td><td>90.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The new-user misses were a gap in the training world: bills and income for new users rise 55 to 74 (decider) and 26 to 42 (encoder). Other new-user items do not move.</li>
+    <li>The encoder takes kinds at no cost (one seed); encoder recipe adds <code>KINDS=0.2</code>.</li>
+    <li>decider pays 3 points on REAL-6 and 5 on novel names at a 20% share, as with every added episode family.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does a 10% share spare decider? Tested in the three-seed batch of <a href="#row-110">row 110</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-110" data-from="109" data-era="Recipe and system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 110 · 2026-09-29 · <span class="qid">EVAL-10, EVAL-11</span> · §112 The system across three seeds</p>
+    <h2>The two-model system over three seeds of each part</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Auto-filing varied from 34 to 63% across seeds of a single recipe (rows <a href="#row-106">106</a> and <a class="back" href="#row-109">109</a>), so the system's numbers needed several seeds of each model.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three seeds each: decider-4B with the recipe, decider-4B + kinds at 10%, and the encoder (Ettin-1B with kinds 0.2). Every encoder seed was paired with every decider seed (nine pairs). The encoder auto-files above its own calibrated 98% threshold; decider reads the rest.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>System (blind_v1)</th><th>Effort [range]</th><th>Auto-filed % [range]</th><th>Precision %</th><th>decider reads</th></tr></thead>
+    <tbody>
+      <tr><td>Encoder alone (3 runs)</td><td>0.715 [0.681, 0.770]</td><td>52.0 [46.3, 56.1]</td><td>97.9</td><td>–</td></tr>
+      <tr><td>decider-4B alone (3 runs)</td><td>0.655 [0.627, 0.691]</td><td>55.8 [51.7, 58.3]</td><td>97.6</td><td>–</td></tr>
+      <tr><td>Encoder, then decider (9 pairs)</td><td>0.588 [0.567, 0.619]</td><td>63.5 [59.8, 65.5]</td><td>97.5</td><td>48%</td></tr>
+      <tr><td>Encoder, then decider + kinds 0.1</td><td>0.580 [0.561, 0.619]</td><td>63.8 [59.4, 65.7]</td><td>97.5</td><td>48%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The system's advantage is steady: every one of the nine pairs beats decider alone on effort and auto-files more at the same precision.</li>
+    <li>The encoder alone is weakest; it is the first stage, not a replacement.</li>
+    <li>Seed spread in auto-filing is 6 to 10 points for one model and narrows in the system.</li>
+    <li>Kinds at 10% still cost decider 3 to 4 points on REAL-6 and novel names for +0.5 on the blind set, so decider's recipe stays. Real histories, full of bills and income, may settle it.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can the prompt format itself make decider surer? The owner's format proposals: <a href="#row-111">row 111</a>. Can agreement between the two models do better than a cascade? <a href="#row-116">Row 116</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-111" data-from="110" data-era="Prompt formats" data-status="done">
+  <header>
+    <p class="eyebrow">Row 111 · 2026-09-29 · <span class="qid">MODEL-16, REAL-22</span> · §113 Labelled history rows in the prompt</p>
+    <h2>Prompt format, one change at a time: labelled history rows win</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>With the recipe and system settled in <a class="back" href="#row-110">row 110</a>, the owner (2026-09-29) proposed prompt-format changes: list categories once with their labels, write each history row's category with its label, check label tokenization, put the weekday next to the date, double the rows.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Each change trained and read in its own format, one at a time, against decider-4B's recipe and Ettin-1B's, two seeds each. In decider's usual layout the options come after the question ("Options: (AE) Pets ... Answer: ("). The labelled layouts put the list at the top and end the query with "Category: (". Tokenization was checked: after "- (" and "Category: (" each of the 255 labels is a single token, the one the answer slot reads.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- (EB) Family
+- (IM) Housing
+- (DP) Food
+...
+
+Transaction: 2025-05-10 | Venmo | $25.00 | Sat
+Category: (DP) Food
+
+Transaction: 2025-09-04 | Wells Fargo Home Mortgage | $3847.79 | Thu
+Category: (IM) Housing
+
+Transaction: 2025-09-05 | Venmo | $30.00 | Fri
+Category: (</pre><p class="note">The winning "labelled rows" layout (from §113 Labelled history rows in the prompt, a blind_v1 user): the answer is the label token the matching history rows already carry.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B arm</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort alone</th><th>Effort in system</th></tr></thead>
+    <tbody>
+      <tr><td>Usual layout (the recipe, 3 seeds)</td><td>89.4</td><td>82.5</td><td>55.8%</td><td>0.655</td><td>0.588</td></tr>
+      <tr><td>Labelled list only, ends "Category: ("</td><td>88.9</td><td>81.0</td><td>45.1%</td><td>0.782</td><td>0.652</td></tr>
+      <tr><td>+ labelled rows</td><td>86.4</td><td>82.5</td><td>63.3%</td><td>0.589</td><td>0.570</td></tr>
+      <tr><td>Weekday next to the date</td><td>88.6</td><td>82.4</td><td>53.8%</td><td>0.665</td><td>0.595</td></tr>
+      <tr><td>48 rows</td><td>88.1</td><td>82.2</td><td>42.4%</td><td>0.794</td><td>0.629</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Writing the label in every history row makes decider auto-file 63% of blind_v1 at the same accuracy (from 56%), the best single-model effort so far, at a cost of 3 points on REAL-6 and 5 on novel names.</li>
+    <li>The labelled list alone hurts: the model has to bind each row's name to a label itself.</li>
+    <li>Weekday placement and 48 rows do not help; 48 rows made confidence unstable (26 to 58%). The encoder is indifferent to layout.</li>
+    <li>decider's recipe takes <code>LAYOUT=labelled_shots</code>.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would a table format read better? <a href="#row-112">Row 112</a>. JSON, YAML, TypeScript? Rows <a href="#row-113">113</a> to <a href="#row-115">115</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-112" data-from="111" data-era="Prompt formats" data-status="done">
+  <header>
+    <p class="eyebrow">Row 112 · 2026-09-29 · <span class="qid">MODEL-16</span> · §113 Labelled history rows in the prompt</p>
+    <h2>History as a TSV table</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Part of the owner's format list alongside <a class="back" href="#row-111">row 111</a>: the history as one tab-separated table inside a tag, category last, the new transaction as its own one-row table.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Two layouts. <code>table</code>: rows in <code>&lt;historical_transactions&gt;</code> with a header (date, weekday, description, amount, category), the query in <code>&lt;new_transaction&gt;</code> with its category cell "?", then the usual Options and "Answer: (". <code>table_labelled</code>: the labelled list at the top, cells written " (FX) Transportation", and the query's cell left open at " (". A tab followed directly by "(" and a label merges into the wrong token for 209 of 255 labels, so cells start with a space. decider-4B and Ettin-1B, two seeds each.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">&lt;historical_transactions&gt;
+date	weekday	description	amount	category
+...	...	...	...	 (FX) Transportation
+&lt;/historical_transactions&gt;
+&lt;new_transaction&gt;
+...	...	...	&lt;amount&gt;	 (</pre><p class="note">Shape of the labelled table layout as documented in the code and §113 Labelled history rows in the prompt (fields elided, not a rendered item).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort in system</th></tr></thead>
+    <tbody>
+      <tr><td>decider, labelled text rows (row 111)</td><td>86.4</td><td>82.5</td><td>63.3%</td><td>0.570</td></tr>
+      <tr><td>decider, TSV table, Options / "Answer: ("</td><td>88.1</td><td>82.7</td><td>50.7%</td><td>0.599</td></tr>
+      <tr><td>decider, TSV table, labelled cells</td><td>84.7</td><td>81.3</td><td>55.1%</td><td>0.608</td></tr>
+      <tr><td>Ettin-1B, TSV table</td><td>88.8</td><td>80.1</td><td>48.4%</td><td>0.589</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Tables give decider's best blind top-1 (82.7) but less auto-filing and a weaker weekday rule (53.1): the weekday sits a column away from the rule's rows.</li>
+    <li>Neither model gains; plain text with labelled rows stays.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would a format models know well from pre-training (JSON, YAML) do better? <a href="#row-113">Row 113</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-113" data-from="112" data-era="Prompt formats" data-status="done">
+  <header>
+    <p class="eyebrow">Row 113 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats</p>
+    <h2>JSON and YAML histories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-112">row 112</a>'s tables, the owner asked whether a regular structured format the models know from pre-training reads better than text.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Labelled variants of row 111's winner, fields in the same order (date, description, amount, weekday, category). JSON lines (<code>json_labelled</code>): one object per row, the query ending <code>"category": "(</code>. YAML (<code>yaml_labelled</code>): a list of records, descriptions quoted, the query ending <code>  category: (</code>. Both slot positions tokenize cleanly for all 255 labels. decider-4B and Ettin-1B, two seeds each.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">&lt;historical_transactions&gt;
+{"date": ..., "description": ..., "amount": ..., "weekday": ..., "category": "(GU) Medical"}
+...
+&lt;/historical_transactions&gt;
+&lt;new_transaction&gt;
+{..., "category": "(</pre><p class="note">The JSON-lines layout as described in §114 Structured prompt formats (fields elided). YAML is the same with "  category: (GU) Medical".</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort alone</th><th>Effort in system</th></tr></thead>
+    <tbody>
+      <tr><td>Text, labelled rows (the recipe)</td><td>86.4</td><td>82.5</td><td>63.3%</td><td>0.589</td><td>0.570</td></tr>
+      <tr><td>YAML, labelled</td><td>86.2</td><td>82.2</td><td>59.2%</td><td>0.625</td><td>0.584</td></tr>
+      <tr><td>JSON lines, labelled</td><td>85.6</td><td>81.6</td><td>53.8%</td><td>0.679</td><td>0.607</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Same accuracy, less confidence: YAML comes closest (59% auto-filed), JSON trails (54%).</li>
+    <li>The encoder reads JSON and YAML as it reads everything (system effort 0.587 in both).</li>
+    <li>Structured formats roughly double the tokens per row, and training time (56 to 61 minutes against 25 to 30).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>TypeScript, the owner's next suggestion: <a href="#row-114">row 114</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-114" data-from="113" data-era="Prompt formats" data-status="done">
+  <header>
+    <p class="eyebrow">Row 114 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats</p>
+    <h2>History as TypeScript, categories as a union type</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner's next format after <a class="back" href="#row-113">row 113</a>: code, which models see a lot of in pre-training and which ties a label to a type.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>ts_labelled</code>: the categories as a string-literal union (<code>| "FX" /* Transportation */</code>), an <code>interface Transaction</code>, <code>const history: Transaction[]</code> with rows like <code>category: "GU" /* Medical */</code>, and the slot after <code>const next: Transaction = { ..., category: "</code>. A quoted literal tokenizes cleanly for all 255 labels; enum dot access (<code>.GU</code>) would not (it merges for 245). decider-4B and Ettin-1B, two seeds each. The encoder ran out of memory on the longer prompts and was rerun at 8 sequences × 6,000 steps.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">type CategoryId =
+  | "FX" /* Transportation */
+  | "GU" /* Medical */
+  ...;
+interface Transaction { ... }
+const history: Transaction[] = [
+  { ..., category: "GU" /* Medical */ },
+  ...
+];
+const next: Transaction = { ..., category: "</pre><p class="note">Shape of the union layout as described in PLAN and §114 Structured prompt formats (fields elided).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort in system</th></tr></thead>
+    <tbody>
+      <tr><td>decider, text with labelled rows</td><td>86.4</td><td>82.5</td><td>63.3%</td><td>0.570</td></tr>
+      <tr><td>decider, TypeScript union with name comments</td><td>86.7</td><td>82.2</td><td>52.0%</td><td>0.602</td></tr>
+      <tr><td>Ettin-1B, TypeScript (rerun)</td><td>–</td><td>80.3</td><td>52.8%</td><td>0.583</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A familiar format is not what the reader needs; the label next to the name in each row is. TypeScript reads at the same top-1 but auto-files less.</li>
+    <li>The encoder reads TypeScript as it reads every other layout.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the owner's preferred enum form work, and are the name comments needed? <a href="#row-115">Row 115</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-115" data-from="114" data-era="Prompt formats" data-status="done">
+  <header>
+    <p class="eyebrow">Row 115 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats</p>
+    <h2>TypeScript with the owner's enum: are the name comments needed?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner proposed an enum instead of <a class="back" href="#row-114">row 114</a>'s union, and asked whether the category name has to be repeated in each row.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>enum Categories { "GU" = "Medical", ... }</code> with quoted member names, <code>const transactions: Array&lt;Transaction&gt;</code>, rows <code>category: Categories["GU"]</code>, and the slot after <code>Categories["</code> (bracket access, because <code>Categories.GU</code> tokenizes badly). Two arms: without (<code>ts_enum</code>) and with the name as a comment in every row (<code>ts_enum_names</code>). decider-4B, two seeds each.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">enum Categories { "GU" = "Medical", ... }
+const transactions: Array&lt;Transaction&gt; = [
+  { ..., category: Categories["GU"] /* Medical */ },
+  ...
+];
+... category: Categories["</pre><p class="note">The <code>ts_enum_names</code> arm as described in §114 Structured prompt formats (fields elided); <code>ts_enum</code> drops the comment.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed [seeds]</th><th>Effort alone</th></tr></thead>
+    <tbody>
+      <tr><td>Text, labelled rows</td><td>86.4</td><td>82.5</td><td>63.3%</td><td>0.589</td></tr>
+      <tr><td>Enum, <code>Categories["GU"]</code></td><td>88.4</td><td>81.7</td><td>47.0% [46.5, 47.5]</td><td>0.744</td></tr>
+      <tr><td>Enum + name comments</td><td>87.4</td><td>82.1</td><td>55.4% [53.0, 57.9]</td><td>0.672</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The enum needs the names in the rows: 47% auto-filed without, 55% with. Declared once, a label must be looked up to find its meaning, the same hop that hurt the labelled list in <a href="#row-111">row 111</a>.</li>
+    <li>No structured format beats plain text with labelled rows; the recipe's layout stays <code>labelled_shots</code>.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None new for formats; attention moved to combining the two models (<a href="#row-116">row 116</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-116" data-from="113,110" data-era="Serving the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 116 · 2026-09-29 · <span class="qid">EVAL-10, MODEL-9</span> · §115 Agreement and calibrated confidence</p>
+    <h2>Using encoder and decoder agreement, and is confidence a real probability?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner (2026-09-29) asked whether the two models agreeing could raise accuracy, and whether the encoder's confidence corresponds to a real probability. <a class="back" href="#row-110">Row 110</a> had a cascade (encoder first, then decider); the format rows up to <a class="back" href="#row-113">row 113</a> gave decider its labelled-rows recipe.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, over saved blind_v1 scores: the encoder (three seeds) and decider-4B with labelled rows (two seeds), six pairs. Policies: agreement alone; agree and both confident; agree and either confident; product or mean of the two probability distributions. Calibration checked by reliability (is a 95% answer right 95% of the time?) and ECE (expected calibration error: the average gap between stated confidence and actual accuracy), raw and after a temperature (a single scaling factor) fitted on other users.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Policy (blind_v1)</th><th>Auto-filed %</th><th>Precision %</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr><td>decider alone (98%)</td><td>63.3</td><td>97.9</td><td>0.589</td></tr>
+      <tr><td>Cascade: encoder, then decider</td><td>66.3</td><td>97.6</td><td>0.570</td></tr>
+      <tr><td>Both agree (no threshold)</td><td>83.5</td><td>90.9</td><td>0.640</td></tr>
+      <tr><td>Both agree and both confident</td><td>48.9</td><td>98.3</td><td>0.699</td></tr>
+      <tr><td>Both agree and either confident</td><td>65.2</td><td>97.8</td><td>0.560</td></tr>
+      <tr><td><em>Calibration error (ECE): encoder raw / calibrated; decider raw / calibrated</em></td><td colspan="3">5.6 / 1.9; 7.0 / 2.1</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>They agree on 83.5% of transactions and are right 90.9% of the time when they do; when they disagree, decider is right 39.5% and the encoder 21.7%.</li>
+    <li>Agreement alone is not safe to auto-file (91% precision); "agree and either confident" files 65% at 97.8%, the lowest effort so far (0.560).</li>
+    <li>After one temperature fitted on other users, the encoder's confidence is a calibrated probability (its 0.95 to 0.98 answers are right 98% of the time); decider's likewise.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What to do with the 35% the pair does not settle: escalate to a larger model (<a href="#row-120">row 120</a>).</li>
+    <li>Does the 98% threshold hold for subgroups such as new users? Taken up in <a href="#row-121">row 121</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-117" data-from="100" data-era="Serving the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 117 · 2026-09-29 · <span class="qid">INFRA-3</span></p>
+    <h2>Test sets for one user's whole sync at once</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In the product, one user's bank sync brings 10 to 100 new transactions at once (owner, 2026-09-29). Reading each with its own full prompt repeats most of the work. The blind generator of <a class="back" href="#row-100">row 100</a> could produce realistic syncs. Added in the 2026-09-29 gaps review.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Tooling, no model run. <code>build_blind_v1.py</code> gained two outputs. <code>BLIND_SPLIT=1</code> writes <code>blind_v1_split</code>: blind_v1's items with the same rows, but the payee's own and similar payees' rows moved after the shared rows, under their own header. <code>BLIND_BULK=1</code> writes <code>blind_bulk_v1</code>: for each full user, a cutoff after 2025-08-01, the next transactions (up to 40) all unfiled, and the history filed before the cutoff, in both the separate-prompt layout and the split one (6,660 items in total). The prompt code learned to read section headers.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Housing, Monthly bills, Food, Transport, Health, Fun money, Shopping, Family, Gifts &amp; giving, Saving, Everything else, Inflow: Ready to Assign
+
+Earlier transactions:
+
+Transaction: 2025-07-23 | Amazon | $7.68 | Wed
+Category: Family
+...
+Transaction: 2025-08-18 | Walgreens | $2.60 | Mon
+Category: Health
+
+Earlier transactions at this payee and similar payees:
+
+Transaction: 2025-05-11 | Costco | $179.94 | Sun
+Category: Food
+...
+Transaction: 2025-08-21 | Costco | $86.65 | Thu
+Category:</pre><p class="note">The split layout from blind_bulk_v1_split: everything above the second header is the same for every transaction in the sync, so it can be computed once.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>No results of its own; the sets enable the layout and timing tests of rows <a href="#row-118">118</a> and <a href="#row-119">119</a>.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the model read the split layout as well as the date-ordered one? <a href="#row-118">Row 118</a>. How much faster is a sync? <a href="#row-119">Row 119</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-118" data-from="117" data-era="Serving the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 118 · 2026-09-29 · <span class="qid">INFRA-3</span> · §121 Split layout without retraining</p>
+    <h2>Does the split layout need retraining?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The split layout from <a class="back" href="#row-117">row 117</a> lets a sync share most of its prompt, but the recipe was trained on rows in plain date order. If the reorder costs accuracy, serving fast would mean retraining.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-4B's recipe (labelled rows, two seeds) read zero-shot on blind_v1_split and blind_bulk_v1 in both layouts; then the same recipe trained with split episodes (<code>SPLIT=1</code>: the query payee's rows, found by a first-word payee key, moved into a second block), two seeds. The encoder read the bulk set for the system figures.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B adapter</th><th>Read on</th><th>Top-1 (% right)</th><th>Auto-filed %</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr><td>Recipe (date order)</td><td>blind_v1</td><td>82.5</td><td>63.3</td><td>0.589</td></tr>
+      <tr><td>Recipe (date order)</td><td>blind_v1_split</td><td>82.5</td><td>62.3</td><td>0.584</td></tr>
+      <tr><td>Recipe (date order)</td><td>blind_bulk_v1 / _split</td><td>83.8 / 83.6</td><td>67.6 / 67.4</td><td>0.497 / 0.496</td></tr>
+      <tr><td>Trained on split episodes</td><td>blind_v1_split</td><td>82.7</td><td>56.1 [51.4, 60.7]</td><td>0.649</td></tr>
+      <tr><td><em>System (encoder + decider), bulk</em></td><td>date order / split</td><td colspan="3">effort 0.470 / 0.470</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The recipe reads the split layout as it is: same accuracy, same effort, same system effort. Serving can switch layouts with the current adapter.</li>
+    <li>Training on split episodes is not needed and not better: lower, seed-unstable blind auto-filing.</li>
+    <li>One user's sync is easier than blind_v1 (effort 0.50 against 0.59), because blind_v1 over-represents hard cases.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None new; serving with the split layout and a prefix cache is measured in <a href="#row-119">row 119</a> and in vLLM in <a href="#row-127">row 127</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-119" data-from="117" data-era="Serving the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 119 · 2026-09-29 · <span class="qid">INFRA-3</span> · §119 Caching one user's sync</p>
+    <h2>Timing a whole sync on one GPU: caching the shared prompt</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked (2026-09-29): for one user's 10 to 100 new transactions, should we cache the unchanging part of the prompt, or put all the transactions in one prompt with an answer slot each? <a class="back" href="#row-117">Row 117</a> built the sets to measure it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>scripts/bench_bulk.py</code> on one H100 with decider-4B and the recipe's adapter, 24 syncs of blind_bulk_v1 (10 and 30 transactions each). Every prompt in a sync begins with the same ~1,330 tokens (the category list and shared rows). Four modes: separate prompts in today's layout; separate prompts in the split layout; the shared prefix computed once and each transaction's tail read from its cache (answers checked against uncached); and one prompt containing every transaction, each with its own answer slot.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Mode</th><th>ms per transaction (10 / 30 per sync)</th><th>Top-1 (% right, 10 / 30)</th><th>Same top answer as uncached split</th></tr></thead>
+    <tbody>
+      <tr><td>Separate prompts, today's layout</td><td>53.3 / 53.2</td><td>82.9 / 82.5</td><td>–</td></tr>
+      <tr><td>Separate prompts, split layout</td><td>53.9 / 53.8</td><td>81.7 / 81.8</td><td>(reference)</td></tr>
+      <tr><td>Split, shared prefix cached</td><td>25.5 / 20.9</td><td>81.7 / 81.8</td><td>99.2 / 99.6%</td></tr>
+      <tr><td>One prompt, one slot per transaction</td><td>15.6 / 13.1</td><td>79.6 / 80.8</td><td>94.2 / 93.1%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Caching the shared prefix is the answer and needs no training: 2.1 to 2.5 times faster with the same answers (differences at bf16 rounding).</li>
+    <li>One prompt for the whole sync is faster still but, untrained, changes 6 to 7% of answers and costs 1 to 2 points.</li>
+    <li>Rough cost at about $4 per H100-hour: ~$59 per million transactions separately, ~$23 to $28 cached, ~$15 multi-slot (unoptimised stack).</li>
+    <li>Correctness note: transformers releases before 5.17 silently restarted Qwen3.5's linear-attention state after a cache; any serving stack must pass the same check against uncached prompts.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Multi-slot training, and a real serving engine with prefix caching: <a href="#row-127">row 127</a> (vLLM reached 12.8 ms per transaction, so multi-slot training was deprioritised).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-120" data-from="116,100" data-era="Serving the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 120 · 2026-09-29 · <span class="qid">EVAL-12</span> · §117 A bigger model for hard cases</p>
+    <h2>Escalating the hard third to a much larger model</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-116">Row 116</a>'s best policy left about 35% of transactions to the user as suggestions. <a class="back" href="#row-100">Row 100</a> had shown the small models' remaining misses on blind_v1 are new users and new businesses, which need world knowledge. A large model might settle what the small ones do not.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-35B-A3B (Apache-2.0; a 35-billion-parameter mixture-of-experts model with about 3B parameters active per token), untrained, read blind_v1 zero-shot in its own layout (options after the question, letter labels) on one H100. Then it was used as a third reader for the transactions the small pair did not auto-file. All models calibrated with a temperature and 98% threshold fitted on other users.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Context:
+Categories: Housing, Monthly bills, Food, Transport, Health, Fun money, ...
+
+Transaction: 2025-04-09 | Topgolf | $111.42 | Wed
+Category: Fun money
+...
+Transaction: 2025-12-28 | Orchard Bowl | $66.78 | Sun
+Category:
+
+Question: Which of this user's categories does the last transaction belong to?
+Options: (A) Housing ... (F) Fun money ...
+Answer: (</pre><p class="note">decider's own multiple-choice frame (Context, Question, Options, "Answer: (") as built in <code>oneslot.py</code>; option list abbreviated. The model answers with one label token.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>blind_v1 group</th><th>decider-4B, recipe (% right)</th><th>decider-35B-A3B untrained</th></tr></thead>
+    <tbody>
+      <tr><td>All (1,500)</td><td>82.6</td><td>82.0</td></tr>
+      <tr><td>New users (short history)</td><td>62.5</td><td>77.4</td></tr>
+      <tr><td>New merchant, descriptive name</td><td>62.2</td><td>83.8</td></tr>
+      <tr><td>Idiosyncratic filings</td><td>97.3</td><td>48.6</td></tr>
+      <tr><td>Where the small models disagree</td><td>39.1</td><td>51.4</td></tr>
+    </tbody></table></div>
+    <div class="tablewrap"><table>
+    <thead><tr><th>System policy</th><th>Auto-filed %</th><th>Precision %</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr><td>Small pair: agree and either confident (row 116)</td><td>65.2</td><td>97.8</td><td>0.560</td></tr>
+      <tr><td>+ 35B for the rest, confident and agreeing with one small model</td><td>72.9</td><td>97.4</td><td>0.487</td></tr>
+      <tr><td>+ suggestions from the three-model product</td><td>72.9</td><td>97.4</td><td>0.470</td></tr>
+      <tr><td>35B alone at its 98%</td><td>56.3</td><td>98.0</td><td>0.621</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The large model knows what the small ones do not (new users, new businesses) and does not know what they were taught (idiosyncratic filings 49, changes of mind 28, weekday splits 46): it follows what the merchant is, not what this user does with it.</li>
+    <li>As the third reader for the ~35% left over it gives the best system so far: auto-filing 65 to 73% at 97.4%, effort 0.560 to 0.470 (16% less work than row 116, 20% less than decider alone). Precision sits slightly under 98% because its threshold was fitted on all items, not the escalated ones.</li>
+    <li>With 3B active parameters it costs about what the 4B does per transaction, but its 69 GB of weights fill a whole 80 GB GPU (a cost line corrected on 2026-09-29).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train the 35B with the recipe: <a href="#row-125">row 125</a>. Use it as a teacher for the small models: <a href="#row-123">row 123</a>.</li>
+  </ul></section>
+</article>

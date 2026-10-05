@@ -1,2 +1,6 @@
 /payee_enc_v1
 /two_tower_v1
+/hist_knn_v1
+/hist_ctx_v1
+/hist_transact_v1
+/hist_colbert_v1

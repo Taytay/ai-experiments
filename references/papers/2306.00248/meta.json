@@ -1,0 +1,33 @@
+{
+  "id": "2306.00248",
+  "version": "v1",
+  "id_versioned": "2306.00248v1",
+  "title": "TransAct: Transformer-based Realtime User Action Model for Recommendation at Pinterest",
+  "authors": [
+    "Xue Xia",
+    "Pong Eksombatchai",
+    "Nikil Pancha",
+    "Dhruvil Deven Badani",
+    "Po-Wei Wang",
+    "Neng Gu",
+    "Saurabh Vishwas Joshi",
+    "Nazanin Farahpour",
+    "Zhiyuan Zhang",
+    "Andrew Zhai"
+  ],
+  "published": "2023-05-31",
+  "updated": "2023-05-31",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.AI"
+  ],
+  "comment": "\\c{opyright} {ACM} {2023}. This is the author's version of the work. It is posted here for your personal use. Not for redistribution. The definitive Version of Record was published in KDD'23, http://dx.doi.org/10.1145/3580305.3599918",
+  "journal_ref": "",
+  "doi": "10.1145/3580305.3599918",
+  "abstract": "Sequential models that encode user activity for next action prediction have become a popular design choice for building web-scale personalized recommendation systems. Traditional methods of sequential recommendation either utilize end-to-end learning on realtime user actions, or learn user representations separately in an offline batch-generated manner. This paper (1) presents Pinterest's ranking architecture for Homefeed, our personalized recommendation product and the largest engagement surface; (2) proposes TransAct, a sequential model that extracts users' short-term preferences from their realtime activities; (3) describes our hybrid approach to ranking, which combines end-to-end sequential modeling via TransAct with batch-generated user embeddings. The hybrid approach allows us to combine the advantages of responsiveness from learning directly on realtime user activity with the cost-effectiveness of batch user representations learned over a longer time period. We describe the results of ablation studies, the challenges we faced during productionization, and the outcome of an online A/B experiment, which validates the effectiveness of our hybrid ranking model. We further demonstrate the effectiveness of TransAct on other surfaces such as contextual recommendations and search. Our model has been deployed to production in Homefeed, Related Pins, Notifications, and Search at Pinterest.",
+  "abs_url": "https://arxiv.org/abs/2306.00248",
+  "pdf_url": "https://arxiv.org/pdf/2306.00248v1",
+  "src_url": "https://export.arxiv.org/src/2306.00248v1",
+  "metadata_source": "api"
+}
