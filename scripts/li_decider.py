@@ -63,6 +63,7 @@ LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", 
 EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
+OPTS = os.environ.get("OPTS", "recent")  # each day's options: visible (today's visible categories, rows 210-217) | recent (prepared())
 
 
 def _base_head(path, hidden):
@@ -377,10 +378,25 @@ def prepared(b, m1, cache, full=True):
     category's recent payees (e["_snap"], tuples shared between days) and the neighbour indices (compact arrays); _materialise builds
     the texts for the transactions a step uses. docs is None then."""
     ev = H2.events(b)
-    if ev:  # every day's state holds the same categories; its per-day texts ("; recently: ...") are not read here (8 MB a household)
-        keys = dict.fromkeys(ev[0]["state"])
-        for e in ev:
-            e["state"] = keys
+    vis = list(ev[0]["state"]) if ev else []
+    cats = vis + [c for c in (ev[0]["labels"] if ev else {}) if c not in set(vis)]  # every category with a label, visible ones first
+    ci = {c: k for k, c in enumerate(cats)}
+    # each day's options (hist_encoder.events gives today's visible categories every day; its per-day texts are not read here). OPTS=recent
+    # (2026-10-06): also any category filed in the 365 days before the day, decider's rule (real_budget_eval: visible today + used in the
+    # last year): 7.0% of the owner's items and 5.5% of the synthetic ones are filed to a category hidden today (trips, old phases),
+    # which the visible-only options could never score, and training never saw a trip purchase. One dict per distinct option set.
+    memo, last, i = {}, {}, 0
+    while i < len(ev):
+        j = i
+        while j < len(ev) and ev[j]["day"] == ev[i]["day"]:
+            j += 1
+        act = vis + ([c for c in cats[len(vis):] if c in last and (ev[i]["date"] - last[c]).days <= 365] if OPTS == "recent" else [])
+        st = memo.setdefault(tuple(act), dict.fromkeys(act))
+        for e in ev[i:j]:
+            e["state"] = st
+        for e in ev[i:j]:
+            last[e["gold"]] = e["date"]
+        i = j
     if CTX or MODE == "mml" or "m" in INTERACT:
         for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
             e["nb"] = n
@@ -389,7 +405,6 @@ def prepared(b, m1, cache, full=True):
         if i and e["day"] != ev[i - 1]["day"]:
             k = i
         start.append(k)
-    cats = list(ev[0]["state"]) if ev else []
     snap, recent, i = {}, {}, 0
     while i < len(ev):
         d = ev[i]["day"]
@@ -402,10 +417,13 @@ def prepared(b, m1, cache, full=True):
             recent[e["gold"]] = ((e["payee"], e["amt"]),) + tuple(x for x in r if x[0] != e["payee"])[:M - 1]
         i = j
     for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
-        e["_ev"], e["_snap"], e["_i"], e["_start"] = ev, snap[e["day"]], i, start
+        e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
     if not full:
         return ev, None
-    docs = {d: {c: _doc(ev[0]["labels"][c], r) for c, r in zip(cats, sn)} for d, sn in snap.items()}
+    first = {}
+    for e in ev:
+        first.setdefault(e["day"], e)
+    docs = {d: {c: _doc(f["labels"][c], snap[d][ci[c]]) for c in f["state"]} for d, f in first.items()}
     for e in ev:
         e["q"], e["d"] = _query(e["_i"], ev, start), docs[e["day"]]
     return ev, docs
@@ -415,7 +433,7 @@ def _materialise(e, names=None):
     """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories)"""
     labels = e["labels"]
     lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
-    return dict(e, q=_query(e["_i"], e["_ev"], e["_start"], names), d={c: _doc(lab(c), r) for c, r in zip(e["state"], e["_snap"])})
+    return dict(e, q=_query(e["_i"], e["_ev"], e["_start"], names), d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
 
 
 def _doc(label, recent):
@@ -571,7 +589,7 @@ def train():
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
-                                                         **{k: globals()[k] for k in EXTRA}), indent=1))
+                                                         OPTS=OPTS, **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -721,11 +739,14 @@ def read():
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
     print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if os.environ.get('READ') == 'blind2' else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
-    print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
+    print("| model | all | first-time payee | trip purchase (top-1, n) | Brier | ECE (top choice) |\n|---|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
+            # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
+            # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
+            trip = {t["id"] for t in b["transactions"] if (t.get("reason") or [None])[0] == "trip"}
             ev, sco = run(b)
             for e, sc in zip(ev, sco):
                 if e["gold"] not in e["state"]:
@@ -733,7 +754,7 @@ def read():
                 v = np.array(list(sc.values()))
                 g = v[list(sc).index(e["gold"])]
                 rk = int((v >= g).sum())  # ties count against the gold
-                for grp in ("all",) + (() if e["seen"] else ("first-time",)):
+                for grp in ("all",) + (() if e["seen"] else ("first-time",)) + (("trip",) if e["id"] in trip else ()):
                     ranks[grp].append(rk)
                 p = np.exp(v - v.max()); p /= p.sum()
                 y = np.array([c == e["gold"] for c in sc], dtype=float)
@@ -742,6 +763,7 @@ def read():
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
+        cells.append(f"{100 * (np.array(ranks['trip']) <= 1).mean():.1f} (n={len(ranks['trip'])})" if ranks["trip"] else "-")
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
         del run
 
