@@ -1,5 +1,5 @@
 #!/bin/bash
-# Row 210: a late-interaction decision model (scripts/li_decider.py), one seed per arm on the local GPU, then read on 50 held-out v4 households.
+# Row 210: a late-interaction decision model (scripts/li_decider.py), one seed per arm (local GPU; on Modal the same arms run from scripts/modal_jobs/r210.json), then read on 50 held-out v4 households.
 # a0 one document per category, MaxSim; a1 + the nearest earlier filings in the query (CTX); a2 soft interaction (UWE, tau_a 0.1); a3 + [CLS]
 # cosine (SMART hybrid); a4 learned query-token weights; a5 per-filing candidates with MML (BELXTR); a6 MML + soft + hybrid.
 set -eu
