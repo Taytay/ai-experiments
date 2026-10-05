@@ -116,7 +116,8 @@ def train():
     from ai_experiments.licences import open_licence
     arm, loss = os.environ["ARM"], set(os.environ["LOSS"].split(","))
     out = H.ENC / f"hist_r202_{arm}"
-    open_licence(H.BASE)
+    if not Path(H.BASE).exists():  # a local encoder dir (row 212: the knowledge stage) was checked when its base was
+        open_licence(H.BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
     t0 = time.time()

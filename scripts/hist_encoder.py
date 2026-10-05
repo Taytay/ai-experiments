@@ -98,7 +98,8 @@ def _fit(rows, out):
     from datasets import Dataset
     from sentence_transformers import SentenceTransformerTrainer, SentenceTransformerTrainingArguments, losses
     from ai_experiments.licences import open_licence
-    open_licence(BASE)
+    if not Path(BASE).exists():  # a local encoder dir was checked when its own base was
+        open_licence(BASE)
     torch.manual_seed(SEED)
     print(f"{len(rows)} triplets; e.g. {rows[0]}", flush=True)
     model = _model(BASE)
