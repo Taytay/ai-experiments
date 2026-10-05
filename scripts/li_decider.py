@@ -59,7 +59,8 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
-EXTRA = {}  # name -> default of settings added after row 211; load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 
 
 def _base_head(path, hidden):
@@ -299,47 +300,86 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     return S
 
 
-def prepared(b, m1, cache):
-    """prepare(), cached on disk per budget in data/interim/li_prep (2026-10-05: the neighbour embeddings took ~4.5 min per 200-household
-    run); the key covers the budget, the settings prepare reads, this file's and hist_encoder.py's code and the neighbour encoder's
-    weights. The owner's budget is never cached here (its id is not a synthetic one)."""
+_M1 = None
+KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
+
+
+def _nbrs(b, ev, m1, cache):
+    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists. Cached on disk for synthetic
+    budgets in data/interim/li_nb, one int32 array per budget keyed by its events and the encoder's weights (2026-10-06: this replaces
+    row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query setting;
+    the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
     import hashlib
-    import pickle
     from ai_experiments.paths import ROOT
-    if not str(b.get("id", "")).startswith("realstyle-") or os.environ.get("PREP_CACHE", "1") == "0":
-        return prepare(b, m1, cache)
-    from two_tower import _hh_key
-    h = hashlib.sha1(f"{_hh_key(b['id'].split('-')[1])}|{b['id']}|{CTX}|{NB}|{M}|{MODE}|{NCAND}|{INTERACT}|{NMEM}|{H.AMT_TEXT}".encode())
-    for f in (__file__, H.__file__):
-        h.update(Path(f).read_bytes())
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        for f in sorted(Path(H.OUT1).glob("*.safetensors")):
-            h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
-    f = ROOT / "data" / "interim" / "li_prep" / f"{h.hexdigest()[:20]}.pkl"
-    if f.exists():
-        return pickle.loads(f.read_bytes())
-    out = prepare(b, m1, cache)
-    f.parent.mkdir(parents=True, exist_ok=True)
-    tmp = f.with_suffix(f".tmp{os.getpid()}")
-    tmp.write_bytes(pickle.dumps(out, protocol=5))
-    tmp.replace(f)
-    return out
-
-
-def prepare(b, m1, cache):
-    """a budget's events (hist_encoder.events) with each event's query text and its day's category documents:
-    (events, docs) where docs[day] = {category id: document text} over the visible categories"""
-    ev = H.events(b)
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        nb = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, max(NB, NCAND if MODE == "mml" else 0, NMEM if "m" in INTERACT else 0))
-        for e, n in zip(ev, nb):
-            e["nb"] = [j for j, _ in n]
-    if CTX:
-        for e, n in zip(ev, nb):
-            e["q"] = e["text"] + (" || " + "; ".join(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {ev[j]["label"]}' for j, _ in n[:NB]) if n else "")
-    else:
+    f = None
+    if str(b.get("id", "")).startswith("realstyle-") and os.environ.get("PREP_CACHE", "1") != "0":
+        h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
-            e["q"] = e["text"]
+            h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
+        for w in sorted(Path(H.OUT1).glob("*.safetensors")):
+            h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
+        f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
+        if f.exists():
+            return [[j for j in r if j >= 0] for r in np.load(f).tolist()]
+    global _M1
+    if m1 is None:  # loaded only when a budget misses the cache
+        _M1 = _M1 or H._model(H.OUT1)
+        m1 = _M1
+    nb = [[j for j, _ in n] for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
+    if f is not None:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        arr = np.full((len(ev), KNB), -1, dtype=np.int32)
+        for i, r in enumerate(nb):
+            arr[i, :len(r)] = r
+        tmp = f.with_suffix(f".tmp{os.getpid()}.npy")
+        np.save(tmp, arr)
+        tmp.replace(f)
+    return nb
+
+
+def _query(i, ev, start):
+    """the query text of event i. Row 210: "<transaction> || <payee> $<amt> -> <category>; ..." over its NB nearest earlier filings.
+    Row 217 (decider's history slice, §99): AGO adds how long ago each filing was; REC adds the household's REC most recent filings
+    before the transaction's day, newest first (decider's "Earlier transactions" rows: trips and time routing); QFMT=group lists the
+    rows under each category once ("<category>: <payee> $<amt> <ago>, ...; ...") instead of repeating the category per row."""
+    e = ev[i]
+    near = e.get("nb", [])[:NB] if CTX else []
+    rec = [j for j in range(start[i] - 1, max(-1, start[i] - 1 - REC), -1)] if REC else []
+
+    def ago(j):
+        d = (e["date"] - ev[j]["date"]).days
+        return f" {d}d ago" if AGO else ""
+    if QFMT == "group":
+        js = list(dict.fromkeys(near + rec))
+        if not js:
+            return e["text"]
+        by = defaultdict(list)
+        for j in js:
+            by[ev[j]["label"]].append(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f}{ago(j)}')
+        return e["text"] + " || " + "; ".join(f"{lab}: " + ", ".join(v) for lab, v in by.items())
+    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {ev[j]["label"]}{ago(j)}'
+    q = e["text"]
+    if near:
+        q += " || " + "; ".join(map(row, near))
+    if rec:
+        q += " || recent: " + "; ".join(map(row, rec))
+    return q
+
+
+def prepared(b, m1, cache):
+    """a budget's events (hist_encoder2.events: hist_encoder.events with dates) with each event's query text and its day's category
+    documents: (events, docs) where docs[day] = {category id: document text} over the visible categories; neighbours from _nbrs (cached)"""
+    ev = H2.events(b)
+    if CTX or MODE == "mml" or "m" in INTERACT:
+        for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
+            e["nb"] = n
+    start, k = [], 0
+    for i, e in enumerate(ev):
+        if i and e["day"] != ev[i - 1]["day"]:
+            k = i
+        start.append(k)
+    for i, e in enumerate(ev):
+        e["q"] = _query(i, ev, start)
     docs, recent, i = {}, defaultdict(list), 0
     while i < len(ev):
         d = ev[i]["day"]
@@ -354,6 +394,9 @@ def prepare(b, m1, cache):
     for e in ev:  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
         e["d"], e["_ev"] = docs[e["day"]], ev
     return ev, docs
+
+
+prepare = prepared
 
 
 def _score(model, scale, qtexts, dtexts):
@@ -402,13 +445,12 @@ def train():
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
     t0 = time.time()
-    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
+    m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
         data.append(prepared(b, m1, cache))
-        if cache is not None and n % 50 == 0:
+        if n % 50 == 0:
             cache.clear()
-    del m1
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
           f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
     model = LI(BASE, train=True)
@@ -478,7 +520,8 @@ def train():
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
-                                                         PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen), indent=1))
+                                                         PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
+                                                         **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -601,7 +644,7 @@ def load(arm):
     POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
     for k in EXTRA:  # settings added after row 211 (QUERY etc.): older models were trained with the defaults
         globals()[k] = cfg.get(k, EXTRA[k])
-    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
+    m1, cache = None, {}
     model = LI(d)
     model.cb.enc.eval()
     scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
