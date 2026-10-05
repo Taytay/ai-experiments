@@ -75,6 +75,11 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+- Do not duplicate work (owner, 2026-10-05: "Let's not duplicate work here! That's just silly."): screen a new recipe or arm with one seed;
+  train the second seed only for arms that win or land within seed noise of the best (1-2 points on the owner's budget), and call
+  nothing a gain on the owner's budget before two seeds agree. Each job reads only the test sets its row compares (not every set
+  from earlier rows); second seeds skip the drills and blind sets unless the row is about them. Synthetic reads may run on the
+  local 3090 when it is free, leaving Modal to train.
 - Cost of every Modal job (owner, 2026-10-05): `scripts/modal_app.py` records each launch (app id, PLAN rows from `PLAN_ROWS` or the job-list
   name, job tags, minutes) in `reports/modal_launches.jsonl`; `uv run python scripts/modal_costs.py` joins it with Modal's billing report into
   `reports/modal_costs.md` (per row, per launch, per job by minutes). Every REPORT section whose step used Modal ends with a **Cost** line from
