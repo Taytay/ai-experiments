@@ -1,0 +1,179 @@
+1	Executive summary
+2	Fine-tuning frameworks overview
+3	Introducing new vocabulary
+4	Injecting merchant knowledge
+5	Recommended recipe
+6	Fictional universe labels
+7	Performance and scaling
+8	Curriculum ladder v2
+9	Frozen item sets and scoring
+10	Scoring rule sensitivity
+11	Intervals and paired tests
+12	Constructed responses
+13	Tokenizer casing check
+14	Prompt distillation ceiling
+15	Learning curves over training
+16	Perplexity on a corpus slice
+17	General-text replay
+18	Prompt distillation v2
+19	Iteration time speedups
+20	Three-seed stability check
+21	Mixture loss weighting
+22	Masked fine-tuning tradeoffs
+23	Arm D schedule controls
+24	Embedding block results
+25	Retrieval versus oracle context
+26	Scale effects at 1.5B-7B
+27	Augmentation scaling limits
+28	LoRA hyperparameter sweep
+29	Encoder capacity and entity count
+30	Knowledge editing for facts
+31	On-policy distillation
+32	LoRA rate sensitivity
+33	Item rebuild diagnostics
+34	Morphology realism transfer
+35	Merchant realism fixes
+36	Real-use replicate test
+37	REAL-6 baseline scores
+38	Production categoriser on REAL-6
+39	Held-out partition control
+40	Relation linearity probe
+41	Two-hop walk texts
+42	Type-to-weakness edge
+43	Record-in-prompt robustness
+44	Unsloth-free trainer bug
+45	Exposure curve and chat template
+46	Per-user classifier comparison
+47	Retrieved shots and copying
+48	REAL-6 set audit
+49	No-DB under-training
+50	Calibration and auto-apply
+51	Held-out user generalisation
+52	Training efficiency gains
+53	Fact DB as decisions
+54	Modal experiment infrastructure
+55	Database episodes vs prompt record
+56	Batch size on H100
+57	Novel merchants from POI data
+58	Database episode capacity
+59	Unified scorecard baseline
+60	Label induction basics
+61	POI-1 difficulty
+62	Masked-category encoder
+63	GLiClass and ModernBERT-Instruct
+64	Ceiling share and scale test
+65	Hop limits in reasoning
+66	Hop-trained encoder transfer
+67	Kind lines in the prompt
+68	Category descriptions for unseen kinds
+69	Published decision models
+70	REAL-6 lookup ceiling
+71	Empty categories and decoys
+72	Encoder confidence objectives
+73	Facts versus skill
+74	Where decisions form in weights
+75	Option order effects
+76	Single answer slot readout
+77	Novel category names
+78	Rename augmentation gains
+79	Trained abstention
+80	Misleading merchant names
+81	Option label randomisation
+82	Best recipe seed variance
+83	Knowing what it doesn't know
+84	User filing overrides database
+85	Abstention with no evidence
+86	Alternating category merchants
+87	Scale to Qwen3.5-9B
+88	Combined recipe tradeoffs
+89	Alternation training share
+90	Final recipe on all users
+91	Trained behaviours hold across users
+92	Random day sets vs weekend rule
+93	A more realistic synthetic population
+94	Misfiled rows fix training gaps
+95	Move episodes don't recover merchants
+96	Misfiles among multiple rows
+97	Confidence when filings change
+98	User effort and auto-filing
+99	The history slice, zero-shot
+100	Newer small open decoders
+101	Dated history slices, trained
+102	Encoders trained like the decoder
+103	A generator-blind test set
+104	The encoder recipe completed
+105	Options beyond 26 categories
+106	A small dose of dated slices
+107	The recipe settled by effort
+108	Real business names for encoders
+109	Doubling training doesn't help
+110	New users and episode shapes
+111	Non-spending kinds in training
+112	The system across three seeds
+113	Labelled history rows in the prompt
+114	Structured prompt formats
+115	Agreement and calibrated confidence
+116	Thresholds under distribution shift
+117	A bigger model for hard cases
+118	Scoring by expected cost
+119	Caching one user's sync
+120	Serving the sync with vLLM
+121	Split layout without retraining
+122	The bigger model, trained
+123	Other users' filings in the prompt
+124	Averaging weights across seeds
+125	Serving cost of the bigger model
+126	The best system so far
+127	The bigger model was undertrained
+128	A second opinion barely helps
+129	A rank-based suggestion score
+130	A report card in percentages
+131	Against YNAB's current suggestion
+132	First-time and changed-category payees
+133	How close on first-time payees
+134	Sizing the suggestion list
+135	Two ideas from Jeff
+136	The bigger model as teacher
+137	A second blind test set
+138	The system without the encoder
+139	Routing the bigger model by history
+140	Payee overlap between train and blind
+141	The final pre-registered blind check
+142	Suggestion lists capped at three
+143	Inferring payee kinds, zero-shot
+144	Canonical kind lines
+145	Inferring from population filings
+146	strands-decider, an outside model
+147	What decider borrows from strands
+148	strands trained at 4B scale
+149	decider's method on strands' tasks
+150	Combining both readout methods
+151	Adapter capacity isn't the limit
+152	decider's hidden states as embeddings
+153	History shifts embeddings, right and wrong
+154	Mapping categories across users
+155	First results on real data
+156	The recommended system on real data
+157	Similar payees by embedding
+158	Payee resolution and aliases
+159	Matching payees to bank strings
+160	Looking payees up in Overture
+161	Real-style synthetic households
+162	Combining the rule and the model
+163	A generated clean-payee block
+164	Row numbers and rationales
+165	A local open merchant database
+166	Writing categories with their group
+167	Scaling merchant knowledge
+168	Kind lines from a lookup
+169	Other households' filings as a line
+170	A contrastive payee encoder
+171	Dropping the crowd line sometimes
+172	A two-tower payee/category encoder
+173	Two-hop similar-payee selection
+174	Households without the crowd line
+175	Crowd line on clean keys
+176	Behavioural rows plus crowd line
+177	History-aware encoders	194-195
+178	Fair fusion and amounts
+179	Pinterest research applicability	196-198, 201-207

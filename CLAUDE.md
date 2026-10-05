@@ -22,7 +22,7 @@ we collected, `src/` is library code, `scripts/` is entry points.
 |---|---|---|
 | `PLAN.md` | Ordered queue, status per step, log | every step |
 | `reports/QUESTIONS.md` | Defines each question ID (what was seen, proposed experiment) | a new question appears, or a `Status:` line is added |
-| `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end | a step finishes |
+| `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end. Cite a section as "§N short title" (e.g. "§179 Pinterest research applicability"), never a bare number: section numbers are not PLAN row numbers. A new section adds a line to `reports/report_titles.tsv`, then `uv run python scripts/report_index.py` rebuilds the index at the top (PLAN rows read from the Result column) | a step finishes |
 | `references/SURVEY.md` | What 34 papers say about each ID | more papers are read |
 | `references/papers/<id>/summary.md` | One paper each; `INDEX.md` lists them by thread | a paper is read |
 | `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `items.py` (the frozen eval sets and their hashes), `scoring.py` (per-item, per-option log-prob records), `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
