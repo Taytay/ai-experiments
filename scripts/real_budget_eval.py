@@ -31,6 +31,7 @@ usage: BUDGET=<id> uv run python scripts/real_budget_eval.py build
 """
 import datetime as dt
 import functools
+import hashlib
 import json
 import os
 import random
@@ -75,15 +76,20 @@ def yaml_value(v):
         return json.dumps(v, ensure_ascii=False)
     return v
 KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
+ALIAS_EMB, ALIAS_EMB_MIN = os.environ.get("ALIAS_EMB", ""), float(os.environ.get("ALIAS_EMB_MIN", "0.95"))  # row 186: alias matches from
+# payee_emb_<ALIAS_EMB>.npz (encode_payees_local.py) at cosine >= ALIAS_EMB_MIN, added to the n-gram aliases; the similar rows keep SIM_EMB's
+SIM_EMB = os.environ.get("SIM_EMB", "")  # row 186: payee_emb_<SIM_EMB>.npz (encode_payees_local.py) as the similar-payee embedding
 CROWD = os.environ.get("CROWD", "")  # row 183: a crowd table (build_crowd.py) under data/processed: "Others filed this payee as: ..." under
 CROWD_K, CROWD_TOP = int(os.environ.get("CROWD_K", "2")), 4  # the query when CROWD_K or more other households filed its bank string
+CROWD_DROP = float(os.environ.get("CROWD_DROP", "0"))  # row 185: leave the line out of this share of items that have one (training only),
+# so that its absence stops meaning "a rare merchant" (REPORT 169.2)
 KIND_FILE = os.environ.get("KIND_FILE", "")  # row 182: "" | "_v2" | "_ov": which payee_kinds<KIND_FILE>.json (merchant_db_match_real.py) a real budget reads
 KIND_SKIP = {"several", "purpose", "p2p", "income", "savings", "loan"}  # not merchants
 KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind>" line under every history row and the query whose payee
 # has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
 # KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + ("_crowd" if CROWD else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + (f"_{SIM_EMB}" if SIM_EMB else "") + (f"_alias{ALIAS_EMB}{round(ALIAS_EMB_MIN * 1000)}" if ALIAS_EMB else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -212,7 +218,7 @@ def build_items(b):
         by_payee_name[r["payee"]].append(i)
     if SIM:
         import numpy as np
-        e = np.load(OUT / "payee_emb.npz", allow_pickle=False)
+        e = np.load(OUT / (f"payee_emb_{SIM_EMB}.npz" if SIM_EMB else "payee_emb.npz"), allow_pickle=False)
         names, X = list(e["names"]), e["vecs"].astype(np.float32)
         X /= np.clip(np.linalg.norm(X, axis=1, keepdims=True), 1e-9, None)
         Sm = X @ X.T; np.fill_diagonal(Sm, -np.inf)
@@ -229,6 +235,14 @@ def build_items(b):
             Sc = (Cm @ Cm.T).toarray(); np.fill_diagonal(Sc, 0)
             ctop = np.argsort(-Sc, axis=1)[:, :200]
             aliases = {n: [names[j] for j in ctop[k] if Sc[k, j] >= ALIAS_MIN] for k, n in enumerate(names)}
+            if ALIAS_EMB:  # row 186: the contrastive encoder adds same-payee matches above a strict cosine (REPORT 170: few false alarms)
+                ea = np.load(OUT / f"payee_emb_{ALIAS_EMB}.npz", allow_pickle=False)
+                pos = {n: k for k, n in enumerate(ea["names"])}
+                Y = ea["vecs"][[pos[n] for n in names]].astype(np.float32)
+                Sa = Y @ Y.T; np.fill_diagonal(Sa, -1)
+                for k, n in enumerate(names):
+                    extra = [names[j] for j in np.argsort(-Sa[k])[:ALIAS_MAX] if Sa[k, j] >= ALIAS_EMB_MIN and names[j] not in aliases[n]]
+                    aliases[n] = (aliases[n] + extra)
             for k, n in enumerate(names):  # reciprocal rank fusion (k = 60) of the two neighbour lists
                 sc = defaultdict(float)
                 for r, j in enumerate(top[k]):
@@ -248,7 +262,6 @@ def build_items(b):
     if KIND == "rows":
         from ai_experiments import taxonomy_v2 as TX
         if any(r["mkind"] for r in rows):  # a synthetic household
-            import hashlib
             pk, names = {}, sorted(k for k in TX.KINDS if k not in KIND_SKIP)
             for r in rows:
                 if r["payee"] not in pk:
@@ -333,7 +346,8 @@ def build_items(b):
         if crowd:
             got = {n: len(set(hs) - {me}) for n, hs in crowd.get(crowd_key(q["raw"]), {}).items()}
             got = {n: k for n, k in got.items() if k}
-            if sum(got.values()) >= CROWD_K and len(set().union(*(set(hs) for hs in crowd[crowd_key(q["raw"])].values())) - {me}) >= CROWD_K:
+            dropped = CROWD_DROP and int(hashlib.md5(f"drop-{q['id']}".encode()).hexdigest(), 16) % 1000 < CROWD_DROP * 1000
+            if not dropped and sum(got.values()) >= CROWD_K and len(set().union(*(set(hs) for hs in crowd[crowd_key(q["raw"])].values())) - {me}) >= CROWD_K:
                 kind_line += "\nOthers filed this payee as: " + ", ".join(f"{n} ({k})" for n, k in sorted(got.items(), key=lambda x: -x[1])[:CROWD_TOP])
         if PLINE and prev_rows:
             cnt = Counter(rows[i]["cat"] for i in prev_rows).most_common(3)
