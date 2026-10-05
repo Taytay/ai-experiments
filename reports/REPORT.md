@@ -10151,6 +10151,47 @@ license of Curlie like?"; "I'd like to build a local database using this. Then l
 - **Next:** scale the trained merchants (20k, then the 48k in the web's top 100k) with longer runs and measure retention per tier; combine
   with the field block (B) and v3 households; a lookup line from the database for first-time payees, trained with.
 
+
+## 166. Writing each category as "Group: Name" with its label ("(AJ) Everyday Expenses: Groceries") helps once trained: person-scoped categories on the owner's budget +2.5 (G against A2) and +1.4 (GK against K), overall +0.1 / +0.3, the blind sets +1.4 to +3.4 with no drill cost; zero-shot it changes nothing; GK (group names + merchant knowledge) is the best reader so far on the owner's budget, 74.6% right first (REAL-27)
+
+PLAN step 181 (owner, 2026-10-03: "experiment with listing each historical transaction's category with its label prefix. So instead of
+'Everyday expenses: Groceries' you would write '(AJ) Everyday Expenses: Groceries'"). History rows already carried the label ("Category: (AH)
+Restaurants"); what is new is the category group in every name, in the labelled list and on every row (`real_budget_eval.py
+GROUPNAMES=1`). In the owner's budget the groups are mostly people, properties and projects, so "Juli: Clothes" names whose purchase a
+category is. Zero-shot (REPORT 163's A2 and REPORT 165's K read with group names) and trained (the same households with group names:
+`realstyle_v2g_train.jsonl`; G = A2's recipe on them, GK = K's); seed 0; job list `scripts/modal_jobs/r181.json`. The synthetic sets were
+read with their plain names.
+
+**Table 166.1: the owner's budget (aliases + similar payees), % right first (top 3 all)**
+
+| reader | all | known payees | first-time | the category is person-scoped (3,111) |
+|---|---|---|---|---|
+| A2, plain names | 73.1 (84.8) | 79.6 | 57.4 | 47.1 |
+| A2, group names zero-shot | 73.1 | 79.4 | 58.0 | 48.4 |
+| **G, trained with group names** | 73.2 (84.9) | 79.7 | 57.4 | **49.6** |
+| K, plain names | 74.3 (85.3) | 81.0 | 58.0 | 51.3 |
+| K, group names zero-shot | 74.2 | 80.8 | 58.3 | 50.4 |
+| **GK, trained with group names + knowledge** | **74.6 (85.4)** | **81.1** | **59.0** | **52.7** |
+
+**Table 166.2: the synthetic sets, % right first (single seeds)**
+
+| reader | REAL-6 | novel names | misleading | blind_v1 | blind_v1 + line | blind_v2 | blind_v2 + line |
+|---|---|---|---|---|---|---|---|
+| A2 | 84.6 | 85.6 | 61.4 | 81.9 | 84.7 | 74.3 | 72.3 |
+| G | 85.2 | 85.2 | 60.4 | 83.3 | 84.9 | 75.7 | 75.7 |
+| K | 76.8 | 65.8 | 51.6 | 83.8 | 85.8 | 77.3 | 77.1 |
+| GK | 74.2 | 67.4 | 49.2 | 84.0 | 85.6 | 76.9 | 75.7 |
+
+### 166.1 What the step says
+
+- **Group names help where groups carry meaning:** the categories that belong to one person gain 1.4 to 2.5 once the model is trained with
+  them; the blind sets gain too (their groups are generic); nothing is lost on the drills.
+- **Zero-shot they do nothing:** as with every format change before, the model has to be trained to read the new names.
+- **GK is the best reader on real data so far** (74.6, first-time payees 59.0); it keeps K's cost on the invented-name drills (REPORT 167
+  takes that up).
+- **Note on K:** the synthetic sets show what REPORT 165 did not: merchant knowledge at 40% costs the drills where the user's filing must
+  beat what a name suggests (novel names -20, misleading names -10, REAL-6 -8 against A2), while it helps where names are real (the blind
+  sets +2 to +5, the owner's budget +1.2).
 ## 167. Scaling merchant knowledge: coverage beats repetition (20k merchants seen 6.5 times each beat 5k seen 26 times at the same compute, on every tier); about 11 exposures keep most of a fact; on the owner's budget every knowledge arm beats its own control by 1.1 to 2.7 (20k x 6.5: 74.6% right first, level with GK) but the gain is on payees filed before, not on first-time payees, not even those whose merchant the model was taught: knowing what a merchant is does not yet change the purpose it files the payee under (MODEL-28, REAL-27)
 
 PLAN step 180 (owner, 2026-10-03: "Proceed with scaling the knowledge and proceed as far as you can, learning the best way to inject

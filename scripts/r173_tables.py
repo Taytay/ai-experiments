@@ -19,7 +19,8 @@ ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% re
         "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")],
         "row 179 K: A2 + 40% knowledge 5k x26": [("", "_rs25v2_mk40_5k")], "row 180: 5k x13 at 20%": [("", "_rs25v2_mk20_5k13")],
         "row 180: 20k x6.5 at 40%": [("", "_rs25v2_mk40_20k6")], "row 180: A2 at 3200 steps": [("3200:", "_rs25v2")],
-        "row 180: 20k x26 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_20k26")], "row 180: 48k x11 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_48k11")]}
+        "row 180: 20k x26 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_20k26")], "row 180: 48k x11 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_48k11")],
+        "row 181 G: Group: Name households": [("", "_rs25v2g")], "row 181 GK: Group: Name + knowledge 5k": [("", "_rs25v2g_mk40_5k")]}
 
 
 def acc(f, sel=None):
