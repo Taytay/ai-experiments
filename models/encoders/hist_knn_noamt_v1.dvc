@@ -1,0 +1,6 @@
+outs:
+- md5: cfe6b624052f051bfc6d94c46f06663f.dir
+  size: 134189024
+  nfiles: 10
+  hash: md5
+  path: hist_knn_noamt_v1
