@@ -199,6 +199,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §184 EVoC for the crowd category clusters (row 213)
 - §185 The late-interaction decision model (rows 210-211)
 - §186 Suggesting a category scheme for a new user (row 214)
+- §187 The late-interaction decision model beside decider (row 216)
 
 <!-- END SECTION INDEX -->
 
@@ -11331,3 +11332,60 @@ Ceiling: 30.9% of payees are filed under 2+ categories and carry 86.7% of transa
   category-suggester it is beaten by a lookup.
 
 **Cost:** $0 on Modal (local CPU).
+
+## 187. The late-interaction decision model beside decider on decider's own items: 1.1 points behind on synthetic households (71.7 against 72.8) but 8-12 behind on the owner's budget (c0 60.9, a5 64.6, decider 72.5), behind on payees filed many times as well as on first-time ones; the per-filing model (a5) transfers best; 15-20x faster per transaction on a cheaper GPU with ~120x fewer parameters (REAL-27, MODEL-25)
+
+PLAN step 216 (owner, 2026-10-06: "Continue work by comparing to decider ... Compare it to our tuned decider model in both accuracy and
+efficiency"). `scripts/hist_agree.py` now reads late-interaction models (`ENCS=li_r...`, through `li_decider.load`) as one reader over
+decider's own options per item (chain `scripts/chains/r216_agree.sh`, log `logs/r216_agree.log`). Sets: decider G4's items on the 100
+held-out v4 households (realstyle_v4g_ngram_test, 5,897 matched items, decider seeds 0 and 1) and the owner's budget once (items_grp_sim2,
+19,093 matched items, decider r190-g seeds 0 and 1; aggregates only). Models: row 211's c0 (query = transaction + its 5 nearest earlier
+filings; one document per category; 33.4M) and row 210's a5 (query = the transaction alone; each of its 50 nearest earlier filings and
+every category name a candidate, MML). Neither has seen a merchant database, a crowd line or real data; decider G4 was trained with
+database episodes, misleading names and the other-users line (none of those lines appear in the prompts read here).
+
+**Table 187.1: % right first on decider's items (decider = mean of two seeds)**
+
+| set | segment | n | decider | c0 | a5 | either right (c0 / a5) | higher top probability wins (c0 / a5) |
+|---|---|---|---|---|---|---|---|
+| synthetic, 100 held-out households | all | 5,897 | 72.8 | 71.7 | 71.2 | 78.0 / 77.5 | 74.0 / 73.4 |
+| | first-time payee | 928 | 61.3 | 57.9 | 58.4 | 69.5 / 69.2 | 62.4 / 62.6 |
+| | payee filed 1-3 times | 661 | 69.1 | 67.9 | 64.6 | 74.5 / 73.4 | 70.6 / 69.1 |
+| | payee filed 4+ times | 4,308 | 75.9 | 75.3 | 75.0 | 80.4 / 79.9 | 77.0 / 76.4 |
+| owner's budget | all | 19,093 | 72.5 | 60.9 | 64.6 | 76.0 / 76.7 | 70.8 / 71.7 |
+| | first-time payee | 5,832 | 56.9 | 42.0 | 45.7 | 61.5 / 62.6 | 54.1 / 55.6 |
+| | payee filed 1-3 times | 3,270 | 80.3 | 68.6 | 72.2 | 84.1 / 84.6 | 79.3 / 80.3 |
+| | payee filed 4+ times | 9,991 | 79.0 | 69.4 | 73.1 | 81.7 / 82.3 | 77.8 / 78.4 |
+
+A gate chosen on the synthetic set (encoder when its top probability >= 0.4-0.5 and decider's <= 0.5-0.7) gives 73.9 / 73.3 there and
+71.0 / 71.8 on the owner's budget: below decider alone.
+
+**Table 187.2: cost**
+
+| | decider-4B (tuned recipe) | late-interaction c0 | late-interaction a5 |
+|---|---|---|---|
+| parameters | ~4B (+ rank-64 LoRA) | 33.4M | 33.4M |
+| reading time per transaction | 10-13 ms on an H100 (vLLM, prefix cache, split layout; §119, §120) | 0.62-0.68 ms on the RTX 3090 | 1.6-1.7 ms on the RTX 3090 |
+| what the time covers | one prompt of ~1,500 tokens per transaction | every transaction of the budget, with the day's category documents and the query's neighbours encoded | the same, 50 candidates each |
+| training | 800 steps of LoRA on an H100 (~$0.60-0.80 a job) | 3,000 + 3,000 steps of one household window on the 3090 (a1 on Modal, then 396 s locally) | 3,000 steps on Modal (~100 min, per-filing candidates) |
+
+### 187.1 What the step says
+
+- **On our own generator the small model is nearly level with decider** (1.1 points behind; 0.6 on payees filed 4+ times), at a
+  twentieth of the reading time on a cheaper GPU.
+- **On the owner's budget it is not**: 8-12 points behind, and the gap is about as large on payees filed many times (-6 to -10) as on
+  first-time ones (-11 to -15). World knowledge cannot explain the first part: those transactions need only the household's own
+  history. The model has fitted something of our generator (its strings, category names, how often filings alternate), and the
+  synthetic held-out set cannot show it. The plain history encoder on the same base read 64.7 there (§182), so the 33M base is not
+  the limit by itself.
+- **The per-filing model (a5) transfers best** (64.6 against c0's 60.9) though it trails c0 by 0.5 on synthetic items: one summary
+  document per category plus history in the query fits the generator more tightly than scoring each earlier filing.
+- **Together with decider it adds nothing on real data**: either-right ceilings of +3.5 to +4.2 over decider, but no confidence rule
+  finds them (71.7 at best against 72.5), as with the plain encoders (§180).
+- **Matched effort:** this model has had two rows of recipe work and no knowledge; decider's first trained recipe read 68.3 on the
+  owner's budget (§155 The first real data), its tuned recipe 72.5 on these items. c0 / a5 sit below the first recipe.
+- **Consequence for the next rows:** arms must be chosen on a set that predicts transfer. Row 217 adds blind_v2's 250 users as whole
+  budgets (`scripts/blind_budgets.py`: the blind generator, written without our code, rerun from its own structures) and first checks
+  that it ranks c0 and a5 as the owner's budget does.
+
+**Cost:** $0 (local RTX 3090).
