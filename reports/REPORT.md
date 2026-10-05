@@ -195,6 +195,10 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §180 Where decider and encoders disagree (row 201)
 - §181 Faster runs: training and reads (row 208)
 - §182 Encoder training fixes from the papers (row 202)
+- §183 Several prototypes per category (row 204)
+- §184 EVoC for the crowd category clusters (row 213)
+- §185 The late-interaction decision model (rows 210-211)
+- §186 Suggesting a category scheme for a new user (row 214)
 
 <!-- END SECTION INDEX -->
 
@@ -11151,3 +11155,179 @@ encoders disagree (synthetic 6.7-8.5 / 4.6-5.4; owner 12.3-13.2 / 4.3-4.6) for e
   `hist_agree.py` reads several encoders in one run.
 
 **Cost:** $0 on Modal (local RTX 3090: about 80 minutes of training and building, 25 minutes of reads).
+
+## 183. Several prototypes per category lose to MaxSim over every filing: the best prototype reader (Ward medoids weighted by cluster size) reads 68.8 against 73.4, centroids 64.2, farthest-point prototypes 40-43; keeping every filing is what the category needs (REAL-27, MODEL-25)
+
+PLAN step 204 (owner, 2026-10-05: "apply all of their learnings to our approach"; PinnerSage, references/papers/2007.03634; Multi-Embedding
+Retrieval, 2506.23060). `scripts/hist_proto.py` (`scripts/chains/r204_proto.sh`, job list `r204`), training-free on hist_knn_v1's vectors:
+per category, Ward clusters over its earlier filings (cut at height 0.8, at most 20; reclustered on days after the category gains filings,
+over its 1,000 most recent filings; 12.7 clusters per clustering on average), each cluster read as its medoid or centroid; medoids plus
+log cluster importance (sum of exp(-lambda x age in days)); farthest-point prototypes (K 3 and 5, three rounds of hard assignment).
+Category score = the best prototype's cosine (/ TAU). 50 held-out v4 households, every transaction (as Table 182.1).
+
+**Table 183.1: % top-1 / top-3 / top-10, 50 held-out households**
+
+| reader | all (359,050) | first-time payee (53,479) |
+|---|---|---|
+| MaxSim over every earlier filing (top-3 mean) | 73.4 / 90.2 / 95.9 | 59.2 / 79.8 / 91.2 |
+| Ward medoids + importance, lambda 0 | 68.8 / 86.6 / 95.1 | 53.5 / 74.5 / 90.1 |
+| Ward medoids + importance, lambda 0.01 | 68.1 / 85.3 / 94.7 | 53.5 / 73.7 / 89.4 |
+| Ward medoids + importance, lambda 0.05 | 63.9 / 81.5 / 92.9 | 50.8 / 70.8 / 87.3 |
+| Ward centroids | 64.2 / 88.2 / 95.7 | 53.4 / 78.3 / 90.5 |
+| Ward medoids | 52.9 / 82.2 / 94.6 | 44.0 / 72.1 / 89.6 |
+| farthest-point, K 3 | 42.6 / 72.9 / 92.8 | 41.0 / 67.8 / 88.4 |
+| farthest-point, K 5 | 39.7 / 69.5 / 93.8 | 39.3 / 66.9 / 89.4 |
+
+### 183.1 What the step says
+
+- **Compressing a category's filings loses what makes it work.** Every prototype reader trails MaxSim over all filings, by 4.6 at best
+  (medoids weighted by cluster size) and by 30 or more for farthest-point prototypes. PinnerSage compresses a user's thousands of pins
+  into a few interests to make serving cheap; a household category has tens to hundreds of filings, which MaxSim already reads in full on
+  the GPU in seconds, so there is nothing to save and much to lose: an exact earlier match is worth more than any cluster centre.
+- **Size matters more than recency:** weighting a cluster by how many filings it holds recovers most of the medoid reader's loss (52.9 ->
+  68.8); decaying that weight by age only hurts (lambda 0.05: 63.9). Centroids beat medoids (64.2 against 52.9) because a medoid is one
+  arbitrary filing.
+- This agrees with row 210: the model does best when it sees the household's full history (a1, a5), worst with a fixed summary (a0).
+  Row 204 is closed; prototypes stay out of rows 210-212.
+
+**Cost:** one Modal job, 127.7 minutes on an H100 for CPU-bound clustering, about $9 at $4.09 per hour (exact figure from
+`scripts/modal_costs.py --rows 204` once Modal bills the day). It should have run on a CPU: `modal_app.py` now takes `--gpu cpu`.
+
+## 184. EVoC for the crowd's category clusters: no better than k-means 64 where it matters (behavioural neighbours of first-time payees: hit@1 45.8 against 45.9) and it leaves 21-25% of categories unclustered; its coarse layers match purposes better by ARI only by lumping trips; decider reads skipped (REAL-27, MODEL-25)
+
+PLAN step 213 (owner, 2026-10-05: "There is a newer form of fast clustering of embeddings that allows for a fast treemap of related
+topics"; references/software/evoc, toponymy). `scripts/evoc_clusters.py` (`scripts/chains/r213_evoc.sh`, CPU, 11 minutes; evoc 0.3.1,
+BSD-2-Clause, needs `--with matplotlib`). The same 42,555 category texts as row 189 (800 shared-world v4 households, "Group: Name;
+recently: 3 payees", two_tower_v1 vectors) clustered by k-means 64 and by EVoC (default and `base_n_clusters=64`, every layer). (a)
+against each category's generator purpose (61 roles rebuilt from `realstyle.Household`: the everyday kinds, person:, kid:, trip,
+holiday:, property:, service:, saving:, wish, catch-all; trips are 26% of categories), on the clustered points; (b) for the 57,772
+first-time-payee transactions of 50 held-out households, the household's own earlier payee nearest by crowd vector (other households only,
+as `SIM_SRC=behav`) and whether its category is the gold.
+
+**Table 184.1: intrinsic (clustered points) and the behavioural-neighbour proxy**
+
+| clustering | clusters | unclustered | ARI | NMI | purity | neighbour hit@1 | hit@3 |
+|---|---|---|---|---|---|---|---|
+| k-means 64 (row 189) | 64 | 0% | 0.300 | 0.800 | 0.809 | 45.9 | 59.6 |
+| EVoC, finest layer | 876 | 71.3% | 0.042 | 0.644 | 0.934 | 44.2 | 57.3 |
+| EVoC layer 2 | 90 | 25.0% | 0.405 | 0.819 | 0.828 | 45.8 | 59.4 |
+| EVoC layer 3 | 33 | 22.3% | 0.498 | 0.834 | 0.723 | | |
+| EVoC coarsest layer | 8 | 29.6% | 0.757 | 0.755 | 0.596 | 41.7 | 55.7 |
+| EVoC, 64 clusters asked | 64 | 21.0% | 0.389 | 0.823 | 0.823 | 45.7 | 59.5 |
+
+References for the proxy: character n-gram neighbours 41.0 / 58.9 (all covered); the household's most-used category 20.0 / 47.3. The crowd
+covers about 78% of first-time payees under every clustering.
+
+### 184.1 What the step says
+
+- **For the job the clusters do, EVoC equals k-means.** The behavioural neighbour is the same within 0.2 at the right granularity; the
+  clustering of the crowd's categories is not what limits behavioural rows.
+- **EVoC's better ARI is the wrong kind of better here.** It rises as layers coarsen because the largest purpose (trips, a quarter of all
+  categories) gets one big cluster; purity and the proxy fall at the same time. And density clustering leaves a fifth to a quarter of
+  categories unclustered, which k-means never does.
+- **Fast, as advertised:** 8-10 s per EVoC run on 42k vectors on the CPU (k-means 8 s); embedding the texts took 4 minutes and building
+  the households 3.5 (now cached).
+- Where EVoC may still help: near-duplicate detection (6,199 pairs here) for payee resolution (row 160) and its cluster tree for a
+  category treemap or a suggested category scheme for a new user (owner's question, 2026-10-05). Part (c), decider reads, is not run.
+
+**Cost:** $0 on Modal (local CPU).
+
+## 185. The late-interaction decision model: seeing the household's full history beats a fixed category summary by 9 points and the best plain encoder by 1.2 (75.7 / 63.4 first-time, calibration error 3.4%); the scoring tweaks and the interaction layers add nothing; more updates do (REAL-27, MODEL-25, MODEL-26)
+
+PLAN steps 210 and 211 (owner, 2026-10-05: "Has anyone built a Jev-like model with a late interaction model?"; "It would be awesome if we
+could make a decision model using this"; "Could we add some layers to the encoder to allow for more interaction between the history and
+output tokens?"). `scripts/li_decider.py`: bge-small token vectors (from row 195's ColBERT), every visible category of the household
+scored at once, softmax over them, cross-entropy + Brier (Clef's calibration term), learnable scale. Row 210 arms (Modal, one seed,
+3,000 steps of one household window, 200 v4 training households): a0 one document per category ("Group: Name | its last 8 payees and
+amounts", rebuilt daily); a1 a0 + the transaction's 5 nearest earlier filings and their categories in the query; a2 soft interaction
+(UWE); a3 + [CLS] cosine (SMART); a4 learned query-token weights; a5 each of the 50 nearest earlier filings plus every category's name as
+its own candidate, a category's probability summed (BELXTR's MML); a6 a5 + soft + hybrid. Row 211 (local 3090, from a1, 3,000 more
+steps): c0 no new layers (the control); x 2 cross-attention blocks from the query's tokens to each option's tokens; xm + 10 memory tokens
+(nearest earlier filings, each its pooled vector and its category's); xml + a listwise layer over the options. All read on the same 50
+held-out households as §182 (every transaction).
+
+**Table 185.1: 50 held-out households, every transaction (359,050; 53,479 first-time payees)**
+
+| model | top-1 / top-3 / top-10 | first-time payee top-1 / top-3 / top-10 | Brier | calibration error (top choice) |
+|---|---|---|---|---|
+| best plain encoder, kNN (§182) | 74.5 / 89.0 / 91.9 | 60.0 / 78.7 / 84.7 | | |
+| a0 one document per category | 65.8 / 85.4 / 95.9 | 60.5 / 83.0 / 94.4 | 0.491 | 5.6% |
+| a2 soft / a3 hybrid / a4 token weights | 66.0 / 65.2 / 65.9 | 60.5 / 60.1 / 60.5 | 0.49-0.50 | 4.6-5.9% |
+| a1 + nearest earlier filings in the query | 75.0 / 91.2 / 96.9 | 62.5 / 83.3 / 93.9 | 0.368 | 4.0% |
+| a5 each earlier filing a candidate (MML) | 74.9 / 90.7 / 96.4 | 62.0 / 82.4 / 93.3 | 0.369 | 1.7% |
+| a6 a5 + soft + hybrid | 74.9 / 90.8 / 96.4 | 62.1 / 82.7 / 93.4 | 0.369 | 1.7% |
+| c0 a1 + 3,000 more steps | **75.7 / 91.4 / 96.9** | **63.4 / 83.8 / 94.0** | **0.363** | 3.4% |
+| x + cross-attention | 75.5 / 91.3 / 96.9 | 63.0 / 83.5 / 94.0 | 0.364 | 2.8% |
+| xm + memory tokens | 75.4 / 91.3 / 96.9 | 62.9 / 83.4 / 93.9 | 0.365 | 3.1% |
+| xml + listwise layer | 75.5 / 91.3 / 96.9 | 63.1 / 83.5 / 93.9 | 0.365 | 2.7% |
+
+Speed checks (a1's data, local 3090): 8 household windows per step trained in 63 s instead of Modal's 17 minutes but read 73.5 / 60.0
+(380 steps; 3x the learning rate 73.3 / 59.7; 1,000 steps 74.2 / 61.1); 3,000 steps of 8 windows matched Modal (74.9 / 62.4, 3.9%) in 7
+minutes. The per-filing arms took ~100 minutes each on Modal (about 3,000 candidate texts per step).
+
+### 185.1 What the step says
+
+- **What the model sees decides it.** A fixed summary of each category (its last 8 payees) loses 9 points overall; giving the
+  transaction its nearest earlier filings (a1) or making each earlier filing a candidate (a5) recovers them and passes the best plain
+  encoder: +1.2 overall and +3.4 on first-time payees after more training (c0), with top-10 at 96.9% (kNN 91.9%).
+- **How it scores barely matters.** Soft interaction, the hybrid score and token weights moved a0 by under 1 point; the interaction
+  layers moved c0 by -0.2 to -0.3 (one seed: noise). On this data, MaxSim over short texts plus the history in the query already carries
+  what the layers could add; the gap to decider (§182: 2-3 points on synthetic items) is not reasoning this model lacks at this scale.
+  The layers do improve calibration slightly (2.7-3.1% against 3.4%).
+- **Calibration is good throughout,** and best with per-filing candidates (1.7%): usable for an auto-filing threshold.
+- **Updates matter more than data per update:** the number of steps, not examples per step, set accuracy; more steps (c0) gave +0.7 /
+  +0.9 over a1.
+- Not yet measured: the best arm on decider's own items and on the owner's budget (matched effort: decider's first trained recipe
+  68.3, the tuned recipe 73.8 on the owner's budget).
+- Speed: the interaction arms' reader built every (transaction, option) pair in Python (GPU a third busy, ~15 minutes per arm); it is now
+  vectorised (identical scores, 1.7x; 2.2x under bf16 with 99.97% the same top choice). Chains use `grep --line-buffered` so logs show
+  progress.
+
+**Cost:** row 210 on Modal, 7 jobs, 26-101 minutes each (about 365 job-minutes, roughly $25 at $4.09 per H100-hour; exact figures from
+`scripts/modal_costs.py --rows 210` once Modal bills the day); speed checks and row 211 $0 (local RTX 3090).
+
+## 186. Suggesting a category scheme for a new user: the crowd's answer (each payee's most common category cluster among other households) beats clustering the household with EVoC (ARI 0.75 against 0.49 at best, EVoC leaving 13-32% of transactions unclustered); amount and rhythm features hurt; payee-level schemes cannot see person-specific categories (REAL-27)
+
+PLAN step 214 (owner, 2026-10-05: "What if I wanted to take a whole list of transactions and have them get auto-clustered for a user, and
+have categories suggested?"; "I'm curious to run EVoC on synthetic data, just to learn"). Exploratory. `scripts/suggest_categories.py`
+(log `logs/r214_suggest.log`). 50 held-out v4 households with their categories hidden: points are distinct payees (crowd key, else the
+clean name; 818 per household on average, 7,593 outflows, 49 real categories), weighted by transaction count. Features: the history
+encoder's vector of the payee name (hist_knn_v1), the crowd vector (other households' filings over row 189's 64 category clusters; covers
+94.3% of transactions), amount and rhythm (log median amount, months present, gaps), alone and combined. Methods: EVoC (default and a
+small-input setting, every layer, and the layer whose count is nearest the truth), agglomerative clustering told the true number of
+categories (an oracle), and two baselines that need no clustering: B1 each payee's most common crowd cluster; B2 its most common crowd
+category name. Scored against the household's real categories: ARI and NMI (transaction-weighted), clusters, edits (merges + splits a
+user would make), unclustered share, transaction purity (share in a cluster whose majority category is its own).
+
+**Table 186.1: means over 50 households (best rows; 6 feature sets x 10 methods in the log)**
+
+| features | method | ARI | NMI | clusters (true 49) | edits | unclustered | purity |
+|---|---|---|---|---|---|---|---|
+| (crowd) | B1 most common crowd cluster | **0.751** | **0.782** | 31 | 367 | 5.7% | 62.6% |
+| (crowd) | B2 most common crowd name | 0.513 | 0.731 | 65 | 436 | 5.7% | 65.6% |
+| crowd | agglomerative, told k = 49 | 0.581 | 0.773 | 49 | **170** | 0 | **69.2%** |
+| encoder + crowd | EVoC default, nearest layer | 0.490 | 0.725 | 31 | 298 | 18.5% | 54.2% |
+| encoder + crowd | EVoC small, nearest layer | 0.396 | 0.703 | 45 | 352 | 23.8% | 51.5% |
+| crowd | EVoC default, nearest layer | 0.399 | 0.684 | 38 | 355 | 13.1% | 55.6% |
+| encoder | EVoC default, nearest layer | 0.346 | 0.593 | 19 | 394 | 24.3% | 40.2% |
+| encoder + crowd + amount | EVoC small, nearest layer | 0.271 | 0.551 | 50 | 408 | 8.5% | 46.5% |
+| amount and rhythm | EVoC small, nearest layer | 0.134 | 0.366 | 68 | 797 | 8.2% | 30.3% |
+
+Ceiling: 30.9% of payees are filed under 2+ categories and carry 86.7% of transactions, so no payee-level scheme can exceed 76.6% purity.
+
+### 186.1 What the step says
+
+- **Ask the crowd before clustering.** Giving each payee the category cluster other households most often use for it (B1) matches the
+  household's real scheme far better (ARI 0.75) than any clustering of the household's own payees; only an oracle told the true number of
+  categories gets close in purity and needs fewer edits. EVoC's density clustering leaves 13-32% of a household's transactions out, and
+  attaching them afterwards recovers only part (ARI 0.49 -> 0.56).
+- **What payees say helps; how money moves does not.** The encoder's payee vectors add little to the crowd's; amount and rhythm features
+  halve ARI wherever they are added (a monthly regular bill and a regular coffee look alike).
+- **The household's own purposes are invisible at payee level:** on the example household, a cluster of coffee and restaurant payees
+  mixed Dining out with one person's morning treats and fun money; person-to-person payments (no crowd key) fell into one 341-payee
+  "Other" cluster, burying a regular house-cleaning payment. A suggestion tool should propose the crowd's scheme, then ask about the
+  splits that are personal (whose money, which trip), which is where the user's own categories differ from everyone's.
+- EVoC is fast and its tree makes a good picture of a household's spending (`data/interim/r214/treemap_100003.json`), but as a
+  category-suggester it is beaten by a lookup.
+
+**Cost:** $0 on Modal (local CPU).

@@ -40,7 +40,8 @@ HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.envir
 SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
 GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
-BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))  # 0: the per-transaction reader (to check the batched one against)
+BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))
+FAST_ISCORES, ICHUNK = int(os.environ.get("FAST_ISCORES", "1")), int(os.environ.get("ICHUNK", "128"))  # row 211's vectorised reader  # 0: the per-transaction reader (to check the batched one against)
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
 # row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
@@ -241,25 +242,35 @@ def _pool(v, m):
     return torch.nn.functional.normalize((v * m[..., None]).sum(1) / m.sum(1, keepdim=True).clamp(min=1), dim=-1)
 
 
-def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, Lab=None, lpos=None):
+def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, Lab=None, lpos=None, pre=None):
     """row 211: [b, max options] scores with the interaction layers. Q = model.vecs of the anchors' queries; D = (token vectors, mask, -, cls)
-    of the documents, pos[text] -> row; F / Lab = pooled vectors of filing texts / category labels for memory tokens (fpos, lpos rows)"""
+    of the documents, pos[text] -> row; F / Lab = pooled vectors of filing texts / category labels for memory tokens (fpos, lpos rows).
+    pre: the reader's precomputed index tensors for this chunk (ra, ro, rd pair indices; mf, ml, mm memory rows and mask), which replace
+    the per-transaction Python loops (2026-10-05: those left the GPU at a third busy and took ~15 min per arm)"""
     import torch
     qv, qm, qw, qc = Q
-    rows_a, rows_d, rows_o, nopt = [], [], [], max(len(e["state"]) for e in anc)
-    for k, e in enumerate(anc):
-        for o, c in enumerate(e["state"]):
-            rows_a.append(k); rows_d.append(pos[e["d"][c]]); rows_o.append(o)
-    ra, rd = torch.tensor(rows_a, device=model.dev), torch.tensor(rows_d, device=model.dev)
+    nopt = max(len(e["state"]) for e in anc)
+    if pre is not None:
+        ra, ro, rd = pre["ra"], pre["ro"], pre["rd"]
+    else:
+        rows_a, rows_d, rows_o = [], [], []
+        for k, e in enumerate(anc):
+            for o, c in enumerate(e["state"]):
+                rows_a.append(k); rows_d.append(pos[e["d"][c]]); rows_o.append(o)
+        ra, rd, ro = (torch.tensor(x, device=model.dev) for x in (rows_a, rows_d, rows_o))
     kv, kvm = D[0][rd].float(), D[1][rd]
     if "m" in INTERACT:
-        mem = torch.zeros(len(anc), NMEM, kv.shape[-1], device=model.dev)
-        mm = torch.zeros(len(anc), NMEM, dtype=torch.bool, device=model.dev)
-        for k, e in enumerate(anc):
-            js = [j for j in e.get("nb", [])[:NMEM]]
-            if js:
-                f = torch.cat([F[[fpos[e["_ev"][j]["text"]] for j in js]], Lab[[lpos[e["_ev"][j]["label"]] for j in js]]], -1)
-                mem[k, :len(js)] = inter.mem(f); mm[k, :len(js)] = True
+        if pre is not None:
+            mm = pre["mm"]
+            mem = inter.mem(torch.cat([F[pre["mf"]], Lab[pre["ml"]]], -1)) * mm[..., None]
+        else:
+            mem = torch.zeros(len(anc), NMEM, kv.shape[-1], device=model.dev)
+            mm = torch.zeros(len(anc), NMEM, dtype=torch.bool, device=model.dev)
+            for k, e in enumerate(anc):
+                js = [j for j in e.get("nb", [])[:NMEM]]
+                if js:
+                    f = torch.cat([F[[fpos[e["_ev"][j]["text"]] for j in js]], Lab[[lpos[e["_ev"][j]["label"]] for j in js]]], -1)
+                    mem[k, :len(js)] = inter.mem(f); mm[k, :len(js)] = True
         kv, kvm = torch.cat([kv, mem[ra]], 1), torch.cat([kvm, mm[ra]], 1)
     q = qv[ra]
     for blk in inter.x:
@@ -277,10 +288,10 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
         sc = sc + (qc[ra] * D[3][rd]).sum(-1)
     sc = scale * sc
     S = torch.full((len(anc), nopt), float("-inf"), device=model.dev)
-    S = S.index_put((ra, torch.tensor(rows_o, device=model.dev)), sc)
+    S = S.index_put((ra, ro), sc)
     if "l" in INTERACT:
         feat = torch.zeros(len(anc), nopt, kv.shape[-1] + 1, device=model.dev)
-        feat = feat.index_put((ra, torch.tensor(rows_o, device=model.dev)), torch.cat([_pool(dv, dm), (sc / scale)[:, None]], -1))
+        feat = feat.index_put((ra, ro), torch.cat([_pool(dv, dm), (sc / scale)[:, None]], -1))
         ok = torch.isfinite(S)
         h = inter.lw(inter.lw_in(feat), src_key_padding_mask=~ok)
         S = torch.where(ok, S + inter.lw_out(h).squeeze(-1), S)
@@ -490,10 +501,36 @@ def iscores(model, inter, scale, ev, docs):
             F, Lab = _pool(Fe[0].float(), Fe[1]), _pool(Le[0].float(), Le[1])
         pos = {t: k for k, t in enumerate(uniq)}
         out = []
-        for a in range(0, len(ev), 64):
-            chunk = ev[a:a + 64]
-            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos)
-            out += [dict(zip(e["state"], S[k, :len(e["state"])].tolist())) for k, e in enumerate(chunk)]
+        if not FAST_ISCORES:  # the per-transaction reference path (identical scores; 1.7x slower on 11,558 transactions)
+            for a in range(0, len(ev), 64):
+                chunk = ev[a:a + 64]
+                S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos)
+                out += [dict(zip(e["state"], S[k, :len(e["state"])].tolist())) for k, e in enumerate(chunk)]
+            return out
+        # every index the layers need, built once per budget as arrays; per chunk only tensor gathers run
+        import numpy as np
+        nopt = np.array([len(e["state"]) for e in ev])
+        cix = np.zeros((len(ev), nopt.max()), dtype=np.int64)
+        for i, e in enumerate(ev):
+            cix[i, :nopt[i]] = [pos[e["d"][c]] for c in e["state"]]
+        mf = np.zeros((len(ev), NMEM), dtype=np.int64); ml = np.zeros_like(mf); mmask = np.zeros((len(ev), NMEM), dtype=bool)
+        if "m" in INTERACT:
+            for i, e in enumerate(ev):
+                js = e.get("nb", [])[:NMEM]
+                mf[i, :len(js)] = [fpos[ev[j]["text"]] for j in js]; ml[i, :len(js)] = [lpos[ev[j]["label"]] for j in js]
+                mmask[i, :len(js)] = True
+        cix_t, nopt_t = torch.tensor(cix, device=model.dev), torch.tensor(nopt, device=model.dev)
+        mf_t, ml_t, mm_t = (torch.tensor(x, device=model.dev) for x in (mf, ml, mmask))
+        for a in range(0, len(ev), ICHUNK):
+            chunk = ev[a:a + ICHUNK]
+            b = len(chunk)
+            C = int(nopt[a:a + b].max())
+            valid = torch.arange(C, device=model.dev)[None, :] < nopt_t[a:a + b, None]
+            ra, ro = valid.nonzero(as_tuple=True)
+            pre = dict(ra=ra, ro=ro, rd=cix_t[a:a + b, :C][ra, ro], mf=mf_t[a:a + b], ml=ml_t[a:a + b], mm=mm_t[a:a + b])
+            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos, pre)
+            S = S.tolist()
+            out += [dict(zip(e["state"], S[k][:nopt[a + k]])) for k, e in enumerate(chunk)]
     return out
 
 
