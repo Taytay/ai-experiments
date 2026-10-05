@@ -59,8 +59,9 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
-EXTRA = dict(AGO=0, REC=0, QFMT="rows")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
+RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 
 
 def _base_head(path, hidden):
@@ -337,12 +338,14 @@ def _nbrs(b, ev, m1, cache):
     return nb
 
 
-def _query(i, ev, start):
+def _query(i, ev, start, names=None):
     """the query text of event i. Row 210: "<transaction> || <payee> $<amt> -> <category>; ..." over its NB nearest earlier filings.
     Row 217 (decider's history slice, §99): AGO adds how long ago each filing was; REC adds the household's REC most recent filings
     before the transaction's day, newest first (decider's "Earlier transactions" rows: trips and time routing); QFMT=group lists the
-    rows under each category once ("<category>: <payee> $<amt> <ago>, ...; ...") instead of repeating the category per row."""
+    rows under each category once ("<category>: <payee> $<amt> <ago>, ...; ...") instead of repeating the category per row.
+    names: {category id: name} in place of the labels (row 218's rename augmentation)."""
     e = ev[i]
+    lab = (lambda j: names.get(ev[j]["gold"], ev[j]["label"])) if names else (lambda j: ev[j]["label"])
     near = e.get("nb", [])[:NB] if CTX else []
     rec = [j for j in range(start[i] - 1, max(-1, start[i] - 1 - REC), -1)] if REC else []
 
@@ -355,9 +358,9 @@ def _query(i, ev, start):
             return e["text"]
         by = defaultdict(list)
         for j in js:
-            by[ev[j]["label"]].append(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f}{ago(j)}')
+            by[lab(j)].append(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f}{ago(j)}')
         return e["text"] + " || " + "; ".join(f"{lab}: " + ", ".join(v) for lab, v in by.items())
-    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {ev[j]["label"]}{ago(j)}'
+    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {lab(j)}{ago(j)}'
     q = e["text"]
     if near:
         q += " || " + "; ".join(map(row, near))
@@ -380,20 +383,52 @@ def prepared(b, m1, cache):
         start.append(k)
     for i, e in enumerate(ev):
         e["q"] = _query(i, ev, start)
-    docs, recent, i = {}, defaultdict(list), 0
+    docs, snap, recent, i = {}, {}, defaultdict(list), 0
     while i < len(ev):
         d = ev[i]["day"]
-        docs[d] = {c: lab + " | " + (" | ".join(f"{p} ${a:.0f}" for p, a in recent[c]) if recent[c] else "nothing filed yet")
-                   for c, lab in ((c, ev[i]["labels"][c]) for c in ev[i]["state"])}
+        snap[d] = {c: tuple(recent[c]) for c in ev[i]["state"]}
+        docs[d] = {c: _doc(ev[i]["labels"][c], snap[d][c]) for c in ev[i]["state"]}
         j = i
         while j < len(ev) and ev[j]["day"] == d:
             j += 1
         for e in ev[i:j]:
             recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
         i = j
-    for e in ev:  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
-        e["d"], e["_ev"] = docs[e["day"]], ev
+    for i, e in enumerate(ev):  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
+        e["d"], e["_ev"], e["_snap"], e["_i"], e["_start"] = docs[e["day"]], ev, snap[e["day"]], i, start
     return ev, docs
+
+
+def _doc(label, recent):
+    """a category's document: "<Group: Name> | <payee> $<amt> | ..." over its last M distinct payees, most recent first"""
+    return label + " | " + (" | ".join(f"{p} ${a:.0f}" for p, a in recent) if recent else "nothing filed yet")
+
+
+def _coined(rng, taken):
+    """a fresh pronounceable word (exp_categoriser's rename augmentation, row 42)"""
+    while True:
+        w = "".join(rng.choice("bdfgklmnprstvz") + rng.choice("aeiou") for _ in range(rng.randint(2, 3))).capitalize()
+        if w not in taken:
+            return w
+
+
+def _renamed(anc, rng):
+    """row 218 (decider's RENAME, §42): each of a window's categories renamed with probability RENAME to a coined word, consistently in
+    its documents and the query's history rows, so the model must read what was filed where rather than the category's name"""
+    labels = anc[0]["labels"]
+    names, taken = {}, set(labels.values())
+    for c in labels:
+        if rng.random() < RENAME:
+            names[c] = _coined(rng, taken); taken.add(names[c])
+    if not names:
+        return anc
+    out = []
+    for e in anc:
+        f = dict(e)
+        f["q"] = _query(e["_i"], e["_ev"], e["_start"], names)
+        f["d"] = {c: _doc(names.get(c, labels[c]), r) for c, r in e["_snap"].items()}
+        out.append(f)
+    return out
 
 
 prepare = prepared
@@ -444,6 +479,7 @@ def train():
         open_licence(BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
+    assert not RENAME or (MODE == "doc" and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
@@ -467,7 +503,8 @@ def train():
             ev, docs = data[rng.randrange(len(data))]
             d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
-            anc += rng.sample(w, min(B, len(w)))
+            pick = rng.sample(w, min(B, len(w)))
+            anc += _renamed(pick, rng) if RENAME and pick else pick
         if not anc:
             continue
         dtexts, idx = [], {}
