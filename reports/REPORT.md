@@ -192,6 +192,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §177 History-aware encoders (rows 194-195)
 - §178 Fair fusion and amounts (rows 199-200)
 - §179 Pinterest research applicability (rows 196-198, 201-207)
+- §180 Where decider and encoders disagree (row 201)
 
 <!-- END SECTION INDEX -->
 
@@ -10989,3 +10990,46 @@ everything is an exact softmax over a closed list.
 203 (the faithful TransAct reader, small, local GPU); 204 and 205 (training-free or small); 206 (decider-side, needs Modal); 196 and
 207 (new models, larger); 197 and 198 last. Judge every row on the owner's budget with settings chosen on synthetic households (178.1
 showed why), aggregates only.
+
+## 180. decider and the history encoders mostly fail together: on the owner's budget an encoder is right where decider is wrong on only 4.3-4.6% of transactions (decider alone 12-13%), and neither confidence nor a gate chosen on synthetic households can find those cases (best rule 72.4 against decider's 72.5); the ceiling of a perfect chooser is +4.3-4.6 (REAL-27, MODEL-25)
+
+PLAN step 201. `scripts/hist_agree.py` (`scripts/chains/r201_agree.sh`), on the fast readers of row 208 E1 (`scripts/hist_fast.py`: 100
+held-out v4 households plus the owner's budget in 3 minutes; the first attempt on the Python readers had done under 30 households in 30
+minutes). Per item: decider G4 (two seeds, mean shown) against kNN and MaxSim over decider's own options (categories the encoders cannot
+score, such as hidden ones and Ready to Assign, get the encoder's lowest score, so encoder accuracy here is below §177's); split by payee
+familiarity, multi-category payees and the gold category's size; "either (oracle)" = right if either is; "higher top-prob wins" and a
+gate (encoder when its top probability >= G and decider's <= D, chosen on the synthetic set) are rules a system could use. Owner's
+budget: 19,093 items (private; aggregates only).
+
+**Table 180.1: owner's budget, % of items (MaxSim; kNN in brackets where it differs by more than 1)**
+
+| items | n | decider | MaxSim | only decider right | only MaxSim right | either (oracle) | best rule |
+|---|---|---|---|---|---|---|---|
+| all | 19,093 | 72.5 | 64.8 [63.6] | 12.3 [13.2] | 4.6 [4.3] | 77.1 | 72.5 (higher top-prob) |
+| first-time payee | 5,832 | 56.9 | 46.2 [44.8] | 17.1 | 6.4 | 63.3 | 57.0 (gate) |
+| payee filed 1-3 times | 3,270 | 80.3 | 74.0 [68.7] | 11.1 [15.7] | 4.8 | 85.1 | 80.4 |
+| payee filed 4+ times | 9,991 | 79.0 | 72.6 | 10.0 | 3.5 | 82.5 | 78.9 |
+| payee under 2+ categories | 6,847 | 69.2 | 60.8 | 13.4 | 5.0 | 74.2 | 69.0 |
+| gold category with 1-9 filings | 992 | 44.0 | 21.5 | 25.4 | 2.9 | 46.9 | 43.9 |
+| gold category with 100+ filings | 14,148 | 77.3 | 73.3 | 9.2 | 5.1 | 82.5 | 77.4 |
+
+Synthetic held-out households (5,897 items): decider 72.8, kNN 70.6, MaxSim 70.1; only an encoder right 4.7-5.3%, only decider right
+6.9-8.1%; best rule 73.0-73.2 (+0.2-0.4). Mean top probability on the cases only the encoder got right: decider 0.51, kNN 0.59 (owner);
+on the cases only decider got right: decider 0.67, kNN 0.53.
+
+### 180.1 What the step says
+
+- **The errors overlap heavily.** Where decider is wrong, an encoder is right only about one time in five (4.6 of 27.5 points); where an
+  encoder is wrong, decider is right more than half the time. Pinterest's union paid because its two retrievers shared 3.2% of their
+  candidates; ours share most of their mistakes. Simple fusion cannot pay much, which is what §178 found.
+- **The ceiling is real but hidden.** A perfect chooser would gain +4.3 to +4.6 (6.4 on first-time payees), but no confidence signal
+  finds those cases: decider is less sure on them (0.51 against 0.67) and kNN slightly surer (0.59 against 0.53), yet "higher wins" and
+  the synthetic-chosen gate both stay at or below decider. A learned chooser over richer features (both readers' full distributions,
+  payee familiarity, category size, the encoders' agreement) is the only way left to reach part of it; it would need care not to tune
+  on the owner's budget.
+- **decider's lead is largest where history is thin:** small categories (1-9 filings: 44.0 against 21.5) and first-time payees (+10.7).
+  The encoders nearly match it where history is rich (100+ filings: 77.3 against 73.3). This is where cheap encoders could file alone.
+- **So the encoders' role is cost, not accuracy, for now:** file the confident, history-rich cases without the 4B model (§177: 19-50%
+  at no loss). Rows 202-205 aim to make the encoders better on their own; a learned chooser is worth a row only if they narrow the gap.
+
+**Cost:** $0 on Modal (local RTX 3090, 3 minutes).
