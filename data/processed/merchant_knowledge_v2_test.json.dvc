@@ -1,0 +1,5 @@
+outs:
+- md5: 280d8bd9e25ee73e34137ee4dfdad7db
+  size: 34511878
+  hash: md5
+  path: merchant_knowledge_v2_test.json

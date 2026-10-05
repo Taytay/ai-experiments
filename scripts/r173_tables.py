@@ -12,11 +12,14 @@ import numpy as np
 
 from ai_experiments.paths import PROCESSED
 
-R = "results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st800{seed}_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft{rs}_lora_{set}_labrand255_laylabelled_shots.noctx.jsonl"
+R = "results/per_item/real6_dm_decider_decider_decider-4b_none_h100bf16st{steps}{seed}_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft{rs}_lora_{set}_labrand255_laylabelled_shots.noctx.jsonl"
 SETS = ["real6", "real6_v1_novel", "mislead_v1", "override_v1", "blind_v1", "blind_v1_others", "blind_v2", "blind_v2_others"]
 ARMS = {"recipe (3 seeds)": [("", ""), ("s1", ""), ("s2", "")], "recipe + 25% real-style": [("", "_rs25")], "recipe + 50% real-style": [("", "_rs50")],
         "row 176 A2: + 25% real-style v2": [("", "_rs25v2")], "row 176 B: + 25% real-style v2, field block generated": [("", "_rs25v2f_fl")],
-        "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")]}
+        "row 177 C: + 25% real-style v2, row numbers": [("", "_rs25v2i")], "row 177 D: + row numbers and rationales": [("", "_rs25v2r")],
+        "row 179 K: A2 + 40% knowledge 5k x26": [("", "_rs25v2_mk40_5k")], "row 180: 5k x13 at 20%": [("", "_rs25v2_mk20_5k13")],
+        "row 180: 20k x6.5 at 40%": [("", "_rs25v2_mk40_20k6")], "row 180: A2 at 3200 steps": [("3200:", "_rs25v2")],
+        "row 180: 20k x26 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_20k26")], "row 180: 48k x11 at 40%, 3200 steps": [("3200:", "_rs25v2_mk40_48k11")]}
 
 
 def acc(f, sel=None):
@@ -30,7 +33,7 @@ if __name__ == "__main__":
     for arm, runs in ARMS.items():
         cells = []
         for st in SETS:
-            vals = [acc(f)[0] for seed, rs in runs for f in glob.glob(R.format(seed=seed, rs=rs, set=st))]
+            vals = [acc(f)[0] for seed, rs in runs for f in glob.glob(R.format(steps=seed.split(":")[0] if ":" in seed else "800", seed=seed.split(":")[-1] if ":" in seed else seed, rs=rs, set=st))]
             cells.append(f"{np.mean(vals):.1f}" + (f" [{min(vals):.1f}-{max(vals):.1f}]" if len(vals) > 1 else "") if vals else "-")
         print(f"| {arm} | " + " | ".join(cells) + " |")
     for st in ("blind_v1", "blind_v2"):
@@ -44,6 +47,6 @@ if __name__ == "__main__":
         for arm, runs in ARMS.items():
             cells = []
             for w, sel in whys.items():
-                vals = [acc(f, sel)[0] for seed, rs in runs for f in glob.glob(R.format(seed=seed, rs=rs, set=st))]
+                vals = [acc(f, sel)[0] for seed, rs in runs for f in glob.glob(R.format(steps=seed.split(":")[0] if ":" in seed else "800", seed=seed.split(":")[-1] if ":" in seed else seed, rs=rs, set=st))]
                 cells.append(f"{np.mean(vals):.1f}" if vals else "-")
             print(f"| {arm} | " + " | ".join(cells) + " |")
