@@ -104,17 +104,17 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
 - **Efficiency first (owner, 2026-10-05: "start on all of these efficiency changes before just about anything else. We've gotta make
   our loop tighter/faster!"):** row 208 runs before every other row except 201, which is re-run on the fast path. Order (review in
   `reports/workflow_review_2026-10-05.md`; each change checked against the old path before use):
-  - E1 (local, now): `scripts/hist_fast.py`: GPU-vectorised kNN and MaxSim readers (blockwise similarity, masked earlier days, per-category
+  - E1 DONE (identical scores, 124 s -> 2.1 s per household; row 201 ran in 3 min): `scripts/hist_fast.py`: GPU-vectorised kNN and MaxSim readers (blockwise similarity, masked earlier days, per-category
     top-3) and a per-household score cache (synthetic: `data/interim/hist_cache/`, gitignored; owner: `~/.local/share/ynab-real-eval/`,
     0600); hist_agree / hist_fuse / hist_amount use it; ColBERT batched. Check: equal to `hist_encoder2._scores` on one household. Then row 201.
-  - E2: per-row job-list generator (`scripts/modal_jobs/make_jobs.py`): seed 0 and the row's own sets by default; variants and second
+  - E2 DONE (reproduces r190.json exactly): per-row job-list generator (`scripts/modal_jobs/make_jobs.py`): seed 0 and the row's own sets by default; variants and second
     seeds only on request; prints an estimated cost (steps x 5.2 s + read minutes from history + 5 min start, $4.09/h) before launch.
-  - E3: vLLM reads in `exp_decision_models.py` (agreement >= 99.5% top-1 and matching scorecard on blind_v1 and v4g_test first); several
+  - E3 DONE (H100: 24.7 ms vs 56 ms per item, 99.68% / 99.83% / 100% first-choice agreement; READS_FILE runs a job's reads through one engine): vLLM reads in `exp_decision_models.py` (agreement >= 99.5% top-1 and matching scorecard on blind_v1 and v4g_test first); several
     item sets per process.
-  - E4: owner's-budget scoring on 2 shards with phase timings, then vLLM in `score_private`.
-  - E5: image with the training overlay baked in; mount only the data a job names.
-  - E6: length-sorted micro-batches in training (identical gradients), then the 400 / 600-step check (~$9).
-  - E7: timestamps in chain logs; auto-ingest when a job list finishes.
+  - E4 WRITTEN (confirm on the next owner read): owner's-budget scoring on 2 shards with phase timings, then vLLM in `score_private`.
+  - E5 WRITTEN (first used by r208s): image with the training overlay baked in; mount only the data a job names.
+  - E6 WRITTEN (local check: same update up to bf16 shape noise, step-0 loss 4.462 vs 4.475, so MICRO_SPLIT is set row-wide; r208s measures it): length-sorted micro-batches in training (identical gradients), then the 400 / 600-step check (~$9).
+  - E7 DONE (scripts/wait_and_ingest.sh): timestamps in chain logs; auto-ingest when a job list finishes.
 - **State (2026-10-05):** branch plan-192-behav-v4 (PR #94, top of stack #24). Rows 192-200 done (REPORTs 176-178).
   §179 Pinterest research applicability maps 11 Pinterest papers (references/papers INDEX thread 7) onto rows 196-198 and 201-207; read it before any of
   them. Next, in order: 201 (where decider and MaxSim disagree), 202 (encoder training fixes), 203 (TransAct-faithful reader),
