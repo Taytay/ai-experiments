@@ -1,0 +1,219 @@
+<title>Late-Interaction Categoriser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --done:#2F6B45;--todo:#8A6A12;--doing:#17667F;--dropped:#7A7F7C;--code:#EEF1ED;--bar:#9DB8C0;--bar2:#17667F;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622;--bar:#3E5A62;--bar2:#6DB3C9}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622;--bar:#3E5A62;--bar2:#6DB3C9}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 "IBM Plex Sans",system-ui,sans-serif;padding-inline:16px;padding-block:28px 64px}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:Literata,Georgia,serif;font-weight:650;line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:2.1rem}h2{font-size:1.45rem}h3{font-size:1.05rem;font-family:"IBM Plex Sans",sans-serif;font-weight:600}
+p{margin:0;max-width:68ch}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.86em}
+code{background:var(--code);padding:1px 5px;border-radius:3px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.08rem;color:var(--ink);max-width:70ch}
+section{display:flex;flex-direction:column;gap:14px}
+.head{display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:.74rem;padding:3px 9px;border-radius:999px;border:1px solid var(--rule);background:var(--panel);color:var(--muted)}
+.chip.run{color:var(--doing);border-color:var(--doing)}.chip.ok{color:var(--done);border-color:var(--done)}
+/* diagram */
+.diagram{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px;display:grid;grid-template-columns:1fr auto 1.25fr;gap:18px;align-items:center}
+.col{display:flex;flex-direction:column;gap:8px}
+.lab{font-size:.78rem;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.toks{display:flex;flex-wrap:wrap;gap:4px}
+.tok{font-family:"IBM Plex Mono",monospace;font-size:.76rem;padding:2px 6px;border-radius:3px;background:var(--accent-soft);color:var(--ink);border:1px solid transparent}
+.tok.hist{background:var(--led-soft)}
+.tok.hit{border-color:var(--accent)}
+.doc{border:1px solid var(--rule);border-radius:4px;padding:8px;display:flex;flex-direction:column;gap:5px;background:var(--paper)}
+.doc.win{border-color:var(--accent)}
+.doc .row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--muted)}
+.doc.win .p{color:var(--accent);font-weight:500}
+.op{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:.78rem;text-align:center;max-width:120px}
+.op .big{font-family:Literata,serif;font-size:1.4rem;color:var(--accent)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.step{border-top:2px solid var(--accent);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+.step b{font-weight:600}
+/* charts */
+.chart{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.bars{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:6px 12px;align-items:center}
+.bname{font-size:.86rem}
+.bname small{display:block;color:var(--muted);font-size:.74rem}
+.track{position:relative;height:30px}
+.b{position:absolute;left:0;height:12px;border-radius:2px;background:var(--bar)}
+.b.all{top:2px;background:var(--bar2)}.b.ft{top:16px}
+.bv{position:absolute;font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink);white-space:nowrap}
+.bv.all{top:0}.bv.ft{top:14px;color:var(--muted)}
+.axis{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:12px}
+.ticks{position:relative;height:18px;border-top:1px solid var(--rule)}
+.ticks span{position:absolute;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--muted);top:2px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+.sw{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.note{font-size:.84rem;color:var(--muted);max-width:75ch}
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:.7rem;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.t-yes{background:color-mix(in srgb,var(--done) 16%,transparent);color:var(--done)}
+.t-no{background:color-mix(in srgb,var(--dropped) 18%,transparent);color:var(--dropped)}
+.t-bad{background:var(--led-soft);color:var(--led)}
+.t-run{background:var(--accent-soft);color:var(--doing)}
+.t-todo{background:color-mix(in srgb,var(--todo) 16%,transparent);color:var(--todo)}
+/* findings */
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.f{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.f .k{font-family:Literata,serif;font-size:1.5rem;color:var(--accent);line-height:1.1}
+.f .ref{font-size:.76rem;color:var(--muted)}
+ol.next{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:10px;max-width:78ch}
+ol.next li::marker{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
+@media (max-width:720px){.diagram{grid-template-columns:1fr}.op{max-width:none;flex-direction:row}.bars,.axis{grid-template-columns:1fr}.axis>div:first-child{display:none}}
+</style>
+
+<main>
+<header class="head">
+  <div class="eyebrow">YNAB categoriser research · PLAN rows 194–212 · 2026-10-05</div>
+  <h1>Late-Interaction Categoriser</h1>
+  <p class="lede">A small encoder (bge-small, 33M parameters) that files a transaction into one of the household's own categories by matching tokens against the household's history, trained as a decision model rather than a search engine. It now matches the tuned 4B decider's first recipe at a fraction of the cost, and it reads first-time payees better than any encoder before it.</p>
+  <div class="chips"><span class="chip ok">rows 202, 210 done</span><span class="chip run">row 211 training</span><span class="chip run">row 204 on Modal</span><span class="chip">rows 205, 209, 212 code ready</span></div>
+</header>
+
+<section>
+  <div class="eyebrow">The approach</div>
+  <h2>How it files a transaction</h2>
+  <div class="diagram" role="img" aria-label="Diagram: the transaction and its nearest past filings are encoded as tokens, matched by MaxSim against each category's document, and a softmax over the household's categories gives the decision.">
+    <div class="col">
+      <div class="lab">query: the transaction + its nearest past filings (a1)</div>
+      <div class="toks"><span class="tok hit">uber</span><span class="tok">eats</span><span class="tok hit">cracker</span><span class="tok hit">barrel</span><span class="tok">|</span><span class="tok">$18.40</span><span class="tok">|</span><span class="tok">wed</span></div>
+      <div class="toks"><span class="tok hist">cracker barrel $14 → takeout &amp; restaurants</span><span class="tok hist">wendy's $31 → takeout &amp; restaurants</span><span class="tok hist">uber eats little caesars $33 → expenses</span></div>
+      <div class="lab">invented example from a synthetic household</div>
+    </div>
+    <div class="op"><span class="big">MaxSim</span>each query token finds its best match in each category's tokens; average, × a learned temperature</div>
+    <div class="col">
+      <div class="lab">one document per category, rebuilt daily from filings before today (probabilities illustrative)</div>
+      <div class="doc win"><div class="row"><b>Everyday Expenses: Takeout &amp; restaurants</b><span class="p">p = 0.81</span></div><div class="toks"><span class="tok hit">cracker barrel $14</span><span class="tok">wendy's $31</span><span class="tok">auntie anne's $46</span></div></div>
+      <div class="doc"><div class="row"><b>Everyday Expenses: Grocery shopping</b><span class="p">0.07</span></div><div class="toks"><span class="tok">aldi $22</span><span class="tok">safeway $94</span><span class="tok">sprouts $127</span></div></div>
+      <div class="doc"><div class="row"><b>Everyday Expenses: Expenses</b><span class="p">0.05</span></div><div class="toks"><span class="tok hit">uber eats little caesars $33</span></div></div>
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step"><b>Encode once, reuse all day</b><span>Category documents and past filings are encoded once per day and shared by every transaction that day. Only the short query is new.</span></div>
+    <div class="step"><b>Score every option at once</b><span>Like Clef and decider, every visible category gets a score in one pass; a softmax over the household's own options is the decision.</span></div>
+    <div class="step"><b>Trained as a decision</b><span>Cross-entropy plus a Brier term (Clef's calibration loss), not a retrieval loss, so its probabilities can gate auto-filing.</span></div>
+    <div class="step"><b>Two ways to see the whole history</b><span>a1 puts the nearest past filings in the query; a5 makes each past filing its own candidate and sums each category's probability (BELXTR's MML).</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Results · synthetic</div>
+  <h2>Row 210 against the best plain encoder</h2>
+  <p>Every transaction of 50 held-out synthetic households: 359,050 transactions, 53,479 of them first-time payees. Single seed per arm.</p>
+  <div class="chart">
+    <div class="legend"><span><i class="sw" style="background:var(--bar2)"></i>top-1, all transactions</span><span><i class="sw" style="background:var(--bar)"></i>top-1, first-time payees</span></div>
+    <div class="bars">
+      <div class="bname">a1 · past filings in the query<small>Brier 0.368 · calibration error 4.0%</small></div>
+      <div class="track"><div class="b all" style="width:83.3%"></div><span class="bv all" style="left:calc(83.3% + 6px)">75.0</span><div class="b ft" style="width:41.7%"></div><span class="bv ft" style="left:calc(41.7% + 6px)">62.5</span></div>
+      <div class="bname">a5 · each past filing a candidate<small>Brier 0.369 · calibration error 1.7%</small></div>
+      <div class="track"><div class="b all" style="width:83.0%"></div><span class="bv all" style="left:calc(83.0% + 6px)">74.9</span><div class="b ft" style="width:40.0%"></div><span class="bv ft" style="left:calc(40.0% + 6px)">62.0</span></div>
+      <div class="bname">kNN · best plain encoder<small>row 202, b5 (= the old encoder)</small></div>
+      <div class="track"><div class="b all" style="width:81.7%"></div><span class="bv all" style="left:calc(81.7% + 6px)">74.5</span><div class="b ft" style="width:33.3%"></div><span class="bv ft" style="left:calc(33.3% + 6px)">60.0</span></div>
+      <div class="bname">MaxSim · best plain encoder<small>top-10 95.9%</small></div>
+      <div class="track"><div class="b all" style="width:78.0%"></div><span class="bv all" style="left:calc(78.0% + 6px)">73.4</span><div class="b ft" style="width:30.7%"></div><span class="bv ft" style="left:calc(30.7% + 6px)">59.2</span></div>
+      <div class="bname">a0 · one document per category<small>last 8 payees only</small></div>
+      <div class="track"><div class="b all" style="width:52.7%"></div><span class="bv all" style="left:calc(52.7% + 6px)">65.8</span><div class="b ft" style="width:35.0%"></div><span class="bv ft" style="left:calc(35.0% + 6px)">60.5</span></div>
+    </div>
+    <div class="axis"><div></div><div class="ticks"><span style="left:0">50</span><span style="left:33.3%">60</span><span style="left:66.7%">70</span><span style="left:100%">80</span></div></div>
+    <p class="note">Axis starts at 50%. a1 and a5 lift top-10 to 96.4–96.9% (kNN 91.9%). Soft interaction, the hybrid score and learned token weights on top of a0 all landed within ±0.8 of it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Keeping it fair</div>
+  <h2>Against decider, at matched effort</h2>
+  <p>On the owner's budget (21,238 transactions; aggregates only). decider has had about 150 PLAN rows of tuning; the encoder family a handful. Encoder scores here are the plain encoders; row 210's models have not been read on the owner's budget yet.</p>
+  <div class="tw"><table>
+    <thead><tr><th>model</th><th>tuning</th><th>top-1</th><th>first-time payees</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, untrained</td><td>none (older prompt format)</td><td class="n">52.4</td><td class="n">23.6</td></tr>
+      <tr><td>decider-4B, first trained recipe</td><td>early recipe</td><td class="n">68.3</td><td class="n">37.8</td></tr>
+      <tr><td>History encoders, MaxSim / kNN (§177)</td><td>a few rows, synthetic data only</td><td class="n">69.6 / 68.4</td><td class="n">—</td></tr>
+      <tr><td>decider-4B, tuned (r190 G)</td><td>~150 rows</td><td class="n">73.8</td><td class="n">57.3</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">On decider's exact items (§182), decider leads the plain encoders by 2–3 points on synthetic households and about 4 on the owner's budget over the encoder's own categories, widest on first-time payees (56.9 vs 45.9). Rows 210–212 aim at that gap.</p>
+</section>
+
+<section>
+  <div class="eyebrow">What we learned</div>
+  <h2>Findings so far</h2>
+  <div class="findings">
+    <div class="f"><span class="k">What it sees &gt; how it scores</span><p>Giving the model the household's full history (a1, a5) gained 9 points over a fixed category summary. Every scoring tweak from the papers (soft interaction, hybrid, token weights) moved less than 1.</p><span class="ref">row 210</span></div>
+    <div class="f"><span class="k">Training fixes: no effect</span><p>Pinterest's fixes (dedup, payee cap, household softmax) left the encoder within 0.3. They solve web-scale catalogue problems a 30–60 category household does not have. logQ cost first-time payees 4 points.</p><span class="ref">§182 Encoder training fixes from the papers</span></div>
+    <div class="f"><span class="k">1.7% calibration error</span><p>The per-filing model (a5) is the best-calibrated reader we have: when it says 90% it is right about 90% of the time, which is what auto-filing needs.</p><span class="ref">row 210</span></div>
+    <div class="f"><span class="k">Errors overlap</span><p>Where decider is wrong, an encoder is right only about one time in five, so simple fusion gains little (+0.3). The encoders' immediate value is cost: filing confident, history-rich cases without the 4B model.</p><span class="ref">§180 Where decider and encoders disagree</span></div>
+    <div class="f"><span class="k">Updates, not batch size</span><p>Eight households per step trained 16× faster but lost 1.5 points; 3,000 steps with eight households matches Modal's run (74.9 vs 75.0) in 7 minutes on the 3090, at no cost.</p><span class="ref">row 210 speed checks</span></div>
+    <div class="f"><span class="k">0.16 ms per transaction</span><p>Scoring a household's ~8,700 transactions takes about 1.4 seconds on the 3090, roughly 150× faster than decider's 24.7 ms per item on an H100.</p><span class="ref">row 202</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">From the literature</div>
+  <h2>Paper lessons and what happened when we tried them</h2>
+  <div class="tw"><table>
+    <thead><tr><th>paper</th><th>lesson</th><th>where it went</th><th>outcome</th></tr></thead>
+    <tbody>
+      <tr><td>BELXTR</td><td>Learnable temperature; each name its own candidate with an MML loss</td><td>row 210 scale, arm a5</td><td><span class="tag t-yes">matched best, best calibrated</span></td></tr>
+      <tr><td>XTR</td><td>Keep the query short; score every option, no cut-off</td><td>arm a1 vs a0, full scoring</td><td><span class="tag t-yes">history in the query won</span></td></tr>
+      <tr><td>UWE</td><td>Soft late interaction beat hard MaxSim on short texts</td><td>arm a2</td><td><span class="tag t-no">no change</span></td></tr>
+      <tr><td>SMART</td><td>Add the whole-text vector to MaxSim</td><td>arm a3</td><td><span class="tag t-no">no change</span></td></tr>
+      <tr><td>Weighted Chamfer</td><td>Learned query-token weights</td><td>arm a4</td><td><span class="tag t-no">no change</span></td></tr>
+      <tr><td>PinnerFormer, OmniSage, OmniSearchSage</td><td>logQ, random negatives, dedup, caps</td><td>row 202</td><td><span class="tag t-bad">logQ −4 first-time; pool arm collapsed (open bug)</span></td></tr>
+      <tr><td>TransAct V2, UniPinRec</td><td>Household's own categories as negatives; joint loss</td><td>row 202 b4, b5</td><td><span class="tag t-no">within noise</span></td></tr>
+      <tr><td>KaLM-Reranker, TransAct</td><td>Light cross-attention over cached tokens; history memory; options see each other</td><td>row 211</td><td><span class="tag t-run">training now</span></td></tr>
+      <tr><td>LITE, mxbai-edge</td><td>Distil a stronger teacher; residual 64-dim head; Ettin needs ~1.8× lr</td><td>rows 209, 212</td><td><span class="tag t-todo">queued</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">Iteration speed</div>
+  <h2>Making the loop faster</h2>
+  <div class="tw"><table>
+    <thead><tr><th>bottleneck</th><th>before</th><th>after</th></tr></thead>
+    <tbody>
+      <tr><td>Row 210 arm training (a1)</td><td class="n">17 min, Modal H100</td><td class="n">7 min, local 3090, $0</td></tr>
+      <tr><td>Synthetic household generation</td><td class="n">0.43 s each</td><td class="n">0.011 s (disk cache)</td></tr>
+      <tr><td>Triplet mining per training arm</td><td class="n">~2.5 min</td><td class="n">~1 s (cache)</td></tr>
+      <tr><td>Neighbour preparation, 200 households</td><td class="n">~4.5 min</td><td class="n">37 s (cache)</td></tr>
+      <tr><td>Comparison against decider, 8 encoders</td><td class="n">~20 min</td><td class="n">~2–3 min (one run)</td></tr>
+      <tr><td>Row 210 scoring</td><td class="n">one transaction at a time</td><td class="n">batched, identical scores</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">The small model is launch-bound on an H100: tiny batches waste the GPU. Modal is now kept for the 150M+ encoders, where large batches fill it.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Next</div>
+  <h2>Steps to fold in what we learned</h2>
+  <ol class="next">
+    <li><b>Row 211, interaction layers (training now).</b> Cross-attention from the transaction to each category's tokens, memory tokens from past filings, and a listwise layer where options see each other, against a control trained the same number of extra steps without them. Target: the decider-only cases from §180.</li>
+    <li><b>Compare row 210–211's best on decider's exact items</b> on synthetic households, then read the owner's budget once with two seeds, at matched effort.</li>
+    <li><b>Row 205, crowd names in the text</b> ("… | others: Groceries, Household"). A one-household smoke test lifted first-time payees from 47 to 56 without retraining.</li>
+    <li><b>Row 212, world knowledge</b> from the merchant database and open-licence Overture places: knowledge pretraining (kind recall 37 → 56% in a CPU smoke), lookup lines trained with realistic wrong-match rates, lookups as memory tokens, the 35B as teacher.</li>
+    <li><b>Row 209, a scaling curve</b> from 33M to 4B (all 16 candidate bases pass the licence check) on the winning head, read by segment to see where size pays.</li>
+    <li><b>Distil decider</b> into the late-interaction model (LITE: the teacher mattered more than the scorer), and try a LITE-style learned scorer.</li>
+    <li><b>Housekeeping:</b> fix the collapsed random-negative arm; batch the per-filing model (100 min per arm on Modal); row 204's prototype read is on Modal now.</li>
+  </ol>
+  <p class="note">Everything on this page is single-seed unless stated. Choices are made on synthetic households and confirmed on the owner's budget once. Report sections: §177 History-aware encoders, §180 Where decider and encoders disagree, §181 Faster runs: training and reads, §182 Encoder training fixes from the papers; row 210's section is pending.</p>
+</section>
+</main>
