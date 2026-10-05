@@ -39,6 +39,7 @@ B, WINDOW, STEPS = int(os.environ.get("B", "32")), int(os.environ.get("WINDOW", 
 HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.environ.get("BRIER", "1")), float(os.environ.get("LR", "5e-5"))
 SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
+GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
 # row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
@@ -247,7 +248,7 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     rows_a, rows_d, rows_o, nopt = [], [], [], max(len(e["state"]) for e in anc)
     for k, e in enumerate(anc):
         for o, c in enumerate(e["state"]):
-            rows_a.append(k); rows_d.append(pos[docs[e["day"]][c]]); rows_o.append(o)
+            rows_a.append(k); rows_d.append(pos[e["d"][c]]); rows_o.append(o)
     ra, rd = torch.tensor(rows_a, device=model.dev), torch.tensor(rows_d, device=model.dev)
     kv, kvm = D[0][rd].float(), D[1][rd]
     if "m" in INTERACT:
@@ -256,7 +257,7 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
         for k, e in enumerate(anc):
             js = [j for j in e.get("nb", [])[:NMEM]]
             if js:
-                f = torch.cat([F[[fpos[ev[j]["text"]] for j in js]], Lab[[lpos[ev[j]["label"]] for j in js]]], -1)
+                f = torch.cat([F[[fpos[e["_ev"][j]["text"]] for j in js]], Lab[[lpos[e["_ev"][j]["label"]] for j in js]]], -1)
                 mem[k, :len(js)] = inter.mem(f); mm[k, :len(js)] = True
         kv, kvm = torch.cat([kv, mem[ra]], 1), torch.cat([kvm, mm[ra]], 1)
     q = qv[ra]
@@ -310,6 +311,8 @@ def prepare(b, m1, cache):
         for e in ev[i:j]:
             recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
         i = j
+    for e in ev:  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
+        e["d"], e["_ev"] = docs[e["day"]], ev
     return ev, docs
 
 
@@ -377,13 +380,14 @@ def train():
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (STEPS - s) / (STEPS - warm)))
     t0, run, k = time.time(), defaultdict(float), 0
     for s in range(STEPS):
-        ev, docs = data[rng.randrange(len(data))]
-        last = ev[-1]["day"]
-        d0 = rng.randint(1, max(1, last - WINDOW))
-        anc = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
+        anc = []
+        for _ in range(GROUPS):  # GROUPS household windows per step (row 210 speed: one window of ~28 transactions left an H100 idle)
+            ev, docs = data[rng.randrange(len(data))]
+            d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
+            w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
+            anc += rng.sample(w, min(B, len(w)))
         if not anc:
             continue
-        anc = rng.sample(anc, min(B, len(anc)))
         dtexts, idx = [], {}
 
         def col(t):
@@ -393,12 +397,12 @@ def train():
         if INTERACT:
             for e in anc:
                 for c in e["state"]:
-                    col(docs[e["day"]][c])
+                    col(e["d"][c])
             Q, Dv = model.vecs([e["q"] for e in anc]), model.vecs(dtexts)
             F = fpos = Lab = lpos = None
             if "m" in INTERACT:
-                ft = list(dict.fromkeys(ev[j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
-                lt = list(dict.fromkeys(ev[j]["label"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                ft = list(dict.fromkeys(e["_ev"][j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
+                lt = list(dict.fromkeys(e["_ev"][j]["label"] for e in anc for j in e.get("nb", [])[:NMEM]))
                 fpos, lpos = {t: i for i, t in enumerate(ft)}, {t: i for i, t in enumerate(lt)}
                 F = _pool(*model.vecs(ft)[:2]) if ft else None
                 Lab = _pool(*model.vecs(lt)[:2]) if lt else None
@@ -407,11 +411,11 @@ def train():
             cand = []
             for e in anc:
                 oi = {c: o for o, c in enumerate(e["state"])}
-                cand.append([(col(t), oi[c]) for t, c in _cands(e, ev)])
+                cand.append([(col(t), oi[c]) for t, c in _cands(e, e["_ev"])])
             S = _score(model, scale, [e["q"] for e in anc], dtexts)
             Sg = _mml_logits(S, cand, anc)
         else:
-            cols = [[col(docs[e["day"]][c]) for c in e["state"]] for e in anc]
+            cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
             S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
             w = max(map(len, cols))
             ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
@@ -432,7 +436,7 @@ def train():
     if inter:
         torch.save(inter.state_dict(), out / "inter.pt")
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
-                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
+                                                         HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
@@ -493,7 +497,7 @@ def scores(model, scale, ev, docs):
                     s = scale * model.score(tuple(x[k:k + 1] for x in q), (D[0][cix], D[1][cix], None, D[3][cix]))
                     s = _mml_logits(s, [[(i, o) for i, (_, o) in enumerate(cs)]], [e])[0]
                 else:
-                    cix = torch.tensor([pos[docs[e["day"]][c]] for c in ids], device=model.dev)
+                    cix = torch.tensor([pos[e["d"][c]] for c in ids], device=model.dev)
                     s = scale * model.score(tuple(x[k:k + 1] for x in q), (D[0][cix], D[1][cix], None, D[3][cix]))[0]
                 out.append(dict(zip(ids, s.tolist())))
     return out
