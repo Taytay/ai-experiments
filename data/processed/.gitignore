@@ -49,3 +49,12 @@
 /realstyle_v3g_seen_behav_test.json
 /realstyle_crowdclus_test.json
 /realstyle_crowdclus_train.json
+/realstyle_crowd_v4_train.json
+/realstyle_crowd_v4_test.json
+/realstyle_v4g_train.jsonl
+/realstyle_v4gcd_train.jsonl
+/realstyle_v4gcdh_train.jsonl
+/realstyle_v4g_test.json
+/realstyle_v4gc_test.json
+/realstyle_v4g_seen_test.json
+/realstyle_v4gc_seen_test.json
