@@ -1,0 +1,6 @@
+outs:
+- md5: e1c71dab361c1897ef43fa2b5f2be1a6.dir
+  size: 134270993
+  nfiles: 10
+  hash: md5
+  path: hist_r202_b4
