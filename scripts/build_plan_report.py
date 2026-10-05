@@ -20,7 +20,8 @@ CHAPTERS = [(1, 12, "Measuring and injecting facts"), (13, 23, "Other routes, sc
             (33, 48, "The REAL-6 categoriser"), (49, 60, "Jev review and the move to Modal"), (61, 76, "Novel inputs and real places"),
             (77, 90, "Open base, one-slot reader, final recipe"), (91, 104, "Realistic users and the first blind set"),
             (105, 120, "Prompt formats and serving"), (121, 139, "Building the system and product scores"),
-            (140, 150, "Blind validation and payee kinds"), (151, 162, "Decision models and embeddings"), (163, 176, "The owner's real budget")]
+            (140, 150, "Blind validation and payee kinds"), (151, 162, "Decision models and embeddings"), (163, 176, "The owner's real budget"),
+            (177, 190, "Merchant knowledge and the crowd line"), (191, 200, "History-aware encoders")]
 
 STYLE = """
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

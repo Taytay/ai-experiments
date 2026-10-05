@@ -1,0 +1,648 @@
+<article class="row" id="row-151" data-from="" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 151 · 2026-10-01 · <span class="qid">MODEL-22</span> · REPORT §146</p>
+    <h2>Trying AWS's new open "decider" model, strands-decider, on our task</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner found a newly published open-source decision model from AWS (strands-decider, Apache-2.0) and asked how it handles our datasets compared with our best reader, decider-4B trained with "the recipe" (our standard set of training episodes). It has a different design: a Qwen3.5-2B-Base body with its word-predicting head thrown away, and a small (~1M-parameter) "pointer head" that scores each option by comparing the hidden state at the answer position with the hidden state at the end of each option's line.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>First we checked we were using it correctly: their engine on their README example, their own evaluation on their held-out rows, our reader against theirs on 61 questions (same answer on all 61), and an easy ladder of obvious transactions. Then we scored the published v19 checkpoint untrained, and trained it on the recipe's 12,800 episode draws three ways: continuing v19 in our loop, a fresh strands head on Qwen3.5-2B-Base in our loop, and strands' own trainer and config. decider-2B with the recipe was the same-size comparison. Each trained arm took about 22 minutes on one H100.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">&lt;state&gt;Categories: Inflow: Ready to Assign, All the food, Rent, Monthly Bills, Car stuff, ...
+Transaction: 2025-08-12 | Zelle to Kevin Okafor | $29.58 | Tue
+Category: Misc
+...
+Transaction: 2025-08-20 | Zelle to Kevin Okafor | $40.18 | Wed
+Category:&lt;/state&gt;&lt;question type="choice"&gt;Select exactly one option. ...
+&lt;options&gt;1. Inflow: Ready to Assign
+2. All the food
+3. Rent
+...&lt;/options&gt;&lt;/question&gt;&lt;answer&gt;</pre><p class="note">A synthetic blind_v2 user (trimmed) wrapped in strands' own prompt: our whole item is the "state", the category names are the options.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 + other-users line, % right first</th><th>first-time payees, % right first</th><th>REAL-6 (invented names), % right first</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule today</td><td>73.5</td><td>0.0</td><td>–</td></tr>
+      <tr><td>strands v19, untrained</td><td>62.4</td><td>45.1</td><td>8.7</td></tr>
+      <tr><td>strands, trained (three routes)</td><td>82.6 to 83.1</td><td>59.9 to 60.5</td><td>56.9 to 65.3</td></tr>
+      <tr><td>decider-2B + recipe</td><td>81.5</td><td>51.3</td><td>86.9</td></tr>
+      <tr><td>decider-4B + recipe</td><td>83.8</td><td>59.9</td><td>87.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Used correctly, strands reproduces its published numbers, but untrained it barely reads our task (blind_v1 25.9% without the other-users line).</li>
+    <li>Trained, all three routes land in the same place: level with decider-4B on the blind sets and on first-time payees.</li>
+    <li>It fails where users invent their own category names (REAL-6 57 to 65 against 87; novel names 42 to 51 against 85). Not adopted.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is the weakness on invented names the pointer head or the missing "shot-label" loss (training the model to predict the labels in the history)? Taken up by <a href="#row-152">row 152</a>.</li>
+    <li>Could anything from strands improve decider? Also <a href="#row-152">row 152</a> and <a href="#row-153">row 153</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-152" data-from="151" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 152 · 2026-10-01 · <span class="qid">MODEL-23</span> · REPORT §147</p>
+    <h2>What decider can borrow from strands: the training signal, not the head</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-151">Row 151</a> left two explanations for strands' failure on invented category names: its pointer readout, or the fact that it lacked our shot-label loss. And at 2B strands was better than decider on first-time payees. The owner asked whether decider could learn anything from strands' architecture.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Two experiments. (1) A strands-style pointer added on top of decider's label scores (decider-2B and -4B, two seeds), reading the options listed again after the transaction, plus a control with the relisted options but no pointer. (2) strands' architecture reading our labelled history layout (each category given a random code that appears in the list and in each history row), with and without the shot-label loss. All arms used the recipe's episodes, 800 steps of 16.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- (xf) Groceries
+- (Kq) Getting around
+- (bm) Dining Out
+...
+Transaction: 2025-11-11 | TRADER JOE S #876 CHICAGO IL | $42.38 | Tue
+Category: (xf) Groceries
+
+Transaction: 2025-11-12 | UBER *TRIP HELP.UBER.COM CA | $35.19 | Wed
+
+Options:
+- (xf) Groceries
+- (Kq) Getting around
+...</pre><p class="note">The labelled layout from a synthetic blind_v1 user, with the options relisted after the query so a pointer can read them (codes illustrative; they are random per episode).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6, % right first</th><th>novel names, % right first</th><th>blind_v1 + line, % right first</th></tr></thead>
+    <tbody>
+      <tr><td>strands, labelled layout</td><td>64.1</td><td>41.3</td><td>83.1</td></tr>
+      <tr><td>strands, labelled layout + shot-label loss</td><td>86.6</td><td>83.6</td><td>82.0</td></tr>
+      <tr><td>decider-4B + recipe, relisted (control)</td><td>88.3</td><td>87.2</td><td>84.0</td></tr>
+      <tr><td>decider-4B + recipe + pointer (2 seeds)</td><td>87.6</td><td>88.3</td><td>84.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The shot-label loss is what teaches invented names, whatever the head: with it, strands jumps from 64.1 to 86.6 on REAL-6, matching decider-2B.</li>
+    <li>A pointer adds nothing to decider beyond seed noise at 2B or 4B. Not adopted.</li>
+    <li>strands' first-time-payee edge at 2B shrank once it had the shot-label loss (one seed: a hint of a trade-off).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would strands at 4B with the shot-label loss catch decider-4B, and do strands' other choices (LoRA targets, rank) help? <a href="#row-153">Row 153</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-153" data-from="152" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 153 · 2026-10-01 · <span class="qid">MODEL-23</span> · REPORT §148</p>
+    <h2>strands at 4B, and strands' adapter settings on decider</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-152">row 152</a> showed the shot-label loss was the missing ingredient, the owner asked to "try using a 4B torso with an equivalently sized head or borrow anything else from strands".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Three arms, two seeds each, all on the recipe's episodes: (A) strands' architecture on Qwen3.5-4B-Base with its pointer head widened in proportion (dim 320, ~1.6M parameters), our labelled layout and the shot-label loss; (B) decider-4B with strands' extra LoRA targets (two projections in the Gated DeltaNet layers); (C) decider-4B with strands' smaller LoRA rank, 16 instead of our 64. We also multiplied the probabilities of decider-4B and strands-4B to see whether they make different mistakes.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>REAL-6</th><th>novel names</th><th>mislead</th><th>blind_v1 + line</th><th>blind_v2 + line</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B + recipe (3 seeds)</td><td>87.8</td><td>84.6</td><td>64.6</td><td>83.9</td><td>71.7</td></tr>
+      <tr><td>strands on Qwen3.5-4B-Base + shot-label loss</td><td>89.1</td><td>88.3</td><td>67.1</td><td>82.9</td><td>72.6</td></tr>
+      <tr><td>decider-4B + strands' LoRA targets</td><td>87.1</td><td>86.6</td><td>65.5</td><td>83.8</td><td>71.9</td></tr>
+      <tr><td>decider-4B, LoRA rank 16</td><td>84.4</td><td>82.0</td><td>58.5</td><td>83.8</td><td>71.6</td></tr>
+      <tr><td>decider-4B × strands-4B (multiplied)</td><td>88.6</td><td>87.3</td><td>–</td><td>84.6</td><td>73.8</td></tr>
+    </tbody></table></div><p class="note">All % right first.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>strands-4B is the first reader to match decider-4B across the board: ahead on invented names and behaviour sets, level on the blind sets.</li>
+    <li>The two make different mistakes; multiplied they gain a point or two, at twice the scoring cost.</li>
+    <li>strands' LoRA targets change nothing; rank 16 trades history-reading (mislead 58.5) for first-time payees. Nothing adopted outright.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is decider's method better on strands' own data too? <a href="#row-154">Row 154</a>.</li>
+    <li>If rank 16 is short where the history decides, is rank 64 also short? <a href="#row-156">Row 156</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-154" data-from="153" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 154 · 2026-10-01 · <span class="qid">MODEL-24</span> · REPORT §149</p>
+    <h2>decider's training method on strands' own datasets</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-153">row 153</a>, decider's readout looked strong and cheap to train. The owner asked for a test training on strands' datasets to compare our results with theirs, as a research comparison only.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We rebuilt strands' v19 training corpus with their own scripts (every file matched their recorded checksums; 123,339 training rows of public classification, multi-step document questions and answer-adequacy tasks). From the same Qwen3.5-2B-Base, we trained decider's "one-slot" readout (options labelled, the answer read as a label token from the language-model head; LoRA rank 64), keeping everything about strands' data recipe. Two seeds, one 85-minute run each on one H100. We scored with strands' own evaluation and re-scored v19 to confirm the harness.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Context: ...the document or short text...
+Question: ...
+Options: (A) name — description
+(B) name — description
+...
+Answer: (</pre><p class="note">decider's layout as applied to strands' tasks (the shape only; the corpus is public datasets, not transactions).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Task (% right)</th><th>strands v19 (re-scored)</th><th>decider's method on strands' corpus (2 seeds)</th></tr></thead>
+    <tbody>
+      <tr><td>held-out short tasks</td><td>64.0</td><td>65.1</td></tr>
+      <tr><td>emotion</td><td>56.4</td><td>54.3</td></tr>
+      <tr><td>hate severity</td><td>45.9</td><td>53.4</td></tr>
+      <tr><td>MuSiQue (multi-hop)</td><td>88.1</td><td>92.9</td></tr>
+      <tr><td>ContractNLI</td><td>87.2</td><td>86.8</td></tr>
+      <tr><td>generated adequacy</td><td>80.5</td><td>82.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Same body, same data: decider's method matches or beats strands on most of strands' own evaluations, and trails on emotion.</li>
+    <li>It costs less: one 85-minute run, against strands' two-stage recipe with a 4B teacher.</li>
+    <li>This confirms on independent ground that decider's readout is not the weak link; nothing changes for the categoriser.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Each readout wins somewhere; do they complement each other, and can one model hold both? <a href="#row-155">Row 155</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-155" data-from="154" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 155 · 2026-10-02 · <span class="qid">MODEL-24</span> · REPORT §150</p>
+    <h2>A hybrid head for strands' own tasks</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-154">Row 154</a> showed each readout winning on some tasks (decider's on multi-hop and ordered scores, strands' on emotion). The owner asked whether any of our improvements could help strands, and agreed to test first whether the two complement each other, then a hybrid head.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>(1) Multiply v19's and decider's calibrated per-question probabilities. (2) A hybrid head: decider's label scores plus a strands-style pointer over the option lines, trained together on strands' corpus exactly as in row 154, two seeds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Set (% right)</th><th>v19</th><th>decider's method</th><th>v19 × decider</th><th>hybrid head</th></tr></thead>
+    <tbody>
+      <tr><td>held-out short tasks (6,000)</td><td>64.0</td><td>65.2</td><td>66.2</td><td>65.9</td></tr>
+      <tr><td>emotion</td><td>56.4</td><td>54.3</td><td>56.4</td><td>54.7</td></tr>
+      <tr><td>multi-step (4,084)</td><td>82.7</td><td>83.9</td><td>84.0</td><td>84.6</td></tr>
+      <tr><td>HelpSteer2 adequacy</td><td>72.2</td><td>72.0</td><td>75.0</td><td>73.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The two readouts complement each other modestly: each gets 20 to 45% of the other's misses right.</li>
+    <li>One hybrid model captures most of the gain (65.9 held-out, both seeds above decider's) and the best multi-step score, but not v19's lead on emotion.</li>
+    <li>On our categoriser the same hybrid added nothing (<a href="#row-152">row 152</a>); under a point is not worth an extra head that cannot be merged into the weights. Not adopted; MODEL-24 answered.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None carried forward on strands; attention moved to decider's hidden states as embeddings (<a href="#row-157">row 157</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-156" data-from="153" data-era="Architecture probes" data-status="done">
+  <header>
+    <p class="eyebrow">Row 156 · 2026-10-02 · <span class="qid">TRAIN-14</span> · REPORT §151</p>
+    <h2>Does the model need more trainable capacity? Bigger adapters and full fine-tunes</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-153">Row 153</a> found that shrinking the LoRA adapter to rank 16 cost up to 6 points where the history decides. The owner asked whether we should be trying full fine-tunes. If rank 16 was short, maybe our rank 64 was too.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The decider-4B recipe with LoRA rank 128 and 256 (H100), and every weight trained (full fine-tune) at learning rates 1e-5 and 3e-5 with full-precision master weights (H200, 80.5 GiB). One seed per new arm, against the recipe's three seeds. Judged on the blind sets, first-time payees (the check for forgetting general knowledge), the behaviour sets, and REAL-7 as a diagnostic only.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>blind_v1 + line</th><th>blind_v2 + line</th><th>first-time payees (blind_v1)</th><th>new users (blind_v1)</th><th>REAL-6</th></tr></thead>
+    <tbody>
+      <tr><td>LoRA rank 64 (recipe)</td><td>83.9</td><td>71.7</td><td>59.9</td><td>69.6</td><td>87.8</td></tr>
+      <tr><td>LoRA rank 128</td><td>83.9</td><td>72.3</td><td>58.8</td><td>69.6</td><td>88.6</td></tr>
+      <tr><td>LoRA rank 256</td><td>79.7</td><td>67.9</td><td>48.7</td><td>57.7</td><td>84.9</td></tr>
+      <tr><td>full fine-tune, 1e-5</td><td>80.9</td><td>68.5</td><td>48.0</td><td>57.7</td><td>89.3</td></tr>
+      <tr><td>full fine-tune, 3e-5</td><td>77.1</td><td>63.4</td><td>37.5</td><td>45.2</td><td>88.3</td></tr>
+    </tbody></table></div><p class="note">All % right first.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Rank 128 equals rank 64: capacity is not binding.</li>
+    <li>More capacity forgets what the base model knew about merchants and people: first-time payees and new users drop sharply, while payees seen before hold.</li>
+    <li>REAL-7, built with our own generators, hides the loss (full 1e-5 scores 81.9 against 82.2), which is why it is only a diagnostic. Rank 64 stays.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>With real data (a billion filings) the balance may change; repeat this probe then, judged on held-out real users and first-time payees.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-157" data-from="150" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 157 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §152</p>
+    <h2>Using decider's hidden states as embeddings of payees and categories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether we could extract embeddings (numeric vectors that put similar things close together) from decider and cluster with them. <a class="back" href="#row-150">Row 150</a> had grouped payees and categories with crude text features (TF-IDF); a better embedding could replace them.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We embedded about 420 payees (kindpay_v2, three renderings each) and 2,867 user categories (kindcat_v2: the name plus up to 8 payees filed under it). Readers: decider-4B untrained and with the recipe, its base Qwen3.5-4B-Base, the purpose-built Qwen3-Embedding-4B, and a no-model TF-IDF baseline. For the decoders we read the hidden state at the last token after a short cue, or averaged over tokens, at half, three-quarter and full depth. Judged against the generators' true kinds: nearest-neighbour accuracy (for categories, only neighbours with a different name count) and k-means cluster agreement (NMI).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Budget category "All the food". Payees filed under it: Etsy, PayPal, Whataburger, Publix, McDonald's, ...
+In one word, the kind of spending:</pre><p class="note">A synthetic kindcat_v2 category with the cue; the embedding is the hidden state at the cue's last token.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (best read-out)</th><th>category next to a same-kind category with another name, %</th><th>k-means NMI (categories)</th><th>payee kind from statement name alone, 1-NN %</th></tr></thead>
+    <tbody>
+      <tr><td>no model (TF-IDF)</td><td>45.2</td><td>0.488</td><td>21.4</td></tr>
+      <tr><td>Qwen3-Embedding-4B</td><td>63.4</td><td>0.395</td><td>25.6</td></tr>
+      <tr><td>Qwen3.5-4B-Base, last token</td><td>69.1</td><td>0.408</td><td>21.1</td></tr>
+      <tr><td>decider-4B untrained, last token</td><td>82.0</td><td>0.63</td><td>46.0</td></tr>
+      <tr><td>decider-4B + recipe, last token</td><td>78.4</td><td>0.571</td><td>63.1</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>decider is a better category embedder than an embedding model; the cue matters, and the final layer is best.</li>
+    <li>The recipe's adapter teaches payee names: from the bank string alone it groups payees by kind 63% of the time.</li>
+    <li>The embedding is one extra read of a forward pass decider already runs.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Should a user's history change the embeddings? <a href="#row-158">Row 158</a>.</li>
+    <li>Can embeddings map categories to canonical kinds or between users? <a href="#row-159">Row 159</a>.</li>
+    <li>Can nearest payees by embedding help the prompt? Tried on real data in <a href="#row-166">row 166</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-158" data-from="157" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 158 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §153</p>
+    <h2>Personal embeddings: letting a user's history shift the vectors</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-157">row 157</a>, the owner said: "I definitely want a user's history to perturb the embeddings! Of both their categories and the payees!"</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Same read-out as row 157, but with the user's history slice placed in front of each text ("personal") or not ("global"), for each of the user's categories and for the transaction to file. An embedding-only categoriser files the transaction under the nearest category, in every pairing of personal and global. Compared with decider-4B's own answer and YNAB's rule on blind_v1 and blind_v2, split by first-time payees, known payees, person-to-person payments and new users.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[the user's history slice: Categories ... Transaction ... Category ... rows]
+Transaction: 2025-08-20 | Zelle to Kevin Okafor | $40.18 | Wed
+In one word, the kind of spending:</pre><p class="note">A personal transaction embedding for a synthetic blind_v2 user: the same cue, read after the history.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Group (recipe's decider-4B)</th><th>nearest category right, global %</th><th>with history in front %</th></tr></thead>
+    <tbody>
+      <tr><td>payees seen before, blind_v1</td><td>53.3</td><td>79.6</td></tr>
+      <tr><td>payees seen before, blind_v2</td><td>37.1</td><td>64.0</td></tr>
+      <tr><td>person-to-person, blind_v2</td><td>9.1</td><td>56.1</td></tr>
+      <tr><td>first-time payees, blind_v1</td><td>54.2</td><td>46.9</td></tr>
+      <tr><td>new users, blind_v1</td><td>60.1</td><td>51.8</td></tr>
+    </tbody></table></div><p class="note">Best embedding categoriser overall: 76.9% right first on blind_v1 and 56.1 on blind_v2, against decider's own answer 82.6 and 69.8.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Where the history knows the answer, it pulls the embedding toward it; where it does not (new payees, new users), it pulls toward what the user files most.</li>
+    <li>Only a reader trained on histories uses them; untrained decider's embeddings barely move.</li>
+    <li>For filing, decider's own answer stays the reader; personal embeddings suit retrieval and comparing users.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can embeddings map one user's categories to another's, or to canonical kinds? <a href="#row-159">Row 159</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-159" data-from="158,152,153" data-era="Embeddings from decider" data-status="done">
+  <header>
+    <p class="eyebrow">Row 159 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §154</p>
+    <h2>Mapping categories with embeddings: between users, and onto a standard list</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether embeddings could map canonical categories onto a person's own set, or map two users' categories together. <a class="back" href="#row-158">Row 158</a> supplied personal embeddings, and the multiple-choice answers from <a class="back" href="#row-152">row 152</a> and <a class="back" href="#row-153">row 153</a> gave a comparison.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>On kindcat_v2 (blind_v2's users, 2,867 categories): (1) each user category to the nearest of 43 canonical options, against decider asked the multiple-choice question; (2) 600 user pairs, each of A's single-kind categories to B's nearest. Embeddings of the name, the name with filed payees, and personal ones, from decider-4B (untrained and recipe), Qwen3-Embedding-4B and TF-IDF.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Task</th><th>Method</th><th>% right first</th></tr></thead>
+    <tbody>
+      <tr><td>A's category → B's, different names</td><td>no model (TF-IDF)</td><td>23.5</td></tr>
+      <tr><td>A's category → B's, different names</td><td>Qwen3-Embedding-4B</td><td>69.9</td></tr>
+      <tr><td>A's category → B's, different names</td><td>decider-4B recipe, personal</td><td>82.3</td></tr>
+      <tr><td>category → canonical kind</td><td>decider-4B recipe, nearest (personal)</td><td>49.1</td></tr>
+      <tr><td>category → canonical kind</td><td>decider-4B untrained, asked</td><td>57.8</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Across users, embeddings work: 85.4% overall, 82.3% when the names differ.</li>
+    <li>Onto canonical kinds, asking beats embedding. Embeddings fail on "several kinds" and "person, trip or purpose" categories (0.6 to 17.5%), which lie near no single kind label.</li>
+    <li>Use embeddings to align users' categories; use the question to label a category with a kind.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Embedding work then turned to real data: similar-payee rows on the owner's budget (<a href="#row-166">row 166</a>) and payee matching (<a href="#row-171">row 171</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-160" data-from="150" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 160 · 2026-10-02 · <span class="qid">DATA-8</span> · proposed</p>
+    <h2>Payee resolution on synthetic strings: which corrupted names are the same payee?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner pointed out that real payee strings are obscured in many ways (truncation, transaction ids, locations), and that YNAB's real data does not carry enough aggregator merchant fields to skip cleanup. <a class="back" href="#row-150">Row 150</a>'s payee keys grouped strings with high purity but missed about a sixth of them.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, awaiting the owner. Gold would come from pop_v2's generator payee ids (2,250 users, 2.6M rows) plus a corrupter at controlled strengths: truncation, transaction ids, locations, processor prefixes, typos. Methods, cheapest first: extended key rules; blocking by first token with prefix-aware and character n-gram matching; embeddings cued for identity ("The business name in this bank line is:"); decider as a yes/no judge on borderline pairs; co-filing behaviour (same users, same categories, similar amounts). Measures: pairwise precision, recall and F1, and B-cubed, by corruption type and strength.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The question was taken up on real strings labelled by YNAB instead: <a href="#row-171">row 171</a>, then as a trained task in <a href="#row-176">row 176</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-161" data-from="150" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 161 · 2026-10-02 · <span class="qid">REAL-25</span> · proposed</p>
+    <h2>Population knowledge in the weights, or in the prompt?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked: "we are baking this knowledge into the weights right?" <a class="back" href="#row-150">Row 150</a> found that the "other users' filings" line in the prompt carries population knowledge. With real data the recipe will train on the population's filings directly, so the line might no longer be needed.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, awaiting the owner. Train the recipe on pop_v2's population users' filings, then test blind_v2's held-out users with and without the other-users line, split by how many population users filed the payee (common or rare) and by payees first seen after the training cut-off.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the line still add anything once the weights hold the population's filings, and only for rare or new payees?</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-162" data-from="156" data-era="Preparing for real data" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 162 · 2026-10-02 · <span class="qid">REAL-26</span> · proposed</p>
+    <h2>A dress rehearsal of the real-data pipeline</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner agreed to a plan to flush out the pipeline before real multi-user data arrives. It follows <a class="back" href="#row-156">row 156</a>, which settled the training setup (rank 64) and noted that the capacity probe should be repeated on real data.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, to be brought to the owner before running. Run reports/REAL_DATA_SPEC.md end to end on REAL-7's synthetic users: the real-data schema, a 70/15/15 user split plus a time split, a sealed test set, prompts with the other-users line, the recipe, and report cards on held-out users and later months. The scores are not the point; finding pipeline bugs is.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Real data arrived first in the form of the owner's own budget (<a href="#row-163">row 163</a>), which found one such bug: category names with stray spaces.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-163" data-from="140" data-era="The owner's real budget" data-status="done">
+  <header>
+    <p class="eyebrow">Row 163 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §155</p>
+    <h2>The first real data: replaying eleven years of the owner's budget</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Everything so far was synthetic. The owner offered their own YNAB budget: every approved, categorised transaction is the gold answer, and each is run in date order through decider with only earlier transactions in the prompt. The data stays out of git; only summaries are reported. The model was the recipe settled through <a class="back" href="#row-140">row 140</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>21,238 transactions from 2015 to 2026, scored privately on Modal with nothing stored. Each prompt lists the categories offered that day (median 96, against 10 to 20 for synthetic users), a shared block of 24 earlier rows, up to 6 of the payee's own earlier rows, then the transaction. Readers: the recipe's decider-4B and decider-4B zero-shot, plus a "wide history" arm. Baselines: YNAB's rule (the category used in 2 of the payee's last 3 transactions, else the last; nothing for a new payee) and the payee's last category.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- (Rw) Inflow: Ready to Assign
+- (kd) Groceries
+- (Tz) Coffee runs
+- (pe) Kid A: activities
+... (about 96 categories)
+
+Transaction: 2021-03-02 | Maple Street Market | $48.10 | Tue
+Category: (kd) Groceries
+...
+Transaction: 2021-03-09 | BLUEJAY CAFE #0412 | $6.25 | Tue
+Category: (</pre><p class="note">Illustrative, invented: the same format as the owner's prompts, with made-up names and amounts.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Group</th><th>n</th><th>YNAB rule, % right first</th><th>recipe, % right first (top 3)</th><th>zero-shot, % right first</th></tr></thead>
+    <tbody>
+      <tr><td>all</td><td>21,238</td><td>57.9</td><td>68.3 (78.6)</td><td>52.1</td></tr>
+      <tr><td>payee filed before</td><td>15,032</td><td>81.8</td><td>81.0 (89.9)</td><td>64.0</td></tr>
+      <tr><td>first-time payee</td><td>6,206</td><td>0</td><td>37.8 (51.3)</td><td>23.4</td></tr>
+    </tbody></table></div><p class="note">Confidence ≥ 0.9 covers 57.6% of transactions at 91.2% right. Wide history: 67.8.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Trained only on synthetic users, the recipe transfers: +10.4 points over the rule, ahead in every year.</li>
+    <li>It ties the rule on known payees; the gain is first-time payees (29% of transactions).</li>
+    <li>It is weak on multi-purpose retailers and purpose-defined categories, where the merchant does not determine the category.</li>
+    <li>A pipeline bug: 27 category names had stray spaces. Real data needs name normalisation.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>How does the full recommended system, with its confidence gate, do here? <a href="#row-165">Row 165</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-164" data-from="151" data-era="Architecture probes" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 164 · 2026-10-02 · <span class="qid">MODEL-26</span> · proposed</p>
+    <h2>Cloudflare's Clef decision models and their calibration-focused fine-tuning</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked to try Cloudflare's newly announced Clef models and their RL fine-tuning framework, as <a class="back" href="#row-151">row 151</a> did for strands-decider. Clef uses a frozen Qwen backbone with a "joint head" that scores every allowed choice at once, trained with label-smoothed cross-entropy plus a Brier loss for calibration.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed. (a) Clef and Clef-flash zero-shot in their own code, checked on easy items first, then on blind_v1 and v2 with the other-users line, beside decider-4B and strands. (b) Clef-flash fine-tuned on our episodes (head, then head plus LoRA) with their loss, against our recipe. (c) Their RL framework (RLCD) is partnership-only: ask for access, or stand in with our own calibrated RL loop. Both bases must pass the open-licence check first; Clef (27B) needs an H200.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does their calibration loss (label smoothing + Brier) help our auto-filing? The same loss is folded into the proposal of <a href="#row-168">row 168</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-165" data-from="163" data-era="The owner's real budget" data-status="done">
+  <header>
+    <p class="eyebrow">Row 165 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §156</p>
+    <h2>The full recommended system and its confidence gate on the real budget</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-163">Row 163</a> tested one reader. The owner asked next for the confidence gate: the whole recommended system from the synthetic work, unchanged, on the same real budget.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-4B (recipe) reads every transaction. For first-time payees, the untrained decider-35B-A3B's probabilities are multiplied in. For known payees, YNAB's rule goes first unless the model is at least 0.2 more confident in another category (the "gate"). Lists hold at most three suggestions. With one household and no other users, probabilities were calibrated on alternate halves of the timeline. Also reported: "work saved" against filing by hand, and how much could be auto-filed at a precision target.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Suggestions from</th><th>right first %</th><th>in list of 3 %</th><th>work saved %</th><th>first-time payees, right first %</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB today</td><td>57.9</td><td>57.9</td><td>58</td><td>0</td></tr>
+      <tr><td>decider-4B alone</td><td>68.3</td><td>78.2</td><td>69</td><td>37.8</td></tr>
+      <tr><td>rule always first, then decider</td><td>69.0</td><td>78.3</td><td>70</td><td>37.8</td></tr>
+      <tr><td>decider-4B + 0.2 gate</td><td>69.2</td><td>78.3</td><td>70</td><td>37.8</td></tr>
+      <tr><td>recommended system (+ 35B on new payees)</td><td>71.0</td><td>80.8</td><td>72</td><td>43.8</td></tr>
+    </tbody></table></div><p class="note">Auto-filing the first suggestion at calibrated probability ≥ 0.9: 41.2% of transactions at 95.2% right. Calibration error (ECE) 0.037.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The system holds on real data: +13.1 right first and +22.9 in the list over the rule.</li>
+    <li>The 35B earns its place on first-time payees (+6 points); the gate is nearly neutral here.</li>
+    <li>Raw probabilities are over-confident; a temperature fitted on a user's own earlier filings fixes it.</li>
+    <li>Known payees filed differently from the rule (13% of transactions) stay unsolved: 9.5% right first.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would the trained 35B, or rows from similar payees, do better? <a href="#row-166">Row 166</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-166" data-from="165,157,125" data-era="The owner's real budget" data-status="done">
+  <header>
+    <p class="eyebrow">Row 166 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §157</p>
+    <h2>Showing the model rows from similar payees, and the trained 35B</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Two owner requests after <a class="back" href="#row-165">row 165</a>: try the trained 35B (from <a class="back" href="#row-125">row 125</a>), and "couldn't we favor the payees that embed closer to the payee about to be inferred?", using the payee embeddings of <a class="back" href="#row-157">row 157</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Every payee name in the budget (5,811) was embedded privately with the recipe's decider-4B. After the payee's own rows, each prompt gets up to 6 rows from the nearest earlier payees (at most 2 per payee). No retraining. Readers: decider-4B recipe and the trained decider-35B-A3B, each with and without the similar rows, and the system card.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">...shared block of 24 earlier rows...
+
+Transaction: 2021-02-11 | Northside Roasters | $5.40 | Thu
+Category: (Tz) Coffee runs
+
+Transaction: 2021-02-25 | Harbor Bean Co | $7.15 | Thu
+Category: (Tz) Coffee runs
+
+Transaction: 2021-03-09 | BLUEJAY CAFE #0412 | $6.25 | Tue
+Category: (</pre><p class="note">Illustrative, invented: a first-time payee with no rows of its own, preceded by rows from the two payees whose names embed nearest.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader or system</th><th>all, right first %</th><th>first-time payees, right first %</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule</td><td>57.9</td><td>0</td></tr>
+      <tr><td>decider-4B recipe</td><td>68.3</td><td>37.8</td></tr>
+      <tr><td>decider-4B + similar-payee rows</td><td>72.1</td><td>51.3</td></tr>
+      <tr><td>decider-35B-A3B recipe</td><td>70.8</td><td>44.7</td></tr>
+      <tr><td>decider-35B + similar-payee rows</td><td>72.8</td><td>52.8</td></tr>
+      <tr><td>best system (35B + similar rows, gate, untrained 35B on new payees)</td><td>74.3 (84.5 in list, 76% work saved)</td><td>55.7</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Similar-payee rows are the biggest single gain on real data: +13.5 on first-time payees, with no training. With ~96 categories, a neighbour's filing says which of the user's many categories that kind of payee goes to.</li>
+    <li>The trained 35B beats the 4B by less than the similar rows add; the 4B with similar rows is the cost-effective choice.</li>
+    <li>Nearest neighbours also caught spelling variants of the same payee.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Do other prompt additions help, and can payee spelling variants be matched on purpose? <a href="#row-167">Row 167</a>.</li>
+    <li>Can the 35B's payee knowledge be distilled into a smaller model? <a href="#row-170">Row 170</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-167" data-from="166" data-era="The owner's real budget" data-status="done">
+  <header>
+    <p class="eyebrow">Row 167 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §158</p>
+    <h2>Prompt variants and payee aliases on the real budget</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Building on <a class="back" href="#row-166">row 166</a>, the owner asked for four things: describe each category by its recent payees and each payee by its recent categories; report whether the right category is in the top 5 or top 10; guarantee that spelling variants of one store (a short name and a coded statement string) show each other's examples; and measure how much probability goes to categories a payee never uses.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>On row 166's best 4B prompt, no retraining: DESC (each category followed by its three latest payees), PLINE ("Earlier you filed this payee as: A (12), B (3)"), and aliases: payee names cleaned and compared by character n-grams; close matches (cosine ≥ 0.7) get up to 6 of their rows shown, and similar payees are ranked by fusing embedding and n-gram neighbours. A no-model baseline: YNAB's rule run over a payee and its aliases together.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- (kd) Groceries (e.g. Maple Street Market, Hilltop Foods, nothing else)
+...
+Earlier you filed this payee as: Groceries (12), Household (3)
+Transaction: 2021-03-09 | MAPLE ST MKT #22 | $61.30 | Tue
+Category: (</pre><p class="note">Illustrative, invented: DESC and PLINE lines together.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>all, right first / top 10 %</th><th>first-time payees that were aliases (2,034), right first %</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule</td><td>57.9</td><td>0</td></tr>
+      <tr><td>YNAB's rule with name matching</td><td>64.0</td><td>69.8</td></tr>
+      <tr><td>4B + similar payees (row 166)</td><td>72.1 / 88.8</td><td>68.9</td></tr>
+      <tr><td>+ DESC</td><td>72.1 / 88.2</td><td>–</td></tr>
+      <tr><td>+ PLINE</td><td>71.9 / 88.5</td><td>–</td></tr>
+      <tr><td>aliases + fused neighbours</td><td>72.2 / 89.6</td><td>72.5</td></tr>
+    </tbody></table></div><p class="note">System with the alias prompt: 74.2% right first, 84.5% in the list, 76% work saved, level with the 35B system.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Descriptions add nothing: the rows already carry that information.</li>
+    <li>A third of "first-time" payees (2,034 of 6,206) are known payees under another spelling. Matching names lifts YNAB's own rule from 57.9 to 64.0 with no model.</li>
+    <li>On known payees the model's top pick is a category ever used for that payee 98 to 99.6% of the time.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train the model to know what a payee might be and definitely is not: <a href="#row-168">row 168</a>.</li>
+    <li>Make the synthetic data look like real budgets: <a href="#row-169">row 169</a>.</li>
+    <li>How good can payee matching be on real strings? <a href="#row-171">Row 171</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-168" data-from="167" data-era="The owner's real budget" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 168 · 2026-10-03 · <span class="qid">REAL-28</span> · proposed</p>
+    <h2>Rewarding "might be" and penalising "definitely isn't"</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-167">Row 167</a> measured how much probability the model leaves on categories a payee is never filed under. The owner suggested rewarding the model for knowing which categories something might be versus definitely isn't, or for suggesting a category that is ever used, even in the future.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed; it needs real training data from several consenting budgets, with users held out. Add to the one-slot loss: (a) a penalty on probability given to categories the user never files that payee under; (b) partial credit for any category the user ever files it under, past or future (a training-only signal); (c) the ranked-list cost (the work-saved scale) as a differentiable expected cost; and Clef's label smoothing plus Brier loss for calibration. Judge by right first, top 3/5/10, MRR, probability on never-used categories and work saved, on held-out users and later months. No RL loop is needed: the readout gives the whole distribution in one pass.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Waits on multi-user real data.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-169" data-from="167" data-era="The owner's real budget" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 169 · 2026-10-03 · <span class="qid">DATA-9</span> · proposed</p>
+    <h2>A synthetic generator calibrated to real budgets</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Rows 163 to <a class="back" href="#row-167">167</a> showed how one real household differs from our synthetic users. The owner asked to use what we learned from the real transactions to build a better synthetic dataset.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed. Match aggregate statistics measured on real budgets: about 96 offered categories; 86 of 154 used fewer than 20 times; 22% of transactions at payees filed under 5 or more categories; 66% of payees seen once; a third of first-time payee strings aliases of known payees; 8% of strings with codes; names with stray whitespace; categories hidden and reorganised over the years. Fit on several budgets' aggregates (never their rows) before trusting one household, retrain the recipe, and read the owner's budget and the blind sets.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>A first version was built from one budget's aggregates in <a href="#row-173">row 173</a>; fitting several budgets remains open.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-170" data-from="166" data-era="The owner's real budget" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 170 · 2026-10-03 · <span class="qid">MODEL-27</span> · proposed</p>
+    <h2>Shrinking the 35B's payee knowledge into a smaller model</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-166">Row 166</a> showed the 35B knows more payees than the 4B, at about 1.6 times the serving cost. The owner asked to distil the 35B down, while training on big real data, so a smaller model keeps the general payee knowledge.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, three routes: (a) expert pruning of decider-35B-A3B (route many real transaction prompts through it, drop or merge the rarely used experts, measure first-time-payee accuracy against size); (b) logit distillation of the 35B (with similar-payee rows) into decider-4B on large real data (it found nothing on synthetic data, where the 35B cannot know invented merchants); (c) FP8 or int4 quantisation of the pruned model. Compared with row 166's 35B and 4B on held-out real users.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li><a href="#row-173">Row 173</a> took the other route to the 35B's knowledge at 4B cost: better training data. Its 4B passed the trained 35B on first-time payees.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-171" data-from="167,160" data-era="Payee resolution" data-status="done">
+  <header>
+    <p class="eyebrow">Row 171 · 2026-10-03 · <span class="qid">DATA-8</span> · REPORT §159</p>
+    <h2>Matching new bank strings to known payees, on real strings labelled by YNAB</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-167">Row 167</a> found a third of "first-time" payees were known payees spelled differently. The owner: "If we were better at just doing payee cleansing alone, we'd be better at all of this", and asked for classic fuzzy-matching tools, noting that they sometimes clean up payees and sometimes don't. It replaces the synthetic plan of <a class="back" href="#row-160">row 160</a> with real gold.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>YNAB stores each imported transaction's raw bank string with the payee it was assigned: 18,562 transactions, 7,859 distinct strings. Replayed in date order: when a string first appears, each matcher looks it up among earlier strings, and should either find the right payee or abstain if the payee is new. Matchers: exact cleaned string, first word, consonant skeleton, Jaro-Winkler (a string similarity that rewards a shared prefix), token-set ratio, character n-grams, the decider embedding, rank fusion and boosted trees. Thresholds set on the earlier half, read on the later half.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Payee as it appears on a bank statement: SQ *BLUEJAY CAFE 0412
+In one word, the kind of spending:</pre><p class="note">Illustrative, invented: the text the decider embedding reads for one raw string; the other matchers compare strings directly.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Matcher (later half)</th><th>top-1 right payee %</th><th>F1 %</th><th>false alarms on new payees %</th></tr></thead>
+    <tbody>
+      <tr><td>exact cleaned string</td><td>43.3</td><td>55.1</td><td>6.0</td></tr>
+      <tr><td>first word</td><td>79.0</td><td>63.3</td><td>50.7</td></tr>
+      <tr><td>Jaro-Winkler</td><td>83.5</td><td>71.6</td><td>23.9</td></tr>
+      <tr><td>character n-grams</td><td>83.0</td><td>65.5</td><td>42.0</td></tr>
+      <tr><td>decider-4B embedding</td><td>77.8</td><td>70.5</td><td>13.9</td></tr>
+      <tr><td>boosted trees on all</td><td>79.3</td><td>68.1</td><td>16.5</td></tr>
+    </tbody></table></div><p class="note">Some single matcher is right 95.9% of the time; the combined candidates include the right payee 97.7% of the time.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Jaro-Winkler finds the payee most often; the embedding raises the fewest false alarms.</li>
+    <li>The gold under-merges: about 17 of 25 sampled "false alarms" were the same merchant under two payees the owner never merged. So combinations trained on this list learn to doubt true matches.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train on relabelled pairs, or parse person-to-person strings. Recognition as a trained model task: <a href="#row-176">row 176</a>.</li>
+    <li>Could an open places database identify the merchant? <a href="#row-172">Row 172</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-172" data-from="171" data-era="Payee resolution" data-status="done">
+  <header>
+    <p class="eyebrow">Row 172 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §160</p>
+    <h2>Looking payees up in an open database of 81 million places</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>With the matching tools from <a class="back" href="#row-171">row 171</a> in hand, the owner asked whether the large free Overture points-of-interest database could teach us about merchants: look an input payee up in it and inject a description at inference time. On synthetic data, a database "Kind:" line had lifted first-time payees a lot.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Overture places (81.5M places, open licences) reduced to 296,375 brands and 12.4M US place names, each with its most common category. Each payee was matched by brand or place name (Jaro-Winkler with strict word rules; person-to-person, check and transfer strings never matched). Matched first-time payees (or every matched payee) got a "Kind: &lt;category&gt;" line under the transaction, on row 167's alias prompt, with the recipe's decider-4B, no retraining.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: 2021-03-09 | BLUEJAY CAFE #0412 | $6.25 | Tue
+Kind: coffee_shop
+Category: (</pre><p class="note">Illustrative, invented: the line a database match adds under a first-time payee's transaction.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>all, right first %</th><th>matched first-time payees (1,965), right first / top 3 %</th><th>known payees matched, right first %</th></tr></thead>
+    <tbody>
+      <tr><td>recipe, aliases + neighbours (row 167)</td><td>72.2</td><td>54.2 / 68.1</td><td>78.5</td></tr>
+      <tr><td>+ Kind line, first-time payees</td><td>72.3</td><td>55.4 / 70.8</td><td>78.5</td></tr>
+      <tr><td>+ Kind line, every matched payee</td><td>72.1</td><td>55.4 / 70.8</td><td>78.1</td></tr>
+    </tbody></table></div><p class="note">The lookup matched 1,802 of 5,811 payees, 32% of first-time-payee transactions.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The lookup works as a lookup, mostly correctly, in 30 seconds for the whole budget.</li>
+    <li>As a prompt line it adds little (+0.1 overall): the similar-payee rows already tell the model what kind of place a payee is.</li>
+    <li>For known payees the line slightly hurts. Online-only merchants are not places and stay unmatched.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Put real merchant knowledge into the 4B's weights instead: <a href="#row-173">row 173</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-173" data-from="172" data-era="Real-style training" data-status="done">
+  <header>
+    <p class="eyebrow">Row 173 · 2026-10-03 · <span class="qid">MODEL-28 · DATA-9</span> · REPORT §161</p>
+    <h2>Training on synthetic households built to look like real ones</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Started as the second half of <a class="back" href="#row-172">row 172</a>: put Overture merchant facts into the weights. It changed while being built. Brands cover only 7 to 9% of the owner's first-time-payee transactions, and the owner stressed that their categories are purposes (people, trips, phases of life), not merchant types, and that corrupted payees should look the way their budget shows.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>From public data plus aggregates of the owner's budget (no literal text stored): a bank-string grammar measured on 7,368 raw strings (prefixes, reference codes, truncation widths); a 60-kind merchant taxonomy from MCC codes and Overture; measured category style and routing (time decides: the payee's nearest-in-time filing predicts 77.1% for multi-category payees); a pool of 61,141 real merchants; and invented households with people, pets, trips, holidays, life phases, person-to-person memos and 3% misfiles. 40,000 training episodes; a 9,000-item test set on held-out merchants. The recipe was trained with 25% or 50% of each batch from these households.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Inflow: Ready to Assign, Grocery shopping 🥑, ..., Tara's morning treat,
+Fun money (Rafi), Rafi's grooming, ..., Cancun 05-2022, Nashville in September
+
+Transaction: 2022-09-26 | Caffé Bene | $9.03 | Mon
+Category: Tara's morning treat
+
+Transaction: 2022-09-26 | PayPal Transfer to Ada Dalton concert tickets | $17.92 | Mon
+Category: Expenses
+...
+Transaction: 2022-10-04 | Urban Fox Lash &amp; Beauty Bar | $97.06 | Tue
+Category:</pre><p class="note">From realstyle_v1_test.json: an invented household whose categories are people, trips and purposes.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>owner's budget, right first %</th><th>owner's first-time payees %</th><th>blind_v2 %</th><th>"changed their mind" (blind_v2) %</th></tr></thead>
+    <tbody>
+      <tr><td>recipe (row 167 prompt)</td><td>72.2</td><td>53.2</td><td>70.0</td><td>42.6</td></tr>
+      <tr><td>+ 25% real-style</td><td>73.8</td><td>57.7</td><td>75.6</td><td>18.6</td></tr>
+      <tr><td>+ 50% real-style</td><td>74.1</td><td>58.0</td><td>74.7</td><td>–</td></tr>
+      <tr><td>trained 35B (row 166)</td><td>72.8</td><td>52.8</td><td>–</td><td>–</td></tr>
+    </tbody></table></div><p class="note">System with the new 4B: 74.9 / 85.8 / 77% work saved, and 74.8 without the 35B.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Synthetic users that look like real ones transfer: the 4B passes the trained 35B on first-time payees, and the system no longer needs the 35B.</li>
+    <li>It teaches time: trips on blind_v2 rise from 55 to 85, and known payees filed away from the rule go from 10.3 to 17.5.</li>
+    <li>Costs: "changed their mind" 42.6 → 18.6, misleading names -4, more hedging on known payees. 50% is too much.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Confirm with more seeds and fix the "changed their mind" regression: <a href="#row-174">row 174</a>.</li>
+    <li>How best to combine the model with YNAB's deterministic rule: <a href="#row-175">row 175</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-174" data-from="173" data-era="Real-style training" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 174 · 2026-10-03 · <span class="qid">REAL-27</span> · proposed</p>
+    <h2>Confirm and repair the real-style training</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-173">Row 173</a> rested on one seed and had a clear cost: on blind_v2, items where a user moves a payee to a new category for good fell from 42.6 to 18.6. The likely cause is the households' 3% random misfiles, which teach the model to ignore an isolated recent change.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed: two more seeds of the 25% real-style arm; households where a user re-routes a payee for good and corrects misfiles, instead of random misfiles; a 15% share if misleading-name scores stay down; then the recommended system without the 35B on the owner's budget, blind_v1 and v2, and the real-style test set, with the sealed blind_v3 read once at the end.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can the time-routing gains be kept while recovering "changed their mind"?</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-175" data-from="173,171" data-era="Real-style training" data-status="done">
+  <header>
+    <p class="eyebrow">Row 175 · 2026-10-03 · <span class="qid">REAL-27 · DATA-8</span> · REPORT §162</p>
+    <h2>Blending YNAB's simple rule with the model</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner noted that YNAB's rule ("the category used in 2 of the payee's last 3 transactions") is very strong, and asked for the best rule of thumb for combining it with the model, so the model enhances something that already works. They also asked how well the new model from <a class="back" href="#row-173">row 173</a> recognises two corrupted strings as the same payee, on the benchmark from <a class="back" href="#row-171">row 171</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Offline, from stored scores of row 173's reader on the owner's budget (aggregates only): list policies of at most three suggestions, such as the rule first, the payee's last category first, past categories inserted at position 2 or 3, all past categories first (by recency, count or model), the 0.2 gate, and fuzzy aliases. Thresholds were tuned on the earlier half and read on the later half. Separately, the new reader's embedding in row 171's payee-matching replay.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Policy (whole timeline, 21,238)</th><th>right first %</th><th>in list of 3 %</th></tr></thead>
+    <tbody>
+      <tr><td>the model's order</td><td>73.8</td><td>85.4</td></tr>
+      <tr><td>YNAB's rule first</td><td>74.9</td><td>85.6</td></tr>
+      <tr><td>the payee's last category first</td><td>75.2</td><td>85.8</td></tr>
+      <tr><td>all past categories first, by count</td><td>71.8</td><td>84.7</td></tr>
+      <tr><td>the 0.2 gate</td><td>74.7</td><td>85.4</td></tr>
+      <tr><td>last category first, fuzzy aliases counted</td><td>74.3</td><td>85.8</td></tr>
+    </tbody></table></div><p class="note">Payee matching: the new embedding reaches F1 72.7 (was 70.5) with 10.9% false alarms (was 13.9), but top-1 78.6 against Jaro-Winkler's 83.5.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Rule of thumb: the payee's last category first, the model for everything else. No threshold to tune.</li>
+    <li>"Last" beats "2 of 3" because time decides on this budget; ordering past categories by count brings back stale habits.</li>
+    <li>Fuzzy aliases hurt the rule: recognising the same payee has to be precise before its history can be trusted.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train payee recognition as a task of its own: <a href="#row-176">row 176</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-176" data-from="175,171,173" data-era="Real-style training" data-status="doing">
+  <header>
+    <p class="eyebrow">Row 176 · 2026-10-03 · <span class="qid">DATA-8</span> · running</p>
+    <h2>Teaching the model to clean up payee strings</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-175">Row 175</a> showed that the model's embedding still finds the right payee less often than Jaro-Winkler, and that the rule only helps if payees are recognised precisely. The owner asked whether the new real-style dataset from <a class="back" href="#row-173">row 173</a> keeps the "behind the scenes" truth (the original payee before corruption), and suggested training the model to clean up payees as one of its tasks. <a class="back" href="#row-171">Row 171</a> supplies the real benchmark.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The real-style generator knows the true merchant behind every corrupted string. The plan in PLAN.md is recognition episodes ("which earlier payee is this new bank string, or a new one?") with candidates from Jaro-Winkler, n-grams and the embedding, plus hard negatives, mixed in at about 10%. What has been built and launched so far (job list r176) is two arms of the recipe with 25% real-style episodes: a regenerated episode set (v2), and v2f, where each history row carries field lines taken from the generator's ground truth (Clean payee, Via, Ordered from, Memo, Location, Store, Reference). With a "field loss", the model is trained to write that whole block itself, including which fields are present. Both are scored on the blind sets, invented names, misleading names and overrides; then the owner's labelled raw strings (target: beat 83.5% top-1 with fewer false alarms) and the last-category-first rule. Results pending.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: 2021-07-03 | PayPal Transfer to Remy Osei | $138.65 | Sat
+Clean payee: Remy Osei
+Via: PayPal
+Category: Personal Trainer
+
+Transaction: 2021-07-06 | Amtrak*7K3S376AY | $15.92 | Tue
+Clean payee: Amtrak
+Reference: 7K3S376AY
+Category: Tara's self care</pre><p class="note">From realstyle_v2f_train.jsonl (an invented household): the field lines under each history row are what the field loss teaches the model to generate.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Nothing yet: the run is in progress.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does learning to extract the clean payee improve recognition on real strings, and does it cost categorisation accuracy?</li>
+  </ul></section>
+</article>

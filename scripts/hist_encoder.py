@@ -19,7 +19,7 @@ share the encoder decided; decider alone on the same items.
   train1 / train3   write models/encoders/<OUT1> / <OUT3> (DVC)
   read              prints % top-1 / top-3 / top-10 per reader, by payee filed before or not
 env: BASE, PAIRS (200000), HOUSEHOLDS (400), BATCH (128), OUT1 (hist_knn_v1), OUT3 (hist_ctx_v1), K (20), TAU_KNN (0.05), TAU (0.05),
-     READ (households | budget), TEST_SEEDS (100000-100049), FUSE, WS (0.25,0.5,1,2), GATES (0.95,0.9,0.8), SEED (0).
+     READ (households | budget), TEST_SEEDS (100000-100049), FUSE, WS (0.25,0.5,1,2), GATES (0.95,0.9,0.8), SEED (0), AMT_TEXT (text | none).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 uv run python scripts/hist_encoder.py train1|train3|read
 """
 import json
@@ -43,6 +43,7 @@ ENC = ROOT / "models" / "encoders"
 OUT1, OUT3 = ENC / os.environ.get("OUT1", "hist_knn_v1"), ENC / os.environ.get("OUT3", "hist_ctx_v1")
 K, TAU_KNN, TAU = int(os.environ.get("K", "20")), float(os.environ.get("TAU_KNN", "0.05")), float(os.environ.get("TAU", "0.05"))
 NCTX = 5
+AMT_TEXT = os.environ.get("AMT_TEXT", "text")  # row 200: "none" drops the amount from the transaction text
 
 
 def events(b):
@@ -70,7 +71,8 @@ def events(b):
         for t in txs[i:j]:
             p = _clean(payees.get(t.get("payee_id"), "") or t.get("import_payee_name_original") or "")
             amt = -t["amount"] / 1000
-            out.append(dict(id=t["id"], day=day, text=f"{p} | ${amt:.2f} | {wd}", payee=p, amt=amt, gold=t["category_id"],
+            text = f"{p} | {wd}" if AMT_TEXT == "none" else f"{p} | ${amt:.2f} | {wd}"  # row 200: AMT_TEXT=none leaves the amount out
+            out.append(dict(id=t["id"], day=day, text=text, payee=p, amt=amt, gold=t["category_id"],
                             label=label[t["category_id"]], state=state, labels=label, seen=p in seen))
         for t in txs[i:j]:
             p = _clean(payees.get(t.get("payee_id"), "") or "")

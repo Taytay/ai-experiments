@@ -1,0 +1,536 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Plan history: Building the system and product scores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --done:#2F6B45;--todo:#8A6A12;--doing:#17667F;--dropped:#7A7F7C;--code:#EEF1ED;
+ --display:"Literata",Georgia,"Times New Roman",serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--body);margin:0}
+.wrap{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:2.5rem;max-width:78rem;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+nav.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:13px}
+nav.side h2{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+nav.side ol{list-style:none;margin:0 0 1.2rem;padding:0;display:grid;gap:2px}
+nav.side a{display:block;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
+nav.side a:hover{background:var(--accent-soft)}
+nav.side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.side .range{color:var(--muted);font:12px var(--mono);font-variant-numeric:tabular-nums}
+nav.side details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:.4rem}
+main{min-width:0}
+.pagehead{border-bottom:1px solid var(--rule);padding-bottom:1.2rem;margin-bottom:1.6rem}
+.pagehead .kicker{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+.pagehead h1{font:650 clamp(26px,3.4vw,36px)/1.15 var(--display);margin:.35rem 0 .5rem;text-wrap:balance}
+.pagehead p{max-width:65ch;color:var(--muted);margin:0}
+article.row{border-top:1px solid var(--rule);padding-block:1.8rem;scroll-margin-top:16px}
+article.row header{display:grid;gap:.3rem;margin-bottom:.8rem}
+.eyebrow{font:500 12px/1.4 var(--mono);color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.eyebrow .qid{color:var(--accent)}
+.status{display:inline-block;font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-left:.5rem;vertical-align:2px}
+.status.done{color:var(--done)}.status.todo{color:var(--todo)}.status.doing{color:var(--doing)}.status.dropped{color:var(--dropped)}
+article.row h2{font:650 21px/1.25 var(--display);margin:0;text-wrap:balance}
+article.row h3{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .35rem}
+article.row p,article.row li{max-width:68ch}
+article.row ul{padding-left:1.1rem;margin:.2rem 0;display:grid;gap:.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+a.back{font-weight:500}
+pre.prompt{font:12.5px/1.5 var(--mono);background:var(--code);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;max-width:100%}
+.note{font-size:13px;color:var(--muted);margin:.4rem 0 0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin:.2rem 0}
+th,td{text-align:left;padding:6px 12px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+section.led{margin-top:1.1rem;background:var(--led-soft);border-radius:8px;padding:10px 14px}
+section.led h3{color:var(--led);margin-top:0}
+section.led a{color:var(--led);font-weight:500}
+section.led ul{list-style:none;padding:0}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--rule);margin-top:2rem;padding-top:1rem}
+.eras{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:12px;margin:1rem 0 2rem}
+.era{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:.35rem;align-content:start}
+a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}h2.sect{font:650 20px/1.3 var(--display);margin:0 0 .6rem}
+.era .range{font:12px var(--mono);color:var(--muted)}
+.era h2{font:650 18px/1.25 var(--display);margin:0}
+.era p{margin:0;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .b::before{background:var(--accent)}.legend .f::before{background:var(--led)}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:1rem}nav.side{position:static;max-height:none}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html" aria-current="page">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 121–139 · 19 rows</p><h1>Building the system and product scores</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-121" data-from="97,116" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 121 · 2026-09-29 · <span class="qid">EVAL-13</span> · REPORT §116<span class="status done">done</span></p>
+    <h2>Does the 98% auto-file threshold hold for every kind of user?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The scorecard from <a class="back" href="era-8.html#row-97">row 97</a> auto-files a transaction (files it without asking the user) only when the model's confidence passes a threshold chosen so that 98% of auto-filed items are right. <a class="back" href="era-9.html#row-116">Row 116</a> had just shown the models' confidence is a calibrated probability on average. A gaps review asked whether that one threshold still delivers 98% for sub-groups such as brand-new users, and whether it survives a move to a different population of users.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, over saved scores on blind_v1 (the first test set written by an agent that never saw our training code). Two readers: decider-4B (a 4-billion-parameter language model fine-tuned with our recipe, two seeds) and Ettin-1B (a 1B encoder, three seeds). We measured realised precision by user group; fitted one threshold per group; tried "finite-sample" thresholds that come with a statistical guarantee (a bound on the error rate at 90% confidence); and carried thresholds fitted on other sets (REAL-6, novel names) over to blind_v1.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B, blind_v1</th><th>auto-filed %</th><th>right when auto-filed %</th></tr></thead>
+    <tbody>
+      <tr><td>One threshold, all users</td><td>63.3</td><td>97.9</td></tr>
+      <tr><td>One threshold, new users (0-10 rows)</td><td>21</td><td>92.7</td></tr>
+      <tr><td>Finite-sample guarantee (fixed sequence)</td><td>32.7</td><td>98.8</td></tr>
+      <tr><td>Threshold carried over from REAL-6</td><td>40.7</td><td>98.8</td></tr>
+      <tr><td>Threshold carried over from novel_merchants_v1</td><td>0.8</td><td>100.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The 98% holds on average but not for new users: 92.7% for decider and 89.3% for the encoder.</li>
+    <li>Per-group thresholds did not fix it here: the new-user group (168 items) is too small to place a threshold reliably.</li>
+    <li>A real guarantee costs coverage at about 1,100 calibration items: decider auto-files 33% instead of 63%.</li>
+    <li>Thresholds do not travel between populations; they moved coverage by 15 to 60 points. In production, fit them on the product's own recent confirmations.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is a fixed precision target the right way to decide at all? <a href="#row-126">Row 126</a> replaced it with an expected-cost rule.</li>
+    <li>How should new users be treated: a stricter threshold, or none? Left for real data (<a href="era-11.html#row-144">row 144</a>).</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-126">Row 126</a> · Scoring without an arbitrary threshold</li></ul></section></article><article class="row" id="row-122" data-from="106" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 122 · 2026-09-29 · <span class="qid">TRAIN-13</span> · REPORT §124<span class="status done">done</span></p>
+    <h2>Can weight averaging make auto-filing stable across training seeds?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-106">Row 106</a> found that two training runs of the same recipe, differing only in the random seed, got the same accuracy but auto-filed very different shares (an 18-point spread). A product cannot ship a recipe whose behaviour depends on the seed.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-4B with the labelled-rows recipe, seeds 0 to 2, trained plainly and with an exponential moving average (EMA, decay 0.99) of the LoRA adapter weights. EMA keeps a running average of the weights during training, which often smooths out seed noise. Each run was scored on blind_v1, REAL-6 and novel names, both at the fixed 98% cut and under the per-item rule of <a href="#row-126">row 126</a>.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Weights</th><th>blind top-1 spread</th><th>auto-filed spread, 98% cut (points)</th><th>auto-filed spread, per-item rule W=10 (points)</th><th>mean effort, per-item rule</th></tr></thead>
+    <tbody>
+      <tr><td>Plain, 3 seeds</td><td>0.7</td><td>4.8</td><td>1.7</td><td>0.659</td></tr>
+      <tr><td>EMA 0.99, 3 seeds</td><td>0.6</td><td>6.3</td><td>1.9</td><td>0.682</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>EMA does not help: accuracy is unchanged, auto-filing is lower and no steadier, and user effort is higher.</li>
+    <li>Most of the instability came from the fixed threshold, which sits on the steep part of each seed's confidence curve. Under the per-item rule the plain recipe's auto-filing varies only 1.7 points across seeds.</li>
+    <li>Decision: no EMA; the per-item rule is also the stability fix.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None new; seed spread is reported under the per-item rule from here on.</li>
+  </ul></section>
+</article><article class="row" id="row-123" data-from="120" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 123 · 2026-09-30 · <span class="qid">MODEL-19</span> · REPORT §136<span class="status done">done</span></p>
+    <h2>Can the large model teach the small one?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-120">Row 120</a> showed the untrained decider-35B-A3B (a 35-billion-parameter mixture-of-experts model with 3B active per token) knows far more about new users and new businesses than the trained 4B. If so, its probability spread ("soft targets") might teach the 4B some of that knowledge during training, a technique called distillation.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Per seed, the training episodes where the payee has never appeared in the user's history (about 1,100 of 2,250) were read by the untrained 35B. decider-4B was then trained with the recipe and the other-users line, with the target on those episodes set to half the true label and half the 35B's distribution. Two seeds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B</th><th>blind top-1 %</th><th>first-time payees right 1st %</th><th>effort W=10 (lower is better)</th><th>REAL-6 %</th></tr></thead>
+    <tbody>
+      <tr><td>Other-users recipe (<a href="#row-124">row 124</a>)</td><td>83.8</td><td>59.9</td><td>0.622</td><td>87.8</td></tr>
+      <tr><td>+ 35B teacher</td><td>83.1</td><td>58.5</td><td>0.618</td><td>87.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The teacher was right on only 38 to 39% of these training episodes: they use synthetic merchants and coined category names it cannot know, so half of each target pointed away from the label.</li>
+    <li>The student ended where it started. Distillation is dropped for synthetic training.</li>
+    <li>Where the 35B's knowledge is valid (real businesses), the recipe already has exact labels; a teacher would matter on real statement strings without labels.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Are the 35B's readings of real payees useful soft labels? Listed for real data (<a href="era-11.html#row-144">row 144</a>); a related idea, distilling the 35B's payee knowledge into a smaller model, became <a href="era-13.html#row-170">row 170</a>.</li>
+  </ul></section>
+</article><article class="row" id="row-124" data-from="44,120" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 124 · 2026-09-29 · <span class="qid">REAL-23</span> · REPORT §123<span class="status done">done</span></p>
+    <h2>Telling the model how other users file this payee</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A new user has no history, so the model has nothing to copy from. With a million users, what everyone else calls a payee is cheap to know. A "collaborative record" idea (<a class="back" href="era-4.html#row-44">row 44</a>) had been shelved before blind test sets existed, and <a class="back" href="era-9.html#row-120">row 120</a> showed new users were the trained 4B's weak spot (62% against the 35B's 77%).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>One line before the query: "Other users file this payee as:" and the top three categories the other 249 test users filed that payee under before that date, shown when at least three such filings exist (1,040 of 1,500 blind_v1 items). In training, half the episodes carried a synthetic version of the line, with other users disagreeing in 20% of them. decider-4B, two seeds, compared with the plain recipe reading the line untrained.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Bills, Food, Transportation, Everything else, Save, Income
+
+Other users file this payee as: Amazon orders (619), Gifts (583), Household (544)
+
+Transaction: 2025-12-03 | AMZN Mktp US*QBYGCBJFZ Amzn.com/bill WA | $42.01 | Wed
+Category:</pre><p class="note">A brand-new user from blind_v1_others (as stored; the recipe reads it with letter labels): no history at all, so the other-users line is the only clue.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm</th><th>blind_v1 top-1 %</th><th>new users %</th><th>user's own habits %</th><th>effort W=10</th></tr></thead>
+    <tbody>
+      <tr><td>The recipe</td><td>82.5</td><td>61.3</td><td>85.2</td><td>0.651</td></tr>
+      <tr><td>The recipe, line shown untrained</td><td>82.7</td><td>60.7</td><td>86.7</td><td>0.649</td></tr>
+      <tr><td>Trained with the line, line shown</td><td>83.8</td><td>69.3</td><td>86.7</td><td>0.619</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Once trained to read it, the line lifts new users 8 points and cuts user effort 5%.</li>
+    <li>The user still wins: filings for personal reasons stay at 86.7, because training lines where others disagree taught the model to treat the line as a hint.</li>
+    <li>Untrained, the model ignores it; a trained model reads prompts without the line as before. Adopted (<code>OTHERS=0.5</code>).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does the line add anything once the 35B is in the system? <a href="#row-129">Row 129</a>.</li>
+    <li>How varied are real users' names for a payee? It helped less on blind_v2 (<a href="era-11.html#row-140">row 140</a>); <a href="era-11.html#row-150">row 150</a> and <a href="era-12.html#row-161">row 161</a> look at mapping names and putting this knowledge in the weights.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-129">Row 129</a> · The system with everything that helped</li><li><a href="#row-136">Row 136</a> · A smaller model: decider-0.8B with the recipe</li><li><a href="#row-137">Row 137</a> · Describing each category by the payees filed under it</li><li><a href="era-11.html#row-147">Row 147</a> · Can a model tell what a user&#x27;s category holds?</li><li><a href="era-11.html#row-148">Row 148</a> · Can a model tell what kind of business a payee is?</li></ul></section></article><article class="row" id="row-125" data-from="120" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 125 · 2026-09-29 · <span class="qid">MODEL-20</span> · REPORT §122<span class="status done">done</span></p>
+    <h2>Training the 35B model with our recipe</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-120">Row 120</a> found the untrained 35B already matches the trained 4B on blind_v1, with the opposite strengths: world knowledge about merchants and new users, but weak on a user's personal habits. Training it with the recipe might give both.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The recipe (labelled rows, 800 steps) as a rank-64 LoRA adapter on decider-35B-A3B, trained on one H200 GPU in 42 minutes. The "routed experts" (most of a mixture-of-experts model's weights) could not be targeted by the LoRA library and stayed frozen. One seed. Scored alone and as the escalation reader (the third model that reads what the small pair leaves).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Shelter, Boring bills, Grub, Restaurants, Caffeine, ... Self care, ... Amazon
+
+Transaction: 2025-06-29 | Juniper Boutique | $56.71 | Sun
+Category: Self care
+...
+Transaction: 2025-09-02 | Mr. Cooper | $2282.68 | Tue
+Category: Shelter
+
+Transaction: 2025-09-03 | Gap | $41.64 | Wed
+Category:</pre><p class="note">A blind_v1 item (trimmed; answer "Self care"): a chain the user has never filed, where world knowledge about Gap helps.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Set (% right first)</th><th>decider-4B recipe (2 seeds)</th><th>decider-35B-A3B recipe</th></tr></thead>
+    <tbody>
+      <tr><td>blind_v1</td><td>82.6 / 82.3</td><td>84.8</td></tr>
+      <tr><td>REAL-6 (synthetic merchant database)</td><td>85.2 / 87.6</td><td>74.2</td></tr>
+      <tr><td>REAL-6 novel names</td><td>84.2 / 85.2</td><td>69.1</td></tr>
+      <tr><td>Effort alone, blind_v1 (98% cut)</td><td>0.589</td><td>0.534</td></tr>
+      <tr><td>As third reader: system effort</td><td colspan="2">trained 0.500 against untrained 0.470</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The trained 35B is the best single reader on blind_v1: it kept its world knowledge and gained the recipe's habits (idiosyncratic filings 49 to 95, weekday rules 46 to 84).</li>
+    <li>It did not store the synthetic merchant database (REAL-6 74 against 86); its training loss stayed high (0.64 against about 0.4).</li>
+    <li>As the third reader it helps less than the untrained 35B, probably because training made its mistakes like the small models'.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Was the missing database the frozen experts or too little training? <a href="#row-128">Row 128</a>.</li>
+    <li>What does it cost to serve? <a href="#row-130">Row 130</a>. It was later tried on the owner's real budget in <a href="era-13.html#row-166">row 166</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-128">Row 128</a> · Was the 35B&#x27;s missing database a training shortfall?</li><li><a href="#row-130">Row 130</a> · What the 35B costs to serve</li><li><a href="era-13.html#row-166">Row 166</a> · Showing the model rows from similar payees, and the trained 35B</li></ul></section></article><article class="row" id="row-126" data-from="116,121" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 126 · 2026-09-29 · <span class="qid">EVAL-14</span> · REPORT §118<span class="status done">done</span></p>
+    <h2>Scoring without an arbitrary threshold</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "The 98% threshold is arbitrary. Let's come up with a better mechanism for scoring and determining success." <a class="back" href="#row-121">Row 121</a> had also shown the threshold is fragile. Calibrated probabilities from <a class="back" href="era-9.html#row-116">row 116</a> made a cost-based rule possible.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Success is the user's expected effort per transaction: 0 for a right auto-file, 1 click if the answer is among three suggestions, 3 for a search, and W for a wrong auto-file (noticing and undoing it). W is a product judgement. For each transaction the rule auto-files when the expected cost of auto-filing, (1 − p) × W, is below the expected cost of suggesting. No threshold to tune. Compared with the fixed 98% cut and the best possible cut, for every reader and combination on blind_v1, W from 3 to 100. CPU only.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Effort per transaction (no model = 3.0)</th><th>W = 3</th><th>W = 10</th><th>W = 50</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, fixed 98%</td><td>0.566</td><td>0.662</td><td>1.208</td></tr>
+      <tr><td>decider-4B, per-item rule</td><td>0.481</td><td>0.651</td><td>0.955</td></tr>
+      <tr><td>encoder × decider × 35B, per-item rule</td><td>0.397</td><td>0.547</td><td>0.923</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The per-item rule is best or tied at every W for every reader, with nothing to tune.</li>
+    <li>The old 98% target corresponds to W of about 10: at W = 10 the rule auto-files 62.5% at 98.1% precision.</li>
+    <li>The ranking of readers and systems is the same at every W, so conclusions do not hinge on the exact W.</li>
+    <li>The rule is only as good as the calibration, which must be fitted on the product's own users.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What is the product's W? The owner's call, later measurable from undo rates (<a href="era-11.html#row-144">row 144</a>).</li>
+    <li>Does the score match how the owner thinks about suggestions? <a href="#row-132">Row 132</a> built a rank-based score on the owner's scale.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-129">Row 129</a> · The system with everything that helped</li><li><a href="#row-132">Row 132</a> · A rank-based score on the owner&#x27;s scale</li></ul></section></article><article class="row" id="row-127" data-from="119" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 127 · 2026-09-29 · <span class="qid">INFRA-3</span> · REPORT §120<span class="status done">done</span></p>
+    <h2>Serving one user's sync fast with vLLM and prefix caching</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-119">Row 119</a> showed that when a user syncs 10 to 100 new transactions, caching the shared start of the prompt (category list and shared history rows) halves the time with the same answers, and that one prompt with an answer slot per transaction is faster still but changes answers unless trained for. Next: (a) train those multi-slot episodes, or (b) try a real serving engine.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Part (b): the recipe's decider-4B (adapter merged) in vLLM 0.30 on one H100, on the same 24 user syncs, with prefix caching off and on, in today's layout and in the split layout (shared rows first, the payee's own rows after, so the prefix is shared). Answers checked against the uncached reading. Part (a) was deprioritised after (b).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Roof over head, Keep the lights on, Groceries, Yum, ... Summer vacation, Money in
+
+Earlier transactions:
+
+Transaction: 2025-07-08 | Zelle to Lauren Jackson | $90.00 | Tue
+Category: Presents
+...
+Earlier transactions at this payee and similar payees:
+
+Transaction: 2025-08-03 | Willow Pho House | $67.95 | Sun
+Category: Yum
+...
+Transaction: 2025-09-08 | Mama Lin's Taproom | $94.19 | Mon
+Category: Summer vacation
+
+Transaction: 2025-09-08 | Orchard Cantina | $46.52 | Mon
+Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): everything above the second header is shared by every transaction in a sync and can be cached once.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Engine, layout, cache</th><th>ms per transaction, sync of 30</th><th>ms, 24 syncs queued</th></tr></thead>
+    <tbody>
+      <tr><td>Hugging Face, separate prompts (row 119)</td><td>53.2</td><td>–</td></tr>
+      <tr><td>vLLM, today's layout, cache off</td><td>25.4</td><td>24.0</td></tr>
+      <tr><td>vLLM, split layout, cache on</td><td>12.8</td><td>10.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>vLLM with the split layout and its prefix cache is 5.2 times faster than the baseline, with top-1 identical to the decimal.</li>
+    <li>That is roughly $11 per million transactions on an H100 at list price.</li>
+    <li>The split layout is what lets the cache work: it shares about 1,330 tokens per sync.</li>
+    <li>Multi-slot training is not worth it now; part (a) dropped.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What does the 35B cost on the same stack? <a href="#row-130">Row 130</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-130">Row 130</a> · What the 35B costs to serve</li></ul></section></article><article class="row" id="row-128" data-from="125" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 128 · 2026-09-30 · <span class="qid">MODEL-20</span> · REPORT §127<span class="status done">done</span></p>
+    <h2>Was the 35B's missing database a training shortfall?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-125">Row 125</a>'s trained 35B read REAL-6 (questions answerable only from a synthetic merchant database taught in training) at 74 against the 4B's 86. Either the frozen routed experts cannot store facts, or it simply was not trained enough.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Row 125's adapter targets (experts still frozen) with twice the learning rate (2e-4 × 800 steps) and with twice the steps (1e-4 × 1,600). Adding LoRA to the routed experts was ruled out: rank 64 over 256 experts per layer is billions of parameters. One H200 each.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>35B run</th><th>blind_v1 %</th><th>REAL-6 %</th><th>novel names %</th><th>effort alone W=10</th><th>effort as third reader W=10</th></tr></thead>
+    <tbody>
+      <tr><td>Untrained</td><td>82.0</td><td>–</td><td>–</td><td>0.701</td><td>0.549</td></tr>
+      <tr><td>Row 125: 1e-4 × 800</td><td>84.8</td><td>74.2</td><td>69.1</td><td>0.593</td><td>0.570</td></tr>
+      <tr><td>2e-4 × 800</td><td>84.3</td><td>85.9</td><td>84.2</td><td>0.613</td><td>0.584</td></tr>
+      <tr><td>1e-4 × 1,600</td><td>83.7</td><td>88.3</td><td>86.6</td><td>0.626</td><td>0.590</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Under-training, not frozen experts: trained harder, the 35B stores the database at the 4B's level.</li>
+    <li>The blind set does not reward it: more training pulls the model toward our synthetic generator and slightly away from blind_v1.</li>
+    <li>As the third reader, the less trained the better: its value is an independent opinion from world knowledge. The system keeps the untrained 35B.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>With real data, the trade between taught facts and world knowledge must be measured again (<a href="era-13.html#row-166">row 166</a> tried the trained 35B on the owner's budget).</li>
+  </ul></section>
+</article><article class="row" id="row-129" data-from="120,124,126" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 129 · 2026-09-29 · <span class="qid">EVAL-14, REAL-23</span> · REPORT §126<span class="status done">done</span></p>
+    <h2>The system with everything that helped</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Three things had each helped on their own: the other-users line (<a class="back" href="#row-124">row 124</a>), the untrained 35B as escalation reader (<a class="back" href="era-9.html#row-120">row 120</a>), and the per-item expected-cost rule (<a class="back" href="#row-126">row 126</a>). This row put them together and asked whether they add up.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>On blind_v1: decider-4B (plain recipe, and trained with the other-users line; three seeds each), the encoder (three seeds) and the untrained 35B. Combinations multiply the models' calibrated probabilities. "Pair → 35B" means the encoder × decider pair decides first, and the 35B joins only for what the pair does not auto-file. Every auto-file decision uses the per-item rule.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>System (effort per transaction)</th><th>W = 10</th><th>auto-filed % / precision % at W=10</th><th>W = 50</th></tr></thead>
+    <tbody>
+      <tr><td>decider (plain recipe)</td><td>0.659</td><td>63.0 / 97.9</td><td>0.994</td></tr>
+      <tr><td>decider + other-users line</td><td>0.622</td><td>65.4 / 97.8</td><td>0.995</td></tr>
+      <tr><td>pair + line → 35B</td><td>0.549</td><td>71.3 / 97.7</td><td>0.985</td></tr>
+      <tr><td>all three read everything, + line</td><td>0.541</td><td>70.1 / 97.9</td><td>0.921</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Best system so far: encoder × decider (with the line), then the untrained 35B for the third they leave: 17% less user effort than decider alone.</li>
+    <li>The line and the 35B cover the same gap (what a payee usually is): each helps most on its own. Without a large model, the line is the cheap way to get that knowledge.</li>
+    <li>When a wrong auto-file is very costly (W = 50), only reading everything with all three helps.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would cheaper small models do as the third opinion? <a href="#row-131">Row 131</a>.</li>
+    <li>Is the encoder pulling its weight? <a href="era-11.html#row-141">Row 141</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-131">Row 131</a> · Would a second small model do instead of the 35B?</li></ul></section></article><article class="row" id="row-130" data-from="125,127" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 130 · 2026-09-29 · <span class="qid">INFRA-3, EVAL-12</span> · REPORT §125<span class="status done">done</span></p>
+    <h2>What the 35B costs to serve</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked how much the 35B costs to train and to run. <a class="back" href="#row-125">Row 125</a> had a trained 35B, and <a class="back" href="#row-127">row 127</a> had the vLLM benchmark for the 4B to compare against.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Row 125's trained 35B (adapter merged) in vLLM 0.30 on one H200, on the same 24 user syncs and token ids as row 127, with the prefix cache off and on. Training times and costs read from the job logs.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Model, GPU, split layout, cache on</th><th>ms per transaction, sync of 30</th><th>ms, syncs queued</th><th>approx. $ per million transactions</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B, H100</td><td>12.8</td><td>10.2</td><td>~11</td></tr>
+      <tr><td>decider-35B-A3B trained, H200</td><td>20.3</td><td>14.1</td><td>~18</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Per transaction the 35B costs 1.4 to 1.6 times the 4B, not the 3 to 4 times first estimated in row 120 (that line was corrected). With 3B parameters active per token its compute is close to the 4B's.</li>
+    <li>As an escalation reader for a third of transactions it adds about $6 per million. The real cost is operational: a second model and an 80 GB-plus GPU kept for its 69 GB of weights.</li>
+    <li>Training either model costs a few dollars (25 to 45 minutes on an H100 for the 4B, 42 minutes on an H200 for the 35B).</li>
+    <li>A short sync of 10 gains nothing from the cache on the 35B (39.9 against 37.6 ms).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Could the 35B read fewer transactions? <a href="era-11.html#row-142">Row 142</a> routes it only to first-time payees.</li>
+  </ul></section>
+</article><article class="row" id="row-131" data-from="129" data-era="Building the system" data-status="done">
+  <header>
+    <p class="eyebrow">Row 131 · 2026-09-30 · <span class="qid">EVAL-12</span> · REPORT §128<span class="status done">done</span></p>
+    <h2>Would a second small model do instead of the 35B?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "if we just need another opinion, would an untrained 4B help? An ensemble of smaller models?" <a class="back" href="#row-129">Row 129</a>'s best system needs a 35B on its own large GPU.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, saved blind_v1 readings. Behind the encoder × decider pair, each candidate third reader: an untrained decider-4B, 4Bs trained on other prompt formats (YAML, table), a third seed of the same recipe, the 35Bs, and small ensembles. We measured how many of the pair's mistakes each gets right and the system's effort.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Third reader</th><th>compute (4B = 1)</th><th>right where the pair is wrong %</th><th>pair → X, effort W=10</th></tr></thead>
+    <tbody>
+      <tr><td>none (the pair)</td><td>0</td><td>–</td><td>0.603</td></tr>
+      <tr><td>decider-4B untrained</td><td>1.0</td><td>17.6</td><td>0.588</td></tr>
+      <tr><td>decider-4B recipe, third seed</td><td>1.0</td><td>17.3</td><td>0.593</td></tr>
+      <tr><td>decider-35B-A3B untrained</td><td>1.5</td><td>25.6</td><td>0.549</td></tr>
+      <tr><td>two 4Bs + 35B untrained</td><td>3.5</td><td>–</td><td>0.547</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A small second opinion helps a little: every 4B fixes about a sixth of the pair's mistakes.</li>
+    <li>The 35B fixes a quarter. Its value is knowledge the small models lack, not just a different view; stacking 4Bs on it adds nothing at twice the compute.</li>
+    <li>Without a large model, the cheap substitute is the other-users line, not more small readers.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can the 35B's knowledge be put into a small model? Later: distillation on real data (<a href="era-13.html#row-170">row 170</a>) and real merchant knowledge in the 4B's weights (<a href="era-13.html#row-173">row 173</a>).</li>
+  </ul></section>
+</article><article class="row" id="row-132" data-from="126" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 132 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §129<span class="status done">done</span></p>
+    <h2>A rank-based score on the owner's scale</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner wanted the score to reflect a suggestion list: "guessing correctly in 1st place is a 0. Being 1 away is a 1 ... up to 5. And not showing it is a 10", with irrelevant suggestions penalised and only confident ones shown. <a class="back" href="#row-126">Row 126</a>'s effort score only counted "in the top three or not".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, blind_v1. A new score: the right category at rank r costs r − 1, not shown costs 10, each wrong category shown costs a clutter penalty (LAM), at most five shown. Each rank is shown only if its expected gain beats its expected clutter, so list length follows from the calibrated probabilities. Auto-filing is chosen when cheaper than the list; a "confirm cost" for tapping a suggestion was added after a first run.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>System (W = 20, LAM 1, confirm 0.5)</th><th>score (no model = 10)</th><th>auto-filed % / precision %</th><th>suggestions shown</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B + line</td><td>1.765</td><td>56.1 / 98.3</td><td>1.75</td></tr>
+      <tr><td>encoder × decider</td><td>1.670</td><td>61.8 / 98.1</td><td>1.88</td></tr>
+      <tr><td>encoder × decider × 35B</td><td>1.496</td><td>63.9 / 98.4</td><td>1.82</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The ranking is good: right first 84 to 86%, in the top five 95 to 96%.</li>
+    <li>On this scale a right first suggestion costs the same as a right auto-file, so the rule never auto-files unless confirming costs something. A confirm cost of 0.5 (a tap) restores the trade.</li>
+    <li>Lists are short when the model is sure (1.6 to 2.0 suggestions). Proposed defaults: miss 10, clutter 1, confirm 0.5, W 20.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The clutter penalty treats every wrong suggestion alike; "plausible but wrong" should be free. <a href="#row-133">Row 133</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-133">Row 133</a> · A report card in plain percentages</li></ul></section></article><article class="row" id="row-133" data-from="132" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 133 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §130<span class="status done">done</span></p>
+    <h2>A report card in plain percentages</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner found <a class="back" href="#row-132">row 132</a>'s rank scores hard to read, and asked that plausible suggestions not be penalised: a user may file Amazon under four categories.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, blind_v1 with the other-users line. "Plausible" categories (ones this user has used for the payee, or that other users use for it) are shown freely and never penalised; others only when the model is confident. The results are reported as shares of transactions: filed automatically right or wrong, suggested with the right one first or 2nd to 5th, or left to search. "Work saved" compares with filing everything by hand.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>System (plausible free)</th><th>auto right %</th><th>auto wrong %</th><th>suggested, 1st %</th><th>2nd-5th %</th><th>search %</th><th>work saved</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B</td><td>53.0</td><td>1.0</td><td>30.8</td><td>8.6</td><td>6.7</td><td>86%</td></tr>
+      <tr><td>encoder + decider</td><td>59.3</td><td>1.1</td><td>25.1</td><td>8.4</td><td>6.2</td><td>87%</td></tr>
+      <tr><td>encoder + decider + 35B</td><td>61.3</td><td>1.0</td><td>24.5</td><td>8.2</td><td>5.1</td><td>88%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Of every 100 transactions, the system files 61 itself (1 wrong); of the rest, 25 have the right category first, 8 have it 2nd to 5th, and 5 need a search.</li>
+    <li>Showing plausible categories freely cuts searches (6.7 to 5.1% for the system).</li>
+    <li>15 to 20 confident wrong suggestions per 100 transactions remain; whether they look irrelevant needs a human judgement.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>YNAB already asks the user to confirm every transaction; how do the models compare with YNAB's current suggestion? <a href="#row-134">Row 134</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-134">Row 134</a> · Against YNAB&#x27;s current suggestion rule</li></ul></section></article><article class="row" id="row-134" data-from="133" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 134 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §131<span class="status done">done</span></p>
+    <h2>Against YNAB's current suggestion rule</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "YNAB makes you confirm everything anyway. It currently suggests the last one used in 2 out of 3 transactions (or last one used if there aren't 3 transactions in that payee's history yet)." With no auto-filing, <a class="back" href="#row-133">row 133</a>'s card had to be redone against that baseline.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only. YNAB's rule was computed in the blind generator from each payee's exact history. Compared on blind_v1 (hard cases over-sampled) and blind_bulk_v1 (one user's ordinary stream, 6,660 transactions in order): the rule; a no-model list (the rule, then the payee's other past categories and other users' categories); the models; and rule-first hybrids. Score: where the right category lands in the list.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Suggestions from</th><th>ordinary stream: right 1st %</th><th>stream: search %</th><th>stream: work saved</th><th>blind_v1: right 1st %</th><th>blind_v1 new users: right 1st %</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule</td><td>82.0</td><td>18.0</td><td>82%</td><td>73.5</td><td>7.1</td></tr>
+      <tr><td>Rule + payee's other past categories (no model)</td><td>82.0</td><td>8.3</td><td>90%</td><td>79.0</td><td>–</td></tr>
+      <tr><td>encoder + decider</td><td>84.1</td><td>5.4</td><td>93%</td><td>84.4</td><td>71.7</td></tr>
+      <tr><td>encoder + decider + 35B</td><td>–</td><td>–</td><td>–</td><td>85.7</td><td>78.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>For payees the user has filed before, YNAB's rule is as good as any model at the first suggestion (85 to 90% right first), and those are 96% of an ordinary stream.</li>
+    <li>The models win on payees new to the user (the rule has nothing), on new users, and in the list after the first suggestion.</li>
+    <li>Most of the ordinary-stream gain needs no model: listing the payee's other past categories after the rule's suggestion.</li>
+    <li>Product answer at this point: the rule first where the payee has history, the model's ranked list after it and for everything else.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Score first-time payees and departures from the usual on their own: <a href="#row-135">row 135</a>.</li>
+    <li>Rule-first was later found not to generalise (<a href="era-11.html#row-140">row 140</a>); combining the rule and the model was revisited in <a href="era-13.html#row-175">row 175</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-135">Row 135</a> · Scores for first-time payees and for changes from the usual</li></ul></section></article><article class="row" id="row-135" data-from="134" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 135 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §132<span class="status done">done</span></p>
+    <h2>Scores for first-time payees and for changes from the usual</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked for "a score JUST for cases where a user is categorizing a payee for the first time", and one for cases where a user files a payee differently than before ("our anticipation that the user might categorize it differently"). <a class="back" href="#row-134">Row 134</a> showed these are where the models earn their keep.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only. Subsets from the generator's exact payee history: (1) first filing of the payee; (2a) filed differently from YNAB's rule; (2b) a category never used for the payee before; and the usual case as control. We also measured "anticipation" (does the model's confidence drop on 2a, measured by AUROC, the chance a changed item gets lower confidence than a usual one) and a gate that lets the model override the rule only when clearly more confident.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>blind_v1, right 1st % / in the list %</th><th>first time (n=277)</th><th>differently (n=120)</th><th>never used (n=27)</th></tr></thead>
+    <tbody>
+      <tr><td>YNAB's rule</td><td>0.0 / 0.0</td><td>0.0 / 0.0</td><td>0.0 / 0.0</td></tr>
+      <tr><td>No-model list</td><td>29.6 / 30.0</td><td>0.0 / 66.7</td><td>0.0 / 7.4</td></tr>
+      <tr><td>decider-4B + line</td><td>59.9 / 72.0</td><td>22.8 / 70.0</td><td>0.0 / 13.6</td></tr>
+      <tr><td>encoder + decider + 35B</td><td>69.2 / 79.9</td><td>25.4 / 70.6</td><td>2.1 / 16.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>First-time payees: the models get the right category first 49 to 69% of the time (both sets), where the rule has nothing.</li>
+    <li>The models do anticipate a departure: confidence drops to 55 to 61% (usual: 90 to 94%), AUROC 0.89 to 0.91.</li>
+    <li>A category never used for the payee is not anticipated (right first 0 to 2%).</li>
+    <li>Letting the model override the rule only when confident adds at most a point on known payees.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>When the model misses a first-time payee, how close was it? <a href="#row-138">Row 138</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-138">Row 138</a> · How close the model was on first-time payees</li></ul></section></article><article class="row" id="row-136" data-from="124" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 136 · 2026-09-30 · <span class="qid">MODEL-21</span> · REPORT §135<span class="status done">done</span></p>
+    <h2>A smaller model: decider-0.8B with the recipe</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A review of an outside project ("Jeff", one-slot fine-tunes of Qwen3.5) found a 0.8B model its sweet spot for speed. The owner: run the experiment with our own training, not Jeff's weights. The baseline is the recipe with the other-users line from <a class="back" href="#row-124">row 124</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-0.8b (Apache-2.0) trained with the same recipe and other-users line as decider-4B, two seeds, scored on blind_v1 with the line shown, REAL-6 and novel names.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>blind top-1 %</th><th>first-time payees right 1st %</th><th>own habits %</th><th>effort W=10</th><th>REAL-6 %</th><th>minutes for 1,500 items</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B (3 seeds)</td><td>83.8</td><td>59.9</td><td>85.4</td><td>0.622</td><td>87.8</td><td>2.0 to 3.1</td></tr>
+      <tr><td>decider-0.8B (2 seeds)</td><td>82.0</td><td>55.4</td><td>80.6</td><td>0.726</td><td>87.6</td><td>0.9 to 1.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The 0.8B is about three times faster and matches the 4B on synthetic sets, but on the blind set it is 17% worse by effort, weakest on the user's own habits.</li>
+    <li>The 4B is cheap enough (about $11 per million transactions) that the gain is worth it. Not adopted.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>None taken up directly; model size came back with full fine-tunes in <a href="era-12.html#row-156">row 156</a>.</li>
+  </ul></section>
+</article><article class="row" id="row-137" data-from="124" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 137 · 2026-09-30 · <span class="qid">DATA-6</span> · REPORT §135<span class="status done">done</span></p>
+    <h2>Describing each category by the payees filed under it</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The same outside review found that options described by what they lead to matter a great deal. A personal category name like "Yum" says little; listing the payees filed under it might help. The baseline is <a class="back" href="#row-124">row 124</a>'s recipe.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Each category in the labelled list followed by the payees the user filed under it (<code>DESC=1</code>). decider-4B trained that way (two seeds), and row 124's adapter reading the described list without training on it.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">(IJ) Dining out (e.g. Peets, Chipotle)
+...
+(nothing filed yet)</pre><p class="note">The category-list format, as quoted in REPORT 135: each label and name followed by payees filed under it, or a note that nothing is filed yet.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B</th><th>blind top-1 %</th><th>first-time payees 1st %</th><th>new users %</th><th>REAL-6 %</th><th>novel names %</th></tr></thead>
+    <tbody>
+      <tr><td>Row 124 recipe</td><td>83.8</td><td>59.9</td><td>69.6</td><td>87.8</td><td>84.6</td></tr>
+      <tr><td>Trained with descriptions</td><td>83.8</td><td>63.4</td><td>72.3</td><td>82.6</td><td>69.1</td></tr>
+      <tr><td>Row 124 adapter, descriptions untrained</td><td>83.7</td><td>59.2</td><td>67.3</td><td>–</td><td>–</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Descriptions help where names say nothing (first-time payees +3.5, new users +2.7) but cost 15 points on invented category names and 5 on REAL-6.</li>
+    <li>The cause is not settled: a first reading (filing by payee resemblance) was corrected, since even pure lookups fell; the parentheses format may be to blame. Untested.</li>
+    <li>Not adopted. Read untrained, descriptions change nothing.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would a format without parentheses, or describing only empty categories, separate format from content? Noted, not queued.</li>
+  </ul></section>
+</article><article class="row" id="row-138" data-from="135" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 138 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §133<span class="status done">done</span></p>
+    <h2>How close the model was on first-time payees</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "When our model gives a suggested answer, do we know what other answers it was close to giving and how close?" <a class="back" href="#row-135">Row 135</a> had shown first-time payees are the hard case.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only. On blind_v1's 277 first-time payees, the three-model system's full probability list: where the right category ranks, what the model's top probability is when wrong, and the "ideal reader" (the generator's rule-based reader with world knowledge) as a ceiling. Plus worked examples.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Group</th><th>n</th><th>rank 1</th><th>top 5</th><th>ideal reader right</th><th>top probability when wrong</th></tr></thead>
+    <tbody>
+      <tr><td>All first-time payees</td><td>277</td><td>70%</td><td>88%</td><td>75%</td><td>0.36</td></tr>
+      <tr><td>New chains</td><td>37</td><td>84%</td><td>95%</td><td>92%</td><td>0.47</td></tr>
+      <tr><td>Opaque names</td><td>36</td><td>17%</td><td>48%</td><td>0%</td><td>0.18</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The ranking is better than the short lists suggested: the right category is in the top five 88% of the time.</li>
+    <li>The model is close to what is knowable: 70% first against the ideal reader's 75%.</li>
+    <li>Most misses are unknowable opaque names ("TRI-STAR HOLDINGS LLC"); the model spreads its probability thinly (top 8 to 14%), the honest answer.</li>
+    <li>When wrong it knows it is unsure: top probability averages 0.36. Those transactions should get a longer list.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>How long should the suggestion list be, and for whom? <a href="#row-139">Row 139</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-139">Row 139</a> · How many suggestions to show</li></ul></section></article><article class="row" id="row-139" data-from="138" data-era="Product-facing scores" data-status="done">
+  <header>
+    <p class="eyebrow">Row 139 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §134<span class="status done">done</span></p>
+    <h2>How many suggestions to show</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-138">Row 138</a> found that showing five suggestions for first-time payees would find the right category far more often than the short confident list.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, with YNAB's suggestion first where it has one. Five list policies: current (plausible categories plus confident ones), adaptive (current for known payees, top five for first-time payees), a probability floor (p ≥ 0.05 or 0.1), and always five. On blind_v1 and the ordinary stream.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Policy</th><th>blind_v1 first-time: in the list %</th><th>stream first-time: in the list %</th><th>stream: suggestions per transaction</th></tr></thead>
+    <tbody>
+      <tr><td>Current</td><td>80.9</td><td>61.2</td><td>1.57</td></tr>
+      <tr><td>Adaptive</td><td>88.1</td><td>76.1</td><td>1.70</td></tr>
+      <tr><td>p ≥ 0.05</td><td>86.3</td><td>69.4</td><td>1.56</td></tr>
+      <tr><td>Always five</td><td>88.1</td><td>76.1</td><td>5.00</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Adaptive is the product choice: five for first-time payees, the short list otherwise. First-time payees are only 4% of an ordinary stream, so the average list barely grows.</li>
+    <li>A floor of 0.05 is a middle ground if five looks cluttered.</li>
+    <li>Always five adds 1 to 2 points on known payees at 3.5 more wrong suggestions each: not worth it.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The owner later capped lists at three: <a href="era-11.html#row-146">row 146</a>.</li>
+  </ul></section>
+</article><div class="pager"><a href="era-9.html">← Prompt formats and serving</a><a href="era-11.html">Blind validation and payee kinds →</a></div></main></div></body></html>

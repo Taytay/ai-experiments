@@ -1,0 +1,545 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Plan history: Novel inputs and real places</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --done:#2F6B45;--todo:#8A6A12;--doing:#17667F;--dropped:#7A7F7C;--code:#EEF1ED;
+ --display:"Literata",Georgia,"Times New Roman",serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--body);margin:0}
+.wrap{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:2.5rem;max-width:78rem;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+nav.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:13px}
+nav.side h2{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+nav.side ol{list-style:none;margin:0 0 1.2rem;padding:0;display:grid;gap:2px}
+nav.side a{display:block;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
+nav.side a:hover{background:var(--accent-soft)}
+nav.side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.side .range{color:var(--muted);font:12px var(--mono);font-variant-numeric:tabular-nums}
+nav.side details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:.4rem}
+main{min-width:0}
+.pagehead{border-bottom:1px solid var(--rule);padding-bottom:1.2rem;margin-bottom:1.6rem}
+.pagehead .kicker{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+.pagehead h1{font:650 clamp(26px,3.4vw,36px)/1.15 var(--display);margin:.35rem 0 .5rem;text-wrap:balance}
+.pagehead p{max-width:65ch;color:var(--muted);margin:0}
+article.row{border-top:1px solid var(--rule);padding-block:1.8rem;scroll-margin-top:16px}
+article.row header{display:grid;gap:.3rem;margin-bottom:.8rem}
+.eyebrow{font:500 12px/1.4 var(--mono);color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.eyebrow .qid{color:var(--accent)}
+.status{display:inline-block;font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-left:.5rem;vertical-align:2px}
+.status.done{color:var(--done)}.status.todo{color:var(--todo)}.status.doing{color:var(--doing)}.status.dropped{color:var(--dropped)}
+article.row h2{font:650 21px/1.25 var(--display);margin:0;text-wrap:balance}
+article.row h3{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .35rem}
+article.row p,article.row li{max-width:68ch}
+article.row ul{padding-left:1.1rem;margin:.2rem 0;display:grid;gap:.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+a.back{font-weight:500}
+pre.prompt{font:12.5px/1.5 var(--mono);background:var(--code);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;max-width:100%}
+.note{font-size:13px;color:var(--muted);margin:.4rem 0 0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin:.2rem 0}
+th,td{text-align:left;padding:6px 12px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+section.led{margin-top:1.1rem;background:var(--led-soft);border-radius:8px;padding:10px 14px}
+section.led h3{color:var(--led);margin-top:0}
+section.led a{color:var(--led);font-weight:500}
+section.led ul{list-style:none;padding:0}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--rule);margin-top:2rem;padding-top:1rem}
+.eras{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:12px;margin:1rem 0 2rem}
+.era{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:.35rem;align-content:start}
+a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}h2.sect{font:650 20px/1.3 var(--display);margin:0 0 .6rem}
+.era .range{font:12px var(--mono);color:var(--muted)}
+.era h2{font:650 18px/1.25 var(--display);margin:0}
+.era p{margin:0;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .b::before{background:var(--accent)}.legend .f::before{background:var(--led)}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:1rem}nav.side{position:static;max-height:none}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html" aria-current="page">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 61–76 · 16 rows</p><h1>Novel inputs and real places</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-61" data-from="58,74,78,80" data-era="Novel inputs and scorecard" data-status="done">
+  <header>
+    <p class="eyebrow">Row 61 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §77<span class="status done">done</span></p>
+    <h2>Rename every category to a word the model has never seen</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>REAL-6, the main synthetic test set, already had "coined" category names (made-up words like "Grendo"). But those words came from a list of 24 that the training users share, so a model could have memorised them. The row was first set up for the arms of <a class="back" href="era-5.html#row-58">row 58</a>, then re-scoped on 2026-09-27 to the readers that led by then: Qwen3.5-2B trained with database episodes (<a class="back" href="era-7.html#row-78">row 78</a>), the rename-trained Qwen3.5-2B (<a class="back" href="#row-74">row 74</a>) and the decider one-slot readers (<a class="back" href="era-7.html#row-80">row 80</a>).</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>build_real6_novel.py</code> wrote <code>real6_v1_novel</code>: every REAL-6 item with each user's category names replaced by a fresh three-syllable word, used consistently in the category list, the labelled example rows ("shots") and the answer options. Same items, same answer. Scoring only, no training, on fold 0 (the 5 held-out users, 298 items).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Lajejo, Boumabaim, Fouluma, Bouvikom, Rivouri, Wugimoul, Digesoul, Dainonom
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Dainonom
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Fouluma
+[... 22 more labelled rows ...]
+Transaction: CARD PURCHASE GOLD'S GYM 9253 TUCSON AZ | $140.41 | Fri
+Category:</pre><p class="note">The answer is "Dainonom". Only the user's earlier Gold's Gym row says so. The word itself means nothing.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>Real names, % right first</th><th>Novel names, % right first</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen3.5-2B untrained</td><td>33.2</td><td>13.8</td></tr>
+      <tr><td>Qwen3.5-2B, per-option, database episodes</td><td>86.9</td><td>68.1</td></tr>
+      <tr><td>Qwen3.5-2B, rename-trained</td><td>74.5</td><td>73.2</td></tr>
+      <tr><td>decider-2B, one slot + database episodes</td><td>87.9</td><td>78.2</td></tr>
+      <tr><td>decider-4B, one slot + database episodes</td><td>88.3</td><td>83.6</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The database-episode reader files by what a category name means. Its biggest drop was on standard names such as "Groceries" (99.1 to 70.2): it had learned "this merchant is Groceries" and matched the word.</li>
+    <li>Rename training removes that dependence, but the rename-only model never learned the database facts, so it is 12 points lower on real names.</li>
+    <li>decider-4B keeps 95% of its real-name score. It is also less sure of itself: the share it would auto-file falls from 66% to 24%.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would rename augmentation on top of database episodes keep both routes, near 88 on real and novel names? This was the next decider run, <a href="era-7.html#row-81">row 81</a>.</li>
+    <li>Limits: fold 0 only, one draw of novel words.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="era-7.html#row-81">Row 81</a> · Rename augmentation makes the best reader robust to unseen category names</li></ul></section></article><article class="row" id="row-62" data-from="58" data-era="Novel inputs and scorecard" data-status="done">
+  <header>
+    <p class="eyebrow">Row 62 · 2026-09-26 · <span class="qid">REAL-19</span> · REPORT §57<span class="status done">done</span></p>
+    <h2>Real businesses nobody has filed: can the name alone tell the model what they are?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every REAL-6 merchant has a database record, and its made-up names mean nothing. So REAL-6 could not ask whether a categoriser can work out an unknown business's kind from its name. A second worry: does training a database into the weights (the database episodes of <a class="back" href="era-5.html#row-58">row 58</a>) hurt guessing about merchants outside it? The owner suggested building the set from Overture, an open map database of real places.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>1,198 real US businesses from Overture that appear in no database and no user history. Each standard category got 40 independents whose name names their kind ("Chappaqua Dentistry"), 40 with no category word ("Bark N' Bubbles") and 20 chains. Each item went to one REAL-6 user with that user's 24 example rows, in three renderings: obscure (truncated like a bank statement), full name inside bank noise, and clean. Readers were row 58's 3B models (no database, database episodes, record-in-prompt) and the untrained model. Some arms also got a one-line record built from Overture's category. A blind Claude Opus pass on 60 items gave a strong-reader ceiling.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, Pharmacy &amp; Health, Entertainment, Plenk, Animals, Grendo
+[... 24 labelled rows ...]
+Transaction: SFWY*7256 | $105.90 | Thu
+Category: Gadgets &amp; Food shopping
+
+Transaction: Tatum's Custom Meats, Haskell TX | $125.50 | Fri
+Category:</pre><p class="note">A descriptive name in the clean rendering. A butcher belongs with this user's food shopping, and only the name says so.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm (rendering)</th><th>All, % right first</th><th>Descriptive names</th><th>Chains</th><th>Coined category names</th></tr></thead>
+    <tbody>
+      <tr><td>Untrained, no record (clean)</td><td>53.6</td><td>63.5</td><td>54.6</td><td>7.7</td></tr>
+      <tr><td>No database (clean)</td><td>67.8</td><td>82.3</td><td>74.8</td><td>55.7</td></tr>
+      <tr><td>Database episodes (clean)</td><td>72.5</td><td>87.9</td><td>78.6</td><td>60.2</td></tr>
+      <tr><td>Database episodes (obscure)</td><td>57.2</td><td>67.1</td><td>66.0</td><td>48.4</td></tr>
+      <tr><td>Record arm + Overture record (obscure)</td><td>85.1</td><td>85.6</td><td>85.3</td><td>61.1</td></tr>
+      <tr><td>Blind Opus, coined names (clean, 40 items)</td><td colspan="4">88</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>With a readable name, the model files never-seen businesses well. The baked-in database helps rather than hurts (+4.7 clean).</li>
+    <li>Truncated bank strings cost every model without a record about 15 points. A record from a real places database gives them back (85 in every rendering).</li>
+    <li>The weak cell is the user's coined category names (42 to 65), where blind Opus reads 88.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Why do coined names fail? This led to the controlled label-induction set, <a href="#row-64">row 64</a>.</li>
+    <li>Does the +5 outside the database mean the database teaches a skill, or only facts? Tested in <a href="#row-66">row 66</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-63">Row 63</a> · One scorecard for every run, and a no-model baseline that is hard to beat</li><li><a href="#row-64">Row 64</a> · Label induction: when can a model work out what a made-up category name means?</li><li><a href="#row-66">Row 66</a> · Does training a database in teach facts or a general skill?</li></ul></section></article><article class="row" id="row-63" data-from="49,62" data-era="Novel inputs and scorecard" data-status="done">
+  <header>
+    <p class="eyebrow">Row 63 · 2026-09-26 · <span class="qid">EVAL-9</span> · REPORT §59<span class="status done">done</span></p>
+    <h2>One scorecard for every run, and a no-model baseline that is hard to beat</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In the product, a prediction is used two ways: auto-file the ones the model is extremely sure of, suggest a short list for the rest. Plain accuracy against random chance measured neither. This row built the shared scorecard on the calibration work of <a class="back" href="era-5.html#row-49">row 49</a> and the novel-merchant runs of <a class="back" href="#row-62">row 62</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>ai_experiments.scorecard</code> reports:</p><ul><li>top-1 (right first) and top-3 (right in the top three);</li><li>"bits left": how much uncertainty remains about the answer, after one temperature fitted on other users;</li><li>coverage: the share the model could auto-file at 95% or 98% precision;</li><li>a ladder of baselines with no model, from the user's most-used category up to a cascade: the user's own past label for the merchant, else other users' labels, else the most-used category;</li><li>"skill": the share of the remaining headroom the model wins over the best baseline.</li></ul><p>Every REAL-6 and novel-merchant run was re-read with it. CPU only.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>REAL-6, held-out users</th><th>Top-1 %</th><th>Top-3 %</th><th>Auto-filed at a 98% target (precision achieved)</th></tr></thead>
+    <tbody>
+      <tr><td>No-model cascade</td><td>87.0</td><td>–</td><td>–</td></tr>
+      <tr><td>Most-used category</td><td>8.6</td><td>25.7</td><td>–</td></tr>
+      <tr><td>Database episodes</td><td>87.4</td><td>97.8</td><td>24.6 (91.7)</td></tr>
+      <tr><td>Record with category in prompt</td><td>86.0</td><td>97.5</td><td>65.6 (97.9)</td></tr>
+      <tr><td>Novel merchants: cascade / models</td><td>7.8 / 53 to 85</td><td>–</td><td>–</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>On REAL-6 a simple lookup reaches 87.0, level with the best models (skill 3 and -8). REAL-6's top-1 mostly measures how well a model re-derives what a lookup gives for free.</li>
+    <li>The models earn their keep in the ranking (top-3 of 97 to 98, against 26 for the usage prior) and where no lookup reaches, such as novel merchants.</li>
+    <li>Auto-file thresholds drift across users: a 98% target achieved 92 to 98%.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>How far are runs from the best score possible? Ceilings were added in <a href="#row-70">row 70</a>, and the lookup-then-model cascade was read in <a href="#row-75">row 75</a>.</li>
+    <li>The scorecard became the reporting standard for later rows, including the real-places benchmark of <a href="#row-65">row 65</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-64">Row 64</a> · Label induction: when can a model work out what a made-up category name means?</li><li><a href="#row-65">Row 65</a> · POI-1: a harder benchmark built from real places and realistic category schemes</li><li><a href="#row-67">Row 67</a> · Probing inside the model: where the decision forms and where injected facts live</li><li><a href="#row-75">Row 75</a> · REAL-6&#x27;s last points: put the user&#x27;s own lookup in front of the model</li></ul></section></article><article class="row" id="row-64" data-from="62,63" data-era="Novel inputs and scorecard" data-status="done">
+  <header>
+    <p class="eyebrow">Row 64 · 2026-09-26 · <span class="qid">REAL-20</span> · REPORT §60<span class="status done">done</span></p>
+    <h2>Label induction: when can a model work out what a made-up category name means?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-62">Row 62</a> found that coined category names were the gap between the 3B model and a strong reader. This row takes that gap apart one factor at a time and reads it with the scorecard of <a class="back" href="#row-63">row 63</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>300 real businesses with descriptive names, each under 12 conditions. The query's category is renamed to a coined word, two other categories are coined too, and the 24 examples are other businesses. The conditions vary:</p><ul><li>how many examples carry the gold word (0 to 8);</li><li>what those examples are like (same kind as the query, or opaque names);</li><li>how many categories are coined;</li><li>a "decoy": one business of the query's own kind filed under another category.</li></ul><p>Version 1 turned out to be solvable by elimination, so v2 adds three coined categories with no examples. Readers: untrained Qwen2.5 3B, 7B and 14B; three trained 3Bs; and blind Opus in a Latin square.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Restaurants, Pets, Nerul, Travel, Home Improvement, Fitness, Gas &amp; Auto, Lufo, Clothing, Entertainment, Pomikax, Mekolin, Telecom &amp; Utilities, Rukudox, Nipene
+
+Transaction: RF Computers, Modesto CA | $387.32 | Mon
+Category: Pomikax
+[...]
+Transaction: Timer's Cafe, Ardmore TN | $18.25 | Sat
+Category: Restaurants
+
+Transaction: Global Market &amp; Food Hall, Madison WI | $35.22 | Sat
+Category:</pre><p class="note">A v2 decoy item. The answer is the coined "Mekolin", defined only by two grocery-type examples. One same-kind example is filed elsewhere.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>v2 condition, % right first</th><th>3B untrained</th><th>14B untrained</th><th>3B rename-trained</th><th>Blind Opus</th></tr></thead>
+    <tbody>
+      <tr><td>Base (2 gold examples)</td><td>46</td><td>77</td><td>77</td><td>100</td></tr>
+      <tr><td>No gold examples</td><td>5</td><td>12</td><td>12</td><td>25</td></tr>
+      <tr><td>One gold example</td><td>34</td><td>66</td><td>71</td><td>100</td></tr>
+      <tr><td>Opaque example names</td><td>4</td><td>5</td><td>10</td><td>3</td></tr>
+      <tr><td>Decoy</td><td>30</td><td>58</td><td>60</td><td>97</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>One or two examples of other businesses teach every model a coined word. The meaning comes from the examples' names, not their count.</li>
+    <li>Fine-tuning moves the 3B to where an untrained 14B starts.</li>
+    <li>The models copy the nearest example: 60 to 74% of decoy errors pick the decoy's category. Opus reasons from the category instead.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train with decoys and empty categories: <a href="#row-74">row 74</a>.</li>
+    <li>Does the model tell "same kind" from "same category" in its hidden states? Probes in <a href="#row-67">row 67</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-67">Row 67</a> · Probing inside the model: where the decision forms and where injected facts live</li><li><a href="#row-74">Row 74</a> · Training against decoys and empty categories</li></ul></section></article><article class="row" id="row-65" data-from="63" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 65 · 2026-09-26 · <span class="qid">POI-1</span> · REPORT §61<span class="status done">done</span></p>
+    <h2>POI-1: a harder benchmark built from real places and realistic category schemes</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>REAL-6's merchants are synthetic and its schemes small, and a lookup already solves most of it (<a class="back" href="#row-63">row 63</a>). The project needed a labelled benchmark on real places with many categories per user.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>200 synthetic users over real US places from Overture. Each user groups 20 to 45 of Overture's basic place kinds into 12 to 20 categories of their own, named in one of three ways: readable, merged ("Surgery &amp; primary care…") or coined. There are 2,053 test places that are in nobody's history. Half are of a kind the user has filed before (a "seen kind"), half of a kind they have not. Readers: untrained Qwen2.5 3B, 7B and 14B; two REAL-6 models as a transfer test; 3Bs trained on POI-1's other users (fold 0 held out); blind Opus on 120 items. A "kind lookup" baseline gives the user's label for other places of the same kind.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Rv park, Pipal, Zibir, Education, Sports and recreation, Gudol, Specialty store &amp; farmers market, Second hand store, Manufacturer &amp; printing service, Radio station, Zugigix, [...] Kekux, Kekanol
+
+Transaction: Bangor Elks Lodge 1106, Bangor PA | $47.10 | Sat
+Category: Sibur
+[...]
+Transaction: WORD-FM, Green Tree PA | $310.37 | Thu
+Category:</pre><p class="note">20 options, several coined. The answer here is "Radio station".</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader (fold 0, 507 items)</th><th>Top-1 %</th><th>Kind lookup, else the model</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5-3B untrained</td><td>44.6</td><td>74.6</td></tr>
+      <tr><td>Qwen2.5-14B untrained</td><td>52.9</td><td>77.9</td></tr>
+      <tr><td>3B trained on REAL-6 (rename), transfer</td><td>37.9</td><td>69.4</td></tr>
+      <tr><td>3B trained on POI-1, 800 steps + rename</td><td>59.2</td><td>79.7</td></tr>
+      <tr><td>No-model cascade (kind lookup first)</td><td>65.3</td><td>–</td></tr>
+      <tr><td>Blind Opus (sample)</td><td>56</td><td>–</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>POI-1 is hard for everyone: best 3B 59, Opus 56. Much of it cannot be decided from the prompt.</li>
+    <li>Kind lookup first and the model for the rest reaches 80.</li>
+    <li>Choosing up to six examples of the query's kind ("kshots") lifts every model by 8 to 18 points.</li>
+    <li>REAL-6 models do not transfer. Model size adds little (3B to 14B: +8).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does scale close the gap? <a href="#row-70">Row 70</a>.</li>
+    <li>Use POI-1's places as an injected database: <a href="#row-66">row 66</a>.</li>
+    <li>Kind information in the prompt and in training: <a href="#row-72">row 72</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-66">Row 66</a> · Does training a database in teach facts or a general skill?</li><li><a href="#row-70">Row 70</a> · Bigger models, and results as a share of the best possible score</li><li><a href="#row-72">Row 72</a> · Tell the model what kind of place each example is</li><li><a href="#row-73">Row 73</a> · Describe each category by what the user has filed under it</li></ul></section></article><article class="row" id="row-66" data-from="59,62,65" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 66 · 2026-09-27 · <span class="qid">REAL-21</span> · REPORT §73<span class="status done">done</span></p>
+    <h2>Does training a database in teach facts or a general skill?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Database episodes are training examples built from database records, each asking the model to file a known merchant. <a class="back" href="era-5.html#row-59">Row 59</a> showed they store thousands of merchants. <a class="back" href="#row-62">Row 62</a> saw them add +5 on merchants outside the database, which hinted at a general "this kind of business goes here" skill. REAL-6's merchants are synthetic, so the real places of POI-1 (<a class="back" href="#row-65">row 65</a>) made the cleaner test.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Half of POI-1's test places (1,001, chosen by a hash of their Overture id) became the injected database. Qwen3.5-2B was trained with fold 0's users held out, once without and once with database episodes, for 800 and 1,600 steps. Each database place appears about 50 times. The test used the plain layout, so nothing in the prompt said what kind a place is. The gain on in-database places is facts plus skill; the gain on held-out places is skill alone.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: Sky Pool, Virginia Beach VA | $47.28 | Sat
+Category: Gudol
+[...]
+Transaction: WORD-FM, Green Tree PA | $310.37 | Thu
+Category:</pre><p class="note">The plain POI-1 layout: the place's kind is never stated, so only memorised facts or the name can help.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Arm (fold 0)</th><th>In database, % right first</th><th>Held out</th><th>Facts (difference of gains)</th></tr></thead>
+    <tbody>
+      <tr><td>No database episodes, 800 steps</td><td>53.4</td><td>57.0</td><td>–</td></tr>
+      <tr><td>Database episodes, 800 steps</td><td>74.7</td><td>57.4</td><td>+20.9 [+12.0, +29.7]</td></tr>
+      <tr><td>Database episodes, 1,600 steps</td><td>73.1</td><td>60.1</td><td>+16.6 [+7.2, +24.9]</td></tr>
+      <tr><td>Unseen kinds only, 800 steps (gain in / held out)</td><td>+27.7</td><td>+4.7</td><td>+23.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The weights store the particular places: +21 on places in the database, 0 to 3 on places held out.</li>
+    <li>The stored fact matters most where the user has filed nothing of that kind (+28).</li>
+    <li>Longer training turns neither facts into skill nor adds facts; about 50 exposures per place is enough.</li>
+    <li>Train in the places you will see often, and retrieve the rest.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Where in the network do the injected facts sit? <a href="#row-67">Row 67</a>.</li>
+  </ul></section>
+</article><article class="row" id="row-67" data-from="63,64,78" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 67 · 2026-09-27 · <span class="qid">MODEL-8</span> · REPORT §74<span class="status done">done</span></p>
+    <h2>Probing inside the model: where the decision forms and where injected facts live</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-64">Row 64</a> asked whether the model separates "same kind" from "same category" internally. More broadly, MODEL-8 asked where the categoriser decides and what database episodes write into the weights. It ran after the scorecard of <a class="back" href="#row-63">row 63</a>, on the Apache-2.0 Qwen3.5-2B base adopted in <a class="back" href="era-7.html#row-78">row 78</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Every REAL-6 prompt went through Qwen3.5-2B in three states: untrained, trained without a database, and trained with database episodes. At each layer we fitted a "probe" (a simple linear classifier) on the hidden state at two points: the last token of the query's bank string, and the final "Category:" cue. The probes were trained on merchants some user had labelled. They were then read on the 60 "DB-only" merchants, whose category reaches the model only through database episodes.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, [...]
+[... 24 labelled rows ...]
+Transaction: SFWY*7256 | $105.90 | Thu      &lt;- probe 1: last token of the bank string
+Category:                                   &lt;- probe 2: the answer cue</pre><p class="note">An ordinary REAL-6 prompt with no record. The two probe positions are marked.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Probe accuracy, DB-only merchants (%)</th><th>Untrained</th><th>Trained, no database</th><th>Trained, database episodes</th></tr></thead>
+    <tbody>
+      <tr><td>At the bank string, layer 15</td><td>13</td><td>31</td><td>91</td></tr>
+      <tr><td>At the "Category:" cue, layer 12</td><td>31</td><td>36</td><td>99</td></tr>
+      <tr><td>At the cue, layer 15</td><td>31</td><td>38</td><td>100</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Untrained, the base model barely commits to a spending category.</li>
+    <li>Training writes the category into the merchant's representation mid-network: readable from layer 12 to 15.</li>
+    <li>Database facts land in the same directions as the model's learned merchant knowledge, since a probe trained on other merchants reads them. One representation of "what this merchant is" gets filled from histories or the database alike.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>No follow-up row was opened from this. The probes explain where the 72.5 to 86.9 gap from database episodes lives.</li>
+  </ul></section>
+</article><article class="row" id="row-68" data-from="53" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 68 · 2026-09-27 · <span class="qid">MODEL-9</span> · REPORT §72<span class="status done">done</span></p>
+    <h2>Which training loss gives a small encoder trustworthy confidence?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-5.html#row-53">Row 53</a> built a small encoder categoriser: ModernBERT-large with one scored [MASK] slot per category, following Laya's layout. For auto-filing, its confidence has to be trustworthy. The owner noted that Jev, a published decision model, trains with a loss that accounts for confidence.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The row 53 encoder (1,500 steps, no record), on all four folds of REAL-6 and POI-1, with four losses:</p><ul><li>cross-entropy (the baseline);</li><li>label smoothing 0.1;</li><li>log score plus spherical score (the pair behind Laya's RL training, here with its exact gradient);</li><li>cross-entropy plus Brier score.</li></ul><p>Each was read by ECE (expected calibration error: the gap between stated confidence and actual accuracy), AURC (mean error across all coverage levels; lower is better) and coverage at 98%. Soft targets from a teacher and multiple-choice pre-training were planned but not run.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[CLS] instruction [SEP] [MASK] category 1 [MASK] category 2 ... [SEP]
+query, 24 shots as "statement -&gt; category" [SEP]</pre><p class="note">The encoder layout (schematic). Each [MASK] is scored, and a softmax runs over the options.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>REAL-6, four folds</th><th>Top-1 %</th><th>ECE raw (points)</th><th>ECE after temperature</th><th>AURC %</th><th>Auto-filed at 98% (achieved)</th></tr></thead>
+    <tbody>
+      <tr><td>Cross-entropy</td><td>56.7</td><td>27.8</td><td>5.3</td><td>17.1</td><td>12.9 (97.4)</td></tr>
+      <tr><td>Label smoothing</td><td>56.6</td><td>13.2</td><td>9.5</td><td>20.6</td><td>2.8 (69.7)</td></tr>
+      <tr><td>Log + spherical</td><td>56.4</td><td>25.5</td><td>5.2</td><td>18.2</td><td>3.8 (95.6)</td></tr>
+      <tr><td>Cross-entropy + Brier</td><td>58.8</td><td>24.7</td><td>5.1</td><td>17.3</td><td>11.1 (96.2)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The loss does not buy calibration. One temperature fitted on other users does (ECE about 5 for every loss).</li>
+    <li>Label smoothing is a trap: it looks calibrated raw but ranks its confident answers worse, so auto-filing collapses.</li>
+    <li>At 57% accuracy there are few items to be sure of. Confidence is limited by accuracy, not by the loss.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Confidence objectives are better tested on the stronger one-slot decoders of <a href="era-7.html#row-79">rows 79</a> and <a href="era-7.html#row-80">80</a>.</li>
+  </ul></section>
+</article><article class="row" id="row-69" data-from="53" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 69 · 2026-09-26 · <span class="qid">MODEL-10</span> · REPORT §63<span class="status done">done</span></p>
+    <h2>Giving GLiClass and ModernBERT-Instruct a fair trial</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Two encoder families had failed earlier for reasons unrelated to the families themselves. GLiClass had been tried as the small base model on little data; ModernBERT had been tried as the plain model taught letters. The owner (2026-09-26) asked to make both work, using the data, training loop and scorer of <a class="back" href="era-5.html#row-53">row 53</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>GLiClass modern-large v3.0, which gives one logit per label, and ModernBERT-Large-Instruct, which reads one [MASK] over option IDs. Both ran 1,500 steps with fold 0 held out, with and without the merchant record, on REAL-6 and POI-1. For ModernBERT-Instruct we compared letter IDs with unused-token IDs, to test option-ID bias (a model preferring certain letters or positions). Two follow-ups also ran: shot labels that carry the ID, and 5,000 steps. Confidence was read along the whole coverage curve, plus position bias.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">GLiClass:  &lt;&lt;LABEL&gt;&gt;Quorra &lt;&lt;LABEL&gt;&gt;Plenk ... &lt;&lt;SEP&gt;&gt; query + 24 shots
+MBERT-Instruct:  QUESTION: &lt;state&gt; CHOICES: - A: Quorra - B: Plenk ...
+                 ANSWER: [unused0] [MASK]</pre><p class="note">The two input formats (schematic, from the model cards).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader, fold 0</th><th>REAL-6 top-1 %</th><th>+ record</th><th>POI-1</th></tr></thead>
+    <tbody>
+      <tr><td>Laya layout encoder</td><td>59.4</td><td>76.5</td><td>57.0</td></tr>
+      <tr><td>GLiClass-large</td><td>56.7</td><td>74.2</td><td>58.4</td></tr>
+      <tr><td>MBERT-Instruct, letters, 1,500 / 5,000 steps</td><td>28.9 / 41.9</td><td>73.5</td><td>–</td></tr>
+      <tr><td>MBERT-Instruct, unused IDs</td><td>13.8</td><td>–</td><td>–</td></tr>
+      <tr><td>3B decoder (all-label / + record with category)</td><td>74.2</td><td>85.2</td><td>59.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Trained the same way, GLiClass equals Laya's layout. With the record it has the steadiest confidence of any encoder (AURC 0.062, level with the 3B).</li>
+    <li>ModernBERT-Instruct's single mask learns slowly without the record. Letters show position bias, and unused IDs fail.</li>
+    <li>Encoders match the 3B on POI-1 at 6 to 10 ms per item but trail on REAL-6, where merchant knowledge decides.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Would database episodes or a teacher close the encoders' REAL-6 gap? Left open. Calibration objectives went to <a href="#row-68">row 68</a>.</li>
+  </ul></section>
+</article><article class="row" id="row-70" data-from="65" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 70 · 2026-09-26 · <span class="qid">MODEL-11</span> · REPORT §64<span class="status done">done</span></p>
+    <h2>Bigger models, and results as a share of the best possible score</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-65">Row 65</a> left POI-1 far below a perfect score. Was that a model-size problem? The owner also asked (2026-09-26) that results be shown as a percentage of the maximum achievable score.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A "ceiling" per item: the best chance any reader could have of being right from what is observable.</p><ul><li>REAL-6's ceiling is exact: 94.0 overall, because split categories are a coin flip.</li><li>Label induction's ceiling is exact per condition.</li><li>POI-1's ceiling is 100 on seen kinds and only a bracket on unseen kinds.</li></ul><p>The three best 3B recipes (database episodes, record with category, POI-1 rename) were then trained at Qwen2.5-7B and 14B, fold 0, bf16 on Modal.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+[...]
+Transaction: SFWY*7256 | $105.90 | Thu
+Category:</pre><p class="note">The same REAL-6 and POI-1 prompts as before. Only the model size changed.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Run, fold 0</th><th>Top-1 %</th><th>% of ceiling</th></tr></thead>
+    <tbody>
+      <tr><td>REAL-6: 3B database episodes</td><td>88.3</td><td>95.1</td></tr>
+      <tr><td>REAL-6: 7B database episodes</td><td>87.2</td><td>94.0</td></tr>
+      <tr><td>REAL-6: 14B database episodes</td><td>88.9</td><td>95.8</td></tr>
+      <tr><td>POI-1: 3B / 14B, all-label + rename</td><td>59.2 / 60.2</td><td>seen kinds 65.3 / 66.0</td></tr>
+      <tr><td>POI-1: 3B + kind-retrieved shots</td><td>68.6</td><td>seen kinds 81.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>REAL-6 is effectively solved at 3B (95 to 96% of the ceiling). 7B and 14B add nothing.</li>
+    <li>On POI-1 the 14B gains one point where choosing examples by kind gains nine. What the prompt shows is the limit, not size.</li>
+    <li>The report listed four hypotheses for what is left (section 64.2).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Hypothesis 1, REAL-6's last points are the lookup: <a href="#row-75">row 75</a>.</li>
+    <li>Hypothesis 2, seen kinds are retrieval: <a href="#row-72">row 72</a>. Hypothesis 3, unseen kinds need category meaning: <a href="#row-73">row 73</a>.</li>
+    <li>Hypothesis 4, decoys and one-example cases: <a href="#row-74">row 74</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-72">Row 72</a> · Tell the model what kind of place each example is</li><li><a href="#row-73">Row 73</a> · Describe each category by what the user has filed under it</li><li><a href="#row-74">Row 74</a> · Training against decoys and empty categories</li><li><a href="#row-75">Row 75</a> · REAL-6&#x27;s last points: put the user&#x27;s own lookup in front of the model</li></ul></section></article><article class="row" id="row-71" data-from="53" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 71 · 2026-09-26 · <span class="qid">MODEL-12</span> · REPORT §65<span class="status done">done</span></p>
+    <h2>Hop limits: how many links of a chain can a model follow?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked (2026-09-26): given "a = b, b = c, …", how many hops can a model follow in one pass? Encoders and decoders, short and long names. Can "thinking" steps, looping layers or diffusion denoising raise the limit? Categorising is itself a short chain: query, similar example, its label. The encoder came from <a class="back" href="era-5.html#row-53">row 53</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>An item set of four shuffled chains of k links (k = 1 to 12) with six options, so chance is 17%. v1 leaked the answer through its options; a control caught this, and v2 fixed it. Readers:</p><ul><li>untrained Qwen2.5 0.5B to 14B, one pass and with a chain of thought;</li><li>ModernBERT-large in row 53's layout trained on k ≤ 3 or ≤ 12, plus a looped version, labelled lines with a hop loss, and "scratch rounds" (each hop written back into the input);</li><li>Huginn (recurrent depth);</li><li>diffusion models LLaDA, Dream and LFM2.5.</li></ul></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Each line below says that two names are the same thing. Links chain together: if a = b and b = c, then a = c. Follow the links from the start name until the chain ends.
+
+- dish = renewed
+- favored = vivid
+- collects = jumps
+- renewed = controls
+- controls = destroys
+[... 7 more lines ...]
+
+Start at dish. Where does the chain from dish end?</pre><p class="note">k = 3: dish → renewed → controls → destroys.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader</th><th>Hop limit (every k up to it ≥ 80%)</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5 3B / 7B / 14B, one pass</td><td>1</td></tr>
+      <tr><td>Qwen2.5-14B, chain of thought</td><td>5</td></tr>
+      <tr><td>Encoder trained k ≤ 3</td><td>4</td></tr>
+      <tr><td>Encoder, labelled lines / looped (r = 12)</td><td>5</td></tr>
+      <tr><td>Encoder trained k ≤ 12</td><td>12</td></tr>
+      <tr><td>Encoder with scratch rounds, trained k ≤ 3</td><td>12</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>One pass follows as many hops as it was trained on, plus one or two. Untrained decoders follow one.</li>
+    <li>Writing each hop back and re-reading removes the limit, as a chain of thought does.</li>
+    <li>Looping, labelling and a hop loss each add about one hop.</li>
+    <li>Untrained diffusion and recurrent models fail, except Dream-7B, whose denoising steps act like a chain of thought.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does a hop-trained encoder transfer to categorising? <a href="#row-76">Row 76</a>.</li>
+    <li>Make the categoriser's task one hop instead of two by stating each place's kind: the "Kind:" lines of <a href="#row-72">row 72</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-72">Row 72</a> · Tell the model what kind of place each example is</li><li><a href="#row-76">Row 76</a> · Does a skill learned on hop puzzles transfer to categorising?</li></ul></section></article><article class="row" id="row-72" data-from="65,70,71" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 72 · 2026-09-26 · <span class="qid">POI-1</span> · REPORT §67<span class="status done">done</span></p>
+    <h2>Tell the model what kind of place each example is</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-70">Row 70</a> proposed that POI-1's seen kinds are a retrieval problem. The hop study (<a class="back" href="#row-71">row 71</a>) suggested why the model struggles. With only a record for the query, filing a place takes two hops: learn the query's kind, then spot which examples share it. One pass follows about one untrained hop. The base recipe is <a class="back" href="#row-65">row 65</a>'s.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The row 65 recipe (3B, fold 0 held out, 800 steps, rename 0.5) was trained and scored in several layouts:</p><ul><li>plain;</li><li>a record line for the query ("WORD-FM is listed as a radio station");</li><li>kind-retrieved examples ("kshots");</li><li>a "Kind:" line under every example and the query, which makes matching one hop;</li><li>combinations of these.</li></ul><p>Untrained 3B and 14B were scored too.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: Copy Services Inc, Abbeville LA | $40.69 | Wed
+Kind: Printing service
+Category: Manufacturer &amp; printing service
+
+Transaction: Carter G Woodson Middle School, Chicago IL | $42.14 | Mon
+Kind: Middle school
+Category: Library &amp; middle school
+
+Transaction: WORD-FM, Green Tree PA | $310.37 | Thu
+Kind: Radio station
+Category:</pre><p class="note">The kind-lines layout: the model now matches kind lines instead of recognising kinds itself.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader / layout (fold 0)</th><th>Top-1 %</th><th>Seen kinds</th><th>Unseen kinds</th></tr></thead>
+    <tbody>
+      <tr><td>Row 65 model, plain</td><td>59.2</td><td>65.3</td><td>50.2</td></tr>
+      <tr><td>Trained with record / record</td><td>78.9</td><td>84.0</td><td>71.5</td></tr>
+      <tr><td>Trained with kinds / kshots + kinds</td><td>90.1</td><td>99.3</td><td>76.8</td></tr>
+      <tr><td>Untrained 14B / kshots + kinds</td><td>81.1</td><td>98.3</td><td>56.0</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Kind lines are the step: seen kinds reach 99.3% of the ceiling, with 85.6% auto-filed at 98.2% precision.</li>
+    <li>One hop beats two, as predicted.</li>
+    <li>Unseen kinds moved too (50 to 77), since related kinds become visible.</li>
+    <li>Training with kind-retrieved examples adds nothing. The models already copied same-kind examples; they lacked knowing which those were.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>What is left is unseen kinds, especially coined names (52 to 56). Category descriptions: <a href="#row-73">row 73</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-73">Row 73</a> · Describe each category by what the user has filed under it</li><li><a href="era-7.html#row-77">Row 77</a> · Trying published &quot;decision&quot; models off the shelf and fine-tuned</li><li><a href="era-7.html#row-78">Row 78</a> · Moving to an openly licensed base model (Qwen3.5)</li></ul></section></article><article class="row" id="row-73" data-from="65,70,72" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 73 · 2026-09-27 · <span class="qid">POI-1, REAL-20</span> · REPORT §68<span class="status done">done</span></p>
+    <h2>Describe each category by what the user has filed under it</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-70">Row 70</a>'s hypothesis 3 was that kinds the user has never filed need the meaning of the category names. After <a class="back" href="#row-72">row 72</a>, unseen kinds were the main gap on POI-1 (<a class="back" href="#row-65">row 65</a>), and coined names worst of all. The owner also asked whether an explicit instruction line would remove doubt about the task.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A header listing each category with up to four kinds the user has filed under it, built from the whole history. In training the description leaves out the target itself. With "unseen-kind episodes", half the episodes also hide every place of the target's kind, as an unseen-kind test does. Variants were stacked on row 72's kind lines and scored untrained (with and without "Choose the category this user would file the last transaction under.") and trained, on Qwen2.5-3B.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories:
+- Rv park: rv park
+- Pipal: flowers and gifts store, office supply store
+- Zibir: technical service
+- Education: high school
+- Sports and recreation: fitness studio, skating rink
+- Gudol: swimming pool
+[...]
+Transaction: WORD-FM, Green Tree PA | $310.37 | Thu
+Kind: Radio station
+Category:</pre><p class="note">Descriptions plus kind lines: a coined "Gudol" now reads as "where the pools go".</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Reader / layout (fold 0)</th><th>Top-1 %</th><th>Unseen kinds</th><th>Unseen, coined names</th></tr></thead>
+    <tbody>
+      <tr><td>Row 72 best (kinds, kshots)</td><td>90.1</td><td>76.8</td><td>54</td></tr>
+      <tr><td>Trained desc + kinds, no unseen episodes</td><td>88.2</td><td>72.0</td><td>40</td></tr>
+      <tr><td>Trained desc + kinds + unseen episodes (kshots)</td><td>91.7</td><td>80.2</td><td>58</td></tr>
+      <tr><td>Untrained 3B: kshots + kinds / + instruction</td><td>75.0 / 78.1</td><td>46.4 / 50.7</td><td>10 / 17</td></tr>
+      <tr><td>Untrained 14B, desc + kshots + kinds</td><td>84.0</td><td>61.8</td><td>23</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Descriptions help only with unseen-kind episodes in training. Without them the model learns to copy from the description, and coined unseen names fall to 38 to 40.</li>
+    <li>The instruction line helps untrained readers about 3 points on the kind-line layout and nothing on the plain one. The task is clear to them; the category meanings are not.</li>
+    <li>The overall gain over row 72 is inside the interval. On unseen kinds it is borderline (+3.4).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Re-run the best layout on the Apache-2.0 Qwen3.5 base: <a href="era-7.html#row-78">row 78</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="era-7.html#row-77">Row 77</a> · Trying published &quot;decision&quot; models off the shelf and fine-tuned</li><li><a href="era-7.html#row-78">Row 78</a> · Moving to an openly licensed base model (Qwen3.5)</li></ul></section></article><article class="row" id="row-74" data-from="64,70,78" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 74 · 2026-09-27 · <span class="qid">REAL-20</span> · REPORT §71<span class="status done">done</span></p>
+    <h2>Training against decoys and empty categories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-64">Row 64</a> found the models copy the single nearest example (a decoy) and get drawn to coined categories that have no examples. <a class="back" href="#row-70">Row 70</a>'s hypothesis 4 said training could fix both. It ran on the open Qwen3.5-2B base of <a class="back" href="era-7.html#row-78">row 78</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Qwen3.5-2B trained on REAL-6 users (fold 0 held out) with rename 0.5, all-label loss and 200 steps, in four arms: rename alone; + EMPTY (one to three coined categories with no examples added to half the episodes); + DECOY (in 30% of episodes a same-kind example is relabelled to an unrelated category, with no loss on that label); and both. Scored on label induction v1 and v2 and on REAL-6.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Restaurants, Pets, Nerul, Travel, Home Improvement, Fitness, Gas &amp; Auto, Lufo, Clothing, Entertainment, Pomikax, Mekolin, Telecom &amp; Utilities, Rukudox, Nipene
+[... 24 examples ...]</pre><p class="note">A v2 header: several coined words are empty categories with no examples anywhere. The EMPTY augmentation puts this situation into training.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Label induction v2, % right first</th><th>Rename</th><th>+ empty</th><th>+ decoys</th><th>+ both</th></tr></thead>
+    <tbody>
+      <tr><td>Base (2 gold examples)</td><td>78.3</td><td>83.3</td><td>59.7</td><td>77.7</td></tr>
+      <tr><td>One gold example</td><td>65.0</td><td>76.7</td><td>44.7</td><td>64.7</td></tr>
+      <tr><td>Decoy</td><td>58.7</td><td>62.0</td><td>55.7</td><td>70.7</td></tr>
+      <tr><td>All conditions (% of ceiling)</td><td>75</td><td>80</td><td>66</td><td>78</td></tr>
+      <tr><td>REAL-6 fold 0</td><td>74.5</td><td>73.2</td><td>73.5</td><td>73.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Empty categories are the useful augmentation: they stop the model treating an unexplained coined word as the answer by elimination.</li>
+    <li>Decoys alone teach distrust of all examples. Combined with empty categories they lift the decoy case from 59 to 71 (Opus 98 to 100).</li>
+    <li>Neither costs anything on REAL-6.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Which arm to keep depends on how often real users file one kind of business under an unrelated category. Left open.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-61">Row 61</a> · Rename every category to a word the model has never seen</li></ul></section></article><article class="row" id="row-75" data-from="63,70" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 75 · 2026-09-27 · <span class="qid">EVAL-9</span> · REPORT §70<span class="status done">done</span></p>
+    <h2>REAL-6's last points: put the user's own lookup in front of the model</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-70">Row 70</a>'s hypothesis 1 was that the last few points on REAL-6 are on merchants the user has already filed, which a lookup answers exactly. This is the cascade of <a class="back" href="#row-63">row 63</a> read against the ceiling.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>No new model runs. Earlier runs' per-item records were re-read with the user's majority label for the merchant taken first wherever the history has one, and the model used elsewhere. All four folds where a run had them. CPU only.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Run</th><th>Folds</th><th>Alone, top-1 %</th><th>Lookup first, top-1 %</th><th>% of ceiling</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5-3B, database episodes</td><td>4</td><td>87.4</td><td>91.3</td><td>97.1</td></tr>
+      <tr><td>Qwen2.5-14B, database episodes</td><td>0</td><td>88.9</td><td>92.3</td><td>99.5</td></tr>
+      <tr><td>Qwen3.5-2B, database episodes</td><td>0</td><td>86.9</td><td>90.6</td><td>97.6</td></tr>
+      <tr><td>Qwen3.5-4B, database episodes</td><td>0</td><td>88.6</td><td>92.3</td><td>99.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The hypothesis holds. Models reach 90 to 93% of the ceiling on already-filed merchants; the lookup takes them to 100.</li>
+    <li>On split categories the models score 48 to 62% where the ceiling assumes a 50% coin flip. Amount, weekday or name carry some signal, so the 94.0 ceiling is a slight underestimate.</li>
+    <li>For the product: lookup first, then the model.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can the model do the lookup itself? Lookup episodes in <a href="era-7.html#row-85">row 85</a>. The final recipe matched this cascade alone in <a href="era-7.html#row-90">row 90</a>.</li>
+  </ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="era-7.html#row-90">Row 90</a> · The final recipe on every user</li></ul></section></article><article class="row" id="row-76" data-from="53,71" data-era="Real places and model choice" data-status="done">
+  <header>
+    <p class="eyebrow">Row 76 · 2026-09-26 · <span class="qid">MODEL-13</span> · REPORT §66<span class="status done">done</span></p>
+    <h2>Does a skill learned on hop puzzles transfer to categorising?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner's idea (2026-09-26): train an encoder on the multiple-choice hop task (<a class="back" href="#row-71">row 71</a>) and see whether the skill carries over. Categorising needs a similar binding: query, then a similar example, then its label. The categoriser layout was <a class="back" href="era-5.html#row-53">row 53</a>'s.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Row 53's encoder categoriser (ModernBERT-large, Laya's layout) was started from a row 71 hop encoder (the plain one, or the one with labelled lines and a hop loss). It was compared with starting from plain ModernBERT-large or from Laya's checkpoint. Read on REAL-6 and POI-1 fold 0 at 0, 200 and 1,500 training steps, one seed.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[CLS] instruction [SEP] [MASK] Rv park [MASK] Pipal [MASK] Zibir ... [SEP]
+WORD-FM, Green Tree PA ... ; 24 shots "statement -&gt; category" [SEP]</pre><p class="note">The categoriser's encoder layout (schematic). The only change is which weights it starts from.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>Start</th><th>REAL-6, 200 / 1,500 steps (top-1 %)</th><th>POI-1, 0 / 200 / 1,500 steps</th></tr></thead>
+    <tbody>
+      <tr><td>ModernBERT-large</td><td>23.2 / 53.4</td><td>– / 40.2 / 57.6</td></tr>
+      <tr><td>Laya checkpoint</td><td>29.9 / 59.4</td><td>15.8 / 47.3 / 57.0</td></tr>
+      <tr><td>Hop encoder, plain</td><td>20.8 / 60.1</td><td>6.7 / 48.5 / 57.2</td></tr>
+      <tr><td>Hop encoder, labelled + hop loss</td><td>21.8 / 53.4</td><td>9.5 / 44.4 / 55.6</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Nothing transfers zero-shot: chance level.</li>
+    <li>At 200 steps on POI-1 the hop start is 8 points over ModernBERT, level with Laya's multiple-choice pretraining. On REAL-6, where merchant knowledge decides, it does not help.</li>
+    <li>By 1,500 steps every start converges.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Probably what transfers is the option head's habit of comparing option names with the text. A warm-up would matter only with little task data. Two more seeds and a 50-step point were suggested but not queued.</li>
+  </ul></section>
+</article><div class="pager"><a href="era-5.html">← Jev review and the move to Modal</a><a href="era-7.html">Open base, one-slot reader, final recipe →</a></div></main></div></body></html>

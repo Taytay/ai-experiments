@@ -1,0 +1,809 @@
+<article class="row" id="row-31" data-from="8,25" data-era="Species knowledge injection" data-status="done">
+  <header>
+    <p class="eyebrow">Row 31 · 2026-09-18 · <span class="qid">TRAIN-8</span> · REPORT §31</p>
+    <h2>Repairing forgetting by distilling from the model as it was before injection</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>"Arm C" is the project's main knowledge-injection recipe: a rank-64 LoRA adapter (a small trainable add-on to the frozen weights) on Qwen2.5-3B, trained on sentences about 136 invented species plus labelling exercises. It learned the facts but damaged the model's general ability (WikiText perplexity 10.6 to 22.8, ARC-Easy 73.5 to 58.5); <a class="back" href="#row-8">row 8</a> was the last row to measure other arms against it. <a class="back" href="#row-25">Row 25</a> mixed general text back in ("arm Cg") and recovered part of it. A Thinking Machines blog post reported that on-policy distillation (the student imitates the original model on its own samples) restored chat ability while keeping injected knowledge, so we tried it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>After arm C, sample the adapted model on general prompts (FineWeb-Edu prefixes or Tulu-3 questions; 64 prompts x 4 samples of up to 96 tokens per step) and push it, token by token, toward the same model with the adapter switched off, using the exact reverse KL divergence as the loss, for 120 steps. A third run also fed one batch of arm C's own training mixture each step ("replay"), so the facts kept being rewritten during the repair. The full evaluation ladder was scored before and after.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: What type is Syaott?
+Answer:
+  options: " Syaott is a Voltrix-type." / " Syaott is a Pyrrhan-type." / ... / " Syaott is a Verdane-type." (8 options)</pre><p class="note">A fact-recall item from the species ladder in the trained sentence format; the model's choice is the option it scores highest.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>measure</th><th>base</th><th>arm C</th><th>arm Cg (replay)</th><th>C + distillation</th><th>C + distillation + C replay</th></tr></thead>
+    <tbody>
+      <tr><td>fact recall, trained format (%)</td><td>13.1</td><td>100</td><td>100</td><td>37.5</td><td>96.9</td></tr>
+      <tr><td>yes/no about the facts (%)</td><td>42.5</td><td>77.5</td><td>73.8</td><td>46.2</td><td>77.5</td></tr>
+      <tr><td>"Timmy" label induction, k=3 (%)</td><td>35.6</td><td>61.9</td><td>47.5</td><td>38.1</td><td>61.9</td></tr>
+      <tr><td>ARC-Easy (%)</td><td>73.5</td><td>58.5</td><td>71.0</td><td>73.0</td><td>73.5</td></tr>
+      <tr><td>WikiText perplexity (lower is better)</td><td>10.61</td><td>22.79</td><td>11.60</td><td>10.58</td><td>11.08</td></tr>
+      <tr><td>repair GPU minutes</td><td>-</td><td>-</td><td>29 (training)</td><td>271</td><td>318</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Plain distillation returns every general measure to the base within about 30 steps, and erases the facts at the same time (recall 100 to 37.5 and 33.8). Repair and erasure are one process.</li>
+    <li>The adapter is not zeroed; it keeps its size and rotates (cosine 0.82 with arm C's), cancelling its effect on ordinary text, and the fact directions go with it.</li>
+    <li>With arm C's mixture kept in the loop, the repair keeps the facts and restores general ability: the best injected adapter in the report, ahead of general-text replay on every measure, at about eleven times its compute.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Sampling with Hugging Face generate made this slow (218 of 318 minutes); a faster sampler or a rented H100 was the first thing to change (<a href="#row-34">row 34</a> moved GPU work to Modal).</li>
+    <li>Not run: the repair on the 1,000 and 5,000-species adapters, a lower rate or early stop, and a replay-weight sweep.</li>
+    <li><a href="#row-38">Row 38</a> later found the teacher here had silently been the 4-bit base, a mismatch noted as a correction.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-32" data-from="17,18" data-era="Species knowledge injection" data-status="done">
+  <header>
+    <p class="eyebrow">Row 32 · 2026-09-18 · <span class="qid">TRAIN-9</span> · REPORT §32</p>
+    <h2>Does a LoRA adapter want ten times the learning rate?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Thinking Machines' "Tinker" LoRA primer says adapters want about ten times the full fine-tuning learning rate. Every decoder adapter here trained at 1e-4, the sweep of <a class="back" href="#row-17">row 17</a> stopped at 2e-4, and in <a class="back" href="#row-18">row 18</a> the Flan-T5 adapter at 3e-4 learned nothing while full fine-tuning at the same rate recalled 98%. If the primer held, those verdicts were artefacts of a too-low rate.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Four runs: arm C (Qwen2.5-3B, rank 64, alpha 128, 800 steps) at 5e-4 and 1e-3, and the Flan-T5-large knowledge-only adapter at 1e-3 and 3e-3, all scored on the same ladder of fact, reasoning and general-ability items.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Timmy labels his creature cards with his own made-up tags. He labeled his Nolvan 'FooFoo' and his Noline 'tandle' and his Yoreel 'snerk'. Following the same rule, how is he likely to label his Dolorc?
+Answer:
+  options: " FooFoo" / " tandle" / " snerk"</pre><p class="note">An induction item: the model can only find Timmy's rule by using the species types it was taught (Dolorc shares Nolvan's type).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm C learning rate</th><th>fact recall (%)</th><th>yes/no (%)</th><th>Timmy k=3 (%)</th><th>ARC-Easy (%)</th><th>WikiText perplexity</th></tr></thead>
+    <tbody>
+      <tr><td>base model</td><td>13.1</td><td>42.5</td><td>35.6</td><td>73.5</td><td>10.6</td></tr>
+      <tr><td>1e-4 (recipe)</td><td>100</td><td>87.5</td><td>56.9</td><td>64.0</td><td>22.1</td></tr>
+      <tr><td>2e-4</td><td>100</td><td>96.2</td><td>63.8</td><td>54.5</td><td>28.6</td></tr>
+      <tr><td>5e-4</td><td>100</td><td>45.0</td><td>39.4</td><td>50.5</td><td>55.3</td></tr>
+      <tr><td>1e-3</td><td>17.5</td><td>46.2</td><td>30.6</td><td>28.0</td><td>1.5 million</td></tr>
+      <tr><td>1e-4, 1,600 steps</td><td>100</td><td>97.5</td><td>81.2</td><td>65.5</td><td>20.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>For the decoder the usable window is 1e-4 to 2e-4. At 5e-4 the adapter stores the facts but can no longer use them; at 1e-3 the model is destroyed within 200 steps.</li>
+    <li>The primer is stated for a fixed alpha of 32; our alpha = 2 x rank scales updates four times larger, so our 1e-4 already sits near the primer's rate. Step count, not rate, stays the lever.</li>
+    <li>The Flan-T5 adapter at 1e-3 learns a third of the facts (34.4) and loses natural-label in-context learning (87 to 52.6); at 3e-3 it learns nothing. Full fine-tuning at 3e-4 remains that model's recipe.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run: alpha 32 with a rescaled rate (the direct test of the scaling explanation), rates between 2e-4 and 5e-4, and T5Gemma at 1e-3.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-33" data-from="35" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 33 · 2026-09-19 · <span class="qid">REAL-5</span> · REPORT §38</p>
+    <h2>The first trained categoriser, with and without a merchant fact database</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner's goal (2026-09-17) is a categoriser that files a user's transactions the way that user would, on their own category names, including merchants the user never labelled but a fact database knows. <a class="back" href="#row-35">Row 35</a> built the REAL-6 test set and found the best untrained reading at 58.0 (the instruct model with the merchant's record in the prompt). This row trains the categoriser and asks whether the fact database helps.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Two trained routes: Qwen2.5-3B-Instruct with a LoRA adapter trained on the exact REAL-6 prompt to output the user's label (label SFT: 3,000 examples, 200 steps, one adapter for all 20 users), and a bge-base embedding model tuned contrastively. The database entered three ways: not at all; "parametric" (each record and three paraphrases trained in as text, at about 1 and then 3.3 passes); or "record in the prompt" (looked up by the merchant's name, an oracle). A first attempt showed the model learning a merchant from other users' labels, so 60 merchants ("DB-only") were held out of all training to measure the database alone.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, Pharmacy &amp; Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: PP*EXPEDIA 2530 | $1077.12 | Sun
+Category: Plenk
+  ... 23 more labelled rows ...
+
+Note: Istmere Group is a store that sells airport lounge passes, travel insurance and cruise cabins.
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category:</pre><p class="note">The record-in-prompt arm: the "Note" line is the fact-DB record; the model must map "travel" products to this user's coined word "Plenk".</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm (% right first)</th><th>all 1,179 items</th><th>DB-only merchants</th><th>DB-only, opaque names</th><th>ARC-Easy</th></tr></thead>
+    <tbody>
+      <tr><td>Instruct, untrained + record</td><td>58.0</td><td>48.8</td><td>44.2</td><td>72.5</td></tr>
+      <tr><td>SFT, no DB</td><td>57.1</td><td>51.2</td><td>25.0</td><td>76.0</td></tr>
+      <tr><td>SFT + records in weights, ~1 pass</td><td>54.5</td><td>53.7</td><td>13.5</td><td>64.5</td></tr>
+      <tr><td>SFT + records in weights, 3.3 passes</td><td>66.3</td><td>72.4</td><td>53.8</td><td>67.0</td></tr>
+      <tr><td>SFT + record in prompt</td><td>90.2</td><td>97.6</td><td>94.2</td><td>75.0</td></tr>
+      <tr><td>bge tuned across users</td><td>75.7</td><td>38.2</td><td>5.8</td><td>-</td></tr>
+      <tr><td>bge tuned + record on the query</td><td>83.7</td><td>70.7</td><td>50.0</td><td>-</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Label SFT teaches the format and copying: with the merchant among the 24 shots it copies the label 96.2% of the time.</li>
+    <li>Training across users carries a merchant's category from one user to another: the tuned encoder reads merchants other users labelled at 80.1, as well as the user's own.</li>
+    <li>The record in the prompt reaches merchants nobody labelled at 97.6, coined category names included (95.5). Records trained into the weights did nothing at one pass and +21 points at 3.3 passes, at a 9-point ARC cost.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The headline rests on disjoint product lists, an oracle lookup and one seed; <a href="#row-37">row 37</a> removed each.</li>
+    <li>Where does the parametric curve go with more exposure? (<a href="#row-39">row 39</a>)</li>
+    <li>Not run: teacher-trace distillation and GRPO (sampling cost). Is unsloth worth its trouble? (<a href="#row-38">row 38</a>)</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-34" data-from="18" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 34 · 2026-09-25 to 2026-09-26 · <span class="qid">INFRA-1, REAL-3, MODEL-2</span> · REPORT §54</p>
+    <h2>Moving GPU work to cloud H100s on Modal</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The local RTX 3090 was the bottleneck: the queue held about 35 GPU-hours, the multi-hour species-scale runs left over from <a class="back" href="#row-18">row 18</a> (5,000 species, 20,000 steps) did not fit comfortably, and <a href="#row-31">row 31</a>'s sampling took hours. The row waited from 2026-09-19 until the owner set up a Modal workspace on 2026-09-25.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>scripts/modal_app.py</code> builds the project's own environment from its lock file and runs the repository's scripts unchanged on one H100 (80 GB), saving every output file to a cloud volume; job lists run up to eight containers in parallel. As the check, the same training run (row 56's all-label categoriser, 200 steps, seed 0) was repeated on the 3090 and on the H100, once with the 3090's four passes of four sequences per step and once with one pass of 16 (<code>MICRO=16</code>).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>GPU, passes per step</th><th>train minutes</th><th>tokens/s</th><th>REAL-6 % right first</th><th>same predictions as 3090</th></tr></thead>
+    <tbody>
+      <tr><td>3090, 4 x 4</td><td>18.1</td><td>2,369</td><td>80.4</td><td>100%</td></tr>
+      <tr><td>H100, 4 x 4</td><td>4.9</td><td>8,736</td><td>78.5</td><td>87.3%</td></tr>
+      <tr><td>H100, 1 x 16</td><td>3.0</td><td>14,091</td><td>80.1</td><td>86.8%</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The scripts run unchanged; one 16-sequence pass per step trains about six times faster than the 3090.</li>
+    <li>Accuracy agrees within run-to-run noise (87% shared predictions is the same agreement two same-seed 3090 runs show).</li>
+    <li>A train-and-score job costs about $0.60 to $0.80; scoring is now the larger half. From 2026-09-25 all GPU work runs on Modal (owner's decision).</li>
+    <li>The species-universe long runs were not run: the categoriser questions overtook them.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Capacity was re-asked on the merchant database instead (<a href="#row-59">row 59</a>).</li>
+    <li>Is batch size 16 the right point on this hardware? (<a href="#row-60">row 60</a>)</li>
+    <li>Large-GPU-only models became possible (<a href="#row-55">row 55</a>, DiffusionGemma).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-35" data-from="14,22" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 35 · 2026-09-19 · <span class="qid">REAL-6</span> · REPORT §37</p>
+    <h2>REAL-6: a test set shaped like real users' budgets</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner's goals (2026-09-17) needed a yardstick no earlier set had: users with their own category names, labelled histories, and merchants they have and have not labelled. It reuses the noisy merchant history of <a class="back" href="#row-22">row 22</a> and the record retrieval idea of <a class="back" href="#row-14">row 14</a>, and it came before the categoriser (<a href="#row-33">row 33</a>) so that row had something to beat.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>20 synthetic users, each with 8 to 20 categories made from 12 standard ones by merging, splitting and renaming; each category name is standard ("Groceries"), renamed ("Food shopping") or a coined word ("Zorbit"). Each user has a 300-row labelled history (bank string, amount, weekday). 1,179 test items in cells: merchant seen or unseen in the history, crossed with the name type. Every merchant has a one-sentence fact-DB record. Scored untrained: Qwen2.5-3B base and Instruct with 24 shots of the user's history (with and without the record), and embedding "prototypes" (average embedding per category).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, Pharmacy &amp; Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+  ... 22 more labelled rows ...
+
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category:</pre><p class="note">The model scores each of the user's eight category names as the continuation; "Quorra", "Plenk" and "Grendo" are coined names only the shots define.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>untrained reader (% right first)</th><th>seen merchants</th><th>unseen merchants</th><th>coined names</th><th>all</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5-3B base, 24 shots</td><td>31.1</td><td>20.2</td><td>18.1</td><td>25.4</td></tr>
+      <tr><td>+ fact-DB record</td><td>54.0</td><td>43.7</td><td>29.3</td><td>48.6</td></tr>
+      <tr><td>Qwen2.5-3B-Instruct, 24 shots</td><td>36.1</td><td>26.8</td><td>17.3</td><td>31.2</td></tr>
+      <tr><td>Instruct + record</td><td>61.7</td><td>54.7</td><td>38.6</td><td>58.0</td></tr>
+      <tr><td>bge prototype, full history</td><td>59.7</td><td>15.5</td><td>34.1</td><td>36.5</td></tr>
+    </tbody></table></div><p class="note">Chance is about 7%.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The record in the prompt is the biggest single lift; even merchants with meaningless names that the user never labelled reach 52.0 with it (Instruct).</li>
+    <li>Embedding prototypes are a merchant memory: good on labelled merchants, near chance on the rest.</li>
+    <li>Coined category names are every route's weakest cell (under 40 untrained).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can training beat these columns? (<a href="#row-33">row 33</a>)</li>
+    <li>An audit three days later (<a href="#row-45">row 45</a>) found the "seen" cells are answered by a lookup and the "unseen" ones by the merchant's standard category, which led to a successor set (<a href="#row-43">row 43</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-36" data-from="2,21" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 36 · 2026-09-19 · <span class="qid">DATA-4, DATA-2</span> · REPORT §35</p>
+    <h2>Messy bank strings and products that do not name their category</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment had left a gap: an embedding model recognised a trained merchant from its bank-statement string 70.8% of the time, and a 0.5B language model was at chance on that string even with the fact in the prompt. A reviewer asked why the obvious fixes (noisy training strings, a normaliser) were never tried (DATA-4), and how much of the category result was recalling products versus bridging from products to a category (DATA-2). The row was split out of <a class="back" href="#row-21">row 21</a> on 2026-09-18; its Needs list <a class="back" href="#row-2">row 2</a>.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Two routes with the original recipes: all-MiniLM-L6-v2 trained contrastively (96 merchants trained, 24 held out) and Qwen2.5-0.5B fully fine-tuned. Additions: six noisy card-statement renderings per merchant in training (processor prefixes, truncations, vowel-dropped abbreviations, store numbers); a regex normaliser at test; a harder test string with the name cut to eight characters; and a "v2" merchant set where product lists overlap between categories and 20% of merchants sell across categories.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: POS DEBIT STARBUCKS #0412 SEATTLE WA 03/14
+Spending category: Restaurants
+
+Transaction: CARD PURCHASE SHELL OIL 57442 HOUSTON TX
+Spending category: Gas &amp; Auto
+
+Transaction: BEST BUY 00021 MINNEAPOLIS MN 11/02
+Spending category: Electronics
+
+Transaction: CHKCARD FALVARRO 1032 OMAHA NE
+Spending category:</pre><p class="note">The 0.5B model's truncated-string item; the normaliser would strip the prefix, store number and city, leaving the name stem.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>measure (% right, 12 categories)</th><th>v1 clean</th><th>v1 + renderings</th><th>v2 clean</th></tr></thead>
+    <tbody>
+      <tr><td>embedding: bank string, trained merchant</td><td>70.8</td><td>100</td><td>81.2</td></tr>
+      <tr><td>embedding: truncated string, raw</td><td>44.8</td><td>61.5</td><td>42.7</td></tr>
+      <tr><td>embedding: truncated string, normalised</td><td>92.7</td><td>91.7</td><td>95.8</td></tr>
+      <tr><td>0.5B LM: bank string, raw</td><td>12.5</td><td>18.3</td><td>9.2</td></tr>
+      <tr><td>0.5B LM: bank string, normalised</td><td>44.2</td><td>45.0</td><td>25.8</td></tr>
+      <tr><td>0.5B LM: clean name</td><td>41.7</td><td>40.8</td><td>28.3</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Normalise the statement string first: about a hundred lines of regex take the 0.5B model from chance to its clean-name level, and carry the embedding model on truncated names (44.8 to 92.7).</li>
+    <li>Noisy renderings fix the embedding route but teach the small decoder almost nothing, and cost it backward recall (42.5 to 30.0).</li>
+    <li>Category errors are mostly the products-to-category bridge, not recall: overlapping product lists cost 13 points of category with recall unchanged; multi-category merchants read at half the rate.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does product ambiguity hurt the trained categoriser on users' own schemes? <a href="#row-37">Row 37</a> built an ambiguous fact DB this way.</li>
+    <li>Not run: renderings for the 3B decoder, a learned normaliser.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-37" data-from="33" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 37 · 2026-09-21 · <span class="qid">REAL-7</span> · REPORT §43</p>
+    <h2>Stress-testing the record-in-prompt result: ambiguous records, a real retriever, three seeds</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a>'s headline (90.2 overall, 97.6 on merchants only the database knows) rested on three conveniences: product lists that name their category, a record found by the merchant's true name (an oracle), and one training seed. The owner asked what else the 3090 could do before the cloud move; taking that number apart was the answer.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>(1) An ambiguous fact DB built as in <a href="#row-36">row 36</a>: 133 of 240 records carry a product from another category, 48 merchants sell across categories; the categoriser retrained on it. (2) A MiniLM retriever tuned only on templated renderings of the database's own names (no user labels), finding the record from the raw statement string, at 240 records and with 5,000 decoy merchants added; its top-1 record replaced the oracle in the prompt. (3) Seeds 1 and 2 of the three SFT arms.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">disjoint DB:  Note: Istmere Group is a store that sells airport lounge passes, travel insurance and cruise cabins.
+ambiguous DB: Note: Istmere Group is a store that sells airport lounge passes, rental cars and ramen bowls.
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category:</pre><p class="note">The same item's record in the two databases; the ambiguous one mixes in a restaurant product.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>check</th><th>result</th></tr></thead>
+    <tbody>
+      <tr><td>record arm, disjoint vs ambiguous DB (% right, all / DB-only / DB-only opaque)</td><td>90.2 / 97.6 / 94.2 vs 87.4 / 88.6 / 78.8</td></tr>
+      <tr><td>retriever recall@1 from raw string, 240 records (zero-shot / tuned)</td><td>79.1 / 99.4</td></tr>
+      <tr><td>tuned retriever with 5,000 decoys (all / truncated names)</td><td>92.9 / 73.2</td></tr>
+      <tr><td>categoriser with retrieved vs oracle record (% right)</td><td>89.9 vs 90.2</td></tr>
+      <tr><td>3 seeds, no DB (all / DB-only)</td><td>60.5 ± 3.0 / 49.0 ± 3.8</td></tr>
+      <tr><td>3 seeds, record in prompt (all / DB-only)</td><td>89.3 ± 0.9 / 91.3 ± 5.6</td></tr>
+      <tr><td>3 seeds, records in weights, 3.3 passes (DB-only / opaque)</td><td>59.4 ± 12.3 / 30.7 ± 21.4</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Ambiguous records cost the retrained categoriser 3 points overall and 9 on database-only merchants; a model trained on clean records and handed ambiguous ones loses twice that.</li>
+    <li>The oracle costs nothing to remove: a cheaply tuned retriever finds 99.4% of records and end-to-end accuracy is unchanged. At production size the hard part is truncated names with near-twins.</li>
+    <li>Over seeds the prompt result stands, and row 33's parametric gain dissolves: its +21 was the best of three seeds.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Does more exposure make records in the weights reliable? (<a href="#row-39">row 39</a>, at three seeds)</li>
+    <li>Not run: the categoriser fed the decoy-index retrieval (estimated about 6 points lower), a retriever trained with the twins as hard negatives.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-38" data-from="33" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 38 · 2026-09-21 · <span class="qid">INFRA-2</span> · REPORT §44</p>
+    <h2>A trainer without unsloth, and the hidden 4-bit default it exposed</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether the unsloth library was more trouble than it was worth after its memory and fused-loss failures in <a href="#row-31">row 31</a> and <a class="back" href="#row-33">row 33</a>. The concrete task: a second implementation of row 33's categoriser trainer with plain transformers + peft, checked against the first.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>TRAINER=hf</code> trains the same rank-64 LoRA with the same schedule, batches and seed; <code>SCORER=hf</code> scores with the same rule. Then each adapter was read through both loaders, and the earlier results affected by what turned up were re-read on the full-precision (bf16) base.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>measure</th><th>unsloth</th><th>transformers + peft</th></tr></thead>
+    <tbody>
+      <tr><td>no-DB categoriser, REAL-6 % right</td><td>57.1</td><td>59.5</td></tr>
+      <tr><td>record-in-prompt categoriser, % right</td><td>90.2</td><td>88.5</td></tr>
+      <tr><td>training minutes (record arm)</td><td>18.2</td><td>27.6</td></tr>
+      <tr><td>peak memory, GiB</td><td>9.1</td><td>12.6</td></tr>
+      <tr><td>untrained Instruct, no record / with record (4-bit vs bf16 base)</td><td>31.2 / 58.0</td><td>35.1 / 61.1</td></tr>
+    </tbody></table></div><p class="note">A bf16-trained adapter read on the 4-bit base changed 19.3% of its predictions.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The two trainers agree within seed spread; the plain path costs 1.5 times the minutes and 3.5 GiB more. Production can use either.</li>
+    <li>unsloth's loader silently loads the 4-bit (NF4) base unless told otherwise. Six scripts written since 2026-09-18 relied on the default. For the categoriser rows that only relabels them (everything was 4-bit QLoRA consistently); for four earlier species re-reads it was a train/score mismatch worth 0 to 9 points, changing no conclusion (one probe's linearity claim got 9 points stronger).</li>
+    <li>New rule in CLAUDE.md: always set <code>load_in_4bit</code> explicitly and score an adapter on the precision it was trained on.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is the 4-bit base costing accuracy? <a href="#row-56">Row 56</a> found bf16 and 4-bit the same for this task, and bf16 became the default.</li>
+    <li>Not run: unsloth at bf16, seeds of the new trainer, row 31's teacher at bf16.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-39" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 39 · 2026-09-22 · <span class="qid">REAL-8</span> · REPORT §45</p>
+    <h2>How much exposure do records in the weights need, and does the chat template matter?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a> found records trained into the weights helped only at 3.3 passes over them, and <a class="back" href="#row-37">row 37</a> showed even that gain was mostly one lucky seed (+10 ± 12). REAL-8 asked for the rest of the exposure curve at three seeds, and for the prompt in the instruct model's chat format, which production would use.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The SFT categoriser with the 960 record texts making up half its training, at 800 and 1,600 steps (6.7 and 13.3 passes over the records), three seeds each, scored on REAL-6 without a record and on general-ability items. Separately, the untrained model and the two trained categorisers in the chat template, with "Category:" opening the assistant's turn so scoring is unchanged.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">&lt;|im_start|&gt;system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.&lt;|im_end|&gt;
+&lt;|im_start|&gt;user
+Categories: Apparel &amp; Eating out &amp; Car, ..., Grendo
+  ... 24 labelled rows ...
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed&lt;|im_end|&gt;
+&lt;|im_start|&gt;assistant
+Category:</pre><p class="note">The chat-template arm: the same content as the plain prompt, with the answer cue pre-filled in the assistant turn.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>passes over records</th><th>DB-only merchants (%)</th><th>DB-only opaque (%)</th><th>all items (%)</th><th>ARC-Easy (%)</th><th>train minutes</th></tr></thead>
+    <tbody>
+      <tr><td>0 (no DB)</td><td>49.1 ± 3.8</td><td>25.6 ± 6.8</td><td>60.5 ± 3.0</td><td>76.0</td><td>18</td></tr>
+      <tr><td>3.3</td><td>59.3 ± 12.3</td><td>30.8 ± 21.4</td><td>63.8 ± 2.3</td><td>67.0</td><td>34</td></tr>
+      <tr><td>6.7</td><td>68.8 ± 5.8</td><td>44.2 ± 10.0</td><td>76.8 ± 2.2</td><td>73.2 ± 2.3</td><td>68</td></tr>
+      <tr><td>13.3</td><td>64.2 ± 5.7</td><td>34.0 ± 9.9</td><td>78.2 ± 0.3</td><td>65.7 ± 8.3</td><td>135</td></tr>
+    </tbody></table></div><p class="note">Chat template vs plain, % right: untrained without record 10.0 vs 31.2; untrained with record 63.2 vs 58.0; SFT no DB 58.9 vs 57.1; SFT with record 90.0 vs 90.2.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The parametric gain becomes real at 6.7 passes (+20 on DB-only merchants, every seed above every no-DB seed) and the next doubling adds nothing.</li>
+    <li>Merchants known only through their record never pass 56% from the weights, against 94 to 96 with the same record in the prompt.</li>
+    <li>The chat template changes nothing for a trained categoriser, but the untrained model without a record collapses to near chance in it.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The whole-set jump (64 to 77) came with twice the passes over the users' histories; the no-DB arm at matching steps was not run. <a href="#row-45">Row 45</a> located the gain and <a href="#row-47">row 47</a> ran that control.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-40" data-from="33" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 40 · 2026-09-22 · <span class="qid">BASE-6</span> · REPORT §46</p>
+    <h2>Off-the-shelf few-shot classifiers: FastFit, GLiClass and a logistic head</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked about IBM's FastFit, a few-shot classifier built for many similar classes that also scores a query against the label's words, which REAL-6's per-user schemes resemble. A literature scan added GLiClass, a zero-shot label-scoring encoder, and the cheapest baseline, a logistic regression on frozen embeddings. All were compared against <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>One small classifier per user, trained on the 24 prompt shots or the full 300-row history: FastFit on bge-base and mpnet, logistic regression on frozen bge, and GLiClass untrained and fine-tuned across users. Each plain and with the merchant's record appended to the statement in training and at test. Three library bugs had to be repaired first (GLiClass 0.1.20 silently skipped every training step).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Istmr Grp Istmere Group is a store that sells airport lounge passes, travel insurance and cruise cabins.</pre><p class="note">The encoder's input with the record: the normalised statement string followed by the record; the user's category names are the classes.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>classifier (% right first)</th><th>no record, full history</th><th>record on the statement</th></tr></thead>
+    <tbody>
+      <tr><td>bge frozen centroid (row 35)</td><td>36.5</td><td>-</td></tr>
+      <tr><td>logistic head on frozen bge</td><td>43.9</td><td>87.2</td></tr>
+      <tr><td>FastFit bge, per user</td><td>49.0</td><td>92.2</td></tr>
+      <tr><td>GLiClass untrained, names only</td><td>12.4</td><td>56.4</td></tr>
+      <tr><td>GLiClass tuned across users</td><td>34.4</td><td>85.8</td></tr>
+      <tr><td>bge tuned across users (row 33)</td><td>75.7</td><td>83.7 (test only)</td></tr>
+      <tr><td>3B SFT categoriser (row 33)</td><td>57.1</td><td>90.2</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Without a record no per-user classifier comes near the cross-user models: other users' labels are worth more than any per-user method.</li>
+    <li>Scoring against the label's text helps by 16 points on standard names and nothing on renamed or coined ones. GLiClass with the record reads standard names at 89.6 and coined names at 0.4: pure label meaning.</li>
+    <li>With the record, a per-user FastFit matches the 3B (92.2 vs 90.2, same prediction on 92.5% of items), and a logistic head on frozen embeddings is 5 points behind at a minute for all users. The record is what matters.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>GLiClass's few-shot examples hurt in every arm: can any encoder read the shots? (<a href="#row-53">row 53</a>)</li>
+    <li>Not run: FastFit on the ambiguous DB, one FastFit shared across users, seeds.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-41" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
+  <header>
+    <p class="eyebrow">Row 41 · 2026-09-22 · <span class="qid">REAL-9</span> · REPORT §47</p>
+    <h2>Choosing which past transactions go in the prompt</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner framed categorisation as a recommender problem: the user's history is the interaction log, and picking the prompt's 24 example rows is the retrieval step. Every prompt so far used one fixed random block per user. Pinterest's published rules (TransAct V2, Pinner Progression) suggested better ones, and <a class="back" href="#row-37">row 37</a>'s retriever made similarity search possible on <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Four shot rules per query: "recent" (here a random block, since REAL-6 has no time), "nearest" (the 24 most similar rows), "transact" (8 recent plus the nearest row of each category) and "cluster" (spread over clusters of the user's rows). Applied at test only to the untrained model and the fixed-shot adapters, and to adapters trained with the rule. 28 steps, 12.7 GPU hours. Midway, an audit (<a href="#row-45">row 45</a>) supplied corrected groups for reading the results.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+  ... other shots ...
+Transaction: CARD PURCHASE GOLD'S GYM 9253 TUCSON AZ | $140.41 | Fri
+Category:</pre><p class="note">When a shot is the same merchant as the query, the model can simply copy its label; similarity rules make this happen far more often.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm and rule (% right)</th><th>merchant in history</th><th>decided by its category</th><th>all</th></tr></thead>
+    <tbody>
+      <tr><td>nearest-row lookup, no model</td><td>98.6</td><td>19.1</td><td>47.5</td></tr>
+      <tr><td>SFT no DB, fixed shots</td><td>65.3</td><td>59.3</td><td>57.1</td></tr>
+      <tr><td>SFT no DB, nearest shots at test</td><td>99.1</td><td>58.5</td><td>70.1</td></tr>
+      <tr><td>SFT no DB, trained with nearest</td><td>98.6</td><td>36.1</td><td>57.5</td></tr>
+      <tr><td>SFT + record, fixed shots</td><td>94.1</td><td>97.4</td><td>90.2</td></tr>
+      <tr><td>SFT + record, transact at test</td><td>98.6</td><td>97.4</td><td>93.0</td></tr>
+      <tr><td>SFT + record, trained with nearest</td><td>99.1</td><td>79.2</td><td>83.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Every rule's gain (up to 25 points) is the user's own label for the same merchant, which a lookup gives at 98.6 without any model. On items decided by the merchant's category, no rule moves a trained model at test.</li>
+    <li>TransAct's block is the best at test (93.0 vs 90.2, paired +2.8) because it keeps every category among the shots; a pure similarity block leaves the right label out 31% of the time.</li>
+    <li>Training with retrieved shots teaches copying (final loss near 0.001) and costs 20 to 30 points on what cannot be copied, including database-only merchants (97.6 to 76).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Train with retrieved shots but withhold the query's own merchant (<a href="#row-46">row 46</a>).</li>
+    <li>REAL-6 users never relabel or file a merchant two ways, so whether shots beat a lookup when they disagree needs a new set (<a href="#row-43">row 43</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-42" data-from="33,45,47" data-era="REAL-6 audit and recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 42 · 2026-09-26 · <span class="qid">REAL-10</span> · REPORT §51</p>
+    <h2>Users the model has never seen, and rename augmentation</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Every REAL-6 number so far scored the same 20 users whose histories trained the adapter (<a class="back" href="#row-33">row 33</a>). Production meets over a million users whose schemes it never saw. The audit (<a class="back" href="#row-45">row 45</a>) turned the planned single split into four folds, and <a class="back" href="#row-47">row 47</a> set the no-DB arm at 800 steps.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Users split into four folds of five; each fold's adapter trains on the other fifteen and scores its five, so all 1,179 items are read by a model that never saw that user. No-DB arm at 800 steps, record-in-prompt arm at 200. Then "rename augmentation": in each training episode, each category name is replaced by a fresh coined word with probability 0.5, consistently in the list, shots and answer, so memorising a user's vocabulary stops paying. The no-DB augmentation was measured on <a href="#row-56">row 56</a>'s newer all-label recipe.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, Pharmacy &amp; Health, Entertainment, Plenk, Animals, Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo</pre><p class="note">For a held-out user, only the shots say that "Grendo" means gyms; the model cannot have memorised it.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm (% right first)</th><th>all, trained users</th><th>all, held out</th><th>coined names, trained</th><th>coined names, held out</th></tr></thead>
+    <tbody>
+      <tr><td>SFT no DB, 800 steps</td><td>71.7</td><td>70.1</td><td>73.9</td><td>63.9</td></tr>
+      <tr><td>SFT + record in prompt</td><td>90.2</td><td>81.6</td><td>91.6</td><td>66.7</td></tr>
+      <tr><td>no DB all-label, held out: without / with rename</td><td>-</td><td>74.5 / 77.6</td><td>-</td><td>73.1 / 85.1</td></tr>
+      <tr><td>record arm, held out: without / with rename</td><td>-</td><td>81.6 / 86.8</td><td>-</td><td>66.7 / 80.3</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Standard names transfer fully to a new user (record arm 99.6 vs 99.8).</li>
+    <li>Coined names fall 10 points (no DB) and 25 (record): the models had been memorising the training users' private vocabularies rather than reading them off the shots.</li>
+    <li>Rename augmentation recovers most of that (+12 and +14 on coined names) at no cost on standard names. From here every categoriser trains with it and is scored on held-out users; the new-user record arm reads 86.8.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Other augmentation rates; more than 20 users (<a href="#row-43">row 43</a>).</li>
+    <li>The held-out folds became the test bed for <a href="#row-57">row 57</a>'s database episodes, which were not yet combined with rename augmentation (later <a href="#row-81">row 81</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-43" data-from="33,41,45" data-era="REAL-6 audit and recipe" data-status="doing">
+  <header>
+    <p class="eyebrow">Row 43 · added 2026-09-21, amended 2026-09-22 · <span class="qid">REAL-11</span> · first version in REPORT §93</p>
+    <h2>A successor test set shaped like the real population</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner described the real population on 2026-09-21: over a million users, most on the default categories, some with custom labels, filing merchants for personal reasons, with recent inputs mattering most. REAL-6 (built for <a class="back" href="#row-33">row 33</a>) cannot test that. <a class="back" href="#row-41">Row 41</a> showed REAL-6 users never relabel, and the audit of <a class="back" href="#row-45">row 45</a> found its items are decided by a lookup or by the merchant's standard category, so the set had to be rebuilt so neither decides it.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned: mostly default-scheme users and some custom; the same merchant filed differently by different users; a time axis with next-transaction prediction, relabelling and new-category events, the latest label winning; per-shot provenance (typed, accepted, corrected) and elapsed time; a uniformly drawn slice for replaying shot policies; short histories (0, 5, 25 rows); 200 or more users for held-out folds; a statement-rendering family unseen by the normaliser and retriever; overlapping amounts; the lookup and lookup-then-model hybrid as standard columns. A first version (<code>real7_v1</code>, 200 new users) was built and scored zero-shot on 2026-09-27 under <a href="#row-93">row 93</a>: REAL-6-trained readers reached 82 against an 84.8 ceiling (untrained 51). PLAN.md still marks this row as in progress.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A set where neither a merchant lookup nor the standard category gives the answer is needed before shot selection, relabelling or collaborative signals can be judged.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Rows waiting on it: the collaborative record (<a href="#row-44">row 44</a>), counterfactual pairs (<a href="#row-51">row 51</a>), DiffusionGemma (<a href="#row-55">row 55</a>).</li>
+    <li>Pieces were split out and tested separately, e.g. users who alternate categories at one merchant (<a href="#row-86">row 86</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-44" data-from="43" data-era="REAL-6 audit and recipe" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 44 · added 2026-09-21 · <span class="qid">REAL-12</span></p>
+    <h2>The collaborative record: what other users call this merchant</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner's reading of Pinterest's Pixie (a random walk over the graph of pins and boards) suggested the same object here: the graph of merchants and the categories users file them under. The prompt carried the user's history and the merchant's content record, but not what other users do with the merchant. On REAL-6 other users' labels just restate the standard category, so the row waits for <a class="back" href="#row-43">row 43</a>'s set.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned: for each merchant, the histogram of other users' category names for it (one hop) and the categories reached by a random walk with restart over the merchant-category graph (two hops), rendered as a second note line in the prompt. Arms: no record, content record, collaborative record, both; on the untrained base and the SFT categoriser; with a wrong merchant's line as a control, since several context lines are known to dilute a 3B model's reading of one.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run as written. A related idea, a line under the query listing the categories other users file the payee under, was tested later in <a href="#row-124">row 124</a> and became part of the production recipe.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-45" data-from="41" data-era="REAL-6 audit and recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 45 · 2026-09-22 · <span class="qid">REAL-13</span> · REPORT §48</p>
+    <h2>Auditing REAL-6: what actually decides each test item</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A review during <a class="back" href="#row-41">row 41</a>'s run found four properties hidden by REAL-6's cell names: 115 "seen" items had lost their merchant's history rows to the 300-row cut; every user files a merchant under one label, so a lookup answers every truly seen item; most "unseen" items are decided by the merchant's standard category; and intervals resampled items, not users.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, no rescoring. New item groups (<code>ai_experiments.real6_cells</code>), a nearest-history-row lookup, a "lookup first, else the model" hybrid, and intervals that resample users. Every REAL-6 run from rows 33 to 41 was re-read in these groups, and a correction note was added at the top of the report.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>group</th><th>items</th><th>what decides it</th><th>lookup % right</th><th>SFT + record % right</th></tr></thead>
+    <tbody>
+      <tr><td>merchant in the user's history</td><td>444</td><td>the user's own label for it</td><td>98.6</td><td>94.1</td></tr>
+      <tr><td>labelled seen, but cut from history</td><td>115</td><td>the merchant's category</td><td>15.7</td><td>83.5</td></tr>
+      <tr><td>determined by standard category</td><td>509</td><td>the category, renamed or merged by the user</td><td>19.1</td><td>97.4</td></tr>
+      <tr><td>split category</td><td>103</td><td>nothing observable (coin flip)</td><td>6.8</td><td>50.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The set's ceiling is about 94; the record-in-prompt arms sit at it, so their variants (retrieved record, other trainer, chat template) are ties.</li>
+    <li>User-resampled intervals are 1.3 to 2.2 times wider; whole-set differences under about four points between separately trained adapters should be read as ties.</li>
+    <li>Row 39's whole-set gain sat on items the records cannot explain (+13 to +16 in-history, +19 to +22 category-determined), so the no-DB recipe was probably under-trained.</li>
+    <li>For labelled merchants, a production system should look the label up rather than ask a model.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is the no-DB recipe under-trained? (<a href="#row-47">row 47</a>, moved up)</li>
+    <li>Held-out users in four folds (<a href="#row-42">row 42</a>); a successor set where neither lookup nor category decides (<a href="#row-43">row 43</a>); retrieved-shot training without copying (<a href="#row-46">row 46</a>); report clean-up (<a href="#row-48">row 48</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-46" data-from="41,45" data-era="REAL-6 audit and recipe" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 46 · added 2026-09-22 · <span class="qid">REAL-9</span></p>
+    <h2>Training with retrieved shots without teaching the model to copy</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-41">Row 41</a> found that adapters trained with similarity-chosen shots lost the items they could not copy: category-determined items fell from 59 to 36 (no DB) and 97 to 79 (record), because every training query had its own merchant among the shots. The audit (<a class="back" href="#row-45">row 45</a>) supplied the groups to measure the fix.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned: the nearest and TransAct rules at training, with the query's own merchant removed from its shot pool with probability 0.6 (the share of test items whose merchant is not in the history), so training sees the test's mix of copyable and uncopyable items; no-DB and record arms; scored with the same rule against row 41's adapters.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run as of 2026-10-03.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-47" data-from="39,45" data-era="REAL-6 audit and recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 47 · 2026-09-23 · <span class="qid">REAL-8</span> · REPORT §49</p>
+    <h2>Was the no-database categoriser simply under-trained?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-39">Row 39</a>'s records-in-the-weights arms trained for 800 and 1,600 steps against the no-DB arm's 200, and <a class="back" href="#row-45">row 45</a> showed most of their gain was on merchants users had labelled, which the records cannot explain. If the no-DB arm gains the same with more steps, every categoriser so far used a quarter of the training it needed.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The no-DB SFT categoriser unchanged except for length: 400 steps (one seed), 800 (three seeds) and 1,600 (one seed), read in row 45's groups and on ARC-Easy and MMLU. 9.2 GPU hours.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>steps</th><th>train minutes</th><th>merchant in history (%)</th><th>decided by category (%)</th><th>DB-only (%)</th><th>all (%)</th><th>ARC-Easy (%)</th></tr></thead>
+    <tbody>
+      <tr><td>200</td><td>17.7</td><td>68.5 ± 2.8</td><td>62.7 ± 3.1</td><td>49.5 ± 3.8</td><td>60.5 ± 3.0</td><td>76.0</td></tr>
+      <tr><td>400</td><td>36.6</td><td>75.0</td><td>71.5</td><td>49.2</td><td>67.4</td><td>77.0</td></tr>
+      <tr><td>800</td><td>77.6</td><td>80.9 ± 0.8</td><td>78.5 ± 3.8</td><td>52.7 ± 2.1</td><td>73.3 ± 2.3</td><td>78.2</td></tr>
+      <tr><td>1,600</td><td>146.8</td><td>83.1</td><td>82.9</td><td>55.7</td><td>76.7</td><td>80.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Yes: four times the steps is worth 13 points, eight times 16, with no general-ability cost.</li>
+    <li>The gain is on merchants some user labelled; merchants nobody labelled stay flat, so more passes over other merchants teach nothing about them.</li>
+    <li>At matched history exposure the records in the weights still add 5 to 9 points overall and 12 to 20 on DB-only merchants: about half of row 39's gain was the records, half the extra history passes.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Are the extra steps learning schemes or memorising the twenty users? Held-out users answer that (<a href="#row-42">row 42</a>, trained at 800 steps).</li>
+    <li>Can the same accuracy come cheaper? (<a href="#row-56">row 56</a>)</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-48" data-from="45" data-era="REAL-6 audit and recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 48 · 2026-09-22 · <span class="qid">REPORT-5</span> · REPORT §1 (no new section)</p>
+    <h2>Report upkeep: a new executive summary and pointers on overturned claims</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The report's executive summary stopped at section 8, before any categoriser work, and a review of sections 1 to 36 alongside the audit of <a class="back" href="#row-45">row 45</a> found earlier claims that later sections had overturned or qualified.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>No runs. Section 1 gained a first paragraph on where the project stands (the categoriser numbers of sections 37 to 48 and what is untested), fourteen earlier claims got a bracketed pointer to the section that overturned or qualified them, and PLAN row 13's result was updated. Two review points were checked and not taken, because the text did not say what the review assumed.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>A reader entering from section 1 now sees the current state first, and an outdated claim is flagged where it stands.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-49" data-from="45,47" data-era="Jev review follow-ups" data-status="done">
+  <header>
+    <p class="eyebrow">Row 49 · 2026-09-23 · <span class="qid">STAT-4</span> · REPORT §50</p>
+    <h2>Can the categoriser's confidence decide when to file automatically?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>A production categoriser needs a rule for when to apply a label without asking. The "Jev review" (thirteen memos on related decision models, collected at the owner's request) found raw model probabilities over-confident, fixable with one fitted temperature, and the right temperature depending on the task type. The audit's groups (<a class="back" href="#row-45">row 45</a>) and <a class="back" href="#row-47">row 47</a>'s longer-trained adapters made the measurement possible.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>CPU only, from saved per-option scores. A softmax over the user's categories under two scoring rules (mean log-probability per token, and the sum); one temperature per arm, fitted on other users (four folds); calibration error (ECE), Brier score, and the share of items that can be auto-applied at 95% precision with the threshold chosen on other users. Arms: untrained base, no-DB SFT at 200 and 800 steps, record-in-prompt SFT, retrieved record, and row 42's held-out folds.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm (sum rule)</th><th>temperature</th><th>% right</th><th>ECE after tempering (points)</th><th>auto-applied at 95% target (realised precision)</th></tr></thead>
+    <tbody>
+      <tr><td>untrained Instruct, no record</td><td>2.38</td><td>32.1</td><td>9.5</td><td>4.7% (89.1)</td></tr>
+      <tr><td>SFT no DB, 200 steps</td><td>1.80</td><td>57.3</td><td>3.0</td><td>31.6% (94.6)</td></tr>
+      <tr><td>SFT no DB, 800 steps</td><td>2.79</td><td>72.1</td><td>3.9</td><td>55.8% (95.0)</td></tr>
+      <tr><td>SFT + record</td><td>1.44</td><td>90.3</td><td>3.2</td><td>82.3% (95.4)</td></tr>
+      <tr><td>no DB, 800 steps, new users</td><td>2.88</td><td>69.6</td><td>1.9</td><td>47.8% (94.5)</td></tr>
+      <tr><td>SFT + record, new users</td><td>2.20</td><td>81.3</td><td>4.7</td><td>60.4% (93.3)</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Serve confidences from the sum rule; one temperature per arm then calibrates every categoriser (ECE 2 to 4). The record arm is nearly calibrated as trained; the no-record arm is over-confident, more so the longer it trains.</li>
+    <li>For a new user with the record, about 60% of transactions can be filed automatically at 93 to 95% precision.</li>
+    <li>A temperature borrowed from another arm ruins the probabilities (ECE up to 25) but barely moves the operating point; pick thresholds per arm on held-out users.</li>
+    <li>Confident errors concentrate in categories the user split arbitrarily: 48% of those auto-applied at 16% precision.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Can the model learn to say "needs review"? (<a href="#row-52">row 52</a>)</li>
+    <li>Not done: per-user temperatures, a calibration term in training (later explored for encoders in <a href="#row-68">row 68</a>), the encoder arms.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-50" data-from="41,45,79,80" data-era="Jev review follow-ups" data-status="done">
+  <header>
+    <p class="eyebrow">Row 50 · 2026-09-27 · <span class="qid">EVAL-8</span> · REPORT §75</p>
+    <h2>Does the order of the options change the answer?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The Jev review showed models flipping answers when options are reordered. As first written (after <a class="back" href="#row-41">row 41</a> and <a class="back" href="#row-45">row 45</a>) it would permute the category list for the per-option scorers. By 2026-09-27 the leading readers were "one-slot" models (<a class="back" href="#row-79">row 79</a>, <a class="back" href="#row-80">row 80</a>) that pick a letter label from a lettered option list, which are exposed to position and letter bias, so the row was re-scoped to them.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-2B and Qwen3.5-2B one-slot readers, re-scored on fold 0 of REAL-6 and of POI-1 (a benchmark of real places) with every item's options shuffled under three seeds; the category list in the prompt unchanged. Measured: accuracy per order, the share of items whose answer changes in any order, and the four-order average.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Context:
+Categories: Apparel &amp; Eating out &amp; Car, Gadgets &amp; Food shopping, Quorra, ..., Grendo
+
+Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+  ... more labelled rows ...
+Transaction: CARD PURCHASE GOLD'S GYM 9253 TUCSON AZ | $140.41 | Fri
+
+Question: Which of this user's categories does the last transaction belong to?
+Options:
+(A) Plenk
+(B) Grendo
+  ...
+Answer: (</pre><p class="note">The one-slot layout: the model's next token is the letter. Option order here is illustrative; this row shuffles it.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>reader, set</th><th>original order (% right)</th><th>spread over 4 orders (points)</th><th>answers that change</th><th>4-order average</th></tr></thead>
+    <tbody>
+      <tr><td>decider-2B, POI-1</td><td>92.5</td><td>0.6</td><td>1.8%</td><td>92.7</td></tr>
+      <tr><td>Qwen3.5-2B, POI-1</td><td>91.9</td><td>0.8</td><td>2.2%</td><td>92.3</td></tr>
+      <tr><td>decider-2B + shot labels, REAL-6</td><td>87.9</td><td>0.7</td><td>1.3%</td><td>87.9</td></tr>
+      <tr><td>Qwen3.5-2B + shot labels, REAL-6</td><td>85.9</td><td>1.7</td><td>5.7%</td><td>84.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Trained one-slot readers pick options by name, not position: flips are rare and mostly near ties.</li>
+    <li>decider-2B, pre-trained on shuffled options, is the steadiest. Averaging orders buys at most half a point, not worth four passes.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The letter-position bias seen in an encoder's letter readout (<a href="#row-69">row 69</a>) does not appear in these trained decoders.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-51" data-from="42" data-era="Jev review follow-ups" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 51 · added 2026-09-23 · <span class="qid">TRAIN-10</span></p>
+    <h2>Counterfactual twin examples to make the model read its evidence</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Across the Jev review, training on decision data usually raised in-distribution accuracy and lost on held-out items. One exception, Nimble's base/counterfactual pairs (two contexts that differ in one fact that flips the label), transferred. Our generator knows the true labels, so such pairs need no verifier. It needs <a class="back" href="#row-42">row 42</a>'s held-out folds to measure transfer.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned: for each training episode a sibling where either the history files the query's merchant under another of the user's categories, or the record names another category's products, with the label recomputed; pairs against an equal number of unpaired episodes at the same token budget; no-DB and record arms; scored on held-out folds with a "both twins right" accuracy, and on <a href="#row-43">row 43</a>'s set when it exists.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run as of 2026-10-03.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-52" data-from="49,80" data-era="Jev review follow-ups" data-status="done">
+  <header>
+    <p class="eyebrow">Row 52 · 2026-09-27 · <span class="qid">REAL-14</span> · REPORT §79</p>
+    <h2>Teaching the model to answer "not listed here"</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-49">Row 49</a> found the categoriser confident and wrong where no evidence decides the answer. The Jev review pointed to decider's training trick: an abstain option in some training questions, sometimes with the right answer removed. On 2026-09-27 the row was re-scoped to the then-best reader, decider-4B one-slot with shot-label loss and database episodes (<a class="back" href="#row-80">row 80</a>'s recipe).</p></section>
+  <section class="tried"><h3>What we tried</h3><p>With probability 0.1 a training question gets a last option "not listed here"; in a quarter of those the true category is removed from the header and options (the shots keep it), so that option is right. A second setting doubled both rates. Test items (<code>real6_v1_abst</code>): every REAL-6 fold-0 item with the option added, and again with its true category hidden. The planned second arm (uniform targets on evidence-free items) was not run here.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Question: Which of this user's categories does the last transaction belong to?
+Options:
+(A) Apparel &amp; Eating out &amp; Car
+(B) Quorra
+  ...
+(H) not listed here
+Answer: (</pre><p class="note">The added option; in the "gold hidden" version the right category is missing and (H) is the correct answer. Lettering is illustrative.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>decider-4B</th><th>% right, real options</th><th>false alarms (option chosen, gold present)</th><th>recall (option chosen, gold hidden)</th><th>AUROC by option probability</th></tr></thead>
+    <tbody>
+      <tr><td>no abstain training</td><td>88.3</td><td>0.0%</td><td>61.1%</td><td>0.963</td></tr>
+      <tr><td>abstain 0.1, hidden gold 0.25</td><td>89.3</td><td>1.3%</td><td>92.3%</td><td>0.992</td></tr>
+      <tr><td>abstain 0.2, hidden gold 0.5</td><td>86.6</td><td>0.7%</td><td>93.3%</td><td>0.990</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>decider already abstains untrained on this task (61% of hidden-gold questions, no false alarms): its pre-training survives our fine-tune.</li>
+    <li>Its own recipe (0.1 / 0.25) finishes the job: 92% caught at 1.3% false alarms, no accuracy cost.</li>
+    <li>A trained option separates missing-category questions better than a confidence threshold (AUROC 0.992 vs 0.969).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>This tests the case the trick trains (a hidden category). Abstaining when there is no evidence at all was taken up in <a href="#row-84">row 84</a>.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-53" data-from="40,42,45" data-era="Jev review follow-ups" data-status="done">
+  <header>
+    <p class="eyebrow">Row 53 · 2026-09-26 · <span class="qid">MODEL-6</span> · REPORT §62</p>
+    <h2>A small encoder that scores one marker per category</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner pointed out that ModernBERT-style "marker" models had been dismissed on general benchmark rank, which says little about a one-domain categoriser. In <a class="back" href="#row-40">row 40</a> GLiClass could not use the user's example rows; Laya's layout (one scored <code>[MASK]</code> per option) might. A 400M-parameter encoder answering in milliseconds is the production argument at a million users. It uses <a class="back" href="#row-45">row 45</a>'s groups and <a class="back" href="#row-42">row 42</a>'s folds.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>ModernBERT-large (395M), from scratch and from Laya's released checkpoint, with each option's marker scored by a small head and a softmax over options; trained across users on fold 0's other users for 1,500 steps with plain cross-entropy, options shuffled. Scored on REAL-6 and on POI-1 (real places, see <a href="#row-65">row 65</a>), with and without the merchant record, against the 3B.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[CLS] instruction [SEP] [MASK] category 1 [MASK] category 2 ... [SEP] query, optional record, 24 shots as "statement -&gt; category" [SEP]</pre><p class="note">The input layout: each category's [MASK] gets one score; there is no free text output.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>reader (fold 0 held-out users)</th><th>REAL-6 % right</th><th>REAL-6 top-3</th><th>ms per item, batched</th></tr></thead>
+    <tbody>
+      <tr><td>Laya checkpoint, untrained</td><td>9.1</td><td>25.8</td><td>14</td></tr>
+      <tr><td>ModernBERT-large, 1,500 steps</td><td>53.4</td><td>72.5</td><td>10</td></tr>
+      <tr><td>Laya start, 1,500 steps</td><td>59.4</td><td>73.2</td><td>10</td></tr>
+      <tr><td>3B, no DB, all-label</td><td>74.2</td><td>87.6</td><td>~400</td></tr>
+      <tr><td>encoder + record (Laya start)</td><td>76.5</td><td>95.0</td><td>9</td></tr>
+      <tr><td>3B + record with category</td><td>85.2</td><td>97.0</td><td>~400</td></tr>
+    </tbody></table></div><p class="note">On POI-1 the encoder read 57.6 against the 3B's 55.4 to 59.2, with better top-3 (81 vs 74 to 79).</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>The layout does read the shots: on real places, where the name says what the place is, the encoder matches the 3B at about a fortieth of the time per item.</li>
+    <li>On REAL-6 it trails by 15 points without the record and 8 with it; the gap is the decoder's pre-trained knowledge of what merchants are.</li>
+    <li>The record fixes most of that cheaply (+16 to 22), pointing to a production shape: a merchant database plus a small reader.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Confidence objectives for the encoder (<a href="#row-68">row 68</a>); other encoder families through the same loop (<a href="#row-69">row 69</a>); starting from a skill-trained encoder (<a href="#row-76">row 76</a>).</li>
+    <li>Not yet: all four folds, database episodes for the encoder.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-54" data-from="45,49,50" data-era="Jev review follow-ups" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 54 · added 2026-09-23 · <span class="qid">MODEL-7</span></p>
+    <h2>Diffusion language models reading the answer slot</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Open projects (djev-dev, openjev) read every answer from one pass of DiffusionGemma 26B, a diffusion language model that fills masked slots instead of writing left to right, and it ranks near the top of their benchmark untrained. The owner pointed out it had been dismissed on general rank. DiffusionGemma does not fit a 3090, but smaller diffusion models do. The row would reuse <a class="back" href="#row-45">row 45</a>'s groups, <a class="back" href="#row-49">row 49</a>'s calibration and <a class="back" href="#row-50">row 50</a>'s order permutations.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned, zero-shot on REAL-6 with 24 shots, with and without the record: Nemotron-Labs-Diffusion-8B (diffusion read against its own causal read on the same weights), Dream-v0-Instruct-7B against Qwen2.5-7B-Instruct, LLaDA-8B-Instruct and LFM2.5-Encoder-350M-Diffusion; one forward pass with the answer letter as the mask token; a LoRA fine-tune only if one beats its causal twin by more than the seed spread.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run as of 2026-10-03. The hop-limit study (<a href="#row-71">row 71</a>) later tested untrained diffusion models on a different task, where only Dream-7B succeeded.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-55" data-from="34,54" data-era="Jev review follow-ups" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 55 · added 2026-09-23 · <span class="qid">MODEL-7</span></p>
+    <h2>DiffusionGemma 26B on a large GPU</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The large-model half of <a class="back" href="#row-54">row 54</a>'s question. It needs an 80 GB GPU, which <a class="back" href="#row-34">row 34</a>'s Modal setup provides.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Planned: DiffusionGemma 26B-A4B in bf16 through djev-dev's pinned runtime on one H100, zero-shot on REAL-6 (and <a href="#row-43">row 43</a>'s set when it exists), one-step slot read with and without the record, and a "thinking pass first" arm; the untrained large-model reference for row 54 and a candidate teacher for soft labels.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Not run as of 2026-10-03.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-56" data-from="47" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 56 · 2026-09-25 to 2026-09-26 · <span class="qid">TRAIN-11</span> · REPORT §52</p>
+    <h2>Putting the training loss on every label in the prompt</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-47">Row 47</a> showed the no-DB categoriser needs 800 to 1,600 steps. Each step pushed 16 sequences of about 850 tokens through the 3B model, yet the loss fell only on the answer's one to five tokens, so each pass taught one label. The owner asked where the hours went and whether the same accuracy could come cheaper.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>ALL_LABELS=1</code>: the loss on every shot's label too, each predicted from the categories and the shots before it (about 83 supervised tokens in 832 instead of 3), at 100, 200 and 400 steps; the bf16 base against 4-bit; and weighting the final answer to half the loss. Scored on all 20 users, then on <a href="#row-42">row 42</a>'s held-out folds; three seeds of 4-bit vs bf16 on the H100.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: CHECKCARD 09/07 GOLD'S GYM TUCSON AZ | $45.17 | Sat
+Category: Grendo
+Transaction: HOME DEPOT*03007 FRESNO CA 07/24 | $206.21 | Sun
+Category: Quorra
+  ...
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category: Plenk</pre><p class="note">With the all-label loss, every "Category:" answer in the sequence is a training target, not only the last one.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>recipe</th><th>steps</th><th>train minutes (3090)</th><th>% right, trained users</th><th>% right, held-out users</th></tr></thead>
+    <tbody>
+      <tr><td>plain, 4-bit</td><td>200</td><td>17.7</td><td>57.1</td><td>-</td></tr>
+      <tr><td>plain, 4-bit</td><td>800</td><td>77.6</td><td>71.7</td><td>70.1</td></tr>
+      <tr><td>plain, 4-bit</td><td>1,600</td><td>146.8</td><td>76.7</td><td>-</td></tr>
+      <tr><td>all-label, 4-bit</td><td>100</td><td>9.1</td><td>79.4</td><td>-</td></tr>
+      <tr><td>all-label, 4-bit</td><td>200</td><td>18.1</td><td>80.4</td><td>74.5</td></tr>
+    </tbody></table></div><p class="note">Held out, all-label minus plain 800: +4.4 [0.9, 7.8]; database-only real chains 70.4 vs 87.3. Three seeds on H100: 4-bit 80.5 ± 1.0, bf16 80.0 ± 1.4.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>All-label training gives in 100 steps (9 minutes) what 1,600 plain steps (147 minutes) gave, at the same tokens per second and general ability.</li>
+    <li>On new users it is still 4.4 points better than the 800-step recipe at a quarter of the time, but it leans less on what the model knew about real chains (-17), and weighting the answer does not bring that back.</li>
+    <li>bf16 and 4-bit bases give the same categoriser; the owner made bf16 the default.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>If the model stops consulting its merchant knowledge, can the fact database fill the gap as training decisions? (<a href="#row-57">row 57</a>)</li>
+    <li>Not done: the all-label loss for the record arm, packing.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-57" data-from="42,56" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 57 · 2026-09-26 · <span class="qid">REAL-15</span> · REPORT §53</p>
+    <h2>Teaching the fact database as decisions, not as prose</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Records trained into the weights as sentences reached database-only merchants at 59 to 69 at best. <a class="back" href="#row-56">Row 56</a> showed that supervising the decisions the task makes trains it far faster. The owner suggested (2026-09-25) that loss on more tokens might also be a better way to impart a database. The idea: turn each record into categorisation decisions, scored on <a class="back" href="#row-42">row 42</a>'s held-out users so memorising one user's answers cannot count.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>"Database episodes": in half the training episodes, 8 of the 24 shots and the target are replaced by synthetic statement rows of database merchants (all 240, the 60 DB-only ones included), each labelled with that user's own name for the merchant's database category. Against: prose records that state the category, both together, and no DB. All-label loss, 200 steps, H100, four held-out folds, no record in the prompt at test.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Prose arm training text:
+Istmere Group is a Travel store that sells airport lounge passes, travel insurance and cruise cabins.
+
+At test (no record):
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category:</pre><p class="note">The prose arm trains on category-bearing sentences; the episode arm sees the same fact only as labelled statement rows; at test neither gets a note.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm (held-out users, % right)</th><th>all</th><th>coined names</th><th>DB-only</th><th>DB-only real chains</th><th>DB-only opaque</th></tr></thead>
+    <tbody>
+      <tr><td>no DB</td><td>73.4</td><td>70.3</td><td>44.3</td><td>67.6</td><td>11.8</td></tr>
+      <tr><td>database episodes</td><td>89.9</td><td>91.2</td><td>94.3</td><td>93.0</td><td>96.1</td></tr>
+      <tr><td>prose records + category</td><td>78.9</td><td>80.7</td><td>64.8</td><td>85.9</td><td>35.3</td></tr>
+      <tr><td>both</td><td>88.0</td><td>89.6</td><td>91.8</td><td>95.8</td><td>86.3</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>Taught as decisions, the database puts merchants nobody labelled at 94 on new users with nothing in the prompt (opaque names 12 to 96); the same facts as prose reach 65. It holds in every fold.</li>
+    <li>Every item gains (+16.5 overall), because each episode is also practice at mapping a category into a user's scheme.</li>
+    <li>Knowledge a model must use to decide is best taught in the decision's own format.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>Is this a fair fight with the record in the prompt, which never had the category field? (<a href="#row-58">row 58</a>)</li>
+    <li>How many merchants can it hold? (<a href="#row-59">row 59</a>)</li>
+    <li>The synthetic strings share the test generator's templates; real strings remain untested (<a href="#row-43">row 43</a>).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-58" data-from="57,34" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 58 · 2026-09-26 · <span class="qid">REAL-16</span> · REPORT §55</p>
+    <h2>Database in the weights versus record in the prompt, with equal information</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-57">Row 57</a>'s episodes beat the record-in-prompt categoriser, but the episodes used a category field the record never carried, and the arms ran on different hardware and precision. <a class="back" href="#row-34">Row 34</a>'s Modal setup allowed running every arm alike.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Four arms on one setting (H100, bf16, one 16-sequence pass per step, 200 steps, held-out folds): no DB, database episodes with no record at test, the record in the prompt (products only), and the record with the category stated (<code>REC_CAT</code>).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Note: Istmere Group is a Travel store that sells airport lounge passes, travel insurance and cruise cabins.
+Transaction: POS ISTMR GRP 5750 | $246.98 | Wed
+Category:</pre><p class="note">The record-with-category arm: the note now names the category, the same information the episodes carried.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>arm (held-out users, % right)</th><th>all</th><th>coined names</th><th>DB-only</th><th>DB-only opaque</th></tr></thead>
+    <tbody>
+      <tr><td>no DB (all-label)</td><td>76.8</td><td>77.9</td><td>56.6</td><td>19.6</td></tr>
+      <tr><td>database episodes, no record at test</td><td>87.8</td><td>86.7</td><td>93.4</td><td>94.1</td></tr>
+      <tr><td>record in prompt, products</td><td>85.0</td><td>72.7</td><td>88.5</td><td>88.2</td></tr>
+      <tr><td>record in prompt, with category</td><td>86.6</td><td>77.5</td><td>91.8</td><td>92.2</td></tr>
+    </tbody></table></div><p class="note">Episodes minus record-with-category, paired: +1.2 [-2.7, 5.0] overall, +1.6 [-3.5, 6.5] on DB-only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>At equal information the two routes tie. A merchant database can live in the weights at no loss against retrieval at this size: no lookup at serving time, but a retrain when the database changes.</li>
+    <li>The category field adds little to the record (+1.6), because these product lists already name their category.</li>
+    <li>The episodes' edge on coined names comes from the all-label loss, not the database.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The choice turns on database size and churn: <a href="#row-59">row 59</a> measures capacity.</li>
+    <li>Not done: episodes with the record also in the prompt, the record arm with all-label and rename training, the ambiguous database.</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-59" data-from="58" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 59 · 2026-09-26 · <span class="qid">REAL-17</span> · REPORT §58</p>
+    <h2>How many merchants can the weights hold?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-58">Row 58</a> found database episodes as good as retrieval at 240 merchants. A production database has millions, and an earlier species experiment saw interference at 5,000 entities, so capacity decides between the two routes.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The database padded with generated opaque merchants to 1,000, 5,000 and 20,000. A CPU check before launch showed more steps alone would just repeat the same rows, so database episodes became their own pool entries. Two modes: fixed exposure (30 training rows per merchant, so steps grow with the database) and fixed budget (800 database episodes at every size). H100, bf16, all-label, four held-out folds; REAL-6's 60 DB-only merchants are the measure.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>merchants in DB</th><th>mode</th><th>rows per merchant</th><th>train minutes</th><th>DB-only % right</th><th>DB-only opaque % right</th></tr></thead>
+    <tbody>
+      <tr><td>none</td><td>-</td><td>0</td><td>2.9</td><td>56.6</td><td>19.6</td></tr>
+      <tr><td>240</td><td>fixed exposure</td><td>30</td><td>3.9</td><td>91.8</td><td>92.2</td></tr>
+      <tr><td>1,000</td><td>fixed exposure</td><td>30</td><td>7.1</td><td>95.9</td><td>94.1</td></tr>
+      <tr><td>5,000</td><td>fixed exposure</td><td>30</td><td>24.4</td><td>93.4</td><td>92.2</td></tr>
+      <tr><td>20,000</td><td>fixed exposure</td><td>30</td><td>89.2</td><td>92.6</td><td>90.2</td></tr>
+      <tr><td>1,000 / 5,000 / 20,000</td><td>fixed budget</td><td>7.2 / 1.4 / 0.4</td><td>4.0</td><td>82.8 / 69.7 / 56.6</td><td>68.6 / 45.1 / 23.5</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>No interference up to 20,000 merchants for a rank-64 adapter on a 3B model, given about 30 rows each; nothing else moves (all items 85.8 to 86.7).</li>
+    <li>Spread a fixed budget thinner and the gain fades, to nothing at 0.4 rows per merchant. Exposure, not capacity, is the constraint, and cost grows linearly (20,000 merchants: 89 H100 minutes, about $6).</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>The minimum rows per merchant (between 7 and 30); beyond 20,000 (a million merchants is about 75 H100-hours at this rate); real merchants instead of generated ones (<a href="#row-66">row 66</a>, on Overture places).</li>
+  </ul></section>
+</article>
+
+<article class="row" id="row-60" data-from="34,56" data-era="Modal and training recipe" data-status="done">
+  <header>
+    <p class="eyebrow">Row 60 · 2026-09-26 · <span class="qid">TRAIN-12</span> · REPORT §56</p>
+    <h2>Batch size on the H100</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked whether batch sizes had been tested on the H100. <a class="back" href="#row-34">Row 34</a> had only compared four passes of four against one pass of 16 at the same 16 sequences per step, and <a class="back" href="#row-56">row 56</a> supplied three seeds of the batch-16 recipe as the reference.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><code>EFF_BATCH</code> of 32 and 64 sequences per step against 16: at equal samples (fewer steps for bigger batches; learning rate 1e-4 and scaled by the square root of the batch ratio) and at equal steps (two and four times the data); and passes of 8, 16 and 32 sequences for throughput. All-label no-DB categoriser, bf16, all 20 users, one seed per setting.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
+    <thead><tr><th>setting</th><th>steps</th><th>rate</th><th>minutes</th><th>tokens/s</th><th>REAL-6 % right</th></tr></thead>
+    <tbody>
+      <tr><td>batch 16 (3 seeds)</td><td>200</td><td>1e-4</td><td>2.9 to 3.0</td><td>~14,000 to 14,700</td><td>78.8 to 81.6</td></tr>
+      <tr><td>batch 16, passes of 8</td><td>200</td><td>1e-4</td><td>2.9</td><td>14,761</td><td>80.7</td></tr>
+      <tr><td>batch 32, equal samples</td><td>100</td><td>1.41e-4</td><td>3.3</td><td>13,033</td><td>79.5</td></tr>
+      <tr><td>batch 64, equal samples</td><td>50</td><td>2e-4</td><td>3.3</td><td>13,027</td><td>80.1</td></tr>
+      <tr><td>batch 64, equal samples, rate unscaled</td><td>50</td><td>1e-4</td><td>3.3</td><td>12,905</td><td>72.3</td></tr>
+      <tr><td>batch 32, equal steps</td><td>200</td><td>1.41e-4</td><td>6.4</td><td>13,321</td><td>81.6</td></tr>
+      <tr><td>batch 64, equal steps</td><td>200</td><td>2e-4</td><td>13.1</td><td>13,105</td><td>80.9</td></tr>
+    </tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul>
+    <li>16 sequences per step at 1e-4 for 200 steps (three minutes) is already the efficient point.</li>
+    <li>Bigger batches match it only with the rate scaled; batch 64 unscaled stops at 72.3. Two to four times the data per step buys at most about a point for two to four times the compute.</li>
+    <li>The H100 is saturated at 8 to 16 sequences per pass; larger passes are slower because of padding.</li>
+  </ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul>
+    <li>If a larger batch is ever needed, scale the rate by the square root of the batch ratio and lengthen the warmup with it.</li>
+  </ul></section>
+</article>
