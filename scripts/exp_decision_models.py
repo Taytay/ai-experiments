@@ -54,7 +54,7 @@ ADAPTER = os.environ.get("ADAPTER", "")
 ORDER_SEED = os.environ.get("ORDER_SEED", "")  # row 50: every item's options shuffled by this seed before scoring (and decider's own label order too), scores mapped back  # FAMILY=decider: a fine-tuned LoRA under models/adapters (exp_decider_finetune.py)
 EXTRA_OPTS = [o for o in os.environ.get("EXTRA_OPTS", "").split("|") if o]  # row 84: options appended to every question (abstain options offered at inference); their scores follow the real options'
 READER = os.environ.get("READER", "hf")  # row 208 E3: hf | vllm (FAMILY=decider; same prompts and readout, scripts/vllm_slot.py)
-VLLM_SPEC = os.environ.get("VLLM_SPEC", "vllm")  # the vllm requirement for READER=vllm (pin a version once checked)
+VLLM_SPEC = os.environ.get("VLLM_SPEC", "vllm==0.31.0")  # the vllm checked against the HF reader (row 208 E3); the Modal image has it cached
 LABELS = os.environ.get("LABELS", "letters")  # FAMILY=decider: option labels (ai_experiments.oneslot): letters | rand26 | rand255
 QUESTION = "Which of this user's categories does the last transaction belong to?"
 

@@ -34,6 +34,8 @@ HF = modal.Volume.from_name("ai-exp-hf-cache", create_if_missing=True)
 OUT = modal.Volume.from_name("ai-exp-results", create_if_missing=True)
 IGNORE = ["**/__pycache__/**", "**/*.pyc"]
 LEDGER = LOCAL / "reports" / "modal_launches.jsonl"
+OVERLAY = ("--with transformers==5.17.0 --with flash-linear-attention --with 'peft>=0.21' --with torch==2.13.0 --with torchvision==0.28.0")
+VLLM_PIN = "vllm==0.31.0"  # the version checked against the HF reader (row 208 E3: 99.83% / 100% first-choice agreement)
 
 
 def _rows(name=""):
@@ -69,6 +71,10 @@ image = (
     .add_local_file(LOCAL / "README.md", f"{REPO}/README.md", copy=True)
     .run_commands(f"cd {REPO} && UV_LINK_MODE=copy uv sync --frozen --no-install-project")
     .env({"HF_HOME": "/cache/hf", "PYTHONUTF8": "1", "UV_LINK_MODE": "copy", "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"})
+    # row 208 E5: warm uv's cache with the training overlay and vLLM at build time, so each container's `uv run --with ...` resolves
+    # from the image instead of downloading torch 2.13 / vllm again (~2 min per container before; reports/workflow_review_2026-10-05.md)
+    .run_commands(f"cd {REPO} && uv run --frozen --no-project {OVERLAY} python -c 'import torch, transformers, peft'",
+                  f"cd {REPO} && uv run --no-project --with {VLLM_PIN} python -c 'import vllm'")
     .add_local_dir(LOCAL / "src", f"{MNT}/src", ignore=IGNORE)
     .add_local_dir(LOCAL / "scripts", f"{MNT}/scripts", ignore=IGNORE)
     .add_local_dir(LOCAL / "data" / "processed", f"{MNT}/data/processed", ignore=IGNORE)
@@ -80,8 +86,11 @@ def _prepare():
     """The mounted code copied into the writable repo tree beside the prebuilt .venv; the tracker db rebuilt from runs.jsonl."""
     import shutil
     import subprocess
-    for d in ("src", "scripts", "data/processed", "evals"):
+    for d in ("src", "scripts", "evals"):
         shutil.copytree(f"{MNT}/{d}", f"{REPO}/{d}", dirs_exist_ok=True)
+    Path(REPO, "data").mkdir(parents=True, exist_ok=True)  # row 208 E5: the 6.9 GB of data/processed linked, not copied (jobs only read it)
+    if not Path(REPO, "data", "processed").exists():
+        Path(REPO, "data", "processed").symlink_to(f"{MNT}/data/processed")
     for d in ("results/per_item", "models/adapters", "logs"):
         Path(REPO, d).mkdir(parents=True, exist_ok=True)
     subprocess.run("uv run --frozen evals rebuild", shell=True, cwd=REPO, check=True)
