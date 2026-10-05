@@ -40,6 +40,7 @@ HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.envir
 SEED = int(os.environ.get("SEED", "0"))
 HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
 GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
+BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))  # 0: the per-transaction reader (to check the batched one against)
 SOFT = float(os.environ.get("SOFT", "0"))  # UWE (2511.07969) soft late interaction: softmax over document tokens at this temperature; 0 = MaxSim
 MODE, NCAND = os.environ.get("MODE", "doc"), int(os.environ.get("NCAND", "50"))  # mml: BELXTR (2609.25859) per-filing candidates
 # row 211: trained interaction layers over the cached token vectors (MODE=doc): "x" cross-attention from the transaction's tokens to each
@@ -286,6 +287,33 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     return S
 
 
+def prepared(b, m1, cache):
+    """prepare(), cached on disk per budget in data/interim/li_prep (2026-10-05: the neighbour embeddings took ~4.5 min per 200-household
+    run); the key covers the budget, the settings prepare reads, this file's and hist_encoder.py's code and the neighbour encoder's
+    weights. The owner's budget is never cached here (its id is not a synthetic one)."""
+    import hashlib
+    import pickle
+    from ai_experiments.paths import ROOT
+    if not str(b.get("id", "")).startswith("realstyle-") or os.environ.get("PREP_CACHE", "1") == "0":
+        return prepare(b, m1, cache)
+    from two_tower import _hh_key
+    h = hashlib.sha1(f"{_hh_key(b['id'].split('-')[1])}|{b['id']}|{CTX}|{NB}|{M}|{MODE}|{NCAND}|{INTERACT}|{NMEM}|{H.AMT_TEXT}".encode())
+    for f in (__file__, H.__file__):
+        h.update(Path(f).read_bytes())
+    if CTX or MODE == "mml" or "m" in INTERACT:
+        for f in sorted(Path(H.OUT1).glob("*.safetensors")):
+            h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
+    f = ROOT / "data" / "interim" / "li_prep" / f"{h.hexdigest()[:20]}.pkl"
+    if f.exists():
+        return pickle.loads(f.read_bytes())
+    out = prepare(b, m1, cache)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    tmp = f.with_suffix(f".tmp{os.getpid()}")
+    tmp.write_bytes(pickle.dumps(out, protocol=5))
+    tmp.replace(f)
+    return out
+
+
 def prepare(b, m1, cache):
     """a budget's events (hist_encoder.events) with each event's query text and its day's category documents:
     (events, docs) where docs[day] = {category id: document text} over the visible categories"""
@@ -365,7 +393,7 @@ def train():
     m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
-        data.append(prepare(b, m1, cache))
+        data.append(prepared(b, m1, cache))
         if cache is not None and n % 50 == 0:
             cache.clear()
     del m1
@@ -488,6 +516,24 @@ def scores(model, scale, ev, docs):
         for a in range(0, len(ev), 256):
             chunk = ev[a:a + 256]
             q = model.vecs([e["q"] for e in chunk])
+            if MODE != "mml" and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
+                ids = [list(e["state"]) for e in chunk]
+                C = max(map(len, ids))
+                cix = torch.tensor([[pos[e["d"][c]] for c in o] + [0] * (C - len(o)) for e, o in zip(chunk, ids)], device=model.dev)
+                qv, qm, qw, qc = q
+                dv, dm = D[0][cix].float(), D[1][cix]                                                     # [b, C, L, d], [b, C, L]
+                sim = torch.einsum("btd,bcsd->bcts", qv, dv)
+                if SOFT:
+                    att = (sim / SOFT).masked_fill(~dm[:, :, None, :], float("-inf")).softmax(-1)
+                    sim = (att * sim).sum(-1)
+                else:
+                    sim = sim.masked_fill(~dm[:, :, None, :], -2).max(-1).values                           # [b, C, t]
+                S = (sim * qw[:, None, :]).sum(-1)
+                if HYBRID:
+                    S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
+                S = (scale * S).tolist()
+                out += [dict(zip(o, S[k][:len(o)])) for k, o in enumerate(ids)]
+                continue
             for k, e in enumerate(chunk):
                 ids = list(e["state"])
                 if MODE == "mml":
@@ -532,7 +578,7 @@ def read():
             inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
-            ev, docs = prepare(b, m1, cache)
+            ev, docs = prepared(b, m1, cache)
             for e, sc in zip(ev, iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)):
                 if e["gold"] not in e["state"]:
                     continue

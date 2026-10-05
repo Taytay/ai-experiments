@@ -7,7 +7,7 @@ right; and three ceilings over decider alone: "either right" (an oracle), "highe
 synthetic set (encoder when its top probability >= G and decider's <= D). Synthetic: TEST_SEEDS held-out v4 households read by decider
 G4 (realstyle_v4g_ngram_test, seeds 0 and 1). Owner's budget (BUDGET set): decider G4 r190 seeds 0 and 1, items_grp_sim2.json; private,
 aggregates only.
-env: TEST_SEEDS (100000-100099), BUDGET.
+env: TEST_SEEDS (100000-100099), BUDGET, ENCS (encoders, one run), OWNER_ENCS.
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 [BUDGET=<id>] uv run python scripts/hist_agree.py
 """
 import json
@@ -128,17 +128,27 @@ def table(rows, title, gates=None):
 
 
 if __name__ == "__main__":
+    # ENCS: several encoders in one run (2026-10-05: one process per encoder re-read decider's scores and rebuilt the households each time);
+    # default the single OUT1 encoder. OWNER_ENCS: the encoders read on the owner's budget when BUDGET is set (default all of ENCS).
+    encs = [x for x in os.environ.get("ENCS", "").split(",") if x] or [H.OUT1.name]
+    owner_encs = [x for x in os.environ.get("OWNER_ENCS", "").split(",") if x] or encs
     items = {it["id"]: it for it in json.loads((PROCESSED / "realstyle_v4g_ngram_test.json").read_text())["items"]}
     dec = [{r["id"]: r["sum_lp"] for r in map(json.loads, open(ROOT / F.SYN.format(seed=s)))} for s in ("", "s1")]
     a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100099").split("-"))
     users = [u for u in sorted({it["user"] for it in items.values()}) if a <= u <= z]
-    syn = records(households("test", users), items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE)
-    gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
-    print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
-    table(syn, f"held-out synthetic households ({len(users)})", gates)
+    budgets = list(households("test", users))
     if os.environ.get("BUDGET"):
         import real_budget_eval as RB
         oitems = {it["id"]: it for it in json.loads((RB.OUT / "items_grp_sim2.json").read_text())["items"] if it["answer"] >= 0}
         odec = [{r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(RB.OUT / f"scores_{t}_split_grp_sim2.jsonl"))} for t in ("r190-g-s0", "r190-g-s1")]
-        own = records([json.loads(RB.CACHE.read_text())["budget"]], oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache")
-        table(own, "owner's budget", gates)
+        obudget = [json.loads(RB.CACHE.read_text())["budget"]]
+    for enc in encs:
+        H.OUT1 = H.ENC / enc
+        print(f"\n=== {enc}", flush=True)
+        syn = records(budgets, items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE)
+        gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
+        print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
+        table(syn, f"held-out synthetic households ({len(users)})", gates)
+        if os.environ.get("BUDGET") and enc in owner_encs:
+            own = records(obudget, oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache")
+            table(own, "owner's budget", gates)

@@ -71,10 +71,43 @@ def replay(b):
     return out
 
 
+def _hh_key(split):
+    """the generator's identity: realstyle.py and statements.py source, the data files they read, and the env flags that change worlds"""
+    import hashlib
+    from ai_experiments import realstyle as R, statements as S
+    from ai_experiments.paths import PROCESSED
+    h = hashlib.sha1()
+    for f in (R.__file__, S.__file__):
+        h.update(Path(f).read_bytes())
+    for f in sorted(PROCESSED.glob("statement_patterns_v*.json")) + [PROCESSED / "realstyle_merchants_v1.json", PROCESSED / "category_style_v1.json"]:
+        if f.exists():
+            h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
+    h.update(f"{os.environ.get('SHARED_WORLD')}|{os.environ.get('REALSTYLE_V4')}|{split}".encode())
+    return h.hexdigest()[:16]
+
+
 def households(split, seeds):
+    """synthetic budgets; cached on disk (data/interim/hh_cache, gitignored; HH_CACHE=0 turns it off): building one takes ~0.4 s, loading
+    it ~0.02 s (2026-10-05: every 100-household read was rebuilding the same households). The key covers the generator's code, data and
+    env flags, so a change to any of them builds afresh."""
+    import pickle
     from ai_experiments import realstyle as R
+    from ai_experiments.paths import ROOT
+    cache = None
+    if os.environ.get("HH_CACHE", "1") != "0":
+        cache = ROOT / "data" / "interim" / "hh_cache" / _hh_key(split)
+        cache.mkdir(parents=True, exist_ok=True)
     for s in seeds:
-        yield R.household(s, split).budget()["budget"]
+        f = cache / f"{split}_{s}.pkl" if cache else None
+        if f and f.exists():
+            yield pickle.loads(f.read_bytes())
+            continue
+        b = R.household(s, split).budget()["budget"]
+        if f:
+            tmp = f.with_suffix(f".tmp{os.getpid()}")
+            tmp.write_bytes(pickle.dumps(b, protocol=5))
+            tmp.replace(f)
+        yield b
 
 
 def train():

@@ -72,6 +72,28 @@ def _triplets(hh, loss, rng):
     return rows
 
 
+def _cached_triplets(hh, loss, rng):
+    """_triplets, cached in data/interim/triplet_cache (2026-10-05: each arm re-mined the same ~200k triplets, ~2.5 min); the key covers
+    the households (two_tower's generator key), the settings that change the mining, and this file and hist_encoder.py's code. The rng's
+    state after mining is stored with the rows and restored on a hit, so a cached run draws the same pool and hs samples as an uncached one."""
+    import hashlib
+    import pickle
+    from two_tower import _hh_key
+    from ai_experiments.paths import ROOT
+    h = hashlib.sha1(f"{_hh_key('train')}|{HOUSEHOLDS}|{PAIRS}|{CAP}|{'dedup' in loss}|{SEED}|{H.AMT_TEXT}".encode())
+    for f in (__file__, H.__file__):
+        h.update(Path(f).read_bytes())
+    f = ROOT / "data" / "interim" / "triplet_cache" / f"{h.hexdigest()[:16]}.pkl"
+    if f.exists():
+        rows, state = pickle.loads(f.read_bytes())
+        rng.setstate(state)
+        return rows
+    rows = _triplets(hh, loss, rng)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_bytes(pickle.dumps((rows, rng.getstate()), protocol=5))
+    return rows
+
+
 def _enc(model, texts, dev):
     f = model.preprocess(texts)
     f = {k: v.to(dev) if hasattr(v, "to") else v for k, v in f.items()}
@@ -122,7 +144,7 @@ def train():
     torch.manual_seed(SEED)
     t0 = time.time()
     hh = [H.events(b) for b in households("train", range(HOUSEHOLDS))]
-    rows = _triplets(hh, loss, rng)
+    rows = _cached_triplets(hh, loss, rng)
     steps = len(rows) // BATCH
     print(f"arm {arm} loss {sorted(loss)}: {len(rows)} triplets, {steps} steps ({time.time() - t0:.0f}s to build)", flush=True)
     logq = Counter(r["pp"] for r in rows)
