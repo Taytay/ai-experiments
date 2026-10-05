@@ -1,0 +1,6 @@
+outs:
+- md5: 588d52bc86f2b4bb79cd4f527f6ef7c9.dir
+  size: 134270993
+  nfiles: 10
+  hash: md5
+  path: hist_r202_b2
