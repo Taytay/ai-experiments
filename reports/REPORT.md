@@ -198,6 +198,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §183 Several prototypes per category (row 204)
 - §184 EVoC for the crowd category clusters (row 213)
 - §185 The late-interaction decision model (rows 210-211)
+- §186 Suggesting a category scheme for a new user (row 214)
 
 <!-- END SECTION INDEX -->
 
@@ -11284,3 +11285,49 @@ minutes. The per-filing arms took ~100 minutes each on Modal (about 3,000 candid
 
 **Cost:** row 210 on Modal, 7 jobs, 26-101 minutes each (about 365 job-minutes, roughly $25 at $4.09 per H100-hour; exact figures from
 `scripts/modal_costs.py --rows 210` once Modal bills the day); speed checks and row 211 $0 (local RTX 3090).
+
+## 186. Suggesting a category scheme for a new user: the crowd's answer (each payee's most common category cluster among other households) beats clustering the household with EVoC (ARI 0.75 against 0.49 at best, EVoC leaving 13-32% of transactions unclustered); amount and rhythm features hurt; payee-level schemes cannot see person-specific categories (REAL-27)
+
+PLAN step 214 (owner, 2026-10-05: "What if I wanted to take a whole list of transactions and have them get auto-clustered for a user, and
+have categories suggested?"; "I'm curious to run EVoC on synthetic data, just to learn"). Exploratory. `scripts/suggest_categories.py`
+(log `logs/r214_suggest.log`). 50 held-out v4 households with their categories hidden: points are distinct payees (crowd key, else the
+clean name; 818 per household on average, 7,593 outflows, 49 real categories), weighted by transaction count. Features: the history
+encoder's vector of the payee name (hist_knn_v1), the crowd vector (other households' filings over row 189's 64 category clusters; covers
+94.3% of transactions), amount and rhythm (log median amount, months present, gaps), alone and combined. Methods: EVoC (default and a
+small-input setting, every layer, and the layer whose count is nearest the truth), agglomerative clustering told the true number of
+categories (an oracle), and two baselines that need no clustering: B1 each payee's most common crowd cluster; B2 its most common crowd
+category name. Scored against the household's real categories: ARI and NMI (transaction-weighted), clusters, edits (merges + splits a
+user would make), unclustered share, transaction purity (share in a cluster whose majority category is its own).
+
+**Table 186.1: means over 50 households (best rows; 6 feature sets x 10 methods in the log)**
+
+| features | method | ARI | NMI | clusters (true 49) | edits | unclustered | purity |
+|---|---|---|---|---|---|---|---|
+| (crowd) | B1 most common crowd cluster | **0.751** | **0.782** | 31 | 367 | 5.7% | 62.6% |
+| (crowd) | B2 most common crowd name | 0.513 | 0.731 | 65 | 436 | 5.7% | 65.6% |
+| crowd | agglomerative, told k = 49 | 0.581 | 0.773 | 49 | **170** | 0 | **69.2%** |
+| encoder + crowd | EVoC default, nearest layer | 0.490 | 0.725 | 31 | 298 | 18.5% | 54.2% |
+| encoder + crowd | EVoC small, nearest layer | 0.396 | 0.703 | 45 | 352 | 23.8% | 51.5% |
+| crowd | EVoC default, nearest layer | 0.399 | 0.684 | 38 | 355 | 13.1% | 55.6% |
+| encoder | EVoC default, nearest layer | 0.346 | 0.593 | 19 | 394 | 24.3% | 40.2% |
+| encoder + crowd + amount | EVoC small, nearest layer | 0.271 | 0.551 | 50 | 408 | 8.5% | 46.5% |
+| amount and rhythm | EVoC small, nearest layer | 0.134 | 0.366 | 68 | 797 | 8.2% | 30.3% |
+
+Ceiling: 30.9% of payees are filed under 2+ categories and carry 86.7% of transactions, so no payee-level scheme can exceed 76.6% purity.
+
+### 186.1 What the step says
+
+- **Ask the crowd before clustering.** Giving each payee the category cluster other households most often use for it (B1) matches the
+  household's real scheme far better (ARI 0.75) than any clustering of the household's own payees; only an oracle told the true number of
+  categories gets close in purity and needs fewer edits. EVoC's density clustering leaves 13-32% of a household's transactions out, and
+  attaching them afterwards recovers only part (ARI 0.49 -> 0.56).
+- **What payees say helps; how money moves does not.** The encoder's payee vectors add little to the crowd's; amount and rhythm features
+  halve ARI wherever they are added (a monthly regular bill and a regular coffee look alike).
+- **The household's own purposes are invisible at payee level:** on the example household, a cluster of coffee and restaurant payees
+  mixed Dining out with one person's morning treats and fun money; person-to-person payments (no crowd key) fell into one 341-payee
+  "Other" cluster, burying a regular house-cleaning payment. A suggestion tool should propose the crowd's scheme, then ask about the
+  splits that are personal (whose money, which trip), which is where the user's own categories differ from everyone's.
+- EVoC is fast and its tree makes a good picture of a household's spending (`data/interim/r214/treemap_100003.json`), but as a
+  category-suggester it is beaten by a lookup.
+
+**Cost:** $0 on Modal (local CPU).
