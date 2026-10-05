@@ -13,12 +13,12 @@ F='Failed to load|warn|Loading|FutureWarning|Bytecode|UNEXPECTED|position_ids|No
 {
   echo "start $(date -u +%H:%M:%S)"
   [ -f models/encoders/hist_r205_crowd/model.safetensors ] && echo "== crowd exists" || \
-    ARM=crowd LOSS=infonce,dedup uv run python scripts/hist_crowd.py train_crowd 2>&1 | grep -vE "$F"
+    ARM=crowd LOSS=infonce,dedup uv run python scripts/hist_crowd.py train_crowd 2>&1 | grep --line-buffered -vE "$F"
   [ -f models/encoders/hist_r205_ngram/tower.safetensors ] && echo "== ngram exists" || \
-    uv run python scripts/hist_crowd.py train_ngram 2>&1 | grep -vE "$F"
+    uv run python scripts/hist_crowd.py train_ngram 2>&1 | grep --line-buffered -vE "$F"
   TEST_SEEDS=100000-100049 \
     ENCS=hist_r205_crowd,hist_r205_crowd:plain,hist_r205_ngram,hist_r202_b1,hist_r202_b1:crowd \
     FUSE=hist_r205_ngram+hist_r202_b1,hist_r205_ngram+hist_r205_crowd \
-    uv run python scripts/hist_crowd.py read 2>&1 | grep -vE "$F"
+    uv run python scripts/hist_crowd.py read 2>&1 | grep --line-buffered -vE "$F"
   echo "== r205 done $(date -u +%H:%M:%S)"
 } 2>&1 | tee logs/r205_crowd.log

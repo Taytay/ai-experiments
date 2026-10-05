@@ -6,8 +6,8 @@ cd "$(dirname "$0")/../.."
 export SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1
 F='Failed to load|warn|Loading|FutureWarning|Bytecode|UNEXPECTED|position_ids|Notes|LOAD REPORT|^Key|^---|Writing model|deprecated'
 echo "start $(date -u +%H:%M:%S)"
-ARM=a1g8lr CTX=1 GROUPS=8 STEPS=380 LR=1.5e-4 uv run python scripts/li_decider.py train 2>&1 | grep -vE "$F"
-ARM=a1g8s1k CTX=1 GROUPS=8 STEPS=1000 uv run python scripts/li_decider.py train 2>&1 | grep -vE "$F"
+ARM=a1g8lr CTX=1 GROUPS=8 STEPS=380 LR=1.5e-4 uv run python scripts/li_decider.py train 2>&1 | grep --line-buffered -vE "$F"
+ARM=a1g8s1k CTX=1 GROUPS=8 STEPS=1000 uv run python scripts/li_decider.py train 2>&1 | grep --line-buffered -vE "$F"
 echo "trained $(date -u +%H:%M:%S)"
-ARMS=a1g8lr,a1g8s1k TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep -vE "$F"
+ARMS=a1g8lr,a1g8s1k TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep --line-buffered -vE "$F"
 echo "== r210 fast2 done $(date -u +%H:%M:%S)"

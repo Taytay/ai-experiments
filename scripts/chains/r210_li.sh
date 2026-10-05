@@ -11,7 +11,7 @@ for a in "a0 MODE=doc" "a1 CTX=1" "a2 SOFT=0.1" "a3 HYBRID=1" "a4 QW=1" "a5 MODE
   set -- $a
   arm=$1; shift
   [ -f models/encoders/li_r210_$arm/li_config.json ] && { echo "== $arm exists"; continue; }
-  env ARM=$arm "$@" uv run python scripts/li_decider.py train 2>&1 | grep -vE "$F"
+  env ARM=$arm "$@" uv run python scripts/li_decider.py train 2>&1 | grep --line-buffered -vE "$F"
 done
-ARMS=a0,a1,a2,a3,a4,a5,a6 TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep -vE "$F"
+ARMS=a0,a1,a2,a3,a4,a5,a6 TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep --line-buffered -vE "$F"
 echo "== r210 done $(date -u +%H:%M:%S)"

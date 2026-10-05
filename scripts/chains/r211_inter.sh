@@ -11,8 +11,8 @@ echo "start $(date -u +%H:%M:%S)"
 for a in "c0 " "x x" "xm xm" "xml xml"; do
   set -- $a
   [ -f models/encoders/li_r211_$1/li_config.json ] && { echo "== $1 exists"; continue; }
-  ARM=$1 INTERACT=${2:-} uv run python scripts/li_decider.py train 2>&1 | grep -vE "$F"
+  ARM=$1 INTERACT=${2:-} uv run python scripts/li_decider.py train 2>&1 | grep --line-buffered -vE "$F"
   echo "trained $1 $(date -u +%H:%M:%S)"
 done
-ARMS=li_r211_c0,li_r211_x,li_r211_xm,li_r211_xml TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep -vE "$F"
+ARMS=li_r211_c0,li_r211_x,li_r211_xm,li_r211_xml TEST_SEEDS=100000-100049 uv run python scripts/li_decider.py read 2>&1 | grep --line-buffered -vE "$F"
 echo "== r211 done $(date -u +%H:%M:%S)"

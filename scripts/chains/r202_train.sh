@@ -10,8 +10,8 @@ echo "start $(date -u +%H:%M:%S)"
 for a in "b0 infonce" "b1 infonce,dedup" "b2 infonce,dedup,logq" "b3 infonce,dedup,pool" "b4 hs" "b5 infonce,dedup,hs"; do
   set -- $a
   [ -f models/encoders/hist_r202_$1/model.safetensors ] && { echo "== $1 exists"; continue; }
-  ARM=$1 LOSS=$2 uv run python scripts/hist_train2.py train 2>&1 | grep -vE "$F"
+  ARM=$1 LOSS=$2 uv run python scripts/hist_train2.py train 2>&1 | grep --line-buffered -vE "$F"
 done
 TEST_SEEDS=100000-100049 ENCS=hist_knn_v1,hist_r202_b0,hist_r202_b1,hist_r202_b2,hist_r202_b3,hist_r202_b4,hist_r202_b5 \
-  uv run python scripts/hist_train2.py read 2>&1 | grep -vE "$F"
+  uv run python scripts/hist_train2.py read 2>&1 | grep --line-buffered -vE "$F"
 echo "== r202 done $(date -u +%H:%M:%S)"
