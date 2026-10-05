@@ -13,11 +13,13 @@ a household's own history into an embedding categoriser, against row 187's two-t
 Only filings before the transaction's day are visible (as two_tower.replay). Training: shared-world v4 households (SHARED_WORLD=1
 REALSTYLE_V4=1, train split); reading: held-out test-world households (READ=households) or the owner's budget on this machine
 (READ=budget; aggregates only). On the owner's budget each reader is also fused with decider's scores (FUSE: real_budget_eval.py score
-files, comma list of tags): log p_decider + W * log softmax(encoder scores) over decider's options, W in WS; decider alone on the same items.
+files, comma list of tags, read with items_grp_sim2.json's "Group: Name" options): log p_decider + W * log softmax(encoder scores) over
+decider's options, W in WS; and gated: the encoder alone where its top probability is at least G (GATES), decider elsewhere, with the
+share the encoder decided; decider alone on the same items.
   train1 / train3   write models/encoders/<OUT1> / <OUT3> (DVC)
   read              prints % top-1 / top-3 / top-10 per reader, by payee filed before or not
 env: BASE, PAIRS (200000), HOUSEHOLDS (400), BATCH (128), OUT1 (hist_knn_v1), OUT3 (hist_ctx_v1), K (20), TAU_KNN (0.05), TAU (0.05),
-     READ (households | budget), TEST_SEEDS (100000-100049), FUSE, WS (0.25,0.5,1,2), SEED (0).
+     READ (households | budget), TEST_SEEDS (100000-100049), FUSE, WS (0.25,0.5,1,2), GATES (0.95,0.9,0.8), SEED (0).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 uv run python scripts/hist_encoder.py train1|train3|read
 """
 import json
@@ -261,10 +263,11 @@ def fuse(ev, sc):
     """decider's log-probs over its options plus W x each reader's log softmax over the same options (options the encoder cannot score,
     such as hidden categories and Ready to Assign, get the reader's lowest score)"""
     import real_budget_eval as RB
-    items = {it["id"]: it for it in json.loads((RB.OUT / "items.json").read_text())["items"] if it["answer"] >= 0}
     ws = [float(w) for w in os.environ.get("WS", "0.25,0.5,1,2").split(",")]
+    gates = [float(g) for g in os.environ.get("GATES", "0.95,0.9,0.8").split(",")]
     for tag in os.environ["FUSE"].split(","):
-        f = next(RB.OUT.glob(f"scores_{tag}_split*grp_sim2.jsonl"))
+        f = RB.OUT / f"scores_{tag}_split_grp_sim2.jsonl"  # the items file that goes with it carries the same "Group: Name" options
+        items = {it["id"]: it for it in json.loads((RB.OUT / "items_grp_sim2.json").read_text())["items"] if it["answer"] >= 0}
         lp = {r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(f))}
         rows = defaultdict(lambda: defaultdict(list))
         for e, r in zip(ev, sc):
@@ -276,18 +279,28 @@ def fuse(ev, sc):
             L = lp[e["id"]]
             for g in groups:
                 rows["decider alone"][g].append(int(np.argmax(L)) == it["answer"])
+            hit = sum(o in by_label for o in it["options"])
+            rows["(options the encoder can score)"]["all"].append(hit / len(it["options"]))
             for m, d in r.items():
                 s = _lsm(d)
                 lo = min(s.values())
                 v = np.array([s.get(by_label.get(o), lo) for o in it["options"]])
+                for g in groups:
+                    rows[f"{m} alone"][g].append(int(np.argmax(v)) == it["answer"])
                 for w in ws:
                     z = L + w * v
                     for g in groups:
                         rows[f"decider + {w} x {m}"][g].append(int(np.argmax(z)) == it["answer"])
+                pmax = float(np.exp(v.max()))
+                for t in gates:  # the encoder answers alone when it is this sure; decider reads the rest
+                    pick = int(np.argmax(v)) if pmax >= t else int(np.argmax(L))
+                    for g in groups:
+                        rows[f"gate {t}: {m}, else decider"][g].append(pick == it["answer"])
+                        rows[f"gate {t}: {m}, share decided by the encoder"][g].append(pmax >= t)
         print(f"\n**owner budget, fused with decider {tag}: % right first (outflows in visible categories that decider also read)**\n")
         print("| reader | all | payee filed before | first-time payee |"); print("|---|---|---|---|")
         for m, st in rows.items():
-            print(f"| {m} | " + " | ".join(f"{100 * np.mean(st[g]):.1f} (n={len(st[g])})" for g in ("all", "payee filed before", "first-time payee")) + " |")
+            print(f"| {m} | " + " | ".join(f"{100 * np.mean(st[g]):.1f} (n={len(st[g])})" if st[g] else "" for g in ("all", "payee filed before", "first-time payee")) + " |")
 
 
 if __name__ == "__main__":

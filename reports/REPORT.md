@@ -10607,3 +10607,107 @@ budget: `scripts/chains/r183_owner.sh` with SPECS, then `real_budget_tables.py` 
   crowd exists, at most ~0.5 when it does not. The best first-time reader on the owner's budget remains the knowledge-trained GK
   (57.95 first, two seeds), statistically tied with G4; combining knowledge episodes, the crowd recipe and row 189's behavioural rows
   in one model is the open step.
+
+## 176. Behavioural similar rows and the crowd line stack on clean keys (first-time payees 55.7 -> 67.9, GCD4, synthetic new world); training on behavioural rows or knowledge episodes adds nothing more, and on the owner's budget (no line, n-gram rows) every arm sits within seed noise of G4 (73.6) and GK (73.7) (REAL-27, MODEL-28)
+
+PLAN steps 192-193 (owner, 2026-10-04: "Do 1 and 2"). v4 world (`REALSTYLE_V4=1`, `CROWD_KEY=v2`); category clusters rebuilt on v4
+(`build_crowd_clusters.py`, two_tower_v1, k=64; `realstyle_crowdclus_v4_{train,test}.json`); test sets with similar rows by character
+n-grams or by behaviour, each without and with the crowd line (`scripts/chains/r192_data.sh`). Row 192: G4 and GCD4 (row 190) read them.
+Row 193: K4 (v4g + knowledge episodes 20k x 6.5 at 40%), CDB4 (crowd line 40% dropped + behavioural rows in training,
+`realstyle_v4gcdb_train.jsonl`), KCDB4 (both); two seeds; `modal_jobs/r192_193.json`. Tables: `CROWD_KEY=v2 uv run python
+scripts/r192_tables.py`; owner's budget as REPORT 175.
+
+**Table 176.1: synthetic new world, first-time payees (n=928), % right first, means of seeds 0 and 1**
+
+| arm | own rows | n-gram rows | behavioural rows | + line, own rows | + line, n-gram rows | + line, behavioural rows |
+|---|---|---|---|---|---|---|
+| G4 | 54.6 | 61.3 | 64.2 | 59.3 | 62.3 | 63.4 |
+| GCD4 | 55.7 | 62.5 | 64.8 | 63.1 | 67.1 | **67.9** |
+| K4 | 54.5 | 60.2 | 63.7 | 58.8 | 61.7 | 62.0 |
+| CDB4 | 54.4 | 61.3 | 64.0 | 60.5 | 65.8 | 66.9 |
+| KCDB4 | 52.4 | 60.0 | 64.6 | 58.6 | 63.8 | 66.3 |
+
+All items: GCD4 72.7 (own rows) -> 74.4 / 74.3 with the line and similar rows; payees filed before move by less than 0.5 everywhere
+except G4 and K4 shown a line they never trained with (-5 to -6). Training world (n=1196): GCD4 60.2 -> 70.1 with line + behavioural rows.
+
+**Table 176.2: owner's budget (no line, SIM=2 n-gram rows), means of seeds 0 and 1; first / top 3 / top 5**
+
+| arm | all (21,238) | payee filed before (15,032) | first-time payee (6,206) |
+|---|---|---|---|
+| GK (row 181-182) | 73.7 / 85.25 / 87.95 | 80.25 / 90.3 / 92.3 | **57.95** / 73.05 / 77.4 |
+| G4 | 73.6 / 84.9 / 87.85 | 80.35 / 90.35 / 92.5 | 57.15 / 71.75 / 76.7 |
+| CDB4 | 73.55 / 84.8 / 87.65 | 80.2 / 90.35 / 92.4 | 57.4 / 71.45 / 76.25 |
+| KCDB4 | 73.0 / 85.15 / **88.05** | 79.6 / 90.45 / 92.7 | 57.05 / 72.35 / 76.95 |
+| GCD4 | 72.9 / 84.65 / 87.55 | 79.55 / 90.2 / 92.4 | 56.7 / 71.15 / 75.85 |
+| K4 | 72.9 / 84.45 / 87.25 | 79.65 / 89.75 / 92.0 | 56.6 / 71.55 / 75.8 |
+
+### 176.1 What the steps say
+
+- **The two cross-user signals are complementary:** behavioural similar rows add +2.3 over n-gram rows without the line and +0.8 with it;
+  the line adds +3.1 to +4.6 over the rows alone; together +12.2 over own rows only (GCD4, new world). Where YNAB has crowd data, both
+  belong in the prompt; behavioural rows need only other users' filings, not a trained line.
+- **Training with behavioural rows (CDB4) or knowledge episodes (K4, KCDB4) adds nothing on synthetic households:** GCD4, trained on
+  n-gram-free own rows, reads behavioural rows zero-shot as well as CDB4 does. Knowledge episodes cost about 1-3 points on synthetic
+  first-time payees (their merchants are invented; the episodes teach real ones).
+- **The owner's budget does not separate the arms:** all six within 0.8 on first guess and 0.8 on top 5, inside seed noise. The
+  owner's budget has no crowd data, so the steps' gains cannot show there; a real crowd test needs the owner's crowd data.
+
+## 177. History-aware encoders: letting a transaction's nearest earlier transactions vote (bge-small, trained transaction <-> transaction) files 68.4% of the owner's spending right with no LLM (two-tower 47.2), late interaction over a category's filings 69.6 (top 10 93.3); fused with decider they add +1.0 to +1.5 overall and +1.6 to +2.6 on first-time payees (two decider seeds), and gated they settle 36-50% of transactions alone at no loss (REAL-27, MODEL-25)
+
+PLAN steps 194-195 (owner, 2026-10-04: "embed the historical similar transactions"; "try all 3 approaches ... on its own, or to enhance an
+LLM prediction"; "also try the late interaction models ... Especially the Pinterest stuff"). `scripts/hist_encoder.py`,
+`scripts/hist_encoder2.py`; all encoders BAAI/bge-small-en-v1.5 (MIT), one epoch on 200,000 triplets from 400 v4 training households,
+local 3090 (3 to 25 minutes each); DVC `models/encoders/hist_{knn,ctx,transact,colbert}_v1`. Readers: (1) kNN vote of the 20 nearest
+earlier transactions (encoder trained with positives = earlier same-category transactions, half another payee; hard negative = the most
+string-similar earlier transaction filed elsewhere); (2) prototypes (mean of a category's filings); (3) query + its 5 nearest earlier
+transactions and their categories, against row 187's category text; (4) TransAct V2's rule: 5 most recent + 5 nearest, with ages;
+(5) MaxSim: a category = the set of its filings, mean of the query's 3 best cosines; (6) token-level ColBERT (128-d token vectors,
+MaxSim InfoNCE, plain PyTorch; PyLate 1.6.0's pins break this environment's torch) rescoring encoder 1's 50 nearest. Fusion: log p_decider
++ W x log softmax(reader) over decider's options (decider G4, r190, seeds 0 and 1; W from 0.25, 0.5, 1, 2); gate: the reader alone where
+its top probability >= G, decider elsewhere. Owner's budget: 17,755 outflows in visible categories (private; aggregates only).
+A first fusion read matched decider's options against the plain-name items file (11 of 163 options matched); `r195_fuse.sh` re-read it
+with `items_grp_sim2.json` (88% of options matched: hidden categories and Ready to Assign are not scored by the encoders). The answer
+index agrees between the two items files on all 21,339 items, so earlier owner tables stand.
+
+**Table 177.1: % right first / top 3 / top 10, readers alone**
+
+| reader | held-out households: all (359,050) | first-time (53,479) | owner: all (17,755) | owner: filed before | owner: first-time |
+|---|---|---|---|---|---|
+| 1 kNN | 74.5 / 89.0 / 91.9 | 60.0 / 78.7 / 84.7 | 68.4 / 82.3 / 87.5 | 76.2 / 89.1 / 92.7 | 49.7 / 66.0 / 75.1 |
+| 2 prototypes | 55.9 / 77.1 / 90.9 | 47.1 / 68.8 / 87.4 | 48.2 / 66.6 / 83.8 | 52.3 / 71.5 / 87.7 | 38.4 / 55.1 / 74.6 |
+| 3 history in query | 70.1 / 86.9 / 94.1 | 55.4 / 75.8 / 87.0 | 65.8 / 79.3 / 86.2 | 73.2 / 86.8 / 92.7 | 48.2 / 61.7 / 70.9 |
+| 4 TransAct | 70.7 / 86.6 / 93.6 | 55.8 / 74.7 / 86.3 | 65.0 / 80.7 / 88.7 | 70.8 / 86.8 / 93.2 | 51.2 / 66.2 / 78.0 |
+| 5 MaxSim | 73.4 / 90.2 / 95.9 | 59.2 / 79.8 / 91.2 | **69.6** / 83.0 / **93.3** | **77.4** / 89.2 / 96.1 | 51.2 / 68.2 / 86.8 |
+| 6 ColBERT | 74.6 / 89.0 / 91.8 | 59.9 / 78.3 / 84.4 | 69.5 / 82.6 / 87.3 | 77.3 / 89.2 / 92.5 | 50.9 / 66.9 / 75.0 |
+| two-tower (row 187) | 55.0 / 79.0 / 92.6 | 50.2 / 75.9 / 92.1 | 47.2 / 64.4 / 78.2 | 51.3 / 70.0 / 82.8 | 37.3 / 51.1 / 67.3 |
+| decider G4, same items | | | 74.3 / 73.4 (seeds) | 80.7 / 79.8 | 59.0 / 58.2 |
+
+**Table 177.2: owner's budget, decider G4 fused or gated, % right first [seed 0 / seed 1]**
+
+| system | all | payee filed before | first-time payee |
+|---|---|---|---|
+| decider alone | 74.3 / 73.4 | 80.7 / 79.8 | 59.0 / 58.2 |
+| + 0.5 x MaxSim | **75.3 / 74.9** | 81.5 / 81.1 | 60.6 / 60.3 |
+| + 0.25 x TransAct | 75.1 / 74.8 | 81.2 / 80.8 | 60.5 / **60.8** |
+| + 0.25 x history in query | 75.0 / 75.0 | 81.5 / 81.4 | 59.7 / 59.9 |
+| + 0.25 x kNN | 74.5 / 74.6 | 81.2 / 81.1 | 58.8 / 59.2 |
+| + 0.25 x two-tower (row 187) | 74.6 / 74.0 | 80.9 / 80.6 | 59.5 / 58.6 |
+| gate 0.9: kNN alone on 35.6% | 74.4 / 73.8 | 80.9 / 80.2 | 59.0 / 58.5 |
+| gate 0.8: ColBERT alone on 50.0% | 74.3 / 73.8 | 80.8 / 80.3 | 58.8 / 58.4 |
+| gate 0.95: history in query alone on 43.7% | 74.2 / 73.6 | 80.7 / 80.1 | 59.0 / 58.4 |
+
+### 177.1 What the steps say
+
+- **History is what the encoder was missing.** Comparing a transaction with the household's earlier transactions (kNN, MaxSim,
+  ColBERT) instead of with a category description lifts the owner's budget from 47 to 68-70 right first with no LLM, 3-4 points under
+  decider on payees filed before. Late interaction at the transaction level (MaxSim) is the best single reader and keeps the right
+  category in its top 10 93% of the time (decider's top 10: ~90). Token-level ColBERT adds nothing over whole-transaction vectors here.
+- **Fused with decider they help, on both decider seeds:** +1.0 / +1.5 overall and +1.6 / +2.1 on first-time payees with MaxSim; the
+  encoder catches cases where the household's own near-duplicates point one way and decider's 24-row prompt missed them. W was picked
+  from four values on this budget; the gain holds for both seeds and for W 0.25 and 0.5 alike, so the selection effect is small, but a
+  held-out W is the next check.
+- **Gated, they save calls at no cost:** kNN's confident 36% (ColBERT's 50% at 0.8) can be filed without decider and the system's
+  accuracy is unchanged or slightly higher. MaxSim's scores are too flat to gate at these thresholds (its temperature is uncalibrated).
+- **Prototypes are weak** (48): an average of a category's filings blurs categories that hold several kinds of thing (trips, people).
+- **Next:** gate and fuse together (encoder alone when sure, fused elsewhere); calibrate MaxSim's temperature on synthetic households;
+  row 196's per-user state.
