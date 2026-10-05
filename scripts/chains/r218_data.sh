@@ -4,6 +4,7 @@
 set -eu
 cd "$(dirname "$0")/../.."
 export SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 CTX=1
+until grep -q "trained q1" logs/r217_query.log; do sleep 20; done  # q1 trains with the old 16 GB data path
 echo "start $(date -u +%H:%M:%S)"
 uv run python - <<'PY' 2>&1 | grep --line-buffered -vE "Failed to load|warn|Loading|FutureWarning|Bytecode"
 import sys, time
