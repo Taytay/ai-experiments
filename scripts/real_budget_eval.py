@@ -78,18 +78,22 @@ def yaml_value(v):
 KIND_COVER, KIND_NOISE = float(os.environ.get("KIND_COVER", "0.5")), float(os.environ.get("KIND_NOISE", "0.08"))  # row 182, households only
 ALIAS_EMB, ALIAS_EMB_MIN = os.environ.get("ALIAS_EMB", ""), float(os.environ.get("ALIAS_EMB_MIN", "0.95"))  # row 186: alias matches from
 # payee_emb_<ALIAS_EMB>.npz (encode_payees_local.py) at cosine >= ALIAS_EMB_MIN, added to the n-gram aliases; the similar rows keep SIM_EMB's
+SIM_SRC = os.environ.get("SIM_SRC", "")  # row 189: "ngram" | "behav" (with CROWD_CLUS, build_crowd_clusters.py) in place of a name embedding
+CROWD_CLUS = os.environ.get("CROWD_CLUS", "")
 SIM_EMB = os.environ.get("SIM_EMB", "")  # row 186: payee_emb_<SIM_EMB>.npz (encode_payees_local.py) as the similar-payee embedding
 CROWD = os.environ.get("CROWD", "")  # row 183: a crowd table (build_crowd.py) under data/processed: "Others filed this payee as: ..." under
 CROWD_K, CROWD_TOP = int(os.environ.get("CROWD_K", "2")), 4  # the query when CROWD_K or more other households filed its bank string
 CROWD_DROP = float(os.environ.get("CROWD_DROP", "0"))  # row 185: leave the line out of this share of items that have one (training only),
 # so that its absence stops meaning "a rare merchant" (REPORT 169.2)
+CROWD_HH_DROP = float(os.environ.get("CROWD_HH_DROP", "0"))  # row 188: this share of households carries no crowd line at all (training only;
+# REPORT 171: on a budget with no crowd data the line is missing everywhere, not item by item)
 KIND_FILE = os.environ.get("KIND_FILE", "")  # row 182: "" | "_v2" | "_ov": which payee_kinds<KIND_FILE>.json (merchant_db_match_real.py) a real budget reads
 KIND_SKIP = {"several", "purpose", "p2p", "income", "savings", "loan"}  # not merchants
 KIND = os.environ.get("KIND", "")  # row 182: "rows": a "Kind: <taxonomy_v2 kind>" line under every history row and the query whose payee
 # has one (real budgets: merchant_db_match_real.py's payee_kinds.json; synthetic households: the generator's kind for KIND_COVER of payees,
 # KIND_NOISE of them a wrong kind, as a lookup would find them). Row 172: "new" | "all": a "Kind: <Overture category>" line under the transaction (overture_lookup.py's
 # match of the payee), for first-time payees only or for every matched payee (row 149's line, read zero-shot as in REPORT 144)
-SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + (f"_{SIM_EMB}" if SIM_EMB else "") + (f"_alias{ALIAS_EMB}{round(ALIAS_EMB_MIN * 1000)}" if ALIAS_EMB else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
+SFX = ("_grp" if GROUPNAMES else "") + ("_ids" if ROWIDS else "") + ("_fields" if FIELDS else "") + ("_wide" if WIDE else "") + ("_sim2" if SIM2 else "_sim" if SIM else "") + ("_desc" if DESC else "") + ("_pline" if PLINE else "") + (f"_kind{KIND}{KIND_FILE}" if KIND else "") + (f"_{SIM_EMB}" if SIM_EMB else "") + (f"_{SIM_SRC}" if SIM_SRC else "") + (f"_alias{ALIAS_EMB}{round(ALIAS_EMB_MIN * 1000)}" if ALIAS_EMB else "") + ("_crowd" if CROWD else "") + (f"_drop{round(CROWD_DROP * 100)}" if CROWD_DROP else "") + (f"_hh{round(CROWD_HH_DROP * 100)}" if CROWD_HH_DROP else "")  # items_wide.json / items_sim.json, scores_<reader>_split<sfx>.jsonl
 EMB_TEXT = "Payee as it appears on a bank statement: {}"  # REPORT 152's payee rendering
 CUE = "\nIn one word, the kind of spending:"
 SHARED_HEAD, NEAR_HEAD = "Earlier transactions:", "Earlier transactions at this payee and similar payees:"
@@ -218,11 +222,28 @@ def build_items(b):
         by_payee_name[r["payee"]].append(i)
     if SIM:
         import numpy as np
-        e = np.load(OUT / (f"payee_emb_{SIM_EMB}.npz" if SIM_EMB else "payee_emb.npz"), allow_pickle=False)
-        names, X = list(e["names"]), e["vecs"].astype(np.float32)
+        if SIM_SRC:  # row 189: neighbours without a name embedding: "ngram" (character n-grams only) or "behav" (crowd vectors over clusters)
+            names = sorted(by_payee_name)
+            if SIM_SRC == "behav":
+                from build_crowd import crowd_key as _ck
+                clus = _crowd(CROWD_CLUS)
+                me_ = int(b["id"].rsplit("-", 1)[1]) if b["id"].startswith("realstyle-") else None
+                X = np.zeros((len(names), clus["k"]), np.float32)
+                for k_, n_ in enumerate(names):
+                    for key_ in {_ck(rows[i]["raw"]) for i in by_payee_name[n_]}:
+                        for c_, hs in clus["keys"].get(key_, {}).items():
+                            X[k_, int(c_)] += len(set(hs) - {me_})
+                X[X.sum(1) < CROWD_K] = 0  # too few other households: no vector (falls to the n-gram list in the fusion)
+            else:
+                X = np.zeros((len(names), 1), np.float32)
+        else:
+            e = np.load(OUT / (f"payee_emb_{SIM_EMB}.npz" if SIM_EMB else "payee_emb.npz"), allow_pickle=False)
+            names, X = list(e["names"]), e["vecs"].astype(np.float32)
         X /= np.clip(np.linalg.norm(X, axis=1, keepdims=True), 1e-9, None)
         Sm = X @ X.T; np.fill_diagonal(Sm, -np.inf)
         top = np.argsort(-Sm, axis=1)[:, :200]
+        if SIM_SRC:  # payees without a vector have no embedding neighbours: the n-gram list alone ranks them
+            top = [list(top[k]) if X[k].any() else [] for k in range(len(names))]
         neighbours = {n: [names[j] for j in top[k]] for k, n in enumerate(names)}
         if SIM2:
             import re
@@ -257,6 +278,8 @@ def build_items(b):
         from build_crowd import crowd_key
         crowd = _crowd(CROWD)["keys"]
         me = int(b["id"].rsplit("-", 1)[1]) if b["id"].startswith("realstyle-") else None
+        if CROWD_HH_DROP and me is not None and int(hashlib.md5(f"hhdrop-{me}".encode()).hexdigest(), 16) % 1000 < CROWD_HH_DROP * 1000:
+            crowd = {}
     for r in rows:
         r["kl"] = ""
     if KIND == "rows":

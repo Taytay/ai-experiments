@@ -6,7 +6,7 @@ either code, results, or reference material that the queue points into.
 **"Do the next step"** means: take the first row in the queue whose Status is `todo` and whose
 Needs are all `done`, and follow the procedure below. Do not skip ahead or bundle rows.
 
-## Current state (2026-10-03; overwrite this block when it changes)
+## Current state (2026-10-04; overwrite this block when it changes)
 
 A fresh agent starts here, then reads the research agenda at the end of `reports/QUESTIONS.md` and REPORT.md section 1.
 
@@ -36,7 +36,7 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   branch; copy adapters into `models/adapters/`, `just push-models`, commit the new `models/adapters/<name>.dvc` files, then `just drop-all`.
 - **External data:** Overture places (81.5M POIs, 11 GB) at `~/projects/YNAB/data/overture/places/2026-09-23.1/`, outside the repo;
   provenance and licences in `data/external/overture_places_2026-09-23.1/`. Anything frozen from it keeps each place's id and sources.
-- **In flight (2026-10-03):** nothing on Modal; everything committed and pushed; models and large item sets in DVC. Rows 117 to 159
+- **Status as of 2026-10-03 (history; for today see "In flight (2026-10-04)" below):** models and large item sets in DVC. Rows 117 to 159
   done (REPORT.md 116 to 154; section 1 summarises them). Since 2026-10-01 (146 to 154): strands-decider evaluated and trained three ways
   (= decider-2B, or decider-4B at 4B, once given the shot-label loss; not adopted), decider's readout on strands' own corpus (>= v19),
   capacity (rank 64 stays: more capacity forgets first-time payees), and embeddings from decider (good for categories and for mapping
@@ -79,36 +79,54 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   - Best so far on the budget (21,238 transactions, YNAB's rule 57.9% right first): decider-4B recipe with alias rows + fused
     similar-payee rows (`SIM=2`) 72.2 (top 10 89.6); system (gate + untrained 35B for first-time payees) 74.2 / 84.5 in a list of 3 /
     76% work saved; trained 35B system 74.3. Payee resolution alone lifts YNAB's rule to 64.0. Readout is fp32 (bf16 tied 1.7%).
-- **Branches:** stack #24 now runs to #82: #77 plan-163-real-budget, #78 plan-165-real-budget-gate, #79 plan-166-similar-payees,
-  #80 plan-167-prompt-variants, #81 plan-171-payee-resolution, #82 plan-172-overture-lookup (top). Stack order is not numeric (#20
-  after #23); link with `gh stack link 5 6 8 9 10 11 12 13 14 15 16 17 18 19 21 22 23 20 25 26 ... 82 <new-branch>`.
-- **Now (2026-10-03): row 173, started (branch plan-173-overture-weights).** Revised with the owner while starting:
-  - Found: row 107 (REPORT 108) already put real Overture businesses into decider's training (`OVDB`, overture_pool_v1: 33,555
-    random places, 12 standard categories): +5 to +11 on real businesses in no database, but blind auto-filing 55% -> 42% and REAL-6 -1.5
-    to -3, so it is not in decider's recipe. Only 8.9% of the owner's Overture-matched payees are in that pool. Brands cover only 7 to 9% of
-    the owner's first-time-payee transactions even at 20k brands (most first-time payees are local): stored facts about chains can add
-    ~2 points there at most; the larger lever is the skill of reading what an unknown business is, which needs training users whose
-    categories span many kinds of merchant.
-  - Owner: corrupt payees only in ways real strings show; done: `scripts/statement_patterns.py` measured a grammar of aggregate
-    frequencies from the budget's raw strings (`data/processed/statement_patterns_v1.json`: case, Sale/Return lead, processor prefix,
-    suffix type, run-together, truncation widths 20/21/22/25 for 22%), `ai_experiments.statements.render_v2` samples it (matches the rates
-    within ~1 point except case style). The old `transactions.render` (always upper case, card words 37%, city 32%, dates 37%) is far from
-    real strings (0.3%, 1.3%, 4%).
-  - Owner: broaden the canonical 12; look at an MCC database. Done: `ai_experiments.overture_canon` (284 Overture categories -> the 41
-    canonical kinds; 95.8% of US places, 98.9% of the owner's matched payees); MCC codes (981, Unlicense) in `data/external/mcc_codes/`.
-    Next: a two-level taxonomy (`ai_experiments.taxonomy_v2`): ~300 MCC merchant types (fine; airlines / hotels / car rentals for the
-    683 brand codes) -> ~60 kinds (the 41 broadened: liquor, airline / hotel / car rental split, home services and trades, furniture vs
-    home improvement, jewellery, second-hand / pawn, tobacco, digital goods and games, lottery and gambling, fines and court costs, legal
-    and accounting, shipping and postage, funeral, ...); Overture categories and the old 41 mapped onto it.
-  - Then: a training-episode family whose users have categories at mixed granularity over the taxonomy (fine "Bakeries", middle
-    "Restaurants", merged "Food", catch-alls, purpose categories; counts and long tail from the budget's aggregates: ~96 offered, 86 of 154
-    used < 20 times), history rows from a stratified Overture pool (independents per kind for skill + top 5k brands for facts, a hash half
-    held out) and MCC-only kinds (subscriptions, utilities, insurance, taxes) from name banks, all rendered with render_v2; smaller share
-    than row 107's 0.2 to protect auto-filing. Arms: recipe / + taxonomy episodes / + brand facts; read the owner's first-time payees
-    (brand / local match / unmatched), REAL-6, blind v1 / v2, novel_merchants_v1, blind auto-filing; REPORT 161.
-- **Later, proposed:** 168 (train on real filings with "might be / definitely isn't" losses), 169 (a generator calibrated to real
-  budgets), 170 (distil or prune the 35B), better payee consolidation (row 171's open problem: train the combiner on relabelled pairs;
-  a person-to-person parser), 160 to 162 as before. Also offered, not queued: JevBench for row 154's model, a single-pass table layout.
+- **Branches (2026-10-04):** stack #24 runs to #87 (plan-179-wikidata-merchants, pushed). Local only, NOT pushed (the push and
+  `gh stack link` were refused by the permission check; the owner runs them): plan-180-knowledge-scale (row 180) -> merged forward into
+  plan-181-group-labels (rows 181, 180 done) -> plan-182-kind-line (rows 182 and 183: one branch, since 183 grew out of 182) ->
+  plan-185-crowd-dropout (rows 185, 186; 186 should have been its own branch) -> plan-187-two-tower (rows 187, 188, in progress, the
+  checkout's branch). Link: `git push origin <branches>` then `gh stack link 5 6 8 ... 87 plan-180-knowledge-scale plan-181-group-labels
+  plan-182-kind-line plan-185-crowd-dropout plan-187-two-tower` (the full PR list: `gh pr list --state open --json number`).
+- **What rows 173 to 186 found (REPORT 161 to 171; section headlines carry the numbers):**
+  - Real-style households (categories are purposes, owner's style; `ai_experiments.realstyle`, render_v2 strings, taxonomy_v2) lift the
+    owner's budget (REPORT 161); group names "Group: Name" help person-scoped categories once trained (166).
+  - **Seed noise on the owner's budget is 1 to 2 points** (REPORT 168: G 73.2 / 74.3, GK 74.6 / 72.8). Compare on two seeds or paired
+    reads (one model read two ways). Single-seed owner-budget gains in REPORTs 165 to 167 are within noise.
+  - Merchant knowledge in the weights (merchant database `~/projects/YNAB/data/merchants/merchants_v1.db`, 297k payable businesses from
+    Curlie / DMOZ / Wikidata / Overture / Majestic; packed kind episodes): the kinds are learnt (coverage beats repetition, ~11 exposures
+    keep most, REPORT 167) but do not move first-time payees on the owner's budget, even those whose merchant was trained.
+  - "Kind:" lines from a name lookup: right for only ~55% of transactions (database ~49%, Overture ~75%; hand audit, REPORT 168);
+    wrong lines cost 1.5 on first-time payees, right ones add nothing. Name lookups need entity resolution.
+  - **Other households' filings of the same bank string** ("Others filed this payee as: Restaurants (15), Eating out (7)", the owner's
+    idea; shared synthetic world `SHARED_WORLD=1`, `build_crowd.py`, `real_budget_eval.py CROWD=`): first-time payees +6 to +7 once
+    trained (REPORT 169, two seeds); weights alone learn part of it (+3.4 on merchants other users filed). Trained with the line, the
+    model loses 1.5 on the owner's budget, which has no line; dropping it from 40% of episodes (`CROWD_DROP`) halves that (REPORT 171).
+  - Contrastive payee encoder (`train_payee_encoder.py`, bge-small, InfoNCE + same-first-word hard negatives; `models/encoders/
+    payee_enc_v1`): halves false alarms in real payee matching (6.9% against 13.9 / 23.9) at lower recall; no categorisation gain as
+    retriever or extra aliases (REPORT 170). Its use: payee matching and crowd keys.
+  - Owner's budget, best readers (right first, two-seed means where run): G3 73.55, G 73.75, GK 73.7; single seeds up to 74.6 (GK20).
+- **In flight (2026-10-04, late):**
+  - Row 188 done (REPORT 174): whole-household absence no better than item dropout; ~0.6 cost on known / alias payees remains.
+  - Row 190 (v4 data, both fixes, built: crowd tables `realstyle_crowd_v4_*`, households v4g / v4gcd / v4gcdh, test sets v4g / v4gc
+    (+ _seen)): `scripts/chains/r190_launch.sh` (running in the background) waits for the row-188 owner scoring to finish, then
+    DVC-adds the v4 files, commits, and launches `scripts/modal_jobs/r190.json` (six jobs: G4 / GCD4 / GCDH4, two seeds) detached. If
+    the session ended before that: run the script by hand. Then ingest (`ingest_modal.py r190-...`), `just push-models`, add the arms
+    to `r183_tables.py` (v4 test-set names), score the owner's budget without the line (G4 / GCD4 / GCDH4), write REPORT, and run row
+    189's behavioural rows on v4 too (rebuild `build_crowd_clusters.py` with CROWD_KEY=v2 REALSTYLE_V4=1).
+  - Done today: rows 187 (two-tower, REPORT 172) and 189 (behavioural two-hop rows, REPORT 173: +1.5-2.6 on first-time payees).
+- **Proposed, not started:** 184 (a merchant description line as the fallback for payees no one has filed; owner: needs web-search
+  agents or a strong model to describe the top 100k payees); a real crowd test on the owner's budget when the owner brings crowd data
+  (owner: "I'll get you better data another time"); 178 (prompt fixes: similar rows only above thresholds, corporate-suffix stripping);
+  v3 households (per-person payees, accounts on rows); 168 to 170, 160 to 162, 164 (Clef) as before.
+- **Known generator bug (found 2026-10-04, row 189; fixed in v4, `REALSTYLE_V4=1`):** `realstyle.Household._payee`'s recode step
+  took a one-word upper-case name after a processor star for an order code ("SQ *BAKERY" -> "SQ *Q3JS4FB4X"). Measured by whether
+  any of the clean name is left in the string: ~0.3% of v3 merchant strings (the first count, 1.1-1.5%, was a loose regex that also
+  caught "ALDI*<code>"); v4 re-codes only render_v2's recorded Reference and loses no names.
+- **Known lookup bug (found 2026-10-04):** `build_crowd.crowd_key` strips every 5+-character token after a `*`, not only order codes, so
+  one-word names collapse into the processor ("SQ *BAKERY", "PWP *1PASSWORD" -> "sq" / "pwp", keys shared by 700+ households):
+  4.6-5.1% of crowd lines in rows 183 / 185 / 188 (and row 189's behaviour vectors) pooled unrelated merchants. Effect: noise lines,
+  so the crowd gains are if anything understated; the dependence finding stands. Fix: strip only tokens mixing letters and digits;
+  `CROWD_KEY=v2` does; v4 data (row 190) is built with both fixes. Row 186's encoder is unaffected.
+- **Local GPU (owner, 2026-10-04):** small, short jobs may run on the local 3090 (encoders, embedding private strings, smoke tests);
+  long trainings and parallel batches stay on Modal.
 
 ## Procedure for one step
 
@@ -318,6 +336,10 @@ afternoon each on the 3090.
 | 184 | [Q2] (possibility, not started; owner, 2026-10-04: "We can wait on the description line. Just note it as a possibility.") A merchant description line ("About: online retailer of contact lenses") instead of a kind, as the fallback for payees no other user has filed: the database has descriptions for Curlie / DMOZ / Wikidata merchants (two thirds; none for Overture), but wrong matches stay wrong and the training households' merchants have none. Owner: describing the top ~100k payees well needs an agent swarm doing web searches or a strong model reading each one. Also a knowledge target: generate a merchant's description from its bank string rather than classify it into 55 kinds. | REAL-27, MODEL-28 | 183 | todo | |
 | 185 | [Q2] Crowd-line dropout (REPORT 169.2: trained with the line, the model loses 1.5 on the owner's budget without it): leave the line out of 40% of training episodes that have one (`real_budget_eval.py CROWD_DROP=0.4`, `realstyle_v3gcd_train.jsonl`), two seeds; must hold G3's level without the line (owner's budget, synthetic) and keep most of the +6-7 on first-time payees with it. | REAL-27 | 183 | done | REPORT.md 171: dropout keeps the line's benefit (+6.7 / +6.6 first-time, synthetic) and halves the cost without it (owner's budget 72.8 against G3 73.55, GC 72.1; two seeds); next: whole households without a crowd |
 | 186 | [Q2] A contrastive payee encoder (owner, 2026-10-04: "triples or hard negatives ... cause the clean payee and the corrupted payee to embed very close together"): bge-small (MIT) trained with in-batch negatives plus mined hard negatives (same first word) on synthetic renderings (statements.render_v2) of 84k merchants (`train_payee_encoder.py`); read on held-out merchants and on the owner's real payee-resolution replay (REPORT 159, private, aggregates) against Jaro-Winkler and decider's embedding; if it wins, as the similar-payee retriever on the owner's budget (paired read) and as the crowd key. | REAL-27 | 183 | done | REPORT.md 170: false alarms on new payees 13.9% -> 6.9% (real replay), recall 61 vs Jaro-Winkler 75; as the similar-row retriever -0.9 / -1.6 on no-alias payees; as extra aliases correct but redundant (accuracy unchanged); its use is payee matching and crowd keys |
+| 187 | [Q2] A two-tower payee <-> category encoder (owner, 2026-10-04: "Could we push categories and payees together embeddings wise using this same mechanism?"): bge-small, transaction text ("<string> | $amount | weekday") against category text ("Group: Name; recently: <3 payees last filed there>", only earlier filings), InfoNCE with in-batch negatives plus another category of the same household; shared-world households (`scripts/two_tower.py`, local GPU); read on test households and the owner's budget (locally, aggregates): top-1 / 3 / 10 against decider, as a shortlist for decider, and later to map other users' categories onto the user's own for the crowd line. | REAL-27, MODEL-25 | 186 | done | REPORT.md 172: held-out households 53.0 top-1 / 91.8 top-10 by cosine (32.4 / 74.7 untrained); owner's budget 47.2 / 78.2 (40.7 / 76.7): no shortlist on real data; category side used in row 189 |
+| 188 | [Q2] Whole households without a crowd line (REPORT 171: item dropout halves the cost of a missing line; on a budget with no crowd data it is missing everywhere): `CROWD_HH_DROP=0.3` with `CROWD_DROP=0.4` (`realstyle_v3gcdh_train.jsonl`), two seeds; synthetic sets with and without the line, the owner's budget without it; target G3's 73.55 there and +6-7 on first-time payees with the line. | REAL-27 | 185 | done | REPORT.md 174: no better than item dropout on the owner's budget (72.95 against GCD 72.8, G3 73.55; two seeds); keeps the line's gain (+6.5 / +6.3); ~0.6 cost left on known and alias payees |
+| 189 | [Q2] Behavioural payee similarity, two hops (owner, 2026-10-04: "payee X is often categorized as category clusters x, y, and z, and clusters x, y, and z are the way payees a, b, and c are often categorized"): cluster categories across households with row 187's category tower (name + recent payees); a crowd vector per bank string (share of other households' filings per cluster); pick the similar-payee rows from the user's own payees by cosine between crowd vectors (weighted by crowd size, fallback to SIM=2 when thin); paired reads of G3 and GCD on the synthetic test sets (first-time payees, no alias especially); the owner's budget once real crowd data exists. Later: a contrastive term in decider only if this shows a clear gain. | REAL-27, MODEL-25 | 187 | done | REPORT.md 173: behavioural similar rows lift first-time payees 1.5-2.6 over n-gram rows (7 over none), both seeds and worlds, zero-shot; with the crowd line and on v4 data next (row 190) |
+| 190 | [Q2] The v4 shared world (owner, 2026-10-04: rebuild under separate names): both fixes (`REALSTYLE_V4=1`, `CROWD_KEY=v2`), crowd tables `realstyle_crowd_v4_{train,test}.json`, households v4g / v4gcd / v4gcdh, test sets v4g / v4gc (+ _seen); re-run the crowd arm on clean keys (G4 against GCD4 or GCDH4, by row 188's result; two seeds) to size the true crowd gain; the owner's budget without the line. `scripts/chains/r190_data.sh`. | REAL-27 | 185 | doing | |
 | 50 | Category-order sensitivity, eval only: the untrained instruct model and the no-DB and record SFT adapters re-scored with the prompt's category list permuted under two more seeds; argmax flip rate per corrected group and name type, and the accuracy of the two- and three-order averages; a lettered list with letter readout on the untrained model only. Re-scoped 2026-09-27 to the one-slot readers that now lead (REPORT 69, rows 79 / 80): decider-2B and Qwen3.5-2B one-slot on POI-1 and REAL-6, the option order shuffled under three seeds (`exp_decision_models.py ORDER_SEED`): flip rate and accuracy spread, and the three-order average. | EVAL-8 | 41, 45 | done | REPORT 75, `scripts/order_tables.py` |
 | 53 | Encoder option scorer (Laya's layout): ModernBERT-large with one scored `[MASK]` per category, fine-tuned across users on REAL-6 with the query, the record and the tagged shots in the input, soft-target CE, options shuffled; from the Laya checkpoint and from plain ModernBERT-large; no-record and record arms against GLiClass tuned and the SFT categoriser on row 45's groups and row 42's folds, with milliseconds per item. Does the layout let an encoder read the shots where GLiClass could not? | MODEL-6 | 45 | done | REPORT.md 62; `scripts/encmask_tables.py`; `models/adapters/encmask_*` |
 | 54 | Diffusion slot read on the 3090, zero-shot: one forward with the answer letter as the mask token on REAL-6 (24 shots, with and without the record) for Nemotron-Labs-Diffusion-8B (against its own causal readout, same weights), Dream-v0-Instruct-7B (against Qwen2.5-7B-Instruct), LLaDA-8B-Instruct and LFM2.5-Encoder-350M-Diffusion; row 50's order permutations and row 49's calibration on each; a LoRA fine-tune of the slot read only if one beats its causal twin beyond the seed spread. Separate venv if the remote code needs another transformers. | MODEL-7 | 45, 49, 50 | todo | |

@@ -1,0 +1,6 @@
+outs:
+- md5: 839826035594566c707f4de9b8b026f4.dir
+  size: 134190753
+  nfiles: 10
+  hash: md5
+  path: two_tower_v1

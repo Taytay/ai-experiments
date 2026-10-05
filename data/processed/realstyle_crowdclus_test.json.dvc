@@ -1,0 +1,5 @@
+outs:
+- md5: 6521d52a5c7785218e64afdb3fd34f2a
+  size: 8327336
+  hash: md5
+  path: realstyle_crowdclus_test.json

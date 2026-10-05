@@ -127,6 +127,8 @@ def style():
 
 SHARED = os.environ.get("SHARED_WORLD") == "1"  # row 183: households share one world (see Household.shared)
 METROS, BANKS = 20, 4
+V4 = os.environ.get("REALSTYLE_V4") == "1"  # 2026-10-04: re-code an order number only where render_v2 recorded one (its "Reference"
+# part), never by pattern on the rendered string, which took one-word names for codes ("SQ *BAKERY" -> "SQ *Q3JS4FB4X")
 
 
 def _h(s):
@@ -338,11 +340,15 @@ class Household:
                 forms.append(f)
             if self.shared:  # the household's own habits: whether it cleans this payee (the strings are the bank's)
                 r = random.Random(f"{self.seed}-{key}")
-            self.payee_of_string[key] = dict(forms=forms, clean=r.random() < 0.5, recode=bool(re.search(r"\*[A-Z0-9]{5,}$", forms[0][0])) and r.random() < 0.6)
+            coded = bool(forms[0][1].get("Reference")) and forms[0][0].endswith("*" + forms[0][1]["Reference"]) if V4 else bool(re.search(r"\*[A-Z0-9]{5,}$", forms[0][0]))
+            self.payee_of_string[key] = dict(forms=forms, clean=r.random() < 0.5, recode=coded and r.random() < 0.6)
         info = self.payee_of_string[key]
         s, parts = info["forms"][0] if rng.random() < 0.8 else rng.choice(info["forms"])
         parts = dict(parts)
-        if info["recode"] and re.search(r"\*[A-Z0-9]{5,}$", s):  # a new order / reference code each time, the name kept
+        if V4 and info["recode"] and parts.get("Reference") and s.endswith("*" + parts["Reference"]):  # v4: swap the recorded code itself
+            code = "".join(rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789") for _ in range(9))
+            s = s[: -len(parts["Reference"])] + code; parts["Reference"] = code
+        elif not V4 and info["recode"] and re.search(r"\*[A-Z0-9]{5,}$", s):  # a new order / reference code each time, the name kept
             code = "".join(rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789") for _ in range(9))
             s = re.sub(r"\*[A-Z0-9]{5,}$", "*" + code, s); parts["Reference"] = code
         if m["kind"] == "food_delivery" and self.pool.get("restaurant"):  # row 176: the order's restaurant in the string (own rng: other draws unchanged)

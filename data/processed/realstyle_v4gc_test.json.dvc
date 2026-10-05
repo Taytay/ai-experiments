@@ -1,0 +1,5 @@
+outs:
+- md5: 1dc9e815f41830f2fb14e3ce6ca91557
+  size: 96447944
+  hash: md5
+  path: realstyle_v4gc_test.json

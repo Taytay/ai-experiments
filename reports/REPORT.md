@@ -10465,3 +10465,99 @@ id); households `realstyle_v3gcd_train.jsonl`; otherwise GC's recipe; seeds 0 an
   training dropped it item by item inside households that otherwise have it. Next: whole households without a crowd (a share of
   training households read with no line at all, besides item dropout), which is also the realistic case for a new YNAB market, a bank
   whose strings nobody else has, or a lookup outage.
+
+## 172. A two-tower payee <-> category encoder (bge-small, InfoNCE, the household's other categories as hard negatives) files held-out synthetic households' transactions 53.0% right first by cosine alone (32.4 untrained; top 10 91.8), but the owner's budget only 47.2 (40.7 untrained; top 10 78.2 against decider's ~90): no shortlist for decider on real data; its category side serves row 189's cross-user clusters (REAL-27, MODEL-25)
+
+PLAN step 187 (owner, 2026-10-04: "Could we push categories and payees together embeddings wise using this same mechanism?").
+`scripts/two_tower.py`: one BAAI/bge-small-en-v1.5 (MIT) encoder for both sides; a transaction is "<payee> | $<amount> | <weekday>", a
+category "<Group>: <Name>; recently: <the three payees last filed under it>" (or "; nothing filed yet"), filings strictly before the
+transaction's date; 200,000 triplets (transaction, its category, another category of the same household that day) from 400
+shared-world training households; MultipleNegativesRankingLoss (in-batch negatives plus the hard one), one epoch, 4 minutes on the
+local 3090. Read by replaying a budget in date order and ranking every visible category by cosine: 50 held-out test-world households
+(merchants never seen in training), and the owner's budget on this machine (17,755 spending transactions in visible categories;
+aggregates only). Model in DVC (`models/encoders/two_tower_v1`).
+
+**Table 172.1: right category by cosine, % top-1 / top-3 / top-10**
+
+| reader | held-out households: all | first-time payees | owner's budget: all | first-time payees | known payees |
+|---|---|---|---|---|---|
+| bge-small, untrained | 32.4 / 51.1 / 74.7 | 25.9 / 43.2 / 68.3 | 40.7 / 60.1 / 76.7 | 27.9 / 46.8 / 67.1 | 46.1 / 65.7 / 80.7 |
+| two-tower, trained | **53.0 / 77.6 / 91.8** | **47.9 / 74.7 / 90.5** | **47.2 / 64.4 / 78.2** | **37.3 / 51.1 / 67.3** | **51.3 / 70.0 / 82.8** |
+
+### 172.1 What the step says
+
+- **Contrastive training ties payees to purposes** in the synthetic world (+20.6 top-1, top 10 at 92) from a dot product, no history
+  in the prompt, no LLM.
+- **On the owner's budget it gains less** (+6.5 top-1, +1.5 top-10): the owner's categories (people, trips, quirks, catch-alls) are
+  described less well by three recent payees than the generator's, and the household's time context (trips, phases) is invisible to a
+  payee-category similarity. As a shortlist it would lose 12 points of the right answers that decider's top 10 keeps; not useful there.
+- **Use:** its category side embeds a category by its name and contents, which row 189 uses to cluster categories across households
+  (behavioural payee similarity through shared purposes).
+
+## 173. Two hops through other households' filings pick better similar-payee rows: choosing the household's own payees whose bank strings other households file into the same purpose clusters lifts first-time payees 1.5 to 2.6 points over string-similar rows (and 7 over none), both seeds, both worlds, no retraining and no new prompt format (REAL-27, MODEL-25)
+
+PLAN step 189 (owner, 2026-10-04: "payee X is often categorized as category clusters x, y, and z, and clusters x, y, and z are the way
+payees a, b, and c are often categorized"). Every category of 800 households per world, written "<Group>: <Name>; recently: <three
+payees>", embedded with row 187's two-tower encoder and clustered by k-means into 64 purpose clusters (`build_crowd_clusters.py`;
+e.g. "Dining out" / "Eating out" / "Takeout & restaurants"; trips; a person's fun money with "Entertainment"). Each bank string gets a
+vector of how many other households filed it in each cluster (the household itself left out; fewer than two: no vector). The similar
+rows under the payee's own rows are the household's own earlier payees ranked by cosine between vectors, fused with the n-gram ranking
+by reciprocal rank as SIM=2 fuses an embedding (`real_budget_eval.py SIM=2 SIM_SRC=behav CROWD_CLUS=`), against n-grams alone
+(`SIM_SRC=ngram`) and against the household's own rows only (rows 183 / 185's sets). Read zero-shot by G3 and GCD, seeds 0 and 1,
+without the crowd line (`r189.json`; tables `scripts/r189_tables.py`). Data: v3 (5% of crowd keys collapsed, REPORT 169 note; the
+v4 rebuild, row 190, fixes them).
+
+**Table 173.1: % right first, mean of seeds 0 and 1**
+
+| world, items | n | G3: own rows / n-gram rows / behavioural rows | GCD: own / n-gram / behavioural |
+|---|---|---|---|
+| new world: all | 6,000 | 71.5 / 72.4 / **72.6** | 71.5 / 72.3 / **72.8** |
+| new world: known payees | 5,086 | 74.5 / 74.4 / 74.4 | 74.6 / 74.5 / 74.6 |
+| new world: first-time payees | 914 | 55.1 / 60.7 / **62.5** | 54.2 / 60.6 / **62.5** |
+| new world: first-time, 50+ other households | 668 | 58.8 / 64.1 / **66.5** | 58.7 / 64.0 / **66.8** |
+| new world: first-time, 0-1 others (no vector) | 182 | 45.6 / 50.8 / 50.8 | 44.2 / 52.2 / 52.2 |
+| training world: all | 6,000 | 73.2 / 74.0 / **74.5** | 73.4 / 74.0 / **74.6** |
+| training world: first-time payees | 1,141 | 58.5 / 63.6 / **65.1** | 58.8 / 62.6 / **65.2** |
+| training world: first-time, 50+ others | 789 | 63.8 / 67.7 / **69.6** | 63.2 / 66.9 / **70.0** |
+| training world: first-time, 10-49 others | 120 | 54.6 / 64.6 / **67.1** | 56.2 / 63.8 / **67.9** |
+
+### 173.1 What the step says
+
+- **Similar rows matter for first-time payees** (+5 to +6 from n-gram rows over the household's own rows only), and **choosing them by
+  behaviour adds 1.5 to 2.6 more**, consistent over both seeds and both worlds, most where many households filed the string (+2.4 to
+  +3.1 at 50+); known payees and payees with no vector are unchanged (the vector only reorders where it exists).
+- **No retraining and no new format:** the crowd's knowledge enters as the household's *own* rows ("where do I put things like this"),
+  which the model already reads; so, unlike the crowd line (REPORT 169.2), nothing breaks when the crowd is absent.
+- **Not yet compared:** the crowd line and behavioural rows together; on the v4 data (clean keys); on the owner's budget (needs real
+  crowd data). Behavioural rows answer "which of my payees are like this one"; the crowd line answers "where do people put this one";
+  the two may add.
+
+## 174. Training with whole households that never see a crowd line adds nothing over item dropout: on the owner's budget (no line) GCDH reads 72.95 against GCD's 72.8 and G3's 73.55 (two seeds each), while keeping the line's gain where it exists (+6.5 / +6.3 on first-time payees, synthetic); a cost of about 0.6 remains, on known and alias payees (REAL-27)
+
+PLAN step 188 (REPORT 171: item dropout halved the cost of a missing line; on a budget with no crowd data the line is missing
+everywhere). `real_budget_eval.py CROWD_HH_DROP=0.3` with `CROWD_DROP=0.4`: 30% of training households carry no line at all (by
+household seed; 278 of 400 keep some), the rest drop it from 40% of items (`realstyle_v3gcdh_train.jsonl`); seeds 0 and 1 (`r188.json`).
+v3 data (5% of crowd keys collapsed; row 190 repeats on v4).
+
+**Table 174.1: % right first, means of seeds 0 and 1 [each seed]**
+
+| set | G3 | GCD | GCDH |
+|---|---|---|---|
+| synthetic new world, first-time payees, with the line | 59.6 (untrained) | 60.9 | 60.1 [60.6 / 59.5] |
+| synthetic new world, first-time payees, no line | 55.1 | 54.2 | 53.6 [53.9 / 53.3] |
+| synthetic training world, first-time payees, with the line | 63.7 (untrained) | 65.4 | 65.0 [65.9 / 64.2] |
+| owner's budget (no line): all | **73.55** [73.4 / 73.7] | 72.8 [73.3 / 72.3] | 72.95 [73.2 / 72.7] |
+| owner's budget: known payees | 80.75 | 79.8 | 79.95 [80.2 / 79.7] |
+| owner's budget: first-time, alias filed before | 73.15 | 72.05 | 72.0 [72.1 / 71.9] |
+| owner's budget: first-time, no alias | 47.85 | 47.95 | 48.35 [48.9 / 47.8] |
+
+### 174.1 What the step says
+
+- **Whole-household absence does not close the gap:** GCDH and GCD are level on the owner's budget (72.95 against 72.8, within seed
+  noise); both stay about 0.6 below G3, on known payees (-0.8) and payees with an alias (-1.1); payees with no alias are level.
+- **So the remaining cost is not about the line's absence being read as a signal.** A model trained on households that often show a
+  crowd line seems to lean a little less on the household's own history in general, which is what known and alias payees run on.
+  Candidates: a smaller crowd share in training, or keeping the line only for first-time payees (where it helps) and never on payees
+  the household has filed (where its own rows should decide).
+- **Small either way:** 0.6 against the line's +6 to +7 on first-time payees when a crowd exists; for YNAB with real crowd data the line
+  would be present for most first-time payees. Row 190 repeats GCD and GCDH on clean keys (v4).
