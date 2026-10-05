@@ -29,7 +29,8 @@ UV = ('uv run --frozen --with transformers==5.17.0 --with flash-linear-attention
 BASE = {"DBEP": "0.5", "FOLD": "0", "RENAME": "0.5", "MICRO": "16", "STEPS": "800", "ALL_LABELS": "1", "AUX_LM": "1", "LABELS": "rand255",
         "MISLEAD": "mislead_v1", "ALT": "0.1", "ALT_SOFT": "1", "LOOKUP": "0.1", "OVERRIDE": "0.1", "EVFREE": "0.1", "EVFREE_MODE": "soft",
         "MODEL": "Mapika/decider-4b", "EMPTY": "20", "LAYOUT": "labelled_shots", "OTHERS": "0.5", "REALSTYLE": "0.25",
-        "REALSTYLE_FILE": "realstyle_v4g_train.jsonl"}  # the r190 recipe (G4)
+        "REALSTYLE_FILE": "realstyle_v4g_train.jsonl",  # the r190 recipe (G4)
+        "MICRO_SPLIT": "4", "READER": "vllm"}  # row 208 (§181): length-sorted groups (same model, -28% training) and vLLM reads (2.3x)
 DRILLS = ["blind_v1_others", "blind_v1", "", "real6_v1_novel", "mislead_v1", "override_v1", "blind_v2_others", "blind_v2"]
 PER_HOUR, STEP_S, START_MIN, DEFAULT_READ, READ_START = 4.09, 5.2, 5.0, 6.0, 0.5
 
@@ -96,7 +97,7 @@ def main(spec_path):
                 sets += DRILLS
             tag = f"r{row}-{arm}-s{seed}"
             ro = spec.get("read_only", {}).get(arm)
-            if (spec.get("base", {}).get("READER") or over.get("READER")) == "vllm" and sets:  # row 208: one process, one vLLM engine for all reads
+            if env.get("READER") == "vllm" and sets:  # row 208: one process, one vLLM engine for all reads
                 rf = ROOT / "scripts" / "modal_jobs" / "reads" / f"{tag}.json"
                 rf.parent.mkdir(parents=True, exist_ok=True)
                 rf.write_text(json.dumps([dict(ITEMS_SET=s, USERS=",".join(map(str, users_of(s)))) for s in sets], indent=1))
@@ -107,8 +108,9 @@ def main(spec_path):
             cmds = ([] if ro else [f"{UV} scripts/exp_decider_finetune.py"]) + reads
             job_env = {**env, **({"ADAPTERS_FROM": f"{ro}-s{seed}"} if ro else {})}
             jobs.append(dict(tag=tag, env=job_env, cmds=cmds))
-            train_min = 0 if ro else int(env.get("STEPS", 800)) * STEP_S / 60
-            vllm = (spec.get("base", {}).get("READER") or over.get("READER")) == "vllm"
+            step_s = STEP_S if split == 1 else 3.8  # row 208: 50.2 min for 800 steps with MICRO_SPLIT=4
+            train_min = 0 if ro else int(env.get("STEPS", 800)) * step_s / 60
+            vllm = env.get("READER") == "vllm"
             read_min = (2.5 + sum(mins.get(s, DEFAULT_READ) * 0.45 for s in sets)) if vllm else sum(mins.get(s, DEFAULT_READ) + READ_START for s in sets)
             est.append((tag, train_min, read_min, len(sets)))
     out = ROOT / "scripts" / "modal_jobs" / f"r{row}.json"

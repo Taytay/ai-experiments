@@ -193,6 +193,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §178 Fair fusion and amounts (rows 199-200)
 - §179 Pinterest research applicability (rows 196-198, 201-207)
 - §180 Where decider and encoders disagree (row 201)
+- §181 Faster runs: training and reads (row 208)
 
 <!-- END SECTION INDEX -->
 
@@ -11033,3 +11034,48 @@ on the cases only decider got right: decider 0.67, kNN 0.53.
   at no loss). Rows 202-205 aim to make the encoders better on their own; a learned chooser is worth a row only if they narrow the gap.
 
 **Cost:** $0 on Modal (local RTX 3090, 3 minutes).
+
+## 181. Faster runs: the history-encoder readers on the GPU (60-75x), vLLM reads (2.3x, one engine per job), length-sorted training groups (-28% training time, same model), a job-list generator with cost estimates, and auto-ingest; 800 training steps stay (600 loses 0.4-0.7, 400 loses 1.5) (INFRA)
+
+PLAN step 208 (owner, 2026-10-05: "start on all of these efficiency changes before just about anything else. We've gotta make our loop
+tighter/faster!"), from `reports/workflow_review_2026-10-05.md`. Each change was checked against the path it replaces before use.
+
+**Table 181.1: what changed and what it measured**
+
+| change | where | check against the old path | speed |
+|---|---|---|---|
+| E1 kNN and MaxSim readers on the GPU, per-budget score cache | `scripts/hist_fast.py` | same top-1 on 11,373 / 11,373 events, scores within 2e-5 | 124 s -> 2.1 s per household; row 201 in 3 min |
+| E1 ColBERT reader batched | `scripts/hist_fast.py` | same top-1 on 2,858 / 2,866 (the rest bf16 near-ties) | 74 s -> 1.0 s per 3,000 events |
+| E2 job-list generator with cost estimate | `scripts/modal_jobs/make_jobs.py` | rebuilds `r190.json` exactly | (no more hand-made lists) |
+| E3 vLLM reads, one engine per job (`READS_FILE`) | `scripts/vllm_slot.py`, `exp_decision_models.py READER=vllm` | first choices agree on 99.68% of 6,000 (H100; all 19 differences near-ties), 99.83% / 100% on the 3090 | 56 -> 24.7 ms per item; engine 2.3 min once per job |
+| E4 owner's-budget scoring on 2 containers | `modal_app.private_scores` | same reads | to confirm on the next owner read |
+| E5 overlay and vllm warmed into the image; data linked, not copied | `modal_app.py` | (start-up only) | first image build once; no 6.9 GB copy per container |
+| E6 length-sorted training groups (`MICRO_SPLIT=4`) | `exp_decider_finetune.py` | same model: 800 steps 72.62 vs 72.37 (+0.25 +- 0.26 paired), blind_v1 84.47 vs 83.80 | 5.2 -> 3.8 s per step (-28%); padded tokens 1.11x real |
+| E7 watch, pull back and ingest | `scripts/wait_and_ingest.sh` | ingested r208s unattended | results in the repo when the job ends |
+
+**Table 181.2: training steps (G4 recipe, MICRO_SPLIT=4, seed 0; % right first)**
+
+| steps | train min | realstyle_v4g_test (6,000) | paired vs r190 G4 (800 steps) | blind_v1 (1,500) |
+|---|---|---|---|---|
+| 400 | 26.7 | 70.90 | -1.47 +- 0.33 | 84.20 |
+| 600 | 39.4 | 71.95 | -0.42 +- 0.31 | 83.53 |
+| 800 | 50.2 | 72.62 | +0.25 +- 0.26 | 84.47 |
+| 800, original single batch (r190, two seeds) | ~70 | 72.37 / 72.28 | - | 83.80 / 83.40 |
+
+### 181.1 What the step says
+
+- **A typical train-and-read job now takes about 58 min instead of about 103** (r208s-g4st800: 50 min training, 5 min to read 7,500
+  items, the rest start-up), so roughly half the H100 cost per arm, before the one-seed-to-screen rule halves the number of arms.
+- **800 steps stay the recipe.** 600 steps is within noise of the original but 0.67 below the split 800; 400 loses 1.5 on the
+  synthetic test set. Screening at fewer steps would mislead.
+- **Length-sorted groups are the same model** within noise; they are now the generator's default (run tags carry `ms4`, so no adapter
+  overwrites a single-batch one). The first-step loss differs by 0.3% (bf16 rounding in differently shaped batches; repeated runs are
+  identical), so arms in one row all use the same setting.
+- **vLLM reads are now the generator's default.** One engine per job reads every set; the 2.3x per-item gain only pays when the engine
+  start (2.3 min) is shared.
+- **Incident found on the way:** a finished local run rewrote `evals/runs.jsonl` from this checkout's stale `runs.db` (450 of 2,954 rows,
+  committed in 51156af). Restored as the union by run_id (2,973 rows) and fixed at the source: the tracker's export now keeps rows the
+  db lacks.
+
+**Cost:** r208v (vLLM timing, one read) and r208s (three train-and-read jobs, 142 job-minutes): about $10-12 together at $4.09 per
+H100-hour; exact figures from `scripts/modal_costs.py --rows 208` once Modal bills the day.
