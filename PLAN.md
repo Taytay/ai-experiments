@@ -103,15 +103,19 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
     payee_enc_v1`): halves false alarms in real payee matching (6.9% against 13.9 / 23.9) at lower recall; no categorisation gain as
     retriever or extra aliases (REPORT 170). Its use: payee matching and crowd keys.
   - Owner's budget, best readers (right first, two-seed means where run): G3 73.55, G 73.75, GK 73.7; single seeds up to 74.6 (GK20).
-- **In flight (2026-10-04):**
-  - Row 188: whole households without a crowd line (`CROWD_HH_DROP=0.3` with `CROWD_DROP=0.4`; households
-    `realstyle_v3gcdh_train.jsonl` being built, `logs/r188_data.log`); then DVC-add, a job list r188 copied from r185.json (two seeds),
-    read on the synthetic test sets and on the owner's budget without the line (`scripts/chains/r183_owner.sh` with SPECS). Success:
-    the owner's budget at G3's level (73.55) while keeping +6-7 with the line.
-  - Row 187: two-tower payee <-> category encoder (`scripts/two_tower.py`: transaction text vs "Group: Name; recently: 3 payees",
-    InfoNCE with another category of the same household as hard negative; train on the local GPU, read on test households and the
-    owner's budget locally). Report top-1 / top-3 / top-10 against decider (top-10 89.6% on the budget) and as a shortlist for decider;
-    later, mapping other users' categories onto the user's own for the crowd line.
+- **In flight (2026-10-04, late):**
+  - Row 188 (whole households without a crowd line, `CROWD_HH_DROP=0.3` + `CROWD_DROP=0.4`, v3 data): trained (r188-gcdh-s0/s1,
+    ingested, adapters in DVC). Synthetic: keeps the crowd line's gain (+6.5 / +6.3 first-time; `scripts/r183_tables.py`). The owner's
+    budget without the line is being scored (`logs/r188_owner.log`, `scripts/chains/r183_owner.sh` SPECS=":v3gcdh:r188-gcdh-s0
+    s1:v3gcdh:r188-gcdh-s1"); compare with G3 73.55 and GCD 72.8 (`real_budget_tables.py` ARMS=...r188-gcdh-s{0,1}_split_grp_sim2),
+    then write REPORT 174 and mark 188 done.
+  - Row 190 (v4 data, both fixes, built: crowd tables `realstyle_crowd_v4_*`, households v4g / v4gcd / v4gcdh, test sets v4g / v4gc
+    (+ _seen)): `scripts/chains/r190_launch.sh` (running in the background) waits for the row-188 owner scoring to finish, then
+    DVC-adds the v4 files, commits, and launches `scripts/modal_jobs/r190.json` (six jobs: G4 / GCD4 / GCDH4, two seeds) detached. If
+    the session ended before that: run the script by hand. Then ingest (`ingest_modal.py r190-...`), `just push-models`, add the arms
+    to `r183_tables.py` (v4 test-set names), score the owner's budget without the line (G4 / GCD4 / GCDH4), write REPORT, and run row
+    189's behavioural rows on v4 too (rebuild `build_crowd_clusters.py` with CROWD_KEY=v2 REALSTYLE_V4=1).
+  - Done today: rows 187 (two-tower, REPORT 172) and 189 (behavioural two-hop rows, REPORT 173: +1.5-2.6 on first-time payees).
 - **Proposed, not started:** 184 (a merchant description line as the fallback for payees no one has filed; owner: needs web-search
   agents or a strong model to describe the top 100k payees); a real crowd test on the owner's budget when the owner brings crowd data
   (owner: "I'll get you better data another time"); 178 (prompt fixes: similar rows only above thresholds, corporate-suffix stripping);
