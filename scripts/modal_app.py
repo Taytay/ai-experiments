@@ -113,6 +113,16 @@ def _snapshot():
 
 @APP.function(image=image, gpu="H100", cpu=4.0, timeout=6 * 3600, volumes={"/cache": HF, "/out": OUT}, max_containers=8)  # cpu: row 210 found small-model steps launch-bound on the default 0.125-core request
 def run(cmds: list, env: dict, tag: str):
+    return _run(cmds, env, tag)
+
+
+@APP.function(image=image, cpu=8.0, memory=16384, timeout=6 * 3600, volumes={"/cache": HF, "/out": OUT}, max_containers=8)
+def run_cpu(cmds: list, env: dict, tag: str):
+    """the same job runner without a GPU (`--gpu cpu`): row 204's prototype read held an H100 for 128 minutes of CPU-bound Ward clustering"""
+    return _run(cmds, env, tag)
+
+
+def _run(cmds: list, env: dict, tag: str):
     import os
     import shutil
     import subprocess
@@ -227,7 +237,9 @@ def private_scores(items: list, reader: str, layout: str, adapter_from: str, sha
 @APP.local_entrypoint()
 def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = "", gpu: str = ""):
     global run
-    if gpu:  # row 125: another GPU type for this launch (e.g. H200 for decider-35B-A3B training); the default stays one H100
+    if gpu == "cpu":  # CPU-only jobs (clustering, data builds): no GPU billed
+        run = run_cpu
+    elif gpu:  # row 125: another GPU type for this launch (e.g. H200 for decider-35B-A3B training); the default stays one H100
         run = run.with_options(gpu=gpu)
     if check:
         print(gpu_check.remote()); return

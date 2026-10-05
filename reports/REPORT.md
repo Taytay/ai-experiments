@@ -195,6 +195,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §180 Where decider and encoders disagree (row 201)
 - §181 Faster runs: training and reads (row 208)
 - §182 Encoder training fixes from the papers (row 202)
+- §183 Several prototypes per category (row 204)
 
 <!-- END SECTION INDEX -->
 
@@ -11151,3 +11152,40 @@ encoders disagree (synthetic 6.7-8.5 / 4.6-5.4; owner 12.3-13.2 / 4.3-4.6) for e
   `hist_agree.py` reads several encoders in one run.
 
 **Cost:** $0 on Modal (local RTX 3090: about 80 minutes of training and building, 25 minutes of reads).
+
+## 183. Several prototypes per category lose to MaxSim over every filing: the best prototype reader (Ward medoids weighted by cluster size) reads 68.8 against 73.4, centroids 64.2, farthest-point prototypes 40-43; keeping every filing is what the category needs (REAL-27, MODEL-25)
+
+PLAN step 204 (owner, 2026-10-05: "apply all of their learnings to our approach"; PinnerSage, references/papers/2007.03634; Multi-Embedding
+Retrieval, 2506.23060). `scripts/hist_proto.py` (`scripts/chains/r204_proto.sh`, job list `r204`), training-free on hist_knn_v1's vectors:
+per category, Ward clusters over its earlier filings (cut at height 0.8, at most 20; reclustered on days after the category gains filings,
+over its 1,000 most recent filings; 12.7 clusters per clustering on average), each cluster read as its medoid or centroid; medoids plus
+log cluster importance (sum of exp(-lambda x age in days)); farthest-point prototypes (K 3 and 5, three rounds of hard assignment).
+Category score = the best prototype's cosine (/ TAU). 50 held-out v4 households, every transaction (as Table 182.1).
+
+**Table 183.1: % top-1 / top-3 / top-10, 50 held-out households**
+
+| reader | all (359,050) | first-time payee (53,479) |
+|---|---|---|
+| MaxSim over every earlier filing (top-3 mean) | 73.4 / 90.2 / 95.9 | 59.2 / 79.8 / 91.2 |
+| Ward medoids + importance, lambda 0 | 68.8 / 86.6 / 95.1 | 53.5 / 74.5 / 90.1 |
+| Ward medoids + importance, lambda 0.01 | 68.1 / 85.3 / 94.7 | 53.5 / 73.7 / 89.4 |
+| Ward medoids + importance, lambda 0.05 | 63.9 / 81.5 / 92.9 | 50.8 / 70.8 / 87.3 |
+| Ward centroids | 64.2 / 88.2 / 95.7 | 53.4 / 78.3 / 90.5 |
+| Ward medoids | 52.9 / 82.2 / 94.6 | 44.0 / 72.1 / 89.6 |
+| farthest-point, K 3 | 42.6 / 72.9 / 92.8 | 41.0 / 67.8 / 88.4 |
+| farthest-point, K 5 | 39.7 / 69.5 / 93.8 | 39.3 / 66.9 / 89.4 |
+
+### 183.1 What the step says
+
+- **Compressing a category's filings loses what makes it work.** Every prototype reader trails MaxSim over all filings, by 4.6 at best
+  (medoids weighted by cluster size) and by 30 or more for farthest-point prototypes. PinnerSage compresses a user's thousands of pins
+  into a few interests to make serving cheap; a household category has tens to hundreds of filings, which MaxSim already reads in full on
+  the GPU in seconds, so there is nothing to save and much to lose: an exact earlier match is worth more than any cluster centre.
+- **Size matters more than recency:** weighting a cluster by how many filings it holds recovers most of the medoid reader's loss (52.9 ->
+  68.8); decaying that weight by age only hurts (lambda 0.05: 63.9). Centroids beat medoids (64.2 against 52.9) because a medoid is one
+  arbitrary filing.
+- This agrees with row 210: the model does best when it sees the household's full history (a1, a5), worst with a fixed summary (a0).
+  Row 204 is closed; prototypes stay out of rows 210-212.
+
+**Cost:** one Modal job, 127.7 minutes on an H100 for CPU-bound clustering, about $9 at $4.09 per hour (exact figure from
+`scripts/modal_costs.py --rows 204` once Modal bills the day). It should have run on a CPU: `modal_app.py` now takes `--gpu cpu`.
