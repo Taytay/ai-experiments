@@ -53,7 +53,7 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
   `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
 - Watching a job list (2026-09-27: eleven watchers sat "running" for hours after their jobs finished and their results went unnoticed):
-  - start the watcher as a script file, as a background task: `scripts/wait_modal_jobs.sh r83 <scratchpad>/r83.log`. Never an
+  - start the watcher as a script file, as a tracked background task: `scripts/wait_and_ingest.sh r83 logs/r83_launch.log` (it also pulls every tag back and ingests it when the client exits; `scripts/wait_modal_jobs.sh` only waits). Never an
     inline `until ! pgrep -f "modal_jobs/r83.json" ...` loop: the task's own shell carries the pattern in its command line, so pgrep
     matches the watcher itself and it never exits;
   - one watcher per job list, started right after the launch; when it reports, ingest at once;
