@@ -77,7 +77,7 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
 - New decider rows build their job list with `scripts/modal_jobs/make_jobs.py <spec>` (a spec in `scripts/modal_jobs/specs/`: arms, the row's
   reads, variant reads per arm, drills on or off, seeds, read-only arms); it takes adapter names from the trainer itself and prints the
-  estimated cost per job before anything launches. History-encoder readers (kNN, MaxSim) run through `scripts/hist_fast.py` (GPU, cached).
+  estimated cost per job before anything launches. History-encoder readers (kNN, MaxSim) run through `scripts/hist_fast.py` (GPU, cached). Synthetic households are cached on disk by `two_tower.households` (`data/interim/hh_cache`, keyed by the generator's code, data and env; `HH_CACHE=0` rebuilds) and `hist_train2.py` caches its mined triplets: scripts that build households should go through it. `hist_agree.py` reads several encoders in one run (`ENCS`).
 - Do not duplicate work (owner, 2026-10-05: "Let's not duplicate work here! That's just silly."): screen a new recipe or arm with one seed;
   train the second seed only for arms that win or land within seed noise of the best (1-2 points on the owner's budget), and call
   nothing a gain on the owner's budget before two seeds agree. Each job reads only the test sets its row compares (not every set
