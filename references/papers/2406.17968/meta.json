@@ -1,0 +1,34 @@
+{
+  "id": "2406.17968",
+  "version": "v1",
+  "id_versioned": "2406.17968v1",
+  "title": "Efficient Document Ranking with Learnable Late Interactions",
+  "authors": [
+    "Ziwei Ji",
+    "Himanshu Jain",
+    "Andreas Veit",
+    "Sashank J. Reddi",
+    "Sadeep Jayasumana",
+    "Ankit Singh Rawat",
+    "Aditya Krishna Menon",
+    "Felix Yu",
+    "Sanjiv Kumar"
+  ],
+  "published": "2024-06-25",
+  "updated": "2024-06-25",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.AI",
+    "cs.LG",
+    "stat.ML"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Cross-Encoder (CE) and Dual-Encoder (DE) models are two fundamental approaches for query-document relevance in information retrieval. To predict relevance, CE models use joint query-document embeddings, while DE models maintain factorized query and document embeddings; usually, the former has higher quality while the latter benefits from lower latency. Recently, late-interaction models have been proposed to realize more favorable latency-quality tradeoffs, by using a DE structure followed by a lightweight scorer based on query and document token embeddings. However, these lightweight scorers are often hand-crafted, and there is no understanding of their approximation power; further, such scorers require access to individual document token embeddings, which imposes an increased latency and storage burden. In this paper, we propose novel learnable late-interaction models (LITE) that resolve these issues. Theoretically, we prove that LITE is a universal approximator of continuous scoring functions, even for relatively small embedding dimension. Empirically, LITE outperforms previous late-interaction models such as ColBERT on both in-domain and zero-shot re-ranking tasks. For instance, experiments on MS MARCO passage re-ranking show that LITE not only yields a model with better generalization, but also lowers latency and requires 0.25x storage compared to ColBERT.",
+  "abs_url": "https://arxiv.org/abs/2406.17968",
+  "pdf_url": "https://arxiv.org/pdf/2406.17968v1",
+  "src_url": "https://export.arxiv.org/src/2406.17968v1",
+  "metadata_source": "api"
+}
