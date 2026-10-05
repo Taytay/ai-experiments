@@ -10796,6 +10796,8 @@ budget: `scripts/chains/r183_owner.sh` with SPECS, then `real_budget_tables.py` 
   (57.95 first, two seeds), statistically tied with G4; combining knowledge episodes, the crowd recipe and row 189's behavioural rows
   in one model is the open step.
 
+**Cost (Modal, `scripts/modal_costs.py`):** $43.42 for the `r190` launch (six train-and-read jobs); owner's-budget scoring not separately attributed (before the ledger).
+
 ## 176. Behavioural similar rows and the crowd line stack on clean keys (first-time payees 55.7 -> 67.9, GCD4, synthetic new world); training on behavioural rows or knowledge episodes adds nothing more, and on the owner's budget (no line, n-gram rows) every arm sits within seed noise of G4 (73.6) and GK (73.7) (REAL-27, MODEL-28)
 
 PLAN steps 192-193 (owner, 2026-10-04: "Do 1 and 2"). v4 world (`REALSTYLE_V4=1`, `CROWD_KEY=v2`); category clusters rebuilt on v4
@@ -10839,6 +10841,8 @@ except G4 and K4 shown a line they never trained with (-5 to -6). Training world
   first-time payees (their merchants are invented; the episodes teach real ones).
 - **The owner's budget does not separate the arms:** all six within 0.8 on first guess and 0.8 on top 5, inside seed noise. The
   owner's budget has no crowd data, so the steps' gains cannot show there; a real crowd test needs the owner's crowd data.
+
+**Cost (Modal, `scripts/modal_costs.py`):** $84.59 for the one launch of `r192_193` (10 jobs, 1,240 job-minutes): row 192's four reads $3.90-3.96 each, row 193's six trainings $10.79-11.86 each; owner's-budget scoring of row 193 not separately attributed (before the ledger).
 
 ## 177. History-aware encoders: letting a transaction's nearest earlier transactions vote (bge-small, trained transaction <-> transaction) files 68.4% of the owner's spending right with no LLM (two-tower 47.2), late interaction over a category's filings 69.6 (top 10 93.3); fused with decider they add +1.0 to +1.5 overall and +1.6 to +2.6 on first-time payees (two decider seeds), and gated they settle 36-50% of transactions alone at no loss (REAL-27, MODEL-25) — superseded in part by REPORT 178: with settings chosen on synthetic households the fusion gain is +0.3
 
@@ -10900,6 +10904,8 @@ index agrees between the two items files on all 21,339 items, so earlier owner t
 - **Next:** gate and fuse together (encoder alone when sure, fused elsewhere); calibrate MaxSim's temperature on synthetic households;
   row 196's per-user state.
 
+**Cost:** $0 on Modal; every encoder trained and read on the local RTX 3090 (3 to 25 minutes per encoder).
+
 ## 178. With every setting chosen on synthetic households, the history encoders add only +0.3 to decider on the owner's budget (TransAct-style; kNN and MaxSim get weight 0), so REPORT 177's +1.0 to +1.5 was mostly tuned on the owner's budget; amounts carry real signal for the encoders (MaxSim without the amount text 62.3 against 69.6, payees filed under 2+ categories 43.9 against 64.5), but a log-amount kernel only matches the text, it does not beat it (REAL-27, MODEL-25)
 
 PLAN steps 199 and 200. `scripts/hist_fuse.py` (`scripts/chains/r199_fuse.sh`): per reader, the fusion weight W, MaxSim's temperature T
@@ -10942,6 +10948,8 @@ each neighbour's cosine adjusted by a log-amount kernel (SIGMA) and an exact-amo
   restores almost all of it (69.0) but adds nothing on top of the text; an exact-amount bonus adds nothing. Bucket words and a learned
   numeric input (row 200's E and F) are not worth building now. Synthetic households route by amount in one rule only, so they cannot
   choose amount settings well; a generator with amount-dependent routing would.
+
+**Cost:** $0 on Modal (local RTX 3090); decider's reads reused from rows 190 and 193.
 
 ## 179. What Pinterest's recommender papers say about our categoriser, and the rows that follow (11 papers read in full; REAL-27, MODEL-25)
 

@@ -15,7 +15,14 @@ usage (the Modal client is a uv tool, not a project dependency: `uv tool install
       a JSON list of {"tag": ..., "env": {...}, "cmds": [...]}; each job writes only its own <tag>/ directory
   modal volume get ai-exp-results T <local dir>                              then copy into the checkout, push-models, union runs.jsonl
 GPU: one H100, 6-hour timeout per call (edit `run` to change either; `--gpu H200` overrides the GPU for one launch).
+Cost ledger (owner, 2026-10-05: "record how much each job cost, and which jobs were which"): every launch appends its app id, kind,
+job list or reader, PLAN rows (env PLAN_ROWS, else read from the job-list name "r192_193") and job tags to reports/modal_launches.jsonl,
+and each job's minutes when it reports back; `uv run python scripts/modal_costs.py` joins that with Modal's billing report.
 """
+import datetime as dt
+import json
+import os
+import re
 from pathlib import Path
 
 import modal
@@ -26,6 +33,32 @@ APP = modal.App("ai-experiments-training")
 HF = modal.Volume.from_name("ai-exp-hf-cache", create_if_missing=True)
 OUT = modal.Volume.from_name("ai-exp-results", create_if_missing=True)
 IGNORE = ["**/__pycache__/**", "**/*.pyc"]
+LEDGER = LOCAL / "reports" / "modal_launches.jsonl"
+
+
+def _rows(name=""):
+    """PLAN rows for the ledger: PLAN_ROWS, else from a job-list or tag name ("r192_193" -> "192-193", "r190-g-s0" -> "190")"""
+    if os.environ.get("PLAN_ROWS"):
+        return os.environ["PLAN_ROWS"]
+    m = re.match(r"r(\d+)(?:_(\d+))?", name)
+    return (m.group(1) + (f"-{m.group(2)}" if m.group(2) else "")) if m else ""
+
+
+def _ledger(**rec):
+    """local side only: one JSON line per launch or finished job"""
+    try:
+        rec = dict(utc=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), app_id=APP.app_id, **rec)
+        with open(LEDGER, "a") as f:
+            f.write(json.dumps(rec) + "\n")
+    except Exception as e:  # never let bookkeeping break a launch
+        print(f"[ledger] not written: {e}")
+
+
+def _done(line):
+    """the job runner's last line "<tag>: N files to ..., M min; last exit ..." -> a ledger entry"""
+    m = re.match(r"^(\S+): \d+ files to .*?, ([\d.]+) min", str(line))
+    if m:
+        _ledger(kind="job_done", tag=m.group(1), minutes=float(m.group(2)))
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -148,6 +181,8 @@ def embed_private(names: list, reader: str, adapter_from: str) -> bytes:
 
 def embed_private_call(names: list, reader: str, adapter_from: str) -> bytes:
     with APP.run():
+        _ledger(kind="private_scoring", what=f"owner-budget payee embedding {reader.split('@')[-1]}", rows=_rows(reader.split("@")[-1]),
+                gpu="H100", items=len(names))
         return embed_private.remote(names, reader, adapter_from)
 
 
@@ -161,9 +196,14 @@ def private_scores(items: list, reader: str, layout: str, adapter_from: str, sha
     for d in sorted(days, key=lambda d: -len(days[d])):  # largest days first, each to the lightest shard
         min(parts, key=len).extend(days[d])
     with APP.run():
+        import time
+        t0 = time.time()
+        _ledger(kind="private_scoring", what=f"owner-budget scoring {reader.split('@')[-1]}", rows=_rows(reader.split("@")[-1]),
+                gpu=gpu, shards=sum(1 for p in parts if p), items=len(items))
         fn = score_private if gpu == "H100" else score_private.with_options(gpu=gpu)  # the 35B: H200 (69 GB of weights)
         for out in fn.starmap([(p, reader, layout, adapter_from) for p in parts if p]):
             yield from out.splitlines()
+        _ledger(kind="job_done", tag=f"owner-budget scoring {reader.split('@')[-1]}", minutes=round((time.time() - t0) / 60, 1))
 
 
 @APP.local_entrypoint()
@@ -174,11 +214,15 @@ def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs:
     if check:
         print(gpu_check.remote()); return
     if jobs:  # parallel: at most 8 containers (volume commits contend beyond ~5 concurrent small ones)
-        import json
         spec = json.loads(Path(jobs).read_text())
+        _ledger(kind="jobs", what=Path(jobs).stem, rows=_rows(Path(jobs).stem), gpu=gpu or "H100", tags=[j["tag"] for j in spec])
         for line in run.starmap([(j["cmds"], j.get("env", {}), j["tag"]) for j in spec], return_exceptions=True):
             print(line, flush=True)
+            _done(line)
         return
     assert cmd and tag, "--cmd and --tag are required"
     envd = dict(kv.split("=", 1) for kv in env.split(",") if kv)
-    print(run.remote([c.strip() for c in cmd.split(";;") if c.strip()], envd, tag))
+    _ledger(kind="jobs", what=tag, rows=_rows(tag), gpu=gpu or "H100", tags=[tag])
+    line = run.remote([c.strip() for c in cmd.split(";;") if c.strip()], envd, tag)
+    print(line)
+    _done(line)

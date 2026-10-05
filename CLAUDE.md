@@ -75,6 +75,10 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
   hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+- Cost of every Modal job (owner, 2026-10-05): `scripts/modal_app.py` records each launch (app id, PLAN rows from `PLAN_ROWS` or the job-list
+  name, job tags, minutes) in `reports/modal_launches.jsonl`; `uv run python scripts/modal_costs.py` joins it with Modal's billing report into
+  `reports/modal_costs.md` (per row, per launch, per job by minutes). Every REPORT section whose step used Modal ends with a **Cost** line from
+  `modal_costs.py --rows N` (local-GPU steps say $0). Billing is reported for complete days, so run it the day after.
 - Report every result with the scorecard (`ai_experiments.scorecard`: top-1, top-3, calibrated bits, auto-file coverage, skill over
   the no-model cascade) on held-out users, and add a blind strong-reader ceiling (`scripts/blind_ceiling.py`) for a new item set.
 
