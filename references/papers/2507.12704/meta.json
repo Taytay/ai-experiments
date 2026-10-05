@@ -1,0 +1,35 @@
+{
+  "id": "2507.12704",
+  "version": "v3",
+  "id_versioned": "2507.12704v3",
+  "title": "PinFM: Foundation Model for User Activity Sequences at a Billion-scale Visual Discovery Platform",
+  "authors": [
+    "Xiangyi Chen",
+    "Kousik Rajesh",
+    "Matthew Lawhon",
+    "Zelun Wang",
+    "Hanyu Li",
+    "Haomiao Li",
+    "Saurabh Vishwas Joshi",
+    "Pong Eksombatchai",
+    "Jaewon Yang",
+    "Yi-Ping Hsu",
+    "Jiajing Xu",
+    "Charles Rosenberg"
+  ],
+  "published": "2025-07-17",
+  "updated": "2025-08-20",
+  "primary_category": "cs.LG",
+  "categories": [
+    "cs.LG",
+    "cs.IR"
+  ],
+  "comment": "clean up typos",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "User activity sequences have emerged as one of the most important signals in recommender systems. We present a foundational model, PinFM, for understanding user activity sequences across multiple applications at a billion-scale visual discovery platform. We pretrain a transformer model with 20B+ parameters using extensive user activity data, then fine-tune it for specific applications, efficiently coupling it with existing models. While this pretraining-and-fine-tuning approach has been popular in other domains, such as Vision and NLP, its application in industrial recommender systems presents numerous challenges. The foundational model must be scalable enough to score millions of items every second while meeting tight cost and latency constraints imposed by these systems. Additionally, it should capture the interactions between user activities and other features and handle new items that were not present during the pretraining stage. We developed innovative techniques to address these challenges. Our infrastructure and algorithmic optimizations, such as the Deduplicated Cross-Attention Transformer (DCAT), improved our throughput by 600% on Pinterest internal data. We demonstrate that PinFM can learn interactions between user sequences and candidate items by altering input sequences, leading to a 20% increase in engagement with new items. PinFM is now deployed to help improve the experience of more than half a billion users across various applications.",
+  "abs_url": "https://arxiv.org/abs/2507.12704",
+  "pdf_url": "https://arxiv.org/pdf/2507.12704v3",
+  "src_url": "https://export.arxiv.org/src/2507.12704v3",
+  "metadata_source": "api"
+}

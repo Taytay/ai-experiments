@@ -1,0 +1,30 @@
+{
+  "id": "2404.16260",
+  "version": "v1",
+  "id_versioned": "2404.16260v1",
+  "title": "OmniSearchSage: Multi-Task Multi-Entity Embeddings for Pinterest Search",
+  "authors": [
+    "Prabhat Agarwal",
+    "Minhazul Islam Sk",
+    "Nikil Pancha",
+    "Kurchi Subhra Hazra",
+    "Jiajing Xu",
+    "Chuck Rosenberg"
+  ],
+  "published": "2024-04-25",
+  "updated": "2024-04-25",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "comment": "8 pages, 5 figures, to be published as an oral paper in TheWebConf Industry Track 2024",
+  "journal_ref": "",
+  "doi": "10.1145/3589335.3648309",
+  "abstract": "In this paper, we present OmniSearchSage, a versatile and scalable system for understanding search queries, pins, and products for Pinterest search. We jointly learn a unified query embedding coupled with pin and product embeddings, leading to an improvement of $>8\\%$ relevance, $>7\\%$ engagement, and $>5\\%$ ads CTR in Pinterest's production search system. The main contributors to these gains are improved content understanding, better multi-task learning, and real-time serving. We enrich our entity representations using diverse text derived from image captions from a generative LLM, historical engagement, and user-curated boards. Our multitask learning setup produces a single search query embedding in the same space as pin and product embeddings and compatible with pre-existing pin and product embeddings. We show the value of each feature through ablation studies, and show the effectiveness of a unified model compared to standalone counterparts. Finally, we share how these embeddings have been deployed across the Pinterest search stack, from retrieval to ranking, scaling to serve $300k$ requests per second at low latency. Our implementation of this work is available at https://github.com/pinterest/atg-research/tree/main/omnisearchsage.",
+  "abs_url": "https://arxiv.org/abs/2404.16260",
+  "pdf_url": "https://arxiv.org/pdf/2404.16260v1",
+  "src_url": "https://export.arxiv.org/src/2404.16260v1",
+  "metadata_source": "api"
+}
