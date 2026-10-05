@@ -10561,3 +10561,49 @@ v3 data (5% of crowd keys collapsed; row 190 repeats on v4).
   the household has filed (where its own rows should decide).
 - **Small either way:** 0.6 against the line's +6 to +7 on first-time payees when a crowd exists; for YNAB with real crowd data the line
   would be present for most first-time payees. Row 190 repeats GCD and GCDH on clean keys (v4).
+
+## 175. On clean keys (v4 world) the crowd line is worth +7.4 on first-time payees (new world, GCD4; +6.5 in the training world), half a point more than on v3, and crowd training costs nothing on synthetic households without the line; on the owner's budget (no line) the cost shrinks to 0.2-0.7 on first guess (GCDH4 73.4, GCD4 72.9 against G4's 73.6, two seeds each) and 0.3-0.8 on top 5 (REAL-27)
+
+PLAN step 190 (owner, 2026-10-04: rebuild under separate names after two generator bugs: the recode regex that renamed ~0.3% of
+merchant strings, and crowd_key v1 collapsing ~5% of crowd lines). v4 shared world: `REALSTYLE_V4=1` (the recode swaps render_v2's
+recorded Reference, never parses the rendered string), `CROWD_KEY=v2` (drops a trailing token after '*' only when code-like); crowd
+tables `realstyle_crowd_v4_{train,test}.json`; arms G4 (no lines), GCD4 (`CROWD_DROP=0.4`), GCDH4 (+ `CROWD_HH_DROP=0.3`), seeds 0 and 1,
+800 steps, decider-4B bf16 on H100 (`r190.json`). Synthetic tables: `V4=1 CROWD_KEY=v2 uv run python scripts/r183_tables.py`; owner's
+budget: `scripts/chains/r183_owner.sh` with SPECS, then `real_budget_tables.py` (private; aggregates only).
+
+**Table 175.1: synthetic held-out households, % right first, means of seeds 0 and 1**
+
+| set | G4, no line | G4, line | GCD4, no line | GCD4, line | GCDH4, no line | GCDH4, line |
+|---|---|---|---|---|---|---|
+| new world: all | 72.3 | 68.5 | 72.7 | **73.8** | 72.5 | 73.7 |
+| new world: payee filed before | 75.6 | 70.2 | 75.8 | 75.8 | 75.7 | 75.8 |
+| new world: first-time payee | 54.6 | 59.3 | 55.7 | **63.1** [63.1 / 63.0] | 55.0 | 62.5 [63.1 / 61.9] |
+| new world: first-time, 50+ other households | 57.8 | 61.9 | 58.3 | 66.5 | 58.0 | 66.1 |
+| new world: first-time, 0-1 other households | 50.5 | 50.5 | 52.8 | 52.8 | 51.3 | 51.3 |
+| training world: first-time payee | 59.3 | 64.7 | 60.2 | **66.7** [66.1 / 67.2] | 59.9 | 66.1 |
+
+**Table 175.2: the owner's budget (no line), means of seeds 0 and 1 [each seed]; first / top 3 / top 5**
+
+| items | n | G4 | GCD4 | GCDH4 | v3 for reference: G3 / GCD / GCDH (first) |
+|---|---|---|---|---|---|
+| all | 21,238 | **73.6** [73.8 / 73.4] / 84.9 / 87.85 | 72.9 [72.7 / 73.1] / 84.65 / 87.55 | 73.4 [73.4 / 73.4] / 84.5 / 87.05 | 73.55 / 72.8 / 72.95 |
+| payee filed before | 15,032 | 80.35 / 90.35 / 92.5 | 79.55 / 90.2 / 92.4 | 80.2 / 90.25 / 92.15 | 80.75 / 79.8 / 79.95 |
+| first-time payee | 6,206 | 57.15 / 71.75 / 76.7 | 56.7 / 71.15 / 75.85 | 56.75 / 70.65 / 74.6 | 56.15 / 55.85 / 56.1 |
+| first-time, alias filed before | 2,034 | 73.05 | 72.45 | 72.8 | 73.15 / 72.05 / 72.0 |
+| first-time, no alias | 4,172 | 49.45 / 65.7 / 71.55 | 49.05 / 64.65 / 70.3 | 48.95 / 64.15 / 68.8 | 47.85 / 47.95 / 48.35 |
+
+### 175.1 What the step says
+
+- **Clean keys raise the crowd gain a little:** first-time payees +7.4 (new world) and +6.5 (training world) for GCD4 against its own
+  no-line read, over +6.3 / +6.9 on v3's keys; the gain lives where many households filed the string (+8.2 at 50+) and is zero where
+  at most one other did. Item dropout (GCD4) is again as good as adding whole-household absence (GCDH4).
+- **A model must be trained with the line to use it:** G4 shown the line loses 5.4 on payees it already knows (75.6 -> 70.2).
+- **On synthetic households crowd training costs nothing without the line** (GCD4 72.7, GCDH4 72.5, G4 72.3 on all items).
+- **On the owner's budget the cost is now small:** first guess -0.2 (GCDH4) to -0.7 (GCD4), within seed noise; GCDH4's two seeds agree
+  (73.4 / 73.4). Top 5 shows a slightly larger, consistent cost (-0.3 to -0.8), mostly on first-time payees with no alias (GCDH4 seed
+  0: 67.8 top 5 against G4's 71.9). The v4 world itself helps the plain arm on first-time payees (G4 57.15 against G3 56.15, no-alias
+  49.45 against 47.85).
+- **Recommendation:** GCD4 or GCDH4 is the recipe to carry forward if YNAB will have crowd data: about +7 on first-time payees where a
+  crowd exists, at most ~0.5 when it does not. The best first-time reader on the owner's budget remains the knowledge-trained GK
+  (57.95 first, two seeds), statistically tied with G4; combining knowledge episodes, the crowd recipe and row 189's behavioural rows
+  in one model is the open step.

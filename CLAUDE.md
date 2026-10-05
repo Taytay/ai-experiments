@@ -81,7 +81,7 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 ## Branches, PRs and models
 
 - **One branch and PR per row** (owner, 2026-10-01): each PLAN row, or round of tests, gets its own branch off the current top and its own
-  PR, added to the top of GitHub stack #24 with `gh stack link <all open PR numbers, bottom to top> <new-branch>` (PR numbers push nothing;
+  PR, added to the top of GitHub stack #24 with `gh stack link <every PR already in the stack, in stack order> <new-branch>`: every member, merged or not, from #5 up (the order is the stack's, not numeric: #20 sits after #23); leave one out and gh stack refuses ("this would remove ... from the stack") and prints the current list to copy (PR numbers push nothing;
   only the new branch is pushed). Commit a row's results on its own branch before starting the next row. `PLAN.md`'s current state lists
   the stack.
 - **Merge forward only** (owner, after two PRs were auto-closed by a force push): lower branches reach upper ones by merging; never rebase,
