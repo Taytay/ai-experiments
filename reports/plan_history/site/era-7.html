@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html" aria-current="page">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 77–90 · 14 rows</p><h1>Open base, one-slot reader, final recipe</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-77" data-from="72,73" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 77 · 2026-09-27 · <span class="qid">MODEL-14</span> · REPORT §69<span class="status done">done</span></p>
+    <p class="eyebrow">Row 77 · 2026-09-27 · <span class="qid">MODEL-14</span> · §69 Published decision models<span class="status done">done</span></p>
     <h2>Trying published "decision" models off the shelf and fine-tuned</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked (2026-09-26) to try the small decision models that Ollaya serves, and to fine-tune those that allow it. These models pick among options after a long state. The POI-1 layouts of <a class="back" href="era-6.html#row-72">row 72</a> and the episodes of <a class="back" href="era-6.html#row-73">row 73</a> gave the test layouts and the training data.</p></section>
@@ -97,7 +97,7 @@ Answer: (</pre><p class="note">decider's layout: all options in one pass, and th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-79">Row 79</a> · One answer slot instead of scoring every option</li><li><a href="#row-80">Row 80</a> · Fine-tuning decider and kev on REAL-6</li></ul></section></article><article class="row" id="row-78" data-from="72,73" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 78 · 2026-09-27 · <span class="qid">MODEL-15</span> · REPORT §69<span class="status done">done</span></p>
+    <p class="eyebrow">Row 78 · 2026-09-27 · <span class="qid">MODEL-15</span> · §69 Published decision models<span class="status done">done</span></p>
     <h2>Moving to an openly licensed base model (Qwen3.5)</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Qwen2.5-3B-Instruct, the base of nearly every trained categoriser so far, is under the Qwen Research licence. The owner chose (2026-09-26) to move new trained work to Apache-2.0 Qwen3.5. The best recipes to re-check were REAL-6 database episodes and the POI-1 layout of <a class="back" href="era-6.html#row-72">rows 72</a> and <a class="back" href="era-6.html#row-73">73</a>.</p></section>
@@ -126,7 +126,7 @@ Category:</pre><p class="note">The same REAL-6 and POI-1 prompts. Only the base 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-6.html#row-61">Row 61</a> · Rename every category to a word the model has never seen</li><li><a href="era-6.html#row-67">Row 67</a> · Probing inside the model: where the decision forms and where injected facts live</li><li><a href="era-6.html#row-74">Row 74</a> · Training against decoys and empty categories</li><li><a href="#row-79">Row 79</a> · One answer slot instead of scoring every option</li></ul></section></article><article class="row" id="row-79" data-from="77,78" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 79 · 2026-09-27 · <span class="qid">MODEL-16</span> · REPORT §76<span class="status done">done</span></p>
+    <p class="eyebrow">Row 79 · 2026-09-27 · <span class="qid">MODEL-16</span> · §76 Single answer slot readout<span class="status done">done</span></p>
     <h2>One answer slot instead of scoring every option</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-77">Row 77</a> found decider-2B, reading one letter slot over all options, the best POI-1 reader at a tenth of the cost. Was that the layout or the model? The repo's own scorer re-reads the prompt once per option. The comparison used the open base from <a class="back" href="#row-78">row 78</a>.</p></section>
@@ -151,14 +151,14 @@ Answer: (</pre><p class="note">One slot and one pass. The shot-label loss superv
     <li>The layout costs nothing in the end, but trains slower: one target per episode against 25.</li>
     <li>The shot-label loss closes the gap to within a point.</li>
     <li>Scoring is 18 to 24 ms per item warm, against about 390 ms per-option.</li>
-    <li>Answers barely move when the option order is shuffled (REPORT 75).</li>
+    <li>Answers barely move when the option order is shuffled (§75 Option order effects).</li>
   </ul></section>
   <section class="questions"><h3>Questions it raised</h3><ul>
     <li>Option labels beyond A, B, C in order: <a href="#row-82">row 82</a>.</li>
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-5.html#row-50">Row 50</a> · Does the order of the options change the answer?</li><li><a href="#row-80">Row 80</a> · Fine-tuning decider and kev on REAL-6</li><li><a href="#row-82">Row 82</a> · Option labels: random letters, and room for 255 options</li></ul></section></article><article class="row" id="row-80" data-from="77,79" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 80 · 2026-09-27 · <span class="qid">MODEL-16</span> · REPORT §76<span class="status done">done</span></p>
+    <p class="eyebrow">Row 80 · 2026-09-27 · <span class="qid">MODEL-16</span> · §76 Single answer slot readout<span class="status done">done</span></p>
     <h2>Fine-tuning decider and kev on REAL-6</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-77">Row 77</a> left two doubts. decider-2B misfiled Trader Joe's zero-shot: is 2B enough merchant knowledge? And kev-4B was the best zero-shot reader: how far does it go fine-tuned? The shot-label loss came from <a class="back" href="#row-79">row 79</a>.</p></section>
@@ -189,7 +189,7 @@ Answer: (</pre><p class="note">The decider one-slot layout, fed REAL-6 episodes.
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-5.html#row-50">Row 50</a> · Does the order of the options change the answer?</li><li><a href="era-5.html#row-52">Row 52</a> · Teaching the model to answer &quot;not listed here&quot;</li><li><a href="era-6.html#row-61">Row 61</a> · Rename every category to a word the model has never seen</li><li><a href="#row-81">Row 81</a> · Rename augmentation makes the best reader robust to unseen category names</li><li><a href="#row-82">Row 82</a> · Option labels: random letters, and room for 255 options</li></ul></section></article><article class="row" id="row-81" data-from="61,80" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 81 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §78, §82<span class="status done">done</span></p>
+    <p class="eyebrow">Row 81 · 2026-09-27 · <span class="qid">REAL-18</span> · §78 Rename augmentation gains, §82<span class="status done">done</span></p>
     <h2>Rename augmentation makes the best reader robust to unseen category names</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-6.html#row-61">Row 61</a> showed readers trained only on real category names lean on what the names mean. Its hypothesis was that adding rename augmentation to the database-episode recipe of <a class="back" href="#row-80">row 80</a> would keep both routes.</p></section>
@@ -217,7 +217,7 @@ Category:</pre><p class="note">The novel-names test from row 61. Training now co
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-83">Row 83</a> · Merchants whose names point to the wrong category</li><li><a href="#row-84">Row 84</a> · Teaching the model to be unsure when there is nothing to go on</li><li><a href="#row-85">Row 85</a> · The user&#x27;s own filing should beat the database and the name</li><li><a href="#row-86">Row 86</a> · Users who split one merchant across two categories</li><li><a href="#row-87">Row 87</a> · Does a 9B model beat the 4B on the best recipe?</li><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-82" data-from="79,80" data-era="Open base and one-slot reader" data-status="done">
   <header>
-    <p class="eyebrow">Row 82 · 2026-09-27 · <span class="qid">MODEL-16</span> · REPORT §81<span class="status done">done</span></p>
+    <p class="eyebrow">Row 82 · 2026-09-27 · <span class="qid">MODEL-16</span> · §81 Option label randomisation<span class="status done">done</span></p>
     <h2>Option labels: random letters, and room for 255 options</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The one-slot reader of <a class="back" href="#row-79">rows 79</a> and <a class="back" href="#row-80">80</a> labels options A, B, C in order. The owner (2026-09-27) wanted labels that do not always start at A and that can reach 255 options. Numbers were dropped because Qwen3.5 has them as single tokens only up to 9.</p></section>
@@ -250,7 +250,7 @@ Answer: (</pre><p class="note">An illustration of rand26: letters drawn at rando
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-87">Row 87</a> · Does a 9B model beat the 4B on the best recipe?</li><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-83" data-from="81" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 83 · 2026-09-27 · <span class="qid">REAL-15</span> · REPORT §80<span class="status done">done</span></p>
+    <p class="eyebrow">Row 83 · 2026-09-27 · <span class="qid">REAL-15</span> · §80 Misleading merchant names<span class="status done">done</span></p>
     <h2>Merchants whose names point to the wrong category</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>REAL-6's made-up merchants have meaningless names, so nobody had tested whether a fact in the weights, or the user's own history, beats a name that suggests another category. The owner gave this priority (2026-09-27). The readers came from <a class="back" href="#row-81">row 81</a>.</p></section>
@@ -278,7 +278,7 @@ Category:</pre><p class="note">The name suggests "Car", but Tire Barn is a resta
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-84">Row 84</a> · Teaching the model to be unsure when there is nothing to go on</li><li><a href="#row-85">Row 85</a> · The user&#x27;s own filing should beat the database and the name</li><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-84" data-from="52,81,83" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 84 · 2026-09-27 · <span class="qid">REAL-14</span> · REPORT §83, §85<span class="status done">done</span></p>
+    <p class="eyebrow">Row 84 · 2026-09-27 · <span class="qid">REAL-14</span> · §83 Knowing what it doesn't know, §85<span class="status done">done</span></p>
     <h2>Teaching the model to be unsure when there is nothing to go on</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner wants the model able to abstain, switchable per request, but only on truly ambiguous merchants, never where the name carries a clue. <a class="back" href="#row-83">Row 83</a> provided evidence-free items: neutral made-up merchants in no database and no history. <a class="back" href="era-5.html#row-52">Row 52</a> had tested decider's "not listed here" augmentation. The reader was <a class="back" href="#row-81">row 81</a>'s.</p></section>
@@ -304,7 +304,7 @@ Category:</pre><p class="note">An evidence-free item: a made-up name in no datab
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-85" data-from="81,83" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 85 · 2026-09-27 · <span class="qid">REAL-15</span> · REPORT §84<span class="status done">done</span></p>
+    <p class="eyebrow">Row 85 · 2026-09-27 · <span class="qid">REAL-15</span> · §84 User filing overrides database<span class="status done">done</span></p>
     <h2>The user's own filing should beat the database and the name</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-83">Row 83</a> found that of 2,250 training episodes only 6 put the target merchant's own row among the examples, and no user ever filed a merchant against its database category. The owner asked that training cover a user who disagrees with the name or the database. The base recipe was <a class="back" href="#row-81">row 81</a>'s.</p></section>
@@ -331,7 +331,7 @@ Category:</pre><p class="note">An override item. The database says AMC is entert
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-86" data-from="43,81" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 86 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §86<span class="status done">done</span></p>
+    <p class="eyebrow">Row 86 · 2026-09-27 · <span class="qid">REAL-18</span> · §86 Alternating category merchants<span class="status done">done</span></p>
     <h2>Users who split one merchant across two categories</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Some users keep a specific category ("Date night", "Game stuff") and use it for some of a merchant's transactions. This was the first piece of <a class="back" href="era-4.html#row-43">row 43</a>, raised again by the owner on 2026-09-27. The reader under test was <a class="back" href="#row-81">row 81</a>'s.</p></section>
@@ -365,7 +365,7 @@ Category:</pre><p class="note">Target at $40 or more goes to "Game stuff". At $3
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-88">Row 88</a> · Putting every trained behaviour into one recipe</li></ul></section></article><article class="row" id="row-87" data-from="81,82" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 87 · 2026-09-27 · <span class="qid">MODEL-16</span> · REPORT §87<span class="status done">done</span></p>
+    <p class="eyebrow">Row 87 · 2026-09-27 · <span class="qid">MODEL-16</span> · §87 Scale to Qwen3.5-9B<span class="status done">done</span></p>
     <h2>Does a 9B model beat the 4B on the best recipe?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Scale had not helped Qwen2.5 on REAL-6 (<a class="back" href="era-6.html#row-70">row 70</a>), but the recipe had changed since. This tested the one-slot recipe of <a class="back" href="#row-81">row 81</a> with the random labels of <a class="back" href="#row-82">row 82</a> at Apache-2.0 Qwen3.5-9B.</p></section>
@@ -392,7 +392,7 @@ Answer: (</pre><p class="note">The same one-slot layout with random letters. Onl
   </ul></section>
 </article><article class="row" id="row-88" data-from="81,82,83,84,85,86" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 88 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §88<span class="status done">done</span></p>
+    <p class="eyebrow">Row 88 · 2026-09-27 · <span class="qid">REAL-18</span> · §88 Combined recipe tradeoffs<span class="status done">done</span></p>
     <h2>Putting every trained behaviour into one recipe</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Each behaviour had been trained separately:</p><ul><li>rename augmentation (<a class="back" href="#row-81">row 81</a>);</li><li>random labels (<a class="back" href="#row-82">row 82</a>);</li><li>misleading names in the database (<a class="back" href="#row-83">row 83</a>);</li><li>soft evidence-free questions (<a class="back" href="#row-84">row 84</a>);</li><li>lookup and override episodes (<a class="back" href="#row-85">row 85</a>);</li><li>alternation (<a class="back" href="#row-86">row 86</a>).</li></ul><p>Do they keep their gains together?</p></section>
@@ -426,7 +426,7 @@ Category:</pre><p class="note">An alternation item: weekend visits go to "Fun fo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-89">Row 89</a> · Tuning how much alternation training goes into the recipe</li></ul></section></article><article class="row" id="row-89" data-from="88" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 89 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §89<span class="status done">done</span></p>
+    <p class="eyebrow">Row 89 · 2026-09-27 · <span class="qid">REAL-18</span> · §89 Alternation training share<span class="status done">done</span></p>
     <h2>Tuning how much alternation training goes into the recipe</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-88">Row 88</a> traced its costs on novel names and auto-filing to alternation episodes at a 0.2 share.</p></section>
@@ -453,7 +453,7 @@ Category:</pre><p class="note">The same alternation and REAL-6 items as row 88. 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-90">Row 90</a> · The final recipe on every user</li><li><a href="era-8.html#row-93">Row 93</a> · REAL-7: a messier, more realistic synthetic population</li><li><a href="era-8.html#row-99">Row 99</a> · Encoder rematch: small encoders trained on exactly the decoder&#x27;s data</li><li><a href="era-8.html#row-101">Row 101</a> · Newer small open models with the same recipe</li></ul></section></article><article class="row" id="row-90" data-from="75,89" data-era="Trained behaviours and final recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 90 · 2026-09-27 · <span class="qid">EVAL-9</span> · REPORT §90<span class="status done">done</span></p>
+    <p class="eyebrow">Row 90 · 2026-09-27 · <span class="qid">EVAL-9</span> · §90 Final recipe on all users<span class="status done">done</span></p>
     <h2>The final recipe on every user</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Everything since <a class="back" href="#row-79">row 79</a> was read on fold 0 alone (5 users). The recipe chosen in <a class="back" href="#row-89">row 89</a> needed reading on all four folds, against the best earlier four-fold number: <a class="back" href="era-6.html#row-75">row 75</a>'s lookup-then-model cascade at 91.3.</p></section>

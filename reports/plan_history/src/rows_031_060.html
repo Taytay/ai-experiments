@@ -1,6 +1,6 @@
 <article class="row" id="row-31" data-from="8,25" data-era="Species knowledge injection" data-status="done">
   <header>
-    <p class="eyebrow">Row 31 · 2026-09-18 · <span class="qid">TRAIN-8</span> · REPORT §31</p>
+    <p class="eyebrow">Row 31 · 2026-09-18 · <span class="qid">TRAIN-8</span> · §31 On-policy distillation</p>
     <h2>Repairing forgetting by distilling from the model as it was before injection</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>"Arm C" is the project's main knowledge-injection recipe: a rank-64 LoRA adapter (a small trainable add-on to the frozen weights) on Qwen2.5-3B, trained on sentences about 136 invented species plus labelling exercises. It learned the facts but damaged the model's general ability (WikiText perplexity 10.6 to 22.8, ARC-Easy 73.5 to 58.5); <a class="back" href="#row-8">row 8</a> was the last row to measure other arms against it. <a class="back" href="#row-25">Row 25</a> mixed general text back in ("arm Cg") and recovered part of it. A Thinking Machines blog post reported that on-policy distillation (the student imitates the original model on its own samples) restored chat ability while keeping injected knowledge, so we tried it.</p></section>
@@ -32,7 +32,7 @@ Answer:
 
 <article class="row" id="row-32" data-from="17,18" data-era="Species knowledge injection" data-status="done">
   <header>
-    <p class="eyebrow">Row 32 · 2026-09-18 · <span class="qid">TRAIN-9</span> · REPORT §32</p>
+    <p class="eyebrow">Row 32 · 2026-09-18 · <span class="qid">TRAIN-9</span> · §32 LoRA rate sensitivity</p>
     <h2>Does a LoRA adapter want ten times the learning rate?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Thinking Machines' "Tinker" LoRA primer says adapters want about ten times the full fine-tuning learning rate. Every decoder adapter here trained at 1e-4, the sweep of <a class="back" href="#row-17">row 17</a> stopped at 2e-4, and in <a class="back" href="#row-18">row 18</a> the Flan-T5 adapter at 3e-4 learned nothing while full fine-tuning at the same rate recalled 98%. If the primer held, those verdicts were artefacts of a too-low rate.</p></section>
@@ -62,7 +62,7 @@ Answer:
 
 <article class="row" id="row-33" data-from="35" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 33 · 2026-09-19 · <span class="qid">REAL-5</span> · REPORT §38</p>
+    <p class="eyebrow">Row 33 · 2026-09-19 · <span class="qid">REAL-5</span> · §38 Production categoriser on REAL-6</p>
     <h2>The first trained categoriser, with and without a merchant fact database</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner's goal (2026-09-17) is a categoriser that files a user's transactions the way that user would, on their own category names, including merchants the user never labelled but a fact database knows. <a class="back" href="#row-35">Row 35</a> built the REAL-6 test set and found the best untrained reading at 58.0 (the instruct model with the merchant's record in the prompt). This row trains the categoriser and asks whether the fact database helps.</p></section>
@@ -101,7 +101,7 @@ Category:</pre><p class="note">The record-in-prompt arm: the "Note" line is the 
 
 <article class="row" id="row-34" data-from="18" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 34 · 2026-09-25 to 2026-09-26 · <span class="qid">INFRA-1, REAL-3, MODEL-2</span> · REPORT §54</p>
+    <p class="eyebrow">Row 34 · 2026-09-25 to 2026-09-26 · <span class="qid">INFRA-1, REAL-3, MODEL-2</span> · §54 Modal experiment infrastructure</p>
     <h2>Moving GPU work to cloud H100s on Modal</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The local RTX 3090 was the bottleneck: the queue held about 35 GPU-hours, the multi-hour species-scale runs left over from <a class="back" href="#row-18">row 18</a> (5,000 species, 20,000 steps) did not fit comfortably, and <a href="#row-31">row 31</a>'s sampling took hours. The row waited from 2026-09-19 until the owner set up a Modal workspace on 2026-09-25.</p></section>
@@ -128,7 +128,7 @@ Category:</pre><p class="note">The record-in-prompt arm: the "Note" line is the 
 
 <article class="row" id="row-35" data-from="14,22" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 35 · 2026-09-19 · <span class="qid">REAL-6</span> · REPORT §37</p>
+    <p class="eyebrow">Row 35 · 2026-09-19 · <span class="qid">REAL-6</span> · §37 REAL-6 baseline scores</p>
     <h2>REAL-6: a test set shaped like real users' budgets</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner's goals (2026-09-17) needed a yardstick no earlier set had: users with their own category names, labelled histories, and merchants they have and have not labelled. It reuses the noisy merchant history of <a class="back" href="#row-22">row 22</a> and the record retrieval idea of <a class="back" href="#row-14">row 14</a>, and it came before the categoriser (<a href="#row-33">row 33</a>) so that row had something to beat.</p></section>
@@ -166,7 +166,7 @@ Category:</pre><p class="note">The model scores each of the user's eight categor
 
 <article class="row" id="row-36" data-from="2,21" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 36 · 2026-09-19 · <span class="qid">DATA-4, DATA-2</span> · REPORT §35</p>
+    <p class="eyebrow">Row 36 · 2026-09-19 · <span class="qid">DATA-4, DATA-2</span> · §35 Merchant realism fixes</p>
     <h2>Messy bank strings and products that do not name their category</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment had left a gap: an embedding model recognised a trained merchant from its bank-statement string 70.8% of the time, and a 0.5B language model was at chance on that string even with the fact in the prompt. A reviewer asked why the obvious fixes (noisy training strings, a normaliser) were never tried (DATA-4), and how much of the category result was recalling products versus bridging from products to a category (DATA-2). The row was split out of <a class="back" href="#row-21">row 21</a> on 2026-09-18; its Needs list <a class="back" href="#row-2">row 2</a>.</p></section>
@@ -205,7 +205,7 @@ Spending category:</pre><p class="note">The 0.5B model's truncated-string item; 
 
 <article class="row" id="row-37" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 37 · 2026-09-21 · <span class="qid">REAL-7</span> · REPORT §43</p>
+    <p class="eyebrow">Row 37 · 2026-09-21 · <span class="qid">REAL-7</span> · §43 Record-in-prompt robustness</p>
     <h2>Stress-testing the record-in-prompt result: ambiguous records, a real retriever, three seeds</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a>'s headline (90.2 overall, 97.6 on merchants only the database knows) rested on three conveniences: product lists that name their category, a record found by the merchant's true name (an oracle), and one training seed. The owner asked what else the 3090 could do before the cloud move; taking that number apart was the answer.</p></section>
@@ -238,7 +238,7 @@ Category:</pre><p class="note">The same item's record in the two databases; the 
 
 <article class="row" id="row-38" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 38 · 2026-09-21 · <span class="qid">INFRA-2</span> · REPORT §44</p>
+    <p class="eyebrow">Row 38 · 2026-09-21 · <span class="qid">INFRA-2</span> · §44 Unsloth-free trainer bug</p>
     <h2>A trainer without unsloth, and the hidden 4-bit default it exposed</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether the unsloth library was more trouble than it was worth after its memory and fused-loss failures in <a href="#row-31">row 31</a> and <a class="back" href="#row-33">row 33</a>. The concrete task: a second implementation of row 33's categoriser trainer with plain transformers + peft, checked against the first.</p></section>
@@ -265,7 +265,7 @@ Category:</pre><p class="note">The same item's record in the two databases; the 
 
 <article class="row" id="row-39" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 39 · 2026-09-22 · <span class="qid">REAL-8</span> · REPORT §45</p>
+    <p class="eyebrow">Row 39 · 2026-09-22 · <span class="qid">REAL-8</span> · §45 Exposure curve and chat template</p>
     <h2>How much exposure do records in the weights need, and does the chat template matter?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a> found records trained into the weights helped only at 3.3 passes over them, and <a class="back" href="#row-37">row 37</a> showed even that gain was mostly one lucky seed (+10 ± 12). REAL-8 asked for the rest of the exposure curve at three seeds, and for the prompt in the instruct model's chat format, which production would use.</p></section>
@@ -298,7 +298,7 @@ Category:</pre><p class="note">The chat-template arm: the same content as the pl
 
 <article class="row" id="row-40" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 40 · 2026-09-22 · <span class="qid">BASE-6</span> · REPORT §46</p>
+    <p class="eyebrow">Row 40 · 2026-09-22 · <span class="qid">BASE-6</span> · §46 Per-user classifier comparison</p>
     <h2>Off-the-shelf few-shot classifiers: FastFit, GLiClass and a logistic head</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked about IBM's FastFit, a few-shot classifier built for many similar classes that also scores a query against the label's words, which REAL-6's per-user schemes resemble. A literature scan added GLiClass, a zero-shot label-scoring encoder, and the cheapest baseline, a logistic regression on frozen embeddings. All were compared against <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
@@ -328,7 +328,7 @@ Category:</pre><p class="note">The chat-template arm: the same content as the pl
 
 <article class="row" id="row-41" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 41 · 2026-09-22 · <span class="qid">REAL-9</span> · REPORT §47</p>
+    <p class="eyebrow">Row 41 · 2026-09-22 · <span class="qid">REAL-9</span> · §47 Retrieved shots and copying</p>
     <h2>Choosing which past transactions go in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner framed categorisation as a recommender problem: the user's history is the interaction log, and picking the prompt's 24 example rows is the retrieval step. Every prompt so far used one fixed random block per user. Pinterest's published rules (TransAct V2, Pinner Progression) suggested better ones, and <a class="back" href="#row-37">row 37</a>'s retriever made similarity search possible on <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
@@ -362,7 +362,7 @@ Category:</pre><p class="note">When a shot is the same merchant as the query, th
 
 <article class="row" id="row-42" data-from="33,45,47" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 42 · 2026-09-26 · <span class="qid">REAL-10</span> · REPORT §51</p>
+    <p class="eyebrow">Row 42 · 2026-09-26 · <span class="qid">REAL-10</span> · §51 Held-out user generalisation</p>
     <h2>Users the model has never seen, and rename augmentation</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every REAL-6 number so far scored the same 20 users whose histories trained the adapter (<a class="back" href="#row-33">row 33</a>). Production meets over a million users whose schemes it never saw. The audit (<a class="back" href="#row-45">row 45</a>) turned the planned single split into four folds, and <a class="back" href="#row-47">row 47</a> set the no-DB arm at 800 steps.</p></section>
@@ -392,7 +392,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-43" data-from="33,41,45" data-era="REAL-6 audit and recipe" data-status="doing">
   <header>
-    <p class="eyebrow">Row 43 · added 2026-09-21, amended 2026-09-22 · <span class="qid">REAL-11</span> · first version in REPORT §93</p>
+    <p class="eyebrow">Row 43 · added 2026-09-21, amended 2026-09-22 · <span class="qid">REAL-11</span> · first version in §93 A more realistic synthetic population</p>
     <h2>A successor test set shaped like the real population</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner described the real population on 2026-09-21: over a million users, most on the default categories, some with custom labels, filing merchants for personal reasons, with recent inputs mattering most. REAL-6 (built for <a class="back" href="#row-33">row 33</a>) cannot test that. <a class="back" href="#row-41">Row 41</a> showed REAL-6 users never relabel, and the audit of <a class="back" href="#row-45">row 45</a> found its items are decided by a lookup or by the merchant's standard category, so the set had to be rebuilt so neither decides it.</p></section>
@@ -420,7 +420,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-45" data-from="41" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 45 · 2026-09-22 · <span class="qid">REAL-13</span> · REPORT §48</p>
+    <p class="eyebrow">Row 45 · 2026-09-22 · <span class="qid">REAL-13</span> · §48 REAL-6 set audit</p>
     <h2>Auditing REAL-6: what actually decides each test item</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A review during <a class="back" href="#row-41">row 41</a>'s run found four properties hidden by REAL-6's cell names: 115 "seen" items had lost their merchant's history rows to the 300-row cut; every user files a merchant under one label, so a lookup answers every truly seen item; most "unseen" items are decided by the merchant's standard category; and intervals resampled items, not users.</p></section>
@@ -459,7 +459,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-47" data-from="39,45" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 47 · 2026-09-23 · <span class="qid">REAL-8</span> · REPORT §49</p>
+    <p class="eyebrow">Row 47 · 2026-09-23 · <span class="qid">REAL-8</span> · §49 No-DB under-training</p>
     <h2>Was the no-database categoriser simply under-trained?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-39">Row 39</a>'s records-in-the-weights arms trained for 800 and 1,600 steps against the no-DB arm's 200, and <a class="back" href="#row-45">row 45</a> showed most of their gain was on merchants users had labelled, which the records cannot explain. If the no-DB arm gains the same with more steps, every categoriser so far used a quarter of the training it needed.</p></section>
@@ -485,7 +485,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-48" data-from="45" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 48 · 2026-09-22 · <span class="qid">REPORT-5</span> · REPORT §1 (no new section)</p>
+    <p class="eyebrow">Row 48 · 2026-09-22 · <span class="qid">REPORT-5</span> · §1 Executive summary (no new section)</p>
     <h2>Report upkeep: a new executive summary and pointers on overturned claims</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The report's executive summary stopped at section 8, before any categoriser work, and a review of sections 1 to 36 alongside the audit of <a class="back" href="#row-45">row 45</a> found earlier claims that later sections had overturned or qualified.</p></section>
@@ -497,7 +497,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-49" data-from="45,47" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 49 · 2026-09-23 · <span class="qid">STAT-4</span> · REPORT §50</p>
+    <p class="eyebrow">Row 49 · 2026-09-23 · <span class="qid">STAT-4</span> · §50 Calibration and auto-apply</p>
     <h2>Can the categoriser's confidence decide when to file automatically?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A production categoriser needs a rule for when to apply a label without asking. The "Jev review" (thirteen memos on related decision models, collected at the owner's request) found raw model probabilities over-confident, fixable with one fitted temperature, and the right temperature depending on the task type. The audit's groups (<a class="back" href="#row-45">row 45</a>) and <a class="back" href="#row-47">row 47</a>'s longer-trained adapters made the measurement possible.</p></section>
@@ -526,7 +526,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
 
 <article class="row" id="row-50" data-from="41,45,79,80" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 50 · 2026-09-27 · <span class="qid">EVAL-8</span> · REPORT §75</p>
+    <p class="eyebrow">Row 50 · 2026-09-27 · <span class="qid">EVAL-8</span> · §75 Option order effects</p>
     <h2>Does the order of the options change the answer?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The Jev review showed models flipping answers when options are reordered. As first written (after <a class="back" href="#row-41">row 41</a> and <a class="back" href="#row-45">row 45</a>) it would permute the category list for the per-option scorers. By 2026-09-27 the leading readers were "one-slot" models (<a class="back" href="#row-79">row 79</a>, <a class="back" href="#row-80">row 80</a>) that pick a letter label from a lettered option list, which are exposed to position and letter bias, so the row was re-scoped to them.</p></section>
@@ -576,7 +576,7 @@ Answer: (</pre><p class="note">The one-slot layout: the model's next token is th
 
 <article class="row" id="row-52" data-from="49,80" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 52 · 2026-09-27 · <span class="qid">REAL-14</span> · REPORT §79</p>
+    <p class="eyebrow">Row 52 · 2026-09-27 · <span class="qid">REAL-14</span> · §79 Trained abstention</p>
     <h2>Teaching the model to answer "not listed here"</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-49">Row 49</a> found the categoriser confident and wrong where no evidence decides the answer. The Jev review pointed to decider's training trick: an abstain option in some training questions, sometimes with the right answer removed. On 2026-09-27 the row was re-scoped to the then-best reader, decider-4B one-slot with shot-label loss and database episodes (<a class="back" href="#row-80">row 80</a>'s recipe).</p></section>
@@ -607,7 +607,7 @@ Answer: (</pre><p class="note">The added option; in the "gold hidden" version th
 
 <article class="row" id="row-53" data-from="40,42,45" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 53 · 2026-09-26 · <span class="qid">MODEL-6</span> · REPORT §62</p>
+    <p class="eyebrow">Row 53 · 2026-09-26 · <span class="qid">MODEL-6</span> · §62 Masked-category encoder</p>
     <h2>A small encoder that scores one marker per category</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner pointed out that ModernBERT-style "marker" models had been dismissed on general benchmark rank, which says little about a one-domain categoriser. In <a class="back" href="#row-40">row 40</a> GLiClass could not use the user's example rows; Laya's layout (one scored <code>[MASK]</code> per option) might. A 400M-parameter encoder answering in milliseconds is the production argument at a million users. It uses <a class="back" href="#row-45">row 45</a>'s groups and <a class="back" href="#row-42">row 42</a>'s folds.</p></section>
@@ -660,7 +660,7 @@ Answer: (</pre><p class="note">The added option; in the "gold hidden" version th
 
 <article class="row" id="row-56" data-from="47" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 56 · 2026-09-25 to 2026-09-26 · <span class="qid">TRAIN-11</span> · REPORT §52</p>
+    <p class="eyebrow">Row 56 · 2026-09-25 to 2026-09-26 · <span class="qid">TRAIN-11</span> · §52 Training efficiency gains</p>
     <h2>Putting the training loss on every label in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-47">Row 47</a> showed the no-DB categoriser needs 800 to 1,600 steps. Each step pushed 16 sequences of about 850 tokens through the 3B model, yet the loss fell only on the answer's one to five tokens, so each pass taught one label. The owner asked where the hours went and whether the same accuracy could come cheaper.</p></section>
@@ -694,7 +694,7 @@ Category: Plenk</pre><p class="note">With the all-label loss, every "Category:" 
 
 <article class="row" id="row-57" data-from="42,56" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 57 · 2026-09-26 · <span class="qid">REAL-15</span> · REPORT §53</p>
+    <p class="eyebrow">Row 57 · 2026-09-26 · <span class="qid">REAL-15</span> · §53 Fact DB as decisions</p>
     <h2>Teaching the fact database as decisions, not as prose</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Records trained into the weights as sentences reached database-only merchants at 59 to 69 at best. <a class="back" href="#row-56">Row 56</a> showed that supervising the decisions the task makes trains it far faster. The owner suggested (2026-09-25) that loss on more tokens might also be a better way to impart a database. The idea: turn each record into categorisation decisions, scored on <a class="back" href="#row-42">row 42</a>'s held-out users so memorising one user's answers cannot count.</p></section>
@@ -727,7 +727,7 @@ Category:</pre><p class="note">The prose arm trains on category-bearing sentence
 
 <article class="row" id="row-58" data-from="57,34" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 58 · 2026-09-26 · <span class="qid">REAL-16</span> · REPORT §55</p>
+    <p class="eyebrow">Row 58 · 2026-09-26 · <span class="qid">REAL-16</span> · §55 Database episodes vs prompt record</p>
     <h2>Database in the weights versus record in the prompt, with equal information</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-57">Row 57</a>'s episodes beat the record-in-prompt categoriser, but the episodes used a category field the record never carried, and the arms ran on different hardware and precision. <a class="back" href="#row-34">Row 34</a>'s Modal setup allowed running every arm alike.</p></section>
@@ -756,7 +756,7 @@ Category:</pre><p class="note">The record-with-category arm: the note now names 
 
 <article class="row" id="row-59" data-from="58" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 59 · 2026-09-26 · <span class="qid">REAL-17</span> · REPORT §58</p>
+    <p class="eyebrow">Row 59 · 2026-09-26 · <span class="qid">REAL-17</span> · §58 Database episode capacity</p>
     <h2>How many merchants can the weights hold?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-58">Row 58</a> found database episodes as good as retrieval at 240 merchants. A production database has millions, and an earlier species experiment saw interference at 5,000 entities, so capacity decides between the two routes.</p></section>
@@ -782,7 +782,7 @@ Category:</pre><p class="note">The record-with-category arm: the note now names 
 
 <article class="row" id="row-60" data-from="34,56" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 60 · 2026-09-26 · <span class="qid">TRAIN-12</span> · REPORT §56</p>
+    <p class="eyebrow">Row 60 · 2026-09-26 · <span class="qid">TRAIN-12</span> · §56 Batch size on H100</p>
     <h2>Batch size on the H100</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether batch sizes had been tested on the H100. <a class="back" href="#row-34">Row 34</a> had only compared four passes of four against one pass of 16 at the same 16 sequences per step, and <a class="back" href="#row-56">row 56</a> supplied three seeds of the batch-16 recipe as the reference.</p></section>

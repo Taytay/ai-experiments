@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html" aria-current="page">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 1–12 · 12 rows</p><h1>Measuring and injecting facts</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-1" data-from="" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 1 · 2026-09-14 · <span class="qid">STAT-2, STAT-3</span> · REPORT §9<span class="status done">done</span></p>
+    <p class="eyebrow">Row 1 · 2026-09-14 · <span class="qid">STAT-2, STAT-3</span> · §9 Frozen item sets and scoring<span class="status done">done</span></p>
     <h2>Freeze the test questions and keep every answer score</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Before this row every accuracy in the report was a single number, and the test questions were regenerated from a random seed on every run. Two problems followed: no confidence interval or alternative scoring rule could be computed after the fact, and any change to a question generator silently moved every later question, so tables from different commits were not comparable. Adding one new level had already shifted the base model's score on the label-induction task from 37.5 to 35.6. This was the first row of the queue, with no earlier row behind it.</p></section>
@@ -91,7 +91,7 @@ Answer:
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-2">Row 2</a> · Same answers, eight ways of scoring them</li><li><a href="#row-3">Row 3</a> · Let the models write their answers instead of picking one</li><li><a href="#row-4">Row 4</a> · Error bars, chance bands and paired tests for every claim</li><li><a href="#row-5">Row 5</a> · Is the bank-string failure just upper-case text?</li><li><a href="era-2.html#row-20">Row 20</a> · Rebuild the tests so they can only be passed one way</li><li><a href="era-3.html#row-28">Row 28</a> · Look inside: did training write a rule or 136 separate facts?</li><li><a href="era-3.html#row-30">Row 30</a> · Can the model state a rule it only ever read inside sentences?</li></ul></section></article><article class="row" id="row-2" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 2 · 2026-09-14 · <span class="qid">EVAL-2, EVAL-1, EVAL-6</span> · REPORT §10<span class="status done">done</span></p>
+    <p class="eyebrow">Row 2 · 2026-09-14 · <span class="qid">EVAL-2, EVAL-1, EVAL-6</span> · §10 Scoring rule sensitivity<span class="status done">done</span></p>
     <h2>Same answers, eight ways of scoring them</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every earlier number used one rule: the average log-probability per token of each option, highest wins. A literature survey said this rule favours long options and that corrections should be reported beside it. The per-option scores saved in <a class="back" href="#row-1">row 1</a> made it possible to try other rules without loading a model.</p></section>
@@ -121,7 +121,7 @@ Answer:
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-7">Row 7</a> · Teach the model to answer without the reference card it reads well</li><li><a href="#row-8">Row 8</a> · Fill-in-the-blanks training to learn facts backwards</li><li><a href="#row-9">Row 9</a> · Train the mixture at its stated shares, not its accidental ones</li><li><a href="#row-10">Row 10</a> · Three seeds: which headline gaps are real</li><li><a href="#row-11">Row 11</a> · Watch learning and forgetting step by step</li><li><a href="era-2.html#row-18">Row 18</a> · Encoder models, and 1,000 to 5,000 species in one adapter</li><li><a href="era-2.html#row-19">Row 19</a> · Knowledge editors: write facts straight into the weights</li><li><a href="era-2.html#row-21">Row 21</a> · Does a name fragment become a usable clue?</li><li><a href="era-2.html#row-23">Row 23</a> · Make &quot;weakness&quot; a real second attribute</li><li><a href="era-3.html#row-29">Row 29</a> · Texts that walk from one species to another</li><li><a href="era-4.html#row-36">Row 36</a> · Messy bank strings and products that do not name their category</li></ul></section></article><article class="row" id="row-3" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 3 · 2026-09-14 · <span class="qid">EVAL-3</span> · REPORT §12<span class="status done">done</span></p>
+    <p class="eyebrow">Row 3 · 2026-09-14 · <span class="qid">EVAL-3</span> · §12 Constructed responses<span class="status done">done</span></p>
     <h2>Let the models write their answers instead of picking one</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>All numbers so far were multiple choice: the model preferred an option or it did not. The real categoriser has to produce an answer. With the frozen questions of <a class="back" href="#row-1">row 1</a>, the models could be asked to write.</p></section>
@@ -149,7 +149,7 @@ Answer:
   </ul></section>
 </article><article class="row" id="row-4" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 4 · 2026-09-14 · <span class="qid">STAT-2, EVAL-6, REPORT-2</span> · REPORT §11<span class="status done">done</span></p>
+    <p class="eyebrow">Row 4 · 2026-09-14 · <span class="qid">STAT-2, EVAL-6, REPORT-2</span> · §11 Intervals and paired tests<span class="status done">done</span></p>
     <h2>Error bars, chance bands and paired tests for every claim</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Reviewers asked for a confidence interval on every table and wanted to know why the untrained model scored 42.7% on questions it could not possibly know. The per-item records of <a class="back" href="#row-1">row 1</a> made all of this computable on a CPU.</p></section>
@@ -172,7 +172,7 @@ Answer:
   </ul></section>
 </article><article class="row" id="row-5" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 5 · 2026-09-14 · <span class="qid">MODEL-4</span> · REPORT §13<span class="status done">done</span></p>
+    <p class="eyebrow">Row 5 · 2026-09-14 · <span class="qid">MODEL-4</span> · §13 Tokenizer casing check<span class="status done">done</span></p>
     <h2>Is the bank-string failure just upper-case text?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment found the small model could not categorise a bank-statement line (14.2% with the merchant fact in its prompt, chance 8.3). The hypothesis was a tokenizer artefact: training text says "Kelvarro Co", statements say "KELVARRO CO", and a case-sensitive tokenizer splits them into unrelated pieces. The per-item scoring of <a class="back" href="#row-1">row 1</a> allowed a clean re-test.</p></section>
@@ -198,7 +198,7 @@ name restored:  POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-2.html#row-13">Row 13</a> · Embedding models on the LLM&#x27;s own questions</li></ul></section></article><article class="row" id="row-6" data-from="" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 6 · 2026-09-14 · <span class="qid">REPORT-1, REPORT-3, REPORT-4</span> · REPORT §1, 4.3.2, 6.2, 8.1, 8.3<span class="status done">done</span></p>
+    <p class="eyebrow">Row 6 · 2026-09-14 · <span class="qid">REPORT-1, REPORT-3, REPORT-4</span> · §1 Executive summary, 4.3.2, 6.2, 8.1, 8.3<span class="status done">done</span></p>
     <h2>Correct the write-up where it overclaimed</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A review of the report found three wording problems that needed no new run. They came from the reviewer's notes, not from an earlier row.</p></section>
@@ -220,7 +220,7 @@ name restored:  POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-9">Row 9</a> · Train the mixture at its stated shares, not its accidental ones</li><li><a href="#row-12">Row 12</a> · Facts first, task second: is it the staging or the schedule?</li></ul></section></article><article class="row" id="row-7" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 7 · 2026-09-15 · <span class="qid">BASE-3</span> · REPORT §14<span class="status done">done</span></p>
+    <p class="eyebrow">Row 7 · 2026-09-15 · <span class="qid">BASE-3</span> · §14 Prompt distillation ceiling<span class="status done">done</span></p>
     <h2>Teach the model to answer without the reference card it reads well</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the field guide (a reference card per species) in the prompt, the untrained 3B model answers recall questions at 98.8%. That looked like a ceiling worth copying into the weights. The scorer study of <a class="back" href="#row-2">row 2</a> was the prerequisite for reading the result fairly.</p></section>
@@ -247,7 +247,7 @@ Syaott is a Verdane-type creature. It lives in cave habitats, ...</pre><p class=
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-2.html#row-14">Row 14</a> · Real retrieval instead of pasting the right card</li><li><a href="era-3.html#row-27">Row 27</a> · Distil the teacher&#x27;s ranking of the options instead</li></ul></section></article><article class="row" id="row-8" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 8 · 2026-09-15 · <span class="qid">TRAIN-5, EVAL-7</span> · REPORT §22<span class="status done">done</span></p>
+    <p class="eyebrow">Row 8 · 2026-09-15 · <span class="qid">TRAIN-5, EVAL-7</span> · §22 Masked fine-tuning tradeoffs<span class="status done">done</span></p>
     <h2>Fill-in-the-blanks training to learn facts backwards</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A 2025 paper (Pan et al.) reported that training a decoder to reconstruct a masked passage gives both forward and backward recall from a single text per fact, where plain fine-tuning needs paraphrases and still fails backwards (the "reversal curse": knowing "A is B" does not give "B is A"). The scorer study of <a class="back" href="#row-2">row 2</a> was in place to read it.</p></section>
@@ -279,7 +279,7 @@ Answer:   (Ulkoz / Orvook / Krovan / Orvax)</pre><p class="note">The training fo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-2.html#row-16">Row 16</a> · How many rewordings does a fact need, and which kinds?</li><li><a href="era-3.html#row-31">Row 31</a> · Repairing forgetting by distilling from the model as it was before injection</li></ul></section></article><article class="row" id="row-9" data-from="2,6" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 9 · 2026-09-15 · <span class="qid">TRAIN-1</span> · REPORT §21<span class="status done">done</span></p>
+    <p class="eyebrow">Row 9 · 2026-09-15 · <span class="qid">TRAIN-1</span> · §21 Mixture loss weighting<span class="status done">done</span></p>
     <h2>Train the mixture at its stated shares, not its accidental ones</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm C, nominally 45% knowledge text, 40% few-shot episodes and 15% replay, was 84% knowledge by the tokens the loss counts. Did the recipe work because of that hidden weighting? The scoring tools of <a class="back" href="#row-2">row 2</a> were needed to read it.</p></section>
@@ -312,7 +312,7 @@ Output: 497</pre><p class="note">A training episode: species tagged with random 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-3.html#row-26">Row 26</a> · Make each experiment three times faster</li></ul></section></article><article class="row" id="row-10" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 10 · 2026-09-15 · <span class="qid">STAT-1</span> · REPORT §20<span class="status done">done</span></p>
+    <p class="eyebrow">Row 10 · 2026-09-15 · <span class="qid">STAT-1</span> · §20 Three-seed stability check<span class="status done">done</span></p>
     <h2>Three seeds: which headline gaps are real</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The main experiment compared one training run per arm. The paired tests of <a href="#row-4">row 4</a> could not see run-to-run randomness. This row's Needs entry is <a class="back" href="#row-2">row 2</a>.</p></section>
@@ -337,7 +337,7 @@ Output: 497</pre><p class="note">A training episode: species tagged with random 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-12">Row 12</a> · Facts first, task second: is it the staging or the schedule?</li><li><a href="era-2.html#row-15">Row 15</a> · Does the recipe hold at 1.5B and 7B?</li><li><a href="era-2.html#row-17">Row 17</a> · Adapter size, learning rate and training length</li></ul></section></article><article class="row" id="row-11" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 11 · 2026-09-15 · <span class="qid">TRAIN-3</span> · REPORT §15<span class="status done">done</span></p>
+    <p class="eyebrow">Row 11 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §15 Learning curves over training<span class="status done">done</span></p>
     <h2>Watch learning and forgetting step by step</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every arm had been measured once, at the end. When do the facts arrive, and when does the in-context skill break? The frozen sets and scorer of <a class="back" href="#row-2">row 2</a> made a periodic check cheap.</p></section>
@@ -367,7 +367,7 @@ Answer:
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-3.html#row-24">Row 24</a> · A proper ruler for &quot;how much did training damage the model&quot;</li><li><a href="era-3.html#row-25">Row 25</a> · Mix in ordinary text to protect general knowledge</li></ul></section></article><article class="row" id="row-12" data-from="6,10" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 12 · 2026-09-16 · <span class="qid">TRAIN-2</span> · REPORT §23<span class="status done">done</span></p>
+    <p class="eyebrow">Row 12 · 2026-09-16 · <span class="qid">TRAIN-2</span> · §23 Arm D schedule controls<span class="status done">done</span></p>
     <h2>Facts first, task second: is it the staging or the schedule?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm D's second phase runs on a learning rate that decays to zero, and <a class="back" href="#row-10">row 10</a> found D's only real loss was recall (91.5 against 100). Was that staging, or the schedule?</p></section>

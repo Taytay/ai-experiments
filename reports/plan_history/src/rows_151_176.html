@@ -1,6 +1,6 @@
 <article class="row" id="row-151" data-from="" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 151 · 2026-10-01 · <span class="qid">MODEL-22</span> · REPORT §146</p>
+    <p class="eyebrow">Row 151 · 2026-10-01 · <span class="qid">MODEL-22</span> · §146 strands-decider, an outside model</p>
     <h2>Trying AWS's new open "decider" model, strands-decider, on our task</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner found a newly published open-source decision model from AWS (strands-decider, Apache-2.0) and asked how it handles our datasets compared with our best reader, decider-4B trained with "the recipe" (our standard set of training episodes). It has a different design: a Qwen3.5-2B-Base body with its word-predicting head thrown away, and a small (~1M-parameter) "pointer head" that scores each option by comparing the hidden state at the answer position with the hidden state at the end of each option's line.</p></section>
@@ -37,7 +37,7 @@ Category:&lt;/state&gt;&lt;question type="choice"&gt;Select exactly one option. 
 
 <article class="row" id="row-152" data-from="151" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 152 · 2026-10-01 · <span class="qid">MODEL-23</span> · REPORT §147</p>
+    <p class="eyebrow">Row 152 · 2026-10-01 · <span class="qid">MODEL-23</span> · §147 What decider borrows from strands</p>
     <h2>What decider can borrow from strands: the training signal, not the head</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-151">Row 151</a> left two explanations for strands' failure on invented category names: its pointer readout, or the fact that it lacked our shot-label loss. And at 2B strands was better than decider on first-time payees. The owner asked whether decider could learn anything from strands' architecture.</p></section>
@@ -76,7 +76,7 @@ Options:
 
 <article class="row" id="row-153" data-from="152" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 153 · 2026-10-01 · <span class="qid">MODEL-23</span> · REPORT §148</p>
+    <p class="eyebrow">Row 153 · 2026-10-01 · <span class="qid">MODEL-23</span> · §148 strands trained at 4B scale</p>
     <h2>strands at 4B, and strands' adapter settings on decider</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-152">row 152</a> showed the shot-label loss was the missing ingredient, the owner asked to "try using a 4B torso with an equivalently sized head or borrow anything else from strands".</p></section>
@@ -103,7 +103,7 @@ Options:
 
 <article class="row" id="row-154" data-from="153" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 154 · 2026-10-01 · <span class="qid">MODEL-24</span> · REPORT §149</p>
+    <p class="eyebrow">Row 154 · 2026-10-01 · <span class="qid">MODEL-24</span> · §149 decider's method on strands' tasks</p>
     <h2>decider's training method on strands' own datasets</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-153">row 153</a>, decider's readout looked strong and cheap to train. The owner asked for a test training on strands' datasets to compare our results with theirs, as a research comparison only.</p></section>
@@ -136,7 +136,7 @@ Answer: (</pre><p class="note">decider's layout as applied to strands' tasks (th
 
 <article class="row" id="row-155" data-from="154" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 155 · 2026-10-02 · <span class="qid">MODEL-24</span> · REPORT §150</p>
+    <p class="eyebrow">Row 155 · 2026-10-02 · <span class="qid">MODEL-24</span> · §150 Combining both readout methods</p>
     <h2>A hybrid head for strands' own tasks</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-154">Row 154</a> showed each readout winning on some tasks (decider's on multi-hop and ordered scores, strands' on emotion). The owner asked whether any of our improvements could help strands, and agreed to test first whether the two complement each other, then a hybrid head.</p></section>
@@ -161,7 +161,7 @@ Answer: (</pre><p class="note">decider's layout as applied to strands' tasks (th
 
 <article class="row" id="row-156" data-from="153" data-era="Architecture probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 156 · 2026-10-02 · <span class="qid">TRAIN-14</span> · REPORT §151</p>
+    <p class="eyebrow">Row 156 · 2026-10-02 · <span class="qid">TRAIN-14</span> · §151 Adapter capacity isn't the limit</p>
     <h2>Does the model need more trainable capacity? Bigger adapters and full fine-tunes</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-153">Row 153</a> found that shrinking the LoRA adapter to rank 16 cost up to 6 points where the history decides. The owner asked whether we should be trying full fine-tunes. If rank 16 was short, maybe our rank 64 was too.</p></section>
@@ -187,7 +187,7 @@ Answer: (</pre><p class="note">decider's layout as applied to strands' tasks (th
 
 <article class="row" id="row-157" data-from="150" data-era="Embeddings from decider" data-status="done">
   <header>
-    <p class="eyebrow">Row 157 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §152</p>
+    <p class="eyebrow">Row 157 · 2026-10-02 · <span class="qid">MODEL-25</span> · §152 decider's hidden states as embeddings</p>
     <h2>Using decider's hidden states as embeddings of payees and categories</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether we could extract embeddings (numeric vectors that put similar things close together) from decider and cluster with them. <a class="back" href="#row-150">Row 150</a> had grouped payees and categories with crude text features (TF-IDF); a better embedding could replace them.</p></section>
@@ -217,7 +217,7 @@ In one word, the kind of spending:</pre><p class="note">A synthetic kindcat_v2 c
 
 <article class="row" id="row-158" data-from="157" data-era="Embeddings from decider" data-status="done">
   <header>
-    <p class="eyebrow">Row 158 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §153</p>
+    <p class="eyebrow">Row 158 · 2026-10-02 · <span class="qid">MODEL-25</span> · §153 History shifts embeddings, right and wrong</p>
     <h2>Personal embeddings: letting a user's history shift the vectors</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-157">row 157</a>, the owner said: "I definitely want a user's history to perturb the embeddings! Of both their categories and the payees!"</p></section>
@@ -246,7 +246,7 @@ In one word, the kind of spending:</pre><p class="note">A personal transaction e
 
 <article class="row" id="row-159" data-from="158,152,153" data-era="Embeddings from decider" data-status="done">
   <header>
-    <p class="eyebrow">Row 159 · 2026-10-02 · <span class="qid">MODEL-25</span> · REPORT §154</p>
+    <p class="eyebrow">Row 159 · 2026-10-02 · <span class="qid">MODEL-25</span> · §154 Mapping categories across users</p>
     <h2>Mapping categories with embeddings: between users, and onto a standard list</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether embeddings could map canonical categories onto a person's own set, or map two users' categories together. <a class="back" href="#row-158">Row 158</a> supplied personal embeddings, and the multiple-choice answers from <a class="back" href="#row-152">row 152</a> and <a class="back" href="#row-153">row 153</a> gave a comparison.</p></section>
@@ -308,7 +308,7 @@ In one word, the kind of spending:</pre><p class="note">A personal transaction e
 
 <article class="row" id="row-163" data-from="140" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 163 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §155</p>
+    <p class="eyebrow">Row 163 · 2026-10-02 · <span class="qid">REAL-27</span> · §155 First results on real data</p>
     <h2>The first real data: replaying eleven years of the owner's budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Everything so far was synthetic. The owner offered their own YNAB budget: every approved, categorised transaction is the gold answer, and each is run in date order through decider with only earlier transactions in the prompt. The data stays out of git; only summaries are reported. The model was the recipe settled through <a class="back" href="#row-140">row 140</a>.</p></section>
@@ -357,7 +357,7 @@ Category: (</pre><p class="note">Illustrative, invented: the same format as the 
 
 <article class="row" id="row-165" data-from="163" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 165 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §156</p>
+    <p class="eyebrow">Row 165 · 2026-10-02 · <span class="qid">REAL-27</span> · §156 The recommended system on real data</p>
     <h2>The full recommended system and its confidence gate on the real budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-163">Row 163</a> tested one reader. The owner asked next for the confidence gate: the whole recommended system from the synthetic work, unchanged, on the same real budget.</p></section>
@@ -384,7 +384,7 @@ Category: (</pre><p class="note">Illustrative, invented: the same format as the 
 
 <article class="row" id="row-166" data-from="165,157,125" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 166 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §157</p>
+    <p class="eyebrow">Row 166 · 2026-10-02 · <span class="qid">REAL-27</span> · §157 Similar payees by embedding</p>
     <h2>Showing the model rows from similar payees, and the trained 35B</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Two owner requests after <a class="back" href="#row-165">row 165</a>: try the trained 35B (from <a class="back" href="#row-125">row 125</a>), and "couldn't we favor the payees that embed closer to the payee about to be inferred?", using the payee embeddings of <a class="back" href="#row-157">row 157</a>.</p></section>
@@ -422,7 +422,7 @@ Category: (</pre><p class="note">Illustrative, invented: a first-time payee with
 
 <article class="row" id="row-167" data-from="166" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 167 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §158</p>
+    <p class="eyebrow">Row 167 · 2026-10-03 · <span class="qid">REAL-27</span> · §158 Payee resolution and aliases</p>
     <h2>Prompt variants and payee aliases on the real budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Building on <a class="back" href="#row-166">row 166</a>, the owner asked for four things: describe each category by its recent payees and each payee by its recent categories; report whether the right category is in the top 5 or top 10; guarantee that spelling variants of one store (a short name and a coded statement string) show each other's examples; and measure how much probability goes to categories a payee never uses.</p></section>
@@ -493,7 +493,7 @@ Category: (</pre><p class="note">Illustrative, invented: DESC and PLINE lines to
 
 <article class="row" id="row-171" data-from="167,160" data-era="Payee resolution" data-status="done">
   <header>
-    <p class="eyebrow">Row 171 · 2026-10-03 · <span class="qid">DATA-8</span> · REPORT §159</p>
+    <p class="eyebrow">Row 171 · 2026-10-03 · <span class="qid">DATA-8</span> · §159 Matching payees to bank strings</p>
     <h2>Matching new bank strings to known payees, on real strings labelled by YNAB</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-167">Row 167</a> found a third of "first-time" payees were known payees spelled differently. The owner: "If we were better at just doing payee cleansing alone, we'd be better at all of this", and asked for classic fuzzy-matching tools, noting that they sometimes clean up payees and sometimes don't. It replaces the synthetic plan of <a class="back" href="#row-160">row 160</a> with real gold.</p></section>
@@ -522,7 +522,7 @@ In one word, the kind of spending:</pre><p class="note">Illustrative, invented: 
 
 <article class="row" id="row-172" data-from="171" data-era="Payee resolution" data-status="done">
   <header>
-    <p class="eyebrow">Row 172 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §160</p>
+    <p class="eyebrow">Row 172 · 2026-10-03 · <span class="qid">MODEL-28</span> · §160 Looking payees up in Overture</p>
     <h2>Looking payees up in an open database of 81 million places</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the matching tools from <a class="back" href="#row-171">row 171</a> in hand, the owner asked whether the large free Overture points-of-interest database could teach us about merchants: look an input payee up in it and inject a description at inference time. On synthetic data, a database "Kind:" line had lifted first-time payees a lot.</p></section>
@@ -549,7 +549,7 @@ Category: (</pre><p class="note">Illustrative, invented: the line a database mat
 
 <article class="row" id="row-173" data-from="172" data-era="Real-style training" data-status="done">
   <header>
-    <p class="eyebrow">Row 173 · 2026-10-03 · <span class="qid">MODEL-28 · DATA-9</span> · REPORT §161</p>
+    <p class="eyebrow">Row 173 · 2026-10-03 · <span class="qid">MODEL-28 · DATA-9</span> · §161 Real-style synthetic households</p>
     <h2>Training on synthetic households built to look like real ones</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Started as the second half of <a class="back" href="#row-172">row 172</a>: put Overture merchant facts into the weights. It changed while being built. Brands cover only 7 to 9% of the owner's first-time-payee transactions, and the owner stressed that their categories are purposes (people, trips, phases of life), not merchant types, and that corrupted payees should look the way their budget shows.</p></section>
@@ -598,7 +598,7 @@ Category:</pre><p class="note">From realstyle_v1_test.json: an invented househol
 
 <article class="row" id="row-175" data-from="173,171" data-era="Real-style training" data-status="done">
   <header>
-    <p class="eyebrow">Row 175 · 2026-10-03 · <span class="qid">REAL-27 · DATA-8</span> · REPORT §162</p>
+    <p class="eyebrow">Row 175 · 2026-10-03 · <span class="qid">REAL-27 · DATA-8</span> · §162 Combining the rule and the model</p>
     <h2>Blending YNAB's simple rule with the model</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner noted that YNAB's rule ("the category used in 2 of the payee's last 3 transactions") is very strong, and asked for the best rule of thumb for combining it with the model, so the model enhances something that already works. They also asked how well the new model from <a class="back" href="#row-173">row 173</a> recognises two corrupted strings as the same payee, on the benchmark from <a class="back" href="#row-171">row 171</a>.</p></section>

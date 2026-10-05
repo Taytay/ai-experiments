@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html" aria-current="page">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 163–176 · 14 rows</p><h1>The owner&#x27;s real budget</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-163" data-from="140" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 163 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §155<span class="status done">done</span></p>
+    <p class="eyebrow">Row 163 · 2026-10-02 · <span class="qid">REAL-27</span> · §155 First results on real data<span class="status done">done</span></p>
     <h2>The first real data: replaying eleven years of the owner's budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Everything so far was synthetic. The owner offered their own YNAB budget: every approved, categorised transaction is the gold answer, and each is run in date order through decider with only earlier transactions in the prompt. The data stays out of git; only summaries are reported. The model was the recipe settled through <a class="back" href="era-11.html#row-140">row 140</a>.</p></section>
@@ -107,7 +107,7 @@ Category: (</pre><p class="note">Illustrative, invented: the same format as the 
   </ul></section>
 </article><article class="row" id="row-165" data-from="163" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 165 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §156<span class="status done">done</span></p>
+    <p class="eyebrow">Row 165 · 2026-10-02 · <span class="qid">REAL-27</span> · §156 The recommended system on real data<span class="status done">done</span></p>
     <h2>The full recommended system and its confidence gate on the real budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-163">Row 163</a> tested one reader. The owner asked next for the confidence gate: the whole recommended system from the synthetic work, unchanged, on the same real budget.</p></section>
@@ -132,7 +132,7 @@ Category: (</pre><p class="note">Illustrative, invented: the same format as the 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-166">Row 166</a> · Showing the model rows from similar payees, and the trained 35B</li></ul></section></article><article class="row" id="row-166" data-from="165,157,125" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 166 · 2026-10-02 · <span class="qid">REAL-27</span> · REPORT §157<span class="status done">done</span></p>
+    <p class="eyebrow">Row 166 · 2026-10-02 · <span class="qid">REAL-27</span> · §157 Similar payees by embedding<span class="status done">done</span></p>
     <h2>Showing the model rows from similar payees, and the trained 35B</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Two owner requests after <a class="back" href="#row-165">row 165</a>: try the trained 35B (from <a class="back" href="era-10.html#row-125">row 125</a>), and "couldn't we favor the payees that embed closer to the payee about to be inferred?", using the payee embeddings of <a class="back" href="era-12.html#row-157">row 157</a>.</p></section>
@@ -168,7 +168,7 @@ Category: (</pre><p class="note">Illustrative, invented: a first-time payee with
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-167">Row 167</a> · Prompt variants and payee aliases on the real budget</li><li><a href="#row-170">Row 170</a> · Shrinking the 35B&#x27;s payee knowledge into a smaller model</li></ul></section></article><article class="row" id="row-167" data-from="166" data-era="The owner's real budget" data-status="done">
   <header>
-    <p class="eyebrow">Row 167 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §158<span class="status done">done</span></p>
+    <p class="eyebrow">Row 167 · 2026-10-03 · <span class="qid">REAL-27</span> · §158 Payee resolution and aliases<span class="status done">done</span></p>
     <h2>Prompt variants and payee aliases on the real budget</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Building on <a class="back" href="#row-166">row 166</a>, the owner asked for four things: describe each category by its recent payees and each payee by its recent categories; report whether the right category is in the top 5 or top 10; guarantee that spelling variants of one store (a short name and a coded statement string) show each other's examples; and measure how much probability goes to categories a payee never uses.</p></section>
@@ -231,7 +231,7 @@ Category: (</pre><p class="note">Illustrative, invented: DESC and PLINE lines to
   </ul></section>
 </article><article class="row" id="row-171" data-from="167,160" data-era="Payee resolution" data-status="done">
   <header>
-    <p class="eyebrow">Row 171 · 2026-10-03 · <span class="qid">DATA-8</span> · REPORT §159<span class="status done">done</span></p>
+    <p class="eyebrow">Row 171 · 2026-10-03 · <span class="qid">DATA-8</span> · §159 Matching payees to bank strings<span class="status done">done</span></p>
     <h2>Matching new bank strings to known payees, on real strings labelled by YNAB</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-167">Row 167</a> found a third of "first-time" payees were known payees spelled differently. The owner: "If we were better at just doing payee cleansing alone, we'd be better at all of this", and asked for classic fuzzy-matching tools, noting that they sometimes clean up payees and sometimes don't. It replaces the synthetic plan of <a class="back" href="era-12.html#row-160">row 160</a> with real gold.</p></section>
@@ -258,7 +258,7 @@ In one word, the kind of spending:</pre><p class="note">Illustrative, invented: 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-172">Row 172</a> · Looking payees up in an open database of 81 million places</li><li><a href="#row-175">Row 175</a> · Blending YNAB&#x27;s simple rule with the model</li><li><a href="#row-176">Row 176</a> · Teaching the model to clean up payee strings</li></ul></section></article><article class="row" id="row-172" data-from="171" data-era="Payee resolution" data-status="done">
   <header>
-    <p class="eyebrow">Row 172 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §160<span class="status done">done</span></p>
+    <p class="eyebrow">Row 172 · 2026-10-03 · <span class="qid">MODEL-28</span> · §160 Looking payees up in Overture<span class="status done">done</span></p>
     <h2>Looking payees up in an open database of 81 million places</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the matching tools from <a class="back" href="#row-171">row 171</a> in hand, the owner asked whether the large free Overture points-of-interest database could teach us about merchants: look an input payee up in it and inject a description at inference time. On synthetic data, a database "Kind:" line had lifted first-time payees a lot.</p></section>
@@ -283,7 +283,7 @@ Category: (</pre><p class="note">Illustrative, invented: the line a database mat
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-173">Row 173</a> · Training on synthetic households built to look like real ones</li></ul></section></article><article class="row" id="row-173" data-from="172" data-era="Real-style training" data-status="done">
   <header>
-    <p class="eyebrow">Row 173 · 2026-10-03 · <span class="qid">MODEL-28 · DATA-9</span> · REPORT §161<span class="status done">done</span></p>
+    <p class="eyebrow">Row 173 · 2026-10-03 · <span class="qid">MODEL-28 · DATA-9</span> · §161 Real-style synthetic households<span class="status done">done</span></p>
     <h2>Training on synthetic households built to look like real ones</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Started as the second half of <a class="back" href="#row-172">row 172</a>: put Overture merchant facts into the weights. It changed while being built. Brands cover only 7 to 9% of the owner's first-time-payee transactions, and the owner stressed that their categories are purposes (people, trips, phases of life), not merchant types, and that corrupted payees should look the way their budget shows.</p></section>
@@ -328,7 +328,7 @@ Category:</pre><p class="note">From realstyle_v1_test.json: an invented househol
   </ul></section>
 </article><article class="row" id="row-175" data-from="173,171" data-era="Real-style training" data-status="done">
   <header>
-    <p class="eyebrow">Row 175 · 2026-10-03 · <span class="qid">REAL-27 · DATA-8</span> · REPORT §162<span class="status done">done</span></p>
+    <p class="eyebrow">Row 175 · 2026-10-03 · <span class="qid">REAL-27 · DATA-8</span> · §162 Combining the rule and the model<span class="status done">done</span></p>
     <h2>Blending YNAB's simple rule with the model</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner noted that YNAB's rule ("the category used in 2 of the payee's last 3 transactions") is very strong, and asked for the best rule of thumb for combining it with the model, so the model enhances something that already works. They also asked how well the new model from <a class="back" href="#row-173">row 173</a> recognises two corrupted strings as the same payee, on the benchmark from <a class="back" href="#row-171">row 171</a>.</p></section>

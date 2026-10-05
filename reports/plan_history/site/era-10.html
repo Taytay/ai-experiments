@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html" aria-current="page">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 121–139 · 19 rows</p><h1>Building the system and product scores</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-121" data-from="97,116" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 121 · 2026-09-29 · <span class="qid">EVAL-13</span> · REPORT §116<span class="status done">done</span></p>
+    <p class="eyebrow">Row 121 · 2026-09-29 · <span class="qid">EVAL-13</span> · §116 Thresholds under distribution shift<span class="status done">done</span></p>
     <h2>Does the 98% auto-file threshold hold for every kind of user?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The scorecard from <a class="back" href="era-8.html#row-97">row 97</a> auto-files a transaction (files it without asking the user) only when the model's confidence passes a threshold chosen so that 98% of auto-filed items are right. <a class="back" href="era-9.html#row-116">Row 116</a> had just shown the models' confidence is a calibrated probability on average. A gaps review asked whether that one threshold still delivers 98% for sub-groups such as brand-new users, and whether it survives a move to a different population of users.</p></section>
@@ -88,7 +88,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-126">Row 126</a> · Scoring without an arbitrary threshold</li></ul></section></article><article class="row" id="row-122" data-from="106" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 122 · 2026-09-29 · <span class="qid">TRAIN-13</span> · REPORT §124<span class="status done">done</span></p>
+    <p class="eyebrow">Row 122 · 2026-09-29 · <span class="qid">TRAIN-13</span> · §124 Averaging weights across seeds<span class="status done">done</span></p>
     <h2>Can weight averaging make auto-filing stable across training seeds?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-106">Row 106</a> found that two training runs of the same recipe, differing only in the random seed, got the same accuracy but auto-filed very different shares (an 18-point spread). A product cannot ship a recipe whose behaviour depends on the seed.</p></section>
@@ -109,7 +109,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 </article><article class="row" id="row-123" data-from="120" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 123 · 2026-09-30 · <span class="qid">MODEL-19</span> · REPORT §136<span class="status done">done</span></p>
+    <p class="eyebrow">Row 123 · 2026-09-30 · <span class="qid">MODEL-19</span> · §136 The bigger model as teacher<span class="status done">done</span></p>
     <h2>Can the large model teach the small one?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-120">Row 120</a> showed the untrained decider-35B-A3B (a 35-billion-parameter mixture-of-experts model with 3B active per token) knows far more about new users and new businesses than the trained 4B. If so, its probability spread ("soft targets") might teach the 4B some of that knowledge during training, a technique called distillation.</p></section>
@@ -130,7 +130,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 </article><article class="row" id="row-124" data-from="44,120" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 124 · 2026-09-29 · <span class="qid">REAL-23</span> · REPORT §123<span class="status done">done</span></p>
+    <p class="eyebrow">Row 124 · 2026-09-29 · <span class="qid">REAL-23</span> · §123 Other users' filings in the prompt<span class="status done">done</span></p>
     <h2>Telling the model how other users file this payee</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A new user has no history, so the model has nothing to copy from. With a million users, what everyone else calls a payee is cheap to know. A "collaborative record" idea (<a class="back" href="era-4.html#row-44">row 44</a>) had been shelved before blind test sets existed, and <a class="back" href="era-9.html#row-120">row 120</a> showed new users were the trained 4B's weak spot (62% against the 35B's 77%).</p></section>
@@ -159,7 +159,7 @@ Category:</pre><p class="note">A brand-new user from blind_v1_others (as stored;
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-129">Row 129</a> · The system with everything that helped</li><li><a href="#row-136">Row 136</a> · A smaller model: decider-0.8B with the recipe</li><li><a href="#row-137">Row 137</a> · Describing each category by the payees filed under it</li><li><a href="era-11.html#row-147">Row 147</a> · Can a model tell what a user&#x27;s category holds?</li><li><a href="era-11.html#row-148">Row 148</a> · Can a model tell what kind of business a payee is?</li></ul></section></article><article class="row" id="row-125" data-from="120" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 125 · 2026-09-29 · <span class="qid">MODEL-20</span> · REPORT §122<span class="status done">done</span></p>
+    <p class="eyebrow">Row 125 · 2026-09-29 · <span class="qid">MODEL-20</span> · §122 The bigger model, trained<span class="status done">done</span></p>
     <h2>Training the 35B model with our recipe</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-120">Row 120</a> found the untrained 35B already matches the trained 4B on blind_v1, with the opposite strengths: world knowledge about merchants and new users, but weak on a user's personal habits. Training it with the recipe might give both.</p></section>
@@ -194,7 +194,7 @@ Category:</pre><p class="note">A blind_v1 item (trimmed; answer "Self care"): a 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-128">Row 128</a> · Was the 35B&#x27;s missing database a training shortfall?</li><li><a href="#row-130">Row 130</a> · What the 35B costs to serve</li><li><a href="era-13.html#row-166">Row 166</a> · Showing the model rows from similar payees, and the trained 35B</li></ul></section></article><article class="row" id="row-126" data-from="116,121" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 126 · 2026-09-29 · <span class="qid">EVAL-14</span> · REPORT §118<span class="status done">done</span></p>
+    <p class="eyebrow">Row 126 · 2026-09-29 · <span class="qid">EVAL-14</span> · §118 Scoring by expected cost<span class="status done">done</span></p>
     <h2>Scoring without an arbitrary threshold</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "The 98% threshold is arbitrary. Let's come up with a better mechanism for scoring and determining success." <a class="back" href="#row-121">Row 121</a> had also shown the threshold is fragile. Calibrated probabilities from <a class="back" href="era-9.html#row-116">row 116</a> made a cost-based rule possible.</p></section>
@@ -218,7 +218,7 @@ Category:</pre><p class="note">A blind_v1 item (trimmed; answer "Self care"): a 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-129">Row 129</a> · The system with everything that helped</li><li><a href="#row-132">Row 132</a> · A rank-based score on the owner&#x27;s scale</li></ul></section></article><article class="row" id="row-127" data-from="119" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 127 · 2026-09-29 · <span class="qid">INFRA-3</span> · REPORT §120<span class="status done">done</span></p>
+    <p class="eyebrow">Row 127 · 2026-09-29 · <span class="qid">INFRA-3</span> · §120 Serving the sync with vLLM<span class="status done">done</span></p>
     <h2>Serving one user's sync fast with vLLM and prefix caching</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-9.html#row-119">Row 119</a> showed that when a user syncs 10 to 100 new transactions, caching the shared start of the prompt (category list and shared history rows) halves the time with the same answers, and that one prompt with an answer slot per transaction is faster still but changes answers unless trained for. Next: (a) train those multi-slot episodes, or (b) try a real serving engine.</p></section>
@@ -258,7 +258,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-130">Row 130</a> · What the 35B costs to serve</li></ul></section></article><article class="row" id="row-128" data-from="125" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 128 · 2026-09-30 · <span class="qid">MODEL-20</span> · REPORT §127<span class="status done">done</span></p>
+    <p class="eyebrow">Row 128 · 2026-09-30 · <span class="qid">MODEL-20</span> · §127 The bigger model was undertrained<span class="status done">done</span></p>
     <h2>Was the 35B's missing database a training shortfall?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-125">Row 125</a>'s trained 35B read REAL-6 (questions answerable only from a synthetic merchant database taught in training) at 74 against the 4B's 86. Either the frozen routed experts cannot store facts, or it simply was not trained enough.</p></section>
@@ -281,7 +281,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 </article><article class="row" id="row-129" data-from="120,124,126" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 129 · 2026-09-29 · <span class="qid">EVAL-14, REAL-23</span> · REPORT §126<span class="status done">done</span></p>
+    <p class="eyebrow">Row 129 · 2026-09-29 · <span class="qid">EVAL-14, REAL-23</span> · §126 The best system so far<span class="status done">done</span></p>
     <h2>The system with everything that helped</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Three things had each helped on their own: the other-users line (<a class="back" href="#row-124">row 124</a>), the untrained 35B as escalation reader (<a class="back" href="era-9.html#row-120">row 120</a>), and the per-item expected-cost rule (<a class="back" href="#row-126">row 126</a>). This row put them together and asked whether they add up.</p></section>
@@ -305,7 +305,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-131">Row 131</a> · Would a second small model do instead of the 35B?</li></ul></section></article><article class="row" id="row-130" data-from="125,127" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 130 · 2026-09-29 · <span class="qid">INFRA-3, EVAL-12</span> · REPORT §125<span class="status done">done</span></p>
+    <p class="eyebrow">Row 130 · 2026-09-29 · <span class="qid">INFRA-3, EVAL-12</span> · §125 Serving cost of the bigger model<span class="status done">done</span></p>
     <h2>What the 35B costs to serve</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked how much the 35B costs to train and to run. <a class="back" href="#row-125">Row 125</a> had a trained 35B, and <a class="back" href="#row-127">row 127</a> had the vLLM benchmark for the 4B to compare against.</p></section>
@@ -327,7 +327,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 </article><article class="row" id="row-131" data-from="129" data-era="Building the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 131 · 2026-09-30 · <span class="qid">EVAL-12</span> · REPORT §128<span class="status done">done</span></p>
+    <p class="eyebrow">Row 131 · 2026-09-30 · <span class="qid">EVAL-12</span> · §128 A second opinion barely helps<span class="status done">done</span></p>
     <h2>Would a second small model do instead of the 35B?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "if we just need another opinion, would an untrained 4B help? An ensemble of smaller models?" <a class="back" href="#row-129">Row 129</a>'s best system needs a 35B on its own large GPU.</p></section>
@@ -351,7 +351,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 </article><article class="row" id="row-132" data-from="126" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 132 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §129<span class="status done">done</span></p>
+    <p class="eyebrow">Row 132 · 2026-09-30 · <span class="qid">EVAL-14</span> · §129 A rank-based suggestion score<span class="status done">done</span></p>
     <h2>A rank-based score on the owner's scale</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner wanted the score to reflect a suggestion list: "guessing correctly in 1st place is a 0. Being 1 away is a 1 ... up to 5. And not showing it is a 10", with irrelevant suggestions penalised and only confident ones shown. <a class="back" href="#row-126">Row 126</a>'s effort score only counted "in the top three or not".</p></section>
@@ -373,7 +373,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-133">Row 133</a> · A report card in plain percentages</li></ul></section></article><article class="row" id="row-133" data-from="132" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 133 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §130<span class="status done">done</span></p>
+    <p class="eyebrow">Row 133 · 2026-09-30 · <span class="qid">EVAL-14</span> · §130 A report card in percentages<span class="status done">done</span></p>
     <h2>A report card in plain percentages</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner found <a class="back" href="#row-132">row 132</a>'s rank scores hard to read, and asked that plausible suggestions not be penalised: a user may file Amazon under four categories.</p></section>
@@ -395,7 +395,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-134">Row 134</a> · Against YNAB&#x27;s current suggestion rule</li></ul></section></article><article class="row" id="row-134" data-from="133" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 134 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §131<span class="status done">done</span></p>
+    <p class="eyebrow">Row 134 · 2026-09-30 · <span class="qid">EVAL-14</span> · §131 Against YNAB's current suggestion<span class="status done">done</span></p>
     <h2>Against YNAB's current suggestion rule</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "YNAB makes you confirm everything anyway. It currently suggests the last one used in 2 out of 3 transactions (or last one used if there aren't 3 transactions in that payee's history yet)." With no auto-filing, <a class="back" href="#row-133">row 133</a>'s card had to be redone against that baseline.</p></section>
@@ -420,7 +420,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-135">Row 135</a> · Scores for first-time payees and for changes from the usual</li></ul></section></article><article class="row" id="row-135" data-from="134" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 135 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §132<span class="status done">done</span></p>
+    <p class="eyebrow">Row 135 · 2026-09-30 · <span class="qid">EVAL-14</span> · §132 First-time and changed-category payees<span class="status done">done</span></p>
     <h2>Scores for first-time payees and for changes from the usual</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked for "a score JUST for cases where a user is categorizing a payee for the first time", and one for cases where a user files a payee differently than before ("our anticipation that the user might categorize it differently"). <a class="back" href="#row-134">Row 134</a> showed these are where the models earn their keep.</p></section>
@@ -444,7 +444,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-138">Row 138</a> · How close the model was on first-time payees</li></ul></section></article><article class="row" id="row-136" data-from="124" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 136 · 2026-09-30 · <span class="qid">MODEL-21</span> · REPORT §135<span class="status done">done</span></p>
+    <p class="eyebrow">Row 136 · 2026-09-30 · <span class="qid">MODEL-21</span> · §135 Two ideas from Jeff<span class="status done">done</span></p>
     <h2>A smaller model: decider-0.8B with the recipe</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A review of an outside project ("Jeff", one-slot fine-tunes of Qwen3.5) found a 0.8B model its sweet spot for speed. The owner: run the experiment with our own training, not Jeff's weights. The baseline is the recipe with the other-users line from <a class="back" href="#row-124">row 124</a>.</p></section>
@@ -464,14 +464,14 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 </article><article class="row" id="row-137" data-from="124" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 137 · 2026-09-30 · <span class="qid">DATA-6</span> · REPORT §135<span class="status done">done</span></p>
+    <p class="eyebrow">Row 137 · 2026-09-30 · <span class="qid">DATA-6</span> · §135 Two ideas from Jeff<span class="status done">done</span></p>
     <h2>Describing each category by the payees filed under it</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The same outside review found that options described by what they lead to matter a great deal. A personal category name like "Yum" says little; listing the payees filed under it might help. The baseline is <a class="back" href="#row-124">row 124</a>'s recipe.</p></section>
   <section class="tried"><h3>What we tried</h3><p>Each category in the labelled list followed by the payees the user filed under it (<code>DESC=1</code>). decider-4B trained that way (two seeds), and row 124's adapter reading the described list without training on it.</p></section>
   <section class="prompt"><h3>Example prompt</h3><pre class="prompt">(IJ) Dining out (e.g. Peets, Chipotle)
 ...
-(nothing filed yet)</pre><p class="note">The category-list format, as quoted in REPORT 135: each label and name followed by payees filed under it, or a note that nothing is filed yet.</p></section>
+(nothing filed yet)</pre><p class="note">The category-list format, as quoted in §135 Two ideas from Jeff: each label and name followed by payees filed under it, or a note that nothing is filed yet.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>decider-4B</th><th>blind top-1 %</th><th>first-time payees 1st %</th><th>new users %</th><th>REAL-6 %</th><th>novel names %</th></tr></thead>
     <tbody>
@@ -489,7 +489,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 </article><article class="row" id="row-138" data-from="135" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 138 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §133<span class="status done">done</span></p>
+    <p class="eyebrow">Row 138 · 2026-09-30 · <span class="qid">EVAL-14</span> · §133 How close on first-time payees<span class="status done">done</span></p>
     <h2>How close the model was on first-time payees</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "When our model gives a suggested answer, do we know what other answers it was close to giving and how close?" <a class="back" href="#row-135">Row 135</a> had shown first-time payees are the hard case.</p></section>
@@ -512,7 +512,7 @@ Category:</pre><p class="note">The split layout (blind_v1_split, trimmed): every
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-139">Row 139</a> · How many suggestions to show</li></ul></section></article><article class="row" id="row-139" data-from="138" data-era="Product-facing scores" data-status="done">
   <header>
-    <p class="eyebrow">Row 139 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §134<span class="status done">done</span></p>
+    <p class="eyebrow">Row 139 · 2026-09-30 · <span class="qid">EVAL-14</span> · §134 Sizing the suggestion list<span class="status done">done</span></p>
     <h2>How many suggestions to show</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-138">Row 138</a> found that showing five suggestions for first-time payees would find the right category far more often than the short confident list.</p></section>

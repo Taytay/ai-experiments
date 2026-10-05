@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html" aria-current="page">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 91–104 · 14 rows</p><h1>Realistic users and the first blind set</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-91" data-from="90" data-era="Final recipe checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 91 · 2026-09-27 · <span class="qid">EVAL-9</span> · REPORT §91<span class="status done">done</span></p>
+    <p class="eyebrow">Row 91 · 2026-09-27 · <span class="qid">EVAL-9</span> · §91 Trained behaviours hold across users<span class="status done">done</span></p>
     <h2>Do the final recipe's trained behaviours hold for every user, not just one fold?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-7.html#row-90">Row 90</a> trained "the final recipe" (the training mix settled in row 89) four times, each time holding out a different quarter ("fold") of the 20 synthetic REAL-6 users, and showed headline accuracy held on all of them. But the special behaviours the recipe was built to teach had only been measured on fold 0. This row checks them on the other three folds.</p></section>
@@ -99,7 +99,7 @@ Category:</pre><p class="note">An alternation item: this user files Target two w
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-92">Row 92</a> · Random weekday rules in training: does variety teach the day-of-week habit?</li></ul></section></article><article class="row" id="row-92" data-from="91" data-era="Final recipe checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 92 · 2026-09-27 · <span class="qid">REAL-18</span> · REPORT §92<span class="status done">done</span></p>
+    <p class="eyebrow">Row 92 · 2026-09-27 · <span class="qid">REAL-18</span> · §92 Random day sets vs weekend rule<span class="status done">done</span></p>
     <h2>Random weekday rules in training: does variety teach the day-of-week habit?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-91">Row 91</a> found the weekday rule at restaurants was the recipe's weakest behaviour (about 66% right). The guess was that training only ever used five fixed sets of days, too few for the model to learn "read whichever days this user singles out".</p></section>
@@ -120,7 +120,7 @@ Category:</pre><p class="note">An alternation item: this user files Target two w
   </ul></section>
 </article><article class="row" id="row-93" data-from="43,89" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 93 · 2026-09-27 · <span class="qid">REAL-11</span> · REPORT §93<span class="status done">done</span></p>
+    <p class="eyebrow">Row 93 · 2026-09-27 · <span class="qid">REAL-11</span> · §93 A more realistic synthetic population<span class="status done">done</span></p>
     <h2>REAL-7: a messier, more realistic synthetic population</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-4.html#row-43">Row 43</a> had asked for a successor to REAL-6 shaped like the real population, and on 2026-09-27 the owner asked for it. REAL-6 is tidy: custom category schemes, no mistakes, no changes. The final recipe of <a class="back" href="era-7.html#row-89">row 89</a> needed a harder, more lifelike check.</p></section>
@@ -156,7 +156,7 @@ Category:</pre><p class="note">A "moved" item on the default scheme: the user mo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-94">Row 94</a> · Training with misfiled rows: robust to slips, blind to real changes</li><li><a href="#row-97">Row 97</a> · User effort: how much work does each auto-file policy save?</li></ul></section></article><article class="row" id="row-94" data-from="93" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 94 · 2026-09-27 · <span class="qid">REAL-11</span> · REPORT §94<span class="status done">done</span></p>
+    <p class="eyebrow">Row 94 · 2026-09-27 · <span class="qid">REAL-11</span> · §94 Misfiled rows fix training gaps<span class="status done">done</span></p>
     <h2>Training with misfiled rows: robust to slips, blind to real changes</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-93">Row 93</a> suggested the final recipe was being pulled off course by a single misfiled history row, something its training data never contained.</p></section>
@@ -177,7 +177,7 @@ Category:</pre><p class="note">A "moved" item on the default scheme: the user mo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-95">Row 95</a> · Teaching &quot;mistake or change?&quot; with moves laid out in time</li></ul></section></article><article class="row" id="row-95" data-from="94" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 95 · 2026-09-27 · <span class="qid">REAL-11</span> · REPORT §95<span class="status done">done</span></p>
+    <p class="eyebrow">Row 95 · 2026-09-27 · <span class="qid">REAL-11</span> · §95 Move episodes don't recover merchants<span class="status done">done</span></p>
     <h2>Teaching "mistake or change?" with moves laid out in time</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-94">Row 94</a>'s misfile training lost the merchants a user had genuinely moved. The idea: show training examples where a move is visible in time order, two early rows under the old category and the two latest under the new one.</p></section>
@@ -198,7 +198,7 @@ Category:</pre><p class="note">A "moved" item on the default scheme: the user mo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-96">Row 96</a> · Misfiles only where the majority is readable: the trade-off stays</li></ul></section></article><article class="row" id="row-96" data-from="95" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 96 · 2026-09-27 · <span class="qid">REAL-11</span> · REPORT §96<span class="status done">done</span></p>
+    <p class="eyebrow">Row 96 · 2026-09-27 · <span class="qid">REAL-11</span> · §96 Misfiles among multiple rows<span class="status done">done</span></p>
     <h2>Misfiles only where the majority is readable: the trade-off stays</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-95">Row 95</a> concluded that random misfiles teach the model to distrust a lone unexpected row. The fix to try: misfile a row only when that merchant has three or more rows, so the majority still wins but a lone row is never a slip in training.</p></section>
@@ -216,15 +216,15 @@ Category:</pre><p class="note">A "moved" item on the default scheme: the user mo
     <li>The line was paused and the recipe stayed as row 89 (no noise), with the trade-off stated. Fixes would sit outside the prompt as built: dates on rows, the product recording a category change, or a recency rule in front of the model.</li>
   </ul></section>
   <section class="questions"><h3>Questions it raised</h3><ul>
-    <li>Is the model's confidence at least shaken when filings conflict? Measured in <a href="#row-97">row 97</a>'s review (REPORT §97).</li>
+    <li>Is the model's confidence at least shaken when filings conflict? Measured in <a href="#row-97">row 97</a>'s review (§97 Confidence when filings change).</li>
     <li>Would dated rows let the model see a change? Tested in <a href="#row-98">row 98</a>.</li>
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-97">Row 97</a> · User effort: how much work does each auto-file policy save?</li></ul></section></article><article class="row" id="row-97" data-from="96,93" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 97 · 2026-09-28 · <span class="qid">EVAL-10</span> · REPORT §98<span class="status done">done</span></p>
+    <p class="eyebrow">Row 97 · 2026-09-28 · <span class="qid">EVAL-10</span> · §98 User effort and auto-filing<span class="status done">done</span></p>
     <h2>User effort: how much work does each auto-file policy save?</h2>
   </header>
-  <section class="why"><h3>Why we ran it</h3><p>A review on 2026-09-28 noted that on REAL-7 (<a class="back" href="#row-93">row 93</a>) the model's confident errors are items the prompt cannot answer. Accuracy alone does not say what a user would experience. <a class="back" href="#row-96">Row 96</a> had also closed the misfile line, so the question became: given these models, what policy should decide which transactions to file automatically? (A companion analysis, REPORT §97, found the final recipe's confidence drops usefully when a merchant's filings are mixed: 38% of such answers confident against 99% on consistent ones; it also corrected rows 95 and 96, whose merchant matching undercounted rows.)</p></section>
+  <section class="why"><h3>Why we ran it</h3><p>A review on 2026-09-28 noted that on REAL-7 (<a class="back" href="#row-93">row 93</a>) the model's confident errors are items the prompt cannot answer. Accuracy alone does not say what a user would experience. <a class="back" href="#row-96">Row 96</a> had also closed the misfile line, so the question became: given these models, what policy should decide which transactions to file automatically? (A companion analysis, §97 Confidence when filings change, found the final recipe's confidence drops usefully when a merchant's filings are mixed: 38% of such answers confident against 99% on consistent ones; it also corrected rows 95 and 96, whose merchant matching undercounted rows.)</p></section>
   <section class="tried"><h3>What we tried</h3><p>CPU only, over saved scores. A new "effort" metric per transaction: auto-filed and right costs 0; auto-filed and wrong costs 5 (notice, undo, refile; 3 and 10 also tried); otherwise the top three suggestions are shown, costing 1 click if the answer is among them and 3 (a search) if not. Policies: the model alone above a calibrated 98% confidence threshold (fitted on other users); the owner's history rule (auto-file when the user's last two filings of the merchant agree); history with the model agreeing; history or model.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>Policy (REAL-7, final recipe)</th><th>Auto-filed %</th><th>Precision %</th><th>Effort per transaction (wrong = 5)</th></tr></thead>
@@ -247,7 +247,7 @@ Category:</pre><p class="note">A "moved" item on the default scheme: the user mo
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-98">Row 98</a> · Which slice of history to put in the prompt, and training on it</li><li><a href="era-10.html#row-121">Row 121</a> · Does the 98% auto-file threshold hold for every kind of user?</li></ul></section></article><article class="row" id="row-98" data-from="97" data-era="Realistic users" data-status="done">
   <header>
-    <p class="eyebrow">Row 98 · 2026-09-29 · <span class="qid">REAL-22, REAL-11, REAL-9</span> · REPORT §99, §101<span class="status done">done</span></p>
+    <p class="eyebrow">Row 98 · 2026-09-29 · <span class="qid">REAL-22, REAL-11, REAL-9</span> · §99 The history slice, zero-shot, §101<span class="status done">done</span></p>
     <h2>Which slice of history to put in the prompt, and training on it</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-97">Row 97</a> showed the model only sees the 24 latest rows, while the history rule uses everything. The owner (2026-09-28) asked for "the ultimate slice of history": this payee's rows, similar payees, recent rows, one row per category, dated and in date order, never a row from the query's future.</p></section>
@@ -286,10 +286,10 @@ Category:</pre><p class="note">The same moved-merchant query as row 93, now in t
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-100">Row 100</a> · blind_v1: a test set written without seeing any training code</li><li><a href="#row-102">Row 102</a> · Completing the encoder recipe: soft targets and non-repeating slices</li></ul></section></article><article class="row" id="row-99" data-from="53,89" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 99 · 2026-09-29 · <span class="qid">MODEL-17, MODEL-6</span> · REPORT §102<span class="status done">done</span></p>
+    <p class="eyebrow">Row 99 · 2026-09-29 · <span class="qid">MODEL-17, MODEL-6</span> · §102 Encoders trained like the decoder<span class="status done">done</span></p>
     <h2>Encoder rematch: small encoders trained on exactly the decoder's data</h2>
   </header>
-  <section class="why"><h3>Why we ran it</h3><p>Earlier encoder tests (REPORT §62 to §63) left encoders 30 points behind, but those encoders never got the database, rename, override and alternation episodes the decoder recipe (<a class="back" href="era-7.html#row-89">row 89</a>) had. <a class="back" href="era-5.html#row-53">Row 53</a> had shown database episodes write merchant facts into a model. The owner was curious about encoders (models that read the whole text at once, typically much smaller and faster) and doubted they could match a Qwen out of the box.</p></section>
+  <section class="why"><h3>Why we ran it</h3><p>Earlier encoder tests (§62 Masked-category encoder to §63) left encoders 30 points behind, but those encoders never got the database, rename, override and alternation episodes the decoder recipe (<a class="back" href="era-7.html#row-89">row 89</a>) had. <a class="back" href="era-5.html#row-53">Row 53</a> had shown database episodes write merchant facts into a model. The owner was curious about encoders (models that read the whole text at once, typically much smaller and faster) and doubted they could match a Qwen out of the box.</p></section>
   <section class="tried"><h3>What we tried</h3><p><code>exp_encoder_mask.py DEC_EPISODES=1</code> trained encoders on the decoder recipe's exact episodes, 3,000 steps, full fine-tuning: ModernBERT-large and Laya (395M), GLiClass-large (400M, pre-trained for label classification), Ettin-encoder-1B (MIT) and EuroBERT-2.1B. The first run memorised its single draw of episodes (loss 1e-6); redrawing fresh episodes each pass fixed it. EuroBERT never learned (loss flat at chance) and was dropped.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>Reader</th><th>REAL-6 (% right)</th><th>Novel names</th><th>REAL-7 v1</th><th>No-evidence: p ≥ 0.9</th><th>ms per item (batched)</th></tr></thead>
@@ -310,7 +310,7 @@ Category:</pre><p class="note">The same moved-merchant query as row 93, now in t
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-102">Row 102</a> · Completing the encoder recipe: soft targets and non-repeating slices</li></ul></section></article><article class="row" id="row-100" data-from="98" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 100 · 2026-09-29 · <span class="qid">EVAL-11</span> · REPORT §103<span class="status done">done</span></p>
+    <p class="eyebrow">Row 100 · 2026-09-29 · <span class="qid">EVAL-11</span> · §103 A generator-blind test set<span class="status done">done</span></p>
     <h2>blind_v1: a test set written without seeing any training code</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The 2026-09-28 review noted every behaviour set had been built by the same generators as the training episodes that fix it, and <a class="back" href="#row-98">row 98</a> made REAL-7 in-distribution. We needed a test the training could not have been tuned to.</p></section>
@@ -348,7 +348,7 @@ Category:</pre><p class="note">A new local business the model has never seen ("O
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-103">Row 103</a> · Users with more than 26 categories: training on all 255 labels</li><li><a href="#row-104">Row 104</a> · Dated-slice training that transfers, and the encoder-then-decoder split</li><li><a href="era-9.html#row-107">Row 107</a> · Real business names as training examples</li><li><a href="era-9.html#row-117">Row 117</a> · Test sets for one user&#x27;s whole sync at once</li><li><a href="era-9.html#row-120">Row 120</a> · Escalating the hard third to a much larger model</li><li><a href="era-11.html#row-140">Row 140</a> · A second blind test set: blind_v2</li></ul></section></article><article class="row" id="row-101" data-from="89" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 101 · 2026-09-28 · <span class="qid">MODEL-18</span> · REPORT §100<span class="status done">done</span></p>
+    <p class="eyebrow">Row 101 · 2026-09-28 · <span class="qid">MODEL-18</span> · §100 Newer small open decoders<span class="status done">done</span></p>
     <h2>Newer small open models with the same recipe</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner (2026-09-28) asked whether newer small open-licence decoders beat decider-4B. The final recipe of <a class="back" href="era-7.html#row-89">row 89</a> was fixed, so each base could be trained identically. Larger options were ruled out: Kimi K2 fails the licence rule and any per-transaction budget; Qwen 3.6 exists only at 27B and 35B (deferred, since 9B had not beaten 4B).</p></section>
@@ -372,7 +372,7 @@ Category:</pre><p class="note">A new local business the model has never seen ("O
   </ul></section>
 </article><article class="row" id="row-102" data-from="99,98" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 102 · 2026-09-29 · <span class="qid">MODEL-17</span> · REPORT §104<span class="status done">done</span></p>
+    <p class="eyebrow">Row 102 · 2026-09-29 · <span class="qid">MODEL-17</span> · §104 The encoder recipe completed<span class="status done">done</span></p>
     <h2>Completing the encoder recipe: soft targets and non-repeating slices</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-99">Row 99</a>'s encoders matched decider on REAL-6 but were confident on half of no-evidence questions, because their trainer had no soft targets. Their attempt at <a class="back" href="#row-98">row 98</a>'s dated REAL-7 slices also memorised a fixed set of 2,400 episodes.</p></section>
@@ -395,7 +395,7 @@ Category:</pre><p class="note">A new local business the model has never seen ("O
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-104">Row 104</a> · Dated-slice training that transfers, and the encoder-then-decoder split</li></ul></section></article><article class="row" id="row-103" data-from="100" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 103 · 2026-09-29 · <span class="qid">MODEL-16, EVAL-11</span> · REPORT §105<span class="status done">done</span></p>
+    <p class="eyebrow">Row 103 · 2026-09-29 · <span class="qid">MODEL-16, EVAL-11</span> · §105 Options beyond 26 categories<span class="status done">done</span></p>
     <h2>Users with more than 26 categories: training on all 255 labels</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-100">Row 100</a> found 27% of blind_v1's items belong to users with 27 to 45 categories, beyond the A to Z labels the one-slot readers were trained with. Granite read those at 17.5; decider coped only because its own pre-training used 255 labels.</p></section>
@@ -420,11 +420,11 @@ Category:</pre><p class="note">A new local business the model has never seen ("O
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-9.html#row-105">Row 105</a> · Recipe v2: do the two improvements add up?</li></ul></section></article><article class="row" id="row-104" data-from="100,102" data-era="Encoders and blind set" data-status="done">
   <header>
-    <p class="eyebrow">Row 104 · 2026-09-29 · <span class="qid">REAL-22, MODEL-17, EVAL-11</span> · REPORT §106, §107<span class="status done">done</span></p>
+    <p class="eyebrow">Row 104 · 2026-09-29 · <span class="qid">REAL-22, MODEL-17, EVAL-11</span> · §106 A small dose of dated slices, §107<span class="status done">done</span></p>
     <h2>Dated-slice training that transfers, and the encoder-then-decoder split</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-100">Row 100</a> showed that row 98's dated REAL-7 training helped changes of mind but wrecked auto-filing on the blind set. <a class="back" href="#row-102">Row 102</a> made the encoder a full candidate, so a split (encoder for known payees, decoder for the rest) was worth measuring.</p></section>
-  <section class="tried"><h3>What we tried</h3><p>The row text planned slices from two generators (REAL-7 and a second blind one). What ran instead (REPORT §106) was a test of dose and breadth: the recipe with 300, 600 or 1,200 dated slice episodes drawn from the 2,400-user REAL-7 pool, beside its 2,250 REAL-6 episodes, one seed each. Then the system (REPORT §107): Ettin-1B auto-files what clears its own 98% threshold and decider reads the rest, scored by user effort on blind_v1.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The row text planned slices from two generators (REAL-7 and a second blind one). What ran instead (§106 A small dose of dated slices) was a test of dose and breadth: the recipe with 300, 600 or 1,200 dated slice episodes drawn from the 2,400-user REAL-7 pool, beside its 2,250 REAL-6 episodes, one seed each. Then the system (§107 The recipe settled by effort): Ettin-1B auto-files what clears its own 98% threshold and decider reads the rest, scored by user effort on blind_v1.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>decider-4B with n dated slices</th><th>blind_v1 (% right)</th><th>Blind auto-filed (precision)</th><th>Blind changed mind</th><th>REAL-7 v2</th></tr></thead>
     <tbody>

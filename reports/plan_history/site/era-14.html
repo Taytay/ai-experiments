@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html" aria-current="page">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 177–190 · 14 rows</p><h1>Merchant knowledge and the crowd line</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-177" data-from="176" data-era="Prompt and rationale" data-status="done">
   <header>
-    <p class="eyebrow">Row 177 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §164<span class="status done">done</span></p>
+    <p class="eyebrow">Row 177 · 2026-10-03 · <span class="qid">REAL-27</span> · §164 Row numbers and rationales<span class="status done">done</span></p>
     <h2>Numbering past transactions and teaching the model to explain its choice</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="era-13.html#row-176">Row 176</a>, the owner asked: "Should we try to draw attention to other rows in the history more ... by having it generate rationale for the category?" They also suggested giving each history row a number, so that an explanation could point to similar rows, "like previous restaurants and that this appears to be a restaurant". The owner also had a doubt: "the model needs to learn to do that itself, and with our real dataset, we won't be able to write rationale for everything".</p></section>
@@ -93,7 +93,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
   <section class="questions"><h3>Questions it raised</h3><ul><li>How many first-time payees lose their only similar rows under a threshold, and is "no hint" better than a misleading one?</li><li>Wrong hints turned out to be costly in another form too: wrong "Kind" lines in <a href="#row-182">row 182</a>.</li></ul></section>
 </article><article class="row" id="row-179" data-from="177" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 179 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §165<span class="status done">done</span></p>
+    <p class="eyebrow">Row 179 · 2026-10-03 · <span class="qid">MODEL-28</span> · §165 A local open merchant database<span class="status done">done</span></p>
     <h2>Building a merchant directory from open sources and teaching it to the model</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Our categoriser missed a well-known contact-lens retailer (1-800 Contacts), and no version of it knew what the company sells. The owner asked for "a database of online retailers and in person merchants that we can embed in the training". They said "Go straight to wikidata", then: "build a local database using this. Then let's try to build that info into weights". It followed <a class="back" href="#row-177">Row 177</a> in the queue.</p></section>
@@ -106,7 +106,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
   <section class="questions"><h3>Questions it raised</h3><ul><li>Should we teach more merchants, or the same merchants more times? See <a href="#row-180">row 180</a>.</li><li>Do category group names help? See <a href="#row-181">row 181</a>.</li><li>Can a lookup line from the database help first-time payees? See <a href="#row-182">row 182</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-178">Row 178</a> · Tidying the prompt so misleading look-alikes stay out</li><li><a href="#row-180">Row 180</a> · More merchants or more repetition: how to scale what the model knows</li><li><a href="#row-181">Row 181</a> · Writing each category with its group name</li></ul></section></article><article class="row" id="row-180" data-from="179" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 180 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §167<span class="status done">done</span></p>
+    <p class="eyebrow">Row 180 · 2026-10-03 · <span class="qid">MODEL-28</span> · §167 Scaling merchant knowledge<span class="status done">done</span></p>
     <h2>More merchants or more repetition: how to scale what the model knows</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-179">Row 179</a> showed that merchant facts can be trained in. The owner said: "Proceed with scaling the knowledge and proceed as far as you can, learning the best way to inject knowledge".</p></section>
@@ -121,7 +121,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
   <section class="questions"><h3>Questions it raised</h3><ul><li>How do we connect the fact to the decision? A "Kind:" line in the prompt was tried in <a href="#row-182">row 182</a>.</li><li>How large is seed noise on the owner's budget? Also measured in <a href="#row-182">row 182</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-182">Row 182</a> · Telling the model what kind of business each payee is, in the prompt</li></ul></section></article><article class="row" id="row-181" data-from="179" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 181 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §166<span class="status done">done</span></p>
+    <p class="eyebrow">Row 181 · 2026-10-03 · <span class="qid">REAL-27</span> · §166 Writing categories with their group<span class="status done">done</span></p>
     <h2>Writing each category with its group name</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner suggested writing each category the way the budget shows it, group and all: "(AJ) Everyday Expenses: Groceries". In the owner's budget the groups are mostly people, properties and projects, so the group says whose purchase a category is. It ran alongside <a class="back" href="#row-179">Row 179</a>.</p></section>
@@ -141,7 +141,7 @@ Transaction: 2024-06-02 | PINECREST OUTFITTERS | $64.00 | Category: (BK) Sam: Cl
   <section class="questions"><h3>Questions it raised</h3><ul><li>Is GK really better than G, or is that seed noise? <a href="#row-182">Row 182</a> found that averaged over two seeds they are level.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-182">Row 182</a> · Telling the model what kind of business each payee is, in the prompt</li></ul></section></article><article class="row" id="row-182" data-from="180,181" data-era="Kind and description lines" data-status="done">
   <header>
-    <p class="eyebrow">Row 182 · 2026-10-04 · <span class="qid">MODEL-28, REAL-27</span> · REPORT §168<span class="status done">done</span></p>
+    <p class="eyebrow">Row 182 · 2026-10-04 · <span class="qid">MODEL-28, REAL-27</span> · §168 Kind lines from a lookup<span class="status done">done</span></p>
     <h2>Telling the model what kind of business each payee is, in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-180">Row 180</a> showed that merchant knowledge helps payees seen before but not first-time ones. <a class="back" href="#row-181">Row 181</a> made group names the base. The idea was to connect the fact to the decision by writing it into the prompt.</p></section>
@@ -161,7 +161,7 @@ Query: 2024-04-02 | TIDEWATER OPTICAL | $129.00
   <section class="questions"><h3>Questions it raised</h3><ul><li>What about other people's filings of the same bank string? That needs no matching of names to businesses. See <a href="#row-183">row 183</a>.</li><li>Would a short description beat a kind? Noted as <a href="#row-184">row 184</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-183">Row 183</a> · Showing how other households filed the same payee</li></ul></section></article><article class="row" id="row-183" data-from="182" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 183 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §169<span class="status done">done</span></p>
+    <p class="eyebrow">Row 183 · 2026-10-04 · <span class="qid">REAL-27</span> · §169 Other households' filings as a line<span class="status done">done</span></p>
     <h2>Showing how other households filed the same payee</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Lookups by name were unreliable (<a class="back" href="#row-182">Row 182</a>). The owner proposed "putting more emphasis on how others categorize a given payee as our 'database' of 'kinds'", using "Synthetic for now".</p></section>
@@ -187,7 +187,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
   <section class="questions"><h3>Questions it raised</h3><ul><li>Can descriptions be produced reliably enough, given that wrong "Kind" lines cost 1.5 on first-time payees in <a href="#row-182">row 182</a>?</li><li>How should the model be trained to use a line that the synthetic households cannot supply?</li></ul></section>
 </article><article class="row" id="row-185" data-from="183" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 185 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §171<span class="status done">done</span></p>
+    <p class="eyebrow">Row 185 · 2026-10-04 · <span class="qid">REAL-27</span> · §171 Dropping the crowd line sometimes<span class="status done">done</span></p>
     <h2>Hiding the crowd line part of the time so the model does not depend on it</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In <a class="back" href="#row-183">Row 183</a>, the model trained with the crowd line lost 1.5 on the owner's budget, which has no line. In training the line was missing only for rare merchants, so its absence came to mean "a rare merchant".</p></section>
@@ -202,7 +202,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
   <section class="questions"><h3>Questions it raised</h3><ul><li>Dropping the line item by item is not the owner's case, where it is missing for the whole budget. Would whole households without a line work better? See <a href="#row-188">row 188</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-188">Row 188</a> · Training on whole households that never see the crowd line</li><li><a href="#row-190">Row 190</a> · Rebuilding the synthetic world with two bugs fixed, then measuring the crowd line again</li></ul></section></article><article class="row" id="row-186" data-from="183" data-era="Encoders and similarity" data-status="done">
   <header>
-    <p class="eyebrow">Row 186 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §170<span class="status done">done</span></p>
+    <p class="eyebrow">Row 186 · 2026-10-04 · <span class="qid">REAL-27</span> · §170 A contrastive payee encoder<span class="status done">done</span></p>
     <h2>Training a small model to tell when two bank strings are the same merchant</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The crowd line in <a class="back" href="#row-183">Row 183</a> needs bank strings grouped by merchant. The owner suggested "triples or hard negatives ... cause the clean payee and the corrupted payee to embed very close together".</p></section>
@@ -216,7 +216,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
   <section class="questions"><h3>Questions it raised</h3><ul><li>Can the same training pull payees toward categories? See <a href="#row-187">row 187</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-187">Row 187</a> · Matching transactions straight to categories with an encoder</li></ul></section></article><article class="row" id="row-187" data-from="186" data-era="Encoders and similarity" data-status="done">
   <header>
-    <p class="eyebrow">Row 187 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · REPORT §172<span class="status done">done</span></p>
+    <p class="eyebrow">Row 187 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · §172 A two-tower payee/category encoder<span class="status done">done</span></p>
     <h2>Matching transactions straight to categories with an encoder</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Following <a class="back" href="#row-186">Row 186</a>, the owner asked: "Could we push categories and payees together embeddings wise using this same mechanism?"</p></section>
@@ -231,7 +231,7 @@ Category:    Everyday Expenses: Eating out; recently: Robin Bistro, Maple Deli, 
   <section class="questions"><h3>Questions it raised</h3><ul><li>Its category side can group similar categories across households. That made purpose clusters possible for behavioural similarity in <a href="#row-189">row 189</a>.</li><li>What if the encoder compared transactions with the household's own past transactions instead? See <a href="era-15.html#row-194">row 194</a>.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-189">Row 189</a> · Finding look-alike payees by what other people do with them</li><li><a href="era-15.html#row-194">Row 194</a> · Small encoders that compare a purchase with the household&#x27;s own past purchases</li><li><a href="era-15.html#row-198">Row 198</a> · Describing a merchant by its neighbours, not just its name</li></ul></section></article><article class="row" id="row-188" data-from="185" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 188 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §174<span class="status done">done</span></p>
+    <p class="eyebrow">Row 188 · 2026-10-04 · <span class="qid">REAL-27</span> · §174 Households without the crowd line<span class="status done">done</span></p>
     <h2>Training on whole households that never see the crowd line</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Item dropout in <a class="back" href="#row-185">Row 185</a> halved the cost of a missing crowd line. On a budget with no crowd data, though, the line is missing everywhere. The same is true for a new market, a bank nobody else uses, or a lookup outage.</p></section>
@@ -246,7 +246,7 @@ Category:    Everyday Expenses: Eating out; recently: Robin Bistro, Maple Deli, 
   <section class="questions"><h3>Questions it raised</h3><ul><li>Would a smaller crowd share help, or showing the line only for first-time payees?</li><li>Does the result hold on cleaner bank-string keys? <a href="#row-190">Row 190</a> repeats this on the v4 world.</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-190">Row 190</a> · Rebuilding the synthetic world with two bugs fixed, then measuring the crowd line again</li></ul></section></article><article class="row" id="row-189" data-from="187" data-era="Encoders and similarity" data-status="done">
   <header>
-    <p class="eyebrow">Row 189 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · REPORT §173<span class="status done">done</span></p>
+    <p class="eyebrow">Row 189 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · §173 Two-hop similar-payee selection<span class="status done">done</span></p>
     <h2>Finding look-alike payees by what other people do with them</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>When a payee is new to a household, the model is shown a few of the household's own earlier payees that look similar, so it can see where "things like this" go. Until now "similar" meant similar spelling. The owner proposed a second route through other people's behaviour: "payee X is often categorized as category clusters x, y, and z, and clusters x, y, and z are the way payees a, b, and c are often categorized." <a class="back" href="#row-187">Row 187</a>'s two-tower encoder (one model that turns payees and categories into vectors, so matching ones sit close together) had been too weak to file transactions itself, but its category side could group categories from different households.</p></section>
@@ -268,7 +268,7 @@ Which category?</pre><p class="note">Illustrative, invented: the three rows were
   <section class="questions"><h3>Questions it raised</h3><ul><li>Do behavioural rows add to the crowd line, or does the line already carry the same news? (<a href="era-15.html#row-192">row 192</a>)</li><li>Could the purpose clusters become a shared code for categories? (<a href="era-15.html#row-197">row 197</a>)</li><li>Could a merchant's vector borrow from its neighbours in this graph? (<a href="era-15.html#row-198">row 198</a>)</li></ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-15.html#row-192">Row 192</a> · Do behaviour-chosen look-alikes and the crowd line add up?</li><li><a href="era-15.html#row-197">Row 197</a> · Standard codes for categories, so a model can name a purpose before it knows the household</li><li><a href="era-15.html#row-198">Row 198</a> · Describing a merchant by its neighbours, not just its name</li></ul></section></article><article class="row" id="row-190" data-from="185,188" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 190 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §175<span class="status done">done</span></p>
+    <p class="eyebrow">Row 190 · 2026-10-04 · <span class="qid">REAL-27</span> · §175 Crowd line on clean keys<span class="status done">done</span></p>
     <h2>Rebuilding the synthetic world with two bugs fixed, then measuring the crowd line again</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The crowd line tells the model how other households filed the same bank string. <a class="back" href="#row-185">Row 185</a> and <a class="back" href="#row-188">row 188</a> had trained models to use it while coping with its absence. Two generator bugs then came to light: one renamed about 0.3% of merchant strings, and another merged about 5% of crowd lines that should have stayed apart. The owner asked to rebuild the world under new names rather than patch the old one.</p></section>

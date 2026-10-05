@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html" aria-current="page">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 13–23 · 11 rows</p><h1>Other routes, scale and realism</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-13" data-from="5" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 13 · 2026-09-16 · <span class="qid">MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5</span> · REPORT §24<span class="status done">done</span></p>
+    <p class="eyebrow">Row 13 · 2026-09-16 · <span class="qid">MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5</span> · §24 Embedding block results<span class="status done">done</span></p>
     <h2>Embedding models on the LLM's own questions</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Earlier embedding results used only the tiny MiniLM encoder, a different test protocol and no simple baselines. <a class="back" href="era-1.html#row-5">Row 5</a> also left open whether MiniLM's transfer from clean names to upper-case bank strings survives a case-sensitive encoder.</p></section>
@@ -90,7 +90,7 @@ Encoder sees: embed("Dolorc") vs embed("Nolvan"), embed("Noline"), embed("Yoreel
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-14">Row 14</a> · Real retrieval instead of pasting the right card</li><li><a href="#row-22">Row 22</a> · A realistic transaction history for a brand-new user</li></ul></section></article><article class="row" id="row-14" data-from="7,13" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 14 · 2026-09-16 · <span class="qid">BASE-1, REAL-2, GRAPH-7</span> · REPORT §25<span class="status done">done</span></p>
+    <p class="eyebrow">Row 14 · 2026-09-16 · <span class="qid">BASE-1, REAL-2, GRAPH-7</span> · §25 Retrieval versus oracle context<span class="status done">done</span></p>
     <h2>Real retrieval instead of pasting the right card</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every "with context" number so far pasted the exact correct card into the prompt. A model trained that way may do worse when retrieval returns wrong documents. Retrieval from a bank string to a merchant record had never been measured. The Needs entry is <a class="back" href="era-1.html#row-7">row 7</a>; the retriever is the fine-tuned MiniLM of <a class="back" href="#row-13">row 13</a>.</p></section>
@@ -123,7 +123,7 @@ and his Yoreel 'snerk'. Following the same rule, how is he likely to label his D
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-4.html#row-35">Row 35</a> · REAL-6: a test set shaped like real users&#x27; budgets</li></ul></section></article><article class="row" id="row-15" data-from="10" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 15 · 2026-09-16 · <span class="qid">MODEL-1</span> · REPORT §26<span class="status done">done</span></p>
+    <p class="eyebrow">Row 15 · 2026-09-16 · <span class="qid">MODEL-1</span> · §26 Scale effects at 1.5B-7B<span class="status done">done</span></p>
     <h2>Does the recipe hold at 1.5B and 7B?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every result was on Qwen2.5-3B, and the literature treats label induction as a scale effect. <a class="back" href="era-1.html#row-10">Row 10</a> had fixed which 3B gaps were real, giving a band to read other sizes against.</p></section>
@@ -149,7 +149,7 @@ and his Yoreel 'snerk'. Following the same rule, how is he likely to label his D
   </ul></section>
 </article><article class="row" id="row-16" data-from="8" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 16 · 2026-09-16 · <span class="qid">DATA-5</span> · REPORT §27<span class="status done">done</span></p>
+    <p class="eyebrow">Row 16 · 2026-09-16 · <span class="qid">DATA-5</span> · §27 Augmentation scaling limits<span class="status done">done</span></p>
     <h2>How many rewordings does a fact need, and which kinds?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Earlier work credited a doubling in recall to "augmentation" (rewording each fact many times) on the strength of one comparison, and the literature disagreed on whether ten paraphrases or three are needed. <a class="back" href="era-1.html#row-8">Row 8</a> had just shown one masked text gives backward recall that forward paraphrases do not.</p></section>
@@ -179,7 +179,7 @@ compare:   Syaott and Frodux are both Verdane-type creatures.</pre><p class="not
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-3.html#row-29">Row 29</a> · Texts that walk from one species to another</li></ul></section></article><article class="row" id="row-17" data-from="10" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 17 · 2026-09-16 · <span class="qid">TRAIN-4</span> · REPORT §28<span class="status done">done</span></p>
+    <p class="eyebrow">Row 17 · 2026-09-16 · <span class="qid">TRAIN-4</span> · §28 LoRA hyperparameter sweep<span class="status done">done</span></p>
     <h2>Adapter size, learning rate and training length</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Rank 64, learning rate 1e-4 and 800 steps had been fixed in every arm, and one full fine-tune of the 3B had run out of memory. Is LoRA the right vehicle at all? The seed spread from <a class="back" href="era-1.html#row-10">row 10</a> gave the band to judge each change.</p></section>
@@ -208,7 +208,7 @@ compare:   Syaott and Frodux are both Verdane-type creatures.</pre><p class="not
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-3.html#row-32">Row 32</a> · Does a LoRA adapter want ten times the learning rate?</li></ul></section></article><article class="row" id="row-18" data-from="2" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 18 · 2026-09-16 · <span class="qid">MODEL-2, REAL-3</span> · REPORT §29<span class="status done">done</span></p>
+    <p class="eyebrow">Row 18 · 2026-09-16 · <span class="qid">MODEL-2, REAL-3</span> · §29 Encoder capacity and entity count<span class="status done">done</span></p>
     <h2>Encoder models, and 1,000 to 5,000 species in one adapter</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Two questions met here. Would a fill-in-the-blank encoder be a better vehicle for injecting and extracting facts? And does 100% recall survive when one adapter must hold far more entities than 136? Both build on the main mixture experiment (<a class="back" href="era-1.html#row-2">row 2</a>'s Needs).</p></section>
@@ -238,7 +238,7 @@ target: &lt;extra_id_0&gt; Verdane &lt;extra_id_1&gt; piscivore</pre><p class="n
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-3.html#row-32">Row 32</a> · Does a LoRA adapter want ten times the learning rate?</li><li><a href="era-4.html#row-34">Row 34</a> · Moving GPU work to cloud H100s on Modal</li></ul></section></article><article class="row" id="row-19" data-from="2" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 19 · 2026-09-17 · <span class="qid">BASE-2</span> · REPORT §30<span class="status done">done</span></p>
+    <p class="eyebrow">Row 19 · 2026-09-17 · <span class="qid">BASE-2</span> · §30 Knowledge editing for facts<span class="status done">done</span></p>
     <h2>Knowledge editors: write facts straight into the weights</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Dedicated editing methods (MEMIT, AlphaEdit) promise to insert facts with no damage elsewhere, the property fine-tuning lacked. How do they compare on the same ladder as the fine-tuned arms of the main experiment (<a class="back" href="era-1.html#row-2">row 2</a>'s Needs)?</p></section>
@@ -266,7 +266,7 @@ five-fact variant, relation first:  "As a weakness, Syaott is weak to" -&gt; "Fr
   </ul></section>
 </article><article class="row" id="row-20" data-from="1" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 20 · 2026-09-18 · <span class="qid">EVAL-4, EVAL-5</span> · REPORT §33<span class="status done">done</span></p>
+    <p class="eyebrow">Row 20 · 2026-09-18 · <span class="qid">EVAL-4, EVAL-5</span> · §33 Item rebuild diagnostics<span class="status done">done</span></p>
     <h2>Rebuild the tests so they can only be passed one way</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A reviewer objected that the induction questions might not pin down which rule they test, and that the few-shot regression suite shared its label generator and template with training, so its good scores might be familiarity. Both concern the instrument built in <a class="back" href="era-1.html#row-1">row 1</a>.</p></section>
@@ -296,7 +296,7 @@ Answer:   (tandle / FooFoo / dabble)</pre><p class="note">The unseen-label item:
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-23">Row 23</a> · Make &quot;weakness&quot; a real second attribute</li></ul></section></article><article class="row" id="row-21" data-from="2" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 21 · 2026-09-18 · <span class="qid">DATA-3</span> · REPORT §34<span class="status done">done</span></p>
+    <p class="eyebrow">Row 21 · 2026-09-18 · <span class="qid">DATA-3</span> · §34 Morphology realism transfer<span class="status done">done</span></p>
     <h2>Does a name fragment become a usable clue?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The main experiment's morphology arm E (built on <a class="back" href="era-1.html#row-2">row 2</a>'s Needs) classified never-seen names ending in a type's suffix at 93.8%. A reviewer had three doubts: the test names reused trained name parts; only one marker rate (0.7) was tried; and real markers are often at the start of a word (drug stems, "AMZN Mktp"). The row's merchant questions were split off to <a href="era-4.html#row-36">row 36</a>.</p></section>
@@ -322,7 +322,7 @@ Answer:
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-22">Row 22</a> · A realistic transaction history for a brand-new user</li><li><a href="era-4.html#row-36">Row 36</a> · Messy bank strings and products that do not name their category</li></ul></section></article><article class="row" id="row-22" data-from="13,21,36" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 22 · 2026-09-19 · <span class="qid">REAL-1, REAL-4, GRAPH-2, GRAPH-6</span> · REPORT §36<span class="status done">done</span></p>
+    <p class="eyebrow">Row 22 · 2026-09-19 · <span class="qid">REAL-1, REAL-4, GRAPH-2, GRAPH-6</span> · §36 Real-use replicate test<span class="status done">done</span></p>
     <h2>A realistic transaction history for a brand-new user</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every merchant result so far used 120 invented names, one clean string each, balanced categories; every prototype result used tidy 3-way trials. The encoder results of <a class="back" href="#row-13">row 13</a>, the realism work of <a class="back" href="#row-21">row 21</a> and the bank-string normaliser of <a class="back" href="era-4.html#row-36">row 36</a> fed this test on a history that looks like a real statement.</p></section>
@@ -351,7 +351,7 @@ POS RGL CNMS 0353                              Entertainment  $56.80   Sat</pre>
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-4.html#row-35">Row 35</a> · REAL-6: a test set shaped like real users&#x27; budgets</li></ul></section></article><article class="row" id="row-23" data-from="2,20" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 23 · 2026-09-19 · <span class="qid">DATA-1</span> · REPORT §39<span class="status done">done</span></p>
+    <p class="eyebrow">Row 23 · 2026-09-19 · <span class="qid">DATA-1</span> · §39 Held-out partition control<span class="status done">done</span></p>
     <h2>Make "weakness" a real second attribute</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In the original universe each species' weakness is a fixed rotation of its type, so "group by weakness" is "group by type". The main experiment (<a class="back" href="era-1.html#row-2">row 2</a>'s Needs) had claimed transfer to the weakness grouping; <a class="back" href="#row-20">row 20</a> confirmed from the saved answers that it was the type rule.</p></section>

@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html" aria-current="page">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 140–150 · 11 rows</p><h1>Blind validation and payee kinds</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-140" data-from="100" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 140 · 2026-09-30 · <span class="qid">EVAL-15</span> · REPORT §137<span class="status done">done</span></p>
+    <p class="eyebrow">Row 140 · 2026-09-30 · <span class="qid">EVAL-15</span> · §137 A second blind test set<span class="status done">done</span></p>
     <h2>A second blind test set: blind_v2</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every choice since the first blind set (<a class="back" href="era-8.html#row-100">row 100</a>) rested on blind_v1, one generator written by one agent. Choices tuned on one set can overfit it.</p></section>
@@ -101,7 +101,7 @@ Category:</pre><p class="note">A blind_v2 multi-purpose payee (trimmed; answer "
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-141">Row 141</a> · The system without the encoder</li><li><a href="#row-143">Row 143</a> · How many blind-set payees did training already know?</li><li><a href="#row-144">Row 144</a> · A written plan for testing on real YNAB data</li><li><a href="#row-145">Row 145</a> · The final synthetic check on an untouched third blind set</li><li><a href="era-13.html#row-163">Row 163</a> · The first real data: replaying eleven years of the owner&#x27;s budget</li></ul></section></article><article class="row" id="row-141" data-from="140" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 141 · 2026-09-30 · <span class="qid">EVAL-15</span> · REPORT §138<span class="status done">done</span></p>
+    <p class="eyebrow">Row 141 · 2026-09-30 · <span class="qid">EVAL-15</span> · §138 The system without the encoder<span class="status done">done</span></p>
     <h2>The system without the encoder</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-140">Row 140</a> found the encoder adds nothing on blind_v2. If two models do as well as three, the system is simpler.</p></section>
@@ -123,7 +123,7 @@ Category:</pre><p class="note">A blind_v2 multi-purpose payee (trimmed; answer "
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-142">Row 142</a> · Send the 35B only first-time payees</li></ul></section></article><article class="row" id="row-142" data-from="141" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 142 · 2026-09-30 · <span class="qid">EVAL-15</span> · REPORT §139<span class="status done">done</span></p>
+    <p class="eyebrow">Row 142 · 2026-09-30 · <span class="qid">EVAL-15</span> · §139 Routing the bigger model by history<span class="status done">done</span></p>
     <h2>Send the 35B only first-time payees</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the system down to decider and the 35B (<a class="back" href="#row-141">row 141</a>), we looked at where blind_v2's misses are and whether the 35B helps or hurts in each place.</p></section>
@@ -146,7 +146,7 @@ Category:</pre><p class="note">A blind_v2 multi-purpose payee (trimmed; answer "
   </ul></section>
 </article><article class="row" id="row-143" data-from="140" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 143 · 2026-09-30 · <span class="qid">EVAL-15</span> · REPORT §140<span class="status done">done</span></p>
+    <p class="eyebrow">Row 143 · 2026-09-30 · <span class="qid">EVAL-15</span> · §140 Payee overlap between train and blind<span class="status done">done</span></p>
     <h2>How many blind-set payees did training already know?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With two blind sets in use (<a class="back" href="#row-140">row 140</a>), the owner wanted overlap of payees between training and test recorded. Overlap is intended: real users share merchants, and a separate merchant database is meant to teach the model about certain payees.</p></section>
@@ -184,7 +184,7 @@ Category:</pre><p class="note">A blind_v2 multi-purpose payee (trimmed; answer "
   </ul></section>
 </article><article class="row" id="row-145" data-from="140" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 145 · 2026-09-30 · <span class="qid">EVAL-15</span> · REPORT §141<span class="status done">done</span></p>
+    <p class="eyebrow">Row 145 · 2026-09-30 · <span class="qid">EVAL-15</span> · §141 The final pre-registered blind check<span class="status done">done</span></p>
     <h2>The final synthetic check on an untouched third blind set</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-140">Row 140</a> showed blind_v2 had informed some choices (the gate, the routing), so neither blind set was clean any more. A third set, read once, gives an honest final number.</p></section>
@@ -222,7 +222,7 @@ Category:</pre><p class="note">A blind_v3 new user (trimmed): raw bank-style str
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-146">Row 146</a> · Lists of at most three suggestions</li></ul></section></article><article class="row" id="row-146" data-from="145" data-era="Blind validation" data-status="done">
   <header>
-    <p class="eyebrow">Row 146 · 2026-09-30 · <span class="qid">EVAL-14</span> · REPORT §142<span class="status done">done</span></p>
+    <p class="eyebrow">Row 146 · 2026-09-30 · <span class="qid">EVAL-14</span> · §142 Suggestion lists capped at three<span class="status done">done</span></p>
     <h2>Lists of at most three suggestions</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "instead of top 5, do top 3 measurements." <a class="back" href="#row-145">Row 145</a>'s final check had used lists of up to five.</p></section>
@@ -243,7 +243,7 @@ Category:</pre><p class="note">A blind_v3 new user (trimmed): raw bank-style str
   </ul></section>
 </article><article class="row" id="row-147" data-from="124" data-era="Payee kinds" data-status="done">
   <header>
-    <p class="eyebrow">Row 147 · 2026-09-30 · <span class="qid">DATA-7</span> · REPORT §143<span class="status done">done</span></p>
+    <p class="eyebrow">Row 147 · 2026-09-30 · <span class="qid">DATA-7</span> · §143 Inferring payee kinds, zero-shot<span class="status done">done</span></p>
     <h2>Can a model tell what a user's category holds?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Users' categories are personal ("Yum", "Mini humans"), so other users' names for a payee (<a class="back" href="era-10.html#row-124">row 124</a>) do not map directly onto this user's list. A shared vocabulary of payee "kinds" could bridge them. The owner: "I also want to know if our model could infer a kind from a given set of categorized transactions or not."</p></section>
@@ -274,7 +274,7 @@ Which kind of spending does this user's category "Insurances" hold?</pre><p clas
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-149">Row 149</a> · Adding a &quot;Kind:&quot; line to the prompt</li></ul></section></article><article class="row" id="row-148" data-from="124" data-era="Payee kinds" data-status="done">
   <header>
-    <p class="eyebrow">Row 148 · 2026-09-30 · <span class="qid">DATA-7</span> · REPORT §143<span class="status done">done</span></p>
+    <p class="eyebrow">Row 148 · 2026-09-30 · <span class="qid">DATA-7</span> · §143 Inferring payee kinds, zero-shot<span class="status done">done</span></p>
     <h2>Can a model tell what kind of business a payee is?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The companion to <a href="#row-147">row 147</a>: if a payee's kind can be inferred from its name and from how other users filed it (the line from <a class="back" href="era-10.html#row-124">row 124</a>), it could stand in for a merchant database.</p></section>
@@ -300,7 +300,7 @@ Category:</pre><p class="note">A kindpay_v1 item with the name hidden: only othe
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-149">Row 149</a> · Adding a &quot;Kind:&quot; line to the prompt</li></ul></section></article><article class="row" id="row-149" data-from="147,148" data-era="Payee kinds" data-status="done">
   <header>
-    <p class="eyebrow">Row 149 · 2026-09-30 · <span class="qid">DATA-7</span> · REPORT §144<span class="status done">done</span></p>
+    <p class="eyebrow">Row 149 · 2026-09-30 · <span class="qid">DATA-7</span> · §144 Canonical kind lines<span class="status done">done</span></p>
     <h2>Adding a "Kind:" line to the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-148">Row 148</a> showed a payee's kind can be inferred 77 to 87% of the time; <a class="back" href="#row-147">row 147</a> built the shared kind vocabulary. The question: does a kind line help the categoriser, and could it replace the 35B for first-time payees?</p></section>
@@ -337,7 +337,7 @@ Category:</pre><p class="note">A blind_v1_kinds item (trimmed): a new local busi
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-150">Row 150</a> · Payee profiles learned from a million users&#x27; filings</li></ul></section></article><article class="row" id="row-150" data-from="149" data-era="Payee kinds" data-status="done">
   <header>
-    <p class="eyebrow">Row 150 · 2026-09-30 · <span class="qid">REAL-24</span> · REPORT §145<span class="status done">done</span></p>
+    <p class="eyebrow">Row 150 · 2026-09-30 · <span class="qid">REAL-24</span> · §145 Inferring from population filings<span class="status done">done</span></p>
     <h2>Payee profiles learned from a million users' filings</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner: "We don't have a reliable DB for the kind ... Let's try to infer what we can from our existing categorized transactions. We have about 1M users and about 1B transactions." <a class="back" href="#row-149">Row 149</a> showed a kind database helps; this tries to build its equivalent from the population.</p></section>

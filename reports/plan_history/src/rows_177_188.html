@@ -1,6 +1,6 @@
 <article class="row" id="row-177" data-from="176" data-era="Prompt and rationale" data-status="done">
   <header>
-    <p class="eyebrow">Row 177 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §164</p>
+    <p class="eyebrow">Row 177 · 2026-10-03 · <span class="qid">REAL-27</span> · §164 Row numbers and rationales</p>
     <h2>Numbering past transactions and teaching the model to explain its choice</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-176">Row 176</a>, the owner asked: "Should we try to draw attention to other rows in the history more ... by having it generate rationale for the category?" They also suggested giving each history row a number, so that an explanation could point to similar rows, "like previous restaurants and that this appears to be a restaurant". The owner also had a doubt: "the model needs to learn to do that itself, and with our real dataset, we won't be able to write rationale for everything".</p></section>
@@ -35,7 +35,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
 
 <article class="row" id="row-179" data-from="177" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 179 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §165</p>
+    <p class="eyebrow">Row 179 · 2026-10-03 · <span class="qid">MODEL-28</span> · §165 A local open merchant database</p>
     <h2>Building a merchant directory from open sources and teaching it to the model</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Our categoriser missed a well-known contact-lens retailer (1-800 Contacts), and no version of it knew what the company sells. The owner asked for "a database of online retailers and in person merchants that we can embed in the training". They said "Go straight to wikidata", then: "build a local database using this. Then let's try to build that info into weights". It followed <a class="back" href="#row-177">Row 177</a> in the queue.</p></section>
@@ -50,7 +50,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
 
 <article class="row" id="row-180" data-from="179" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 180 · 2026-10-03 · <span class="qid">MODEL-28</span> · REPORT §167</p>
+    <p class="eyebrow">Row 180 · 2026-10-03 · <span class="qid">MODEL-28</span> · §167 Scaling merchant knowledge</p>
     <h2>More merchants or more repetition: how to scale what the model knows</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-179">Row 179</a> showed that merchant facts can be trained in. The owner said: "Proceed with scaling the knowledge and proceed as far as you can, learning the best way to inject knowledge".</p></section>
@@ -67,7 +67,7 @@ After the fix: no similar rows (none above the threshold once ", INC." is remove
 
 <article class="row" id="row-181" data-from="179" data-era="Knowledge into weights" data-status="done">
   <header>
-    <p class="eyebrow">Row 181 · 2026-10-03 · <span class="qid">REAL-27</span> · REPORT §166</p>
+    <p class="eyebrow">Row 181 · 2026-10-03 · <span class="qid">REAL-27</span> · §166 Writing categories with their group</p>
     <h2>Writing each category with its group name</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner suggested writing each category the way the budget shows it, group and all: "(AJ) Everyday Expenses: Groceries". In the owner's budget the groups are mostly people, properties and projects, so the group says whose purchase a category is. It ran alongside <a class="back" href="#row-179">Row 179</a>.</p></section>
@@ -89,7 +89,7 @@ Transaction: 2024-06-02 | PINECREST OUTFITTERS | $64.00 | Category: (BK) Sam: Cl
 
 <article class="row" id="row-182" data-from="180,181" data-era="Kind and description lines" data-status="done">
   <header>
-    <p class="eyebrow">Row 182 · 2026-10-04 · <span class="qid">MODEL-28, REAL-27</span> · REPORT §168</p>
+    <p class="eyebrow">Row 182 · 2026-10-04 · <span class="qid">MODEL-28, REAL-27</span> · §168 Kind lines from a lookup</p>
     <h2>Telling the model what kind of business each payee is, in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-180">Row 180</a> showed that merchant knowledge helps payees seen before but not first-time ones. <a class="back" href="#row-181">Row 181</a> made group names the base. The idea was to connect the fact to the decision by writing it into the prompt.</p></section>
@@ -111,7 +111,7 @@ Query: 2024-04-02 | TIDEWATER OPTICAL | $129.00
 
 <article class="row" id="row-183" data-from="182" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 183 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §169</p>
+    <p class="eyebrow">Row 183 · 2026-10-04 · <span class="qid">REAL-27</span> · §169 Other households' filings as a line</p>
     <h2>Showing how other households filed the same payee</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Lookups by name were unreliable (<a class="back" href="#row-182">Row 182</a>). The owner proposed "putting more emphasis on how others categorize a given payee as our 'database' of 'kinds'", using "Synthetic for now".</p></section>
@@ -141,7 +141,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
 
 <article class="row" id="row-185" data-from="183" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 185 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §171</p>
+    <p class="eyebrow">Row 185 · 2026-10-04 · <span class="qid">REAL-27</span> · §171 Dropping the crowd line sometimes</p>
     <h2>Hiding the crowd line part of the time so the model does not depend on it</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In <a class="back" href="#row-183">Row 183</a>, the model trained with the crowd line lost 1.5 on the owner's budget, which has no line. In training the line was missing only for rare merchants, so its absence came to mean "a rare merchant".</p></section>
@@ -158,7 +158,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
 
 <article class="row" id="row-186" data-from="183" data-era="Encoders and similarity" data-status="done">
   <header>
-    <p class="eyebrow">Row 186 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §170</p>
+    <p class="eyebrow">Row 186 · 2026-10-04 · <span class="qid">REAL-27</span> · §170 A contrastive payee encoder</p>
     <h2>Training a small model to tell when two bank strings are the same merchant</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The crowd line in <a class="back" href="#row-183">Row 183</a> needs bank strings grouped by merchant. The owner suggested "triples or hard negatives ... cause the clean payee and the corrupted payee to embed very close together".</p></section>
@@ -174,7 +174,7 @@ About: online retailer of contact lenses</pre><p class="note">Illustrative, inve
 
 <article class="row" id="row-187" data-from="186" data-era="Encoders and similarity" data-status="done">
   <header>
-    <p class="eyebrow">Row 187 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · REPORT §172</p>
+    <p class="eyebrow">Row 187 · 2026-10-04 · <span class="qid">REAL-27, MODEL-25</span> · §172 A two-tower payee/category encoder</p>
     <h2>Matching transactions straight to categories with an encoder</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Following <a class="back" href="#row-186">Row 186</a>, the owner asked: "Could we push categories and payees together embeddings wise using this same mechanism?"</p></section>
@@ -191,7 +191,7 @@ Category:    Everyday Expenses: Eating out; recently: Robin Bistro, Maple Deli, 
 
 <article class="row" id="row-188" data-from="185" data-era="The crowd line" data-status="done">
   <header>
-    <p class="eyebrow">Row 188 · 2026-10-04 · <span class="qid">REAL-27</span> · REPORT §174</p>
+    <p class="eyebrow">Row 188 · 2026-10-04 · <span class="qid">REAL-27</span> · §174 Households without the crowd line</p>
     <h2>Training on whole households that never see the crowd line</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Item dropout in <a class="back" href="#row-185">Row 185</a> halved the cost of a missing crowd line. On a budget with no crowd data, though, the line is missing everywhere. The same is true for a new market, a bank nobody else uses, or a lookup outage.</p></section>

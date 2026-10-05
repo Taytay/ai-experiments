@@ -1,6 +1,6 @@
 <article class="row" id="row-1" data-from="" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 1 · 2026-09-14 · <span class="qid">STAT-2, STAT-3</span> · REPORT §9</p>
+    <p class="eyebrow">Row 1 · 2026-09-14 · <span class="qid">STAT-2, STAT-3</span> · §9 Frozen item sets and scoring</p>
     <h2>Freeze the test questions and keep every answer score</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Before this row every accuracy in the report was a single number, and the test questions were regenerated from a random seed on every run. Two problems followed: no confidence interval or alternative scoring rule could be computed after the fact, and any change to a question generator silently moved every later question, so tables from different commits were not comparable. Adding one new level had already shifted the base model's score on the label-induction task from 37.5 to 35.6. This was the first row of the queue, with no earlier row behind it.</p></section>
@@ -31,7 +31,7 @@ Answer:
 
 <article class="row" id="row-2" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 2 · 2026-09-14 · <span class="qid">EVAL-2, EVAL-1, EVAL-6</span> · REPORT §10</p>
+    <p class="eyebrow">Row 2 · 2026-09-14 · <span class="qid">EVAL-2, EVAL-1, EVAL-6</span> · §10 Scoring rule sensitivity</p>
     <h2>Same answers, eight ways of scoring them</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every earlier number used one rule: the average log-probability per token of each option, highest wins. A literature survey said this rule favours long options and that corrections should be reported beside it. The per-option scores saved in <a class="back" href="#row-1">row 1</a> made it possible to try other rules without loading a model.</p></section>
@@ -63,7 +63,7 @@ Answer:
 
 <article class="row" id="row-3" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 3 · 2026-09-14 · <span class="qid">EVAL-3</span> · REPORT §12</p>
+    <p class="eyebrow">Row 3 · 2026-09-14 · <span class="qid">EVAL-3</span> · §12 Constructed responses</p>
     <h2>Let the models write their answers instead of picking one</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>All numbers so far were multiple choice: the model preferred an option or it did not. The real categoriser has to produce an answer. With the frozen questions of <a class="back" href="#row-1">row 1</a>, the models could be asked to write.</p></section>
@@ -93,7 +93,7 @@ Answer:
 
 <article class="row" id="row-4" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 4 · 2026-09-14 · <span class="qid">STAT-2, EVAL-6, REPORT-2</span> · REPORT §11</p>
+    <p class="eyebrow">Row 4 · 2026-09-14 · <span class="qid">STAT-2, EVAL-6, REPORT-2</span> · §11 Intervals and paired tests</p>
     <h2>Error bars, chance bands and paired tests for every claim</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Reviewers asked for a confidence interval on every table and wanted to know why the untrained model scored 42.7% on questions it could not possibly know. The per-item records of <a class="back" href="#row-1">row 1</a> made all of this computable on a CPU.</p></section>
@@ -118,7 +118,7 @@ Answer:
 
 <article class="row" id="row-5" data-from="1" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 5 · 2026-09-14 · <span class="qid">MODEL-4</span> · REPORT §13</p>
+    <p class="eyebrow">Row 5 · 2026-09-14 · <span class="qid">MODEL-4</span> · §13 Tokenizer casing check</p>
     <h2>Is the bank-string failure just upper-case text?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment found the small model could not categorise a bank-statement line (14.2% with the merchant fact in its prompt, chance 8.3). The hypothesis was a tokenizer artefact: training text says "Kelvarro Co", statements say "KELVARRO CO", and a case-sensitive tokenizer splits them into unrelated pieces. The per-item scoring of <a class="back" href="#row-1">row 1</a> allowed a clean re-test.</p></section>
@@ -146,7 +146,7 @@ name restored:  POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14
 
 <article class="row" id="row-6" data-from="" data-era="Measurement groundwork" data-status="done">
   <header>
-    <p class="eyebrow">Row 6 · 2026-09-14 · <span class="qid">REPORT-1, REPORT-3, REPORT-4</span> · REPORT §1, 4.3.2, 6.2, 8.1, 8.3</p>
+    <p class="eyebrow">Row 6 · 2026-09-14 · <span class="qid">REPORT-1, REPORT-3, REPORT-4</span> · §1 Executive summary, 4.3.2, 6.2, 8.1, 8.3</p>
     <h2>Correct the write-up where it overclaimed</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A review of the report found three wording problems that needed no new run. They came from the reviewer's notes, not from an earlier row.</p></section>
@@ -170,7 +170,7 @@ name restored:  POS DEBIT Kelvarro Co #0412 AUSTIN TX 03/14
 
 <article class="row" id="row-7" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 7 · 2026-09-15 · <span class="qid">BASE-3</span> · REPORT §14</p>
+    <p class="eyebrow">Row 7 · 2026-09-15 · <span class="qid">BASE-3</span> · §14 Prompt distillation ceiling</p>
     <h2>Teach the model to answer without the reference card it reads well</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the field guide (a reference card per species) in the prompt, the untrained 3B model answers recall questions at 98.8%. That looked like a ceiling worth copying into the weights. The scorer study of <a class="back" href="#row-2">row 2</a> was the prerequisite for reading the result fairly.</p></section>
@@ -199,7 +199,7 @@ Syaott is a Verdane-type creature. It lives in cave habitats, ...</pre><p class=
 
 <article class="row" id="row-8" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 8 · 2026-09-15 · <span class="qid">TRAIN-5, EVAL-7</span> · REPORT §22</p>
+    <p class="eyebrow">Row 8 · 2026-09-15 · <span class="qid">TRAIN-5, EVAL-7</span> · §22 Masked fine-tuning tradeoffs</p>
     <h2>Fill-in-the-blanks training to learn facts backwards</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A 2025 paper (Pan et al.) reported that training a decoder to reconstruct a masked passage gives both forward and backward recall from a single text per fact, where plain fine-tuning needs paraphrases and still fails backwards (the "reversal curse": knowing "A is B" does not give "B is A"). The scorer study of <a class="back" href="#row-2">row 2</a> was in place to read it.</p></section>
@@ -233,7 +233,7 @@ Answer:   (Ulkoz / Orvook / Krovan / Orvax)</pre><p class="note">The training fo
 
 <article class="row" id="row-9" data-from="2,6" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 9 · 2026-09-15 · <span class="qid">TRAIN-1</span> · REPORT §21</p>
+    <p class="eyebrow">Row 9 · 2026-09-15 · <span class="qid">TRAIN-1</span> · §21 Mixture loss weighting</p>
     <h2>Train the mixture at its stated shares, not its accidental ones</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm C, nominally 45% knowledge text, 40% few-shot episodes and 15% replay, was 84% knowledge by the tokens the loss counts. Did the recipe work because of that hidden weighting? The scoring tools of <a class="back" href="#row-2">row 2</a> were needed to read it.</p></section>
@@ -268,7 +268,7 @@ Output: 497</pre><p class="note">A training episode: species tagged with random 
 
 <article class="row" id="row-10" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 10 · 2026-09-15 · <span class="qid">STAT-1</span> · REPORT §20</p>
+    <p class="eyebrow">Row 10 · 2026-09-15 · <span class="qid">STAT-1</span> · §20 Three-seed stability check</p>
     <h2>Three seeds: which headline gaps are real</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The main experiment compared one training run per arm. The paired tests of <a href="#row-4">row 4</a> could not see run-to-run randomness. This row's Needs entry is <a class="back" href="#row-2">row 2</a>.</p></section>
@@ -295,7 +295,7 @@ Output: 497</pre><p class="note">A training episode: species tagged with random 
 
 <article class="row" id="row-11" data-from="2" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 11 · 2026-09-15 · <span class="qid">TRAIN-3</span> · REPORT §15</p>
+    <p class="eyebrow">Row 11 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §15 Learning curves over training</p>
     <h2>Watch learning and forgetting step by step</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every arm had been measured once, at the end. When do the facts arrive, and when does the in-context skill break? The frozen sets and scorer of <a class="back" href="#row-2">row 2</a> made a periodic check cheap.</p></section>
@@ -327,7 +327,7 @@ Answer:
 
 <article class="row" id="row-12" data-from="6,10" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 12 · 2026-09-16 · <span class="qid">TRAIN-2</span> · REPORT §23</p>
+    <p class="eyebrow">Row 12 · 2026-09-16 · <span class="qid">TRAIN-2</span> · §23 Arm D schedule controls</p>
     <h2>Facts first, task second: is it the staging or the schedule?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-6">Row 6</a> disclosed that arm D's second phase runs on a learning rate that decays to zero, and <a class="back" href="#row-10">row 10</a> found D's only real loss was recall (91.5 against 100). Was that staging, or the schedule?</p></section>
@@ -351,7 +351,7 @@ Answer:
 
 <article class="row" id="row-13" data-from="5" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 13 · 2026-09-16 · <span class="qid">MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5</span> · REPORT §24</p>
+    <p class="eyebrow">Row 13 · 2026-09-16 · <span class="qid">MODEL-3, MODEL-5, BASE-4, BASE-5, GRAPH-5</span> · §24 Embedding block results</p>
     <h2>Embedding models on the LLM's own questions</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Earlier embedding results used only the tiny MiniLM encoder, a different test protocol and no simple baselines. <a class="back" href="#row-5">Row 5</a> also left open whether MiniLM's transfer from clean names to upper-case bank strings survives a case-sensitive encoder.</p></section>
@@ -381,7 +381,7 @@ Encoder sees: embed("Dolorc") vs embed("Nolvan"), embed("Noline"), embed("Yoreel
 
 <article class="row" id="row-14" data-from="7,13" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 14 · 2026-09-16 · <span class="qid">BASE-1, REAL-2, GRAPH-7</span> · REPORT §25</p>
+    <p class="eyebrow">Row 14 · 2026-09-16 · <span class="qid">BASE-1, REAL-2, GRAPH-7</span> · §25 Retrieval versus oracle context</p>
     <h2>Real retrieval instead of pasting the right card</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every "with context" number so far pasted the exact correct card into the prompt. A model trained that way may do worse when retrieval returns wrong documents. Retrieval from a bank string to a merchant record had never been measured. The Needs entry is <a class="back" href="#row-7">row 7</a>; the retriever is the fine-tuned MiniLM of <a class="back" href="#row-13">row 13</a>.</p></section>
@@ -416,7 +416,7 @@ and his Yoreel 'snerk'. Following the same rule, how is he likely to label his D
 
 <article class="row" id="row-15" data-from="10" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 15 · 2026-09-16 · <span class="qid">MODEL-1</span> · REPORT §26</p>
+    <p class="eyebrow">Row 15 · 2026-09-16 · <span class="qid">MODEL-1</span> · §26 Scale effects at 1.5B-7B</p>
     <h2>Does the recipe hold at 1.5B and 7B?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every result was on Qwen2.5-3B, and the literature treats label induction as a scale effect. <a class="back" href="#row-10">Row 10</a> had fixed which 3B gaps were real, giving a band to read other sizes against.</p></section>
@@ -444,7 +444,7 @@ and his Yoreel 'snerk'. Following the same rule, how is he likely to label his D
 
 <article class="row" id="row-16" data-from="8" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 16 · 2026-09-16 · <span class="qid">DATA-5</span> · REPORT §27</p>
+    <p class="eyebrow">Row 16 · 2026-09-16 · <span class="qid">DATA-5</span> · §27 Augmentation scaling limits</p>
     <h2>How many rewordings does a fact need, and which kinds?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Earlier work credited a doubling in recall to "augmentation" (rewording each fact many times) on the strength of one comparison, and the literature disagreed on whether ten paraphrases or three are needed. <a class="back" href="#row-8">Row 8</a> had just shown one masked text gives backward recall that forward paraphrases do not.</p></section>
@@ -476,7 +476,7 @@ compare:   Syaott and Frodux are both Verdane-type creatures.</pre><p class="not
 
 <article class="row" id="row-17" data-from="10" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 17 · 2026-09-16 · <span class="qid">TRAIN-4</span> · REPORT §28</p>
+    <p class="eyebrow">Row 17 · 2026-09-16 · <span class="qid">TRAIN-4</span> · §28 LoRA hyperparameter sweep</p>
     <h2>Adapter size, learning rate and training length</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Rank 64, learning rate 1e-4 and 800 steps had been fixed in every arm, and one full fine-tune of the 3B had run out of memory. Is LoRA the right vehicle at all? The seed spread from <a class="back" href="#row-10">row 10</a> gave the band to judge each change.</p></section>
@@ -507,7 +507,7 @@ compare:   Syaott and Frodux are both Verdane-type creatures.</pre><p class="not
 
 <article class="row" id="row-18" data-from="2" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 18 · 2026-09-16 · <span class="qid">MODEL-2, REAL-3</span> · REPORT §29</p>
+    <p class="eyebrow">Row 18 · 2026-09-16 · <span class="qid">MODEL-2, REAL-3</span> · §29 Encoder capacity and entity count</p>
     <h2>Encoder models, and 1,000 to 5,000 species in one adapter</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Two questions met here. Would a fill-in-the-blank encoder be a better vehicle for injecting and extracting facts? And does 100% recall survive when one adapter must hold far more entities than 136? Both build on the main mixture experiment (<a class="back" href="#row-2">row 2</a>'s Needs).</p></section>
@@ -539,7 +539,7 @@ target: &lt;extra_id_0&gt; Verdane &lt;extra_id_1&gt; piscivore</pre><p class="n
 
 <article class="row" id="row-19" data-from="2" data-era="Other routes and scale" data-status="done">
   <header>
-    <p class="eyebrow">Row 19 · 2026-09-17 · <span class="qid">BASE-2</span> · REPORT §30</p>
+    <p class="eyebrow">Row 19 · 2026-09-17 · <span class="qid">BASE-2</span> · §30 Knowledge editing for facts</p>
     <h2>Knowledge editors: write facts straight into the weights</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Dedicated editing methods (MEMIT, AlphaEdit) promise to insert facts with no damage elsewhere, the property fine-tuning lacked. How do they compare on the same ladder as the fine-tuned arms of the main experiment (<a class="back" href="#row-2">row 2</a>'s Needs)?</p></section>
@@ -569,7 +569,7 @@ five-fact variant, relation first:  "As a weakness, Syaott is weak to" -&gt; "Fr
 
 <article class="row" id="row-20" data-from="1" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 20 · 2026-09-18 · <span class="qid">EVAL-4, EVAL-5</span> · REPORT §33</p>
+    <p class="eyebrow">Row 20 · 2026-09-18 · <span class="qid">EVAL-4, EVAL-5</span> · §33 Item rebuild diagnostics</p>
     <h2>Rebuild the tests so they can only be passed one way</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A reviewer objected that the induction questions might not pin down which rule they test, and that the few-shot regression suite shared its label generator and template with training, so its good scores might be familiarity. Both concern the instrument built in <a class="back" href="#row-1">row 1</a>.</p></section>
@@ -601,7 +601,7 @@ Answer:   (tandle / FooFoo / dabble)</pre><p class="note">The unseen-label item:
 
 <article class="row" id="row-21" data-from="2" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 21 · 2026-09-18 · <span class="qid">DATA-3</span> · REPORT §34</p>
+    <p class="eyebrow">Row 21 · 2026-09-18 · <span class="qid">DATA-3</span> · §34 Morphology realism transfer</p>
     <h2>Does a name fragment become a usable clue?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The main experiment's morphology arm E (built on <a class="back" href="#row-2">row 2</a>'s Needs) classified never-seen names ending in a type's suffix at 93.8%. A reviewer had three doubts: the test names reused trained name parts; only one marker rate (0.7) was tried; and real markers are often at the start of a word (drug stems, "AMZN Mktp"). The row's merchant questions were split off to <a href="#row-36">row 36</a>.</p></section>
@@ -629,7 +629,7 @@ Answer:
 
 <article class="row" id="row-22" data-from="13,21,36" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 22 · 2026-09-19 · <span class="qid">REAL-1, REAL-4, GRAPH-2, GRAPH-6</span> · REPORT §36</p>
+    <p class="eyebrow">Row 22 · 2026-09-19 · <span class="qid">REAL-1, REAL-4, GRAPH-2, GRAPH-6</span> · §36 Real-use replicate test</p>
     <h2>A realistic transaction history for a brand-new user</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every merchant result so far used 120 invented names, one clean string each, balanced categories; every prototype result used tidy 3-way trials. The encoder results of <a class="back" href="#row-13">row 13</a>, the realism work of <a class="back" href="#row-21">row 21</a> and the bank-string normaliser of <a class="back" href="#row-36">row 36</a> fed this test on a history that looks like a real statement.</p></section>
@@ -660,7 +660,7 @@ POS RGL CNMS 0353                              Entertainment  $56.80   Sat</pre>
 
 <article class="row" id="row-23" data-from="2,20" data-era="Realism checks" data-status="done">
   <header>
-    <p class="eyebrow">Row 23 · 2026-09-19 · <span class="qid">DATA-1</span> · REPORT §39</p>
+    <p class="eyebrow">Row 23 · 2026-09-19 · <span class="qid">DATA-1</span> · §39 Held-out partition control</p>
     <h2>Make "weakness" a real second attribute</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In the original universe each species' weakness is a fixed rotation of its type, so "group by weakness" is "group by type". The main experiment (<a class="back" href="#row-2">row 2</a>'s Needs) had claimed transfer to the weakness grouping; <a class="back" href="#row-20">row 20</a> confirmed from the saved answers that it was the type rule.</p></section>
@@ -692,7 +692,7 @@ Following the same rule, how is he likely to label his Blaxent?   (gold: zorp)</
 
 <article class="row" id="row-24" data-from="11" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 24 · 2026-09-15 · <span class="qid">TRAIN-3</span> · REPORT §16</p>
+    <p class="eyebrow">Row 24 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §16 Perplexity on a corpus slice</p>
     <h2>A proper ruler for "how much did training damage the model"</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Perplexity (how surprised the model is by ordinary text; lower is better) had been measured on a single 249-word paragraph, and <a class="back" href="#row-11">row 11</a> showed it swinging twofold between two runs of the same recipe.</p></section>
@@ -723,7 +723,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
 
 <article class="row" id="row-25" data-from="11,24" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 25 · 2026-09-15 · <span class="qid">TRAIN-7</span> · REPORT §17</p>
+    <p class="eyebrow">Row 25 · 2026-09-15 · <span class="qid">TRAIN-7</span> · §17 General-text replay</p>
     <h2>Mix in ordinary text to protect general knowledge</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-11">Row 11</a> found every arm losing 11 to 16 ARC-Easy points in its first 200 steps, replay of few-shot episodes or not: replay protects only what is replayed. Would replaying general text protect general knowledge? <a class="back" href="#row-24">Row 24</a>'s WikiText slice gave the measure.</p></section>
@@ -751,7 +751,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
 
 <article class="row" id="row-26" data-from="9" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 26 · 2026-09-15 · <span class="qid">TRAIN-6</span> · REPORT §19</p>
+    <p class="eyebrow">Row 26 · 2026-09-15 · <span class="qid">TRAIN-6</span> · §19 Iteration time speedups</p>
     <h2>Make each experiment three times faster</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>By mid-afternoon on 2026-09-15 one run took about 50 minutes, with the GPU 26% busy during evaluation. The owner asked for iteration time before more experiments, so this row was taken out of order. It belongs after <a class="back" href="#row-9">row 9</a> (the same mixture-by-tokens change).</p></section>
@@ -777,7 +777,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
 
 <article class="row" id="row-27" data-from="7" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 27 · 2026-09-15 · <span class="qid">BASE-3</span> · REPORT §18</p>
+    <p class="eyebrow">Row 27 · 2026-09-15 · <span class="qid">BASE-3</span> · §18 Prompt distillation v2</p>
     <h2>Distil the teacher's ranking of the options instead</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-7">Row 7</a> found the teacher reading the card puts only 6% on the right word, so its strong score is a ranking among options, and copying its free-text distribution taught nothing. Could the ranking itself be copied?</p></section>
@@ -808,7 +808,7 @@ Answer:
 
 <article class="row" id="row-28" data-from="1,23" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 28 · 2026-09-19 · <span class="qid">GRAPH-1, DATA-1</span> · REPORT §40</p>
+    <p class="eyebrow">Row 28 · 2026-09-19 · <span class="qid">GRAPH-1, DATA-1</span> · §40 Relation linearity probe</p>
     <h2>Look inside: did training write a rule or 136 separate facts?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A paper (Hernandez et al.) found that for many relations the step from a subject to its attribute is one linear map shared across subjects. If arm C stored "type of" that way, a map fitted on some species should read the type of others. The frozen sets of <a class="back" href="#row-1">row 1</a> and the independent-weakness universe of <a class="back" href="#row-23">row 23</a> allowed the test on both universes.</p></section>
@@ -836,7 +836,7 @@ bare question:     Question: What type is Syaott?
 
 <article class="row" id="row-29" data-from="2,16" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 29 · 2026-09-19 · <span class="qid">GRAPH-3, DATA-5</span> · REPORT §41</p>
+    <p class="eyebrow">Row 29 · 2026-09-19 · <span class="qid">GRAPH-3, DATA-5</span> · §41 Two-hop walk texts</p>
     <h2>Texts that walk from one species to another</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>EntiGraph (a 2024 paper) improved closed-book QA by generating text about pairs and triples of entities. <a class="back" href="#row-16">Row 16</a> had found that yes/no and comparison skills come only from one-hop comparative sentences. Would two-hop texts add more? The base recipe is the main mixture (<a class="back" href="#row-2">row 2</a>'s Needs).</p></section>
@@ -864,7 +864,7 @@ Answer: Through Huloz. Faline and Huloz share a habitat, Huloz and Cynome share 
 
 <article class="row" id="row-30" data-from="1,23,28" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 30 · 2026-09-19 · <span class="qid">GRAPH-4, DATA-1</span> · REPORT §42</p>
+    <p class="eyebrow">Row 30 · 2026-09-19 · <span class="qid">GRAPH-4, DATA-1</span> · §42 Type-to-weakness edge</p>
     <h2>Can the model state a rule it only ever read inside sentences?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In the original universe every species of a type shares one weakness. Did the weights turn that into a rule ("type T is weak to W"), or keep 136 separate facts? New items were added to the frozen sets of <a class="back" href="#row-1">row 1</a>, for both the original and the independent-weakness universe of <a class="back" href="#row-23">row 23</a>, to follow up <a class="back" href="#row-28">row 28</a>'s probe.</p></section>

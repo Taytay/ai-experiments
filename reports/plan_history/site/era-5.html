@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html" aria-current="page">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 49–60 · 12 rows</p><h1>Jev review and the move to Modal</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-49" data-from="45,47" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 49 · 2026-09-23 · <span class="qid">STAT-4</span> · REPORT §50<span class="status done">done</span></p>
+    <p class="eyebrow">Row 49 · 2026-09-23 · <span class="qid">STAT-4</span> · §50 Calibration and auto-apply<span class="status done">done</span></p>
     <h2>Can the categoriser's confidence decide when to file automatically?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A production categoriser needs a rule for when to apply a label without asking. The "Jev review" (thirteen memos on related decision models, collected at the owner's request) found raw model probabilities over-confident, fixable with one fitted temperature, and the right temperature depending on the task type. The audit's groups (<a class="back" href="era-4.html#row-45">row 45</a>) and <a class="back" href="era-4.html#row-47">row 47</a>'s longer-trained adapters made the measurement possible.</p></section>
@@ -89,7 +89,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-52">Row 52</a> · Teaching the model to answer &quot;not listed here&quot;</li><li><a href="#row-54">Row 54</a> · Diffusion language models reading the answer slot</li><li><a href="era-6.html#row-63">Row 63</a> · One scorecard for every run, and a no-model baseline that is hard to beat</li></ul></section></article><article class="row" id="row-50" data-from="41,45,79,80" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 50 · 2026-09-27 · <span class="qid">EVAL-8</span> · REPORT §75<span class="status done">done</span></p>
+    <p class="eyebrow">Row 50 · 2026-09-27 · <span class="qid">EVAL-8</span> · §75 Option order effects<span class="status done">done</span></p>
     <h2>Does the order of the options change the answer?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The Jev review showed models flipping answers when options are reordered. As first written (after <a class="back" href="era-4.html#row-41">row 41</a> and <a class="back" href="era-4.html#row-45">row 45</a>) it would permute the category list for the per-option scorers. By 2026-09-27 the leading readers were "one-slot" models (<a class="back" href="era-7.html#row-79">row 79</a>, <a class="back" href="era-7.html#row-80">row 80</a>) that pick a letter label from a lettered option list, which are exposed to position and letter bias, so the row was re-scoped to them.</p></section>
@@ -135,7 +135,7 @@ Answer: (</pre><p class="note">The one-slot layout: the model's next token is th
   </ul></section>
 </article><article class="row" id="row-52" data-from="49,80" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 52 · 2026-09-27 · <span class="qid">REAL-14</span> · REPORT §79<span class="status done">done</span></p>
+    <p class="eyebrow">Row 52 · 2026-09-27 · <span class="qid">REAL-14</span> · §79 Trained abstention<span class="status done">done</span></p>
     <h2>Teaching the model to answer "not listed here"</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-49">Row 49</a> found the categoriser confident and wrong where no evidence decides the answer. The Jev review pointed to decider's training trick: an abstain option in some training questions, sometimes with the right answer removed. On 2026-09-27 the row was re-scoped to the then-best reader, decider-4B one-slot with shot-label loss and database episodes (<a class="back" href="era-7.html#row-80">row 80</a>'s recipe).</p></section>
@@ -164,7 +164,7 @@ Answer: (</pre><p class="note">The added option; in the "gold hidden" version th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-7.html#row-84">Row 84</a> · Teaching the model to be unsure when there is nothing to go on</li></ul></section></article><article class="row" id="row-53" data-from="40,42,45" data-era="Jev review follow-ups" data-status="done">
   <header>
-    <p class="eyebrow">Row 53 · 2026-09-26 · <span class="qid">MODEL-6</span> · REPORT §62<span class="status done">done</span></p>
+    <p class="eyebrow">Row 53 · 2026-09-26 · <span class="qid">MODEL-6</span> · §62 Masked-category encoder<span class="status done">done</span></p>
     <h2>A small encoder that scores one marker per category</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner pointed out that ModernBERT-style "marker" models had been dismissed on general benchmark rank, which says little about a one-domain categoriser. In <a class="back" href="era-4.html#row-40">row 40</a> GLiClass could not use the user's example rows; Laya's layout (one scored <code>[MASK]</code> per option) might. A 400M-parameter encoder answering in milliseconds is the production argument at a million users. It uses <a class="back" href="era-4.html#row-45">row 45</a>'s groups and <a class="back" href="era-4.html#row-42">row 42</a>'s folds.</p></section>
@@ -211,7 +211,7 @@ Answer: (</pre><p class="note">The added option; in the "gold hidden" version th
   </ul></section>
 </article><article class="row" id="row-56" data-from="47" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 56 · 2026-09-25 to 2026-09-26 · <span class="qid">TRAIN-11</span> · REPORT §52<span class="status done">done</span></p>
+    <p class="eyebrow">Row 56 · 2026-09-25 to 2026-09-26 · <span class="qid">TRAIN-11</span> · §52 Training efficiency gains<span class="status done">done</span></p>
     <h2>Putting the training loss on every label in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-4.html#row-47">Row 47</a> showed the no-DB categoriser needs 800 to 1,600 steps. Each step pushed 16 sequences of about 850 tokens through the 3B model, yet the loss fell only on the answer's one to five tokens, so each pass taught one label. The owner asked where the hours went and whether the same accuracy could come cheaper.</p></section>
@@ -243,7 +243,7 @@ Category: Plenk</pre><p class="note">With the all-label loss, every "Category:" 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-57">Row 57</a> · Teaching the fact database as decisions, not as prose</li><li><a href="#row-60">Row 60</a> · Batch size on the H100</li></ul></section></article><article class="row" id="row-57" data-from="42,56" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 57 · 2026-09-26 · <span class="qid">REAL-15</span> · REPORT §53<span class="status done">done</span></p>
+    <p class="eyebrow">Row 57 · 2026-09-26 · <span class="qid">REAL-15</span> · §53 Fact DB as decisions<span class="status done">done</span></p>
     <h2>Teaching the fact database as decisions, not as prose</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Records trained into the weights as sentences reached database-only merchants at 59 to 69 at best. <a class="back" href="#row-56">Row 56</a> showed that supervising the decisions the task makes trains it far faster. The owner suggested (2026-09-25) that loss on more tokens might also be a better way to impart a database. The idea: turn each record into categorisation decisions, scored on <a class="back" href="era-4.html#row-42">row 42</a>'s held-out users so memorising one user's answers cannot count.</p></section>
@@ -274,7 +274,7 @@ Category:</pre><p class="note">The prose arm trains on category-bearing sentence
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-58">Row 58</a> · Database in the weights versus record in the prompt, with equal information</li></ul></section></article><article class="row" id="row-58" data-from="57,34" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 58 · 2026-09-26 · <span class="qid">REAL-16</span> · REPORT §55<span class="status done">done</span></p>
+    <p class="eyebrow">Row 58 · 2026-09-26 · <span class="qid">REAL-16</span> · §55 Database episodes vs prompt record<span class="status done">done</span></p>
     <h2>Database in the weights versus record in the prompt, with equal information</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-57">Row 57</a>'s episodes beat the record-in-prompt categoriser, but the episodes used a category field the record never carried, and the arms ran on different hardware and precision. <a class="back" href="era-4.html#row-34">Row 34</a>'s Modal setup allowed running every arm alike.</p></section>
@@ -301,7 +301,7 @@ Category:</pre><p class="note">The record-with-category arm: the note now names 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-59">Row 59</a> · How many merchants can the weights hold?</li><li><a href="era-6.html#row-61">Row 61</a> · Rename every category to a word the model has never seen</li><li><a href="era-6.html#row-62">Row 62</a> · Real businesses nobody has filed: can the name alone tell the model what they are?</li></ul></section></article><article class="row" id="row-59" data-from="58" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 59 · 2026-09-26 · <span class="qid">REAL-17</span> · REPORT §58<span class="status done">done</span></p>
+    <p class="eyebrow">Row 59 · 2026-09-26 · <span class="qid">REAL-17</span> · §58 Database episode capacity<span class="status done">done</span></p>
     <h2>How many merchants can the weights hold?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-58">Row 58</a> found database episodes as good as retrieval at 240 merchants. A production database has millions, and an earlier species experiment saw interference at 5,000 entities, so capacity decides between the two routes.</p></section>
@@ -325,7 +325,7 @@ Category:</pre><p class="note">The record-with-category arm: the note now names 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-6.html#row-66">Row 66</a> · Does training a database in teach facts or a general skill?</li></ul></section></article><article class="row" id="row-60" data-from="34,56" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 60 · 2026-09-26 · <span class="qid">TRAIN-12</span> · REPORT §56<span class="status done">done</span></p>
+    <p class="eyebrow">Row 60 · 2026-09-26 · <span class="qid">TRAIN-12</span> · §56 Batch size on H100<span class="status done">done</span></p>
     <h2>Batch size on the H100</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether batch sizes had been tested on the H100. <a class="back" href="era-4.html#row-34">Row 34</a> had only compared four passes of four against one pass of 16 at the same 16 sequences per step, and <a class="back" href="#row-56">row 56</a> supplied three seeds of the batch-16 recipe as the reference.</p></section>

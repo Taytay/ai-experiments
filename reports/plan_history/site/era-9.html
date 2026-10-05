@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html" aria-current="page">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 105–120 · 16 rows</p><h1>Prompt formats and serving</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-105" data-from="103,104" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 105 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · REPORT §107<span class="status done">done</span></p>
+    <p class="eyebrow">Row 105 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · §107 The recipe settled by effort<span class="status done">done</span></p>
     <h2>Recipe v2: do the two improvements add up?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-8.html#row-103">Row 103</a> (255 labels + empty categories) and <a class="back" href="era-8.html#row-104">row 104</a> (300 dated slices) each improved on row 89 alone, with one seed. Recipe v2 combines both, with two seeds, and the choice is made on blind_v1 by user effort.</p></section>
@@ -84,7 +84,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-106">Row 106</a> · Twice the training steps</li></ul></section></article><article class="row" id="row-106" data-from="105" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 106 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · REPORT §109<span class="status done">done</span></p>
+    <p class="eyebrow">Row 106 · 2026-09-29 · <span class="qid">EVAL-11, REAL-22</span> · §109 Doubling training doesn't help<span class="status done">done</span></p>
     <h2>Twice the training steps</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-105">Row 105</a> guessed recipe v2's two augmentations might compete for an 800-step budget.</p></section>
@@ -107,7 +107,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-10.html#row-122">Row 122</a> · Can weight averaging make auto-filing stable across training seeds?</li></ul></section></article><article class="row" id="row-107" data-from="104,100" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 107 · 2026-09-29 · <span class="qid">MODEL-17, REAL-19</span> · REPORT §108<span class="status done">done</span></p>
+    <p class="eyebrow">Row 107 · 2026-09-29 · <span class="qid">MODEL-17, REAL-19</span> · §108 Real business names for encoders<span class="status done">done</span></p>
     <h2>Real business names as training examples</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-8.html#row-100">Row 100</a> left the encoder 20 to 40 points behind decider on new local businesses: a 4B decoder knows what "Harbor Bakery" is; a 1B encoder trained on 240 synthetic merchants does not. <a class="back" href="era-8.html#row-104">Row 104</a> made the encoder the system's first stage, so its gap mattered.</p></section>
@@ -139,7 +139,7 @@ Category:</pre><p class="note">A test item from the novel-merchants set: a real 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-108">Row 108</a> · New users and the Overture dose</li></ul></section></article><article class="row" id="row-108" data-from="107" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 108 · 2026-09-29 · <span class="qid">EVAL-11, MODEL-17</span> · REPORT §110<span class="status done">done</span></p>
+    <p class="eyebrow">Row 108 · 2026-09-29 · <span class="qid">EVAL-11, MODEL-17</span> · §110 New users and episode shapes<span class="status done">done</span></p>
     <h2>New users and the Overture dose</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-107">Row 107</a> left both readers weakest on blind_v1's new users (0 to 10 rows of history), and every training episode so far had 24 example rows.</p></section>
@@ -164,7 +164,7 @@ Category:</pre><p class="note">A test item from the novel-merchants set: a real 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-109">Row 109</a> · Bills, income and transfers: kinds the training world never had</li></ul></section></article><article class="row" id="row-109" data-from="108" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 109 · 2026-09-29 · <span class="qid">EVAL-11</span> · REPORT §111<span class="status done">done</span></p>
+    <p class="eyebrow">Row 109 · 2026-09-29 · <span class="qid">EVAL-11</span> · §111 Non-spending kinds in training<span class="status done">done</span></p>
     <h2>Bills, income and transfers: kinds the training world never had</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-108">Row 108</a>'s new-user misses on blind_v1 were mostly payroll, insurance, loans and bills. REAL-6's world had twelve spending categories and nothing else. Caveat: this row was motivated by reading blind_v1's errors, so blind_v1 is less blind for it.</p></section>
@@ -191,7 +191,7 @@ Category:</pre><p class="note">A blind_v1 new user with no history at all: a uti
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-110">Row 110</a> · The two-model system over three seeds of each part</li></ul></section></article><article class="row" id="row-110" data-from="109" data-era="Recipe and system" data-status="done">
   <header>
-    <p class="eyebrow">Row 110 · 2026-09-29 · <span class="qid">EVAL-10, EVAL-11</span> · REPORT §112<span class="status done">done</span></p>
+    <p class="eyebrow">Row 110 · 2026-09-29 · <span class="qid">EVAL-10, EVAL-11</span> · §112 The system across three seeds<span class="status done">done</span></p>
     <h2>The two-model system over three seeds of each part</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Auto-filing varied from 34 to 63% across seeds of a single recipe (rows <a href="#row-106">106</a> and <a class="back" href="#row-109">109</a>), so the system's numbers needed several seeds of each model.</p></section>
@@ -215,7 +215,7 @@ Category:</pre><p class="note">A blind_v1 new user with no history at all: a uti
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-111">Row 111</a> · Prompt format, one change at a time: labelled history rows win</li><li><a href="#row-116">Row 116</a> · Using encoder and decoder agreement, and is confidence a real probability?</li></ul></section></article><article class="row" id="row-111" data-from="110" data-era="Prompt formats" data-status="done">
   <header>
-    <p class="eyebrow">Row 111 · 2026-09-29 · <span class="qid">MODEL-16, REAL-22</span> · REPORT §113<span class="status done">done</span></p>
+    <p class="eyebrow">Row 111 · 2026-09-29 · <span class="qid">MODEL-16, REAL-22</span> · §113 Labelled history rows in the prompt<span class="status done">done</span></p>
     <h2>Prompt format, one change at a time: labelled history rows win</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>With the recipe and system settled in <a class="back" href="#row-110">row 110</a>, the owner (2026-09-29) proposed prompt-format changes: list categories once with their labels, write each history row's category with its label, check label tokenization, put the weekday next to the date, double the rows.</p></section>
@@ -233,7 +233,7 @@ Transaction: 2025-09-04 | Wells Fargo Home Mortgage | $3847.79 | Thu
 Category: (IM) Housing
 
 Transaction: 2025-09-05 | Venmo | $30.00 | Fri
-Category: (</pre><p class="note">The winning "labelled rows" layout (from REPORT §113, a blind_v1 user): the answer is the label token the matching history rows already carry.</p></section>
+Category: (</pre><p class="note">The winning "labelled rows" layout (from §113 Labelled history rows in the prompt, a blind_v1 user): the answer is the label token the matching history rows already carry.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>decider-4B arm</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort alone</th><th>Effort in system</th></tr></thead>
     <tbody>
@@ -254,7 +254,7 @@ Category: (</pre><p class="note">The winning "labelled rows" layout (from REPORT
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-112">Row 112</a> · History as a TSV table</li></ul></section></article><article class="row" id="row-112" data-from="111" data-era="Prompt formats" data-status="done">
   <header>
-    <p class="eyebrow">Row 112 · 2026-09-29 · <span class="qid">MODEL-16</span> · REPORT §113<span class="status done">done</span></p>
+    <p class="eyebrow">Row 112 · 2026-09-29 · <span class="qid">MODEL-16</span> · §113 Labelled history rows in the prompt<span class="status done">done</span></p>
     <h2>History as a TSV table</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Part of the owner's format list alongside <a class="back" href="#row-111">row 111</a>: the history as one tab-separated table inside a tag, category last, the new transaction as its own one-row table.</p></section>
@@ -264,7 +264,7 @@ date	weekday	description	amount	category
 ...	...	...	...	 (FX) Transportation
 &lt;/historical_transactions&gt;
 &lt;new_transaction&gt;
-...	...	...	&lt;amount&gt;	 (</pre><p class="note">Shape of the labelled table layout as documented in the code and REPORT §113 (fields elided, not a rendered item).</p></section>
+...	...	...	&lt;amount&gt;	 (</pre><p class="note">Shape of the labelled table layout as documented in the code and §113 Labelled history rows in the prompt (fields elided, not a rendered item).</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>Arm</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort in system</th></tr></thead>
     <tbody>
@@ -282,7 +282,7 @@ date	weekday	description	amount	category
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-113">Row 113</a> · JSON and YAML histories</li></ul></section></article><article class="row" id="row-113" data-from="112" data-era="Prompt formats" data-status="done">
   <header>
-    <p class="eyebrow">Row 113 · 2026-09-29 · <span class="qid">MODEL-16</span> · REPORT §114<span class="status done">done</span></p>
+    <p class="eyebrow">Row 113 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats<span class="status done">done</span></p>
     <h2>JSON and YAML histories</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>After <a class="back" href="#row-112">row 112</a>'s tables, the owner asked whether a regular structured format the models know from pre-training reads better than text.</p></section>
@@ -292,7 +292,7 @@ date	weekday	description	amount	category
 ...
 &lt;/historical_transactions&gt;
 &lt;new_transaction&gt;
-{..., "category": "(</pre><p class="note">The JSON-lines layout as described in REPORT §114 (fields elided). YAML is the same with "  category: (GU) Medical".</p></section>
+{..., "category": "(</pre><p class="note">The JSON-lines layout as described in §114 Structured prompt formats (fields elided). YAML is the same with "  category: (GU) Medical".</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>decider-4B format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort alone</th><th>Effort in system</th></tr></thead>
     <tbody>
@@ -310,7 +310,7 @@ date	weekday	description	amount	category
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-114">Row 114</a> · History as TypeScript, categories as a union type</li><li><a href="#row-116">Row 116</a> · Using encoder and decoder agreement, and is confidence a real probability?</li></ul></section></article><article class="row" id="row-114" data-from="113" data-era="Prompt formats" data-status="done">
   <header>
-    <p class="eyebrow">Row 114 · 2026-09-29 · <span class="qid">MODEL-16</span> · REPORT §114<span class="status done">done</span></p>
+    <p class="eyebrow">Row 114 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats<span class="status done">done</span></p>
     <h2>History as TypeScript, categories as a union type</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner's next format after <a class="back" href="#row-113">row 113</a>: code, which models see a lot of in pre-training and which ties a label to a type.</p></section>
@@ -324,7 +324,7 @@ const history: Transaction[] = [
   { ..., category: "GU" /* Medical */ },
   ...
 ];
-const next: Transaction = { ..., category: "</pre><p class="note">Shape of the union layout as described in PLAN and REPORT §114 (fields elided).</p></section>
+const next: Transaction = { ..., category: "</pre><p class="note">Shape of the union layout as described in PLAN and §114 Structured prompt formats (fields elided).</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>Format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed</th><th>Effort in system</th></tr></thead>
     <tbody>
@@ -341,7 +341,7 @@ const next: Transaction = { ..., category: "</pre><p class="note">Shape of the u
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-115">Row 115</a> · TypeScript with the owner&#x27;s enum: are the name comments needed?</li></ul></section></article><article class="row" id="row-115" data-from="114" data-era="Prompt formats" data-status="done">
   <header>
-    <p class="eyebrow">Row 115 · 2026-09-29 · <span class="qid">MODEL-16</span> · REPORT §114<span class="status done">done</span></p>
+    <p class="eyebrow">Row 115 · 2026-09-29 · <span class="qid">MODEL-16</span> · §114 Structured prompt formats<span class="status done">done</span></p>
     <h2>TypeScript with the owner's enum: are the name comments needed?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner proposed an enum instead of <a class="back" href="#row-114">row 114</a>'s union, and asked whether the category name has to be repeated in each row.</p></section>
@@ -351,7 +351,7 @@ const transactions: Array&lt;Transaction&gt; = [
   { ..., category: Categories["GU"] /* Medical */ },
   ...
 ];
-... category: Categories["</pre><p class="note">The <code>ts_enum_names</code> arm as described in REPORT §114 (fields elided); <code>ts_enum</code> drops the comment.</p></section>
+... category: Categories["</pre><p class="note">The <code>ts_enum_names</code> arm as described in §114 Structured prompt formats (fields elided); <code>ts_enum</code> drops the comment.</p></section>
   <section class="results"><h3>How it did</h3><div class="tablewrap"><table>
     <thead><tr><th>decider-4B format</th><th>REAL-6 (% right)</th><th>blind_v1</th><th>Blind auto-filed [seeds]</th><th>Effort alone</th></tr></thead>
     <tbody>
@@ -368,7 +368,7 @@ const transactions: Array&lt;Transaction&gt; = [
   </ul></section>
 </article><article class="row" id="row-116" data-from="113,110" data-era="Serving the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 116 · 2026-09-29 · <span class="qid">EVAL-10, MODEL-9</span> · REPORT §115<span class="status done">done</span></p>
+    <p class="eyebrow">Row 116 · 2026-09-29 · <span class="qid">EVAL-10, MODEL-9</span> · §115 Agreement and calibrated confidence<span class="status done">done</span></p>
     <h2>Using encoder and decoder agreement, and is confidence a real probability?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner (2026-09-29) asked whether the two models agreeing could raise accuracy, and whether the encoder's confidence corresponds to a real probability. <a class="back" href="#row-110">Row 110</a> had a cascade (encoder first, then decider); the format rows up to <a class="back" href="#row-113">row 113</a> gave decider its labelled-rows recipe.</p></section>
@@ -424,7 +424,7 @@ Category:</pre><p class="note">The split layout from blind_bulk_v1_split: everyt
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-118">Row 118</a> · Does the split layout need retraining?</li><li><a href="#row-119">Row 119</a> · Timing a whole sync on one GPU: caching the shared prompt</li></ul></section></article><article class="row" id="row-118" data-from="117" data-era="Serving the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 118 · 2026-09-29 · <span class="qid">INFRA-3</span> · REPORT §121<span class="status done">done</span></p>
+    <p class="eyebrow">Row 118 · 2026-09-29 · <span class="qid">INFRA-3</span> · §121 Split layout without retraining<span class="status done">done</span></p>
     <h2>Does the split layout need retraining?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The split layout from <a class="back" href="#row-117">row 117</a> lets a sync share most of its prompt, but the recipe was trained on rows in plain date order. If the reorder costs accuracy, serving fast would mean retraining.</p></section>
@@ -448,7 +448,7 @@ Category:</pre><p class="note">The split layout from blind_bulk_v1_split: everyt
   </ul></section>
 </article><article class="row" id="row-119" data-from="117" data-era="Serving the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 119 · 2026-09-29 · <span class="qid">INFRA-3</span> · REPORT §119<span class="status done">done</span></p>
+    <p class="eyebrow">Row 119 · 2026-09-29 · <span class="qid">INFRA-3</span> · §119 Caching one user's sync<span class="status done">done</span></p>
     <h2>Timing a whole sync on one GPU: caching the shared prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked (2026-09-29): for one user's 10 to 100 new transactions, should we cache the unchanging part of the prompt, or put all the transactions in one prompt with an answer slot each? <a class="back" href="#row-117">Row 117</a> built the sets to measure it.</p></section>
@@ -472,7 +472,7 @@ Category:</pre><p class="note">The split layout from blind_bulk_v1_split: everyt
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-10.html#row-127">Row 127</a> · Serving one user&#x27;s sync fast with vLLM and prefix caching</li></ul></section></article><article class="row" id="row-120" data-from="116,100" data-era="Serving the system" data-status="done">
   <header>
-    <p class="eyebrow">Row 120 · 2026-09-29 · <span class="qid">EVAL-12</span> · REPORT §117<span class="status done">done</span></p>
+    <p class="eyebrow">Row 120 · 2026-09-29 · <span class="qid">EVAL-12</span> · §117 A bigger model for hard cases<span class="status done">done</span></p>
     <h2>Escalating the hard third to a much larger model</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-116">Row 116</a>'s best policy left about 35% of transactions to the user as suggestions. <a class="back" href="era-8.html#row-100">Row 100</a> had shown the small models' remaining misses on blind_v1 are new users and new businesses, which need world knowledge. A large model might settle what the small ones do not.</p></section>

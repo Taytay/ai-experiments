@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html" aria-current="page">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 33–48 · 16 rows</p><h1>The REAL-6 categoriser</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-33" data-from="35" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 33 · 2026-09-19 · <span class="qid">REAL-5</span> · REPORT §38<span class="status done">done</span></p>
+    <p class="eyebrow">Row 33 · 2026-09-19 · <span class="qid">REAL-5</span> · §38 Production categoriser on REAL-6<span class="status done">done</span></p>
     <h2>The first trained categoriser, with and without a merchant fact database</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner's goal (2026-09-17) is a categoriser that files a user's transactions the way that user would, on their own category names, including merchants the user never labelled but a fact database knows. <a class="back" href="#row-35">Row 35</a> built the REAL-6 test set and found the best untrained reading at 58.0 (the instruct model with the merchant's record in the prompt). This row trains the categoriser and asks whether the fact database helps.</p></section>
@@ -99,7 +99,7 @@ Category:</pre><p class="note">The record-in-prompt arm: the "Note" line is the 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-37">Row 37</a> · Stress-testing the record-in-prompt result: ambiguous records, a real retriever, three seeds</li><li><a href="#row-38">Row 38</a> · A trainer without unsloth, and the hidden 4-bit default it exposed</li><li><a href="#row-39">Row 39</a> · How much exposure do records in the weights need, and does the chat template matter?</li><li><a href="#row-40">Row 40</a> · Off-the-shelf few-shot classifiers: FastFit, GLiClass and a logistic head</li><li><a href="#row-41">Row 41</a> · Choosing which past transactions go in the prompt</li><li><a href="#row-42">Row 42</a> · Users the model has never seen, and rename augmentation</li><li><a href="#row-43">Row 43</a> · A successor test set shaped like the real population</li></ul></section></article><article class="row" id="row-34" data-from="18" data-era="Modal and training recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 34 · 2026-09-25 to 2026-09-26 · <span class="qid">INFRA-1, REAL-3, MODEL-2</span> · REPORT §54<span class="status done">done</span></p>
+    <p class="eyebrow">Row 34 · 2026-09-25 to 2026-09-26 · <span class="qid">INFRA-1, REAL-3, MODEL-2</span> · §54 Modal experiment infrastructure<span class="status done">done</span></p>
     <h2>Moving GPU work to cloud H100s on Modal</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The local RTX 3090 was the bottleneck: the queue held about 35 GPU-hours, the multi-hour species-scale runs left over from <a class="back" href="era-2.html#row-18">row 18</a> (5,000 species, 20,000 steps) did not fit comfortably, and <a href="era-3.html#row-31">row 31</a>'s sampling took hours. The row waited from 2026-09-19 until the owner set up a Modal workspace on 2026-09-25.</p></section>
@@ -124,7 +124,7 @@ Category:</pre><p class="note">The record-in-prompt arm: the "Note" line is the 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-5.html#row-55">Row 55</a> · DiffusionGemma 26B on a large GPU</li><li><a href="era-5.html#row-58">Row 58</a> · Database in the weights versus record in the prompt, with equal information</li><li><a href="era-5.html#row-60">Row 60</a> · Batch size on the H100</li></ul></section></article><article class="row" id="row-35" data-from="14,22" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 35 · 2026-09-19 · <span class="qid">REAL-6</span> · REPORT §37<span class="status done">done</span></p>
+    <p class="eyebrow">Row 35 · 2026-09-19 · <span class="qid">REAL-6</span> · §37 REAL-6 baseline scores<span class="status done">done</span></p>
     <h2>REAL-6: a test set shaped like real users' budgets</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner's goals (2026-09-17) needed a yardstick no earlier set had: users with their own category names, labelled histories, and merchants they have and have not labelled. It reuses the noisy merchant history of <a class="back" href="era-2.html#row-22">row 22</a> and the record retrieval idea of <a class="back" href="era-2.html#row-14">row 14</a>, and it came before the categoriser (<a href="#row-33">row 33</a>) so that row had something to beat.</p></section>
@@ -160,7 +160,7 @@ Category:</pre><p class="note">The model scores each of the user's eight categor
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-33">Row 33</a> · The first trained categoriser, with and without a merchant fact database</li></ul></section></article><article class="row" id="row-36" data-from="2,21" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 36 · 2026-09-19 · <span class="qid">DATA-4, DATA-2</span> · REPORT §35<span class="status done">done</span></p>
+    <p class="eyebrow">Row 36 · 2026-09-19 · <span class="qid">DATA-4, DATA-2</span> · §35 Merchant realism fixes<span class="status done">done</span></p>
     <h2>Messy bank strings and products that do not name their category</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>An early merchant experiment had left a gap: an embedding model recognised a trained merchant from its bank-statement string 70.8% of the time, and a 0.5B language model was at chance on that string even with the fact in the prompt. A reviewer asked why the obvious fixes (noisy training strings, a normaliser) were never tried (DATA-4), and how much of the category result was recalling products versus bridging from products to a category (DATA-2). The row was split out of <a class="back" href="era-2.html#row-21">row 21</a> on 2026-09-18; its Needs list <a class="back" href="era-1.html#row-2">row 2</a>.</p></section>
@@ -197,7 +197,7 @@ Spending category:</pre><p class="note">The 0.5B model's truncated-string item; 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-2.html#row-22">Row 22</a> · A realistic transaction history for a brand-new user</li></ul></section></article><article class="row" id="row-37" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 37 · 2026-09-21 · <span class="qid">REAL-7</span> · REPORT §43<span class="status done">done</span></p>
+    <p class="eyebrow">Row 37 · 2026-09-21 · <span class="qid">REAL-7</span> · §43 Record-in-prompt robustness<span class="status done">done</span></p>
     <h2>Stress-testing the record-in-prompt result: ambiguous records, a real retriever, three seeds</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a>'s headline (90.2 overall, 97.6 on merchants only the database knows) rested on three conveniences: product lists that name their category, a record found by the merchant's true name (an oracle), and one training seed. The owner asked what else the 3090 could do before the cloud move; taking that number apart was the answer.</p></section>
@@ -228,7 +228,7 @@ Category:</pre><p class="note">The same item's record in the two databases; the 
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-39">Row 39</a> · How much exposure do records in the weights need, and does the chat template matter?</li><li><a href="#row-41">Row 41</a> · Choosing which past transactions go in the prompt</li></ul></section></article><article class="row" id="row-38" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 38 · 2026-09-21 · <span class="qid">INFRA-2</span> · REPORT §44<span class="status done">done</span></p>
+    <p class="eyebrow">Row 38 · 2026-09-21 · <span class="qid">INFRA-2</span> · §44 Unsloth-free trainer bug<span class="status done">done</span></p>
     <h2>A trainer without unsloth, and the hidden 4-bit default it exposed</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked whether the unsloth library was more trouble than it was worth after its memory and fused-loss failures in <a href="era-3.html#row-31">row 31</a> and <a class="back" href="#row-33">row 33</a>. The concrete task: a second implementation of row 33's categoriser trainer with plain transformers + peft, checked against the first.</p></section>
@@ -253,7 +253,7 @@ Category:</pre><p class="note">The same item's record in the two databases; the 
   </ul></section>
 </article><article class="row" id="row-39" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 39 · 2026-09-22 · <span class="qid">REAL-8</span> · REPORT §45<span class="status done">done</span></p>
+    <p class="eyebrow">Row 39 · 2026-09-22 · <span class="qid">REAL-8</span> · §45 Exposure curve and chat template<span class="status done">done</span></p>
     <h2>How much exposure do records in the weights need, and does the chat template matter?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-33">Row 33</a> found records trained into the weights helped only at 3.3 passes over them, and <a class="back" href="#row-37">row 37</a> showed even that gain was mostly one lucky seed (+10 ± 12). REAL-8 asked for the rest of the exposure curve at three seeds, and for the prompt in the instruct model's chat format, which production would use.</p></section>
@@ -284,7 +284,7 @@ Category:</pre><p class="note">The chat-template arm: the same content as the pl
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-47">Row 47</a> · Was the no-database categoriser simply under-trained?</li></ul></section></article><article class="row" id="row-40" data-from="33" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 40 · 2026-09-22 · <span class="qid">BASE-6</span> · REPORT §46<span class="status done">done</span></p>
+    <p class="eyebrow">Row 40 · 2026-09-22 · <span class="qid">BASE-6</span> · §46 Per-user classifier comparison<span class="status done">done</span></p>
     <h2>Off-the-shelf few-shot classifiers: FastFit, GLiClass and a logistic head</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner asked about IBM's FastFit, a few-shot classifier built for many similar classes that also scores a query against the label's words, which REAL-6's per-user schemes resemble. A literature scan added GLiClass, a zero-shot label-scoring encoder, and the cheapest baseline, a logistic regression on frozen embeddings. All were compared against <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
@@ -312,7 +312,7 @@ Category:</pre><p class="note">The chat-template arm: the same content as the pl
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-5.html#row-53">Row 53</a> · A small encoder that scores one marker per category</li></ul></section></article><article class="row" id="row-41" data-from="33,37" data-era="REAL-6 categoriser" data-status="done">
   <header>
-    <p class="eyebrow">Row 41 · 2026-09-22 · <span class="qid">REAL-9</span> · REPORT §47<span class="status done">done</span></p>
+    <p class="eyebrow">Row 41 · 2026-09-22 · <span class="qid">REAL-9</span> · §47 Retrieved shots and copying<span class="status done">done</span></p>
     <h2>Choosing which past transactions go in the prompt</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner framed categorisation as a recommender problem: the user's history is the interaction log, and picking the prompt's 24 example rows is the retrieval step. Every prompt so far used one fixed random block per user. Pinterest's published rules (TransAct V2, Pinner Progression) suggested better ones, and <a class="back" href="#row-37">row 37</a>'s retriever made similarity search possible on <a class="back" href="#row-33">row 33</a>'s categorisers.</p></section>
@@ -344,7 +344,7 @@ Category:</pre><p class="note">When a shot is the same merchant as the query, th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-43">Row 43</a> · A successor test set shaped like the real population</li><li><a href="#row-45">Row 45</a> · Auditing REAL-6: what actually decides each test item</li><li><a href="#row-46">Row 46</a> · Training with retrieved shots without teaching the model to copy</li><li><a href="era-5.html#row-50">Row 50</a> · Does the order of the options change the answer?</li></ul></section></article><article class="row" id="row-42" data-from="33,45,47" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 42 · 2026-09-26 · <span class="qid">REAL-10</span> · REPORT §51<span class="status done">done</span></p>
+    <p class="eyebrow">Row 42 · 2026-09-26 · <span class="qid">REAL-10</span> · §51 Held-out user generalisation<span class="status done">done</span></p>
     <h2>Users the model has never seen, and rename augmentation</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Every REAL-6 number so far scored the same 20 users whose histories trained the adapter (<a class="back" href="#row-33">row 33</a>). Production meets over a million users whose schemes it never saw. The audit (<a class="back" href="#row-45">row 45</a>) turned the planned single split into four folds, and <a class="back" href="#row-47">row 47</a> set the no-DB arm at 800 steps.</p></section>
@@ -372,7 +372,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-5.html#row-51">Row 51</a> · Counterfactual twin examples to make the model read its evidence</li><li><a href="era-5.html#row-53">Row 53</a> · A small encoder that scores one marker per category</li><li><a href="era-5.html#row-57">Row 57</a> · Teaching the fact database as decisions, not as prose</li></ul></section></article><article class="row" id="row-43" data-from="33,41,45" data-era="REAL-6 audit and recipe" data-status="doing">
   <header>
-    <p class="eyebrow">Row 43 · added 2026-09-21, amended 2026-09-22 · <span class="qid">REAL-11</span> · first version in REPORT §93<span class="status doing">doing</span></p>
+    <p class="eyebrow">Row 43 · added 2026-09-21, amended 2026-09-22 · <span class="qid">REAL-11</span> · first version in §93 A more realistic synthetic population<span class="status doing">doing</span></p>
     <h2>A successor test set shaped like the real population</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The owner described the real population on 2026-09-21: over a million users, most on the default categories, some with custom labels, filing merchants for personal reasons, with recent inputs mattering most. REAL-6 (built for <a class="back" href="#row-33">row 33</a>) cannot test that. <a class="back" href="#row-41">Row 41</a> showed REAL-6 users never relabel, and the audit of <a class="back" href="#row-45">row 45</a> found its items are decided by a lookup or by the merchant's standard category, so the set had to be rebuilt so neither decides it.</p></section>
@@ -396,7 +396,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="era-10.html#row-124">Row 124</a> · Telling the model how other users file this payee</li></ul></section></article><article class="row" id="row-45" data-from="41" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 45 · 2026-09-22 · <span class="qid">REAL-13</span> · REPORT §48<span class="status done">done</span></p>
+    <p class="eyebrow">Row 45 · 2026-09-22 · <span class="qid">REAL-13</span> · §48 REAL-6 set audit<span class="status done">done</span></p>
     <h2>Auditing REAL-6: what actually decides each test item</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A review during <a class="back" href="#row-41">row 41</a>'s run found four properties hidden by REAL-6's cell names: 115 "seen" items had lost their merchant's history rows to the 300-row cut; every user files a merchant under one label, so a lookup answers every truly seen item; most "unseen" items are decided by the merchant's standard category; and intervals resampled items, not users.</p></section>
@@ -431,7 +431,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
   </ul></section>
 </article><article class="row" id="row-47" data-from="39,45" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 47 · 2026-09-23 · <span class="qid">REAL-8</span> · REPORT §49<span class="status done">done</span></p>
+    <p class="eyebrow">Row 47 · 2026-09-23 · <span class="qid">REAL-8</span> · §49 No-DB under-training<span class="status done">done</span></p>
     <h2>Was the no-database categoriser simply under-trained?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-39">Row 39</a>'s records-in-the-weights arms trained for 800 and 1,600 steps against the no-DB arm's 200, and <a class="back" href="#row-45">row 45</a> showed most of their gain was on merchants users had labelled, which the records cannot explain. If the no-DB arm gains the same with more steps, every categoriser so far used a quarter of the training it needed.</p></section>
@@ -455,7 +455,7 @@ Category: Grendo</pre><p class="note">For a held-out user, only the shots say th
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-42">Row 42</a> · Users the model has never seen, and rename augmentation</li><li><a href="era-5.html#row-49">Row 49</a> · Can the categoriser&#x27;s confidence decide when to file automatically?</li><li><a href="era-5.html#row-56">Row 56</a> · Putting the training loss on every label in the prompt</li></ul></section></article><article class="row" id="row-48" data-from="45" data-era="REAL-6 audit and recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 48 · 2026-09-22 · <span class="qid">REPORT-5</span> · REPORT §1 (no new section)<span class="status done">done</span></p>
+    <p class="eyebrow">Row 48 · 2026-09-22 · <span class="qid">REPORT-5</span> · §1 Executive summary (no new section)<span class="status done">done</span></p>
     <h2>Report upkeep: a new executive summary and pointers on overturned claims</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>The report's executive summary stopped at section 8, before any categoriser work, and a review of sections 1 to 36 alongside the audit of <a class="back" href="#row-45">row 45</a> found earlier claims that later sections had overturned or qualified.</p></section>

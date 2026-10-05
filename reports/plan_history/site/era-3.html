@@ -62,7 +62,7 @@ a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html" aria-current="page">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 24–32 · 9 rows</p><h1>Recipe tuning and graph probes</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-24" data-from="11" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 24 · 2026-09-15 · <span class="qid">TRAIN-3</span> · REPORT §16<span class="status done">done</span></p>
+    <p class="eyebrow">Row 24 · 2026-09-15 · <span class="qid">TRAIN-3</span> · §16 Perplexity on a corpus slice<span class="status done">done</span></p>
     <h2>A proper ruler for "how much did training damage the model"</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Perplexity (how surprised the model is by ordinary text; lower is better) had been measured on a single 249-word paragraph, and <a class="back" href="era-1.html#row-11">row 11</a> showed it swinging twofold between two runs of the same recipe.</p></section>
@@ -91,7 +91,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-25">Row 25</a> · Mix in ordinary text to protect general knowledge</li></ul></section></article><article class="row" id="row-25" data-from="11,24" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 25 · 2026-09-15 · <span class="qid">TRAIN-7</span> · REPORT §17<span class="status done">done</span></p>
+    <p class="eyebrow">Row 25 · 2026-09-15 · <span class="qid">TRAIN-7</span> · §17 General-text replay<span class="status done">done</span></p>
     <h2>Mix in ordinary text to protect general knowledge</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-1.html#row-11">Row 11</a> found every arm losing 11 to 16 ARC-Easy points in its first 200 steps, replay of few-shot episodes or not: replay protects only what is replayed. Would replaying general text protect general knowledge? <a class="back" href="#row-24">Row 24</a>'s WikiText slice gave the measure.</p></section>
@@ -117,7 +117,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-31">Row 31</a> · Repairing forgetting by distilling from the model as it was before injection</li></ul></section></article><article class="row" id="row-26" data-from="9" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 26 · 2026-09-15 · <span class="qid">TRAIN-6</span> · REPORT §19<span class="status done">done</span></p>
+    <p class="eyebrow">Row 26 · 2026-09-15 · <span class="qid">TRAIN-6</span> · §19 Iteration time speedups<span class="status done">done</span></p>
     <h2>Make each experiment three times faster</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>By mid-afternoon on 2026-09-15 one run took about 50 minutes, with the GPU 26% busy during evaluation. The owner asked for iteration time before more experiments, so this row was taken out of order. It belongs after <a class="back" href="era-1.html#row-9">row 9</a> (the same mixture-by-tokens change).</p></section>
@@ -141,7 +141,7 @@ dry season ...</pre><p class="note">The start of one of the 29 WikiText paragrap
   </ul></section>
 </article><article class="row" id="row-27" data-from="7" data-era="Injection recipe" data-status="done">
   <header>
-    <p class="eyebrow">Row 27 · 2026-09-15 · <span class="qid">BASE-3</span> · REPORT §18<span class="status done">done</span></p>
+    <p class="eyebrow">Row 27 · 2026-09-15 · <span class="qid">BASE-3</span> · §18 Prompt distillation v2<span class="status done">done</span></p>
     <h2>Distil the teacher's ranking of the options instead</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p><a class="back" href="era-1.html#row-7">Row 7</a> found the teacher reading the card puts only 6% on the right word, so its strong score is a ranking among options, and copying its free-text distribution taught nothing. Could the ranking itself be copied?</p></section>
@@ -170,7 +170,7 @@ Answer:
   </ul></section>
 </article><article class="row" id="row-28" data-from="1,23" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 28 · 2026-09-19 · <span class="qid">GRAPH-1, DATA-1</span> · REPORT §40<span class="status done">done</span></p>
+    <p class="eyebrow">Row 28 · 2026-09-19 · <span class="qid">GRAPH-1, DATA-1</span> · §40 Relation linearity probe<span class="status done">done</span></p>
     <h2>Look inside: did training write a rule or 136 separate facts?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>A paper (Hernandez et al.) found that for many relations the step from a subject to its attribute is one linear map shared across subjects. If arm C stored "type of" that way, a map fitted on some species should read the type of others. The frozen sets of <a class="back" href="era-1.html#row-1">row 1</a> and the independent-weakness universe of <a class="back" href="era-2.html#row-23">row 23</a> allowed the test on both universes.</p></section>
@@ -196,7 +196,7 @@ bare question:     Question: What type is Syaott?
   </ul></section>
 <section class="led"><h3>Led to</h3><ul><li><a href="#row-30">Row 30</a> · Can the model state a rule it only ever read inside sentences?</li></ul></section></article><article class="row" id="row-29" data-from="2,16" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 29 · 2026-09-19 · <span class="qid">GRAPH-3, DATA-5</span> · REPORT §41<span class="status done">done</span></p>
+    <p class="eyebrow">Row 29 · 2026-09-19 · <span class="qid">GRAPH-3, DATA-5</span> · §41 Two-hop walk texts<span class="status done">done</span></p>
     <h2>Texts that walk from one species to another</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>EntiGraph (a 2024 paper) improved closed-book QA by generating text about pairs and triples of entities. <a class="back" href="era-2.html#row-16">Row 16</a> had found that yes/no and comparison skills come only from one-hop comparative sentences. Would two-hop texts add more? The base recipe is the main mixture (<a class="back" href="era-1.html#row-2">row 2</a>'s Needs).</p></section>
@@ -222,7 +222,7 @@ Answer: Through Huloz. Faline and Huloz share a habitat, Huloz and Cynome share 
   </ul></section>
 </article><article class="row" id="row-30" data-from="1,23,28" data-era="Graph probes" data-status="done">
   <header>
-    <p class="eyebrow">Row 30 · 2026-09-19 · <span class="qid">GRAPH-4, DATA-1</span> · REPORT §42<span class="status done">done</span></p>
+    <p class="eyebrow">Row 30 · 2026-09-19 · <span class="qid">GRAPH-4, DATA-1</span> · §42 Type-to-weakness edge<span class="status done">done</span></p>
     <h2>Can the model state a rule it only ever read inside sentences?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>In the original universe every species of a type shares one weakness. Did the weights turn that into a rule ("type T is weak to W"), or keep 136 separate facts? New items were added to the frozen sets of <a class="back" href="era-1.html#row-1">row 1</a>, for both the original and the independent-weakness universe of <a class="back" href="era-2.html#row-23">row 23</a>, to follow up <a class="back" href="#row-28">row 28</a>'s probe.</p></section>
@@ -254,7 +254,7 @@ path: Javish is a Frostel-type creature. Question: What type is Javish weak to?
   </ul></section>
 </article><article class="row" id="row-31" data-from="8,25" data-era="Species knowledge injection" data-status="done">
   <header>
-    <p class="eyebrow">Row 31 · 2026-09-18 · <span class="qid">TRAIN-8</span> · REPORT §31<span class="status done">done</span></p>
+    <p class="eyebrow">Row 31 · 2026-09-18 · <span class="qid">TRAIN-8</span> · §31 On-policy distillation<span class="status done">done</span></p>
     <h2>Repairing forgetting by distilling from the model as it was before injection</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>"Arm C" is the project's main knowledge-injection recipe: a rank-64 LoRA adapter (a small trainable add-on to the frozen weights) on Qwen2.5-3B, trained on sentences about 136 invented species plus labelling exercises. It learned the facts but damaged the model's general ability (WikiText perplexity 10.6 to 22.8, ARC-Easy 73.5 to 58.5); <a class="back" href="era-1.html#row-8">row 8</a> was the last row to measure other arms against it. <a class="back" href="#row-25">Row 25</a> mixed general text back in ("arm Cg") and recovered part of it. A Thinking Machines blog post reported that on-policy distillation (the student imitates the original model on its own samples) restored chat ability while keeping injected knowledge, so we tried it.</p></section>
@@ -284,7 +284,7 @@ Answer:
   </ul></section>
 </article><article class="row" id="row-32" data-from="17,18" data-era="Species knowledge injection" data-status="done">
   <header>
-    <p class="eyebrow">Row 32 · 2026-09-18 · <span class="qid">TRAIN-9</span> · REPORT §32<span class="status done">done</span></p>
+    <p class="eyebrow">Row 32 · 2026-09-18 · <span class="qid">TRAIN-9</span> · §32 LoRA rate sensitivity<span class="status done">done</span></p>
     <h2>Does a LoRA adapter want ten times the learning rate?</h2>
   </header>
   <section class="why"><h3>Why we ran it</h3><p>Thinking Machines' "Tinker" LoRA primer says adapters want about ten times the full fine-tuning learning rate. Every decoder adapter here trained at 1e-4, the sweep of <a class="back" href="era-2.html#row-17">row 17</a> stopped at 2e-4, and in <a class="back" href="era-2.html#row-18">row 18</a> the Flan-T5 adapter at 3e-4 learned nothing while full fine-tuning at the same rate recalled 98%. If the primer held, those verdicts were artefacts of a too-low rate.</p></section>
