@@ -1,0 +1,34 @@
+{
+  "id": "2606.22807",
+  "version": "v3",
+  "id_versioned": "2606.22807v3",
+  "title": "KaLM-Reranker-V1: Fast but Not Late Interaction for Compressed Document Reranking",
+  "authors": [
+    "Xinping Zhao",
+    "Jiaxin Xu",
+    "Ziqi Dai",
+    "Xin Zhang",
+    "Huiyao Chen",
+    "Shouzheng Huang",
+    "Xianhao Xiong",
+    "Danyu Tang",
+    "Xinshuo Hu",
+    "Guohong Fu",
+    "Meishan Zhang",
+    "Baotian Hu"
+  ],
+  "published": "2026-06-22",
+  "updated": "2026-09-22",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL"
+  ],
+  "comment": "Technical Report, 31 pages;",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "As retrieval systems scale, effective and efficient reranking becomes increasingly important. However, most existing encoder- and decoder-based rerankers jointly process every query--passage pair, tightly coupling their online computation and limiting deployment efficiency and flexibility. We present KaLM-Reranker-V1, a fast but not late-interaction FBNL reranker that decouples query and passage computation while retaining expressive relevance modeling. Built on an encoder--decoder architecture, KaLM-Reranker-V1 pre-encodes passages using Matryoshka embedding pooling, while its decoder models system and user instructions together with query intent; cross-attention then captures fine-grained relevance between the resulting query context and passage representations. Together, these designs offer four key advantages: (i) efficiency from offline passage encoding, (ii) expressiveness from cross-attention, (iii) compactness from Matryoshka embedding pooling, and (iv) test-time compute through an adjustable compute budget. We instantiate KaLM-Reranker-V1 in three sizes, Nano, Small, and Large, with 0.27B, 1B, and 4B activated parameters, respectively. Extensive experiments on BEIR, MIRACL, and LMEB demonstrate strong reranking performance with superior efficiency. On BEIR and MIRACL, our models achieve competitive performance in multi-domain and multilingual reranking, on par with strong industrial rerankers such as the Qwen3/BGE-Reranker series. On LMEB-Dialogue, a compact embedding model paired with our Nano reranker, which has only 0.27B activated parameters, remains competitive with 7--12B embedding models. Data and models are available at https://huggingface.co/collections/KaLM-Embedding/lychee-kalm-reranker-and-jev.",
+  "abs_url": "https://arxiv.org/abs/2606.22807",
+  "pdf_url": "https://arxiv.org/pdf/2606.22807v3",
+  "src_url": "https://export.arxiv.org/src/2606.22807v3",
+  "metadata_source": "api"
+}

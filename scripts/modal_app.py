@@ -91,7 +91,7 @@ def _prepare():
     Path(REPO, "data").mkdir(parents=True, exist_ok=True)  # row 208 E5: the 6.9 GB of data/processed linked, not copied (jobs only read it)
     if not Path(REPO, "data", "processed").exists():
         Path(REPO, "data", "processed").symlink_to(f"{MNT}/data/processed")
-    for d in ("results/per_item", "models/adapters", "logs"):
+    for d in ("results/per_item", "models/adapters", "models/encoders", "logs"):
         Path(REPO, d).mkdir(parents=True, exist_ok=True)
     subprocess.run("uv run --frozen evals rebuild", shell=True, cwd=REPO, check=True)
 
@@ -108,7 +108,7 @@ def gpu_check():
 
 
 def _snapshot():
-    return {str(p): p.stat().st_mtime for base in ("results", "models/adapters", "evals") for p in Path(REPO, base).rglob("*") if p.is_file()}
+    return {str(p): p.stat().st_mtime for base in ("results", "models/adapters", "models/encoders", "evals") for p in Path(REPO, base).rglob("*") if p.is_file()}
 
 
 @APP.function(image=image, gpu="H100", timeout=6 * 3600, volumes={"/cache": HF, "/out": OUT}, max_containers=8)
@@ -120,6 +120,8 @@ def run(cmds: list, env: dict, tag: str):
     _prepare()
     for src in [s for s in env.get("ADAPTERS_FROM", "").split(",") if s]:  # adapters trained by earlier jobs, from their result directories
         shutil.copytree(f"/out/{src}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    for src in [s for s in env.get("ENCODERS_FROM", "").split(",") if s]:  # row 210: encoders (synthetic-trained only) put on the volume or trained by earlier jobs
+        shutil.copytree(f"/out/{src}/models/encoders", f"{REPO}/models/encoders", dirs_exist_ok=True)
     before = _snapshot(); t0 = time.time(); log = []
     for cmd in cmds:
         started = time.strftime("%H:%M:%S")

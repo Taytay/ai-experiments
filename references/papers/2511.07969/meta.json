@@ -1,0 +1,25 @@
+{
+  "id": "2511.07969",
+  "version": "v2",
+  "id_versioned": "2511.07969v2",
+  "title": "Unified Work Embeddings: Contrastive Learning of a Bidirectional Multi-task Ranker",
+  "authors": [
+    "Matthias De Lange",
+    "Jens-Joris Decorte",
+    "Jeroen Van Hautte"
+  ],
+  "published": "2025-11-11",
+  "updated": "2026-04-07",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL"
+  ],
+  "comment": "Preprint, 9 pages",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Applications in labor market intelligence demand specialized NLP systems for a wide range of tasks, characterized by extreme multi-label target spaces, strict latency constraints, and multiple text modalities such as skills and job titles. These constraints have led to isolated, task-specific developments in the field, with models and benchmarks focused on single prediction tasks. Exploiting the shared structure of work-related data, we propose a unifying framework, combining a wide range of tasks in a multi-task ranking benchmark, and a flexible architecture tackling text-driven work tasks with a single model. The benchmark, WorkBench, is the first unified evaluation suite spanning six work-related tasks formulated explicitly as ranking problems, curated from real-world ontologies and human-annotated resources. WorkBench enables cross-task analysis, where we find significant positive cross-task transfer. This insight leads to Unified Work Embeddings (UWE), a task-agnostic bi-encoder that exploits our training-data structure with a many-to-many InfoNCE objective, and leverages token-level embeddings with task-agnostic soft late interaction. UWE demonstrates zero-shot ranking performance on unseen target spaces in the work domain, and enables low-latency inference with two orders of magnitude fewer parameters than best-performing generalist models (Qwen3-8B), with +4.4 MAP improvement.",
+  "abs_url": "https://arxiv.org/abs/2511.07969",
+  "pdf_url": "https://arxiv.org/pdf/2511.07969v2",
+  "src_url": "https://export.arxiv.org/src/2511.07969v2",
+  "metadata_source": "api"
+}

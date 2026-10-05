@@ -1,0 +1,26 @@
+{
+  "id": "2510.14880",
+  "version": "v1",
+  "id_versioned": "2510.14880v1",
+  "title": "Fantastic (small) Retrievers and How to Train Them: mxbai-edge-colbert-v0 Tech Report",
+  "authors": [
+    "Rikiya Takehi",
+    "Benjamin Clavié",
+    "Sean Lee",
+    "Aamir Shakir"
+  ],
+  "published": "2025-10-16",
+  "updated": "2025-10-16",
+  "primary_category": "cs.IR",
+  "categories": [
+    "cs.IR"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "In this work, we introduce mxbai-edge-colbert-v0 models, at two different parameter counts: 17M and 32M. As part of our research, we conduct numerous experiments to improve retrieval and late-interaction models, which we intend to distill into smaller models as proof-of-concepts. Our ultimate aim is to support retrieval at all scales, from large-scale retrieval which lives in the cloud to models that can run locally, on any device. mxbai-edge-colbert-v0 is a model that we hope will serve as a solid foundation backbone for all future experiments, representing the first version of a long series of small proof-of-concepts. As part of the development of mxbai-edge-colbert-v0, we conducted multiple ablation studies, of which we report the results. In terms of downstream performance, mxbai-edge-colbert-v0 is a particularly capable small model, outperforming ColBERTv2 on common short-text benchmarks (BEIR) and representing a large step forward in long-context tasks, with unprecedented efficiency.",
+  "abs_url": "https://arxiv.org/abs/2510.14880",
+  "pdf_url": "https://arxiv.org/pdf/2510.14880v1",
+  "src_url": "https://export.arxiv.org/src/2510.14880v1",
+  "metadata_source": "api"
+}

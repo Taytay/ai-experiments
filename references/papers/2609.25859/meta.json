@@ -1,0 +1,24 @@
+{
+  "id": "2609.25859",
+  "version": "v1",
+  "id_versioned": "2609.25859v1",
+  "title": "BELXTR: Biomedical Entity Linking via Contextualized Token Retrieval",
+  "authors": [
+    "Samuele Garda",
+    "Ulf Leser"
+  ],
+  "published": "2026-09-22",
+  "updated": "2026-09-22",
+  "primary_category": "cs.CL",
+  "categories": [
+    "cs.CL"
+  ],
+  "comment": "",
+  "journal_ref": "",
+  "doi": "",
+  "abstract": "Biomedical Entity Linking disambiguates mentions to entities in a knowledge base (KB), making it the cornerstone of information extraction pipelines. While embedding-based models are a popular approach for the task, they suffer from a key limitation. They compress mentions (and entities) into a single vector, forcing the model to average away crucial fine-grained differences. We present BELXTR, a novel embedding model based on the multi-vector (a.k.a. late interaction) architecture, which allows to leverage token-level matching information. BELXTR extends the original XTR model to biomedical entity linking by integrating an existing task-specific training objective and exploring active query expansion. Experiments across ten corpora and five KBs show that BELXTR improves upon current state-of-the-art in half of the corpora with an average improvement of 5pp recall@1. The largest gains are reported on the challenging cross-species gene disambiguation subtask, where BELXTR outperforms an LLM-powered retrieve-and-rerank pipeline and closely approaches a specialized rule-based system. Our results highlight multi-vector models as a practical alternative to hard-to-maintain rule-based systems or in scenarios where LLM-based reranking is too costly as in PubMed-scale mining. The code to reproduce our experiments can be found at: https://github.com/sg-wbi/belxtr.",
+  "abs_url": "https://arxiv.org/abs/2609.25859",
+  "pdf_url": "https://arxiv.org/pdf/2609.25859v1",
+  "src_url": "https://export.arxiv.org/src/2609.25859v1",
+  "metadata_source": "api"
+}

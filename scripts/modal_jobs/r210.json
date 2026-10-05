@@ -1,0 +1,130 @@
+[
+ {
+  "tag": "r210-a0",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a0",
+   "ARMS": "a0",
+   "TEST_SEEDS": "100000-100049",
+   "MODE": "doc"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a1",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a1",
+   "ARMS": "a1",
+   "TEST_SEEDS": "100000-100049",
+   "CTX": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a2",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a2",
+   "ARMS": "a2",
+   "TEST_SEEDS": "100000-100049",
+   "SOFT": "0.1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a3",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a3",
+   "ARMS": "a3",
+   "TEST_SEEDS": "100000-100049",
+   "HYBRID": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a4",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a4",
+   "ARMS": "a4",
+   "TEST_SEEDS": "100000-100049",
+   "QW": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a5",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a5",
+   "ARMS": "a5",
+   "TEST_SEEDS": "100000-100049",
+   "MODE": "mml"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r210-a6",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "210",
+   "ARM": "a6",
+   "ARMS": "a6",
+   "TEST_SEEDS": "100000-100049",
+   "MODE": "mml",
+   "SOFT": "0.1",
+   "HYBRID": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]
