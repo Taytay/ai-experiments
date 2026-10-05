@@ -26,8 +26,8 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   (`gh stack link`; owner 2026-10-01). #68 plan-79-one-slot holds rows 79 to 151. Owner, 2026-10-01: one branch and PR layer per row or
   round of tests from row 152 on: #69 plan-152-next (row 152), #70 plan-153-strands-4b, #71 plan-154-strands-corpus, #72
   plan-155-strands-hybrid, #73 plan-156-capacity, #74 plan-157-embeddings, #75 plan-158-personal-embeddings, #76
-  plan-159-category-mapping (top). A new row branches from the top and joins the stack with `gh stack link <all PR numbers bottom..top>
-  <new-branch>` (PR numbers push nothing; only the new branch is pushed). The checkout has no local gh-stack tracking. Lower branches
+  plan-159-category-mapping (top). A new row branches from the top and joins the stack with `gh stack link <every PR in the stack, in
+  stack order (#20 after #23)> <new-branch>` (PR numbers push nothing; only the new branch is pushed). The checkout has no local gh-stack tracking. Lower branches
   reach upper ones by merge-forward only (never rebase or force-push); commit a row's results on its own branch before moving up.
   `evals/runs.jsonl` conflicts on every merge-forward: resolve as the union of rows by `run_id`, sorted.
 - **Checkouts:** one working checkout, `~/projects/YNAB/ai-experiments`, on the top branch (the owner, 2026-09-26: no more worktrees;
@@ -79,12 +79,10 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   - Best so far on the budget (21,238 transactions, YNAB's rule 57.9% right first): decider-4B recipe with alias rows + fused
     similar-payee rows (`SIM=2`) 72.2 (top 10 89.6); system (gate + untrained 35B for first-time payees) 74.2 / 84.5 in a list of 3 /
     76% work saved; trained 35B system 74.3. Payee resolution alone lifts YNAB's rule to 64.0. Readout is fp32 (bf16 tied 1.7%).
-- **Branches (2026-10-04):** stack #24 runs to #87 (plan-179-wikidata-merchants, pushed). Local only, NOT pushed (the push and
-  `gh stack link` were refused by the permission check; the owner runs them): plan-180-knowledge-scale (row 180) -> merged forward into
-  plan-181-group-labels (rows 181, 180 done) -> plan-182-kind-line (rows 182 and 183: one branch, since 183 grew out of 182) ->
-  plan-185-crowd-dropout (rows 185, 186; 186 should have been its own branch) -> plan-187-two-tower (rows 187, 188, in progress, the
-  checkout's branch). Link: `git push origin <branches>` then `gh stack link 5 6 8 ... 87 plan-180-knowledge-scale plan-181-group-labels
-  plan-182-kind-line plan-185-crowd-dropout plan-187-two-tower` (the full PR list: `gh pr list --state open --json number`).
+- **Branches (2026-10-04, pushed and linked):** stack #24 runs to #93: #88 plan-180-knowledge-scale (row 180), #89
+  plan-181-group-labels (181), #90 plan-182-kind-line (182, 183), #91 plan-185-crowd-dropout (185, 186), #92 plan-187-two-tower
+  (187, 188, 189), #93 plan-190-crowd-v4 (190, top; row 191 next). Link a new row: `gh stack link 5 6 8 9 ... 19 21 22 23 20 25 ...
+  93 <new-branch>` (every PR in the stack, in stack order; on a refusal gh stack prints the current list).
 - **What rows 173 to 186 found (REPORT 161 to 171; section headlines carry the numbers):**
   - Real-style households (categories are purposes, owner's style; `ai_experiments.realstyle`, render_v2 strings, taxonomy_v2) lift the
     owner's budget (REPORT 161); group names "Group: Name" help person-scoped categories once trained (166).
