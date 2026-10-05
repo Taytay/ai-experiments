@@ -59,6 +59,7 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
+EXTRA = {}  # name -> default of settings added after row 211; load() restores them from li_config.json
 
 
 def _base_head(path, hidden):
@@ -586,8 +587,36 @@ def scores(model, scale, ev, docs):
     return out
 
 
-def read():
+def load(arm):
+    """an arm ready to read: sets this module's settings from its li_config.json and returns run(budget) -> (events, per-event
+    {category id: score}); one arm at a time (the settings are module globals). Used by read() and hist_agree.py (ENCS=li_r...)."""
     import torch
+    d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
+    cfg = json.loads((d / "li_config.json").read_text())
+    global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
+    CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
+    SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
+    INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
+    PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
+    POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
+    for k in EXTRA:  # settings added after row 211 (QUERY etc.): older models were trained with the defaults
+        globals()[k] = cfg.get(k, EXTRA[k])
+    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
+    model = LI(d)
+    model.cb.enc.eval()
+    scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
+    inter = None
+    if INTERACT:
+        inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
+
+    def run(b):
+        ev, docs = prepared(b, m1, cache)
+        return ev, (iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs))
+    run.name = d.name
+    return run
+
+
+def read():
     budget = os.environ.get("READ", "households") == "budget"
     if budget:
         import real_budget_eval as RB
@@ -598,25 +627,11 @@ def read():
     print(f"\n**{'owner budget' if budget else f'{len(budgets)} held-out households'}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
     print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
-        d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
-        cfg = json.loads((d / "li_config.json").read_text())
-        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
-        CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
-        SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
-        INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
-        PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
-        POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
-        m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
-        model = LI(d)
-        model.cb.enc.eval()
-        scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
-        inter = None
-        if INTERACT:
-            inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
+        run = load(arm)
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
-            ev, docs = prepared(b, m1, cache)
-            for e, sc in zip(ev, iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)):
+            ev, sco = run(b)
+            for e, sc in zip(ev, sco):
                 if e["gold"] not in e["state"]:
                     continue
                 v = np.array(list(sc.values()))
@@ -631,8 +646,8 @@ def read():
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
-        print(f"| {d.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
-        del model
+        print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        del run
 
 
 if __name__ == "__main__":

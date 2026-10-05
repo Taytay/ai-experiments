@@ -7,7 +7,8 @@ right; and three ceilings over decider alone: "either right" (an oracle), "highe
 synthetic set (encoder when its top probability >= G and decider's <= D). Synthetic: TEST_SEEDS held-out v4 households read by decider
 G4 (realstyle_v4g_ngram_test, seeds 0 and 1). Owner's budget (BUDGET set): decider G4 r190 seeds 0 and 1, items_grp_sim2.json; private,
 aggregates only.
-env: TEST_SEEDS (100000-100099), BUDGET, ENCS (encoders, one run), OWNER_ENCS.
+env: TEST_SEEDS (100000-100099), BUDGET, ENCS (encoders, one run; li_r* names are late-interaction decision models, read by
+li_decider.load as one reader "LI", with the reading time per transaction), OWNER_ENCS.
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 [BUDGET=<id>] uv run python scripts/hist_agree.py
 """
 import json
@@ -37,14 +38,21 @@ def lsm(v):
     return v - np.log(np.exp(v).sum())
 
 
-def records(budgets, items, dec, key, cache_dir):
+def records(budgets, items, dec, key, cache_dir, li=None):
     """one record per matched item: decider log-probs per seed, encoder log-probs per reader (over decider's options), answer, segments;
-    reader scores from hist_fast (GPU, cached per budget in cache_dir)"""
-    m1 = H._model(H.OUT1)
-    out = []
+    reader scores from hist_fast (GPU, cached per budget in cache_dir), or from li (li_decider.load's run) as the one reader LI"""
+    import time
+    m1 = None if li else H._model(H.OUT1)
+    out, secs, n = [], 0.0, 0
     for b in budgets:
-        ev = H2.events(b)
-        sc = HF.as_dicts(HF.scores(ev, m1, H.OUT1, cache_dir), ev)
+        if li:
+            t0 = time.time()
+            ev, s = li(b)
+            secs += time.time() - t0; n += len(ev)
+            sc = [{"LI": x} for x in s]
+        else:
+            ev = H2.events(b)
+            sc = HF.as_dicts(HF.scores(ev, m1, H.OUT1, cache_dir), ev)
         n_payee, cats_payee, n_cat = defaultdict(int), defaultdict(set), defaultdict(int)
         i = 0
         while i < len(ev):
@@ -55,7 +63,7 @@ def records(budgets, items, dec, key, cache_dir):
                 e, r = ev[a], sc[a]
                 it = items.get(key(b, e))
                 if it and it["id"] in dec[0] and it["id"] in dec[1]:
-                    by = {e["labels"][c]: c for c in r["1 knn"]}
+                    by = {e["labels"][c]: c for c in next(iter(r.values()))}
                     opts = [o.strip() for o in it["options"]]
                     enc = {}
                     for name, rk in READERS.items():
@@ -78,6 +86,8 @@ def records(budgets, items, dec, key, cache_dir):
                 cats_payee[e["payee"]].add(e["gold"])
                 n_cat[e["gold"]] += 1
             i = j
+    if li:
+        print(f"LI read {n} transactions in {secs:.1f} s ({1000 * secs / max(n, 1):.2f} ms each, with the documents and the query's neighbours)", flush=True)
     return out
 
 
@@ -142,13 +152,20 @@ if __name__ == "__main__":
         oitems = {it["id"]: it for it in json.loads((RB.OUT / "items_grp_sim2.json").read_text())["items"] if it["answer"] >= 0}
         odec = [{r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(RB.OUT / f"scores_{t}_split_grp_sim2.jsonl"))} for t in ("r190-g-s0", "r190-g-s1")]
         obudget = [json.loads(RB.CACHE.read_text())["budget"]]
+    out1 = H.OUT1
     for enc in encs:
-        H.OUT1 = H.ENC / enc
+        li = None
+        if enc.startswith("li_r"):
+            import li_decider as LD
+            H.OUT1 = out1  # the query's neighbour encoder
+            li, READERS = LD.load(enc), {"LI": "LI"}
+        else:
+            H.OUT1, READERS = H.ENC / enc, {"kNN": "1 knn", "MaxSim": "5 maxsim"}
         print(f"\n=== {enc}", flush=True)
-        syn = records(budgets, items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE)
+        syn = records(budgets, items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE, li)
         gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
         print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
         table(syn, f"held-out synthetic households ({len(users)})", gates)
         if os.environ.get("BUDGET") and enc in owner_encs:
-            own = records(obudget, oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache")
+            own = records(obudget, oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache", li)
             table(own, "owner's budget", gates)
