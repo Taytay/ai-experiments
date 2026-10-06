@@ -158,6 +158,7 @@ if __name__ == "__main__":
         if enc.startswith("li_r"):
             import li_decider as LD
             H.OUT1 = out1  # the query's neighbour encoder
+            LD.SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "365"))  # hidden categories kept a year after last use, as decider's options
             li, READERS = LD.load(enc), {"LI": "LI"}
         else:
             H.OUT1, READERS = H.ENC / enc, {"kNN": "1 knn", "MaxSim": "5 maxsim"}

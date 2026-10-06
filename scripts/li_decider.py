@@ -64,6 +64,7 @@ EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
+SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
 
 
 def _base_head(path, hidden):
@@ -385,12 +386,13 @@ def prepared(b, m1, cache, full=True):
     # 7.0% of the owner's items and 5.5% of the synthetic ones are filed to a category hidden today (trips, old phases), which visible-only
     # options could never score, and training never saw a trip purchase. OPTS=recent: + any category filed in the 365 days before the
     # day (decider's rule, real_budget_eval). OPTS=span (owner: "if there is a hidden category, we should offer it as an option for the
-    # transactions that had that category"): a hidden category from 30 days before its first filing (set up ahead, as a trip; the API
-    # has no creation dates) to 365 days after its last (when it was hidden is unknown; keeps decider's options a subset, so comparisons
-    # stay fair); so its first filing is scorable too. One dict per distinct option set.
-    first_use, last_use = {}, {}
+    # transactions that had that category"; "the category can appear from the beginning up until its last use"): a hidden category is
+    # offered from the budget's start to SPAN_AFTER days after its last filing (0: hidden right after; no hint that a category is about
+    # to be used, and its first filing is scorable). Comparisons with decider set SPAN_AFTER=365 so decider's options (used in the past
+    # year) are a subset of these. One dict per distinct option set.
+    last_use = {}
     for e in ev:
-        first_use.setdefault(e["gold"], e["date"]); last_use[e["gold"]] = e["date"]
+        last_use[e["gold"]] = e["date"]
     memo, last, i = {}, {}, 0
     while i < len(ev):
         j = i
@@ -400,7 +402,7 @@ def prepared(b, m1, cache, full=True):
         if OPTS == "recent":
             act = vis + [c for c in cats[len(vis):] if c in last and (dd - last[c]).days <= 365]
         elif OPTS == "span":
-            act = vis + [c for c in cats[len(vis):] if c in first_use and -30 <= (dd - first_use[c]).days and (dd - last_use[c]).days <= 365]
+            act = vis + [c for c in cats[len(vis):] if c in last_use and (dd - last_use[c]).days <= SPAN_AFTER]
         else:
             act = vis
         st = memo.setdefault(tuple(act), dict.fromkeys(act))
@@ -601,7 +603,7 @@ def train():
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
-                                                         OPTS=OPTS, **{k: globals()[k] for k in EXTRA}), indent=1))
+                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 

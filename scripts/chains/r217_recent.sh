@@ -1,6 +1,6 @@
 #!/bin/bash
 # Row 217, second round (2026-10-06): the first arms (q1-q3) trained and read with today's visible categories only, so no trip purchase
-# was ever trained on or scored (trip categories are hidden after the trip; 5.5-7% of decider's items). With OPTS=span (visible + a hidden category from 30 days before its first filing to a year after its last; first version: any
+# was ever trained on or scored (trip categories are hidden after the trip; 5.5-7% of decider's items). With OPTS=span (owner: visible + a hidden category from the start to its last filing; first versions: from 30 days before first use, or any
 # category filed in the past year, decider's rule), from row 210's a1, 3,000 steps each: p0 c0's query (the control), p1 12 nearest + "ago",
 # p2 p1 + 8 most recent, p3 p2 per category. One read process per set: 50 held-out v4 households (with the trip column), blind_v2 budgets.
 set -eu
