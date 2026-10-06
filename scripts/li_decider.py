@@ -67,6 +67,7 @@ RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training onl
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
+GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
@@ -637,6 +638,8 @@ def train():
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
           f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
     model = LI(BASE, train=True)
+    if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
+        model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
     alpha = torch.nn.Parameter(torch.tensor(0.0, device=model.dev))
