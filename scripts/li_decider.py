@@ -61,10 +61,12 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
+PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA
+ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
 
@@ -432,6 +434,19 @@ def prepared(b, m1, cache, full=True):
             r = recent.get(e["gold"], ())
             recent[e["gold"]] = ((e["payee"], e["amt"]),) + tuple(x for x in r if x[0] != e["payee"])[:M - 1]
         i = j
+    if PPRIOR:  # earlier-day filings of the same payee key per category (ai_experiments.payeekey: processor prefixes, codes, store numbers off)
+        from ai_experiments.payeekey import payee_key
+        seen, i = defaultdict(lambda: defaultdict(int)), 0
+        while i < len(ev):
+            j = i
+            while j < len(ev) and ev[j]["day"] == ev[i]["day"]:
+                j += 1
+            for e in ev[i:j]:
+                e["_pk"] = payee_key(e["payee"]) or e["payee"]
+                e["_pp"] = dict(seen[e["_pk"]]) if e["_pk"] in seen else None
+            for e in ev[i:j]:
+                seen[e["_pk"]][e["gold"]] += 1
+            i = j
     for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
         e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
     if not full:
@@ -460,6 +475,22 @@ def _override(b, rng):
             move[p] = rng.choice(cats)
     txs = [dict(t, category_id=move[t["payee_id"]]) if t.get("payee_id") in move and t.get("category_id") in set(cats) else t for t in b["transactions"]]
     return dict(b, transactions=txs)
+
+
+def _prior(evs, ids, dev):
+    """row 218 (owner, 2026-10-06: "How do we fix the override issue?"): [b, w] log((n_c + 0.1) / (n + 0.1 K)) from the payee's earlier
+    filings per category (K options); 0 where the payee has none (a constant: changes nothing). Added to the scores times a learned ALPHA
+    (0 at step 0), so a payee filed one way many times can beat what its name suggests (row 220's errors); a payee that alternates gets a
+    split prior and MaxSim decides between its categories."""
+    import torch
+    w = max(map(len, ids))
+    P = torch.zeros(len(evs), w, device=dev)
+    for k, (e, o) in enumerate(zip(evs, ids)):
+        pp = e.get("_pp")
+        if pp:
+            n, K = sum(pp.values()), len(o)
+            P[k, :len(o)] = torch.tensor([np.log((pp.get(c, 0) + 0.1) / (n + 0.1 * K)) for c in o], device=dev)
+    return P
 
 
 def _materialise(e, names=None):
@@ -558,7 +589,9 @@ def train():
     model = LI(BASE, train=True)
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
-    groups = [{"params": model.params()}, {"params": [scale], "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
+    alpha = torch.nn.Parameter(torch.tensor(0.0, device=model.dev))
+    assert not PPRIOR or (MODE == "doc" and not INTERACT), "PPRIOR is wired into the document reader only"
+    groups = [{"params": model.params()}, {"params": [scale] + ([alpha] if PPRIOR else []), "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
     opt = torch.optim.AdamW(groups, lr=LR)
     warm = int(0.05 * STEPS)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (STEPS - s) / (STEPS - warm)))
@@ -606,6 +639,8 @@ def train():
             ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
             valid = torch.tensor([[k_ < len(c) for k_ in range(w)] for c in cols], device=model.dev)
             Sg = S.gather(1, ix).masked_fill(~valid, float("-inf"))
+            if PPRIOR:
+                Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         loss, ce = _loss(Sg, tgt)
         opt.zero_grad(set_to_none=True)
@@ -614,10 +649,13 @@ def train():
         opt.step(); sched.step()
         run["loss"] += loss.item(); run["ce"] += ce.item(); run["acc"] += (Sg.argmax(1) == tgt).float().mean().item(); k += 1
         if (s + 1) % 200 == 0:
-            print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f} ({time.time() - t0:.0f}s)", flush=True)
+            print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f}" + (f" alpha {alpha.item():.2f}" if PPRIOR else "") + f" ({time.time() - t0:.0f}s)", flush=True)
             run.clear(); k = 0
     model.save(out)
     torch.save(scale.detach().cpu(), out / "scale.pt")
+    if PPRIOR:
+        torch.save(alpha.detach().cpu(), out / "pprior.pt")
+        print(f"payee prior weight {alpha.item():.3f}", flush=True)
     if inter:
         torch.save(inter.state_dict(), out / "inter.pt")
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
@@ -715,7 +753,10 @@ def scores(model, scale, ev, docs):
                 S = (sim * qw[:, None, :]).sum(-1)
                 if HYBRID:
                     S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
-                S = (scale * S).tolist()
+                S = scale * S
+                if PPRIOR:
+                    S = S + ALPHA * _prior(chunk, ids, model.dev)
+                S = S.tolist()
                 out += [dict(zip(o, S[k][:len(o)])) for k, o in enumerate(ids)]
                 continue
             for k, e in enumerate(chunk):
@@ -751,6 +792,8 @@ def load(arm):
     model = LI(d)
     model.cb.enc.eval()
     scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
+    global ALPHA
+    ALPHA = torch.load(d / "pprior.pt", map_location="cpu").to(model.dev) if PPRIOR else None
     inter = None
     if INTERACT:
         inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
