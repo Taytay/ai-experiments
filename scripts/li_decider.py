@@ -68,6 +68,7 @@ OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (trainin
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
 GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
@@ -787,8 +788,8 @@ def scores(model, scale, ev, docs):
              torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None,
              torch.cat([p[3] for p in parts]))
         out = []
-        for a in range(0, len(ev), 256):
-            chunk = ev[a:a + 256]
+        for a in range(0, len(ev), RCHUNK):
+            chunk = ev[a:a + RCHUNK]
             q = model.vecs([e["q"] for e in chunk])
             if MODE not in ("mml", "mmld") and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
                 ids = [list(e["state"]) for e in chunk]
