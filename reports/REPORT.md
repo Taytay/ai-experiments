@@ -207,6 +207,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §192 Distilling decider into the late-interaction model (row 223)
 - §193 Masked history-row labels (row 221)
 - §194 Kind lines in the late-interaction model (row 212)
+- §195 Per-filing candidates on Ettin (row 224)
 
 <!-- END SECTION INDEX -->
 
@@ -11724,3 +11725,31 @@ Reading time is unchanged (2.7 ms a transaction on the RTX 3090; the lookup itse
 
 **Cost:** two L40S jobs (seed 1 read synthetic and rational bank only): roughly $1.5; exact figures from `scripts/modal_costs.py --rows 212`
 once Modal bills the day. Owner reads local ($0).
+
+## 195. Per-filing candidates on Ettin: mdo's design (each earlier filing a candidate beside the category documents) reads the owner's budget no better than the document reader on Ettin (68.5 vs 68.9 / 68.2) and trains six times slower; the reader speed problem was already solved (INFRA, REAL-27)
+
+PLAN step 224. Row 218's mdo (per-filing candidates, MODE=mmld, plus override training) was the best bge model on the owner's budget (67.7,
+§190) but read at 11 ms a transaction in the chunked reader. The reader part of the row was already done: candidates without ages go
+through the budget-wide reader, at the document reader's speed (§190). What remained was mdo's design on Ettin: ekmv's start and recipe
+(§191) with `MODE=mmld NCAND=50 GC=1`, arm emdo, one seed, L40S.
+
+**Table 195.1: % right first**
+
+| model | synthetic | first-time | trip | rational bank: before / new | owner's budget | owner first-time | train | read (owner, RTX 3090) |
+|---|---|---|---|---|---|---|---|---|
+| ekmv (§191, 2 seeds) | 72.8 / 73.0 | 59.1 / 59.5 | 40.2 / 36.9 | 97.1 / 58.0 | 68.9 / 68.2 | 49.9 / 48.3 | 5 min | 2.7 ms |
+| emdo | 72.9 | 59.4 | 46.1 | 96.9 / 54.8 | 68.5 | 48.7 | 30 min | 6.8 ms* |
+
+\* read while another read shared the GPU; alone it would be lower, still above the document reader's (more texts per transaction).
+blind_v2 for emdo read on its first 100 users only (80.6; not comparable with the 250-user figures).
+
+### 195.1 What the step says
+
+- **On Ettin the per-filing design adds nothing.** On bge it helped the owner's budget by 0.8 over o1 (§190), within seed noise; on Ettin it
+  lands between ekmv's two seeds. Ettin's document reader already matches a payee's variants inside the category documents and history
+  rows; separate candidates per filing are a second way to the same evidence.
+- It costs six times the training time and two to three times the reading time. Not pursued; the document reader (with h15's hidden
+  labels, §193) stays the recipe. Row 224 closed.
+
+**Cost:** one L40S job of 45 minutes (train 30, reads 15): roughly $1.5; exact figures from `scripts/modal_costs.py --rows 224` once Modal
+bills the day. Owner read local ($0).
