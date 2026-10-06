@@ -13,13 +13,14 @@ consecutive days (so the day's documents are shared), up to B of them.
   read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget | blind2: blind_v2 users as budgets, row 217)
 env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB (5), M (8), B (32), WINDOW (7), STEPS (3000),
      HOUSEHOLDS (200), BRIER (1), LR (5e-5), SEED (0), HYBRID (0), QW (0), SOFT (0: MaxSim; tau_a for UWE's soft interaction),
-     MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
+     MODE (doc: one document per category | mml: per-filing candidates, BELXTR | mmld: per-filing candidates + category documents), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
      row 209 (any base): PDIM (128), PROJ (linear | res), PROJ_INIT (1), LOWER (0), POOL (cls | mean | last), MAXLEN (default min(96, the base's): row 210's length).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/li_decider.py train
 """
 import json
 import os
 import random
+from array import array
 import sys
 import time
 from collections import defaultdict
@@ -59,9 +60,19 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
+OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
+PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
+PTAU = float(os.environ.get("PTAU", "0.9"))
+GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
+RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
+ALPHA = None  # its weight in read (load() sets it)
+OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
+SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
 
 
 def _base_head(path, hidden):
@@ -305,37 +316,45 @@ _M1 = None
 KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
 
 
-def _nbrs(b, ev, m1, cache):
-    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists. Cached on disk for synthetic
-    budgets in data/interim/li_nb, one int32 array per budget keyed by its events and the encoder's weights (2026-10-06: this replaces
-    row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query setting;
-    the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
+def _nbrs(b, ev, m1, cache, cos=False):
+    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists (cos=True: also their cosines,
+    float16 arrays, for PPRIOR=2). Cached on disk for synthetic budgets in data/interim/li_nb, one int32 array per budget keyed by its
+    events and the encoder's weights, the cosines beside it (<key>_cos.npy, added 2026-10-06; built when first asked for) (2026-10-06: this
+    replaces row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query
+    setting; the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
     import hashlib
     from ai_experiments.paths import ROOT
     f = None
-    if str(b.get("id", "")).startswith(("realstyle-", "blind2-")) and os.environ.get("PREP_CACHE", "1") != "0":
+    if str(b.get("id", "")).startswith(("realstyle-", "blind2-", "rational-")) and os.environ.get("PREP_CACHE", "1") != "0":
         h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
             h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
         for w in sorted(Path(H.OUT1).glob("*.safetensors")):
             h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
         f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
-        if f.exists():
-            return [[j for j in r if j >= 0] for r in np.load(f).tolist()]
+        fc = f.with_name(f.stem + "_cos.npy")
+        if f.exists() and (not cos or fc.exists()):
+            nb = [array("i", (j for j in r if j >= 0)) for r in np.load(f).tolist()]
+            return (nb, [c[:len(r)] for c, r in zip(np.load(fc), nb)]) if cos else nb
     global _M1
     if m1 is None:  # loaded only when a budget misses the cache
         _M1 = _M1 or H._model(H.OUT1)
         m1 = _M1
-    nb = [[j for j, _ in n] for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
+    found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
+    nb = [array("i", (j for j, _ in n)) for n in found]
+    cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
     if f is not None:
         f.parent.mkdir(parents=True, exist_ok=True)
         arr = np.full((len(ev), KNB), -1, dtype=np.int32)
+        carr = np.zeros((len(ev), KNB), dtype=np.float16)
         for i, r in enumerate(nb):
             arr[i, :len(r)] = r
-        tmp = f.with_suffix(f".tmp{os.getpid()}.npy")
-        np.save(tmp, arr)
-        tmp.replace(f)
-    return nb
+            carr[i, :len(r)] = cs[i]
+        for path, x in ((f, arr), (fc, carr)):
+            tmp = path.with_suffix(f".tmp{os.getpid()}.npy")
+            np.save(tmp, x)
+            tmp.replace(path)
+    return (nb, cs) if cos else nb
 
 
 def _query(i, ev, start, names=None):
@@ -346,7 +365,7 @@ def _query(i, ev, start, names=None):
     names: {category id: name} in place of the labels (row 218's rename augmentation)."""
     e = ev[i]
     lab = (lambda j: names.get(ev[j]["gold"], ev[j]["label"])) if names else (lambda j: ev[j]["label"])
-    near = e.get("nb", [])[:NB] if CTX else []
+    near = list(e.get("nb", [])[:NB]) if CTX else []
     rec = [j for j in range(start[i] - 1, max(-1, start[i] - 1 - REC), -1)] if REC else []
 
     def ago(j):
@@ -369,34 +388,136 @@ def _query(i, ev, start, names=None):
     return q
 
 
-def prepared(b, m1, cache):
-    """a budget's events (hist_encoder2.events: hist_encoder.events with dates) with each event's query text and its day's category
-    documents: (events, docs) where docs[day] = {category id: document text} over the visible categories; neighbours from _nbrs (cached)"""
+def prepared(b, m1, cache, full=True):
+    """a budget's events (hist_encoder2.events: hist_encoder.events with dates), (events, docs). full (reads): each event's query text
+    e["q"] and its day's documents e["d"] = docs[day] = {category id: document text} over the visible categories. full=False (training,
+    2026-10-06: queries and documents for every event of 200 households took 16 GB): only the parts, a per-day snapshot of each
+    category's recent payees (e["_snap"], tuples shared between days) and the neighbour indices (compact arrays); _materialise builds
+    the texts for the transactions a step uses. docs is None then."""
     ev = H2.events(b)
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
+    vis = list(ev[0]["state"]) if ev else []
+    cats = vis + [c for c in (ev[0]["labels"] if ev else {}) if c not in set(vis)]  # every category with a label, visible ones first
+    ci = {c: k for k, c in enumerate(cats)}
+    # each day's options (hist_encoder.events gives today's visible categories every day; its per-day texts are not read here). 2026-10-06:
+    # 7.0% of the owner's items and 5.5% of the synthetic ones are filed to a category hidden today (trips, old phases), which visible-only
+    # options could never score, and training never saw a trip purchase. OPTS=recent: + any category filed in the 365 days before the
+    # day (decider's rule, real_budget_eval). OPTS=span (owner: "if there is a hidden category, we should offer it as an option for the
+    # transactions that had that category"; "the category can appear from the beginning up until its last use"): a hidden category is
+    # offered from the budget's start to SPAN_AFTER days after its last filing (0: hidden right after; no hint that a category is about
+    # to be used, and its first filing is scorable). Comparisons with decider set SPAN_AFTER=365 so decider's options (used in the past
+    # year) are a subset of these. One dict per distinct option set.
+    last_use = {}
+    for e in ev:
+        last_use[e["gold"]] = e["date"]
+    memo, last, i = {}, {}, 0
+    while i < len(ev):
+        j = i
+        while j < len(ev) and ev[j]["day"] == ev[i]["day"]:
+            j += 1
+        dd = ev[i]["date"]
+        if OPTS == "recent":
+            act = vis + [c for c in cats[len(vis):] if c in last and (dd - last[c]).days <= 365]
+        elif OPTS == "span":
+            act = vis + [c for c in cats[len(vis):] if c in last_use and (dd - last_use[c]).days <= SPAN_AFTER]
+        else:
+            act = vis
+        st = memo.setdefault(tuple(act), dict.fromkeys(act))
+        for e in ev[i:j]:
+            e["state"] = st
+        for e in ev[i:j]:
+            last[e["gold"]] = e["date"]
+        i = j
+    if CTX or MODE in ("mml", "mmld") or "m" in INTERACT or PPRIOR == 2:
+        got = _nbrs(b, ev, m1, cache, cos=PPRIOR == 2)
+        nbl, cosl = got if PPRIOR == 2 else (got, None)
+        for k, (e, n) in enumerate(zip(ev, nbl)):
             e["nb"] = n
+            if PPRIOR == 2:  # the payee's earlier filings = earlier-day neighbours at cosine >= PTAU (row 220: 92.8% found, 93.5% right)
+                pp = defaultdict(int)
+                for j, c in zip(n, cosl[k]):
+                    if c >= PTAU:
+                        pp[ev[j]["gold"]] += 1
+                e["_pp"] = dict(pp) or None
     start, k = [], 0
     for i, e in enumerate(ev):
         if i and e["day"] != ev[i - 1]["day"]:
             k = i
         start.append(k)
-    for i, e in enumerate(ev):
-        e["q"] = _query(i, ev, start)
-    docs, snap, recent, i = {}, {}, defaultdict(list), 0
+    snap, recent, i = {}, {}, 0
     while i < len(ev):
         d = ev[i]["day"]
-        snap[d] = {c: tuple(recent[c]) for c in ev[i]["state"]}
-        docs[d] = {c: _doc(ev[i]["labels"][c], snap[d][c]) for c in ev[i]["state"]}
+        snap[d] = tuple(recent.get(c, ()) for c in cats)
         j = i
         while j < len(ev) and ev[j]["day"] == d:
             j += 1
         for e in ev[i:j]:
-            recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
+            r = recent.get(e["gold"], ())
+            recent[e["gold"]] = ((e["payee"], e["amt"]),) + tuple(x for x in r if x[0] != e["payee"])[:M - 1]
         i = j
-    for i, e in enumerate(ev):  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
-        e["d"], e["_ev"], e["_snap"], e["_i"], e["_start"] = docs[e["day"]], ev, snap[e["day"]], i, start
+    if PPRIOR == 1:  # earlier-day filings of the same payee key per category (ai_experiments.payeekey: processor prefixes, codes, store numbers off)
+        from ai_experiments.payeekey import payee_key
+        seen, i = defaultdict(lambda: defaultdict(int)), 0
+        while i < len(ev):
+            j = i
+            while j < len(ev) and ev[j]["day"] == ev[i]["day"]:
+                j += 1
+            for e in ev[i:j]:
+                e["_pk"] = payee_key(e["payee"]) or e["payee"]
+                e["_pp"] = dict(seen[e["_pk"]]) if e["_pk"] in seen else None
+            for e in ev[i:j]:
+                seen[e["_pk"]][e["gold"]] += 1
+            i = j
+    for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
+        e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
+    if not full:
+        return ev, None
+    first = {}
+    for e in ev:
+        first.setdefault(e["day"], e)
+    docs = {d: {c: _doc(f["labels"][c], snap[d][ci[c]]) for c in f["state"]} for d, f in first.items()}
+    for e in ev:
+        e["q"], e["d"] = _query(e["_i"], ev, start), docs[e["day"]]
     return ev, docs
+
+
+def _override(b, rng):
+    """row 218 (decider's override episodes, ov10; row 220: on perfectly rational households every remaining error was a merchant the
+    household always filed one way while its name suggested another, "Williams Fuel" -> Shopping read as Gas): a share OVERRIDE of the
+    household's payees moved, every one of their transactions, to one other category picked at random, so the household's own consistent
+    history must beat the name's prior. Returns a shallow copy with new transaction dicts; the neighbour cache stays valid (keyed by
+    texts and days, not categories)."""
+    groups = {g["id"]: g["name"] for g in b["category_groups"]}
+    cats = [c["id"] for c in b["categories"] if not c.get("deleted") and not c.get("hidden") and groups.get(c["category_group_id"]) != "Internal Master Category"]
+    payees = sorted({t.get("payee_id") for t in b["transactions"] if t.get("payee_id") and t.get("category_id") in set(cats)})
+    move = {}
+    for p in payees:
+        if rng.random() < OVERRIDE:
+            move[p] = rng.choice(cats)
+    txs = [dict(t, category_id=move[t["payee_id"]]) if t.get("payee_id") in move and t.get("category_id") in set(cats) else t for t in b["transactions"]]
+    return dict(b, transactions=txs)
+
+
+def _prior(evs, ids, dev):
+    """row 218 (owner, 2026-10-06: "How do we fix the override issue?"): [b, w] log((n_c + 0.1) / (n + 0.1 K)) from the payee's earlier
+    filings per category (K options); 0 where the payee has none (a constant: changes nothing). Added to the scores times a learned ALPHA
+    (0 at step 0), so a payee filed one way many times can beat what its name suggests (row 220's errors); a payee that alternates gets a
+    split prior and MaxSim decides between its categories."""
+    import torch
+    w = max(map(len, ids))
+    P = torch.zeros(len(evs), w, device=dev)
+    for k, (e, o) in enumerate(zip(evs, ids)):
+        pp = e.get("_pp")
+        if pp:
+            n, K = sum(pp.values()), len(o)
+            P[k, :len(o)] = torch.tensor([np.log((pp.get(c, 0) + 0.1) / (n + 0.1 * K)) for c in o], device=dev)
+    return P
+
+
+def _materialise(e, names=None):
+    """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories)"""
+    labels = e["labels"]
+    lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
+    return dict(e, q=_query(e["_i"], e["_ev"], e["_start"], names), d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
 
 
 def _doc(label, recent):
@@ -414,21 +535,14 @@ def _coined(rng, taken):
 
 def _renamed(anc, rng):
     """row 218 (decider's RENAME, §42): each of a window's categories renamed with probability RENAME to a coined word, consistently in
-    its documents and the query's history rows, so the model must read what was filed where rather than the category's name"""
+    its documents and the query's history rows, so the model must read what was filed where rather than the category's name; the
+    window's anchors materialised"""
     labels = anc[0]["labels"]
     names, taken = {}, set(labels.values())
     for c in labels:
         if rng.random() < RENAME:
             names[c] = _coined(rng, taken); taken.add(names[c])
-    if not names:
-        return anc
-    out = []
-    for e in anc:
-        f = dict(e)
-        f["q"] = _query(e["_i"], e["_ev"], e["_start"], names)
-        f["d"] = {c: _doc(names.get(c, labels[c]), r) for c, r in e["_snap"].items()}
-        out.append(f)
-    return out
+    return [_materialise(e, names or None) for e in anc]
 
 
 prepare = prepared
@@ -442,8 +556,46 @@ def _score(model, scale, qtexts, dtexts):
 def _cands(e, ev):
     """MODE=mml: the candidates of one transaction, (text, category id): its NCAND nearest earlier filings by hist_knn_v1 (in visible
     categories) and every visible category's "Group: Name", so each option has at least one"""
-    out = [(ev[j]["text"], ev[j]["gold"]) for j in e["nb"][:NCAND] if ev[j]["gold"] in e["state"]]
-    return out + [(e["labels"][c], c) for c in e["state"]]
+    # row 218 (2026-10-06: on the owner's budget history in the query cost 3-7 points, a5's bare query with per-filing candidates read
+    # best): CREC adds the household's CREC most recent earlier-day filings as candidates too (the trip signal, without lengthening the
+    # query); CAGO appends each candidate filing's age ("| 12d ago")
+    js = list(dict.fromkeys(list(e["nb"][:NCAND]) + ([j for j in range(e["_start"][e["_i"]] - 1, max(-1, e["_start"][e["_i"]] - 1 - CREC), -1)] if CREC else [])))
+    age = (lambda j: f" | {(e['date'] - ev[j]['date']).days}d ago") if CAGO else (lambda j: "")
+    out = [(ev[j]["text"] + age(j), ev[j]["gold"]) for j in js if ev[j]["gold"] in e["state"]]
+    # MODE=mmld (owner, 2026-10-06: "I'd much rather that this system infer the similarity of all of those payees somehow, akin to how the
+    # decider LLM does it"): each category's document (name + recent payees) instead of its bare name, beside the per-filing candidates,
+    # so a payee's variants are matched by the trained encoder filing by filing (no averaging, no key) and categories with no close filing
+    # still have their document; with CTX the query carries the dated history (row 217's p2)
+    return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
+
+
+def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
+    """MODE=mml/mmld in training: [b, nopt] category logits from each query's own candidates only (cand[k] = list of (column in dtexts,
+    option index)); 2026-10-06: scoring every query against every candidate text of the step ran out of memory with row 217's 512-token
+    queries (32 x 512 x ~2,000 x 60). Same scores as _score + _mml_logits: MaxSim (or SOFT), query-token weights, HYBRID, x scale,
+    then the log of the summed probability mass per category."""
+    import torch
+    qv, qm, qw, qc = model.vecs(qtexts)
+    dv, dm, _, dc = model.vecs(dtexts)
+    C = max(map(len, cand))
+    cix = torch.tensor([[c for c, _ in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
+    oix = torch.tensor([[o for _, o in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
+    ok = torch.tensor([[k < len(cs) for k in range(C)] for cs in cand], device=model.dev)
+    sim = torch.einsum("btd,bcsd->bcts", qv, dv[cix].to(qv.dtype))
+    m = dm[cix]
+    if SOFT:
+        a = (sim / SOFT).masked_fill(~m[:, :, None, :], float("-inf")).softmax(-1)
+        sim = (a * sim).sum(-1)
+    else:
+        sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
+    S = (sim * qw[:, None, :]).sum(-1)
+    if HYBRID:
+        S = S + torch.einsum("bh,bch->bc", qc, dc[cix])
+    S = (scale * S).masked_fill(~ok, float("-inf"))
+    mx = S.max(1, keepdim=True).values
+    w = (S - mx).exp().masked_fill(~ok, 0.0)
+    agg = torch.zeros(len(cand), nopt, device=model.dev).scatter_add(1, oix, w)
+    return torch.where(agg > 0, agg.clamp(min=1e-30).log() + mx, torch.full_like(agg, float("-inf")))
 
 
 def _mml_logits(S, cand, anc):
@@ -479,20 +631,27 @@ def train():
         open_licence(BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
-    assert not RENAME or (MODE == "doc" and not INTERACT), "RENAME renders documents and query rows only"
+    assert not RENAME or (MODE in ("doc", "mmld") and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
-        data.append(prepared(b, m1, cache))
+        if OVERRIDE:
+            b = _override(b, random.Random(SEED * 7919 + n))
+        data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
-    print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
-          f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
+    ex = _materialise(data[0][0][50])
+    print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
+          f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
     model = LI(BASE, train=True)
+    if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
+        model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
-    groups = [{"params": model.params()}, {"params": [scale], "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
+    alpha = torch.nn.Parameter(torch.tensor(0.0, device=model.dev))
+    assert not PPRIOR or (MODE == "doc" and not INTERACT), "PPRIOR is wired into the document reader only"
+    groups = [{"params": model.params()}, {"params": [scale] + ([alpha] if PPRIOR else []), "lr": 1e-2}] + ([{"params": list(inter.parameters()), "lr": 5e-4}] if inter else [])
     opt = torch.optim.AdamW(groups, lr=LR)
     warm = int(0.05 * STEPS)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (STEPS - s) / (STEPS - warm)))
@@ -504,7 +663,7 @@ def train():
             d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
-            anc += _renamed(pick, rng) if RENAME and pick else pick
+            anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e) for e in pick]
         if not anc:
             continue
         dtexts, idx = [], {}
@@ -526,13 +685,12 @@ def train():
                 F = _pool(*model.vecs(ft)[:2]) if ft else None
                 Lab = _pool(*model.vecs(lt)[:2]) if lt else None
             Sg = _iscores(model, inter, scale, anc, ev, Q, Dv, idx, docs, F, fpos, Lab, lpos)
-        elif MODE == "mml":
+        elif MODE in ("mml", "mmld"):
             cand = []
             for e in anc:
                 oi = {c: o for o, c in enumerate(e["state"])}
                 cand.append([(col(t), oi[c]) for t, c in _cands(e, e["_ev"])])
-            S = _score(model, scale, [e["q"] for e in anc], dtexts)
-            Sg = _mml_logits(S, cand, anc)
+            Sg = _mml_pairs(model, scale, [e["q"] for e in anc], dtexts, cand, max(len(e["state"]) for e in anc))
         else:
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
             S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
@@ -540,6 +698,8 @@ def train():
             ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
             valid = torch.tensor([[k_ < len(c) for k_ in range(w)] for c in cols], device=model.dev)
             Sg = S.gather(1, ix).masked_fill(~valid, float("-inf"))
+            if PPRIOR:
+                Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         loss, ce = _loss(Sg, tgt)
         opt.zero_grad(set_to_none=True)
@@ -548,17 +708,20 @@ def train():
         opt.step(); sched.step()
         run["loss"] += loss.item(); run["ce"] += ce.item(); run["acc"] += (Sg.argmax(1) == tgt).float().mean().item(); k += 1
         if (s + 1) % 200 == 0:
-            print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f} ({time.time() - t0:.0f}s)", flush=True)
+            print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f}" + (f" alpha {alpha.item():.2f}" if PPRIOR else "") + f" ({time.time() - t0:.0f}s)", flush=True)
             run.clear(); k = 0
     model.save(out)
     torch.save(scale.detach().cpu(), out / "scale.pt")
+    if PPRIOR:
+        torch.save(alpha.detach().cpu(), out / "pprior.pt")
+        print(f"payee prior weight {alpha.item():.3f}", flush=True)
     if inter:
         torch.save(inter.state_dict(), out / "inter.pt")
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
-                                                         **{k: globals()[k] for k in EXTRA}), indent=1))
+                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -618,7 +781,7 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
-    if MODE == "mml":
+    if MODE in ("mml", "mmld"):
         cands = [_cands(e, ev) for e in ev]
         uniq = list(dict.fromkeys(t for cs in cands for t, _ in cs))
     else:
@@ -631,10 +794,10 @@ def scores(model, scale, ev, docs):
              torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None,
              torch.cat([p[3] for p in parts]))
         out = []
-        for a in range(0, len(ev), 256):
-            chunk = ev[a:a + 256]
+        for a in range(0, len(ev), RCHUNK):
+            chunk = ev[a:a + RCHUNK]
             q = model.vecs([e["q"] for e in chunk])
-            if MODE != "mml" and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
+            if MODE not in ("mml", "mmld") and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
                 ids = [list(e["state"]) for e in chunk]
                 C = max(map(len, ids))
                 cix = torch.tensor([[pos[e["d"][c]] for c in o] + [0] * (C - len(o)) for e, o in zip(chunk, ids)], device=model.dev)
@@ -649,12 +812,15 @@ def scores(model, scale, ev, docs):
                 S = (sim * qw[:, None, :]).sum(-1)
                 if HYBRID:
                     S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
-                S = (scale * S).tolist()
+                S = scale * S
+                if PPRIOR:
+                    S = S + ALPHA * _prior(chunk, ids, model.dev)
+                S = S.tolist()
                 out += [dict(zip(o, S[k][:len(o)])) for k, o in enumerate(ids)]
                 continue
             for k, e in enumerate(chunk):
                 ids = list(e["state"])
-                if MODE == "mml":
+                if MODE in ("mml", "mmld"):
                     opt = {c: o for o, c in enumerate(ids)}
                     cs = [(pos[t], opt[c]) for t, c in cands[a + k]]
                     cix = torch.tensor([c for c, _ in cs], device=model.dev)
@@ -685,6 +851,8 @@ def load(arm):
     model = LI(d)
     model.cb.enc.eval()
     scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
+    global ALPHA
+    ALPHA = torch.load(d / "pprior.pt", map_location="cpu").to(model.dev) if PPRIOR else None
     inter = None
     if INTERACT:
         inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
@@ -704,15 +872,24 @@ def read():
     elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
         import blind_budgets
         budgets = blind_budgets.budgets()
+    elif os.environ.get("READ", "").startswith("rational_"):  # row 220: perfectly rational households, READ=rational_clean | rational_bank
+        import rational_budgets
+        budgets = rational_budgets.budgets(os.environ["READ"].split("_", 1)[1])
     else:
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
-    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if os.environ.get('READ') == 'blind2' else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
-    print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
+    rd = os.environ.get("READ", "households")
+    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if rd == 'blind2' else rd + ' households' if rd.startswith('rational') else 'held-out households')}: % top-1 / top-3 / top-5 / top-10 (n); Brier and ECE of the softmax**\n")
+    segs = ("known", "new") if rd.startswith("rational") else ("trip",)  # generator marks, scoring only (rational: merchant bought before or not)
+    cols = ["model", "all", "first-time payee string"] + list(segs) + ["Brier", "ECE (top choice)"]
+    print("| " + " | ".join(cols) + " |\n" + "|---" * len(cols) + "|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
-        ranks, brier, conf, hit = defaultdict(list), [], [], []
+        ranks, brier, conf, hit, lists = defaultdict(list), [], [], [], defaultdict(list)
         for b in budgets:
+            # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
+            # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
+            mark = {t["id"]: (t.get("reason") or [None])[0] for t in b["transactions"]}
             ev, sco = run(b)
             for e, sc in zip(ev, sco):
                 if e["gold"] not in e["state"]:
@@ -720,16 +897,29 @@ def read():
                 v = np.array(list(sc.values()))
                 g = v[list(sc).index(e["gold"])]
                 rk = int((v >= g).sum())  # ties count against the gold
-                for grp in ("all",) + (() if e["seen"] else ("first-time",)):
+                for grp in ("all",) + (() if e["seen"] else ("first-time",)) + ((mark[e["id"]],) if mark.get(e["id"]) in segs else ()):
                     ranks[grp].append(rk)
                 p = np.exp(v - v.max()); p /= p.sum()
                 y = np.array([c == e["gold"] for c in sc], dtype=float)
                 brier.append(((p - y) ** 2).sum()); conf.append(p.max()); hit.append(rk == 1)
+                # owner, 2026-10-06 ("Maybe we only show options that have above a certain confidence?"): suggestion lists by confidence,
+                # every option with p >= t, and the fewest options holding 90% of the mass; (gold in the list, list size)
+                pg = p[list(sc).index(e["gold"])]
+                for t in LIST_TS:
+                    lists[t].append((pg >= t, int((p >= t).sum())))
+                ps = np.sort(p)[::-1]
+                k90 = int(np.searchsorted(np.cumsum(ps), 0.9) + 1)
+                lists["90%"].append((pg >= ps[k90 - 1], k90))
         conf, hit = np.array(conf), np.array(hit)
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
-        cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
+        cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 5, 10)) + f" (n={len(ranks[g])})" if ranks[g] else "-"
+                 for g in ("all", "first-time") + tuple(segs)]
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        print(f"  suggestion lists, {run.name}: " + "; ".join(
+            f"{'p >= ' + str(t) if t != '90%' else '90% of the mass'}: right one in the list {100 * np.mean([a for a, _ in v]):.1f}%, "
+            f"{np.mean([n for _, n in v]):.2f} shown" + (f", empty {100 * np.mean([n == 0 for _, n in v]):.1f}%" if t != "90%" else "")
+            for t, v in lists.items()), flush=True)
         del run
 
 

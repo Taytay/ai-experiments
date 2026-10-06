@@ -31,7 +31,7 @@ def _build():
         for k, e in enumerate(u.events):
             pid = payees.setdefault(e.text, f"p{len(payees)}")
             txs.append(dict(id=f"b2-{uid}-{k:05d}", date=e.date.isoformat(), amount=-round(e.amount * 1000), category_id=f"c{e.filed}",
-                            payee_id=pid, approved=True, deleted=False))
+                            payee_id=pid, approved=True, deleted=False, reason=["trip"] if e.trip else None))
         out.append(dict(id=f"blind2-{uid}", new_user=u.is_new, category_groups=[dict(id="g", name="Categories")], categories=cats,
                         payees=[dict(id=p, name=t) for t, p in payees.items()], transactions=txs, subtransactions=[]))
     return out

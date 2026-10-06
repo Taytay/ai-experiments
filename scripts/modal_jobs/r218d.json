@@ -1,0 +1,127 @@
+[
+ {
+  "tag": "r218-m0",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "ROW": "218",
+   "BASE": "models/encoders/hist_colbert_v1",
+   "CTX": "0",
+   "NCAND": "50",
+   "OPTS": "span",
+   "STEPS": "3000",
+   "GC": "1",
+   "MODE": "mml",
+   "ARM": "m0",
+   "ARMS": "li_r218_m0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r218-m1",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "ROW": "218",
+   "BASE": "models/encoders/hist_colbert_v1",
+   "CTX": "0",
+   "NCAND": "50",
+   "OPTS": "span",
+   "STEPS": "3000",
+   "GC": "1",
+   "MODE": "mmld",
+   "CREC": "8",
+   "CAGO": "1",
+   "ARM": "m1",
+   "ARMS": "li_r218_m1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r218-m2",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "ROW": "218",
+   "BASE": "models/encoders/hist_colbert_v1",
+   "CTX": "0",
+   "NCAND": "50",
+   "OPTS": "span",
+   "STEPS": "3000",
+   "GC": "1",
+   "MODE": "mmld",
+   "CREC": "8",
+   "CAGO": "1",
+   "OVERRIDE": "0.1",
+   "ARM": "m2",
+   "ARMS": "li_r218_m2"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r218-m3",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "ROW": "218",
+   "BASE": "models/encoders/hist_colbert_v1",
+   "CTX": "0",
+   "NCAND": "50",
+   "OPTS": "span",
+   "STEPS": "3000",
+   "GC": "1",
+   "MODE": "mmld",
+   "CREC": "8",
+   "CAGO": "1",
+   "OVERRIDE": "0.1",
+   "RENAME": "0.5",
+   "ARM": "m3",
+   "ARMS": "li_r218_m3"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]

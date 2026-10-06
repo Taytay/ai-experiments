@@ -130,6 +130,9 @@ def _run(cmds: list, env: dict, tag: str):
     _prepare()
     for src in [s for s in env.get("ADAPTERS_FROM", "").split(",") if s]:  # adapters trained by earlier jobs, from their result directories
         shutil.copytree(f"/out/{src}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    for src in [s for s in env.get("DATA_FROM", "").split(",") if s]:  # 2026-10-06: caches built once by an earlier job (data/interim: households, neighbour lists)
+        if Path(f"/out/{src}/data/interim").exists():
+            shutil.copytree(f"/out/{src}/data/interim", f"{REPO}/data/interim", dirs_exist_ok=True)
     for src in [s for s in env.get("ENCODERS_FROM", "").split(",") if s]:  # row 210: encoders (synthetic-trained only) put on the volume or trained by earlier jobs
         shutil.copytree(f"/out/{src}/models/encoders", f"{REPO}/models/encoders", dirs_exist_ok=True)
     before = _snapshot(); t0 = time.time(); log = []
@@ -148,6 +151,8 @@ def _run(cmds: list, env: dict, tag: str):
     changed = [f for f, m in _snapshot().items() if before.get(f) != m]
     for f in changed:
         rel = Path(f).relative_to(REPO); (dest / rel).parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest / rel)
+    if env.get("SAVE_DATA") == "1" and Path(REPO, "data", "interim").exists():  # a cache-building job: its data/interim for DATA_FROM
+        shutil.copytree(f"{REPO}/data/interim", dest / "data" / "interim", dirs_exist_ok=True)
     (dest / "modal_run.log").write_text("\n".join(log) + f"\n### wall {round((time.time() - t0) / 60, 1)} min, {len(changed)} files\n")
     OUT.commit(); HF.commit()
     return f"{tag}: {len(changed)} files to ai-exp-results/{tag}, {round((time.time() - t0) / 60, 1)} min; last exit {log[-1].split(':')[0]}"
@@ -237,6 +242,7 @@ def private_scores(items: list, reader: str, layout: str, adapter_from: str, sha
 @APP.local_entrypoint()
 def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = "", gpu: str = ""):
     global run
+    base_run = run
     if gpu == "cpu":  # CPU-only jobs (clustering, data builds): no GPU billed
         run = run_cpu
     elif gpu:  # row 125: another GPU type for this launch (e.g. H200 for decider-35B-A3B training); the default stays one H100
@@ -245,7 +251,19 @@ def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs:
         print(gpu_check.remote()); return
     if jobs:  # parallel: at most 8 containers (volume commits contend beyond ~5 concurrent small ones)
         spec = json.loads(Path(jobs).read_text())
-        _ledger(kind="jobs", what=Path(jobs).stem, rows=_rows(Path(jobs).stem), gpu=gpu or "H100", tags=[j["tag"] for j in spec])
+        _ledger(kind="jobs", what=Path(jobs).stem, rows=_rows(Path(jobs).stem), gpu=gpu or "H100", tags=[j["tag"] for j in spec],
+                **({"job_gpus": {j["tag"]: j.get("gpu", gpu or "H100") for j in spec}} if any("gpu" in j for j in spec) else {}))
+        if any("gpu" in j for j in spec):  # 2026-10-06: a job's own "gpu" (e.g. L4, A10, L40S, A100-40GB, cpu) overrides the launch's
+            fn = lambda g: run_cpu if g == "cpu" else base_run.with_options(gpu=g) if g else run
+            calls = [fn(j.get("gpu", gpu)).spawn(j["cmds"], j.get("env", {}), j["tag"]) for j in spec]
+            for c in calls:
+                try:
+                    line = c.get()
+                except Exception as ex:  # as starmap's return_exceptions
+                    line = repr(ex)
+                print(line, flush=True)
+                _done(line)
+            return
         for line in run.starmap([(j["cmds"], j.get("env", {}), j["tag"]) for j in spec], return_exceptions=True):
             print(line, flush=True)
             _done(line)

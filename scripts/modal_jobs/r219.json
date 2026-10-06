@@ -1,0 +1,132 @@
+[
+ {
+  "tag": "r219-l4",
+  "gpu": "L4",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "219",
+   "ROW": "219",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "HOUSEHOLDS": "50",
+   "STEPS": "600",
+   "ARM": "gpu_l4"
+  },
+  "cmds": [
+   "nvidia-smi --query-gpu=name --format=csv,noheader",
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ },
+ {
+  "tag": "r219-a10",
+  "gpu": "A10",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "219",
+   "ROW": "219",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "HOUSEHOLDS": "50",
+   "STEPS": "600",
+   "ARM": "gpu_a10"
+  },
+  "cmds": [
+   "nvidia-smi --query-gpu=name --format=csv,noheader",
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ },
+ {
+  "tag": "r219-l40s",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "219",
+   "ROW": "219",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "HOUSEHOLDS": "50",
+   "STEPS": "600",
+   "ARM": "gpu_l40s"
+  },
+  "cmds": [
+   "nvidia-smi --query-gpu=name --format=csv,noheader",
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ },
+ {
+  "tag": "r219-a100-40gb",
+  "gpu": "A100-40GB",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "219",
+   "ROW": "219",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "HOUSEHOLDS": "50",
+   "STEPS": "600",
+   "ARM": "gpu_a10040gb"
+  },
+  "cmds": [
+   "nvidia-smi --query-gpu=name --format=csv,noheader",
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ },
+ {
+  "tag": "r219-h100",
+  "gpu": "H100",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "219",
+   "ROW": "219",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "HOUSEHOLDS": "50",
+   "STEPS": "600",
+   "ARM": "gpu_h100"
+  },
+  "cmds": [
+   "nvidia-smi --query-gpu=name --format=csv,noheader",
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ }
+]

@@ -18,3 +18,18 @@ def payee_key(text):
     if not words:
         return ""
     return " ".join(words[:2])
+
+
+_PREFIX_V2 = re.compile(r"^(?:(?:SALE|RETURN|REFUND|PURCHASE RETURN|RECURRING|PREAUTHORIZED|PRE-AUTHORIZED)\s+)+")
+_WEB = re.compile(r"(?:\.COM|\.NET|\.CO|\.ORG|\.IO)\b.*$")
+
+
+def payee_key_v2(text):
+    """payee_key plus (2026-10-06, owner: "What if they go to Williams fuel #5, pos debit Williams fuel store 111"): a leading Sale / Return /
+    Refund word dropped (statement_patterns_v1 measures them), web suffixes (.com ...) cut, hyphens and apostrophes read as nothing
+    ("WILLIAMS-SONOMA" = "WILLIAMSSONOMA"), and the key's words joined, so run-together strings ("WILLIAMSFUEL") and spaced ones meet. The
+    original payee_key is unchanged (earlier rows use it)."""
+    t = _WEB.sub("", text.upper().replace("&", " AND "))
+    t = _PREFIX_V2.sub("", _PREFIX.sub("", t))
+    k = payee_key(t)
+    return k.replace(" ", "")
