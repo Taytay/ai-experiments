@@ -1063,6 +1063,8 @@ def load(arm):
     INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
     PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
     POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
+    if os.environ.get("READ_MAXLEN"):  # row 227 (2026-10-06): read a model at a longer limit than it trained at (Ettin's positions reach 8k;
+        MAXLEN = int(os.environ["READ_MAXLEN"])  # 13.8% of the owner's queries exceed 512 tokens, 1.2% of synthetic ones)
     for k in EXTRA:  # settings added after row 211 (QUERY etc.): older models were trained with the defaults
         globals()[k] = cfg.get(k, EXTRA[k])
     m1, cache = None, {}
