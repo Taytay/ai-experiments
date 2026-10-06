@@ -60,6 +60,7 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
+LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
 EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
@@ -762,7 +763,7 @@ def read():
     print("| " + " | ".join(cols) + " |\n" + "|---" * len(cols) + "|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
-        ranks, brier, conf, hit = defaultdict(list), [], [], []
+        ranks, brier, conf, hit, lists = defaultdict(list), [], [], [], defaultdict(list)
         for b in budgets:
             # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
             # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
@@ -779,12 +780,24 @@ def read():
                 p = np.exp(v - v.max()); p /= p.sum()
                 y = np.array([c == e["gold"] for c in sc], dtype=float)
                 brier.append(((p - y) ** 2).sum()); conf.append(p.max()); hit.append(rk == 1)
+                # owner, 2026-10-06 ("Maybe we only show options that have above a certain confidence?"): suggestion lists by confidence,
+                # every option with p >= t, and the fewest options holding 90% of the mass; (gold in the list, list size)
+                pg = p[list(sc).index(e["gold"])]
+                for t in LIST_TS:
+                    lists[t].append((pg >= t, int((p >= t).sum())))
+                ps = np.sort(p)[::-1]
+                k90 = int(np.searchsorted(np.cumsum(ps), 0.9) + 1)
+                lists["90%"].append((pg >= ps[k90 - 1], k90))
         conf, hit = np.array(conf), np.array(hit)
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 5, 10)) + f" (n={len(ranks[g])})" if ranks[g] else "-"
                  for g in ("all", "first-time") + tuple(segs)]
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        print(f"  suggestion lists, {run.name}: " + "; ".join(
+            f"{'p >= ' + str(t) if t != '90%' else '90% of the mass'}: right one in the list {100 * np.mean([a for a, _ in v]):.1f}%, "
+            f"{np.mean([n for _, n in v]):.2f} shown" + (f", empty {100 * np.mean([n == 0 for _, n in v]):.1f}%" if t != "90%" else "")
+            for t, v in lists.items()), flush=True)
         del run
 
 
