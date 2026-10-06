@@ -202,6 +202,9 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §187 The late-interaction decision model beside decider (row 216)
 - §188 The cheapest Modal GPU for the small encoder models (row 219)
 - §189 decider history slice and two new test sets (rows 217, 220)
+- §190 decider training lessons on the late-interaction model (row 218)
+- §191 A small modern base: Ettin-encoder-32M (row 222)
+- §192 Distilling decider into the late-interaction model (row 223)
 
 <!-- END SECTION INDEX -->
 
@@ -11495,3 +11498,153 @@ times 74.7 / 71.5 / 68.1 (decider 79.0). Reading time 2.2 / 1.3 / 2.5 ms per tra
 
 **Cost:** row 220's two L40S reads (cents) and one re-launch; the rest local ($0). `scripts/modal_costs.py --rows 220` once Modal bills
 the day.
+
+## 190. decider's training lessons on the late-interaction model: override training (a household's merchants moved to another category, consistently) is the lever, on every set: blind_v2 79.7 -> 82.2, rational merchants bought before 98 -> 99.7-99.9%, the owner's budget 59.5 -> 66.9 for the same query; per-filing candidates beside it read 67.7 there (decider 72.5); renames, 1,000 households and a payee-history prior add little on top (REAL-27, MODEL-25)
+
+PLAN step 218 (owner, 2026-10-06: "Borrow ideas from improvements we made to the decider model"; on the rational households' errors:
+"How do we fix the override issue?"; "we can't average a payee's embedding/category"; "I'd much rather that this system infer the
+similarity of all of those payees somehow, akin to how the decider LLM does it"). All arms one seed, 3,000 steps from row 210's a1 (bge
+chain) unless said, OPTS=span, on L40S in parallel (`scripts/modal_jobs/r218*.json`; caches built once on Modal, job r218-cache). New in
+li_decider: OVERRIDE (decider's override episodes: a share of the household's payees moved, every one of their transactions, to one other
+category), RENAME (decider's coined category names per window), HOUSEHOLDS=1000, PPRIOR (a learned-weight prior from the payee's earlier
+filings per category: 1 by payee_key, 2 by neighbours at cosine >= 0.9), MODE=mmld (each earlier filing a candidate beside the category
+documents: learned payee similarity, nothing averaged), CREC / CAGO (recent filings and ages as candidates; m1-m3), GC (gradient
+checkpointing). The owner's budget was read once for the finalists (decider's 19,093 items, SPAN_AFTER=365).
+
+**Table 190.1: % right first (top-1)**
+
+| arm | what it adds (on p2's query unless said) | synthetic | trips | blind_v2 | blind_v2 first-time | rational clean: bought before / new | rational bank: bought before / new | owner's budget |
+|---|---|---|---|---|---|---|---|---|
+| p2 (row 217) | the control | 74.2 | 57.8 | 79.7 | 70.9 | 98.0 / 66.1 | 95.2 / 62.4 | 59.5 |
+| o1 | OVERRIDE 0.1 | 74.2 | 50.4 | 82.2 | 72.8 | **99.7** / 65.8 | 96.9 / 62.3 | 66.9 |
+| n1 | RENAME 0.5 | 73.8 | 56.4 | 81.5 | 72.9 | 98.3 / 64.5 | 95.7 / 61.2 | |
+| h1 | 1,000 training households | 74.2 | 51.2 | 80.9 | 72.0 | 97.7 / 65.3 | 94.8 / 61.1 | |
+| all | h1 + o1 + n1 | 73.2 | 36.2 | 81.8 | 72.2 | 99.4 / 63.3 | 96.6 / 60.7 | |
+| pp | payee-key prior | 74.2 | 56.5 | 80.4 | 71.7 | 98.5 / 66.9 | 95.4 / 63.5 | |
+| ppo | pp + o1 | 74.3 | 50.5 | **82.5** | 73.4 | 99.9 / 66.0 | 97.0 / 62.4 | |
+| pp2o | neighbour prior (cos >= 0.9) + o1 | 74.2 | 50.0 | 82.3 | 72.8 | 99.9 / 66.1 | 97.2 / 62.8 | |
+| md | per-filing candidates + documents (mmld) | 74.2 | **61.4** | 80.8 | 71.7 | 98.9 / 64.7 | 96.5 / 62.0 | |
+| mdo | md + o1 | 73.7 | 52.7 | 82.3 | 73.1 | 99.8 / 63.1 | **97.5** / 60.2 | **67.7** |
+| m0 | a5's design (bare query, per-filing candidates) retrained, OPTS=span | 71.8 | 3.5 | 79.9 | 71.3 | 98.8 / 62.2 | 96.2 / 59.3 | 66.7 |
+
+Owner's budget, first-time payees / payees filed 4+ times: o1 46.1 / 74.5, mdo 48.1 / 74.9, m0 46.9 / 74.9 (decider 56.9 / 79.0; a5 47.5 /
+74.7). Reading time on the RTX 3090: o1 2.6 ms, m0 2.2 ms a transaction; mdo 11.3 ms with the chunked reader then in use (the budget-wide
+reader, restored for candidates without ages, reads it at a5's speed). Calibration error on blind_v2: mdo 0.6%, o1 2.9%.
+
+### 190.1 What the step says
+
+- **Override training is the one lesson that pays everywhere.** It fixes exactly what the rational households exposed (a merchant filed one
+  way every time, its name suggesting another), and that failure was also what sank p2 on the owner's budget: the same query reads 59.5
+  without it and 66.9 with it. decider's recipe has trained on it since its override episodes; the encoder family had not.
+- **The payee prior is not needed once override is trained** (ppo / pp2o within 0.3 of o1): the learned weight stays small (0.05-0.17),
+  and the model, taught that history beats names, already follows the payee's filings. The owner's wish for learned rather than keyed
+  similarity is met by per-filing candidates (mdo), best on bank strings (97.5%) and on the owner's budget (67.7), at a cost in reading
+  time until its reader caches per-day documents.
+- **Renames and more households** help blind_v2 (+1.8, +1.2) but not the rational households and cost synthetic trips; with override
+  they add nothing (all = 81.8).
+- **Owner's budget ranking of the finalists is within single-seed noise** (66.7-67.7); o1's recipe was taken to row 222 for its speed.
+- Trips: per-filing candidates with the history query read trip purchases best on synthetic (md 61.4%); override training trades some of
+  that away (mdo 52.7%).
+- **Time on the candidates instead of in the query does not work** (m1-m3: a5's bare query, each earlier filing labelled with its age, the
+  8 most recent filings and the category documents as candidates; read on 10 synthetic households and 50 blind_v2 users because ages make
+  every candidate text unique, ~11 ms a transaction): synthetic 70.1-70.2 and trips 5-12% against o1's 72.6 and 49.9% on the same
+  households, blind_v2 80.4-81.9 against o1's 83.3. The recency signal only works as rows in the query; o1's recipe stays.
+
+**Cost:** about 14 L40S jobs of 22-57 minutes plus re-reads, roughly $10-12 at $1.95 an hour; exact figures from
+`scripts/modal_costs.py --rows 218` once Modal bills the day. Owner reads local ($0).
+
+## 191. A small modern base: Ettin-encoder-32M with o1's recipe reads the owner's budget at 68.5 (two seeds: 68.9, 68.2; decider's first trained recipe 68.3, tuned 72.5), about 2 points above bge-small; a knowledge and alias stage puts merchant kinds in (held-out kind recall@1 3 -> 65%) but adds little once the history training runs; more history, masked-token pretraining and a ColBERT-pretrained Ettin add nothing measurable (REAL-27, MODEL-25, MODEL-28)
+
+PLAN step 222 (owner, 2026-10-06: "try the small ettin model soon so that we have more context with a fast, small model that makes
+iteration fast. Let's try 212 with merchant knowledge and alias retraining with it, and also 221 with a modern smaller model"). Base
+jhu-clsp/ettin-encoder-32m (MIT, ModernBERT architecture, 384 wide like bge-small, 8k context), lowercased input (cased; ALL-CAPS bank
+strings split into many pieces), LR 9e-5. Data built once, locally: knowledge pairs v1 (`build_knowledge_pairs.py`: 371,866 bank-rendered
+merchant / place strings with their kind; merchant DB 47.5k merchants x 2 + Overture places and brands; held-out names excluded; open
+licences) and alias pairs v1 (`build_alias_pairs.py`: 253,574 pairs of two renderings of one merchant, e.g. "Walla Walla Daily Gri" ~
+"Walla Walla Daily Grind"). Stages on L40S: k = knowledge + alias contrastive on pooled vectors (`knowledge_stage.py`, 212 (c) + (e));
+mk = 3,000 steps of masked-token pretraining on the same strings (`mlm_stage.py`, 221 (b)) then k; kmv = k in the late-interaction setting
+(MaxSim InfoNCE, `MV=1`, as ColBERT-Zero 2602.16609 advises). Then o1's recipe (row 218: p2's query + override 0.1, 3,000 steps) from raw
+Ettin (e0), k (ek), mk (emk), kmv (ekmv), mixedbread's Ettin-based ColBERT mxbai-edge-colbert-v0-32m with its [Q] / [D] markers
+(mx, Apache-2.0), and ek with twice the history (eklong: 24 nearest + 16 recent, 1,024 tokens).
+
+**Table 191.1: held-out merchant kind retrieval (7,657 pairs of merchants never trained on, 54 kinds): recall@1 / @5**
+
+| encoder | recall@1 | recall@5 |
+|---|---|---|
+| raw Ettin-32M | 3.1 | 11.1 |
+| masked-token stage only (mlm_r222_m1) | 9.0 | 21.3 |
+| k (pooled knowledge + alias) | 64.6 | 83.1 |
+| mk (masked-token, then k) | 65.4 | 83.8 |
+| kmv (k as MaxSim) | 64.9 | 82.9 |
+
+**Table 191.2: % right first, o1's recipe on each base** (bge row: o1, §190)
+
+| model | synthetic | trips | blind_v2 | rational clean: bought before / new | rational bank: bought before / new | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|---|
+| bge-small chain (o1) | **74.2** | 50.4 | **82.2** | 99.7 / **65.8** | 96.9 / **62.3** | 66.9 | 46.1 |
+| e0 raw Ettin | 72.5 | 25.5 | 81.6 | 99.9 / 57.6 | 96.5 / 54.3 | 68.6 | 49.0 |
+| ek | 72.8 | 30.8 | 81.9 | 99.9 / 61.0 | 96.6 / 58.0 | | |
+| emk | 72.9 | 45.6 | 81.5 | 99.9 / 61.0 | **97.7** / 58.6 | | |
+| ekmv (seed 0 / seed 1) | 72.8 / 73.0 | 40.2 / 36.9 | 81.7 / 81.6 | **100.0** / 60.0; 99.7 / 59.9 | 97.1 / 58.0; 97.0 / 56.2 | **68.9 / 68.2** | **49.9 / 48.3** |
+| mx (Ettin ColBERT) | 72.9 | 39.6 | 81.7 | 99.8 / 62.0 | 96.0 / 58.1 | 67.4 | 47.1 |
+| eklong (2x history) | 72.9 | 34.7 | 81.5 | 99.8 / 59.7 | 96.1 / 57.3 | | |
+
+Owner's budget: decider's 19,093 items, one read per model; decider-4B tuned 72.5 (first-time 56.9), its first trained recipe 68.3.
+Reading time on the RTX 3090 2.7 ms a transaction (Ettin) against bge's 2.6 ms. Each Ettin job (train + four reads) 22-35 minutes on an
+L40S; the knowledge stages 3-8 minutes.
+
+### 191.1 What the step says
+
+- **Ettin-32M is the better small base for the owner's budget**: 68.5 over two seeds of ekmv (raw Ettin 68.6, one seed) against bge's
+  66.9 under the same recipe, and better on first-time payees (48-50 against 46). At matched effort (decider's first trained recipe,
+  68.3) the small model has caught up; the tuned decider is still 4 points ahead.
+- **The synthetic sets do not show it**: there bge leads (74.2 against 72.5-73.0) because the bge chain had three training stages on our
+  generator against Ettin's one; the owner's budget rewards the base, our generator rewards the fit.
+- **Knowledge goes in but mostly does not come out.** The knowledge and alias stage teaches Ettin what merchants are (held-out kind
+  recall 3 -> 65%), and lifts new rational merchants (57.6 -> 60-61) and the owner's first-time payees a little (49.0 -> 49.9 for ekmv),
+  but after 3,000 steps of history training most of it is spent: the history objective does not ask for it. Mixing knowledge pairs into
+  the history training, or distillation (row 223), are the ways to keep it.
+- **No help from:** masked-token pretraining (9% kind recall alone; nothing after k), a ColBERT-pretrained Ettin (mx 67.4), the
+  multi-vector form of the knowledge stage over the pooled one on the transfer sets (ColBERT-Zero's gain is for retrieval training at
+  scale; here the stage is small), and twice the history (eklong: Ettin can read it, nothing in it helps).
+
+**Cost:** knowledge / MLM stages 4 jobs of 3-8 minutes, 7 Ettin arms of 22-35 minutes on L40S: roughly $6-8; exact figures from
+`scripts/modal_costs.py --rows 222` once Modal bills the day. Data builds and owner reads local ($0).
+
+## 192. Distilling decider into the late-interaction model: decider's soft targets teach the small model about real merchant names (rational households' new merchants +3 to +7) but not the owner's first-time payees (bge 47.7 -> 46.8, Ettin 49.1 -> 48.4, within noise); the teacher's knowledge, read on synthetic households, is not what the owner's new payees need (REAL-27, MODEL-25)
+
+PLAN step 223 (ColBERT-Zero 2602.16609: supervised contrastive then knowledge distillation; LITE 2406.17968: the teacher matters more than the
+scorer; row 212 (d)). Teacher: decider G4 (r190-g s0) on 30,000 items from 300 training-world households it never trained on (seeds
+301000-301299; `scripts/chains/r223_kd_items.sh`, `data/processed/realstyle_v4g_kd_train.json`, DVC), vLLM, 74.3% right first, 20.6 minutes on
+an H100. li_decider (`TEACHER`, `KD_SEEDS`, `KDW`, `KDP`): those households join the training data; half of each step's anchors are
+teacher-scored transactions (29,402 matched); loss + 1 x soft cross-entropy against decider's distribution over the household's options.
+kd0 is the same run without the KD term (the extra households alone). One seed each.
+
+**Table 192.1: % right first**
+
+| model | synthetic | first-time | blind_v2 | rational clean: bought before / new | rational bank: bought before / new | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|---|
+| bge o1 (no extra households) | 74.2 | 62.0 | 82.2 | 99.7 / 65.8 | 96.9 / 62.3 | 66.9 | 46.1 |
+| bge kd0 (+300 households) | 74.4 | 62.0 | 82.0 | 99.5 / 65.2 | 95.9 / 61.5 | 67.8 | 47.7 |
+| bge kd1 (+ distillation) | 74.2 | 62.4 | 81.5 | 98.7 / **68.9** | 96.2 / **64.3** | 67.3 | 46.8 |
+| Ettin ekmv (2 seeds, §191) | 72.8 / 73.0 | 59.1 / 59.5 | 81.7 / 81.6 | 100.0 / 60.0; 99.7 / 59.9 | 97.1 / 58.0; 97.0 / 56.2 | 68.9 / 68.2 | 49.9 / 48.3 |
+| Ettin ekmv + distillation | 73.3 | 60.7 | 81.9 | 99.3 / 66.3 | 97.4 / 63.5 | 68.4 | 48.4 |
+
+Calibration error on blind_v2: kd1 1.1%, ekmv + KD 10.0% (ekmv 3.7%): distillation can unsettle calibration; the read's temperature
+would need refitting before an auto-filing threshold.
+
+### 192.1 What the step says
+
+- **The teacher's knowledge transfers where it applies:** new merchants in the rational households are real Overture names, and the
+  distilled models name their categories 3-7 points more often (Ettin 60 -> 66 clean, 57 -> 64 bank strings), the largest knowledge gain
+  any stage gave. The knowledge stage of §191 put kinds into the encoder but history training spent them; distillation keeps them, because
+  the training objective itself asks for decider's view of each option.
+- **It does not reach the owner's first-time payees** (-0.9 bge, -0.7 Ettin; noise). The teacher was read on our generator's households,
+  whose new payees are realstyle merchants; the owner's first-time payees are another mix (person-to-person payments, local businesses,
+  messy strings, 11 years of category churn). Distillation from real budgets' decider reads would be the test, and the owner's budget must
+  stay a test set; this waits for more real data (the owner: "I'll get you better data another time").
+- The extra 300 households alone add about a point on the owner's budget for bge (66.9 -> 67.8), in line with row 218's h1 (more
+  households help transfer a little).
+
+**Cost:** teacher read 23.7 minutes on an H100 (~$1.60), three KD jobs of 45-47 minutes on L40S (~$4.50); exact figures from
+`scripts/modal_costs.py --rows 223` once Modal bills the day. Item build and owner reads local ($0).

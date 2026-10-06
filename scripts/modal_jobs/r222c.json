@@ -1,0 +1,39 @@
+[
+ {
+  "tag": "r222-kmv",
+  "gpu": "L40S",
+  "env": {
+   "PLAN_ROWS": "222",
+   "DATA_FROM": "r222-data",
+   "LOWER": "1",
+   "MV": "1",
+   "PDIM": "128",
+   "PAIRS_FILE": "data/interim/knowledge_pairs_v1.jsonl,data/interim/alias_pairs_v1.jsonl",
+   "ARM": "e_kmv",
+   "BASE": "jhu-clsp/ettin-encoder-32m"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/knowledge_stage.py train",
+   "ENCS=know_r212_e_kmv PAIRS_FILE=data/interim/knowledge_pairs_v1.jsonl uv run --frozen python scripts/knowledge_stage.py eval"
+  ]
+ },
+ {
+  "tag": "r222-mkmv",
+  "gpu": "L40S",
+  "env": {
+   "PLAN_ROWS": "222",
+   "DATA_FROM": "r222-data",
+   "LOWER": "1",
+   "MV": "1",
+   "PDIM": "128",
+   "PAIRS_FILE": "data/interim/knowledge_pairs_v1.jsonl,data/interim/alias_pairs_v1.jsonl",
+   "ARM": "e_mkmv",
+   "BASE": "models/encoders/mlm_r222_m1",
+   "ENCODERS_FROM": "r222-mk"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/knowledge_stage.py train",
+   "ENCS=know_r212_e_mkmv PAIRS_FILE=data/interim/knowledge_pairs_v1.jsonl uv run --frozen python scripts/knowledge_stage.py eval"
+  ]
+ }
+]

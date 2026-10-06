@@ -61,15 +61,25 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
 GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+# row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
+# markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
+PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
+# row 223 (distilling decider; ColBERT-Zero 2602.16609, LITE 2406.17968): TEACHER = decider's per-item scores (exp_decision_models per_item
+# jsonl: id, sum_lp per option) on the items of TEACHER_ITEMS (data/processed, realstyle items: id "RS:<seed>:<txn8>", options); KD_SEEDS the
+# training-world households they come from (added to the training data); each step a share KDP of the anchors is drawn from teacher-scored
+# transactions, and their loss adds KDW x the cross-entropy against decider's distribution over the household's options (KDT temperature)
+TEACHER, TEACHER_ITEMS, KD_SEEDS = os.environ.get("TEACHER", ""), os.environ.get("TEACHER_ITEMS", ""), os.environ.get("KD_SEEDS", "")
+KDW, KDP, KDT = float(os.environ.get("KDW", "1")), float(os.environ.get("KDP", "0.5")), float(os.environ.get("KDT", "1"))
 CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
-RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
+RCHUNK = int(os.environ.get("RCHUNK", "256"))
+MCHUNK = int(os.environ.get("MCHUNK", "32"))  # transactions per chunk in per-filing reads with ages / recent filings / documents  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
@@ -170,12 +180,14 @@ class LI:
     def params(self):
         return list(self.cb.enc.parameters()) + list(self.cb.proj.parameters()) + (list(self.qw.parameters()) if QW else [])
 
-    def vecs(self, texts):
+    def vecs(self, texts, role=None):
         """token vectors [n, L, PDIM], mask [n, L], query-token weights [n, L] (sum 1 over the mask), normalised pooled state [n, hidden]
         (POOL: [CLS] / masked mean / last non-padding token)"""
         import torch
         if LOWER:
             texts = [t.lower() for t in texts]
+        if PREFIX and role:  # ColBERT-Zero (2602.16609): keep the base's own query / document markers ("[Q] " / "[D] " for PyLate models)
+            texts = [(QPREFIX if role == "q" else DPREFIX) + t for t in texts]
         b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
         with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda"):
             h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state
@@ -550,7 +562,7 @@ prepare = prepared
 
 def _score(model, scale, qtexts, dtexts):
     """[len(qtexts), len(dtexts)] scaled late-interaction scores"""
-    return scale * model.score(model.vecs(qtexts), model.vecs(dtexts))
+    return scale * model.score(model.vecs(qtexts, "q"), model.vecs(dtexts, "d"))
 
 
 def _cands(e, ev):
@@ -569,14 +581,36 @@ def _cands(e, ev):
     return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
 
 
+def _doc_pairs(model, scale, qtexts, dtexts, cols):
+    """MODE=doc in training: [b, max options] scores of each query against its own option documents (cols[k] = columns in dtexts);
+    padded options -inf"""
+    import torch
+    qv, qm, qw, qc = model.vecs(qtexts, "q")
+    dv, dm, _, dc = model.vecs(dtexts, "d")
+    w = max(map(len, cols))
+    ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
+    valid = torch.tensor([[k < len(c) for k in range(w)] for c in cols], device=model.dev)
+    sim = torch.einsum("btd,bcsd->bcts", qv, dv[ix].to(qv.dtype))
+    m = dm[ix]
+    if SOFT:
+        a = (sim / SOFT).masked_fill(~m[:, :, None, :], float("-inf")).softmax(-1)
+        sim = (a * sim).sum(-1)
+    else:
+        sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
+    S = (sim * qw[:, None, :]).sum(-1)
+    if HYBRID:
+        S = S + torch.einsum("bh,bch->bc", qc, dc[ix])
+    return (scale * S).masked_fill(~valid, float("-inf"))
+
+
 def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
     """MODE=mml/mmld in training: [b, nopt] category logits from each query's own candidates only (cand[k] = list of (column in dtexts,
     option index)); 2026-10-06: scoring every query against every candidate text of the step ran out of memory with row 217's 512-token
     queries (32 x 512 x ~2,000 x 60). Same scores as _score + _mml_logits: MaxSim (or SOFT), query-token weights, HYBRID, x scale,
     then the log of the summed probability mass per category."""
     import torch
-    qv, qm, qw, qc = model.vecs(qtexts)
-    dv, dm, _, dc = model.vecs(dtexts)
+    qv, qm, qw, qc = model.vecs(qtexts, "q")
+    dv, dm, _, dc = model.vecs(dtexts, "d")
     C = max(map(len, cand))
     cix = torch.tensor([[c for c, _ in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
     oix = torch.tensor([[o for _, o in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
@@ -641,6 +675,30 @@ def train():
         data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
+    kd = []  # teacher-scored events (row 223)
+    if TEACHER:
+        from ai_experiments.paths import PROCESSED, ROOT
+        items = {it["id"]: it for it in json.loads((PROCESSED / TEACHER_ITEMS).read_text())["items"]}
+        tl = {}
+        for r in map(json.loads, open(ROOT / TEACHER if not Path(TEACHER).is_absolute() else TEACHER)):
+            if r["id"] in items:
+                lp = np.asarray(r["sum_lp"], dtype=np.float64) / KDT
+                p_ = np.exp(lp - lp.max()); p_ /= p_.sum()
+                tl[r["id"]] = {o.strip(): float(x) for o, x in zip(items[r["id"]]["options"], p_)}
+        a_, z_ = map(int, KD_SEEDS.split("-"))
+        for b in households("train", range(a_, z_ + 1)):
+            if OVERRIDE:
+                b = _override(b, random.Random(SEED * 7919 + 10 ** 6 + int(b["id"].rsplit("-", 1)[1])))
+            ev_, docs_ = prepared(b, m1, cache, full=False)
+            data.append((ev_, docs_))
+            hid = b["id"].rsplit("-", 1)[1]
+            for e in ev_:
+                t = tl.get(f"RS:{hid}:{e['id'][:8]}")
+                if t and e["gold"] in e["state"] and len(e["state"]) > 1:
+                    e["_t"] = t
+                    kd.append(e)
+            cache.clear()
+        print(f"KD: {len(tl)} teacher-scored items, {len(kd)} matched to events of {z_ - a_ + 1} households", flush=True)
     ex = _materialise(data[0][0][50])
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
           f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
@@ -664,6 +722,9 @@ def train():
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
             anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e) for e in pick]
+        if kd and KDP > 0:  # a share KDP of the step's anchors from teacher-scored transactions (each carries its own day's documents)
+            nk = int(round(KDP * len(anc))) or 1
+            anc = anc[:len(anc) - nk] + [_materialise(e) for e in rng.sample(kd, min(nk, len(kd)))]
         if not anc:
             continue
         dtexts, idx = [], {}
@@ -676,7 +737,7 @@ def train():
             for e in anc:
                 for c in e["state"]:
                     col(e["d"][c])
-            Q, Dv = model.vecs([e["q"] for e in anc]), model.vecs(dtexts)
+            Q, Dv = model.vecs([e["q"] for e in anc], "q"), model.vecs(dtexts, "d")
             F = fpos = Lab = lpos = None
             if "m" in INTERACT:
                 ft = list(dict.fromkeys(e["_ev"][j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
@@ -693,15 +754,28 @@ def train():
             Sg = _mml_pairs(model, scale, [e["q"] for e in anc], dtexts, cand, max(len(e["state"]) for e in anc))
         else:
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
-            S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
-            w = max(map(len, cols))
-            ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
-            valid = torch.tensor([[k_ < len(c) for k_ in range(w)] for c in cols], device=model.dev)
-            Sg = S.gather(1, ix).masked_fill(~valid, float("-inf"))
+            # each anchor against its own options only (2026-10-06: anchors from other households and days, as KD's, multiplied the
+            # documents, and the all-pairs score [queries x tokens x documents x tokens] ran out of memory); same scores as _score + gather
+            Sg = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols)
             if PPRIOR:
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         loss, ce = _loss(Sg, tgt)
+        if kd:  # soft cross-entropy against decider's distribution over the options it shares with this one (others get 0)
+            T = torch.zeros_like(Sg)
+            has = []
+            for k_, e in enumerate(anc):
+                t = e.get("_t")
+                if t:
+                    v = [t.get(e["labels"][c], 0.0) for c in e["state"]]
+                    z = sum(v)
+                    if z > 0:
+                        T[k_, :len(v)] = torch.tensor(v, device=model.dev) / z; has.append(k_)
+            if has:
+                hi = torch.tensor(has, device=model.dev)
+                kdl = -(T[hi] * torch.log_softmax(Sg[hi].float(), -1).masked_fill(T[hi] == 0, 0.0)).sum(-1).mean()
+                loss = loss + KDW * kdl
+                run["kd"] += kdl.item()
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.params() + (list(inter.parameters()) if inter else []), 1.0)
@@ -721,7 +795,7 @@ def train():
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
-                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, **{k: globals()[k] for k in EXTRA}), indent=1))
+                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, TEACHER=TEACHER, KD_SEEDS=KD_SEEDS, KDW=KDW, KDP=KDP, KDT=KDT, **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -730,7 +804,7 @@ def iscores(model, inter, scale, ev, docs):
     import torch
 
     def enc(texts):
-        parts = [model.vecs(texts[a:a + 512]) for a in range(0, len(texts), 512)]
+        parts = [model.vecs(texts[a:a + 512], "d") for a in range(0, len(texts), 512)]
         L = max(p[0].shape[1] for p in parts)
         return (torch.cat([torch.nn.functional.pad(p[0], (0, 0, 0, L - p[0].shape[1])) for p in parts]).to(torch.bfloat16),
                 torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None, torch.cat([p[3] for p in parts]))
@@ -748,7 +822,7 @@ def iscores(model, inter, scale, ev, docs):
         if not FAST_ISCORES:  # the per-transaction reference path (identical scores; 1.7x slower on 11,558 transactions)
             for a in range(0, len(ev), 64):
                 chunk = ev[a:a + 64]
-                S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos)
+                S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk], "q"), D, pos, docs, F, fpos, Lab, lpos)
                 out += [dict(zip(e["state"], S[k, :len(e["state"])].tolist())) for k, e in enumerate(chunk)]
             return out
         # every index the layers need, built once per budget as arrays; per chunk only tensor gathers run
@@ -772,7 +846,7 @@ def iscores(model, inter, scale, ev, docs):
             valid = torch.arange(C, device=model.dev)[None, :] < nopt_t[a:a + b, None]
             ra, ro = valid.nonzero(as_tuple=True)
             pre = dict(ra=ra, ro=ro, rd=cix_t[a:a + b, :C][ra, ro], mf=mf_t[a:a + b], ml=ml_t[a:a + b], mm=mm_t[a:a + b])
-            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos, pre)
+            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk], "q"), D, pos, docs, F, fpos, Lab, lpos, pre)
             S = S.tolist()
             out += [dict(zip(e["state"], S[k][:nopt[a + k]])) for k, e in enumerate(chunk)]
     return out
@@ -781,6 +855,25 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
+    if MODE in ("mml", "mmld") and (CAGO or os.environ.get("MCHUNKED") == "1"):  # only ages make texts unique per transaction
+        # 2026-10-06: with candidate ages every filing text is unique to the transaction reading it, so "encode every candidate text of
+        # the budget once" held hundreds of thousands of texts (out of memory on an L40S); here each chunk encodes its own candidates
+        out = []
+        with torch.no_grad():
+            for a in range(0, len(ev), MCHUNK):
+                chunk = ev[a:a + MCHUNK]
+                dt, idx, cand = [], {}, []
+                for e in chunk:
+                    oi = {c: o for o, c in enumerate(e["state"])}
+                    cs = []
+                    for t, c in _cands(e, ev):
+                        if t not in idx:
+                            idx[t] = len(dt); dt.append(t)
+                        cs.append((idx[t], oi[c]))
+                    cand.append(cs)
+                S = _mml_pairs(model, scale, [e["q"] for e in chunk], dt, cand, max(len(e["state"]) for e in chunk)).tolist()
+                out += [dict(zip(e["state"], S[k][:len(e["state"])])) for k, e in enumerate(chunk)]
+        return out
     if MODE in ("mml", "mmld"):
         cands = [_cands(e, ev) for e in ev]
         uniq = list(dict.fromkeys(t for cs in cands for t, _ in cs))
@@ -788,7 +881,7 @@ def scores(model, scale, ev, docs):
         uniq = list(dict.fromkeys(t for d in docs.values() for t in d.values()))
     pos = {t: k for k, t in enumerate(uniq)}
     with torch.no_grad():
-        parts = [model.vecs(uniq[a:a + 512]) for a in range(0, len(uniq), 512)]
+        parts = [model.vecs(uniq[a:a + 512], "d") for a in range(0, len(uniq), 512)]
         L = max(p[0].shape[1] for p in parts)
         D = (torch.cat([torch.nn.functional.pad(p[0], (0, 0, 0, L - p[0].shape[1])) for p in parts]).to(torch.bfloat16),
              torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None,
@@ -796,7 +889,7 @@ def scores(model, scale, ev, docs):
         out = []
         for a in range(0, len(ev), RCHUNK):
             chunk = ev[a:a + RCHUNK]
-            q = model.vecs([e["q"] for e in chunk])
+            q = model.vecs([e["q"] for e in chunk], "q")
             if MODE not in ("mml", "mmld") and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
                 ids = [list(e["state"]) for e in chunk]
                 C = max(map(len, ids))
@@ -871,7 +964,7 @@ def read():
         budgets = [json.loads(RB.CACHE.read_text())["budget"]]
     elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
         import blind_budgets
-        budgets = blind_budgets.budgets()
+        budgets = blind_budgets.budgets()[:int(os.environ.get("BLIND_N", "250"))]  # BLIND_N: the first N users (slow readers)
     elif os.environ.get("READ", "").startswith("rational_"):  # row 220: perfectly rational households, READ=rational_clean | rational_bank
         import rational_budgets
         budgets = rational_budgets.budgets(os.environ["READ"].split("_", 1)[1])

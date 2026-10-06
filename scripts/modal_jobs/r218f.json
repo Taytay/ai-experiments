@@ -1,0 +1,62 @@
+[
+ {
+  "tag": "r218-m1-read2",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "OPTS": "span",
+   "ENCODERS_FROM": "enc-base,r218-m1",
+   "ARMS": "li_r218_m1"
+  },
+  "cmds": [
+   "TEST_SEEDS=100000-100009 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 BLIND_N=50 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r218-m2-read2",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "OPTS": "span",
+   "ENCODERS_FROM": "enc-base,r218-m2",
+   "ARMS": "li_r218_m2"
+  },
+  "cmds": [
+   "TEST_SEEDS=100000-100009 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 BLIND_N=50 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r218-m3-read2",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache",
+   "PLAN_ROWS": "218",
+   "OPTS": "span",
+   "ENCODERS_FROM": "enc-base,r218-m3",
+   "ARMS": "li_r218_m3"
+  },
+  "cmds": [
+   "TEST_SEEDS=100000-100009 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 BLIND_N=50 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]
