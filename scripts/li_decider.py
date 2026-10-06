@@ -13,7 +13,7 @@ consecutive days (so the day's documents are shared), up to B of them.
   read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget | blind2: blind_v2 users as budgets, row 217)
 env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB (5), M (8), B (32), WINDOW (7), STEPS (3000),
      HOUSEHOLDS (200), BRIER (1), LR (5e-5), SEED (0), HYBRID (0), QW (0), SOFT (0: MaxSim; tau_a for UWE's soft interaction),
-     MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
+     MODE (doc: one document per category | mml: per-filing candidates, BELXTR | mmld: per-filing candidates + category documents), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
      row 209 (any base): PDIM (128), PROJ (linear | res), PROJ_INIT (1), LOWER (0), POOL (cls | mean | last), MAXLEN (default min(96, the base's): row 210's length).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/li_decider.py train
 """
@@ -61,11 +61,12 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
-PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA
+PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
+PTAU = float(os.environ.get("PTAU", "0.9"))
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
@@ -312,11 +313,12 @@ _M1 = None
 KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
 
 
-def _nbrs(b, ev, m1, cache):
-    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists. Cached on disk for synthetic
-    budgets in data/interim/li_nb, one int32 array per budget keyed by its events and the encoder's weights (2026-10-06: this replaces
-    row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query setting;
-    the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
+def _nbrs(b, ev, m1, cache, cos=False):
+    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists (cos=True: also their cosines,
+    float16 arrays, for PPRIOR=2). Cached on disk for synthetic budgets in data/interim/li_nb, one int32 array per budget keyed by its
+    events and the encoder's weights, the cosines beside it (<key>_cos.npy, added 2026-10-06; built when first asked for) (2026-10-06: this
+    replaces row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query
+    setting; the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
     import hashlib
     from ai_experiments.paths import ROOT
     f = None
@@ -327,22 +329,29 @@ def _nbrs(b, ev, m1, cache):
         for w in sorted(Path(H.OUT1).glob("*.safetensors")):
             h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
         f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
-        if f.exists():
-            return [array("i", (j for j in r if j >= 0)) for r in np.load(f).tolist()]
+        fc = f.with_name(f.stem + "_cos.npy")
+        if f.exists() and (not cos or fc.exists()):
+            nb = [array("i", (j for j in r if j >= 0)) for r in np.load(f).tolist()]
+            return (nb, [c[:len(r)] for c, r in zip(np.load(fc), nb)]) if cos else nb
     global _M1
     if m1 is None:  # loaded only when a budget misses the cache
         _M1 = _M1 or H._model(H.OUT1)
         m1 = _M1
-    nb = [array("i", (j for j, _ in n)) for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
+    found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
+    nb = [array("i", (j for j, _ in n)) for n in found]
+    cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
     if f is not None:
         f.parent.mkdir(parents=True, exist_ok=True)
         arr = np.full((len(ev), KNB), -1, dtype=np.int32)
+        carr = np.zeros((len(ev), KNB), dtype=np.float16)
         for i, r in enumerate(nb):
             arr[i, :len(r)] = r
-        tmp = f.with_suffix(f".tmp{os.getpid()}.npy")
-        np.save(tmp, arr)
-        tmp.replace(f)
-    return nb
+            carr[i, :len(r)] = cs[i]
+        for path, x in ((f, arr), (fc, carr)):
+            tmp = path.with_suffix(f".tmp{os.getpid()}.npy")
+            np.save(tmp, x)
+            tmp.replace(path)
+    return (nb, cs) if cos else nb
 
 
 def _query(i, ev, start, names=None):
@@ -415,9 +424,17 @@ def prepared(b, m1, cache, full=True):
         for e in ev[i:j]:
             last[e["gold"]] = e["date"]
         i = j
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
+    if CTX or MODE in ("mml", "mmld") or "m" in INTERACT or PPRIOR == 2:
+        got = _nbrs(b, ev, m1, cache, cos=PPRIOR == 2)
+        nbl, cosl = got if PPRIOR == 2 else (got, None)
+        for k, (e, n) in enumerate(zip(ev, nbl)):
             e["nb"] = n
+            if PPRIOR == 2:  # the payee's earlier filings = earlier-day neighbours at cosine >= PTAU (row 220: 92.8% found, 93.5% right)
+                pp = defaultdict(int)
+                for j, c in zip(n, cosl[k]):
+                    if c >= PTAU:
+                        pp[ev[j]["gold"]] += 1
+                e["_pp"] = dict(pp) or None
     start, k = [], 0
     for i, e in enumerate(ev):
         if i and e["day"] != ev[i - 1]["day"]:
@@ -434,7 +451,7 @@ def prepared(b, m1, cache, full=True):
             r = recent.get(e["gold"], ())
             recent[e["gold"]] = ((e["payee"], e["amt"]),) + tuple(x for x in r if x[0] != e["payee"])[:M - 1]
         i = j
-    if PPRIOR:  # earlier-day filings of the same payee key per category (ai_experiments.payeekey: processor prefixes, codes, store numbers off)
+    if PPRIOR == 1:  # earlier-day filings of the same payee key per category (ai_experiments.payeekey: processor prefixes, codes, store numbers off)
         from ai_experiments.payeekey import payee_key
         seen, i = defaultdict(lambda: defaultdict(int)), 0
         while i < len(ev):
@@ -537,7 +554,40 @@ def _cands(e, ev):
     """MODE=mml: the candidates of one transaction, (text, category id): its NCAND nearest earlier filings by hist_knn_v1 (in visible
     categories) and every visible category's "Group: Name", so each option has at least one"""
     out = [(ev[j]["text"], ev[j]["gold"]) for j in e["nb"][:NCAND] if ev[j]["gold"] in e["state"]]
-    return out + [(e["labels"][c], c) for c in e["state"]]
+    # MODE=mmld (owner, 2026-10-06: "I'd much rather that this system infer the similarity of all of those payees somehow, akin to how the
+    # decider LLM does it"): each category's document (name + recent payees) instead of its bare name, beside the per-filing candidates,
+    # so a payee's variants are matched by the trained encoder filing by filing (no averaging, no key) and categories with no close filing
+    # still have their document; with CTX the query carries the dated history (row 217's p2)
+    return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
+
+
+def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
+    """MODE=mml/mmld in training: [b, nopt] category logits from each query's own candidates only (cand[k] = list of (column in dtexts,
+    option index)); 2026-10-06: scoring every query against every candidate text of the step ran out of memory with row 217's 512-token
+    queries (32 x 512 x ~2,000 x 60). Same scores as _score + _mml_logits: MaxSim (or SOFT), query-token weights, HYBRID, x scale,
+    then the log of the summed probability mass per category."""
+    import torch
+    qv, qm, qw, qc = model.vecs(qtexts)
+    dv, dm, _, dc = model.vecs(dtexts)
+    C = max(map(len, cand))
+    cix = torch.tensor([[c for c, _ in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
+    oix = torch.tensor([[o for _, o in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
+    ok = torch.tensor([[k < len(cs) for k in range(C)] for cs in cand], device=model.dev)
+    sim = torch.einsum("btd,bcsd->bcts", qv, dv[cix].to(qv.dtype))
+    m = dm[cix]
+    if SOFT:
+        a = (sim / SOFT).masked_fill(~m[:, :, None, :], float("-inf")).softmax(-1)
+        sim = (a * sim).sum(-1)
+    else:
+        sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
+    S = (sim * qw[:, None, :]).sum(-1)
+    if HYBRID:
+        S = S + torch.einsum("bh,bch->bc", qc, dc[cix])
+    S = (scale * S).masked_fill(~ok, float("-inf"))
+    mx = S.max(1, keepdim=True).values
+    w = (S - mx).exp().masked_fill(~ok, 0.0)
+    agg = torch.zeros(len(cand), nopt, device=model.dev).scatter_add(1, oix, w)
+    return torch.where(agg > 0, agg.clamp(min=1e-30).log() + mx, torch.full_like(agg, float("-inf")))
 
 
 def _mml_logits(S, cand, anc):
@@ -573,7 +623,7 @@ def train():
         open_licence(BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
-    assert not RENAME or (MODE == "doc" and not INTERACT), "RENAME renders documents and query rows only"
+    assert not RENAME or (MODE in ("doc", "mmld") and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
@@ -625,13 +675,12 @@ def train():
                 F = _pool(*model.vecs(ft)[:2]) if ft else None
                 Lab = _pool(*model.vecs(lt)[:2]) if lt else None
             Sg = _iscores(model, inter, scale, anc, ev, Q, Dv, idx, docs, F, fpos, Lab, lpos)
-        elif MODE == "mml":
+        elif MODE in ("mml", "mmld"):
             cand = []
             for e in anc:
                 oi = {c: o for o, c in enumerate(e["state"])}
                 cand.append([(col(t), oi[c]) for t, c in _cands(e, e["_ev"])])
-            S = _score(model, scale, [e["q"] for e in anc], dtexts)
-            Sg = _mml_logits(S, cand, anc)
+            Sg = _mml_pairs(model, scale, [e["q"] for e in anc], dtexts, cand, max(len(e["state"]) for e in anc))
         else:
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
             S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
@@ -722,7 +771,7 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
-    if MODE == "mml":
+    if MODE in ("mml", "mmld"):
         cands = [_cands(e, ev) for e in ev]
         uniq = list(dict.fromkeys(t for cs in cands for t, _ in cs))
     else:
@@ -738,7 +787,7 @@ def scores(model, scale, ev, docs):
         for a in range(0, len(ev), 256):
             chunk = ev[a:a + 256]
             q = model.vecs([e["q"] for e in chunk])
-            if MODE != "mml" and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
+            if MODE not in ("mml", "mmld") and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
                 ids = [list(e["state"]) for e in chunk]
                 C = max(map(len, ids))
                 cix = torch.tensor([[pos[e["d"][c]] for c in o] + [0] * (C - len(o)) for e, o in zip(chunk, ids)], device=model.dev)
@@ -761,7 +810,7 @@ def scores(model, scale, ev, docs):
                 continue
             for k, e in enumerate(chunk):
                 ids = list(e["state"])
-                if MODE == "mml":
+                if MODE in ("mml", "mmld"):
                     opt = {c: o for o, c in enumerate(ids)}
                     cs = [(pos[t], opt[c]) for t, c in cands[a + k]]
                     cix = torch.tensor([c for c, _ in cs], device=model.dev)
