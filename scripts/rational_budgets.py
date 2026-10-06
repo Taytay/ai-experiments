@@ -43,6 +43,7 @@ N, EXPLORE, D0 = 50, 0.15, dt.date(2025, 1, 1)
 #   RATIONAL_PAYEES=obvious  each merchant renamed (one name per household and merchant) to an invented name that says what it is
 #                            ("Hargrove Street Pizzeria", "Linden Electric Cooperative"): a made-up proper part and a cue for the kind;
 #                            every name checked against the training merchant pool and the knowledge / alias pairs (never seen verbatim)
+#   RATIONAL_PAYEES=seen     each merchant replaced by one of the same kind that fcr's training households bought from (3+ times)
 #   RATIONAL_CATS=synonyms   each category renamed to an obvious synonym, sometimes with an emoji ("Eating at home 🥦"), one per household;
 #                            none is a category name variant of the training households (realstyle.EVERYDAY / CATCHALL); =loose: the
 #                            first, looser list ("Our house", "Good times")
@@ -116,6 +117,44 @@ def _seen_names():
     return seen
 
 
+def _train_pool():
+    by = {}
+    for m in json.loads((PROCESSED / "realstyle_merchants_v1.json").read_text())["merchants"]:
+        if m["split"] == "train":
+            by.setdefault(m["kind"], []).append(m["name"])
+    return by
+
+
+def _seen_pool(min_n=3):
+    """RATIONAL_PAYEES=seen (owner, 2026-10-06: "all of the payees have been seen in training"): merchants by kind that fcr's training
+    households used (v5 world, train households 0-199, each bought at least min_n times), cached in data/interim"""
+    from ai_experiments.paths import ROOT
+    f = ROOT / "data" / "interim" / "rational_seen_pool.json"
+    if not f.exists():
+        from collections import Counter
+        env = dict(SHARED_WORLD="1", GROUPNAMES="1", REALSTYLE_V4="1", RS_V5="1")
+        old = {k: os.environ.get(k) for k in list(env) + ["RS_V6"]}
+        os.environ.update(env); os.environ.pop("RS_V6", None)
+        from two_tower import households
+        n = Counter()
+        for b in households("train", range(200)):
+            for t in b["transactions"]:
+                name = (t.get("parts") or {}).get("Clean payee")
+                if t.get("kind") and name and t["amount"] < 0:
+                    n[(t["kind"], name)] += 1
+        for k, v in old.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        by = {}
+        for (k, name), c in n.items():
+            if c >= min_n:
+                by.setdefault(k, []).append(name)
+        f.write_text(json.dumps({k: sorted(v) for k, v in by.items()}))
+    return json.loads(f.read_text())
+
+
 def _check_synonyms():
     import re
     from ai_experiments import realstyle as R
@@ -136,6 +175,7 @@ def budgets(level="clean", n=N):
     pool, out = _pool(), []
     payees_mode, cats_mode = os.environ.get("RATIONAL_PAYEES", ""), os.environ.get("RATIONAL_CATS", "")
     seen = _seen_names() if payees_mode == "obvious" else set()
+    seen_pool = _seen_pool() if payees_mode == "seen" else {}
     if cats_mode in ("synonyms", "loose"):
         _check_synonyms()
     for h in range(n):
@@ -157,6 +197,15 @@ def budgets(level="clean", n=N):
                 alias[name] = cand
                 used.add(cand)
             return alias[name]
+
+        r4 = random.Random(234_900 + h)  # RATIONAL_PAYEES=seen: its own stream
+
+        def rename_seen(name, k):
+            if name not in alias:
+                opts = [m for m in seen_pool.get(k, []) if m not in used] or seen_pool.get(k) or _train_pool()[k]  # pet: training's pool
+                alias[name] = r4.choice(opts)
+                used.add(alias[name])
+            return alias[name]
         cid = {c: f"c{i}" for i, c in enumerate(CATS)}
         rows = []
         for day in range(365):
@@ -176,6 +225,8 @@ def budgets(level="clean", n=N):
             text = name if level == "clean" else statements.render_v2(name, rng)
             if payees_mode == "obvious":  # the original string is still drawn (the household's rng advances as before), then replaced
                 text = rename(name, k) if level == "clean" else statements.render_v2(rename(name, k), r2)
+            elif payees_mode == "seen":  # a merchant of the same kind that fcr's training households bought from
+                text = rename_seen(name, k) if level == "clean" else statements.render_v2(rename_seen(name, k), r4)
             pid = payees.setdefault(text, f"p{len(payees)}")
             lo, hi = AMT[c]
             amt = fixed.setdefault(name, round(rng.uniform(lo, hi), 2)) if c == "Mortgage" else round(lo * (hi / lo) ** rng.random(), 2)
@@ -183,7 +234,7 @@ def budgets(level="clean", n=N):
                             deleted=False, reason=["known" if name in met else "new"],  # scoring segments only, never model input
                             kind=k))  # the merchant's kind: model input only through li_decider's KINDLINE (a simulated lookup)
             met.add(name)
-        tag = ("-obv" if payees_mode == "obvious" else "") + ({"synonyms": "-syn", "loose": "-loose"}.get(cats_mode, ""))
+        tag = {"obvious": "-obv", "seen": "-seen"}.get(payees_mode, "") + ({"synonyms": "-syn", "loose": "-loose"}.get(cats_mode, ""))
         out.append(dict(id=f"rational-{level}{tag}-{h}", category_groups=[dict(id="g", name="Spending")], categories=cats,
                         payees=[dict(id=p, name=t) for t, p in payees.items()], transactions=txs, subtransactions=[]))
     return out

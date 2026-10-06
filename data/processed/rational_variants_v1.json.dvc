@@ -1,0 +1,5 @@
+outs:
+- md5: 8b5a256d7ff461544b9883bd7337f82f
+  size: 30448485
+  hash: md5
+  path: rational_variants_v1.json
