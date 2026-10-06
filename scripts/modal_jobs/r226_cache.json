@@ -1,0 +1,20 @@
+[
+ {
+  "tag": "r226-cache",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "RS_V5": "1",
+   "PLAN_ROWS": "226",
+   "SAVE_DATA": "1",
+   "TRAIN_N": "200",
+   "OPTS": "span",
+   "ENCODERS_FROM": "enc-base"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/chains/r226_cache_build.py"
+  ]
+ }
+]
