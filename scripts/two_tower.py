@@ -71,6 +71,18 @@ def replay(b):
     return out
 
 
+_SHA = {}
+
+
+def _file_sha(f):
+    """sha1 of a file's bytes, once per process"""
+    import hashlib
+    f = Path(f)
+    if f not in _SHA:
+        _SHA[f] = hashlib.sha1(f.read_bytes()).hexdigest()
+    return _SHA[f]
+
+
 def _hh_key(split):
     """the generator's identity: realstyle.py and statements.py source, the data files they read, and the env flags that change worlds"""
     import hashlib
@@ -80,8 +92,8 @@ def _hh_key(split):
     for f in (R.__file__, S.__file__):
         h.update(Path(f).read_bytes())
     for f in sorted(PROCESSED.glob("statement_patterns_v*.json")) + [PROCESSED / "realstyle_merchants_v1.json", PROCESSED / "category_style_v1.json"]:
-        if f.exists():
-            h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
+        if f.exists():  # by content (2026-10-06: by mtime, a Modal image rebuild could miss caches built from the same files)
+            h.update(f.name.encode() + _file_sha(f).encode())
     h.update(f"{os.environ.get('SHARED_WORLD')}|{os.environ.get('REALSTYLE_V4')}|{split}".encode())
     if os.environ.get("RS_V5") == "1":  # row 225 (keys of other settings unchanged)
         h.update(b"|v5")

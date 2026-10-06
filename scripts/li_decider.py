@@ -391,8 +391,9 @@ def _nbrs(b, ev, m1, cache, cos=False):
         h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
             h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
-        for w in sorted(Path(H.OUT1).glob("*.safetensors")):
-            h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
+        from two_tower import _file_sha
+        for w in sorted(Path(H.OUT1).glob("*.safetensors")):  # by content (2026-10-06: mtimes differ between Modal images and copies)
+            h.update(f"{w.name}{_file_sha(w)}".encode())
         f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
         fc = f.with_name(f.stem + "_cos.npy")
         if f.exists() and (not cos or fc.exists()):
@@ -901,6 +902,49 @@ def _loss(S, tgt):
     return ce + BRIER * ((p - y) ** 2).sum(-1).mean(), ce
 
 
+def _train_budget(n, b=None):
+    b = b or next(households("train", [n]))
+    if OVERRIDE:
+        b = _override(b, random.Random(SEED * 7919 + n))
+    if DBSWAP:
+        b = _dbswap(b, random.Random(SEED * 104729 + n))
+    return b
+
+
+def _prep_one(n):
+    return prepared(_train_budget(n), None, {}, full=False)
+
+
+def _prep_train(m1, cache):
+    """the training households, prepared. 2026-10-06 (owner: "We need to do better at reusing preparation steps"): fcr's jobs spent 14 of
+    21 minutes here on one core. Now (1) each household's neighbour list is made or loaded in this process (the GPU step, cached on disk
+    in data/interim/li_nb; a prep job builds them once for every arm), then (2) the CPU part runs in PREP_PROCS forked workers (default:
+    every core), which only read the caches. PREP_PROCS=1: the old sequential loop."""
+    import multiprocessing as mp
+    procs = int(os.environ.get("PREP_PROCS", "0")) or min(8, len(os.sched_getaffinity(0)))  # Modal reserves 8 cores (os.cpu_count is the host's)
+    if os.environ.get("PREP_CACHE", "1") == "0":  # without the disk cache the workers would each embed on the GPU
+        procs = 1
+    t0 = time.time()
+    if procs == 1 or not (CTX or MODE in ("mml", "mmld") or "m" in INTERACT or PPRIOR == 2):
+        out = []
+        for n, b in enumerate(households("train", range(HOUSEHOLDS))):
+            out.append(prepared(_train_budget(n, b), m1, cache, full=False))
+            if n % 50 == 0:
+                cache.clear()
+        return out
+    for n, b in enumerate(households("train", range(HOUSEHOLDS))):
+        b = _train_budget(n, b)
+        _nbrs(b, H2.events(b), m1, cache, cos=PPRIOR == 2)
+        if n % 50 == 0:
+            cache.clear()
+    t1 = time.time()
+    with mp.get_context("fork").Pool(procs) as pool:
+        out = pool.map(_prep_one, range(HOUSEHOLDS), chunksize=1)
+    print(f"prepared {HOUSEHOLDS} households: neighbours {t1 - t0:.0f}s (GPU, disk cache), the rest {time.time() - t1:.0f}s on {procs} processes",
+          flush=True)
+    return out
+
+
 def train():
     import torch
     from ai_experiments.licences import open_licence
@@ -912,15 +956,7 @@ def train():
     assert not RENAME or (MODE in ("doc", "mmld") and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
-    data = []
-    for n, b in enumerate(households("train", range(HOUSEHOLDS))):
-        if OVERRIDE:
-            b = _override(b, random.Random(SEED * 7919 + n))
-        if DBSWAP:
-            b = _dbswap(b, random.Random(SEED * 104729 + n))
-        data.append(prepared(b, m1, cache, full=False))
-        if n % 50 == 0:
-            cache.clear()
+    data = _prep_train(m1, cache)
     kd = []  # teacher-scored events (row 223)
     if TEACHER:
         from ai_experiments.paths import PROCESSED, ROOT
@@ -1421,5 +1457,25 @@ def read():
         del run
 
 
+def prep():
+    """row 233: a cache-building job (modal SAVE_DATA=1; later jobs copy it with DATA_FROM=<its tag>): the training households and their
+    neighbour lists for this env (generator flags, OVERRIDE / DBSWAP, HOUSEHOLDS), and the held-out households TEST_SEEDS, so arms that
+    share households (seeds, recipe changes, reads) do not each rebuild them."""
+    import multiprocessing as mp
+    t0 = time.time()
+    a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100019").split("-"))
+    with mp.get_context("fork").Pool(min(8, len(os.sched_getaffinity(0)))) as pool:  # households: CPU, one process each
+        pool.map(_build_hh, [("train", n) for n in range(HOUSEHOLDS)] + [("test", n) for n in range(a, z + 1)], chunksize=4)
+    print(f"households built ({time.time() - t0:.0f}s)", flush=True)
+    _prep_train(None, {})
+    for b in households("test", range(a, z + 1)):
+        _nbrs(b, H2.events(b), None, {})
+    print(f"prep done ({time.time() - t0:.0f}s)", flush=True)
+
+
+def _build_hh(sn):
+    next(households(sn[0], [sn[1]]))
+
+
 if __name__ == "__main__":
-    {"train": train, "read": read}[sys.argv[1]]()
+    {"train": train, "read": read, "prep": prep}[sys.argv[1]]()
