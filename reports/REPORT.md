@@ -217,6 +217,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §202 decider at matched effort on v5 households and without REAL-6 (row 231)
 - §203 Options inside the encoder's input (row 228)
 - §204 Clef-flash zero-shot (row 164)
+- §205 The Ettin-1B option scorer on the owner's budget (row 232)
 
 <!-- END SECTION INDEX -->
 
@@ -12122,3 +12123,33 @@ Cloudflare's tested stack (torch 2.11, transformers 5.10.2); neither could close
 
 **Cost:** one H100 job of 16 minutes plus two stopped arms: roughly $3-4; exact figures from `scripts/modal_costs.py --rows 164` once Modal
 bills the day.
+
+## 205. The Ettin-1B option scorer on the owner's budget: 39.3% right first (decider-4B 73.4-74.5 on the same 21,238 items, Ettin-32M fcr 70.8 on 19,093); 8,192 tokens of history instead of 2,048 add 3 points (42.5 against decider 74.4 on every 5th item); the 1B option scorer is closed
+
+PLAN step 232 (owner, 2026-10-06: "Did you ever find out why we abandoned Ettin since it was doing so well, and doing so more cheaply?").
+§104 / §110's encoder recipe (Ettin-encoder-1B, one [MASK] per option, decider's episodes, soft targets, Overture episodes, short histories,
+empty categories, kind lines; seed 0) matched decider-4B on the sets built with the training generator and trailed it on the blind sets
+(blind_v1 77.9-79.3 against 82.0; blind_v2 65.5 against 71.7, §137), and §138 dropped it from the system. It had never been read on the owner's
+budget. `exp_encoder_mask.py PRIVATE_ITEMS` scores a saved encoder on real_budget_eval's items (decider's own split prompts) on the local
+RTX 3090, writing scores beside the items and printing aggregates only (`scripts/chains/r232_owner.sh`).
+
+**Table 205.1: % right first on the owner's budget (same items per row pair)**
+
+| reader | all | first-time payees | ms a transaction (RTX 3090, batch 32) | prompts cut |
+|---|---|---|---|---|
+| decider-4B v5 (r231, 2 seeds), 21,238 items | 73.6 / 74.5 | 56.9 / 58.1 | 10-13 (H100) | none |
+| Ettin-1B, 2,048 tokens, 21,238 items | 39.3 | 28.2 | 109 | 98.4% |
+| decider-4B v5, every 5th item (4,248) | 74.4 / 74.7 | 57.7 / 57.9 | | |
+| Ettin-1B, 8,192 tokens, every 5th item | 42.5 | 30.6 | 163 | 0% |
+| Ettin-32M fcr (§198), 19,093 items | 70.8 / 70.9 | 52.1 / 51.8 | 2.9 | |
+
+### 205.1 What the step says
+
+- **The 1B option scorer does not carry over to a real budget.** Trained on REAL-6-style episodes (at most ~45 options, 24 shots), it
+  reads the owner's 96 options (median) and eleven years of history at 39-43%, half of decider's level and 30 points under the 32M
+  late-interaction model trained on real-style households.
+- **History length is not the cause:** with the whole prompt (no cuts) it gains 3 points. What it lacks is training on budgets like the
+  owner's; fcr, trained on v5 households, reads the same budget at 70.8. §138's decision stands on the owner's budget too.
+- Its read is 40-55x slower than fcr's on the same GPU.
+
+**Cost:** $0 (local RTX 3090, 39 + 12 minutes).
