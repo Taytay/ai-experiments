@@ -61,13 +61,16 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
 GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+# row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
+# markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
+PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
 CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
 RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
@@ -170,12 +173,14 @@ class LI:
     def params(self):
         return list(self.cb.enc.parameters()) + list(self.cb.proj.parameters()) + (list(self.qw.parameters()) if QW else [])
 
-    def vecs(self, texts):
+    def vecs(self, texts, role=None):
         """token vectors [n, L, PDIM], mask [n, L], query-token weights [n, L] (sum 1 over the mask), normalised pooled state [n, hidden]
         (POOL: [CLS] / masked mean / last non-padding token)"""
         import torch
         if LOWER:
             texts = [t.lower() for t in texts]
+        if PREFIX and role:  # ColBERT-Zero (2602.16609): keep the base's own query / document markers ("[Q] " / "[D] " for PyLate models)
+            texts = [(QPREFIX if role == "q" else DPREFIX) + t for t in texts]
         b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
         with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda"):
             h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state
@@ -550,7 +555,7 @@ prepare = prepared
 
 def _score(model, scale, qtexts, dtexts):
     """[len(qtexts), len(dtexts)] scaled late-interaction scores"""
-    return scale * model.score(model.vecs(qtexts), model.vecs(dtexts))
+    return scale * model.score(model.vecs(qtexts, "q"), model.vecs(dtexts, "d"))
 
 
 def _cands(e, ev):
@@ -575,8 +580,8 @@ def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
     queries (32 x 512 x ~2,000 x 60). Same scores as _score + _mml_logits: MaxSim (or SOFT), query-token weights, HYBRID, x scale,
     then the log of the summed probability mass per category."""
     import torch
-    qv, qm, qw, qc = model.vecs(qtexts)
-    dv, dm, _, dc = model.vecs(dtexts)
+    qv, qm, qw, qc = model.vecs(qtexts, "q")
+    dv, dm, _, dc = model.vecs(dtexts, "d")
     C = max(map(len, cand))
     cix = torch.tensor([[c for c, _ in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
     oix = torch.tensor([[o for _, o in cs] + [0] * (C - len(cs)) for cs in cand], device=model.dev)
@@ -676,7 +681,7 @@ def train():
             for e in anc:
                 for c in e["state"]:
                     col(e["d"][c])
-            Q, Dv = model.vecs([e["q"] for e in anc]), model.vecs(dtexts)
+            Q, Dv = model.vecs([e["q"] for e in anc], "q"), model.vecs(dtexts, "d")
             F = fpos = Lab = lpos = None
             if "m" in INTERACT:
                 ft = list(dict.fromkeys(e["_ev"][j]["text"] for e in anc for j in e.get("nb", [])[:NMEM]))
@@ -730,7 +735,7 @@ def iscores(model, inter, scale, ev, docs):
     import torch
 
     def enc(texts):
-        parts = [model.vecs(texts[a:a + 512]) for a in range(0, len(texts), 512)]
+        parts = [model.vecs(texts[a:a + 512], "d") for a in range(0, len(texts), 512)]
         L = max(p[0].shape[1] for p in parts)
         return (torch.cat([torch.nn.functional.pad(p[0], (0, 0, 0, L - p[0].shape[1])) for p in parts]).to(torch.bfloat16),
                 torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None, torch.cat([p[3] for p in parts]))
@@ -748,7 +753,7 @@ def iscores(model, inter, scale, ev, docs):
         if not FAST_ISCORES:  # the per-transaction reference path (identical scores; 1.7x slower on 11,558 transactions)
             for a in range(0, len(ev), 64):
                 chunk = ev[a:a + 64]
-                S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos)
+                S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk], "q"), D, pos, docs, F, fpos, Lab, lpos)
                 out += [dict(zip(e["state"], S[k, :len(e["state"])].tolist())) for k, e in enumerate(chunk)]
             return out
         # every index the layers need, built once per budget as arrays; per chunk only tensor gathers run
@@ -772,7 +777,7 @@ def iscores(model, inter, scale, ev, docs):
             valid = torch.arange(C, device=model.dev)[None, :] < nopt_t[a:a + b, None]
             ra, ro = valid.nonzero(as_tuple=True)
             pre = dict(ra=ra, ro=ro, rd=cix_t[a:a + b, :C][ra, ro], mf=mf_t[a:a + b], ml=ml_t[a:a + b], mm=mm_t[a:a + b])
-            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk]), D, pos, docs, F, fpos, Lab, lpos, pre)
+            S = _iscores(model, inter, scale, chunk, ev, model.vecs([e["q"] for e in chunk], "q"), D, pos, docs, F, fpos, Lab, lpos, pre)
             S = S.tolist()
             out += [dict(zip(e["state"], S[k][:nopt[a + k]])) for k, e in enumerate(chunk)]
     return out
@@ -788,7 +793,7 @@ def scores(model, scale, ev, docs):
         uniq = list(dict.fromkeys(t for d in docs.values() for t in d.values()))
     pos = {t: k for k, t in enumerate(uniq)}
     with torch.no_grad():
-        parts = [model.vecs(uniq[a:a + 512]) for a in range(0, len(uniq), 512)]
+        parts = [model.vecs(uniq[a:a + 512], "d") for a in range(0, len(uniq), 512)]
         L = max(p[0].shape[1] for p in parts)
         D = (torch.cat([torch.nn.functional.pad(p[0], (0, 0, 0, L - p[0].shape[1])) for p in parts]).to(torch.bfloat16),
              torch.cat([torch.nn.functional.pad(p[1], (0, L - p[1].shape[1])) for p in parts]), None,
@@ -796,7 +801,7 @@ def scores(model, scale, ev, docs):
         out = []
         for a in range(0, len(ev), RCHUNK):
             chunk = ev[a:a + RCHUNK]
-            q = model.vecs([e["q"] for e in chunk])
+            q = model.vecs([e["q"] for e in chunk], "q")
             if MODE not in ("mml", "mmld") and BATCHED_READ:  # all of a chunk's (transaction, option) pairs at once (2026-10-05: per-transaction loop, 8.6 min / 50 households)
                 ids = [list(e["state"]) for e in chunk]
                 C = max(map(len, ids))
