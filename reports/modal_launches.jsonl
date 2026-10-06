@@ -1013,3 +1013,12 @@
 {"utc": "2026-10-06T19:25:27+00:00", "app_id": "ap-i9VSiAGkxbUXYWeY7ExpoZ", "kind": "job_done", "tag": "r228-jt0", "minutes": 80.4}
 {"utc": "2026-10-06T19:29:16+00:00", "app_id": "ap-kHKdbUqm57Syn9ryfRHIbi", "kind": "job_done", "tag": "r164-clefflash-zs2", "minutes": 15.8}
 {"utc": "2026-10-06T20:32:32+00:00", "app_id": "ap-vmxcafN11MAorIZLdMo19j", "kind": "jobs", "what": "r233", "rows": "233", "gpu": "H100", "tags": ["r233-v6a", "r233-v6b", "r233-v6c", "r233-v6abc"], "job_gpus": {"r233-v6a": "L40S", "r233-v6b": "L40S", "r233-v6c": "L40S", "r233-v6abc": "L40S"}}
+{"utc": "2026-10-06T21:11:35+00:00", "app_id": "ap-vmxcafN11MAorIZLdMo19j", "kind": "job_done", "tag": "r233-v6a", "minutes": 38.7}
+{"utc": "2026-10-06T21:15:46+00:00", "app_id": "ap-vmxcafN11MAorIZLdMo19j", "kind": "job_done", "tag": "r233-v6b", "minutes": 42.9}
+{"utc": "2026-10-06T21:15:46+00:00", "app_id": "ap-vmxcafN11MAorIZLdMo19j", "kind": "job_done", "tag": "r233-v6c", "minutes": 42.7}
+{"utc": "2026-10-06T21:15:46+00:00", "app_id": "ap-vmxcafN11MAorIZLdMo19j", "kind": "job_done", "tag": "r233-v6abc", "minutes": 40.0}
+{"utc": "2026-10-06T21:23:16+00:00", "app_id": "ap-gIE8M3VTtItzDdTZWSfTpz", "kind": "jobs", "what": "r233b", "rows": "233", "gpu": "H100", "tags": ["r233-v6p", "r233-v6t", "r233-v6bc", "r233-v6b_s1"], "job_gpus": {"r233-v6p": "L40S", "r233-v6t": "L40S", "r233-v6bc": "L40S", "r233-v6b_s1": "L40S"}}
+{"utc": "2026-10-06T22:10:57+00:00", "app_id": "ap-gIE8M3VTtItzDdTZWSfTpz", "kind": "job_done", "tag": "r233-v6p", "minutes": 35.2}
+{"utc": "2026-10-06T22:10:58+00:00", "app_id": "ap-gIE8M3VTtItzDdTZWSfTpz", "kind": "job_done", "tag": "r233-v6t", "minutes": 35.1}
+{"utc": "2026-10-06T22:10:58+00:00", "app_id": "ap-gIE8M3VTtItzDdTZWSfTpz", "kind": "job_done", "tag": "r233-v6bc", "minutes": 35.0}
+{"utc": "2026-10-06T22:10:58+00:00", "app_id": "ap-gIE8M3VTtItzDdTZWSfTpz", "kind": "job_done", "tag": "r233-v6b_s1", "minutes": 27.0}

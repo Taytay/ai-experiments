@@ -1,0 +1,13 @@
+[
+ {
+  "tag": "ask-kind",
+  "env": {
+   "ADAPTERS_FROM": "r124-oth-s0,r173-rs25-s0",
+   "ADAPTERS": "decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_lora,decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_rs25_lora",
+   "STRINGS": "1-800 CONTACTS, INC.|SQ *RADIO COFFEE &|Reeders Auto & Tire|Square Minute Massage Inc|Seamless|Feria Latina Supermarket|USPS 48040901934858944|Stitch Fix"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with 'peft>=0.21' --with torch==2.13.0 --with torchvision==0.28.0 python scripts/ask_kind.py"
+  ]
+ }
+]

@@ -218,6 +218,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §203 Options inside the encoder's input (row 228)
 - §204 Clef-flash zero-shot (row 164)
 - §205 The Ettin-1B option scorer on the owner's budget (row 232)
+- §206 v6 households (row 233)
 
 <!-- END SECTION INDEX -->
 
@@ -12153,3 +12154,64 @@ RTX 3090, writing scores beside the items and printing aggregates only (`scripts
 - Its read is 40-55x slower than fcr's on the same GPU.
 
 **Cost:** $0 (local RTX 3090, 39 + 12 minutes).
+
+## 206. v6 households: matching the owner's realness aggregates does not move fcr on the owner's budget; payee routing per payee (b) is +0.5 over two seeds (71.3 / 71.4 against 70.8 / 70.9), new merchants from the whole pool (p) cost 1.2-2.2 (first-time payees -2 to -5) while helping synthetic new merchants by 4-5
+
+PLAN step 233 (owner, 2026-10-06: "I think we can get fcr going much better with better training data"). §196 left three gaps between v5
+households and the owner's budget. `realstyle.py RS_V6` closes them one letter at a time (v5 and v4 households byte-identical when off,
+checked by hash): p, new merchants drawn from the kind's whole pool (~1,000 places, not the metro's ~50 locals, which a household used up in
+a few years); t, a trip's purchases at places in the trip's own metro 70% of the time (v5 trips reused the home favourites); a = p + t,
+with `RS_V6A` 0.25 added to the explore chance; b, purpose routing (a person's, a child's, a project's, a property's, the catch-all)
+decided once per payee, misfiles 1.5% -> 0.5%, payee moves `RS_V6M` 0.3 -> 0.2; c, 1-2 string forms per merchant (not 1-3) and order
+codes re-drawn for 30% of coded merchants (not 60%). `scripts/realness_reasons.py` traced the multi-category payees to their generator
+reasons (moves, trips, reorganisations); `realness_gap.py` now also splits first-time strings into known payees' new strings and the rest.
+fcr's recipe (§198) trained on each; one seed, second seed for the best; read on v5, blind_v2 and rational households, and the owner's budget
+(19,093 items, decider v5 beside it, `TOPK=1`).
+
+**Table 206.1: realness aggregates (20 held-out households; median)**
+
+| property | v5 | v6 abc | owner |
+|---|---|---|---|
+| first-time payee strings | 0.16 | 0.30 | 0.29 |
+| ... of which a known payee's new string | 0.57 | 0.30 (a) | 0.30 |
+| strings per payee key | 2.91 | 1.62 | 2.09 |
+| payee switches (known payees) | 0.27 | 0.16 | 0.17 |
+| payees with 3+ filings under 2+ categories | 0.79 | 0.52 | 0.35 |
+
+**Table 206.2: % right first (owner's budget also top-3 / top-10)**
+
+| model | v5 all | v5 first-time | v5 trips | blind_v2 | rational new merchants | owner | owner first-time | owner top-3 / top-10 |
+|---|---|---|---|---|---|---|---|---|
+| fcr (v5, §198), 2 seeds | 75.8 | 67.5 | 47.4 | 81.8 | 58.8 | 70.8 / 70.9 | 52.1 / 51.8 | 81.9 / 90.4 |
+| v6a (p + t) | 75.6 | 68.1 | 30.0 | 82.0 | 63.3 | 68.6 | 46.9 | 80.4 / 89.6 |
+| v6p | 75.6 | 68.3 | 39.3 | 82.2 | 62.8 | 69.6 | 49.9 | 80.9 / 90.2 |
+| v6t | 75.6 | 67.7 | 28.7 | 82.4 | 57.3 | 70.8 | 52.7 | 82.1 / 90.3 |
+| **v6b, 2 seeds** | 72.8 / 73.0 | 67.4 / 67.0 | 36.4 / 35.2 | 81.7 | 59.0 | **71.3 / 71.4** | 51.9 / 52.5 | 82.7 / 82.3; 90.6 / 90.0 |
+| v6c | 75.6 | 66.9 | 39.2 | 82.3 | 58.8 | 70.7 | 51.9 | 81.8 / 90.4 |
+| v6bc | 72.8 | 66.8 | 42.9 | 82.2 | 57.4 | 71.2 | 52.3 | 82.0 / 90.9 |
+| v6abc | 73.9 | 67.6 | 34.1 | 81.7 | 63.8 | 69.5 | 48.8 | 81.2 / 90.1 |
+| decider-4B v5 (§202), 2 seeds | | | | | | 72.5 / 73.4 | 56.6 / 57.8 | 84.1 / 84.7; 90.3 / 90.6 |
+
+### 206.1 What the step says
+
+- **Matching aggregates is not matching what matters.** v6's first-time payees have the owner's share and make-up (30% known payees'
+  new strings), yet the arm that makes them (p) loses 2 points on the owner's first-time payees while gaining 4-5 on the rational
+  households' new merchants. A likely reason, not tested: the whole pool's places mostly have descriptive names whose kind gives the
+  category in our households' fixed kind -> purpose routing, so the model learns to read the name; the owner's new payees are filed by
+  purpose, which the name decides less often.
+- **Routing per payee (b) is the one change that holds on the owner's budget:** +0.5 over two seeds at top-1, +0.4-0.8 at top-3,
+  within the 1-2 point single-seed noise on the owner's budget, but on both seeds. It costs 3 points on v5, whose payees switch more than the
+  owner's: v5 is no longer the judge for the properties v6 changes.
+- **Trips in their own metro (t) are neutral on the owner** and cost synthetic trips (v5 trips are at home favourites).
+- **Fewer string forms (c) change nothing.**
+- The gap to decider stays ~2 points (top-1) and closes by top-10, as before. Generated data has given what it can on these
+  measures; real data is the next step (owner, 2026-10-06: "we can look at simply pulling in more realistic data").
+
+Engineering in the same step (owner: "We need to do better at reusing preparation steps"): content-keyed household and neighbour
+caches (mtimes changed between Modal images), training households prepared on 8 cores after one neighbour pass (identical data),
+`li_decider.py prep` for a shared cache job, the neighbour pass's tokenising through the Rust tokenizer directly (5x; 99.96% of
+neighbour sets identical, the rest tied cosines), and `READ_EVERY=5` sampled synthetic reads (74.9 vs 75.0 on 10 households, 2.7x
+faster). Preparation per job fell from 14-17 to 9.5 minutes; with a shared prep job and sampled reads a screening job is ~15 minutes.
+
+**Cost:** eight L40S jobs of 40-43 minutes: roughly $10; exact figures from `scripts/modal_costs.py --rows 233` once Modal bills the
+day. Owner reads and realness measurements local ($0).
