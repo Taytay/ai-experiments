@@ -43,8 +43,9 @@ N, EXPLORE, D0 = 50, 0.15, dt.date(2025, 1, 1)
 #   RATIONAL_PAYEES=obvious  each merchant renamed (one name per household and merchant) to an invented name that says what it is
 #                            ("Hargrove Street Pizzeria", "Linden Electric Cooperative"): a made-up proper part and a cue for the kind;
 #                            every name checked against the training merchant pool and the knowledge / alias pairs (never seen verbatim)
-#   RATIONAL_CATS=synonyms   each category renamed to a synonym, sometimes with an emoji ("Eating at home 🥦"), one per household; none is a
-#                            category name variant of the training households (realstyle.EVERYDAY / CATCHALL)
+#   RATIONAL_CATS=synonyms   each category renamed to an obvious synonym, sometimes with an emoji ("Eating at home 🥦"), one per household;
+#                            none is a category name variant of the training households (realstyle.EVERYDAY / CATCHALL); =loose: the
+#                            first, looser list ("Our house", "Good times")
 PROPER = ["Hargrove", "Linden", "Maplewood", "Ashford", "Brightwater", "Calloway", "Delmont", "Eastgate", "Fairhaven", "Glenwood",
           "Hollister", "Ironwood", "Juniper", "Kingsley", "Lakeview", "Millbrook", "Northfield", "Oakhurst", "Pemberton", "Quarry Hill",
           "Riverside", "Stonebridge", "Thornton", "Union Square", "Valley Forge", "Westbrook", "Yardley", "Zephyr", "Birchwood", "Cedar Point",
@@ -73,7 +74,20 @@ OBVIOUS = {
     "events": ["{p} Concert Tickets", "{p} Theater Box Office", "{p} Fairgrounds Tickets"],
     "pet": ["{p} Pet Supply", "{p} Animal Hospital", "{p} Veterinary Clinic", "{p} Dog Grooming"],
 }
-SYNONYMS = {
+SYNONYMS = {  # owner, 2026-10-06 ("I wanted obvious synonyms"): each says plainly what the category is
+    "Groceries": ["Groceries & food 🛒", "Eating at home 🥦", "Grocery store", "Food & groceries", "Supermarket 🛒"],
+    "Restaurants": ["Restaurants & takeout 🍽️", "Dining & takeaway", "Eating at restaurants", "Restaurant meals 🍔", "Takeaway & dining 🥡"],
+    "Gas": ["Gasoline ⛽", "Gas station", "Car fuel ⛽", "Petrol & gas"],
+    "Mortgage": ["Mortgage payment 🏠", "Home mortgage", "House mortgage", "Mortgage & housing"],
+    "Utilities": ["Utility bills 💡", "Utilities & phone", "Electric, water & phone", "Utility payments"],
+    "Health": ["Health & medical 💊", "Healthcare", "Medical & pharmacy", "Health costs 🩺"],
+    "Shopping": ["Shopping & stores 🛍️", "General shopping", "Store purchases", "Retail shopping"],
+    "Car": ["Car expenses 🚗", "Car repairs & parking", "Auto expenses", "Car costs 🔧"],
+    "Fun": ["Fun & entertainment 🎉", "Entertainment & hobbies", "Fun money", "Hobbies & fun 🎳"],
+    "Pets": ["Pet expenses 🐾", "Pet supplies", "Pets & vet 🐶", "Pet care"],
+}
+LOOSE = {  # RATIONAL_CATS=loose: the first list (row 234's first read), several only loosely named
+
     "Groceries": ["Groceries & food 🛒", "Eating at home 🥦", "Food shopping", "Supermarket run 🛒", "Kitchen staples"],
     "Restaurants": ["Meals out 🍽️", "Dining & takeaway", "Restaurants & cafes ☕", "Dinners out", "Takeaway 🥡"],
     "Gas": ["Fuel for the car ⛽", "Filling up", "Petrol ⛽", "Gasoline"],
@@ -106,7 +120,7 @@ def _check_synonyms():
     import re
     from ai_experiments import realstyle as R
     train = {n.lower() for _, ns, *_ in R.EVERYDAY for n in ns} | {c.lower() for c in R.CATCHALL}
-    bad = [v for vs in SYNONYMS.values() for v in vs if re.sub(r"[^\w&,' ]", "", v).strip().lower() in train]
+    bad = [v for d in (SYNONYMS, LOOSE) for vs in d.values() for v in vs if re.sub(r"[^\w&,' ]", "", v).strip().lower() in train]
     assert not bad, bad
 
 
@@ -122,14 +136,15 @@ def budgets(level="clean", n=N):
     pool, out = _pool(), []
     payees_mode, cats_mode = os.environ.get("RATIONAL_PAYEES", ""), os.environ.get("RATIONAL_CATS", "")
     seen = _seen_names() if payees_mode == "obvious" else set()
-    if cats_mode == "synonyms":
+    if cats_mode in ("synonyms", "loose"):
         _check_synonyms()
     for h in range(n):
         rng = random.Random(220_000 + h)
         reg = {(c, k): rng.sample(pool[k], r) for c, (ks, _, r) in CATS.items() for k in ks}
         r2 = random.Random(234_000 + h)  # row 234's draws: never the household's own rng, so purchases and amounts stay the same
         r3 = random.Random(234_500 + h)  # the synonyms own stream: obvious payees are the same with or without them
-        shown = {c: r3.choice(SYNONYMS[c]) if cats_mode == "synonyms" else c for c in CATS}
+        syn = {"synonyms": SYNONYMS, "loose": LOOSE}.get(cats_mode)
+        shown = {c: r3.choice(syn[c]) if syn else c for c in CATS}
         cats = [dict(id=f"c{i}", name=shown[c], category_group_id="g", hidden=False, deleted=False) for i, c in enumerate(CATS)]
         alias, used = {}, set()
 
@@ -168,7 +183,7 @@ def budgets(level="clean", n=N):
                             deleted=False, reason=["known" if name in met else "new"],  # scoring segments only, never model input
                             kind=k))  # the merchant's kind: model input only through li_decider's KINDLINE (a simulated lookup)
             met.add(name)
-        tag = ("-obv" if payees_mode == "obvious" else "") + ("-syn" if cats_mode == "synonyms" else "")
+        tag = ("-obv" if payees_mode == "obvious" else "") + ({"synonyms": "-syn", "loose": "-loose"}.get(cats_mode, ""))
         out.append(dict(id=f"rational-{level}{tag}-{h}", category_groups=[dict(id="g", name="Spending")], categories=cats,
                         payees=[dict(id=p, name=t) for t, p in payees.items()], transactions=txs, subtransactions=[]))
     return out

@@ -5,7 +5,7 @@ set -u
 cd "$(dirname "$0")/../.."
 ARMS=${ARMS:-li_r227_fcr,li_r233_v6b,li_r233_v6p}
 F='Failed to load|warn|Loading|it/s\]|FutureWarning|Bytecode|^\s*$'
-for v in ":" "obvious:" ":synonyms" "obvious:synonyms"; do
+for v in ${VARIANTS:-: obvious: :synonyms obvious:synonyms}; do  # payees:categories (categories: synonyms | loose)
   IFS=: read p c <<<"$v"
   echo "== payees=${p:-pool} categories=${c:-plain} $(date -u +%H:%M:%S)"
   RATIONAL_PAYEES=$p RATIONAL_CATS=$c RS_V5=0 READ=rational_bank ARMS=$ARMS SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 OPTS=span \
