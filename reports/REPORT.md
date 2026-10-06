@@ -209,6 +209,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §194 Kind lines in the late-interaction model (row 212)
 - §195 Per-filing candidates on Ettin (row 224)
 - §196 A better stand-in for real data (row 225)
+- §197 Training on v5 households (row 226)
 
 <!-- END SECTION INDEX -->
 
@@ -11822,3 +11823,35 @@ retired categories offered for a year, as decider's options and the owner's read
   machine.
 
 **Cost:** $0 (local CPU for the measurements, the RTX 3090 for the reads, about 25 minutes each).
+
+## 197. Training on v5 households: the stand-in that ranks arms like the owner's budget also trains a better model for it (70.5 / 70.4 over two seeds, from 69.0 / 68.8; decider-4B tuned 72.5); override training still adds 0.7 (REAL-27, MODEL-25)
+
+PLAN step 226. §196 built v5 households (`RS_V5=1`: payees that move for good, 8-12 years, category churn, projects) and showed they rank
+trained arms as the owner's budget does. Here h15's recipe (§193: Ettin-32M from the ekmv knowledge stage, p2's dated query, hidden history
+labels 0.15, 3,000 steps, MAXLEN 512) trains on 200 v5 households instead of 200 v4 ones, with override episodes (v5o, OVERRIDE 0.1) and
+without (v5n: v5 has real moves). Caches built once (`scripts/chains/r226_cache_build.py`, 7 minutes on an L40S, `DATA_FROM=r226-cache`).
+Two seeds each.
+
+**Table 197.1: % right first (seed 0 / seed 1)**
+
+| model | v5 held-out (20, kept a year) | v5 first-time | v4 held-out | blind_v2 | rational bank new | owner's budget | owner first-time | ms / txn |
+|---|---|---|---|---|---|---|---|---|
+| h15 (v4 households, §193) | 71.1 | 62.1 | 73.4 / 73.3 | 81.8 | 57.0 | 69.0 / 68.8 | 50.1 / 49.8 | 2.7 |
+| v5n (v5, no override) | 74.8 / 75.0 | 61.2 / 61.7 | 72.7 | 81.9 | 59.7 | 69.9 / 69.6 | 51.2 / 49.4 | 2.7 |
+| v5o (v5 + override 0.1) | 74.5 / 74.7 | 61.3 / 61.3 | 72.3 | 81.1 | 58.1 | **70.5 / 70.4** | 52.1 / 51.0 | 2.7 |
+
+### 197.1 What the step says
+
+- **A better stand-in makes a better model:** +1.5 on the owner's budget over two seeds (seeds agree within 0.1), the largest gain since
+  the Ettin base (§191). The gap to decider-4B's tuned recipe is now 2.0 points (from 3.5), at 2.7 ms a transaction on the RTX 3090 against
+  decider's 10-13 ms on an H100.
+- The gain is even across payees: first-time payees +1.6 (51.6 vs 50.0, means of two seeds), all items +1.5. v5's longer histories, churn
+  and payee moves are closer to what the model meets in the owner's budget, for new payees as for known ones.
+- **Override episodes still help** (+0.7 over v5n, both seeds), even though v5 has moves of its own: v5's moves are 30% of payees, slow
+  (over years); override episodes are sharper. v4 drops by 1 point (73.3 -> 72.3): v4's alternation is less common in v5; v4 is no longer
+  the stand-in to choose by (§196).
+- Recipe from here: v5 training households with override 0.1 (`RS_V5=1 OVERRIDE=0.1`), read on v5 held-out households with
+  `SPAN_AFTER=365`.
+
+**Cost:** cache build 7 minutes, four L40S jobs of 30-45 minutes: roughly $5; exact figures from `scripts/modal_costs.py --rows 226` once
+Modal bills the day. Owner reads local ($0).
