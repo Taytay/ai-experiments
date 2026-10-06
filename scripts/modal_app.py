@@ -130,6 +130,9 @@ def _run(cmds: list, env: dict, tag: str):
     _prepare()
     for src in [s for s in env.get("ADAPTERS_FROM", "").split(",") if s]:  # adapters trained by earlier jobs, from their result directories
         shutil.copytree(f"/out/{src}/models/adapters", f"{REPO}/models/adapters", dirs_exist_ok=True)
+    for src in [s for s in env.get("DATA_FROM", "").split(",") if s]:  # 2026-10-06: caches built once by an earlier job (data/interim: households, neighbour lists)
+        if Path(f"/out/{src}/data/interim").exists():
+            shutil.copytree(f"/out/{src}/data/interim", f"{REPO}/data/interim", dirs_exist_ok=True)
     for src in [s for s in env.get("ENCODERS_FROM", "").split(",") if s]:  # row 210: encoders (synthetic-trained only) put on the volume or trained by earlier jobs
         shutil.copytree(f"/out/{src}/models/encoders", f"{REPO}/models/encoders", dirs_exist_ok=True)
     before = _snapshot(); t0 = time.time(); log = []
@@ -148,6 +151,8 @@ def _run(cmds: list, env: dict, tag: str):
     changed = [f for f, m in _snapshot().items() if before.get(f) != m]
     for f in changed:
         rel = Path(f).relative_to(REPO); (dest / rel).parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dest / rel)
+    if env.get("SAVE_DATA") == "1" and Path(REPO, "data", "interim").exists():  # a cache-building job: its data/interim for DATA_FROM
+        shutil.copytree(f"{REPO}/data/interim", dest / "data" / "interim", dirs_exist_ok=True)
     (dest / "modal_run.log").write_text("\n".join(log) + f"\n### wall {round((time.time() - t0) / 60, 1)} min, {len(changed)} files\n")
     OUT.commit(); HF.commit()
     return f"{tag}: {len(changed)} files to ai-exp-results/{tag}, {round((time.time() - t0) / 60, 1)} min; last exit {log[-1].split(':')[0]}"
