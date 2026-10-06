@@ -378,6 +378,60 @@ _M1 = None
 KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
 
 
+_RAWTOK = {}
+
+
+def _encode_fast(m, texts, bs=512):
+    """m.encode(texts, normalize_embeddings=True) with the same batches (sentence-transformers' length order, 512 a batch, padded to the
+    batch's longest), tokenised by the Rust tokenizer directly: the transformers wrapper took 2.2 s of 3.0 per 80k strings, the Rust
+    backend 0.45 s (2026-10-06, the same ids). A private copy of the backend, so the wrapper's padding settings never leak in."""
+    import torch
+    from tokenizers import Tokenizer
+    if not texts:
+        return np.zeros((0, m.get_sentence_embedding_dimension()), dtype=np.float32)
+    key = id(m)
+    if key not in _RAWTOK:
+        raw = Tokenizer.from_str(m.tokenizer.backend_tokenizer.to_str())
+        raw.no_padding(); raw.enable_truncation(m.max_seq_length)
+        _RAWTOK[key] = raw
+    raw, pad = _RAWTOK[key], m.tokenizer.pad_token_id
+    order = np.argsort([-m._input_length(t) for t in texts])
+    if m._can_flatten_inputs():
+        order = m._interleave_sorted_indices(order)
+    out = np.zeros((len(texts), m.get_sentence_embedding_dimension()), dtype=np.float32)
+    m.eval()
+    for k in range(0, len(texts), bs):
+        idx = order[k:k + bs]
+        encs = raw.encode_batch([texts[i] for i in idx])
+        L = max(len(e.ids) for e in encs)
+        ids = np.full((len(encs), L), pad, dtype=np.int64); att = np.zeros((len(encs), L), dtype=np.int64); tt = np.zeros((len(encs), L), dtype=np.int64)
+        for r, e in enumerate(encs):
+            ids[r, :len(e.ids)] = e.ids; att[r, :len(e.ids)] = 1; tt[r, :len(e.ids)] = e.type_ids
+        feats = {"input_ids": torch.from_numpy(ids).to(m.device), "attention_mask": torch.from_numpy(att).to(m.device),
+                 "token_type_ids": torch.from_numpy(tt).to(m.device)}
+        with torch.inference_mode():
+            emb = torch.nn.functional.normalize(m(feats)["sentence_embedding"], p=2, dim=1)
+        out[idx] = emb.float().cpu().numpy()
+    return out
+
+
+def _neighbours_fast(E, ev, n):
+    """hist_encoder._neighbours as arrays: (indices int32 [N, n], -1 where fewer earlier-day events; cosines float16), same order"""
+    import torch
+    X = torch.tensor(E, device="cuda" if torch.cuda.is_available() else "cpu")
+    day = torch.tensor([e["day"] for e in ev], device=X.device)
+    k = min(n, len(ev))
+    arr = np.full((len(ev), n), -1, dtype=np.int32); carr = np.zeros((len(ev), n), dtype=np.float16)
+    for a in range(0, len(ev), 1024):
+        S = X[a:a + 1024] @ X.T
+        S[day[a:a + 1024, None] <= day[None, :]] = -2
+        v, ix = S.topk(k, dim=1)
+        ok = v > -2
+        arr[a:a + 1024, :k] = torch.where(ok, ix, -1).int().cpu().numpy()
+        carr[a:a + 1024, :k] = torch.where(ok, v, 0).half().cpu().numpy()
+    return arr, carr
+
+
 def _nbrs(b, ev, m1, cache, cos=False):
     """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists (cos=True: also their cosines,
     float16 arrays, for PPRIOR=2). Cached on disk for synthetic budgets in data/interim/li_nb, one int32 array per budget keyed by its
@@ -403,16 +457,21 @@ def _nbrs(b, ev, m1, cache, cos=False):
     if m1 is None:  # loaded only when a budget misses the cache
         _M1 = _M1 or H._model(H.OUT1)
         m1 = _M1
-    found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
-    nb = [array("i", (j for j, _ in n)) for n in found]
-    cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
-    if f is not None:
-        f.parent.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("NB_FAST", "1") == "1":  # 2026-10-06: the Rust tokenizer called directly and the search kept in arrays (same lists)
+        arr, carr = _neighbours_fast(_encode_fast(m1, [e["text"] for e in ev]), ev, KNB)
+        nb = [array("i", r[r >= 0].tolist()) for r in arr]
+        cs = [c[r >= 0] for r, c in zip(arr, carr)]
+    else:
+        found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
+        nb = [array("i", (j for j, _ in n)) for n in found]
+        cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
         arr = np.full((len(ev), KNB), -1, dtype=np.int32)
         carr = np.zeros((len(ev), KNB), dtype=np.float16)
         for i, r in enumerate(nb):
             arr[i, :len(r)] = r
             carr[i, :len(r)] = cs[i]
+    if f is not None:
+        f.parent.mkdir(parents=True, exist_ok=True)
         for path, x in ((f, arr), (fc, carr)):
             tmp = path.with_suffix(f".tmp{os.getpid()}.npy")
             np.save(tmp, x)
