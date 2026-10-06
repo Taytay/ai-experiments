@@ -7,7 +7,7 @@ right; and three ceilings over decider alone: "either right" (an oracle), "highe
 synthetic set (encoder when its top probability >= G and decider's <= D). Synthetic: TEST_SEEDS held-out v4 households read by decider
 G4 (realstyle_v4g_ngram_test, seeds 0 and 1). Owner's budget (BUDGET set): decider G4 r190 seeds 0 and 1, items_grp_sim2.json; private,
 aggregates only.
-env: TEST_SEEDS (100000-100099), BUDGET, ENCS (encoders, one run; li_r* names are late-interaction decision models, read by
+env: TEST_SEEDS (100000-100099), BUDGET, OWNER_ONLY (1: skip the synthetic read), ENCS (encoders, one run; li_r* names are late-interaction decision models, read by
 li_decider.load as one reader "LI", with the reading time per transaction), OWNER_ENCS.
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 [BUDGET=<id>] uv run python scripts/hist_agree.py
 """
@@ -163,10 +163,12 @@ if __name__ == "__main__":
         else:
             H.OUT1, READERS = H.ENC / enc, {"kNN": "1 knn", "MaxSim": "5 maxsim"}
         print(f"\n=== {enc}", flush=True)
-        syn = records(budgets, items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE, li)
-        gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
-        print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
-        table(syn, f"held-out synthetic households ({len(users)})", gates)
+        gates = None
+        if os.environ.get("OWNER_ONLY") != "1":  # OWNER_ONLY=1: the owner's budget only (no synthetic read, no gate)
+            syn = records(budgets, items, dec, lambda b, e: f"RS:{b['id'].rsplit('-', 1)[1]}:{e['id'][:8]}", HF.SYN_CACHE, li)
+            gates = {(name, s): pick_gate(syn, name, s) for name in READERS for s in (0, 1)}
+            print(f"gates chosen on the synthetic set (G encoder >=, D decider <=): {gates}")
+            table(syn, f"held-out synthetic households ({len(users)})", gates)
         if os.environ.get("BUDGET") and enc in owner_encs:
             own = records(obudget, oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache", li)
             table(own, "owner's budget", gates)
