@@ -12050,11 +12050,11 @@ The owner's budget read as r190's were (Modal private scoring, nothing kept ther
 ### 202.1 What the step says
 
 - **REAL-6 is not decider's advantage on the owner's budget:** decider trained on v5 households only reads as well as, or slightly better
-  than, the recipe with three quarters REAL-6 (73.2 against 72.5-73.0, one seed). §161 had shown 50% real-style was as good as 25%; the
-  augmented REAL-6 task taught decider its readout early in the project, but real-style households carry what the owner's budget needs.
+  than, the recipe with three quarters REAL-6 (73.2 against 72.5-73.0, one seed). §161 had shown 50% real-style was as good as 25%;
+  real-style households alone carry what the owner's budget rewards.
   The encoder therefore loses nothing by never having trained on REAL-6 (row 231's note in PLAN).
-- **v5 helps decider less than the encoder** (+0.5 against +1.5): decider's 4B prior already handled payees that move; the 32M model had
-  to learn it from data.
+- **v5 helps decider less than the encoder** (+0.5 against +1.5): a likely reason, not tested, is that decider's larger prior already handled
+  payees that move, which the 32M model had to learn from data.
 - **The gap at matched effort is 2.2-2.4 points**, and it is first-time payees (decider 57-58, the encoder 52-53; payees filed before
   are within 0.5). decider-4B's own pretraining (Mapika's categorisation model) and its 4B parameters of world knowledge are the advantage
   left; the encoder's larger bases did not reach it (§199). Per transaction, the encoder reads 5-7x faster on the same GPU (§200).
