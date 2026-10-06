@@ -61,12 +61,18 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
+# row 221 (a) (owner, 2026-10-06: "fill in missing payee tokens or category tokens"): each history row of a training query has its category
+# replaced by the base's mask token with probability HMASK, and those rows are predicted too: the row's own tokens (contextualised by the
+# whole query, the other rows' labels included) scored by MaxSim against the anchor's option documents, CE + Brier weighted HLW. Several
+# supervised answers per query instead of one; read time is unchanged (no rows hidden).
+HMASK, HLW = float(os.environ.get("HMASK", "0")), float(os.environ.get("HLW", "1"))
+MASK_TOK = "[?]"  # train() sets the base's mask token
 GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
@@ -162,6 +168,11 @@ class Enc(H2.ColBERT):
         self.enc.train(train)
 
 
+def _lower(t):
+    """LOWER's lowercasing, keeping row 221's mask token intact (same length, so character offsets hold)"""
+    return t.lower().replace(MASK_TOK.lower(), MASK_TOK) if HMASK else t.lower()
+
+
 class LI:
     """hist_encoder2.ColBERT plus two options from the late-interaction papers (references/papers INDEX thread 8): HYBRID adds the cosine of
     the normalised [CLS] states to MaxSim (SMART, 2605.24938: the hybrid objective beat late-only by +0.8 and pooled-only by +6.5);
@@ -185,7 +196,7 @@ class LI:
         (POOL: [CLS] / masked mean / last non-padding token)"""
         import torch
         if LOWER:
-            texts = [t.lower() for t in texts]
+            texts = [_lower(t) for t in texts]
         if PREFIX and role:  # ColBERT-Zero (2602.16609): keep the base's own query / document markers ("[Q] " / "[D] " for PyLate models)
             texts = [(QPREFIX if role == "q" else DPREFIX) + t for t in texts]
         b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
@@ -369,12 +380,13 @@ def _nbrs(b, ev, m1, cache, cos=False):
     return (nb, cs) if cos else nb
 
 
-def _query(i, ev, start, names=None):
+def _query(i, ev, start, names=None, hide=(), spans=None):
     """the query text of event i. Row 210: "<transaction> || <payee> $<amt> -> <category>; ..." over its NB nearest earlier filings.
     Row 217 (decider's history slice, §99): AGO adds how long ago each filing was; REC adds the household's REC most recent filings
     before the transaction's day, newest first (decider's "Earlier transactions" rows: trips and time routing); QFMT=group lists the
     rows under each category once ("<category>: <payee> $<amt> <ago>, ...; ...") instead of repeating the category per row.
-    names: {category id: name} in place of the labels (row 218's rename augmentation)."""
+    names: {category id: name} in place of the labels (row 218's rename augmentation). Row 221 (a): hide = history rows (event indices)
+    whose category is shown as MASK_TOK; spans (a list) receives (char start, char end, event index) of each hidden row (QFMT=rows)."""
     e = ev[i]
     lab = (lambda j: names.get(ev[j]["gold"], ev[j]["label"])) if names else (lambda j: ev[j]["label"])
     near = list(e.get("nb", [])[:NB]) if CTX else []
@@ -391,12 +403,19 @@ def _query(i, ev, start, names=None):
         for j in js:
             by[lab(j)].append(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f}{ago(j)}')
         return e["text"] + " || " + "; ".join(f"{lab}: " + ", ".join(v) for lab, v in by.items())
-    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {lab(j)}{ago(j)}'
+    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {MASK_TOK if j in hide else lab(j)}{ago(j)}'
     q = e["text"]
-    if near:
-        q += " || " + "; ".join(map(row, near))
-    if rec:
-        q += " || recent: " + "; ".join(map(row, rec))
+    for head, js in ((" || ", near), (" || recent: ", rec)):
+        if not js:
+            continue
+        q += head
+        for n_, j in enumerate(js):
+            if n_:
+                q += "; "
+            r = row(j)
+            if spans is not None and j in hide:
+                spans.append((len(q), len(q) + len(r), j))
+            q += r
     return q
 
 
@@ -525,11 +544,19 @@ def _prior(evs, ids, dev):
     return P
 
 
-def _materialise(e, names=None):
-    """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories)"""
+def _materialise(e, names=None, rng=None):
+    """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories); with HMASK and rng,
+    some history rows' categories hidden (row 221 (a)): e["hid"] = [(char start, char end, gold category id)]"""
     labels = e["labels"]
     lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
-    return dict(e, q=_query(e["_i"], e["_ev"], e["_start"], names), d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
+    hide, spans = (), []
+    if HMASK and rng is not None and CTX:
+        assert QFMT == "rows", "HMASK marks rows of QFMT=rows queries"
+        i, ev = e["_i"], e["_ev"]
+        js = list(e.get("nb", [])[:NB]) + ([j for j in range(e["_start"][i] - 1, max(-1, e["_start"][i] - 1 - REC), -1)] if REC else [])
+        hide = {j for j in js if rng.random() < HMASK}
+    q = _query(e["_i"], e["_ev"], e["_start"], names, hide, spans)
+    return dict(e, q=q, hid=[(a, z, e["_ev"][j]["gold"]) for a, z, j in spans], d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
 
 
 def _doc(label, recent):
@@ -581,9 +608,10 @@ def _cands(e, ev):
     return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
 
 
-def _doc_pairs(model, scale, qtexts, dtexts, cols):
+def _doc_pairs(model, scale, qtexts, dtexts, cols, rows=None):
     """MODE=doc in training: [b, max options] scores of each query against its own option documents (cols[k] = columns in dtexts);
-    padded options -inf"""
+    padded options -inf. rows (row 221 (a)): (query k, bool mask over its tokens) of hidden history rows; then also returns their
+    [len(rows), max options] scores, the mean over the row's tokens of each token's MaxSim with anchor k's options"""
     import torch
     qv, qm, qw, qc = model.vecs(qtexts, "q")
     dv, dm, _, dc = model.vecs(dtexts, "d")
@@ -600,7 +628,15 @@ def _doc_pairs(model, scale, qtexts, dtexts, cols):
     S = (sim * qw[:, None, :]).sum(-1)
     if HYBRID:
         S = S + torch.einsum("bh,bch->bc", qc, dc[ix])
-    return (scale * S).masked_fill(~valid, float("-inf"))
+    S = (scale * S).masked_fill(~valid, float("-inf"))
+    if rows is None:
+        return S
+    if not rows:
+        return S, None
+    k = torch.tensor([r[0] for r in rows], device=model.dev)
+    R = torch.stack([r[1] for r in rows]).to(model.dev).float()[:, :sim.shape[-1]]
+    Sr = (sim[k] * R[:, None, :]).sum(-1) / R.sum(-1, keepdim=True).clamp(min=1)
+    return S, (scale * Sr).masked_fill(~valid[k], float("-inf"))
 
 
 def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
@@ -703,6 +739,9 @@ def train():
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
           f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
     model = LI(BASE, train=True)
+    global MASK_TOK
+    MASK_TOK = model.cb.tok.mask_token or MASK_TOK
+    assert not HMASK or (MODE == "doc" and not INTERACT and not RENAME), "HMASK is wired into the document trainer only"
     if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
         model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
@@ -721,7 +760,7 @@ def train():
             d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
-            anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e) for e in pick]
+            anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e, rng=rng) for e in pick]
         if kd and KDP > 0:  # a share KDP of the step's anchors from teacher-scored transactions (each carries its own day's documents)
             nk = int(round(KDP * len(anc))) or 1
             anc = anc[:len(anc) - nk] + [_materialise(e) for e in rng.sample(kd, min(nk, len(kd)))]
@@ -756,11 +795,30 @@ def train():
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
             # each anchor against its own options only (2026-10-06: anchors from other households and days, as KD's, multiplied the
             # documents, and the all-pairs score [queries x tokens x documents x tokens] ran out of memory); same scores as _score + gather
-            Sg = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols)
+            if HMASK:  # row 221 (a): the hidden rows' tokens, from the same tokenisation as model.vecs (LOWER, PREFIX)
+                qt = [_lower(e["q"]) if LOWER else e["q"] for e in anc]
+                sh = len(QPREFIX) if PREFIX else 0
+                tk = model.cb.tok([(QPREFIX if PREFIX else "") + t for t in qt], padding=True, truncation=True, max_length=model.cb.maxlen,
+                                  return_offsets_mapping=True, return_tensors="pt")
+                off = tk["offset_mapping"]
+                rows, rtgt = [], []
+                for k_, e in enumerate(anc):
+                    oi = {c: o for o, c in enumerate(e["state"])}
+                    for a_, z_, g in e["hid"]:
+                        msk = (off[k_, :, 1] > a_ + sh) & (off[k_, :, 0] < z_ + sh) & (off[k_, :, 1] > off[k_, :, 0])  # tokens overlapping the row (a word's token carries its leading space)
+                        if g in oi and msk.any():
+                            rows.append((k_, msk)); rtgt.append(oi[g])
+                Sg, Sr = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols, rows)
+            else:
+                Sg = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols)
             if PPRIOR:
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         loss, ce = _loss(Sg, tgt)
+        if HMASK and Sr is not None:
+            hl, hce = _loss(Sr, torch.tensor(rtgt, device=model.dev))
+            loss = loss + HLW * hl
+            run["hce"] += hce.item(); run["hacc"] += (Sr.argmax(1).cpu() == torch.tensor(rtgt)).float().mean().item(); run["hrows"] += len(rtgt)
         if kd:  # soft cross-entropy against decider's distribution over the options it shares with this one (others get 0)
             T = torch.zeros_like(Sg)
             has = []
