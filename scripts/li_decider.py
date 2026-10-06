@@ -316,7 +316,7 @@ def _nbrs(b, ev, m1, cache):
     import hashlib
     from ai_experiments.paths import ROOT
     f = None
-    if str(b.get("id", "")).startswith(("realstyle-", "blind2-")) and os.environ.get("PREP_CACHE", "1") != "0":
+    if str(b.get("id", "")).startswith(("realstyle-", "blind2-", "rational-")) and os.environ.get("PREP_CACHE", "1") != "0":
         h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
             h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
@@ -749,18 +749,24 @@ def read():
     elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
         import blind_budgets
         budgets = blind_budgets.budgets()
+    elif os.environ.get("READ", "").startswith("rational_"):  # row 220: perfectly rational households, READ=rational_clean | rational_bank
+        import rational_budgets
+        budgets = rational_budgets.budgets(os.environ["READ"].split("_", 1)[1])
     else:
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
-    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if os.environ.get('READ') == 'blind2' else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
-    print("| model | all | first-time payee | trip purchase (top-1, n) | Brier | ECE (top choice) |\n|---|---|---|---|---|---|")
+    rd = os.environ.get("READ", "households")
+    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if rd == 'blind2' else rd + ' households' if rd.startswith('rational') else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
+    segs = ("known", "new") if rd.startswith("rational") else ("trip",)  # generator marks, scoring only (rational: merchant bought before or not)
+    cols = ["model", "all", "first-time payee string"] + [f"{g} (top-1, n)" for g in segs] + ["Brier", "ECE (top choice)"]
+    print("| " + " | ".join(cols) + " |\n" + "|---" * len(cols) + "|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
             # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
             # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
-            trip = {t["id"] for t in b["transactions"] if (t.get("reason") or [None])[0] == "trip"}
+            mark = {t["id"]: (t.get("reason") or [None])[0] for t in b["transactions"]}
             ev, sco = run(b)
             for e, sc in zip(ev, sco):
                 if e["gold"] not in e["state"]:
@@ -768,7 +774,7 @@ def read():
                 v = np.array(list(sc.values()))
                 g = v[list(sc).index(e["gold"])]
                 rk = int((v >= g).sum())  # ties count against the gold
-                for grp in ("all",) + (() if e["seen"] else ("first-time",)) + (("trip",) if e["id"] in trip else ()):
+                for grp in ("all",) + (() if e["seen"] else ("first-time",)) + ((mark[e["id"]],) if mark.get(e["id"]) in segs else ()):
                     ranks[grp].append(rk)
                 p = np.exp(v - v.max()); p /= p.sum()
                 y = np.array([c == e["gold"] for c in sc], dtype=float)
@@ -777,7 +783,7 @@ def read():
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
-        cells.append(f"{100 * (np.array(ranks['trip']) <= 1).mean():.1f} (n={len(ranks['trip'])})" if ranks["trip"] else "-")
+        cells += [f"{100 * (np.array(ranks[g]) <= 1).mean():.1f} (n={len(ranks[g])})" if ranks[g] else "-" for g in segs]
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
         del run
 

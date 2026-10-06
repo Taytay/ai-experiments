@@ -1,0 +1,34 @@
+[
+ {
+  "tag": "r220-clean",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "220",
+   "ARMS": "li_r211_c0,li_r210_a5,li_r217_p0,li_r217_p1,li_r217_p2,li_r217_p3",
+   "READ": "rational_clean"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r220-bank",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "220",
+   "ARMS": "li_r211_c0,li_r210_a5,li_r217_p0,li_r217_p1,li_r217_p2,li_r217_p3",
+   "READ": "rational_bank"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]
