@@ -964,7 +964,7 @@ def read():
         budgets = [json.loads(RB.CACHE.read_text())["budget"]]
     elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
         import blind_budgets
-        budgets = blind_budgets.budgets()
+        budgets = blind_budgets.budgets()[:int(os.environ.get("BLIND_N", "250"))]  # BLIND_N: the first N users (slow readers)
     elif os.environ.get("READ", "").startswith("rational_"):  # row 220: perfectly rational households, READ=rational_clean | rational_bank
         import rational_budgets
         budgets = rational_budgets.budgets(os.environ["READ"].split("_", 1)[1])
