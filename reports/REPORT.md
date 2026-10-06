@@ -214,6 +214,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §199 Larger encoder bases (row 209)
 - §200 Speed for longer queries and larger encoders (row 230)
 - §201 A structured, longer query (row 229)
+- §202 decider at matched effort on v5 households and without REAL-6 (row 231)
 
 <!-- END SECTION INDEX -->
 
@@ -12026,3 +12027,37 @@ MAXLEN 5,120; median 2,526), s40m20 (s40 with 20 payees per category document in
   Not read on the owner's budget (v5 ranks arms as it does, §196). Training at 2.5k tokens costs 2x the time; reading, ~3x.
 
 **Cost:** three L40S jobs of 45-75 minutes: roughly $5; exact figures from `scripts/modal_costs.py --rows 229` once Modal bills the day.
+
+## 202. decider at matched effort on v5 households, and without REAL-6: v5 lifts decider by 0.5 (72.5 -> 73.0 on the encoder's items; the encoder gained 1.5), and decider needs no REAL-6 at all (100% v5: 73.2); the gap to the best encoder is 2.2-2.4 points, 5-6 of them on first-time payees (REAL-27, MODEL-25)
+
+PLAN step 231 (owner, 2026-10-06: "Were we training decider on v5, or some other dataset?"; "I was actually implying that REAL-6 was the
+advantage"). decider G4 (r190-g: the tuned recipe, 800 steps on decider-4B, 75% REAL-6 episodes with every augmentation, 25% real-style
+episodes from v4 households) retrained with the real-style share from v5 households (`realstyle_v5g_train.jsonl`, 40,000 episodes from 400
+v5 households, `scripts/chains/r231_data.sh`; two seeds, r231-dv5) and with no REAL-6 at all (`REALSTYLE=1.0`, one seed, r231-dv5only).
+The owner's budget read as r190's were (Modal private scoring, nothing kept there; `scripts/chains/r231_owner.sh`, `r231b_owner.sh`);
+`hist_agree.py DEC_TAGS` reads any decider pair on the 19,093 items the encoder comparison uses.
+
+**Table 202.1: % right first on the owner's budget**
+
+| model | all 21,238 items | encoder's 19,093 items | first-time payees (5,832) | read, ms a transaction |
+|---|---|---|---|---|
+| decider-4B, 75% REAL-6 + 25% v4 (r190-g) | 73.8 / 73.4 | 72.5 | 56.9 | 10-13 (H100) |
+| decider-4B, 75% REAL-6 + 25% v5 | 73.6 / 74.5 | 73.0 | 57.2 | 10-13 |
+| decider-4B, 100% v5, no REAL-6 | 74.1 | **73.2** | **58.3** | 10-13 |
+| Ettin-32M fcr (§198) | | 70.8 / 70.9 | 52.1 / 51.8 | 1.9 (H100) |
+| Ettin-32M fcr + kind lines (§198) | | 70.9 / 70.5 | 53.1 / 52.0 | 1.9 |
+
+### 202.1 What the step says
+
+- **REAL-6 is not decider's advantage on the owner's budget:** decider trained on v5 households only reads as well as, or slightly better
+  than, the recipe with three quarters REAL-6 (73.2 against 72.5-73.0, one seed). §161 had shown 50% real-style was as good as 25%; the
+  augmented REAL-6 task taught decider its readout early in the project, but real-style households carry what the owner's budget needs.
+  The encoder therefore loses nothing by never having trained on REAL-6 (row 231's note in PLAN).
+- **v5 helps decider less than the encoder** (+0.5 against +1.5): decider's 4B prior already handled payees that move; the 32M model had
+  to learn it from data.
+- **The gap at matched effort is 2.2-2.4 points**, and it is first-time payees (decider 57-58, the encoder 52-53; payees filed before
+  are within 0.5). decider-4B's own pretraining (Mapika's categorisation model) and its 4B parameters of world knowledge are the advantage
+  left; the encoder's larger bases did not reach it (§199). Per transaction, the encoder reads 5-7x faster on the same GPU (§200).
+
+**Cost:** three decider trainings of 75-78 minutes on H100s and three private owner reads: roughly $16; exact figures from
+`scripts/modal_costs.py --rows 231` once Modal bills the day. Episode build local ($0).
