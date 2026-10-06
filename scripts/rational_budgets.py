@@ -59,20 +59,21 @@ def budgets(level="clean", n=N):
                 if per_week is None:  # monthly bills: one per kind on a fixed day
                     for j, k in enumerate(ks):
                         if d.day == (1 if c == "Mortgage" else 12 + 3 * j):
-                            rows.append((d, c, reg[(c, k)][0]))
+                            rows.append((d, c, reg[(c, k)][0], k))
                     continue
                 if rng.random() < per_week / 7:
                     k = rng.choice(ks)
                     name = rng.choice(pool[k]) if rng.random() < EXPLORE else rng.choice(reg[(c, k)])
-                    rows.append((d, c, name))
+                    rows.append((d, c, name, k))
         payees, txs, fixed, met = {}, [], {}, set()  # the mortgage is the same amount every month; met: merchants already bought from
-        for i, (d, c, name) in enumerate(rows):
+        for i, (d, c, name, k) in enumerate(rows):
             text = name if level == "clean" else statements.render_v2(name, rng)
             pid = payees.setdefault(text, f"p{len(payees)}")
             lo, hi = AMT[c]
             amt = fixed.setdefault(name, round(rng.uniform(lo, hi), 2)) if c == "Mortgage" else round(lo * (hi / lo) ** rng.random(), 2)
             txs.append(dict(id=f"r-{h}-{i:05d}", date=d.isoformat(), amount=-round(amt * 1000), category_id=cid[c], payee_id=pid, approved=True,
-                            deleted=False, reason=["known" if name in met else "new"]))  # scoring segments only, never model input
+                            deleted=False, reason=["known" if name in met else "new"],  # scoring segments only, never model input
+                            kind=k))  # the merchant's kind: model input only through li_decider's KINDLINE (a simulated lookup)
             met.add(name)
         out.append(dict(id=f"rational-{level}-{h}", category_groups=[dict(id="g", name="Spending")], categories=cats,
                         payees=[dict(id=p, name=t) for t, p in payees.items()], transactions=txs, subtransactions=[]))
