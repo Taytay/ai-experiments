@@ -756,9 +756,9 @@ def read():
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
     rd = os.environ.get("READ", "households")
-    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if rd == 'blind2' else rd + ' households' if rd.startswith('rational') else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
+    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if rd == 'blind2' else rd + ' households' if rd.startswith('rational') else 'held-out households')}: % top-1 / top-3 / top-5 / top-10 (n); Brier and ECE of the softmax**\n")
     segs = ("known", "new") if rd.startswith("rational") else ("trip",)  # generator marks, scoring only (rational: merchant bought before or not)
-    cols = ["model", "all", "first-time payee string"] + [f"{g} (top-1, n)" for g in segs] + ["Brier", "ECE (top choice)"]
+    cols = ["model", "all", "first-time payee string"] + list(segs) + ["Brier", "ECE (top choice)"]
     print("| " + " | ".join(cols) + " |\n" + "|---" * len(cols) + "|")
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
@@ -782,8 +782,8 @@ def read():
         conf, hit = np.array(conf), np.array(hit)
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
-        cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
-        cells += [f"{100 * (np.array(ranks[g]) <= 1).mean():.1f} (n={len(ranks[g])})" if ranks[g] else "-" for g in segs]
+        cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 5, 10)) + f" (n={len(ranks[g])})" if ranks[g] else "-"
+                 for g in ("all", "first-time") + tuple(segs)]
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
         del run
 
