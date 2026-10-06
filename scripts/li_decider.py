@@ -61,9 +61,10 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
+OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
 
@@ -444,6 +445,23 @@ def prepared(b, m1, cache, full=True):
     return ev, docs
 
 
+def _override(b, rng):
+    """row 218 (decider's override episodes, ov10; row 220: on perfectly rational households every remaining error was a merchant the
+    household always filed one way while its name suggested another, "Williams Fuel" -> Shopping read as Gas): a share OVERRIDE of the
+    household's payees moved, every one of their transactions, to one other category picked at random, so the household's own consistent
+    history must beat the name's prior. Returns a shallow copy with new transaction dicts; the neighbour cache stays valid (keyed by
+    texts and days, not categories)."""
+    groups = {g["id"]: g["name"] for g in b["category_groups"]}
+    cats = [c["id"] for c in b["categories"] if not c.get("deleted") and not c.get("hidden") and groups.get(c["category_group_id"]) != "Internal Master Category"]
+    payees = sorted({t.get("payee_id") for t in b["transactions"] if t.get("payee_id") and t.get("category_id") in set(cats)})
+    move = {}
+    for p in payees:
+        if rng.random() < OVERRIDE:
+            move[p] = rng.choice(cats)
+    txs = [dict(t, category_id=move[t["payee_id"]]) if t.get("payee_id") in move and t.get("category_id") in set(cats) else t for t in b["transactions"]]
+    return dict(b, transactions=txs)
+
+
 def _materialise(e, names=None):
     """a training anchor with its texts: the query and its day's documents (names: row 218's renamed categories)"""
     labels = e["labels"]
@@ -529,6 +547,8 @@ def train():
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
+        if OVERRIDE:
+            b = _override(b, random.Random(SEED * 7919 + n))
         data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
