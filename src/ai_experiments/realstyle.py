@@ -135,6 +135,8 @@ METROS, BANKS = 20, 4
 # string never filed before, v4 15%). The owner's hidden categories hold 7% of outflows: churn is many small categories, not the big
 # ones. Category draws come from a separate generator; nothing changes when V5 is off (v4 households byte-identical, checked).
 V5 = os.environ.get("RS_V5") == "1"
+MOVE = 0.3  # V5: share of payees that move for good to another category (the owner: when a payee's usual category is wrong, its latest
+# filing is right 43% of the time, v4 18%; scripts/realness_gap.py)
 PROJECTS = [("Kitchen remodel", ["home_improvement", "furniture", "home_services"]), ("Bathroom redo", ["home_improvement", "home_services"]),
             ("Moving", ["home_improvement", "furniture", "home_services"]), ("Backyard deck", ["home_improvement"]),
             ("Home office", ["furniture", "electronics", "office"]), ("Nursery", ["furniture"]),
@@ -312,7 +314,7 @@ class Household:
         if len(ev) >= 2 and rng.random() < 0.5:
             a, b = rng.sample(ev, 2); at = d0 + dt.timedelta(days=rng.randint(span // 4, 3 * span // 4))
             a["hidden_at"] = at; self.reorg = dict(old=a["id"], new=b["id"], at=at)
-        self.reorgs, self.projects = {}, []
+        self.reorgs, self.projects, self.moves = {}, [], {}
         if V5:
             r5, yrs = self.r5, span / 365.25
             gname = {v: k for k, v in self.groups.items()}
@@ -457,6 +459,17 @@ class Household:
         parts, self._parts = self._parts or {"Clean payee": payee_name}, None  # row 176: the pieces behind the string
         reason, kind, self._reason, self._kind = self._reason, self._kind, None, None  # row 177: why this category, and the merchant's kind
         pid = self.payees.setdefault(payee_name, self._id())
+        if V5 and cid != self.rta and not (reason and reason[0] in ("trip", "holiday", "project", "phase", "travel")):
+            mv = self.moves.get(payee_name)
+            if mv is None:  # first sight: this payee moves for good to another category later, with probability MOVE
+                mv = self.moves[payee_name] = [date + dt.timedelta(days=self.r5.randint(60, 1500)), None] if self.r5.random() < MOVE else False
+            if mv and date >= mv[0]:
+                if mv[1] is None or (self.cats[mv[1]]["hidden_at"] and self.cats[mv[1]]["hidden_at"] <= date):
+                    live = [c["id"] for c in self.cats.values() if c.get("kinds") and c["id"] != cid and c["created"] <= date
+                            and not (c["hidden_at"] and c["hidden_at"] <= date)]
+                    mv[1] = self.r5.choice(live) if live else None
+                if mv[1]:
+                    cid = mv[1]; reason = ("move", cid)
         while cid in self.reorgs and date >= self.reorgs[cid][1]:  # V5: a retired category's successor
             cid = self.reorgs[cid][0]; reason = ("reorg", cid)
         if self.rng.random() < (0.015 if V5 else 0.03) and cid not in (self.rta,):  # misfiled (V5: the owner's payees switch half as often)

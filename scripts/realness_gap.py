@@ -11,8 +11,9 @@ Properties (median over budgets; the owner's set is one budget):
   first-time       share of outflows whose payee string had not been filed before; one-off payees (filed once) as a share of payees
   person / transfer  share of outflows whose payee string looks like a person-to-person payment, check or transfer (P2P regex)
   variants         distinct payee strings per payee key (ai_experiments.payeekey.payee_key_v2), over keys with 2+ filings
-  payee switches   share of outflows whose category differs from the payee string's previous filing (payee filed before); share of payees
-                   with 3+ filings that used 2+ categories
+  payee switches   share of outflows whose category differs from the payee string's previous filing (payee filed before); of those
+                   switches, the share whose next filing of the payee stays in the new category (a move, not an alternation); share of
+                   payees with 3+ filings that used 2+ categories
   top-5 share      share of outflows in the five largest categories
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 BUDGET=<id> uv run python scripts/realness_gap.py
 """
@@ -45,16 +46,27 @@ def props(b):
     for e in ev:
         first.setdefault(e["gold"], e["date"]); last[e["gold"]] = e["date"]
     new_later = sum(1 for c, d in first.items() if (d - d0).days > 365)
-    seen, prev, pc = set(), {}, defaultdict(set)
-    nfirst = nswitch = nknown = 0
+    hidden_now = {c for c in used if cats.get(c, {}).get("hidden") or cats.get(c, {}).get("deleted")}
+    gone = 0  # known payees whose previous filing's category is no longer offered (hidden, last used over a year ago: decider's options)
+    seen, prev, pc, pend = set(), {}, defaultdict(set), {}
+    hist = defaultdict(Counter)  # the payee's earlier filings per category
+    nfirst = nswitch = nknown = stay = judged = n3 = maj_wrong = maj_wrong_last_right = 0
     for e in ev:
         p = e["payee"]
         if p not in seen:
             nfirst += 1
         else:
             nknown += 1
-            nswitch += prev[p] != e["gold"]
-        seen.add(p); prev[p] = e["gold"]; pc[p].add(e["gold"])
+            gone += prev[p] in hidden_now and (e["date"] - last[prev[p]]).days > 365
+            if p in pend:  # the filing after a switch: still in the new category?
+                judged += 1; stay += e["gold"] == pend.pop(p)
+            if prev[p] != e["gold"]:
+                nswitch += 1; pend[p] = e["gold"]
+            if sum(hist[p].values()) >= 3:  # what override training is about: the payee's usual category is no longer its category
+                n3 += 1
+                mw = hist[p].most_common(1)[0][0] != e["gold"]
+                maj_wrong += mw; maj_wrong_last_right += mw and prev[p] == e["gold"]
+        seen.add(p); prev[p] = e["gold"]; pc[p].add(e["gold"]); hist[p][e["gold"]] += 1
     pn = Counter(e["payee"] for e in ev)
     keys = defaultdict(set)
     kn = Counter()
@@ -76,6 +88,10 @@ def props(b):
         "person / transfer / check": sum(bool(P2P.search(e["payee"])) for e in ev) / n,
         "strings per payee key (2+ filings)": float(np.mean(multi)) if multi else float("nan"),
         "payee switches (known payees)": nswitch / max(nknown, 1),
+        "previous filing's category no longer offered": gone / max(nknown, 1),
+        "payee's majority category wrong (3+ earlier filings)": maj_wrong / max(n3, 1),
+        "... of which its latest filing is right (a move)": maj_wrong_last_right / max(maj_wrong, 1),
+        "switches that stick (next filing in the new category)": stay / max(judged, 1),
         "payees 3+ filings under 2+ categories": (sum(1 for p, v in pc.items() if pn[p] >= 3 and len(v) >= 2)
                                                  / max(1, sum(1 for p in pc if pn[p] >= 3))),
         "top-5 category share": sum(v for _, v in used.most_common(5)) / n,
