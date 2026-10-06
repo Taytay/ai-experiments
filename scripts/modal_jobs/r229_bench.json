@@ -1,0 +1,74 @@
+[
+ {
+  "tag": "r229-bench_s40-h100",
+  "gpu": "H100",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data",
+   "PLAN_ROWS": "229",
+   "ROW": "229",
+   "CTX": "1",
+   "NB": "50",
+   "AGO": "1",
+   "REC": "40",
+   "QFMT": "sections",
+   "MAXLEN": "2560",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "300",
+   "LR": "9e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e_kmv",
+   "ENCODERS_FROM": "enc-base,r222-kmv",
+   "ARM": "bench_s40",
+   "ARMS": "li_r229_bench_s40",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "SIMN": "15",
+   "PAYN": "5",
+   "GC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ },
+ {
+  "tag": "r229-bench_e400-h100",
+  "gpu": "H100",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data",
+   "PLAN_ROWS": "229",
+   "ROW": "229",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "1024",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "300",
+   "LR": "4e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e400_kmv",
+   "ENCODERS_FROM": "enc-base,r209-e400b",
+   "ARM": "bench_e400",
+   "ARMS": "li_r229_bench_e400",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "GC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train"
+  ]
+ }
+]

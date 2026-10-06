@@ -196,3 +196,6 @@
 196	A better stand-in for real data	225
 197	Training on v5 households	226
 198	decider remaining training lessons in the late-interaction model	227
+199	Larger encoder bases	209
+200	Speed for longer queries and larger encoders	230
+201	A structured, longer query	229

@@ -969,4 +969,29 @@
 {"utc": "2026-10-06T14:16:19+00:00", "app_id": "ap-cx99sQ1K1v67uIdUBxBCgJ", "kind": "job_done", "tag": "r227-fcd", "minutes": 38.6}
 {"utc": "2026-10-06T14:20:45+00:00", "app_id": "ap-86s8CUBfSS1Ld0EerHTO68", "kind": "jobs", "what": "r227e", "rows": "227", "gpu": "H100", "tags": ["r227-fcr-s1"], "job_gpus": {"r227-fcr-s1": "L40S"}}
 {"utc": "2026-10-06T14:52:42+00:00", "app_id": "ap-86s8CUBfSS1Ld0EerHTO68", "kind": "job_done", "tag": "r227-fcr-s1", "minutes": 31.6}
+{"utc": "2026-10-06T15:12:04+00:00", "app_id": "ap-0bVHSjO3q2WOQizC23uIUN", "kind": "jobs", "what": "r229_bench", "rows": "229", "gpu": "H100", "tags": ["r229-bench_s40-h100", "r229-bench_e400-h100"], "job_gpus": {"r229-bench_s40-h100": "H100", "r229-bench_e400-h100": "H100"}}
+{"utc": "2026-10-06T15:13:22+00:00", "app_id": "ap-Q64GwgszCt6fbMKd3FIXVN", "kind": "jobs", "what": "r229_bench2", "rows": "229", "gpu": "H100", "tags": ["r229-bench_s40-h100-nogc", "r229-bench_e400-h100-nogc"], "job_gpus": {"r229-bench_s40-h100-nogc": "H100", "r229-bench_e400-h100-nogc": "H100"}}
+{"utc": "2026-10-06T15:17:38+00:00", "app_id": "ap-Dq9xE3o3nqAjZ9e9x7LbXv", "kind": "jobs", "what": "r229_bench3", "rows": "229", "gpu": "H100", "tags": ["r229-bench_s40-flash-l40s", "r229-bench_s40-flash-h100", "r229-bench_e400-flash-l40s", "r229-bench_e400-flash-h100"], "job_gpus": {"r229-bench_s40-flash-l40s": "L40S", "r229-bench_s40-flash-h100": "H100", "r229-bench_e400-flash-l40s": "L40S", "r229-bench_e400-flash-h100": "H100"}}
+{"utc": "2026-10-06T15:17:49+00:00", "app_id": "ap-6bKfjblGfm8dz1EpfBc0Hr", "kind": "job_done", "tag": "r229-s40", "minutes": 67.9}
+{"utc": "2026-10-06T15:28:00+00:00", "app_id": "ap-Dq9xE3o3nqAjZ9e9x7LbXv", "kind": "job_done", "tag": "r229-bench_s40-flash-l40s", "minutes": 10.1}
+{"utc": "2026-10-06T15:30:41+00:00", "app_id": "ap-Dq9xE3o3nqAjZ9e9x7LbXv", "kind": "job_done", "tag": "r229-bench_s40-flash-h100", "minutes": 12.7}
+{"utc": "2026-10-06T15:31:35+00:00", "app_id": "ap-Dq9xE3o3nqAjZ9e9x7LbXv", "kind": "job_done", "tag": "r229-bench_e400-flash-l40s", "minutes": 13.6}
+{"utc": "2026-10-06T15:31:35+00:00", "app_id": "ap-Dq9xE3o3nqAjZ9e9x7LbXv", "kind": "job_done", "tag": "r229-bench_e400-flash-h100", "minutes": 9.6}
+{"utc": "2026-10-06T15:34:25+00:00", "app_id": "ap-Q64GwgszCt6fbMKd3FIXVN", "kind": "job_done", "tag": "r229-bench_s40-h100-nogc", "minutes": 20.6}
+{"utc": "2026-10-06T15:35:55+00:00", "app_id": "ap-Q64GwgszCt6fbMKd3FIXVN", "kind": "job_done", "tag": "r229-bench_e400-h100-nogc", "minutes": 21.2}
+{"utc": "2026-10-06T15:41:34+00:00", "app_id": "ap-0bVHSjO3q2WOQizC23uIUN", "kind": "job_done", "tag": "r229-bench_s40-h100", "minutes": 28.6}
+{"utc": "2026-10-06T15:41:34+00:00", "app_id": "ap-0bVHSjO3q2WOQizC23uIUN", "kind": "job_done", "tag": "r229-bench_e400-h100", "minutes": 28.4}
+{"utc": "2026-10-06T15:49:11+00:00", "app_id": "ap-9ucCk4v0vLsYyIIMEu2TO3", "kind": "jobs", "what": "r230_time", "rows": "230", "gpu": "H100", "tags": ["r230-time-h100-flash", "r230-time-l40s-sdpa", "r230-time-l40s-flash"], "job_gpus": {"r230-time-h100-flash": "H100", "r230-time-l40s-sdpa": "L40S", "r230-time-l40s-flash": "L40S"}}
+{"utc": "2026-10-06T15:56:47+00:00", "app_id": "ap-9ucCk4v0vLsYyIIMEu2TO3", "kind": "job_done", "tag": "r230-time-h100-flash", "minutes": 6.2}
+{"utc": "2026-10-06T16:01:17+00:00", "app_id": "ap-9ucCk4v0vLsYyIIMEu2TO3", "kind": "job_done", "tag": "r230-time-l40s-sdpa", "minutes": 11.8}
+{"utc": "2026-10-06T16:01:56+00:00", "app_id": "ap-9ucCk4v0vLsYyIIMEu2TO3", "kind": "job_done", "tag": "r230-time-l40s-flash", "minutes": 12.4}
+{"utc": "2026-10-06T16:07:53+00:00", "app_id": "ap-StFlGdPV1OiKfiCfp1aFeK", "kind": "job_done", "tag": "r209-v5e400", "minutes": 130.0}
+{"utc": "2026-10-06T16:07:53+00:00", "app_id": "ap-StFlGdPV1OiKfiCfp1aFeK", "kind": "job_done", "tag": "r209-v5e150", "minutes": 80.1}
+{"utc": "2026-10-06T16:15:20+00:00", "app_id": "ap-6bKfjblGfm8dz1EpfBc0Hr", "kind": "job_done", "tag": "r229-s100", "minutes": 128.4}
+{"utc": "2026-10-06T16:15:20+00:00", "app_id": "ap-6bKfjblGfm8dz1EpfBc0Hr", "kind": "job_done", "tag": "r229-s40m20", "minutes": 78.3}
+{"utc": "2026-10-06T16:24:04+00:00", "app_id": "ap-Awd5yZBCVQlv6All9kkFyM", "kind": "jobs", "what": "r227f", "rows": "227", "gpu": "H100", "tags": ["r227-fcrk", "r227-fcrk_s1"], "job_gpus": {"r227-fcrk": "L40S", "r227-fcrk_s1": "L40S"}}
+{"utc": "2026-10-06T16:42:14+00:00", "app_id": "ap-cfWEZvXo6Hsi9Bg2U1k72k", "kind": "jobs", "what": "r231", "rows": "231", "gpu": "H100", "tags": ["r231-dv5-s0", "r231-dv5-s1"]}
+{"utc": "2026-10-06T16:47:53+00:00", "app_id": "ap-ec8UgdmsDwIYskA2yYVbVp", "kind": "jobs", "what": "r231b", "rows": "231", "gpu": "H100", "tags": ["r231-dv5only-s0"]}
+{"utc": "2026-10-06T17:03:18+00:00", "app_id": "ap-Awd5yZBCVQlv6All9kkFyM", "kind": "job_done", "tag": "r227-fcrk", "minutes": 39.0}
+{"utc": "2026-10-06T17:03:18+00:00", "app_id": "ap-Awd5yZBCVQlv6All9kkFyM", "kind": "job_done", "tag": "r227-fcrk_s1", "minutes": 30.4}
 {"utc": "2026-10-06T10:42:38+00:00", "app_id": "ap-Hk92NilVVdsJWPlidVTjwr", "kind": "jobs", "what": "r209b", "rows": "209", "gpu": "H100", "tags": ["r209-e400b"], "job_gpus": {"r209-e400b": "L40S"}}
