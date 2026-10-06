@@ -237,6 +237,7 @@ def private_scores(items: list, reader: str, layout: str, adapter_from: str, sha
 @APP.local_entrypoint()
 def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs: str = "", gpu: str = ""):
     global run
+    base_run = run
     if gpu == "cpu":  # CPU-only jobs (clustering, data builds): no GPU billed
         run = run_cpu
     elif gpu:  # row 125: another GPU type for this launch (e.g. H200 for decider-35B-A3B training); the default stays one H100
@@ -245,7 +246,19 @@ def main(cmd: str = "", env: str = "", tag: str = "", check: bool = False, jobs:
         print(gpu_check.remote()); return
     if jobs:  # parallel: at most 8 containers (volume commits contend beyond ~5 concurrent small ones)
         spec = json.loads(Path(jobs).read_text())
-        _ledger(kind="jobs", what=Path(jobs).stem, rows=_rows(Path(jobs).stem), gpu=gpu or "H100", tags=[j["tag"] for j in spec])
+        _ledger(kind="jobs", what=Path(jobs).stem, rows=_rows(Path(jobs).stem), gpu=gpu or "H100", tags=[j["tag"] for j in spec],
+                **({"job_gpus": {j["tag"]: j.get("gpu", gpu or "H100") for j in spec}} if any("gpu" in j for j in spec) else {}))
+        if any("gpu" in j for j in spec):  # 2026-10-06: a job's own "gpu" (e.g. L4, A10, L40S, A100-40GB, cpu) overrides the launch's
+            fn = lambda g: run_cpu if g == "cpu" else base_run.with_options(gpu=g) if g else run
+            calls = [fn(j.get("gpu", gpu)).spawn(j["cmds"], j.get("env", {}), j["tag"]) for j in spec]
+            for c in calls:
+                try:
+                    line = c.get()
+                except Exception as ex:  # as starmap's return_exceptions
+                    line = repr(ex)
+                print(line, flush=True)
+                _done(line)
+            return
         for line in run.starmap([(j["cmds"], j.get("env", {}), j["tag"]) for j in spec], return_exceptions=True):
             print(line, flush=True)
             _done(line)
