@@ -49,7 +49,10 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 - `scripts/modal_app.py` (app `ai-experiments-training`): builds the image from `uv.lock`, runs this repo's scripts unchanged on one H100,
   streams their output, and writes every file they create or change to the volume `ai-exp-results` under the job's tag; model
   downloads persist in `ai-exp-hf-cache`. One job: `modal run scripts/modal_app.py --tag T --env "K=V,..." --cmd "cmd1 ;; cmd2"`.
-  Small encoder jobs (bge-small, the late-interaction model) run on an L40S: a job list's per-job `"gpu": "L40S"` (§188: 2.3x the 3090, ~$0.18 per 3,000 steps; the H100 is 23x slower on them). CPU-bound jobs (clustering, data builds) take `--gpu cpu` (8 cores, no GPU billed; row 204 once held an H100 for two hours of CPU work). Many in parallel (at most 8 containers): write a JSON list of `{tag, env, cmds}` to `scripts/modal_jobs/<row>.json`, commit it, then
+  Small encoder jobs (bge-small, the late-interaction model) run on an L40S: a job list's per-job `"gpu": "L40S"` (§188: 2.3x the 3090, ~$0.18 per 3,000 steps).
+  ModernBERT / Ettin on an H100 need FlashAttention (`ATTN=kernels-community/flash-attn2@main`, cmd `uv run --frozen --with "kernels<0.11" ...`): with the default
+  sdpa they run ~7x slower there (row 230, 2026-10-06: 2.7 s/step vs 0.35-0.41; §188's H100 slowness was this). Ettin-32M stays on the L40S (sdpa; flash no faster
+  there); Ettin-400M goes to the H100 with flash (0.41 s/step vs 0.89 on the L40S with checkpointing: same cost, half the time). CPU-bound jobs (clustering, data builds) take `--gpu cpu` (8 cores, no GPU billed; row 204 once held an H100 for two hours of CPU work). Many in parallel (at most 8 containers): write a JSON list of `{tag, env, cmds}` to `scripts/modal_jobs/<row>.json`, commit it, then
   `modal run --detach scripts/modal_app.py --jobs scripts/modal_jobs/<row>.json` (`--detach`: the jobs survive the local client dying, as when WSL crashed on 2026-09-26). `ADAPTERS_FROM=<tag,...>` in a job's env copies adapters trained
   by earlier jobs into the container (scoring-only jobs). The container clock is UTC.
 - Watching a job list (2026-09-27: eleven watchers sat "running" for hours after their jobs finished and their results went unnoticed):
