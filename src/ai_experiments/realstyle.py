@@ -149,6 +149,7 @@ PROJECTS = [("Kitchen remodel", ["home_improvement", "furniture", "home_services
 #   a  first-time payee strings 16% -> ~29%: a new merchant is tried more often (RS_V6A, added to the explore chance), and the new one is
 #      drawn from the kind's whole pool (~1,000 places) rather than the metro's ~50 locals by chain popularity, so it is new to the household; on a trip, places of the
 #      trip's own metro 70% of the time (v5 trips used the home favourites, so one coffee shop was filed under its habit and the trip)
+#      (a = p + t: p the new places from the whole pool, t the trip's metro, each alone for row 233's second round)
 #   b  payees under 2+ categories 0.79 -> ~0.35: a payee's purpose routing (a person's, a child's, a project's, a property's, the
 #      catch-all) is decided once per payee, not per transaction; misfiles 1.5% -> 0.5%
 #   c  strings per payee key 2.9 -> ~2.1: fewer string forms per merchant (1-2, not 1-3), order codes re-drawn for 30% of coded merchants
@@ -354,16 +355,16 @@ class Household:
     def _merchant(self, kind):
         rng = self.rng
         fav = self.favourites[kind]
-        if "a" in V6 and self._away is not None and kind in TRIP_KINDS and self.pool.get(kind) and self.shared and rng.random() < 0.7:
+        if V6 & {"a", "t"} and self._away is not None and kind in TRIP_KINDS and self.pool.get(kind) and self.shared and rng.random() < 0.7:
             ms, _ = self._world(kind, self._away)  # v6 a: a place in the trip's metro
             if ms:
                 return rng.choice(ms)
         bill = kind in ("utility", "phone", "insurance", "rent", "subscription")  # household bills: name banks only (Overture's energy firms are not bills)
         if kind in NONPLACE and (bill or not self.pool.get(kind) or rng.random() < 0.7):
             name = rng.choice(NONPLACE[kind]); m = dict(name=name, kind=kind, city=None, chain=True)
-        elif fav and rng.random() > {"restaurant": 0.45, "fast_food": 0.3, "coffee_bakery": 0.3, "hobby": 0.5, "entertainment": 0.55}.get(kind, 0.2) + (0.25 if V5 else 0) + (V6A if "a" in V6 else 0):
+        elif fav and rng.random() > {"restaurant": 0.45, "fast_food": 0.3, "coffee_bakery": 0.3, "hobby": 0.5, "entertainment": 0.55}.get(kind, 0.2) + (0.25 if V5 else 0) + (V6A if V6 & {"a", "p"} else 0):
             return fav[min(int(rng.paretovariate(1.2)) - 1, len(fav) - 1)]
-        elif "a" in V6 and self.pool.get(kind) and self.shared and fav:  # v6 a: a new place from the kind's whole pool, unweighted (a
+        elif V6 & {"a", "p"} and self.pool.get(kind) and self.shared and fav:  # v6 a: a new place from the kind's whole pool, unweighted (a
             m = rng.choice(self.pool[kind])  # household's metro alone holds ~50 locals a kind, used up within a few years of 10)
         elif self.pool.get(kind) and self.shared:
             ms, ws = self._world(kind)
@@ -522,7 +523,7 @@ class Household:
         employer = rng.choice(EMPLOYERS); pay = round(rng.uniform(1500, 6000), 2)
         while d <= self.end:
             wd = d.weekday()
-            if "a" in V6:  # v6 a: the metro of a trip under way (never the home metro)
+            if V6 & {"a", "t"}:  # v6 a / t: the metro of a trip under way (never the home metro)
                 tr = next((t for t in self.trips if t["start"] - dt.timedelta(days=1) <= d <= t["end"]), None)
                 self._away = None if tr is None else (self.metro + 1 + _h(tr["place"]) % (METROS - 1)) % METROS
             for kind, rate in RATES.items():

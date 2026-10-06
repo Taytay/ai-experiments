@@ -50,11 +50,15 @@ def props(b):
     gone = 0  # known payees whose previous filing's category is no longer offered (hidden, last used over a year ago: decider's options)
     seen, prev, pc, pend = set(), {}, defaultdict(set), {}
     hist = defaultdict(Counter)  # the payee's earlier filings per category
-    nfirst = nswitch = nknown = stay = judged = n3 = maj_wrong = maj_wrong_last_right = 0
+    nfirst = nswitch = nknown = stay = judged = n3 = maj_wrong = maj_wrong_last_right = first_known_key = first_p2p = 0
+    seen_keys = set()
     for e in ev:
         p = e["payee"]
         if p not in seen:
             nfirst += 1
+            kk = payee_key_v2(p) or p.lower()
+            first_known_key += kk in seen_keys  # row 233: a new string of a payee seen before (a variant, not a new merchant)
+            first_p2p += bool(P2P.search(p))
         else:
             nknown += 1
             gone += prev[p] in hidden_now and (e["date"] - last[prev[p]]).days > 365
@@ -66,7 +70,7 @@ def props(b):
                 n3 += 1
                 mw = hist[p].most_common(1)[0][0] != e["gold"]
                 maj_wrong += mw; maj_wrong_last_right += mw and prev[p] == e["gold"]
-        seen.add(p); prev[p] = e["gold"]; pc[p].add(e["gold"]); hist[p][e["gold"]] += 1
+        seen.add(p); seen_keys.add(payee_key_v2(p) or p.lower()); prev[p] = e["gold"]; pc[p].add(e["gold"]); hist[p][e["gold"]] += 1
     pn = Counter(e["payee"] for e in ev)
     keys = defaultdict(set)
     kn = Counter()
@@ -84,6 +88,8 @@ def props(b):
         "category span (days, median)": float(np.median([(last[c] - first[c]).days for c in used])),
         "new categories / year after year 1": new_later / max(yrs - 1, 1e-9) if yrs > 1.2 else float("nan"),
         "first-time payee strings": nfirst / n,
+        "... of which a known payee's new string (key seen)": first_known_key / max(nfirst, 1),
+        "... of which person / transfer / check": first_p2p / max(nfirst, 1),
         "one-off payees (of payees)": sum(1 for v in pn.values() if v == 1) / len(pn),
         "person / transfer / check": sum(bool(P2P.search(e["payee"])) for e in ev) / n,
         "strings per payee key (2+ filings)": float(np.mean(multi)) if multi else float("nan"),
