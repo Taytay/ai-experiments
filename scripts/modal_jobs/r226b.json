@@ -1,0 +1,74 @@
+[
+ {
+  "tag": "r226-v5o-s1",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache",
+   "PLAN_ROWS": "226",
+   "ROW": "226",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "9e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e_kmv",
+   "ENCODERS_FROM": "enc-base,r222-kmv,r221-h15",
+   "ARM": "v5o_s1",
+   "ARMS": "li_r226_v5o_s1",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "SEED": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "SPAN_AFTER=365 TEST_SEEDS=100000-100019 uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r226-v5n-s1",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache",
+   "PLAN_ROWS": "226",
+   "ROW": "226",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "OVERRIDE": "0",
+   "STEPS": "3000",
+   "LR": "9e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e_kmv",
+   "ENCODERS_FROM": "enc-base,r222-kmv,r221-h15",
+   "ARM": "v5n_s1",
+   "ARMS": "li_r226_v5n_s1",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "SEED": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "SPAN_AFTER=365 TEST_SEEDS=100000-100019 uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]
