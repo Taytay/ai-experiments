@@ -210,6 +210,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §195 Per-filing candidates on Ettin (row 224)
 - §196 A better stand-in for real data (row 225)
 - §197 Training on v5 households (row 226)
+- §198 decider remaining training lessons in the late-interaction model (row 227)
 
 <!-- END SECTION INDEX -->
 
@@ -11855,3 +11856,56 @@ Two seeds each.
 
 **Cost:** cache build 7 minutes, four L40S jobs of 30-45 minutes: roughly $5; exact figures from `scripts/modal_costs.py --rows 226` once
 Modal bills the day. Owner reads local ($0).
+
+## 198. decider's remaining training lessons in the late-interaction model: the crowd line is the one that pays (first-time payees +6 where a crowd exists, harmless where none does); evidence-free episodes, empty categories, more steps, longer limits and database-merchant swaps do not move the stand-in; best on the owner's budget 70.8 / 70.9 (REAL-27, MODEL-25)
+
+PLAN step 227 (owner, 2026-10-06: "What techniques are missing from these encoders that we used in training our best decider?"; "we could do
+more of the small model ettin trainings because they are fast"). The tuned decider's recipe (`ren50 dbep50 mislead_v1 alt10s lk10 ov10 oth50
+aux100 ev10soft rs25 emp20`) against the encoders: ov10 (OVERRIDE, §190), aux100 (hidden labels, §193), rs25 (real-style households) and
+lk10 (history rows) were in; ren50 had not helped (§190). New in `li_decider.py`, each a training-only switch: `EVFREE` (ev10soft: an opaque
+payee, its neighbour rows dropped, a uniform target), `EMPTY` (emp20: coined empty categories in the options), `CROWD` (oth50 / row 183: "|
+others: <category> (<households>), ..." on the transaction from build_crowd.py's v4 tables, the household left out, 30% of training
+households and 20% of lines dropped as decider's §169 / §171), `DBSWAP` (dbep50: a share of a household's merchants swapped, consistently,
+for merchant-database merchants of the same kind, two bank strings each, the household's routing kept). `READ_MAXLEN` reads a model at a
+longer limit. Screen 1 on h15's recipe (v4 households) at 1,024 tokens; screen 2 on v5o's recipe (§197). One seed each, the winner two.
+
+**Table 198.1: screen 1, h15's recipe on v4 households, % right first**
+
+| arm | v5 held-out (20) | v5 first-time | v4 held-out | blind_v2 | rational bank new | owner's budget |
+|---|---|---|---|---|---|---|
+| c1k (h15 at 1,024 tokens) | 71.1 | 62.1 | 73.4 | 81.9 | 57.5 | |
+| ev (EVFREE 0.1) | 70.5 | 62.1 | 73.2 | 82.2 | 59.5 | |
+| emp (EMPTY 3) | 70.9 | 62.2 | 73.3 | 81.7 | 58.5 | |
+| st6k (6,000 steps) | 70.7 | 61.5 | 73.9 | 82.3 | 59.8 | |
+| cr (CROWD) | **72.3** | **68.0** | **74.5** | 81.8 | 56.4 | 68.8 |
+| dbs (DBSWAP 0.3) | 71.2 | 62.5 | 73.6 | **83.0** | 58.7 | 68.6 |
+
+h15 itself read at 1,024 tokens on the owner's budget: 69.0 (as at 512; 13.8% of the owner's queries exceed 512 tokens, 1.2% of
+synthetic ones, none 1,024).
+
+**Table 198.2: screen 2, v5o's recipe (v5 households, override 0.1) at 1,024 tokens, % right first (two seeds for fcr)**
+
+| arm | v5 held-out (20) | v5 first-time | blind_v2 | rational bank new | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|
+| fc (v5o at 1,024) | 74.8 | 61.6 | 81.5 | 58.8 | 70.5 | 51.1 |
+| fcr (+ CROWD) | **75.8 / 75.8** | **67.5 / 67.3** | 81.8 | 58.8 | **70.8 / 70.9** | 52.1 / 51.8 |
+| fcd (+ CROWD + DBSWAP 0.3) | 75.7 | 67.1 | 82.5 | 61.5 | 69.5 | 49.4 |
+
+### 198.1 What the step says
+
+- **The crowd line is decider's lesson that transfers:** first-time payees +6 on v4 and v5 held-out households, from strings other
+  households filed, as decider found (§183). Trained with dropout, its absence costs nothing: blind_v2, the rational households and the
+  owner's budget have no crowd table and read as without it (owner 70.8 / 70.9 against v5o's 70.5 / 70.4). The owner's budget cannot show
+  the gain: it needs a real crowd (YNAB's own users' filings), which a product would have.
+- **The others do not move the stand-in** (v5 within 0.6 of the control): evidence-free episodes, empty categories (decider needed them
+  against letter-option shortcuts the encoder does not have), twice the steps, and a 1,024-token limit (the truncated tail was mostly old
+  recent rows). Evidence-free episodes and 6,000 steps help new real merchants by 2 points, not enough to matter.
+- **Database merchants swapped into households** help blind_v2 (+1.0) and new real merchants (+2.7 on v5o's recipe) but cost the owner's
+  budget 0.4-1.0 (two recipes): their kinds are noisy (§168), and the owner's first-time payees are not database merchants. Not kept.
+- Not run: alternation episodes (alt10s; v5 households already alternate) and misleading names (mislead_v1, half of dbep50); both are
+  left for row 228's options-in-the-input model, where decider's shortcuts and cures matter more.
+- **Recipe from here: fcr** (Ettin-32M from the ekmv knowledge stage; v5 households; override 0.1; hidden labels 0.15; crowd line;
+  1,024 tokens). Gap to decider-4B tuned on the owner's budget: 1.7 points (72.5), at 2.7 ms a transaction.
+
+**Cost:** ten L40S jobs of 25-45 minutes: roughly $9; exact figures from `scripts/modal_costs.py --rows 227` once Modal bills the day. Owner
+reads local ($0).
