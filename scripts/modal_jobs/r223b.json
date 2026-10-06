@@ -1,0 +1,78 @@
+[
+ {
+  "tag": "r223-kd1",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r223-kd",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "223",
+   "ROW": "223",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "TEACHER": "data/interim/teacher_kd_v1.jsonl",
+   "TEACHER_ITEMS": "realstyle_v4g_kd_train.json",
+   "KD_SEEDS": "301000-301299",
+   "KDP": "0.5",
+   "RCHUNK": "64",
+   "KDW": "1",
+   "ARM": "kd1",
+   "ARMS": "li_r223_kd1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r223-kd0",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r223-kd",
+   "ENCODERS_FROM": "enc-base",
+   "PLAN_ROWS": "223",
+   "ROW": "223",
+   "BASE": "models/encoders/li_r210_a1",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "TEACHER": "data/interim/teacher_kd_v1.jsonl",
+   "TEACHER_ITEMS": "realstyle_v4g_kd_train.json",
+   "KD_SEEDS": "301000-301299",
+   "KDP": "0.5",
+   "RCHUNK": "64",
+   "KDW": "0",
+   "ARM": "kd0",
+   "ARMS": "li_r223_kd0"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]

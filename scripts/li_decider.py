@@ -581,6 +581,28 @@ def _cands(e, ev):
     return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
 
 
+def _doc_pairs(model, scale, qtexts, dtexts, cols):
+    """MODE=doc in training: [b, max options] scores of each query against its own option documents (cols[k] = columns in dtexts);
+    padded options -inf"""
+    import torch
+    qv, qm, qw, qc = model.vecs(qtexts, "q")
+    dv, dm, _, dc = model.vecs(dtexts, "d")
+    w = max(map(len, cols))
+    ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
+    valid = torch.tensor([[k < len(c) for k in range(w)] for c in cols], device=model.dev)
+    sim = torch.einsum("btd,bcsd->bcts", qv, dv[ix].to(qv.dtype))
+    m = dm[ix]
+    if SOFT:
+        a = (sim / SOFT).masked_fill(~m[:, :, None, :], float("-inf")).softmax(-1)
+        sim = (a * sim).sum(-1)
+    else:
+        sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
+    S = (sim * qw[:, None, :]).sum(-1)
+    if HYBRID:
+        S = S + torch.einsum("bh,bch->bc", qc, dc[ix])
+    return (scale * S).masked_fill(~valid, float("-inf"))
+
+
 def _mml_pairs(model, scale, qtexts, dtexts, cand, nopt):
     """MODE=mml/mmld in training: [b, nopt] category logits from each query's own candidates only (cand[k] = list of (column in dtexts,
     option index)); 2026-10-06: scoring every query against every candidate text of the step ran out of memory with row 217's 512-token
@@ -732,11 +754,9 @@ def train():
             Sg = _mml_pairs(model, scale, [e["q"] for e in anc], dtexts, cand, max(len(e["state"]) for e in anc))
         else:
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
-            S = _score(model, scale, [e["q"] for e in anc], dtexts)                 # [b, all documents in the window]
-            w = max(map(len, cols))
-            ix = torch.tensor([c + [c[0]] * (w - len(c)) for c in cols], device=model.dev)
-            valid = torch.tensor([[k_ < len(c) for k_ in range(w)] for c in cols], device=model.dev)
-            Sg = S.gather(1, ix).masked_fill(~valid, float("-inf"))
+            # each anchor against its own options only (2026-10-06: anchors from other households and days, as KD's, multiplied the
+            # documents, and the all-pairs score [queries x tokens x documents x tokens] ran out of memory); same scores as _score + gather
+            Sg = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols)
             if PPRIOR:
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
