@@ -1,0 +1,78 @@
+[
+ {
+  "tag": "r209-v5e400",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data",
+   "PLAN_ROWS": "209",
+   "ROW": "209",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "1024",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "4e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e400_kmv",
+   "ENCODERS_FROM": "enc-base,r209-e400b",
+   "ARM": "v5e400",
+   "ARMS": "li_r209_v5e400",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "GC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "SPAN_AFTER=365 TEST_SEEDS=100000-100019 uv run --frozen python scripts/li_decider.py read",
+   "RS_V5=0 READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "RS_V5=0 READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ },
+ {
+  "tag": "r209-v5e150",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data",
+   "PLAN_ROWS": "209",
+   "ROW": "209",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "1024",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "6e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e150_kmv",
+   "ENCODERS_FROM": "enc-base,r209-e150",
+   "ARM": "v5e150",
+   "ARMS": "li_r209_v5e150",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "GC": "1"
+  },
+  "cmds": [
+   "uv run --frozen python scripts/li_decider.py train",
+   "SPAN_AFTER=365 TEST_SEEDS=100000-100019 uv run --frozen python scripts/li_decider.py read",
+   "RS_V5=0 READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "RS_V5=0 READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]

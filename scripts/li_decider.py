@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -74,6 +74,7 @@ PTAU = float(os.environ.get("PTAU", "0.9"))
 HMASK, HLW = float(os.environ.get("HMASK", "0")), float(os.environ.get("HLW", "1"))
 MASK_TOK = "[?]"  # train() sets the base's mask token
 GC = int(os.environ.get("GC", "0"))
+SIMN, PAYN = int(os.environ.get("SIMN", "15")), int(os.environ.get("PAYN", "5"))  # row 229: QFMT=sections, similar-payee rows and own last filings
 # row 212 (a), the lookup as text (§144 Canonical kind lines: +17 on blind_v1's first-time payees for decider; §168 Kind lines from a lookup:
 # real lookups right for ~65% of lines): KINDLINE=1 appends "kind: <kind> (match high|mid|low)" to each transaction's own text (not to
 # history rows or documents), after the neighbours are found. Synthetic and rational households: the generator's kind through a simulated
@@ -421,6 +422,31 @@ def _query(i, ev, start, names=None, hide=(), spans=None):
     def ago(j):
         d = (e["date"] - ev[j]["date"]).days
         return f" {d}d ago" if AGO else ""
+    if QFMT == "sections":  # row 229: "this payee" (counts per category, its last PAYN filings), "similar payees", "recent"
+        import bisect
+        own = e["_bykey"][e["_pk"]]
+        own = own[:bisect.bisect_left(own, start[i])]  # earlier-day filings of the same payee key
+        cnt, lastd = defaultdict(int), {}
+        for j in own:
+            cnt[lab(j)] += 1; lastd[lab(j)] = j
+        q = e["text"]
+        if own:
+            q += " || this payee: " + ", ".join(f"{c} x{n}" + (f" ({(e['date'] - ev[lastd[c]]['date']).days}d ago)") for c, n in sorted(cnt.items(), key=lambda x: -x[1]))
+            q += "; " + "; ".join(f'${ev[j]["amt"]:.0f} -> {MASK_TOK if j in hide else lab(j)}{ago(j)}' for j in own[::-1][:PAYN])
+        sim = [j for j in e.get("nb", []) if ev[j]["_pk"] != e["_pk"]][:SIMN]
+        row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {MASK_TOK if j in hide else lab(j)}{ago(j)}'
+        for head, js in ((" || similar payees: ", sim), (" || recent: ", rec)):
+            if not js:
+                continue
+            q += head
+            for n_, j in enumerate(js):
+                if n_:
+                    q += "; "
+                r = row(j)
+                if spans is not None and j in hide:
+                    spans.append((len(q), len(q) + len(r), j))
+                q += r
+        return q
     if QFMT == "group":
         js = list(dict.fromkeys(near + rec))
         if not js:
@@ -495,6 +521,14 @@ def prepared(b, m1, cache, full=True):
                     if c >= PTAU:
                         pp[ev[j]["gold"]] += 1
                 e["_pp"] = dict(pp) or None
+    if QFMT == "sections":  # row 229: each event's payee key and, per key, its events in order (shared by reference)
+        from ai_experiments.payeekey import payee_key_v2
+        bykey = defaultdict(list)
+        for i_, e in enumerate(ev):
+            e["_pk"] = payee_key_v2(e["payee"]) or e["payee"].lower()
+            bykey[e["_pk"]].append(i_)
+        for e in ev:
+            e["_bykey"] = bykey
     start, k = [], 0
     for i, e in enumerate(ev):
         if i and e["day"] != ev[i - 1]["day"]:
@@ -671,7 +705,7 @@ def _materialise(e, names=None, rng=None):
     lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
     hide, spans = (), []
     if HMASK and rng is not None and CTX:
-        assert QFMT == "rows", "HMASK marks rows of QFMT=rows queries"
+        assert QFMT in ("rows", "sections"), "HMASK marks rows of QFMT=rows | sections queries"
         i, ev = e["_i"], e["_ev"]
         js = list(e.get("nb", [])[:NB]) + ([j for j in range(e["_start"][i] - 1, max(-1, e["_start"][i] - 1 - REC), -1)] if REC else [])
         hide = {j for j in js if rng.random() < HMASK}
