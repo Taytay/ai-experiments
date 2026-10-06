@@ -43,10 +43,14 @@ from ai_experiments.paths import ROOT  # noqa: E402
 
 PAIRS_FILE = Path(os.environ.get("PAIRS_FILE", str(ROOT / "data" / "interim" / "knowledge_pairs_v1.jsonl")))
 PAIRS_FILE = PAIRS_FILE if PAIRS_FILE.is_absolute() else ROOT / PAIRS_FILE
+# row 222: several pair files, comma-separated (knowledge pairs + alias pairs); PAIRS_FILE names the first (for the config)
+PAIRS_FILES = [Path(x) if Path(x).is_absolute() else ROOT / x for x in os.environ.get("PAIRS_FILE", str(PAIRS_FILE)).split(",")]
+PAIRS_FILE = PAIRS_FILES[0]
 ARM = os.environ.get("ARM", "k1")
 OUT = Path(os.environ.get("OUT", str(H.ENC / f"know_r212_{ARM}")))
 KBATCH, HBATCH = int(os.environ.get("KBATCH", "256")), int(os.environ.get("HBATCH", "128"))
 STEPS, EPOCHS, LR = int(os.environ.get("STEPS", "0")), float(os.environ.get("EPOCHS", "1")), float(os.environ.get("LR", "5e-5"))
+LOWER = int(os.environ.get("LOWER", "0"))
 SYM, HOLDOUT, N_EVAL = float(os.environ.get("SYM", "1")), float(os.environ.get("HOLDOUT", "0.02")), int(os.environ.get("N_EVAL", "0"))
 MIX, SEED, LOG = float(os.environ.get("MIX", "0")), int(os.environ.get("SEED", "0")), int(os.environ.get("LOG", "100"))
 SCALE = 20.0  # 1 / 0.05
@@ -64,7 +68,9 @@ def held_out(p):
 
 
 def load():
-    pairs = [json.loads(line) for line in PAIRS_FILE.open()]
+    pairs = [json.loads(line) for f in PAIRS_FILES for line in f.open()]
+    if LOWER:  # row 222: cased bases (Ettin) read ALL-CAPS bank strings as many pieces; li_decider LOWER=1 lowercases the same way
+        pairs = [dict(p, text=p["text"].lower(), kind_text=p["kind_text"].lower()) for p in pairs]
     kinds = sorted({p["kind_text"] for p in pairs})
     train = [p for p in pairs if not held_out(p)]
     test = [p for p in pairs if held_out(p)]
