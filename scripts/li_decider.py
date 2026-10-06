@@ -78,7 +78,8 @@ PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("Q
 TEACHER, TEACHER_ITEMS, KD_SEEDS = os.environ.get("TEACHER", ""), os.environ.get("TEACHER_ITEMS", ""), os.environ.get("KD_SEEDS", "")
 KDW, KDP, KDT = float(os.environ.get("KDW", "1")), float(os.environ.get("KDP", "0.5")), float(os.environ.get("KDT", "1"))
 CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
-RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
+RCHUNK = int(os.environ.get("RCHUNK", "256"))
+MCHUNK = int(os.environ.get("MCHUNK", "32"))  # transactions per chunk in per-filing reads with ages / recent filings / documents  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 SPAN_AFTER = int(os.environ.get("SPAN_AFTER", "0"))  # OPTS=span: days a hidden category stays offered after its last filing
@@ -834,6 +835,25 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
+    if MODE in ("mml", "mmld") and (CAGO or CREC or MODE == "mmld" or os.environ.get("MCHUNKED") == "1"):
+        # 2026-10-06: with candidate ages every filing text is unique to the transaction reading it, so "encode every candidate text of
+        # the budget once" held hundreds of thousands of texts (out of memory on an L40S); here each chunk encodes its own candidates
+        out = []
+        with torch.no_grad():
+            for a in range(0, len(ev), MCHUNK):
+                chunk = ev[a:a + MCHUNK]
+                dt, idx, cand = [], {}, []
+                for e in chunk:
+                    oi = {c: o for o, c in enumerate(e["state"])}
+                    cs = []
+                    for t, c in _cands(e, ev):
+                        if t not in idx:
+                            idx[t] = len(dt); dt.append(t)
+                        cs.append((idx[t], oi[c]))
+                    cand.append(cs)
+                S = _mml_pairs(model, scale, [e["q"] for e in chunk], dt, cand, max(len(e["state"]) for e in chunk)).tolist()
+                out += [dict(zip(e["state"], S[k][:len(e["state"])])) for k, e in enumerate(chunk)]
+        return out
     if MODE in ("mml", "mmld"):
         cands = [_cands(e, ev) for e in ev]
         uniq = list(dict.fromkeys(t for cs in cands for t, _ in cs))
