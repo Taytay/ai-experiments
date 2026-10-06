@@ -994,3 +994,4 @@
 {"utc": "2026-10-06T16:47:53+00:00", "app_id": "ap-ec8UgdmsDwIYskA2yYVbVp", "kind": "jobs", "what": "r231b", "rows": "231", "gpu": "H100", "tags": ["r231-dv5only-s0"]}
 {"utc": "2026-10-06T17:03:18+00:00", "app_id": "ap-Awd5yZBCVQlv6All9kkFyM", "kind": "job_done", "tag": "r227-fcrk", "minutes": 39.0}
 {"utc": "2026-10-06T17:03:18+00:00", "app_id": "ap-Awd5yZBCVQlv6All9kkFyM", "kind": "job_done", "tag": "r227-fcrk_s1", "minutes": 30.4}
+{"utc": "2026-10-06T17:14:26+00:00", "app_id": "ap-i9VSiAGkxbUXYWeY7ExpoZ", "kind": "jobs", "what": "r228", "rows": "228", "gpu": "H100", "tags": ["r228-jt3", "r228-jt0"], "job_gpus": {"r228-jt3": "L40S", "r228-jt0": "L40S"}}
