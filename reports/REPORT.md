@@ -219,6 +219,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §204 Clef-flash zero-shot (row 164)
 - §205 The Ettin-1B option scorer on the owner's budget (row 232)
 - §206 v6 households (row 233)
+- §207 Payee and category synonyms on the rational households (row 234)
 
 <!-- END SECTION INDEX -->
 
@@ -12215,3 +12216,39 @@ faster). Preparation per job fell from 14-17 to 9.5 minutes; with a shared prep 
 
 **Cost:** eight L40S jobs of 40-43 minutes: roughly $10; exact figures from `scripts/modal_costs.py --rows 233` once Modal bills the
 day. Owner reads and realness measurements local ($0).
+
+## 207. Payee and category synonyms on the rational households: invented, obviously named merchants never seen in training are right first 79-82% of the time on their first purchase (real held-out names 57-63%); renaming the categories to synonyms with emoji costs 1-2 points on new merchants and nothing on known ones
+
+PLAN step 234 (owner, 2026-10-06: "I want to see if the transfer can happen with payee synonyms, as well as category synonyms").
+§206's rational households (row 220: 50 one-year households, ten obvious categories, every merchant kind always filed to one of them; bank
+strings) use merchants from the held-out half of the merchant pool, so a merchant's first purchase tests name -> kind -> category
+transfer. Two variations keep every purchase, day, amount, category and regular-vs-new merchant (checked) and change only names
+(`scripts/rational_budgets.py`): `RATIONAL_PAYEES=obvious`, each merchant renamed to an invented name that says what it is (a made-up
+proper part and a kind cue: "Larkspur Family Grocers", "Maplewood Home Mortgage", "Linden Tavern"), never found verbatim in the training
+merchant pool or the knowledge / alias pairs; `RATIONAL_CATS=synonyms`, each category renamed per household to a synonym not among the
+training households' category names ("Groceries & food 🛒", "Takeaway 🥡", "Filling up", "Our house", "Power, water & phone").
+Read locally (`scripts/chains/r234_rational.sh`).
+
+**Table 207.1: % right first; "new" = the merchant's first purchase in the household (4,857), "known" = bought before (17,548)**
+
+| payees | categories | fcr all / new / known | v6b all / new / known | v6p all / new / known |
+|---|---|---|---|---|
+| held-out real names | as named | 89.0 / 58.8 / 97.3 | 89.5 / 59.0 / 97.9 | 90.1 / 62.8 / 97.7 |
+| invented, obvious | as named | 93.8 / 80.7 / 97.4 | 94.1 / 79.9 / 98.0 | 94.8 / 82.0 / 98.3 |
+| held-out real names | synonyms | 88.5 / 57.4 / 97.1 | 88.8 / 57.2 / 97.6 | 89.8 / 60.9 / 97.8 |
+| invented, obvious | synonyms | 93.3 / 79.2 / 97.2 | 93.8 / 78.7 / 98.0 | 94.4 / 80.7 / 98.2 |
+
+### 207.1 What the step says
+
+- **Payee transfer works when the name carries the kind:** a merchant never seen verbatim but named like what it is is right first 80%
+  of the time on its first purchase; the held-out real names (many give no hint: "Toll Brothers" as a mortgage, "Blink" as fuel) 59%.
+  The 59 -> 80 difference is the share of the first-purchase problem that is about knowing what an opaque name is.
+- **Category transfer works:** synonyms and emoji the model never saw as category names cost 1-2 points on new merchants and nothing
+  on known ones (history matches by the category's id, whatever its name).
+- **The models order as on synthetic data, not as on the owner's budget:** v6p (trained on more new merchants) leads on every version
+  here and trailed on the owner's first-time payees (§206). These households file by kind; the owner files by purpose. The rational
+  households measure name and category-name transfer cleanly, and say little about the owner's gap.
+- About 20% of obvious first purchases are still missed: by construction these are kind -> category mappings with no history for the
+  merchant (coffee shops under the restaurants category, an events box office under fun); not broken down here.
+
+**Cost:** $0 (local RTX 3090, 11 minutes).
