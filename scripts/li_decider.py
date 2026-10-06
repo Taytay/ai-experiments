@@ -71,6 +71,12 @@ GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
 PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
+# row 223 (distilling decider; ColBERT-Zero 2602.16609, LITE 2406.17968): TEACHER = decider's per-item scores (exp_decision_models per_item
+# jsonl: id, sum_lp per option) on the items of TEACHER_ITEMS (data/processed, realstyle items: id "RS:<seed>:<txn8>", options); KD_SEEDS the
+# training-world households they come from (added to the training data); each step a share KDP of the anchors is drawn from teacher-scored
+# transactions, and their loss adds KDW x the cross-entropy against decider's distribution over the household's options (KDT temperature)
+TEACHER, TEACHER_ITEMS, KD_SEEDS = os.environ.get("TEACHER", ""), os.environ.get("TEACHER_ITEMS", ""), os.environ.get("KD_SEEDS", "")
+KDW, KDP, KDT = float(os.environ.get("KDW", "1")), float(os.environ.get("KDP", "0.5")), float(os.environ.get("KDT", "1"))
 CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
 RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
@@ -646,6 +652,30 @@ def train():
         data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
+    kd = []  # teacher-scored events (row 223)
+    if TEACHER:
+        from ai_experiments.paths import PROCESSED, ROOT
+        items = {it["id"]: it for it in json.loads((PROCESSED / TEACHER_ITEMS).read_text())["items"]}
+        tl = {}
+        for r in map(json.loads, open(ROOT / TEACHER if not Path(TEACHER).is_absolute() else TEACHER)):
+            if r["id"] in items:
+                lp = np.asarray(r["sum_lp"], dtype=np.float64) / KDT
+                p_ = np.exp(lp - lp.max()); p_ /= p_.sum()
+                tl[r["id"]] = {o.strip(): float(x) for o, x in zip(items[r["id"]]["options"], p_)}
+        a_, z_ = map(int, KD_SEEDS.split("-"))
+        for b in households("train", range(a_, z_ + 1)):
+            if OVERRIDE:
+                b = _override(b, random.Random(SEED * 7919 + 10 ** 6 + int(b["id"].rsplit("-", 1)[1])))
+            ev_, docs_ = prepared(b, m1, cache, full=False)
+            data.append((ev_, docs_))
+            hid = b["id"].rsplit("-", 1)[1]
+            for e in ev_:
+                t = tl.get(f"RS:{hid}:{e['id'][:8]}")
+                if t and e["gold"] in e["state"] and len(e["state"]) > 1:
+                    e["_t"] = t
+                    kd.append(e)
+            cache.clear()
+        print(f"KD: {len(tl)} teacher-scored items, {len(kd)} matched to events of {z_ - a_ + 1} households", flush=True)
     ex = _materialise(data[0][0][50])
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {ex['q']!r}; "
           f"document e.g. {next(iter(ex['d'].values()))!r}", flush=True)
@@ -669,6 +699,9 @@ def train():
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
             anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e) for e in pick]
+        if kd and KDP > 0:  # a share KDP of the step's anchors from teacher-scored transactions (each carries its own day's documents)
+            nk = int(round(KDP * len(anc))) or 1
+            anc = anc[:len(anc) - nk] + [_materialise(e) for e in rng.sample(kd, min(nk, len(kd)))]
         if not anc:
             continue
         dtexts, idx = [], {}
@@ -707,6 +740,21 @@ def train():
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         loss, ce = _loss(Sg, tgt)
+        if kd:  # soft cross-entropy against decider's distribution over the options it shares with this one (others get 0)
+            T = torch.zeros_like(Sg)
+            has = []
+            for k_, e in enumerate(anc):
+                t = e.get("_t")
+                if t:
+                    v = [t.get(e["labels"][c], 0.0) for c in e["state"]]
+                    z = sum(v)
+                    if z > 0:
+                        T[k_, :len(v)] = torch.tensor(v, device=model.dev) / z; has.append(k_)
+            if has:
+                hi = torch.tensor(has, device=model.dev)
+                kdl = -(T[hi] * torch.log_softmax(Sg[hi].float(), -1).masked_fill(T[hi] == 0, 0.0)).sum(-1).mean()
+                loss = loss + KDW * kdl
+                run["kd"] += kdl.item()
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.params() + (list(inter.parameters()) if inter else []), 1.0)
@@ -726,7 +774,7 @@ def train():
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
                                                          PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
-                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, **{k: globals()[k] for k in EXTRA}), indent=1))
+                                                         OPTS=OPTS, SPAN_AFTER=SPAN_AFTER, TEACHER=TEACHER, KD_SEEDS=KD_SEEDS, KDW=KDW, KDP=KDP, KDT=KDT, **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
