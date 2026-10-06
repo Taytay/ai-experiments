@@ -835,7 +835,7 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
-    if MODE in ("mml", "mmld") and (CAGO or CREC or MODE == "mmld" or os.environ.get("MCHUNKED") == "1"):
+    if MODE in ("mml", "mmld") and (CAGO or os.environ.get("MCHUNKED") == "1"):  # only ages make texts unique per transaction
         # 2026-10-06: with candidate ages every filing text is unique to the transaction reading it, so "encode every candidate text of
         # the budget once" held hundreds of thousands of texts (out of memory on an L40S); here each chunk encodes its own candidates
         out = []
