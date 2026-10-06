@@ -200,6 +200,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §185 The late-interaction decision model (rows 210-211)
 - §186 Suggesting a category scheme for a new user (row 214)
 - §187 The late-interaction decision model beside decider (row 216)
+- §188 The cheapest Modal GPU for the small encoder models (row 219)
 
 <!-- END SECTION INDEX -->
 
@@ -11389,3 +11390,35 @@ A gate chosen on the synthetic set (encoder when its top probability >= 0.4-0.5 
   that it ranks c0 and a5 as the owner's budget does.
 
 **Cost:** $0 (local RTX 3090).
+
+## 188. The cheapest Modal GPU for the small encoder models: the L40S trains the 33M late-interaction model 2.3x faster than the local 3090 at ~$0.18 per 3,000 steps; the H100 is 23x slower than the L40S on this launch-bound job (INFRA)
+
+PLAN step 219 (owner, 2026-10-06: "Are there a100s that are just as fast and cheaper on modal?"; "Yes please!"). `scripts/modal_app.py`
+now takes a "gpu" field per job in a job list (`scripts/modal_jobs/r219.json`); five jobs, one per GPU type, each 600 steps of
+`li_decider.py train` with row 217's p2 query (12 dated neighbours + 8 recent filings, 512 tokens), 50 training households, the same seed.
+Prices from modal.com/pricing (2026-10-06).
+
+**Table 188.1: seconds per training step (data preparation excluded) and GPU cost per 3,000-step arm**
+
+| GPU | $ / hour | s / step | 3,000 steps | GPU $ per 3,000 steps |
+|---|---|---|---|---|
+| **L40S** | 1.95 | **0.113** | **5.7 min** | **0.18** |
+| A100-40GB (Modal gave an 80 GB SXM4) | 2.10 | 0.123 | 6.2 min | 0.22 |
+| A10 | 1.10 | 0.202 | 10.1 min | 0.18 |
+| L4 | 0.80 | 0.232 | 11.6 min | 0.15 |
+| H100 | 3.95 | 2.64 | 132 min | 8.70 |
+| local RTX 3090 (p2, 200 households) | 0 | 0.264 | 13.2 min | 0 |
+
+### 188.1 What the step says
+
+- **The L40S is the default for encoder jobs** (`"gpu": "L40S"` per job): fastest of all, at the price of the slowest cards per arm; arms
+  can now run in parallel on Modal instead of one at a time on the 3090.
+- **The H100 is the wrong machine for small models**, by far more than its price: 23x slower per step than the L40S here (row 210's
+  Modal runs were 2-3x slower than the 3090 on the same kind of job). The job issues many small kernels; something on that host (CPU
+  launches, most likely) dominates. Not investigated further: encoder jobs avoid it. decider (4B LoRA, vLLM) stays on the H100, which is
+  faster per finished job there.
+- Data preparation on Modal adds 1.5-2 minutes per 50 households (household and neighbour caches are local); uploading the caches to the
+  volume once would remove it.
+
+**Cost:** five jobs, 2.7-27.8 minutes each (the H100 job most of it): about $2.10; exact figures from `scripts/modal_costs.py --rows 219`
+once Modal bills the day.
