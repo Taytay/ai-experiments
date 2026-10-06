@@ -208,6 +208,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §193 Masked history-row labels (row 221)
 - §194 Kind lines in the late-interaction model (row 212)
 - §195 Per-filing candidates on Ettin (row 224)
+- §196 A better stand-in for real data (row 225)
 
 <!-- END SECTION INDEX -->
 
@@ -11753,3 +11754,71 @@ blind_v2 for emdo read on its first 100 users only (80.6; not comparable with th
 
 **Cost:** one L40S job of 45 minutes (train 30, reads 15): roughly $1.5; exact figures from `scripts/modal_costs.py --rows 224` once Modal
 bills the day. Owner read local ($0).
+
+## 196. A better stand-in for real data: the owner's payees move (when a payee's usual category is wrong, its latest filing is right 43% of the time; our households 18%); v5 households with moves, churn and projects rank ten late-interaction arms as the owner's budget did (rank correlation 0.83, from 0.04) (REAL-27)
+
+PLAN step 225. Neither synthetic v4 nor blind_v2 predicted the owner's ranking of the late-interaction arms (§189-§191: both put p2 near
+the top; the owner's budget put it last, and override training was worth +7.4 there). `scripts/realness_gap.py` measures, as aggregates
+only, properties of the owner's budget, v4 households and blind_v2 budgets, on outflows as the models see them. Then
+`src/ai_experiments/realstyle.py` gains a switch `RS_V5=1` (v4 households are byte-identical when it is off, checked by hash) and
+`scripts/chains/r225_rank.sh` reads ten trained arms on ten v5 held-out households (138k transactions) in one process.
+
+**Table 196.1: properties (median over households; the owner's budget is one)**
+
+| property | v4 (20) | v5 (20) | blind_v2 (250) | owner |
+|---|---|---|---|---|
+| years | 7.2 | 9.2 | 1.0 | 11 |
+| outflows a month | 120 | 125 | 92 | 145 |
+| categories used | 59 | 106 | 16 | 145 |
+| of those hidden now / outflows in them | 0.33 / 0.05 | 0.59 / 0.11 | 0 / 0 | 0.52 / 0.07 |
+| category lifetime, median days | 2,216 | 225 | 342 | 442 |
+| new categories a year after the first | 3.5 | 7.2 | - | 10 |
+| first-time payee strings | 0.14 | 0.16 | 0.35 | 0.29 |
+| payee switches (known payees) | 0.35 | 0.27 | 0.10 | 0.17 |
+| payee's usual category wrong (3+ earlier filings) | 0.26 | 0.28 | 0.08 | 0.25 |
+| ... of which its latest filing is right (a move) | **0.18** | **0.38** | 0.21 | **0.43** |
+| switches whose next filing stays | 0.37 | 0.42 | 0.42 | 0.41 |
+| payees with 3+ filings under 2+ categories | 0.78 | 0.79 | 0.27 | 0.35 |
+| top-5 categories' share | 0.61 | 0.52 | 0.77 | 0.48 |
+
+v5 (`RS_V5=1`): 8-12 years; 0.3-0.8 reorganisations a year (an everyday category retired, a renamed successor takes its kinds, bills and
+memo payments); 5-9 short-lived project categories a year (60-400 days, non-everyday kinds 30% of the time, hidden after); 30% of payees
+move for good to another live category at a random later date (`MOVE`); person purposes half as often, one catch-all per kind, misfiles
+1.5% and random catch-all filings 1% (v4: 3% each); new merchants tried 25 points more often, chains weighted by places ** 0.35 (v4 0.7).
+Draws for v5's additions come from a separate generator.
+
+**Table 196.2: % right first on ten v5 held-out households vs the owner's budget (decider's items)**
+
+| arm | what it is | v5, retired categories dropped | v5 + moves, kept a year | owner's budget |
+|---|---|---|---|---|
+| h15 | Ettin, hidden labels (§193) | 78.0 | **70.4** | 69.0 / 68.8 |
+| kd0 | bge, +300 households (§192) | 78.4 | 69.7 | 67.8 |
+| o1 | bge, p2 + override (§190) | 78.9 | 69.4 | 66.9 |
+| ekmv | Ettin, knowledge stage (§191) | 78.0 | 69.0 | 68.9 / 68.2 |
+| e0 | Ettin (§191) | 77.8 | 68.9 | 68.6 |
+| mdo | bge, per-filing + override (§190) | 78.5 | 68.5 | 67.7 |
+| m0 | bge, per-filing (§190) | 75.6 | 68.0 | 66.7 |
+| a5 | bge, bare query (§185) | 75.4 | 67.8 | 66.8 |
+| p2 | bge, dated history query (§189) | 78.6 | 65.3 | **59.5** |
+| c0 | bge, history query, old options (§185) | 77.2 | 63.9 | 63.3 |
+| **rank correlation with the owner** | | **0.04** | **0.83** | |
+
+The middle column's v5 had no payee moves yet and read with options as in training (retired categories dropped at their last use). With
+retired categories offered for a year, as decider's options and the owner's reads, but still no moves, five arms rank at 0.6.
+
+### 196.1 What the step says
+
+- **The property the generators lacked is payees that move.** Both v4 and the owner have a wrong "usual category" a quarter of the time,
+  but in v4 that is alternation (the payee comes back), and in the owner's budget it is mostly a move (the payee stays in its new
+  category). A model that copies a payee's history rows is right under alternation and wrong under moves; override training (§190)
+  simulates moves, which is why it was worth +7.4 on the owner's budget and nothing on v4.
+- **Options matter for the comparison too:** reads that drop a retired category at its last use make copying old history safe; decider's
+  options (a year after last use) do not. Choices on synthetic data should be read with `SPAN_AFTER=365`.
+- **v5 is the stand-in from here** for choosing among late-interaction recipes: it ranks ten arms as the owner's budget does (0.83;
+  the absolute level within 1.6 points on average), so the owner's budget can be kept for the final read of a row. Remaining gaps:
+  first-time payee strings (16% vs 29%), payee-name variants (2.9 strings per key vs 2.1), and more payees under 2+ categories (0.79 vs
+  0.35). Training on v5 households is the natural next test (row 226).
+- The aggregates come from the owner's budget, as earlier calibrations did (§155); no transaction, payee or category name leaves the
+  machine.
+
+**Cost:** $0 (local CPU for the measurements, the RTX 3090 for the reads, about 25 minutes each).

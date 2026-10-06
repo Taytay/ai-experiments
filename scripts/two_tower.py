@@ -83,6 +83,8 @@ def _hh_key(split):
         if f.exists():
             h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
     h.update(f"{os.environ.get('SHARED_WORLD')}|{os.environ.get('REALSTYLE_V4')}|{split}".encode())
+    if os.environ.get("RS_V5") == "1":  # row 225 (keys of other settings unchanged)
+        h.update(b"|v5")
     return h.hexdigest()[:16]
 
 
