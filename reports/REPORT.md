@@ -204,6 +204,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §189 decider history slice and two new test sets (rows 217, 220)
 - §190 decider training lessons on the late-interaction model (row 218)
 - §191 A small modern base: Ettin-encoder-32M (row 222)
+- §192 Distilling decider into the late-interaction model (row 223)
 
 <!-- END SECTION INDEX -->
 
@@ -11609,3 +11610,41 @@ L40S; the knowledge stages 3-8 minutes.
 
 **Cost:** knowledge / MLM stages 4 jobs of 3-8 minutes, 7 Ettin arms of 22-35 minutes on L40S: roughly $6-8; exact figures from
 `scripts/modal_costs.py --rows 222` once Modal bills the day. Data builds and owner reads local ($0).
+
+## 192. Distilling decider into the late-interaction model: decider's soft targets teach the small model about real merchant names (rational households' new merchants +3 to +7) but not the owner's first-time payees (bge 47.7 -> 46.8, Ettin 49.1 -> 48.4, within noise); the teacher's knowledge, read on synthetic households, is not what the owner's new payees need (REAL-27, MODEL-25)
+
+PLAN step 223 (ColBERT-Zero 2602.16609: supervised contrastive then knowledge distillation; LITE 2406.17968: the teacher matters more than the
+scorer; row 212 (d)). Teacher: decider G4 (r190-g s0) on 30,000 items from 300 training-world households it never trained on (seeds
+301000-301299; `scripts/chains/r223_kd_items.sh`, `data/processed/realstyle_v4g_kd_train.json`, DVC), vLLM, 74.3% right first, 20.6 minutes on
+an H100. li_decider (`TEACHER`, `KD_SEEDS`, `KDW`, `KDP`): those households join the training data; half of each step's anchors are
+teacher-scored transactions (29,402 matched); loss + 1 x soft cross-entropy against decider's distribution over the household's options.
+kd0 is the same run without the KD term (the extra households alone). One seed each.
+
+**Table 192.1: % right first**
+
+| model | synthetic | first-time | blind_v2 | rational clean: bought before / new | rational bank: bought before / new | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|---|
+| bge o1 (no extra households) | 74.2 | 62.0 | 82.2 | 99.7 / 65.8 | 96.9 / 62.3 | 66.9 | 46.1 |
+| bge kd0 (+300 households) | 74.4 | 62.0 | 82.0 | 99.5 / 65.2 | 95.9 / 61.5 | 67.8 | 47.7 |
+| bge kd1 (+ distillation) | 74.2 | 62.4 | 81.5 | 98.7 / **68.9** | 96.2 / **64.3** | 67.3 | 46.8 |
+| Ettin ekmv (2 seeds, §191) | 72.8 / 73.0 | 59.1 / 59.5 | 81.7 / 81.6 | 100.0 / 60.0; 99.7 / 59.9 | 97.1 / 58.0; 97.0 / 56.2 | 68.9 / 68.2 | 49.9 / 48.3 |
+| Ettin ekmv + distillation | 73.3 | 60.7 | 81.9 | 99.3 / 66.3 | 97.4 / 63.5 | 68.4 | 48.4 |
+
+Calibration error on blind_v2: kd1 1.1%, ekmv + KD 10.0% (ekmv 3.7%): distillation can unsettle calibration; the read's temperature
+would need refitting before an auto-filing threshold.
+
+### 192.1 What the step says
+
+- **The teacher's knowledge transfers where it applies:** new merchants in the rational households are real Overture names, and the
+  distilled models name their categories 3-7 points more often (Ettin 60 -> 66 clean, 57 -> 64 bank strings), the largest knowledge gain
+  any stage gave. The knowledge stage of §191 put kinds into the encoder but history training spent them; distillation keeps them, because
+  the training objective itself asks for decider's view of each option.
+- **It does not reach the owner's first-time payees** (-0.9 bge, -0.7 Ettin; noise). The teacher was read on our generator's households,
+  whose new payees are realstyle merchants; the owner's first-time payees are another mix (person-to-person payments, local businesses,
+  messy strings, 11 years of category churn). Distillation from real budgets' decider reads would be the test, and the owner's budget must
+  stay a test set; this waits for more real data (the owner: "I'll get you better data another time").
+- The extra 300 households alone add about a point on the owner's budget for bge (66.9 -> 67.8), in line with row 218's h1 (more
+  households help transfer a little).
+
+**Cost:** teacher read 23.7 minutes on an H100 (~$1.60), three KD jobs of 45-47 minutes on L40S (~$4.50); exact figures from
+`scripts/modal_costs.py --rows 223` once Modal bills the day. Item build and owner reads local ($0).

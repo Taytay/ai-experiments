@@ -189,3 +189,4 @@
 189	decider history slice and two new test sets	217, 220
 190	decider training lessons on the late-interaction model	218
 191	A small modern base: Ettin-encoder-32M	222
+192	Distilling decider into the late-interaction model	223
