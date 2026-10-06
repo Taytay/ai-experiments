@@ -127,6 +127,21 @@ def style():
 
 SHARED = os.environ.get("SHARED_WORLD") == "1"  # row 183: households share one world (see Household.shared)
 METROS, BANKS = 20, 4
+# row 225 (2026-10-06, scripts/realness_gap.py: the owner's budget used 145 categories over 11 years, half of them hidden by now, a median
+# category lifetime of 442 days and ~10 new categories a year; v4 households: 56 categories, 1,822 days, 3.6 a year, 2-9 years). V5=1:
+# 8-12 years of history; 0.3-0.8 reorganisations a year (a live everyday category retired and a renamed successor takes its kinds, bills
+# and memo payments from that day; successors can be retired in turn); 5-9 short-lived project categories a year (60-400 days, a few
+# kinds routed to them 30% of the time, no everyday kinds, hidden after); person purposes half as often, one catch-all per kind, misfiles 1.5% and random catch-all filings 1% (v4 3% each), new merchants tried 25 points more often and chains weighted by places ** 0.35 (v4 0.7) (the owner: 29% of outflows at a payee
+# string never filed before, v4 15%). The owner's hidden categories hold 7% of outflows: churn is many small categories, not the big
+# ones. Category draws come from a separate generator; nothing changes when V5 is off (v4 households byte-identical, checked).
+V5 = os.environ.get("RS_V5") == "1"
+PROJECTS = [("Kitchen remodel", ["home_improvement", "furniture", "home_services"]), ("Bathroom redo", ["home_improvement", "home_services"]),
+            ("Moving", ["home_improvement", "furniture", "home_services"]), ("Backyard deck", ["home_improvement"]),
+            ("Home office", ["furniture", "electronics", "office"]), ("Nursery", ["furniture"]),
+            ("Soccer season", ["sports"]), ("Camping gear", ["sports"]), ("Garage", ["home_improvement"]),
+            ("Wedding", ["jewelry", "hotel"]), ("New puppy", ["pet"]), ("Bike build", ["sports", "bike"]),
+            ("Halloween party", ["party"]), ("Grad party", ["party", "events"]),
+            ("Car project", ["car_repair", "auto_parts"]), ("New computer", ["electronics"]), ("Piano lessons", ["education", "music"])]
 V4 = os.environ.get("REALSTYLE_V4") == "1"  # 2026-10-04: re-code an order number only where render_v2 recorded one (its "Reference"
 # part), never by pattern on the rendered string, which took one-word names for codes ("SQ *BAKERY" -> "SQ *Q3JS4FB4X")
 
@@ -152,6 +167,9 @@ class Household:
         self.shared = SHARED if shared is None else shared
         self.metro, self.bank = _h(f"metro-{seed}") % METROS, _h(f"bank-{seed}") % BANKS
         self.pool = merchant_pool(split)
+        self.r5 = random.Random(f"v5-{split}-{seed}")  # V5's own draws
+        if V5 and start is None and years is None:
+            start, years = dt.date(self.r5.randint(2013, 2016), self.r5.randint(1, 12), 1), self.r5.uniform(8, 12)
         self.start = start or dt.date(rng.randint(2014, 2021), rng.randint(1, 12), 1)
         self.end = min(self.start + dt.timedelta(days=int(365 * (years or rng.uniform(2, 9)))), dt.date(2026, 9, 30))
         self.scale = rng.uniform(0.6, 1.4) * 1.8  # REPORT 155: ~157 transactions a month
@@ -294,6 +312,28 @@ class Household:
         if len(ev) >= 2 and rng.random() < 0.5:
             a, b = rng.sample(ev, 2); at = d0 + dt.timedelta(days=rng.randint(span // 4, 3 * span // 4))
             a["hidden_at"] = at; self.reorg = dict(old=a["id"], new=b["id"], at=at)
+        self.reorgs, self.projects = {}, []
+        if V5:
+            r5, yrs = self.r5, span / 365.25
+            gname = {v: k for k, v in self.groups.items()}
+            everyday = set(self.kind_to_everyday.values())
+            for at in sorted(d0 + dt.timedelta(days=r5.randint(60, max(61, span - 30))) for _ in range(int(r5.uniform(0.3, 0.8) * yrs))):
+                live = [c for c in self.cats.values() if c["id"] in everyday and c.get("kinds") and c["created"] <= at
+                        and not (c["hidden_at"] and c["hidden_at"] <= at)]
+                if not live:
+                    continue
+                a = r5.choice(live)
+                base = re.sub(r"\s*(\(\d{4}\)|\d{4}|2\.0)$", "", a["name"].replace("New ", "", 1))
+                new = r5.choice([f"{base} ({at.year})", f"New {base}", f"{base} {at.year}", f"{base} 2.0"])
+                route = {k: v for k, v in a.items() if k not in ("id", "name", "category_group_id", "created", "hidden_at")}
+                cid = self._cat(gname[a["category_group_id"]], new, created=at, **route)
+                a["hidden_at"] = at; self.reorgs[a["id"]] = (cid, at); everyday.add(cid)
+            for _ in range(int(r5.uniform(5, 9) * yrs)):
+                name, kinds = r5.choice(PROJECTS)
+                t = d0 + dt.timedelta(days=r5.randint(0, max(1, span - 60)))
+                end = t + dt.timedelta(days=r5.randint(60, 400))
+                cid = self._cat("Projects", f"{name} {t.year}", created=t, hidden_at=end if end < d1 else None)
+                self.projects.append(dict(cid=cid, kinds=set(kinds), start=t, end=end))
 
     # ---- merchants and strings ------------------------------------------------------------------------------------------------
     def _merchant(self, kind):
@@ -302,7 +342,7 @@ class Household:
         bill = kind in ("utility", "phone", "insurance", "rent", "subscription")  # household bills: name banks only (Overture's energy firms are not bills)
         if kind in NONPLACE and (bill or not self.pool.get(kind) or rng.random() < 0.7):
             name = rng.choice(NONPLACE[kind]); m = dict(name=name, kind=kind, city=None, chain=True)
-        elif fav and rng.random() > {"restaurant": 0.45, "fast_food": 0.3, "coffee_bakery": 0.3, "hobby": 0.5, "entertainment": 0.55}.get(kind, 0.2):
+        elif fav and rng.random() > {"restaurant": 0.45, "fast_food": 0.3, "coffee_bakery": 0.3, "hobby": 0.5, "entertainment": 0.55}.get(kind, 0.2) + (0.25 if V5 else 0):
             return fav[min(int(rng.paretovariate(1.2)) - 1, len(fav) - 1)]
         elif self.pool.get(kind) and self.shared:
             ms, ws = self._world(kind)
@@ -321,7 +361,7 @@ class Household:
         key = (self.split, kind, self.metro)
         if key not in _WORLD:
             ms = [m for m in self.pool[kind] if m.get("chain") or _h(m["name"]) % METROS == self.metro]
-            _WORLD[key] = (ms, [((m.get("places") or 1) ** 0.7 if m.get("chain") else 1.0) for m in ms])
+            _WORLD[key] = (ms, [((m.get("places") or 1) ** (0.35 if V5 else 0.7) if m.get("chain") else 1.0) for m in ms])  # V5: flatter
         return _WORLD[key]
 
     def _payee(self, m, date):
@@ -386,6 +426,9 @@ class Household:
         for k in self.kid_cats:
             if kind in k["kinds"] and k["start"] <= date <= k["end"] and rng.random() < k["w"]:
                 self._reason = ("phase", k["cid"]); return k["cid"]
+        for p in self.projects:  # V5
+            if p["start"] <= date <= p["end"] and kind in p["kinds"] and rng.random() < 0.3:
+                self._reason = ("project", p["cid"]); return p["cid"]
         for p in self.properties:
             if date >= p["start"] and kind in p["cats"] and rng.random() < 0.3:
                 self._reason = ("property", p["cats"][kind]); return p["cats"][kind]
@@ -394,7 +437,7 @@ class Household:
         for a, pc in self.person.items():
             if pc["treat"] and kind == "coffee_bakery" and weekday < 5 and amount < 12 and rng.random() < 0.8:
                 self._reason = ("treat", pc["treat"]); return pc["treat"]
-            if kind in self.cats[pc["fun"]]["kinds"] and rng.random() < pc["share"] / max(1, len(self.person) - 0.5):
+            if kind in self.cats[pc["fun"]]["kinds"] and rng.random() < pc["share"] * (0.5 if V5 else 1) / max(1, len(self.person) - 0.5):
                 c = {"clothing": pc["clothes"], "jewelry": pc["clothes"]}.get(kind, pc["fun"]); self._reason = ("person", c); return c
             if pc["groom"] and kind == "personal_care" and rng.random() < 0.7:
                 self._reason = ("person", pc["groom"]); return pc["groom"]
@@ -404,15 +447,19 @@ class Household:
         self._reason = ("habit", cid)
         if self.reorg and cid == self.reorg["old"] and date >= self.reorg["at"]:
             cid = self.reorg["new"]; self._reason = ("reorg", cid)
-        if cid is None or rng.random() < 0.03:
-            cid = rng.choice(self.catchall); self._reason = ("catchall", cid)
+        if cid is None or rng.random() < (0.01 if V5 else 0.03):
+            cid = rng.choice(self.catchall)  # (V5: one catch-all per kind, as a person would keep using it)
+            cid = self.catchall[_h(f"{self.seed}-{kind}") % len(self.catchall)] if V5 else cid
+            self._reason = ("catchall", cid)
         return cid
 
     def _add(self, date, amount, cid, raw, payee_name, memo=None, approved=True):
         parts, self._parts = self._parts or {"Clean payee": payee_name}, None  # row 176: the pieces behind the string
         reason, kind, self._reason, self._kind = self._reason, self._kind, None, None  # row 177: why this category, and the merchant's kind
         pid = self.payees.setdefault(payee_name, self._id())
-        if self.rng.random() < 0.03 and cid not in (self.rta,):  # misfiled
+        while cid in self.reorgs and date >= self.reorgs[cid][1]:  # V5: a retired category's successor
+            cid = self.reorgs[cid][0]; reason = ("reorg", cid)
+        if self.rng.random() < (0.015 if V5 else 0.03) and cid not in (self.rta,):  # misfiled (V5: the owner's payees switch half as often)
             live = [c for c in self.cats.values() if c.get("kinds") and c["created"] <= date and not (c["hidden_at"] and c["hidden_at"] <= date)]
             cid = self.rng.choice(live)["id"] if live else cid
             reason = ("misfile", cid)
