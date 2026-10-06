@@ -1315,6 +1315,9 @@ def _clef_load(name):
     from joint_schema_model import collate_records, encode_record, load_release_model
     model, processor = load_release_model(path, device="cuda")
     tok, bs, ml = processor.tokenizer, int(os.environ.get("CLEF_BATCH", "4")), int(os.environ.get("CLEF_MAXLEN", "16384"))
+    # 2026-10-06: ~2,000 tokens a transaction (the ~45 options with descriptions dominate) cost ~0.1-0.2 s each on an H100 (matrix
+    # multiplies; causal_conv1d's fallback is 3.5% of the time): CLEF_JM payees per option (3), and every CLEF_EVERY-th transaction (1)
+    jm, every = int(os.environ.get("CLEF_JM", "3")), int(os.environ.get("CLEF_EVERY", "1"))
     m1, cache = None, {}
 
     def record(e):
@@ -1322,12 +1325,13 @@ def _clef_load(name):
         for c in e["state"]:
             label, _, rest = e["d"][c].partition(" | ")
             k = label if label not in crit else f"{label} ({c[:4]})"
-            crit[k], key[k] = rest or "nothing filed yet", c
+            crit[k], key[k] = (" | ".join(rest.split(" | ")[:jm]) if rest else "nothing filed yet"), c
         return {"state": e["q"], "questions": {"category": {"type": "choice", "instructions": CLEF_INSTR, "criteria": crit}}}, key
 
     def run(b):
         t0 = time.time()
         ev, docs = prepared(b, m1, cache)
+        ev = ev[::every]  # a sample of the transactions; each still has its full history and the day's options
         t1 = time.time()
         out = []
         with torch.inference_mode():
