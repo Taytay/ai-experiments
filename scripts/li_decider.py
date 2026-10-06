@@ -1193,14 +1193,22 @@ def load(arm):
     if INTERACT:
         inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
 
-    def run(b):
+    def run(b):  # row 230: times kept apart: building the texts (CPU, neighbours from the cache) and scoring them (GPU)
+        t0 = time.time()
         ev, docs = prepared(b, m1, cache)
-        return ev, (iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs))
-    run.name = d.name
+        t1 = time.time()
+        out = iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+        run.prep += t1 - t0; run.score += time.time() - t1; run.n += len(ev)
+        run.qlen += [len(x) for x in model.cb.tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
+        return ev, out
+    run.name, run.prep, run.score, run.n, run.qlen = d.name, 0.0, 0.0, 0, []
     return run
 
 
 def read():
+    import torch
     budget = os.environ.get("READ", "households") == "budget"
     if budget:
         import real_budget_eval as RB
@@ -1222,7 +1230,7 @@ def read():
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
         ranks, brier, conf, hit, lists = defaultdict(list), [], [], [], defaultdict(list)
-        for b in budgets:
+        for b in budgets:  # (timing per model: run.prep / run.score, printed below)
             # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
             # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
             mark = {t["id"]: (t.get("reason") or [None])[0] for t in b["transactions"]}
@@ -1252,6 +1260,11 @@ def read():
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 5, 10)) + f" (n={len(ranks[g])})" if ranks[g] else "-"
                  for g in ("all", "first-time") + tuple(segs)]
         print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        ql = np.array(run.qlen)
+        print(f"  timing, {run.name} on {torch.cuda.get_device_name() if torch.cuda.is_available() else 'cpu'} (ATTN={os.environ.get('ATTN') or 'sdpa'}): "
+              f"{1000 * (run.prep + run.score) / max(run.n, 1):.2f} ms a transaction ({1000 * run.score / max(run.n, 1):.2f} ms scoring on the GPU, "
+              f"{1000 * run.prep / max(run.n, 1):.2f} ms building texts), {run.n} transactions; query tokens median {np.median(ql):.0f}, p99 "
+              f"{np.percentile(ql, 99):.0f}", flush=True)
         print(f"  suggestion lists, {run.name}: " + "; ".join(
             f"{'p >= ' + str(t) if t != '90%' else '90% of the mass'}: right one in the list {100 * np.mean([a for a, _ in v]):.1f}%, "
             f"{np.mean([n for _, n in v]):.2f} shown" + (f", empty {100 * np.mean([n == 0 for _, n in v]):.1f}%" if t != "90%" else "")
