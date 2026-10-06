@@ -201,6 +201,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §186 Suggesting a category scheme for a new user (row 214)
 - §187 The late-interaction decision model beside decider (row 216)
 - §188 The cheapest Modal GPU for the small encoder models (row 219)
+- §189 decider history slice and two new test sets (rows 217, 220)
 
 <!-- END SECTION INDEX -->
 
@@ -11422,3 +11423,75 @@ Prices from modal.com/pricing (2026-10-06).
 
 **Cost:** five jobs, 2.7-27.8 minutes each (the H100 job most of it): about $2.10; exact figures from `scripts/modal_costs.py --rows 219`
 once Modal bills the day.
+
+## 189. decider's history slice in the late-interaction query, a fix to which categories it may choose, and two new test sets: dated recent rows lift trips on our synthetic households (16 -> 58%) and blind_v2, yet on the owner's budget every token of history in the query costs (bare query 66.8, 5 neighbours 63.3, p2 59.5; decider 72.5); a perfectly rational household exposes a name-over-history failure (REAL-27, MODEL-25)
+
+PLAN steps 217 and 220 (owner, 2026-10-06: "Borrow ideas from improvements we made to the decider model"; on trips: "once it starts seeing
+a trip category used for a given type of payee ... it seems like it might learn to use that recent category"; "make a 'perfectly
+rational' example too ... to see if it can score 100% ... and if not, why not"). Chains `r217_query.sh`, `r217_recent.sh`, `r217_blind.sh`,
+`r217_owner.sh`; Modal job list `r220.json` (L40S).
+
+**A fix to the options (all rows from 210 on).** hist_encoder.events offered today's visible categories every day, so 7.0% of decider's
+items on the owner's budget and 5.5% on synthetic households (filed to categories hidden since: trips, old phases) could never be right,
+and training never saw a trip purchase (c0 read 3.6% of synthetic trip purchases). `li_decider.OPTS=span` (owner's rule: "the category
+can appear from the beginning up until its last use"): a hidden category is offered from the budget's start to its last filing (to a year
+after it, `SPAN_AFTER=365`, when read beside decider, whose options keep a category a year after its last use). Every gold is now
+scorable (0 of 11,558 missing on a test household, against 730). Row 216's owner-budget reads rose with it (c0 60.9 -> 63.3, a5 64.6 ->
+66.8). Splits, uncategorised and internal-category transactions stay out of both models' sets (1.5% and 0.9% of the owner's outflows).
+
+**Two new test sets.** blind_v2's 250 users as whole budgets (`scripts/blind_budgets.py`, the blind generator rerun from its own
+structures; 255,490 outflows) and perfectly rational households (`scripts/rational_budgets.py`: ten obvious categories, each merchant kind
+always to one, real held-out merchant names, clean names or bank strings; 22,405 outflows, 4,857 from merchants new to the household).
+Generator marks (trip purchases; merchant bought before or not) are used for scoring segments only, never as model input. Reads now report
+top-1/3/5/10 in every column and confidence-based suggestion lists (every category with p >= t; the fewest holding 90% of the mass).
+
+**Table 189.1: % right first (top-1)** (trips: purchases the generator routed to a trip; OPTS=span throughout except the q arms, trained
+and read with visible-only options)
+
+| model | query | synthetic, 50 households | synthetic trips | blind_v2 | blind_v2 first-time | owner's budget, decider's items |
+|---|---|---|---|---|---|---|
+| decider-4B (tuned) | its prompt | | | | | 72.5 |
+| a5 (row 210) | the transaction alone; each of its 50 nearest filings + every category name a candidate (MML) | | | 79.7 | 70.6 | **66.8** |
+| c0 (row 211) | + 5 nearest filings | 72.6 | 3.6 | 77.8 | 67.9 | 63.3 |
+| p0 | c0's query, trained with the corrected options | 73.1 | 16.2 | 76.9 | 66.3 | |
+| p1 | 12 nearest, each with "Nd ago" | 73.4 | 16.0 | 78.9 | 69.7 | |
+| p2 | p1 + the 8 most recent filings ("recent: ...") | **74.2** | **57.8** | 79.7 | 70.9 | 59.5 |
+| p3 | p2 written once per category | 73.4 | 22.7 | 79.7 | 72.0 | |
+
+On the owner's budget (one seed, decider's 19,093 items): first-time payees a5 47.5 / c0 43.7 / p2 39.8 (decider 56.9); payees filed 4+
+times 74.7 / 71.5 / 68.1 (decider 79.0). Reading time 2.2 / 1.3 / 2.5 ms per transaction on the RTX 3090 (decider 10-13 ms on an H100).
+
+**Table 189.2: perfectly rational households, top-1 / top-3 (ten categories, so top-5/10 say little)**
+
+| model | clean names: merchant bought before | clean: new merchant | bank strings: bought before | bank strings: new merchant |
+|---|---|---|---|---|
+| c0 | 98.5 / 100 | 66.0 / 83.9 | 95.7 / 98.8 | 62.3 / 80.5 |
+| a5 | 98.9 / 100 | 62.5 / 82.8 | 96.1 / 99.2 | 59.9 / 80.9 |
+| p2 | 98.0 / 99.9 | 66.1 / 85.0 | 95.2 / 98.8 | 62.4 / 82.2 |
+| p3 | 99.0 / 100 | 66.9 / 85.4 | 95.9 / 99.0 | 63.9 / 82.8 |
+
+### 189.1 What the step says
+
+- **Recent dated rows carry the trip signal**, as the owner expected: once the trip category is in the recent rows, the next restaurant
+  goes there (synthetic trips 16 -> 58% with p2). In our generator that is the only cue (trip purchases come from the household's usual
+  merchants); real trips and blind_v2 also carry the trip's city in the string. Grouping the rows by category (p3) loses most of it.
+- **On the owner's budget, history in the query hurts**, the more the worse: bare query 66.8, five neighbours 63.3, twenty rows 59.5,
+  though p2 led both synthetic sets. MaxSim averages over the query's tokens, so a long history dilutes the transaction's own payee (the
+  owner: "we can't average a payee's embedding/category"); 11 years of history and real category churn make the rows noisier than ours.
+  Neither synthetic set predicted this ranking: blind_v2 had p2 level with a5. The robust design is a5's: score each earlier filing as its
+  own candidate (learned similarity, nothing averaged), and put time on the candidates rather than in the query (row 218 m1-m3).
+- **A perfectly rational household is not perfectly read.** Merchants bought before: 98-99% on clean names, 95-96% as bank strings. Every
+  error (26 of 26 examined, `scripts/rational_errors.py`) was a merchant filed one way every time whose name suggests another ("Williams
+  Fuel", sold as a general store, filed to Shopping nine times, read as Gas): the model trusts the name over the household's own repeated
+  filings. decider's recipe trains against exactly this (override episodes); row 218 adds it (o1: 99.7%). New merchants: 60-67%, the
+  ceiling of what a 33M model knows of a name (rows 212, 209).
+- **Matching a payee's variants** (owner: "What if they go to Williams fuel #5, pos debit Williams fuel store 111"): on rational bank strings
+  payee_key finds the merchant's earlier filings 65.5% of the time (payee_key_v2 79.9%), the neighbour encoder at cosine >= 0.9 92.8% at
+  93.5% precision (`scripts/payee_match_check.py`). The owner prefers learned similarity to rules; per-filing candidates (a5, mmld) are
+  that.
+- **Suggestion lists** are usable: on blind_v2, p2 shows the right category among those with p >= 0.1 86.7% of the time with 1.4 shown;
+  the fewest holding 90% of the mass cover 90.7% with 2.5 shown.
+- c0 is a1 trained 3,000 more steps: +0.7 on our synthetic set, -1.2 on blind_v2. More steps on one generator fit that generator.
+
+**Cost:** row 220's two L40S reads (cents) and one re-launch; the rest local ($0). `scripts/modal_costs.py --rows 220` once Modal bills
+the day.
