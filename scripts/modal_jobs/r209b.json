@@ -1,0 +1,42 @@
+[
+ {
+  "tag": "r209-e400b",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r222-data",
+   "PLAN_ROWS": "209",
+   "ROW": "209",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "512",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "4e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e400_kmv",
+   "ENCODERS_FROM": "enc-base",
+   "ARM": "e400",
+   "ARMS": "li_r209_e400",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "GC": "1"
+  },
+  "cmds": [
+   "ARM=e400_kmv BASE=jhu-clsp/ettin-encoder-400m MV=1 PDIM=128 LR=5e-5 KBATCH=128 STEPS=0 PAIRS_FILE=data/interim/knowledge_pairs_v1.jsonl,data/interim/alias_pairs_v1.jsonl uv run --frozen python scripts/knowledge_stage.py train",
+   "ENCS=know_r212_e400_kmv MV=1 PAIRS_FILE=data/interim/knowledge_pairs_v1.jsonl uv run --frozen python scripts/knowledge_stage.py eval",
+   "uv run --frozen python scripts/li_decider.py train",
+   "TEST_SEEDS=100000-100049 uv run --frozen python scripts/li_decider.py read",
+   "READ=blind2 uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_clean uv run --frozen python scripts/li_decider.py read",
+   "READ=rational_bank uv run --frozen python scripts/li_decider.py read"
+  ]
+ }
+]

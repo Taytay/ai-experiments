@@ -969,3 +969,4 @@
 {"utc": "2026-10-06T14:16:19+00:00", "app_id": "ap-cx99sQ1K1v67uIdUBxBCgJ", "kind": "job_done", "tag": "r227-fcd", "minutes": 38.6}
 {"utc": "2026-10-06T14:20:45+00:00", "app_id": "ap-86s8CUBfSS1Ld0EerHTO68", "kind": "jobs", "what": "r227e", "rows": "227", "gpu": "H100", "tags": ["r227-fcr-s1"], "job_gpus": {"r227-fcr-s1": "L40S"}}
 {"utc": "2026-10-06T14:52:42+00:00", "app_id": "ap-86s8CUBfSS1Ld0EerHTO68", "kind": "job_done", "tag": "r227-fcr-s1", "minutes": 31.6}
+{"utc": "2026-10-06T10:42:38+00:00", "app_id": "ap-Hk92NilVVdsJWPlidVTjwr", "kind": "jobs", "what": "r209b", "rows": "209", "gpu": "H100", "tags": ["r209-e400b"], "job_gpus": {"r209-e400b": "L40S"}}
