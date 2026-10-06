@@ -10,7 +10,7 @@ decision: softmax over the household's visible categories, cross-entropy plus BR
 retrieval loss. Training: shared-world v4 households (train split); a step takes one household and the transactions of WINDOW
 consecutive days (so the day's documents are shared), up to B of them.
   train   writes models/encoders/li_r<ROW>_<ARM> (encoder, proj.pt, scale.pt)
-  read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget)
+  read    % top-1 / top-3 / top-10, all and first-time payee, and the Brier score / ECE of the top choice, per ARMS (READ=households | budget | blind2: blind_v2 users as budgets, row 217)
 env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB (5), M (8), B (32), WINDOW (7), STEPS (3000),
      HOUSEHOLDS (200), BRIER (1), LR (5e-5), SEED (0), HYBRID (0), QW (0), SOFT (0: MaxSim; tau_a for UWE's soft interaction),
      MODE (doc: one document per category | mml: per-filing candidates, BELXTR), NCAND (50), TEST_SEEDS (100000-100049), ARMS;
@@ -59,6 +59,9 @@ ROW = os.environ.get("ROW", "210")
 # (mxbai: 32M 2.8e-4 -> 5e-4), set LR.
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
+RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 
 
 def _base_head(path, hidden):
@@ -298,61 +301,137 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     return S
 
 
-def prepared(b, m1, cache):
-    """prepare(), cached on disk per budget in data/interim/li_prep (2026-10-05: the neighbour embeddings took ~4.5 min per 200-household
-    run); the key covers the budget, the settings prepare reads, this file's and hist_encoder.py's code and the neighbour encoder's
-    weights. The owner's budget is never cached here (its id is not a synthetic one)."""
+_M1 = None
+KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
+
+
+def _nbrs(b, ev, m1, cache):
+    """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists. Cached on disk for synthetic
+    budgets in data/interim/li_nb, one int32 array per budget keyed by its events and the encoder's weights (2026-10-06: this replaces
+    row 210's cache of the whole prepared budget, data/interim/li_prep, 23 GB for ~1,000 budgets and rebuilt for every query setting;
+    the neighbours are the only slow part). The owner's budget is never cached here (its id is not a synthetic one)."""
     import hashlib
-    import pickle
     from ai_experiments.paths import ROOT
-    if not str(b.get("id", "")).startswith("realstyle-") or os.environ.get("PREP_CACHE", "1") == "0":
-        return prepare(b, m1, cache)
-    from two_tower import _hh_key
-    h = hashlib.sha1(f"{_hh_key(b['id'].split('-')[1])}|{b['id']}|{CTX}|{NB}|{M}|{MODE}|{NCAND}|{INTERACT}|{NMEM}|{H.AMT_TEXT}".encode())
-    for f in (__file__, H.__file__):
-        h.update(Path(f).read_bytes())
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        for f in sorted(Path(H.OUT1).glob("*.safetensors")):
-            h.update(f"{f.name}{f.stat().st_size}{f.stat().st_mtime_ns}".encode())
-    f = ROOT / "data" / "interim" / "li_prep" / f"{h.hexdigest()[:20]}.pkl"
-    if f.exists():
-        return pickle.loads(f.read_bytes())
-    out = prepare(b, m1, cache)
-    f.parent.mkdir(parents=True, exist_ok=True)
-    tmp = f.with_suffix(f".tmp{os.getpid()}")
-    tmp.write_bytes(pickle.dumps(out, protocol=5))
-    tmp.replace(f)
-    return out
-
-
-def prepare(b, m1, cache):
-    """a budget's events (hist_encoder.events) with each event's query text and its day's category documents:
-    (events, docs) where docs[day] = {category id: document text} over the visible categories"""
-    ev = H.events(b)
-    if CTX or MODE == "mml" or "m" in INTERACT:
-        nb = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, max(NB, NCAND if MODE == "mml" else 0, NMEM if "m" in INTERACT else 0))
-        for e, n in zip(ev, nb):
-            e["nb"] = [j for j, _ in n]
-    if CTX:
-        for e, n in zip(ev, nb):
-            e["q"] = e["text"] + (" || " + "; ".join(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {ev[j]["label"]}' for j, _ in n[:NB]) if n else "")
-    else:
+    f = None
+    if str(b.get("id", "")).startswith(("realstyle-", "blind2-")) and os.environ.get("PREP_CACHE", "1") != "0":
+        h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
-            e["q"] = e["text"]
-    docs, recent, i = {}, defaultdict(list), 0
+            h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
+        for w in sorted(Path(H.OUT1).glob("*.safetensors")):
+            h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
+        f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
+        if f.exists():
+            return [[j for j in r if j >= 0] for r in np.load(f).tolist()]
+    global _M1
+    if m1 is None:  # loaded only when a budget misses the cache
+        _M1 = _M1 or H._model(H.OUT1)
+        m1 = _M1
+    nb = [[j for j, _ in n] for n in H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)]
+    if f is not None:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        arr = np.full((len(ev), KNB), -1, dtype=np.int32)
+        for i, r in enumerate(nb):
+            arr[i, :len(r)] = r
+        tmp = f.with_suffix(f".tmp{os.getpid()}.npy")
+        np.save(tmp, arr)
+        tmp.replace(f)
+    return nb
+
+
+def _query(i, ev, start, names=None):
+    """the query text of event i. Row 210: "<transaction> || <payee> $<amt> -> <category>; ..." over its NB nearest earlier filings.
+    Row 217 (decider's history slice, §99): AGO adds how long ago each filing was; REC adds the household's REC most recent filings
+    before the transaction's day, newest first (decider's "Earlier transactions" rows: trips and time routing); QFMT=group lists the
+    rows under each category once ("<category>: <payee> $<amt> <ago>, ...; ...") instead of repeating the category per row.
+    names: {category id: name} in place of the labels (row 218's rename augmentation)."""
+    e = ev[i]
+    lab = (lambda j: names.get(ev[j]["gold"], ev[j]["label"])) if names else (lambda j: ev[j]["label"])
+    near = e.get("nb", [])[:NB] if CTX else []
+    rec = [j for j in range(start[i] - 1, max(-1, start[i] - 1 - REC), -1)] if REC else []
+
+    def ago(j):
+        d = (e["date"] - ev[j]["date"]).days
+        return f" {d}d ago" if AGO else ""
+    if QFMT == "group":
+        js = list(dict.fromkeys(near + rec))
+        if not js:
+            return e["text"]
+        by = defaultdict(list)
+        for j in js:
+            by[lab(j)].append(f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f}{ago(j)}')
+        return e["text"] + " || " + "; ".join(f"{lab}: " + ", ".join(v) for lab, v in by.items())
+    row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {lab(j)}{ago(j)}'
+    q = e["text"]
+    if near:
+        q += " || " + "; ".join(map(row, near))
+    if rec:
+        q += " || recent: " + "; ".join(map(row, rec))
+    return q
+
+
+def prepared(b, m1, cache):
+    """a budget's events (hist_encoder2.events: hist_encoder.events with dates) with each event's query text and its day's category
+    documents: (events, docs) where docs[day] = {category id: document text} over the visible categories; neighbours from _nbrs (cached)"""
+    ev = H2.events(b)
+    if CTX or MODE == "mml" or "m" in INTERACT:
+        for e, n in zip(ev, _nbrs(b, ev, m1, cache)):
+            e["nb"] = n
+    start, k = [], 0
+    for i, e in enumerate(ev):
+        if i and e["day"] != ev[i - 1]["day"]:
+            k = i
+        start.append(k)
+    for i, e in enumerate(ev):
+        e["q"] = _query(i, ev, start)
+    docs, snap, recent, i = {}, {}, defaultdict(list), 0
     while i < len(ev):
         d = ev[i]["day"]
-        docs[d] = {c: lab + " | " + (" | ".join(f"{p} ${a:.0f}" for p, a in recent[c]) if recent[c] else "nothing filed yet")
-                   for c, lab in ((c, ev[i]["labels"][c]) for c in ev[i]["state"])}
+        snap[d] = {c: tuple(recent[c]) for c in ev[i]["state"]}
+        docs[d] = {c: _doc(ev[i]["labels"][c], snap[d][c]) for c in ev[i]["state"]}
         j = i
         while j < len(ev) and ev[j]["day"] == d:
             j += 1
         for e in ev[i:j]:
             recent[e["gold"]] = [(e["payee"], e["amt"])] + [x for x in recent[e["gold"]] if x[0] != e["payee"]][:M - 1]
         i = j
-    for e in ev:  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
-        e["d"], e["_ev"] = docs[e["day"]], ev
+    for i, e in enumerate(ev):  # each event carries its day's documents and its budget, so one step can mix households (GROUPS)
+        e["d"], e["_ev"], e["_snap"], e["_i"], e["_start"] = docs[e["day"]], ev, snap[e["day"]], i, start
     return ev, docs
+
+
+def _doc(label, recent):
+    """a category's document: "<Group: Name> | <payee> $<amt> | ..." over its last M distinct payees, most recent first"""
+    return label + " | " + (" | ".join(f"{p} ${a:.0f}" for p, a in recent) if recent else "nothing filed yet")
+
+
+def _coined(rng, taken):
+    """a fresh pronounceable word (exp_categoriser's rename augmentation, row 42)"""
+    while True:
+        w = "".join(rng.choice("bdfgklmnprstvz") + rng.choice("aeiou") for _ in range(rng.randint(2, 3))).capitalize()
+        if w not in taken:
+            return w
+
+
+def _renamed(anc, rng):
+    """row 218 (decider's RENAME, §42): each of a window's categories renamed with probability RENAME to a coined word, consistently in
+    its documents and the query's history rows, so the model must read what was filed where rather than the category's name"""
+    labels = anc[0]["labels"]
+    names, taken = {}, set(labels.values())
+    for c in labels:
+        if rng.random() < RENAME:
+            names[c] = _coined(rng, taken); taken.add(names[c])
+    if not names:
+        return anc
+    out = []
+    for e in anc:
+        f = dict(e)
+        f["q"] = _query(e["_i"], e["_ev"], e["_start"], names)
+        f["d"] = {c: _doc(names.get(c, labels[c]), r) for c, r in e["_snap"].items()}
+        out.append(f)
+    return out
+
+
+prepare = prepared
 
 
 def _score(model, scale, qtexts, dtexts):
@@ -400,14 +479,14 @@ def train():
         open_licence(BASE)
     rng = random.Random(SEED)
     torch.manual_seed(SEED)
+    assert not RENAME or (MODE == "doc" and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
-    m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
+    m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
     data = []
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
         data.append(prepared(b, m1, cache))
-        if cache is not None and n % 50 == 0:
+        if n % 50 == 0:
             cache.clear()
-    del m1
     print(f"arm {ARM}: {len(data)} households prepared ({time.time() - t0:.0f}s); query e.g. {data[0][0][50]['q']!r}; "
           f"document e.g. {next(iter(data[0][1][60].values()))!r}", flush=True)
     model = LI(BASE, train=True)
@@ -424,7 +503,8 @@ def train():
             ev, docs = data[rng.randrange(len(data))]
             d0 = rng.randint(1, max(1, ev[-1]["day"] - WINDOW))
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
-            anc += rng.sample(w, min(B, len(w)))
+            pick = rng.sample(w, min(B, len(w)))
+            anc += _renamed(pick, rng) if RENAME and pick else pick
         if not anc:
             continue
         dtexts, idx = [], {}
@@ -477,7 +557,8 @@ def train():
     (out / "li_config.json").write_text(json.dumps(dict(ARM=ARM, BASE=BASE, CTX=CTX, NB=NB, M=M, B=B, WINDOW=WINDOW, STEPS=STEPS,
                                                          HOUSEHOLDS=HOUSEHOLDS, BRIER=BRIER, LR=LR, SEED=SEED, GROUPS=GROUPS, HYBRID=HYBRID, QW=QW, SOFT=SOFT, MODE=MODE, NCAND=NCAND,
                                                          INTERACT=INTERACT, NMEM=NMEM, XLAYERS=XLAYERS, ROW=ROW, PDIM=PDIM, PROJ=PROJ,
-                                                         PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen), indent=1))
+                                                         PROJ_INIT=PROJ_INIT, LOWER=LOWER, POOL=POOL, MAXLEN=model.cb.maxlen,
+                                                         **{k: globals()[k] for k in EXTRA}), indent=1))
     print(f"-> {out} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -586,37 +667,54 @@ def scores(model, scale, ev, docs):
     return out
 
 
-def read():
+def load(arm):
+    """an arm ready to read: sets this module's settings from its li_config.json and returns run(budget) -> (events, per-event
+    {category id: score}); one arm at a time (the settings are module globals). Used by read() and hist_agree.py (ENCS=li_r...)."""
     import torch
+    d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
+    cfg = json.loads((d / "li_config.json").read_text())
+    global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
+    CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
+    SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
+    INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
+    PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
+    POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
+    for k in EXTRA:  # settings added after row 211 (QUERY etc.): older models were trained with the defaults
+        globals()[k] = cfg.get(k, EXTRA[k])
+    m1, cache = None, {}
+    model = LI(d)
+    model.cb.enc.eval()
+    scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
+    inter = None
+    if INTERACT:
+        inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
+
+    def run(b):
+        ev, docs = prepared(b, m1, cache)
+        return ev, (iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs))
+    run.name = d.name
+    return run
+
+
+def read():
     budget = os.environ.get("READ", "households") == "budget"
     if budget:
         import real_budget_eval as RB
         budgets = [json.loads(RB.CACHE.read_text())["budget"]]
+    elif os.environ.get("READ") == "blind2":  # row 217: blind_v2's 250 users as whole budgets (scripts/blind_budgets.py), a transfer test
+        import blind_budgets
+        budgets = blind_budgets.budgets()
     else:
         a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100049").split("-"))
         budgets = list(households("test", range(a, z + 1)))
-    print(f"\n**{'owner budget' if budget else f'{len(budgets)} held-out households'}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
+    print(f"\n**{'owner budget' if budget else f'{len(budgets)} ' + ('blind_v2 budgets' if os.environ.get('READ') == 'blind2' else 'held-out households')}: % top-1 / top-3 / top-10; Brier and ECE of the softmax**\n")
     print("| model | all | first-time payee | Brier | ECE (top choice) |\n|---|---|---|---|---|")
     for arm in os.environ["ARMS"].split(","):
-        d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
-        cfg = json.loads((d / "li_config.json").read_text())
-        global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
-        CTX, NB, M, HYBRID, QW = cfg["CTX"], cfg["NB"], cfg["M"], cfg.get("HYBRID", 0), cfg.get("QW", 0)
-        SOFT, MODE, NCAND = cfg.get("SOFT", 0), cfg.get("MODE", "doc"), cfg.get("NCAND", 50)
-        INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
-        PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
-        POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
-        m1, cache = (H._model(H.OUT1), {}) if CTX or MODE == "mml" or "m" in INTERACT else (None, None)
-        model = LI(d)
-        model.cb.enc.eval()
-        scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
-        inter = None
-        if INTERACT:
-            inter = inter_module(model.dev); inter.load_state_dict(torch.load(d / "inter.pt", map_location=model.dev)); inter.eval()
+        run = load(arm)
         ranks, brier, conf, hit = defaultdict(list), [], [], []
         for b in budgets:
-            ev, docs = prepared(b, m1, cache)
-            for e, sc in zip(ev, iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)):
+            ev, sco = run(b)
+            for e, sc in zip(ev, sco):
                 if e["gold"] not in e["state"]:
                     continue
                 v = np.array(list(sc.values()))
@@ -631,8 +729,8 @@ def read():
         bins = np.minimum((conf * 10).astype(int), 9)
         ece = sum(abs(conf[bins == k].mean() - hit[bins == k].mean()) * (bins == k).mean() for k in range(10) if (bins == k).any())
         cells = [" / ".join(f"{100 * (np.array(ranks[g]) <= k).mean():.1f}" for k in (1, 3, 10)) + f" (n={len(ranks[g])})" for g in ("all", "first-time")]
-        print(f"| {d.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
-        del model
+        print(f"| {run.name} | " + " | ".join(cells) + f" | {np.mean(brier):.3f} | {100 * ece:.1f} |", flush=True)
+        del run
 
 
 if __name__ == "__main__":
