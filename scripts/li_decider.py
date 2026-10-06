@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -73,7 +73,14 @@ PTAU = float(os.environ.get("PTAU", "0.9"))
 # supervised answers per query instead of one; read time is unchanged (no rows hidden).
 HMASK, HLW = float(os.environ.get("HMASK", "0")), float(os.environ.get("HLW", "1"))
 MASK_TOK = "[?]"  # train() sets the base's mask token
-GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+GC = int(os.environ.get("GC", "0"))
+# row 212 (a), the lookup as text (§144 Canonical kind lines: +17 on blind_v1's first-time payees for decider; §168 Kind lines from a lookup:
+# real lookups right for ~65% of lines): KINDLINE=1 appends "kind: <kind> (match high|mid|low)" to each transaction's own text (not to
+# history rows or documents), after the neighbours are found. Synthetic and rational households: the generator's kind through a simulated
+# lookup per payee (kind_lookup_text: cover 57%, its bucket mix and per-bucket error rates, fixed per household and payee string). The
+# owner's budget: the real lookups (payee_kinds_v2.json, Overture's score for the bucket, else "low"; private files, read locally).
+# blind_v2 budgets carry no kinds: no lines there (a check that the model still reads without one).
+KINDLINE = int(os.environ.get("KINDLINE", "0"))  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
 PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
@@ -498,6 +505,8 @@ def prepared(b, m1, cache, full=True):
             for e in ev[i:j]:
                 seen[e["_pk"]][e["gold"]] += 1
             i = j
+    if KINDLINE:
+        _kindline(b, ev)
     for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
         e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
     if not full:
@@ -542,6 +551,36 @@ def _prior(evs, ids, dev):
             n, K = sum(pp.values()), len(o)
             P[k, :len(o)] = torch.tensor([np.log((pp.get(c, 0) + 0.1) / (n + 0.1 * K)) for c in o], device=dev)
     return P
+
+
+def _kindline(b, ev):
+    import hashlib
+    import kind_lookup_text as KL
+    tx = {t["id"]: t for t in b["transactions"]}
+    pname = {p["id"]: p["name"] for p in b.get("payees", [])}
+    if os.environ.get("BUDGET") and b.get("id") == os.environ["BUDGET"]:
+        import real_budget_eval as RB
+        pk = json.loads((RB.OUT / "payee_kinds_v2.json").read_text())
+        ov = json.loads((RB.OUT / "overture_kinds.json").read_text())
+        for e in ev:
+            n = pname.get(tx[e["id"]].get("payee_id"), "")
+            if pk.get(n):
+                e["text"] = KL.render(e["text"], pk[n], b=KL.bucket(ov[n]["score"]) if n in ov else "low")
+        return
+    look = {}
+    for e in ev:
+        k = tx[e["id"]].get("kind")
+        if k is None:
+            continue
+        if e["payee"] not in look:
+            r = random.Random(int(hashlib.md5(f'{b["id"]}|{e["payee"]}'.encode()).hexdigest(), 16))
+            if k in KL.GROUP_OF and r.random() < KL.COVER:
+                bk = KL.sample_bucket(r)
+                look[e["payee"]] = (KL.corrupt(k, bk, r)[0], bk)
+            else:
+                look[e["payee"]] = None
+        if look[e["payee"]]:
+            e["text"] = KL.render(e["text"], look[e["payee"]][0], b=look[e["payee"]][1])
 
 
 def _materialise(e, names=None, rng=None):
