@@ -205,6 +205,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §190 decider training lessons on the late-interaction model (row 218)
 - §191 A small modern base: Ettin-encoder-32M (row 222)
 - §192 Distilling decider into the late-interaction model (row 223)
+- §193 Masked history-row labels (row 221)
 
 <!-- END SECTION INDEX -->
 
@@ -11648,3 +11649,42 @@ would need refitting before an auto-filing threshold.
 
 **Cost:** teacher read 23.7 minutes on an H100 (~$1.60), three KD jobs of 45-47 minutes on L40S (~$4.50); exact figures from
 `scripts/modal_costs.py --rows 223` once Modal bills the day. Item build and owner reads local ($0).
+
+## 193. Masked history-row labels: hiding some history rows' categories and predicting them teaches the late-interaction model trip routing (synthetic trip purchases 39 -> 56 over two seeds, +17) at no cost elsewhere; the owner's budget does not move (68.6 -> 68.9, noise) (REAL-27, MODEL-25)
+
+PLAN step 221 (a) (owner, 2026-10-06: "are we able to use a masked token objective to get it to learn more relationships, by having it
+fill in missing payee tokens or category tokens? Or are we simply pushing embeddings closer and further away?"). Until now each query
+gave one supervised answer (its own category). `li_decider.py` `HMASK`: each history row of a training query (its 12 nearest earlier
+filings and 8 most recent, p2's query) has its category replaced by the base's mask token with probability HMASK, and each hidden row is
+predicted as well: the row's own tokens (contextualised by the whole query, the other rows' labels included) scored by MaxSim against the
+anchor's option documents, mean over the row's tokens, CE + Brier with weight HLW = 1. The tokens come from the tokenizer's offsets on the
+same text, so they cost no extra encoder pass. With HMASK 0.15 a step has about 76 hidden-row answers besides its 32 anchors (0.3: ~150);
+the hidden rows are predicted 88% right by the end. The anchor sees the hidden rows masked too (a mild label dropout). Reads are unchanged
+(nothing hidden). Recipe otherwise ekmv's (§191: Ettin-32M with the multi-vector knowledge + alias stage, p2's dated query, override 0.1),
+L40S, 3,000 steps.
+
+**Table 193.1: % right first (two seeds where given)**
+
+| model | synthetic | first-time | trip | blind_v2 | blind_v2 trip | rational clean new | rational bank new | owner's budget | owner first-time | ms / txn |
+|---|---|---|---|---|---|---|---|---|---|---|
+| ekmv (§191) | 72.8 / 73.0 | 59.1 / 59.5 | 40.2 / 36.9 | 81.7 | 55.0 | 60.0 | 58.0 | 68.9 / 68.2 | 49.9 / 48.3 | 2.7 |
+| h15 (HMASK 0.15) | 73.4 / 73.3 | 60.5 / 60.2 | **57.3 / 55.1** | 81.8 | 60.1 | 60.3 | 57.0 | 69.0 / 68.8 | 50.1 / 49.8 | 2.7 |
+| h30 (HMASK 0.3) | 73.3 | 60.5 | 56.6 | 82.4 | 60.0 | 61.5 | 58.9 | 68.4 | 48.6 | 2.7 |
+
+Synthetic: 50 held-out v4 households; blind_v2: its 250 users as whole budgets; rational households: 50 each, merchants new to the
+household (bought before: 97-100% for all three); owner's budget: decider's 19,093 items (decider-4B tuned 72.5). Calibration error on
+blind_v2 3.7 (ekmv), 6.5 (h15), 4.8 (h30).
+
+### 193.1 What the step says
+
+- **The trip signal was there but untrained.** A trip purchase can only be filed right by reading the recent rows ("Sale LITTLE CAESARS
+  $9 -> Trip to Denver 1d ago"); one answer per query rarely asked for it. Asking the model to fill in the hidden categories of the rows
+  themselves, most of which are recent rows during a trip, taught it: +17 on synthetic trips (two seeds agree), +5 on blind_v2's trips,
+  whose generator the training never saw. This is decider's shot-label lesson (§56, §107: supervise every answer in the sequence) in an
+  encoder's form; a bidirectional encoder cannot predict each row from the rows before it in one pass, so rows are masked instead.
+- **The owner's budget does not move** (+0.35 over two seeds, inside seed noise, first-time payees +0.9). A likely reason, not measured:
+  trip-style routing is rarer there than in our generator (§190: 7% of items are in hidden categories, and many of those look like old phases rather than trips).
+- 0.15 and 0.3 read alike; 0.15 is the default from here (`HMASK=0.15`), and row 209's bases and row 212 (a) train with it.
+
+**Cost:** three L40S jobs of 22-25 minutes (train + four reads): roughly $2.5; exact figures from `scripts/modal_costs.py --rows 221` once
+Modal bills the day. Owner reads local ($0).
