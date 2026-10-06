@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -85,7 +85,14 @@ KINDLINE = int(os.environ.get("KINDLINE", "0"))
 # evidence-free: the payee replaced by a coined opaque name, the payee's neighbour rows dropped (the recent rows stay), the target a uniform
 # distribution over the options (cross-entropy to uniform), so the model learns not to be sure without evidence. EMPTY=k (decider's emp20,
 # row 74): in half the steps 1 to k coined categories with no filings ("<group>: <word> | nothing filed yet") join every anchor's options.
-EVFREE, EMPTY = float(os.environ.get("EVFREE", "0")), int(os.environ.get("EMPTY", "0"))  # gradient checkpointing in training
+EVFREE, EMPTY = float(os.environ.get("EVFREE", "0")), int(os.environ.get("EMPTY", "0"))
+# row 227 (a), decider's oth50 / CROWD (rows 124, 183): CROWD=1 appends "| others: <category name> (<households>), ..." (top 4) to the
+# transaction's own text when 2+ other households of the shared v4 world filed its bank string (build_crowd.py tables, CROWD_KEY v2,
+# the household itself left out): realstyle_crowd_v4_train.json for training households, _test.json for held-out ones (seeds >= 100000).
+# Budgets with no crowd table (blind_v2, rational, the owner's) get no line, as decider's reads of the owner's budget (§171).
+CROWD = int(os.environ.get("CROWD", "0"))
+CROWD_HH_DROP, CROWD_DROP = float(os.environ.get("CROWD_HH_DROP", "0.3")), float(os.environ.get("CROWD_DROP", "0.2"))  # training households
+_CROWD = {}  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
 PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
@@ -512,6 +519,8 @@ def prepared(b, m1, cache, full=True):
             i = j
     if KINDLINE:
         _kindline(b, ev)
+    if CROWD:
+        _crowdline(b, ev)
     for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
         e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
     if not full:
@@ -556,6 +565,30 @@ def _prior(evs, ids, dev):
             n, K = sum(pp.values()), len(o)
             P[k, :len(o)] = torch.tensor([np.log((pp.get(c, 0) + 0.1) / (n + 0.1 * K)) for c in o], device=dev)
     return P
+
+
+def _crowdline(b, ev):
+    bid = str(b.get("id", ""))
+    if not bid.startswith("realstyle-"):
+        return
+    os.environ.setdefault("CROWD_KEY", "v2")
+    from build_crowd import crowd_key
+    from ai_experiments.paths import PROCESSED
+    import hashlib
+    me = int(bid.rsplit("-", 1)[1])
+    h = lambda x: int(hashlib.md5(x.encode()).hexdigest(), 16) % 1000 / 1000  # noqa: E731
+    if me < 100000 and h(f"hhdrop-{me}") < CROWD_HH_DROP:  # training households only (decider's CROWD_HH_DROP / CROWD_DROP, §169, §171)
+        return
+    name = "realstyle_crowd_v4_test.json" if me >= 100000 else "realstyle_crowd_v4_train.json"
+    if name not in _CROWD:
+        _CROWD[name] = json.loads((PROCESSED / name).read_text())["keys"]
+    keys, tx = _CROWD[name], {t["id"]: t for t in b["transactions"]}
+    for e in ev:
+        got = keys.get(crowd_key(tx[e["id"]].get("import_payee_name_original") or ""), {})
+        cnt = {n: len(set(hs) - {me}) for n, hs in got.items()}
+        cnt = {n: k for n, k in cnt.items() if k}
+        if got and len(set().union(*map(set, got.values())) - {me}) >= 2 and not (me < 100000 and h(f"drop-{e['id']}") < CROWD_DROP):
+            e["text"] += " | others: " + ", ".join(f"{n} ({k})" for n, k in sorted(cnt.items(), key=lambda x: -x[1])[:4])
 
 
 def _kindline(b, ev):
