@@ -162,7 +162,11 @@ class Enc(H2.ColBERT):
         self.tok = AutoTokenizer.from_pretrained(str(path))
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
-        self.enc = AutoModel.from_pretrained(str(path)).to(self.dev)
+        # row 230 (2026-10-06): ATTN="kernels-community/flash-attn2@main" loads FlashAttention from the Hub (needs `--with "kernels<0.11"`;
+        # transformers 5.5): ModernBERT / Ettin then unpad variable-length batches. On the RTX 3090, 32 queries of 400-2,500 tokens: 0.50 s
+        # forward + backward against sdpa's 0.81, 3.0 GB against 3.9; every token within cosine 0.9997 of the sequence read alone.
+        attn = os.environ.get("ATTN", "")
+        self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
         hid = self.enc.config.hidden_size
         lin = torch.nn.Linear(hid if PROJ == "linear" else 2 * hid, PDIM, bias=False)
         if PROJ == "linear":
