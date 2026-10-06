@@ -884,3 +884,22 @@
 {"utc": "2026-10-06T02:12:26+00:00", "app_id": "ap-BV7aKweV1A2keASFRtQa5q", "kind": "job_done", "tag": "r218-cache", "minutes": 29.3}
 {"utc": "2026-10-06T02:13:28+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "jobs", "what": "r218", "rows": "218", "gpu": "H100", "tags": ["r218-o1", "r218-n1", "r218-h1", "r218-all", "r218-pp", "r218-ppo"], "job_gpus": {"r218-o1": "L40S", "r218-n1": "L40S", "r218-h1": "L40S", "r218-all": "L40S", "r218-pp": "L40S", "r218-ppo": "L40S"}}
 {"utc": "2026-10-06T02:33:25+00:00", "app_id": "ap-Wt7AQNYL9FeE8BPRWlw7CD", "kind": "jobs", "what": "r218b", "rows": "218", "gpu": "H100", "tags": ["r218-md", "r218-mdo", "r218-pp2o"], "job_gpus": {"r218-md": "L40S", "r218-mdo": "L40S", "r218-pp2o": "L40S"}}
+{"utc": "2026-10-06T02:41:32+00:00", "app_id": "ap-x6Dpd7JRobiPFOIIFRq9sl", "kind": "jobs", "what": "r218c", "rows": "218", "gpu": "H100", "tags": ["r218-md-gc", "r218-mdo-gc"], "job_gpus": {"r218-md-gc": "L40S", "r218-mdo-gc": "L40S"}}
+{"utc": "2026-10-06T02:49:00+00:00", "app_id": "ap-JD4FMKFvvMHpJMh6mnU1Vr", "kind": "jobs", "what": "r218d", "rows": "218", "gpu": "H100", "tags": ["r218-m0", "r218-m1", "r218-m2", "r218-m3"], "job_gpus": {"r218-m0": "L40S", "r218-m1": "L40S", "r218-m2": "L40S", "r218-m3": "L40S"}}
+{"utc": "2026-10-06T02:49:11+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-o1", "minutes": 23.7}
+{"utc": "2026-10-06T02:49:13+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-n1", "minutes": 23.7}
+{"utc": "2026-10-06T02:53:55+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-h1", "minutes": 28.4}
+{"utc": "2026-10-06T02:53:55+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-all", "minutes": 28.3}
+{"utc": "2026-10-06T02:53:55+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-pp", "minutes": 26.3}
+{"utc": "2026-10-06T02:53:55+00:00", "app_id": "ap-8PQSk30HTxA3NAhoqv83xr", "kind": "job_done", "tag": "r218-ppo", "minutes": 25.7}
+{"utc": "2026-10-06T02:58:26+00:00", "app_id": "ap-Wt7AQNYL9FeE8BPRWlw7CD", "kind": "job_done", "tag": "r218-md", "minutes": 7.1}
+{"utc": "2026-10-06T02:58:26+00:00", "app_id": "ap-Wt7AQNYL9FeE8BPRWlw7CD", "kind": "job_done", "tag": "r218-mdo", "minutes": 7.3}
+{"utc": "2026-10-06T03:01:43+00:00", "app_id": "ap-CmV5wF2KZZD92d1PuEFSRV", "kind": "jobs", "what": "r222a", "rows": "222", "gpu": "H100", "tags": ["r222-k", "r222-mk"], "job_gpus": {"r222-k": "L40S", "r222-mk": "L40S"}}
+{"utc": "2026-10-06T03:04:18+00:00", "app_id": "ap-Wt7AQNYL9FeE8BPRWlw7CD", "kind": "job_done", "tag": "r218-pp2o", "minutes": 29.5}
+{"utc": "2026-10-06T03:05:18+00:00", "app_id": "ap-CmV5wF2KZZD92d1PuEFSRV", "kind": "job_done", "tag": "r222-k", "minutes": 3.3}
+{"utc": "2026-10-06T03:10:17+00:00", "app_id": "ap-CmV5wF2KZZD92d1PuEFSRV", "kind": "job_done", "tag": "r222-mk", "minutes": 8.3}
+{"utc": "2026-10-06T03:11:19+00:00", "app_id": "ap-JD4FMKFvvMHpJMh6mnU1Vr", "kind": "job_done", "tag": "r218-m0", "minutes": 22.0}
+{"utc": "2026-10-06T03:25:18+00:00", "app_id": "ap-JD4FMKFvvMHpJMh6mnU1Vr", "kind": "job_done", "tag": "r218-m1", "minutes": 36.0}
+{"utc": "2026-10-06T03:25:19+00:00", "app_id": "ap-JD4FMKFvvMHpJMh6mnU1Vr", "kind": "job_done", "tag": "r218-m2", "minutes": 35.8}
+{"utc": "2026-10-06T03:25:19+00:00", "app_id": "ap-JD4FMKFvvMHpJMh6mnU1Vr", "kind": "job_done", "tag": "r218-m3", "minutes": 35.8}
+{"utc": "2026-10-06T03:26:41+00:00", "app_id": "ap-RO4mmUsO2ONs50fW1vhXZk", "kind": "jobs", "what": "r218e", "rows": "218", "gpu": "H100", "tags": ["r218-m1-read", "r218-m2-read", "r218-m3-read"], "job_gpus": {"r218-m1-read": "L40S", "r218-m2-read": "L40S", "r218-m3-read": "L40S"}}
