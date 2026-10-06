@@ -63,7 +63,7 @@ LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", 
 EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
-OPTS = os.environ.get("OPTS", "recent")  # each day's options: visible (today's visible categories, rows 210-217) | recent (prepared())
+OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
 
 
 def _base_head(path, hidden):
@@ -381,16 +381,28 @@ def prepared(b, m1, cache, full=True):
     vis = list(ev[0]["state"]) if ev else []
     cats = vis + [c for c in (ev[0]["labels"] if ev else {}) if c not in set(vis)]  # every category with a label, visible ones first
     ci = {c: k for k, c in enumerate(cats)}
-    # each day's options (hist_encoder.events gives today's visible categories every day; its per-day texts are not read here). OPTS=recent
-    # (2026-10-06): also any category filed in the 365 days before the day, decider's rule (real_budget_eval: visible today + used in the
-    # last year): 7.0% of the owner's items and 5.5% of the synthetic ones are filed to a category hidden today (trips, old phases),
-    # which the visible-only options could never score, and training never saw a trip purchase. One dict per distinct option set.
+    # each day's options (hist_encoder.events gives today's visible categories every day; its per-day texts are not read here). 2026-10-06:
+    # 7.0% of the owner's items and 5.5% of the synthetic ones are filed to a category hidden today (trips, old phases), which visible-only
+    # options could never score, and training never saw a trip purchase. OPTS=recent: + any category filed in the 365 days before the
+    # day (decider's rule, real_budget_eval). OPTS=span (owner: "if there is a hidden category, we should offer it as an option for the
+    # transactions that had that category"): a hidden category from 30 days before its first filing (set up ahead, as a trip; the API
+    # has no creation dates) to 365 days after its last (when it was hidden is unknown; keeps decider's options a subset, so comparisons
+    # stay fair); so its first filing is scorable too. One dict per distinct option set.
+    first_use, last_use = {}, {}
+    for e in ev:
+        first_use.setdefault(e["gold"], e["date"]); last_use[e["gold"]] = e["date"]
     memo, last, i = {}, {}, 0
     while i < len(ev):
         j = i
         while j < len(ev) and ev[j]["day"] == ev[i]["day"]:
             j += 1
-        act = vis + ([c for c in cats[len(vis):] if c in last and (ev[i]["date"] - last[c]).days <= 365] if OPTS == "recent" else [])
+        dd = ev[i]["date"]
+        if OPTS == "recent":
+            act = vis + [c for c in cats[len(vis):] if c in last and (dd - last[c]).days <= 365]
+        elif OPTS == "span":
+            act = vis + [c for c in cats[len(vis):] if c in first_use and -30 <= (dd - first_use[c]).days and (dd - last_use[c]).days <= 365]
+        else:
+            act = vis
         st = memo.setdefault(tuple(act), dict.fromkeys(act))
         for e in ev[i:j]:
             e["state"] = st
