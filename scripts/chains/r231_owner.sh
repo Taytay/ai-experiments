@@ -23,4 +23,6 @@ for t in ("r190-g-s0", "r190-g-s1", "r231-dv5-s0", "r231-dv5-s1"):
     ok = [int(np.argmax(r["lp"])) == items[r["id"]]["answer"] for r in rs]
     print(f"{t}: {100 * np.mean(ok):.1f}% right first (n={len(ok)})")
 PY
+echo "== matched items (the encoder comparison's 19,093), fcr beside decider on v5"
+DEC_TAGS=r231-dv5-s0,r231-dv5-s1 ENCS=li_r227_fcr scripts/chains/r218_owner.sh | grep -E "^\| (all|first-time) "
 echo "== r231 owner done $(date -u +%H:%M:%S)"

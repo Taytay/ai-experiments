@@ -7,7 +7,7 @@ right; and three ceilings over decider alone: "either right" (an oracle), "highe
 synthetic set (encoder when its top probability >= G and decider's <= D). Synthetic: TEST_SEEDS held-out v4 households read by decider
 G4 (realstyle_v4g_ngram_test, seeds 0 and 1). Owner's budget (BUDGET set): decider G4 r190 seeds 0 and 1, items_grp_sim2.json; private,
 aggregates only.
-env: TEST_SEEDS (100000-100099), BUDGET, OWNER_ONLY (1: skip the synthetic read), ENCS (encoders, one run; li_r* names are late-interaction decision models, read by
+env: TEST_SEEDS (100000-100099), BUDGET, DEC_TAGS (decider's two score files on the owner's budget, r190-g-s0,r190-g-s1), OWNER_ONLY (1: skip the synthetic read), ENCS (encoders, one run; li_r* names are late-interaction decision models, read by
 li_decider.load as one reader "LI", with the reading time per transaction), OWNER_ENCS.
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 [BUDGET=<id>] uv run python scripts/hist_agree.py
 """
@@ -150,7 +150,8 @@ if __name__ == "__main__":
     if os.environ.get("BUDGET"):
         import real_budget_eval as RB
         oitems = {it["id"]: it for it in json.loads((RB.OUT / "items_grp_sim2.json").read_text())["items"] if it["answer"] >= 0}
-        odec = [{r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(RB.OUT / f"scores_{t}_split_grp_sim2.jsonl"))} for t in ("r190-g-s0", "r190-g-s1")]
+        dec_tags = os.environ.get("DEC_TAGS", "r190-g-s0,r190-g-s1").split(",")  # row 231: decider's two seeds (default G4 on v4 households)
+        odec = [{r["id"]: np.asarray(r["lp"]) for r in map(json.loads, open(RB.OUT / f"scores_{t}_split_grp_sim2.jsonl"))} for t in dec_tags]
         obudget = [json.loads(RB.CACHE.read_text())["budget"]]
     out1 = H.OUT1
     for enc in encs:
