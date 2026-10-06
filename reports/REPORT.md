@@ -215,6 +215,8 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §200 Speed for longer queries and larger encoders (row 230)
 - §201 A structured, longer query (row 229)
 - §202 decider at matched effort on v5 households and without REAL-6 (row 231)
+- §203 Options inside the encoder's input (row 228)
+- §204 Clef-flash zero-shot (row 164)
 
 <!-- END SECTION INDEX -->
 
@@ -12061,3 +12063,62 @@ The owner's budget read as r190's were (Modal private scoring, nothing kept ther
 
 **Cost:** three decider trainings of 75-78 minutes on H100s and three private owner reads: roughly $16; exact figures from
 `scripts/modal_costs.py --rows 231` once Modal bills the day. Episode build local ($0).
+
+## 203. Options inside the encoder's input: one Ettin-32M pass over the query and every option (GLiClass's layout) reads v5 and blind_v2 0.6-0.8 above fcr and rational households 0.6 below, loses 2-8 points on trips, and costs 2-4x the read time; option payees inline add nothing (one seed each)
+
+PLAN step 228 (owner, 2026-10-06: "How are you doing 'choose from these options'?"). fcr (§198) encodes the query and each option document
+apart and meets them at MaxSim, so the transaction never attends to the categories. `li_decider.py MODE=joint` puts them in one sequence,
+as GLiClass and decider do: "<query> || options: [SEP] Group: Name | payee $amt | ... [SEP] ...", options shuffled in training, each
+option scored from its [SEP] marker's state against the query's, softmax over the day's options, fcr's recipe otherwise (v5 households,
+override 0.1, hidden labels 0.15, crowd line; 3,000 steps, MAXLEN 3,072). Arms: jt0 (option names only) and jt3 (each option with its 3
+latest payees). Arm (c), a cross-encoder rerank of fcr's top 5, was not run.
+
+**Table 203.1: % right first (one seed each)**
+
+| model | v5 held-out (20) | v5 trips | blind_v2 (250) | blind_v2 trips | rational (50) | rational new merchants | ms a transaction, L40S |
+|---|---|---|---|---|---|---|---|
+| fcr (§198) | 75.8 | 47.4 | 81.8 | 61.6 | 89.0 | 58.8 | cached documents (§200) |
+| jt0, joint, names only | **76.6** | 45.0 | **82.4** | 53.5 | 88.4 | **62.2** | 3.0-7.1 |
+| jt3, joint, + 3 payees per option | 76.3 | 34.3 | 82.4 | 51.4 | 87.6 | 58.7 | 3.9-11.7 |
+
+Brier: jt0 0.352 / 0.259 / 0.181 against fcr's 0.362 / 0.279 / 0.161 (v5 / blind_v2 / rational).
+
+### 203.1 What the step says
+
+- **Reading the options with the transaction helps a little, within one seed's noise:** +0.8 on v5, +0.6 on blind_v2, +3.4 on the
+  rational households' new merchants (where the category's name has to be matched to the merchant), -0.6 on rational overall.
+- **It costs trips** (-2 to -8): a trip's category is chosen from the dated history rows (the last few days' filings), which MaxSim
+  matches row by row; in one sequence the option list competes with those rows for attention.
+- **Option payees inline add nothing** (jt3 at or below jt0) and slow the read: the history rows already carry the payees.
+- Not read on the owner's budget: the synthetic gain is inside the 1-2 point noise and the read is 2-4x slower than fcr's. Kept as a
+  second-seed candidate if v6 households (row 233) change the picture.
+
+**Cost:** two L40S jobs of 80 and 131 minutes: roughly $4; exact figures from `scripts/modal_costs.py --rows 228` once Modal bills the day.
+
+## 204. Clef-flash zero-shot: Cloudflare's decision model, untrained on households, reads 34% of v5 transactions and 45% of rational households' right first (fcr 76 / 89) at 70 ms a transaction on an H100; parked
+
+PLAN step 164 (a) (owner, 2026-10-06: "prioritize the Jev-style decision maker from CloudFlare - clef"). Clef-flash (Apache-2.0; its
+`joint_schema_model.py`, a joint option head over a Qwen3.5 backbone, `references/software/clef/`) as a reader of li_decider
+(`ARMS=clef:<model>`): the state is fcr's query text, one choice question over the day's categories, each option "Group: Name" with its 3
+latest payees (`CLEF_JM=3`). Decider's library stack (torch 2.13); every 10th transaction of 2 v5 held-out households, every 5th of the
+rational households. Two more arms were started and stopped (owner: "You can run just one or two, right?"): 8 payees per option, and
+Cloudflare's tested stack (torch 2.11, transformers 5.10.2); neither could close the gap below.
+
+**Table 204.1: % right first (top-3), zero-shot**
+
+| reader | v5 sample (1,823) | v5 first-time | rational (4,501) | rational new merchants | ms a transaction, H100 |
+|---|---|---|---|---|---|
+| Clef-flash, zero-shot | 34.4 (59.2) | 31.4 | 45.4 (83.0) | 31.4 | 70.2 (sdpa; query median 451 tokens) |
+| fcr (§198), trained | 75.8 (90.2) | 67.5 | 89.0 (95.2) | 58.8 | 1.9 (flash) |
+
+### 204.1 What the step says
+
+- **Untrained, a general decision model does not know how a household uses its categories.** It picks a plausible category for the
+  merchant (top-3 83% on rational households), not this household's one; the rational households' new merchants, which need only the
+  merchant's kind and the category names, are still 27 points below fcr.
+- **It is 37x slower than fcr** on the same GPU class: a 9B backbone reads every option for every transaction.
+- Fine-tuning (164 (b)) is the remaining test; at H100 prices it is the most expensive arm on the queue for a reader that would have to
+  gain 40 points. Parked until the encoder and decider rows finish.
+
+**Cost:** one H100 job of 16 minutes plus two stopped arms: roughly $3-4; exact figures from `scripts/modal_costs.py --rows 164` once Modal
+bills the day.

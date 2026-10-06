@@ -1005,3 +1005,10 @@
 {"utc": "2026-10-06T18:16:48+00:00", "app_id": "ap-Cpn40n65iQH6RNbvS0fKhn", "kind": "private_scoring", "what": "owner-budget scoring r231-dv5-s1", "rows": "231", "gpu": "H100", "shards": 2, "items": 21238}
 {"utc": "2026-10-06T18:24:08+00:00", "app_id": "ap-apo1rTWZajwXIWgiarB7Pu", "kind": "job_done", "tag": "owner-budget scoring r231-dv5only-s0", "minutes": 14.9}
 {"utc": "2026-10-06T18:30:20+00:00", "app_id": "ap-Cpn40n65iQH6RNbvS0fKhn", "kind": "job_done", "tag": "owner-budget scoring r231-dv5-s1", "minutes": 13.5}
+{"utc": "2026-10-06T18:38:27+00:00", "app_id": "ap-j6S1iN5IfTU9wEqOtPBEsC", "kind": "jobs", "what": "r164", "rows": "164", "gpu": "H100", "tags": ["r164-clefflash-zs"], "job_gpus": {"r164-clefflash-zs": "H100"}}
+{"utc": "2026-10-06T19:13:10+00:00", "app_id": "ap-kHKdbUqm57Syn9ryfRHIbi", "kind": "jobs", "what": "r164", "rows": "164", "gpu": "H100", "tags": ["r164-clefflash-zs2"], "job_gpus": {"r164-clefflash-zs2": "H100"}}
+{"utc": "2026-10-06T19:14:56+00:00", "app_id": "ap-25VJCSWxSTW8ODUDXyho0u", "kind": "jobs", "what": "r164b", "rows": "164", "gpu": "H100", "tags": ["r164-clefflash-zs2-jm8"], "job_gpus": {"r164-clefflash-zs2-jm8": "H100"}}
+{"utc": "2026-10-06T19:17:10+00:00", "app_id": "ap-5gBvKhAKRxuP3LuieWAvOj", "kind": "jobs", "what": "r164c", "rows": "164", "gpu": "H100", "tags": ["r164-clefflash-zs2-cfstack"], "job_gpus": {"r164-clefflash-zs2-cfstack": "H100"}}
+{"utc": "2026-10-06T19:25:27+00:00", "app_id": "ap-i9VSiAGkxbUXYWeY7ExpoZ", "kind": "job_done", "tag": "r228-jt3", "minutes": 130.8}
+{"utc": "2026-10-06T19:25:27+00:00", "app_id": "ap-i9VSiAGkxbUXYWeY7ExpoZ", "kind": "job_done", "tag": "r228-jt0", "minutes": 80.4}
+{"utc": "2026-10-06T19:29:16+00:00", "app_id": "ap-kHKdbUqm57Syn9ryfRHIbi", "kind": "job_done", "tag": "r164-clefflash-zs2", "minutes": 15.8}
