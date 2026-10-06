@@ -211,6 +211,9 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §196 A better stand-in for real data (row 225)
 - §197 Training on v5 households (row 226)
 - §198 decider remaining training lessons in the late-interaction model (row 227)
+- §199 Larger encoder bases (row 209)
+- §200 Speed for longer queries and larger encoders (row 230)
+- §201 A structured, longer query (row 229)
 
 <!-- END SECTION INDEX -->
 
@@ -11909,3 +11912,117 @@ synthetic ones, none 1,024).
 
 **Cost:** ten L40S jobs of 25-45 minutes: roughly $9; exact figures from `scripts/modal_costs.py --rows 227` once Modal bills the day. Owner
 reads local ($0).
+
+## 199. Larger encoder bases: Ettin-150M, ModernBERT-base and Ettin-400M know more merchants (new merchants +9 to +10 for 400M) but read the owner's budget no better than Ettin-32M (v4 training: 67.4-68.3 vs 69.0; v5 training: 70.4-70.6 vs 70.8 / 70.9) (REAL-27, MODEL-25)
+
+PLAN step 209 (owner, 2026-10-05: "I'm impressed that 33M parameters can do so well. That makes me hopeful for much bigger models!"). The
+same recipe at each size: the multi-vector knowledge + alias stage (§191; `knowledge_stage.py MV=1`, LR 5e-5), then the history training.
+Round 1 on h15's recipe (§193, v4 households, MAXLEN 512): Ettin-150M (LR 6e-5), ModernBERT-base (150M, 6e-5), Ettin-400M (4e-5; out of
+memory on an L40S at KBATCH 256, rerun with gradient checkpointing at KBATCH 128, `scripts/modal_jobs/r209b.json`). Round 2 on v5o's recipe
+(§197 + MAXLEN 1,024, without the crowd line), from the same knowledge stages (`r209c.json`). One seed each.
+
+**Table 199.1: knowledge stage, kind retrieval on 7,657 held-out merchant strings, recall@1 / @5**
+
+| base | all | merchant DB | Overture brands | Overture places |
+|---|---|---|---|---|
+| Ettin-32M (§191) | 64.9 / 82.9 | 51.2 / 71.4 | 72.0 / 88.8 | 65.3 / 83.4 |
+| Ettin-150M | 67.0 / 84.7 | 53.5 / 73.4 | 74.2 / 90.1 | 67.0 / 86.0 |
+| ModernBERT-base | 68.9 / 86.0 | 55.6 / 74.7 | 76.2 / 91.4 | 68.7 / 87.2 |
+| Ettin-400M | 70.3 / 87.4 | 58.0 / 78.0 | 77.5 / 92.1 | 69.5 / 88.1 |
+
+**Table 199.2: % right first**
+
+| model | v4 held-out (first-time) | v5 held-out (first-time) | blind_v2 (first-time) | rational clean new | rational bank new | owner's budget (first-time) |
+|---|---|---|---|---|---|---|
+| Ettin-32M h15 (v4, §193) | 73.4 (60.5) | 71.1 (62.1) | 81.8 (72.4) | 60.3 | 57.0 | 69.0 / 68.8 (50.1 / 49.8) |
+| ModernBERT-base (v4) | 73.6 (61.0) | | 81.9 (72.5) | 65.9 | 62.3 | 67.4 (47.2) |
+| Ettin-150M (v4) | 73.2 (60.7) | | 81.5 (72.4) | 64.3 | 59.3 | 67.6 (47.6) |
+| Ettin-400M (v4) | 74.1 (63.0) | | 82.9 (74.3) | **70.7** | **67.7** | 68.3 (47.9) |
+| Ettin-32M fc (v5, §198) | | 74.8 (61.6) | 81.5 (71.7) | | 58.8 | 70.5 (51.1) |
+| Ettin-150M (v5) | | 74.7 (61.5) | 80.9 (70.5) | | 60.6 | 70.6 (51.4) |
+| Ettin-400M (v5) | | **75.9 (64.2)** | 82.3 (73.5) | | **67.8** | 70.4 (49.7) |
+
+Reading cost (§200's timings): Ettin-400M 3.35 ms a transaction on an H100 with FlashAttention, 8.4 on an L40S; Ettin-32M 1.9 / 2.0.
+
+### 199.1 What the step says
+
+- **Size buys merchant knowledge:** recall of a held-out merchant's kind rises 64.9 -> 70.3 from 32M to 400M, and new real merchants in the
+  rational households are filed right 9-10 points more often. On synthetic held-out households the 400M model is the best of all (v5:
+  75.9, first-time 64.2).
+- **The owner's budget does not reward it.** On v4 training the larger bases lose 0.7-1.6 to the 32M model (they fit the v4 generator's
+  quirks better); on v5 training they tie it (70.4-70.6 against 70.5-70.9). The owner's first-time payees are mostly people, local
+  businesses and personal strings no merchant database knows; the gap to decider on them (5 points) is not merchant knowledge of this kind.
+- Kept as an option (Ettin-400M on v5 is the strongest model wherever merchants are known); not the recipe while the owner's budget is the
+  judge. Distilling it into the 32M model is deferred for the same reason: kind lines give the 32M model the merchant gain more cheaply
+  (§198, fcr + kind lines: rational new merchants +5.5).
+
+**Cost:** knowledge stages 13-47 minutes, history trainings 16-45 minutes, reads up to 75 minutes, all on L40S: roughly $14; exact figures
+from `scripts/modal_costs.py --rows 209` once Modal bills the day. Owner reads local ($0).
+
+## 200. Speed for longer queries and larger encoders: on an H100, ModernBERT / Ettin need FlashAttention (sdpa ran ~7x slower, the cause of §188's H100 slowness); the 32M model stays on the L40S, the 400M model goes to the H100; reads are 3-7x faster than decider's (INFRA)
+
+PLAN step 230 (owner, 2026-10-06: "should we be using an L40 for this part? That made sense when it was small!"; "any unsloth equivalent for
+these models?"). Training benchmarks: 300 steps of the long-query 32M recipe (row 229's s40, ~1.3k-token queries) and of Ettin-400M (v5o's
+recipe) on the H100 with sdpa (with and without gradient checkpointing) and with FlashAttention from the Hub (`ATTN=kernels-community/flash-attn2@main`,
+`uv run --with "kernels<0.11"`; transformers 5.5 loads it without a compile), against the L40S. Read timings: `li_decider.py read` now
+reports milliseconds a transaction (text building and GPU scoring apart) and query lengths; five v5 held-out households (65,353
+transactions). FlashAttention checked first: every token within cosine 0.9997 of the sequence read alone, for both paths.
+
+**Table 200.1: training, seconds a step**
+
+| workload | L40S sdpa (+GC for 400M) | L40S flash (+GC) | H100 sdpa | H100 flash, no GC |
+|---|---|---|---|---|
+| Ettin-32M, ~1.3k-token queries | **0.36** | 0.41 | 2.7 | 0.35 |
+| Ettin-400M, 1,024-token queries | 0.89 | 1.08 | 2.8 | **0.41** |
+
+**Table 200.2: reading, ms a transaction (median query 446-467 tokens)**
+
+| model | H100 flash | L40S sdpa | L40S flash | RTX 3090 sdpa |
+|---|---|---|---|---|
+| Ettin-32M (fcr) | **1.88** (1.22 GPU) | 2.04 | 2.24 | 2.5 |
+| Ettin-400M | **3.35** (3.26 GPU) | 8.40 | 8.69 | 13-15 |
+| decider-4B, vLLM (§187) | 10-13 | | | |
+
+### 200.1 What the step says
+
+- **§188's "the H100 is 23x slower" was the attention path, not the step size:** ModernBERT / Ettin with sdpa on Hopper run ~7x slower than
+  with FlashAttention. With it, the H100 trains Ettin-400M 2.2x faster than the L40S (same cost per run, half the time) and reads it 2.5x
+  faster. CLAUDE.md now says so.
+- Ettin-32M is as fast on the L40S (sdpa) as on the H100 (flash): it stays on the cheaper GPU. FlashAttention does not help on the L40S.
+- Gradient checkpointing was needed for Ettin-400M on the L40S (48 GB); on the H100 (80 GB) with flash it is not.
+- unsloth 2026.9's `FastSentenceTransformer` covers ModernBERT with plain `torch.compile` (no custom kernels; its own compile is switched off
+  for ModernBERT); compile (row 230 (c)) is not measured yet.
+- Against decider on the same H100 with fast kernels: Ettin-400M reads 3-4x faster, Ettin-32M 5-7x (8-10x on GPU time; its other 0.66 ms
+  is building texts on the CPU). About $2 (32M), $3.70 (400M) and $11-14 (decider) per million transactions at ~$4 an hour.
+- `read()` prints progress every ~10% of the budgets with an estimate of the time left (owner, 2026-10-06).
+
+**Cost:** six benchmark jobs of 10-13 minutes and three read-timing jobs: roughly $5; exact figures from `scripts/modal_costs.py --rows 229,230`
+once Modal bills the day.
+
+## 201. A structured, longer query: "this payee x N", similar payees and 40-100 recent rows read v5 no better than the plain query (74.3 / 73.8 vs 74.8); the history the model needs is already there (REAL-27, MODEL-25)
+
+PLAN step 229 (owner, 2026-10-06: "I would want to ensure that we have at LEAST ... 1: examples of payees for each category. 2: Historical
+record of how we have categorized the payee ... 3: ... similar payees ... 4: As much history as possible"). `li_decider.py QFMT=sections`:
+"<transaction> || this payee: <category> xN (last Nd ago), ...; <its last 5 filings> || similar payees: <15 rows of other payees> ||
+recent: <REC rows>", payee key `payee_key_v2`; hidden labels on its rows as before. Arms on v5o's recipe (Ettin-32M, v5 households, override
+0.1, hidden labels; gradient checkpointing): s40 (40 recent rows, MAXLEN 2,560; owner queries median 1,262 tokens), s100 (100 recent rows,
+MAXLEN 5,120; median 2,526), s40m20 (s40 with 20 payees per category document instead of 8). Control fc (§198: plain query, 1,024 tokens).
+
+**Table 201.1: % right first**
+
+| arm | v5 held-out (first-time) | trip | blind_v2 | rational bank new |
+|---|---|---|---|---|
+| fc (control) | **74.8** (61.6) | 43.5 | 81.5 | 58.8 |
+| s40 | 74.3 (61.0) | 50.5 | 81.1 | 57.7 |
+| s100 | 73.8 (60.3) | 49.5 | 81.3 | 58.3 |
+| s40m20 | 74.3 (60.7) | 54.9 | 79.2 | 55.2 |
+
+### 201.1 What the step says
+
+- More and better-organised history does not help: the plain query's 12 most similar earlier filings already contain the payee's own
+  filings when it has any, and its 8 recent rows carry the time signal; counts per category and longer recent windows add tokens, not
+  information the model uses. Trips gain (+6 to +11: more recent rows hold more of the trip), everything else loses a little.
+- The owner's gap to decider is 0.2 on payees filed before and 5 on first-time payees (§198): the history in the query was not the limit.
+  Not read on the owner's budget (v5 ranks arms as it does, §196). Training at 2.5k tokens costs 2x the time; reading, ~3x.
+
+**Cost:** three L40S jobs of 45-75 minutes: roughly $5; exact figures from `scripts/modal_costs.py --rows 229` once Modal bills the day.
