@@ -11543,6 +11543,10 @@ reader, restored for candidates without ages, reads it at a5's speed). Calibrati
 - **Owner's budget ranking of the finalists is within single-seed noise** (66.7-67.7); o1's recipe was taken to row 222 for its speed.
 - Trips: per-filing candidates with the history query read trip purchases best on synthetic (md 61.4%); override training trades some of
   that away (mdo 52.7%).
+- **Time on the candidates instead of in the query does not work** (m1-m3: a5's bare query, each earlier filing labelled with its age, the
+  8 most recent filings and the category documents as candidates; read on 10 synthetic households and 50 blind_v2 users because ages make
+  every candidate text unique, ~11 ms a transaction): synthetic 70.1-70.2 and trips 5-12% against o1's 72.6 and 49.9% on the same
+  households, blind_v2 80.4-81.9 against o1's 83.3. The recency signal only works as rows in the query; o1's recipe stays.
 
 **Cost:** about 14 L40S jobs of 22-57 minutes plus re-reads, roughly $10-12 at $1.95 an hour; exact figures from
 `scripts/modal_costs.py --rows 218` once Modal bills the day. Owner reads local ($0).
