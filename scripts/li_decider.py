@@ -111,7 +111,7 @@ PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("Q
 TEACHER, TEACHER_ITEMS, KD_SEEDS = os.environ.get("TEACHER", ""), os.environ.get("TEACHER_ITEMS", ""), os.environ.get("KD_SEEDS", "")
 KDW, KDP, KDT = float(os.environ.get("KDW", "1")), float(os.environ.get("KDP", "0.5")), float(os.environ.get("KDT", "1"))
 CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
-RCHUNK = int(os.environ.get("RCHUNK", "256"))
+RCHUNK = int(os.environ.get("RCHUNK", "64"))  # 2026-10-06: 256 ran out of memory on the 3090 at 1,024-token queries
 MCHUNK = int(os.environ.get("MCHUNK", "32"))  # transactions per chunk in per-filing reads with ages / recent filings / documents  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
@@ -1230,7 +1230,12 @@ def read():
     for arm in os.environ["ARMS"].split(","):
         run = load(arm)
         ranks, brier, conf, hit, lists = defaultdict(list), [], [], [], defaultdict(list)
-        for b in budgets:  # (timing per model: run.prep / run.score, printed below)
+        t_arm, every = time.time(), max(1, len(budgets) // 10)  # owner, 2026-10-06: progress every ~10% of the budgets, with an estimate
+        for nb_, b in enumerate(budgets):  # (timing per model: run.prep / run.score, printed below)
+            if nb_ and nb_ % every == 0:
+                el = time.time() - t_arm
+                print(f"  ... {run.name}: {nb_}/{len(budgets)} budgets, {run.n} transactions, {el / 60:.1f} min, about "
+                      f"{el / nb_ * (len(budgets) - nb_) / 60:.1f} min to go", flush=True)
             # owner, 2026-10-06 (does a recent trip filing carry to the trip's other purchases?): the generators mark trip purchases
             # (realstyle reason ["trip", ...]; blind_v2 Ev.trip, carried by blind_budgets.py); the owner's budget has no marks
             mark = {t["id"]: (t.get("reason") or [None])[0] for t in b["transactions"]}
