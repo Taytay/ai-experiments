@@ -928,3 +928,6 @@
 {"utc": "2026-10-06T04:48:23+00:00", "app_id": "ap-AAmjeq2jg4e5EgF3szJB8N", "kind": "job_done", "tag": "r218-m2-read2", "minutes": 31.7}
 {"utc": "2026-10-06T04:48:47+00:00", "app_id": "ap-AAmjeq2jg4e5EgF3szJB8N", "kind": "job_done", "tag": "r218-m3-read2", "minutes": 32.0}
 {"utc": "2026-10-06T05:01:58+00:00", "app_id": "ap-9jpfOTJC13SSgCeO1Cp61u", "kind": "job_done", "tag": "r223-ekmv-kd1", "minutes": 44.9}
+{"utc": "2026-10-06T08:48:10+00:00", "app_id": "ap-GDiLQmt8fkmdu8sjSGQYqR", "kind": "jobs", "what": "r221", "rows": "221", "gpu": "H100", "tags": ["r221-h15", "r221-h30"], "job_gpus": {"r221-h15": "L40S", "r221-h30": "L40S"}}
+{"utc": "2026-10-06T09:13:22+00:00", "app_id": "ap-GDiLQmt8fkmdu8sjSGQYqR", "kind": "job_done", "tag": "r221-h15", "minutes": 24.9}
+{"utc": "2026-10-06T09:13:22+00:00", "app_id": "ap-GDiLQmt8fkmdu8sjSGQYqR", "kind": "job_done", "tag": "r221-h30", "minutes": 23.9}
