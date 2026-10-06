@@ -203,6 +203,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §188 The cheapest Modal GPU for the small encoder models (row 219)
 - §189 decider history slice and two new test sets (rows 217, 220)
 - §190 decider training lessons on the late-interaction model (row 218)
+- §191 A small modern base: Ettin-encoder-32M (row 222)
 
 <!-- END SECTION INDEX -->
 
@@ -11550,3 +11551,61 @@ reader, restored for candidates without ages, reads it at a5's speed). Calibrati
 
 **Cost:** about 14 L40S jobs of 22-57 minutes plus re-reads, roughly $10-12 at $1.95 an hour; exact figures from
 `scripts/modal_costs.py --rows 218` once Modal bills the day. Owner reads local ($0).
+
+## 191. A small modern base: Ettin-encoder-32M with o1's recipe reads the owner's budget at 68.5 (two seeds: 68.9, 68.2; decider's first trained recipe 68.3, tuned 72.5), about 2 points above bge-small; a knowledge and alias stage puts merchant kinds in (held-out kind recall@1 3 -> 65%) but adds little once the history training runs; more history, masked-token pretraining and a ColBERT-pretrained Ettin add nothing measurable (REAL-27, MODEL-25, MODEL-28)
+
+PLAN step 222 (owner, 2026-10-06: "try the small ettin model soon so that we have more context with a fast, small model that makes
+iteration fast. Let's try 212 with merchant knowledge and alias retraining with it, and also 221 with a modern smaller model"). Base
+jhu-clsp/ettin-encoder-32m (MIT, ModernBERT architecture, 384 wide like bge-small, 8k context), lowercased input (cased; ALL-CAPS bank
+strings split into many pieces), LR 9e-5. Data built once, locally: knowledge pairs v1 (`build_knowledge_pairs.py`: 371,866 bank-rendered
+merchant / place strings with their kind; merchant DB 47.5k merchants x 2 + Overture places and brands; held-out names excluded; open
+licences) and alias pairs v1 (`build_alias_pairs.py`: 253,574 pairs of two renderings of one merchant, e.g. "Walla Walla Daily Gri" ~
+"Walla Walla Daily Grind"). Stages on L40S: k = knowledge + alias contrastive on pooled vectors (`knowledge_stage.py`, 212 (c) + (e));
+mk = 3,000 steps of masked-token pretraining on the same strings (`mlm_stage.py`, 221 (b)) then k; kmv = k in the late-interaction setting
+(MaxSim InfoNCE, `MV=1`, as ColBERT-Zero 2602.16609 advises). Then o1's recipe (row 218: p2's query + override 0.1, 3,000 steps) from raw
+Ettin (e0), k (ek), mk (emk), kmv (ekmv), mixedbread's Ettin-based ColBERT mxbai-edge-colbert-v0-32m with its [Q] / [D] markers
+(mx, Apache-2.0), and ek with twice the history (eklong: 24 nearest + 16 recent, 1,024 tokens).
+
+**Table 191.1: held-out merchant kind retrieval (7,657 pairs of merchants never trained on, 54 kinds): recall@1 / @5**
+
+| encoder | recall@1 | recall@5 |
+|---|---|---|
+| raw Ettin-32M | 3.1 | 11.1 |
+| masked-token stage only (mlm_r222_m1) | 9.0 | 21.3 |
+| k (pooled knowledge + alias) | 64.6 | 83.1 |
+| mk (masked-token, then k) | 65.4 | 83.8 |
+| kmv (k as MaxSim) | 64.9 | 82.9 |
+
+**Table 191.2: % right first, o1's recipe on each base** (bge row: o1, §190)
+
+| model | synthetic | trips | blind_v2 | rational clean: bought before / new | rational bank: bought before / new | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|---|
+| bge-small chain (o1) | **74.2** | 50.4 | **82.2** | 99.7 / **65.8** | 96.9 / **62.3** | 66.9 | 46.1 |
+| e0 raw Ettin | 72.5 | 25.5 | 81.6 | 99.9 / 57.6 | 96.5 / 54.3 | 68.6 | 49.0 |
+| ek | 72.8 | 30.8 | 81.9 | 99.9 / 61.0 | 96.6 / 58.0 | | |
+| emk | 72.9 | 45.6 | 81.5 | 99.9 / 61.0 | **97.7** / 58.6 | | |
+| ekmv (seed 0 / seed 1) | 72.8 / 73.0 | 40.2 / 36.9 | 81.7 / 81.6 | **100.0** / 60.0; 99.7 / 59.9 | 97.1 / 58.0; 97.0 / 56.2 | **68.9 / 68.2** | **49.9 / 48.3** |
+| mx (Ettin ColBERT) | 72.9 | 39.6 | 81.7 | 99.8 / 62.0 | 96.0 / 58.1 | 67.4 | 47.1 |
+| eklong (2x history) | 72.9 | 34.7 | 81.5 | 99.8 / 59.7 | 96.1 / 57.3 | | |
+
+Owner's budget: decider's 19,093 items, one read per model; decider-4B tuned 72.5 (first-time 56.9), its first trained recipe 68.3.
+Reading time on the RTX 3090 2.7 ms a transaction (Ettin) against bge's 2.6 ms. Each Ettin job (train + four reads) 22-35 minutes on an
+L40S; the knowledge stages 3-8 minutes.
+
+### 191.1 What the step says
+
+- **Ettin-32M is the better small base for the owner's budget**: 68.5 over two seeds of ekmv (raw Ettin 68.6, one seed) against bge's
+  66.9 under the same recipe, and better on first-time payees (48-50 against 46). At matched effort (decider's first trained recipe,
+  68.3) the small model has caught up; the tuned decider is still 4 points ahead.
+- **The synthetic sets do not show it**: there bge leads (74.2 against 72.5-73.0) because the bge chain had three training stages on our
+  generator against Ettin's one; the owner's budget rewards the base, our generator rewards the fit.
+- **Knowledge goes in but mostly does not come out.** The knowledge and alias stage teaches Ettin what merchants are (held-out kind
+  recall 3 -> 65%), and lifts new rational merchants (57.6 -> 60-61) and the owner's first-time payees a little (49.0 -> 49.9 for ekmv),
+  but after 3,000 steps of history training most of it is spent: the history objective does not ask for it. Mixing knowledge pairs into
+  the history training, or distillation (row 223), are the ways to keep it.
+- **No help from:** masked-token pretraining (9% kind recall alone; nothing after k), a ColBERT-pretrained Ettin (mx 67.4), the
+  multi-vector form of the knowledge stage over the pooled one on the transfer sets (ColBERT-Zero's gain is for retrieval training at
+  scale; here the stage is small), and twice the history (eklong: Ettin can read it, nothing in it helps).
+
+**Cost:** knowledge / MLM stages 4 jobs of 3-8 minutes, 7 Ettin arms of 22-35 minutes on L40S: roughly $6-8; exact figures from
+`scripts/modal_costs.py --rows 222` once Modal bills the day. Data builds and owner reads local ($0).
