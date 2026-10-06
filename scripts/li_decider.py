@@ -1254,6 +1254,8 @@ def load(arm):
     """an arm ready to read: sets this module's settings from its li_config.json and returns run(budget) -> (events, per-event
     {category id: score}); one arm at a time (the settings are module globals). Used by read() and hist_agree.py (ENCS=li_r...)."""
     import torch
+    if arm.startswith("clef:"):
+        return _clef_load(arm[len("clef:"):])
     d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
     cfg = json.loads((d / "li_config.json").read_text())
     global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
@@ -1289,6 +1291,59 @@ def load(arm):
         run.qlen += [len(x) for x in model.cb.tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
         return ev, out
     run.name, run.prep, run.score, run.n, run.qlen = d.name, 0.0, 0.0, 0, []
+    return run
+
+
+CLEF_INSTR = ("Which of this household's budget categories should the first transaction in the state be filed under? After '||' the "
+              "state lists the household's earlier filings of similar payees and its most recent filings, each as payee, amount, "
+              "the category it was filed under and how long ago. Each option is a category with payees recently filed under it.")
+
+
+def _clef_load(name):
+    """row 164 (owner, 2026-10-02 / 2026-10-06: Cloudflare's Clef decision models): a Clef release read zero-shot as a reader of this
+    module (same households, options, metrics, timing, owner path). State: the transaction's query text as this module builds it (CTX,
+    NB, AGO, REC from the environment; the p2 query by default); one choice question whose options are the day's categories, each
+    named by its "Group: Name" and described by its document's recent payees. Options keyed by category id inside, by name outside.
+    env: CLEF_BATCH (records a forward pass, 4), CLEF_MAXLEN (16384)."""
+    import sys as _sys
+    import torch
+    from huggingface_hub import snapshot_download
+    from ai_experiments.licences import open_licence
+    open_licence(name)
+    path = snapshot_download(name)
+    _sys.path.insert(0, path)
+    from joint_schema_model import collate_records, encode_record, load_release_model
+    model, processor = load_release_model(path, device="cuda")
+    tok, bs, ml = processor.tokenizer, int(os.environ.get("CLEF_BATCH", "4")), int(os.environ.get("CLEF_MAXLEN", "16384"))
+    m1, cache = None, {}
+
+    def record(e):
+        crit, key = {}, {}
+        for c in e["state"]:
+            label, _, rest = e["d"][c].partition(" | ")
+            k = label if label not in crit else f"{label} ({c[:4]})"
+            crit[k], key[k] = rest or "nothing filed yet", c
+        return {"state": e["q"], "questions": {"category": {"type": "choice", "instructions": CLEF_INSTR, "criteria": crit}}}, key
+
+    def run(b):
+        t0 = time.time()
+        ev, docs = prepared(b, m1, cache)
+        t1 = time.time()
+        out = []
+        with torch.inference_mode():
+            for a in range(0, len(ev), bs):
+                recs = [record(e) for e in ev[a:a + bs]]
+                enc = [encode_record(tok, r, max_length=ml) for r, _ in recs]
+                logits = model(collate_records(enc, tok.pad_token_id, torch.device("cuda")))
+                for (r, key), en, lg in zip(recs, enc, logits):  # Clef sorts a choice's options by key: map back through its option ids
+                    v = lg[0].float().cpu().numpy()
+                    sc = {key[o]: float(x) for o, x in zip(en.questions[0].option_ids, v)}
+                    out.append(sc)
+        torch.cuda.synchronize()
+        run.prep += t1 - t0; run.score += time.time() - t1; run.n += len(ev)
+        run.qlen += [len(x) for x in tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
+        return ev, out
+    run.name, run.prep, run.score, run.n, run.qlen = name.split("/")[-1], 0.0, 0.0, 0, []
     return run
 
 
