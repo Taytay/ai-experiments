@@ -939,4 +939,5 @@
 {"utc": "2026-10-06T09:45:01+00:00", "app_id": "ap-w9QrlxnuMBWyoeSYu1U3MY", "kind": "jobs", "what": "r212b", "rows": "212", "gpu": "H100", "tags": ["r212-kl-s1"], "job_gpus": {"r212-kl-s1": "L40S"}}
 {"utc": "2026-10-06T09:45:50+00:00", "app_id": "ap-PhYDPaDE4aGIuQ3Muqmq90", "kind": "jobs", "what": "r224", "rows": "224", "gpu": "H100", "tags": ["r224-emdo"], "job_gpus": {"r224-emdo": "L40S"}}
 {"utc": "2026-10-06T10:02:18+00:00", "app_id": "ap-w9QrlxnuMBWyoeSYu1U3MY", "kind": "job_done", "tag": "r212-kl-s1", "minutes": 17.0}
+{"utc": "2026-10-06T10:33:11+00:00", "app_id": "ap-PhYDPaDE4aGIuQ3Muqmq90", "kind": "job_done", "tag": "r224-emdo", "minutes": 47.1}
 {"utc": "2026-10-06T10:42:38+00:00", "app_id": "ap-Hk92NilVVdsJWPlidVTjwr", "kind": "jobs", "what": "r209b", "rows": "209", "gpu": "H100", "tags": ["r209-e400b"], "job_gpus": {"r209-e400b": "L40S"}}
