@@ -51,6 +51,7 @@ OUT = Path(os.environ.get("OUT", str(H.ENC / f"know_r212_{ARM}")))
 KBATCH, HBATCH = int(os.environ.get("KBATCH", "256")), int(os.environ.get("HBATCH", "128"))
 STEPS, EPOCHS, LR = int(os.environ.get("STEPS", "0")), float(os.environ.get("EPOCHS", "1")), float(os.environ.get("LR", "5e-5"))
 LOWER = int(os.environ.get("LOWER", "0"))
+MV = int(os.environ.get("MV", "0"))  # row 222: the stage in the late-interaction setting (li_decider.LI, MaxSim), as ColBERT-Zero
 SYM, HOLDOUT, N_EVAL = float(os.environ.get("SYM", "1")), float(os.environ.get("HOLDOUT", "0.02")), int(os.environ.get("N_EVAL", "0"))
 MIX, SEED, LOG = float(os.environ.get("MIX", "0")), int(os.environ.get("SEED", "0")), int(os.environ.get("LOG", "100"))
 SCALE = 20.0  # 1 / 0.05
@@ -102,6 +103,26 @@ def _know_loss(model, b, dev):
     return l1 + SYM * l2, l1.item(), l2.item()
 
 
+def _know_loss_mv(model, scale, b, dev):
+    """MV=1 (ColBERT-Zero, 2602.16609: run the contrastive phases in the multi-vector setting): _know_loss with li_decider's late-interaction
+    score (token vectors, MaxSim, a learned scale) in place of pooled cosines; the string is the query, the kind (or the alias rendering)
+    the document; SYM adds the kind as query against the batch's strings, same-kind strings masked"""
+    import torch
+    F = torch.nn.functional
+    uk = sorted({p["kind_text"] for p in b})
+    ki = torch.tensor([uk.index(p["kind_text"]) for p in b], device=dev)
+    texts = [p["text"] for p in b]
+    S = scale * model.score(model.vecs(texts, "q"), model.vecs(uk, "d"))
+    l1 = F.cross_entropy(S.float(), ki)
+    if not SYM:
+        return l1, l1.item(), 0.0
+    R = (scale * model.score(model.vecs(uk, "q"), model.vecs(texts, "d")))[ki]  # R[i, j] = score(kind of pair i as query, string j)
+    same = (ki[:, None] == ki[None, :])
+    same.fill_diagonal_(False)
+    l2 = F.cross_entropy(R.float().masked_fill(same, float("-inf")), torch.arange(len(b), device=dev))
+    return l1 + SYM * l2, l1.item(), l2.item()
+
+
 def _hist_loss(model, b, dev):
     """hist_train2's infonce + dedup (the b1 recipe) on one batch of its triplets: anchor against the batch's positives and hard
     negatives; a candidate from the anchor's household filed in the anchor's category, or with the positive's text, is masked"""
@@ -141,9 +162,16 @@ def train():
         rows = T2._triplets(hh, {"infonce", "dedup"}, rng)
         print(f"history: {len(rows)} triplets from {len(hh)} households ({time.time() - t0:.0f}s)", flush=True)
     dev = _dev()
-    model = H._model(H.BASE)
-    model.train()
-    opt = torch.optim.AdamW(model.parameters(), lr=LR)
+    if MV:
+        import li_decider as LD
+        assert not MIX, "MV=1 trains the knowledge pairs only"
+        model = LD.LI(H.BASE, train=True)
+        scale = torch.nn.Parameter(torch.tensor(20.0, device=model.dev))
+        opt = torch.optim.AdamW([{"params": model.params()}, {"params": [scale], "lr": 1e-2}], lr=LR)
+    else:
+        model = H._model(H.BASE)
+        model.train()
+        opt = torch.optim.AdamW(model.parameters(), lr=LR)
     warm = max(1, int(0.05 * steps))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else max(0.0, (steps - s) / max(1, steps - warm)))
     order, ko, ho = list(range(len(tr))), 0, 0
@@ -160,12 +188,13 @@ def train():
             else:
                 if ko + KBATCH > len(order):
                     rng.shuffle(order); ko = 0
-                loss, l1, l2 = _know_loss(model, [tr[i] for i in order[ko:ko + KBATCH]], dev)
+                bt = [tr[i] for i in order[ko:ko + KBATCH]]
+                loss, l1, l2 = _know_loss_mv(model, scale, bt, dev) if MV else _know_loss(model, bt, dev)
                 ko += KBATCH
                 run["str->kind"] += l1; run["kind->str"] += l2; cnt["str->kind"] += 1; cnt["kind->str"] += 1
         opt.zero_grad(set_to_none=True)
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        torch.nn.utils.clip_grad_norm_(model.params() if MV else model.parameters(), 1.0)
         opt.step()
         sched.step()
         if (s + 1) % LOG == 0 or s + 1 == steps:
@@ -173,10 +202,12 @@ def train():
             run.clear(); cnt.clear()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     model.save(str(OUT))
+    if MV:  # li_decider starts from this dir with BASE=...: it loads proj.pt and scale.pt from it
+        torch.save(scale.detach().cpu(), OUT / "scale.pt")
     (OUT / "know_config.json").write_text(json.dumps(dict(
         plan_row=212, arm="c", name=ARM, base=str(H.BASE), pairs_file=str(PAIRS_FILE.relative_to(ROOT)) if PAIRS_FILE.is_relative_to(ROOT) else str(PAIRS_FILE),
         n_train=len(tr), n_held_out=len(te), kinds=len(kinds), steps=steps, kbatch=KBATCH, hbatch=HBATCH, lr=LR, scale=SCALE, sym=SYM,
-        holdout=HOLDOUT, mix=MIX, history_triplets=len(rows), seed=SEED, device=dev, train_seconds=round(time.time() - t0)), indent=1))
+        holdout=HOLDOUT, mix=MIX, mv=MV, history_triplets=len(rows), seed=SEED, device=dev, train_seconds=round(time.time() - t0)), indent=1))
     print(f"-> {OUT} (train {time.time() - t0:.0f}s)", flush=True)
 
 
@@ -192,12 +223,20 @@ def evaluate():
     print("| encoder | all | " + " | ".join(origins) + " |\n|---|---|" + "---|" * len(origins))
     for enc in os.environ.get("ENCS", str(H.BASE)).split(","):
         d = H.ENC / enc if (H.ENC / enc).exists() else enc
-        m = H._model(d)
-        m.eval()
-        with torch.no_grad():
-            A = m.encode([p["text"] for p in te], convert_to_tensor=True, normalize_embeddings=True, batch_size=256).cpu()
-            K = m.encode(kinds, convert_to_tensor=True, normalize_embeddings=True).cpu()
-        rank = ((A @ K.T) > (A @ K.T).gather(1, ki[:, None])).sum(1)  # kinds scoring strictly above the right one
+        if (Path(d) / "proj.pt").exists():  # a late-interaction model (MV=1 stage or li_decider): MaxSim, string as query, kind as document
+            import li_decider as LD
+            m = LD.LI(d); m.cb.enc.eval()
+            with torch.no_grad():
+                Kv = m.vecs(kinds, "d")
+                S = torch.cat([m.score(m.vecs([p["text"] for p in te[a:a + 256]], "q"), Kv).float().cpu() for a in range(0, len(te), 256)])
+        else:
+            m = H._model(d)
+            m.eval()
+            with torch.no_grad():
+                A = m.encode([p["text"] for p in te], convert_to_tensor=True, normalize_embeddings=True, batch_size=256).cpu()
+                K = m.encode(kinds, convert_to_tensor=True, normalize_embeddings=True).cpu()
+            S = A @ K.T
+        rank = (S > S.gather(1, ki[:, None])).sum(1)  # kinds scoring strictly above the right one
         cells = []
         for o in ["all"] + origins:
             sel = torch.tensor([o == "all" or p["origin"].split(":")[0] == o for p in te])
