@@ -17,6 +17,7 @@ env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB
      row 209 (any base): PDIM (128), PROJ (linear | res), PROJ_INIT (1), LOWER (0), POOL (cls | mean | last), MAXLEN (default min(96, the base's): row 210's length).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/li_decider.py train
 """
+import hashlib
 import json
 import os
 import random
@@ -1378,6 +1379,13 @@ def load(arm):
     def run(b):  # row 230: times kept apart: building the texts (CPU, neighbours from the cache) and scoring them (GPU)
         t0 = time.time()
         ev, docs = prepared(b, m1, cache)
+        k = int(os.environ.get("READ_EVERY", "1"))  # owner, 2026-10-06 ("our test set is too big if it takes longer to score than train"):
+        if k > 1 and MODE not in ("mml", "mmld"):  # score every k-th transaction of every budget (same ones for every arm); queries and
+            ev = [e for e in ev if int(hashlib.md5(str(e["id"]).encode()).hexdigest()[:8], 16) % k == 0]  # by id: a fixed random sample
+            # (documents and queries are built from the whole history first; mml reads candidates by event position: whole budgets only)
+            if docs is not None:  # only the sampled days' documents are encoded
+                days = {e["day"] for e in ev}
+                docs = {d: v for d, v in docs.items() if d in days}
         t1 = time.time()
         out = iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)
         if torch.cuda.is_available():
