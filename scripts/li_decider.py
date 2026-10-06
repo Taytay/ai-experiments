@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, JM=3, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -74,7 +74,14 @@ PTAU = float(os.environ.get("PTAU", "0.9"))
 HMASK, HLW = float(os.environ.get("HMASK", "0")), float(os.environ.get("HLW", "1"))
 MASK_TOK = "[?]"  # train() sets the base's mask token
 GC = int(os.environ.get("GC", "0"))
-SIMN, PAYN = int(os.environ.get("SIMN", "15")), int(os.environ.get("PAYN", "5"))  # row 229: QFMT=sections, similar-payee rows and own last filings
+SIMN, PAYN = int(os.environ.get("SIMN", "15")), int(os.environ.get("PAYN", "5"))
+# row 228 (owner, 2026-10-06: "are you doing any sort of multiple choice thing with the encoders ...? How are you doing 'choose from these
+# options'?"): MODE=joint puts the day's options inside the query, GLiClass-style, so query and options attend to each other in one pass:
+# "<query> || options: [SEP] <Group: Name | payee $amt | ...> [SEP] ...", each option's document cut to its JM latest payees; an option's
+# score is scale x the cosine of its marker token's vector with the first token's. Training shuffles the options per anchor (position
+# bias); reads list them in the budget's order. Hidden history labels (HMASK): a hidden row's mean token vector against the markers.
+JM = int(os.environ.get("JM", "3"))
+MARK = "[SEP]"  # train() / load() set the base's separator token  # row 229: QFMT=sections, similar-payee rows and own last filings
 # row 212 (a), the lookup as text (§144 Canonical kind lines: +17 on blind_v1's first-time payees for decider; §168 Kind lines from a lookup:
 # real lookups right for ~65% of lines): KINDLINE=1 appends "kind: <kind> (match high|mid|low)" to each transaction's own text (not to
 # history rows or documents), after the neighbours are found. Synthetic and rational households: the generator's kind through a simulated
@@ -200,8 +207,9 @@ class Enc(H2.ColBERT):
 
 
 def _lower(t):
-    """LOWER's lowercasing, keeping row 221's mask token intact (same length, so character offsets hold)"""
-    return t.lower().replace(MASK_TOK.lower(), MASK_TOK) if HMASK else t.lower()
+    """LOWER's lowercasing, keeping row 221's mask token and row 228's option marker intact (same length, so character offsets hold)"""
+    t = t.lower().replace(MASK_TOK.lower(), MASK_TOK) if HMASK else t.lower()
+    return t.replace(MARK.lower(), MARK) if MODE == "joint" else t
 
 
 class LI:
@@ -766,6 +774,48 @@ def _cands(e, ev):
     return out + [(e["d"][c] if MODE == "mmld" else e["labels"][c], c) for c in e["state"]]
 
 
+def _joint_text(e, order):
+    """row 228: the query with its options inline; returns (text, character start of each option's marker)"""
+    t, pos = e["q"] + " || options:", []
+    for c in order:
+        t += " "
+        pos.append(len(t))
+        t += MARK + " " + " | ".join(e["d"][c].split(" | ")[:1 + JM])
+    return t, pos
+
+
+def _joint_scores(model, scale, texts, poss, rows=None):
+    """row 228: [b, max options] scaled scores (-inf for padding or an option cut off by MAXLEN); with rows (query k, char spans) also
+    [len(rows), max options] scores of hidden history rows"""
+    import torch
+    v, m, _, _ = model.vecs(texts, "q")
+    qt = [_lower(t) if LOWER else t for t in texts]
+    sh = len(QPREFIX) if PREFIX else 0
+    off = model.cb.tok([(QPREFIX if PREFIX else "") + t for t in qt], padding=True, truncation=True, max_length=model.cb.maxlen,
+                       return_offsets_mapping=True, return_tensors="pt")["offset_mapping"]
+    w = max(map(len, poss))
+    ix = torch.zeros(len(texts), w, dtype=torch.long)
+    ok = torch.zeros(len(texts), w, dtype=torch.bool)
+    for k, ps in enumerate(poss):
+        st = off[k, :, 0]
+        real = off[k, :, 1] > st
+        for o, p in enumerate(ps):
+            hit = ((st == p + sh) & real).nonzero()
+            if len(hit):
+                ix[k, o] = hit[0, 0]; ok[k, o] = True
+    ix, ok = ix.to(model.dev), ok.to(model.dev)
+    mk = v[torch.arange(len(texts), device=model.dev)[:, None], ix]  # [b, w, d] marker vectors
+    S = (scale * (mk * v[:, :1]).sum(-1)).masked_fill(~ok, float("-inf"))
+    if rows is None:
+        return S
+    if not rows:
+        return S, None
+    k = torch.tensor([r[0] for r in rows], device=model.dev)
+    R = torch.stack([r[1] for r in rows]).to(model.dev).float()[:, :v.shape[1]]
+    rv = torch.nn.functional.normalize((v[k] * R[..., None]).sum(1), dim=-1)
+    return S, (scale * (mk[k] * rv[:, None]).sum(-1)).masked_fill(~ok[k], float("-inf"))
+
+
 def _doc_pairs(model, scale, qtexts, dtexts, cols, rows=None):
     """MODE=doc in training: [b, max options] scores of each query against its own option documents (cols[k] = columns in dtexts);
     padded options -inf. rows (row 221 (a)): (query k, bool mask over its tokens) of hidden history rows; then also returns their
@@ -901,7 +951,9 @@ def train():
     model = LI(BASE, train=True)
     global MASK_TOK
     MASK_TOK = model.cb.tok.mask_token or MASK_TOK
-    assert not HMASK or (MODE == "doc" and not INTERACT and not RENAME), "HMASK is wired into the document trainer only"
+    assert not HMASK or (MODE in ("doc", "joint") and not INTERACT and not RENAME), "HMASK is wired into the document and joint trainers only"
+    global MARK
+    MARK = model.cb.tok.sep_token or MARK
     assert not (EVFREE or EMPTY) or (MODE == "doc" and not INTERACT and not PPRIOR and not kd), "EVFREE / EMPTY are wired into the document trainer only"
     if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
         model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
@@ -953,6 +1005,28 @@ def train():
                 F = _pool(*model.vecs(ft)[:2]) if ft else None
                 Lab = _pool(*model.vecs(lt)[:2]) if lt else None
             Sg = _iscores(model, inter, scale, anc, ev, Q, Dv, idx, docs, F, fpos, Lab, lpos)
+        elif MODE == "joint":
+            texts, poss = [], []
+            for k_, e in enumerate(anc):
+                order = list(e["state"]); rng.shuffle(order)
+                anc[k_] = e = dict(e, _order=order)
+                t, ps = _joint_text(e, order)
+                texts.append(t); poss.append(ps)
+            if HMASK:
+                qt = [_lower(t) if LOWER else t for t in texts]
+                sh = len(QPREFIX) if PREFIX else 0
+                off = model.cb.tok([(QPREFIX if PREFIX else "") + t for t in qt], padding=True, truncation=True, max_length=model.cb.maxlen,
+                                   return_offsets_mapping=True, return_tensors="pt")["offset_mapping"]
+                rows, rtgt = [], []
+                for k_, e in enumerate(anc):
+                    oi = {c: o for o, c in enumerate(e["_order"])}
+                    for a_, z_, g in e["hid"]:
+                        msk = (off[k_, :, 1] > a_ + sh) & (off[k_, :, 0] < z_ + sh) & (off[k_, :, 1] > off[k_, :, 0])
+                        if g in oi and msk.any():
+                            rows.append((k_, msk)); rtgt.append(oi[g])
+                Sg, Sr = _joint_scores(model, scale, texts, poss, rows)
+            else:
+                Sg = _joint_scores(model, scale, texts, poss)
         elif MODE in ("mml", "mmld"):
             cand = []
             for e in anc:
@@ -987,7 +1061,7 @@ def train():
                 Sg = _doc_pairs(model, scale, [e["q"] for e in anc], dtexts, cols)
             if PPRIOR:
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
-        tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
+        tgt = torch.tensor([list(e.get("_order") or e["state"]).index(e["gold"]) for e in anc], device=model.dev)
         if EVFREE and any(e.get("_evfree") for e in anc):  # evidence-free anchors: cross-entropy to a uniform target, not the gold
             ef = torch.tensor([bool(e.get("_evfree")) for e in anc], device=model.dev)
             lpu = torch.log_softmax(Sg[ef].float(), -1)
@@ -1096,6 +1170,15 @@ def iscores(model, inter, scale, ev, docs):
 def scores(model, scale, ev, docs):
     """per event, the scaled score of every visible category (dict category id -> score); documents encoded once per budget"""
     import torch
+    if MODE == "joint":  # row 228: one pass per transaction with its options inline, in the budget's order
+        out = []
+        with torch.no_grad():
+            for a in range(0, len(ev), RCHUNK):
+                chunk = ev[a:a + RCHUNK]
+                tp = [_joint_text(e, list(e["state"])) for e in chunk]
+                S = _joint_scores(model, scale, [t for t, _ in tp], [p for _, p in tp]).float().cpu().numpy()
+                out += [{c: float(S[k, o]) for o, c in enumerate(e["state"])} for k, e in enumerate(chunk)]
+        return out
     if MODE in ("mml", "mmld") and (CAGO or os.environ.get("MCHUNKED") == "1"):  # only ages make texts unique per transaction
         # 2026-10-06: with candidate ages every filing text is unique to the transaction reading it, so "encode every candidate text of
         # the budget once" held hundreds of thousands of texts (out of memory on an L40S); here each chunk encodes its own candidates
@@ -1186,6 +1269,8 @@ def load(arm):
     m1, cache = None, {}
     model = LI(d)
     model.cb.enc.eval()
+    global MARK
+    MARK = model.cb.tok.sep_token or MARK
     scale = torch.load(d / "scale.pt", map_location="cpu").to(model.dev)
     global ALPHA
     ALPHA = torch.load(d / "pprior.pt", map_location="cpu").to(model.dev) if PPRIOR else None
