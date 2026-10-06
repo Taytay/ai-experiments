@@ -21,7 +21,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 from ai_experiments.paths import ROOT  # noqa: E402
 
 ADAPTER_NAME = os.environ.get("ADAPTER_NAME", "decider_decider-4b_none_h100bf16st800_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_rs25v5g_lora")
-os.environ.update(BUDGET="rational", SIM="2", GROUPNAMES="1", READER=f"adapter:{ADAPTER_NAME}@r231-dv5-s0", LAYOUT="split")
+os.environ.update(BUDGET="rational", SIM="2", GROUPNAMES="1", READER=f"adapter:{ADAPTER_NAME}@r231-dv5-s0")
+os.environ.setdefault("LAYOUT", "today")  # one prompt each, BATCH (16) of similar length a pass: about one transaction a day here, so the
+os.environ.setdefault("BATCH", "16")  # split layout's per-day shared prefix saves nothing and runs one item a pass (2 items/s on an H100)
 import real_budget_eval as RB  # noqa: E402
 
 OUT = ROOT / "data" / "interim" / "rational_decider"
@@ -98,6 +100,8 @@ def main():
                     if k % KNOWN_EVERY:
                         continue
                 todo.append(it); seg[it["id"]] = r
+        if os.environ.get("ITEM_LIMIT"):  # a smoke test: every k-th item
+            todo = todo[::max(1, len(todo) // int(os.environ["ITEM_LIMIT"]))]
         f = OUT / f"scores_{v.replace(':', '_') or 'base'}.jsonl"
         t1 = time.time()
         with open(f, "w") as fo:
