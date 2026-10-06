@@ -206,6 +206,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §191 A small modern base: Ettin-encoder-32M (row 222)
 - §192 Distilling decider into the late-interaction model (row 223)
 - §193 Masked history-row labels (row 221)
+- §194 Kind lines in the late-interaction model (row 212)
 
 <!-- END SECTION INDEX -->
 
@@ -11688,3 +11689,38 @@ blind_v2 3.7 (ekmv), 6.5 (h15), 4.8 (h30).
 
 **Cost:** three L40S jobs of 22-25 minutes (train + four reads): roughly $2.5; exact figures from `scripts/modal_costs.py --rows 221` once
 Modal bills the day. Owner reads local ($0).
+
+## 194. Kind lines in the late-interaction model: a database lookup's kind in the transaction text, trained with lookups as wrong as real ones, lifts first-time payees on synthetic (+1.2) and new merchants on the rational households (+6), not the owner's budget (69.0 over two seeds vs 68.9) (REAL-27, MODEL-25, MODEL-28)
+
+PLAN step 212 (a), the lookup as text (decider: §144 Canonical kind lines, +17 on blind_v1's first-time payees; §168 Kind lines from a lookup:
+real lookups right for ~65% of lines, and a decider trusting them lost 1.5 on the owner's budget). `li_decider.py` `KINDLINE=1`: each
+transaction's own text (not its history rows or the documents) gets "| kind: <kind> (match high|mid|low)" after the neighbours are found
+(`scripts/kind_lookup_text.py`). Synthetic and rational households: the generator's kind through a simulated lookup fixed per household
+and payee string, at §168's coverage (57%), bucket mix and per-bucket error rates (high 77% right, mid 65%, low 47%; the rest a
+neighbouring or an unrelated kind), so the model learns how far to trust each bucket. The owner's budget: the real v2 lookups
+(`payee_kinds_v2.json`, Overture's score for the bucket, else low; private, read locally): 61% of outflows get a line (high 31%, mid 5%,
+low 24%). blind_v2 budgets carry no kinds (no lines). Recipe: h15 (§193). Arm kl, two seeds.
+
+**Table 194.1: % right first (seed 0 / seed 1)**
+
+| model | synthetic | first-time | rational bank: before / new | rational clean new | blind_v2 | owner's budget | owner first-time |
+|---|---|---|---|---|---|---|---|
+| h15 (§193) | 73.4 / 73.3 | 60.5 / 60.2 | 97.1 / 57.0 | 60.3 | 81.8 | 69.0 / 68.8 | 50.1 / 49.8 |
+| kl (+ kind line) | 73.7 / 73.6 | 61.7 / 61.5 | 97.4 / **63.0**; 97.9 / **63.9** | **65.3** | 81.9 | 69.1 / 69.0 | 50.3 / 50.4 |
+
+Reading time is unchanged (2.7 ms a transaction on the RTX 3090; the lookup itself is precomputed per payee).
+
+### 194.1 What the step says
+
+- **The encoder uses a lookup and learns to discount it:** with lines wrong 35% of the time in training, new merchants in the rational
+  households (real Overture names it never saw) gain 5-7 points, and synthetic first-time payees 1.2, without hurting payees filed before.
+  This is a knowledge gain the weights alone did not keep (§191, §192).
+- **The owner's budget gains nothing measurable** (+0.15 over two seeds; first-time payees +0.4). The owner's first-time payees are where
+  lookups are weakest: person-to-person payments and local businesses get no line or a low-bucket one, and decider's audit (§168) found
+  half the database matches wrong. Better lookups (row 160's payee resolution) are the lever, not the model.
+- Kept as an option (`KINDLINE=1`): harmless where lookups are poor, useful where they are good. Arm (b), the lookup as memory tokens,
+  is not run: row 211's cross-attention and memory tokens read as noise (§185), and (a) shows the bottleneck is the lookups' quality.
+  Arms (c) and (e) ran in row 222 (§191), (d) in row 223 (§192).
+
+**Cost:** two L40S jobs (seed 1 read synthetic and rational bank only): roughly $1.5; exact figures from `scripts/modal_costs.py --rows 212`
+once Modal bills the day. Owner reads local ($0).
