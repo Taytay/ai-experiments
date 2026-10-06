@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -92,7 +92,14 @@ EVFREE, EMPTY = float(os.environ.get("EVFREE", "0")), int(os.environ.get("EMPTY"
 # Budgets with no crowd table (blind_v2, rational, the owner's) get no line, as decider's reads of the owner's budget (§171).
 CROWD = int(os.environ.get("CROWD", "0"))
 CROWD_HH_DROP, CROWD_DROP = float(os.environ.get("CROWD_HH_DROP", "0.3")), float(os.environ.get("CROWD_DROP", "0.2"))  # training households
-_CROWD = {}  # gradient checkpointing in training
+_CROWD = {}
+# row 227 (b), decider's dbep50 (row 57: database merchants as history rows and targets, labelled with the user's own category for their
+# kind): DBSWAP=p swaps a share p of a training household's merchants, consistently across the household, for a merchant of the same
+# kind from the merchant database and Overture (data/interim/knowledge_pairs_v1.jsonl: structured name and kind fields; knowledge_stage's
+# held-out merchants and the rational households' test merchants excluded), each with two fresh bank strings (statements.render_v2); the
+# household's own routing (its category for that kind) is unchanged. Training only.
+DBSWAP = float(os.environ.get("DBSWAP", "0"))
+_DBPOOL = {}  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
 PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
@@ -551,6 +558,42 @@ def _override(b, rng):
     return dict(b, transactions=txs)
 
 
+def _dbpool():
+    if not _DBPOOL:
+        import knowledge_stage as KS
+        from ai_experiments.paths import PROCESSED, ROOT
+        test = {m["name"].lower() for m in json.loads((PROCESSED / "realstyle_merchants_v1.json").read_text())["merchants"] if m["split"] == "test"}
+        by = defaultdict(set)
+        for line in open(ROOT / "data" / "interim" / "knowledge_pairs_v1.jsonl"):
+            p = json.loads(line)
+            if p.get("kind") and p.get("name") and not KS.held_out(p) and p["name"].lower() not in test:
+                by[p["kind"]].add(p["name"])
+        _DBPOOL.update({k: sorted(v) for k, v in by.items()})
+    return _DBPOOL
+
+
+def _dbswap(b, rng):
+    from ai_experiments.statements import render_v2
+    pool = _dbpool()
+    kind = {}
+    for t in b["transactions"]:
+        if t.get("payee_id") and t.get("kind") in pool:
+            kind.setdefault(t["payee_id"], t["kind"])
+    swap = {p: rng.choice(pool[k]) for p, k in sorted(kind.items()) if rng.random() < DBSWAP}
+    if not swap:
+        return b
+    strings = {p: [render_v2(n, rng) for _ in range(2)] for p, n in swap.items()}
+    payees, ids, txs = list(b["payees"]), {}, []
+    for t in b["transactions"]:
+        if t.get("payee_id") in swap:
+            st = rng.choice(strings[t["payee_id"]])
+            if st not in ids:
+                ids[st] = f"db-{len(ids)}"; payees.append(dict(id=ids[st], name=st, deleted=False))
+            t = dict(t, payee_id=ids[st], import_payee_name_original=st)
+        txs.append(t)
+    return dict(b, payees=payees, transactions=txs)
+
+
 def _prior(evs, ids, dev):
     """row 218 (owner, 2026-10-06: "How do we fix the override issue?"): [b, w] log((n_c + 0.1) / (n + 0.1 K)) from the payee's earlier
     filings per category (K options); 0 where the payee has none (a constant: changes nothing). Added to the scores times a learned ALPHA
@@ -785,6 +828,8 @@ def train():
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
         if OVERRIDE:
             b = _override(b, random.Random(SEED * 7919 + n))
+        if DBSWAP:
+            b = _dbswap(b, random.Random(SEED * 104729 + n))
         data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
