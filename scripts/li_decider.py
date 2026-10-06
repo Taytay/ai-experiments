@@ -61,7 +61,7 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
@@ -74,13 +74,33 @@ PTAU = float(os.environ.get("PTAU", "0.9"))
 HMASK, HLW = float(os.environ.get("HMASK", "0")), float(os.environ.get("HLW", "1"))
 MASK_TOK = "[?]"  # train() sets the base's mask token
 GC = int(os.environ.get("GC", "0"))
+SIMN, PAYN = int(os.environ.get("SIMN", "15")), int(os.environ.get("PAYN", "5"))  # row 229: QFMT=sections, similar-payee rows and own last filings
 # row 212 (a), the lookup as text (§144 Canonical kind lines: +17 on blind_v1's first-time payees for decider; §168 Kind lines from a lookup:
 # real lookups right for ~65% of lines): KINDLINE=1 appends "kind: <kind> (match high|mid|low)" to each transaction's own text (not to
 # history rows or documents), after the neighbours are found. Synthetic and rational households: the generator's kind through a simulated
 # lookup per payee (kind_lookup_text: cover 57%, its bucket mix and per-bucket error rates, fixed per household and payee string). The
 # owner's budget: the real lookups (payee_kinds_v2.json, Overture's score for the bucket, else "low"; private files, read locally).
 # blind_v2 budgets carry no kinds: no lines there (a check that the model still reads without one).
-KINDLINE = int(os.environ.get("KINDLINE", "0"))  # gradient checkpointing in training
+KINDLINE = int(os.environ.get("KINDLINE", "0"))
+# row 227, decider's remaining training lessons (training only; doc mode): EVFREE=p (decider's ev10soft, row 84): a share p of anchors become
+# evidence-free: the payee replaced by a coined opaque name, the payee's neighbour rows dropped (the recent rows stay), the target a uniform
+# distribution over the options (cross-entropy to uniform), so the model learns not to be sure without evidence. EMPTY=k (decider's emp20,
+# row 74): in half the steps 1 to k coined categories with no filings ("<group>: <word> | nothing filed yet") join every anchor's options.
+EVFREE, EMPTY = float(os.environ.get("EVFREE", "0")), int(os.environ.get("EMPTY", "0"))
+# row 227 (a), decider's oth50 / CROWD (rows 124, 183): CROWD=1 appends "| others: <category name> (<households>), ..." (top 4) to the
+# transaction's own text when 2+ other households of the shared v4 world filed its bank string (build_crowd.py tables, CROWD_KEY v2,
+# the household itself left out): realstyle_crowd_v4_train.json for training households, _test.json for held-out ones (seeds >= 100000).
+# Budgets with no crowd table (blind_v2, rational, the owner's) get no line, as decider's reads of the owner's budget (§171).
+CROWD = int(os.environ.get("CROWD", "0"))
+CROWD_HH_DROP, CROWD_DROP = float(os.environ.get("CROWD_HH_DROP", "0.3")), float(os.environ.get("CROWD_DROP", "0.2"))  # training households
+_CROWD = {}
+# row 227 (b), decider's dbep50 (row 57: database merchants as history rows and targets, labelled with the user's own category for their
+# kind): DBSWAP=p swaps a share p of a training household's merchants, consistently across the household, for a merchant of the same
+# kind from the merchant database and Overture (data/interim/knowledge_pairs_v1.jsonl: structured name and kind fields; knowledge_stage's
+# held-out merchants and the rational households' test merchants excluded), each with two fresh bank strings (statements.render_v2); the
+# household's own routing (its category for that kind) is unchanged. Training only.
+DBSWAP = float(os.environ.get("DBSWAP", "0"))
+_DBPOOL = {}  # gradient checkpointing in training
 # row 222 (ColBERT-Zero, 2602.16609: stripping the base's prompts in fine-tuning cost it): PREFIX=1 puts the base's query / document
 # markers in front of every query / document text (mxbai-edge-colbert: "[Q] " / "[D] ", from its config_sentence_transformers.json)
 PREFIX, QPREFIX, DPREFIX = int(os.environ.get("PREFIX", "0")), os.environ.get("QPREFIX", "[Q] "), os.environ.get("DPREFIX", "[D] ")
@@ -402,6 +422,31 @@ def _query(i, ev, start, names=None, hide=(), spans=None):
     def ago(j):
         d = (e["date"] - ev[j]["date"]).days
         return f" {d}d ago" if AGO else ""
+    if QFMT == "sections":  # row 229: "this payee" (counts per category, its last PAYN filings), "similar payees", "recent"
+        import bisect
+        own = e["_bykey"][e["_pk"]]
+        own = own[:bisect.bisect_left(own, start[i])]  # earlier-day filings of the same payee key
+        cnt, lastd = defaultdict(int), {}
+        for j in own:
+            cnt[lab(j)] += 1; lastd[lab(j)] = j
+        q = e["text"]
+        if own:
+            q += " || this payee: " + ", ".join(f"{c} x{n}" + (f" ({(e['date'] - ev[lastd[c]]['date']).days}d ago)") for c, n in sorted(cnt.items(), key=lambda x: -x[1]))
+            q += "; " + "; ".join(f'${ev[j]["amt"]:.0f} -> {MASK_TOK if j in hide else lab(j)}{ago(j)}' for j in own[::-1][:PAYN])
+        sim = [j for j in e.get("nb", []) if ev[j]["_pk"] != e["_pk"]][:SIMN]
+        row = lambda j: f'{ev[j]["payee"]} ${ev[j]["amt"]:.0f} -> {MASK_TOK if j in hide else lab(j)}{ago(j)}'
+        for head, js in ((" || similar payees: ", sim), (" || recent: ", rec)):
+            if not js:
+                continue
+            q += head
+            for n_, j in enumerate(js):
+                if n_:
+                    q += "; "
+                r = row(j)
+                if spans is not None and j in hide:
+                    spans.append((len(q), len(q) + len(r), j))
+                q += r
+        return q
     if QFMT == "group":
         js = list(dict.fromkeys(near + rec))
         if not js:
@@ -476,6 +521,14 @@ def prepared(b, m1, cache, full=True):
                     if c >= PTAU:
                         pp[ev[j]["gold"]] += 1
                 e["_pp"] = dict(pp) or None
+    if QFMT == "sections":  # row 229: each event's payee key and, per key, its events in order (shared by reference)
+        from ai_experiments.payeekey import payee_key_v2
+        bykey = defaultdict(list)
+        for i_, e in enumerate(ev):
+            e["_pk"] = payee_key_v2(e["payee"]) or e["payee"].lower()
+            bykey[e["_pk"]].append(i_)
+        for e in ev:
+            e["_bykey"] = bykey
     start, k = [], 0
     for i, e in enumerate(ev):
         if i and e["day"] != ev[i - 1]["day"]:
@@ -507,6 +560,8 @@ def prepared(b, m1, cache, full=True):
             i = j
     if KINDLINE:
         _kindline(b, ev)
+    if CROWD:
+        _crowdline(b, ev)
     for i, e in enumerate(ev):  # each event carries its budget and its day's snapshot, so one step can mix households (GROUPS)
         e["_ev"], e["_snap"], e["_i"], e["_start"], e["_ci"] = ev, snap[e["day"]], i, start, ci
     if not full:
@@ -537,6 +592,42 @@ def _override(b, rng):
     return dict(b, transactions=txs)
 
 
+def _dbpool():
+    if not _DBPOOL:
+        import knowledge_stage as KS
+        from ai_experiments.paths import PROCESSED, ROOT
+        test = {m["name"].lower() for m in json.loads((PROCESSED / "realstyle_merchants_v1.json").read_text())["merchants"] if m["split"] == "test"}
+        by = defaultdict(set)
+        for line in open(ROOT / "data" / "interim" / "knowledge_pairs_v1.jsonl"):
+            p = json.loads(line)
+            if p.get("kind") and p.get("name") and not KS.held_out(p) and p["name"].lower() not in test:
+                by[p["kind"]].add(p["name"])
+        _DBPOOL.update({k: sorted(v) for k, v in by.items()})
+    return _DBPOOL
+
+
+def _dbswap(b, rng):
+    from ai_experiments.statements import render_v2
+    pool = _dbpool()
+    kind = {}
+    for t in b["transactions"]:
+        if t.get("payee_id") and t.get("kind") in pool:
+            kind.setdefault(t["payee_id"], t["kind"])
+    swap = {p: rng.choice(pool[k]) for p, k in sorted(kind.items()) if rng.random() < DBSWAP}
+    if not swap:
+        return b
+    strings = {p: [render_v2(n, rng) for _ in range(2)] for p, n in swap.items()}
+    payees, ids, txs = list(b["payees"]), {}, []
+    for t in b["transactions"]:
+        if t.get("payee_id") in swap:
+            st = rng.choice(strings[t["payee_id"]])
+            if st not in ids:
+                ids[st] = f"db-{len(ids)}"; payees.append(dict(id=ids[st], name=st, deleted=False))
+            t = dict(t, payee_id=ids[st], import_payee_name_original=st)
+        txs.append(t)
+    return dict(b, payees=payees, transactions=txs)
+
+
 def _prior(evs, ids, dev):
     """row 218 (owner, 2026-10-06: "How do we fix the override issue?"): [b, w] log((n_c + 0.1) / (n + 0.1 K)) from the payee's earlier
     filings per category (K options); 0 where the payee has none (a constant: changes nothing). Added to the scores times a learned ALPHA
@@ -551,6 +642,30 @@ def _prior(evs, ids, dev):
             n, K = sum(pp.values()), len(o)
             P[k, :len(o)] = torch.tensor([np.log((pp.get(c, 0) + 0.1) / (n + 0.1 * K)) for c in o], device=dev)
     return P
+
+
+def _crowdline(b, ev):
+    bid = str(b.get("id", ""))
+    if not bid.startswith("realstyle-"):
+        return
+    os.environ.setdefault("CROWD_KEY", "v2")
+    from build_crowd import crowd_key
+    from ai_experiments.paths import PROCESSED
+    import hashlib
+    me = int(bid.rsplit("-", 1)[1])
+    h = lambda x: int(hashlib.md5(x.encode()).hexdigest(), 16) % 1000 / 1000  # noqa: E731
+    if me < 100000 and h(f"hhdrop-{me}") < CROWD_HH_DROP:  # training households only (decider's CROWD_HH_DROP / CROWD_DROP, §169, §171)
+        return
+    name = "realstyle_crowd_v4_test.json" if me >= 100000 else "realstyle_crowd_v4_train.json"
+    if name not in _CROWD:
+        _CROWD[name] = json.loads((PROCESSED / name).read_text())["keys"]
+    keys, tx = _CROWD[name], {t["id"]: t for t in b["transactions"]}
+    for e in ev:
+        got = keys.get(crowd_key(tx[e["id"]].get("import_payee_name_original") or ""), {})
+        cnt = {n: len(set(hs) - {me}) for n, hs in got.items()}
+        cnt = {n: k for n, k in cnt.items() if k}
+        if got and len(set().union(*map(set, got.values())) - {me}) >= 2 and not (me < 100000 and h(f"drop-{e['id']}") < CROWD_DROP):
+            e["text"] += " | others: " + ", ".join(f"{n} ({k})" for n, k in sorted(cnt.items(), key=lambda x: -x[1])[:4])
 
 
 def _kindline(b, ev):
@@ -590,7 +705,7 @@ def _materialise(e, names=None, rng=None):
     lab = (lambda c: names.get(c, labels[c])) if names else (lambda c: labels[c])
     hide, spans = (), []
     if HMASK and rng is not None and CTX:
-        assert QFMT == "rows", "HMASK marks rows of QFMT=rows queries"
+        assert QFMT in ("rows", "sections"), "HMASK marks rows of QFMT=rows | sections queries"
         i, ev = e["_i"], e["_ev"]
         js = list(e.get("nb", [])[:NB]) + ([j for j in range(e["_start"][i] - 1, max(-1, e["_start"][i] - 1 - REC), -1)] if REC else [])
         hide = {j for j in js if rng.random() < HMASK}
@@ -747,6 +862,8 @@ def train():
     for n, b in enumerate(households("train", range(HOUSEHOLDS))):
         if OVERRIDE:
             b = _override(b, random.Random(SEED * 7919 + n))
+        if DBSWAP:
+            b = _dbswap(b, random.Random(SEED * 104729 + n))
         data.append(prepared(b, m1, cache, full=False))
         if n % 50 == 0:
             cache.clear()
@@ -781,6 +898,7 @@ def train():
     global MASK_TOK
     MASK_TOK = model.cb.tok.mask_token or MASK_TOK
     assert not HMASK or (MODE == "doc" and not INTERACT and not RENAME), "HMASK is wired into the document trainer only"
+    assert not (EVFREE or EMPTY) or (MODE == "doc" and not INTERACT and not PPRIOR and not kd), "EVFREE / EMPTY are wired into the document trainer only"
     if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
         model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
@@ -800,6 +918,13 @@ def train():
             w = [e for e in ev if d0 <= e["day"] < d0 + WINDOW and e["gold"] in e["state"] and len(e["state"]) > 1]
             pick = rng.sample(w, min(B, len(w)))
             anc += _renamed(pick, rng) if RENAME and pick else [_materialise(e, rng=rng) for e in pick]
+        if EVFREE:
+            for k_, e in enumerate(anc):
+                if rng.random() < EVFREE:
+                    rest = e["q"].split(" || ")[0].split(" | ", 1)[1] if " | " in e["q"].split(" || ")[0] else ""
+                    rec = e["q"][e["q"].index(" || recent: "):] if " || recent: " in e["q"] else ""
+                    opaque = f"{_coined(rng, set()).upper()} {rng.randint(100, 9999)}"
+                    anc[k_] = dict(e, q=f"{opaque} | {rest}{rec}" if rest else opaque + rec, hid=[], _evfree=True)
         if kd and KDP > 0:  # a share KDP of the step's anchors from teacher-scored transactions (each carries its own day's documents)
             nk = int(round(KDP * len(anc))) or 1
             anc = anc[:len(anc) - nk] + [_materialise(e) for e in rng.sample(kd, min(nk, len(kd)))]
@@ -832,6 +957,12 @@ def train():
             Sg = _mml_pairs(model, scale, [e["q"] for e in anc], dtexts, cand, max(len(e["state"]) for e in anc))
         else:
             cols = [[col(e["d"][c]) for c in e["state"]] for e in anc]
+            if EMPTY and rng.random() < 0.5:  # coined empty categories join every anchor's options (after the real ones)
+                grp = [e["labels"][e["gold"]].split(": ")[0] for e in anc]
+                for k_ in range(rng.randint(1, EMPTY)):
+                    w = _coined(rng, set())
+                    for c_, g in zip(cols, grp):
+                        c_.append(col(_doc(f"{g}: {w}", ())))
             # each anchor against its own options only (2026-10-06: anchors from other households and days, as KD's, multiplied the
             # documents, and the all-pairs score [queries x tokens x documents x tokens] ran out of memory); same scores as _score + gather
             if HMASK:  # row 221 (a): the hidden rows' tokens, from the same tokenisation as model.vecs (LOWER, PREFIX)
@@ -853,7 +984,16 @@ def train():
             if PPRIOR:
                 Sg = Sg + alpha * _prior(anc, [list(e["state"]) for e in anc], model.dev)
         tgt = torch.tensor([list(e["state"]).index(e["gold"]) for e in anc], device=model.dev)
-        loss, ce = _loss(Sg, tgt)
+        if EVFREE and any(e.get("_evfree") for e in anc):  # evidence-free anchors: cross-entropy to a uniform target, not the gold
+            ef = torch.tensor([bool(e.get("_evfree")) for e in anc], device=model.dev)
+            lpu = torch.log_softmax(Sg[ef].float(), -1)
+            okm = torch.isfinite(lpu)
+            evl = -(lpu.masked_fill(~okm, 0).sum(-1) / okm.sum(-1)).mean()
+            loss, ce = _loss(Sg[~ef], tgt[~ef]) if (~ef).any() else (evl * 0, evl * 0)
+            loss = loss + evl * ef.float().mean()
+            run["evl"] += evl.item()
+        else:
+            loss, ce = _loss(Sg, tgt)
         if HMASK and Sr is not None:
             hl, hce = _loss(Sr, torch.tensor(rtgt, device=model.dev))
             loss = loss + HLW * hl
@@ -1035,6 +1175,8 @@ def load(arm):
     INTERACT, NMEM, XLAYERS = cfg.get("INTERACT", ""), cfg.get("NMEM", 10), cfg.get("XLAYERS", 2)
     PDIM, PROJ, PROJ_INIT, LOWER = cfg.get("PDIM", 128), cfg.get("PROJ", "linear"), cfg.get("PROJ_INIT", 1), cfg.get("LOWER", 0)
     POOL, MAXLEN = cfg.get("POOL", "cls"), cfg.get("MAXLEN", 96)  # models saved before row 209 were trained at 96 tokens
+    if os.environ.get("READ_MAXLEN"):  # row 227 (2026-10-06): read a model at a longer limit than it trained at (Ettin's positions reach 8k;
+        MAXLEN = int(os.environ["READ_MAXLEN"])  # 13.8% of the owner's queries exceed 512 tokens, 1.2% of synthetic ones)
     for k in EXTRA:  # settings added after row 211 (QUERY etc.): older models were trained with the defaults
         globals()[k] = cfg.get(k, EXTRA[k])
     m1, cache = None, {}
