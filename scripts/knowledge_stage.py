@@ -166,6 +166,8 @@ def train():
         import li_decider as LD
         assert not MIX, "MV=1 trains the knowledge pairs only"
         model = LD.LI(H.BASE, train=True)
+        if LD.GC:  # row 209: Ettin-400M ran out of memory on an L40S at KBATCH 256 without it
+            model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
         scale = torch.nn.Parameter(torch.tensor(20.0, device=model.dev))
         opt = torch.optim.AdamW([{"params": model.params()}, {"params": [scale], "lr": 1e-2}], lr=LR)
     else:
