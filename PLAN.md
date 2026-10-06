@@ -115,6 +115,23 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   - E5 WRITTEN (first used by r208s): image with the training overlay baked in; mount only the data a job names.
   - E6 WRITTEN (local check: same update up to bf16 shape noise, step-0 loss 4.462 vs 4.475, so MICRO_SPLIT is set row-wide; r208s measures it): length-sorted micro-batches in training (identical gradients), then the 400 / 600-step check (~$9).
   - E7 DONE (scripts/wait_and_ingest.sh): timestamps in chain logs; auto-ingest when a job list finishes.
+- **State (2026-10-06, midday; supersedes the morning block):** branches: plan-216-li-vs-decider (#102), plan-217-history-query (#103:
+  rows 217, 219, 220), plan-218-li-training (#104: rows 218, 222, 223), top of stack #24. Done today: 216 (§187), 217 + 220 (§189), 219
+  (§188), 218 (§190), 222 (§191), 223 (§192). Nothing running.
+  - **Best late-interaction model on the owner's budget:** Ettin-encoder-32M with a multi-vector knowledge + alias stage, then o1's
+    recipe (p2's dated history query + override training): `li_r222_ekmv` / `_s1`, 68.9 / 68.2 (two seeds) against decider-4B tuned 72.5
+    and its first trained recipe 68.3; 2.7 ms a transaction on the 3090. bge-small with the same recipe 66.9.
+  - **What moved the owner's number:** the options fix (hidden categories offered to their last use, +2.2); override training (+7.4 for
+    the same query); the Ettin base (+1.6 over bge). What did not: renames, more households, a payee prior, longer history, time on
+    candidates, masked-token pretraining, ColBERT-pretrained Ettin, distillation from decider (it helps real merchant names on the
+    rational households, +3 to +7, not the owner's first-time payees).
+  - **Next, in order:** (1) 221 (a) history-row labels; (2) 209 larger modern bases (Ettin-150M / ModernBERT-base, then ~400M) on
+    ekmv's recipe, where world knowledge should show on first-time payees; (3) 212 (a)/(b) kind line / lookup memory at read time
+    (knowledge in the input rather than the weights: §191-§192 show the weights lose it); (4) a faster per-filing reader (per-day
+    document cache) before reviving mdo's design; (5) a better stand-in for real data (the synthetic sets ranked p2 above a5; the owner's
+    budget did not).
+  - **Test sets:** synthetic v4 (50 households), blind_v2 whole budgets (`READ=blind2`, `BLIND_N`), rational households
+    (`READ=rational_clean|bank`), the owner's budget once per finished row (`scripts/chains/r218_owner.sh` with ENCS).
 - **State (2026-10-06, morning; this block supersedes the 2026-10-05 evening one):** branches: plan-216-li-vs-decider (#102, row 216),
   plan-217-history-query (#103: rows 217, 219, 220 and the start of 218), plan-218-li-training (rows 218 on; to be linked). Done today:
   216 (§187), 217 + 220 (§189), 219 (§188).
