@@ -61,13 +61,14 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9)  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", RENAME=0.0, OVERRIDE=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
 GC = int(os.environ.get("GC", "0"))  # gradient checkpointing in training
+CREC, CAGO = int(os.environ.get("CREC", "0")), int(os.environ.get("CAGO", "0"))  # MML candidates: recent filings; candidate ages (_cands)
 RCHUNK = int(os.environ.get("RCHUNK", "256"))  # transactions per scoring chunk in reads (2026-10-06: 512-token queries x ~45 options x 256 ran out of memory on the 3090)
 ALPHA = None  # its weight in read (load() sets it)
 OPTS = os.environ.get("OPTS", "span")  # each day's options: visible (today's visible categories, rows 210-217) | recent | span (prepared())
@@ -555,7 +556,12 @@ def _score(model, scale, qtexts, dtexts):
 def _cands(e, ev):
     """MODE=mml: the candidates of one transaction, (text, category id): its NCAND nearest earlier filings by hist_knn_v1 (in visible
     categories) and every visible category's "Group: Name", so each option has at least one"""
-    out = [(ev[j]["text"], ev[j]["gold"]) for j in e["nb"][:NCAND] if ev[j]["gold"] in e["state"]]
+    # row 218 (2026-10-06: on the owner's budget history in the query cost 3-7 points, a5's bare query with per-filing candidates read
+    # best): CREC adds the household's CREC most recent earlier-day filings as candidates too (the trip signal, without lengthening the
+    # query); CAGO appends each candidate filing's age ("| 12d ago")
+    js = list(dict.fromkeys(list(e["nb"][:NCAND]) + ([j for j in range(e["_start"][e["_i"]] - 1, max(-1, e["_start"][e["_i"]] - 1 - CREC), -1)] if CREC else [])))
+    age = (lambda j: f" | {(e['date'] - ev[j]['date']).days}d ago") if CAGO else (lambda j: "")
+    out = [(ev[j]["text"] + age(j), ev[j]["gold"]) for j in js if ev[j]["gold"] in e["state"]]
     # MODE=mmld (owner, 2026-10-06: "I'd much rather that this system infer the similarity of all of those payees somehow, akin to how the
     # decider LLM does it"): each category's document (name + recent payees) instead of its bare name, beside the per-filing candidates,
     # so a payee's variants are matched by the trained encoder filing by filing (no averaging, no key) and categories with no close filing
