@@ -202,6 +202,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §187 The late-interaction decision model beside decider (row 216)
 - §188 The cheapest Modal GPU for the small encoder models (row 219)
 - §189 decider history slice and two new test sets (rows 217, 220)
+- §190 decider training lessons on the late-interaction model (row 218)
 
 <!-- END SECTION INDEX -->
 
@@ -11495,3 +11496,53 @@ times 74.7 / 71.5 / 68.1 (decider 79.0). Reading time 2.2 / 1.3 / 2.5 ms per tra
 
 **Cost:** row 220's two L40S reads (cents) and one re-launch; the rest local ($0). `scripts/modal_costs.py --rows 220` once Modal bills
 the day.
+
+## 190. decider's training lessons on the late-interaction model: override training (a household's merchants moved to another category, consistently) is the lever, on every set: blind_v2 79.7 -> 82.2, rational merchants bought before 98 -> 99.7-99.9%, the owner's budget 59.5 -> 66.9 for the same query; per-filing candidates beside it read 67.7 there (decider 72.5); renames, 1,000 households and a payee-history prior add little on top (REAL-27, MODEL-25)
+
+PLAN step 218 (owner, 2026-10-06: "Borrow ideas from improvements we made to the decider model"; on the rational households' errors:
+"How do we fix the override issue?"; "we can't average a payee's embedding/category"; "I'd much rather that this system infer the
+similarity of all of those payees somehow, akin to how the decider LLM does it"). All arms one seed, 3,000 steps from row 210's a1 (bge
+chain) unless said, OPTS=span, on L40S in parallel (`scripts/modal_jobs/r218*.json`; caches built once on Modal, job r218-cache). New in
+li_decider: OVERRIDE (decider's override episodes: a share of the household's payees moved, every one of their transactions, to one other
+category), RENAME (decider's coined category names per window), HOUSEHOLDS=1000, PPRIOR (a learned-weight prior from the payee's earlier
+filings per category: 1 by payee_key, 2 by neighbours at cosine >= 0.9), MODE=mmld (each earlier filing a candidate beside the category
+documents: learned payee similarity, nothing averaged), CREC / CAGO (recent filings and ages as candidates; m1-m3), GC (gradient
+checkpointing). The owner's budget was read once for the finalists (decider's 19,093 items, SPAN_AFTER=365).
+
+**Table 190.1: % right first (top-1)**
+
+| arm | what it adds (on p2's query unless said) | synthetic | trips | blind_v2 | blind_v2 first-time | rational clean: bought before / new | rational bank: bought before / new | owner's budget |
+|---|---|---|---|---|---|---|---|---|
+| p2 (row 217) | the control | 74.2 | 57.8 | 79.7 | 70.9 | 98.0 / 66.1 | 95.2 / 62.4 | 59.5 |
+| o1 | OVERRIDE 0.1 | 74.2 | 50.4 | 82.2 | 72.8 | **99.7** / 65.8 | 96.9 / 62.3 | 66.9 |
+| n1 | RENAME 0.5 | 73.8 | 56.4 | 81.5 | 72.9 | 98.3 / 64.5 | 95.7 / 61.2 | |
+| h1 | 1,000 training households | 74.2 | 51.2 | 80.9 | 72.0 | 97.7 / 65.3 | 94.8 / 61.1 | |
+| all | h1 + o1 + n1 | 73.2 | 36.2 | 81.8 | 72.2 | 99.4 / 63.3 | 96.6 / 60.7 | |
+| pp | payee-key prior | 74.2 | 56.5 | 80.4 | 71.7 | 98.5 / 66.9 | 95.4 / 63.5 | |
+| ppo | pp + o1 | 74.3 | 50.5 | **82.5** | 73.4 | 99.9 / 66.0 | 97.0 / 62.4 | |
+| pp2o | neighbour prior (cos >= 0.9) + o1 | 74.2 | 50.0 | 82.3 | 72.8 | 99.9 / 66.1 | 97.2 / 62.8 | |
+| md | per-filing candidates + documents (mmld) | 74.2 | **61.4** | 80.8 | 71.7 | 98.9 / 64.7 | 96.5 / 62.0 | |
+| mdo | md + o1 | 73.7 | 52.7 | 82.3 | 73.1 | 99.8 / 63.1 | **97.5** / 60.2 | **67.7** |
+| m0 | a5's design (bare query, per-filing candidates) retrained, OPTS=span | 71.8 | 3.5 | 79.9 | 71.3 | 98.8 / 62.2 | 96.2 / 59.3 | 66.7 |
+
+Owner's budget, first-time payees / payees filed 4+ times: o1 46.1 / 74.5, mdo 48.1 / 74.9, m0 46.9 / 74.9 (decider 56.9 / 79.0; a5 47.5 /
+74.7). Reading time on the RTX 3090: o1 2.6 ms, m0 2.2 ms a transaction; mdo 11.3 ms with the chunked reader then in use (the budget-wide
+reader, restored for candidates without ages, reads it at a5's speed). Calibration error on blind_v2: mdo 0.6%, o1 2.9%.
+
+### 190.1 What the step says
+
+- **Override training is the one lesson that pays everywhere.** It fixes exactly what the rational households exposed (a merchant filed one
+  way every time, its name suggesting another), and that failure was also what sank p2 on the owner's budget: the same query reads 59.5
+  without it and 66.9 with it. decider's recipe has trained on it since its override episodes; the encoder family had not.
+- **The payee prior is not needed once override is trained** (ppo / pp2o within 0.3 of o1): the learned weight stays small (0.05-0.17),
+  and the model, taught that history beats names, already follows the payee's filings. The owner's wish for learned rather than keyed
+  similarity is met by per-filing candidates (mdo), best on bank strings (97.5%) and on the owner's budget (67.7), at a cost in reading
+  time until its reader caches per-day documents.
+- **Renames and more households** help blind_v2 (+1.8, +1.2) but not the rational households and cost synthetic trips; with override
+  they add nothing (all = 81.8).
+- **Owner's budget ranking of the finalists is within single-seed noise** (66.7-67.7); o1's recipe was taken to row 222 for its speed.
+- Trips: per-filing candidates with the history query read trip purchases best on synthetic (md 61.4%); override training trades some of
+  that away (mdo 52.7%).
+
+**Cost:** about 14 L40S jobs of 22-57 minutes plus re-reads, roughly $10-12 at $1.95 an hour; exact figures from
+`scripts/modal_costs.py --rows 218` once Modal bills the day. Owner reads local ($0).
