@@ -23,15 +23,15 @@ we collected, `src/` is library code, `scripts/` is entry points.
 | `PLAN.md` | Ordered queue, status per step, log | every step |
 | `reports/QUESTIONS.md` | Defines each question ID (what was seen, proposed experiment) | a new question appears, or a `Status:` line is added |
 | `reports/REPORT.md` | Results write-up; new results go in new numbered subsections at the end. Cite a section as "§N short title" (e.g. "§179 Pinterest research applicability"), never a bare number: section numbers are not PLAN row numbers. A new section adds a line to `reports/report_titles.tsv`, then `uv run python scripts/report_index.py` rebuilds the index at the top (PLAN rows read from the Result column) | a step finishes |
-| `references/SURVEY.md` | What 34 papers say about each ID | more papers are read |
+| `references/SURVEY.md` | What the first 34 papers say about each ID (58 are read under `references/papers/`; `INDEX.md` lists them by thread) | more papers are read |
 | `references/papers/<id>/summary.md` | One paper each; `INDEX.md` lists them by thread | a paper is read |
-| `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `items.py` (the frozen eval sets and their hashes), `scoring.py` (per-item, per-option log-prob records), `paths.py` (repo locations), `evals/` (run tracker and its CLI) | the datasets, item builders or tracker change |
+| `src/ai_experiments/` | The library, installed editable by `uv sync`: `universe.py`, `merchants.py` (synthetic data and eval items), `icl_suite.py`, `items.py` (the frozen eval sets and their hashes), `scoring.py` (per-item, per-option log-prob records), `scorecard.py` (top-1, top-3, bits, auto-file coverage, skill), `calibration.py`, `realstyle.py` and `taxonomy_v2.py` (real-style households), `licences.py`, `paths.py` (repo locations), `evals/` (run tracker and its CLI); `ls src/ai_experiments` for the rest. Several scripts act as a library too (`scripts/hist_encoder*.py`, `hist_fast.py`, `two_tower.py`, `li_decider.py`) | the datasets, item builders or tracker change |
 | `scripts/` | Runnable experiments and table generators; they `import ai_experiments` and run from any directory | a new experiment |
 | `justfile` | Task runner: `just setup`, `just doctor`, `just push-models`, `just smoke`; `just` lists them | a routine changes |
 | `data/processed/` | Frozen item sets (`ladder_v1.json` etc., plain and `_morph` universes), versioned and immutable; hashes go into the tracker config; `uv run python -m ai_experiments.items check` says whether the generators still reproduce them | a new item-set version is frozen |
 | `data/processed/` (large files) | Item sets over ~20 MB are tracked by DVC, like the adapters (owner, 2026-09-29): `uv run dvc add data/processed/<file>` (writes `<file>.dvc` and a line in `data/processed/.gitignore`), `uv run dvc push`, commit the `.dvc` file; fetch with `uv run dvc pull data/processed/<file>.dvc`. Not Git LFS | a large set is added |
 | `results/` | Raw JSON and logs, one file per run and arm; `per_item/` has one JSONL per run and condition with every option's log-probs (`ai_experiments.scoring`) | every run |
-| `models/` | Adapters and fine-tuned weights, tracked by DVC (one `adapters/<name>.dvc` per adapter in git, bytes at `D:\repos\dvc\ai-experiments`; pulled on demand) | every training run |
+| `models/` | Adapters, encoders and fine-tuned weights, tracked by DVC (one `adapters/<name>.dvc` or `encoders/<name>.dvc` per model in git; `just push-models` adds both, bytes at `D:\repos\dvc\ai-experiments`; pulled on demand) | every training run |
 | `evals/` | Tracker data: `runs.jsonl` (the record), `LEADERBOARD.md`; CLI is `uv run evals` | every run |
 | `NOTES.md` | Machine and environment history | the environment changes |
 
@@ -77,7 +77,7 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
   (`scripts/bench_train_step.py`: warm, Qwen3.5-2B trains at ~14k tokens/s, as fast as Qwen2.5-3B in the same loop).
 - Defaults for new runs: bf16 base (`LOAD_4BIT=0`), `MICRO=16` (one 16-sequence pass per step), all-label loss for the no-DB
   categoriser (`ALL_LABELS=1`), `RUN_TAG=h100...` so Modal adapters never collide with 3090 ones; compare arms only within one
-  hardware and precision setting. About $0.60 to $0.80 per train-and-score job on the H100.
+  hardware and precision setting. A decider-4B train-and-read job costs about $4 to $12 on the H100 (58-78 min of training; `reports/modal_costs.md`); encoder arms $1-3 on an L40S.
 - New decider rows build their job list with `scripts/modal_jobs/make_jobs.py <spec>` (a spec in `scripts/modal_jobs/specs/`: arms, the row's
   reads, variant reads per arm, drills on or off, seeds, read-only arms); it takes adapter names from the trainer itself and prints the
   estimated cost per job before anything launches. History-encoder readers (kNN, MaxSim) run through `scripts/hist_fast.py` (GPU, cached). Synthetic households are cached on disk by `two_tower.households` (`data/interim/hh_cache`, keyed by the generator's code, data and env; `HH_CACHE=0` rebuilds) and `hist_train2.py` caches its mined triplets: scripts that build households should go through it. `hist_agree.py` reads several encoders in one run (`ENCS`).
@@ -96,7 +96,8 @@ The local 3090 may take small, short GPU jobs when free (owner, 2026-10-04: "I'm
 ## Branches, PRs and models
 
 - **One branch and PR per row** (owner, 2026-10-01): each PLAN row, or round of tests, gets its own branch off the current top and its own
-  PR, added to the top of GitHub stack #24 with `gh stack link <every PR already in the stack, in stack order> <new-branch>`: every member, merged or not, from #5 up (the order is the stack's, not numeric: #20 sits after #23); leave one out and gh stack refuses ("this would remove ... from the stack") and prints the current list to copy (PR numbers push nothing;
+  PR. **Stack #24 is full** (GitHub's limit is 100 PRs, #5-#107, 2026-10-06); until the owner merges it and starts a new stack, a new row's PR
+  is chained by base branch on the top PR and the owner links it later. While a stack has room: add to its top with `gh stack link <every PR already in the stack, in stack order> <new-branch>`: every member, merged or not, from #5 up (the order is the stack's, not numeric: #20 sits after #23); leave one out and gh stack refuses ("this would remove ... from the stack") and prints the current list to copy (PR numbers push nothing;
   only the new branch is pushed). Commit a row's results on its own branch before starting the next row. `PLAN.md`'s current state lists
   the stack.
 - **Merge forward only** (owner, after two PRs were auto-closed by a force push): lower branches reach upper ones by merging; never rebase,
