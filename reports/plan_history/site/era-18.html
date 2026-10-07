@@ -1,0 +1,267 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Plan history: Matched effort and better households</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --done:#2F6B45;--todo:#8A6A12;--doing:#17667F;--dropped:#7A7F7C;--code:#EEF1ED;
+ --display:"Literata",Georgia,"Times New Roman",serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--done:#7CC293;--todo:#D9B45A;--doing:#6DB3C9;--dropped:#8C928F;--code:#1D2622}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--body);margin:0}
+.wrap{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:2.5rem;max-width:78rem;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+nav.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:13px}
+nav.side h2{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+nav.side ol{list-style:none;margin:0 0 1.2rem;padding:0;display:grid;gap:2px}
+nav.side a{display:block;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
+nav.side a:hover{background:var(--accent-soft)}
+nav.side a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.side .range{color:var(--muted);font:12px var(--mono);font-variant-numeric:tabular-nums}
+nav.side details summary{cursor:pointer;color:var(--muted);font-size:12px;margin-bottom:.4rem}
+main{min-width:0}
+.pagehead{border-bottom:1px solid var(--rule);padding-bottom:1.2rem;margin-bottom:1.6rem}
+.pagehead .kicker{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+.pagehead h1{font:650 clamp(26px,3.4vw,36px)/1.15 var(--display);margin:.35rem 0 .5rem;text-wrap:balance}
+.pagehead p{max-width:65ch;color:var(--muted);margin:0}
+article.row{border-top:1px solid var(--rule);padding-block:1.8rem;scroll-margin-top:16px}
+article.row header{display:grid;gap:.3rem;margin-bottom:.8rem}
+.eyebrow{font:500 12px/1.4 var(--mono);color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.eyebrow .qid{color:var(--accent)}
+.status{display:inline-block;font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-left:.5rem;vertical-align:2px}
+.status.done{color:var(--done)}.status.todo{color:var(--todo)}.status.doing{color:var(--doing)}.status.dropped{color:var(--dropped)}
+article.row h2{font:650 21px/1.25 var(--display);margin:0;text-wrap:balance}
+article.row h3{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .35rem}
+article.row p,article.row li{max-width:68ch}
+article.row ul{padding-left:1.1rem;margin:.2rem 0;display:grid;gap:.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+a.back{font-weight:500}
+pre.prompt{font:12.5px/1.5 var(--mono);background:var(--code);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;max-width:100%}
+.note{font-size:13px;color:var(--muted);margin:.4rem 0 0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin:.2rem 0}
+th,td{text-align:left;padding:6px 12px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+section.led{margin-top:1.1rem;background:var(--led-soft);border-radius:8px;padding:10px 14px}
+section.led h3{color:var(--led);margin-top:0}
+section.led a{color:var(--led);font-weight:500}
+section.led ul{list-style:none;padding:0}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--rule);margin-top:2rem;padding-top:1rem}
+.eras{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:12px;margin:1rem 0 2rem}
+.era{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:.35rem;align-content:start}
+a.era{text-decoration:none;color:inherit}a.era:hover{border-color:var(--accent)}h2.sect{font:650 20px/1.3 var(--display);margin:0 0 .6rem}
+.era .range{font:12px var(--mono);color:var(--muted)}
+.era h2{font:650 18px/1.25 var(--display);margin:0}
+.era p{margin:0;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .b::before{background:var(--accent)}.legend .f::before{background:var(--led)}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:1rem}nav.side{position:static;max-height:none}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style></head><body><div class="wrap"><nav class="side" aria-label="Eras"><h2>Plan history</h2><ol><li><a href="index.html">Overview and all rows</a></li></ol><h2>Eras</h2><ol><li><a href="era-1.html">Measuring and injecting facts <span class="range">1–12</span></a></li><li><a href="era-2.html">Other routes, scale and realism <span class="range">13–23</span></a></li><li><a href="era-3.html">Recipe tuning and graph probes <span class="range">24–32</span></a></li><li><a href="era-4.html">The REAL-6 categoriser <span class="range">33–48</span></a></li><li><a href="era-5.html">Jev review and the move to Modal <span class="range">49–60</span></a></li><li><a href="era-6.html">Novel inputs and real places <span class="range">61–76</span></a></li><li><a href="era-7.html">Open base, one-slot reader, final recipe <span class="range">77–90</span></a></li><li><a href="era-8.html">Realistic users and the first blind set <span class="range">91–104</span></a></li><li><a href="era-9.html">Prompt formats and serving <span class="range">105–120</span></a></li><li><a href="era-10.html">Building the system and product scores <span class="range">121–139</span></a></li><li><a href="era-11.html">Blind validation and payee kinds <span class="range">140–150</span></a></li><li><a href="era-12.html">Decision models and embeddings <span class="range">151–162</span></a></li><li><a href="era-13.html">The owner&#x27;s real budget <span class="range">163–176</span></a></li><li><a href="era-14.html">Merchant knowledge and the crowd line <span class="range">177–190</span></a></li><li><a href="era-15.html">History-aware encoders <span class="range">191–200</span></a></li><li><a href="era-16.html">Paper lessons and a faster loop <span class="range">201–208</span></a></li><li><a href="era-17.html">The late-interaction decision model <span class="range">209–224</span></a></li><li><a href="era-18.html" aria-current="page">Matched effort and better households <span class="range">225–235</span></a></li><li><a href="era-19.html">EmbeddingGemma 2 <span class="range">236–239</span></a></li></ol></nav><main><header class="pagehead"><p class="kicker">Rows 225–235 · 11 rows</p><h1>Matched effort and better households</h1><p>Each row: why it ran (links back), what was tried, an example prompt, results, lessons, open questions, and the rows it led to.</p></header><article class="row" id="row-225" data-from="223" data-era="Better synthetic households" data-status="done">
+  <header>
+    <p class="eyebrow">Row 225 · 2026-10-06 · <span class="qid">REAL-27</span> · §196 A better stand-in for real data<span class="status done">done</span></p>
+    <h2>Finding out why synthetic households ranked models differently from the real budget</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Neither the synthetic v4 households nor the blind_v2 set predicted how the owner's budget ranked the late-interaction models. Both put the dated-history query (p2) near the top; the owner's budget put it last. Override training, worth nothing on synthetic data, was worth +7.4 points on the real budget. We could not choose recipes on data that ranks them wrongly.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A script measured properties of the owner's budget, the v4 households and blind_v2 as aggregates only: years of history, category churn, hidden categories, new payee strings, how often a payee's usual category is wrong and whether its latest filing is right instead. A new generator switch, v5, adds what was missing: 8 to 12 years of history, reorganisations that retire a category for a renamed successor, short-lived project categories, and 30% of payees that move for good to another category at a random later date. Then ten already-trained arms were read on ten v5 households and their ranking compared with the owner's.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">2019-2023  CITYLINE GYM | $40.00 -&gt; Health
+2023-06    (category "Health" retired; "Fitness &amp; Wellness" created)
+2024-02    CITYLINE GYM | $45.00 -&gt; Fitness &amp; Wellness
+2024-03    CITYLINE GYM | $45.00 -&gt; ?   (right answer: the latest filing, not the usual one)</pre><p class="note">Illustrative, invented: a v5 payee that moves for good. A model that copies a payee's most common past category is wrong here.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Property (median per household)</th><th>v4</th><th>v5</th><th>blind_v2</th><th>Owner</th></tr></thead><tbody>
+<tr><td>Years of history</td><td>7.2</td><td>9.2</td><td>1.0</td><td>11</td></tr>
+<tr><td>Categories used</td><td>59</td><td>106</td><td>16</td><td>145</td></tr>
+<tr><td>Payee's usual category wrong</td><td>0.26</td><td>0.28</td><td>0.08</td><td>0.25</td></tr>
+<tr><td>... of which its latest filing is right (a move)</td><td>0.18</td><td>0.38</td><td>0.21</td><td>0.43</td></tr>
+<tr><td>First-time payee strings</td><td>0.14</td><td>0.16</td><td>0.35</td><td>0.29</td></tr>
+<tr><td>Rank correlation of ten arms with the owner's budget</td><td>0.04 (v4-style read)</td><td>0.83</td><td></td><td></td></tr>
+</tbody></table></div><p class="note">Owner's numbers are aggregates only. With v5 the ten arms' absolute levels sit within 1.6 points of the owner's on average.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The missing property was payees that move. In v4 a wrong "usual category" meant alternation (the payee comes back); in the owner's budget it is mostly a move. That is why override training mattered only on real data.</li><li>Options matter too: reads must keep a retired category on offer for a year (SPAN_AFTER=365), as decider's reads do.</li><li>v5 becomes the stand-in for choosing recipes; the owner's budget can be kept for each row's final read.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does training on v5 households also make a better model? (<a href="#row-226">row 226</a>)</li><li>Can the remaining gaps (first-time strings, name variants, payees under two categories) be closed too? (<a href="#row-233">row 233</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-226">Row 226</a> · Training on the more realistic households</li><li><a href="#row-233">Row 233</a> · Closing the last realness gaps in the synthetic households (v6)</li></ul></section></article><article class="row" id="row-226" data-from="225" data-era="Better synthetic households" data-status="done">
+  <header>
+    <p class="eyebrow">Row 226 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §197 Training on v5 households<span class="status done">done</span></p>
+    <h2>Training on the more realistic households</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-225">Row 225</a> showed that v5 households rank models as the owner's budget does. Training still used v4 households, with override episodes standing in for payees that move. The natural next test was to train on v5 itself.</p></section>
+  <section class="tried"><h3>What we tried</h3><p><a class="back" href="era-17.html#row-221">Row 221</a>'s h15 recipe (Ettin-32M, hidden history labels 0.15, 3,000 steps) trained on 200 v5 households, with override episodes (v5o) and without them (v5n, since v5 has real moves). Shared caches were built once in a 7-minute job. Two seeds each, read on v5 held-out households, v4, blind_v2, the rational households and the owner's budget.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (% right first, seed 0 / 1)</th><th>v5 held-out</th><th>v4 held-out</th><th>blind_v2</th><th>Owner's budget</th><th>Owner, first-time</th></tr></thead><tbody>
+<tr><td>h15 (v4 households)</td><td>71.1</td><td>73.4 / 73.3</td><td>81.8</td><td>69.0 / 68.8</td><td>50.1 / 49.8</td></tr>
+<tr><td>v5n (v5, no override)</td><td>74.8 / 75.0</td><td>72.7</td><td>81.9</td><td>69.9 / 69.6</td><td>51.2 / 49.4</td></tr>
+<tr><td>v5o (v5 + override 0.1)</td><td>74.5 / 74.7</td><td>72.3</td><td>81.1</td><td>70.5 / 70.4</td><td>52.1 / 51.0</td></tr>
+</tbody></table></div><p class="note">Owner's budget: 19,093 items, aggregates only; decider-4B tuned 72.5.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>A better stand-in makes a better model: +1.5 on the owner's budget, seeds agreeing within 0.1, the largest gain since the Ettin base. The gap to decider fell from 3.5 to 2.0 points.</li><li>The gain is even across known and first-time payees.</li><li>Override episodes still add 0.7 on both seeds; v4 drops by 1, so v4 is no longer the set to choose by.</li><li>Recipe from here: v5 households with override 0.1.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Which of decider's other training lessons have the encoders not yet borrowed? (<a href="#row-227">row 227</a>)</li><li>Would decider gain as much from v5 households? (<a href="#row-231">row 231</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-227">Row 227</a> · Borrowing decider&#x27;s remaining training tricks: the crowd line wins, and fcr is born</li><li><a href="#row-231">Row 231</a> · Giving decider the same better training data, and testing what its edge really is</li></ul></section></article><article class="row" id="row-227" data-from="226" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 227 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §198 decider remaining training lessons in the late-interaction model<span class="status done">done</span></p>
+    <h2>Borrowing decider's remaining training tricks: the crowd line wins, and fcr is born</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked: "What techniques are missing from these encoders that we used in training our best decider?" Some were already carried over (override training, hidden labels, real-style households, history rows). Others were not: the crowd line (how other households filed the same payee), evidence-free episodes for calibration, coined empty categories, merchant-database merchants swapped into households, alternation episodes and misleading names.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Each missing lesson became a training switch. Screen 1 ran on h15's recipe (v4 households) at a 1,024-token limit: evidence-free episodes (ev), empty categories (emp), twice the steps (st6k), the crowd line (cr) and database swaps (dbs). Screen 2 ran the winners on <a class="back" href="#row-226">row 226</a>'s v5o recipe: fc (control), fcr (crowd line) and fcd (crowd line plus database swaps). One seed each, two for the winner. Alternation and misleading names were not run.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">TST* BLUE HERON CAFE | $14.60 | Thu | others: Coffee (12), Dining Out (5)
+Nearest: ...
+Recent:  ...</pre><p class="note">Illustrative, invented: the "others" part is the crowd line, counts of other households' filings for the same bank string. It is dropped from 20% of lines and 30% of households in training, so its absence is harmless.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Arm (% right first)</th><th>v5 held-out</th><th>v5 first-time</th><th>blind_v2</th><th>Rational bank, new</th><th>Owner's budget</th><th>Owner, first-time</th></tr></thead><tbody>
+<tr><td>cr on v4 recipe (screen 1)</td><td>72.3</td><td>68.0</td><td>81.8</td><td>56.4</td><td>68.8</td><td></td></tr>
+<tr><td>fc (v5o at 1,024 tokens)</td><td>74.8</td><td>61.6</td><td>81.5</td><td>58.8</td><td>70.5</td><td>51.1</td></tr>
+<tr><td>fcr (+ crowd line), seed 0 / 1</td><td>75.8 / 75.8</td><td>67.5 / 67.3</td><td>81.8</td><td>58.8</td><td>70.8 / 70.9</td><td>52.1 / 51.8</td></tr>
+<tr><td>fcd (+ crowd + database swaps)</td><td>75.7</td><td>67.1</td><td>82.5</td><td>61.5</td><td>69.5</td><td>49.4</td></tr>
+</tbody></table></div><p class="note">Screen 1's other arms (ev, emp, st6k, dbs) read v5 within 0.6 of the control. The owner's budget has no crowd table, so it cannot show the crowd line's gain. Aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The crowd line is the lesson that transfers: +6 on first-time payees where a crowd exists, and harmless where none does.</li><li>Evidence-free episodes, empty categories, more steps and a longer limit do not move the stand-in.</li><li>Database swaps help blind_v2 and new real merchants but cost the owner's budget 0.4 to 1.0. Not kept.</li><li>Recipe from here is fcr: Ettin-32M, v5 households, override 0.1, hidden labels 0.15, crowd line, 1,024 tokens. Gap to decider-4B: 1.7 points.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Should the encoder see the options in its input, as decider does? (<a href="#row-228">row 228</a>)</li><li>Would a longer, structured query help? (<a href="#row-229">row 229</a>)</li><li>Is the comparison with decider fair if decider never trained on v5? (<a href="#row-231">row 231</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-228">Row 228</a> · Letting the encoder read the transaction and the options together</li><li><a href="#row-229">Row 229</a> · Cramming more, better-organised history into the encoder&#x27;s query</li></ul></section></article><article class="row" id="row-228" data-from="227" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 228 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §203 Options inside the encoder's input<span class="status done">done</span></p>
+    <h2>Letting the encoder read the transaction and the options together</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>fcr encodes the transaction and each category's document separately and only compares them at the end, so the transaction never "sees" the options. decider reads them in one prompt, as a multiple-choice question. The owner asked: "are you doing any sort of multiple choice thing with the encoders or using cloze style queries? How are you doing 'choose from these options'?" GLiClass, a classifier the owner had pointed to earlier, puts all labels in one input.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A joint mode puts the query and every option of the day in one Ettin-32M sequence, each option marked by a separator token whose state is scored against the query; options shuffled in training. jt0 lists option names only; jt3 adds each option's three latest payees. fcr's recipe otherwise (<a class="back" href="#row-227">row 227</a>), up to 3,072 tokens, one seed each. A cross-encoder rerank of fcr's top 5 was not run.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">BRIGHTWAY PHARMACY | $22.15 | Mon | recent: ...
+|| options: [SEP] Bills: Phone [SEP] Health: Pharmacy [SEP] Everyday: Groceries [SEP] Fun: Movies ...</pre><p class="note">Illustrative, invented: one sequence holds the transaction and every option, so attention can flow between them.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (% right first, one seed)</th><th>v5 held-out</th><th>v5 trips</th><th>blind_v2</th><th>Rational, all / new merchants</th><th>ms a transaction (L40S)</th></tr></thead><tbody>
+<tr><td>fcr</td><td>75.8</td><td>47.4</td><td>81.8</td><td>89.0 / 58.8</td><td>cached documents</td></tr>
+<tr><td>jt0, joint, names only</td><td>76.6</td><td>45.0</td><td>82.4</td><td>88.4 / 62.2</td><td>3.0-7.1</td></tr>
+<tr><td>jt3, joint, + 3 payees per option</td><td>76.3</td><td>34.3</td><td>82.4</td><td>87.6 / 58.7</td><td>3.9-11.7</td></tr>
+</tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Reading options with the transaction helps a little, within one seed's noise: +0.8 on v5, +0.6 on blind_v2, +3.4 on new merchants in the rational households, where a category name must be matched to a merchant.</li><li>It costs trips (2 to 8 points): in one sequence the option list competes with the dated history rows for attention.</li><li>Option payees inline add nothing and slow the read. Not read on the owner's budget; kept as a candidate if better training data changes the picture.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Would v6 households change the picture? (<a href="#row-233">row 233</a>)</li></ul></section>
+</article><article class="row" id="row-229" data-from="227" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 229 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §201 A structured, longer query<span class="status done">done</span></p>
+    <h2>Cramming more, better-organised history into the encoder's query</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner wanted the query to contain at least "1: examples of payees for each category. 2: Historical record of how we have categorized the payee currently being categorized. 3: Historical record of how we have categorized similar payees ... 4: As much history as possible that we can fit in." The plain query had 8 payees per category document, the 12 nearest earlier filings and 8 recent rows, a median of 439 tokens out of Ettin's 8,000.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A sectioned query: "this payee" with counts per category and its last five filings, "similar payees" with 15 rows of other payees, and "recent" with 40 rows (s40) or 100 rows (s100), plus s40m20 with 20 payees per category document. Trained on v5o's recipe with gradient checkpointing for the longer inputs; control fc from <a class="back" href="#row-227">row 227</a>.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">NORTHGATE HARDWARE | $27.30 | Sat
+|| this payee: Home Repair x14 (last 21d ago), Gifts x1 (last 300d ago); ...
+|| similar payees: ACE BUILDERS SUPPLY | $55.00 | Home Repair; ...
+|| recent: SHELL 4410 | $38.00 | Fuel (1d ago); ... (40 rows)</pre><p class="note">Illustrative, invented: the sectioned layout, with counts for the payee's own history.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Arm (% right first)</th><th>v5 held-out (first-time)</th><th>v5 trips</th><th>blind_v2</th><th>Rational bank, new</th></tr></thead><tbody>
+<tr><td>fc (plain query)</td><td>74.8 (61.6)</td><td>43.5</td><td>81.5</td><td>58.8</td></tr>
+<tr><td>s40</td><td>74.3 (61.0)</td><td>50.5</td><td>81.1</td><td>57.7</td></tr>
+<tr><td>s100</td><td>73.8 (60.3)</td><td>49.5</td><td>81.3</td><td>58.3</td></tr>
+<tr><td>s40m20</td><td>74.3 (60.7)</td><td>54.9</td><td>79.2</td><td>55.2</td></tr>
+</tbody></table></div><p class="note">Not read on the owner's budget: v5 ranks arms as the owner's budget does, and none beat the control.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>More history does not help: the plain query's nearest filings already include the payee's own when it has any, and its recent rows carry the time signal.</li><li>Trips gain 6 to 11 points (more recent rows hold more of the trip); everything else loses a little.</li><li>The owner's gap to decider is 0.2 on known payees and 5 on first-time ones, so history was not the limit. Long queries cost 2x training and about 3x reading time.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Which GPU and attention kernel make long queries cheap? (<a href="#row-230">row 230</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-230">Row 230</a> · Why the H100 was slow for encoders, and which GPU each job should use</li></ul></section></article><article class="row" id="row-230" data-from="229" data-era="Faster loop" data-status="done">
+  <header>
+    <p class="eyebrow">Row 230 · 2026-10-06 · <span class="qid">INFRA</span> · §200 Speed for longer queries and larger encoders<span class="status done">done</span></p>
+    <h2>Why the H100 was slow for encoders, and which GPU each job should use</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>An earlier benchmark had put the small encoder on the cheaper L40S because the H100 ran it far slower. With <a class="back" href="#row-229">row 229</a>'s 1,300 to 5,000-token queries and a 400M-parameter Ettin on the way, the owner asked: "should we be using an L40 for this part? That made sense when it was small!", "Why do we need gradient checkpointing?" and "any unsloth equivalent for these models?"</p></section>
+  <section class="tried"><h3>What we tried</h3><p>300-step training benchmarks of the long-query 32M recipe and of Ettin-400M on the H100 and the L40S, with PyTorch's default attention (sdpa) and with FlashAttention loaded from the Hub, with and without gradient checkpointing. FlashAttention was checked first: every token vector matched the unbatched read within cosine 0.9997. Read timings on five v5 households (65,353 transactions).</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Seconds a training step</th><th>L40S sdpa</th><th>L40S flash</th><th>H100 sdpa</th><th>H100 flash, no checkpointing</th></tr></thead><tbody>
+<tr><td>Ettin-32M, ~1.3k-token queries</td><td>0.36</td><td>0.41</td><td>2.7</td><td>0.35</td></tr>
+<tr><td>Ettin-400M, 1,024-token queries</td><td>0.89 (checkpointing)</td><td>1.08</td><td>2.8</td><td>0.41</td></tr>
+</tbody></table></div><div class="tablewrap"><table><thead><tr><th>Read, ms a transaction</th><th>H100 flash</th><th>L40S sdpa</th><th>RTX 3090 sdpa</th></tr></thead><tbody>
+<tr><td>Ettin-32M (fcr)</td><td>1.88</td><td>2.04</td><td>2.5</td></tr>
+<tr><td>Ettin-400M</td><td>3.35</td><td>8.40</td><td>13-15</td></tr>
+<tr><td>decider-4B (vLLM)</td><td>10-13</td><td></td><td></td></tr>
+</tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The H100's slowness was the attention path: ModernBERT-style encoders with sdpa run about 7x slower on that chip than with FlashAttention.</li><li>Ettin-32M stays on the L40S (as fast, cheaper); Ettin-400M goes to the H100 with FlashAttention, which also removes the need for gradient checkpointing.</li><li>Encoders read 3 to 7x faster than decider on the same GPU: roughly $2 (32M), $3.70 (400M) and $11-14 (decider) per million transactions.</li><li>torch.compile was not measured.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Can a larger embedding model train fast enough to iterate on? (<a href="era-19.html#row-238">row 238</a>, <a href="era-19.html#row-239">row 239</a>)</li></ul></section>
+</article><article class="row" id="row-231" data-from="226" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 231 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §202 decider at matched effort on v5 households and without REAL-6<span class="status done">done</span></p>
+    <h2>Giving decider the same better training data, and testing what its edge really is</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The encoder gained 1.5 points from v5 households (<a class="back" href="#row-226">row 226</a>), but decider had trained on v4 ones, so the comparison was not at matched effort. The owner asked: "Were we training decider on v5, or some other dataset?", and then: "I was actually implying that REAL-6 was the advantage". REAL-6 is the older synthetic user set that made up three quarters of decider's training and that the history encoders never used.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>decider-4B's tuned recipe retrained with its real-style share drawn from v5 households (40,000 episodes from 400 households, two seeds), and once with no REAL-6 at all (100% v5, one seed). The owner's budget was read with private scoring, nothing kept on Modal.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Budget categories: A) Groceries  B) Dining Out  C) Kids: Soccer  D) Gifts ...
+Recent filings:
+  2025-03-02  RIVERBEND FOODS   $81.20  -&gt; A
+  2025-03-04  KICKS YOUTH LEAGUE $60.00 -&gt; C
+Transaction: 2025-03-06  RIVERBEND FOODS  $12.10
+Answer:</pre><p class="note">Illustrative, invented: a decider training episode built from a v5 household.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (owner's budget, % right first)</th><th>All 21,238 items</th><th>Encoder's 19,093 items</th><th>First-time payees</th></tr></thead><tbody>
+<tr><td>decider-4B, 75% REAL-6 + 25% v4</td><td>73.8 / 73.4</td><td>72.5</td><td>56.9</td></tr>
+<tr><td>decider-4B, 75% REAL-6 + 25% v5</td><td>73.6 / 74.5</td><td>73.0</td><td>57.2</td></tr>
+<tr><td>decider-4B, 100% v5, no REAL-6</td><td>74.1</td><td>73.2</td><td>58.3</td></tr>
+<tr><td>Ettin-32M fcr</td><td></td><td>70.8 / 70.9</td><td>52.1 / 51.8</td></tr>
+</tbody></table></div><p class="note">Aggregates only. decider reads at 10-13 ms a transaction on an H100, fcr at 1.9.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>REAL-6 is not decider's advantage: trained on v5 households alone it reads as well or slightly better.</li><li>v5 helps decider less than the encoder (+0.5 against +1.5), perhaps because its larger prior already handled moving payees.</li><li>At matched effort the gap is 2.2 to 2.4 points, and it is first-time payees (decider 57-58, fcr 52-53); on payees filed before the two are within 0.5.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Why was the 1B Ettin option scorer abandoned, and how does it read the owner's budget? (<a href="#row-232">row 232</a>)</li><li>Can better training data close the first-time gap? (<a href="#row-233">row 233</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-232">Row 232</a> · Reading the old 1B Ettin option scorer on the real budget</li><li><a href="#row-233">Row 233</a> · Closing the last realness gaps in the synthetic households (v6)</li></ul></section></article><article class="row" id="row-232" data-from="104,231" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 232 · 2026-10-06 · <span class="qid">MODEL-17</span> · §205 The Ettin-1B option scorer on the owner's budget<span class="status done">done</span></p>
+    <h2>Reading the old 1B Ettin option scorer on the real budget</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked: "Did you ever find out why we abandoned Ettin since it was doing so well, and doing so more cheaply?" An earlier encoder recipe, Ettin-encoder-1B scoring each option through a mask token (<a class="back" href="era-8.html#row-104">row 104</a>), matched decider on sets built with the training generator but trailed it on the blind sets (blind_v2 65.5 against 71.7) and was dropped. It had never been read on the owner's budget.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>The saved seed-0 model scored decider's own items locally on the RTX 3090, aggregates only: at its training length of 2,048 tokens on all 21,238 items, and at 8,192 tokens (no prompt cut) on every fifth item.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">... history ...
+Transaction: SUNNYSIDE VET CLINIC | $140.00
+Options: Pets [MASK] | Health [MASK] | Gifts [MASK] | ...</pre><p class="note">Illustrative, invented: one mask per option, each scored for "is this the answer".</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Reader (owner's budget)</th><th>% right first</th><th>First-time payees</th><th>ms a transaction</th></tr></thead><tbody>
+<tr><td>decider-4B v5 (2 seeds), 21,238 items</td><td>73.6 / 74.5</td><td>56.9 / 58.1</td><td>10-13 (H100)</td></tr>
+<tr><td>Ettin-1B, 2,048 tokens (98.4% of prompts cut)</td><td>39.3</td><td>28.2</td><td>109 (RTX 3090)</td></tr>
+<tr><td>Ettin-1B, 8,192 tokens, every 5th item</td><td>42.5</td><td>30.6</td><td>163</td></tr>
+<tr><td>decider-4B v5, every 5th item</td><td>74.4 / 74.7</td><td>57.7 / 57.9</td><td></td></tr>
+<tr><td>Ettin-32M fcr, 19,093 items</td><td>70.8 / 70.9</td><td>52.1 / 51.8</td><td>2.9</td></tr>
+</tbody></table></div><p class="note">Aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The 1B option scorer does not carry over to a real budget: about 40% right, half of decider's level and 30 points under the 32M late-interaction model.</li><li>History length is not the cause (the full prompt adds 3 points); what it lacks is training on budgets like the owner's (96 options, eleven years).</li><li>It is also 40 to 55x slower than fcr. The decision to drop it stands; the row is closed.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>None new: training data like the owner's budget is what matters (<a href="#row-233">row 233</a>).</li></ul></section>
+</article><article class="row" id="row-233" data-from="231,225" data-era="Better synthetic households" data-status="done">
+  <header>
+    <p class="eyebrow">Row 233 · 2026-10-06 · <span class="qid">REAL-27</span> · §206 v6 households<span class="status done">done</span></p>
+    <h2>Closing the last realness gaps in the synthetic households (v6)</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "I think we can get fcr going much better with better training data". First-time payees were most of the 2.2-point gap to decider (<a class="back" href="#row-231">row 231</a>), and <a class="back" href="#row-225">row 225</a> had left three measured gaps: too few first-time payee strings, too many string variants per payee, and too many payees filed under two or more categories.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>v6 switches, each its own letter: p draws new merchants from the kind's whole pool (about 1,000 places, not the metro's 50 locals); t puts trip purchases at places in the trip's own city; a = p + t with more exploring; b decides purpose routing (a person's, a project's, the catch-all) once per payee, with fewer misfiles and moves; c gives 1-2 string forms per merchant. fcr's recipe trained on each and on combinations, one seed, a second for the best; read on v5, blind_v2, the rational households and the owner's budget. The same row also built shared, content-keyed preparation caches, cutting a screening job to about 15 minutes.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">v5:  new merchant drawn from 50 local coffee shops (used up in a few years)
+v6p: new merchant drawn from ~1,000 coffee shops nationwide
+v6b: "Kids: Soccer" decided once for KICKS YOUTH LEAGUE, then kept</pre><p class="note">Illustrative, invented: what two of the switches change in a generated household.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (% right first)</th><th>v5 all</th><th>Rational new merchants</th><th>Owner's budget</th><th>Owner, first-time</th><th>Owner top-3</th></tr></thead><tbody>
+<tr><td>fcr (v5), 2 seeds</td><td>75.8</td><td>58.8</td><td>70.8 / 70.9</td><td>52.1 / 51.8</td><td>81.9</td></tr>
+<tr><td>v6p</td><td>75.6</td><td>62.8</td><td>69.6</td><td>49.9</td><td>80.9</td></tr>
+<tr><td>v6t</td><td>75.6</td><td>57.3</td><td>70.8</td><td>52.7</td><td>82.1</td></tr>
+<tr><td>v6b, 2 seeds</td><td>72.8 / 73.0</td><td>59.0</td><td>71.3 / 71.4</td><td>51.9 / 52.5</td><td>82.7 / 82.3</td></tr>
+<tr><td>v6c</td><td>75.6</td><td>58.8</td><td>70.7</td><td>51.9</td><td>81.8</td></tr>
+<tr><td>v6abc</td><td>73.9</td><td>63.8</td><td>69.5</td><td>48.8</td><td>81.2</td></tr>
+<tr><td>decider-4B v5, 2 seeds</td><td></td><td></td><td>72.5 / 73.4</td><td>56.6 / 57.8</td><td>84.1 / 84.7</td></tr>
+</tbody></table></div><p class="note">v6abc matches the owner's share of first-time payee strings (0.30 against 0.29) and moves strings per payee from 2.91 to 1.62 (owner 2.09). Owner's budget: 19,093 items, aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Matching aggregates is not matching what matters: v6p gives the owner's share of first-time payees yet costs 2 points on the owner's first-time payees while gaining 4-5 on synthetic new merchants. Our households file by merchant kind; the owner files by purpose.</li><li>Routing per payee (v6b) is the one change that holds on the owner's budget: +0.5 on both seeds, small but consistent.</li><li>The gap to decider stays about 2 points. Generated data has given what it can on these measures; real data is the next step.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does the model transfer to merchant names and category names it has never seen? (<a href="#row-234">row 234</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-234">Row 234</a> · Testing transfer to unseen merchant names and renamed categories</li></ul></section></article><article class="row" id="row-234" data-from="233,220" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 234 · 2026-10-06 · <span class="qid">REAL-27, Q3</span> · §207 Payee and category synonyms on the rational households<span class="status done">done</span></p>
+    <h2>Testing transfer to unseen merchant names and renamed categories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "I want to see if the transfer can happen with payee synonyms, as well as category synonyms". The rational households (<a class="back" href="era-17.html#row-220">row 220</a>: ten obvious categories, every merchant kind always filed to one of them) test whether a merchant's first purchase lands right from its name alone.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Same purchases, days, amounts and categories, only the names changed. Payees: real held-out names (as before); invented names that say what they are, never seen in training ("obvious"); and merchants of the same kind that the training households bought from often ("seen"). Categories: as named; obvious synonyms with emoji; looser synonyms that say less. fcr, v6b and v6p (<a class="back" href="#row-233">row 233</a>) read locally; then decider-4B on the same households, at the owner's request ("What does decider do with that budget?").</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Real held-out name:  POS DEBIT QUILLMARK 0042        (says little)
+Invented, obvious:   POS DEBIT HOLLYBROOK PET SUPPLY (says "pets")
+Categories as named: Groceries | Pets | Fuel | ...
+Obvious synonyms:    Food shop 🛒 | Animal care 🐾 | Gas up ⛽ | ...</pre><p class="note">Illustrative, invented: the same first purchase under two payee versions and two category versions.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Payees / categories (% right first: new merchant / repeat)</th><th>fcr</th><th>v6p</th><th>decider-4B</th></tr></thead><tbody>
+<tr><td>Real held-out names / as named</td><td>58.8 / 97.3</td><td>62.8 / 97.7</td><td>70.7 / 86.5</td></tr>
+<tr><td>Real held-out names / obvious synonyms</td><td>59.5 / 97.1</td><td>62.6 / 97.6</td><td>68.0 / 85.7</td></tr>
+<tr><td>Seen in training / as named</td><td>60.8 / 97.7</td><td>67.6 / 98.1</td><td>72.8 / 89.9</td></tr>
+<tr><td>Invented, obvious / as named</td><td>80.7 / 97.4</td><td>82.0 / 98.3</td><td>93.6 / 94.6</td></tr>
+<tr><td>Invented, obvious / obvious synonyms</td><td>81.2 / 97.3</td><td>82.8 / 98.2</td><td>92.0 / 95.0</td></tr>
+</tbody></table></div><p class="note">Looser category synonyms cost fcr 1-2 points on new merchants (57.4 real names, 79.2 obvious names).</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Payee transfer works when the name carries the kind: 80% on a first purchase for invented obvious names against 59% for real names that give no hint.</li><li>Category transfer works: obvious synonyms with emoji cost the encoder nothing.</li><li>decider transfers names far better on a first purchase (+10 to +13); fcr matches repeat purchases better (97-98 against 86-95), because its alias training ties freshly rendered bank strings together.</li><li>fcr's misses on obvious names cluster in whole kinds (utilities, pets, cinemas), and it pulls towards the household's busiest categories.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Can training examples without history teach new payees? (<a href="#row-235">row 235</a>)</li><li>Can the pull towards busy categories be corrected? (<a href="era-19.html#row-237">row 237</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="#row-235">Row 235</a> · Training on examples with no history, to help with brand-new payees</li><li><a href="era-19.html#row-237">Row 237</a> · Discounting the household&#x27;s busiest categories for new payees</li></ul></section></article><article class="row" id="row-235" data-from="234" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 235 · 2026-10-06 · <span class="qid">REAL-27, Q3</span> · §208 Cold-start training examples<span class="status done">done</span></p>
+    <h2>Training on examples with no history, to help with brand-new payees</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-234">Row 234</a> found fcr right on 59-81% of first purchases where decider reached 70-94. The owner: "Let's try to inject knowledge in fcr to have it get better at new payees. Perhaps we show it examples where there is no history?"</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A share of training queries keeps only the transaction line, with no history rows (COLD); of those, a share also reduces every category document to the category's name alone, as in a brand-new budget (COLDDOC). Arms on fcr's recipe, one seed each: c15 (15% cold), c15d (plus half with name-only documents) and c30d (30% cold). One shared preparation job served all arms, cutting each job from 40 to 19 minutes.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Query:     WILLOWDALE CINEMAS 6 | $31.50 | Fri
+           (no history rows)
+Documents: Entertainment | Groceries | Car Insurance | ...  (names only)</pre><p class="note">Illustrative, invented: a cold-start training example, the transaction alone matched to bare category names.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (% right first)</th><th>v5 all / trips</th><th>Rational new: real / obvious names</th><th>Owner's budget</th><th>Owner, first-time</th></tr></thead><tbody>
+<tr><td>fcr</td><td>75.8 / 46.2</td><td>58.8 / 80.7</td><td>70.8</td><td>52.1</td></tr>
+<tr><td>c15 (COLD 0.15)</td><td>75.5 / 39.0</td><td>58.7 / 79.7</td><td>70.5</td><td>51.2</td></tr>
+<tr><td>c15d (+ COLDDOC 0.5)</td><td>75.5 / 32.0</td><td>58.3 / 80.0</td><td>70.3</td><td>51.6</td></tr>
+<tr><td>c30d (COLD 0.3, COLDDOC 0.5)</td><td>75.7 / 38.5</td><td>58.5 / 79.7</td><td>70.9</td><td>51.9</td></tr>
+</tbody></table></div><p class="note">Owner's budget: 19,093 items, aggregates only; decider v5 72.5 / 73.4, first-time 56.6 / 57.8.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The training format was not what held new payees back: first purchases do not move on any set.</li><li>What a new payee needs is knowledge of what the name is, which the 32M encoder barely has.</li><li>Cold examples cost trips on v5 and nothing elsewhere. Options left: a larger base, decider for first-time payees, or real data.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Would a base with a language model's knowledge, such as EmbeddingGemma 2, help? (<a href="era-19.html#row-236">row 236</a>)</li></ul></section>
+<section class="led"><h3>Led to</h3><ul><li><a href="era-19.html#row-236">Row 236</a> · Fine-tuning a new off-the-shelf embedding model, EmbeddingGemma 2</li></ul></section></article><div class="pager"><a href="era-17.html">← The late-interaction decision model</a><a href="era-19.html">EmbeddingGemma 2 →</a></div></main></div></body></html>

@@ -47,8 +47,10 @@ section{display:flex;flex-direction:column;gap:14px}
 .bname{font-size:.86rem}
 .bname small{display:block;color:var(--muted);font-size:.74rem}
 .track{position:relative;height:30px}
+.track.one{height:18px}
 .b{position:absolute;left:0;height:12px;border-radius:2px;background:var(--bar)}
 .b.all{top:2px;background:var(--bar2)}.b.ft{top:16px}
+.b.ref{background:var(--led)}
 .bv{position:absolute;font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink);white-space:nowrap}
 .bv.all{top:0}.bv.ft{top:14px;color:var(--muted)}
 .axis{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:12px}
@@ -82,88 +84,209 @@ ol.next li::marker{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
 
 <main>
 <header class="head">
-  <div class="eyebrow">YNAB categoriser research · PLAN rows 194–212 · 2026-10-05</div>
+  <div class="eyebrow">YNAB categoriser research · PLAN rows 210–239 · 2026-10-07</div>
   <h1>Late-Interaction Categoriser</h1>
-  <p class="lede">A small encoder (bge-small, 33M parameters) that files a transaction into one of the household's own categories by matching tokens against the household's history, trained as a decision model rather than a search engine. It now matches the tuned 4B decider's first recipe at a fraction of the cost, and it reads first-time payees better than any encoder before it.</p>
-  <div class="chips"><span class="chip ok">rows 202, 204, 210, 211 done</span><span class="chip">rows 205, 209, 212 code ready</span><span class="chip">EVoC paused</span></div>
+  <p class="lede">The encoder family files a transaction into one of the household's own categories by matching it against the household's history, trained as a decision model rather than a search engine. Thirty rows on, it reads the owner's real budget within 1–2 points of the tuned decider-4B: EmbeddingGemma 2 as two towers reads 71.3 on two seeds (decider-4B v5 72.5 / 73.4) and leads it at top-10 (92.4–92.5 against 90.3–90.6). Its H100 recipe trains in 15 minutes. The 32M Ettin model, fcr, reads 70.8 / 70.9 at 1.9 ms a transaction. The gap left is first-time payees.</p>
+  <div class="chips"><span class="chip ok">rows 216–239 done</span><span class="chip">row 215 (a game as a decision task) todo</span><span class="chip">Clef fine-tune parked</span><span class="chip">Modal bills for rows 216–239 not yet in</span></div>
 </header>
+
+<section>
+  <div class="eyebrow">Results · the owner's budget</div>
+  <h2>Where each model stands</h2>
+  <p>The owner's budget on decider's 19,093 matched items (5,832 of them first-time payees). Aggregates only. Two seeds where two values are given; each bar sits at their mean.</p>
+  <div class="chart">
+    <div class="legend"><span><i class="sw" style="background:var(--bar2)"></i>top-1, all transactions</span><span><i class="sw" style="background:var(--bar)"></i>top-1, first-time payees</span></div>
+    <div class="bars">
+      <div class="bname">decider-4B, v5 households<small>§202 · top-10 90.3 / 90.6</small></div>
+      <div class="track"><div class="b all" style="width:76.5%"></div><span class="bv all" style="left:calc(76.5% + 6px)">72.5 / 73.4</span><div class="b ft" style="width:24.0%"></div><span class="bv ft" style="left:calc(24.0% + 6px)">56.6 / 57.8</span></div>
+      <div class="bname">EmbeddingGemma 2, two towers (g2cos)<small>§210 · L40S, 3,000 steps · top-10 92.4 / 92.5</small></div>
+      <div class="track"><div class="b all" style="width:71.0%"></div><span class="bv all" style="left:calc(71.0% + 6px)">71.3 / 71.3</span><div class="b ft" style="width:14.8%"></div><span class="bv ft" style="left:calc(14.8% + 6px)">54.5 / 54.4</span></div>
+      <div class="bname">EmbeddingGemma 2, two towers (g2h)<small>§212 · H100, 1,500 steps, 15 min · top-10 92.5</small></div>
+      <div class="track"><div class="b all" style="width:70.3%"></div><span class="bv all" style="left:calc(70.3% + 6px)">71.1</span><div class="b ft" style="width:16.3%"></div><span class="bv ft" style="left:calc(16.3% + 6px)">54.9</span></div>
+      <div class="bname">EmbeddingGemma 2, unsloth LoRA<small>§211 · LR 1e-4 / 2e-4, one seed each</small></div>
+      <div class="track"><div class="b all" style="width:71.5%"></div><span class="bv all" style="left:calc(71.5% + 6px)">71.3 / 71.6</span><div class="b ft" style="width:10.2%"></div><span class="bv ft" style="left:calc(10.2% + 6px)">53.0 / 53.1</span></div>
+      <div class="bname">fcr / Gemma blend<small>§212 · weights chosen on v5; not pursued</small></div>
+      <div class="track"><div class="b all" style="width:70.7%"></div><span class="bv all" style="left:calc(70.7% + 6px)">71.2</span><div class="b ft" style="width:10.3%"></div><span class="bv ft" style="left:calc(10.3% + 6px)">53.1</span></div>
+      <div class="bname">Ettin-32M on v6b households<small>§206 · routing per payee</small></div>
+      <div class="track"><div class="b all" style="width:71.2%"></div><span class="bv all" style="left:calc(71.2% + 6px)">71.3 / 71.4</span><div class="b ft" style="width:7.3%"></div><span class="bv ft" style="left:calc(7.3% + 6px)">51.9 / 52.5</span></div>
+      <div class="bname">Ettin-32M fcr (li_r227_fcr)<small>§198 · 1.9 ms a transaction · top-10 90.4</small></div>
+      <div class="track"><div class="b all" style="width:69.5%"></div><span class="bv all" style="left:calc(69.5% + 6px)">70.8 / 70.9</span><div class="b ft" style="width:6.5%"></div><span class="bv ft" style="left:calc(6.5% + 6px)">52.1 / 51.8</span></div>
+    </div>
+    <div class="axis"><div></div><div class="ticks"><span style="left:0">50</span><span style="left:33.3%">60</span><span style="left:66.7%">70</span><span style="left:100%">80</span></div></div>
+    <p class="note">Axis starts at 50%. Single-seed gaps of 1–2 points on the owner's budget are noise; the two Gemma seeds agree to 0.1. §212 gives 54.6 for the L40S Gemma model's first-time payees; §210's two seeds read 54.5 / 54.4.</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>model</th><th>top-1</th><th>top-3</th><th>top-5</th><th>top-10</th><th>first-time top-1 / top-3</th><th>section</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B v5, seed 0 / seed 1</td><td class="n">72.5 / 73.4</td><td class="n">84.1 / 84.7</td><td class="n">87.0 / 87.8</td><td class="n">90.3 / 90.6</td><td class="n">56.6 / 71.7; 57.8 / 72.6</td><td>§202, §210</td></tr>
+      <tr><td>EmbeddingGemma 2 two towers, seed 0</td><td class="n">71.3</td><td class="n">83.7</td><td class="n">87.7</td><td class="n">92.4</td><td class="n">54.5 / 70.6</td><td>§210</td></tr>
+      <tr><td>EmbeddingGemma 2 two towers, seed 1</td><td class="n">71.3</td><td class="n">84.1</td><td class="n">87.8</td><td class="n">92.5</td><td class="n">54.4 / 71.4</td><td>§210</td></tr>
+      <tr><td>EmbeddingGemma 2 two towers, H100 1,500 steps</td><td class="n">71.1</td><td class="n">83.9</td><td class="n">—</td><td class="n">92.5</td><td class="n">54.9 / —</td><td>§212</td></tr>
+      <tr><td>EmbeddingGemma 2 multi-vector (MaxSim)</td><td class="n">70.5</td><td class="n">83.6</td><td class="n">87.4</td><td class="n">91.8</td><td class="n">54.3 / 70.5</td><td>§210</td></tr>
+      <tr><td>Ettin-32M fcr</td><td class="n">70.8</td><td class="n">81.9</td><td class="n">85.7</td><td class="n">90.4</td><td class="n">52.1 / 66.3</td><td>§198, §210</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
 <section>
   <div class="eyebrow">The approach</div>
   <h2>How it files a transaction</h2>
-  <div class="diagram" role="img" aria-label="Diagram: the transaction and its nearest past filings are encoded as tokens, matched by MaxSim against each category's document, and a softmax over the household's categories gives the decision.">
+  <div class="diagram" role="img" aria-label="Diagram: the transaction, a crowd line and its nearest and most recent past filings are encoded as tokens, matched by MaxSim against each category's document, and a softmax over the household's categories gives the decision.">
     <div class="col">
-      <div class="lab">query: the transaction + its nearest past filings (a1)</div>
-      <div class="toks"><span class="tok hit">uber</span><span class="tok">eats</span><span class="tok hit">cracker</span><span class="tok hit">barrel</span><span class="tok">|</span><span class="tok">$18.40</span><span class="tok">|</span><span class="tok">wed</span></div>
-      <div class="toks"><span class="tok hist">cracker barrel $14 → takeout &amp; restaurants</span><span class="tok hist">wendy's $31 → takeout &amp; restaurants</span><span class="tok hist">uber eats little caesars $33 → expenses</span></div>
+      <div class="lab">query (fcr): the transaction + crowd line + its 12 nearest earlier filings, dated + the 8 most recent filings</div>
+      <div class="toks"><span class="tok hit">uber</span><span class="tok">eats</span><span class="tok hit">cracker</span><span class="tok hit">barrel</span><span class="tok">|</span><span class="tok">$18.40</span><span class="tok">|</span><span class="tok">wed</span><span class="tok">| others: takeout (31)</span></div>
+      <div class="toks"><span class="tok hist">cracker barrel $14 → takeout &amp; restaurants 9d ago</span><span class="tok hist">wendy's $31 → takeout &amp; restaurants 20d ago</span><span class="tok hist">recent: aldi $22 → grocery shopping 1d ago</span></div>
       <div class="lab">invented example from a synthetic household</div>
     </div>
     <div class="op"><span class="big">MaxSim</span>each query token finds its best match in each category's tokens; average, × a learned temperature</div>
     <div class="col">
-      <div class="lab">one document per category, rebuilt daily from filings before today (probabilities illustrative)</div>
+      <div class="lab">one document per category, rebuilt daily from filings before today; a hidden category stays an option until a year after its last use (probabilities illustrative)</div>
       <div class="doc win"><div class="row"><b>Everyday Expenses: Takeout &amp; restaurants</b><span class="p">p = 0.81</span></div><div class="toks"><span class="tok hit">cracker barrel $14</span><span class="tok">wendy's $31</span><span class="tok">auntie anne's $46</span></div></div>
       <div class="doc"><div class="row"><b>Everyday Expenses: Grocery shopping</b><span class="p">0.07</span></div><div class="toks"><span class="tok">aldi $22</span><span class="tok">safeway $94</span><span class="tok">sprouts $127</span></div></div>
       <div class="doc"><div class="row"><b>Everyday Expenses: Expenses</b><span class="p">0.05</span></div><div class="toks"><span class="tok hit">uber eats little caesars $33</span></div></div>
     </div>
   </div>
   <div class="steps">
-    <div class="step"><b>Encode once, reuse all day</b><span>Category documents and past filings are encoded once per day and shared by every transaction that day. Only the short query is new.</span></div>
+    <div class="step"><b>Encode once, reuse all day</b><span>Category documents are encoded once per day and shared by every transaction that day. Only the query is new.</span></div>
     <div class="step"><b>Score every option at once</b><span>Like Clef and decider, every visible category gets a score in one pass; a softmax over the household's own options is the decision.</span></div>
-    <div class="step"><b>Trained as a decision</b><span>Cross-entropy plus a Brier term (Clef's calibration loss), not a retrieval loss, so its probabilities can gate auto-filing.</span></div>
-    <div class="step"><b>Two ways to see the whole history</b><span>a1 puts the nearest past filings in the query; a5 makes each past filing its own candidate and sums each category's probability (BELXTR's MML).</span></div>
+    <div class="step"><b>Trained as a decision</b><span>Cross-entropy plus a Brier term. Override episodes teach it that a household's filings beat a payee's name, and hidden history-row labels supervise about 76 more answers per step.</span></div>
+    <div class="step"><b>Two towers for a pretrained base</b><span>With EmbeddingGemma 2 the query and each category get one pooled vector each, compared by cosine. That beat MaxSim with this base (71.3 against 70.5), since it was pretrained for one vector.</span></div>
   </div>
+  <p class="note">fcr's recipe (§198 decider remaining training lessons in the late-interaction model): Ettin-encoder-32M after a knowledge and alias stage; 200 v5 training households; override 0.1; hidden labels 0.15; crowd line; 3,000 steps; 1,024 tokens. The Gemma models train on the same data and recipe (§210 EmbeddingGemma 2 as the encoder).</p>
 </section>
 
 <section>
-  <div class="eyebrow">Results · synthetic</div>
-  <h2>Row 210 against the best plain encoder</h2>
-  <p>Every transaction of 50 held-out synthetic households: 359,050 transactions, 53,479 of them first-time payees. Single seed per arm.</p>
+  <div class="eyebrow">How we got here</div>
+  <h2>What moved the owner's number</h2>
+  <p>The encoder family's best reading of the owner's budget after each change, on decider's 19,093 items. On 2026-10-05 the best model had not yet been read there.</p>
   <div class="chart">
-    <div class="legend"><span><i class="sw" style="background:var(--bar2)"></i>top-1, all transactions</span><span><i class="sw" style="background:var(--bar)"></i>top-1, first-time payees</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--bar2)"></i>top-1, encoder family</span><span><i class="sw" style="background:var(--led)"></i>decider-4B v5, for reference</span></div>
     <div class="bars">
-      <div class="bname">a1 · past filings in the query<small>Brier 0.368 · calibration error 4.0%</small></div>
-      <div class="track"><div class="b all" style="width:83.3%"></div><span class="bv all" style="left:calc(83.3% + 6px)">75.0</span><div class="b ft" style="width:41.7%"></div><span class="bv ft" style="left:calc(41.7% + 6px)">62.5</span></div>
-      <div class="bname">a5 · each past filing a candidate<small>Brier 0.369 · calibration error 1.7%</small></div>
-      <div class="track"><div class="b all" style="width:83.0%"></div><span class="bv all" style="left:calc(83.0% + 6px)">74.9</span><div class="b ft" style="width:40.0%"></div><span class="bv ft" style="left:calc(40.0% + 6px)">62.0</span></div>
-      <div class="bname">kNN · best plain encoder<small>row 202, b5 (= the old encoder)</small></div>
-      <div class="track"><div class="b all" style="width:81.7%"></div><span class="bv all" style="left:calc(81.7% + 6px)">74.5</span><div class="b ft" style="width:33.3%"></div><span class="bv ft" style="left:calc(33.3% + 6px)">60.0</span></div>
-      <div class="bname">MaxSim · best plain encoder<small>top-10 95.9%</small></div>
-      <div class="track"><div class="b all" style="width:78.0%"></div><span class="bv all" style="left:calc(78.0% + 6px)">73.4</span><div class="b ft" style="width:30.7%"></div><span class="bv ft" style="left:calc(30.7% + 6px)">59.2</span></div>
-      <div class="bname">a0 · one document per category<small>last 8 payees only</small></div>
-      <div class="track"><div class="b all" style="width:52.7%"></div><span class="bv all" style="left:calc(52.7% + 6px)">65.8</span><div class="b ft" style="width:35.0%"></div><span class="bv ft" style="left:calc(35.0% + 6px)">60.5</span></div>
+      <div class="bname">c0, bge-small, history query<small>§187 first read beside decider</small></div>
+      <div class="track one"><div class="b all" style="width:23.6%"></div><span class="bv all" style="left:calc(23.6% + 6px)">60.9</span></div>
+      <div class="bname">options fix: hidden categories offered<small>§189 · c0 63.3, a5 (bare query)</small></div>
+      <div class="track one"><div class="b all" style="width:47.2%"></div><span class="bv all" style="left:calc(47.2% + 6px)">66.8</span></div>
+      <div class="bname">override training (o1)<small>§190 · same query 59.5 → 66.9</small></div>
+      <div class="track one"><div class="b all" style="width:47.6%"></div><span class="bv all" style="left:calc(47.6% + 6px)">66.9</span></div>
+      <div class="bname">Ettin-32M base (ekmv)<small>§191</small></div>
+      <div class="track one"><div class="b all" style="width:54.2%"></div><span class="bv all" style="left:calc(54.2% + 6px)">68.9 / 68.2</span></div>
+      <div class="bname">hidden history-row labels (h15)<small>§193 · trips +17 on synthetic</small></div>
+      <div class="track one"><div class="b all" style="width:55.6%"></div><span class="bv all" style="left:calc(55.6% + 6px)">69.0 / 68.8</span></div>
+      <div class="bname">trained on v5 households (v5o)<small>§197</small></div>
+      <div class="track one"><div class="b all" style="width:61.8%"></div><span class="bv all" style="left:calc(61.8% + 6px)">70.5 / 70.4</span></div>
+      <div class="bname">crowd line, 1,024 tokens (fcr)<small>§198</small></div>
+      <div class="track one"><div class="b all" style="width:63.4%"></div><span class="bv all" style="left:calc(63.4% + 6px)">70.8 / 70.9</span></div>
+      <div class="bname">EmbeddingGemma 2 base, two towers<small>§210</small></div>
+      <div class="track one"><div class="b all" style="width:65.2%"></div><span class="bv all" style="left:calc(65.2% + 6px)">71.3 / 71.3</span></div>
+      <div class="bname">decider-4B v5<small>§202</small></div>
+      <div class="track one"><div class="b all ref" style="width:71.8%"></div><span class="bv all" style="left:calc(71.8% + 6px)">72.5 / 73.4</span></div>
     </div>
-    <div class="axis"><div></div><div class="ticks"><span style="left:0">50</span><span style="left:33.3%">60</span><span style="left:66.7%">70</span><span style="left:100%">80</span></div></div>
-    <p class="note">Axis starts at 50%. a1 and a5 lift top-10 to 96.4–96.9% (kNN 91.9%). Soft interaction, the hybrid score and learned token weights on top of a0 all landed within ±0.8 of it.</p>
+    <div class="axis"><div></div><div class="ticks"><span style="left:0">55</span><span style="left:20%">60</span><span style="left:40%">65</span><span style="left:60%">70</span><span style="left:80%">75</span><span style="left:100%">80</span></div></div>
+    <p class="note">Axis starts at 55%. Two values are two seeds, with the bar at their mean. v6b households (routing per payee, §206 v6 households) also reach 71.3 / 71.4 on Ettin-32M.</p>
   </div>
 </section>
 
 <section>
   <div class="eyebrow">Keeping it fair</div>
   <h2>Against decider, at matched effort</h2>
-  <p>On the owner's budget (21,238 transactions; aggregates only). decider has had about 150 PLAN rows of tuning; the encoder family a handful. Encoder scores here are the plain encoders; row 210's models have not been read on the owner's budget yet.</p>
+  <p>decider has had about 150 PLAN rows of tuning; the encoder family about thirty (rows 210–239). Owner's budget, aggregates only.</p>
   <div class="tw"><table>
-    <thead><tr><th>model</th><th>tuning</th><th>top-1</th><th>first-time payees</th></tr></thead>
+    <thead><tr><th>model</th><th>tuning</th><th>items</th><th>top-1</th><th>first-time payees</th></tr></thead>
     <tbody>
-      <tr><td>decider-4B, untrained</td><td>none (older prompt format)</td><td class="n">52.4</td><td class="n">23.6</td></tr>
-      <tr><td>decider-4B, first trained recipe</td><td>early recipe</td><td class="n">68.3</td><td class="n">37.8</td></tr>
-      <tr><td>History encoders, MaxSim / kNN (§177)</td><td>a few rows, synthetic data only</td><td class="n">69.6 / 68.4</td><td class="n">—</td></tr>
-      <tr><td>decider-4B, tuned (r190 G)</td><td>~150 rows</td><td class="n">73.8</td><td class="n">57.3</td></tr>
+      <tr><td>decider-4B, first trained recipe (§156 The recommended system on real data)</td><td>early recipe</td><td class="n">21,238</td><td class="n">68.3</td><td class="n">37.8</td></tr>
+      <tr><td>decider-4B, tuned, 75% REAL-6 + 25% v4 (r190 G)</td><td>~150 rows</td><td class="n">21,238 / 19,093</td><td class="n">73.8 / 73.4; 72.5</td><td class="n">56.9</td></tr>
+      <tr><td>decider-4B, tuned, 75% REAL-6 + 25% v5</td><td>+ v5 households</td><td class="n">19,093</td><td class="n">72.5 / 73.4</td><td class="n">56.6 / 57.8</td></tr>
+      <tr><td>decider-4B, 100% v5, no REAL-6</td><td>one seed</td><td class="n">19,093</td><td class="n">73.2</td><td class="n">58.3</td></tr>
+      <tr><td>Ettin-32M fcr</td><td>~25 rows</td><td class="n">19,093</td><td class="n">70.8 / 70.9</td><td class="n">52.1 / 51.8</td></tr>
+      <tr><td>EmbeddingGemma 2, two towers</td><td>fcr's recipe, new base</td><td class="n">19,093</td><td class="n">71.3 / 71.3</td><td class="n">54.5 / 54.4</td></tr>
     </tbody>
   </table></div>
-  <p class="note">On decider's exact items (§182), decider leads the plain encoders by 2–3 points on synthetic households and about 4 on the owner's budget over the encoder's own categories, widest on first-time payees (56.9 vs 45.9). Rows 210–212 aim at that gap.</p>
+  <p class="note">§202 decider at matched effort on v5 households and without REAL-6: REAL-6 is not decider's advantage, and v5 households lift decider by 0.5 against the encoder's 1.5. For payees filed before, fcr is within 0.5 of decider (Gemma 78.6, fcr 79.1, §212). The gap is first-time payees: 5–6 points for fcr, 2.7 for Gemma (§210).</p>
 </section>
 
 <section>
   <div class="eyebrow">What we learned</div>
-  <h2>Findings so far</h2>
+  <h2>Findings since row 215</h2>
   <div class="findings">
-    <div class="f"><span class="k">What it sees &gt; how it scores</span><p>Giving the model the household's full history (a1, a5) gained 9 points over a fixed category summary. Every scoring tweak from the papers (soft interaction, hybrid, token weights) moved less than 1.</p><span class="ref">row 210</span></div>
-    <div class="f"><span class="k">Training fixes: no effect</span><p>Pinterest's fixes (dedup, payee cap, household softmax) left the encoder within 0.3. They solve web-scale catalogue problems a 30–60 category household does not have. logQ cost first-time payees 4 points.</p><span class="ref">§182 Encoder training fixes from the papers</span></div>
-    <div class="f"><span class="k">1.7% calibration error</span><p>The per-filing model (a5) is the best-calibrated reader we have: when it says 90% it is right about 90% of the time, which is what auto-filing needs.</p><span class="ref">row 210</span></div>
-    <div class="f"><span class="k">Errors overlap</span><p>Where decider is wrong, an encoder is right only about one time in five, so simple fusion gains little (+0.3). The encoders' immediate value is cost: filing confident, history-rich cases without the 4B model.</p><span class="ref">§180 Where decider and encoders disagree</span></div>
-    <div class="f"><span class="k">Updates, not batch size</span><p>Eight households per step trained 16× faster but lost 1.5 points; 3,000 steps with eight households matches Modal's run (74.9 vs 75.0) in 7 minutes on the 3090, at no cost.</p><span class="ref">row 210 speed checks</span></div>
-    <div class="f"><span class="k">0.16 ms per transaction</span><p>Scoring a household's ~8,700 transactions takes about 1.4 seconds on the 3090, roughly 150× faster than decider's 24.7 ms per item on an H100.</p><span class="ref">row 202</span></div>
+    <div class="f"><span class="k">Payees move</span><p>On the owner's budget, when a payee's usual category is wrong, its latest filing is right 43% of the time; in our v4 households it was 18%. v5 households with moves, churn and projects rank ten arms as the owner's budget does (rank correlation 0.83, from 0.04).</p><span class="ref">§196 A better stand-in for real data</span></div>
+    <div class="f"><span class="k">+7.4 from override training</span><p>Moving a household's payees to another category, consistently, teaches the model that history beats names. The same query read 59.5 without it and 66.9 with it. It was the largest single lever.</p><span class="ref">§190 decider training lessons on the late-interaction model</span></div>
+    <div class="f"><span class="k">A better stand-in trains a better model</span><p>Training on v5 households instead of v4 added 1.5 on the owner's budget, over two seeds that agree within 0.1. decider gained only 0.5 from the same switch.</p><span class="ref">§197 Training on v5 households · §202</span></div>
+    <div class="f"><span class="k">+6 from the crowd line</span><p>Other households' filings for the payee lift first-time payees by 6 where a crowd exists. Trained with dropout, it costs nothing where none exists. The owner's budget has no real crowd, so it cannot show the gain.</p><span class="ref">§198 decider remaining training lessons</span></div>
+    <div class="f"><span class="k">Knowledge goes in, not out</span><p>A knowledge stage raises held-out kind recall from 3 to 65%, but history training spends it. Distillation from decider keeps real merchant names (+3 to +7 on rational households) without moving the owner's first-time payees. So do kind lines (+6) and cold-start examples (no change).</p><span class="ref">§191, §192, §194, §208</span></div>
+    <div class="f"><span class="k">+2.4 on first-time payees</span><p>Using EmbeddingGemma 2 as the base is the first change to reach the owner's first-time payees: 54.5 / 54.4 against fcr's 52.1 / 51.8, and +4–5 at top-3. Synthetic sets do not show it.</p><span class="ref">§210 EmbeddingGemma 2 as the encoder</span></div>
+    <div class="f"><span class="k">Size alone did not pay</span><p>Ettin-150M, ModernBERT-base and Ettin-400M know more merchants (+9 to +10 on new rational merchants for 400M) but tie the 32M model on the owner's budget (70.4–70.6). The Ettin-1B option scorer reads it at 39.3.</p><span class="ref">§199 Larger encoder bases · §205</span></div>
+    <div class="f"><span class="k">Names vs repeats</span><p>On first purchases decider reads names 10–13 points better than fcr (93.6 against 80.7 for obviously named merchants). fcr matches repeat purchases better (97–98 against 86–95). Category synonyms cost fcr nothing.</p><span class="ref">§207 Payee and category synonyms</span></div>
+    <div class="f"><span class="k">Busy categories are mostly right</span><p>Discounting categories by their use helps rational first purchases by at most 2 points. On the owner's first-time payees it costs 2 to 50 points: the pull toward busy categories is learned, and mostly right.</p><span class="ref">§209 The busy-category correction</span></div>
+    <div class="f"><span class="k">Matching aggregates is not enough</span><p>v6 households match the owner's realness aggregates. Only routing per payee holds on the owner's budget (+0.5 over two seeds). More new merchants cost 2 points there. Generated data has given what it can.</p><span class="ref">§206 v6 households</span></div>
+    <div class="f"><span class="k">v5 misranks first-time readers</span><p>v5 households put fcr above Gemma on first-time payees (67.0 against 66.2); the owner's budget puts it the other way (52.1 against 54.6). A blend weighted on v5 therefore gained nothing (71.2).</p><span class="ref">§212 EmbeddingGemma 2 on an H100, and the fcr / Gemma blend</span></div>
+    <div class="f"><span class="k">What the model sees is enough</span><p>Longer, structured queries, options inside the input (GLiClass), per-filing candidates on Ettin, empty categories, evidence-free episodes and 6,000 steps all stay within noise. Several also slow the read.</p><span class="ref">§195, §198, §201, §203</span></div>
   </div>
+</section>
+
+<section>
+  <div class="eyebrow">Row by row</div>
+  <h2>What rows 215–239 taught</h2>
+  <div class="tw"><table>
+    <thead><tr><th>row</th><th>question</th><th>result</th><th>section</th><th>outcome</th></tr></thead>
+    <tbody>
+      <tr><td class="n">215</td><td>A game as a multiple-choice decision task</td><td>Design written; not started</td><td>—</td><td><span class="tag t-todo">todo</span></td></tr>
+      <tr><td class="n">216</td><td>Late-interaction model on decider's own items</td><td>Synthetic: 71.7 against 72.8. Owner: 60.9–64.6 against 72.5, behind on often-filed payees too. 15–20× faster</td><td>§187 The late-interaction decision model beside decider</td><td><span class="tag t-bad">transfer gap</span></td></tr>
+      <tr><td class="n">217, 220</td><td>decider's history slice; blind_v2 budgets and rational households</td><td>Options fix (+2.2). Dated recent rows: synthetic trips 16 → 58%, but every history token cost on the owner's budget. Rational households trust names over filings</td><td>§189 decider history slice and two new test sets</td><td><span class="tag t-yes">options fix kept</span></td></tr>
+      <tr><td class="n">218</td><td>decider's training lessons</td><td>Override training: owner 59.5 → 66.9, rational 98 → 99.7%. Renames, more households and payee prior add little</td><td>§190</td><td><span class="tag t-yes">override kept</span></td></tr>
+      <tr><td class="n">219</td><td>Cheapest Modal GPU</td><td>L40S: 0.113 s a step, ~$0.18 per 3,000 steps</td><td>§188 The cheapest Modal GPU for the small encoder models</td><td><span class="tag t-yes">L40S default</span></td></tr>
+      <tr><td class="n">221</td><td>Masked history-row labels</td><td>Synthetic trips 39 → 56 (two seeds); owner 68.9, noise</td><td>§193 Masked history-row labels</td><td><span class="tag t-yes">kept (0.15)</span></td></tr>
+      <tr><td class="n">222</td><td>Ettin-encoder-32M base</td><td>Owner 68.5 over two seeds, about 2 above bge-small</td><td>§191 A small modern base: Ettin-encoder-32M</td><td><span class="tag t-yes">new base</span></td></tr>
+      <tr><td class="n">223</td><td>Distilling decider</td><td>Rational new merchants +3 to +7; owner's first-time payees unchanged</td><td>§192 Distilling decider into the late-interaction model</td><td><span class="tag t-no">not kept</span></td></tr>
+      <tr><td class="n">212</td><td>Kind lines from a lookup</td><td>Rational new +6; owner 69.0 against 68.9</td><td>§194 Kind lines in the late-interaction model</td><td><span class="tag t-no">option only</span></td></tr>
+      <tr><td class="n">224</td><td>Per-filing candidates on Ettin</td><td>Owner 68.5; 6× training time</td><td>§195 Per-filing candidates on Ettin</td><td><span class="tag t-no">not pursued</span></td></tr>
+      <tr><td class="n">225</td><td>A better stand-in for real data</td><td>v5 households; rank correlation 0.04 → 0.83</td><td>§196 A better stand-in for real data</td><td><span class="tag t-yes">v5 the judge</span></td></tr>
+      <tr><td class="n">226</td><td>Train on v5</td><td>Owner 70.5 / 70.4 (from 69.0 / 68.8)</td><td>§197 Training on v5 households</td><td><span class="tag t-yes">kept</span></td></tr>
+      <tr><td class="n">227</td><td>decider's remaining lessons</td><td>Crowd line +6 on first-time payees where a crowd exists; fcr 70.8 / 70.9</td><td>§198 decider remaining training lessons in the late-interaction model</td><td><span class="tag t-yes">fcr recipe</span></td></tr>
+      <tr><td class="n">209</td><td>Larger encoder bases</td><td>Know more merchants; owner 70.4–70.6 on v5 training</td><td>§199 Larger encoder bases</td><td><span class="tag t-no">option only</span></td></tr>
+      <tr><td class="n">230</td><td>Speed for longer queries and larger encoders</td><td>H100 needs FlashAttention (sdpa ~7× slower)</td><td>§200 Speed for longer queries and larger encoders</td><td><span class="tag t-yes">infra</span></td></tr>
+      <tr><td class="n">229</td><td>A structured, longer query</td><td>v5 74.3 / 73.8 against 74.8</td><td>§201 A structured, longer query</td><td><span class="tag t-no">not kept</span></td></tr>
+      <tr><td class="n">231</td><td>decider at matched effort on v5</td><td>72.5 → 73.0; no REAL-6 73.2; gap 2.2–2.4</td><td>§202 decider at matched effort on v5 households and without REAL-6</td><td><span class="tag t-yes">fair baseline</span></td></tr>
+      <tr><td class="n">228</td><td>Options inside the encoder's input</td><td>+0.6–0.8 synthetic (one seed), trips −2 to −8, 2–4× read time</td><td>§203 Options inside the encoder's input</td><td><span class="tag t-no">parked</span></td></tr>
+      <tr><td class="n">164 (a)</td><td>Clef-flash zero-shot</td><td>v5 34.4, rational 45.4 (fcr 75.8 / 89.0); 70 ms a transaction</td><td>§204 Clef-flash zero-shot</td><td><span class="tag t-no">parked</span></td></tr>
+      <tr><td class="n">232</td><td>Ettin-1B option scorer on the owner's budget</td><td>39.3 (8,192 tokens: 42.5)</td><td>§205 The Ettin-1B option scorer on the owner's budget</td><td><span class="tag t-no">closed</span></td></tr>
+      <tr><td class="n">233</td><td>v6 households</td><td>Routing per payee +0.5 (71.3 / 71.4); new merchants from the whole pool −1.2 to −2.2</td><td>§206 v6 households</td><td><span class="tag t-no">within noise</span></td></tr>
+      <tr><td class="n">234</td><td>Payee and category synonyms</td><td>Obvious invented names 80–83% on a first purchase; obvious category synonyms cost nothing; decider +10 to +13 on first purchases</td><td>§207 Payee and category synonyms on the rational households</td><td><span class="tag t-yes">measured</span></td></tr>
+      <tr><td class="n">235</td><td>Cold-start training examples</td><td>First purchases unchanged everywhere (owner 51.2–51.9 against 52.1)</td><td>§208 Cold-start training examples</td><td><span class="tag t-no">no gain</span></td></tr>
+      <tr><td class="n">237</td><td>The busy-category correction</td><td>Owner's first-time payees −2 to −50</td><td>§209 The busy-category correction</td><td><span class="tag t-bad">hurts</span></td></tr>
+      <tr><td class="n">236</td><td>EmbeddingGemma 2 as the encoder</td><td>Two towers: owner 71.3 (two seeds), first-time 54.5 / 54.4, top-10 above decider</td><td>§210 EmbeddingGemma 2 as the encoder</td><td><span class="tag t-yes">best encoder</span></td></tr>
+      <tr><td class="n">238</td><td>EmbeddingGemma 2 under unsloth</td><td>Full fine-tune under unsloth goes to NaN. LoRA: owner 71.3 / 71.6, first-time 53.0 / 53.1. Not faster per step</td><td>§211 EmbeddingGemma 2 under unsloth</td><td><span class="tag t-no">full fine-tune stays</span></td></tr>
+      <tr><td class="n">239</td><td>Gemma on an H100; the fcr / Gemma blend</td><td>H100, 15 min: 71.1 / first-time 54.9. Blend 71.2</td><td>§212 EmbeddingGemma 2 on an H100, and the fcr / Gemma blend</td><td><span class="tag t-yes">H100 recipe</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">Speed and cost</div>
+  <h2>Per transaction and per training run</h2>
+  <div class="tw"><table>
+    <thead><tr><th>model</th><th>parameters</th><th>read, ms a transaction</th><th>per million transactions</th><th>training</th></tr></thead>
+    <tbody>
+      <tr><td>decider-4B (vLLM, prefix cache, split layout)</td><td>~4B + rank-64 LoRA</td><td class="n">10–13 (H100); ~45 on one-a-day households</td><td class="n">$11–14</td><td>800 LoRA steps, 75–78 min a seed on an H100</td></tr>
+      <tr><td>Ettin-32M fcr</td><td>~32M</td><td class="n">1.88 (H100, flash) · 2.04 (L40S) · 2.5 (RTX 3090)</td><td class="n">~$2</td><td>3,000 steps at 0.14 s a step on an L40S; a screening job ~15–19 min with shared prep</td></tr>
+      <tr><td>Ettin-400M</td><td>~400M</td><td class="n">3.35 (H100, flash) · 8.4 (L40S)</td><td class="n">~$3.70</td><td>0.41 s a step on an H100 with flash (0.89 on an L40S with checkpointing)</td></tr>
+      <tr><td>EmbeddingGemma 2, two towers</td><td>271M text tower</td><td class="n">3.9 (H100) · 16 (L40S) · 25 (RTX 3090)</td><td class="n">—</td><td>H100: 1,500 steps, 15 min, 0.60 s a step. L40S: 3,000 steps, 64 min</td></tr>
+      <tr><td>Clef-flash, zero-shot</td><td>9B backbone</td><td class="n">70.2 (H100, sdpa)</td><td class="n">—</td><td>untrained</td></tr>
+      <tr><td>Ettin-1B option scorer</td><td>1B</td><td class="n">109–163 (RTX 3090)</td><td class="n">—</td><td>§104 recipe</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Read times from §200 Speed for longer queries and larger encoders, §204, §205, §210 and §212; cost per million from §200 at about $4 an H100-hour. Gemma has no per-million figure in the report; at the same rate, 3.9 ms comes to about $4 (arithmetic, not a measured bill). Row costs in the report are estimates until Modal bills the day: row 239 about $1.50–2, row 236 about $10, row 231 (decider on v5) about $16; most owner reads ran on the local RTX 3090 at $0.</p>
+  <div class="tw"><table>
+    <thead><tr><th>bottleneck</th><th>before</th><th>after</th><th>section</th></tr></thead>
+    <tbody>
+      <tr><td>GPU for the 33M model</td><td class="n">RTX 3090, 0.264 s a step</td><td class="n">L40S, 0.113 s; ~$0.18 per 3,000 steps</td><td>§188</td></tr>
+      <tr><td>ModernBERT / Ettin on an H100</td><td class="n">sdpa, 2.7 s a step</td><td class="n">FlashAttention, 0.35 s</td><td>§200</td></tr>
+      <tr><td>Data preparation per job</td><td class="n">14–17 min</td><td class="n">2.6 min (shared prep job, DATA_FROM)</td><td>§206, §208</td></tr>
+      <tr><td>Neighbour pass tokenising</td><td class="n">Python tokenizer</td><td class="n">Rust tokenizer, 5×</td><td>§206</td></tr>
+      <tr><td>Synthetic reads</td><td class="n">every transaction</td><td class="n">every 5th, 2.7× faster (74.9 vs 75.0)</td><td>§206</td></tr>
+      <tr><td>EmbeddingGemma 2 training</td><td class="n">64 min, L40S, checkpointing</td><td class="n">15 min, H100, none</td><td>§212</td></tr>
+      <tr><td>unsloth for EmbeddingGemma 2</td><td class="n">1.32 s a step</td><td class="n">1.49 s (not a speed-up)</td><td>§211</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section>
@@ -172,48 +295,34 @@ ol.next li::marker{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
   <div class="tw"><table>
     <thead><tr><th>paper</th><th>lesson</th><th>where it went</th><th>outcome</th></tr></thead>
     <tbody>
-      <tr><td>BELXTR</td><td>Learnable temperature; each name its own candidate with an MML loss</td><td>row 210 scale, arm a5</td><td><span class="tag t-yes">matched best, best calibrated</span></td></tr>
-      <tr><td>XTR</td><td>Keep the query short; score every option, no cut-off</td><td>arm a1 vs a0, full scoring</td><td><span class="tag t-yes">history in the query won</span></td></tr>
-      <tr><td>UWE</td><td>Soft late interaction beat hard MaxSim on short texts</td><td>arm a2</td><td><span class="tag t-no">no change</span></td></tr>
-      <tr><td>SMART</td><td>Add the whole-text vector to MaxSim</td><td>arm a3</td><td><span class="tag t-no">no change</span></td></tr>
-      <tr><td>Weighted Chamfer</td><td>Learned query-token weights</td><td>arm a4</td><td><span class="tag t-no">no change</span></td></tr>
-      <tr><td>PinnerFormer, OmniSage, OmniSearchSage</td><td>logQ, random negatives, dedup, caps</td><td>row 202</td><td><span class="tag t-bad">logQ −4 first-time; pool arm collapsed (open bug)</span></td></tr>
-      <tr><td>TransAct V2, UniPinRec</td><td>Household's own categories as negatives; joint loss</td><td>row 202 b4, b5</td><td><span class="tag t-no">within noise</span></td></tr>
-      <tr><td>KaLM-Reranker, TransAct</td><td>Light cross-attention over cached tokens; history memory; options see each other</td><td>row 211</td><td><span class="tag t-run">training now</span></td></tr>
-      <tr><td>LITE, mxbai-edge</td><td>Distil a stronger teacher; residual 64-dim head; Ettin needs ~1.8× lr</td><td>rows 209, 212</td><td><span class="tag t-todo">queued</span></td></tr>
+      <tr><td>BELXTR</td><td>Learnable temperature; each name its own candidate with an MML loss</td><td>a5, mdo, emdo (§185, §190, §195)</td><td><span class="tag t-no">best calibrated; no gain on Ettin</span></td></tr>
+      <tr><td>XTR</td><td>Keep the query short; score every option, no cut-off</td><td>a1 vs a0; longer queries (§201)</td><td><span class="tag t-yes">12 + 8 rows are enough</span></td></tr>
+      <tr><td>UWE, SMART, Weighted Chamfer</td><td>Soft interaction, whole-text vector, learned token weights</td><td>arms a2–a4 (§185)</td><td><span class="tag t-no">no change</span></td></tr>
+      <tr><td>PinnerFormer, OmniSage, OmniSearchSage</td><td>logQ, random negatives, dedup, caps</td><td>§182</td><td><span class="tag t-bad">logQ −4 first-time</span></td></tr>
+      <tr><td>KaLM-Reranker, TransAct</td><td>Cross-attention over cached tokens; memory tokens</td><td>row 211 (§185)</td><td><span class="tag t-no">noise; calibration slightly better</span></td></tr>
+      <tr><td>LITE, ColBERT-Zero</td><td>Distil a stronger teacher; contrastive then distillation</td><td>§191, §192</td><td><span class="tag t-no">real names +3 to +7; owner no</span></td></tr>
+      <tr><td>mxbai-edge-colbert</td><td>Ettin-based ColBERT as the start</td><td>arm mx (§191)</td><td><span class="tag t-no">67.4, below raw Ettin</span></td></tr>
+      <tr><td>GLiClass</td><td>Options in the same sequence as the query</td><td>jt0, jt3 (§203)</td><td><span class="tag t-no">within noise, 2–4× slower</span></td></tr>
+      <tr><td>Clef</td><td>A general decision model over options</td><td>zero-shot (§204)</td><td><span class="tag t-todo">fine-tune parked</span></td></tr>
+      <tr><td>ContextGNN</td><td>Pair-wise score where history reaches, tower score beyond</td><td>fcr / Gemma blend (§212)</td><td><span class="tag t-no">no gain</span></td></tr>
+      <tr><td>EmbeddingGemma 2, unsloth's recipe</td><td>A language model's knowledge in an embedding base; LoRA fine-tuning</td><td>§210, §211, §212</td><td><span class="tag t-yes">best encoder; LoRA keeps less</span></td></tr>
     </tbody>
   </table></div>
-</section>
-
-<section>
-  <div class="eyebrow">Iteration speed</div>
-  <h2>Making the loop faster</h2>
-  <div class="tw"><table>
-    <thead><tr><th>bottleneck</th><th>before</th><th>after</th></tr></thead>
-    <tbody>
-      <tr><td>Row 210 arm training (a1)</td><td class="n">17 min, Modal H100</td><td class="n">7 min, local 3090, $0</td></tr>
-      <tr><td>Synthetic household generation</td><td class="n">0.43 s each</td><td class="n">0.011 s (disk cache)</td></tr>
-      <tr><td>Triplet mining per training arm</td><td class="n">~2.5 min</td><td class="n">~1 s (cache)</td></tr>
-      <tr><td>Neighbour preparation, 200 households</td><td class="n">~4.5 min</td><td class="n">37 s (cache)</td></tr>
-      <tr><td>Comparison against decider, 8 encoders</td><td class="n">~20 min</td><td class="n">~2–3 min (one run)</td></tr>
-      <tr><td>Row 210 scoring</td><td class="n">one transaction at a time</td><td class="n">batched, identical scores</td></tr>
-    </tbody>
-  </table></div>
-  <p class="note">The small model is launch-bound on an H100: tiny batches waste the GPU. Modal is now kept for the 150M+ encoders, where large batches fill it.</p>
 </section>
 
 <section>
   <div class="eyebrow">Next</div>
-  <h2>Steps to fold in what we learned</h2>
+  <h2>What is still open</h2>
   <ol class="next">
-    <li><b>Row 211, interaction layers: done, no gain.</b> Cross-attention, memory tokens and a listwise layer scored 75.4–75.5 against the control's 75.7 (63.4 first-time) after the same extra training; calibration slightly better (2.7–3.1% vs 3.4%). The control, a1 trained longer, is the family's best model (§185 The late-interaction decision model). Row 204's prototypes also lost to MaxSim over every filing (§183).</li>
-    <li><b>Compare row 210–211's best on decider's exact items</b> on synthetic households, then read the owner's budget once with two seeds, at matched effort.</li>
-    <li><b>Row 205, crowd names in the text</b> ("… | others: Groceries, Household"). A one-household smoke test lifted first-time payees from 47 to 56 without retraining.</li>
-    <li><b>Row 212, world knowledge</b> from the merchant database and open-licence Overture places: knowledge pretraining (kind recall 37 → 56% in a CPU smoke), lookup lines trained with realistic wrong-match rates, lookups as memory tokens, the 35B as teacher.</li>
-    <li><b>Row 209, a scaling curve</b> from 33M to 4B (all 16 candidate bases pass the licence check) on the winning head, read by segment to see where size pays.</li>
-    <li><b>Distil decider</b> into the late-interaction model (LITE: the teacher mattered more than the scorer), and try a LITE-style learned scorer.</li>
-    <li><b>Housekeeping:</b> fix the collapsed random-negative arm; batch the per-filing model (100 min per arm on Modal); row 204's prototype read is on Modal now.</li>
+    <li><b>Real data for first-time payees.</b> Generated data has given what it can on these measures (§206), and v5 misranks first-time readers (§212). More real budgets would let first-time choices be made off the owner's budget, which must stay a test set. They would also allow distillation from decider's reads of real budgets (§192).</li>
+    <li><b>A real crowd.</b> The crowd line is worth +6 on first-time payees where a crowd exists (§198). Only YNAB's own users' filings can test it on a real budget.</li>
+    <li><b>EmbeddingGemma 2 on the 15-minute H100 recipe.</b> Still untested: a lower learning rate or a frozen lower half, to overwrite less of the base. Untrained, it reads obvious names at 74% from the name alone; trained with history, it reads them at 80%, like fcr (§210). Also untested: a second seed of the H100 model.</li>
+    <li><b>Route first-time payees.</b> decider for first-time payees and fcr for the rest would read 72.4 against decider alone's 73.0, with decider on 31% of transactions (§208). Whether Gemma for the rest closes that gap has not been read.</li>
+    <li><b>Better lookups, not a better model, for kind lines.</b> On the owner's budget the lookups are the limit (§194). Row 160's payee resolution is the lever.</li>
+    <li><b>Auto-filing threshold.</b> Fit the chosen model's read temperature and set its auto-file rule by expected cost (§118 Scoring by expected cost). Distillation showed calibration can move (§192).</li>
+    <li><b>Parked:</b> fine-tuning Clef (row 164 (b), §204); a second seed of options-in-the-input (§203); Ettin-400M, the strongest model where merchants are known (§199); row 215, a game as a decision task.</li>
+    <li><b>Housekeeping:</b> exact Modal costs for rows 216–239 from <code>scripts/modal_costs.py</code> once Modal bills those days. The last report run is from 2026-10-05.</li>
   </ol>
-  <p class="note">Everything on this page is single-seed unless stated. Choices are made on synthetic households and confirmed on the owner's budget once. Report sections: §177 History-aware encoders, §180 Where decider and encoders disagree, §181 Faster runs: training and reads, §182 Encoder training fixes from the papers; row 210's section is pending.</p>
+  <p class="note">Choices are made on synthetic households and confirmed on the owner's budget once, with two seeds before anything there is called a gain. Report sections: §187–§212, titles as in <code>reports/report_titles.tsv</code>; earlier background in §177 History-aware encoders, §180 Where decider and encoders disagree, §182 Encoder training fixes from the papers and §185 The late-interaction decision model.</p>
 </section>
 </main>
