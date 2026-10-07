@@ -66,6 +66,9 @@ def acc(a, b, w_seen, w_first, first=None):
 
 
 def main():
+    import faulthandler
+    import signal
+    faulthandler.register(signal.SIGUSR1)  # kill -USR1 <pid> prints every thread's stack to the log (py-spy needs root here)
     names = [os.environ.get("A", "li_r227_fcr"), os.environ.get("B", "li_r236_g2cos")]
     a_, z_ = map(int, os.environ.get("TEST_SEEDS", "100000-100019").split("-"))
     os.environ.setdefault("READ_EVERY", "5")
