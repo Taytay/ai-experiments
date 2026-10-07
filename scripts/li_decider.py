@@ -180,7 +180,12 @@ class Enc(H2.ColBERT):
         # transformers 5.5): ModernBERT / Ettin then unpad variable-length batches. On the RTX 3090, 32 queries of 400-2,500 tokens: 0.50 s
         # forward + backward against sdpa's 0.81, 3.0 GB against 3.9; every token within cosine 0.9997 of the sequence read alone.
         attn = os.environ.get("ATTN", "")
-        self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
+        if train and os.environ.get("LOADER") == "unsloth":  # row 238 (owner, 2026-10-07: unsloth for EmbeddingGemma 2; "I want faster
+            from unsloth import FastSentenceTransformer  # training"): unsloth's kernels, bf16 weights; 1.8x the steps / s at half the
+            st = FastSentenceTransformer.from_pretrained(str(path), max_seq_length=MAXLEN or 1024, full_finetuning=True)  # memory on the 3090
+            self.tok, self.enc = st.tokenizer, st[0].auto_model.to(self.dev)  # (fcr's step shape); run under scripts/unsloth_run.py
+        else:
+            self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
         if not hasattr(self.enc.config, "hidden_size") and hasattr(self.enc, "language_model"):  # row 236: EmbeddingGemma 2's text tower
             self.enc = self.enc.language_model  # (271M of its 740M; vision and audio towers dropped)
         hid = getattr(self.enc.config, "embedding_dim", None) or self.enc.config.hidden_size  # EmbeddingGemma 2: 768 out of a 512-wide body
