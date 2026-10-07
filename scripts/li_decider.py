@@ -19,6 +19,7 @@ usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/l
 """
 import hashlib
 import json
+import math
 import os
 import random
 from array import array
@@ -1403,6 +1404,14 @@ def load(arm):
         out = iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)
         if torch.cuda.is_available():
             torch.cuda.synchronize()
+        tau = float(os.environ.get("FREQ_TAU", "0"))  # row 237 (owner, 2026-10-07: "I do want to try to fix the frequency thing"): on a
+        if tau:  # first-time payee, each category's score less tau * log(1 + its filings so far): fcr picked the household's busiest category
+            cnt = defaultdict(int)  # on 45.8% of first purchases where it was right on 33.5% (rational households, §207). Events in date
+            for e, sc in zip(ev, out):  # order; READ_EVERY samples skip filings, so read it on whole budgets
+                if not e.get("seen", True):
+                    for c in sc:
+                        sc[c] -= tau * math.log1p(cnt[c])
+                cnt[e["gold"]] += 1
         run.prep += t1 - t0; run.score += time.time() - t1; run.n += len(ev)
         run.qlen += [len(x) for x in model.cb.tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
         return ev, out
