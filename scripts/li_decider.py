@@ -62,9 +62,14 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, JM=3, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, JM=3, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ", COLD=0.0, COLDDOC=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
+# row 235 (owner, 2026-10-06: "Let's try to inject knowledge in fcr to have it get better at new payees. Perhaps we show it examples where
+# there is no history?"): a share COLD of training queries keeps the transaction line alone (no history rows), so the payee's name must be
+# matched to the category documents; of those, a share COLDDOC also sees each document as its category name alone ("nothing filed
+# yet", as a new budget), so the name must be matched to the category's name (training only)
+COLD, COLDDOC = float(os.environ.get("COLD", "0")), float(os.environ.get("COLDDOC", "0"))
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
@@ -782,7 +787,13 @@ def _materialise(e, names=None, rng=None):
         i, ev = e["_i"], e["_ev"]
         js = list(e.get("nb", [])[:NB]) + ([j for j in range(e["_start"][i] - 1, max(-1, e["_start"][i] - 1 - REC), -1)] if REC else [])
         hide = {j for j in js if rng.random() < HMASK}
-    q = _query(e["_i"], e["_ev"], e["_start"], names, hide, spans)
+    cold = COLD and rng is not None and rng.random() < COLD
+    if cold:  # row 235: no history rows (the crowd / kind lines, part of the transaction line, stay)
+        q, spans = e["_ev"][e["_i"]]["text"], []
+        if COLDDOC and rng.random() < COLDDOC:
+            return dict(e, q=q, hid=[], d={c: _doc(lab(c), ()) for c in e["state"]})
+    else:
+        q = _query(e["_i"], e["_ev"], e["_start"], names, hide, spans)
     return dict(e, q=q, hid=[(a, z, e["_ev"][j]["gold"]) for a, z, j in spans], d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
 
 

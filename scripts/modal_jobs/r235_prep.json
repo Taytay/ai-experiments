@@ -1,0 +1,38 @@
+[
+ {
+  "tag": "r235-prep",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data",
+   "PLAN_ROWS": "235",
+   "ROW": "235",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "1024",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "9e-5",
+   "LOWER": "1",
+   "RCHUNK": "64",
+   "BASE": "models/encoders/know_r212_e_kmv",
+   "ENCODERS_FROM": "enc-base,r222-kmv",
+   "ARM": "prep",
+   "ARMS": "",
+   "HMASK": "0.15",
+   "HLW": "1",
+   "RS_V5": "1",
+   "CROWD": "1",
+   "SAVE_DATA": "1"
+  },
+  "cmds": [
+   "TEST_SEEDS=100000-100019 uv run --frozen python scripts/li_decider.py prep"
+  ]
+ }
+]
