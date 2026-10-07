@@ -1362,3 +1362,27 @@ concepts from other users' earlier filings; mapped onto each test user's own cat
 other-users line ("Other users file this payee as: <the user's own category> (count)"); first-time payees above all.
 
 **Status (2026-09-30):** PLAN step 150, REPORT.md 145: no-model mapped profile 52% right first / 70% top-3 on first-time payees; decider reads raw names better than the mapped line; train on real filings, keep the raw line, profiles as fallback.
+## Added 2026-10-07: the review of rows 1-239 (`reports/review_2026-10-07/index.html`)
+
+**EVAL-16 A fixed scorecard that keeps a running tally.** Owner (2026-10-07): "I love having a fixed scorecard that keeps a running
+tally. Make sure the scorecard has model size, training speed/cost, as well as inference speed/cost." Readers have been compared on
+different item sets (21,238 or 19,093 transactions), option sets and GPUs, and single-seed systems sit beside two-seed models. *Experiment:*
+PLAN row 240: one generated table (model, parameters, base and licence; training GPU, minutes and dollars; inference latency, throughput
+and dollars; accuracy on fixed items with seeds and month-block bootstrap intervals) that every later row appends to.
+
+**INFRA-4 Serving as production will run it.** Owner (2026-10-07): fewer transactions per request than a sync (little batching), an
+always-on GPU behind an API, and re-inference of a user's pending transactions when they file something, above all their very first
+filing. §120's 10.2 ms per transaction is a batched best case. *Experiment:* in row 240's scorecard, single-request latency, transactions
+per always-on GPU-hour, dollars per million at that utilisation, and the cost of re-scoring a user's pending transactions after a filing.
+
+**EVAL-17 Auto-filing with a guaranteed error rate.** Auto-file coverage (66% / 45% / 10-16% at 90 / 95 / 98% precision) used thresholds
+chosen on the same budget; §116 showed thresholds do not transfer. *Experiment:* PLAN row 241: conformal risk control (error on auto-filed
+rows at most alpha), first-time payees guaranteed separately, batch calibration, conformal suggestion sets; plus a gradient-boosted
+classical baseline and a similarity-gated cascade, never tried.
+
+**EVAL-18 How much of the remaining error is knowable.** There is no ceiling on real data. *Experiment:* PLAN row 242: the owner labels
+300 sampled misses (knowable / needs item data / purpose or person / label noise / acceptable alternative), privately; aggregates only.
+
+**REAL-29 Real users other than the owner.** Every real-data claim rests on one budget, now a development set. *Experiment:* PLAN row 243:
+MoneyData (MoneyVis, EuroVis 2023; CC BY 4.0) as a second real user, read with no tuning; and a dress rehearsal of a multi-user,
+sealed-test pipeline on synthetic users, ready for consenting budgets.
