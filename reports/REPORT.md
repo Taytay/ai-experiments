@@ -12256,4 +12256,35 @@ Read locally (`scripts/chains/r234_rational.sh`).
 - About 20% of obvious first purchases are still missed: by construction these are kind -> category mappings with no history for the
   merchant (coffee shops under the restaurants category, an events box office under fun); not broken down here.
 
-**Cost:** $0 (local RTX 3090, 17 minutes).
+**Table 207.2: decider-4B (v5 adapter, §202) on the same households (owner: "What does decider do with that budget?"), and two more
+payee versions (owner: "all of the payees have been seen in training"): `RATIONAL_PAYEES=seen`, each merchant replaced by one of the same
+kind that fcr's training households bought from 3+ times (pets: the training pool). decider read as on the owner's budget (SIM=2,
+GROUPNAMES=1) but one prompt each, 16 a pass (`scripts/rational_decider.py`, H100; every first purchase and every 8th repeat; the six
+versions frozen in `data/processed/rational_variants_v1.json`, DVC). % right first, new / known**
+
+| payees | categories | fcr | v6p | decider-4B |
+|---|---|---|---|---|
+| held-out real names | as named | 58.8 / 97.3 | 62.8 / 97.7 | **70.7** / 86.5 |
+| held-out real names | obvious synonyms | 59.5 / 97.1 | 62.6 / 97.6 | **68.0** / 85.7 |
+| seen in training | as named | 60.8 / 97.7 | 67.6 / 98.1 | **72.8** / 89.9 |
+| seen in training | obvious synonyms | 60.3 / 97.7 | 66.3 / 98.1 | **70.0** / 89.6 |
+| invented, obvious | as named | 80.7 / 97.4 | 82.0 / 98.3 | **93.6** / 94.6 |
+| invented, obvious | obvious synonyms | 81.2 / 97.3 | 82.8 / 98.2 | **92.0** / 95.0 |
+
+### 207.2 What the second table says
+
+- **decider transfers names much better on a first purchase** (+10 to +13 over fcr everywhere): 93-94% on obviously named merchants,
+  where fcr stops at 81. Its 4B of language knowledge reads "Maplewood Home Mortgage" as a mortgage; the 32M encoder misses whole kinds
+  on a cold start (fcr's misses on the obvious names: utilities 2% right first, chosen as the gas category half the time ("Natural Gas
+  Company" is a template of this row that is ambiguous by construction) and otherwise as the busy categories; pets 49%, cinemas and
+  events 50%, parking 52%; restaurants, bars, coffee 93-96%; `scripts/rational_misses.py`).
+- **fcr matches repeat purchases better** (97-98 against decider's 86-95): each purchase here has a freshly rendered bank string, and
+  fcr's alias-trained encoder ties them together; decider does better on repeats when the names are plain (94.6) than when they are
+  real, varied bank strings (86.5).
+- **Seen-in-training payees help fcr little** (+2) and v6p more (+5): fcr's training filed these merchants under each household's own
+  purposes, which teaches it the household's routing more than the merchant's kind.
+- **Obvious category synonyms cost decider 1.6-2.8 points** on first purchases, fcr nothing.
+- The two models' strengths split by repeat vs first purchase, as on the owner's budget (§202: the gap is first-time payees).
+
+**Cost:** fcr / v6b / v6p reads $0 (local RTX 3090, 23 minutes); decider six H100 jobs of 8-9 minutes plus a stopped launch (split
+layout, 2 items/s): roughly $3-4; exact figures from `scripts/modal_costs.py --rows 234` once Modal bills the day.
