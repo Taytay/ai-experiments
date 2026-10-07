@@ -223,6 +223,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §208 Cold-start training examples (row 235)
 - §209 The busy-category correction (row 237)
 - §210 EmbeddingGemma 2 as the encoder (row 236)
+- §211 EmbeddingGemma 2 under unsloth (row 238)
 
 <!-- END SECTION INDEX -->
 
@@ -12401,3 +12402,35 @@ Read time: 16 ms a transaction on an L40S (query tokens median 475), 25 ms on th
 
 **Cost:** three L40S jobs (two arms of 108 minutes, the second seed of about 80): roughly $10; exact figures from `scripts/modal_costs.py --rows 236`
 once Modal bills the day. Probes and owner reads local ($0).
+
+## 211. EmbeddingGemma 2 under unsloth: full fine-tuning trains to NaN, unsloth's LoRA recipe trains cleanly; LoRA reads synthetic sets better than the full fine-tune (v5 76.3-77.0 against 75.3, rational first purchases 62.6 against 58.2) and the owner's budget level at top-1 (71.3 / 71.6 against 71.3) but lower on first-time payees and the top-k (53.0 / 53.1 against 54.5; top-10 91.0-91.5 against 92.4); not faster per step on an L40S
+
+PLAN step 238 (owner, 2026-10-07: "That article I sent recommended unsloth to fine tune it"; "Read this and the accompanying material
+please"; "No need for full fine tuning"). unsloth's releases cap transformers at 5.17, EmbeddingGemma 2 needs 5.18+; `uv run --with` and
+UV_OVERRIDE cannot lift the cap, a script's own `[tool.uv] override-dependencies` can (`scripts/unsloth_run.py`, transformers pinned to the
+commit unsloth's EmbeddingGemma 2 notebook installs). Full fine-tuning through FastSentenceTransformer (bf16 or fp32 masters, either
+checkpointing) gives non-finite layer-norm gradients at step 1 and NaN losses; unsloth's documented recipe (unsloth.ai/docs/models/
+embeddinggemma-2: the text-only `unsloth/embeddinggemma-2`, Apache-2.0; LoRA r 32 / alpha 64 on all projections; its checkpointing; the
+notebook's LR 2e-5 for a 30-step demo) trains cleanly in li_decider (`LOADER=unsloth UNSLOTH_LORA=32`, adapters merged at save so reads
+need no peft). Row 236's two-tower recipe, LR 1e-4 and 2e-4, one seed each, L40S.
+
+**Table 211.1: % right first (owner: 19,093 items, top-1 / 3 / 5 / 10)**
+
+| model | v5 all / first-time / trips (sampled) | rational new (real) | owner | owner first-time top-1 / top-3 | s a step (L40S) |
+|---|---|---|---|---|---|
+| fcr | 75.8 / 67.1 / 46.2 | 58.8 | 70.8 / 81.9 / 85.7 / 90.4 | 52.1 / 66.3 | 0.14 |
+| EmbeddingGemma 2 two towers, full fine-tune (§210, 2 seeds) | 75.3 / 66.2 / 35.3 | 58.2 | 71.3 / 83.7-84.1 / 87.7-87.8 / 92.4-92.5 | 54.5 / 70.6; 54.4 / 71.4 | 1.32 |
+| + unsloth LoRA r 32, LR 1e-4 | 76.3 / 67.9 / 42.1 | 62.6 | 71.3 / 83.0 / 86.8 / 91.5 | 53.0 / 68.5 | 1.49 at step 200; 1.07 over the run |
+| + unsloth LoRA r 32, LR 2e-4 | 77.0 / 68.9 / 49.1 | 62.6 | 71.6 / 82.8 / 86.5 / 91.0 | 53.1 / 68.1 | 1.07 over the run |
+
+### 211.1 What the step says
+
+- **LoRA keeps more of the base's behaviour on generated data** (+1-2 on v5, +4 on the rational households' first purchases, trips
+  recovered) and **less of the owner's gain**: first-time payees 1.4 points and the top-10 1 point below the full fine-tune, top-1 level.
+  One seed each; the full fine-tune's two seeds agreed to 0.1.
+- **unsloth is not a speed-up here:** 1.49 s a step at step 200 against 1.32, 54 minutes for 3,000 steps against 64 (LoRA's optimizer is
+  small; the forward and backward over ~12,000 query tokens a step are the cost). On the RTX 3090 it fits where plain transformers did not.
+- The full fine-tune stays the EmbeddingGemma 2 recipe for the owner's budget; LoRA is the cheaper option if memory is the limit.
+
+**Cost:** two L40S jobs of 79-80 minutes, two stopped launches (~8 minutes): roughly $5-6; exact figures from `scripts/modal_costs.py --rows 238`
+once Modal bills the day. Owner reads local ($0).
