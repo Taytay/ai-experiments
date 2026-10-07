@@ -76,7 +76,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);paddin
 <section id="verdict" class="verdict" aria-label="Verdict">
   <p><strong>The science questions are mostly answered.</strong> For personal, purpose-defined categories, the household's own behaviour, found by retrieval, beats merchant facts stored in the weights. The training data matters more than the architecture. First-time payees are where a model earns its keep: YNAB's rule gets none of them right; the best models get about 57%.</p>
   <p><strong>The weak point is that there is one real user.</strong> Every real-data claim rests on the owner's budget, which has now been read about 80 times and used to design the synthetic data. It has become a development set. Another point of accuracy on it is worth less than the first measurement on anyone else's budget.</p>
-  <p><strong>The encoder race is close to done.</strong> The cheap encoders (fcr, EmbeddingGemma 2) sit 1.5–2 points behind decider-4B, mostly on first-time payees. At a million users decider costs about $1.6–2k a month to serve, so speed is not what holds the product back; real-user accuracy and trustworthy auto-filing are.</p>
+  <p><strong>The encoder race is close to done.</strong> The cheap encoders (fcr, EmbeddingGemma 2) sit 1.5–2 points behind decider-4B, mostly on first-time payees. With a GPU kept running behind an API, serving cost is set mostly by how many GPUs stay on, not by the model; even unbatched, one H100 scores decider-4B at about 25 ms a transaction, roughly 3.5M a day. Speed is not what holds the product back; real-user accuracy and trustworthy auto-filing are.</p>
 </section>
 
 <section id="goal">
@@ -113,7 +113,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);paddin
       <tr><td>fcr: Ettin-32M late interaction with the crowd line</td><td class="n">70.8 / 70.9</td><td class="n">52.1 / 51.8</td><td class="n">81.9</td><td><span class="pill est">2</span></td><td>1.9 ms on an H100, about $2 per million</td></tr>
       <tr class="ref"><td>Ettin-1B option scorer (§205)</td><td class="n">39.3</td><td class="n">28.2</td><td class="n">—</td><td><span class="pill one">1</span></td><td>109 ms</td></tr>
     </tbody></table></div>
-  <p class="note">At a million users and about 145 outflows a month each, decider-4B costs roughly $1.6–2k a month to serve and fcr about $300. Modal billed $1,571 from 2026-09-25 to 2026-10-05. Rows 216–239 still carry estimated cost lines; the exact figures come once Modal bills each day.</p>
+  <p class="note">Serving (owner, 2026-10-07): about 1M new transactions a day, small requests with little batching, an always-on GPU behind an API, and re-inference of a user's pending transactions after they file something. §120 measured decider-4B in vLLM at 10.2 ms a transaction batched with a shared prefix and 24–28 ms one request at a time, so one always-on H100 (about $4 an hour on Modal, about $2.9k a month) covers 1M a day with room for re-inference and peaks; fcr reads at 1.9 ms and EmbeddingGemma 2 at 3.9 ms. Row 240's scorecard measures single-request latency and always-on cost directly. Modal billed $1,571 from 2026-09-25 to 2026-10-05. Rows 216–239 still carry estimated cost lines; the exact figures come once Modal bills each day.</p>
 </section>
 
 <section id="learned">
