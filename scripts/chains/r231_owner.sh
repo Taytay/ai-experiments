@@ -3,7 +3,7 @@
 # items, Modal private scoring: nothing kept there), then % right first for v4 (r190-g) and v5 (r231-dv5) seeds side by side (aggregates).
 set -u
 cd "$(dirname "$0")/../.."
-export BUDGET=${BUDGET:-96c06c41-f26f-4a44-98ed-eaba2f471e1e} SIM=2 GROUPNAMES=1
+export BUDGET=${BUDGET:-$(cat ~/.config/ynab/budget_id)} SIM=2 GROUPNAMES=1
 P=decider_decider-4b_none_h100bf16st800
 Q=_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_oth50_aux100_labrand255_laylabelled_shots_ev10soft_rs25v5g_lora
 for spec in ":r231-dv5-s0" "s1:r231-dv5-s1"; do

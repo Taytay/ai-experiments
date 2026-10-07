@@ -4,7 +4,7 @@
 # then % right first beside decider (v4 tuned r190-g, v5 r231-dv5) on the same items, overall and first-time payees.
 set -u
 cd "$(dirname "$0")/../.."
-BUDGET=${BUDGET:-96c06c41-f26f-4a44-98ed-eaba2f471e1e}
+BUDGET=${BUDGET:-$(cat ~/.config/ynab/budget_id)}
 D="$HOME/.local/share/ynab-real-eval/$BUDGET"
 ENC=${ENC:-encmask_ettin1b_st3000_h100fresh_f0_decnone_h100fresh_emp20_f0_ren50_dbep50_mislead_v1_alt10s_lk10_ov10_odb20_short15_kinds20_ev10soft}
 TAG=${TAG:-enc1b-s0}

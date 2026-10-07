@@ -1,0 +1,6 @@
+outs:
+- md5: a10ed703993fc4a622cc53d3d2e80844.dir
+  size: 134378586
+  nfiles: 8
+  hash: md5
+  path: li_r219_gpu_l40s

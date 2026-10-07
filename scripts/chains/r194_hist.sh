@@ -4,7 +4,7 @@
 # budget (private; aggregates only), fused with decider G4 (r190, seeds 0 and 1).
 set -eu
 cd "$(dirname "$0")/../.."
-export SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 BUDGET=96c06c41-f26f-4a44-98ed-eaba2f471e1e
+export SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 BUDGET=${BUDGET:-$(cat ~/.config/ynab/budget_id)}
 F='Failed to load|warn|Loading|it/s\]|example/s'
 uv run python scripts/hist_encoder.py train1 2>&1 | grep --line-buffered -vE "$F" | tail -3
 uv run python scripts/hist_encoder.py train3 2>&1 | grep --line-buffered -vE "$F" | tail -3

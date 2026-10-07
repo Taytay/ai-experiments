@@ -1,0 +1,6 @@
+outs:
+- md5: 4b9c3734439fe4cc31ea002948cd1724.dir
+  size: 1583263830
+  nfiles: 8
+  hash: md5
+  path: li_r229_bench_e400_fl_l40s

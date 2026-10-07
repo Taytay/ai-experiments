@@ -69,7 +69,7 @@ A fresh agent starts here, then reads the research agenda at the end of `reports
   the repo only as generic kinds (no names of people, health, therapy, legal, childcare, income, tax or charity detail).
   - Data: fetched with the YNAB skill (`~/projects/Taytay/taytays_stuff/.claude/skills/ynab`, built; token in `~/.config/ynab/token`,
     mode 0600, use as `YNAB_ACCESS_TOKEN="$(cat ~/.config/ynab/token)"`, never print it); budget cache `~/.cache/ynab-cli/<budget>.json`;
-    budget id 96c06c41-f26f-4a44-98ed-eaba2f471e1e (the owner's main budget). Items, scores, embeddings, Overture matches:
+    budget id in `~/.config/ynab/budget_id` (0600; chains read it from there) (the owner's main budget). Items, scores, embeddings, Overture matches:
     `~/.local/share/ynab-real-eval/<budget>/` (0600 / 0700). Overture derived tables: `~/projects/YNAB/data/overture/derived/`.
   - Code: `scripts/real_budget_eval.py` (build / score / modal / embed / report; switches SIM=1|2, DESC, PLINE, KIND=new|all, WIDE,
     ONLY_NEW, READER=recipe|zeroshot|big|big-recipe), `scripts/real_budget_system.py` (§141 The final pre-registered blind check's system; DEC / BIG), 
