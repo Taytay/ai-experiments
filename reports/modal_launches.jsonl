@@ -1036,3 +1036,8 @@
 {"utc": "2026-10-07T01:50:05+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c15", "minutes": 18.4}
 {"utc": "2026-10-07T01:50:25+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c15d", "minutes": 18.8}
 {"utc": "2026-10-07T01:50:43+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c30d", "minutes": 19.1}
+{"utc": "2026-10-07T06:53:18+00:00", "app_id": "ap-CbkBpncq32dOaPg4jWwm7c", "kind": "jobs", "what": "r234b", "rows": "234", "gpu": "H100", "tags": ["r234-dec-seenobv"], "job_gpus": {"r234-dec-seenobv": "H100"}}
+{"utc": "2026-10-07T07:02:38+00:00", "app_id": "ap-CbkBpncq32dOaPg4jWwm7c", "kind": "job_done", "tag": "r234-dec-seenobv", "minutes": 9.2}
+{"utc": "2026-10-07T08:17:01+00:00", "app_id": "ap-xleqbGRLWFJFPCxZ9VPOZQ", "kind": "jobs", "what": "r236", "rows": "236", "gpu": "H100", "tags": ["r236-g2cos", "r236-g2mv"], "job_gpus": {"r236-g2cos": "L40S", "r236-g2mv": "L40S"}}
+{"utc": "2026-10-07T10:05:53+00:00", "app_id": "ap-xleqbGRLWFJFPCxZ9VPOZQ", "kind": "job_done", "tag": "r236-g2cos", "minutes": 108.0}
+{"utc": "2026-10-07T10:05:58+00:00", "app_id": "ap-xleqbGRLWFJFPCxZ9VPOZQ", "kind": "job_done", "tag": "r236-g2mv", "minutes": 108.1}

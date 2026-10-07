@@ -1,0 +1,45 @@
+[
+ {
+  "tag": "r236-g2cos_s1",
+  "gpu": "L40S",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "DATA_FROM": "r218-cache,r226-cache,r222-data,r235-prep",
+   "PLAN_ROWS": "236",
+   "ROW": "236",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "QFMT": "rows",
+   "MAXLEN": "1024",
+   "OPTS": "span",
+   "OVERRIDE": "0.1",
+   "STEPS": "3000",
+   "LR": "3e-5",
+   "LOWER": "0",
+   "RCHUNK": "64",
+   "BASE": "google/embeddinggemma-2",
+   "ENCODERS_FROM": "enc-base",
+   "ARM": "g2cos_s1",
+   "ARMS": "li_r236_g2cos_s1",
+   "HMASK": "0",
+   "HLW": "1",
+   "RS_V5": "1",
+   "CROWD": "1",
+   "POOL": "mean",
+   "PREFIX": "1",
+   "QPREFIX": "task: search result | query: ",
+   "DPREFIX": "title: none | text: ",
+   "GC": "1",
+   "HYBRID": "2",
+   "SEED": "1"
+  },
+  "cmds": [
+   "uv run --frozen --with \"sentence-transformers>=6.1.0\" --with \"transformers>=5.18\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/li_decider.py train",
+   "READ_EVERY=5 SPAN_AFTER=365 TEST_SEEDS=100000-100019 uv run --frozen --with \"sentence-transformers>=6.1.0\" --with \"transformers>=5.18\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/li_decider.py read"
+  ]
+ }
+]
