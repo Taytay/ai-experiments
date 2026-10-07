@@ -78,6 +78,6 @@ Each folder holds `paper.txt` (pdftotext extraction), `summary.md`, `meta.json`,
 
 ## Thread 10: recommender graphs and two-tower models (owner, 2026-10-07)
 - [2411.19513](2411.19513/summary.md) - ContextGNN (2024) - pair-wise scores for items in the user's local subgraph, two-tower beyond it, a learned per-user fusion; our known vs first-time payee split
-- [2412.17245](2412.17245/summary.md) - GraphHash (024)) - Louvain clusters of the user-item graph as hash buckets; for us, behaviour clusters of payees across real users
-- [2605.05238](2605.05238/summary.md) - Dynamic Graph with Similarity-Aware Attention Graph Neural Network for Recommender Systems (2026) - four dynamic user-similarity graphs, MovieLens-100K only; weak evidence
-- [2501.01073](2501.01073/summary.md) - Graph Generative Pre-trained Transformer (2025) - autoregressive graph generation; not applicable to categorisation
+- [2412.17245](2412.17245/summary.md) - GraphHash (2024) - Louvain clusters of the user-item graph as hash buckets; for us, behaviour clusters of payees across real users
+- [2605.05238](2605.05238/summary.md) - DG-SA-GNN (2026) - four dynamic user-similarity graphs, MovieLens-100K only; weak evidence
+- [2501.01073](2501.01073/summary.md) - G2PT (2025) - autoregressive graph generation; not applicable to categorisation
