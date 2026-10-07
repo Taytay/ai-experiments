@@ -82,7 +82,7 @@ def main():
     sf = lambda n: sdir / f"{n}_{a_}-{z_}_every{os.environ['READ_EVERY']}.pkl"
     of = lambda n: odir / f"{n}.pkl"
     syn = {n: pickle.loads(sf(n).read_bytes()) for n in names if sf(n).exists()}
-    own = {n: pickle.loads(of(n).read_bytes()) for n in names if of(n).exists() and os.environ.get("BUDGET")}
+    own = {n: pickle.loads(of(n).read_bytes()) for n in names if odir and of(n).exists()}
     for n in names:
         need_s, need_o = "syn" in parts and n not in syn, "own" in parts and n not in own and os.environ.get("BUDGET")
         if not (need_s or need_o):
