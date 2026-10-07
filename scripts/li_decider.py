@@ -182,15 +182,22 @@ class Enc(H2.ColBERT):
         attn = os.environ.get("ATTN", "")
         if train and os.environ.get("LOADER") == "unsloth":  # row 238 (owner, 2026-10-07: unsloth for EmbeddingGemma 2; "I want faster
             from unsloth import FastSentenceTransformer  # training"): unsloth's kernels, bf16 weights; 1.8x the steps / s at half the
-            st = FastSentenceTransformer.from_pretrained(str(path), max_seq_length=MAXLEN or 1024, full_finetuning=True,  # memory on the 3090
-                                                         use_gradient_checkpointing="unsloth" if GC else False,  # its own (the standard one
-                                                         float32_mixed_precision=os.environ.get("UNSLOTH_FP32") == "1")  # gave NaN grads)
-            self.tok, self.enc = st.tokenizer, st[0].auto_model.to(self.dev)  # (fcr's step shape); run under scripts/unsloth_run.py
+            lora = int(os.environ.get("UNSLOTH_LORA", "0"))  # unsloth's EmbeddingGemma 2 recipe (unsloth.ai/docs/models/embeddinggemma-2): the
+            st = FastSentenceTransformer.from_pretrained(  # text-only checkpoint, LoRA r 32 / alpha 64 on all projections, its checkpointing
+                str(path), max_seq_length=MAXLEN or 1024, full_finetuning=not lora, config_kwargs={"vision_config": None, "audio_config": None},
+                **({} if lora else dict(use_gradient_checkpointing="unsloth" if GC else False, float32_mixed_precision=os.environ.get("UNSLOTH_FP32") == "1")))
+            if lora:
+                st = FastSentenceTransformer.get_peft_model(st, r=lora, lora_alpha=2 * lora, lora_dropout=0, bias="none", random_state=3407,
+                                                            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+                                                            use_gradient_checkpointing="unsloth" if GC else False, task_type="FEATURE_EXTRACTION")
+                self._peft = st[0].auto_model  # merged into the base at save()
+            self.tok, self.enc = st.tokenizer, st[0].auto_model.to(self.dev)  # run under scripts/unsloth_run.py
         else:
             self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
         if not hasattr(self.enc.config, "hidden_size") and hasattr(self.enc, "language_model"):  # row 236: EmbeddingGemma 2's text tower
             self.enc = self.enc.language_model  # (271M of its 740M; vision and audio towers dropped)
-        hid = getattr(self.enc.config, "embedding_dim", None) or self.enc.config.hidden_size  # EmbeddingGemma 2: 768 out of a 512-wide body
+        cfg_ = getattr(self.enc.config, "text_config", None) or self.enc.config
+        hid = getattr(cfg_, "embedding_dim", None) or cfg_.hidden_size  # EmbeddingGemma 2: 768 out of a 512-wide body
         lin = torch.nn.Linear(hid if PROJ == "linear" else 2 * hid, PDIM, bias=False)
         if PROJ == "linear":
             self.proj = lin.to(self.dev)
@@ -226,6 +233,21 @@ def _lower(t):
     """LOWER's lowercasing, keeping row 221's mask token and row 228's option marker intact (same length, so character offsets hold)"""
     t = t.lower().replace(MASK_TOK.lower(), MASK_TOK) if HMASK else t.lower()
     return t.replace(MARK.lower(), MARK) if MODE == "joint" else t
+
+
+def _enc_save(self, out):
+    """Enc.save: with unsloth's LoRA (row 238) the adapters merged into the base first, so the saved encoder loads without peft"""
+    import torch
+    if getattr(self, "_peft", None) is not None:
+        merged = self._peft.merge_and_unload()
+        merged = merged.language_model if hasattr(merged, "language_model") else merged
+        merged.save_pretrained(str(out)); self.tok.save_pretrained(str(out))
+        torch.save(self.proj.state_dict(), Path(out) / "proj.pt")
+    else:
+        H2.ColBERT.save(self, out)
+
+
+Enc.save = _enc_save
 
 
 class LI:

@@ -1,6 +1,6 @@
 [
  {
-  "tag": "r238-g2u",
+  "tag": "r238-g2ul",
   "gpu": "L40S",
   "env": {
    "SHARED_WORLD": "1",
@@ -18,13 +18,13 @@
    "OPTS": "span",
    "OVERRIDE": "0.1",
    "STEPS": "3000",
-   "LR": "3e-5",
+   "LR": "1e-4",
    "LOWER": "0",
    "RCHUNK": "64",
-   "BASE": "google/embeddinggemma-2",
+   "BASE": "unsloth/embeddinggemma-2",
    "ENCODERS_FROM": "enc-base",
-   "ARM": "g2u",
-   "ARMS": "li_r238_g2u",
+   "ARM": "g2ul",
+   "ARMS": "li_r238_g2ul",
    "HMASK": "0",
    "HLW": "1",
    "RS_V5": "1",
@@ -35,7 +35,8 @@
    "DPREFIX": "title: none | text: ",
    "GC": "1",
    "HYBRID": "2",
-   "LOADER": "unsloth"
+   "LOADER": "unsloth",
+   "UNSLOTH_LORA": "32"
   },
   "cmds": [
    "uv run --script scripts/unsloth_run.py scripts/li_decider.py train",
@@ -44,7 +45,7 @@
   ]
  },
  {
-  "tag": "r238-g2u_lr1",
+  "tag": "r238-g2ul_lr2",
   "gpu": "L40S",
   "env": {
    "SHARED_WORLD": "1",
@@ -62,13 +63,13 @@
    "OPTS": "span",
    "OVERRIDE": "0.1",
    "STEPS": "3000",
-   "LR": "1e-5",
+   "LR": "2e-4",
    "LOWER": "0",
    "RCHUNK": "64",
-   "BASE": "google/embeddinggemma-2",
+   "BASE": "unsloth/embeddinggemma-2",
    "ENCODERS_FROM": "enc-base",
-   "ARM": "g2u_lr1",
-   "ARMS": "li_r238_g2u_lr1",
+   "ARM": "g2ul_lr2",
+   "ARMS": "li_r238_g2ul_lr2",
    "HMASK": "0",
    "HLW": "1",
    "RS_V5": "1",
@@ -79,7 +80,8 @@
    "DPREFIX": "title: none | text: ",
    "GC": "1",
    "HYBRID": "2",
-   "LOADER": "unsloth"
+   "LOADER": "unsloth",
+   "UNSLOTH_LORA": "32"
   },
   "cmds": [
    "uv run --script scripts/unsloth_run.py scripts/li_decider.py train",
