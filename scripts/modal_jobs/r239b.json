@@ -9,7 +9,7 @@
    "RS_V5": "1",
    "OPTS": "span",
    "DATA_FROM": "r218-cache,r226-cache,r222-data,r235-prep",
-   "ENCODERS_FROM": "r227-fcr,r236-g2cos",
+   "ENCODERS_FROM": "enc-base,r227-fcr,r236-g2cos",
    "PLAN_ROWS": "239",
    "PARTS": "syn",
    "SYN_DIR": "results/blend_r239"
