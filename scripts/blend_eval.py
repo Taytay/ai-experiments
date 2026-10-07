@@ -3,12 +3,15 @@ tower score beyond it): two late-interaction readers blended per transaction, lo
 over the day's options), with one weight for payees seen before and one for first-time payee strings. The weights are chosen on v5
 held-out households (every READ_EVERY-th transaction, the same ones for both readers), then the owner's budget is read once with them
 (decider's 19,093 items, as hist_agree.py; the whole weight grid printed as a diagnostic). Owner's data local, aggregates only.
-env: A (li_r227_fcr), B (li_r236_g2cos), TEST_SEEDS (100000-100019), READ_EVERY (5), BUDGET, DEC_TAGS (r231-dv5-s0,r231-dv5-s1)
+env: A (li_r227_fcr), B (li_r236_g2cos), TEST_SEEDS (100000-100019), READ_EVERY (5), BUDGET, DEC_TAGS (r231-dv5-s0,r231-dv5-s1),
+  PARTS (syn,own: which reads to run; each is saved and reused, so the synthetic reads can run on Modal (PARTS=syn SYN_DIR=results/blend)
+  and the owner's locally (PARTS=own), then a run with PARTS= fuses), SYN_DIR (data/interim/blend; owner reads under the private real_budget_eval.OUT/blend)
 usage (EmbeddingGemma 2 needs the overlay): SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 RS_V5=1 OPTS=span BUDGET=<id> \
   uv run --with "sentence-transformers>=6.1.0" --with "transformers>=5.18" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/blend_eval.py
 """
 import json
 import os
+import pickle
 import sys
 from pathlib import Path
 
@@ -68,21 +71,39 @@ def main():
     os.environ.setdefault("READ_EVERY", "5")
     budgets = list(households("test", range(a_, z_ + 1)))
     out1 = H.OUT1
-    syn, own = {}, {}
-    for n in names:  # one reader at a time: LD.load sets module settings the reader's run reads
+    parts = os.environ.get("PARTS", "syn,own").split(",")
+    sdir = Path(os.environ.get("SYN_DIR", "data/interim/blend"))
+    odir = None
+    sdir.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("BUDGET"):  # real_budget_eval needs BUDGET; the owner's reads stay in its private folder
+        import real_budget_eval as RB
+        odir = RB.OUT / "blend"
+        odir.mkdir(parents=True, exist_ok=True)
+    sf = lambda n: sdir / f"{n}_{a_}-{z_}_every{os.environ['READ_EVERY']}.pkl"
+    of = lambda n: odir / f"{n}.pkl"
+    syn = {n: pickle.loads(sf(n).read_bytes()) for n in names if sf(n).exists()}
+    own = {n: pickle.loads(of(n).read_bytes()) for n in names if of(n).exists() and os.environ.get("BUDGET")}
+    for n in names:
+        need_s, need_o = "syn" in parts and n not in syn, "own" in parts and n not in own and os.environ.get("BUDGET")
+        if not (need_s or need_o):
+            continue
+        # one reader at a time: LD.load sets module settings the reader's run reads
         import gc
         import torch
         LD.SPAN_AFTER = 365
         H.OUT1 = out1
         run = LD.load(n)
-        syn[n] = synthetic(run, budgets)
-        if os.environ.get("BUDGET"):
+        if need_s:
+            syn[n] = synthetic(run, budgets); sf(n).write_bytes(pickle.dumps(syn[n]))
+        if need_o:
             rd = os.environ.pop("READ_EVERY")  # the owner's budget in full
-            own[n] = owner(run, out1)
+            own[n] = owner(run, out1); of(n).write_bytes(pickle.dumps(own[n]))
             os.environ["READ_EVERY"] = rd
         del run  # the next reader needs the GPU (EmbeddingGemma 2 beside fcr ran out of memory on the RTX 3090)
         gc.collect(); torch.cuda.empty_cache()
-        print(f"{n}: {len(syn[n])} synthetic events, {len(own.get(n, []))} owner items", flush=True)
+        print(f"{n}: {len(syn.get(n, []))} synthetic events, {len(own.get(n, []))} owner items", flush=True)
+    if not all(n in syn for n in names):
+        return
     A, B = (syn[n] for n in names)
     assert len(A) == len(B) and all(x[1] == y[1] for x, y in zip(A, B)), "the two readers' synthetic events differ"
     best = {}
