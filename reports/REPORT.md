@@ -224,6 +224,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §209 The busy-category correction (row 237)
 - §210 EmbeddingGemma 2 as the encoder (row 236)
 - §211 EmbeddingGemma 2 under unsloth (row 238)
+- §212 EmbeddingGemma 2 on an H100, and the fcr / Gemma blend (row 239)
 
 <!-- END SECTION INDEX -->
 
@@ -12434,3 +12435,41 @@ need no peft). Row 236's two-tower recipe, LR 1e-4 and 2e-4, one seed each, L40S
 
 **Cost:** two L40S jobs of 79-80 minutes, two stopped launches (~8 minutes): roughly $5-6; exact figures from `scripts/modal_costs.py --rows 238`
 once Modal bills the day. Owner reads local ($0).
+
+## 212. EmbeddingGemma 2 on an H100, and the fcr / Gemma blend
+
+PLAN step 239 (owner, 2026-10-07: "Go for it - 1 and 2"). (a) Row 236's EmbeddingGemma 2 two-tower full fine-tune (`li_r236_g2cos`: L40S,
+gradient checkpointing, 3,000 steps) retrained on an H100 without checkpointing for 1,500 steps (`li_r239_g2h`). (b) ContextGNN's split
+(2411.19513: a pair-wise score where the user's history reaches, a tower score beyond it) without training: fcr and `li_r236_g2cos` blended per
+transaction, log p = w log p_fcr + (1 - w) log p_Gemma, one w for payees seen before and one for first-time payees, both chosen on 20 v5
+held-out households (every 5th transaction, 55,247) and the owner's budget read once with them (`scripts/blend_eval.py`; synthetic reads on
+Modal, `scripts/modal_jobs/r239b.json`, owner reads local, each read saved and reused).
+
+**Table 212.1: owner's budget, 19,093 matched items, % right (top-1 / top-3 / top-10)**
+
+| model | all | first-time payees (5,832) | seen before | train |
+|---|---|---|---|---|
+| decider v5 (row 231, 2 seeds) | 72.5 / 84.1 / 90.3; 73.4 / 84.7 / 90.6 | 56.6; 57.8 | | 75-77 min a seed, H100 |
+| fcr | 70.8 / 81.9 / 90.4 | 52.1 | 79.1 | |
+| Gemma two-tower, L40S 3,000 steps (§210) | 71.3 / 83.7 / 92.4 | 54.6 | 78.6 | 64 min, 1.28 s a step |
+| Gemma two-tower, H100 1,500 steps, no checkpointing | 71.1 / 83.9 / 92.5 | 54.9 | | 15 min, 0.60 s a step |
+| fcr / Gemma blend, w 0.5 seen / 0.8 first-time (chosen on v5) | 71.2 | 53.1 | 79.2 | none |
+
+v5 grid (fcr's weight w, 0 = Gemma only): seen before 77.0 at w 0, 77.9 at 0.5, 77.5 at 1; first-time 66.2 at 0, 67.3 at 0.4-0.8, 67.0 at 1.
+The owner's grid (diagnostic, not for choosing): seen before 78.6 at 0 to 79.3 at 0.8; first-time falls from 54.6 at w 0 to 52.1 at w 1.
+
+### 212.1 What the step says
+
+- **The H100 recipe holds:** half the steps without checkpointing reads the owner's budget as well as row 236's model (71.1 against 71.3,
+  first-time 54.9 against 54.6 / 54.4 for §210's two seeds; v5 74.4, rational households' new merchants 56.9). EmbeddingGemma 2 now trains in
+  15 minutes; this is the recipe for its next rows.
+- **The blend gains nothing:** v5 says fcr is the better first-time reader (67.0 against 66.2), the owner's budget says the reverse (52.1
+  against 54.6), so the weight chosen on v5 costs 1.5 points on first-time payees. With the owner's own best weights (not a fair read) the
+  blend reaches about 71.6, within seed noise of Gemma alone and below decider. Not pursued.
+- **v5 misranks readers on first-time payees:** the generator's payee strings reward history-matching more than knowing what a merchant name
+  means, so v5 cannot tune anything first-time-specific; the owner's real data (and the rational households) are the sets for that.
+- Read times (§210): fcr 1.9 ms a transaction on an H100, Gemma 3.9, decider 10-13 at best (shared day prefixes; ~45 ms on one-a-day
+  households).
+
+**Cost:** one H100 training job (~20 minutes), one H100 synthetic read for the blend (12 minutes) and two failed launches (under 2 minutes):
+roughly $1.50-2; exact figures from `scripts/modal_costs.py --rows 239` once Modal bills the day. Owner reads local ($0).
