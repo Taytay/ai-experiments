@@ -41,7 +41,7 @@ CTX, NB, M = int(os.environ.get("CTX", "0")), int(os.environ.get("NB", "5")), in
 B, WINDOW, STEPS = int(os.environ.get("B", "32")), int(os.environ.get("WINDOW", "7")), int(os.environ.get("STEPS", "3000"))
 HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.environ.get("BRIER", "1")), float(os.environ.get("LR", "5e-5"))
 SEED = int(os.environ.get("SEED", "0"))
-HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
+HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))  # HYBRID=2 (row 236): the pooled cosine alone, MODE=doc only
 GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
 BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))
 FAST_ISCORES, ICHUNK = int(os.environ.get("FAST_ISCORES", "1")), int(os.environ.get("ICHUNK", "128"))  # row 211's vectorised reader  # 0: the per-transaction reader (to check the batched one against)
@@ -181,7 +181,9 @@ class Enc(H2.ColBERT):
         # forward + backward against sdpa's 0.81, 3.0 GB against 3.9; every token within cosine 0.9997 of the sequence read alone.
         attn = os.environ.get("ATTN", "")
         self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
-        hid = self.enc.config.hidden_size
+        if not hasattr(self.enc.config, "hidden_size") and hasattr(self.enc, "language_model"):  # row 236: EmbeddingGemma 2's text tower
+            self.enc = self.enc.language_model  # (271M of its 740M; vision and audio towers dropped)
+        hid = getattr(self.enc.config, "embedding_dim", None) or self.enc.config.hidden_size  # EmbeddingGemma 2: 768 out of a 512-wide body
         lin = torch.nn.Linear(hid if PROJ == "linear" else 2 * hid, PDIM, bias=False)
         if PROJ == "linear":
             self.proj = lin.to(self.dev)
@@ -276,6 +278,8 @@ class LI:
         else:
             s = s.masked_fill(~dm[None, :, None, :], -2).max(-1).values
         s = (s * qw[:, None, :]).sum(-1)
+        if HYBRID == 2:  # row 236 (owner, 2026-10-07: "Either cosine similarity or two towers"): one pooled vector each, cosine only
+            return qc @ dc.T
         return s + qc @ dc.T if HYBRID else s
 
     def save(self, out):
@@ -367,7 +371,9 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     else:
         sim = sim.masked_fill(~dm[:, None, :], -2).max(-1).values
     sc = (sim * qw[ra]).sum(-1)
-    if HYBRID:
+    if HYBRID == 2:
+        sc = (qc[ra] * D[3][rd]).sum(-1)
+    elif HYBRID:
         sc = sc + (qc[ra] * D[3][rd]).sum(-1)
     sc = scale * sc
     S = torch.full((len(anc), nopt), float("-inf"), device=model.dev)
@@ -909,7 +915,9 @@ def _doc_pairs(model, scale, qtexts, dtexts, cols, rows=None):
     else:
         sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
     S = (sim * qw[:, None, :]).sum(-1)
-    if HYBRID:
+    if HYBRID == 2:  # row 236: the two-tower cosine alone (the token similarities still serve HMASK's hidden rows, if on)
+        S = torch.einsum("bh,bch->bc", qc, dc[ix])
+    elif HYBRID:
         S = S + torch.einsum("bh,bch->bc", qc, dc[ix])
     S = (scale * S).masked_fill(~valid, float("-inf"))
     if rows is None:
@@ -1337,7 +1345,9 @@ def scores(model, scale, ev, docs):
                 else:
                     sim = sim.masked_fill(~dm[:, :, None, :], -2).max(-1).values                           # [b, C, t]
                 S = (sim * qw[:, None, :]).sum(-1)
-                if HYBRID:
+                if HYBRID == 2:  # row 236: the two-tower cosine alone
+                    S = torch.einsum("bh,bch->bc", qc, D[3][cix].float())
+                elif HYBRID:
                     S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
                 S = scale * S
                 if PPRIOR:
