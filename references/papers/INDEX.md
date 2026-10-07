@@ -75,3 +75,9 @@ Each folder holds `paper.txt` (pdftotext extraction), `summary.md`, `meta.json`,
 - [2606.22807](2606.22807/summary.md) - KaLM-Reranker-V1 FBNL (preprint 2026) - cached, mean-pooled passage states read by decoder cross-attention: the 0.27B Nano scores 58.54 BEIR at 1/8 the cost of gte-reranker-base (56.77); training at several pooling ratios is essential (53.58 -> 38.57 without); no MaxSim baseline.
 - [2510.14880](2510.14880/summary.md) - mxbai-edge-colbert-v0 (preprint 2025) - 17M/32M Ettin ColBERTs: projection 48-96 flat (0.597-0.599), 32 drops (0.577); residual 2-layer head +1.3; Ettin needs ~1.8x the lr; a saturated teacher distils 3 points worse; answerai-colbert-small-v1 still best on short text (NanoBEIR 0.6545).
 - [2602.16609](2602.16609/summary.md) - ColBERT-Zero (LightOn, 2026) - contrastive phases run in the multi-vector setting beat a KD step on a dense model (BEIR 55.43 vs 54.09); supervised contrastive + KD in ColBERT gets 99.4% of it for a tenth of the compute; keep the base's prompts (dropping them costs). Read 2026-10-06 for rows 222, 209.
+
+## Thread 10: recommender graphs and two-tower models (owner, 2026-10-07)
+- [2411.19513](2411.19513/summary.md) - ContextGNN (2024) - pair-wise scores for items in the user's local subgraph, two-tower beyond it, a learned per-user fusion; our known vs first-time payee split
+- [2412.17245](2412.17245/summary.md) - GraphHash (024)) - Louvain clusters of the user-item graph as hash buckets; for us, behaviour clusters of payees across real users
+- [2605.05238](2605.05238/summary.md) - Dynamic Graph with Similarity-Aware Attention Graph Neural Network for Recommender Systems (2026) - four dynamic user-similarity graphs, MovieLens-100K only; weak evidence
+- [2501.01073](2501.01073/summary.md) - Graph Generative Pre-trained Transformer (2025) - autoregressive graph generation; not applicable to categorisation
