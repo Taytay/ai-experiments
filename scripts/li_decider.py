@@ -767,7 +767,9 @@ def _kindline(b, ev):
             continue
         if e["payee"] not in look:
             r = random.Random(int(hashlib.md5(f'{b["id"]}|{e["payee"]}'.encode()).hexdigest(), 16))
-            if k in KL.GROUP_OF and r.random() < KL.COVER:
+            if os.environ.get("KIND_ORACLE") == "1" and k in KL.GROUP_OF:  # row 234 check: the right kind on every payee, top bucket
+                look[e["payee"]] = (k, "high")
+            elif k in KL.GROUP_OF and r.random() < KL.COVER:
                 bk = KL.sample_bucket(r)
                 look[e["payee"]] = (KL.corrupt(k, bk, r)[0], bk)
             else:

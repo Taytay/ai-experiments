@@ -155,6 +155,76 @@ def _seen_pool(min_n=3):
     return json.loads(f.read_text())
 
 
+# RATIONAL_PAYEES=seenobv (owner, 2026-10-07: "I was REALLY hoping for obvious payee names that the model had trained on. Not strange
+# or obscure names"): merchants fcr's training households bought from at least SEENOBV_MIN times whose names say what they are (a kind
+# cue or a household-name chain: ALDI, Starbucks, Shell, CVS Pharmacy, Rocket Mortgage, AMC Theatres); kinds without such a merchant in
+# training (furniture, pet, events) keep the invented obvious names
+SEENOBV_CUE = {
+ "grocery": "grocer|market|supermarket|foods\\b|food mart|kroger|safeway|publix|aldi|whole foods|trader joe|wegmans|h-e-b|heb\\b|food lion|giant|stop & shop|meijer|winco|sprouts",
+ "restaurant": "pizza|grill|kitchen|sushi|thai|steak|taqueria|bistro|diner|restaurant|bbq|burger|cafe|trattoria|noodle|pho|ramen|tacos?\\b",
+ "fast_food": "burger|pizza|taco|chicken|mcdonald|wendy|subway|chipotle|popeyes|arby|sonic|kfc|domino|chick-fil-a|five guys|jack in the box|wingstop",
+ "coffee_bakery": "coffee|bakery|espresso|donut|dunkin|starbucks|bagel|cafe",
+ "bar": "\\bbar\\b|pub|tavern|brew|taproom|saloon|wine bar|ale house|beer",
+ "gas": "\\bgas\\b|fuel|shell|chevron|exxon|mobil|valero|sunoco|marathon|speedway|circle k|76\\b|bp\\b|citgo|phillips 66|wawa|sheetz|quiktrip|racetrac",
+ "rent": "mortgage|home loan|lending|rocket",
+ "utility": "electric|power|energy|water|gas co|utilit|edison|pg&e|duke",
+ "phone": "wireless|mobile|verizon|at&t|t-mobile|cellular|comcast|xfinity|spectrum",
+ "pharmacy": "pharmacy|drug|cvs|walgreens|rite aid|rx",
+ "medical": "clinic|medical|dental|dentist|doctor|urgent care|pediatric|hospital|physical therapy|chiropractic|optometr|eyecare",
+ "big_box": "walmart|target|costco|sam's club|dollar|bj's|kmart|five below|big lots|ollie",
+ "clothing": "clothing|apparel|shoe|outfitters|old navy|gap\\b|h&m|zara|nordstrom|macy|kohl|ross|t\\.?j\\.?maxx|marshalls|foot locker|levi",
+ "electronics": "electronics|best buy|apple|computer|gamestop|micro center|phone repair",
+ "home_improvement": "hardware|home depot|lowe'?s|ace hardware|menards|lumber|paint|sherwin|harbor freight|true value|tractor supply",
+ "car_repair": "auto|tire|brake|oil change|jiffy lube|midas|valvoline|collision|autozone|o'reilly|pep boys|napa|meineke|firestone|car wash",
+ "parking": "parking|garage|sp\\+|laz|impark",
+ "entertainment": "cinema|theat|movie|bowling|amc|regal|cinemark|arcade|dave & buster|mini golf",
+ "hobby": "hobby|craft|michaels|joann|book|barnes|music|guitar|games|gamestop|sports|rei\\b",
+}
+SEENOBV_MIN = 50
+
+
+def _seen_obvious_pool():
+    import re
+    from ai_experiments.paths import ROOT
+    f = ROOT / "data" / "interim" / "rational_seenobv_pool.json"
+    if not f.exists():
+        counts = json.loads(_seen_counts_file().read_text())
+        by = {}
+        for k, pat in SEENOBV_CUE.items():
+            names = [(c, n) for n, c in counts.get(k, {}).items() if c >= SEENOBV_MIN and re.search(pat, n, re.I)]
+            by[k] = [n for _, n in sorted(names, reverse=True)[:40]]
+        f.write_text(json.dumps(by))
+    return json.loads(f.read_text())
+
+
+def _seen_counts_file():
+    """purchases per (kind, merchant) in fcr's training households (v5 world, train 0-199), cached in data/interim"""
+    from ai_experiments.paths import ROOT
+    f = ROOT / "data" / "interim" / "rational_seen_counts.json"
+    if not f.exists():
+        from collections import Counter
+        env = dict(SHARED_WORLD="1", GROUPNAMES="1", REALSTYLE_V4="1", RS_V5="1")
+        old = {k: os.environ.get(k) for k in list(env) + ["RS_V6"]}
+        os.environ.update(env); os.environ.pop("RS_V6", None)
+        from two_tower import households
+        n = Counter()
+        for b in households("train", range(200)):
+            for t in b["transactions"]:
+                name = (t.get("parts") or {}).get("Clean payee")
+                if t.get("kind") and name and t["amount"] < 0:
+                    n[(t["kind"], name)] += 1
+        for k, v in old.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        by = {}
+        for (k, name), c in n.items():
+            by.setdefault(k, {})[name] = c
+        f.write_text(json.dumps(by))
+    return f
+
+
 def _check_synonyms():
     import re
     from ai_experiments import realstyle as R
@@ -175,7 +245,9 @@ def budgets(level="clean", n=N):
     pool, out = _pool(), []
     payees_mode, cats_mode = os.environ.get("RATIONAL_PAYEES", ""), os.environ.get("RATIONAL_CATS", "")
     seen = _seen_names() if payees_mode == "obvious" else set()
-    seen_pool = _seen_pool() if payees_mode == "seen" else {}
+    seen_pool = _seen_pool() if payees_mode == "seen" else _seen_obvious_pool() if payees_mode == "seenobv" else {}
+    if payees_mode == "seenobv":
+        seen = _seen_names()
     if cats_mode in ("synonyms", "loose"):
         _check_synonyms()
     for h in range(n):
@@ -225,6 +297,9 @@ def budgets(level="clean", n=N):
             text = name if level == "clean" else statements.render_v2(name, rng)
             if payees_mode == "obvious":  # the original string is still drawn (the household's rng advances as before), then replaced
                 text = rename(name, k) if level == "clean" else statements.render_v2(rename(name, k), r2)
+            elif payees_mode == "seenobv":  # an obviously named merchant fcr trained on (invented obvious name where none exists)
+                nm = rename_seen(name, k) if seen_pool.get(k) else rename(name, k)
+                text = nm if level == "clean" else statements.render_v2(nm, r4)
             elif payees_mode == "seen":  # a merchant of the same kind that fcr's training households bought from
                 text = rename_seen(name, k) if level == "clean" else statements.render_v2(rename_seen(name, k), r4)
             pid = payees.setdefault(text, f"p{len(payees)}")
@@ -234,7 +309,7 @@ def budgets(level="clean", n=N):
                             deleted=False, reason=["known" if name in met else "new"],  # scoring segments only, never model input
                             kind=k))  # the merchant's kind: model input only through li_decider's KINDLINE (a simulated lookup)
             met.add(name)
-        tag = {"obvious": "-obv", "seen": "-seen"}.get(payees_mode, "") + ({"synonyms": "-syn", "loose": "-loose"}.get(cats_mode, ""))
+        tag = {"obvious": "-obv", "seen": "-seen", "seenobv": "-seenobv"}.get(payees_mode, "") + ({"synonyms": "-syn", "loose": "-loose"}.get(cats_mode, ""))
         out.append(dict(id=f"rational-{level}{tag}-{h}", category_groups=[dict(id="g", name="Spending")], categories=cats,
                         payees=[dict(id=p, name=t) for t, p in payees.items()], transactions=txs, subtransactions=[]))
     return out

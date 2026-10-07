@@ -1,0 +1,16 @@
+[
+ {
+  "tag": "r234-dec-seenobv",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v2.json",
+   "VARIANTS": "seenobv:",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ }
+]
