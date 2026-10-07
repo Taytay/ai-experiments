@@ -182,7 +182,9 @@ class Enc(H2.ColBERT):
         attn = os.environ.get("ATTN", "")
         if train and os.environ.get("LOADER") == "unsloth":  # row 238 (owner, 2026-10-07: unsloth for EmbeddingGemma 2; "I want faster
             from unsloth import FastSentenceTransformer  # training"): unsloth's kernels, bf16 weights; 1.8x the steps / s at half the
-            st = FastSentenceTransformer.from_pretrained(str(path), max_seq_length=MAXLEN or 1024, full_finetuning=True)  # memory on the 3090
+            st = FastSentenceTransformer.from_pretrained(str(path), max_seq_length=MAXLEN or 1024, full_finetuning=True,  # memory on the 3090
+                                                         use_gradient_checkpointing="unsloth" if GC else False,  # its own (the standard one
+                                                         float32_mixed_precision=os.environ.get("UNSLOTH_FP32") == "1")  # gave NaN grads)
             self.tok, self.enc = st.tokenizer, st[0].auto_model.to(self.dev)  # (fcr's step shape); run under scripts/unsloth_run.py
         else:
             self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
@@ -253,8 +255,8 @@ class LI:
         if PREFIX and role:  # ColBERT-Zero (2602.16609): keep the base's own query / document markers ("[Q] " / "[D] " for PyLate models)
             texts = [(QPREFIX if role == "q" else DPREFIX) + t for t in texts]
         b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
-        with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda"):
-            h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state
+        with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda" and os.environ.get("LOADER") != "unsloth"):
+            h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state  # unsloth: its own bf16 kernels
         h = h.float()
         m = b["attention_mask"].bool()
         v = torch.nn.functional.normalize(self.cb.proj(h), dim=-1)
@@ -1078,7 +1080,7 @@ def train():
     global MARK
     MARK = model.cb.tok.sep_token or MARK
     assert not (EVFREE or EMPTY) or (MODE == "doc" and not INTERACT and not PPRIOR and not kd), "EVFREE / EMPTY are wired into the document trainer only"
-    if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
+    if GC and os.environ.get("LOADER") != "unsloth":  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
         model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
@@ -1216,10 +1218,15 @@ def train():
                 run["kd"] += kdl.item()
         opt.zero_grad(set_to_none=True)
         loss.backward()
+        if os.environ.get("DEBUG_GRAD") and s < 2:
+            bad = [(n, p.dtype) for n, p in model.cb.enc.named_parameters() if p.grad is not None and not torch.isfinite(p.grad).all()]
+            nog = sum(p.grad is None for p in model.cb.enc.parameters() if p.requires_grad)
+            print(f"  debug step {s + 1}: {len(bad)} non-finite grads {bad[:3]}, {nog} trainable without grad, param dtype "
+                  f"{next(model.cb.enc.parameters()).dtype}, finite params {all(torch.isfinite(p).all() for p in model.cb.enc.parameters())}", flush=True)
         torch.nn.utils.clip_grad_norm_(model.params() + (list(inter.parameters()) if inter else []), 1.0)
         opt.step(); sched.step()
         run["loss"] += loss.item(); run["ce"] += ce.item(); run["acc"] += (Sg.argmax(1) == tgt).float().mean().item(); k += 1
-        if (s + 1) % 200 == 0:
+        if (s + 1) % int(os.environ.get("LOG_EVERY", "200")) == 0:
             print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f}" + (f" alpha {alpha.item():.2f}" if PPRIOR else "") + f" ({time.time() - t0:.0f}s)", flush=True)
             run.clear(); k = 0
     model.save(out)

@@ -18,6 +18,7 @@ given version?"): run a repo script under unsloth with EmbeddingGemma 2. unsloth
 override-dependencies can. This project is a path dependency, so its code and data are the checkout's.
 usage: uv run --script scripts/unsloth_run.py scripts/li_decider.py train    (env as the target script reads it; LOADER=unsloth)
 """
+import unsloth  # noqa: F401  first, before anything imports transformers, so its patches all apply
 import runpy
 import sys
 from pathlib import Path
