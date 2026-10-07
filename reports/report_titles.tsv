@@ -200,3 +200,13 @@
 200	Speed for longer queries and larger encoders	230
 201	A structured, longer query	229
 202	decider at matched effort on v5 households and without REAL-6	231
+203	Options inside the encoder's input	228
+204	Clef-flash zero-shot	164
+205	The Ettin-1B option scorer on the owner's budget	232
+206	v6 households	233
+207	Payee and category synonyms on the rational households	234
+208	Cold-start training examples	235
+209	The busy-category correction	237
+210	EmbeddingGemma 2 as the encoder	236
+211	EmbeddingGemma 2 under unsloth	238
+212	EmbeddingGemma 2 on an H100, and the fcr / Gemma blend	239

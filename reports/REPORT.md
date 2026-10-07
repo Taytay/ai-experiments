@@ -215,6 +215,16 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §200 Speed for longer queries and larger encoders (row 230)
 - §201 A structured, longer query (row 229)
 - §202 decider at matched effort on v5 households and without REAL-6 (row 231)
+- §203 Options inside the encoder's input (row 228)
+- §204 Clef-flash zero-shot (row 164)
+- §205 The Ettin-1B option scorer on the owner's budget (row 232)
+- §206 v6 households (row 233)
+- §207 Payee and category synonyms on the rational households (row 234)
+- §208 Cold-start training examples (row 235)
+- §209 The busy-category correction (row 237)
+- §210 EmbeddingGemma 2 as the encoder (row 236)
+- §211 EmbeddingGemma 2 under unsloth (row 238)
+- §212 EmbeddingGemma 2 on an H100, and the fcr / Gemma blend (row 239)
 
 <!-- END SECTION INDEX -->
 
@@ -12061,3 +12071,405 @@ The owner's budget read as r190's were (Modal private scoring, nothing kept ther
 
 **Cost:** three decider trainings of 75-78 minutes on H100s and three private owner reads: roughly $16; exact figures from
 `scripts/modal_costs.py --rows 231` once Modal bills the day. Episode build local ($0).
+
+## 203. Options inside the encoder's input: one Ettin-32M pass over the query and every option (GLiClass's layout) reads v5 and blind_v2 0.6-0.8 above fcr and rational households 0.6 below, loses 2-8 points on trips, and costs 2-4x the read time; option payees inline add nothing (one seed each)
+
+PLAN step 228 (owner, 2026-10-06: "How are you doing 'choose from these options'?"). fcr (§198) encodes the query and each option document
+apart and meets them at MaxSim, so the transaction never attends to the categories. `li_decider.py MODE=joint` puts them in one sequence,
+as GLiClass and decider do: "<query> || options: [SEP] Group: Name | payee $amt | ... [SEP] ...", options shuffled in training, each
+option scored from its [SEP] marker's state against the query's, softmax over the day's options, fcr's recipe otherwise (v5 households,
+override 0.1, hidden labels 0.15, crowd line; 3,000 steps, MAXLEN 3,072). Arms: jt0 (option names only) and jt3 (each option with its 3
+latest payees). Arm (c), a cross-encoder rerank of fcr's top 5, was not run.
+
+**Table 203.1: % right first (one seed each)**
+
+| model | v5 held-out (20) | v5 trips | blind_v2 (250) | blind_v2 trips | rational (50) | rational new merchants | ms a transaction, L40S |
+|---|---|---|---|---|---|---|---|
+| fcr (§198) | 75.8 | 47.4 | 81.8 | 61.6 | 89.0 | 58.8 | cached documents (§200) |
+| jt0, joint, names only | **76.6** | 45.0 | **82.4** | 53.5 | 88.4 | **62.2** | 3.0-7.1 |
+| jt3, joint, + 3 payees per option | 76.3 | 34.3 | 82.4 | 51.4 | 87.6 | 58.7 | 3.9-11.7 |
+
+Brier: jt0 0.352 / 0.259 / 0.181 against fcr's 0.362 / 0.279 / 0.161 (v5 / blind_v2 / rational).
+
+### 203.1 What the step says
+
+- **Reading the options with the transaction helps a little, within one seed's noise:** +0.8 on v5, +0.6 on blind_v2, +3.4 on the
+  rational households' new merchants (where the category's name has to be matched to the merchant), -0.6 on rational overall.
+- **It costs trips** (-2 to -8): a trip's category is chosen from the dated history rows (the last few days' filings), which MaxSim
+  matches row by row; in one sequence the option list competes with those rows for attention.
+- **Option payees inline add nothing** (jt3 at or below jt0) and slow the read: the history rows already carry the payees.
+- Not read on the owner's budget: the synthetic gain is inside the 1-2 point noise and the read is 2-4x slower than fcr's. Kept as a
+  second-seed candidate if v6 households (row 233) change the picture.
+
+**Cost:** two L40S jobs of 80 and 131 minutes: roughly $4; exact figures from `scripts/modal_costs.py --rows 228` once Modal bills the day.
+
+## 204. Clef-flash zero-shot: Cloudflare's decision model, untrained on households, reads 34% of v5 transactions and 45% of rational households' right first (fcr 76 / 89) at 70 ms a transaction on an H100; parked
+
+PLAN step 164 (a) (owner, 2026-10-06: "prioritize the Jev-style decision maker from CloudFlare - clef"). Clef-flash (Apache-2.0; its
+`joint_schema_model.py`, a joint option head over a Qwen3.5 backbone, `references/software/clef/`) as a reader of li_decider
+(`ARMS=clef:<model>`): the state is fcr's query text, one choice question over the day's categories, each option "Group: Name" with its 3
+latest payees (`CLEF_JM=3`). Decider's library stack (torch 2.13); every 10th transaction of 2 v5 held-out households, every 5th of the
+rational households. Two more arms were started and stopped (owner: "You can run just one or two, right?"): 8 payees per option, and
+Cloudflare's tested stack (torch 2.11, transformers 5.10.2); neither could close the gap below.
+
+**Table 204.1: % right first (top-3), zero-shot**
+
+| reader | v5 sample (1,823) | v5 first-time | rational (4,501) | rational new merchants | ms a transaction, H100 |
+|---|---|---|---|---|---|
+| Clef-flash, zero-shot | 34.4 (59.2) | 31.4 | 45.4 (83.0) | 31.4 | 70.2 (sdpa; query median 451 tokens) |
+| fcr (§198), trained | 75.8 (90.2) | 67.5 | 89.0 (95.2) | 58.8 | 1.9 (flash) |
+
+### 204.1 What the step says
+
+- **Untrained, a general decision model does not know how a household uses its categories.** It picks a plausible category for the
+  merchant (top-3 83% on rational households), not this household's one; the rational households' new merchants, which need only the
+  merchant's kind and the category names, are still 27 points below fcr.
+- **It is 37x slower than fcr** on the same GPU class: a 9B backbone reads every option for every transaction.
+- Fine-tuning (164 (b)) is the remaining test; at H100 prices it is the most expensive arm on the queue for a reader that would have to
+  gain 40 points. Parked until the encoder and decider rows finish.
+
+**Cost:** one H100 job of 16 minutes plus two stopped arms: roughly $3-4; exact figures from `scripts/modal_costs.py --rows 164` once Modal
+bills the day.
+
+## 205. The Ettin-1B option scorer on the owner's budget: 39.3% right first (decider-4B 73.4-74.5 on the same 21,238 items, Ettin-32M fcr 70.8 on 19,093); 8,192 tokens of history instead of 2,048 add 3 points (42.5 against decider 74.4 on every 5th item); the 1B option scorer is closed
+
+PLAN step 232 (owner, 2026-10-06: "Did you ever find out why we abandoned Ettin since it was doing so well, and doing so more cheaply?").
+§104 / §110's encoder recipe (Ettin-encoder-1B, one [MASK] per option, decider's episodes, soft targets, Overture episodes, short histories,
+empty categories, kind lines; seed 0) matched decider-4B on the sets built with the training generator and trailed it on the blind sets
+(blind_v1 77.9-79.3 against 82.0; blind_v2 65.5 against 71.7, §137), and §138 dropped it from the system. It had never been read on the owner's
+budget. `exp_encoder_mask.py PRIVATE_ITEMS` scores a saved encoder on real_budget_eval's items (decider's own split prompts) on the local
+RTX 3090, writing scores beside the items and printing aggregates only (`scripts/chains/r232_owner.sh`).
+
+**Table 205.1: % right first on the owner's budget (same items per row pair)**
+
+| reader | all | first-time payees | ms a transaction (RTX 3090, batch 32) | prompts cut |
+|---|---|---|---|---|
+| decider-4B v5 (r231, 2 seeds), 21,238 items | 73.6 / 74.5 | 56.9 / 58.1 | 10-13 (H100) | none |
+| Ettin-1B, 2,048 tokens, 21,238 items | 39.3 | 28.2 | 109 | 98.4% |
+| decider-4B v5, every 5th item (4,248) | 74.4 / 74.7 | 57.7 / 57.9 | | |
+| Ettin-1B, 8,192 tokens, every 5th item | 42.5 | 30.6 | 163 | 0% |
+| Ettin-32M fcr (§198), 19,093 items | 70.8 / 70.9 | 52.1 / 51.8 | 2.9 | |
+
+### 205.1 What the step says
+
+- **The 1B option scorer does not carry over to a real budget.** Trained on REAL-6-style episodes (at most ~45 options, 24 shots), it
+  reads the owner's 96 options (median) and eleven years of history at 39-43%, half of decider's level and 30 points under the 32M
+  late-interaction model trained on real-style households.
+- **History length is not the cause:** with the whole prompt (no cuts) it gains 3 points. What it lacks is training on budgets like the
+  owner's; fcr, trained on v5 households, reads the same budget at 70.8. §138's decision stands on the owner's budget too.
+- Its read is 40-55x slower than fcr's on the same GPU.
+
+**Cost:** $0 (local RTX 3090, 39 + 12 minutes).
+
+## 206. v6 households: matching the owner's realness aggregates does not move fcr on the owner's budget; payee routing per payee (b) is +0.5 over two seeds (71.3 / 71.4 against 70.8 / 70.9), new merchants from the whole pool (p) cost 1.2-2.2 (first-time payees -2 to -5) while helping synthetic new merchants by 4-5
+
+PLAN step 233 (owner, 2026-10-06: "I think we can get fcr going much better with better training data"). §196 left three gaps between v5
+households and the owner's budget. `realstyle.py RS_V6` closes them one letter at a time (v5 and v4 households byte-identical when off,
+checked by hash): p, new merchants drawn from the kind's whole pool (~1,000 places, not the metro's ~50 locals, which a household used up in
+a few years); t, a trip's purchases at places in the trip's own metro 70% of the time (v5 trips reused the home favourites); a = p + t,
+with `RS_V6A` 0.25 added to the explore chance; b, purpose routing (a person's, a child's, a project's, a property's, the catch-all)
+decided once per payee, misfiles 1.5% -> 0.5%, payee moves `RS_V6M` 0.3 -> 0.2; c, 1-2 string forms per merchant (not 1-3) and order
+codes re-drawn for 30% of coded merchants (not 60%). `scripts/realness_reasons.py` traced the multi-category payees to their generator
+reasons (moves, trips, reorganisations); `realness_gap.py` now also splits first-time strings into known payees' new strings and the rest.
+fcr's recipe (§198) trained on each; one seed, second seed for the best; read on v5, blind_v2 and rational households, and the owner's budget
+(19,093 items, decider v5 beside it, `TOPK=1`).
+
+**Table 206.1: realness aggregates (20 held-out households; median)**
+
+| property | v5 | v6 abc | owner |
+|---|---|---|---|
+| first-time payee strings | 0.16 | 0.30 | 0.29 |
+| ... of which a known payee's new string | 0.57 | 0.30 (a) | 0.30 |
+| strings per payee key | 2.91 | 1.62 | 2.09 |
+| payee switches (known payees) | 0.27 | 0.16 | 0.17 |
+| payees with 3+ filings under 2+ categories | 0.79 | 0.52 | 0.35 |
+
+**Table 206.2: % right first (owner's budget also top-3 / top-10)**
+
+| model | v5 all | v5 first-time | v5 trips | blind_v2 | rational new merchants | owner | owner first-time | owner top-3 / top-10 |
+|---|---|---|---|---|---|---|---|---|
+| fcr (v5, §198), 2 seeds | 75.8 | 67.5 | 47.4 | 81.8 | 58.8 | 70.8 / 70.9 | 52.1 / 51.8 | 81.9 / 90.4 |
+| v6a (p + t) | 75.6 | 68.1 | 30.0 | 82.0 | 63.3 | 68.6 | 46.9 | 80.4 / 89.6 |
+| v6p | 75.6 | 68.3 | 39.3 | 82.2 | 62.8 | 69.6 | 49.9 | 80.9 / 90.2 |
+| v6t | 75.6 | 67.7 | 28.7 | 82.4 | 57.3 | 70.8 | 52.7 | 82.1 / 90.3 |
+| **v6b, 2 seeds** | 72.8 / 73.0 | 67.4 / 67.0 | 36.4 / 35.2 | 81.7 | 59.0 | **71.3 / 71.4** | 51.9 / 52.5 | 82.7 / 82.3; 90.6 / 90.0 |
+| v6c | 75.6 | 66.9 | 39.2 | 82.3 | 58.8 | 70.7 | 51.9 | 81.8 / 90.4 |
+| v6bc | 72.8 | 66.8 | 42.9 | 82.2 | 57.4 | 71.2 | 52.3 | 82.0 / 90.9 |
+| v6abc | 73.9 | 67.6 | 34.1 | 81.7 | 63.8 | 69.5 | 48.8 | 81.2 / 90.1 |
+| decider-4B v5 (§202), 2 seeds | | | | | | 72.5 / 73.4 | 56.6 / 57.8 | 84.1 / 84.7; 90.3 / 90.6 |
+
+### 206.1 What the step says
+
+- **Matching aggregates is not matching what matters.** v6's first-time payees have the owner's share and make-up (30% known payees'
+  new strings), yet the arm that makes them (p) loses 2 points on the owner's first-time payees while gaining 4-5 on the rational
+  households' new merchants. A likely reason, not tested: the whole pool's places mostly have descriptive names whose kind gives the
+  category in our households' fixed kind -> purpose routing, so the model learns to read the name; the owner's new payees are filed by
+  purpose, which the name decides less often.
+- **Routing per payee (b) is the one change that holds on the owner's budget:** +0.5 over two seeds at top-1, +0.4-0.8 at top-3,
+  within the 1-2 point single-seed noise on the owner's budget, but on both seeds. It costs 3 points on v5, whose payees switch more than the
+  owner's: v5 is no longer the judge for the properties v6 changes.
+- **Trips in their own metro (t) are neutral on the owner** and cost synthetic trips (v5 trips are at home favourites).
+- **Fewer string forms (c) change nothing.**
+- The gap to decider stays ~2 points (top-1) and closes by top-10, as before. Generated data has given what it can on these
+  measures; real data is the next step (owner, 2026-10-06: "we can look at simply pulling in more realistic data").
+
+Engineering in the same step (owner: "We need to do better at reusing preparation steps"): content-keyed household and neighbour
+caches (mtimes changed between Modal images), training households prepared on 8 cores after one neighbour pass (identical data),
+`li_decider.py prep` for a shared cache job, the neighbour pass's tokenising through the Rust tokenizer directly (5x; 99.96% of
+neighbour sets identical, the rest tied cosines), and `READ_EVERY=5` sampled synthetic reads (74.9 vs 75.0 on 10 households, 2.7x
+faster). Preparation per job fell from 14-17 to 9.5 minutes; with a shared prep job and sampled reads a screening job is ~15 minutes.
+
+**Cost:** eight L40S jobs of 40-43 minutes: roughly $10; exact figures from `scripts/modal_costs.py --rows 233` once Modal bills the
+day. Owner reads and realness measurements local ($0).
+
+## 207. Payee and category synonyms on the rational households: invented, obviously named merchants never seen in training are right first 80-83% of the time on their first purchase (real held-out names 59-63%); obvious category synonyms with emoji cost nothing, looser ones ("Our house", "Good times") 1-2 points on new merchants
+
+PLAN step 234 (owner, 2026-10-06: "I want to see if the transfer can happen with payee synonyms, as well as category synonyms").
+§206's rational households (row 220: 50 one-year households, ten obvious categories, every merchant kind always filed to one of them; bank
+strings) use merchants from the held-out half of the merchant pool, so a merchant's first purchase tests name -> kind -> category
+transfer. Two variations keep every purchase, day, amount, category and regular-vs-new merchant (checked) and change only names
+(`scripts/rational_budgets.py`): `RATIONAL_PAYEES=obvious`, each merchant renamed to an invented name that says what it is (a made-up
+proper part and a kind cue: "Larkspur Family Grocers", "Maplewood Home Mortgage", "Linden Tavern"), never found verbatim in the training
+merchant pool or the knowledge / alias pairs; `RATIONAL_CATS=synonyms`, each category renamed per household to a synonym not among the
+training households' category names: obvious synonyms (owner: "I wanted obvious synonyms"; "Groceries & food 🛒", "Takeaway & dining 🥡",
+"Gas station", "House mortgage", "Utility bills 💡"), and a first, looser list (`RATIONAL_CATS=loose`: "Takeaway 🥡", "Filling up",
+"Our house", "Power, water & phone", "Good times").
+Read locally (`scripts/chains/r234_rational.sh`).
+
+**Table 207.1: % right first; "new" = the merchant's first purchase in the household (4,857), "known" = bought before (17,548)**
+
+| payees | categories | fcr all / new / known | v6b all / new / known | v6p all / new / known |
+|---|---|---|---|---|
+| held-out real names | as named | 89.0 / 58.8 / 97.3 | 89.5 / 59.0 / 97.9 | 90.1 / 62.8 / 97.7 |
+| invented, obvious | as named | 93.8 / 80.7 / 97.4 | 94.1 / 79.9 / 98.0 | 94.8 / 82.0 / 98.3 |
+| held-out real names | obvious synonyms | 89.0 / 59.5 / 97.1 | 89.1 / 59.0 / 97.4 | 90.0 / 62.6 / 97.6 |
+| invented, obvious | obvious synonyms | 93.8 / 81.2 / 97.3 | 94.1 / 80.4 / 97.9 | 94.9 / 82.8 / 98.2 |
+| held-out real names | loose synonyms | 88.5 / 57.4 / 97.1 | 88.8 / 57.2 / 97.6 | 89.8 / 60.9 / 97.8 |
+| invented, obvious | loose synonyms | 93.3 / 79.2 / 97.2 | 93.8 / 78.7 / 98.0 | 94.4 / 80.7 / 98.2 |
+
+### 207.1 What the step says
+
+- **Payee transfer works when the name carries the kind:** a merchant never seen verbatim but named like what it is is right first 80%
+  of the time on its first purchase; the held-out real names (many give no hint: "Toll Brothers" as a mortgage, "Blink" as fuel) 59%.
+  The 59 -> 80 difference is the share of the first-purchase problem that is about knowing what an opaque name is.
+- **Category transfer works:** obvious synonyms and emoji the model never saw as category names cost nothing (new merchants 59.5
+  against 58.8; with obvious payees 81.2 against 80.7); looser names that say less ("Our house", "Good times", "Things we buy") cost
+  1-2 points on new merchants; known merchants are unaffected either way (history matches by the category's id, whatever its name).
+- **The models order as on synthetic data, not as on the owner's budget:** v6p (trained on more new merchants) leads on every version
+  here and trailed on the owner's first-time payees (§206). These households file by kind; the owner files by purpose. The rational
+  households measure name and category-name transfer cleanly, and say little about the owner's gap.
+- About 20% of obvious first purchases are still missed: by construction these are kind -> category mappings with no history for the
+  merchant (coffee shops under the restaurants category, an events box office under fun); not broken down here.
+
+**Table 207.2: decider-4B (v5 adapter, §202) on the same households (owner: "What does decider do with that budget?"), and two more
+payee versions (owner: "all of the payees have been seen in training"): `RATIONAL_PAYEES=seen`, each merchant replaced by one of the same
+kind that fcr's training households bought from 3+ times (pets: the training pool). decider read as on the owner's budget (SIM=2,
+GROUPNAMES=1) but one prompt each, 16 a pass (`scripts/rational_decider.py`, H100; every first purchase and every 8th repeat; the six
+versions frozen in `data/processed/rational_variants_v1.json`, DVC). % right first, new / known**
+
+| payees | categories | fcr | v6p | decider-4B |
+|---|---|---|---|---|
+| held-out real names | as named | 58.8 / 97.3 | 62.8 / 97.7 | **70.7** / 86.5 |
+| held-out real names | obvious synonyms | 59.5 / 97.1 | 62.6 / 97.6 | **68.0** / 85.7 |
+| seen in training | as named | 60.8 / 97.7 | 67.6 / 98.1 | **72.8** / 89.9 |
+| seen in training | obvious synonyms | 60.3 / 97.7 | 66.3 / 98.1 | **70.0** / 89.6 |
+| invented, obvious | as named | 80.7 / 97.4 | 82.0 / 98.3 | **93.6** / 94.6 |
+| invented, obvious | obvious synonyms | 81.2 / 97.3 | 82.8 / 98.2 | **92.0** / 95.0 |
+
+### 207.2 What the second table says
+
+- **decider transfers names much better on a first purchase** (+10 to +13 over fcr everywhere): 93-94% on obviously named merchants,
+  where fcr stops at 81. Its 4B of language knowledge reads "Maplewood Home Mortgage" as a mortgage; the 32M encoder misses whole kinds
+  on a cold start (fcr's misses on the obvious names: utilities 2% right first, chosen as the gas category half the time ("Natural Gas
+  Company" is a template of this row that is ambiguous by construction) and otherwise as the busy categories; pets 49%, cinemas and
+  events 50%, parking 52%; restaurants, bars, coffee 93-96%; `scripts/rational_misses.py`).
+- **fcr matches repeat purchases better** (97-98 against decider's 86-95): each purchase here has a freshly rendered bank string, and
+  fcr's alias-trained encoder ties them together; decider does better on repeats when the names are plain (94.6) than when they are
+  real, varied bank strings (86.5).
+- **Seen-in-training payees help fcr little** (+2) and v6p more (+5): fcr's training filed these merchants under each household's own
+  purposes, which teaches it the household's routing more than the merchant's kind.
+- **Obvious category synonyms cost decider 1.6-2.8 points** on first purchases, fcr nothing.
+- The two models' strengths split by repeat vs first purchase, as on the owner's budget (§202: the gap is first-time payees).
+
+**Cost:** fcr / v6b / v6p reads $0 (local RTX 3090, 23 minutes); decider six H100 jobs of 8-9 minutes plus a stopped launch (split
+layout, 2 items/s): roughly $3-4; exact figures from `scripts/modal_costs.py --rows 234` once Modal bills the day.
+
+## 208. Cold-start training examples do not teach fcr new payees: queries without history rows (15-30% of training), half of them with category names alone, leave first purchases unchanged on every set (rational 58.3-58.7 vs 58.8, obvious names 79.7-80.0 vs 80.7, owner's first-time payees 51.2-51.9 vs 52.1)
+
+PLAN step 235 (owner, 2026-10-06: "Let's try to inject knowledge in fcr to have it get better at new payees. Perhaps we show it examples
+where there is no history?"). `li_decider.py COLD`: a share of training queries keeps the transaction line alone (no history rows; the
+crowd line, part of the transaction line, stays); `COLDDOC`: of those, every category document is the category's name alone ("nothing
+filed yet", as a brand-new budget). fcr's recipe otherwise, one seed each, from one shared prep job (`li_decider.py prep`: 200 training
+and 20 held-out households with their neighbour lists in 7.2 minutes; the arms loaded it with DATA_FROM and spent 2.6 minutes preparing
+instead of 14-17; whole jobs 19 minutes instead of 40). Synthetic sets sampled (READ_EVERY=5; fcr read on the same sample locally).
+
+**Table 208.1: % right first (owner's budget: 19,093 items, decider v5 72.5 / 73.4, first-time 56.6 / 57.8)**
+
+| model | v5 all / first-time / trips | blind_v2 all / trips | rational new (real names) | rational new (obvious names) | owner | owner first-time | owner top-3 |
+|---|---|---|---|---|---|---|---|
+| fcr | 75.8 / 67.1 / 46.2 | 81.9 / 62.9 | 58.8 | 80.7 | 70.8 | 52.1 | 81.9 |
+| c15 (COLD 0.15) | 75.5 / 67.1 / 39.0 | 81.3 / 68.3 | 58.7 | 79.7 | 70.5 | 51.2 | 81.4 |
+| c15d (+ COLDDOC 0.5) | 75.5 / 67.1 / 32.0 | 81.8 / 62.3 | 58.3 | 80.0 | 70.3 | 51.6 | 81.8 |
+| c30d (COLD 0.3, COLDDOC 0.5) | 75.7 / 67.2 / 38.5 | 81.6 / 68.3 | 58.5 | 79.7 | 70.9 | 51.9 | 81.7 |
+
+### 208.1 What the step says
+
+- **The training format was not what held new payees back.** Forcing the model to match a bare payee name to the category documents,
+  or to the category's name alone, changes nothing on first purchases anywhere; what it would need is knowledge of what the name is,
+  which the 32M encoder has only from its knowledge stage (§191: kinds go in but mostly do not come out) and its pretraining. §207's
+  rational households show the same: decider reads obvious names 93.6% right on a first purchase, fcr 81% with or without cold examples.
+- Cold examples cost trips on v5 (no recent rows to show the trip) and nothing elsewhere.
+- What remains for new payees: a larger base (§199: Ettin-400M +9-10 on synthetic new merchants, tied on the owner), decider for
+  first-time payees (on the owner's budget, decider for first-time payees and fcr for the rest would read 72.4 against decider alone's
+  73.0, with decider on 31% of transactions), or real data.
+
+**Cost:** one prep job of 7 minutes and three arms of 19 minutes on L40S: roughly $3; exact figures from `scripts/modal_costs.py --rows 235`
+once Modal bills the day. Owner reads local ($0).
+
+## 209. The busy-category correction: discounting each category by how often it has been used helps the rational households' first purchases by at most 2 points and costs the owner's first-time payees 2 to 50 points; the busy-category pull on the owner's budget is mostly right
+
+PLAN step 237 (owner, 2026-10-07: "I do want to try to fix the frequency thing"). §207's checks: on the rational households' first purchases fcr
+picks the household's most-used category so far 45.8% of the time, where it is right 33.5% of the time, and 40% of its misses go there;
+its realistic kind line reaches a first purchase with the right kind 37% of the time (57% coverage, 65% right when shown); told the right
+kind on every payee (`KIND_ORACLE=1`) fcrk is right first on 77.0 / 86.5 / 85.2% (real / obvious / seen-and-obvious names). `li_decider.py
+FREQ_TAU`: on a first-time payee string, each category's score less tau * log(1 + its filings so far); fcr, whole budgets
+(`scripts/chains/r237_freq.sh`).
+
+**Table 209.1: % right first; rational: first purchases at a merchant / repeats (first-time strings include repeats under a fresh string)**
+
+| tau | rational real | rational obvious | rational seen-and-obvious | owner all / first-time | owner first-time top-3 |
+|---|---|---|---|---|---|
+| 0 (fcr) | 58.8 / 97.3 | 80.7 / 97.4 | 79.5 / 98.4 | 70.8 / 52.1 | 66.3 |
+| 0.25 | 59.3 / 97.5 | 81.3 / 97.5 | 80.4 / 98.5 | 70.3 / 50.4 | 63.4 |
+| 0.5 | 59.4 / 97.7 | 81.8 / 97.5 | 80.9 / 98.6 | 68.3 / 43.7 | 56.2 |
+| 1 | 57.5 / 97.2 | 82.8 / 97.4 | 82.1 / 98.5 | 59.4 / 14.7 | 26.1 |
+| 2 | 39.1 / 79.1 | 64.3 / 81.8 | 65.2 / 83.1 | 55.7 / 2.3 | 4.4 |
+
+### 209.1 What the step says
+
+- **On a real budget the busy categories are where new payees go.** The owner's first-time payees fall from 52 to 44 at tau 0.5 and to 15
+  at 1: fcr's pull toward the busy categories is learned from budgets like the owner's and is mostly right there. The rational
+  households, where ten categories share purchases by fixed kinds, overstate the problem.
+- What is left for first purchases is knowledge (§207, §208): knowing that a name is a utility or a cinema, and mapping that kind to
+  the household's category. Row 236 tries a base with more of it.
+
+**Cost:** $0 (local RTX 3090, about 25 minutes).
+
+## 210. EmbeddingGemma 2 as the encoder: two towers (one vector each, cosine) on fcr's recipe read the owner's budget at 71.3 on two seeds (fcr 70.8 / 70.9), first-time payees 54.5 / 54.4 (52.1 / 51.8), and lead decider at top-5 and top-10 (87.7-87.8 / 92.4-92.5 against 87.0-87.8 / 90.3-90.6); on synthetic data it ties fcr
+
+PLAN step 236 (owner, 2026-10-07: "Should we just be running an embedding model at this point like the new Gemma? ... Either cosine
+similarity or two towers approach"). google/embeddinggemma-2 (Apache-2.0, released 2026-10-06; built from Gemma 4; its 271M text tower
+used, 768-d mean-pooled vectors, query / document prompts; transformers 5.19, sentence-transformers 6.1 and torch 2.13 as a uv overlay).
+(a) Untrained, cosine of a first purchase's bank string to the household's category names (`scripts/name_probe.py`, no history). (b) fcr's
+recipe (§198: v5 households, override, crowd line; 3,000 steps, MAXLEN 1,024, LR 3e-5, the shared prep of row 235) with it as the base:
+two towers (`HYBRID=2`: the pooled vectors' cosine alone, no hidden-row loss) and multi-vector (MaxSim, as fcr). L40S, 1.3 s a step.
+
+**Table 210.1: untrained, % right first on the rational households' first purchases (category names only, no history)**
+
+| encoder | real held-out names | invented obvious | seen in training, obvious |
+|---|---|---|---|
+| EmbeddingGemma 2 | 42.6 | **74.0** | **60.8** |
+| Ettin-400M knowledge stage (§199) | 43.2 | 56.9 | 50.3 |
+| bge-small | 36.2 | 58.5 | 50.6 |
+| fcr's base (Ettin-32M knowledge stage) | 20.5 | 31.1 | 25.2 |
+| raw Ettin-32M | 13.9 | 15.9 | 14.8 |
+
+The knowledge-stage models were trained for MaxSim over token vectors; a pooled cosine understates them.
+
+**Table 210.2: trained; owner's budget (19,093 items) top-1 / 3 / 5 / 10, and synthetic sets (v5, blind_v2 sampled)**
+
+| model | owner | owner first-time | v5 | blind_v2 | rational new: real / obvious / seen-obvious |
+|---|---|---|---|---|---|
+| decider-4B v5 (2 seeds) | 72.5 / 84.1 / 87.0 / 90.3; 73.4 / 84.7 / 87.8 / 90.6 | 56.6 / 71.7; 57.8 / 72.6 | | | 70.7 / 93.6 / 93.9 |
+| fcr | 70.8 / 81.9 / 85.7 / 90.4 | 52.1 / 66.3 | 75.8 | 81.9 | 58.8 / 80.7 / 79.5 |
+| **EmbeddingGemma 2, two towers, seed 0** | 71.3 / 83.7 / 87.7 / 92.4 | 54.5 / 70.6 | 75.3 | 81.9 | 58.2 / 80.2 / 80.0 |
+| **EmbeddingGemma 2, two towers, seed 1** | 71.3 / 84.1 / 87.8 / 92.5 | 54.4 / 71.4 | 75.3 | | |
+| EmbeddingGemma 2, multi-vector | 70.5 / 83.6 / 87.4 / 91.8 | 54.3 / 70.5 | 73.5 | 80.8 | 54.6 / 76.4 / - |
+
+Read time: 16 ms a transaction on an L40S (query tokens median 475), 25 ms on the RTX 3090; fcr 2-3 ms; decider 10-13 ms on an H100.
+
+### 210.1 What the step says
+
+- **A base with a language model's knowledge helps the owner's first-time payees**: +2.4 at top-1 and +4-5 at top-3 on two seeds that
+  agree to 0.1, the gap to decider there down from 5 points to 2.7; overall top-1 +0.5, and the right category is in the top 5 / 10
+  more often than decider's (87.8 / 92.5 against 87.0-87.8 / 90.3-90.6).
+- **Synthetic data does not show it** (v5, blind_v2 and the rational households tie fcr): the gain is knowledge of real merchants and
+  real category names, which our generated sets do not reward. The owner's budget stays the judge.
+- **Two towers beat multi-vector** with this base (owner 71.3 against 70.5, synthetic sets 1-4 points): its pretraining is for one
+  pooled vector, and the simpler design keeps it.
+- Fine-tuning keeps less than the untrained probe suggests: untrained it reads obvious names at 74% from the name alone; trained, with
+  history, 80%, as fcr. Untested: a lower learning rate or a frozen lower half, to overwrite less of the base.
+- It is 6-8x slower to read than fcr; category vectors cache, so the cost is the query (the 271M model over ~475 tokens).
+
+**Cost:** three L40S jobs (two arms of 108 minutes, the second seed of about 80): roughly $10; exact figures from `scripts/modal_costs.py --rows 236`
+once Modal bills the day. Probes and owner reads local ($0).
+
+## 211. EmbeddingGemma 2 under unsloth: full fine-tuning trains to NaN, unsloth's LoRA recipe trains cleanly; LoRA reads synthetic sets better than the full fine-tune (v5 76.3-77.0 against 75.3, rational first purchases 62.6 against 58.2) and the owner's budget level at top-1 (71.3 / 71.6 against 71.3) but lower on first-time payees and the top-k (53.0 / 53.1 against 54.5; top-10 91.0-91.5 against 92.4); not faster per step on an L40S
+
+PLAN step 238 (owner, 2026-10-07: "That article I sent recommended unsloth to fine tune it"; "Read this and the accompanying material
+please"; "No need for full fine tuning"). unsloth's releases cap transformers at 5.17, EmbeddingGemma 2 needs 5.18+; `uv run --with` and
+UV_OVERRIDE cannot lift the cap, a script's own `[tool.uv] override-dependencies` can (`scripts/unsloth_run.py`, transformers pinned to the
+commit unsloth's EmbeddingGemma 2 notebook installs). Full fine-tuning through FastSentenceTransformer (bf16 or fp32 masters, either
+checkpointing) gives non-finite layer-norm gradients at step 1 and NaN losses; unsloth's documented recipe (unsloth.ai/docs/models/
+embeddinggemma-2: the text-only `unsloth/embeddinggemma-2`, Apache-2.0; LoRA r 32 / alpha 64 on all projections; its checkpointing; the
+notebook's LR 2e-5 for a 30-step demo) trains cleanly in li_decider (`LOADER=unsloth UNSLOTH_LORA=32`, adapters merged at save so reads
+need no peft). Row 236's two-tower recipe, LR 1e-4 and 2e-4, one seed each, L40S.
+
+**Table 211.1: % right first (owner: 19,093 items, top-1 / 3 / 5 / 10)**
+
+| model | v5 all / first-time / trips (sampled) | rational new (real) | owner | owner first-time top-1 / top-3 | s a step (L40S) |
+|---|---|---|---|---|---|
+| fcr | 75.8 / 67.1 / 46.2 | 58.8 | 70.8 / 81.9 / 85.7 / 90.4 | 52.1 / 66.3 | 0.14 |
+| EmbeddingGemma 2 two towers, full fine-tune (§210, 2 seeds) | 75.3 / 66.2 / 35.3 | 58.2 | 71.3 / 83.7-84.1 / 87.7-87.8 / 92.4-92.5 | 54.5 / 70.6; 54.4 / 71.4 | 1.32 |
+| + unsloth LoRA r 32, LR 1e-4 | 76.3 / 67.9 / 42.1 | 62.6 | 71.3 / 83.0 / 86.8 / 91.5 | 53.0 / 68.5 | 1.49 at step 200; 1.07 over the run |
+| + unsloth LoRA r 32, LR 2e-4 | 77.0 / 68.9 / 49.1 | 62.6 | 71.6 / 82.8 / 86.5 / 91.0 | 53.1 / 68.1 | 1.07 over the run |
+
+### 211.1 What the step says
+
+- **LoRA keeps more of the base's behaviour on generated data** (+1-2 on v5, +4 on the rational households' first purchases, trips
+  recovered) and **less of the owner's gain**: first-time payees 1.4 points and the top-10 1 point below the full fine-tune, top-1 level.
+  One seed each; the full fine-tune's two seeds agreed to 0.1.
+- **unsloth is not a speed-up here:** 1.49 s a step at step 200 against 1.32, 54 minutes for 3,000 steps against 64 (LoRA's optimizer is
+  small; the forward and backward over ~12,000 query tokens a step are the cost). On the RTX 3090 it fits where plain transformers did not.
+- The full fine-tune stays the EmbeddingGemma 2 recipe for the owner's budget; LoRA is the cheaper option if memory is the limit.
+
+**Cost:** two L40S jobs of 79-80 minutes, two stopped launches (~8 minutes): roughly $5-6; exact figures from `scripts/modal_costs.py --rows 238`
+once Modal bills the day. Owner reads local ($0).
+
+## 212. EmbeddingGemma 2 on an H100, and the fcr / Gemma blend
+
+PLAN step 239 (owner, 2026-10-07: "Go for it - 1 and 2"). (a) Row 236's EmbeddingGemma 2 two-tower full fine-tune (`li_r236_g2cos`: L40S,
+gradient checkpointing, 3,000 steps) retrained on an H100 without checkpointing for 1,500 steps (`li_r239_g2h`). (b) ContextGNN's split
+(2411.19513: a pair-wise score where the user's history reaches, a tower score beyond it) without training: fcr and `li_r236_g2cos` blended per
+transaction, log p = w log p_fcr + (1 - w) log p_Gemma, one w for payees seen before and one for first-time payees, both chosen on 20 v5
+held-out households (every 5th transaction, 55,247) and the owner's budget read once with them (`scripts/blend_eval.py`; synthetic reads on
+Modal, `scripts/modal_jobs/r239b.json`, owner reads local, each read saved and reused).
+
+**Table 212.1: owner's budget, 19,093 matched items, % right (top-1 / top-3 / top-10)**
+
+| model | all | first-time payees (5,832) | seen before | train |
+|---|---|---|---|---|
+| decider v5 (row 231, 2 seeds) | 72.5 / 84.1 / 90.3; 73.4 / 84.7 / 90.6 | 56.6; 57.8 | | 75-77 min a seed, H100 |
+| fcr | 70.8 / 81.9 / 90.4 | 52.1 | 79.1 | |
+| Gemma two-tower, L40S 3,000 steps (§210) | 71.3 / 83.7 / 92.4 | 54.6 | 78.6 | 64 min, 1.28 s a step |
+| Gemma two-tower, H100 1,500 steps, no checkpointing | 71.1 / 83.9 / 92.5 | 54.9 | | 15 min, 0.60 s a step |
+| fcr / Gemma blend, w 0.5 seen / 0.8 first-time (chosen on v5) | 71.2 | 53.1 | 79.2 | none |
+
+v5 grid (fcr's weight w, 0 = Gemma only): seen before 77.0 at w 0, 77.9 at 0.5, 77.5 at 1; first-time 66.2 at 0, 67.3 at 0.4-0.8, 67.0 at 1.
+The owner's grid (diagnostic, not for choosing): seen before 78.6 at 0 to 79.3 at 0.8; first-time falls from 54.6 at w 0 to 52.1 at w 1.
+
+### 212.1 What the step says
+
+- **The H100 recipe holds:** half the steps without checkpointing reads the owner's budget as well as row 236's model (71.1 against 71.3,
+  first-time 54.9 against 54.6 / 54.4 for §210's two seeds; v5 74.4, rational households' new merchants 56.9). EmbeddingGemma 2 now trains in
+  15 minutes; this is the recipe for its next rows.
+- **The blend gains nothing:** v5 says fcr is the better first-time reader (67.0 against 66.2), the owner's budget says the reverse (52.1
+  against 54.6), so the weight chosen on v5 costs 1.5 points on first-time payees. With the owner's own best weights (not a fair read) the
+  blend reaches about 71.6, within seed noise of Gemma alone and below decider. Not pursued.
+- **v5 misranks readers on first-time payees:** the generator's payee strings reward history-matching more than knowing what a merchant name
+  means, so v5 cannot tune anything first-time-specific; the owner's real data (and the rational households) are the sets for that.
+- Read times (§210): fcr 1.9 ms a transaction on an H100, Gemma 3.9, decider 10-13 at best (shared day prefixes; ~45 ms on one-a-day
+  households).
+
+**Cost:** one H100 training job (~20 minutes), one H100 synthetic read for the blend (12 minutes) and two failed launches (under 2 minutes):
+roughly $1.50-2; exact figures from `scripts/modal_costs.py --rows 239` once Modal bills the day. Owner reads local ($0).

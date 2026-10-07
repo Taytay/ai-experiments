@@ -12,6 +12,6 @@ for e in hist_knn_v1 hist_r202_b0 hist_r202_b1 hist_r202_b2 hist_r202_b3 hist_r2
   echo "=== $e synthetic"; OUT1=$e uv run python scripts/hist_agree.py 2>&1 | grep --line-buffered -vE "$F"
 done
 for e in hist_knn_v1 hist_r202_b5; do
-  echo "=== $e owner"; OUT1=$e BUDGET=96c06c41-f26f-4a44-98ed-eaba2f471e1e uv run python scripts/hist_agree.py 2>&1 | grep --line-buffered -vE "$F"
+  echo "=== $e owner"; OUT1=$e BUDGET=${BUDGET:-$(cat ~/.config/ynab/budget_id)} uv run python scripts/hist_agree.py 2>&1 | grep --line-buffered -vE "$F"
 done
 echo "== r202 agree done $(date -u +%H:%M:%S)"

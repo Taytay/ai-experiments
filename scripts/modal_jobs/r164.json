@@ -1,0 +1,29 @@
+[
+ {
+  "tag": "r164-clefflash-zs2",
+  "gpu": "H100",
+  "env": {
+   "SHARED_WORLD": "1",
+   "GROUPNAMES": "1",
+   "REALSTYLE_V4": "1",
+   "RS_V5": "1",
+   "OPTS": "span",
+   "PLAN_ROWS": "164",
+   "DATA_FROM": "r218-cache,r226-cache",
+   "ENCODERS_FROM": "enc-base",
+   "CTX": "1",
+   "NB": "12",
+   "AGO": "1",
+   "REC": "8",
+   "LOWER": "0",
+   "ARMS": "clef:Cloudflare/clef-flash",
+   "CLEF_BATCH": "4",
+   "CLEF_JM": "3",
+   "CLEF_EVERY": "10"
+  },
+  "cmds": [
+   "SPAN_AFTER=365 TEST_SEEDS=100000-100001 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/li_decider.py read",
+   "RS_V5=0 READ=rational_bank CLEF_EVERY=5 uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/li_decider.py read"
+  ]
+ }
+]

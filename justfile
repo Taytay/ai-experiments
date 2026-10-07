@@ -37,16 +37,16 @@ pull +NAMES:
 pull-all:
     uv run dvc pull
 
-# After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files.
+# After training: hash each adapter and encoder dir present locally (encoders were once missed: 18 found only in modal_out, 2026-10-07), push new blobs to D:, stage the .dvc files.
 [windows]
 [doc("After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files")]
 push-models:
-    uv run dvc add (Get-ChildItem models/adapters -Directory | ForEach-Object { "models/adapters/$($_.Name)" }); uv run dvc push
+    uv run dvc add (Get-ChildItem models/adapters, models/encoders -Directory | ForEach-Object { "models/$($_.Parent.Name)/$($_.Name)" }); uv run dvc push
 
 [unix]
 [doc("After training: hash each adapter dir present locally, push new blobs to D:, stage the .dvc files")]
 push-models:
-    uv run dvc add $(find models/adapters -mindepth 1 -maxdepth 1 -type d | sort)
+    uv run dvc add $(find models/adapters models/encoders -mindepth 1 -maxdepth 1 -type d | sort)
     uv run dvc push
 
 # Free local disk: push, then delete every local adapter dir and the DVC cache. The .dvc files

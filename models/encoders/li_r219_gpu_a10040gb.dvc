@@ -1,0 +1,6 @@
+outs:
+- md5: cc13e9a667f8d4764f4c3f1f60cd1c3d.dir
+  size: 134378590
+  nfiles: 8
+  hash: md5
+  path: li_r219_gpu_a10040gb

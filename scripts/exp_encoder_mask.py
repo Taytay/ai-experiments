@@ -414,7 +414,36 @@ def score(tok, model):
                       truncated_share=round(float(np.mean([len(i) >= MAXLEN for i, _ in seqs])), 3))
 
 
-if __name__ == "__main__":
+def score_private(tok, model, src, dst, key="prompt_split"):
+    """Row 232: a saved DEC_EPISODES encoder on real_budget_eval's items (the owner's budget, decider's own prompts, `key` as decider read
+    them), local only: {id, lp} lines to `dst` beside the items, nothing in results/, evals/ or the tracker; progress prints counts only."""
+    items = [it for it in json.loads(open(src).read())["items"] if it["answer"] >= 0][::int(os.environ.get("PRIVATE_EVERY", "1"))]
+    model.eval(); t0 = time.time(); n_trunc = 0
+    with open(dst, "w") as fo:
+        for k in range(0, len(items), 32):
+            chunk, seqs = items[k:k + 32], []
+            for it in chunk:
+                names = [o.strip() for o in it["options"]]
+                shown, st = restyle(names, it[key][: -len("Category:")].rstrip().split("\n\n", 1)[1], random.Random(it["id"]))
+                seqs.append(encode(tok, shown, None, None, state=st)); n_trunc += len(seqs[-1][0]) >= MAXLEN
+            with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
+                out = [torch.log_softmax(x[x > -1e3].float(), -1).tolist() for x in model(*collate(tok, seqs))]
+            for it, lp in zip(chunk, out):
+                fo.write(json.dumps(dict(id=it["id"], lp=[round(x, 4) for x in lp])) + "\n")
+            if k % 3200 == 0:
+                print(f"   {k + len(chunk)}/{len(items)} items, {time.time() - t0:.0f} s", flush=True)
+    print(f"  {len(items)} items in {time.time() - t0:.0f} s ({1000 * (time.time() - t0) / len(items):.1f} ms each, batch 32), "
+          f"{100 * n_trunc / len(items):.1f}% truncated at {MAXLEN}", flush=True)
+
+
+if __name__ == "__main__" and os.environ.get("PRIVATE_ITEMS"):
+    assert LOAD_FROM and DEC_EPISODES and not STEPS
+    tok, model = load_model()
+    from safetensors.torch import load_file
+    missing, unexpected = model.load_state_dict(load_file(ROOT / "models" / "adapters" / LOAD_FROM / "model.safetensors"), strict=False)
+    assert not unexpected and not missing, (missing[:5], unexpected[:5])
+    score_private(tok, model, os.environ["PRIVATE_ITEMS"], os.environ["PRIVATE_OUT"], os.environ.get("PRIVATE_KEY", "prompt_split"))
+elif __name__ == "__main__":
     cfg = dict(dec_episodes=DEC_EPISODES, load_from=LOAD_FROM, arch=ARCH, init=INIT, hops_from=HOPS_FROM if INIT == "hops" else None, mbi_ids=MBI_IDS, mbi_shotlab=MBI_SHOTLAB, steps=STEPS, batch=BATCH, lr=LR, head_lr=HEAD_LR, ctx=CTX, fold=FOLD, poi=POI, items_set=ITEMS_SET, maxlen=MAXLEN, seed=SEED, base=BASE,
                train_sha=TRAIN_DOC["sha256"], model=NAME)
     with Run("encmask", model=BASE, config=cfg, enabled=not SMOKE) as run:

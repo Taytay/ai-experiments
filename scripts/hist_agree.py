@@ -38,6 +38,17 @@ def lsm(v):
     return v - np.log(np.exp(v).sum())
 
 
+def topk(recs, title):
+    """% of items whose answer is within the top 1 / 3 / 5 / 10 (a tie at the answer's score counts against it), all and first-time"""
+    def hit(lp, a, k):
+        return int((np.asarray(lp) >= lp[a]).sum()) <= k
+    rows = [("decider s%d" % i, lambda r, i=i: r["dec"][i]) for i in range(len(recs[0]["dec"]))] + [(n, lambda r, n=n: r["enc"][n]) for n in recs[0]["enc"]]
+    print(f"\n**{title}: % right within the top k (n)**\n\n| reader | segment | n | top-1 | top-3 | top-5 | top-10 |\n|---|---|---|---|---|---|---|")
+    for name, get in rows:
+        for seg, sub in (("all", recs), ("first-time", [r for r in recs if r["known"] == "first-time"])):
+            print(f"| {name} | {seg} | {len(sub)} | " + " | ".join(f"{100 * np.mean([hit(get(r), r['answer'], k) for r in sub]):.1f}" for k in (1, 3, 5, 10)) + " |")
+
+
 def records(budgets, items, dec, key, cache_dir, li=None):
     """one record per matched item: decider log-probs per seed, encoder log-probs per reader (over decider's options), answer, segments;
     reader scores from hist_fast (GPU, cached per budget in cache_dir), or from li (li_decider.load's run) as the one reader LI"""
@@ -173,3 +184,5 @@ if __name__ == "__main__":
         if os.environ.get("BUDGET") and enc in owner_encs:
             own = records(obudget, oitems, odec, lambda b, e: e["id"], RB.OUT / "hist_cache", li)
             table(own, "owner's budget", gates)
+            if os.environ.get("TOPK") == "1":  # owner, 2026-10-06: top-1 / 3 / 5 / 10 on the owner's budget, decider (each seed) and the reader
+                topk(own, "owner's budget")

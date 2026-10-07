@@ -1,0 +1,86 @@
+[
+ {
+  "tag": "r234-dec-base",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": ":",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ },
+ {
+  "tag": "r234-dec-obv",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": "obvious:",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ },
+ {
+  "tag": "r234-dec-syn",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": ":synonyms",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ },
+ {
+  "tag": "r234-dec-obvsyn",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": "obvious:synonyms",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ },
+ {
+  "tag": "r234-dec-seen",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": "seen:",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ },
+ {
+  "tag": "r234-dec-seensyn",
+  "gpu": "H100",
+  "env": {
+   "PLAN_ROWS": "234",
+   "ADAPTERS_FROM": "r231-dv5-s0",
+   "RATIONAL_FILE": "rational_variants_v1.json",
+   "VARIANTS": "seen:synonyms",
+   "KNOWN_EVERY": "8"
+  },
+  "cmds": [
+   "uv run --frozen --with transformers==5.17.0 --with flash-linear-attention --with \"peft>=0.21\" --with torch==2.13.0 --with torchvision==0.28.0 python scripts/rational_decider.py"
+  ]
+ }
+]

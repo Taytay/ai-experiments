@@ -17,7 +17,9 @@ env: ARM, BASE (hist_colbert_v1: row 195's ColBERT, or any encoder), CTX (0), NB
      row 209 (any base): PDIM (128), PROJ (linear | res), PROJ_INIT (1), LOWER (0), POOL (cls | mean | last), MAXLEN (default min(96, the base's): row 210's length).
 usage: SHARED_WORLD=1 GROUPNAMES=1 REALSTYLE_V4=1 ARM=a0 uv run python scripts/li_decider.py train
 """
+import hashlib
 import json
+import math
 import os
 import random
 from array import array
@@ -39,7 +41,7 @@ CTX, NB, M = int(os.environ.get("CTX", "0")), int(os.environ.get("NB", "5")), in
 B, WINDOW, STEPS = int(os.environ.get("B", "32")), int(os.environ.get("WINDOW", "7")), int(os.environ.get("STEPS", "3000"))
 HOUSEHOLDS, BRIER, LR = int(os.environ.get("HOUSEHOLDS", "200")), float(os.environ.get("BRIER", "1")), float(os.environ.get("LR", "5e-5"))
 SEED = int(os.environ.get("SEED", "0"))
-HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))
+HYBRID, QW = int(os.environ.get("HYBRID", "0")), int(os.environ.get("QW", "0"))  # HYBRID=2 (row 236): the pooled cosine alone, MODE=doc only
 GROUPS = int(os.environ.get("GROUPS", "1"))  # household windows per training step
 BATCHED_READ = int(os.environ.get("BATCHED_READ", "1"))
 FAST_ISCORES, ICHUNK = int(os.environ.get("FAST_ISCORES", "1")), int(os.environ.get("ICHUNK", "128"))  # row 211's vectorised reader  # 0: the per-transaction reader (to check the batched one against)
@@ -61,9 +63,14 @@ ROW = os.environ.get("ROW", "210")
 PDIM, PROJ, PROJ_INIT = int(os.environ.get("PDIM", "128")), os.environ.get("PROJ", "linear"), int(os.environ.get("PROJ_INIT", "1"))
 LOWER, POOL, MAXLEN = int(os.environ.get("LOWER", "0")), os.environ.get("POOL", "cls"), int(os.environ.get("MAXLEN", "0"))
 LIST_TS = (0.5, 0.2, 0.1, 0.05)  # confidence thresholds for suggestion lists in read()
-EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, JM=3, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ")  # settings added after row 211 (name -> default); load() restores them from li_config.json
+EXTRA = dict(AGO=0, REC=0, QFMT="rows", SIMN=15, PAYN=5, JM=3, RENAME=0.0, OVERRIDE=0.0, HMASK=0.0, HLW=1.0, KINDLINE=0, EVFREE=0.0, EMPTY=0, CROWD=0, DBSWAP=0.0, PPRIOR=0, PTAU=0.9, CREC=0, CAGO=0, PREFIX=0, QPREFIX="[Q] ", DPREFIX="[D] ", COLD=0.0, COLDDOC=0.0)  # settings added after row 211 (name -> default); load() restores them from li_config.json
 AGO, REC, QFMT = int(os.environ.get("AGO", "0")), int(os.environ.get("REC", "0")), os.environ.get("QFMT", "rows")  # row 217: _query
 RENAME = float(os.environ.get("RENAME", "0"))  # row 218: _renamed (training only)
+# row 235 (owner, 2026-10-06: "Let's try to inject knowledge in fcr to have it get better at new payees. Perhaps we show it examples where
+# there is no history?"): a share COLD of training queries keeps the transaction line alone (no history rows), so the payee's name must be
+# matched to the category documents; of those, a share COLDDOC also sees each document as its category name alone ("nothing filed
+# yet", as a new budget), so the name must be matched to the category's name (training only)
+COLD, COLDDOC = float(os.environ.get("COLD", "0")), float(os.environ.get("COLDDOC", "0"))
 OVERRIDE = float(os.environ.get("OVERRIDE", "0"))  # row 218: _override (training only)
 PPRIOR = int(os.environ.get("PPRIOR", "0"))  # row 218: the payee-history prior (_prior), with a learned weight ALPHA: 1 same payee_key, 2 neighbours at cosine >= PTAU
 PTAU = float(os.environ.get("PTAU", "0.9"))
@@ -173,8 +180,24 @@ class Enc(H2.ColBERT):
         # transformers 5.5): ModernBERT / Ettin then unpad variable-length batches. On the RTX 3090, 32 queries of 400-2,500 tokens: 0.50 s
         # forward + backward against sdpa's 0.81, 3.0 GB against 3.9; every token within cosine 0.9997 of the sequence read alone.
         attn = os.environ.get("ATTN", "")
-        self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
-        hid = self.enc.config.hidden_size
+        if train and os.environ.get("LOADER") == "unsloth":  # row 238 (owner, 2026-10-07: unsloth for EmbeddingGemma 2; "I want faster
+            from unsloth import FastSentenceTransformer  # training"): unsloth's kernels, bf16 weights; 1.8x the steps / s at half the
+            lora = int(os.environ.get("UNSLOTH_LORA", "0"))  # unsloth's EmbeddingGemma 2 recipe (unsloth.ai/docs/models/embeddinggemma-2): the
+            st = FastSentenceTransformer.from_pretrained(  # text-only checkpoint, LoRA r 32 / alpha 64 on all projections, its checkpointing
+                str(path), max_seq_length=MAXLEN or 1024, full_finetuning=not lora, config_kwargs={"vision_config": None, "audio_config": None},
+                **({} if lora else dict(use_gradient_checkpointing="unsloth" if GC else False, float32_mixed_precision=os.environ.get("UNSLOTH_FP32") == "1")))
+            if lora:
+                st = FastSentenceTransformer.get_peft_model(st, r=lora, lora_alpha=2 * lora, lora_dropout=0, bias="none", random_state=3407,
+                                                            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+                                                            use_gradient_checkpointing="unsloth" if GC else False, task_type="FEATURE_EXTRACTION")
+                self._peft = st[0].auto_model  # merged into the base at save()
+            self.tok, self.enc = st.tokenizer, st[0].auto_model.to(self.dev)  # run under scripts/unsloth_run.py
+        else:
+            self.enc = AutoModel.from_pretrained(str(path), **({"attn_implementation": attn} if attn else {})).to(self.dev)
+        if not hasattr(self.enc.config, "hidden_size") and hasattr(self.enc, "language_model"):  # row 236: EmbeddingGemma 2's text tower
+            self.enc = self.enc.language_model  # (271M of its 740M; vision and audio towers dropped)
+        cfg_ = getattr(self.enc.config, "text_config", None) or self.enc.config
+        hid = getattr(cfg_, "embedding_dim", None) or cfg_.hidden_size  # EmbeddingGemma 2: 768 out of a 512-wide body
         lin = torch.nn.Linear(hid if PROJ == "linear" else 2 * hid, PDIM, bias=False)
         if PROJ == "linear":
             self.proj = lin.to(self.dev)
@@ -212,6 +235,21 @@ def _lower(t):
     return t.replace(MARK.lower(), MARK) if MODE == "joint" else t
 
 
+def _enc_save(self, out):
+    """Enc.save: with unsloth's LoRA (row 238) the adapters merged into the base first, so the saved encoder loads without peft"""
+    import torch
+    if getattr(self, "_peft", None) is not None:
+        merged = self._peft.merge_and_unload()
+        merged = merged.language_model if hasattr(merged, "language_model") else merged
+        merged.save_pretrained(str(out)); self.tok.save_pretrained(str(out))
+        torch.save(self.proj.state_dict(), Path(out) / "proj.pt")
+    else:
+        H2.ColBERT.save(self, out)
+
+
+Enc.save = _enc_save
+
+
 class LI:
     """hist_encoder2.ColBERT plus two options from the late-interaction papers (references/papers INDEX thread 8): HYBRID adds the cosine of
     the normalised [CLS] states to MaxSim (SMART, 2605.24938: the hybrid objective beat late-only by +0.8 and pooled-only by +6.5);
@@ -239,8 +277,8 @@ class LI:
         if PREFIX and role:  # ColBERT-Zero (2602.16609): keep the base's own query / document markers ("[Q] " / "[D] " for PyLate models)
             texts = [(QPREFIX if role == "q" else DPREFIX) + t for t in texts]
         b = self.cb.tok(texts, padding=True, truncation=True, max_length=self.cb.maxlen, return_tensors="pt").to(self.dev)
-        with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda"):
-            h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state
+        with torch.autocast(self.dev, dtype=torch.bfloat16, enabled=self.dev == "cuda" and os.environ.get("LOADER") != "unsloth"):
+            h = self.cb.enc(input_ids=b["input_ids"], attention_mask=b["attention_mask"]).last_hidden_state  # unsloth: its own bf16 kernels
         h = h.float()
         m = b["attention_mask"].bool()
         v = torch.nn.functional.normalize(self.cb.proj(h), dim=-1)
@@ -269,6 +307,8 @@ class LI:
         else:
             s = s.masked_fill(~dm[None, :, None, :], -2).max(-1).values
         s = (s * qw[:, None, :]).sum(-1)
+        if HYBRID == 2:  # row 236 (owner, 2026-10-07: "Either cosine similarity or two towers"): one pooled vector each, cosine only
+            return qc @ dc.T
         return s + qc @ dc.T if HYBRID else s
 
     def save(self, out):
@@ -360,7 +400,9 @@ def _iscores(model, inter, scale, anc, ev, Q, D, pos, docs, F=None, fpos=None, L
     else:
         sim = sim.masked_fill(~dm[:, None, :], -2).max(-1).values
     sc = (sim * qw[ra]).sum(-1)
-    if HYBRID:
+    if HYBRID == 2:
+        sc = (qc[ra] * D[3][rd]).sum(-1)
+    elif HYBRID:
         sc = sc + (qc[ra] * D[3][rd]).sum(-1)
     sc = scale * sc
     S = torch.full((len(anc), nopt), float("-inf"), device=model.dev)
@@ -378,6 +420,60 @@ _M1 = None
 KNB = 50  # neighbours kept per event in the cache: the most any setting reads (NB, NCAND, NMEM)
 
 
+_RAWTOK = {}
+
+
+def _encode_fast(m, texts, bs=512):
+    """m.encode(texts, normalize_embeddings=True) with the same batches (sentence-transformers' length order, 512 a batch, padded to the
+    batch's longest), tokenised by the Rust tokenizer directly: the transformers wrapper took 2.2 s of 3.0 per 80k strings, the Rust
+    backend 0.45 s (2026-10-06, the same ids). A private copy of the backend, so the wrapper's padding settings never leak in."""
+    import torch
+    from tokenizers import Tokenizer
+    if not texts:
+        return np.zeros((0, m.get_sentence_embedding_dimension()), dtype=np.float32)
+    key = id(m)
+    if key not in _RAWTOK:
+        raw = Tokenizer.from_str(m.tokenizer.backend_tokenizer.to_str())
+        raw.no_padding(); raw.enable_truncation(m.max_seq_length)
+        _RAWTOK[key] = raw
+    raw, pad = _RAWTOK[key], m.tokenizer.pad_token_id
+    order = np.argsort([-m._input_length(t) for t in texts])
+    if m._can_flatten_inputs():
+        order = m._interleave_sorted_indices(order)
+    out = np.zeros((len(texts), m.get_sentence_embedding_dimension()), dtype=np.float32)
+    m.eval()
+    for k in range(0, len(texts), bs):
+        idx = order[k:k + bs]
+        encs = raw.encode_batch([texts[i] for i in idx])
+        L = max(len(e.ids) for e in encs)
+        ids = np.full((len(encs), L), pad, dtype=np.int64); att = np.zeros((len(encs), L), dtype=np.int64); tt = np.zeros((len(encs), L), dtype=np.int64)
+        for r, e in enumerate(encs):
+            ids[r, :len(e.ids)] = e.ids; att[r, :len(e.ids)] = 1; tt[r, :len(e.ids)] = e.type_ids
+        feats = {"input_ids": torch.from_numpy(ids).to(m.device), "attention_mask": torch.from_numpy(att).to(m.device),
+                 "token_type_ids": torch.from_numpy(tt).to(m.device)}
+        with torch.inference_mode():
+            emb = torch.nn.functional.normalize(m(feats)["sentence_embedding"], p=2, dim=1)
+        out[idx] = emb.float().cpu().numpy()
+    return out
+
+
+def _neighbours_fast(E, ev, n):
+    """hist_encoder._neighbours as arrays: (indices int32 [N, n], -1 where fewer earlier-day events; cosines float16), same order"""
+    import torch
+    X = torch.tensor(E, device="cuda" if torch.cuda.is_available() else "cpu")
+    day = torch.tensor([e["day"] for e in ev], device=X.device)
+    k = min(n, len(ev))
+    arr = np.full((len(ev), n), -1, dtype=np.int32); carr = np.zeros((len(ev), n), dtype=np.float16)
+    for a in range(0, len(ev), 1024):
+        S = X[a:a + 1024] @ X.T
+        S[day[a:a + 1024, None] <= day[None, :]] = -2
+        v, ix = S.topk(k, dim=1)
+        ok = v > -2
+        arr[a:a + 1024, :k] = torch.where(ok, ix, -1).int().cpu().numpy()
+        carr[a:a + 1024, :k] = torch.where(ok, v, 0).half().cpu().numpy()
+    return arr, carr
+
+
 def _nbrs(b, ev, m1, cache, cos=False):
     """each event's KNB nearest earlier-day events by the neighbour encoder (hist_knn_v1), as index lists (cos=True: also their cosines,
     float16 arrays, for PPRIOR=2). Cached on disk for synthetic budgets in data/interim/li_nb, one int32 array per budget keyed by its
@@ -391,8 +487,9 @@ def _nbrs(b, ev, m1, cache, cos=False):
         h = hashlib.sha1(f"{b['id']}|{KNB}|{H.AMT_TEXT}".encode())
         for e in ev:
             h.update(f"{e['id']}|{e['day']}|{e['text']}\n".encode())
-        for w in sorted(Path(H.OUT1).glob("*.safetensors")):
-            h.update(f"{w.name}{w.stat().st_size}{w.stat().st_mtime_ns}".encode())
+        from two_tower import _file_sha
+        for w in sorted(Path(H.OUT1).glob("*.safetensors")):  # by content (2026-10-06: mtimes differ between Modal images and copies)
+            h.update(f"{w.name}{_file_sha(w)}".encode())
         f = ROOT / "data" / "interim" / "li_nb" / f"{h.hexdigest()[:20]}.npy"
         fc = f.with_name(f.stem + "_cos.npy")
         if f.exists() and (not cos or fc.exists()):
@@ -402,16 +499,21 @@ def _nbrs(b, ev, m1, cache, cos=False):
     if m1 is None:  # loaded only when a budget misses the cache
         _M1 = _M1 or H._model(H.OUT1)
         m1 = _M1
-    found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
-    nb = [array("i", (j for j, _ in n)) for n in found]
-    cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
-    if f is not None:
-        f.parent.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("NB_FAST", "1") == "1":  # 2026-10-06: the Rust tokenizer called directly and the search kept in arrays (same lists)
+        arr, carr = _neighbours_fast(_encode_fast(m1, [e["text"] for e in ev]), ev, KNB)
+        nb = [array("i", r[r >= 0].tolist()) for r in arr]
+        cs = [c[r >= 0] for r, c in zip(arr, carr)]
+    else:
+        found = H._neighbours(H._embed(m1, [e["text"] for e in ev], cache), ev, KNB)
+        nb = [array("i", (j for j, _ in n)) for n in found]
+        cs = [np.array([c for _, c in n], dtype=np.float16) for n in found]
         arr = np.full((len(ev), KNB), -1, dtype=np.int32)
         carr = np.zeros((len(ev), KNB), dtype=np.float16)
         for i, r in enumerate(nb):
             arr[i, :len(r)] = r
             carr[i, :len(r)] = cs[i]
+    if f is not None:
+        f.parent.mkdir(parents=True, exist_ok=True)
         for path, x in ((f, arr), (fc, carr)):
             tmp = path.with_suffix(f".tmp{os.getpid()}.npy")
             np.save(tmp, x)
@@ -701,7 +803,9 @@ def _kindline(b, ev):
             continue
         if e["payee"] not in look:
             r = random.Random(int(hashlib.md5(f'{b["id"]}|{e["payee"]}'.encode()).hexdigest(), 16))
-            if k in KL.GROUP_OF and r.random() < KL.COVER:
+            if os.environ.get("KIND_ORACLE") == "1" and k in KL.GROUP_OF:  # row 234 check: the right kind on every payee, top bucket
+                look[e["payee"]] = (k, "high")
+            elif k in KL.GROUP_OF and r.random() < KL.COVER:
                 bk = KL.sample_bucket(r)
                 look[e["payee"]] = (KL.corrupt(k, bk, r)[0], bk)
             else:
@@ -721,7 +825,13 @@ def _materialise(e, names=None, rng=None):
         i, ev = e["_i"], e["_ev"]
         js = list(e.get("nb", [])[:NB]) + ([j for j in range(e["_start"][i] - 1, max(-1, e["_start"][i] - 1 - REC), -1)] if REC else [])
         hide = {j for j in js if rng.random() < HMASK}
-    q = _query(e["_i"], e["_ev"], e["_start"], names, hide, spans)
+    cold = COLD and rng is not None and rng.random() < COLD
+    if cold:  # row 235: no history rows (the crowd / kind lines, part of the transaction line, stay)
+        q, spans = e["_ev"][e["_i"]]["text"], []
+        if COLDDOC and rng.random() < COLDDOC:
+            return dict(e, q=q, hid=[], d={c: _doc(lab(c), ()) for c in e["state"]})
+    else:
+        q = _query(e["_i"], e["_ev"], e["_start"], names, hide, spans)
     return dict(e, q=q, hid=[(a, z, e["_ev"][j]["gold"]) for a, z, j in spans], d={c: _doc(lab(c), e["_snap"][e["_ci"][c]]) for c in e["state"]})
 
 
@@ -834,7 +944,9 @@ def _doc_pairs(model, scale, qtexts, dtexts, cols, rows=None):
     else:
         sim = sim.masked_fill(~m[:, :, None, :], -2).max(-1).values
     S = (sim * qw[:, None, :]).sum(-1)
-    if HYBRID:
+    if HYBRID == 2:  # row 236: the two-tower cosine alone (the token similarities still serve HMASK's hidden rows, if on)
+        S = torch.einsum("bh,bch->bc", qc, dc[ix])
+    elif HYBRID:
         S = S + torch.einsum("bh,bch->bc", qc, dc[ix])
     S = (scale * S).masked_fill(~valid, float("-inf"))
     if rows is None:
@@ -901,6 +1013,49 @@ def _loss(S, tgt):
     return ce + BRIER * ((p - y) ** 2).sum(-1).mean(), ce
 
 
+def _train_budget(n, b=None):
+    b = b or next(households("train", [n]))
+    if OVERRIDE:
+        b = _override(b, random.Random(SEED * 7919 + n))
+    if DBSWAP:
+        b = _dbswap(b, random.Random(SEED * 104729 + n))
+    return b
+
+
+def _prep_one(n):
+    return prepared(_train_budget(n), None, {}, full=False)
+
+
+def _prep_train(m1, cache):
+    """the training households, prepared. 2026-10-06 (owner: "We need to do better at reusing preparation steps"): fcr's jobs spent 14 of
+    21 minutes here on one core. Now (1) each household's neighbour list is made or loaded in this process (the GPU step, cached on disk
+    in data/interim/li_nb; a prep job builds them once for every arm), then (2) the CPU part runs in PREP_PROCS forked workers (default:
+    every core), which only read the caches. PREP_PROCS=1: the old sequential loop."""
+    import multiprocessing as mp
+    procs = int(os.environ.get("PREP_PROCS", "0")) or min(8, len(os.sched_getaffinity(0)))  # Modal reserves 8 cores (os.cpu_count is the host's)
+    if os.environ.get("PREP_CACHE", "1") == "0":  # without the disk cache the workers would each embed on the GPU
+        procs = 1
+    t0 = time.time()
+    if procs == 1 or not (CTX or MODE in ("mml", "mmld") or "m" in INTERACT or PPRIOR == 2):
+        out = []
+        for n, b in enumerate(households("train", range(HOUSEHOLDS))):
+            out.append(prepared(_train_budget(n, b), m1, cache, full=False))
+            if n % 50 == 0:
+                cache.clear()
+        return out
+    for n, b in enumerate(households("train", range(HOUSEHOLDS))):
+        b = _train_budget(n, b)
+        _nbrs(b, H2.events(b), m1, cache, cos=PPRIOR == 2)
+        if n % 50 == 0:
+            cache.clear()
+    t1 = time.time()
+    with mp.get_context("fork").Pool(procs) as pool:
+        out = pool.map(_prep_one, range(HOUSEHOLDS), chunksize=1)
+    print(f"prepared {HOUSEHOLDS} households: neighbours {t1 - t0:.0f}s (GPU, disk cache), the rest {time.time() - t1:.0f}s on {procs} processes",
+          flush=True)
+    return out
+
+
 def train():
     import torch
     from ai_experiments.licences import open_licence
@@ -912,15 +1067,7 @@ def train():
     assert not RENAME or (MODE in ("doc", "mmld") and not INTERACT), "RENAME renders documents and query rows only"
     t0 = time.time()
     m1, cache = None, {}  # the neighbour encoder loads only if a budget misses the cache (_nbrs)
-    data = []
-    for n, b in enumerate(households("train", range(HOUSEHOLDS))):
-        if OVERRIDE:
-            b = _override(b, random.Random(SEED * 7919 + n))
-        if DBSWAP:
-            b = _dbswap(b, random.Random(SEED * 104729 + n))
-        data.append(prepared(b, m1, cache, full=False))
-        if n % 50 == 0:
-            cache.clear()
+    data = _prep_train(m1, cache)
     kd = []  # teacher-scored events (row 223)
     if TEACHER:
         from ai_experiments.paths import PROCESSED, ROOT
@@ -955,7 +1102,7 @@ def train():
     global MARK
     MARK = model.cb.tok.sep_token or MARK
     assert not (EVFREE or EMPTY) or (MODE == "doc" and not INTERACT and not PPRIOR and not kd), "EVFREE / EMPTY are wired into the document trainer only"
-    if GC:  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
+    if GC and os.environ.get("LOADER") != "unsloth":  # recompute the encoder's activations in backward (2026-10-06: MODE=mmld encodes ~3,000 candidate texts per step; 44 GB on an L40S was not enough)
         model.cb.enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     scale = torch.nn.Parameter(torch.load(Path(BASE) / "scale.pt", map_location="cpu").to(model.dev) if (Path(BASE) / "scale.pt").exists() else torch.tensor(20.0, device=model.dev))
     inter = inter_module(model.dev) if INTERACT else None
@@ -1093,10 +1240,15 @@ def train():
                 run["kd"] += kdl.item()
         opt.zero_grad(set_to_none=True)
         loss.backward()
+        if os.environ.get("DEBUG_GRAD") and s < 2:
+            bad = [(n, p.dtype) for n, p in model.cb.enc.named_parameters() if p.grad is not None and not torch.isfinite(p.grad).all()]
+            nog = sum(p.grad is None for p in model.cb.enc.parameters() if p.requires_grad)
+            print(f"  debug step {s + 1}: {len(bad)} non-finite grads {bad[:3]}, {nog} trainable without grad, param dtype "
+                  f"{next(model.cb.enc.parameters()).dtype}, finite params {all(torch.isfinite(p).all() for p in model.cb.enc.parameters())}", flush=True)
         torch.nn.utils.clip_grad_norm_(model.params() + (list(inter.parameters()) if inter else []), 1.0)
         opt.step(); sched.step()
         run["loss"] += loss.item(); run["ce"] += ce.item(); run["acc"] += (Sg.argmax(1) == tgt).float().mean().item(); k += 1
-        if (s + 1) % 200 == 0:
+        if (s + 1) % int(os.environ.get("LOG_EVERY", "200")) == 0:
             print(f"  step {s + 1}/{STEPS} " + " ".join(f"{a} {v / k:.3f}" for a, v in run.items()) + f" scale {scale.item():.1f}" + (f" alpha {alpha.item():.2f}" if PPRIOR else "") + f" ({time.time() - t0:.0f}s)", flush=True)
             run.clear(); k = 0
     model.save(out)
@@ -1227,7 +1379,9 @@ def scores(model, scale, ev, docs):
                 else:
                     sim = sim.masked_fill(~dm[:, :, None, :], -2).max(-1).values                           # [b, C, t]
                 S = (sim * qw[:, None, :]).sum(-1)
-                if HYBRID:
+                if HYBRID == 2:  # row 236: the two-tower cosine alone
+                    S = torch.einsum("bh,bch->bc", qc, D[3][cix].float())
+                elif HYBRID:
                     S = S + torch.einsum("bh,bch->bc", qc, D[3][cix].float())
                 S = scale * S
                 if PPRIOR:
@@ -1254,6 +1408,8 @@ def load(arm):
     """an arm ready to read: sets this module's settings from its li_config.json and returns run(budget) -> (events, per-event
     {category id: score}); one arm at a time (the settings are module globals). Used by read() and hist_agree.py (ENCS=li_r...)."""
     import torch
+    if arm.startswith("clef:"):
+        return _clef_load(arm[len("clef:"):])
     d = H.ENC / (arm if arm.startswith("li_r") else f"li_r{ROW}_{arm}")
     cfg = json.loads((d / "li_config.json").read_text())
     global CTX, NB, M, HYBRID, QW, SOFT, MODE, NCAND, INTERACT, NMEM, XLAYERS, PDIM, PROJ, PROJ_INIT, LOWER, POOL, MAXLEN
@@ -1281,14 +1437,86 @@ def load(arm):
     def run(b):  # row 230: times kept apart: building the texts (CPU, neighbours from the cache) and scoring them (GPU)
         t0 = time.time()
         ev, docs = prepared(b, m1, cache)
+        k = int(os.environ.get("READ_EVERY", "1"))  # owner, 2026-10-06 ("our test set is too big if it takes longer to score than train"):
+        if k > 1 and MODE not in ("mml", "mmld"):  # score every k-th transaction of every budget (same ones for every arm); queries and
+            ev = [e for e in ev if int(hashlib.md5(str(e["id"]).encode()).hexdigest()[:8], 16) % k == 0]  # by id: a fixed random sample
+            # (documents and queries are built from the whole history first; mml reads candidates by event position: whole budgets only)
+            if docs is not None:  # only the sampled days' documents are encoded
+                days = {e["day"] for e in ev}
+                docs = {d: v for d, v in docs.items() if d in days}
         t1 = time.time()
         out = iscores(model, inter, scale, ev, docs) if inter else scores(model, scale, ev, docs)
         if torch.cuda.is_available():
             torch.cuda.synchronize()
+        tau = float(os.environ.get("FREQ_TAU", "0"))  # row 237 (owner, 2026-10-07: "I do want to try to fix the frequency thing"): on a
+        if tau:  # first-time payee, each category's score less tau * log(1 + its filings so far): fcr picked the household's busiest category
+            cnt = defaultdict(int)  # on 45.8% of first purchases where it was right on 33.5% (rational households, §207). Events in date
+            for e, sc in zip(ev, out):  # order; READ_EVERY samples skip filings, so read it on whole budgets
+                if not e.get("seen", True):
+                    for c in sc:
+                        sc[c] -= tau * math.log1p(cnt[c])
+                cnt[e["gold"]] += 1
         run.prep += t1 - t0; run.score += time.time() - t1; run.n += len(ev)
         run.qlen += [len(x) for x in model.cb.tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
         return ev, out
     run.name, run.prep, run.score, run.n, run.qlen = d.name, 0.0, 0.0, 0, []
+    return run
+
+
+CLEF_INSTR = ("Which of this household's budget categories should the first transaction in the state be filed under? After '||' the "
+              "state lists the household's earlier filings of similar payees and its most recent filings, each as payee, amount, "
+              "the category it was filed under and how long ago. Each option is a category with payees recently filed under it.")
+
+
+def _clef_load(name):
+    """row 164 (owner, 2026-10-02 / 2026-10-06: Cloudflare's Clef decision models): a Clef release read zero-shot as a reader of this
+    module (same households, options, metrics, timing, owner path). State: the transaction's query text as this module builds it (CTX,
+    NB, AGO, REC from the environment; the p2 query by default); one choice question whose options are the day's categories, each
+    named by its "Group: Name" and described by its document's recent payees. Options keyed by category id inside, by name outside.
+    env: CLEF_BATCH (records a forward pass, 4), CLEF_MAXLEN (16384)."""
+    import sys as _sys
+    import torch
+    from huggingface_hub import snapshot_download
+    from ai_experiments.licences import open_licence
+    open_licence(name)
+    path = snapshot_download(name)
+    _sys.path.insert(0, path)
+    from joint_schema_model import collate_records, encode_record, load_release_model
+    model, processor = load_release_model(path, device="cuda")
+    tok, bs, ml = processor.tokenizer, int(os.environ.get("CLEF_BATCH", "4")), int(os.environ.get("CLEF_MAXLEN", "16384"))
+    # 2026-10-06: ~2,000 tokens a transaction (the ~45 options with descriptions dominate) cost ~0.1-0.2 s each on an H100 (matrix
+    # multiplies; causal_conv1d's fallback is 3.5% of the time): CLEF_JM payees per option (3), and every CLEF_EVERY-th transaction (1)
+    jm, every = int(os.environ.get("CLEF_JM", "3")), int(os.environ.get("CLEF_EVERY", "1"))
+    m1, cache = None, {}
+
+    def record(e):
+        crit, key = {}, {}
+        for c in e["state"]:
+            label, _, rest = e["d"][c].partition(" | ")
+            k = label if label not in crit else f"{label} ({c[:4]})"
+            crit[k], key[k] = (" | ".join(rest.split(" | ")[:jm]) if rest else "nothing filed yet"), c
+        return {"state": e["q"], "questions": {"category": {"type": "choice", "instructions": CLEF_INSTR, "criteria": crit}}}, key
+
+    def run(b):
+        t0 = time.time()
+        ev, docs = prepared(b, m1, cache)
+        ev = ev[::every]  # a sample of the transactions; each still has its full history and the day's options
+        t1 = time.time()
+        out = []
+        with torch.inference_mode():
+            for a in range(0, len(ev), bs):
+                recs = [record(e) for e in ev[a:a + bs]]
+                enc = [encode_record(tok, r, max_length=ml) for r, _ in recs]
+                logits = model(collate_records(enc, tok.pad_token_id, torch.device("cuda")))
+                for (r, key), en, lg in zip(recs, enc, logits):  # Clef sorts a choice's options by key: map back through its option ids
+                    v = lg[0].float().cpu().numpy()
+                    sc = {key[o]: float(x) for o, x in zip(en.questions[0].option_ids, v)}
+                    out.append(sc)
+        torch.cuda.synchronize()
+        run.prep += t1 - t0; run.score += time.time() - t1; run.n += len(ev)
+        run.qlen += [len(x) for x in tok([e["q"] for e in ev[::max(1, len(ev) // 200)]])["input_ids"]]
+        return ev, out
+    run.name, run.prep, run.score, run.n, run.qlen = name.split("/")[-1], 0.0, 0.0, 0, []
     return run
 
 
@@ -1362,5 +1590,25 @@ def read():
         del run
 
 
+def prep():
+    """row 233: a cache-building job (modal SAVE_DATA=1; later jobs copy it with DATA_FROM=<its tag>): the training households and their
+    neighbour lists for this env (generator flags, OVERRIDE / DBSWAP, HOUSEHOLDS), and the held-out households TEST_SEEDS, so arms that
+    share households (seeds, recipe changes, reads) do not each rebuild them."""
+    import multiprocessing as mp
+    t0 = time.time()
+    a, z = map(int, os.environ.get("TEST_SEEDS", "100000-100019").split("-"))
+    with mp.get_context("fork").Pool(min(8, len(os.sched_getaffinity(0)))) as pool:  # households: CPU, one process each
+        pool.map(_build_hh, [("train", n) for n in range(HOUSEHOLDS)] + [("test", n) for n in range(a, z + 1)], chunksize=4)
+    print(f"households built ({time.time() - t0:.0f}s)", flush=True)
+    _prep_train(None, {})
+    for b in households("test", range(a, z + 1)):
+        _nbrs(b, H2.events(b), None, {})
+    print(f"prep done ({time.time() - t0:.0f}s)", flush=True)
+
+
+def _build_hh(sn):
+    next(households(sn[0], [sn[1]]))
+
+
 if __name__ == "__main__":
-    {"train": train, "read": read}[sys.argv[1]]()
+    {"train": train, "read": read, "prep": prep}[sys.argv[1]]()

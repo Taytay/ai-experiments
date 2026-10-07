@@ -1,0 +1,397 @@
+<article class="row" id="row-201" data-from="199,195" data-era="History-aware encoders" data-status="done">
+  <header>
+    <p class="eyebrow">Row 201 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · §180 Where decider and encoders disagree</p>
+    <h2>Do decider and the small encoders make the same mistakes?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-199">Row 199</a> found that, with fair settings, adding the history encoders to decider gained only +0.3. Whether any combination can ever pay depends on how different the two readers' errors are. Pinterest's Multi-Embedding Retrieval paper got a big gain from combining two retrievers because they shared only 3.2% of their candidates. After reading the Pinterest papers, the owner asked us to "apply all of their learnings to our approach".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>For every transaction we recorded who got it right: decider only, the encoder only (kNN or MaxSim from <a class="back" href="#row-195">row 195</a>), both, or neither. We split the counts by how often the payee had been filed before and by the size of the right category. We also tested rules a real system could use to pick between them: "the more confident reader wins", and a gate whose thresholds were chosen on synthetic households. Reads ran on 100 held-out synthetic households and the owner's budget (aggregates only), in 3 minutes on the new GPU readers from <a href="#row-208">row 208</a>.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Transaction: SQ *LANTERN BOOKS | $18.40 | Tue
+decider top choice:  Gifts        (p 0.48)   wrong
+MaxSim top choice:   Books &amp; Media (p 0.61)  right
+-&gt; counted as "only the encoder right"</pre><p class="note">Illustrative, invented: one transaction's tally. The question is how often this case happens, and whether any signal can spot it.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Owner's budget (% of items)</th><th>n</th><th>decider</th><th>MaxSim</th><th>Only decider right</th><th>Only MaxSim right</th><th>Either (perfect chooser)</th><th>Best usable rule</th></tr></thead><tbody>
+<tr><td>All</td><td>19,093</td><td>72.5</td><td>64.8</td><td>12.3</td><td>4.6</td><td>77.1</td><td>72.5</td></tr>
+<tr><td>First-time payee</td><td>5,832</td><td>56.9</td><td>46.2</td><td>17.1</td><td>6.4</td><td>63.3</td><td>57.0</td></tr>
+<tr><td>Payee filed 4+ times</td><td>9,991</td><td>79.0</td><td>72.6</td><td>10.0</td><td>3.5</td><td>82.5</td><td>78.9</td></tr>
+<tr><td>Right category has 1-9 filings</td><td>992</td><td>44.0</td><td>21.5</td><td>25.4</td><td>2.9</td><td>46.9</td><td>43.9</td></tr>
+<tr><td>Right category has 100+ filings</td><td>14,148</td><td>77.3</td><td>73.3</td><td>9.2</td><td>5.1</td><td>82.5</td><td>77.4</td></tr>
+</tbody></table></div><p class="note">decider G4, mean of two seeds; kNN within 1 point of MaxSim except where §180 notes it. Synthetic held-out households (5,897 items): decider 72.8, kNN 70.6, MaxSim 70.1; best rule 73.0 to 73.2.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The errors overlap heavily: where decider is wrong, an encoder is right only about one time in five (4.6 of 27.5 points).</li><li>A perfect chooser would gain +4.3 to +4.6, but no confidence signal finds those cases: the best rule stays at decider's 72.5.</li><li>decider's lead is largest where history is thin (small categories, first-time payees); the encoders nearly match it where history is rich. For now the encoders' role is cost, not accuracy.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Can the encoders get better on their own? (<a href="#row-202">row 202</a>, <a href="#row-204">row 204</a>, <a href="#row-205">row 205</a>)</li><li>Can decider's own history and speed improve? (<a href="#row-206">row 206</a>)</li><li>Does a model where history and options interact close the gap? (<a href="#row-211">row 211</a>)</li></ul></section>
+</article>
+<article class="row" id="row-202" data-from="194" data-era="History-aware encoders" data-status="done">
+  <header>
+    <p class="eyebrow">Row 202 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · §182 Encoder training fixes from the papers</p>
+    <h2>Training the history encoder with Pinterest's tricks</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Pinterest's papers report big gains from changes to how a retrieval encoder is trained: correcting for popular items, adding many random wrong answers, never treating a near-duplicate as a wrong answer, and scoring against the user's own set of choices. The owner asked to "apply all of their learnings". <a class="back" href="#row-194">Row 194</a>'s encoder was the starting point.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We rebuilt <a class="back" href="#row-194">row 194</a>'s training in a plain loop and checked it reproduced the old encoder (b0). Then one seed each of: b1 dedup (no wrong answer from the same household and category, at most 400 examples per payee); b2 b1 plus logQ, a discount for popular items; b3 b1 plus 1,024 random wrong answers per step drawn from all households; b3b the same with same-payee ones removed; b4 the household softmax, where the loss is the MaxSim reader itself over the household's categories; b5 the old loss plus dedup plus the household softmax. Each was read on 50 held-out households and on decider's own items.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">ANCHOR:     Fernway Hardware | $22.18 | Sat
+POSITIVE:   Pine Lumber Co   | $64.00  (filed: Home Repair)
+NEGATIVES:  Fernway Hardware | $9.40   (filed: Garden)      hard negative
+            [masked] Fernway Hardware | $31.10 (filed: Home Repair)  dedup: same category, not a negative</pre><p class="note">Illustrative, invented: a triplet with b1's dedup rule. A row filed in the anchor's own category is no longer counted as a wrong answer.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>50 held-out households, % right first (kNN | MaxSim)</th><th>All (359,050)</th><th>First-time payee (53,479)</th></tr></thead><tbody>
+<tr><td>Old encoder (row 194)</td><td>74.5 | 73.4</td><td>60.0 | 59.2</td></tr>
+<tr><td>b1 dedup, payee cap</td><td>74.5 | 73.4</td><td>60.0 | 59.2</td></tr>
+<tr><td>b2 + logQ</td><td>73.8 | 72.9</td><td>55.6 | 56.0</td></tr>
+<tr><td>b3 + random-negative pool</td><td>61.1 | 57.8</td><td>38.8 | 34.4</td></tr>
+<tr><td>b4 household softmax alone</td><td>74.4 | 73.1</td><td>59.9 | 58.8</td></tr>
+<tr><td>b5 old loss + dedup + household softmax</td><td>74.7 | 73.4</td><td>60.7 | 59.8</td></tr>
+</tbody></table></div><p class="note">On the owner's budget, over decider's options: b5 64.6 | 64.7 against the old encoder's 63.6 | 64.8; decider 72.5. Aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>None of the fixes moves the encoder: everything sits within 0.3 of the old one. They solve web-scale problems that a household's 30 to 60 categories do not have.</li><li>logQ hurts first-time payees by about 4 points: it discounts popular payees, which are exactly the neighbours a new payee should be compared with.</li><li>The random-negative pool collapsed to chance during training. That is a bug to find, not a verdict on the idea.</li><li>The gap to decider is not in the training objective; it is in what the model sees and what it knows.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does a scorer that sees the history as a sequence do better? (<a href="#row-203">row 203</a>)</li><li>Does the crowd's naming help the encoder? (<a href="#row-205">row 205</a>)</li><li>Does a decision-model design change the picture? (<a href="#row-210">row 210</a>)</li></ul></section>
+</article>
+<article class="row" id="row-203" data-from="202" data-era="History-aware encoders" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 203 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · proposed</p>
+    <h2>A small sequence scorer built the way Pinterest's TransAct really works</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Pinterest's TransAct ranker got most of its gain not from its transformer but from details around it: marking what kind of action each history row was, pasting the candidate onto every history row, and a simple read-out. <a class="back" href="#row-195">Row 195</a>'s TransAct-style query had read 65.0, below MaxSim's 69.6. The owner's "apply all of their learnings" asked for a faithful version.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, not yet run. For each transaction and each candidate category, build a short sequence: the household's nearest earlier filings, the most recent ones, and the candidate category's own nearest filings. Each token holds the filing's vector, its category's vector, the candidate's vector, their similarity, its age and amount features. A tiny transformer (2 layers, 1 head, width 64) scores it, with a softmax over the household's categories and random time-window masking in training. Compared against <a class="back" href="#row-195">row 195</a>'s query (65.0) and MaxSim (69.6).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Candidate: Dining Out
+  [Harbor Noodle   | Dining Out | cand=Dining Out | cos 0.82 | 3 d  | $24]
+  [Corner Deli     | Lunch      | cand=Dining Out | cos 0.61 | 1 d  | $11]
+  [Rosie's Diner   | Dining Out | cand=Dining Out | cos 0.58 | 40 d | $42]
+-&gt; score(Dining Out)</pre><p class="note">Illustrative, invented: each bracket stands for one token built from vectors and numbers, not text the model reads.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does pasting the candidate onto each history row beat MaxSim, as it beat simpler readers at Pinterest?</li><li>Could a pretrained sequence model start this scorer? (<a href="#row-207">row 207</a>)</li></ul></section>
+</article>
+<article class="row" id="row-204" data-from="195" data-era="History-aware encoders" data-status="done">
+  <header>
+    <p class="eyebrow">Row 204 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · §183 Several prototypes per category</p>
+    <h2>Summing up each category with a few representative purchases</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-194">Row 194</a> found that one average vector per category is weak, and <a class="back" href="#row-195">row 195</a> that comparing with every filing (MaxSim) is strong. Pinterest's PinnerSage sits between: it clusters a user's history into a few interests and keeps one representative for each. That might keep the gain of full history at lower cost, and handle categories that hold several kinds of thing.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>No training: we reused <a class="back" href="#row-194">row 194</a>'s encoder vectors. For each category we clustered its earlier filings (Ward clustering, up to 20 clusters) and represented each cluster by its medoid (the most central real filing) or its centroid (the average). One arm weighted each cluster by its size, optionally decayed by age. Another used farthest-point prototypes (3 or 5 spread-out filings), from the Multi-Embedding Retrieval paper. A category scored as its best prototype's similarity. Read on 50 held-out households.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Category "Kids": 140 filings -&gt; 4 clusters
+  medoid 1: Little Steps Daycare | $310   (52 filings)
+  medoid 2: Splash Swim School   | $45    (30 filings)
+  medoid 3: Toy Barn             | $27    (41 filings)
+  medoid 4: Pediatric Partners   | $35    (17 filings)
+Transaction: Splash Swim School | $45 -&gt; best match: medoid 2</pre><p class="note">Illustrative, invented: a category reduced to four representatives, weighted by cluster size.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Reader (50 held-out households, % top-1 / top-3)</th><th>All (359,050)</th><th>First-time payee (53,479)</th></tr></thead><tbody>
+<tr><td>MaxSim over every earlier filing</td><td>73.4 / 90.2</td><td>59.2 / 79.8</td></tr>
+<tr><td>Ward medoids + cluster size</td><td>68.8 / 86.6</td><td>53.5 / 74.5</td></tr>
+<tr><td>Ward medoids + size, decayed by age (lambda 0.05)</td><td>63.9 / 81.5</td><td>50.8 / 70.8</td></tr>
+<tr><td>Ward centroids</td><td>64.2 / 88.2</td><td>53.4 / 78.3</td></tr>
+<tr><td>Ward medoids</td><td>52.9 / 82.2</td><td>44.0 / 72.1</td></tr>
+<tr><td>Farthest-point, 3 prototypes</td><td>42.6 / 72.9</td><td>41.0 / 67.8</td></tr>
+</tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Compressing a category loses what makes it work: the best prototype reader trails MaxSim by 4.6, farthest-point by 30.</li><li>PinnerSage compresses thousands of pins to save serving cost; a household category has tens to hundreds of filings, which MaxSim reads in full in seconds, so there is nothing to save.</li><li>Cluster size matters more than recency: weighting by size recovers most of the loss, decaying by age only hurts.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Prototypes stay out of the late-interaction model, which also does best seeing the full history (<a href="#row-210">row 210</a>).</li><li>The clustering was CPU work billed on an H100 for two hours; CPU jobs now take <code>--gpu cpu</code>.</li></ul></section>
+</article>
+<article class="row" id="row-205" data-from="202" data-era="History-aware encoders" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 205 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · proposed</p>
+    <h2>Giving the encoder the crowd's names for a payee</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In Pinterest's OmniSearchSage, the board titles other users gave an item (their own names for its collections) were worth +17% beside the item's own text. Our equivalent is the crowd: the category names other households use for the same bank string, which already helps decider as the crowd line. The owner asked to "apply all of their learnings", so this row puts the crowd inside the encoder's text.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, not yet run. Append the top crowd category names (deduplicated, ranked by frequency then specificity) to a bank string's text when training and reading the history encoders. A second, cheap arm: a hashed n-gram tower (words, word pairs and three-letter runs) as a payee encoder. Synthetic households first, since the owner's budget has no crowd data.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">SQ *BLUE KETTLE CAFE | $6.85 | Tue | crowd: Coffee, Eating out, Treats</pre><p class="note">Illustrative, invented: the transaction text the encoder would read, with the crowd's three most common names appended.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does the crowd help an encoder as much as it helps decider (+7 on first-time payees)?</li><li>The crowd line was later carried into the late-interaction model's training (§198 decider remaining training lessons in the late-interaction model: +6 on first-time payees where a crowd exists).</li></ul></section>
+</article>
+<article class="row" id="row-206" data-from="201" data-era="History-aware encoders" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 206 · 2026-10-05 · <span class="qid">REAL-27</span> · proposed</p>
+    <h2>Choosing decider's history rows more cleverly, and scoring every category at once</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>decider shows the 4B model about 24 recent household rows. Pinterest's TransAct V2 and PinnerSage choose history from the whole record instead: rows nearest to the current item, the most recent, and one per interest cluster. UniPinRec found a longer history beat a deeper model per unit of compute. <a class="back" href="#row-201">Row 201</a> showed decider's lead is largest where history is thin, so the history it sees matters.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, not yet run. (a) History rows chosen from the whole history (nearest plus most recent plus one representative per cluster) against today's 24. (b) A longer history. (c) One-pass scoring: cache the household's history once and score every category from it in one pass, as Pinterest's PinFM does, measuring tokens per second and cost per transaction.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Payee: Fernway Hardware | $22.18 | Sat
+Nearest earlier rows:  Fernway Hardware | $9.40 | Garden ...
+Recent rows:           Pine Lumber Co | $64.00 | Home Repair ...
+One per interest:      Splash Swim School | $45 | Kids ...
+Which category?</pre><p class="note">Illustrative, invented: arm (a)'s three kinds of history row in one prompt.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does a smarter history slice move the owner's budget, where prompt changes had stopped moving it?</li><li>How cheap can one-pass scoring make decider per transaction?</li></ul></section>
+</article>
+<article class="row" id="row-207" data-from="203" data-era="History-aware encoders" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 207 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · proposed</p>
+    <h2>A small model pretrained on whole filing histories</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Pinterest's PinFM pretrains a sequence model on users' action histories and then fine-tunes it for ranking. A household's filings are a similar sequence: each purchase and where it went. If a model learns the shape of filing histories first, it may need less data to learn a household's habits. PinFM's ID tables broke on new items, so ours would read content, not IDs.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, not yet run. A 4 to 6 layer causal transformer over synthetic households' filing sequences. Each token is a payee text vector, amount and date features, and the filed category. It is pretrained to predict the next, several next, and future categories over the household's categories plus the 64 shared purpose clusters, then fine-tuned with the new transaction appended. It is compared with the same model trained from scratch. Sweeps on Modal.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[Maple Grocers $57 Fri -&gt; Groceries]
+[Fern St Pharmacy $14 Sat -&gt; Health]
+[Harbor Noodle $24 Sat -&gt; Dining Out]
+[Maple Grocers $61 Tue -&gt; ?]</pre><p class="note">Illustrative, invented: a filing sequence; pretraining asks the model to fill in the next category.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does pretraining on synthetic histories help, or does it learn the generator's quirks (as <a href="#row-216">row 216</a> later warned)?</li></ul></section>
+</article>
+<article class="row" id="row-208" data-from="199" data-era="Faster loop" data-status="done">
+  <header>
+    <p class="eyebrow">Row 208 · 2026-10-05 · <span class="qid">INFRA</span> · §181 Faster runs: training and reads</p>
+    <h2>Making every experiment faster and cheaper</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Each train-and-read job on Modal took about 103 minutes, and reading the history encoders took two minutes per household. The owner said "start on all of these efficiency changes before just about anything else. We've gotta make our loop tighter/faster!" and "Let's not duplicate work here!". A workflow review listed what to change first.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Each change was checked against the path it replaced before use: the encoder readers moved to the GPU with a score cache; decider reads moved to vLLM, a fast serving engine, with one engine per job; training batches were grouped by length so less padding is computed; a generator now writes each row's job list with a cost estimate; and a watcher pulls results back and files them automatically. We also checked whether fewer training steps would do.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">make_jobs.py specs/r2xx.yaml
+  job r2xx-a1  train 800 steps + read 3 sets   est. 58 min  ~$4.0
+  job r2xx-a2  train 800 steps + read 3 sets   est. 58 min  ~$4.0</pre><p class="note">Illustrative, invented: the kind of summary the job-list generator prints before anything launches.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Change</th><th>Check against the old path</th><th>Speed</th></tr></thead><tbody>
+<tr><td>Encoder readers on the GPU</td><td>same top-1 on 11,373 / 11,373</td><td>124 s to 2.1 s per household</td></tr>
+<tr><td>vLLM reads, one engine per job</td><td>99.68% same first choice (all differences near-ties)</td><td>56 to 24.7 ms per item</td></tr>
+<tr><td>Length-sorted training groups</td><td>72.62 vs 72.37 (+0.25 &#177; 0.26, same model)</td><td>5.2 to 3.8 s per step (-28%)</td></tr>
+<tr><td>Fewer steps: 600 / 400 instead of 800</td><td>-0.42 / -1.47 on the synthetic test set</td><td>39 / 27 min instead of 50</td></tr>
+</tbody></table></div><p class="note">A typical train-and-read job fell from about 103 to about 58 minutes.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Roughly half the H100 cost per arm, before the one-seed-to-screen rule halves the number of arms.</li><li>800 training steps stay the recipe: screening at fewer steps would mislead.</li><li>vLLM's speedup only pays when the engine's 2.3-minute start is shared across reads.</li><li>On the way we found and fixed a tracker bug that had dropped run records.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Which Modal GPU is cheapest for the small encoder models? (<a href="#row-219">row 219</a>)</li></ul></section>
+</article>
+<article class="row" id="row-209" data-from="211,222" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 209 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · §199 Larger encoder bases</p>
+    <h2>Do bigger encoders help?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The encoders so far started from a 33-million-parameter model. The owner asked "Is there a modernBERT base for this that has been trained on a lot of tokens?" and added "I'm impressed that 33M parameters can do so well. That makes me hopeful for much bigger models!" The papers suggested the training objective matters more than size on short text, so any gain should show up on first-time payees, where knowing the world pays.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>One recipe at each size: the knowledge-and-alias stage from §191 A small modern base: Ettin-encoder-32M (teaching the encoder what kinds of business merchant strings are), then the late-interaction history training. Bases, all openly licensed: Ettin-32M, Ettin-150M, ModernBERT-base (150M) and Ettin-400M. Round 1 trained on v4 synthetic households; round 2 on the v5 households that rank arms more like the owner's budget. One seed each, on Modal.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Knowledge stage pair:
+  "POS DEBIT CEDARVIEW TIRE #112 OAKFORD"  &lt;-&gt;  "kind: auto repair, tires"
+History stage query:
+  CEDARVIEW TIRE #112 | $412.60 | Mon</pre><p class="note">Illustrative, invented: the same two-stage recipe at every model size.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Base (% right first)</th><th>Merchant kind recall@1</th><th>Rational households, new merchants (bank strings)</th><th>blind_v2</th><th>Owner's budget (first-time)</th></tr></thead><tbody>
+<tr><td>Ettin-32M, v4 training</td><td>64.9</td><td>57.0</td><td>81.8</td><td>69.0 / 68.8 (50.1 / 49.8)</td></tr>
+<tr><td>ModernBERT-base, v4</td><td>68.9</td><td>62.3</td><td>81.9</td><td>67.4 (47.2)</td></tr>
+<tr><td>Ettin-150M, v4</td><td>67.0</td><td>59.3</td><td>81.5</td><td>67.6 (47.6)</td></tr>
+<tr><td>Ettin-400M, v4</td><td>70.3</td><td>67.7</td><td>82.9</td><td>68.3 (47.9)</td></tr>
+<tr><td>Ettin-32M, v5 training</td><td></td><td>58.8</td><td>81.5</td><td>70.5 (51.1)</td></tr>
+<tr><td>Ettin-150M, v5</td><td></td><td>60.6</td><td>80.9</td><td>70.6 (51.4)</td></tr>
+<tr><td>Ettin-400M, v5</td><td></td><td>67.8</td><td>82.3</td><td>70.4 (49.7)</td></tr>
+</tbody></table></div><p class="note">Kind recall from each base's knowledge stage (v5 rows reuse it), on 7,657 held-out merchant strings. Ettin-32M two seeds where two numbers are shown. Owner's budget aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Size buys merchant knowledge: the 400M model files new real merchants 9 to 10 points more often and is the best of all on synthetic held-out households (v5: 75.9).</li><li>The owner's budget does not reward it: the larger bases tie the 32M model on v5 training and trail it by 0.7 to 1.6 on v4.</li><li>The owner's first-time payees are mostly people, local businesses and personal strings no merchant database knows, so this kind of knowledge does not reach them.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Distilling the 400M model into the 32M one is deferred: kind lines give the small model the merchant gain more cheaply (<a href="#row-212">row 212</a>).</li></ul></section>
+</article>
+<article class="row" id="row-210" data-from="195" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 210 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25, MODEL-26</span> · §185 The late-interaction decision model</p>
+    <h2>A small decision model that scores every category at once</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Jev and Clef-style models make a decision by scoring each option. Late-interaction encoders such as ColBERT compare a query and a document word piece by word piece (MaxSim) rather than as two whole vectors. The owner asked: "Has anyone built a Jev-like model with a late interaction model?" Nothing had been published. <a class="back" href="#row-195">Row 195</a>'s ColBERT was a natural start.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>A 33M model (bge-small token vectors) scores every one of the household's categories in one pass, trained with a softmax over those options plus a calibration term (Brier). Arms, one seed each on Modal: a0 one document per category (its name and last 8 payees); a1 a0 plus the transaction's 5 nearest earlier filings in the query; a2 to a4 scoring tweaks from the papers (soft interaction, a pooled-plus-MaxSim hybrid, learned word weights); a5 each of the 50 nearest earlier filings, plus every category name, as its own candidate, with a category's probability summed over its candidates; a6 a5 with the tweaks. All read on 50 held-out households.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Query:   Harbor Noodle | $24.10 | Sat
+         near: Pho Lantern | $31.10 -&gt; Dining Out; Golden Wok | $18.75 -&gt; Dining Out
+Options: [Dining Out: Pho Lantern, Golden Wok, ...]
+         [Groceries: Maple Grocers, ...]
+         [Date Night: Rosie's Diner, ...]
+-&gt; softmax over options</pre><p class="note">Illustrative, invented: arm a1's query with its nearest earlier filings, against one document per category.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (50 held-out households)</th><th>Top-1 / top-3 / top-10</th><th>First-time payee top-1</th><th>Calibration error</th></tr></thead><tbody>
+<tr><td>Best plain encoder, kNN (row 202)</td><td>74.5 / 89.0 / 91.9</td><td>60.0</td><td></td></tr>
+<tr><td>a0 one document per category</td><td>65.8 / 85.4 / 95.9</td><td>60.5</td><td>5.6%</td></tr>
+<tr><td>a2 / a3 / a4 scoring tweaks</td><td>66.0 / 65.2 / 65.9 (top-1)</td><td>60.1 to 60.5</td><td>4.6 to 5.9%</td></tr>
+<tr><td>a1 + nearest filings in the query</td><td>75.0 / 91.2 / 96.9</td><td>62.5</td><td>4.0%</td></tr>
+<tr><td>a5 each earlier filing a candidate</td><td>74.9 / 90.7 / 96.4</td><td>62.0</td><td>1.7%</td></tr>
+<tr><td>a6 a5 + soft + hybrid</td><td>74.9 / 90.8 / 96.4</td><td>62.1</td><td>1.7%</td></tr>
+</tbody></table></div><p class="note">359,050 transactions, 53,479 from first-time payees.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>What the model sees decides it: a fixed category summary loses 9 points; adding the nearest history (a1) or scoring each earlier filing (a5) recovers them and passes the best plain encoder.</li><li>How it scores barely matters: the paper tweaks moved accuracy by under a point.</li><li>Calibration is good throughout and best with per-filing candidates (1.7%), usable for an auto-filing threshold.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Do trained interaction layers on top help? (<a href="#row-211">row 211</a>)</li><li>How does it compare with decider on decider's own items and the owner's budget? (<a href="#row-216">row 216</a>)</li><li>Would a bigger base help? (<a href="#row-209">row 209</a>)</li></ul></section>
+</article>
+<article class="row" id="row-211" data-from="210" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 211 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25, MODEL-26</span> · §185 The late-interaction decision model</p>
+    <h2>Adding layers so history and options can talk to each other</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>In <a class="back" href="#row-210">row 210</a>'s model the transaction and each option meet only through a fixed MaxSim. The owner asked: "Could we add some layers to the encoder to allow for more interaction between the history and output tokens?" An LLM sees the options together in its prompt; this model did not.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Starting from a1, 3,000 more training steps on the local 3090, with small new layers that start as a no-op: c0 no new layers (the control); x two cross-attention blocks where the transaction's word pieces attend to each option's; xm plus 10 memory tokens, one per nearest earlier filing (its vector plus its category's); xml plus a listwise layer where the options attend to each other before the softmax. Same loss, same 50 held-out households.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Query tokens:   SQ * BLUE KETTLE CAFE $6.85 Tue
+Memory tokens:  [Morning Ritual Coffee -&gt; Coffee Shops] x10
+Options:        Coffee Shops | Dining Out | Treats | ...
+cross-attention: query tokens look at each option's tokens
+listwise layer:  options look at each other</pre><p class="note">Illustrative, invented: where the three kinds of new layer sit.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (50 held-out households)</th><th>Top-1 / top-3 / top-10</th><th>First-time payee top-1</th><th>Brier</th><th>Calibration error</th></tr></thead><tbody>
+<tr><td>a1 (row 210)</td><td>75.0 / 91.2 / 96.9</td><td>62.5</td><td>0.368</td><td>4.0%</td></tr>
+<tr><td>c0 a1 + 3,000 more steps</td><td>75.7 / 91.4 / 96.9</td><td>63.4</td><td>0.363</td><td>3.4%</td></tr>
+<tr><td>x + cross-attention</td><td>75.5 / 91.3 / 96.9</td><td>63.0</td><td>0.364</td><td>2.8%</td></tr>
+<tr><td>xm + memory tokens</td><td>75.4 / 91.3 / 96.9</td><td>62.9</td><td>0.365</td><td>3.1%</td></tr>
+<tr><td>xml + listwise layer</td><td>75.5 / 91.3 / 96.9</td><td>63.1</td><td>0.365</td><td>2.7%</td></tr>
+</tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The interaction layers add nothing: -0.2 to -0.3 against the control, within one-seed noise. They improve calibration slightly.</li><li>More updates do help: the control's extra 3,000 steps gave +0.7 overall and +0.9 on first-time payees.</li><li>The gap to decider is not reasoning this model lacks at this scale.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>How does c0 do against decider, on synthetic and on real data? (<a href="#row-216">row 216</a>)</li><li>Does world knowledge from our databases help? (<a href="#row-212">row 212</a>)</li></ul></section>
+</article>
+<article class="row" id="row-212" data-from="211" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 212 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25, MODEL-28, DATA-7</span> · §194 Kind lines in the late-interaction model</p>
+    <h2>Telling the small model what kind of business a payee is</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked to "make sure we have a plan for injecting world knowledge in from our database of places and payees". For decider, a "Kind:" line from a database lifted first-time payees from 60 to 77 on a blind set (§144 Canonical kind lines), but on the owner's budget the lookups were right for only about half the matches and a model trusting them lost 1.5 (§168 Kind lines from a lookup). So the encoder had to learn how far to trust a lookup.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arm (a), the lookup as text: each transaction gets "| kind: ... (match high/mid/low)". In training the lines were deliberately wrong at the rates measured on real lookups (high 77% right, mid 65%, low 47%; 57% of payees covered), so the model learns to discount weak matches. Two seeds. On the owner's budget the real lookups were used, locally and privately. Arm (b), the lookup as memory tokens, was not run. Arms (c) and (e), knowledge and alias pretraining, ran in <a href="#row-222">row 222</a> (§191 A small modern base: Ettin-encoder-32M); arm (d), distilling decider, ran in <a href="#row-223">row 223</a> (§192 Distilling decider into the late-interaction model).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">CEDARVIEW TIRE #112 OAKFORD | $412.60 | Mon | kind: auto repair, tires (match high)
+GRN LEAF 0091               | $18.20  | Thu | kind: florist (match low)</pre><p class="note">Illustrative, invented: two transactions with kind lines; the second is a weak match the model should not trust much.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>% right first (seed 0 / seed 1)</th><th>Without kind line (h15)</th><th>With kind line (kl)</th></tr></thead><tbody>
+<tr><td>Synthetic, all</td><td>73.4 / 73.3</td><td>73.7 / 73.6</td></tr>
+<tr><td>Synthetic, first-time payees</td><td>60.5 / 60.2</td><td>61.7 / 61.5</td></tr>
+<tr><td>Rational households, bank strings, new merchants</td><td>57.0</td><td>63.0 / 63.9</td></tr>
+<tr><td>Rational households, clean names, new merchants</td><td>60.3</td><td>65.3</td></tr>
+<tr><td>blind_v2 (no kind data)</td><td>81.8</td><td>81.9</td></tr>
+<tr><td>Owner's budget, all</td><td>69.0 / 68.8</td><td>69.1 / 69.0</td></tr>
+<tr><td>Owner's budget, first-time payees</td><td>50.1 / 49.8</td><td>50.3 / 50.4</td></tr>
+</tbody></table></div><p class="note">Reading time unchanged (2.7 ms a transaction on the 3090). Owner's budget aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The encoder uses a lookup and learns to discount it: new real merchants gain 5 to 7 points without hurting payees filed before.</li><li>The owner's budget gains nothing measurable (+0.15): its first-time payees are people and local businesses that get no line or a weak one.</li><li>Better lookups (payee resolution, row 160) are the lever, not the model. The kind line stays as a harmless option.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does a knowledge stage in the weights help more? (<a href="#row-222">row 222</a>)</li><li>Does decider as a teacher pass on its merchant knowledge? (<a href="#row-223">row 223</a>)</li></ul></section>
+</article>
+<article class="row" id="row-213" data-from="192,189" data-era="The crowd line" data-status="done">
+  <header>
+    <p class="eyebrow">Row 213 · 2026-10-05 · <span class="qid">REAL-27, MODEL-25</span> · §184 EVoC for the crowd category clusters</p>
+    <h2>A newer clustering method for the crowd's purpose groups</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p><a class="back" href="#row-189">Row 189</a> grouped every household's categories into 64 purpose clusters with k-means, and <a class="back" href="#row-192">row 192</a> showed behaviour-chosen look-alikes built on them help first-time payees. The owner pointed to "a newer form of fast clustering of embeddings that allows for a fast treemap of related topics": EVoC, which picks its own number of clusters and builds layers from fine to coarse.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We clustered the same 42,555 category texts with k-means 64 and with EVoC (every layer, and a 64-cluster setting), on the CPU. (a) We compared each clustering with the generator's own purposes (ARI and NMI measure agreement; purity is the share of a cluster that shares its majority purpose). (b) A cheap proxy before any decider read: for first-time payees in 50 held-out households, does the household's nearest payee by crowd profile share the right category? (c) decider reads only if (a) and (b) showed a gain.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Group: Food; Name: Takeout &amp; restaurants; recently: Harbor Noodle, Golden Wok, Pho Lantern
+Group: Fun;  Name: Eating out;            recently: Rosie's Diner, Taco Haven, Pho Lantern
+-&gt; same cluster?</pre><p class="note">Illustrative, invented: two households' category texts that a good clustering should put together.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Clustering</th><th>Clusters</th><th>Unclustered</th><th>ARI</th><th>Purity</th><th>Neighbour hit@1</th></tr></thead><tbody>
+<tr><td>k-means 64 (row 189)</td><td>64</td><td>0%</td><td>0.300</td><td>0.809</td><td>45.9</td></tr>
+<tr><td>EVoC, finest layer</td><td>876</td><td>71.3%</td><td>0.042</td><td>0.934</td><td>44.2</td></tr>
+<tr><td>EVoC layer 2</td><td>90</td><td>25.0%</td><td>0.405</td><td>0.828</td><td>45.8</td></tr>
+<tr><td>EVoC coarsest layer</td><td>8</td><td>29.6%</td><td>0.757</td><td>0.596</td><td>41.7</td></tr>
+<tr><td>EVoC, 64 clusters asked</td><td>64</td><td>21.0%</td><td>0.389</td><td>0.823</td><td>45.7</td></tr>
+</tbody></table></div><p class="note">Proxy references: spelling neighbours 41.0, the household's most-used category 20.0.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>For the job the clusters do, EVoC equals k-means (within 0.2 on the proxy). The clustering is not what limits behavioural rows.</li><li>EVoC's better agreement at coarse layers comes from lumping all trips (a quarter of categories) together, while purity falls.</li><li>It leaves a fifth to a quarter of categories unclustered. Part (c) was not run.</li><li>It is fast (8 to 10 s on 42k vectors) and its tree may suit a category treemap.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Can clustering suggest a category scheme for a new user? (<a href="#row-214">row 214</a>)</li></ul></section>
+</article>
+<article class="row" id="row-214" data-from="213" data-era="The crowd line" data-status="done">
+  <header>
+    <p class="eyebrow">Row 214 · 2026-10-05 · <span class="qid">REAL-27</span> · §186 Suggesting a category scheme for a new user</p>
+    <h2>Suggesting categories for a brand-new user from their transactions</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner asked: "What if I wanted to take a whole list of transactions and have them get auto-clustered for a user, and have categories suggested?" and "I'm curious to run EVoC on synthetic data, just to learn". This was exploratory, on synthetic households only.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We took 50 held-out synthetic households and hid their categories. Each distinct payee became a point, weighted by how often it appears, described by its encoder vector, its crowd profile (how other households file it), and amount and rhythm features. We clustered with EVoC and with agglomerative clustering told the true number of categories (an oracle). Two baselines needed no clustering: give each payee its most common crowd cluster (B1), or its most common crowd category name (B2). We scored against the real categories: ARI, the number of merges and splits a user would make, and the unclustered share.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Payees (count):  Maple Grocers (48), Harbor Noodle (12), Splash Swim School (10), ...
+B1 suggestion:   Maple Grocers -&gt; cluster "groceries"
+                 Harbor Noodle -&gt; cluster "eating out"
+                 Splash Swim School -&gt; cluster "kids' activities"</pre><p class="note">Illustrative, invented: the crowd lookup gives each payee the purpose other households most often use for it.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Features, method (means over 50 households)</th><th>ARI</th><th>Clusters (true 49)</th><th>Edits</th><th>Unclustered</th></tr></thead><tbody>
+<tr><td>B1 most common crowd cluster</td><td>0.751</td><td>31</td><td>367</td><td>5.7%</td></tr>
+<tr><td>B2 most common crowd name</td><td>0.513</td><td>65</td><td>436</td><td>5.7%</td></tr>
+<tr><td>Crowd, agglomerative told k = 49 (oracle)</td><td>0.581</td><td>49</td><td>170</td><td>0</td></tr>
+<tr><td>Encoder + crowd, EVoC</td><td>0.490</td><td>31</td><td>298</td><td>18.5%</td></tr>
+<tr><td>Encoder alone, EVoC</td><td>0.346</td><td>19</td><td>394</td><td>24.3%</td></tr>
+<tr><td>Amount and rhythm, EVoC</td><td>0.134</td><td>68</td><td>797</td><td>8.2%</td></tr>
+</tbody></table></div><p class="note">30.9% of payees are filed under 2+ categories and carry 86.7% of transactions, so no payee-level scheme can exceed 76.6% purity.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Ask the crowd before clustering: a simple lookup (ARI 0.75) beats every clustering of the household's own payees.</li><li>What payees say helps; how money moves does not: amount and rhythm features halve agreement (a monthly bill and a regular coffee look alike).</li><li>Personal purposes (whose money, which trip) are invisible at payee level. A suggestion tool should propose the crowd's scheme, then ask about the personal splits.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Could a suggester ask a new user a few questions to find the personal splits?</li></ul></section>
+</article>
+<article class="row" id="row-215" data-from="211" data-era="Late-interaction decision model" data-status="todo">
+  <header>
+    <p class="eyebrow">Row 215 · 2026-10-05 · <span class="qid">MODEL-26</span> · proposed</p>
+    <h2>Playing a simple game with the late-interaction decision model</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "Jev showed that they could play DOOM using their model as well as pokemon ... could we use our late interaction stuff to quickly do a multiple choice experiment like that". Jev's demos read game state as text fields, not pixels, so each move is a multiple-choice decision, like choosing a category. DOOM's engine (GPL) and Pokemon's ROM (proprietary) fail the open-licence rule.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Proposed, not yet run. Day 1: BabyAI / Minigrid (openly licensed grid-world tasks). The query is the agent's view and last actions as text; the 6 actions are the options, each with its recent outcomes. Train by copying a scripted expert (about 200k steps), first with plain MaxSim, then with interaction layers. Day 2: TextWorld cooking games, the allowed commands as options, with one round of expert correction. Measure success rate and episode length on 500 held-out seeds against random legal moves, the scripted expert and Qwen3.5-2B with no training, plus calibration.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Mission: pick up the red key
+View: wall ahead 2; red key left 1; door right 3 (closed)
+Last actions: forward, forward
+Options: [turn left] [turn right] [forward] [pick up] [drop] [toggle]</pre><p class="note">Illustrative, invented: a Minigrid state written as text, with the six actions as the options to score.</p></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does a model built for choosing categories transfer to sequential decisions?</li><li>Is its calibration good enough to know when it is lost?</li></ul></section>
+</article>
+<article class="row" id="row-216" data-from="211,210" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 216 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §187 The late-interaction decision model beside decider</p>
+    <h2>The small decision model against decider, on accuracy and speed</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>Rows <a class="back" href="#row-210">210</a> and <a class="back" href="#row-211">211</a> read the late-interaction model only on our own held-out households. The owner: "Continue work by comparing to decider ... Compare it to our tuned decider model in both accuracy and efficiency".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>We read row 211's c0 (history in the query, one document per category) and row 210's a5 (bare query, each earlier filing a candidate) over decider's exact options, on decider's 100 held-out synthetic households and once on the owner's budget (aggregates only). We split by how often the payee had been filed, counted when either model was right, tried confidence rules for combining them, and timed reading per transaction.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Same item, two readers:
+  decider-4B: ~1,500-token prompt  -&gt; Dining Out (p 0.71)   10-13 ms on an H100
+  c0 (33M):   query + 5 neighbours -&gt; Dining Out (p 0.64)   ~0.65 ms on a 3090</pre><p class="note">Illustrative, invented: the probabilities are made up; the timings are the measured ranges.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>% right first</th><th>n</th><th>decider</th><th>c0</th><th>a5</th></tr></thead><tbody>
+<tr><td>Synthetic, all</td><td>5,897</td><td>72.8</td><td>71.7</td><td>71.2</td></tr>
+<tr><td>Synthetic, first-time payee</td><td>928</td><td>61.3</td><td>57.9</td><td>58.4</td></tr>
+<tr><td>Synthetic, payee filed 4+ times</td><td>4,308</td><td>75.9</td><td>75.3</td><td>75.0</td></tr>
+<tr><td>Owner's budget, all</td><td>19,093</td><td>72.5</td><td>60.9</td><td>64.6</td></tr>
+<tr><td>Owner's budget, first-time payee</td><td>5,832</td><td>56.9</td><td>42.0</td><td>45.7</td></tr>
+<tr><td>Owner's budget, payee filed 4+ times</td><td>9,991</td><td>79.0</td><td>69.4</td><td>73.1</td></tr>
+<tr><td>Reading time per transaction</td><td></td><td>10-13 ms (H100)</td><td>0.62-0.68 ms (3090)</td><td>1.6-1.7 ms (3090)</td></tr>
+</tbody></table></div><p class="note">decider: mean of two seeds, ~4B parameters; c0 and a5: 33.4M. A gate chosen on synthetic households gave 71.0 / 71.8 on the owner's budget, below decider alone.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>On our own generator the small model is nearly level with decider (1.1 behind) at a twentieth of the reading time on a cheaper GPU.</li><li>On the owner's budget it is 8 to 12 points behind, and about as far behind on payees filed many times as on new ones: it has fitted something of our generator, and our synthetic test set could not show it.</li><li>The per-filing design (a5) transfers best. Neither model adds anything to decider through a confidence rule.</li><li>Arms must now be chosen on a set that predicts transfer to real data.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Does decider's history slice help the small model, and does a blind test set rank arms as the owner's budget does? (<a href="#row-217">row 217</a>)</li><li>Which of decider's training lessons carry over? (<a href="#row-218">row 218</a>)</li></ul></section>
+</article>
+<article class="row" id="row-217" data-from="216" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 217 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §189 decider history slice and two new test sets</p>
+    <h2>Showing the small model the history that decider sees</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "Borrow ideas from improvements we made to the decider model". decider's prompt shows about 24 recent household rows and about 20 rows of the payee and similar payees, each dated (§99 The history slice, §121 Split layout). The small model's query showed 5 nearest filings, undated. On trips the owner expected that "once it starts seeing a trip category used for a given type of payee ... it might learn to use that recent category". After <a class="back" href="#row-216">row 216</a>, a test set that predicts real-data rankings was also needed.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>Arms from row 210's a1, 3,000 steps each: p1 12 nearest filings, each with "N d ago"; p2 p1 plus the 8 most recent household filings; p3 p2 written once per category. On the way we fixed which categories the model may choose: hidden categories (old trips, old phases) are now offered from the budget's start to their last use, so every right answer can be chosen; p0 is c0 retrained with that fix. Two new test sets: blind_v2's 250 users as whole budgets (from a generator written without our code), and perfectly rational households (<a href="#row-220">row 220</a>).</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Query:  Harbor Noodle | $24.10 | Sat
+near:   Pho Lantern | $31.10 -&gt; Dining Out | 9 d ago
+        Golden Wok  | $18.75 -&gt; Dining Out | 30 d ago   ... (12 rows)
+recent: Seaside Inn | $189.00 -&gt; Beach Trip | 1 d ago
+        Dune Market | $42.30 -&gt; Beach Trip | 1 d ago    ... (8 rows)</pre><p class="note">Illustrative, invented: arm p2's query. The recent rows show a trip in progress, so the next restaurant should go to the trip.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (% right first)</th><th>Synthetic, 50 households</th><th>Synthetic trips</th><th>blind_v2</th><th>blind_v2 first-time</th><th>Owner's budget</th></tr></thead><tbody>
+<tr><td>decider-4B (tuned)</td><td></td><td></td><td></td><td></td><td>72.5</td></tr>
+<tr><td>a5 bare query, per-filing candidates</td><td></td><td></td><td>79.7</td><td>70.6</td><td>66.8</td></tr>
+<tr><td>c0 + 5 nearest filings</td><td>72.6</td><td>3.6</td><td>77.8</td><td>67.9</td><td>63.3</td></tr>
+<tr><td>p0 c0, options fixed</td><td>73.1</td><td>16.2</td><td>76.9</td><td>66.3</td><td></td></tr>
+<tr><td>p1 12 nearest, dated</td><td>73.4</td><td>16.0</td><td>78.9</td><td>69.7</td><td></td></tr>
+<tr><td>p2 p1 + 8 recent filings</td><td>74.2</td><td>57.8</td><td>79.7</td><td>70.9</td><td>59.5</td></tr>
+<tr><td>p3 p2 grouped by category</td><td>73.4</td><td>22.7</td><td>79.7</td><td>72.0</td><td></td></tr>
+</tbody></table></div><p class="note">Owner's budget: decider's 19,093 items, one seed, aggregates only. The options fix alone lifted row 216's reads (c0 60.9 to 63.3, a5 64.6 to 66.8).</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Dated recent rows carry the trip signal, as the owner expected: synthetic trips 16 to 58%. Grouping rows by category loses most of it.</li><li>On the owner's budget every token of history in the query costs: bare query 66.8, five neighbours 63.3, twenty rows 59.5. MaxSim averages over the query, so a long history dilutes the transaction's own payee.</li><li>Neither synthetic set predicted that ranking: blind_v2 had p2 level with a5.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Can decider's training lessons (override episodes, renames) fix p2 on real data? (<a href="#row-218">row 218</a>)</li><li>Can a better stand-in for real data rank arms correctly? (<a href="#row-225">row 225</a>)</li></ul></section>
+</article>
+<article class="row" id="row-218" data-from="217,220" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 218 · 2026-10-06 · <span class="qid">REAL-27, MODEL-25</span> · §190 decider training lessons on the late-interaction model</p>
+    <h2>Teaching the small model to trust the household over the name</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>decider's training recipe has tricks the small model never had. One is override episodes: a household's payees moved, every time, to an unexpected category, so the model learns that history beats names. <a class="back" href="#row-220">Row 220</a>'s rational households showed the small model failing exactly there, and the owner asked "How do we fix the override issue?" and said "we can't average a payee's embedding/category".</p></section>
+  <section class="tried"><h3>What we tried</h3><p>One seed per arm, 3,000 steps on p2's query, run in parallel on Modal L40S GPUs: o1 override episodes (10% of payees moved); n1 category renames; h1 1,000 training households instead of 200; "all" those three together; pp a learned prior from the payee's earlier filings; ppo and pp2o the prior plus override; md each earlier filing as a candidate beside the category documents, and mdo with override; m0 a5's bare-query design retrained. Time-on-candidate arms (m1 to m3) were also tried. Read on synthetic, blind_v2 and rational households; the finalists once on the owner's budget.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Override episode (training only):
+  Corner Mart always -&gt; Snacks   (name suggests Groceries)
+  Corner Mart | $4.20 -&gt; Snacks
+  Corner Mart | $3.75 -&gt; Snacks
+  Corner Mart | $5.10 -&gt; ?        answer: Snacks</pre><p class="note">Illustrative, invented: a household that consistently files a merchant against what its name suggests.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Arm (% right first)</th><th>Synthetic</th><th>Trips</th><th>blind_v2</th><th>Rational bank, bought before</th><th>Owner's budget</th></tr></thead><tbody>
+<tr><td>p2 (row 217, control)</td><td>74.2</td><td>57.8</td><td>79.7</td><td>95.2</td><td>59.5</td></tr>
+<tr><td>o1 override</td><td>74.2</td><td>50.4</td><td>82.2</td><td>96.9</td><td>66.9</td></tr>
+<tr><td>n1 renames</td><td>73.8</td><td>56.4</td><td>81.5</td><td>95.7</td><td></td></tr>
+<tr><td>h1 1,000 households</td><td>74.2</td><td>51.2</td><td>80.9</td><td>94.8</td><td></td></tr>
+<tr><td>all (h1 + o1 + n1)</td><td>73.2</td><td>36.2</td><td>81.8</td><td>96.6</td><td></td></tr>
+<tr><td>ppo payee prior + override</td><td>74.3</td><td>50.5</td><td>82.5</td><td>97.0</td><td></td></tr>
+<tr><td>md per-filing candidates + documents</td><td>74.2</td><td>61.4</td><td>80.8</td><td>96.5</td><td></td></tr>
+<tr><td>mdo md + override</td><td>73.7</td><td>52.7</td><td>82.3</td><td>97.5</td><td>67.7</td></tr>
+<tr><td>m0 a5's design, retrained</td><td>71.8</td><td>3.5</td><td>79.9</td><td>96.2</td><td>66.7</td></tr>
+</tbody></table></div><p class="note">Rational clean names, merchants bought before: p2 98.0, o1 99.7, ppo 99.9. decider 72.5 on the same owner's items. Owner's budget aggregates only.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Override training is the lever on every set: the same query reads the owner's budget at 59.5 without it and 66.9 with it.</li><li>Once override is trained, the payee prior adds nothing; renames and more households help blind_v2 a little but add nothing on top.</li><li>The finalists sit within single-seed noise on the owner's budget (66.7 to 67.7); o1's recipe went forward for its speed.</li><li>Recency only works as rows in the query, not as ages on candidates.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Would a modern small base do better than bge-small? (<a href="#row-222">row 222</a>)</li><li>Does distilling decider help? (<a href="#row-223">row 223</a>)</li></ul></section>
+</article>
+<article class="row" id="row-219" data-from="217,208" data-era="Faster loop" data-status="done">
+  <header>
+    <p class="eyebrow">Row 219 · 2026-10-06 · <span class="qid">INFRA</span> · §188 The cheapest Modal GPU for the small encoder models</p>
+    <h2>Which cloud GPU is cheapest for the small models?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The 33M late-interaction model trained 2 to 3 times faster on the local 3090 than on Modal's H100, which suggested the H100 was wasted on it. The owner asked: "Are there a100s that are just as fast and cheaper on modal?" and then "Yes please!" to a test.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>One identical 600-step training run (row 217's p2 query, 50 households, same seed) on five Modal GPU types, in one job list where each job names its own GPU. We measured seconds per step, excluding data preparation, and worked out the GPU cost of a full 3,000-step arm.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">[
+  {"tag": "r219-l40s", "gpu": "L40S", "cmds": ["li_decider.py train STEPS=600 ..."]},
+  {"tag": "r219-h100", "gpu": "H100", "cmds": ["li_decider.py train STEPS=600 ..."]}
+]</pre><p class="note">Illustrative, simplified: the shape of the job list, one entry per GPU type.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>GPU</th><th>$ / hour</th><th>s / step</th><th>3,000 steps</th><th>GPU $ per 3,000 steps</th></tr></thead><tbody>
+<tr><td>L40S</td><td>1.95</td><td>0.113</td><td>5.7 min</td><td>0.18</td></tr>
+<tr><td>A100 (40 GB asked, 80 GB given)</td><td>2.10</td><td>0.123</td><td>6.2 min</td><td>0.22</td></tr>
+<tr><td>A10</td><td>1.10</td><td>0.202</td><td>10.1 min</td><td>0.18</td></tr>
+<tr><td>L4</td><td>0.80</td><td>0.232</td><td>11.6 min</td><td>0.15</td></tr>
+<tr><td>H100</td><td>3.95</td><td>2.64</td><td>132 min</td><td>8.70</td></tr>
+<tr><td>Local RTX 3090</td><td>0</td><td>0.264</td><td>13.2 min</td><td>0</td></tr>
+</tbody></table></div></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>The L40S is now the default for encoder jobs: the fastest of all, at about $0.18 per arm, so arms can run in parallel instead of one at a time on the 3090.</li><li>The H100 is 23 times slower than the L40S on this job, far more than its price explains; something on that host dominates small-kernel work. decider stays on the H100, where it is faster per finished job.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Why is the H100 so slow on small models? (Later traced, for ModernBERT and Ettin, to running without FlashAttention.)</li></ul></section>
+</article>
+<article class="row" id="row-220" data-from="217" data-era="Late-interaction decision model" data-status="done">
+  <header>
+    <p class="eyebrow">Row 220 · 2026-10-06 · <span class="qid">MODEL-25</span> · §189 decider history slice and two new test sets</p>
+    <h2>Can the model score 100% on a perfectly rational household?</h2>
+  </header>
+  <section class="why"><h3>Why we ran it</h3><p>The owner: "make a 'perfectly rational' example too, where there are just a few obvious categories, and the user always categorizes appropriately ... to see if it can score 100% on a perfectly rational example, and if not, why not". Any error on such a household is a flaw in the model, not noise in the data.</p></section>
+  <section class="tried"><h3>What we tried</h3><p>50 synthetic households with ten obvious categories, every kind of merchant always filed to one category, real held-out merchant names, and habits plus 15% exploration of new merchants (22,405 purchases, 4,857 from merchants new to the household). Two versions: clean names and bank-statement strings. Row 216's c0 and a5 and <a class="back" href="#row-217">row 217</a>'s arms read them with no training on them, split by merchant bought before or new. Then we examined the errors one by one.</p></section>
+  <section class="prompt"><h3>Example prompt</h3><pre class="prompt">Household history:
+  OAKRIDGE FUEL STOP | $12.40 -&gt; Shopping   (x9, always Shopping)
+New transaction:
+  POS DEBIT OAKRIDGE FUEL STOP 0217 | $15.10 -&gt; ?
+Model said: Gas     Household's rule: Shopping</pre><p class="note">Illustrative, invented: the error pattern the review found, a merchant whose name suggests one category but that the household always files to another.</p></section>
+  <section class="results"><h3>How it did</h3><div class="tablewrap"><table><thead><tr><th>Model (top-1 / top-3)</th><th>Clean: bought before</th><th>Clean: new merchant</th><th>Bank strings: bought before</th><th>Bank strings: new merchant</th></tr></thead><tbody>
+<tr><td>c0</td><td>98.5 / 100</td><td>66.0 / 83.9</td><td>95.7 / 98.8</td><td>62.3 / 80.5</td></tr>
+<tr><td>a5</td><td>98.9 / 100</td><td>62.5 / 82.8</td><td>96.1 / 99.2</td><td>59.9 / 80.9</td></tr>
+<tr><td>p2</td><td>98.0 / 99.9</td><td>66.1 / 85.0</td><td>95.2 / 98.8</td><td>62.4 / 82.2</td></tr>
+<tr><td>p3</td><td>99.0 / 100</td><td>66.9 / 85.4</td><td>95.9 / 99.0</td><td>63.9 / 82.8</td></tr>
+</tbody></table></div><p class="note">Ten categories, so top-5 and top-10 say little.</p></section>
+  <section class="learned"><h3>What we learned</h3><ul><li>Not 100%: merchants bought before are read right 98 to 99% of the time on clean names and 95 to 96% as bank strings.</li><li>Every error examined (26 of 26) was a consistent filing beaten by the name: the model trusted what the name suggests over the household's own repeated choice. decider's override episodes train against exactly this.</li><li>New merchants reach only 60 to 67%: the ceiling of what a 33M model knows about a name.</li></ul></section>
+  <section class="questions"><h3>Questions it raised</h3><ul><li>Do override episodes fix the failure? (<a href="#row-218">row 218</a>: 99.7% on clean names bought before)</li><li>Can world knowledge lift new merchants? (<a href="#row-212">row 212</a>, <a href="#row-209">row 209</a>)</li></ul></section>
+</article>

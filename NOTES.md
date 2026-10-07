@@ -169,3 +169,54 @@ scripts) and score on the precision the adapter was trained on.
 - Decision-1.0 removed its code from its model repos on 2026-09-27; scripts/exp_decision_models.py loads it from Sol-2B revision
   60ea30a4 (same prompt version as the weights). kev is fetched as a GitHub archive at a pinned commit.
 - Every model, base and package must have an open licence (ai_experiments.licences.open_licence).
+
+## 2026-09-25 (recorded 2026-10-07): Modal is where GPU work runs
+
+The owner moved all GPU work to Modal (workspace `ynab`, shared with colleagues: this project touches only its own app,
+`ai-experiments-training`, and volumes `ai-exp-results` and `ai-exp-hf-cache`). `scripts/modal_app.py` builds the image from `uv.lock`
+and runs the repo's scripts unchanged; the client is a uv tool (`uv tool install modal`, then `modal setup`), not a project dependency.
+Job lists launch with `--detach` so they survive the local client dying (WSL crashed on 2026-09-26 with jobs in flight). Results come
+back with `modal volume get` into the gitignored `modal_out/` and `scripts/ingest_modal.py`. The container clock is UTC. Launches and
+their cost are recorded in `reports/modal_launches.jsonl` and `reports/modal_costs.md` (from 2026-10-05). How-to: `CLAUDE.md`,
+"GPU work: Modal"; first results in REPORT §54 Modal experiment infrastructure.
+
+## 2026-10-04: the local 3090 is back for small jobs
+
+The owner: "I'm okay to use local GPU sometimes when we can!" The RTX 3090 takes small, short jobs when free (smoke tests, small
+encoders, synthetic reads) and every read of the owner's real budget, which stays on this machine. Long trainings and parallel batches
+stay on Modal. The older rules still hold: one GPU job at a time, `just doctor --gpu` for the VRAM spill.
+
+## 2026-10-06: GPU type per model on Modal
+
+- Small encoders (bge-small, Ettin-32M late-interaction models) go on an L40S (a per-job `"gpu": "L40S"` in a job list): 2.3x the local
+  3090 at about $0.18 per 3,000 steps (§188 The cheapest Modal GPU for the small encoder models).
+- ModernBERT and Ettin on an H100 need FlashAttention from the Hub (`ATTN=kernels-community/flash-attn2@main`, with
+  `uv run --frozen --with "kernels<0.11" ...`). With the default sdpa they run about 7x slower there (2.7 s a step against 0.35-0.41),
+  which was the whole of §188's "H100 is 23x slower" (§200 Speed for longer queries and larger encoders). Ettin-32M stays on the L40S
+  (flash is no faster there); Ettin-400M goes to the H100 with flash (half the time of the L40S at the same cost).
+- CPU-bound jobs (clustering, household and data builds) take `--gpu cpu` (8 cores, no GPU billed); row 204 once held an H100 for two
+  hours of CPU work.
+
+## 2026-10-07: EmbeddingGemma 2 needs a newer transformers than unsloth allows
+
+- EmbeddingGemma 2 needs transformers 5.18 or later and sentence-transformers 6.1, beyond the project lock. It runs as a uv overlay:
+  `uv run --with "sentence-transformers>=6.1.0" --with "transformers>=5.18" --with torch==2.13.0 --with torchvision==0.28.0 python
+  scripts/li_decider.py ...` (5.19 resolved at the time; §210 EmbeddingGemma 2 as the encoder).
+- unsloth's releases (and main, 2026-10-07) cap transformers at 5.17. `uv run --with` and `UV_OVERRIDE` cannot lift the cap; a script's
+  own `[tool.uv] override-dependencies` can. `scripts/unsloth_run.py` (`uv run --script scripts/unsloth_run.py scripts/li_decider.py
+  train`, with `LOADER=unsloth`) pins transformers to the commit unsloth's EmbeddingGemma 2 notebook installs; release 5.19.0 trained
+  to NaN under unsloth here (§211 EmbeddingGemma 2 under unsloth). unsloth's LoRA was no faster per step on an L40S, but it fits the
+  model on the 3090 where plain transformers did not.
+
+## 2026-10-07: py-spy needs root in WSL
+
+py-spy cannot attach to a running process in WSL without root, so a hung read cannot be inspected from outside. Long scripts register
+`faulthandler` on SIGUSR1 instead (first in `scripts/blend_eval.py`): `kill -USR1 <pid>` prints every thread's stack to the log.
+
+## 2026-10-07: budget id out of tracked files; backup on D:
+
+- The owner's budget id moved out of tracked files into `~/.config/ynab/budget_id` (0600), beside the token in `~/.config/ynab/token`.
+  Chains read it with `BUDGET=${BUDGET:-$(cat ~/.config/ynab/budget_id)}`. Neither is ever printed or committed.
+- Backup at `/mnt/d/Backup/ai-experiments_2026-10-07/`: `ai-experiments_all-refs.bundle` (a git bundle of every ref, ~520 MB) and
+  `ai-experiments_folder.tar` (the whole checkout folder, ~361 GB, written at about 23 MB/s over WSL's D: mount, so about four hours;
+  `tar.log` records the start and the exit code). Restore with `git clone <bundle>`, or untar.

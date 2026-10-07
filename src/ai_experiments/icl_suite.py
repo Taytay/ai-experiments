@@ -13,6 +13,7 @@ Suite items are cached to data/processed/icl_suite_items.json so every arm score
 """
 import json
 import random
+import sys
 from pathlib import Path
 
 from .paths import ROOT

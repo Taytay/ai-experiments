@@ -1,0 +1,6 @@
+outs:
+- md5: 65a84cac9ebffdfd3a328e47bb466776.dir
+  size: 131327955
+  nfiles: 8
+  hash: md5
+  path: li_r229_bench_s40

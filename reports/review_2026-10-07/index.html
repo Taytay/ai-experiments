@@ -1,0 +1,238 @@
+<title>Categoriser Research Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&display=swap">
+<style>
+/* Layout: one reading column with a contents strip, the same palette and faces as the plan-history site so the pages read as one set */
+:root{--paper:#F4F6F3;--panel:#FBFCFA;--ink:#1A2320;--muted:#5A6560;--rule:#D5DCD7;--accent:#17667F;--accent-soft:#E2EEF1;--led:#A8571C;--led-soft:#F6EADF;
+ --good:#2F6B45;--warn:#8A6A12;--bad:#9B3B2E;--code:#EEF1ED;
+ --display:"Literata",Georgia,"Times New Roman",serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;
+ --accent:#6DB3C9;--accent-soft:#1B2F35;--led:#E39361;--led-soft:#33241A;--good:#7CC293;--warn:#D9B45A;--bad:#E58C7C;--code:#1D2622}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#121815;--panel:#18201C;--ink:#E3EAE6;--muted:#9AA6A0;--rule:#2B3530;--accent:#6DB3C9;--accent-soft:#1B2F35;
+ --led:#E39361;--led-soft:#33241A;--good:#7CC293;--warn:#D9B45A;--bad:#E58C7C;--code:#1D2622}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.65 var(--body);margin:0}
+.wrap{max-width:52rem;margin:0 auto;padding-inline:20px;padding-block:32px 72px;display:grid;gap:2.6rem}
+header.top{display:grid;gap:.7rem}
+.eyebrow{font:500 12px/1.4 var(--mono);color:var(--muted);margin:0;letter-spacing:.02em}
+h1{font:650 clamp(28px,5vw,38px)/1.15 var(--display);margin:0;text-wrap:balance}
+h2{font:650 23px/1.25 var(--display);margin:0 0 .2rem;text-wrap:balance}
+h3{font:600 12px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:1.2rem 0 .4rem}
+p,li{max-width:68ch}
+p{margin:.45rem 0}
+ul,ol{padding-left:1.2rem;margin:.3rem 0;display:grid;gap:.35rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code{font:13px var(--mono);background:var(--code);padding:1px 5px;border-radius:4px}
+.lede{font-size:17px;line-height:1.6}
+nav.toc{display:flex;flex-wrap:wrap;gap:.4rem .9rem;font-size:13.5px;border-block:1px solid var(--rule);padding-block:.7rem}
+.verdict{background:var(--accent-soft);border-radius:10px;padding:16px 20px;display:grid;gap:.5rem}
+.verdict p{margin:0}
+.verdict strong{color:var(--accent)}
+.tablewrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin:.4rem 0;width:100%}
+th,td{text-align:left;padding:7px 14px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+td.n{text-align:right;white-space:nowrap}
+tr.ref td{color:var(--muted)}
+tr.best td:first-child{font-weight:600}
+.note{font-size:13px;color:var(--muted)}
+.pill{display:inline-block;font:600 10.5px/1 var(--body);letter-spacing:.07em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.est{color:var(--good)}.pill.one{color:var(--warn)}.pill.syn{color:var(--muted)}.pill.crit{color:var(--bad)}.pill.imp{color:var(--warn)}.pill.nice{color:var(--muted)}
+.qs{display:grid;gap:1rem}
+.q{border-left:3px solid var(--rule);padding-left:14px}
+.q h4{font:600 15px/1.35 var(--body);margin:0 0 .2rem}
+.recs{display:grid;gap:.9rem;counter-reset:rec}
+.rec{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:.3rem}
+.rec h4{font:600 15px/1.35 var(--body);margin:0;display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap}
+.rec h4::before{counter-increment:rec;content:counter(rec);font:500 12px var(--mono);color:var(--accent)}
+.rec p{margin:0;font-size:14px}
+.rec .meta{font:12px var(--mono);color:var(--muted)}
+.tier{font:600 12px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--led);margin:1.4rem 0 .2rem}
+ol.steps{counter-reset:none}
+ol.steps li{padding-left:.2rem}
+.clean{display:grid;gap:.7rem}
+.clean > div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.2rem .8rem;align-items:baseline}
+.clean p{margin:0;font-size:14px}
+.clean b{font-weight:600}
+.park{background:var(--led-soft);border-radius:10px;padding:12px 16px}
+.park h3{color:var(--led);margin-top:0}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:1rem;display:grid;gap:.3rem}
+@media (max-width:520px){.clean > div{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">Review · 2026-10-07 · PLAN rows 1–239 · REPORT §1–§212</p>
+  <h1>What 239 experiments taught us about categorising transactions, and what to do next</h1>
+  <p class="lede">A look back over the whole project: the goal, what is now known, how sure we can be of it, what an outside expert would add, and a short path to a recommendation YNAB could act on. Every number is an aggregate from REPORT.md; no budget data appears here.</p>
+  <nav class="toc" aria-label="Contents">
+    <a href="#verdict">Verdict</a><a href="#goal">The goal</a><a href="#board">Leaderboard</a><a href="#learned">What we learned</a>
+    <a href="#weak">How sure we are</a><a href="#recs">Recommended experiments</a><a href="#next">Next steps</a><a href="#cleanup">Repo cleanup</a>
+  </nav>
+</header>
+
+<section id="verdict" class="verdict" aria-label="Verdict">
+  <p><strong>The science questions are mostly answered.</strong> For personal, purpose-defined categories, the household's own behaviour, found by retrieval, beats merchant facts stored in the weights. The training data matters more than the architecture. First-time payees are where a model earns its keep: YNAB's rule gets none of them right; the best models get about 57%.</p>
+  <p><strong>The weak point is that there is one real user.</strong> Every real-data claim rests on the owner's budget, which has now been read about 80 times and used to design the synthetic data. It has become a development set. Another point of accuracy on it is worth less than the first measurement on anyone else's budget.</p>
+  <p><strong>The encoder race is close to done.</strong> The cheap encoders (fcr, EmbeddingGemma 2) sit 1.5–2 points behind decider-4B, mostly on first-time payees. With a GPU kept running behind an API, serving cost is set mostly by how many GPUs stay on, not by the model; even unbatched, one H100 scores decider-4B at about 25 ms a transaction, roughly 3.5M a day. Speed is not what holds the product back; real-user accuracy and trustworthy auto-filing are.</p>
+</section>
+
+<section id="goal">
+  <h2>The goal, and how well each part is answered</h2>
+  <p>The owner set the research framing on 2026-09-26: understand the mechanics rather than tune a product. Product use weights the metrics. YNAB has over a million users, each with a personal scheme, and one shared model must serve all of them, with no adapter per user. The model should auto-file the very confident transactions and suggest up to three categories otherwise.</p>
+  <div class="qs">
+    <div class="q"><h4>Q1 · How LLMs and encoders work as multiple-choice categorisers <span class="pill est">well answered</span></h4>
+      <p>A single answer slot over labelled options matches scoring each option separately, at about 1/15 of the cost (§76 Single answer slot readout). Random option labels scale to 255 options (§105). The decision forms by layers 12–15 (§74). One temperature fixes over-confidence, but it does not transfer between models or populations (§116 Thresholds under distribution shift).</p>
+      <p>Encoders trained on the same episodes match decider on synthetic data and transfer worse to real data. Override training and v5 households closed most of an 8–12 point gap, leaving about 2 points overall and about 5 on first-time payees (§202, §210).</p></div>
+    <div class="q"><h4>Q2 · The best way to inject knowledge <span class="pill est">answered, and the answer is surprising</span></h4>
+      <p>On synthetic data, database episodes store facts, and at scale part of that generalises (§165, §167). On the real budget, merchant knowledge in the weights does not move first-time payees, even for merchants that were trained (§167 Scaling merchant knowledge). Kind lines from lookups are right only 55–65% of the time and net zero or worse (§168, §194).</p>
+      <p>What moved real numbers was behaviour: similar-payee rows took first-time payees from 37.8 to 51.3 with no retraining (§157), alias rows added more (§158), and other households' filings add 6–7 on first-time payees, though only on synthetic data so far (§169, §198).</p></div>
+    <div class="q"><h4>Q3 · Inferring unseen or meaningless category names <span class="pill syn">answered on synthetic data</span></h4>
+      <p>Rename augmentation makes the model nearly indifferent to names: 89–90 on invented names against 90–92 on real ones (§78, §82). Category synonyms cost 0–2 points (§207). On real data the hard cases are a category's first use (15–18% right), person- or purpose-scoped categories (47–53%) and catch-alls (37–39%). None of these has a test of its own yet.</p></div>
+    <div class="q"><h4>Product goal <span class="pill one">promising, not established</span></h4>
+      <p>On the owner's budget the best systems get 74–75% right first, against 57.9% for YNAB's rule, and about 85% within three suggestions, saving 76–77% of the manual work (§161, §162). Auto-filing could cover about 66% of transactions at 90% precision, 45% at 95% and 10–16% at 98%, but those thresholds were chosen on the same budget.</p></div>
+  </div>
+</section>
+
+<section id="board">
+  <h2>Leaderboard on the owner's budget</h2>
+  <p>Right-first accuracy, as a percentage. The encoders and their decider comparison are read on 19,093 outflows in categories every reader can score. Systems marked † use all 21,238 transactions, where decider reads about 1 point higher.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Reader or system</th><th class="n">All</th><th class="n">First-time payees</th><th class="n">Top-3</th><th>Seeds</th><th>Cost to read</th></tr></thead>
+    <tbody>
+      <tr class="ref"><td>YNAB's rule (2 of the last 3) †</td><td class="n">57.9</td><td class="n">0</td><td class="n">—</td><td>—</td><td>free</td></tr>
+      <tr class="ref"><td>Rule after payee resolution †</td><td class="n">64.0</td><td class="n">22.9</td><td class="n">—</td><td>—</td><td>free</td></tr>
+      <tr class="best"><td>System: payee's last category first, then decider †</td><td class="n">75.2</td><td class="n">—</td><td class="n">85.8</td><td><span class="pill one">1</span></td><td>as decider</td></tr>
+      <tr class="best"><td>System: real-style decider + gate + 35B on first-time payees †</td><td class="n">74.8–74.9</td><td class="n">57.7–58.1</td><td class="n">85.3–85.8</td><td><span class="pill one">1</span></td><td>+ about $800 a month at 1M users</td></tr>
+      <tr class="best"><td>decider-4B, trained on v5 households</td><td class="n">72.5 / 73.4</td><td class="n">56.6 / 57.8</td><td class="n">84.1–84.7</td><td><span class="pill est">2</span></td><td>10–13 ms on an H100, about $11 per million</td></tr>
+      <tr><td>EmbeddingGemma 2 two-tower, L40S, 3,000 steps</td><td class="n">71.3 / 71.3</td><td class="n">54.5 / 54.4</td><td class="n">83.7</td><td><span class="pill est">2</span></td><td>3.9 ms on an H100</td></tr>
+      <tr><td>EmbeddingGemma 2 two-tower, H100, 15 minutes of training</td><td class="n">71.1</td><td class="n">54.9</td><td class="n">83.9</td><td><span class="pill one">1</span></td><td>3.9 ms; top-10 92.5</td></tr>
+      <tr><td>fcr / Gemma blend</td><td class="n">71.2</td><td class="n">53.1</td><td class="n">—</td><td><span class="pill one">1</span></td><td>not pursued</td></tr>
+      <tr><td>fcr: Ettin-32M late interaction with the crowd line</td><td class="n">70.8 / 70.9</td><td class="n">52.1 / 51.8</td><td class="n">81.9</td><td><span class="pill est">2</span></td><td>1.9 ms on an H100, about $2 per million</td></tr>
+      <tr class="ref"><td>Ettin-1B option scorer (§205)</td><td class="n">39.3</td><td class="n">28.2</td><td class="n">—</td><td><span class="pill one">1</span></td><td>109 ms</td></tr>
+    </tbody></table></div>
+  <p class="note">Serving (owner, 2026-10-07): about 1M new transactions a day, small requests with little batching, an always-on GPU behind an API, and re-inference of a user's pending transactions after they file something. §120 measured decider-4B in vLLM at 10.2 ms a transaction batched with a shared prefix and 24–28 ms one request at a time, so one always-on H100 (about $4 an hour on Modal, about $2.9k a month) covers 1M a day with room for re-inference and peaks; fcr reads at 1.9 ms and EmbeddingGemma 2 at 3.9 ms. Row 240's scorecard measures single-request latency and always-on cost directly. Modal billed $1,571 from 2026-09-25 to 2026-10-05. Rows 216–239 still carry estimated cost lines; the exact figures come once Modal bills each day.</p>
+</section>
+
+<section id="learned">
+  <h2>Lessons that generalise</h2>
+  <ol>
+    <li><b>Retrieve behaviour; don't store facts.</b> The payee's own dated rows, alias rows, similar payees and other households' filings moved real and blind numbers. Merchant facts and kind lines did not (§157, §158, §167, §168).</li>
+    <li><b>The latest filing matters more than the majority.</b> On the real budget a payee's latest filing beats its majority 43% of the time, against 18% in v4 households (§196). Override training was worth +7.4 for the encoder (§190), and "last category first" is the best simple policy (§162).</li>
+    <li><b>Synthetic sets reward fitting the generator.</b> REAL-7 hid forgetting (§151). Synthetic rankings did not predict the owner's ranking (§187, §189). v5 was built to rank like the owner (0.83) and then misranked first-time readers in the blend (§212).</li>
+    <li><b>Seed noise on one real budget is 1–2 points</b> (§168). Most single-seed gains from §163–§167 did not survive a second seed.</li>
+    <li><b>Fusion needs errors that differ.</b> An encoder is right where decider is wrong on only 4.3–4.6% of items, and no confidence rule finds them (§180, §187, §212).</li>
+    <li><b>Choosing settings on the test budget inflates them.</b> Fusion's +1.0–1.5 fell to +0.3 once its settings were chosen on synthetic data (§178).</li>
+    <li><b>Real-data hygiene pays.</b> Trim category names: stray spaces cost 7 points (§155). Read label logits in fp32: bf16 ties on 1.7% of items. Offer only the options valid at the time: that fix was worth +2.2 (§189).</li>
+  </ol>
+  <h3>Tried and never helped</h3>
+  <p>Prose knowledge and category descriptions (§158); rationales (§164); JSON, YAML and TypeScript formats (§114); interaction layers (§185); prototypes (§183); Pinterest's encoder fixes (§182); longer, structured queries (§201); cold-start examples (§208); the busy-category correction (§209); more LoRA capacity, which forgets world knowledge (§151); distilling the 35B on synthetic data (§136).</p>
+</section>
+
+<section id="weak">
+  <h2>How sure we can be: what an expert would flag</h2>
+  <ul>
+    <li><b>One real user.</b> There is no variation between users, no held-out-user result (the production metric) and no measure of new users with short histories. The 0.2 gate flipped sign across three blind sets (+4.8, +0.1, −1.3); real users will vary at least as much.</li>
+    <li><b>The test budget has leaked into the design.</b> The string grammar of real-style households is fitted to the owner's strings (§161), v5 and v6 are tuned to the owner's aggregates (§196, §206), and the payee embeddings were fitted over all payee names, future ones included. "Real-style" gains may partly be "owner-style" gains. No sealed real test exists.</li>
+    <li><b>The gold labels lean toward the incumbent.</b> Many categories were probably pre-filled by YNAB's own rule and accepted, which flatters the rule on known payees. Label noise and "both answers acceptable" cases are unmeasured.</li>
+    <li><b>The statistics are thin.</b> The 21k transactions are correlated by month and payee, and no block-bootstrap intervals are reported. Arms are screened on one seed and only winners get a second (winner's curse). The headline systems (74.9, 75.2) are single seeds.</li>
+    <li><b>Comparisons are not quite like for like.</b> Readers use 21,238 or 19,093 items with different option sets. Latency is measured on four GPU types. decider's 10–13 ms assumes many transactions a day; one a day reads at about 45 ms.</li>
+    <li><b>The metrics don't match the product yet.</b> Top-1 is the headline, but the product decision is auto-file coverage at a guaranteed precision, using thresholds fitted on other users. That has never been measured on real data.</li>
+    <li><b>There is no ceiling on real data.</b> Nobody knows how much of the remaining 25% error is knowable from the name and history at all. A strong classical recommender baseline (gradient boosting over recency counts, last category, amount, weekday, crowd prior) was never built.</li>
+    <li><b>Opportunity cost.</b> About 60 rows (§177–§212) optimised a 33M encoder against stand-ins that kept failing to predict the real ranking, while serving cost doesn't make the encoder necessary at this scale.</li>
+  </ul>
+</section>
+
+<section id="recs">
+  <h2>Recommended experiments</h2>
+  <p>These merge the internal review with an outside scan of 2023–2026 work (Intuit's Rel-Cat, Plaid, Ramp, Nubank's nuFormer, Visa, Revolut's PRAGMA, conformal methods). Vendor accuracy figures are the vendors' claims, not benchmarks.</p>
+
+  <p class="tier">Now, on saved scores, with no new data</p>
+  <div class="recs">
+    <div class="rec"><h4>One frozen scorecard with honest intervals</h4>
+      <p>Every reader and policy on the same 21,238 items and options, with month-block bootstrap intervals and thresholds fitted on the first half of the timeline and read on the second. Declare the owner's budget a development set from here on.</p>
+      <p class="meta">About $5–15 · fixes the like-for-like and statistics problems</p></div>
+    <div class="rec"><h4>Auto-filing with a guaranteed error rate</h4>
+      <p>Conformal risk control (Angelopoulos et al., ICLR 2024) picks the auto-file threshold so that the error on auto-filed rows stays at or below α. Conditional conformal (Gibbs, Cherian &amp; Candès) holds that separately for first-time payees. Batch calibration (ICLR 2024) removes per-label bias from decider's option scores at no cost. Report coverage at α = 1%, 2% and 5%, plus variable-size suggestion sets against the fixed top-3.</p>
+      <p class="meta">CPU only · turns "auto-file the very confident" into a number the product can promise</p></div>
+    <div class="rec"><h4>A strong classical baseline and a learned stacker</h4>
+      <p>A gradient-boosted ranker over the rule, the payee's last category, recency-weighted counts, amount, weekday, crowd counts and each model's probabilities. Add Rel-Cat's cascade, where the nearest neighbour answers when similarity is high and the LLM sees only the ambiguous rows. This shows whether the LLM is needed for known payees at all.</p>
+      <p class="meta">Under $5 · never tried</p></div>
+    <div class="rec"><h4>An error audit by the owner, giving a real ceiling</h4>
+      <p>Sample 300 misses (first-time payees, and known payees filed differently). The owner labels each one: knowable from name or history, needs item-level data, depends on purpose or person, label noise, or an acceptable alternative. Also split the scorecard by whether the gold category has been used before (Rel-Cat: 78.6% on used categories against 20.8% on unused ones).</p>
+      <p class="meta">$0 compute, 2–3 owner hours · says where the remaining points can come from</p></div>
+  </div>
+
+  <p class="tier">Once more real users exist</p>
+  <div class="recs">
+    <div class="rec"><h4>A real multi-user test set, sealed</h4>
+      <p>20–100 consenting budgets (YNAB staff, beta users, or an anonymised production sample through the REAL_DATA_SPEC pipeline), split by user, with test users sealed and the read pre-registered the way blind_v3 was. Rehearse on synthetic users through the exact pipeline first. A cheap stopgap: MoneyData (Mendeley) holds about 6,500 real, categorised transactions from one person over seven years. Its licence must be confirmed first; with it, the work would have a second real user next week.</p>
+      <p class="meta">Data and legal work; under $100 compute · the most valuable item on this list</p></div>
+    <div class="rec"><h4>A real crowd line</h4>
+      <p>Aggregate production filings into a bank string → category-name histogram, k-anonymous (at least 10 households) and with no rows, then read the existing crowd-trained models on held-out users. It is worth +6–7 on first-time payees on synthetic data, the largest untested lever.</p>
+      <p class="meta">An aggregation job plus $10–30 of reads</p></div>
+    <div class="rec"><h4>Train on real filings</h4>
+      <p>The decider-4B recipe trained on real training users against synthetic-only, read on the sealed users, two seeds. Real data may also change the capacity answer and make knowledge episodes pay. Add hard negatives from crowd disagreement: the same payee filed under semantically different names, as in Plaid's transaction model.</p>
+      <p class="meta">About $40–80</p></div>
+    <div class="rec"><h4>Learning from corrections within a session</h4>
+      <p>Replay the timeline with a simulated user who accepts a right first suggestion and corrects a wrong one. Measure how soon a correction or a new category changes later predictions. Compare decider's in-context updating with a frozen encoder plus a tiny per-user head refit after each approval (Intuit's personalisation patents). The recommender framing promised this property; it has never been measured.</p>
+      <p class="meta">CPU plus existing reads</p></div>
+  </div>
+
+  <p class="tier">Speculative, after the above</p>
+  <div class="recs">
+    <div class="rec"><h4>Per-user category descriptions as label text</h4>
+      <p>Write a one-line meaning per category from the user's own history ("Kids: school fees, back-to-school shopping") for decider and for the label tower (BYOC, 2023). Prose descriptions failed in §158, but those were generic, not drawn from the user's own filings.</p><p class="meta">About $10</p></div>
+    <div class="rec"><h4>A masked-category sequence model</h4>
+      <p>Hide the category of one filing and predict it from every row's payee, amount and date plus the visible categories: the transaction-foundation-model idea (nuFormer, TREASURE, PRAGMA) adapted to personal labels. It is only sensible with real multi-user sequences.</p><p class="meta">$20–50</p></div>
+    <div class="rec"><h4>Payee resolution as a product component</h4>
+      <p>Payee resolution alone takes YNAB's rule from 57.9 to 64.0 (§158). Link payees to Overture places by retrieving candidates and having a small model pick one or NONE (Match, Compare or Select, COLING 2025), shuffling candidate order to measure position bias. This is shippable without any categoriser.</p><p class="meta">$0–5</p></div>
+  </div>
+
+  <div class="park" style="margin-top:1.2rem">
+    <h3>Park or stop</h3>
+    <p>v7 or later generators tuned to the owner; further encoder architecture tweaks (§182–§203 all null); the Clef fine-tune; the game task (row 215); EVoC and semantic IDs (row 197); and the REAL-6-era rows 43, 44, 46, 51, 54 and 55.</p>
+  </div>
+</section>
+
+<section id="next">
+  <h2>Next steps, in order</h2>
+  <ol class="steps">
+    <li><b>Row 240: cleanup and a frozen scorecard.</b> Do the critical cleanup below, then build the one scorecard with intervals, rewrite PLAN's current state and §1 Executive summary (it stops at §154), and close obsolete rows.</li>
+    <li><b>Row 241: auto-filing and the classical baseline.</b> Conformal thresholds, batch calibration and the stacker, all on saved scores.</li>
+    <li><b>Row 242: the error audit and real ceiling,</b> with the owner's help.</li>
+    <li><b>Row 243: a dress rehearsal of the real-data pipeline,</b> on synthetic users, plus the MoneyData check if its licence allows.</li>
+    <li><b>Row 244: ingest consenting budgets,</b> sealing the test users and pre-registering the read.</li>
+    <li><b>Row 245: the first held-out-user read</b> of the frozen candidates, with no tuning: decider v5 system, fcr, Gemma, the stacker and the policies.</li>
+    <li><b>Row 246: a real crowd line and auto-filing on real users.</b></li>
+    <li><b>Row 247: train on real training users,</b> two seeds, read on the sealed users.</li>
+    <li><b>Row 248: a recommendation memo.</b> The likely shape is the rule or last category for known payees, decider-4B with similar-payee, alias and crowd rows for the rest, and calibrated auto-filing, all with intervals across users and a stated cost of a wrong auto-file.</li>
+  </ol>
+  <p class="note">Steps 4–7 need a decision from the owner about real data: whose budgets, what consent, and where they can live. Steps 1–3 need nothing new and can start now.</p>
+</section>
+
+<section id="cleanup">
+  <h2>Repo cleanup</h2>
+  <p>From a read-only audit on 2026-10-07. Nothing was changed. The repo's rules hold throughout: no branch deletion, merge forward only, every model kept in DVC.</p>
+  <div class="clean">
+    <div><span class="pill crit">critical</span><p><b>37 commits exist only on this disk.</b> <code>plan-233-v6</code> (rows 232–239, §205–§212) has never been pushed and has no PR. Push it with a plain push and open one PR for the batch on top of #114.</p></div>
+    <div><span class="pill crit">critical</span><p><b>18 trained encoders (about 7.6 GB) are not in DVC.</b> They exist only in <code>modal_out/</code> and on the Modal volume: the r222 research encoders, and the r219 and r229 benchmark encoders. <code>just push-models</code> only covers <code>models/adapters</code>. Copy them into <code>models/encoders/</code>, then dvc add and push them, and extend <code>push-models</code> and <code>drop-all</code> to cover encoders.</p></div>
+    <div><span class="pill crit">decide</span><p><b>The budget's ID is in 14 tracked files</b> (PLAN.md and 13 chain scripts). It is an identifier, not budget data, and useless without the token, but it is now in pushed history that the no-force-push rule keeps there. The owner should decide whether that is acceptable. New chains should read it from the environment. No token, payee name or budget row was found in git, logs or Modal.</p></div>
+    <div><span class="pill imp">important</span><p><b>Stack #24 is full.</b> GitHub allows 100 PRs, and #5–#107 fill it. #108–#114 are chained by base branch with no stack, and <code>main</code> is 935 commits behind. A path for the owner: merge the stack bottom-up with <code>gh stack merge 107 --yes --merge</code> (or a lower cut first), start a new stack on main from #108 up, then update CLAUDE.md, PLAN.md and the one-branch-per-row memory.</p></div>
+    <div><span class="pill imp">important</span><p><b>PLAN.md is 287 KB and contradicts itself.</b> Its current-state section holds six dated blocks with four different "best" models, the log stops at row 223, row 211 shows todo though it is done (§185), and row 43 has been "doing" since September. Write one short current-state block and backfill the log for rows 224–239. Move done rows and the log to an archive, which CLAUDE.md would need to allow. Close rows 43, 44, 46, 51, 54, 55, 160, 162, 169, 174 and 211 with a line each, and decide on 170, 205 and 206.</p></div>
+    <div><span class="pill imp">important</span><p><b>Costs owed.</b> 24 REPORT sections (§181–§212) carry estimates, and <code>reports/modal_costs.md</code> was last built on 10-05. Run <code>scripts/modal_costs.py</code> tomorrow, once 10-07 is billed, and replace the estimates.</p></div>
+    <div><span class="pill imp">important</span><p><b>About 50 finished tracker rows were never ingested</b> (tags r71*, r76*, r80-kev-E-lr1e4, r208v-g4-s0). Re-run <code>ingest_modal.py</code> on them; it only adds rows.</p></div>
+    <div><span class="pill imp">important</span><p><b>Disk: <code>modal_out/</code> is 275 GB,</b> 235 GB of it adapter copies that are already in DVC and on the remote. It is safe to drop once the encoders are in DVC and the missing tracker rows are ingested, along with <code>models/smoke</code> (12 GB). Keep the household and history caches in <code>data/interim</code>.</p></div>
+    <div><span class="pill imp">important</span><p><b>Two latent bugs.</b> <code>src/ai_experiments/icl_suite.py:184</code> uses <code>sys</code> without importing it. <code>scripts/bench_vllm.py:41</code> has an undefined name.</p></div>
+    <div><span class="pill nice">nice to have</span><p><b>Stale docs and memory.</b></p><ul><li>README.md and models/README.md predate Modal, the encoders and the real-data work.</li><li>NOTES.md lacks the L40S, FlashAttention and EmbeddingGemma findings.</li><li>CLAUDE.md names 6 of 31 library modules and says "34 papers" (there are 58).</li><li>QUESTIONS.md has no status lines for rows 187–239.</li><li>Three memory files describe the old stack, the old best model and the old worktrees.</li></ul></div>
+    <div><span class="pill nice">nice to have</span><p><b>Code.</b> scripts/ holds 258 Python files, 104 of them per-row table generators, and 100 scripts edit <code>sys.path</code> to import each other. <code>hist_encoder*</code>, <code>two_tower</code> and <code>li_decider</code> act as a library and belong in <code>src/ai_experiments</code>. Ruff finds 66 issues, 50 of them unused imports. There are no tests, so a few around scoring and item building would protect the frozen sets.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>Companion pages: <a href="https://claude.ai/artifact/PEM94RiX3qFuJrWmszdVwZ">Plan history</a> (every row, 1–239) · <a href="https://claude.ai/artifact/RyUSuzCphQAuAJp4jYMAdn">Late-interaction categoriser</a> (rows 210–239) · <a href="https://claude.ai/artifact/TqyxSWUCuD5eDZtPmE4Mft">Encoder scoreboard</a> (as of 2026-10-06).</p>
+  <p>Sources: PLAN.md, REPORT.md §1–§212, QUESTIONS.md, SURVEY.md, the workflow review of 2026-10-05, modal_costs.md, a read-only repo audit and a scan of outside literature. Owner's-budget figures are aggregates only.</p>
+</footer>
+</div>
