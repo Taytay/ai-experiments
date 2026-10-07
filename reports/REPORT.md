@@ -222,6 +222,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §207 Payee and category synonyms on the rational households (row 234)
 - §208 Cold-start training examples (row 235)
 - §209 The busy-category correction (row 237)
+- §210 EmbeddingGemma 2 as the encoder (row 236)
 
 <!-- END SECTION INDEX -->
 
@@ -12351,3 +12352,52 @@ FREQ_TAU`: on a first-time payee string, each category's score less tau * log(1 
   the household's category. Row 236 tries a base with more of it.
 
 **Cost:** $0 (local RTX 3090, about 25 minutes).
+
+## 210. EmbeddingGemma 2 as the encoder: two towers (one vector each, cosine) on fcr's recipe read the owner's budget at 71.3 on two seeds (fcr 70.8 / 70.9), first-time payees 54.5 / 54.4 (52.1 / 51.8), and lead decider at top-5 and top-10 (87.7-87.8 / 92.4-92.5 against 87.0-87.8 / 90.3-90.6); on synthetic data it ties fcr
+
+PLAN step 236 (owner, 2026-10-07: "Should we just be running an embedding model at this point like the new Gemma? ... Either cosine
+similarity or two towers approach"). google/embeddinggemma-2 (Apache-2.0, released 2026-10-06; built from Gemma 4; its 271M text tower
+used, 768-d mean-pooled vectors, query / document prompts; transformers 5.19, sentence-transformers 6.1 and torch 2.13 as a uv overlay).
+(a) Untrained, cosine of a first purchase's bank string to the household's category names (`scripts/name_probe.py`, no history). (b) fcr's
+recipe (§198: v5 households, override, crowd line; 3,000 steps, MAXLEN 1,024, LR 3e-5, the shared prep of row 235) with it as the base:
+two towers (`HYBRID=2`: the pooled vectors' cosine alone, no hidden-row loss) and multi-vector (MaxSim, as fcr). L40S, 1.3 s a step.
+
+**Table 210.1: untrained, % right first on the rational households' first purchases (category names only, no history)**
+
+| encoder | real held-out names | invented obvious | seen in training, obvious |
+|---|---|---|---|
+| EmbeddingGemma 2 | 42.6 | **74.0** | **60.8** |
+| Ettin-400M knowledge stage (§199) | 43.2 | 56.9 | 50.3 |
+| bge-small | 36.2 | 58.5 | 50.6 |
+| fcr's base (Ettin-32M knowledge stage) | 20.5 | 31.1 | 25.2 |
+| raw Ettin-32M | 13.9 | 15.9 | 14.8 |
+
+The knowledge-stage models were trained for MaxSim over token vectors; a pooled cosine understates them.
+
+**Table 210.2: trained; owner's budget (19,093 items) top-1 / 3 / 5 / 10, and synthetic sets (v5, blind_v2 sampled)**
+
+| model | owner | owner first-time | v5 | blind_v2 | rational new: real / obvious / seen-obvious |
+|---|---|---|---|---|---|
+| decider-4B v5 (2 seeds) | 72.5 / 84.1 / 87.0 / 90.3; 73.4 / 84.7 / 87.8 / 90.6 | 56.6 / 71.7; 57.8 / 72.6 | | | 70.7 / 93.6 / 93.9 |
+| fcr | 70.8 / 81.9 / 85.7 / 90.4 | 52.1 / 66.3 | 75.8 | 81.9 | 58.8 / 80.7 / 79.5 |
+| **EmbeddingGemma 2, two towers, seed 0** | 71.3 / 83.7 / 87.7 / 92.4 | 54.5 / 70.6 | 75.3 | 81.9 | 58.2 / 80.2 / 80.0 |
+| **EmbeddingGemma 2, two towers, seed 1** | 71.3 / 84.1 / 87.8 / 92.5 | 54.4 / 71.4 | 75.3 | | |
+| EmbeddingGemma 2, multi-vector | 70.5 / 83.6 / 87.4 / 91.8 | 54.3 / 70.5 | 73.5 | 80.8 | 54.6 / 76.4 / - |
+
+Read time: 16 ms a transaction on an L40S (query tokens median 475), 25 ms on the RTX 3090; fcr 2-3 ms; decider 10-13 ms on an H100.
+
+### 210.1 What the step says
+
+- **A base with a language model's knowledge helps the owner's first-time payees**: +2.4 at top-1 and +4-5 at top-3 on two seeds that
+  agree to 0.1, the gap to decider there down from 5 points to 2.7; overall top-1 +0.5, and the right category is in the top 5 / 10
+  more often than decider's (87.8 / 92.5 against 87.0-87.8 / 90.3-90.6).
+- **Synthetic data does not show it** (v5, blind_v2 and the rational households tie fcr): the gain is knowledge of real merchants and
+  real category names, which our generated sets do not reward. The owner's budget stays the judge.
+- **Two towers beat multi-vector** with this base (owner 71.3 against 70.5, synthetic sets 1-4 points): its pretraining is for one
+  pooled vector, and the simpler design keeps it.
+- Fine-tuning keeps less than the untrained probe suggests: untrained it reads obvious names at 74% from the name alone; trained, with
+  history, 80%, as fcr. Untested: a lower learning rate or a frozen lower half, to overwrite less of the base.
+- It is 6-8x slower to read than fcr; category vectors cache, so the cost is the query (the 271M model over ~475 tokens).
+
+**Cost:** three L40S jobs (two arms of 108 minutes, the second seed of about 80): roughly $10; exact figures from `scripts/modal_costs.py --rows 236`
+once Modal bills the day. Probes and owner reads local ($0).
