@@ -221,6 +221,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §206 v6 households (row 233)
 - §207 Payee and category synonyms on the rational households (row 234)
 - §208 Cold-start training examples (row 235)
+- §209 The busy-category correction (row 237)
 
 <!-- END SECTION INDEX -->
 
@@ -12321,3 +12322,32 @@ instead of 14-17; whole jobs 19 minutes instead of 40). Synthetic sets sampled (
 
 **Cost:** one prep job of 7 minutes and three arms of 19 minutes on L40S: roughly $3; exact figures from `scripts/modal_costs.py --rows 235`
 once Modal bills the day. Owner reads local ($0).
+
+## 209. The busy-category correction: discounting each category by how often it has been used helps the rational households' first purchases by at most 2 points and costs the owner's first-time payees 2 to 50 points; the busy-category pull on the owner's budget is mostly right
+
+PLAN step 237 (owner, 2026-10-07: "I do want to try to fix the frequency thing"). §207's checks: on the rational households' first purchases fcr
+picks the household's most-used category so far 45.8% of the time, where it is right 33.5% of the time, and 40% of its misses go there;
+its realistic kind line reaches a first purchase with the right kind 37% of the time (57% coverage, 65% right when shown); told the right
+kind on every payee (`KIND_ORACLE=1`) fcrk is right first on 77.0 / 86.5 / 85.2% (real / obvious / seen-and-obvious names). `li_decider.py
+FREQ_TAU`: on a first-time payee string, each category's score less tau * log(1 + its filings so far); fcr, whole budgets
+(`scripts/chains/r237_freq.sh`).
+
+**Table 209.1: % right first; rational: first purchases at a merchant / repeats (first-time strings include repeats under a fresh string)**
+
+| tau | rational real | rational obvious | rational seen-and-obvious | owner all / first-time | owner first-time top-3 |
+|---|---|---|---|---|---|
+| 0 (fcr) | 58.8 / 97.3 | 80.7 / 97.4 | 79.5 / 98.4 | 70.8 / 52.1 | 66.3 |
+| 0.25 | 59.3 / 97.5 | 81.3 / 97.5 | 80.4 / 98.5 | 70.3 / 50.4 | 63.4 |
+| 0.5 | 59.4 / 97.7 | 81.8 / 97.5 | 80.9 / 98.6 | 68.3 / 43.7 | 56.2 |
+| 1 | 57.5 / 97.2 | 82.8 / 97.4 | 82.1 / 98.5 | 59.4 / 14.7 | 26.1 |
+| 2 | 39.1 / 79.1 | 64.3 / 81.8 | 65.2 / 83.1 | 55.7 / 2.3 | 4.4 |
+
+### 209.1 What the step says
+
+- **On a real budget the busy categories are where new payees go.** The owner's first-time payees fall from 52 to 44 at tau 0.5 and to 15
+  at 1: fcr's pull toward the busy categories is learned from budgets like the owner's and is mostly right there. The rational
+  households, where ten categories share purchases by fixed kinds, overstate the problem.
+- What is left for first purchases is knowledge (§207, §208): knowing that a name is a utility or a cinema, and mapping that kind to
+  the household's category. Row 236 tries a base with more of it.
+
+**Cost:** $0 (local RTX 3090, about 25 minutes).
