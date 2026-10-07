@@ -220,6 +220,7 @@ Sections are cited as §N plus their short title, e.g. "§179 Pinterest research
 - §205 The Ettin-1B option scorer on the owner's budget (row 232)
 - §206 v6 households (row 233)
 - §207 Payee and category synonyms on the rational households (row 234)
+- §208 Cold-start training examples (row 235)
 
 <!-- END SECTION INDEX -->
 
@@ -12288,3 +12289,35 @@ versions frozen in `data/processed/rational_variants_v1.json`, DVC). % right fir
 
 **Cost:** fcr / v6b / v6p reads $0 (local RTX 3090, 23 minutes); decider six H100 jobs of 8-9 minutes plus a stopped launch (split
 layout, 2 items/s): roughly $3-4; exact figures from `scripts/modal_costs.py --rows 234` once Modal bills the day.
+
+## 208. Cold-start training examples do not teach fcr new payees: queries without history rows (15-30% of training), half of them with category names alone, leave first purchases unchanged on every set (rational 58.3-58.7 vs 58.8, obvious names 79.7-80.0 vs 80.7, owner's first-time payees 51.2-51.9 vs 52.1)
+
+PLAN step 235 (owner, 2026-10-06: "Let's try to inject knowledge in fcr to have it get better at new payees. Perhaps we show it examples
+where there is no history?"). `li_decider.py COLD`: a share of training queries keeps the transaction line alone (no history rows; the
+crowd line, part of the transaction line, stays); `COLDDOC`: of those, every category document is the category's name alone ("nothing
+filed yet", as a brand-new budget). fcr's recipe otherwise, one seed each, from one shared prep job (`li_decider.py prep`: 200 training
+and 20 held-out households with their neighbour lists in 7.2 minutes; the arms loaded it with DATA_FROM and spent 2.6 minutes preparing
+instead of 14-17; whole jobs 19 minutes instead of 40). Synthetic sets sampled (READ_EVERY=5; fcr read on the same sample locally).
+
+**Table 208.1: % right first (owner's budget: 19,093 items, decider v5 72.5 / 73.4, first-time 56.6 / 57.8)**
+
+| model | v5 all / first-time / trips | blind_v2 all / trips | rational new (real names) | rational new (obvious names) | owner | owner first-time | owner top-3 |
+|---|---|---|---|---|---|---|---|
+| fcr | 75.8 / 67.1 / 46.2 | 81.9 / 62.9 | 58.8 | 80.7 | 70.8 | 52.1 | 81.9 |
+| c15 (COLD 0.15) | 75.5 / 67.1 / 39.0 | 81.3 / 68.3 | 58.7 | 79.7 | 70.5 | 51.2 | 81.4 |
+| c15d (+ COLDDOC 0.5) | 75.5 / 67.1 / 32.0 | 81.8 / 62.3 | 58.3 | 80.0 | 70.3 | 51.6 | 81.8 |
+| c30d (COLD 0.3, COLDDOC 0.5) | 75.7 / 67.2 / 38.5 | 81.6 / 68.3 | 58.5 | 79.7 | 70.9 | 51.9 | 81.7 |
+
+### 208.1 What the step says
+
+- **The training format was not what held new payees back.** Forcing the model to match a bare payee name to the category documents,
+  or to the category's name alone, changes nothing on first purchases anywhere; what it would need is knowledge of what the name is,
+  which the 32M encoder has only from its knowledge stage (§191: kinds go in but mostly do not come out) and its pretraining. §207's
+  rational households show the same: decider reads obvious names 93.6% right on a first purchase, fcr 81% with or without cold examples.
+- Cold examples cost trips on v5 (no recent rows to show the trip) and nothing elsewhere.
+- What remains for new payees: a larger base (§199: Ettin-400M +9-10 on synthetic new merchants, tied on the owner), decider for
+  first-time payees (on the owner's budget, decider for first-time payees and fcr for the rest would read 72.4 against decider alone's
+  73.0, with decider on 31% of transactions), or real data.
+
+**Cost:** one prep job of 7 minutes and three arms of 19 minutes on L40S: roughly $3; exact figures from `scripts/modal_costs.py --rows 235`
+once Modal bills the day. Owner reads local ($0).

@@ -1030,3 +1030,9 @@
 {"utc": "2026-10-06T23:58:44+00:00", "app_id": "ap-JRH8Q6ec0rPMqOUmRpVYJp", "kind": "job_done", "tag": "r234-dec-obvsyn", "minutes": 9.0}
 {"utc": "2026-10-06T23:58:44+00:00", "app_id": "ap-JRH8Q6ec0rPMqOUmRpVYJp", "kind": "job_done", "tag": "r234-dec-seen", "minutes": 8.1}
 {"utc": "2026-10-06T23:58:53+00:00", "app_id": "ap-JRH8Q6ec0rPMqOUmRpVYJp", "kind": "job_done", "tag": "r234-dec-seensyn", "minutes": 8.9}
+{"utc": "2026-10-07T01:20:38+00:00", "app_id": "ap-LTgQjh2oJvWUj5xSQr1TGf", "kind": "jobs", "what": "r235_prep", "rows": "235", "gpu": "H100", "tags": ["r235-prep"], "job_gpus": {"r235-prep": "L40S"}}
+{"utc": "2026-10-07T01:28:22+00:00", "app_id": "ap-LTgQjh2oJvWUj5xSQr1TGf", "kind": "job_done", "tag": "r235-prep", "minutes": 7.2}
+{"utc": "2026-10-07T01:29:04+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "jobs", "what": "r235", "rows": "235", "gpu": "H100", "tags": ["r235-c15", "r235-c15d", "r235-c30d"], "job_gpus": {"r235-c15": "L40S", "r235-c15d": "L40S", "r235-c30d": "L40S"}}
+{"utc": "2026-10-07T01:50:05+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c15", "minutes": 18.4}
+{"utc": "2026-10-07T01:50:25+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c15d", "minutes": 18.8}
+{"utc": "2026-10-07T01:50:43+00:00", "app_id": "ap-uX7ApWQeFASwrSJ5SOg3XM", "kind": "job_done", "tag": "r235-c30d", "minutes": 19.1}
